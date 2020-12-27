@@ -1,0 +1,13 @@
+*.pdf
+*.o
+*.a
+*.ali
+*.stderr
+*.stdout
+*.cswi
+*.bexch
+*.xml
+*.db
+*.db*
+*.cgpr
+.DS_Store
