@@ -20,19 +20,19 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Builder is
 
---     type Node;
---     type Tree is access Node;
---     type Node is record
---        The_Item : INTEGER;
---        Left_Subtree : Tree;
---        Right_Subtree: Tree;
---     end record;
+   --     type Node;
+   --     type Tree is access Node;
+   --     type Node is record
+   --        The_Item : INTEGER;
+   --        Left_Subtree : Tree;
+   --        Right_Subtree: Tree;
+   --     end record;
 
    --  -----------------------------------------------------------------------
---  A Leaf node classifies data.
---  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
---  for each class, the number of times that the class appears in the rows
---  from the training data that reach this leaf.
+   --  A Leaf node classifies data.
+   --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
+   --  for each class, the number of times that the class appears in the rows
+   --  from the training data that reach this leaf.
    function Build_Tree (Rows : Support.Rows_Vector) return Tree_Type is
       use Support;
       use Tree_Package;
@@ -41,10 +41,7 @@ package body Builder is
       Best_Split   : Best_Split_Data;
       True_Branch  : Decision_Node_Type;
       False_Branch : Decision_Node_Type;
---        Last_True_Curs  : Tree_Cursor := Curs;
---        Last_False_Curs : Tree_Cursor := Curs;
-      aLeaf        : Support.Count_Package.Map;
---        Decision     : Decision_Node_Type;
+      aLeaf        : Decision_Node_Type (Prediction_Kind);
 
       procedure Recurse (Rows : Support.Rows_Vector;
                          Curs : in out Tree_Cursor) is
@@ -53,18 +50,14 @@ package body Builder is
          False_Curs   : Tree_Cursor;
       begin
          Put_Line ("Recursing, Rows length: " &
-                  Integer'Image (Integer (Rows.Length)));
+                     Integer'Image (Integer (Rows.Length)));
          Best_Split := Find_Best_Split (Rows);
          if Best_Split.Best_Gain = 0.0 then
             Put_Line ("Best_Gain = 0.0");
---              True_Branch.Question := Best_Split.Best_Question;
-            True_Branch.True_Rows := Rows;
-            aLeaf := Class_Counts (Rows);
-            True_Branch.Predictions := aLeaf;
---              Curs := Next_Sibling (Curs);
+            aLeaf.Predictions := Class_Counts (Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
-                                  New_Item => True_Branch);
+                                  New_Item => aLeaf);
          else
             P_Rows := Partition (Rows, Best_Split.Best_Question);
             True_Branch.Question := Best_Split.Best_Question;
@@ -72,6 +65,8 @@ package body Builder is
             True_Branch.True_Rows := P_Rows.True_Rows;
             False_Branch.False_Rows := P_Rows.False_Rows;
             Put_Line ("Insert True_Branch");
+            Print_Rows ("True_Branch.True_Rows", True_Branch.True_Rows);
+            Print_Rows ("False_Branch.False_Rows", False_Branch.False_Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => True_Branch,
@@ -87,6 +82,7 @@ package body Builder is
             Recurse (P_Rows.False_Rows, False_Curs);
             Put_Line ("Recurse loop");
          end if;
+         New_Line;
       end Recurse;
 
    begin
@@ -94,8 +90,8 @@ package body Builder is
       Put_Line ("Build Tree");
       Recurse (Rows, Root_Curs);
       Put_Line ("Tree built");
---        return (Best_Split.Best_Question, True_Branch, False_Branch);
---       return (Best_Split.Best_Question, True_Branch.True_Rows, False_Branch.False_Rows, aLeaf);
+      --        return (Best_Split.Best_Question, True_Branch, False_Branch);
+      --       return (Best_Split.Best_Question, True_Branch.True_Rows, False_Branch.False_Rows, aLeaf);
       return theTree;
    end Build_Tree;
 
@@ -127,25 +123,25 @@ package body Builder is
 
    --  -----------------------------------------------------------------------
    --   Find_Best_Split finds the best question to ask by iterating over every
-   --     feature / value and calculating the information gain.
+   --   feature / value and calculating the information gain.
    function Find_Best_Split (Rows : Support.Rows_Vector)
                              return Best_Split_Data is
       use Ada.Containers;
       use Support;
 
       Rows_Length         : constant Integer := Integer (Rows.Length);
---        Row_Vector          : constant Rows_Vector := To_Vector (Rows);
+      --        Row_Vector          : constant Rows_Vector := To_Vector (Rows);
       Colour_Values       : array (1 .. Rows_Length) of Colour_Type;
       Dimension_Values    : array (1 .. Rows_Length) of Integer;
       Colour_Question     : Question_Type;
       Dimension_Question  : Question_Type (Diameter_Feature);
       Split_Row           : Partitioned_Rows;
-      Gain                : Float := 0.0;
       Best_Gain           : Float := 0.0;
       Best_Question       : Question_Type;
       Current_Uncertainty : constant Float := Gini (Rows);
 
       procedure Test_Gain is
+         Gain             : Float := 0.0;
       begin
          if Split_Row.True_Rows.Length /= 0 and
            Split_Row.False_Rows.Length /= 0 then
@@ -165,12 +161,15 @@ package body Builder is
       end loop;
 
       for col in 1 .. Colour_Values'Length loop
+         Put_Line ("Find_Best_Split col: " & Integer'Image (col));
          Colour_Question.Colour_Value := Colour_Values (col);
          Dimension_Question.Diameter_Value := Dimension_Values (col);
          Split_Row := Partition (Rows, Colour_Question);
          Test_Gain;
+         Put_Line ("Find_Best_Split Best Gain: " & Float'Image (Best_Gain));
          Split_Row := Partition (Rows, Dimension_Question);
          Test_Gain;
+         Put_Line ("Find_Best_Split Best Gain: " & Float'Image (Best_Gain));
       end loop;
 
       return (Best_Gain, Best_Question);
@@ -227,7 +226,7 @@ package body Builder is
    procedure Print_Tree1 (Node : Decision_Node_Type) is
       use Support;
       Question   : constant Support.Question_Type := Node.Question;
---        Counts     : constant Support.Count_Package.Map := Node.Counts;
+      --        Counts     : constant Support.Count_Package.Map := Node.Counts;
    begin
       New_Line;
       Put_Line ("Tree:");
@@ -235,7 +234,7 @@ package body Builder is
       case Question.Feature is
          when Colour_Feature =>
             New_Line;
---              Put_Line (Colour_Type'Image (Question.Colour_Value));
+            --              Put_Line (Colour_Type'Image (Question.Colour_Value));
          when Diameter_Feature =>
             Put_Line (Integer'Image (Question.Diameter_Value));
       end case;
@@ -250,25 +249,30 @@ package body Builder is
    procedure Print_Tree (aTree : Tree_Type) is
       use Support;
       use Tree_Package;
-      Level : Integer := 0;
-      Left_Level : Integer := 0;
+      Level       : Integer := 0;
+      Left_Level  : Integer := 0;
       Right_Level : Integer := 0;
       --        Counts     : constant Support.Count_Package.Map := Node.Counts;
       procedure Recurse (Curs : Tree_Cursor) is
-         Node     : constant Decision_Node_Type := Element (Curs);
-         Question : constant Support.Question_Type := Node.Question;
-         True_Rows : Rows_Vector := Node.True_Rows;
-         False_Rows : Rows_Vector := Node.False_Rows;
---           Left     : Decision_Node_Type := Element (Curs);
+         Node       : constant Decision_Node_Type := Element (Curs);
+         Question   : Support.Question_Type;
       begin
          Level := Level + 1;
          Put_Line ("Level:" & Integer'Image (Level));
-         Put (Feature_Type'Image (Question.Feature) & "  ");
-         case Question.Feature is
-         when Colour_Feature =>
-            Put_Line (Colour_Type'Image (Question.Colour_Value));
-         when Diameter_Feature =>
-            Put_Line (Integer'Image (Question.Diameter_Value));
+         case Node.Node_Type is
+            when Decision_Kind =>
+               Question := Node.Question;
+               Put (Feature_Type'Image (Question.Feature) & "  ");
+               case Node.Question.Feature is
+               when Colour_Feature =>
+                  Put_Line (Colour_Type'Image (Question.Colour_Value));
+               when Diameter_Feature =>
+                  Put_Line (Integer'Image (Question.Diameter_Value));
+               end case;
+               Print_Rows ("True_Rows", Node.True_Rows);
+               Print_Rows ("False_Rows", Node.False_Rows);
+            when Prediction_Kind =>
+               null;
          end case;
 
          if First_Child (Curs) /= Tree_Package.No_Element then

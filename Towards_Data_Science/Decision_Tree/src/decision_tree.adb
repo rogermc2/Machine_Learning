@@ -87,4 +87,6 @@ begin
    aTree := Builder.Build_Tree (To_Vector (Training_Data));
    Builder.Print_Tree (aTree);
 
+--     Classify (aTree);
+
 end Decision_Tree;
