@@ -106,17 +106,18 @@ package body Builder is
       Result       : Support.Count_Package.Map;
    begin
       for row in 1 .. Rows_Length loop
-         if row = Rows.Last_Index then
+         case node.Node_Type is
+            when Prediction_Kind =>
             --  Leaf
             Result := Node.Predictions;
-         else
+         when Decision_Kind =>
             aRow := Rows.Element (row);
             if Match (Node.Question, aRow) then
                Result := Classify (Rows, First_Child (Node_Cursor));
             else
                Result := Classify (Rows, Last_Child (Node_Cursor));
             end if;
-         end if;
+         end case;
       end loop;
       return Result;
    end Classify;
