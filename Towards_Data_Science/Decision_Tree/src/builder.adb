@@ -20,14 +20,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Builder is
 
-   --     type Node;
-   --     type Tree is access Node;
-   --     type Node is record
-   --        The_Item : INTEGER;
-   --        Left_Subtree : Tree;
-   --        Right_Subtree: Tree;
-   --     end record;
-
    --  -----------------------------------------------------------------------
    --  A Leaf node classifies data.
    --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
@@ -100,22 +92,26 @@ package body Builder is
    function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
                       return Support.Count_Package.Map is
       use Tree_Package;
-      Root_Cursor   : constant Tree_Cursor := aTree.Root;
-      True_Cursor   : constant Tree_Cursor := First_Child (Root_Cursor);
-      False_Cursor  : constant Tree_Cursor := Last_Child (Root_Cursor);
-      Node          : constant Decision_Node_Type := Element (Root_Cursor);
+--        Root_Cursor   : constant Tree_Cursor := aTree.Root;
+      --  The node at the root has no element so hence the call of First_Child.
+      First_Cursor  : constant Tree_Package.Cursor := First_Child (Root (aTree));
+      True_Cursor   : constant Tree_Package.Cursor := First_Child (First_Cursor);
+      False_Cursor  : constant Tree_Package.Cursor := Last_Child (First_Cursor);
+      First_Node    : constant Decision_Node_Type := Element (First_Cursor);
       True_Subtree  : Tree_Type;
       False_Subtree : Tree_Type;
       Result        : Support.Count_Package.Map;
    begin
-      True_Subtree.Copy_Subtree (Root_Cursor, No_Element, True_Cursor);
-      False_Subtree.Copy_Subtree (Root_Cursor, No_Element, False_Cursor);
-      case Node.Node_Type is
+      Put_Line ("Classify Copy_Subtree");
+      True_Subtree.Copy_Subtree (First_Cursor, No_Element, True_Cursor);
+      Put_Line ("Classify True_Subtree copied");
+      False_Subtree.Copy_Subtree (First_Cursor, No_Element, False_Cursor);
+      case First_Node.Node_Type is
          when Prediction_Kind =>
             --  Leaf
-            Result := Node.Predictions;
+            Result := First_Node.Predictions;
          when Decision_Kind =>
-            if Match (Node.Question, aRow) then
+            if Match (First_Node.Question, aRow) then
                Result := Classify (aRow, True_Subtree);
             else
                Result := Classify (aRow, False_Subtree);
@@ -223,6 +219,28 @@ package body Builder is
       end loop;
       return (True_Rows, False_Rows);
    end Partition;
+
+   --  --------------------------------------------------------------------------
+
+   function Print_Leaf (Counts : Support.Count_Package.Map) return Strings_List is
+      use Support.Count_Package;
+      Total         : Integer := 0;
+      aCount        : Natural;
+      aString       : Unbounded_String;
+      Probabilities : Strings_List;
+   begin
+      New_Line;
+      Put_Line ("Probabilities:");
+      for index in Counts.First_Key .. Counts.Last_Key loop
+         aCount := Counts.Element (index);
+         Total := Total + aCount;
+         aString :=
+           To_Unbounded_String (Natural'Image (100 * aCount / Total)) & "%";
+         Probabilities.Append (aString);
+         Put_Line (To_String (aString));
+      end loop;
+      return Probabilities;
+   end Print_Leaf;
 
    --  --------------------------------------------------------------------------
 

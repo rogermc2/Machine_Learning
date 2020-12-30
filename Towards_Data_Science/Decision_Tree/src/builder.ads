@@ -1,5 +1,7 @@
 
+with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Support;
 
@@ -44,21 +46,27 @@ package Builder is
       end case;
    end record;
 
-      package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
-        (Decision_Node_Type);
-      subtype Tree_Cursor is Tree_Package.Cursor;
-      subtype Tree_Type is Tree_Package.Tree;
+   package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
+     (Decision_Node_Type);
+   subtype Tree_Cursor is Tree_Package.Cursor;
+   subtype Tree_Type is Tree_Package.Tree;
 
-      function Build_Tree (Rows : Support.Rows_Vector) return Tree_Type;
-      function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
+   package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
+     (Unbounded_String);
+   subtype Strings_List is Strings_Package.List;
+
+   function Build_Tree (Rows : Support.Rows_Vector) return Tree_Type;
+   function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
                          return Support.Count_Package.Map;
-      function Find_Best_Split (Rows : Support.Rows_Vector) return Best_Split_Data;
-      function Match (Self    : Support.Question_Type;
-                      Example : Support.Row_Data) return Boolean;
-      function Partition (Rows     : Support.Rows_Vector;
-                          Question : Support.Question_Type)
-                       return Partitioned_Rows;
-      procedure Print_Tree1 (Node : Decision_Node_Type);
-      procedure Print_Tree (aTree : Tree_Type);
+   function Find_Best_Split (Rows : Support.Rows_Vector) return Best_Split_Data;
+   function Match (Self    : Support.Question_Type;
+                   Example : Support.Row_Data) return Boolean;
+   function Partition (Rows     : Support.Rows_Vector;
+                       Question : Support.Question_Type)
+                          return Partitioned_Rows;
+   function Print_Leaf (Counts : Support.Count_Package.Map)
+                        return Strings_List;
+   procedure Print_Tree1 (Node : Decision_Node_Type);
+   procedure Print_Tree (aTree : Tree_Type);
 
 end Builder;

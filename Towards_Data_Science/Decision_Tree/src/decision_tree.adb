@@ -25,7 +25,8 @@ procedure Decision_Tree is
    P_Rows              : Builder.Partitioned_Rows;
    Best                : Builder.Best_Split_Data;
    aTree               : Builder.Tree_Type;
-
+   Classified          : Count_Package.Map;
+   Probabilities       : Builder.Strings_List;
 begin
    Question := (Colour_Feature, Green);
    Print_Question (Question);
@@ -87,6 +88,7 @@ begin
    aTree := Builder.Build_Tree (To_Vector (Training_Data));
    Builder.Print_Tree (aTree);
 
---     Classify (aTree);
+   Classified := Builder.Classify (Training_Data (1), aTree);
+   Probabilities := Builder.Print_Leaf (Classified);
 
 end Decision_Tree;
