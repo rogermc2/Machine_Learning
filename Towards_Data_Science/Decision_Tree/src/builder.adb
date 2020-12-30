@@ -97,28 +97,30 @@ package body Builder is
 
    --  ---------------------------------------------------------------------------
 
-   function Classify (Rows : Support.Rows_Vector; Node_Cursor : Tree_Cursor)
+   function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
                       return Support.Count_Package.Map is
       use Tree_Package;
-      Rows_Length  : constant Integer := Integer (Rows.Length);
-      Node         : constant Decision_Node_Type := Element (Node_Cursor);
-      aRow         : Support.Row_Data;
-      Result       : Support.Count_Package.Map;
+      Root_Cursor   : constant Tree_Cursor := aTree.Root;
+      True_Cursor   : constant Tree_Cursor := First_Child (Root_Cursor);
+      False_Cursor  : constant Tree_Cursor := Last_Child (Root_Cursor);
+      Node          : constant Decision_Node_Type := Element (Root_Cursor);
+      True_Subtree  : Tree_Type;
+      False_Subtree : Tree_Type;
+      Result        : Support.Count_Package.Map;
    begin
-      for row in 1 .. Rows_Length loop
-         case node.Node_Type is
-            when Prediction_Kind =>
+      True_Subtree.Copy_Subtree (Root_Cursor, No_Element, True_Cursor);
+      False_Subtree.Copy_Subtree (Root_Cursor, No_Element, False_Cursor);
+      case Node.Node_Type is
+         when Prediction_Kind =>
             --  Leaf
             Result := Node.Predictions;
          when Decision_Kind =>
-            aRow := Rows.Element (row);
             if Match (Node.Question, aRow) then
-               Result := Classify (Rows, First_Child (Node_Cursor));
+               Result := Classify (aRow, True_Subtree);
             else
-               Result := Classify (Rows, Last_Child (Node_Cursor));
+               Result := Classify (aRow, False_Subtree);
             end if;
-         end case;
-      end loop;
+      end case;
       return Result;
    end Classify;
 

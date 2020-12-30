@@ -50,8 +50,8 @@ package Builder is
       subtype Tree_Type is Tree_Package.Tree;
 
       function Build_Tree (Rows : Support.Rows_Vector) return Tree_Type;
-      function Classify (Rows : Support.Rows_Vector; Node_Cursor : Tree_Cursor)
-                      return Support.Count_Package.Map;
+      function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
+                         return Support.Count_Package.Map;
       function Find_Best_Split (Rows : Support.Rows_Vector) return Best_Split_Data;
       function Match (Self    : Support.Question_Type;
                       Example : Support.Row_Data) return Boolean;
