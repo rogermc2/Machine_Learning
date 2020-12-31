@@ -9,6 +9,7 @@ package Support is
                               Current_Uncertainty : Float) return float;
    procedure Print_Question (Self : Question_Type);
    procedure Print_Rows (Label : String; Rows : Rows_Vector);
+   procedure Print_Tree (aTree : Tree_Package.Tree);
    function To_Vector (Rows : Row_Array) return Rows_Vector;
 
 end Support;

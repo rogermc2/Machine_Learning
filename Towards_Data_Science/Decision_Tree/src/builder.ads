@@ -1,6 +1,5 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
-with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types; use ML_Types;
@@ -17,7 +16,6 @@ package Builder is
    --        Counts        : Support.Count_Package.Map
    --          := Support.Count_Package.Empty_Map;
    --     end record;
-   type Node_Kind is (Decision_Kind, Prediction_Kind);
 
    type Partitioned_Rows is record
       True_Rows  : Rows_Vector;
@@ -35,21 +33,6 @@ package Builder is
    --        Counts   : Count_Package.Map := Count_Package.Empty_Map;
    --     end record;
    --
-   type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
-      case Node_Type is
-      when  Decision_Kind =>
-         Question    : Question_Type;
-         True_Rows   : Rows_Vector := Rows_Package.Empty_Vector;
-         False_Rows  : Rows_Vector := Rows_Package.Empty_Vector;
-      when Prediction_Kind =>
-         Predictions : Count_Package.Map := Count_Package.Empty_Map;
-      end case;
-   end record;
-
-   package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
-     (Decision_Node_Type);
-   subtype Tree_Cursor is Tree_Package.Cursor;
-   subtype Tree_Type is Tree_Package.Tree;
 
    package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
      (Unbounded_String);
@@ -66,7 +49,5 @@ package Builder is
                           return Partitioned_Rows;
    function Print_Leaf (Counts : Count_Package.Map)
                         return Strings_List;
-   procedure Print_Tree1 (Node : Decision_Node_Type);
-   procedure Print_Tree (aTree : Tree_Type);
 
 end Builder;

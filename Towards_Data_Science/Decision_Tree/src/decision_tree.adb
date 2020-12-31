@@ -25,7 +25,7 @@ procedure Decision_Tree is
    Current_Uncertainty : Float;
    P_Rows              : Builder.Partitioned_Rows;
    Best                : Builder.Best_Split_Data;
-   aTree               : Builder.Tree_Type;
+   aTree               : Tree_Type;
    Classified          : Count_Package.Map;
    Probabilities       : Builder.Strings_List;
 begin
@@ -87,11 +87,10 @@ begin
    end if;
 
    aTree := Builder.Build_Tree (To_Vector (Training_Data));
-   Builder.Print_Tree (aTree);
 
    Classified := Builder.Classify (Training_Data (1), aTree);
    Probabilities := Builder.Print_Leaf (Classified);
    Classified := Builder.Classify (Training_Data (2), aTree);
    Probabilities := Builder.Print_Leaf (Classified);
-
+   Print_Tree (aTree);
 end Decision_Tree;
