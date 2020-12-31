@@ -1,20 +1,20 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 package body Support is
 
    --  -----------------------------------------------------------------------
 
-   function Class_Counts (Rows : Support.Rows_Vector)
-                          return Support.Count_Package.Map is
+   function Class_Counts (Rows : Rows_Vector) return Count_Package.Map is
       use Rows_Package;
       use Count_Package;
-      Counts         : Count_Package.Map;
-      Count_Cursor   : Count_Package.Cursor;
-      aRow           : Row_Data;
-      Label          : Label_Type;
-      Count          : Natural;
+      Counts       : Count_Package.Map;
+      Count_Cursor : Count_Package.Cursor;
+      aRow         : Row_Data;
+      Label        : Label_Type;
+      Count        : Natural;
    begin
       for index in Rows.First_Index .. Rows.Last_Index loop
          aRow := Rows.Element (index);

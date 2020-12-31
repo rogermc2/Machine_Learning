@@ -3,7 +3,7 @@ with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Support;
+with ML_Types; use ML_Types;
 
 package Builder is
 
@@ -20,29 +20,29 @@ package Builder is
    type Node_Kind is (Decision_Kind, Prediction_Kind);
 
    type Partitioned_Rows is record
-      True_Rows  : Support.Rows_Vector;
-      False_Rows : Support.Rows_Vector;
+      True_Rows  : Rows_Vector;
+      False_Rows : Rows_Vector;
    end record;
 
    type Best_Split_Data is record
       Best_Gain     : Float;
-      Best_Question : Support.Question_Type;
+      Best_Question : Question_Type;
    end record;
 
    --     type Decision_Node_Type is record
-   --        Question : Support.Question_Type;
-   --        Rows     : Support.Rows_Vector := Support.Rows_Package.Empty_Vector;
-   --        Counts   : Support.Count_Package.Map := Support.Count_Package.Empty_Map;
+   --        Question : Question_Type;
+   --        Rows     : Rows_Vector := Rows_Package.Empty_Vector;
+   --        Counts   : Count_Package.Map := Count_Package.Empty_Map;
    --     end record;
    --
    type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       case Node_Type is
       when  Decision_Kind =>
-         Question    : Support.Question_Type;
-         True_Rows   : Support.Rows_Vector := Support.Rows_Package.Empty_Vector;
-         False_Rows  : Support.Rows_Vector := Support.Rows_Package.Empty_Vector;
+         Question    : Question_Type;
+         True_Rows   : Rows_Vector := Rows_Package.Empty_Vector;
+         False_Rows  : Rows_Vector := Rows_Package.Empty_Vector;
       when Prediction_Kind =>
-         Predictions : Support.Count_Package.Map := Support.Count_Package.Empty_Map;
+         Predictions : Count_Package.Map := Count_Package.Empty_Map;
       end case;
    end record;
 
@@ -55,16 +55,16 @@ package Builder is
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
 
-   function Build_Tree (Rows : Support.Rows_Vector) return Tree_Type;
-   function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
-                         return Support.Count_Package.Map;
-   function Find_Best_Split (Rows : Support.Rows_Vector) return Best_Split_Data;
-   function Match (Self    : Support.Question_Type;
-                   Example : Support.Row_Data) return Boolean;
-   function Partition (Rows     : Support.Rows_Vector;
-                       Question : Support.Question_Type)
+   function Build_Tree (Rows : Rows_Vector) return Tree_Type;
+   function Classify (aRow : Row_Data; aTree : Tree_Type)
+                         return Count_Package.Map;
+   function Find_Best_Split (Rows : Rows_Vector) return Best_Split_Data;
+   function Match (Self    : Question_Type;
+                   Example : Row_Data) return Boolean;
+   function Partition (Rows     : Rows_Vector;
+                       Question : Question_Type)
                           return Partitioned_Rows;
-   function Print_Leaf (Counts : Support.Count_Package.Map)
+   function Print_Leaf (Counts : Count_Package.Map)
                         return Strings_List;
    procedure Print_Tree1 (Node : Decision_Node_Type);
    procedure Print_Tree (aTree : Tree_Type);

@@ -3,6 +3,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Builder;
+with ML_Types; use ML_Types;
 with Support; use Support;
 
 procedure Decision_Tree is
@@ -76,10 +77,10 @@ begin
 
    Best := Builder.Find_Best_Split (To_Vector (Training_Data));
    Put_Line ("Best_Split " & Float'Image (Best.Best_Gain) & ", " &
-               Support.Feature_Type'Image (Best.Best_Question.Feature));
-   if Best.Best_Question.Feature = Support.Colour_Feature then
+               Feature_Type'Image (Best.Best_Question.Feature));
+   if Best.Best_Question.Feature = Colour_Feature then
       Put_Line ("Best question " & Float'Image (Best.Best_Gain) & ", " &
-                 Support.Colour_Type'Image (Best.Best_Question.Colour_Value));
+                 Colour_Type'Image (Best.Best_Question.Colour_Value));
    else
       Put_Line ("Best question is dimension " &
                   Integer'Image (Best.Best_Question.Diameter_Value));
@@ -89,6 +90,8 @@ begin
    Builder.Print_Tree (aTree);
 
    Classified := Builder.Classify (Training_Data (1), aTree);
+   Probabilities := Builder.Print_Leaf (Classified);
+   Classified := Builder.Classify (Training_Data (2), aTree);
    Probabilities := Builder.Print_Leaf (Classified);
 
 end Decision_Tree;

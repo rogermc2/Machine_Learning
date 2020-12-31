@@ -2,6 +2,8 @@
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Support;
+
 --  Steps for making decision tree:
 --  1. Get list of rows (dataset) to be taken into consideration for making
 --     decision tree (recursively at each node).
@@ -25,8 +27,7 @@ package body Builder is
    --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
    --  for each class, the number of times that the class appears in the rows
    --  from the training data that reach this leaf.
-   function Build_Tree (Rows : Support.Rows_Vector) return Tree_Type is
-      use Support;
+   function Build_Tree (Rows : Rows_Vector) return Tree_Type is
       use Tree_Package;
       theTree      : Tree_Type := Empty_Tree;
       Root_Curs    : Tree_Cursor := Root (theTree);
@@ -35,8 +36,9 @@ package body Builder is
       False_Branch : Decision_Node_Type;
       aLeaf        : Decision_Node_Type (Prediction_Kind);
 
-      procedure Recurse (Rows : Support.Rows_Vector;
+      procedure Recurse (Rows : Rows_Vector;
                          Curs : in out Tree_Cursor) is
+         use Support;
          P_Rows       : Partitioned_Rows;
          True_Curs    : Tree_Cursor;
          False_Curs   : Tree_Cursor;
@@ -46,7 +48,7 @@ package body Builder is
          Best_Split := Find_Best_Split (Rows);
          if Best_Split.Best_Gain = 0.0 then
             Put_Line ("Best_Gain = 0.0");
-            aLeaf.Predictions := Class_Counts (Rows);
+            aLeaf.Predictions := Support.Class_Counts (Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => aLeaf);
@@ -88,24 +90,31 @@ package body Builder is
    end Build_Tree;
 
    --  ---------------------------------------------------------------------------
-
-   function Classify (aRow : Support.Row_Data; aTree : Tree_Type)
-                      return Support.Count_Package.Map is
+   --  The root is a special node that is always present and has neither an
+   --  associated element value nor any parent node.
+   --  The root node provides a place to add nodes to an otherwise empty tree
+   --  and represents the base of the tree.
+   --  A cursor designates a particular node within a tree and, by extension,
+   --  the element contained in that node, if any.
+   --  A cursor keeps designating the same node (and element) as long as the
+   --  node is part of the container even if the node is moved within the
+   --  container.
+   function Classify (aRow : Row_Data; aTree : Tree_Type)
+                      return Count_Package.Map is
       use Tree_Package;
---        Root_Cursor   : constant Tree_Cursor := aTree.Root;
       --  The node at the root has no element so hence the call of First_Child.
-      First_Cursor  : constant Tree_Package.Cursor := First_Child (Root (aTree));
-      True_Cursor   : constant Tree_Package.Cursor := First_Child (First_Cursor);
-      False_Cursor  : constant Tree_Package.Cursor := Last_Child (First_Cursor);
-      First_Node    : constant Decision_Node_Type := Element (First_Cursor);
-      True_Subtree  : Tree_Type;
-      False_Subtree : Tree_Type;
-      Result        : Support.Count_Package.Map;
+      First_Cursor     : constant Cursor := First_Child (Root (aTree));
+      True_Cursor      : constant Cursor := First_Child (First_Cursor);
+      False_Cursor     : constant Cursor := Last_Child (First_Cursor);
+      First_Node       : constant Decision_Node_Type := Element (First_Cursor);
+      True_Subtree     : Tree_Type;
+      False_Subtree    : Tree_Type;
+      True_Sub_Cursor  : constant Cursor := Root (True_Subtree);
+      False_Sub_Cursor : constant Cursor := Root (False_Subtree);
+      Result           : Count_Package.Map;
    begin
-      Put_Line ("Classify Copy_Subtree");
-      True_Subtree.Copy_Subtree (First_Cursor, No_Element, True_Cursor);
-      Put_Line ("Classify True_Subtree copied");
-      False_Subtree.Copy_Subtree (First_Cursor, No_Element, False_Cursor);
+      True_Subtree.Copy_Subtree (True_Sub_Cursor, No_Element, True_Cursor);
+      False_Subtree.Copy_Subtree (False_Sub_Cursor, No_Element, False_Cursor);
       case First_Node.Node_Type is
          when Prediction_Kind =>
             --  Leaf
@@ -123,7 +132,7 @@ package body Builder is
    --  -----------------------------------------------------------------------
    --   Find_Best_Split finds the best question to ask by iterating over every
    --   feature / value and calculating the information gain.
-   function Find_Best_Split (Rows : Support.Rows_Vector)
+   function Find_Best_Split (Rows : Rows_Vector)
                              return Best_Split_Data is
       use Ada.Containers;
       use Support;
@@ -176,9 +185,7 @@ package body Builder is
 
    --  ---------------------------------------------------------------------------
 
-   function Match (Self : Support.Question_Type; Example : Support.Row_Data)
-                   return Boolean is
-      use Support;
+   function Match (Self : Question_Type; Example : Row_Data) return Boolean is
       C       : constant Feature_Type := Self.Feature;
       Matches : Boolean := False;
    begin
@@ -201,10 +208,8 @@ package body Builder is
 
    --  ---------------------------------------------------------------------------
 
-   function Partition (Rows     : Support.Rows_Vector;
-                       Question : Support.Question_Type)
+   function Partition (Rows : Rows_Vector; Question : Question_Type)
                        return Partitioned_Rows is
-      use Support;
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
       Data       : Row_Data;
@@ -222,8 +227,8 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
-   function Print_Leaf (Counts : Support.Count_Package.Map) return Strings_List is
-      use Support.Count_Package;
+   function Print_Leaf (Counts : Count_Package.Map) return Strings_List is
+      use Count_Package;
       Total         : Integer := 0;
       aCount        : Natural;
       aString       : Unbounded_String;
@@ -246,8 +251,8 @@ package body Builder is
 
    procedure Print_Tree1 (Node : Decision_Node_Type) is
       use Support;
-      Question   : constant Support.Question_Type := Node.Question;
-      --        Counts     : constant Support.Count_Package.Map := Node.Counts;
+      Question   : constant Question_Type := Node.Question;
+      --        Counts     : constant Count_Package.Map := Node.Counts;
    begin
       New_Line;
       Put_Line ("Tree:");
@@ -276,7 +281,7 @@ package body Builder is
       --        Counts     : constant Support.Count_Package.Map := Node.Counts;
       procedure Recurse (Curs : Tree_Cursor) is
          Node       : constant Decision_Node_Type := Element (Curs);
-         Question   : Support.Question_Type;
+         Question   : Question_Type;
       begin
          Level := Level + 1;
          Put_Line ("Level:" & Integer'Image (Level));
