@@ -112,11 +112,8 @@ package body Support is
          case Node.Node_Type is
          when  Decision_Kind =>
             Print_Question (Node.Question);
-            if Node.False_Rows.Is_Empty then
-               Print_Rows ("True Rows", Node.True_Rows);
-            else
-               Print_Rows ("False Rows", Node.False_Rows);
-            end if;
+            Print_Rows ("True Rows", Node.True_Rows);
+            Print_Rows ("False Rows", Node.False_Rows);
          when Prediction_Kind =>
             Put_Line ("Prediction; " & Natural'Image
                       (Node.Predictions.First_Element));

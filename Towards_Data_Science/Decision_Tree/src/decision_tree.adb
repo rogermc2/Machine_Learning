@@ -34,6 +34,9 @@ begin
    Builder.Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
    New_Line;
 
+   Builder.Print_Class_Counts (To_Vector (Training_Data));
+   New_Line;
+
    Question := (Colour_Feature, Green);
    Print_Question (Question);
    Question := (Diameter_Feature, 2);
@@ -96,10 +99,15 @@ begin
 
    Put_Line ("Classify tests");
    Classified := Builder.Classify (Training_Data (1), aTree);
+   Builder.Print_Classification (Classified);
+   New_Line;
+
    Probabilities := Builder.Print_Leaf (Classified);
    Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
    New_Line;
    Classified := Builder.Classify (Training_Data (2), aTree);
+   Builder.Print_Classification (Classified);
+   New_Line;
    Probabilities := Builder.Print_Leaf (Classified);
    Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
 end Decision_Tree;

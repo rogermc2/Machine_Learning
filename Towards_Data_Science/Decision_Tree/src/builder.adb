@@ -32,20 +32,17 @@ package body Builder is
       theTree      : Tree_Type := Empty_Tree;
       Root_Curs    : Tree_Cursor := Root (theTree);
       Best_Split   : Best_Split_Data;
-      True_Branch  : Decision_Node_Type;
-      False_Branch : Decision_Node_Type;
       aLeaf        : Decision_Node_Type (Prediction_Kind);
 
       procedure Recurse (Rows : Rows_Vector;
                          Curs : in out Tree_Cursor) is
          use Support;
          P_Rows       : Partitioned_Rows;
-         True_Curs    : Tree_Cursor;
-         False_Curs   : Tree_Cursor;
+         Node         : Decision_Node_Type;
+         Node_Curs    : Tree_Cursor;
       begin
          Best_Split := Find_Best_Split (Rows);
          if Best_Split.Best_Gain = 0.0 then
-            Put_Line ("Best_Gain = 0.0");
             aLeaf.Predictions := Support.Class_Counts (Rows);
             Put_Line ("Predictions" & Integer'Image (aLeaf.Predictions.First_Element));
             theTree.Insert_Child (Parent   => Curs,
@@ -53,22 +50,17 @@ package body Builder is
                                   New_Item => aLeaf);
          else
             P_Rows := Partition (Rows, Best_Split.Best_Question);
-            True_Branch.Question := Best_Split.Best_Question;
-            False_Branch.Question := Best_Split.Best_Question;
-            True_Branch.True_Rows := P_Rows.True_Rows;
-            False_Branch.False_Rows := P_Rows.False_Rows;
-            Print_Rows ("True_Branch.True_Rows", True_Branch.True_Rows);
-            Print_Rows ("False_Branch.False_Rows", False_Branch.False_Rows);
+            Node.Question := Best_Split.Best_Question;
+            Node.True_Rows := P_Rows.True_Rows;
+            Node.False_Rows := P_Rows.False_Rows;
+            Print_Rows ("Node.True_Rows", Node.True_Rows);
+            Print_Rows ("Node.False_Rows", Node.False_Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
-                                  New_Item => True_Branch,
-                                  Position => True_Curs);
-            theTree.Insert_Child (Parent   => Curs,
-                                  Before   => No_Element,
-                                  New_Item => False_Branch,
-                                  Position => False_Curs);
-            Recurse (P_Rows.True_Rows, True_Curs);
-            Recurse (P_Rows.False_Rows, False_Curs);
+                                  New_Item => Node,
+                                  Position => Node_Curs);
+            Recurse (P_Rows.True_Rows, Node_Curs);
+            Recurse (P_Rows.False_Rows, Node_Curs);
          end if;
          New_Line;
       end Recurse;
@@ -78,8 +70,6 @@ package body Builder is
       Put_Line ("Build Tree");
       Recurse (Rows, Root_Curs);
       Put_Line ("Tree built");
-      --        return (Best_Split.Best_Question, True_Branch, False_Branch);
-      --       return (Best_Split.Best_Question, True_Branch.True_Rows, False_Branch.False_Rows, aLeaf);
       return theTree;
    end Build_Tree;
 
@@ -106,19 +96,19 @@ package body Builder is
       Result           : Count_Package.Map;
    begin
       if Is_Leaf (First_Cursor) then
-         Put_Line ("Classify Leaf");
+--           Put_Line ("Classify Leaf");
          Result := First_Node.Predictions;
       else
          case First_Node.Node_Type is
          when Prediction_Kind =>
             null;
          when Decision_Kind =>
-            Put ("Decision_Kind ");
+--              Put ("Decision_Kind ");
             if Match (First_Node.Question, aRow) then
-               Put_Line ("Match");
+--                 Put_Line ("Match");
                Subtree.Copy_Subtree (Sub_Cursor, No_Element, True_Cursor);
             else
-               Put_Line ("No match");
+--                 Put_Line ("No match");
                Subtree.Copy_Subtree (Sub_Cursor, No_Element, False_Cursor);
             end if;
             Result := Classify (aRow, Subtree);
@@ -136,8 +126,7 @@ package body Builder is
       use Support;
 
       Rows_Length         : constant Integer := Integer (Rows.Length);
-      --        Row_Vector          : constant Rows_Vector := To_Vector (Rows);
-      Colour_Values       : array (1 .. Rows_Length) of Colour_Type;
+       Colour_Values       : array (1 .. Rows_Length) of Colour_Type;
       Dimension_Values    : array (1 .. Rows_Length) of Integer;
       Colour_Question     : Question_Type;
       Dimension_Question  : Question_Type (Diameter_Feature);
@@ -167,15 +156,12 @@ package body Builder is
       end loop;
 
       for col in 1 .. Colour_Values'Length loop
-         Put_Line ("Find_Best_Split col: " & Integer'Image (col));
          Colour_Question.Colour_Value := Colour_Values (col);
          Dimension_Question.Diameter_Value := Dimension_Values (col);
          Split_Row := Partition (Rows, Colour_Question);
          Test_Gain;
-         Put_Line ("Find_Best_Split Best Gain: " & Float'Image (Best_Gain));
          Split_Row := Partition (Rows, Dimension_Question);
          Test_Gain;
-         Put_Line ("Find_Best_Split Best Gain: " & Float'Image (Best_Gain));
       end loop;
 
       return (Best_Gain, Best_Question);
@@ -225,6 +211,33 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
+   procedure Print_Classification (Classification : Count_Package.Map) is
+      use Count_Package;
+      aCount : Natural;
+   begin
+      Put_Line ("Class_Counts:");
+      for index in Classification.First_Key .. Classification.Last_Key loop
+         aCount := Classification.Element (index);
+         Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
+      end loop;
+   end Print_Classification;
+
+   --  --------------------------------------------------------------------------
+
+   procedure Print_Class_Counts (Rows : Rows_Vector) is
+      use Count_Package;
+      Counts : constant Count_Package.Map := Support.Class_Counts (Rows);
+      aCount : Natural;
+   begin
+      Put_Line ("Class_Counts:");
+      for index in Counts.First_Key .. Counts.Last_Key loop
+         aCount := Counts.Element (index);
+         Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
+      end loop;
+   end Print_Class_Counts;
+
+   --  --------------------------------------------------------------------------
+
    function Print_Leaf (Counts : Count_Package.Map) return Strings_List is
       use Count_Package;
       Total         : Natural := 0;
@@ -237,7 +250,7 @@ package body Builder is
          Total := Total + Counts.Element (index);
          Put_Line ("Total:" & Natural'Image (Total));
       end loop;
-      Put ("Probabilities:");
+      Put_Line ("Probabilities:");
       for index in Counts.First_Key .. Counts.Last_Key loop
          aCount := Counts.Element (index);
          Put_Line ("aCount:" & Natural'Image (aCount));

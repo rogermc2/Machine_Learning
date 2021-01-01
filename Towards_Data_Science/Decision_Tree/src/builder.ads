@@ -60,10 +60,12 @@ package Builder is
    function Partition (Rows     : Rows_Vector;
                        Question : Question_Type)
                           return Partitioned_Rows;
+   procedure Print_Classification (Classification : Count_Package.Map);
+   procedure Print_Class_Counts (Rows : Rows_Vector);
    function Print_Leaf (Counts : Count_Package.Map)
                         return Strings_List;
-   function Unique_Values (Rows    : Rows_Vector;
-                           Feature : Feature_Type) return Value_Set;
    procedure Print_Unique_Values (Rows    : Rows_Vector;
                                   Feature : Feature_Type);
+   function Unique_Values (Rows    : Rows_Vector;
+                           Feature : Feature_Type) return Value_Set;
 end Builder;
