@@ -43,12 +43,11 @@ package body Builder is
          True_Curs    : Tree_Cursor;
          False_Curs   : Tree_Cursor;
       begin
-         Put_Line ("Recursing, Rows length: " &
-                     Integer'Image (Integer (Rows.Length)));
          Best_Split := Find_Best_Split (Rows);
          if Best_Split.Best_Gain = 0.0 then
             Put_Line ("Best_Gain = 0.0");
             aLeaf.Predictions := Support.Class_Counts (Rows);
+            Put_Line ("Predictions" & Integer'Image (aLeaf.Predictions.First_Element));
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => aLeaf);
@@ -58,23 +57,18 @@ package body Builder is
             False_Branch.Question := Best_Split.Best_Question;
             True_Branch.True_Rows := P_Rows.True_Rows;
             False_Branch.False_Rows := P_Rows.False_Rows;
-            Put_Line ("Insert True_Branch");
             Print_Rows ("True_Branch.True_Rows", True_Branch.True_Rows);
             Print_Rows ("False_Branch.False_Rows", False_Branch.False_Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => True_Branch,
                                   Position => True_Curs);
-            Put_Line ("Insert False_Branch");
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => False_Branch,
                                   Position => False_Curs);
-            Put_Line ("Recurse True_Rows");
             Recurse (P_Rows.True_Rows, True_Curs);
-            Put_Line ("Recurse False_Rows");
             Recurse (P_Rows.False_Rows, False_Curs);
-            Put_Line ("Recurse loop");
          end if;
          New_Line;
       end Recurse;
@@ -107,25 +101,29 @@ package body Builder is
       True_Cursor      : constant Cursor := First_Child (First_Cursor);
       False_Cursor     : constant Cursor := Last_Child (First_Cursor);
       First_Node       : constant Decision_Node_Type := Element (First_Cursor);
-      True_Subtree     : Tree_Type;
-      False_Subtree    : Tree_Type;
-      True_Sub_Cursor  : constant Cursor := Root (True_Subtree);
-      False_Sub_Cursor : constant Cursor := Root (False_Subtree);
+      Subtree          : Tree_Type;
+      Sub_Cursor       : constant Cursor := Root (Subtree);
       Result           : Count_Package.Map;
    begin
-      True_Subtree.Copy_Subtree (True_Sub_Cursor, No_Element, True_Cursor);
-      False_Subtree.Copy_Subtree (False_Sub_Cursor, No_Element, False_Cursor);
-      case First_Node.Node_Type is
+      if Is_Leaf (First_Cursor) then
+         Put_Line ("Classify Leaf");
+         Result := First_Node.Predictions;
+      else
+         case First_Node.Node_Type is
          when Prediction_Kind =>
-            --  Leaf
-            Result := First_Node.Predictions;
+            null;
          when Decision_Kind =>
+            Put ("Decision_Kind ");
             if Match (First_Node.Question, aRow) then
-               Result := Classify (aRow, True_Subtree);
+               Put_Line ("Match");
+               Subtree.Copy_Subtree (Sub_Cursor, No_Element, True_Cursor);
             else
-               Result := Classify (aRow, False_Subtree);
+               Put_Line ("No match");
+               Subtree.Copy_Subtree (Sub_Cursor, No_Element, False_Cursor);
             end if;
-      end case;
+            Result := Classify (aRow, Subtree);
+         end case;
+      end if;
       return Result;
    end Classify;
 
@@ -229,23 +227,74 @@ package body Builder is
 
    function Print_Leaf (Counts : Count_Package.Map) return Strings_List is
       use Count_Package;
-      Total         : Integer := 0;
+      Total         : Natural := 0;
       aCount        : Natural;
       aString       : Unbounded_String;
       Probabilities : Strings_List;
    begin
-      New_Line;
-      Put_Line ("Probabilities:");
+      Put_Line ("Counts size:" & Natural'Image (Natural (Counts.Length)));
+      for index in Counts.First_Key .. Counts.Last_Key loop
+         Total := Total + Counts.Element (index);
+         Put_Line ("Total:" & Natural'Image (Total));
+      end loop;
+      Put ("Probabilities:");
       for index in Counts.First_Key .. Counts.Last_Key loop
          aCount := Counts.Element (index);
-         Total := Total + aCount;
+         Put_Line ("aCount:" & Natural'Image (aCount));
          aString :=
-           To_Unbounded_String (Natural'Image (100 * aCount / Total)) & "%";
+           To_Unbounded_String (Natural'Image ((100 * aCount) / Total)) & "%";
          Probabilities.Append (aString);
          Put_Line (To_String (aString));
       end loop;
       return Probabilities;
    end Print_Leaf;
+
+   --  --------------------------------------------------------------------------
+
+   procedure Print_Unique_Values (Rows    : Rows_Vector;
+                                  Feature : Feature_Type) is
+      use Value_Set_Package;
+      Values : constant Value_Set := Unique_Values (Rows, Feature);
+      Curs   : Cursor := Values.First;
+      Data   : Value_Data (Feature);
+   begin
+      Put ("Unique " & Feature_Type'Image (Feature)  & " Values:");
+      while Has_Element (Curs) loop
+         case Feature is
+            when Colour_Feature =>
+               Data := Element (Curs);
+               Put (" " & Colour_Type'Image (Data.Colour));
+            when Diameter_Feature  =>
+               Data := Element (Curs);
+               Put (Integer'Image (Data.Diameter) & " ");
+         end case;
+         Next (Curs);
+      end loop;
+      New_Line;
+   end Print_Unique_Values;
+
+   --  --------------------------------------------------------------------------
+
+   function Unique_Values (Rows    : Rows_Vector;
+                           Feature : Feature_Type) return Value_Set is
+      Data   : Row_Data;
+      Value  : Value_Data (Feature);
+      theSet : Value_Set;
+   begin
+
+      for index in Rows.First_Index .. Rows.Last_Index loop
+         Data := Rows.Element (index);
+         if Feature = Colour_Feature then
+            Value.Colour := Data.Colour;
+         else
+            Value.Diameter := Data.Diameter;
+         end if;
+         if not theSet.Contains (Value) then
+            theSet.Append (Value);
+         end if;
+      end loop;
+      return theSet;
+   end Unique_Values;
 
    --  --------------------------------------------------------------------------
 

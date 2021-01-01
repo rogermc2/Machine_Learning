@@ -1,5 +1,6 @@
 --  https://towardsdatascience.com/decision-tree-in-machine-learning-e380942a4c96
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Builder;
@@ -29,6 +30,10 @@ procedure Decision_Tree is
    Classified          : Count_Package.Map;
    Probabilities       : Builder.Strings_List;
 begin
+   Builder.Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
+   Builder.Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
+   New_Line;
+
    Question := (Colour_Feature, Green);
    Print_Question (Question);
    Question := (Diameter_Feature, 2);
@@ -87,10 +92,14 @@ begin
    end if;
 
    aTree := Builder.Build_Tree (To_Vector (Training_Data));
+   Print_Tree (aTree);
 
+   Put_Line ("Classify tests");
    Classified := Builder.Classify (Training_Data (1), aTree);
    Probabilities := Builder.Print_Leaf (Classified);
+   Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
+   New_Line;
    Classified := Builder.Classify (Training_Data (2), aTree);
    Probabilities := Builder.Print_Leaf (Classified);
-   Print_Tree (aTree);
+   Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
 end Decision_Tree;

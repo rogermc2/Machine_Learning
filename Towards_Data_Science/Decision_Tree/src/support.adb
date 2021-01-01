@@ -19,15 +19,15 @@ package body Support is
       for index in Rows.First_Index .. Rows.Last_Index loop
          aRow := Rows.Element (index);
          Label := aRow.Fruit;
-         --           Put_Line ("Class_Counts Label " & Label_Type'Image (Label));
+--           Put_Line ("Class_Counts Label " & Label_Type'Image (Label));
          if not Counts.Contains (Label) then
             Counts.Insert (Label, 0);
          end if;
          Count_Cursor := Counts.Find (Label);
          Count := Counts.Element (Label);
          Counts.Replace_Element (Count_Cursor, Count + 1);
-         --           Put_Line ("Label replaced "  & Label_Type'Image (Label) &
-         --                     " " & Integer'Image (Counts.Element (Label)));
+--           Put_Line ("Label replaced "  & Label_Type'Image (Label) &
+--                     " " & Integer'Image (Counts.Element (Label)));
       end loop;
       return Counts;
    end Class_Counts;
