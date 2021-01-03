@@ -97,7 +97,7 @@ begin
    aTree := Builder.Build_Tree (To_Vector (Training_Data));
    Print_Tree (aTree);
 
-   Put_Line ("Classify tests");
+   Put_Line ("Classify tests, Training_Data (1)");
    Classified := Builder.Classify (Training_Data (1), aTree);
    Builder.Print_Classification (Classified);
    New_Line;
@@ -105,9 +105,12 @@ begin
    Probabilities := Builder.Print_Leaf (Classified);
    Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
    New_Line;
+   Put_Line ("Classify tests, Training_Data (2)");
    Classified := Builder.Classify (Training_Data (2), aTree);
+   Put_Line ("Classify tests,  Classified");
    Builder.Print_Classification (Classified);
    New_Line;
+   Put_Line ("Classify tests,  Print_Leaf");
    Probabilities := Builder.Print_Leaf (Classified);
    Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
 end Decision_Tree;

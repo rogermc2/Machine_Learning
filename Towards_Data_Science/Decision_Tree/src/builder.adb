@@ -115,6 +115,12 @@ package body Builder is
          end case;
       end if;
       return Result;
+
+   exception
+         when others =>
+         Put_Line ("Print_Classification exception");
+         raise;
+      return Result;
    end Classify;
 
    --  -----------------------------------------------------------------------
@@ -217,9 +223,18 @@ package body Builder is
    begin
       Put_Line ("Class_Counts:");
       for index in Classification.First_Key .. Classification.Last_Key loop
-         aCount := Classification.Element (index);
-         Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
+         if Classification.Contains (index) then
+            aCount := Classification.Element (index);
+            Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
+         else
+            Put_Line (Label_Type'Image (index) &  ": none");
+         end if;
       end loop;
+
+   exception
+         when others =>
+         Put_Line ("Print_Classification exception");
+         raise;
    end Print_Classification;
 
    --  --------------------------------------------------------------------------
@@ -231,8 +246,12 @@ package body Builder is
    begin
       Put_Line ("Class_Counts:");
       for index in Counts.First_Key .. Counts.Last_Key loop
+         if Counts.Contains (index) then
          aCount := Counts.Element (index);
-         Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
+            Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
+         else
+            Put_Line (Label_Type'Image (index) &  ": none");
+         end if;
       end loop;
    end Print_Class_Counts;
 
@@ -247,17 +266,22 @@ package body Builder is
    begin
       Put_Line ("Counts size:" & Natural'Image (Natural (Counts.Length)));
       for index in Counts.First_Key .. Counts.Last_Key loop
-         Total := Total + Counts.Element (index);
-         Put_Line ("Total:" & Natural'Image (Total));
+         if Counts.Contains (index) then
+            Total := Total + Counts.Element (index);
+--              Put_Line ("Total:" & Natural'Image (Total));
+         end if;
       end loop;
-      Put_Line ("Probabilities:");
+
+--        Put_Line ("Probabilities:");
       for index in Counts.First_Key .. Counts.Last_Key loop
-         aCount := Counts.Element (index);
-         Put_Line ("aCount:" & Natural'Image (aCount));
-         aString :=
-           To_Unbounded_String (Natural'Image ((100 * aCount) / Total)) & "%";
-         Probabilities.Append (aString);
-         Put_Line (To_String (aString));
+         if Counts.Contains (index) then
+            aCount := Counts.Element (index);
+--              Put_Line ("aCount:" & Natural'Image (aCount));
+            aString :=
+              To_Unbounded_String (Natural'Image ((100 * aCount) / Total)) & "%";
+            Probabilities.Append (aString);
+--              Put_Line (To_String (aString));
+         end if;
       end loop;
       return Probabilities;
    end Print_Leaf;
