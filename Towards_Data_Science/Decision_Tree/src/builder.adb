@@ -124,6 +124,21 @@ package body Builder is
    end Classify;
 
    --  -----------------------------------------------------------------------
+
+   procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type) is
+      aRow           : Row_Data;
+      Classification : Count_Package.Map;
+   begin
+      for row in Rows.First_Index .. Rows.Last_Index loop
+         aRow := Rows.Element (row);
+         Put_Line ("Evalution of row " & Integer'Image (row));
+         Classification := Classify (aRow, theTree);
+         Put_Line ("Actual: " & Label_Type'Image (aRow.Fruit) & "  Predicted: " &
+                     Print_Leaf (Classification));
+      end loop;
+   end Evaluate;
+
+   --  -----------------------------------------------------------------------
    --   Find_Best_Split finds the best question to ask by iterating over every
    --   feature / value and calculating the information gain.
    function Find_Best_Split (Rows : Rows_Vector)
@@ -247,7 +262,7 @@ package body Builder is
       Put_Line ("Class_Counts:");
       for index in Counts.First_Key .. Counts.Last_Key loop
          if Counts.Contains (index) then
-         aCount := Counts.Element (index);
+            aCount := Counts.Element (index);
             Put_Line (Label_Type'Image (index) &  ": " & Natural'Image (aCount));
          else
             Put_Line (Label_Type'Image (index) &  ": none");
@@ -257,12 +272,13 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
-   function Print_Leaf (Counts : Count_Package.Map) return Strings_List is
+   function Print_Leaf (Counts : Count_Package.Map) return String is
       use Count_Package;
       Total         : Natural := 0;
       aCount        : Natural;
       aString       : Unbounded_String;
-      Probabilities : Strings_List;
+      Prob          : Natural;
+--        Probabilities : Count_Package.Map;
    begin
       Put_Line ("Counts size:" & Natural'Image (Natural (Counts.Length)));
       for index in Counts.First_Key .. Counts.Last_Key loop
@@ -276,14 +292,15 @@ package body Builder is
       for index in Counts.First_Key .. Counts.Last_Key loop
          if Counts.Contains (index) then
             aCount := Counts.Element (index);
---              Put_Line ("aCount:" & Natural'Image (aCount));
+            --              Put_Line ("aCount:" & Natural'Image (aCount));
+            Prob := (100 * aCount) / Total;
             aString :=
-              To_Unbounded_String (Natural'Image ((100 * aCount) / Total)) & "%";
-            Probabilities.Append (aString);
+              To_Unbounded_String (Natural'Image (Prob) & "%");
+--              Probabilities.Replace (index, Prob);
 --              Put_Line (To_String (aString));
          end if;
       end loop;
-      return Probabilities;
+      return To_String (aString);
    end Print_Leaf;
 
    --  --------------------------------------------------------------------------

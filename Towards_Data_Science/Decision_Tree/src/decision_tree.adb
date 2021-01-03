@@ -1,6 +1,5 @@
 --  https://towardsdatascience.com/decision-tree-in-machine-learning-e380942a4c96
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Builder;
@@ -28,7 +27,7 @@ procedure Decision_Tree is
    Best                : Builder.Best_Split_Data;
    aTree               : Tree_Type;
    Classified          : Count_Package.Map;
-   Probabilities       : Builder.Strings_List;
+--     Probabilities       : Builder.Strings_List;
 begin
    Builder.Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
    Builder.Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
@@ -102,15 +101,17 @@ begin
    Builder.Print_Classification (Classified);
    New_Line;
 
-   Probabilities := Builder.Print_Leaf (Classified);
-   Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
-   New_Line;
    Put_Line ("Classify tests, Training_Data (2)");
    Classified := Builder.Classify (Training_Data (2), aTree);
    Put_Line ("Classify tests,  Classified");
    Builder.Print_Classification (Classified);
    New_Line;
-   Put_Line ("Classify tests,  Print_Leaf");
-   Probabilities := Builder.Print_Leaf (Classified);
-   Put_Line ("Probabilities:" & To_String (Probabilities.First_Element));
+   Put_Line ("Classify tests,  Print_Leaf Training_Data (1)");
+   Put_Line (Builder.Print_Leaf (Builder.Classify (Training_Data (1), aTree)));
+   New_Line;
+   Put_Line ("Classify tests,  Print_Leaf Training_Data (2)");
+   Put_Line (Builder.Print_Leaf (Builder.Classify (Training_Data (2), aTree)));
+   New_Line;
+   Put_Line ("Evaluate tests");
+   Builder.Evaluate (To_Vector (Training_Data), aTree);
 end Decision_Tree;
