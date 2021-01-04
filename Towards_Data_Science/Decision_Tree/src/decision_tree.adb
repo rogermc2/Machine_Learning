@@ -25,7 +25,6 @@ procedure Decision_Tree is
    Best                : Best_Split_Data;
    aTree               : Tree_Type;
    Classified          : Count_Package.Map;
---     Probabilities       : Strings_List;
 begin
    Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
    Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);

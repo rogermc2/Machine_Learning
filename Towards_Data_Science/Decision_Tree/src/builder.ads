@@ -10,17 +10,6 @@ with ML_Types; use ML_Types;
 
 package Builder is
 
-   --     type Decision_Node_Type;
-   --     type R_Tree is access Decision_Node_Type;
-   --     Null_Tree: constant R_Tree:= null;
-   --     type Decision_Node_Type is record
-   --        Question      : Support.Question_Type;
-   --        Left_Subtree  : R_Tree;
-   --        Right_Subtree : R_Tree;
-   --        Counts        : Support.Count_Package.Map
-   --          := Support.Count_Package.Empty_Map;
-   --     end record;
-
    type Colour_Type is (Green, Yellow, Red);
    type Label_Type is (Apple, Grape, Lemon, Grapefruit, Orange, Blueberry);
 
@@ -31,10 +20,6 @@ package Builder is
    end record;
 
    type Feature_Type is (Colour_Feature, Diameter_Feature);
-   pragma Ordered (Feature_Type);
-
-   package Features_Package is new Ada.Containers.Vectors (Positive, Feature_Type);
-   subtype Features_Vector is Features_Package.Vector;
 
    type Features_Data is record
       Colour   : Colour_Type;
