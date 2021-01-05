@@ -1,6 +1,8 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
 with Ada.Containers;
+with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  Steps for making decision tree:
@@ -20,6 +22,18 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  9. Repeat again from step 1 until we get pure node (leaf node).
 
 package body Builder is
+
+  type Header_Type is array (Integer range <>) of Unbounded_String;
+   Header : constant Header_Type (1 ..3 ) :=
+              (To_Unbounded_String ("Colour"),
+               To_Unbounded_String ("diameter"),
+               To_Unbounded_String ("Label"));
+
+   package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
+     (Unbounded_String);
+--     subtype Strings_List is Strings_Package.List;
+
+   subtype Tree_Cursor is Tree_Package.Cursor;
 
    --  -----------------------------------------------------------------------
    --  A Leaf node classifies data.
