@@ -12,4 +12,5 @@
 *.cgpr
 *.DS_Store
 b__*
+.#*
 
