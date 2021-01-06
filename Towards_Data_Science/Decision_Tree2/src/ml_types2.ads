@@ -12,7 +12,7 @@ package ML_Types2 is
    type Class_Range is new Positive range 1 .. Max_Features;
    type Features_Name_Array is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
-   subtype Feature_Type is Class_Range;
+   subtype Feature_Class is Class_Range;
    subtype Label_Type is Positive;
    subtype Question_Type is Class_Range;
 
@@ -38,6 +38,11 @@ package ML_Types2 is
    package Feature_Map_Package is new Ada.Containers.Ordered_Maps
      (Unbounded_String, Positive);
    subtype Feature_Map is Feature_Map_Package.Map;
+
+   type Feature_Type is (Integer_Type, Float_Type, Boolean_Type);
+   package Feature_Type_Package is new Ada.Containers.Ordered_Maps
+     (Positive, Feature_Type);
+   subtype Feature_Type_Map is Feature_Type_Package.Map;
 
    type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       case Node_Type is

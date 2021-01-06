@@ -27,7 +27,8 @@ package body Builder2 is
                To_Unbounded_String ("Diameter"),
                To_Unbounded_String ("Label"));
 
-   Features : Feature_Map;
+   Features      : Feature_Map;
+   Feature_Types : Feature_Type_Map;
 
    --  -----------------------------------------------------------------------
    --  A Leaf node classifies data.
@@ -492,6 +493,10 @@ package body Builder2 is
    --  --------------------------------------------------------------------------
 
 begin
-   Features.Insert ("Colour", 1);
-   Features.Insert ("Diameter", 1);
+   Features.Insert (To_Unbounded_String ("Colour"), 1);
+   Features.Insert (To_Unbounded_String ("Diameter"), 2);
+
+   Feature_Types.Insert (1, Integer_Type);
+   Feature_Types.Insert (2, Integer_Type);
+
 end Builder2;
