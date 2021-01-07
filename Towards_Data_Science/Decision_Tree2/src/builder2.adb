@@ -257,9 +257,9 @@ package body Builder2 is
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Self : Question; Example : Row_Data) return Boolean is
-      Col       : constant Class_Range := Self.Column;
-      Val_Type  : constant Unbounded_String := Example.Features (Col);
-      Feat_Type : constant Class_Range := Features.Element (Val_Type);
+      Col       : constant Unbounded_String := Self.Column;
+--        Val_Type  : constant Unbounded_String := Example.Features (Col);
+      Feat_Type : constant Class_Range := Features.Element (Col);
       VT        : constant Feature_Type := Self.Column_Type;
       Matches   : Boolean := False;
    begin
@@ -270,7 +270,7 @@ package body Builder2 is
             begin
                if Feature_Types.Element (Feat_Type) = Integer_Type then
                   Matches := Value =
-                    Integer'Value (To_String (Example.Features (Col)));
+                    Integer'Value (To_String (Example.Features (Feat_Type)));
                end if;
             end;
          when Float_Type =>
@@ -279,7 +279,7 @@ package body Builder2 is
             begin
                if Feature_Types.Element (Feat_Type) = Float_Type then
                   Matches := Value =
-                    Float'Value (To_String (Example.Features (Col)));
+                    Float'Value (To_String (Example.Features (Feat_Type)));
                end if;
             end;
          when Boolean_Type =>
@@ -288,7 +288,7 @@ package body Builder2 is
             begin
                if Feature_Types.Element (Feat_Type) = Boolean_Type then
                   Matches := Value =
-                    Boolean'Value (To_String (Example.Features (Col)));
+                    Boolean'Value (To_String (Example.Features (Feat_Type)));
                end if;
             end;
       end case;
@@ -390,19 +390,20 @@ package body Builder2 is
    --  --------------------------------------------------------------------------
 
    procedure Print_Question (Self : Question) is
-      use Feature_Map_Package;
-      theKey : Unbounded_String := To_Unbounded_String ("Unknown");
-
-      procedure Find_Key (Curs : Cursor) is
-      begin
-         if Element (Curs) = Self.Column then
-            theKey := Key (Curs);
-         end if;
-      end Find_Key;
+--        use Feature_Map_Package;
+--        Col    : constant Unbounded_String := Self.Column;
+--        theKey : Unbounded_String := To_Unbounded_String ("Unknown");
+--
+--        procedure Find_Key (Curs : Cursor) is
+--        begin
+--           if Features.Element (Curs) = Col then
+--              theKey := Key (Curs);
+--           end if;
+--        end Find_Key;
    begin
-      Features.Iterate (Find_Key'Access);
+--        Features.Iterate (Find_Key'Access);
       Put_Line ("Is " & To_String (Header (1)) & " = " & " " &
-                        To_String (theKey));
+                        To_String (Self.Column));
    end Print_Question;
 
    --  --------------------------------------------------------------------------

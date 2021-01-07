@@ -45,7 +45,7 @@ package ML_Types2 is
    subtype Feature_Type_Map is Feature_Type_Package.Map;
 
    type Question (Column_Type : Feature_Type := Integer_Type) is record
-      Column   : Class_Range;
+      Column   : Unbounded_String;
       case Column_Type is
          when Integer_Type => Integer_Value : Integer;
          when Float_Type => Float_Value   : Float;
