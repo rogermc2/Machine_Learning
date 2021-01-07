@@ -31,6 +31,9 @@ package body Builder2 is
    Features      : Feature_Map;
    Feature_Types : Feature_Type_Map;
 
+   procedure Set_Feature_Map (Features_Array : Features_Name_Array);
+   procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
+
    --  -----------------------------------------------------------------------
    --  A Leaf node classifies data.
    --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
@@ -255,6 +258,18 @@ package body Builder2 is
    --     end Find_Best_Split;
 
    --  ---------------------------------------------------------------------------
+
+   function Is_Integer (Item : in String) return Boolean is
+      Dummy : Integer;
+   begin
+      Dummy := Integer'Value (Item);
+      return True;
+   exception
+      when others =>
+         return False;
+   end Is_Integer;
+
+   --  ---------------------------------------------------------------------------
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Self : Question; Example : Row_Data) return Boolean is
@@ -322,6 +337,7 @@ package body Builder2 is
          Pos_1 := Pos_2;
       end loop;
       Data_Row.Label := To_Unbounded_String (aString (Pos_1 + 1 .. Last));
+      Set_Feature_Map (Data_Row.Features);
       return Data_Row;
    end Parse;
 
@@ -509,6 +525,27 @@ package body Builder2 is
       end loop;
       New_Line;
    end Print_Rows;
+
+   --  --------------------------------------------------------------------------
+
+   procedure Set_Feature_Map (Features_Array : Features_Name_Array) is
+   begin
+      for index in Features_Array'Range loop
+         Features.Insert (Features_Array (index), index);
+      end loop;
+   end Set_Feature_Map;
+
+   --  --------------------------------------------------------------------------
+
+   procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range) is
+      use Ada.Strings;
+   begin
+      if Fixed.Count (Feature, ".") = 1 then
+         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+      elsif Is_Integer (Feature) then
+         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+      end if;
+   end Set_Feature_ID;
 
    --  --------------------------------------------------------------------------
 

@@ -37,6 +37,7 @@ begin
 --     Print_Class_Counts (To_Vector (Training_Data));
 --     New_Line;
 
+
    aQuestion := (Integer_Type, UB ("Green"), 1);
    Print_Question (aQuestion);
    aQuestion := (Diameter_Feature, 2);
