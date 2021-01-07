@@ -39,7 +39,7 @@ package ML_Types2 is
      (Unbounded_String, Class_Range);
    subtype Feature_Map is Feature_Map_Package.Map;
 
-   type Feature_Type is (Integer_Type, Float_Type, Boolean_Type);
+   type Feature_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
    package Feature_Type_Package is new Ada.Containers.Ordered_Maps
      (Class_Range, Feature_Type);
    subtype Feature_Type_Map is Feature_Type_Package.Map;
@@ -50,6 +50,7 @@ package ML_Types2 is
          when Integer_Type => Integer_Value : Integer;
          when Float_Type => Float_Value   : Float;
          when Boolean_Type => Boolean_Value : Boolean;
+         when UB_String_Type => UB_String_Value : Unbounded_String;
       end case;
    end record;
 

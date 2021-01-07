@@ -292,6 +292,14 @@ package body Builder2 is
                     Boolean'Value (To_String (Example.Features (Feat_Type)));
                end if;
             end;
+         when UB_String_Type =>
+            declare
+               Value : constant Unbounded_String := Self.UB_String_Value;
+            begin
+               if Feature_Types.Element (Feat_Type) = UB_String_Type then
+                  Matches := Value = Example.Features (Feat_Type);
+               end if;
+            end;
       end case;
       return Matches;
    end Match;
@@ -547,5 +555,6 @@ begin
    Feature_Types.Insert (1, Integer_Type);
    Feature_Types.Insert (2, Float_Type);
    Feature_Types.Insert (3, Boolean_Type);
+   Feature_Types.Insert (4, UB_String_Type);
 
 end Builder2;
