@@ -1,5 +1,6 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
+with Ada.Characters.Handling;
 --  with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -259,14 +260,21 @@ package body Builder2 is
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Integer (Item : in String) return Boolean is
-      Dummy : Integer;
+   function Is_Boolean (Item : in String) return Boolean is
+      UC : constant String := Ada.Characters.Handling.To_Upper (Item);
    begin
-      Dummy := Integer'Value (Item);
-      return True;
-   exception
-      when others =>
-         return False;
+      return UC = "TRUE" or UC = "FALSE";
+   end Is_Boolean;
+
+   --  ---------------------------------------------------------------------------
+
+   function Is_Integer (Item : in String) return Boolean is
+      Dig : Boolean := True;
+   begin
+      for index in Item'Range loop
+         Dig := Dig and Ada.Characters.Handling.Is_Decimal_Digit (Item (index));
+      end loop;
+      return Dig;
    end Is_Integer;
 
    --  ---------------------------------------------------------------------------
@@ -564,6 +572,10 @@ package body Builder2 is
       if Fixed.Count (Feature, ".") = 1 then
          Features.Insert (To_Unbounded_String (Feature), Feat_ID);
       elsif Is_Integer (Feature) then
+         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+      elsif Is_Boolean (Feature) then
+         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+      else
          Features.Insert (To_Unbounded_String (Feature), Feat_ID);
       end if;
    end Set_Feature_ID;
