@@ -337,9 +337,30 @@ package body Builder2 is
          Pos_1 := Pos_2;
       end loop;
       Data_Row.Label := To_Unbounded_String (aString (Pos_1 + 1 .. Last));
-      Set_Feature_Map (Data_Row.Features);
       return Data_Row;
    end Parse;
+
+   --  ---------------------------------------------------------------------------
+
+    function Parse_Header (Header : String) return Header_Data is
+      use Ada.Strings;
+      Num_Features : constant Class_Range :=
+                       Class_Range (Fixed.Count (Header, ","));
+      Last         : constant Natural := Header'Length;
+      Header_Row   : Header_Data (Num_Features);
+      Pos_1        : Natural := Fixed.Index (Header, ",");
+      Pos_2        : Natural := Fixed.Index (Header (Pos_1 + 1 .. Last) , ",");
+    begin
+      for index in 1 .. Num_Features loop
+         Pos_2 := Fixed.Index (Header (Pos_1 + 1 .. Last) , ",");
+         Header_Row.Features (index) :=
+           To_Unbounded_String (Header (Pos_1 + 1 .. Pos_2 - 1));
+         Pos_1 := Pos_2;
+      end loop;
+      Header_Row.Label := To_Unbounded_String (Header (Pos_1 + 1 .. Last));
+      Set_Feature_Map (Header_Row.Features);
+      return Header_Row;
+    end Parse_Header;
 
    --  ---------------------------------------------------------------------------
 
@@ -551,9 +572,12 @@ package body Builder2 is
 
    function To_Vector (Rows : Row_Array) return Rows_Vector is
       New_Vector : Rows_Vector;
+      Header_Row : Header_Data;
+      First_Index : constant Positive := Rows'First;
       aRow       : Row_Data;
    begin
-      for index in Rows'Range loop
+      Header_Row := Parse_Header (To_String (Rows (Rows'First)));
+      for index in Positive'Succ (First_Index) .. Rows'Last loop
          aRow := Parse (To_String (Rows (index)));
          New_Vector.Append (aRow);
       end loop;

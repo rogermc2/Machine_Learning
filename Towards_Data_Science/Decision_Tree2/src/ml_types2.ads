@@ -23,6 +23,11 @@ package ML_Types2 is
       Label    : Unbounded_String;
    end record;
 
+   type Header_Data (Class_Count : Class_Range := 2) is record
+      Features : Features_Name_Array (1 .. Class_Count);
+      Label    : Unbounded_String;
+   end record;
+
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 

@@ -11,9 +11,10 @@ procedure Decision_Tree2 is
    function UB (Source : String) return Unbounded_String renames
      To_Unbounded_String;
 
-   Training_Data : constant Row_Array (1 .. 5) :=
+   Training_Data : constant Row_Array (1 .. 6) :=
                    --  Colour Diameter Label
-                     (UB ("Green, 3, Apple"),
+                     (UB ("Colour, Diameter, Fruit"),
+                      UB ("Green, 3, Apple"),
                       UB ("Yellow, 3, Apple"),
                       UB ("Red, 1, Grape"),
                       UB ("Red, 1, Grape"),
@@ -37,11 +38,10 @@ begin
 --     Print_Class_Counts (To_Vector (Training_Data));
 --     New_Line;
 
-
    aQuestion := (Integer_Type, UB ("Green"), 1);
    Print_Question (aQuestion);
-   aQuestion := (Diameter_Feature, 2);
-   Print_Question (Question);
+--     aQuestion := (Diameter_Feature, 2);
+--     Print_Question (Question);
 
 --     Rows := Partition (To_Vector (Training_Data), (Colour_Feature, Red));
 --     Print_Rows ("True rows: ", Rows.True_Rows);
