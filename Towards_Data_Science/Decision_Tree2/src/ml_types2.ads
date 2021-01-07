@@ -26,7 +26,7 @@ package ML_Types2 is
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
-   type Row_Array is array (Integer range <>) of Row_Data (2);
+   type Row_Array is array (Integer range <>) of Unbounded_String;
 
    type Features_Data (Class_Count : Class_Range := 2) is record
       Features   : Features_ID_Array (1 .. Class_Count);

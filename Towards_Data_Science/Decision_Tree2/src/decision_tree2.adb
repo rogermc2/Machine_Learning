@@ -11,13 +11,13 @@ procedure Decision_Tree2 is
      To_Unbounded_String;
 --     Num_Features : constant Positive := 2;
 
---     Training_Data : constant Row_Array (1 .. 5) :=
---                     --  Colour Diameter Label
---                       ((2, (UB ("Green"), UB ("3")), UB ("Apple")),
---                        (2, (UB ("Yellow"), UB ("3")), UB ("Apple")),
---                        (2, (UB ("Red"), UB ("1")), UB ("Grape")),
---                        (2, (UB ("Red"), UB ("1")), UB ("Grape")),
---                        (2, (UB ("Yellow"), UB ("3")), UB ("Lemon")));
+   Training_Data : constant Row_Array (1 .. 5) :=
+                   --  Colour Diameter Label
+                     (UB ("Green, 3, Apple"),
+                      UB ("Yellow, 3, Apple"),
+                      UB ("Red, 1, Grape"),
+                      UB ("Red, 1, Grape"),
+                      UB ("Yellow, 3, Lemon"));
 
    aQuestion           : Question;
 --     Rows                : Partitioned_Rows;
