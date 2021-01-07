@@ -36,13 +36,22 @@ package ML_Types2 is
      (Label_Type, Natural);
 
    package Feature_Map_Package is new Ada.Containers.Ordered_Maps
-     (Unbounded_String, Positive);
+     (Unbounded_String, Class_Range);
    subtype Feature_Map is Feature_Map_Package.Map;
 
    type Feature_Type is (Integer_Type, Float_Type, Boolean_Type);
    package Feature_Type_Package is new Ada.Containers.Ordered_Maps
-     (Positive, Feature_Type);
+     (Class_Range, Feature_Type);
    subtype Feature_Type_Map is Feature_Type_Package.Map;
+
+   type Question (Column_Type : Feature_Type := Integer_Type) is record
+      Column   : Class_Range;
+      case Column_Type is
+         when Integer_Type => Integer_Value : Integer;
+         when Float_Type => Float_Value   : Float;
+         when Boolean_Type => Boolean_Value : Boolean;
+      end case;
+   end record;
 
    type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       case Node_Type is

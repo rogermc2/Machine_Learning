@@ -35,28 +35,27 @@ package Builder2 is
 --       Ada.Containers.Indefinite_Doubly_Linked_Lists (Value_Data);
 --     subtype Value_Set is Value_Set_Package.List;
 
-   function Build_Tree (Rows : Rows_Vector) return Tree_Type;
-   function Classify (aRow : Row_Data; aTree : Tree_Type)
-                         return Count_Package.Map;
+--     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
+--     function Classify (aRow : Row_Data; aTree : Tree_Type)
+--                           return Count_Package.Map;
    function Class_Counts (Rows : Rows_Vector) return Count_Package.Map;
-   procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type);
-   function Find_Best_Split (Rows : Rows_Vector) return Best_Split_Data;
+--     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type);
+--     function Find_Best_Split (Rows : Rows_Vector) return Best_Split_Data;
    function Gini (Rows : Rows_Vector) return Float;
    function Information_Gain (Left, Right : Rows_Vector;
                               Current_Uncertainty : Float) return float;
-   procedure Print_Rows (Label : String; Rows : Rows_Vector);
-   function Match (Self    : Question_Type;
+   function Match (Self    : Question;
                    Example : Row_Data) return Boolean;
-   function Partition (Rows     : Rows_Vector;
-                       Question : Question_Type)
-                          return Partitioned_Rows;
+   function Partition (Rows : Rows_Vector; aQuestion : Question)
+                       return Partitioned_Rows;
    procedure Print_Classification (Classification : Count_Package.Map);
    procedure Print_Class_Counts (Rows : Rows_Vector);
    function Print_Leaf (Counts : Count_Package.Map) return String;
-   procedure Print_Question (Self : Question_Type);
+   procedure Print_Question (Self : Question);
+   procedure Print_Rows (Label : String; Rows : Rows_Vector);
    procedure Print_Tree (aTree : Tree_Package.Tree);
-   procedure Print_Unique_Values (Rows    : Rows_Vector;
-                                  Feature : Feature_Class);
+--     procedure Print_Unique_Values (Rows    : Rows_Vector;
+--                                    Feature : Feature_Class);
    function To_Vector (Rows : Row_Array) return Rows_Vector;
 --     function Unique_Values (Rows    : Rows_Vector;
 --                             Feature : Feature_Class) return Value_Set;
