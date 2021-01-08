@@ -32,6 +32,10 @@ package body Builder2 is
    Features      : Feature_Map;
    Feature_Types : Feature_Type_Map;
 
+   function Find_Type (Data : String) return Feature_Type;
+   function Is_Boolean (Item : in String) return Boolean;
+   function Is_Float (Item : in String) return Boolean;
+   function Is_Integer (Item : in String) return Boolean;
    procedure Set_Feature_Map (Features_Array : Features_Name_Array);
    procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
 
@@ -112,6 +116,22 @@ package body Builder2 is
       end loop;
       return Counts;
    end Class_Counts;
+
+   --  ---------------------------------------------------------------------------
+
+   function Find_Type (Data : String) return Feature_Type is
+      theType : Feature_Type;
+   begin
+      if Is_Integer (Data) then
+         theType := Integer_Type;
+      elsif Is_Float (Data) then
+         theType := Float_Type;
+      elsif Is_Boolean (Data) then
+         theType := Boolean_Type;
+      end if;
+
+      return theType;
+   end Find_Type;
 
    --  ---------------------------------------------------------------------------
 
@@ -268,6 +288,14 @@ package body Builder2 is
 
    --  ---------------------------------------------------------------------------
 
+   function Is_Float (Item : in String) return Boolean is
+      use Ada.Strings;
+   begin
+      return Fixed.Count (Item, ".") = 1;
+   end Is_Float;
+
+   --  ---------------------------------------------------------------------------
+
    function Is_Integer (Item : in String) return Boolean is
       Dig : Boolean := True;
    begin
@@ -280,7 +308,7 @@ package body Builder2 is
    --  ---------------------------------------------------------------------------
    --  Match compares the feature value in an example to the
    --  feature value in a question.
-   function Match (Self : Question; Example : Row_Data) return Boolean is
+   function Match (Self : Question_Data; Example : Row_Data) return Boolean is
       Col       : constant Unbounded_String := Self.Column;
       --        Val_Type  : constant Unbounded_String := Example.Features (Col);
       Feat_Type : constant Class_Range := Features.Element (Col);
@@ -350,7 +378,7 @@ package body Builder2 is
 
    --  ---------------------------------------------------------------------------
 
-    function Parse_Header (Header : String) return Header_Data is
+   function Parse_Header (Header : String) return Header_Data is
       use Ada.Strings;
       Num_Features : constant Class_Range :=
                        Class_Range (Fixed.Count (Header, ","));
@@ -358,7 +386,7 @@ package body Builder2 is
       Header_Row   : Header_Data (Num_Features);
       Pos_1        : Natural := Fixed.Index (Header, ",");
       Pos_2        : Natural := Fixed.Index (Header (Pos_1 + 1 .. Last) , ",");
-    begin
+   begin
       for index in 1 .. Num_Features loop
          Pos_2 := Fixed.Index (Header (Pos_1 + 1 .. Last) , ",");
          Header_Row.Features (index) :=
@@ -368,11 +396,11 @@ package body Builder2 is
       Header_Row.Label := To_Unbounded_String (Header (Pos_1 + 1 .. Last));
       Set_Feature_Map (Header_Row.Features);
       return Header_Row;
-    end Parse_Header;
+   end Parse_Header;
 
    --  ---------------------------------------------------------------------------
 
-   function Partition (Rows : Rows_Vector; aQuestion : Question)
+   function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                        return Partitioned_Rows is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
@@ -465,20 +493,31 @@ package body Builder2 is
    --  --------------------------------------------------------------------------
 
    procedure Print_Question (Self : Question) is
-      --        use Feature_Map_Package;
-      --        Col    : constant Unbounded_String := Self.Column;
-      --        theKey : Unbounded_String := To_Unbounded_String ("Unknown");
-      --
-      --        procedure Find_Key (Curs : Cursor) is
-      --        begin
-      --           if Features.Element (Curs) = Col then
-      --              theKey := Key (Curs);
-      --           end if;
-      --        end Find_Key;
+--        use Feature_Map_Package;
+--        Col        : constant Unbounded_String := Self.Feature;
+--        Value      : constant String := To_String (Self.Value);
+--        Feature_ID : constant Class_Range := Features.Element (Col);
+--        V_Type     : constant Feature_Type := Find_Type (Value);
+--        QD         : Question_Data (V_Type);
+--        theKey : Unbounded_String := To_Unbounded_String ("Unknown");
+
+--        procedure Find_Key (Curs : Cursor) is
+--        begin
+--           if Features.Element (Curs) = Col then
+--              theKey := Key (Curs);
+--           end if;
+--        end Find_Key;
    begin
       --        Features.Iterate (Find_Key'Access);
+--        QD.Column := Feature_ID;
+--        case V_Type is
+--           when Integer_Type => QD.Integer_Value := Integer'Value (Value);
+--           when Float_Type => QD.Float_Value := Float'Value (Value);
+--           when Boolean_Type => QD.Boolean_Value := Boolean'Value (Value);
+--           when UB_String_Type => qd.UB_String_Value := To_Unbounded_String (Value);
+--        end case;
       Put_Line ("Is " & To_String (Header (1)) & " = " & " " &
-                  To_String (Self.Column));
+                  To_String (Self.Feature));
    end Print_Question;
 
    --  --------------------------------------------------------------------------
@@ -583,10 +622,10 @@ package body Builder2 is
    --  --------------------------------------------------------------------------
 
    function To_Vector (Rows : Row_Array) return Rows_Vector is
-      New_Vector : Rows_Vector;
-      Header_Row : Header_Data;
+      New_Vector  : Rows_Vector;
+      Header_Row  : Header_Data;
       First_Index : constant Positive := Rows'First;
-      aRow       : Row_Data;
+      aRow        : Row_Data;
    begin
       Header_Row := Parse_Header (To_String (Rows (Rows'First)));
       for index in Positive'Succ (First_Index) .. Rows'Last loop

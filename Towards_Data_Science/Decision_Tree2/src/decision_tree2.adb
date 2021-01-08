@@ -38,7 +38,8 @@ begin
 --     Print_Class_Counts (To_Vector (Training_Data));
 --     New_Line;
 
-   aQuestion := (Integer_Type, UB ("Green"), 1);
+   aQuestion.Feature := (UB("Colour"));
+   aQuestion.Value := (UB("Green"));
    Print_Question (aQuestion);
 --     aQuestion := (Diameter_Feature, 2);
 --     Print_Question (Question);

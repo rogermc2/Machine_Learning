@@ -49,7 +49,12 @@ package ML_Types2 is
      (Class_Range, Feature_Type);
    subtype Feature_Type_Map is Feature_Type_Package.Map;
 
-   type Question (Column_Type : Feature_Type := Integer_Type) is record
+   type Question is record
+      Feature : Unbounded_String;
+      Value   : Unbounded_String;
+   end record;
+
+   type Question_Data (Column_Type : Feature_Type := Integer_Type) is record
       Column   : Unbounded_String;
       case Column_Type is
          when Integer_Type => Integer_Value : Integer;

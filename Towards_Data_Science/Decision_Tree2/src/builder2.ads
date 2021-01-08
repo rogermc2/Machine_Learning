@@ -44,9 +44,9 @@ package Builder2 is
    function Gini (Rows : Rows_Vector) return Float;
    function Information_Gain (Left, Right : Rows_Vector;
                               Current_Uncertainty : Float) return float;
-   function Match (Self    : Question;
+   function Match (Self    : Question_Data;
                    Example : Row_Data) return Boolean;
-   function Partition (Rows : Rows_Vector; aQuestion : Question)
+   function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                        return Partitioned_Rows;
    procedure Print_Classification (Classification : Count_Package.Map);
    procedure Print_Class_Counts (Rows : Rows_Vector);
