@@ -50,8 +50,8 @@ package ML_Types2 is
    subtype Feature_Type_Map is Feature_Type_Package.Map;
 
    type Question is record
-      Feature : Unbounded_String;
-      Value   : Unbounded_String;
+      Feature : Unbounded_String;  --  e.g. "Colour"
+      Value   : Unbounded_String;  --  e.g. "Green"
    end record;
 
    type Question_Data (Column_Type : Feature_Type := Integer_Type) is record

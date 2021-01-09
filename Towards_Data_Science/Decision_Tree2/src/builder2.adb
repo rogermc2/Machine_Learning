@@ -1,6 +1,6 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
-with Ada.Characters.Handling;
+--  with Ada.Characters.Handling;
 --  with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -23,21 +23,21 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Builder2 is
 
-   type Header_Type is array (Integer range <>) of Unbounded_String;
-   Header : constant Header_Type (1 ..3 ) :=
-              (To_Unbounded_String ("Colour"),
-               To_Unbounded_String ("Diameter"),
-               To_Unbounded_String ("Label"));
+--     type Header_Type is array (Integer range <>) of Unbounded_String;
+--     Header : constant Header_Type (1 .. 3) :=
+--                (To_Unbounded_String ("Colour"),
+--                 To_Unbounded_String ("Diameter"),
+--                 To_Unbounded_String ("Label"));
 
    Features      : Feature_Map;
    Feature_Types : Feature_Type_Map;
 
-   function Find_Type (Data : String) return Feature_Type;
-   function Is_Boolean (Item : in String) return Boolean;
-   function Is_Float (Item : in String) return Boolean;
-   function Is_Integer (Item : in String) return Boolean;
+--     function Find_Type (Data : String) return Feature_Type;
+--     function Is_Boolean (Item : in String) return Boolean;
+--     function Is_Float (Item : in String) return Boolean;
+--     function Is_Integer (Item : in String) return Boolean;
    procedure Set_Feature_Map (Features_Array : Features_Name_Array);
-   procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
+--     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
 
    --  -----------------------------------------------------------------------
    --  A Leaf node classifies data.
@@ -119,19 +119,19 @@ package body Builder2 is
 
    --  ---------------------------------------------------------------------------
 
-   function Find_Type (Data : String) return Feature_Type is
-      theType : Feature_Type;
-   begin
-      if Is_Integer (Data) then
-         theType := Integer_Type;
-      elsif Is_Float (Data) then
-         theType := Float_Type;
-      elsif Is_Boolean (Data) then
-         theType := Boolean_Type;
-      end if;
-
-      return theType;
-   end Find_Type;
+--     function Find_Type (Data : String) return Feature_Type is
+--        theType : Feature_Type;
+--     begin
+--        if Is_Integer (Data) then
+--           theType := Integer_Type;
+--        elsif Is_Float (Data) then
+--           theType := Float_Type;
+--        elsif Is_Boolean (Data) then
+--           theType := Boolean_Type;
+--        end if;
+--
+--        return theType;
+--     end Find_Type;
 
    --  ---------------------------------------------------------------------------
 
@@ -280,30 +280,30 @@ package body Builder2 is
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Boolean (Item : in String) return Boolean is
-      UC : constant String := Ada.Characters.Handling.To_Upper (Item);
-   begin
-      return UC = "TRUE" or UC = "FALSE";
-   end Is_Boolean;
+--     function Is_Boolean (Item : in String) return Boolean is
+--        UC : constant String := Ada.Characters.Handling.To_Upper (Item);
+--     begin
+--        return UC = "TRUE" or UC = "FALSE";
+--     end Is_Boolean;
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Float (Item : in String) return Boolean is
-      use Ada.Strings;
-   begin
-      return Fixed.Count (Item, ".") = 1;
-   end Is_Float;
+--     function Is_Float (Item : in String) return Boolean is
+--        use Ada.Strings;
+--     begin
+--        return Fixed.Count (Item, ".") = 1;
+--     end Is_Float;
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Integer (Item : in String) return Boolean is
-      Dig : Boolean := True;
-   begin
-      for index in Item'Range loop
-         Dig := Dig and Ada.Characters.Handling.Is_Decimal_Digit (Item (index));
-      end loop;
-      return Dig;
-   end Is_Integer;
+--     function Is_Integer (Item : in String) return Boolean is
+--        Dig : Boolean := True;
+--     begin
+--        for index in Item'Range loop
+--           Dig := Dig and Ada.Characters.Handling.Is_Decimal_Digit (Item (index));
+--        end loop;
+--        return Dig;
+--     end Is_Integer;
 
    --  ---------------------------------------------------------------------------
    --  Match compares the feature value in an example to the
@@ -493,9 +493,10 @@ package body Builder2 is
    --  --------------------------------------------------------------------------
 
    procedure Print_Question (Self : Question) is
+      --  Example" Self = ("Colour", "Green"));
 --        use Feature_Map_Package;
---        Col        : constant Unbounded_String := Self.Feature;
---        Value      : constant String := To_String (Self.Value);
+      Col        : constant String := To_String (Self.Feature);
+      Value      : constant String := To_String (Self.Value);
 --        Feature_ID : constant Class_Range := Features.Element (Col);
 --        V_Type     : constant Feature_Type := Find_Type (Value);
 --        QD         : Question_Data (V_Type);
@@ -509,15 +510,14 @@ package body Builder2 is
 --        end Find_Key;
    begin
       --        Features.Iterate (Find_Key'Access);
---        QD.Column := Feature_ID;
+--        QD.Column := Self.Feature;
 --        case V_Type is
 --           when Integer_Type => QD.Integer_Value := Integer'Value (Value);
 --           when Float_Type => QD.Float_Value := Float'Value (Value);
 --           when Boolean_Type => QD.Boolean_Value := Boolean'Value (Value);
 --           when UB_String_Type => qd.UB_String_Value := To_Unbounded_String (Value);
 --        end case;
-      Put_Line ("Is " & To_String (Header (1)) & " = " & " " &
-                  To_String (Self.Feature));
+      Put_Line ("Is " & Col & " = " & " " & Value);
    end Print_Question;
 
    --  --------------------------------------------------------------------------
@@ -605,19 +605,19 @@ package body Builder2 is
 
    --  --------------------------------------------------------------------------
 
-   procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range) is
-      use Ada.Strings;
-   begin
-      if Fixed.Count (Feature, ".") = 1 then
-         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-      elsif Is_Integer (Feature) then
-         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-      elsif Is_Boolean (Feature) then
-         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-      else
-         Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-      end if;
-   end Set_Feature_ID;
+--     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range) is
+--        use Ada.Strings;
+--     begin
+--        if Fixed.Count (Feature, ".") = 1 then
+--           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+--        elsif Is_Integer (Feature) then
+--           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+--        elsif Is_Boolean (Feature) then
+--           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+--        else
+--           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
+--        end if;
+--     end Set_Feature_ID;
 
    --  --------------------------------------------------------------------------
 
