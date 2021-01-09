@@ -1,6 +1,6 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
---  with Ada.Characters.Handling;
+with Ada.Characters.Handling;
 --  with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -33,9 +33,10 @@ package body Builder2 is
    Feature_Types : Feature_Type_Map;
 
 --     function Find_Type (Data : String) return Feature_Type;
---     function Is_Boolean (Item : in String) return Boolean;
---     function Is_Float (Item : in String) return Boolean;
---     function Is_Integer (Item : in String) return Boolean;
+   function Is_Boolean (Item : in String) return Boolean;
+   function Is_Float (Item : in String) return Boolean;
+   function Is_Integer (Item : in String) return Boolean;
+   function To_Question (Q : Raw_Question) return Question_Data;
    procedure Set_Feature_Map (Features_Array : Features_Name_Array);
 --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
 
@@ -280,30 +281,30 @@ package body Builder2 is
 
    --  ---------------------------------------------------------------------------
 
---     function Is_Boolean (Item : in String) return Boolean is
---        UC : constant String := Ada.Characters.Handling.To_Upper (Item);
---     begin
---        return UC = "TRUE" or UC = "FALSE";
---     end Is_Boolean;
+   function Is_Boolean (Item : in String) return Boolean is
+      UC : constant String := Ada.Characters.Handling.To_Upper (Item);
+   begin
+      return UC = "TRUE" or UC = "FALSE";
+   end Is_Boolean;
 
    --  ---------------------------------------------------------------------------
 
---     function Is_Float (Item : in String) return Boolean is
---        use Ada.Strings;
---     begin
---        return Fixed.Count (Item, ".") = 1;
---     end Is_Float;
+   function Is_Float (Item : in String) return Boolean is
+      use Ada.Strings;
+   begin
+      return Fixed.Count (Item, ".") = 1;
+   end Is_Float;
 
    --  ---------------------------------------------------------------------------
 
---     function Is_Integer (Item : in String) return Boolean is
---        Dig : Boolean := True;
---     begin
---        for index in Item'Range loop
---           Dig := Dig and Ada.Characters.Handling.Is_Decimal_Digit (Item (index));
---        end loop;
---        return Dig;
---     end Is_Integer;
+   function Is_Integer (Item : in String) return Boolean is
+      Dig    : Boolean := True;
+   begin
+      for index in Item'Range loop
+         Dig := Dig and Ada.Characters.Handling.Is_Decimal_Digit (Item (index));
+      end loop;
+      return Dig;
+   end Is_Integer;
 
    --  ---------------------------------------------------------------------------
    --  Match compares the feature value in an example to the
@@ -618,6 +619,38 @@ package body Builder2 is
 --           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
 --        end if;
 --     end Set_Feature_ID;
+
+   --  --------------------------------------------------------------------------
+
+   function To_Question (Q : Raw_Question) return Question_Data is
+      Value  : constant String := To_String (Q.Value);
+      Q_Data : Question_Data;
+   begin
+      if Is_Integer (Value) then
+         declare
+            QD  : Question_Data (Integer_Type);
+         begin
+            QD.Integer_Value := Integer'Value (Value);
+            Q_Data :=  QD;
+         end;
+      elsif Is_Float (Value) then
+         declare
+            QD  : Question_Data (Float_Type);
+         begin
+            QD.Float_Value := Float'Value (Value);
+            Q_Data := QD;
+         end;
+      elsif Is_Boolean (Value) then
+         declare
+            QD  : Question_Data (Boolean_Type);
+         begin
+            QD.Boolean_Value := Boolean'Value (Value);
+            Q_Data := QD;
+         end;
+      end if;
+         Q_Data.Column := Q.Feature;
+         return Q_Data;
+   end To_Question;
 
    --  --------------------------------------------------------------------------
 

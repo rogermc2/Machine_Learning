@@ -17,13 +17,6 @@ package Builder2 is
 --     package Vector_Rows_Package is new Ada.Containers.Vectors (Positive, Vector_Row_Data);
 --     subtype Rows_Vector_Vector is Vector_Rows_Package.Vector;
 
---     type Question_Type (Feature : Feature_Type := Colour_Feature) is record
---        case Feature is
---           when Colour_Feature => Colour_Value     : Colour_Type;
---           when Diameter_Feature => Diameter_Value : Integer;
---        end case;
---     end record;
-
 --     type Value_Data (Feature : Feature_Type) is record
 --        case Feature is
 --           when Colour_Feature => Colour : Colour_Type;
