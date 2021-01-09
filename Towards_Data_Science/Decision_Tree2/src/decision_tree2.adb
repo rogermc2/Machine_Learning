@@ -20,7 +20,7 @@ procedure Decision_Tree2 is
                       UB ("Red, 1, Grape"),
                       UB ("Yellow, 3, Lemon"));
 
-   aQuestion           : Question;
+   aQuestion           : Raw_Question;
 --     Rows                : Partitioned_Rows;
 --     No_Mixing           : Rows_Vector;
 --     Some_Mixing         : Rows_Vector;
@@ -41,8 +41,9 @@ begin
    aQuestion.Feature := (UB("Colour"));
    aQuestion.Value := (UB("Green"));
    Print_Question (aQuestion);
---     aQuestion := (Diameter_Feature, 2);
---     Print_Question (Question);
+   aQuestion.Feature := (UB("Diameter"));
+   aQuestion.Value := (UB("2"));
+   Print_Question (aQuestion);
 
 --     Rows := Partition (To_Vector (Training_Data), (Colour_Feature, Red));
 --     Print_Rows ("True rows: ", Rows.True_Rows);

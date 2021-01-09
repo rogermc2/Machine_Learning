@@ -51,7 +51,7 @@ package Builder2 is
    procedure Print_Classification (Classification : Count_Package.Map);
    procedure Print_Class_Counts (Rows : Rows_Vector);
    function Print_Leaf (Counts : Count_Package.Map) return String;
-   procedure Print_Question (Self : Question);
+   procedure Print_Question (Self : Raw_Question);
    procedure Print_Rows (Label : String; Rows : Rows_Vector);
    procedure Print_Tree (aTree : Tree_Package.Tree);
 --     procedure Print_Unique_Values (Rows    : Rows_Vector;

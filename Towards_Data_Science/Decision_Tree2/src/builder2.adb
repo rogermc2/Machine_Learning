@@ -492,7 +492,7 @@ package body Builder2 is
 
    --  --------------------------------------------------------------------------
 
-   procedure Print_Question (Self : Question) is
+   procedure Print_Question (Self : Raw_Question) is
       --  Example" Self = ("Colour", "Green"));
 --        use Feature_Map_Package;
       Col        : constant String := To_String (Self.Feature);
