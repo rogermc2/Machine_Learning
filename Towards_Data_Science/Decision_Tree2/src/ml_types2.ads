@@ -13,7 +13,6 @@ package ML_Types2 is
    type Features_Name_Array is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
    subtype Feature_Class is Class_Range;
-   subtype Label_Type is Positive;
    subtype Question_Type is Class_Range;
 
    type Node_Kind is (Decision_Kind, Prediction_Kind);
@@ -37,26 +36,41 @@ package ML_Types2 is
       Features   : Features_ID_Array (1 .. Class_Count);
    end record;
 
+   type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
+   package Label_Type_Package is new Ada.Containers.Ordered_Maps
+     (Class_Range, Data_Type);
+   subtype Label_Type_Map is Label_Type_Package.Map;
+
+   type Label_Data (Label_Kind : Data_Type := Integer_Type) is record
+      case Label_Kind is
+         when Integer_Type => Integer_Value : Integer;
+         when Float_Type => Float_Value   : Float;
+         when Boolean_Type => Boolean_Value : Boolean;
+         when UB_String_Type => UB_String_Value : Unbounded_String;
+      end case;
+   end record;
+
    package Count_Package is new Ada.Containers.Indefinite_Ordered_Maps
-     (Label_Type, Natural);
+     (Data_Type, Natural);
 
    package Feature_Map_Package is new Ada.Containers.Ordered_Maps
      (Unbounded_String, Class_Range);
    subtype Feature_Map is Feature_Map_Package.Map;
 
-   type Feature_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
    package Feature_Type_Package is new Ada.Containers.Ordered_Maps
-     (Class_Range, Feature_Type);
+     (Class_Range, Data_Type);
    subtype Feature_Type_Map is Feature_Type_Package.Map;
+
+   subtype Raw_Label is Unbounded_String;
 
    type Raw_Question is record
       Feature : Unbounded_String;  --  e.g. "Colour"
       Value   : Unbounded_String;  --  e.g. "Green"
    end record;
 
-   type Question_Data (Column_Type : Feature_Type := Integer_Type) is record
-      Column   : Unbounded_String;
-      case Column_Type is
+   type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
+      Feature   : Unbounded_String;
+      case Feature_Kind is
          when Integer_Type => Integer_Value : Integer;
          when Float_Type => Float_Value   : Float;
          when Boolean_Type => Boolean_Value : Boolean;

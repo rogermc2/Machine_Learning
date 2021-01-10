@@ -1,7 +1,7 @@
 --  https://towardsdatascience.com/decision-tree-in-machine-learning-e380942a4c96
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types2; use ML_Types2;
 with Builder2; use Builder2;
@@ -11,7 +11,7 @@ procedure Decision_Tree2 is
    function UB (Source : String) return Unbounded_String renames
      To_Unbounded_String;
 
-   Training_Data : constant Row_Array (1 .. 6) :=
+   Training_Set : constant Row_Array (1 .. 6) :=
                    --  Colour Diameter Label
                      (UB ("Colour, Diameter, Fruit"),
                       UB ("Green, 3, Apple"),
@@ -21,6 +21,8 @@ procedure Decision_Tree2 is
                       UB ("Yellow, 3, Lemon"));
 
    aQuestion           : Raw_Question;
+   Header_Row          : Header_Data;
+   Training_Data       : constant Rows_Vector := To_Vector (Training_Set, Header_Row);
    Rows                : Partitioned_Rows;
 --     No_Mixing           : Rows_Vector;
 --     Some_Mixing         : Rows_Vector;
@@ -34,9 +36,12 @@ begin
 --     Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
 --     Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
 --     New_Line;
-
---     Print_Class_Counts (To_Vector (Training_Data));
---     New_Line;
+   for index in Header_Row .Features'Range loop
+      Put_Line ("Header row features: " &
+                  To_String (Header_Row .Features (index)));
+   end loop;
+   Print_Class_Counts (Training_Data);
+   New_Line;
 
    aQuestion.Feature := (UB("Colour"));
    aQuestion.Value := (UB("Green"));
@@ -45,10 +50,11 @@ begin
    aQuestion.Value := (UB("2"));
    Print_Question (aQuestion);
 
-   aQuestion.Feature := (UB("Colour"), UB(" Red"));
-   Rows := Partition (To_Vector (Training_Data), (Colour_Feature, Red));
---     Print_Rows ("True rows: ", Rows.True_Rows);
---     Print_Rows ("False rows: ", Rows.False_Rows);
+   aQuestion := (UB("Colour"), UB(" Red"));
+   Print_Question (aQuestion);
+   Rows := Partition (Training_Data, (To_Question (aQuestion)));
+   Print_Rows ("True rows: ", Rows.True_Rows);
+   Print_Rows ("False rows: ", Rows.False_Rows);
 --
 --     No_Mixing.Append ((Num_Features, Green, 3, Apple));
 --     No_Mixing.Append ((Num_Features, Yellow, 3, Apple));
