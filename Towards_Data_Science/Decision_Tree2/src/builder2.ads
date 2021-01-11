@@ -5,15 +5,6 @@ with ML_Types2; use ML_Types2;
 
 package Builder2 is
 
---     type Feature_Type is (Colour_Feature, Diameter_Feature);
---     type Colour_Type is (Green, Yellow, Red);
---     type Label_Type is (Apple, Grape, Lemon, Grapefruit, Orange, Blueberry);
-
---      type Vector_Row_Data is record
---        Features : Features_Data;
---        Label    : Label_Type;
---      end record;
-
 --     package Vector_Rows_Package is new Ada.Containers.Vectors (Positive, Vector_Row_Data);
 --     subtype Rows_Vector_Vector is Vector_Rows_Package.Vector;
 

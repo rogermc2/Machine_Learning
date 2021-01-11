@@ -40,7 +40,7 @@ package body Builder2 is
    procedure Set_Feature_Map (Features_Array : Features_Name_Array);
    --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
    function To_Label (UB_String : Raw_Label) return Label_Data;
---     function To_Row_Data (aRow : Unbounded_String) return Row_Data;
+   --     function To_Row_Data (aRow : Unbounded_String) return Row_Data;
 
    --  -----------------------------------------------------------------------
    --  A Leaf node classifies data.
@@ -313,21 +313,22 @@ package body Builder2 is
    --  feature value in a question.
    function Match (Self : Question_Data; Example : Row_Data) return Boolean is
       Col       : constant Unbounded_String := Self.Feature;
-      --        Val_Type  : constant Unbounded_String := Example.Features (Col);
       Feat_Type : constant Class_Range := Features.Element (Col);
-      VT        : constant Data_Type := Self.Feature_Kind;
+      Val_Type  : constant Data_Type := Self.Feature_Kind;
       Matches   : Boolean := False;
    begin
+      New_Line;
       Put_Line ("Match, Col: " & To_String (Col));
-      Put_Line ("Match, VT: " & Data_Type'Image (VT));
-      Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type));
-      case VT is
+      Put_Line ("Match, Value type: " & Data_Type'Image (Val_Type));
+      Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type) &
+                  " ("  & To_String (Col) & ")");
+      case Val_Type is
          when Integer_Type =>
             declare
                Value : constant Integer := Self.Integer_Value;
             begin
-               Put_Line ("Match, Value, Example: " & Integer'Image (Value) & ", " &
-                        To_String (Example.Features (Feat_Type)));
+               Put_Line ("Match, Integer Value, Example: " & Integer'Image (Value) & ", " &
+                           To_String (Example.Features (Feat_Type)));
                if Feature_Types.Element (Feat_Type) = Integer_Type then
                   Matches := Value =
                     Integer'Value (To_String (Example.Features (Feat_Type)));
@@ -355,12 +356,15 @@ package body Builder2 is
             declare
                Value : constant Unbounded_String := Self.UB_String_Value;
             begin
-               Put_Line ("Match, Value: " & To_String (Value));
+               Put_Line ("Match, UB string Value: " & To_String (Value));
                if Feature_Types.Element (Feat_Type) = UB_String_Type then
                   Matches := Value = Example.Features (Feat_Type);
                end if;
             end;
       end case;
+
+      Put_Line ("Example feature type : " & To_String (Example.Features (Feat_Type)));
+      Put_Line ("Match: " & Boolean'Image (Matches));
       return Matches;
    end Match;
 
@@ -377,9 +381,11 @@ package body Builder2 is
    begin
       for index in 1 .. Num_Features loop
          Pos_2 := Fixed.Index (aString (Pos_1 + 1 .. Last) , ",");
-         Data_Row.Features (index) :=
-           To_Unbounded_String (aString (Pos_1 + 1 .. Pos_2 - 1));
-         Pos_1 := Pos_2;
+         if Pos_2 > 0 then
+            Data_Row.Features (index) :=
+              To_Unbounded_String (aString (Pos_1 + 1 .. Pos_2 - 1));
+            Pos_1 := Pos_2;
+         end if;
       end loop;
       Data_Row.Label := To_Unbounded_String (aString (Pos_1 + 1 .. Last));
       return Data_Row;
@@ -415,9 +421,9 @@ package body Builder2 is
       False_Rows : Rows_Vector;
       Data       : Row_Data;
    begin
---        Put_Line ("Partition entered");
       for index in Rows.First_Index .. Rows.Last_Index loop
          Data := Rows.Element (index);
+         Put_Line ("Partition Data.Label: " & To_String (Data.Label));
          if Match (aQuestion, Data) then
             True_Rows.Append (Data);
          else
@@ -609,13 +615,14 @@ package body Builder2 is
    procedure Set_Feature_Map (Features_Array : Features_Name_Array) is
    begin
       for index in Features_Array'Range loop
-            Put_Line ("Set_Feature_Map feature: " &
-                        To_String (Features_Array (index)));
+         Put_Line ("Set_Feature_Map feature: " &
+                     To_String (Features_Array (index)));
          if not Features.Contains (Features_Array (index)) then
             Features.Insert (Features_Array (index), index);
-            Put_Line ("Set_Feature_Map feature added: " &
-                        To_String (Features_Array (index)));
+            Put_Line ("Set_Feature_Map feature added.");
          end if;
+         Put_Line ("Set_Feature_Map feature code: " &
+                     Class_Range'Image (Features.Element (Features_Array (index))));
       end loop;
    end Set_Feature_Map;
 
@@ -701,6 +708,14 @@ package body Builder2 is
             QD.Boolean_Value := Boolean'Value (Value);
             Q_Data := QD;
          end;
+      else
+         declare
+            QD  : Question_Data (UB_String_Type);
+         begin
+            QD.UB_String_Value := To_Unbounded_String (Value);
+            Q_Data := QD;
+         end;
+
       end if;
       Q_Data.Feature := Q.Feature;
       return Q_Data;
@@ -708,10 +723,10 @@ package body Builder2 is
 
    --  --------------------------------------------------------------------------
 
---     function To_Row_Data (aRow : Unbounded_String) return Row_Data is
---     begin
---        return Parse (To_String (aRow));
---     end To_Row_Data;
+   --     function To_Row_Data (aRow : Unbounded_String) return Row_Data is
+   --     begin
+   --        return Parse (To_String (aRow));
+   --     end To_Row_Data;
 
    --  --------------------------------------------------------------------------
 
