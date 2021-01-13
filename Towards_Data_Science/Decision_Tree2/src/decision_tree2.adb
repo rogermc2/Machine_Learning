@@ -50,8 +50,11 @@ begin
    aQuestion.Value := (UB("2"));
    Print_Question (aQuestion);
 
+   New_Line;
+   Put_Line ("Partition example");
    aQuestion := (UB("Colour"), UB(" Red"));
    Print_Question (aQuestion);
+   Put_Line ("aQuestion printed");
    Rows := Partition (Training_Data, (To_Question (aQuestion)));
    Print_Rows ("True rows: ", Rows.True_Rows);
    Print_Rows ("False rows: ", Rows.False_Rows);

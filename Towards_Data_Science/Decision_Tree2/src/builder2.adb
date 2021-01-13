@@ -37,6 +37,7 @@ package body Builder2 is
    function Is_Boolean (Item : in String) return Boolean;
    function Is_Float (Item : in String) return Boolean;
    function Is_Integer (Item : in String) return Boolean;
+   procedure Print_Row (Label : String; Row : Row_Data);
    procedure Set_Feature_Map (Features_Array : Features_Name_Array);
    --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
    function To_Label (UB_String : Raw_Label) return Label_Data;
@@ -376,8 +377,8 @@ package body Builder2 is
                        Class_Range (Fixed.Count (aString, ","));
       Last         : constant Natural := aString'Length;
       Data_Row     : Row_Data (Num_Features);
-      Pos_1        : Natural := Fixed.Index (aString, ",");
-      Pos_2        : Natural := Fixed.Index (aString (Pos_1 + 1 .. Last) , ",");
+      Pos_1        : Natural := 0;
+      Pos_2        : Natural;
    begin
       for index in 1 .. Num_Features loop
          Pos_2 := Fixed.Index (aString (Pos_1 + 1 .. Last) , ",");
@@ -423,8 +424,9 @@ package body Builder2 is
    begin
       for index in Rows.First_Index .. Rows.Last_Index loop
          Data := Rows.Element (index);
-         Put_Line ("Partition Data.Label: " & To_String (Data.Label));
+         Print_Row ("Partition a row", Data);
          if Match (aQuestion, Data) then
+            Put_Line ("Partition matched");
             True_Rows.Append (Data);
          else
             False_Rows.Append (Data);
@@ -538,6 +540,40 @@ package body Builder2 is
 
    --  --------------------------------------------------------------------------
 
+   procedure Print_Row (Label : String; Row : Row_Data) is
+   begin
+      Put (Label);
+      Put (": (");
+      for feat in Row.Features'First .. Row.Features'Last (1) loop
+         Put (To_String (Row.Features (feat)));
+      end loop;
+      Put (") " & To_String (Row.Label));
+      New_Line;
+   end Print_Row;
+
+   --  --------------------------------------------------------------------------
+
+   procedure Print_Rows (Label : String; Rows : Rows_Vector) is
+      use Rows_Package;
+      aRow : Row_Data;
+   begin
+      Put_Line (Label);
+      for index in Rows.First_Index .. Rows.Last_Index loop
+         aRow := Rows.Element (index);
+         Put ("(");
+         for feat in aRow.Features'First .. aRow.Features'Last (1) loop
+            Put (To_String (aRow.Features (feat)));
+         end loop;
+         Put (") " & To_String (aRow.Label));
+         if index /= Rows.Last_Index then
+            Put (", ");
+         end if;
+      end loop;
+      New_Line;
+   end Print_Rows;
+
+   --  --------------------------------------------------------------------------
+
    procedure Print_Tree (aTree : Tree_Package.Tree) is
       use Tree_Package;
       procedure Print_Node (Curs : Cursor) is
@@ -592,25 +628,6 @@ package body Builder2 is
    --     end Print_Unique_Values;
 
    --  -----------------------------------------------------------------------
-
-   procedure Print_Rows (Label : String; Rows : Rows_Vector) is
-      use Rows_Package;
-      aRow : Row_Data;
-   begin
-      Put_Line (Label);
-      for index in Rows.First_Index .. Rows.Last_Index loop
-         aRow := Rows.Element (index);
-         --           Put ("(" & Colour_Type'Image (aRow.Colour) & " " &
-         --                  Integer'Image (aRow.Diameter)  & " " &
-         --                  Label_Type'Image (aRow.Fruit) & ")");
-         if index /= Rows.Last_Index then
-            Put (", ");
-         end if;
-      end loop;
-      New_Line;
-   end Print_Rows;
-
-   --  --------------------------------------------------------------------------
 
    procedure Set_Feature_Map (Features_Array : Features_Name_Array) is
    begin
