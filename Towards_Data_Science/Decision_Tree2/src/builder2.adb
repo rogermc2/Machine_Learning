@@ -30,7 +30,7 @@ package body Builder2 is
    --                 To_Unbounded_String ("Label"));
 
    Features      : Feature_Map;
-   Feature_Types : Feature_Type_Map;
+--     Feature_Types : Feature_Type_Map;
    Label_Types   : Label_Type_Map;
 
    --     function Find_Type (Data : String) return Feature_Type;
@@ -315,6 +315,7 @@ package body Builder2 is
    function Match (Self : Question_Data; Example : Row_Data) return Boolean is
       Col       : constant Unbounded_String := Self.Feature;
       Feat_Type : constant Class_Range := Features.Element (Col);
+--        Feat_Type : constant Class_Range := Features.Element (Col);
       Val_Type  : constant Data_Type := Self.Feature_Kind;
       Matches   : Boolean := False;
    begin
@@ -328,39 +329,36 @@ package body Builder2 is
             declare
                Value : constant Integer := Self.Integer_Value;
             begin
-               Put_Line ("Match, Integer Value, Example: " & Integer'Image (Value) & ", " &
-                           To_String (Example.Features (Feat_Type)));
-               if Feature_Types.Element (Feat_Type) = Integer_Type then
+--                 Put_Line ("Match, Integer Value, Example: " & Integer'Image (Value) & ", " &
+--                             To_String (Example.Features (Feat_Type)));
+--                 if Data_Type'Enum_Val (Feat_Type) = Integer_Type then
                   Matches := Value =
                     Integer'Value (To_String (Example.Features (Feat_Type)));
-               end if;
+--                 end if;
             end;
          when Float_Type =>
             declare
                Value : constant Float := Self.Float_Value;
             begin
-               if Feature_Types.Element (Feat_Type) = Float_Type then
+--                 if Data_Type'Enum_Val (Feat_Type) = Float_Type then
                   Matches := Value =
                     Float'Value (To_String (Example.Features (Feat_Type)));
-               end if;
+--                 end if;
             end;
          when Boolean_Type =>
             declare
                Value : constant Boolean := Self.Boolean_Value;
             begin
-               if Feature_Types.Element (Feat_Type) = Boolean_Type then
+--                 if Data_Type'Enum_Val (Feat_Type) = Boolean_Type then
                   Matches := Value =
                     Boolean'Value (To_String (Example.Features (Feat_Type)));
-               end if;
+--                 end if;
             end;
          when UB_String_Type =>
             declare
                Value : constant Unbounded_String := Self.UB_String_Value;
             begin
-               Put_Line ("Match, UB string Value: " & To_String (Value));
-               if Feature_Types.Element (Feat_Type) = UB_String_Type then
-                  Matches := Value = Example.Features (Feat_Type);
-               end if;
+               Matches := Value = Example.Features (Feat_Type);
             end;
       end case;
 
@@ -788,11 +786,6 @@ package body Builder2 is
    --  --------------------------------------------------------------------------
 
 begin
-
-   Feature_Types.Insert (1, Integer_Type);
-   Feature_Types.Insert (2, Float_Type);
-   Feature_Types.Insert (3, Boolean_Type);
-   Feature_Types.Insert (4, UB_String_Type);
 
    Label_Types.Insert (1, Integer_Type);
    Label_Types.Insert (2, Float_Type);

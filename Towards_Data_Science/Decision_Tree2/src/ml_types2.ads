@@ -37,6 +37,8 @@ package ML_Types2 is
    end record;
 
    type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
+   pragma Ordered (Data_Type);
+
    package Label_Type_Package is new Ada.Containers.Ordered_Maps
      (Class_Range, Data_Type);
    subtype Label_Type_Map is Label_Type_Package.Map;
@@ -57,9 +59,9 @@ package ML_Types2 is
      (Unbounded_String, Class_Range);
    subtype Feature_Map is Feature_Map_Package.Map;
 
-   package Feature_Type_Package is new Ada.Containers.Ordered_Maps
-     (Class_Range, Data_Type);
-   subtype Feature_Type_Map is Feature_Type_Package.Map;
+--     package Feature_Type_Package is new Ada.Containers.Ordered_Maps
+--       (Class_Range, Data_Type);
+--     subtype Feature_Type_Map is Feature_Type_Package.Map;
 
    subtype Raw_Label is Unbounded_String;
 

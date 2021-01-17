@@ -38,7 +38,7 @@ begin
 --     New_Line;
    for index in Header_Row .Features'Range loop
       Put_Line ("Header row features: " &
-                  To_String (Header_Row .Features (index)));
+                  To_String (Header_Row.Features (index)));
    end loop;
    Print_Class_Counts (Training_Data);
    New_Line;
@@ -52,7 +52,7 @@ begin
 
    New_Line;
    Put_Line ("Partition example");
-   aQuestion := (UB("Colour"), UB(" Red"));
+   aQuestion := (UB("Colour"), UB("Red"));
    Print_Question (aQuestion);
    Put_Line ("aQuestion printed");
    Rows := Partition (Training_Data, (To_Question (aQuestion)));
