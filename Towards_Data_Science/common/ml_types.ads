@@ -6,7 +6,7 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package ML_Types2 is
+package ML_Types is
 
    Max_Features : constant Integer := 100;
    type Class_Range is new Positive range 1 .. Max_Features;
@@ -110,4 +110,4 @@ package ML_Types2 is
      (Unbounded_String);
 --     subtype Strings_List is Strings_Package.List;
 
-end ML_Types2;
+end ML_Types;

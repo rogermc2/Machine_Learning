@@ -1,9 +1,9 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with ML_Types2; use ML_Types2;
+with ML_Types; use ML_Types;
 
-package Builder2 is
+package Builder is
 
 --     package Vector_Rows_Package is new Ada.Containers.Vectors (Positive, Vector_Row_Data);
 --     subtype Rows_Vector_Vector is Vector_Rows_Package.Vector;
@@ -45,4 +45,4 @@ package Builder2 is
                        return Rows_Vector;
 --     function Unique_Values (Rows    : Rows_Vector;
 --                             Feature : Feature_Class) return Value_Set;
-end Builder2;
+end Builder;

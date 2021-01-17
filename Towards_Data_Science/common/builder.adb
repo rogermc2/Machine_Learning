@@ -21,7 +21,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  8. Divide the node according to the best question.
 --  9. Repeat again from step 1 until we get pure node (leaf node).
 
-package body Builder2 is
+package body Builder is
 
    --     type Header_Type is array (Integer range <>) of Unbounded_String;
    --     Header : constant Header_Type (1 .. 3) :=
@@ -792,4 +792,4 @@ begin
    Label_Types.Insert (3, Boolean_Type);
    Label_Types.Insert (4, UB_String_Type);
 
-end Builder2;
+end Builder;
