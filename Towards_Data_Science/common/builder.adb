@@ -30,7 +30,7 @@ package body Builder is
    --                 To_Unbounded_String ("Label"));
 
    Features      : Feature_Map;
---     Feature_Types : Feature_Type_Map;
+   --     Feature_Types : Feature_Type_Map;
    Label_Types   : Label_Type_Map;
 
    --     function Find_Type (Data : String) return Feature_Type;
@@ -107,7 +107,6 @@ package body Builder is
       for index in Rows.First_Index .. Rows.Last_Index loop
          aRow := Rows.Element (index);
          Label := To_Label (aRow.Label);
-         Put_Line ("Class_Counts Label " & Data_Type'Image (Label.Label_Kind));
          if not Counts.Contains (Label.Label_Kind) then
             Counts.Insert (Label.Label_Kind, 0);
          end if;
@@ -315,44 +314,35 @@ package body Builder is
    function Match (Self : Question_Data; Example : Row_Data) return Boolean is
       Col       : constant Unbounded_String := Self.Feature;
       Feat_Type : constant Class_Range := Features.Element (Col);
---        Feat_Type : constant Class_Range := Features.Element (Col);
       Val_Type  : constant Data_Type := Self.Feature_Kind;
       Matches   : Boolean := False;
    begin
-      New_Line;
-      Put_Line ("Match, Col: " & To_String (Col));
-      Put_Line ("Match, Value type: " & Data_Type'Image (Val_Type));
-      Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type) &
-                  " ("  & To_String (Col) & ")");
+      --        New_Line;
+      --        Put_Line ("Match, Col: " & To_String (Col));
+      --        Put_Line ("Match, Value type: " & Data_Type'Image (Val_Type));
+      --        Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type) &
+      --                    " ("  & To_String (Col) & ")");
       case Val_Type is
          when Integer_Type =>
             declare
                Value : constant Integer := Self.Integer_Value;
             begin
---                 Put_Line ("Match, Integer Value, Example: " & Integer'Image (Value) & ", " &
---                             To_String (Example.Features (Feat_Type)));
---                 if Data_Type'Enum_Val (Feat_Type) = Integer_Type then
-                  Matches := Value =
-                    Integer'Value (To_String (Example.Features (Feat_Type)));
---                 end if;
+               Matches := Value =
+                 Integer'Value (To_String (Example.Features (Feat_Type)));
             end;
          when Float_Type =>
             declare
                Value : constant Float := Self.Float_Value;
             begin
---                 if Data_Type'Enum_Val (Feat_Type) = Float_Type then
-                  Matches := Value =
-                    Float'Value (To_String (Example.Features (Feat_Type)));
---                 end if;
+               Matches := Value =
+                 Float'Value (To_String (Example.Features (Feat_Type)));
             end;
          when Boolean_Type =>
             declare
                Value : constant Boolean := Self.Boolean_Value;
             begin
---                 if Data_Type'Enum_Val (Feat_Type) = Boolean_Type then
-                  Matches := Value =
-                    Boolean'Value (To_String (Example.Features (Feat_Type)));
---                 end if;
+               Matches := Value =
+                 Boolean'Value (To_String (Example.Features (Feat_Type)));
             end;
          when UB_String_Type =>
             declare
@@ -361,9 +351,8 @@ package body Builder is
                Matches := Value = Example.Features (Feat_Type);
             end;
       end case;
-
-      Put_Line ("Example feature type : " & To_String (Example.Features (Feat_Type)));
-      Put_Line ("Match: " & Boolean'Image (Matches));
+--        Put_Line ("Example feature type : " & To_String (Example.Features (Feat_Type)));
+--        Put_Line ("Match: " & Boolean'Image (Matches));
       return Matches;
    end Match;
 
@@ -422,9 +411,9 @@ package body Builder is
    begin
       for index in Rows.First_Index .. Rows.Last_Index loop
          Data := Rows.Element (index);
-         Print_Row ("Partition a row", Data);
+--           Print_Row ("Partition a row", Data);
          if Match (aQuestion, Data) then
-            Put_Line ("Partition matched");
+--              Put_Line ("Partition matched");
             True_Rows.Append (Data);
          else
             False_Rows.Append (Data);
@@ -439,7 +428,7 @@ package body Builder is
       use Count_Package;
       aCount : Natural;
    begin
-      Put_Line ("Class_Counts:");
+      Put_Line ("Classification:");
       for index in Classification.First_Key .. Classification.Last_Key loop
          if Classification.Contains (index) then
             aCount := Classification.Element (index);
@@ -481,7 +470,6 @@ package body Builder is
       aCount        : Natural;
       aString       : Unbounded_String;
       Prob          : Natural;
-      --        Probabilities : Count_Package.Map;
    begin
       Put_Line ("Counts size:" & Natural'Image (Natural (Counts.Length)));
       for index in Counts.First_Key .. Counts.Last_Key loop
@@ -630,14 +618,14 @@ package body Builder is
    procedure Set_Feature_Map (Features_Array : Features_Name_Array) is
    begin
       for index in Features_Array'Range loop
-         Put_Line ("Set_Feature_Map feature: " &
-                     To_String (Features_Array (index)));
+--           Put_Line ("Set_Feature_Map feature: " &
+--                       To_String (Features_Array (index)));
          if not Features.Contains (Features_Array (index)) then
             Features.Insert (Features_Array (index), index);
-            Put_Line ("Set_Feature_Map feature added.");
+--              Put_Line ("Set_Feature_Map feature added.");
          end if;
-         Put_Line ("Set_Feature_Map feature code: " &
-                     Class_Range'Image (Features.Element (Features_Array (index))));
+--           Put_Line ("Set_Feature_Map feature code: " &
+--                       Class_Range'Image (Features.Element (Features_Array (index))));
       end loop;
    end Set_Feature_Map;
 

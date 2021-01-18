@@ -13,7 +13,7 @@ procedure Decision_Tree is
 
    Training_Set : constant Row_Array (1 .. 6) :=
                    --  Colour Diameter Label
-                     (UB ("Colour, Diameter, Fruit"),
+                     (UB ("Colour,Diameter,Fruit"),
                       UB ("Green, 3, Apple"),
                       UB ("Yellow, 3, Apple"),
                       UB ("Red, 1, Grape"),
@@ -54,7 +54,16 @@ begin
    Put_Line ("Partition example");
    aQuestion := (UB("Colour"), UB("Red"));
    Print_Question (aQuestion);
-   Put_Line ("aQuestion printed");
+
+   Rows := Partition (Training_Data, (To_Question (aQuestion)));
+   Print_Rows ("True rows: ", Rows.True_Rows);
+   Print_Rows ("False rows: ", Rows.False_Rows);
+
+   New_Line;
+   Put_Line ("Partition example");
+   aQuestion := (UB("Diameter"), UB("3"));
+   Print_Question (aQuestion);
+
    Rows := Partition (Training_Data, (To_Question (aQuestion)));
    Print_Rows ("True rows: ", Rows.True_Rows);
    Print_Rows ("False rows: ", Rows.False_Rows);
