@@ -119,6 +119,7 @@ package body Builder is
             Put_Line ("Label replaced "  & Data_Type'Image (Label.Label_Kind) &
                         " " & Integer'Image (Counts.Element (Label.Label_Kind)));
         end loop;
+       Put_Line ("Counts size "  & Integer'Image (Integer (Counts.Length)));
         return Counts;
     end Class_Counts;
 
