@@ -6,12 +6,16 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ML_Types; use ML_Types;
 with Builder; use Builder;
 
+--  Decision tree models where the target variable can take a discrete set of
+--  values are called classification trees.
+--  Decision trees where the target variable can take continuous values
+--  (typically real numbers) are called regression trees
 procedure Decision_Tree is
 
    function UB (Source : String) return Unbounded_String renames
      To_Unbounded_String;
 
-   Training_Set : constant Row_Array (1 .. 6) :=
+   Training_Set : constant Data_Rows (1 .. 6) :=
                    --  Colour Diameter Label
                      (UB ("Colour,Diameter,Fruit"),
                       UB ("Green, 3, Apple"),
@@ -21,8 +25,9 @@ procedure Decision_Tree is
                       UB ("Yellow, 3, Lemon"));
 
    aQuestion           : Raw_Question;
-   Header_Row          : Header_Data;
-   Training_Data       : constant Rows_Vector := To_Vector (Training_Set, Header_Row);
+   Header              : Header_Data;
+   Training_Data       : constant Rows_Vector :=
+                            To_Vector (Training_Set, Header);
    Rows                : Partitioned_Rows;
 --     No_Mixing           : Rows_Vector;
 --     Some_Mixing         : Rows_Vector;
@@ -36,9 +41,9 @@ begin
 --     Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
 --     Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
 --     New_Line;
-   for index in Header_Row .Features'Range loop
+   for index in Header .Features'Range loop
       Put_Line ("Header row features: " &
-                  To_String (Header_Row.Features (index)));
+                  To_String (Header.Features (index)));
    end loop;
    Print_Class_Counts (Training_Data);
    New_Line;

@@ -41,7 +41,7 @@ package Builder is
 --     procedure Print_Unique_Values (Rows    : Rows_Vector;
 --                                    Feature : Feature_Class);
    function To_Question (Q : Raw_Question) return Question_Data;
-   function To_Vector (Rows : Row_Array; Header_Row : out Header_Data)
+   function To_Vector (Rows : Data_Rows; Header_Row : out Header_Data)
                        return Rows_Vector;
 --     function Unique_Values (Rows    : Rows_Vector;
 --                             Feature : Feature_Class) return Value_Set;
