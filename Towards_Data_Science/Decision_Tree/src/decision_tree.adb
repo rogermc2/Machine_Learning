@@ -23,13 +23,20 @@ procedure Decision_Tree is
                       UB ("Red, 1, Grape"),
                       UB ("Red, 1, Grape"),
                       UB ("Yellow, 3, Lemon"));
+--     No_Mixing : constant Data_Rows (1 .. 3) :=
+--                     --  Colour Diameter Label
+--                       (UB ("Fruit"),
+--                        UB ("Apple"),
+--                        UB ("Apple"));
 
    aQuestion           : Raw_Question;
    Header              : Header_Data;
    Training_Data       : constant Rows_Vector :=
                             To_Vector (Training_Set, Header);
    Rows                : Partitioned_Rows;
---     No_Mixing           : Rows_Vector;
+   No_Mixing_Data      : Row_Data (1);
+   No_Mixing_Feature   : Feature_Names (1 .. 1);
+   No_Mixing           : Rows_Vector;
 --     Some_Mixing         : Rows_Vector;
 --     Lots_Of_Mixing      : Rows_Vector;
 --     Current_Uncertainty : Float;
@@ -72,12 +79,16 @@ begin
    Rows := Partition (Training_Data, (To_Question (aQuestion)));
    Print_Rows ("True rows: ", Rows.True_Rows);
    Print_Rows ("False rows: ", Rows.False_Rows);
---
---     No_Mixing.Append ((Num_Features, Green, 3, Apple));
---     No_Mixing.Append ((Num_Features, Yellow, 3, Apple));
---     Put_Line ("No_Mixing Gini " & Float'Image (Gini (No_Mixing)));
---     New_Line;
---
+
+    No_Mixing_Feature (1) := UB ("Fruit");
+    No_Mixing_Data.Features := No_Mixing_Feature;
+    No_Mixing_Data.Label := UB ("Apple");
+    No_Mixing.Append (No_Mixing_Data);
+    No_Mixing.Append (No_Mixing_Data);
+
+   Put_Line ("No_Mixing Gini " & Float'Image (Gini (No_Mixing)));
+   New_Line;
+
 --     Some_Mixing.Append ((Num_Features, Green, 3, Apple));
 --     Some_Mixing.Append ((Num_Features, Green, 3, Orange));
 --     Put_Line ("Some_Mixing Gini " & Float'Image (Gini (Some_Mixing)));

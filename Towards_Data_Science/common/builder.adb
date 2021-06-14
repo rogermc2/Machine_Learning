@@ -361,16 +361,23 @@ package body Builder is
 
     --  ---------------------------------------------------------------------------
 
+    function Num_Features (aString : String) return Class_Range is
+        use Ada.Strings;
+    begin
+--      : constant Class_Range :=
+        return Class_Range (Fixed.Count (aString, ","));
+    end Num_Features;
+
+    --  ---------------------------------------------------------------------------
+
     function Parse (aString : String) return Row_Data is
         use Ada.Strings;
-        Num_Features : constant Class_Range :=
-                         Class_Range (Fixed.Count (aString, ","));
         Last         : constant Natural := aString'Length;
-        Data_Row     : Row_Data (Num_Features);
+        Data_Row     : Row_Data (Num_Features (aString));
         Pos_1        : Natural := 0;
         Pos_2        : Natural;
     begin
-        for index in 1 .. Num_Features loop
+        for index in 1 .. Num_Features (aString) loop
             Pos_2 := Fixed.Index (aString (Pos_1 + 1 .. Last) , ",");
             if Pos_2 > 0 then
                 Data_Row.Features (index) :=

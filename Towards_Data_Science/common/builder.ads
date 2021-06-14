@@ -30,6 +30,7 @@ package Builder is
                               Current_Uncertainty : Float) return float;
    function Match (Self    : Question_Data;
                    Example : Row_Data) return Boolean;
+   function Num_Features (aString : String) return Class_Range;
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                        return Partitioned_Rows;
    procedure Print_Classification (Classification : Count_Package.Map);
