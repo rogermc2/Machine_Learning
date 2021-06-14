@@ -116,8 +116,8 @@ package body Builder is
             Count := Counts.Element (Label.Label_Kind);
             Count := Count + 1;
             Counts.Replace_Element (Count_Cursor, Count);
-            --           Put_Line ("Label replaced "  & Label_Type'Image (Label) &
-            --                     " " & Integer'Image (Counts.Element (Label)));
+            Put_Line ("Label replaced "  & Data_Type'Image (Label.Label_Kind) &
+                        " " & Integer'Image (Counts.Element (Label.Label_Kind)));
         end loop;
         return Counts;
     end Class_Counts;
@@ -152,7 +152,9 @@ package body Builder is
             Impurity := Impurity - Label_Probability ** 2;
         end Calc_Impurity;
     begin
+        Print_Rows ("Gini Rows", Rows);
         Counts := Class_Counts (Rows);
+        Print_Class_Counts (Rows);
         Counts.Iterate (Calc_Impurity'Access);
         return Impurity;
     end Gini;
@@ -364,7 +366,7 @@ package body Builder is
     function Num_Features (aString : String) return Class_Range is
         use Ada.Strings;
     begin
---      : constant Class_Range :=
+        --      : constant Class_Range :=
         return Class_Range (Fixed.Count (aString, ","));
     end Num_Features;
 
@@ -414,7 +416,7 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows is
+                        return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;
@@ -744,7 +746,7 @@ package body Builder is
     --  --------------------------------------------------------------------------
 
     function To_Vector (Rows : Data_Rows; Header_Row : out Header_Data)
-                       return Rows_Vector is
+                        return Rows_Vector is
         New_Vector  : Rows_Vector;
         First_Index : constant Positive := Rows'First;
         aRow        : Row_Data;
