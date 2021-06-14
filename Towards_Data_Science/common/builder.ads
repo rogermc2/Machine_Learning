@@ -19,10 +19,11 @@ package Builder is
 --       Ada.Containers.Indefinite_Doubly_Linked_Lists (Value_Data);
 --     subtype Value_Set is Value_Set_Package.List;
 
+   Builder_Exception : exception;
 --     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
 --     function Classify (aRow : Row_Data; aTree : Tree_Type)
 --                           return Count_Package.Map;
-   function Class_Counts (Rows : Rows_Vector) return Count_Package.Map;
+   function UB_Class_Counts (Rows : Rows_Vector) return UB_Label_Map;
 --     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type);
 --     function Find_Best_Split (Rows : Rows_Vector) return Best_Split_Data;
    function Gini (Rows : Rows_Vector) return Float;
@@ -34,7 +35,7 @@ package Builder is
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                        return Partitioned_Rows;
    procedure Print_Classification (Classification : Count_Package.Map);
-   procedure Print_Class_Counts (Rows : Rows_Vector);
+   procedure Print_UB_Class_Counts (Rows : Rows_Vector);
    function Print_Leaf (Counts : Count_Package.Map) return String;
    procedure Print_Question (Self : Raw_Question);
    procedure Print_Rows (Label : String; Rows : Rows_Vector);

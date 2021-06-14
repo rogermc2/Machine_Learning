@@ -59,9 +59,13 @@ package ML_Types is
      (Unbounded_String, Class_Range);
    subtype Feature_Map is Feature_Map_Package.Map;
 
---     package Feature_Type_Package is new Ada.Containers.Ordered_Maps
---       (Class_Range, Data_Type);
---     subtype Feature_Type_Map is Feature_Type_Package.Map;
+   package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
+     (Unbounded_String, Natural);
+   subtype UB_Label_Map is UB_Label_Map_Package.Map;
+
+   package Integer_Label_Map_Package is new Ada.Containers.Ordered_Maps
+     (Integer, Natural);
+   subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
 
    subtype Raw_Label is Unbounded_String;
 

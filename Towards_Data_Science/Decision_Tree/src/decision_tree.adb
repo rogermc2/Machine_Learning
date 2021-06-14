@@ -52,7 +52,7 @@ begin
         Put_Line ("Header row features: " &
                     To_String (Header.Features (index)));
     end loop;
-    Print_Class_Counts (Training_Data);
+    Print_UB_Class_Counts (Training_Data);
     New_Line;
 
     aQuestion.Feature := (UB ("Colour"));
