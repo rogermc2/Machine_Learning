@@ -223,11 +223,16 @@ package body Builder is
       Cols                 : Row_Data;
       Label                : Unbounded_String;
       Num_Features         : Class_Range;
-      Feature_Question     : Question_Type;
+      Boolean_Question     : Question_Type;
+      Integer_Question     : Question_Type;
+      Float_Question       : Question_Type;
+      String_Question      : Question_Type;
+      aRaw_Question        : Raw_Question;
       --        Dimension_Question  : Question_Type (Diameter_Feature);
       Split_Row            : Partitioned_Rows;
       Best_Gain            : Float := 0.0;
-      Best_Question        : Question_Type;
+      Best_Question_Type   : Question_Type;
+      Best_Q_Data_Type     : Data_Type;
       Current_Uncertainty  : constant Float := Gini (Rows);
 
       procedure Test_Gain is
@@ -239,7 +244,7 @@ package body Builder is
                                       Current_Uncertainty);
             if Gain > Best_Gain then
                Best_Gain := Gain;
-               Best_Question := Feature_Question;
+               --                 Best_Question := Feature_Question;
             end if;
          end if;
       end Test_Gain;
@@ -257,29 +262,52 @@ package body Builder is
             declare
                Features        : Feature_Data (1 .. Num_Features) :=
                                    Cols.Features;
-               Feature         : Unbounded_String;
+               String_Feature  : Unbounded_String;
                Boolean_Feature : Boolean;
                Float_Feature   : Float;
                Integer_Feature : Integer;
-               String_Feature  : Unbounded_String;
             begin
                for col in 1 .. Num_Features loop
-                  Feature := Features (col);
-                  if Is_Boolean (Feature) then
-                     Boolean_Feature := To_Boolean (Feature);
-                  elsif Is_Float (Feature) then
-                     Float_Feature := To_Float (Feature);
-                  elsif Is_Integer (Feature) then
-                     Integer_Feature := To_Integer (Feature);
+                  String_Feature := Features (col);
+                  aRaw_Question.Value := Label;
+                  aRaw_Question.Feature := String_Feature;
+                  if Is_Boolean (String_Feature) then
+                     Boolean_Feature := To_Boolean (String_Feature);
+                     Best_Q_Data_Type := Boolean_Type;
+                     Best_Question_Type := Boolean_Question;
+                  elsif Is_Float (String_Feature) then
+                     Float_Feature := To_Float (String_Feature);
+                     Best_Question_Type := Float_Question;
+                     Best_Q_Data_Type := Float_Type;
+                  elsif Is_Integer (String_Feature) then
+                     Integer_Feature := To_Integer (String_Feature);
+                     Best_Question_Type := Integer_Question;
+                     Best_Q_Data_Type := Integer_Type;
                   else --  should be a string
-                     null;
+                     Best_Question_Type := String_Question;
+                     Best_Q_Data_Type := UB_String_Type;
                   end if;
-                  Colour_Question.Colour_Value := Colour_Values (col);
-                  Dimension_Question.Diameter_Value := Dimension_Values (col);
-                  Split_Row := Partition (Rows, Colour_Question);
-                  Test_Gain;
-                  Split_Row := Partition (Rows, Dimension_Question);
-                  Test_Gain;
+
+                  declare
+                     aQuestion  : Question_Data (Best_Q_Data_Type);
+                  begin
+                     aQuestion.Feature := Features (col);
+                     case Best_Q_Data_Type is
+                     when Integer_Type =>
+                        aQuestion.Integer_Value := Integer_Feature;
+                     when Float_Type =>
+                        aQuestion.Float_Value := Float_Feature;
+                     when Boolean_Type =>
+                        aQuestion.Boolean_Value := Boolean_Feature;
+                     when UB_String_Type =>
+                        aQuestion.UB_String_Value := String_Feature;
+                     end case;
+
+                     Split_Row := Partition (Rows, Colour_Question);
+                     Test_Gain;
+                     Split_Row := Partition (Rows, Dimension_Question);
+                     Test_Gain;
+                  end;
                end loop;
             end;  --  declare block
          end loop;
