@@ -221,9 +221,10 @@ package body Builder is
         use Ada.Containers;
         use Rows_Package;
         Current_Uncertainty   : constant Float := Gini (Rows);
-        Cols                  : Row_Data;
+        Cols                  : Row_Data := Rows.First_Element;
         Label                 : Unbounded_String;
-        Num_Features          : Class_Range;
+        Num_Features          : constant Class_Range := Cols.Class_Count;
+        Features              : Feature_Data (1 .. Num_Features);
         Boolean_Question      : Question_Type;
         Integer_Question      : Question_Type;
         Float_Question        : Question_Type;
@@ -239,6 +240,7 @@ package body Builder is
         Best_Float_Question   : Question_Data (Float_Type);
         Best_Integer_Question : Question_Data (Integer_Type);
         Best_String_Question  : Question_Data (UB_String_Type);
+        String_Feature        : Unbounded_String;
         Result                : Best_Split_Data;
     begin
         --  Rows.First_Index contains column names
@@ -246,20 +248,23 @@ package body Builder is
             raise Builder_Exception with
               "Builder.Find_Best_Split called with empty rows vector";
         else
+            for col in 1 .. Num_Features loop
+                for row in Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
+                    null;
+                end loop;
+            end loop;
+
             for row in Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
                 Cols := Rows.Element (row);
+                Features := Cols.Features;
                 Label := Cols.Label;
-                Num_Features := Cols.Class_Count;
-                declare
-                    Features        : constant Feature_Data (1 .. Num_Features) :=
-                                        Cols.Features;
-                    String_Feature  : Unbounded_String;
-                    Boolean_Feature : Boolean;
-                    Float_Feature   : Float;
-                    Integer_Feature : Integer;
-                begin
-                    for col in 1 .. Num_Features loop
-                        String_Feature := Features (col);
+                for col in 1 .. Num_Features loop
+                    String_Feature := Features (col);
+                    declare
+                        Boolean_Feature : Boolean;
+                        Float_Feature   : Float;
+                        Integer_Feature : Integer;
+                    begin
                         aRaw_Question.Value := Label;
                         aRaw_Question.Feature := String_Feature;
                         if Is_Boolean (String_Feature) then
@@ -321,8 +326,8 @@ package body Builder is
                             Split_Row := Partition (Rows, aQuestion);
                             Test_Gain;
                         end;
-                    end loop;
-                end;  --  declare block
+                    end;  --  declare block
+                end loop;
             end loop;
         end if;
         case Best_Q_Data_Type is
