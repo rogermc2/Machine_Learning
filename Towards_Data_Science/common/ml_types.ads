@@ -76,7 +76,8 @@ package ML_Types is
    end record;
 
    type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
-      Feature   : Unbounded_String;
+      Feature : Unbounded_String;
+      Gain    : Float := 0.0;
       case Feature_Kind is
          when Integer_Type => Integer_Value : Integer;
          when Float_Type => Float_Value   : Float;
