@@ -228,26 +228,11 @@ package body Builder is
       Float_Question       : Question_Type;
       String_Question      : Question_Type;
       aRaw_Question        : Raw_Question;
-      --        Dimension_Question  : Question_Type (Diameter_Feature);
       Split_Row            : Partitioned_Rows;
       Best_Gain            : Float := 0.0;
       Best_Question_Type   : Question_Type;
       Best_Q_Data_Type     : Data_Type;
       Current_Uncertainty  : constant Float := Gini (Rows);
-
-      procedure Test_Gain is
-         Gain             : Float := 0.0;
-      begin
-         if Split_Row.True_Rows.Length /= 0 and then
-           Split_Row.False_Rows.Length /= 0 then
-            Gain := Information_Gain (Split_Row.True_Rows, Split_Row.False_Rows,
-                                      Current_Uncertainty);
-            if Gain > Best_Gain then
-               Best_Gain := Gain;
-               --                 Best_Question := Feature_Question;
-            end if;
-         end if;
-      end Test_Gain;
 
    begin
       --  Rows.First_Index contains column names
@@ -260,7 +245,7 @@ package body Builder is
             Label := Cols.Label;
             Num_Features := Cols.Class_Count;
             declare
-               Features        : Feature_Data (1 .. Num_Features) :=
+               Features        : constant Feature_Data (1 .. Num_Features) :=
                                    Cols.Features;
                String_Feature  : Unbounded_String;
                Boolean_Feature : Boolean;
@@ -289,7 +274,22 @@ package body Builder is
                   end if;
 
                   declare
-                     aQuestion  : Question_Data (Best_Q_Data_Type);
+                     aQuestion      : Question_Data (Best_Q_Data_Type);
+                     Best_Question  : Question_Data (Best_Q_Data_Type);
+                     procedure Test_Gain is
+                        Gain : Float := 0.0;
+                     begin
+                        if Split_Row.True_Rows.Length /= 0 and then
+                          Split_Row.False_Rows.Length /= 0 then
+                           Gain := Information_Gain (Split_Row.True_Rows, Split_Row.False_Rows,
+                                                     Current_Uncertainty);
+                           if Gain > Best_Gain then
+                              Best_Gain := Gain;
+                              Best_Question := aQuestion;
+                           end if;
+                        end if;
+                     end Test_Gain;
+
                   begin
                      aQuestion.Feature := Features (col);
                      case Best_Q_Data_Type is
@@ -303,9 +303,7 @@ package body Builder is
                         aQuestion.UB_String_Value := String_Feature;
                      end case;
 
-                     Split_Row := Partition (Rows, Colour_Question);
-                     Test_Gain;
-                     Split_Row := Partition (Rows, Dimension_Question);
+                     Split_Row := Partition (Rows, aQuestion);
                      Test_Gain;
                   end;
                end loop;
