@@ -36,9 +36,9 @@ package body Builder is
    Label_Types   : Label_Type_Map;
 
    --     function Find_Type (Data : String) return Feature_Type;
-   function Is_Boolean (Item : in String) return Boolean;
-   function Is_Float (Item : in String) return Boolean;
-   function Is_Integer (Item : in String) return Boolean;
+   function Is_Boolean (Item : in Unbounded_String) return Boolean;
+   function Is_Float (Item : in Unbounded_String) return Boolean;
+   function Is_Integer (Item : in Unbounded_String) return Boolean;
    procedure Print_Row (Label : String; Row : Row_Data);
    procedure Set_Feature_Map (Features_Array : Feature_Names);
    --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
@@ -265,11 +265,11 @@ package body Builder is
             begin
                for col in 1 .. Num_Features loop
                   Feature := Features (col);
-                  if Is_Boolean (To_String (Feature)) then
+                  if Is_Boolean (Feature) then
                      Boolean_Feature := To_Boolean (Feature);
-                  elsif Is_Float (To_String (Feature)) then
+                  elsif Is_Float (Feature) then
                      Float_Feature := To_Float (Feature);
-                  elsif Is_Integer (To_String (Feature)) then
+                  elsif Is_Integer (Feature) then
                      Integer_Feature := To_Integer (Feature);
                   else --  should be a string
                      null;
@@ -290,28 +290,31 @@ package body Builder is
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Boolean (Item : in String) return Boolean is
-      UC : constant String := Ada.Characters.Handling.To_Upper (Item);
+   function Is_Boolean (Item : in Unbounded_String) return Boolean is
+      Item_String : constant String :=
+                      Ada.Characters.Handling.To_Upper (To_String (Item));
    begin
-      return UC = "TRUE" or else UC = "FALSE";
+      return Item_String = "TRUE" or else Item_String = "FALSE";
    end Is_Boolean;
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Float (Item : in String) return Boolean is
+   function Is_Float (Item : in Unbounded_String) return Boolean is
+      Item_String : String := To_String (Item);
       use Ada.Strings;
    begin
-      return Fixed.Count (Item, ".") = 1;
+      return Fixed.Count (Item_String, ".") = 1;
    end Is_Float;
 
    --  ---------------------------------------------------------------------------
 
-   function Is_Integer (Item : in String) return Boolean is
-      Dig    : Boolean := True;
+   function Is_Integer (Item : in Unbounded_String) return Boolean is
+      Item_String : String := To_String (Item);
+      Dig         : Boolean := True;
    begin
-      for index in Item'Range loop
+      for index in Item_String'Range loop
          Dig := Dig and then
-           Ada.Characters.Handling.Is_Decimal_Digit (Item (index));
+           Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index));
       end loop;
       return Dig;
    end Is_Integer;
@@ -685,21 +688,21 @@ package body Builder is
       Value : constant String := To_String (UB_String);
       Label : Label_Data;
    begin
-      if Is_Integer (Value) then
+      if Is_Integer (UB_String) then
          declare
             Label_I  : Label_Data (Integer_Type);
          begin
             Label_I.Integer_Value := Integer'Value (Value);
             Label :=  Label_I;
          end;
-      elsif Is_Float (Value) then
+      elsif Is_Float (UB_String) then
          declare
             Label_F  : Label_Data (Float_Type);
          begin
             Label_F.Float_Value := Float'Value (Value);
             Label := Label_F;
          end;
-      elsif Is_Boolean (Value) then
+      elsif Is_Boolean (UB_String) then
          declare
             Label_B  : Label_Data (Boolean_Type);
          begin
@@ -724,21 +727,21 @@ package body Builder is
       Value  : constant String := To_String (Q.Value);
       Q_Data : Question_Data;
    begin
-      if Is_Integer (Value) then
+      if Is_Integer (Q.Value) then
          declare
             QD  : Question_Data (Integer_Type);
          begin
             QD.Integer_Value := Integer'Value (Value);
             Q_Data :=  QD;
          end;
-      elsif Is_Float (Value) then
+      elsif Is_Float (Q.Value) then
          declare
             QD  : Question_Data (Float_Type);
          begin
             QD.Float_Value := Float'Value (Value);
             Q_Data := QD;
          end;
-      elsif Is_Boolean (Value) then
+      elsif Is_Boolean (Q.Value) then
          declare
             QD  : Question_Data (Boolean_Type);
          begin
