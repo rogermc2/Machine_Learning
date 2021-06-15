@@ -100,19 +100,21 @@ package body Builder is
 
     --  ---------------------------------------------------------------------------
 
-    --     function Find_Type (Data : String) return Feature_Type is
-    --        theType : Feature_Type;
-    --     begin
-    --        if Is_Integer (Data) then
-    --           theType := Integer_Type;
-    --        elsif Is_Float (Data) then
-    --           theType := Float_Type;
-    --        elsif Is_Boolean (Data) then
-    --           theType := Boolean_Type;
-    --        end if;
-    --
-    --        return theType;
-    --     end Find_Type;
+       function Find_Data_Type (Data : Unbounded_String) return Data_Type is
+          theType : Data_Type;
+       begin
+          if Is_Integer (Data) then
+             theType := Integer_Type;
+          elsif Is_Float (Data) then
+             theType := Float_Type;
+          elsif Is_Boolean (Data) then
+             theType := Boolean_Type;
+          else
+             theType := UB_String_Type;
+          end if;
+
+          return theType;
+       end Find_Data_Type;
 
     --  ---------------------------------------------------------------------------
 
@@ -222,8 +224,12 @@ package body Builder is
         use Rows_Package;
         Current_Uncertainty   : constant Float := Gini (Rows);
         Cols                  : Row_Data := Rows.First_Element;
+        Row2                  : constant Row_Data :=
+                                  Rows.Element (Positive'Succ (Rows.First_Index));
         Label                 : Unbounded_String;
         Num_Features          : constant Class_Range := Cols.Class_Count;
+        Row2_Features         : constant Feature_Data (1 .. Num_Features) :=
+                                  Row2.Features;
         Features              : Feature_Data (1 .. Num_Features);
         Boolean_Question      : Question_Type;
         Integer_Question      : Question_Type;
@@ -232,6 +238,7 @@ package body Builder is
         aRaw_Question         : Raw_Question;
         Split_Row             : Partitioned_Rows;
         Best_Gain             : Float := 0.0;
+        Feature_Data_Type     : Data_Type;
         Question_Data_Type    : Data_Type;
         theQuestion_Type      : Question_Type;
         Best_Question_Type    : Question_Type;
@@ -249,8 +256,15 @@ package body Builder is
               "Builder.Find_Best_Split called with empty rows vector";
         else
             for col in 1 .. Num_Features loop
-                for row in Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
-                    null;
+                Feature_Data_Type := Find_Data_Type (Row2_Features (col));
+                for row in
+                  Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
+                    case Feature_Data_Type is
+                    when Boolean_Type => null;
+                    when Float_Type => null;
+                    when Integer_Type => null;
+                    when UB_String_Type => null;
+                    end case;
                 end loop;
             end loop;
 
@@ -258,15 +272,16 @@ package body Builder is
                 Cols := Rows.Element (row);
                 Features := Cols.Features;
                 Label := Cols.Label;
+
                 for col in 1 .. Num_Features loop
                     String_Feature := Features (col);
+                    aRaw_Question.Value := Label;
+                    aRaw_Question.Feature := String_Feature;
                     declare
                         Boolean_Feature : Boolean;
                         Float_Feature   : Float;
                         Integer_Feature : Integer;
                     begin
-                        aRaw_Question.Value := Label;
-                        aRaw_Question.Feature := String_Feature;
                         if Is_Boolean (String_Feature) then
                             Boolean_Feature := To_Boolean (String_Feature);
                             Question_Data_Type := Boolean_Type;
