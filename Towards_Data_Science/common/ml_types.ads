@@ -11,6 +11,7 @@ package ML_Types is
    Max_Features : constant Integer := 100;
    type Class_Range is new Positive range 1 .. Max_Features;
    type Feature_Names is array (Class_Range range <>) of Unbounded_String;
+   type Feature_Data is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
    subtype Feature_Class is Class_Range;
    subtype Question_Type is Class_Range;
@@ -18,7 +19,7 @@ package ML_Types is
    type Node_Kind is (Decision_Kind, Prediction_Kind);
 
    type Row_Data (Class_Count : Class_Range := 2) is record
-      Features : Feature_Names (1 .. Class_Count);
+      Features : Feature_Data (1 .. Class_Count);
       Label    : Unbounded_String;
    end record;
 

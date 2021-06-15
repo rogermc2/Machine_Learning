@@ -99,8 +99,6 @@ begin
    New_Line;
 
    Mixing_Data.Features := Mixing_Feature;
---     Mixing_Data.Label := UB ("Apple");
---     Lots_Of_Mixing.Append (Mixing_Data);
    Lots_Of_Mixing.Append ((1, Mixing_Feature, UB ("Apple")));
    Lots_Of_Mixing.Append ((1, Mixing_Feature, UB ("Orange")));
    Lots_Of_Mixing.Append ((1, Mixing_Feature, UB ("Grape")));

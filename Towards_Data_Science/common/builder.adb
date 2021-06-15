@@ -42,6 +42,9 @@ package body Builder is
    procedure Print_Row (Label : String; Row : Row_Data);
    procedure Set_Feature_Map (Features_Array : Feature_Names);
    --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
+   function To_Boolean (Item : in Unbounded_String) return Boolean;
+   function To_Float (Item : in Unbounded_String) return Float;
+   function To_Integer (Item : in Unbounded_String) return Integer;
    function To_Label (UB_String : Raw_Label) return Label_Data;
    --     function To_Row_Data (aRow : Unbounded_String) return Row_Data;
 
@@ -213,52 +216,77 @@ package body Builder is
    --  -----------------------------------------------------------------------
    --   Find_Best_Split finds the best question to ask by iterating over every
    --   feature / value and calculating the information gain.
-      function Find_Best_Split (Rows : Rows_Vector)
-                                return Best_Split_Data is
-         use Ada.Containers;
-         use Rows_Package;
-         Cols : Row_Data;
-         Colour_Values       : array (1 .. Rows_Length) of Colour_Type;
-         Dimension_Values    : array (1 .. Rows_Length) of Integer;
-         Colour_Question     : Question_Type;
-   --        Dimension_Question  : Question_Type (Diameter_Feature);
-         Split_Row           : Partitioned_Rows;
-         Best_Gain           : Float := 0.0;
-         Best_Question       : Question_Type;
-         Current_Uncertainty : constant Float := Gini (Rows);
+   function Find_Best_Split (Rows : Rows_Vector)
+                             return Best_Split_Data is
+      use Ada.Containers;
+      use Rows_Package;
+      Cols                 : Row_Data;
+      Label                : Unbounded_String;
+      Num_Features         : Class_Range;
+      Feature_Question     : Question_Type;
+      --        Dimension_Question  : Question_Type (Diameter_Feature);
+      Split_Row            : Partitioned_Rows;
+      Best_Gain            : Float := 0.0;
+      Best_Question        : Question_Type;
+      Current_Uncertainty  : constant Float := Gini (Rows);
 
-         procedure Test_Gain is
-            Gain             : Float := 0.0;
-         begin
-            if Split_Row.True_Rows.Length /= 0 and then
-              Split_Row.False_Rows.Length /= 0 then
-               Gain := Information_Gain (Split_Row.True_Rows, Split_Row.False_Rows,
-                                         Current_Uncertainty);
-               if Gain > Best_Gain then
-                  Best_Gain := Gain;
-                  Best_Question := Colour_Question;
-               end if;
-            end if;
-         end Test_Gain;
-
+      procedure Test_Gain is
+         Gain             : Float := 0.0;
       begin
-         for row in Rows.First_Index .. Rows.Last_Index loop
+         if Split_Row.True_Rows.Length /= 0 and then
+           Split_Row.False_Rows.Length /= 0 then
+            Gain := Information_Gain (Split_Row.True_Rows, Split_Row.False_Rows,
+                                      Current_Uncertainty);
+            if Gain > Best_Gain then
+               Best_Gain := Gain;
+               Best_Question := Feature_Question;
+            end if;
+         end if;
+      end Test_Gain;
+
+   begin
+      --  Rows.First_Index contains column names
+      if Rows.Length < 2 then
+         raise Builder_Exception with
+           "Builder.Find_Best_Split called with empty rows vector";
+      else
+         for row in Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
             Cols := Rows.Element (row);
-            Colour_Values (col) := Rows.Element (col).Colour;
-            Dimension_Values (col) := Rows.Element (col).Diameter;
+            Label := Cols.Label;
+            Num_Features := Cols.Class_Count;
+            declare
+               Features        : Feature_Data (1 .. Num_Features) :=
+                                   Cols.Features;
+               Feature         : Unbounded_String;
+               Boolean_Feature : Boolean;
+               Float_Feature   : Float;
+               Integer_Feature : Integer;
+               String_Feature  : Unbounded_String;
+            begin
+               for col in 1 .. Num_Features loop
+                  Feature := Features (col);
+                  if Is_Boolean (To_String (Feature)) then
+                     Boolean_Feature := To_Boolean (Feature);
+                  elsif Is_Float (To_String (Feature)) then
+                     Float_Feature := To_Float (Feature);
+                  elsif Is_Integer (To_String (Feature)) then
+                     Integer_Feature := To_Integer (Feature);
+                  else --  should be a string
+                     null;
+                  end if;
+                  Colour_Question.Colour_Value := Colour_Values (col);
+                  Dimension_Question.Diameter_Value := Dimension_Values (col);
+                  Split_Row := Partition (Rows, Colour_Question);
+                  Test_Gain;
+                  Split_Row := Partition (Rows, Dimension_Question);
+                  Test_Gain;
+               end loop;
+            end;  --  declare block
          end loop;
+      end if;
 
-         for col in 1 .. Colour_Values'Length loop
-            Colour_Question.Colour_Value := Colour_Values (col);
-            Dimension_Question.Diameter_Value := Dimension_Values (col);
-            Split_Row := Partition (Rows, Colour_Question);
-            Test_Gain;
-            Split_Row := Partition (Rows, Dimension_Question);
-            Test_Gain;
-         end loop;
-
-         return (Best_Gain, Best_Question);
-      end Find_Best_Split;
+      return (Best_Gain, Best_Question);
+   end Find_Best_Split;
 
    --  ---------------------------------------------------------------------------
 
@@ -441,8 +469,8 @@ package body Builder is
    begin
       Put_Line ("Class_Counts:");
       while Has_Element (Count_Cursor) loop
-            aCount := Element (Count_Cursor);
-            Put_Line (To_String ((Key (Count_Cursor))) &  ": " & Natural'Image (aCount));
+         aCount := Element (Count_Cursor);
+         Put_Line (To_String ((Key (Count_Cursor))) &  ": " & Natural'Image (aCount));
          next (Count_Cursor);
       end loop;
    end Print_UB_Class_Counts;
@@ -632,6 +660,27 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
+   function To_Boolean (Item : in Unbounded_String) return Boolean is
+   begin
+      return Boolean'Value (To_String (Item));
+   end To_Boolean;
+
+   --  --------------------------------------------------------------------------
+
+   function To_Float (Item : in Unbounded_String) return Float is
+   begin
+      return Float'Value (To_String (Item));
+   end To_Float;
+
+   --  --------------------------------------------------------------------------
+
+   function To_Integer (Item : in Unbounded_String) return Integer is
+   begin
+      return Integer'Value (To_String (Item));
+   end To_Integer;
+
+   --  --------------------------------------------------------------------------
+
    function To_Label (UB_String : Raw_Label) return Label_Data is
       Value : constant String := To_String (UB_String);
       Label : Label_Data;
@@ -749,21 +798,21 @@ package body Builder is
          Label := To_Label (aRow.Label);
          if Label.Label_Kind /= UB_String_Type then
             raise Builder_Exception with
-            "Builder.UB_Class_Counts, Label_Kind is not UB_String_Type";
+              "Builder.UB_Class_Counts, Label_Kind is not UB_String_Type";
          else
-               if not Label_Counts.Contains (Label.UB_String_Value) then
-                  Label_Counts.Insert (Label.UB_String_Value, 0);
-               end if;
-               Count_Cursor := Label_Counts.Find (Label.UB_String_Value);
-               Count := Label_Counts.Element (Label.UB_String_Value);
-               Count := Count + 1;
-               Label_Counts.Replace_Element (Count_Cursor, Count);
---              Put_Line ("Label replaced "  &
---                          Data_Type'Image (Label.Label_Kind) &  " " &
---                         Integer'Image (Label_Counts.Element (Label.UB_String_Value)));
+            if not Label_Counts.Contains (Label.UB_String_Value) then
+               Label_Counts.Insert (Label.UB_String_Value, 0);
+            end if;
+            Count_Cursor := Label_Counts.Find (Label.UB_String_Value);
+            Count := Label_Counts.Element (Label.UB_String_Value);
+            Count := Count + 1;
+            Label_Counts.Replace_Element (Count_Cursor, Count);
+            --              Put_Line ("Label replaced "  &
+            --                          Data_Type'Image (Label.Label_Kind) &  " " &
+            --                         Integer'Image (Label_Counts.Element (Label.UB_String_Value)));
          end if;
       end loop;
---        Put_Line ("Label_Counts size "  & Integer'Image (Integer (Label_Counts.Length)));
+      --        Put_Line ("Label_Counts size "  & Integer'Image (Integer (Label_Counts.Length)));
       return Label_Counts;
    end UB_Class_Counts;
 
