@@ -25,7 +25,7 @@ package Builder is
 --                           return Count_Package.Map;
    function UB_Class_Counts (Rows : Rows_Vector) return UB_Label_Map;
 --     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type);
---     function Find_Best_Split (Rows : Rows_Vector) return Best_Split_Data;
+   function Find_Best_Split (Rows : Rows_Vector) return Best_Split_Data;
    function Gini (Rows : Rows_Vector) return Float;
    function Information_Gain (Left, Right : Rows_Vector;
                               Current_Uncertainty : Float) return float;

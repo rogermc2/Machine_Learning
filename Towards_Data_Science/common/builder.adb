@@ -1,7 +1,7 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
 with Ada.Characters.Handling;
---  with Ada.Containers;
+with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -213,50 +213,52 @@ package body Builder is
    --  -----------------------------------------------------------------------
    --   Find_Best_Split finds the best question to ask by iterating over every
    --   feature / value and calculating the information gain.
-   --     function Find_Best_Split (Rows : Rows_Vector)
-   --                               return Best_Split_Data is
-   --        use Ada.Containers;
-   --        Rows_Length         : constant Integer := Integer (Rows.Length);
-   --         Colour_Values       : array (1 .. Rows_Length) of Colour_Type;
-   --        Dimension_Values    : array (1 .. Rows_Length) of Integer;
-   --        Colour_Question     : Question_Type;
-   --  --        Dimension_Question  : Question_Type (Diameter_Feature);
-   --        Split_Row           : Partitioned_Rows;
-   --        Best_Gain           : Float := 0.0;
-   --        Best_Question       : Question_Type;
-   --        Current_Uncertainty : constant Float := Gini (Rows);
-   --
-   --        procedure Test_Gain is
-   --           Gain             : Float := 0.0;
-   --        begin
-   --           if Split_Row.True_Rows.Length /= 0 and
-   --             Split_Row.False_Rows.Length /= 0 then
-   --              Gain := Information_Gain (Split_Row.True_Rows, Split_Row.False_Rows,
-   --                                        Current_Uncertainty);
-   --              if Gain > Best_Gain then
-   --                 Best_Gain := Gain;
-   --                 Best_Question := Colour_Question;
-   --              end if;
-   --           end if;
-   --        end Test_Gain;
-   --
-   --     begin
-   --        for col in 1 .. Rows_Length loop
-   --           Colour_Values (col) := Rows.Element (col).Colour;
-   --           Dimension_Values (col) := Rows.Element (col).Diameter;
-   --        end loop;
-   --
-   --        for col in 1 .. Colour_Values'Length loop
-   --           Colour_Question.Colour_Value := Colour_Values (col);
-   --           Dimension_Question.Diameter_Value := Dimension_Values (col);
-   --           Split_Row := Partition (Rows, Colour_Question);
-   --           Test_Gain;
-   --           Split_Row := Partition (Rows, Dimension_Question);
-   --           Test_Gain;
-   --        end loop;
-   --
-   --        return (Best_Gain, Best_Question);
-   --     end Find_Best_Split;
+      function Find_Best_Split (Rows : Rows_Vector)
+                                return Best_Split_Data is
+         use Ada.Containers;
+         use Rows_Package;
+         Cols : Row_Data;
+         Colour_Values       : array (1 .. Rows_Length) of Colour_Type;
+         Dimension_Values    : array (1 .. Rows_Length) of Integer;
+         Colour_Question     : Question_Type;
+   --        Dimension_Question  : Question_Type (Diameter_Feature);
+         Split_Row           : Partitioned_Rows;
+         Best_Gain           : Float := 0.0;
+         Best_Question       : Question_Type;
+         Current_Uncertainty : constant Float := Gini (Rows);
+
+         procedure Test_Gain is
+            Gain             : Float := 0.0;
+         begin
+            if Split_Row.True_Rows.Length /= 0 and then
+              Split_Row.False_Rows.Length /= 0 then
+               Gain := Information_Gain (Split_Row.True_Rows, Split_Row.False_Rows,
+                                         Current_Uncertainty);
+               if Gain > Best_Gain then
+                  Best_Gain := Gain;
+                  Best_Question := Colour_Question;
+               end if;
+            end if;
+         end Test_Gain;
+
+      begin
+         for row in Rows.First_Index .. Rows.Last_Index loop
+            Cols := Rows.Element (row);
+            Colour_Values (col) := Rows.Element (col).Colour;
+            Dimension_Values (col) := Rows.Element (col).Diameter;
+         end loop;
+
+         for col in 1 .. Colour_Values'Length loop
+            Colour_Question.Colour_Value := Colour_Values (col);
+            Dimension_Question.Diameter_Value := Dimension_Values (col);
+            Split_Row := Partition (Rows, Colour_Question);
+            Test_Gain;
+            Split_Row := Partition (Rows, Dimension_Question);
+            Test_Gain;
+         end loop;
+
+         return (Best_Gain, Best_Question);
+      end Find_Best_Split;
 
    --  ---------------------------------------------------------------------------
 
