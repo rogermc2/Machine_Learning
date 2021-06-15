@@ -178,6 +178,77 @@ package body Builder is
    --        end loop;
    --     end Evaluate;
 
+   --  -------------------------------------------------------------------
+
+   type Boolean_Values_Type is array (Class_Range range <>) of Boolean;
+   type Float_Values_Type is array (Class_Range range <>) of Float;
+   type Integer_Values_Type is array (Class_Range range <>) of Integer;
+   type UB_Values_Type is array (Class_Range range <>) of Unbounded_String;
+
+      generic
+         type Value_Data_Type is (<>);
+         type Data_Type is (<>);
+         type Values_Type is array (Class_Range range <>) of Value_Data_Type;
+      procedure Process_Values (Rows : Rows_Vector; Values : Values_Type;
+      Feature   : Unbounded_String; Uncertainty : Float;
+      Question  : in out Question_Data; Best_Gain : in out Float;
+      Best_Question : in out Question_Data);
+
+   procedure Process_Values
+     (Rows : Rows_Vector; Values : Values_Type;
+      Feature   : Unbounded_String; Uncertainty : Float;
+      Question  : in out Question_Data; Best_Gain : in out Float;
+      Best_Question : in out Question_Data) is
+      Split_Row : Partitioned_Rows;
+   begin
+      for val in Values'Range loop
+         Question.Feature := Feature;
+         case Question.Feature_Kind is
+         when Boolean_Type =>
+            Question.Boolean_Value := Values (val);
+         when others => null;
+         end case;
+         Split_Row := Partition (Rows, Question);
+         if not Split_Row.True_Rows.Is_Empty and then
+           not Split_Row.False_Rows.Is_Empty then
+            Question.Gain := Information_Gain
+              (Split_Row.True_Rows, Split_Row.False_Rows, Uncertainty);
+            if Question.Gain >= Best_Gain then
+               Best_Gain := Question.Gain;
+               Best_Question := Question;
+            end if;
+         end if;
+      end loop;
+   end Process_Values;
+
+   procedure Process_Boolean_Values
+     (Rows      : Rows_Vector; Values : Boolean_Values_Type;
+      Feature   : Unbounded_String; Uncertainty : Float;
+      Question  : in out Question_Data; Best_Gain : in out Float;
+      Best_Question : in out Question_Data) is
+      Split_Row : Partitioned_Rows;
+   begin
+      for val in Values'Range loop
+         Question.Feature := Feature;
+         Question.Boolean_Value := Values (val);
+         Split_Row := Partition (Rows, Question);
+         if not Split_Row.True_Rows.Is_Empty and then
+           not Split_Row.False_Rows.Is_Empty then
+            Question.Gain := Information_Gain
+              (Split_Row.True_Rows, Split_Row.False_Rows, Uncertainty);
+            if Question.Gain >= Best_Gain then
+               Best_Gain := Question.Gain;
+               Best_Question := Question;
+            end if;
+         end if;
+      end loop;
+   end Process_Boolean_Values;
+
+   --  -------------------------------------------------------------------
+
+   --     procedure Process_Boolean_Values is
+   --         new Process (GL.Index_2D, GL.Types.Ints.Vector2);
+
    --  -----------------------------------------------------------------------
    --   Find_Best_Split finds the best question to ask by iterating over every
    --   feature / value and calculating the information gain.
@@ -199,7 +270,7 @@ package body Builder is
       Features              : Feature_Data (1 .. Num_Features);
       Feature               : Unbounded_String;
       Feature_Data_Type     : Data_Type;
-      Boolean_Values        : array (1 .. Num_Features) of Boolean;
+      Boolean_Values        : Boolean_Values_Type (1 .. Num_Features);
       Float_Values          : array (1 .. Num_Features) of Float;
       Integer_Values        : array (1 .. Num_Features) of Integer;
       String_Values         : array (1 .. Num_Features) of Unbounded_String;
@@ -252,21 +323,9 @@ package body Builder is
 
             case Feature_Data_Type is
                when Boolean_Type =>
-                  for val in Boolean_Values'Range loop
-                     Boolean_Question.Feature := Feature;
-                     Boolean_Question.Boolean_Value := Boolean_Values (val);
-                     Split_Row := Partition (Rows, Boolean_Question);
-                     if not Split_Row.True_Rows.Is_Empty and then
-                       not Split_Row.False_Rows.Is_Empty then
-                        Boolean_Question.Gain := Information_Gain
-                          (Split_Row.True_Rows, Split_Row.False_Rows,
-                           Current_Uncertainty);
-                        if Boolean_Question.Gain >= Best_Gain then
-                           Best_Gain := Boolean_Question.Gain;
-                           Best_Boolean_Question := Boolean_Question;
-                        end if;
-                     end if;
-                  end loop;
+                  Process_Boolean_Values
+                    (Rows, Boolean_Values, Feature, Current_Uncertainty,
+                     Boolean_Question, Best_Gain, Best_Boolean_Question);
                when Float_Type =>
                   Float_Values (col) := To_Float (Feature);
                when Integer_Type =>
