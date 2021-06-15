@@ -35,7 +35,7 @@ package body Builder is
     --     Feature_Types : Feature_Type_Map;
     Label_Types   : Label_Type_Map;
 
-    --     function Find_Type (Data : String) return Feature_Type;
+    function Get_Data_Type (Data : Unbounded_String) return Data_Type;
     function Is_Boolean (Item : in Unbounded_String) return Boolean;
     function Is_Float (Item : in Unbounded_String) return Boolean;
     function Is_Integer (Item : in Unbounded_String) return Boolean;
@@ -99,43 +99,6 @@ package body Builder is
     --     end Build_Tree;
 
     --  ---------------------------------------------------------------------------
-
-       function Find_Data_Type (Data : Unbounded_String) return Data_Type is
-          theType : Data_Type;
-       begin
-          if Is_Integer (Data) then
-             theType := Integer_Type;
-          elsif Is_Float (Data) then
-             theType := Float_Type;
-          elsif Is_Boolean (Data) then
-             theType := Boolean_Type;
-          else
-             theType := UB_String_Type;
-          end if;
-
-          return theType;
-       end Find_Data_Type;
-
-    --  ---------------------------------------------------------------------------
-
-    function Gini (Rows : Rows_Vector) return Float is
-        use UB_Label_Map_Package;
-        Counts            : UB_Label_Map;
-        Rows_Size         : constant Float := Float (Rows.Length);
-        Impurity          : Float := 1.0;
-        procedure Calc_Impurity (Curs : UB_Label_Map_Package.Cursor) is
-            Label_Probability : Float range 0.0 .. 1.0;
-        begin
-            Label_Probability := Float (Element (Curs)) / Rows_Size;
-            Impurity := Impurity - Label_Probability ** 2;
-        end Calc_Impurity;
-    begin
-        Print_Rows ("Gini Rows", Rows);
-        Counts := UB_Class_Counts (Rows);
-        Print_UB_Class_Counts (Rows);
-        Counts.Iterate (Calc_Impurity'Access);
-        return Impurity;
-    end Gini;
 
     --  ---------------------------------------------------------------------------
     --  Uncertainty is the uncertainty of the starting node minus
@@ -256,7 +219,7 @@ package body Builder is
               "Builder.Find_Best_Split called with empty rows vector";
         else
             for col in 1 .. Num_Features loop
-                Feature_Data_Type := Find_Data_Type (Row2_Features (col));
+                Feature_Data_Type := Get_Data_Type (Row2_Features (col));
                 for row in
                   Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
                     case Feature_Data_Type is
@@ -360,6 +323,43 @@ package body Builder is
     end Find_Best_Split;
 
     --  ---------------------------------------------------------------------------
+
+    function Get_Data_Type (Data : Unbounded_String) return Data_Type is
+        theType : Data_Type;
+    begin
+        if Is_Integer (Data) then
+            theType := Integer_Type;
+        elsif Is_Float (Data) then
+            theType := Float_Type;
+        elsif Is_Boolean (Data) then
+            theType := Boolean_Type;
+        else
+            theType := UB_String_Type;
+        end if;
+
+        return theType;
+    end Get_Data_Type;
+
+    --  ---------------------------------------------------------------------------
+
+    function Gini (Rows : Rows_Vector) return Float is
+        use UB_Label_Map_Package;
+        Counts            : UB_Label_Map;
+        Rows_Size         : constant Float := Float (Rows.Length);
+        Impurity          : Float := 1.0;
+        procedure Calc_Impurity (Curs : UB_Label_Map_Package.Cursor) is
+            Label_Probability : Float range 0.0 .. 1.0;
+        begin
+            Label_Probability := Float (Element (Curs)) / Rows_Size;
+            Impurity := Impurity - Label_Probability ** 2;
+        end Calc_Impurity;
+    begin
+        Print_Rows ("Gini Rows", Rows);
+        Counts := UB_Class_Counts (Rows);
+        Print_UB_Class_Counts (Rows);
+        Counts.Iterate (Calc_Impurity'Access);
+        return Impurity;
+    end Gini;
 
     function Is_Boolean (Item : in Unbounded_String) return Boolean is
         Item_String : constant String :=
