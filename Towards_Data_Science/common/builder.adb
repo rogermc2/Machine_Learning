@@ -28,11 +28,6 @@ package body Builder is
     type Integer_Values_Type is array (Class_Range range <>) of Integer;
     type UB_Values_Type is array (Class_Range range <>) of Unbounded_String;
 
-    type Best_Data is record
-        Question : Question_Data;
-        Gain     : Float := 0.0;
-    end record;
-
     pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
 
     Features      : Feature_Map;
@@ -228,7 +223,7 @@ package body Builder is
 
     --  -----------------------------------------------------------------------
 
- procedure Process_String_Values
+    procedure Process_String_Values
       (Rows      : Rows_Vector; Values : UB_Values_Type;
        Feature   : Unbounded_String; Uncertainty : Float;
        Question  : in out Question_Data; Best : in out Best_Data) is
@@ -243,22 +238,16 @@ package body Builder is
     --  -----------------------------------------------------------------------
     --   Find_Best_Split finds the best question to ask by iterating over every
     --   feature / value and calculating the information gain.
-    function Find_Best_Split (Rows : Rows_Vector)
-                              return Best_Split_Data is
+    function Find_Best_Split (Rows : Rows_Vector) return Best_Data is
         use Ada.Containers;
         use Rows_Package;
         Current_Uncertainty   : constant Float := Gini (Rows);
         Cols                  : constant Row_Data := Rows.First_Element;
         Row2                  : constant Row_Data :=
                                   Rows.Element (Positive'Succ (Rows.First_Index));
-        Label_Array           : array (1 .. Integer (Rows.Length) - 1) of
-          Unbounded_String;
-        Label_Index           : Natural := 0;
-        Label                 : Unbounded_String;
         Num_Features          : constant Class_Range := Cols.Class_Count;
         Row2_Features         : constant Feature_Data (1 .. Num_Features) :=
                                   Row2.Features;
-        Features              : Feature_Data (1 .. Num_Features);
         Feature               : Unbounded_String;
         Feature_Data_Type     : Data_Type;
         Boolean_Values        : Boolean_Values_Type (1 .. Num_Features);
@@ -269,33 +258,13 @@ package body Builder is
         Integer_Question      : Question_Data (Integer_Type);
         Float_Question        : Question_Data (Float_Type);
         String_Question       : Question_Data (UB_String_Type);
-        aRaw_Question         : Raw_Question;
-        Split_Row             : Partitioned_Rows;
         Best                  : Best_Data;
-        Gain                  : Float := 0.0;
-        Best_Gain             : Float := 0.0;
-        Question_Data_Type    : Data_Type;
-        theQuestion_Type      : Question_Type;
-        Best_Question_Type    : Question_Type;
-        Best_Q_Data_Type      : Data_Type;
-        Best_Boolean_Question : Question_Data (Boolean_Type);
-        Best_Float_Question   : Question_Data (Float_Type);
-        Best_Integer_Question : Question_Data (Integer_Type);
-        Best_String_Question  : Question_Data (UB_String_Type);
-        String_Feature        : Unbounded_String;
-        Result                : Best_Split_Data;
     begin
         --  Rows.First_Index contains column names
         if Rows.Length < 2 then
             raise Builder_Exception with
               "Builder.Find_Best_Split called with empty rows vector";
         else
-            for row in
-              Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
-                Label_Index := Label_Index + 1;
-                Label_Array (Label_Index) := Rows.Element (row).Label;
-            end loop;
-
             for col in 1 .. Num_Features loop
                 Feature_Data_Type := Get_Data_Type (Row2_Features (col));
                 for row in
@@ -333,19 +302,8 @@ package body Builder is
                 end case;
             end loop;
         end if;
+        return Best;
 
-        case Best_Q_Data_Type is
-            when Boolean_Type =>
-                Result := (Best_Gain, Best_Question_Type);
-            when Float_Type =>
-                Result := (Best_Gain, Best_Question_Type);
-            when Integer_Type =>
-                Result := (Best_Gain, Best_Question_Type);
-            when UB_String_Type =>
-                Result := (Best_Gain, Best_Question_Type);
-        end case;
-
-        return Result;
     end Find_Best_Split;
 
     --  ---------------------------------------------------------------------------
