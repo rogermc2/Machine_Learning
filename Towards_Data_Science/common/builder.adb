@@ -567,33 +567,33 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    procedure Print_Question (Self : Raw_Question) is
-    --  Example" Self = ("Colour", "Green"));
-    --        use Feature_Map_Package;
-        Col        : constant String := To_String (Self.Feature);
-        Value      : constant String := To_String (Self.Value);
-        --        Feature_ID : constant Class_Range := Features.Element (Col);
-        --        V_Type     : constant Feature_Type := Find_Type (Value);
-        --        QD         : Question_Data (V_Type);
-        --        theKey : Unbounded_String := To_Unbounded_String ("Unknown");
-
-        --        procedure Find_Key (Curs : Cursor) is
-        --        begin
-        --           if Features.Element (Curs) = Col then
-        --              theKey := Key (Curs);
-        --           end if;
-        --        end Find_Key;
+    procedure Print_Question (Self : Question_Data) is
+        Col          : constant String := To_String (Self.Feature);
+        Feature_Kind : constant Data_Type := Self.Feature_Kind;
     begin
-        --        Features.Iterate (Find_Key'Access);
-        --        QD.Column := Self.Feature;
-        --        case V_Type is
-        --           when Integer_Type => QD.Integer_Value := Integer'Value (Value);
-        --           when Float_Type => QD.Float_Value := Float'Value (Value);
-        --           when Boolean_Type => QD.Boolean_Value := Boolean'Value (Value);
-        --           when UB_String_Type => qd.UB_String_Value := To_Unbounded_String (Value);
-        --        end case;
-        Put_Line ("Is " & Col & " = " & " " & Value);
+        Put ("Is " & Col & " = ");
+        case Feature_Kind is
+            when Integer_Type =>
+                Put_Line (Integer'Image (Self.Integer_Value));
+            when Float_Type =>
+                Put_Line (Float'Image (Self.Float_Value));
+            when Boolean_Type =>
+                Put_Line (Boolean'Image (Self.Boolean_Value));
+            when UB_String_Type => Put_Line (To_String (Self.UB_String_Value));
+        end case;
+        Put_Line (Float'Image (Self.Gain));
+
     end Print_Question;
+
+    --  --------------------------------------------------------------------------
+
+    procedure Print_Raw_Question (Self : Raw_Question) is
+    --  Example" Self = ("Colour", "Green"));
+        Col   : constant String := To_String (Self.Feature);
+        Value : constant String := To_String (Self.Value);
+    begin
+        Put_Line ("Is " & Col & " = " & " " & Value);
+    end Print_Raw_Question;
 
     --  --------------------------------------------------------------------------
 
