@@ -38,7 +38,7 @@ package Builder is
                     Example : Row_Data) return Boolean;
     function Num_Features (aString : String) return Class_Range;
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows;
+                        return Partitioned_Rows;
     procedure Print_Classification (Classification : Count_Package.Map);
     procedure Print_UB_Class_Counts (Rows : Rows_Vector);
     function Print_Leaf (Counts : Count_Package.Map) return String;
@@ -49,8 +49,8 @@ package Builder is
     --     procedure Print_Unique_Values (Rows    : Rows_Vector;
     --                                    Feature : Feature_Class);
     function To_Question (Q : Raw_Question) return Question_Data;
-    function To_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
-                       return Rows_Vector;
+    function To_Rows_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
+                             return Rows_Vector;
     --     function Unique_Values (Rows    : Rows_Vector;
     --                             Feature : Feature_Class) return Value_Set;
 private

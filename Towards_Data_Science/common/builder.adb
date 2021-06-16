@@ -39,8 +39,7 @@ package body Builder is
     function Is_Float (Item : in Unbounded_String) return Boolean;
     function Is_Integer (Item : in Unbounded_String) return Boolean;
     procedure Print_Row (Label : String; Row : Row_Data);
---      procedure Set_Feature_Map (Features_Array : Feature_Names);
-    procedure Set_Feature_Map (Features_Array : Feature_Names);
+    procedure Set_Feature_Map (Rows : Rows_Vector);
 
     procedure Split (Rows : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
@@ -271,7 +270,7 @@ package body Builder is
         String_Question       : Question_Data (UB_String_Type);
         Best                  : Best_Data;
     begin
-        Set_Feature_Map (Feature_Names (Rows.Element (Rows.First_Index).Features));
+        Set_Feature_Map (Rows);
         --  Rows.First_Index contains column names
         if Rows.Length < 2 then
             raise Builder_Exception with
@@ -498,7 +497,7 @@ package body Builder is
             Pos_1 := Pos_2 + 1;
         end loop;
         Header_Row.Label := To_Unbounded_String (Header (Pos_1 + 1 .. Last));
-        Set_Feature_Map (Feature_Names (Header_Row.Features));
+--          Set_Feature_Map (Feature_Names (Header_Row.Features));
         return Header_Row;
     end Parse_Header;
 
@@ -512,7 +511,6 @@ package body Builder is
     begin
         for index in Rows.First_Index .. Rows.Last_Index loop
             Data := Rows.Element (index);
-            Print_Row ("Builder.Partition partitioning a row", Data);
             if Match (aQuestion, Data) then
                 Put_Line ("Builder.Partition Partition matched");
                 True_Rows.Append (Data);
@@ -714,13 +712,15 @@ package body Builder is
 
     --  -----------------------------------------------------------------------
 
-    procedure Set_Feature_Map (Features_Array : Feature_Names) is
+    procedure Set_Feature_Map (Rows : Rows_Vector) is
+        Header_Row : constant Row_Data := Rows.First_Element;
+        Cols       : constant Feature_Data := Header_Row.Features;
     begin
-        for index in Features_Array'Range loop
+        for index in Cols'Range loop
             Put_Line ("Set_Feature_Map feature: " &
-                        To_String (Features_Array (index)));
-            if not Features.Contains (Features_Array (index)) then
-                Features.Insert (Features_Array (index), index);
+                        To_String (Cols (index)));
+            if not Features.Contains (Cols (index)) then
+                Features.Insert (Cols (index), index);
                 --              Put_Line ("Set_Feature_Map feature added.");
             end if;
             --           Put_Line ("Set_Feature_Map feature code: " &
@@ -855,20 +855,20 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    function To_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
+    function To_Rows_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
                         return Rows_Vector is
         New_Vector  : Rows_Vector;
         First_Index : constant Positive := Rows'First;
         aRow        : Row_Data;
     begin
         Header_Row := Parse_Header (To_String (Rows (Rows'First)));
-        Set_Feature_Map (Feature_Names (Header_Row.Features));
-        for index in Positive'Succ (First_Index) .. Rows'Last loop
+        for index in First_Index .. Rows'Last loop
             aRow := Parse (To_String (Rows (index)));
             New_Vector.Append (aRow);
         end loop;
+        Set_Feature_Map (New_Vector);
         return New_Vector;
-    end To_Vector;
+    end To_Rows_Vector;
 
     --  --------------------------------------------------------------------------
 

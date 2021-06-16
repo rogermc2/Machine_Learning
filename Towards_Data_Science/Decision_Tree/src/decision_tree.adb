@@ -32,7 +32,7 @@ procedure Decision_Tree is
                             To_Unbounded_String ("Diameter");
     Header              : Row_Data;
     Training_Data       : constant Rows_Vector :=
-                            To_Vector (Training_Set, Header);
+                            To_Rows_Vector (Training_Set, Header);
     Gain_Zero           : constant Float := 0.0;
     Rows                : Partitioned_Rows;
     Mixing_Data         : Row_Data (1);
