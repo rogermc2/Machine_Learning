@@ -292,6 +292,7 @@ package body Builder is
                         String_Values (col) := Feature;
                     end case;
                 end loop;
+                New_Line;
                 Put_Line ("Builder.Find_Best_Split Feature_Data_Type " &
                             Data_Type'Image (Feature_Data_Type));
 
@@ -403,18 +404,20 @@ package body Builder is
     function Match (Self : Question_Data; Example : Row_Data) return Boolean is
         Feature          : constant Unbounded_String := Self.Feature;
         Example_Features : constant Feature_Data := Example.Features;
-        Feat_Index       : constant Class_Range := Features.Element (Feature);
-        Example_Feature  : constant Unbounded_String :=
-                             Example_Features (Feat_Index);
+        Feat_Index       : Class_Range;
+        Example_Feature  : Unbounded_String;
         Val_Type  :  Data_Type;
         Matches   : Boolean := False;
     begin
         New_Line;
         Put_Line ("Builder.Match, Feature: " & To_String (Feature));
---          Put_Line ("Builder.Match Feat_Type: " & Class_Range'Image (Feat_Type) &
---                      " ("  & To_String (Feature) & ")");
         Val_Type  := Self.Feature_Kind;
         Put_Line ("Builder.Match, Value type: " & Data_Type'Image (Val_Type));
+
+        Feat_Index := Features.Element (Feature);
+        Put_Line ("Builder.Match, Feat_Index: " & Class_Range'Image (Feat_Index));
+        Example_Feature := Example_Features (Feat_Index);
+        Put_Line ("Builder.Match, Example_Feature set");
         case Val_Type is
             when Integer_Type =>
                 declare
@@ -509,7 +512,9 @@ package body Builder is
         False_Rows : Rows_Vector;
         Data       : Row_Data;
     begin
-        for index in Rows.First_Index .. Rows.Last_Index loop
+        --  Skip first row which is column headings
+        for index in Integer'Succ (Rows.First_Index) .. Rows.Last_Index loop
+            Put_Line ("Builder.Partition row " & Integer'Image (index));
             Data := Rows.Element (index);
             if Match (aQuestion, Data) then
                 Put_Line ("Builder.Partition Partition matched");
@@ -733,8 +738,11 @@ package body Builder is
     procedure Split (Rows : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
                      Best : in out Best_Data) is
-        Split_Row : constant Partitioned_Rows := Partition (Rows, Question);
+        Split_Row :  Partitioned_Rows;
     begin
+        Put_Line ("Builder.Split generating Split_Row ");
+        Split_Row := Partition (Rows, Question);
+        Put_Line ("Builder.Split Split_Row generated");
         if not Split_Row.True_Rows.Is_Empty and then
           not Split_Row.False_Rows.Is_Empty then
             Put_Line ("Builder.Split processing Split_Rows ");
