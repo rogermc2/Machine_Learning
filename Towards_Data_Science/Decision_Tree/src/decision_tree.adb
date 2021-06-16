@@ -26,9 +26,9 @@ procedure Decision_Tree is
 
     aRaw_Question       : Raw_Question;
     aQuestion           : Question_Data;  --  Default is integer data
-    Colour_Feature      : constant Unbounded_String :=
+    Colour_Feature      : constant Feature_Name_Type :=
                             To_Unbounded_String ("Colour");
-    Diameter_Feature    : constant Unbounded_String :=
+    Diameter_Feature    : constant Feature_Name_Type :=
                             To_Unbounded_String ("Diameter");
     Header              : Row_Data;
     Training_Data       : constant Rows_Vector :=
@@ -36,7 +36,7 @@ procedure Decision_Tree is
     Gain_Zero           : constant Float := 0.0;
     Rows                : Partitioned_Rows;
     Mixing_Data         : Row_Data (1);
-    Mixing_Feature      : Feature_Data (1 .. 1);
+    Mixing_Feature      : Feature_Data_Array (1 .. 1);
     No_Mixing           : Rows_Vector;
     Some_Mixing         : Rows_Vector;
     Lots_Of_Mixing      : Rows_Vector;
