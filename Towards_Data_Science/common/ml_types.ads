@@ -10,7 +10,8 @@ package ML_Types is
 
    Max_Features : constant Integer := 100;
    type Class_Range is new Positive range 1 .. Max_Features;
-   type Feature_Names is array (Class_Range range <>) of Unbounded_String;
+   subtype Feature_Name_Type is Unbounded_String;
+   type Feature_Names is array (Class_Range range <>) of Feature_Name_Type;
    type Feature_Data is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
    subtype Feature_Class is Class_Range;
@@ -52,7 +53,7 @@ package ML_Types is
      (Data_Type, Natural);
 
    package Feature_Map_Package is new Ada.Containers.Ordered_Maps
-     (Unbounded_String, Class_Range);
+     (Feature_Name_Type, Class_Range);
    subtype Feature_Map is Feature_Map_Package.Map;
 
    package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
@@ -66,13 +67,13 @@ package ML_Types is
    subtype Raw_Label is Unbounded_String;
 
    type Raw_Question is record
-      Feature : Unbounded_String;  --  e.g. "Colour"
-      Value   : Unbounded_String;  --  e.g. "Green"
+      Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
+      Feature_Value : Unbounded_String;  --  e.g. "Green"
    end record;
 
    type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
-      Feature : Unbounded_String;
-      Gain    : Float := 0.0;
+      Feature_Name : Feature_Name_Type;
+      Gain         : Float := 0.0;
       case Feature_Kind is
          when Integer_Type => Integer_Value : Integer;
          when Float_Type => Float_Value   : Float;
@@ -83,7 +84,7 @@ package ML_Types is
 
    type Best_Question_Data is record
       Feature_Kind : Data_Type := Integer_Type;
-      Feature      : Unbounded_String;
+      Feature_Name : Feature_Name_Type;
       Gain         : Float := 0.0;
       Value        : Unbounded_String;
    end record;

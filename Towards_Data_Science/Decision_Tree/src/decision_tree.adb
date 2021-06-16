@@ -56,11 +56,11 @@ begin
     Print_UB_Class_Counts (Training_Data);
     New_Line;
 
-    aRaw_Question.Feature := Colour_Feature;
-    aRaw_Question.Value := (UB ("Green"));
+    aRaw_Question.Feature_Name := Colour_Feature;
+    aRaw_Question.Feature_Value := (UB ("Green"));
     Print_Raw_Question (aRaw_Question);
-    aRaw_Question.Feature := Diameter_Feature;
-    aRaw_Question.Value := (UB ("2"));
+    aRaw_Question.Feature_Name := Diameter_Feature;
+    aRaw_Question.Feature_Value := (UB ("2"));
     Print_Raw_Question (aRaw_Question);
 
     New_Line;
@@ -134,15 +134,8 @@ begin
     Put_Line ("Find_Best_Split");
     Best := Find_Best_Split (Training_Data);
     Put_Line ("Best_Split " & Float'Image (Gain (Best)) & ", " &
-                To_String (Best_Question (Best).Feature));
-    --     if Best.Best_Question.Feature = Colour_Feature then
-    --        Put_Line ("Best question " & Float'Image (Best.Best_Gain) & ", " &
-    --                   Colour_Type'Image (Best.Best_Question.Colour_Value));
-    --     else
-    --        Put_Line ("Best question is dimension " &
-    --                    Integer'Image (Best.Best_Question.Diameter_Value));
-    --     end if;
-    --
+                To_String (Best_Question (Best).Feature_Name));
+
     --     aTree := Build_Tree (To_Vector (Training_Data));
     --     Print_Tree (aTree);
     --

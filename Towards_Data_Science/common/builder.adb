@@ -189,11 +189,11 @@ package body Builder is
 
     procedure Process_Boolean_Values
       (Rows      : Rows_Vector; Values : Boolean_Values_Type;
-       Feature   : Unbounded_String; Uncertainty : Float;
+       Feature   : Feature_Name_Type; Uncertainty : Float;
        Question  : in out Question_Data; Best : in out Best_Data) is
     begin
         for val in Values'Range loop
-            Question.Feature := Feature;
+            Question.Feature_Name := Feature;
             Question.Boolean_Value := Values (val);
             Split (Rows, Uncertainty, Question, Best);
         end loop;
@@ -203,11 +203,11 @@ package body Builder is
 
     procedure Process_Float_Values
       (Rows      : Rows_Vector; Values : Float_Values_Type;
-       Feature   : Unbounded_String; Uncertainty : Float;
+       Feature   : Feature_Name_Type; Uncertainty : Float;
        Question  : in out Question_Data; Best : in out Best_Data) is
     begin
         for val in Values'Range loop
-            Question.Feature := Feature;
+            Question.Feature_Name := Feature;
             Question.Float_Value := Values (val);
             Split (Rows, Uncertainty, Question, Best);
         end loop;
@@ -217,11 +217,11 @@ package body Builder is
 
     procedure Process_Integer_Values
       (Rows      : Rows_Vector; Values : Integer_Values_Type;
-       Feature   : Unbounded_String; Uncertainty : Float;
+       Feature   : Feature_Name_Type; Uncertainty : Float;
        Question  : in out Question_Data; Best : in out Best_Data) is
     begin
         for val in Values'Range loop
-            Question.Feature := Feature;
+            Question.Feature_Name := Feature;
             Question.Integer_Value := Values (val);
             Split (Rows, Uncertainty, Question, Best);
         end loop;
@@ -231,11 +231,11 @@ package body Builder is
 
     procedure Process_String_Values
       (Rows      : Rows_Vector; Values : UB_Values_Type;
-       Feature   : Unbounded_String; Uncertainty : Float;
+       Feature   : Feature_Name_Type; Uncertainty : Float;
        Question  : in out Question_Data; Best : in out Best_Data) is
     begin
         for val in Values'Range loop
-            Question.Feature := Feature;
+            Question.Feature_Name := Feature;
             Put_Line ("Builder.Process_String_Values processing Feature " &
                         To_String (Feature));
             Question.UB_String_Value := Values (val);
@@ -402,7 +402,7 @@ package body Builder is
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Self : Question_Data; Example : Row_Data) return Boolean is
-        Feature          : constant Unbounded_String := Self.Feature;
+        Feature_Name     : constant Feature_Name_Type := Self.Feature_Name;
         Example_Features : constant Feature_Data := Example.Features;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
@@ -410,10 +410,10 @@ package body Builder is
         Matches          : Boolean := False;
     begin
         New_Line;
-        Put_Line ("Builder.Match, Feature: " & To_String (Feature));
+        Put_Line ("Builder.Match, Feature: " & To_String (Feature_Name));
         Val_Type  := Self.Feature_Kind;
         Put_Line ("Builder.Match, Value type: " & Data_Type'Image (Val_Type));
-        Feat_Index := Features.Element (Feature);
+        Feat_Index := Features.Element (Feature_Name);
         Put_Line ("Builder.Match, Feat_Index: " & Class_Range'Image (Feat_Index));
         Example_Feature := Example_Features (Feat_Index);
         Put_Line ("Builder.Match, Example_Feature set");
@@ -598,7 +598,7 @@ package body Builder is
     --  --------------------------------------------------------------------------
 
     procedure Print_Question (Self : Question_Data) is
-        Col          : constant String := To_String (Self.Feature);
+        Col          : constant String := To_String (Self.Feature_Name);
         Feature_Kind : constant Data_Type := Self.Feature_Kind;
     begin
         Put ("Is " & Col & " = ");
@@ -619,8 +619,8 @@ package body Builder is
 
     procedure Print_Raw_Question (Self : Raw_Question) is
     --  Example" Self = ("Colour", "Green"));
-        Col   : constant String := To_String (Self.Feature);
-        Value : constant String := To_String (Self.Value);
+        Col   : constant String := To_String (Self.Feature_Name);
+        Value : constant String := To_String (Self.Feature_Value);
     begin
         Put_Line ("Is " & Col & " = " & " " & Value);
     end Print_Raw_Question;
@@ -816,24 +816,24 @@ package body Builder is
     --  --------------------------------------------------------------------------
 
     function To_Question (Q : Raw_Question) return Question_Data is
-        Value  : constant String := To_String (Q.Value);
+        Value  : constant String := To_String (Q.Feature_Value);
         Q_Data : Question_Data;
     begin
-        if Is_Integer (Q.Value) then
+        if Is_Integer (Q.Feature_Value) then
             declare
                 QD  : Question_Data (Integer_Type);
             begin
                 QD.Integer_Value := Integer'Value (Value);
                 Q_Data :=  QD;
             end;
-        elsif Is_Float (Q.Value) then
+        elsif Is_Float (Q.Feature_Value) then
             declare
                 QD  : Question_Data (Float_Type);
             begin
                 QD.Float_Value := Float'Value (Value);
                 Q_Data := QD;
             end;
-        elsif Is_Boolean (Q.Value) then
+        elsif Is_Boolean (Q.Feature_Value) then
             declare
                 QD  : Question_Data (Boolean_Type);
             begin
@@ -849,7 +849,7 @@ package body Builder is
             end;
 
         end if;
-        Q_Data.Feature := Q.Feature;
+        Q_Data.Feature_Name := Q.Feature_Value;
         return Q_Data;
     end To_Question;
 
