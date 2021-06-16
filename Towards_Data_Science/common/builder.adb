@@ -406,14 +406,13 @@ package body Builder is
         Example_Features : constant Feature_Data := Example.Features;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
-        Val_Type  :  Data_Type;
-        Matches   : Boolean := False;
+        Val_Type         : Data_Type;
+        Matches          : Boolean := False;
     begin
         New_Line;
         Put_Line ("Builder.Match, Feature: " & To_String (Feature));
         Val_Type  := Self.Feature_Kind;
         Put_Line ("Builder.Match, Value type: " & Data_Type'Image (Val_Type));
-
         Feat_Index := Features.Element (Feature);
         Put_Line ("Builder.Match, Feat_Index: " & Class_Range'Image (Feat_Index));
         Example_Feature := Example_Features (Feat_Index);
