@@ -30,9 +30,10 @@ procedure Decision_Tree is
                             To_Unbounded_String ("Colour");
     Diameter_Feature    : constant Unbounded_String :=
                             To_Unbounded_String ("Diameter");
-    Header              : Header_Data;
+    Header              : Row_Data;
     Training_Data       : constant Rows_Vector :=
                             To_Vector (Training_Set, Header);
+    Gain_Zero           : constant Float := 0.0;
     Rows                : Partitioned_Rows;
     Mixing_Data         : Row_Data (1);
     Mixing_Feature      : Feature_Data (1 .. 1);
@@ -41,8 +42,7 @@ procedure Decision_Tree is
     Lots_Of_Mixing      : Rows_Vector;
     Current_Uncertainty : Float;
     P_Rows              : Partitioned_Rows;
-    Gain_Zero           : constant Float := 0.0;
-    --     Best                : Best_Split_Data;
+    Best                : Best_Data;
     --     aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
@@ -130,9 +130,11 @@ begin
     Print_Rows ("True rows: ", P_Rows.True_Rows);
     Print_Rows ("False rows: ", P_Rows.False_Rows);
 
-    --     Best := Find_Best_Split (To_Vector (Training_Data));
-    --     Put_Line ("Best_Split " & Float'Image (Best.Best_Gain) & ", " &
-    --                 Feature_Type'Image (Best.Best_Question.Feature));
+    New_Line;
+    Put_Line ("Find_Best_Split");
+    Best := Find_Best_Split (Training_Data);
+    Put_Line ("Best_Split " & Float'Image (Gain (Best)) & ", " &
+                To_String (Best_Question (Best).Feature));
     --     if Best.Best_Question.Feature = Colour_Feature then
     --        Put_Line ("Best question " & Float'Image (Best.Best_Gain) & ", " &
     --                   Colour_Type'Image (Best.Best_Question.Colour_Value));

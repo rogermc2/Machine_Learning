@@ -39,8 +39,8 @@ package body Builder is
     function Is_Float (Item : in Unbounded_String) return Boolean;
     function Is_Integer (Item : in Unbounded_String) return Boolean;
     procedure Print_Row (Label : String; Row : Row_Data);
-    procedure Set_Feature_Map (Features_Array : Feature_Names);
-    --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range);
+--      procedure Set_Feature_Map (Features_Array : Feature_Names);
+    procedure Set_Feature_Map (Features_Array : Feature_Data);
 
     procedure Split (Rows : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
@@ -50,6 +50,13 @@ package body Builder is
     function To_Integer (Item : in Unbounded_String) return Integer;
     function To_Label (UB_String : Raw_Label) return Label_Data;
     --     function To_Row_Data (aRow : Unbounded_String) return Row_Data;
+
+    --  ---------------------------------------------------------------------------
+
+    function Best_Question (Data : Best_Data) return Question_Data is
+    begin
+        return Data.Question;
+    end Best_Question;
 
     --  -----------------------------------------------------------------------
     --  A Leaf node classifies data.
@@ -230,7 +237,11 @@ package body Builder is
     begin
         for val in Values'Range loop
             Question.Feature := Feature;
+            Put_Line ("Builder.Process_String_Values processing Feature " &
+                        To_String (Feature));
             Question.UB_String_Value := Values (val);
+            Put_Line ("Builder.Process_String_Values processing Question.UB_String_Value " &
+                        To_String (Question.UB_String_Value));
             Split (Rows, Uncertainty, Question, Best);
         end loop;
     end Process_String_Values;
@@ -260,6 +271,7 @@ package body Builder is
         String_Question       : Question_Data (UB_String_Type);
         Best                  : Best_Data;
     begin
+        Set_Feature_Map (Rows.Element (Rows.First_Index).Features);
         --  Rows.First_Index contains column names
         if Rows.Length < 2 then
             raise Builder_Exception with
@@ -281,6 +293,8 @@ package body Builder is
                         String_Values (col) := Feature;
                     end case;
                 end loop;
+                Put_Line ("Builder.Find_Best_Split Feature_Data_Type " &
+                            Data_Type'Image (Feature_Data_Type));
 
                 case Feature_Data_Type is
                 when Boolean_Type =>
@@ -300,6 +314,9 @@ package body Builder is
                       (Rows, String_Values, Feature, Current_Uncertainty,
                        String_Question, Best);
                 end case;
+
+                Put_Line ("Builder.Find_Best_Split processed Feature_Data_Type " &
+                            Data_Type'Image (Feature_Data_Type));
             end loop;
         end if;
         return Best;
@@ -323,6 +340,13 @@ package body Builder is
 
         return theType;
     end Get_Data_Type;
+
+    --  ---------------------------------------------------------------------------
+
+    function Gain (Data : Best_Data) return Float is
+    begin
+        return Data.Gain;
+    end Gain;
 
     --  ---------------------------------------------------------------------------
 
@@ -378,16 +402,19 @@ package body Builder is
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Self : Question_Data; Example : Row_Data) return Boolean is
-        Col       : constant Unbounded_String := Self.Feature;
-        Feat_Type : constant Class_Range := Features.Element (Col);
-        Val_Type  : constant Data_Type := Self.Feature_Kind;
+        Col       :  Unbounded_String;
+        Feat_Type :  Class_Range;
+        Val_Type  :  Data_Type;
         Matches   : Boolean := False;
     begin
-        --        New_Line;
-        --        Put_Line ("Match, Col: " & To_String (Col));
-        --        Put_Line ("Match, Value type: " & Data_Type'Image (Val_Type));
-        --        Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type) &
-        --                    " ("  & To_String (Col) & ")");
+        New_Line;
+        Put_Line ("Match, Col: " & To_String (Col));
+        Col       := Self.Feature;
+        Feat_Type := Features.Element (Col);
+        Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type) &
+                    " ("  & To_String (Col) & ")");
+        Val_Type  := Self.Feature_Kind;
+        Put_Line ("Match, Value type: " & Data_Type'Image (Val_Type));
         case Val_Type is
             when Integer_Type =>
                 declare
@@ -454,12 +481,12 @@ package body Builder is
 
     --  ---------------------------------------------------------------------------
 
-    function Parse_Header (Header : String) return Header_Data is
+    function Parse_Header (Header : String) return Row_Data is
         use Ada.Strings;
         Num_Features : constant Class_Range :=
                          Class_Range (Fixed.Count (Header, ","));
         Last         : constant Natural := Header'Length;
-        Header_Row   : Header_Data (Num_Features);
+        Header_Row   : Row_Data (Num_Features);
         Pos_1        : Natural := Header'First;
         Pos_2        : Natural := Fixed.Index (Header (Pos_1 + 1 .. Last) , ",");
     begin
@@ -483,10 +510,11 @@ package body Builder is
         Data       : Row_Data;
     begin
         for index in Rows.First_Index .. Rows.Last_Index loop
+            Put_Line ("Builder.Partition processing Data ");
             Data := Rows.Element (index);
-            --           Print_Row ("Partition a row", Data);
+            Print_Row ("Builder.Partition partitioning a row", Data);
             if Match (aQuestion, Data) then
-                --              Put_Line ("Partition matched");
+                Put_Line ("Builder.Partition Partition matched");
                 True_Rows.Append (Data);
             else
                 False_Rows.Append (Data);
@@ -686,11 +714,11 @@ package body Builder is
 
     --  -----------------------------------------------------------------------
 
-    procedure Set_Feature_Map (Features_Array : Feature_Names) is
+    procedure Set_Feature_Map (Features_Array : Feature_Data) is
     begin
         for index in Features_Array'Range loop
-            --           Put_Line ("Set_Feature_Map feature: " &
-            --                       To_String (Features_Array (index)));
+            Put_Line ("Set_Feature_Map feature: " &
+                        To_String (Features_Array (index)));
             if not Features.Contains (Features_Array (index)) then
                 Features.Insert (Features_Array (index), index);
                 --              Put_Line ("Set_Feature_Map feature added.");
@@ -700,23 +728,7 @@ package body Builder is
         end loop;
     end Set_Feature_Map;
 
-    --  --------------------------------------------------------------------------
-
-    --     procedure Set_Feature_ID (Feature : String; Feat_ID : Class_Range) is
-    --        use Ada.Strings;
-    --     begin
-    --        if Fixed.Count (Feature, ".") = 1 then
-    --           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-    --        elsif Is_Integer (Feature) then
-    --           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-    --        elsif Is_Boolean (Feature) then
-    --           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-    --        else
-    --           Features.Insert (To_Unbounded_String (Feature), Feat_ID);
-    --        end if;
-    --     end Set_Feature_ID;
-
-    --  --------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------------------------------------------------
 
     procedure Split (Rows : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
@@ -725,6 +737,7 @@ package body Builder is
     begin
         if not Split_Row.True_Rows.Is_Empty and then
           not Split_Row.False_Rows.Is_Empty then
+            Put_Line ("Builder.Split processing Split_Rows ");
             Question.Gain := Information_Gain
               (Split_Row.True_Rows, Split_Row.False_Rows, Uncertainty);
             if Question.Gain >= Best.Gain then
@@ -842,7 +855,7 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    function To_Vector (Rows : Data_Rows; Header_Row : out Header_Data)
+    function To_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
                         return Rows_Vector is
         New_Vector  : Rows_Vector;
         First_Index : constant Positive := Rows'First;

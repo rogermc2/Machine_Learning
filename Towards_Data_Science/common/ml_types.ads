@@ -23,11 +23,6 @@ package ML_Types is
       Label    : Unbounded_String;
    end record;
 
-   type Header_Data (Class_Count : Class_Range := 2) is record
-      Features : Feature_Names (1 .. Class_Count);
-      Label    : Unbounded_String;
-   end record;
-
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
@@ -102,11 +97,6 @@ package ML_Types is
       when Prediction_Kind =>
          Predictions : Count_Package.Map := Count_Package.Empty_Map;
       end case;
-   end record;
-
-   type Best_Split_Data is record
-      Best_Gain     : Float;
-      Best_Question : Question_Type;
    end record;
 
    type Partitioned_Rows is record
