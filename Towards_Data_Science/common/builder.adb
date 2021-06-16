@@ -40,7 +40,7 @@ package body Builder is
     function Is_Integer (Item : in Unbounded_String) return Boolean;
     procedure Print_Row (Label : String; Row : Row_Data);
 --      procedure Set_Feature_Map (Features_Array : Feature_Names);
-    procedure Set_Feature_Map (Features_Array : Feature_Data);
+    procedure Set_Feature_Map (Features_Array : Feature_Names);
 
     procedure Split (Rows : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
@@ -271,7 +271,7 @@ package body Builder is
         String_Question       : Question_Data (UB_String_Type);
         Best                  : Best_Data;
     begin
-        Set_Feature_Map (Rows.Element (Rows.First_Index).Features);
+        Set_Feature_Map (Feature_Names (Rows.Element (Rows.First_Index).Features));
         --  Rows.First_Index contains column names
         if Rows.Length < 2 then
             raise Builder_Exception with
@@ -402,46 +402,47 @@ package body Builder is
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Self : Question_Data; Example : Row_Data) return Boolean is
-        Col       :  Unbounded_String;
-        Feat_Type :  Class_Range;
+        Feature          : constant Unbounded_String := Self.Feature;
+        Example_Features : constant Feature_Data := Example.Features;
+        Feat_Index       : constant Class_Range := Features.Element (Feature);
+        Example_Feature  : constant Unbounded_String :=
+                             Example_Features (Feat_Index);
         Val_Type  :  Data_Type;
         Matches   : Boolean := False;
     begin
         New_Line;
-        Put_Line ("Match, Col: " & To_String (Col));
-        Col       := Self.Feature;
-        Feat_Type := Features.Element (Col);
-        Put_Line ("Feat_Type: " & Class_Range'Image (Feat_Type) &
-                    " ("  & To_String (Col) & ")");
+        Put_Line ("Builder.Match, Feature: " & To_String (Feature));
+--          Put_Line ("Builder.Match Feat_Type: " & Class_Range'Image (Feat_Type) &
+--                      " ("  & To_String (Feature) & ")");
         Val_Type  := Self.Feature_Kind;
-        Put_Line ("Match, Value type: " & Data_Type'Image (Val_Type));
+        Put_Line ("Builder.Match, Value type: " & Data_Type'Image (Val_Type));
         case Val_Type is
             when Integer_Type =>
                 declare
                     Value : constant Integer := Self.Integer_Value;
                 begin
                     Matches := Value =
-                      Integer'Value (To_String (Example.Features (Feat_Type)));
+                      Integer'Value (To_String (Example.Features (Feat_Index)));
                 end;
             when Float_Type =>
                 declare
                     Value : constant Float := Self.Float_Value;
                 begin
                     Matches := Value =
-                      Float'Value (To_String (Example.Features (Feat_Type)));
+                      Float'Value (To_String (Example_Feature));
                 end;
             when Boolean_Type =>
                 declare
                     Value : constant Boolean := Self.Boolean_Value;
                 begin
                     Matches := Value =
-                      Boolean'Value (To_String (Example.Features (Feat_Type)));
+                      Boolean'Value (To_String (Example_Feature));
                 end;
             when UB_String_Type =>
                 declare
                     Value : constant Unbounded_String := Self.UB_String_Value;
                 begin
-                    Matches := Value = Example.Features (Feat_Type);
+                    Matches := Value = Example_Feature;
                 end;
         end case;
         --        Put_Line ("Example feature type : " & To_String (Example.Features (Feat_Type)));
@@ -497,7 +498,7 @@ package body Builder is
             Pos_1 := Pos_2 + 1;
         end loop;
         Header_Row.Label := To_Unbounded_String (Header (Pos_1 + 1 .. Last));
-        Set_Feature_Map (Header_Row.Features);
+        Set_Feature_Map (Feature_Names (Header_Row.Features));
         return Header_Row;
     end Parse_Header;
 
@@ -510,7 +511,6 @@ package body Builder is
         Data       : Row_Data;
     begin
         for index in Rows.First_Index .. Rows.Last_Index loop
-            Put_Line ("Builder.Partition processing Data ");
             Data := Rows.Element (index);
             Print_Row ("Builder.Partition partitioning a row", Data);
             if Match (aQuestion, Data) then
@@ -714,7 +714,7 @@ package body Builder is
 
     --  -----------------------------------------------------------------------
 
-    procedure Set_Feature_Map (Features_Array : Feature_Data) is
+    procedure Set_Feature_Map (Features_Array : Feature_Names) is
     begin
         for index in Features_Array'Range loop
             Put_Line ("Set_Feature_Map feature: " &
@@ -862,7 +862,7 @@ package body Builder is
         aRow        : Row_Data;
     begin
         Header_Row := Parse_Header (To_String (Rows (Rows'First)));
-        Set_Feature_Map (Header_Row.Features);
+        Set_Feature_Map (Feature_Names (Header_Row.Features));
         for index in Positive'Succ (First_Index) .. Rows'Last loop
             aRow := Parse (To_String (Rows (index)));
             New_Vector.Append (aRow);
