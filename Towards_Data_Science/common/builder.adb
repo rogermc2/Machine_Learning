@@ -235,11 +235,7 @@ package body Builder is
    begin
       for val in Values'Range loop
          Question.Feature_Name := Feature;
-         Put_Line ("Builder.Process_String_Values processing Feature " &
-                     To_String (Feature));
          Question.UB_String_Value := Values (val);
-         Put_Line ("Builder.Process_String_Values processing Question.UB_String_Value " &
-                     To_String (Question.UB_String_Value));
          Split (Rows, Uncertainty, Question, Best);
       end loop;
    end Process_String_Values;
@@ -294,9 +290,6 @@ package body Builder is
                      String_Values (col) := Feature;
                end case;
             end loop;
-            New_Line;
-            Put_Line ("Builder.Find_Best_Split Feature_Data_Type " &
-                        Data_Type'Image (Feature_Data_Type));
 
             case Feature_Data_Type is
                when Boolean_Type =>
@@ -316,9 +309,6 @@ package body Builder is
                     (Rows, String_Values, Feature_Name, Current_Uncertainty,
                      String_Question, Best);
             end case;
-
-            Put_Line ("Builder.Find_Best_Split processed Feature_Data_Type " &
-                        Data_Type'Image (Feature_Data_Type));
          end loop;
       end if;
       return Best;
@@ -412,13 +402,9 @@ package body Builder is
       Matches          : Boolean := False;
    begin
       New_Line;
-      Put_Line ("Builder.Match, Feature: " & To_String (Feature_Name));
       Val_Type  := Self.Feature_Kind;
-      Put_Line ("Builder.Match, Value type: " & Data_Type'Image (Val_Type));
       Feat_Index := Features_Map.Element (Feature_Name);
-      Put_Line ("Builder.Match, Feat_Index: " & Class_Range'Image (Feat_Index));
       Example_Feature := Example_Features (Feat_Index);
-      Put_Line ("Builder.Match, Example_Feature set");
       case Val_Type is
          when Integer_Type =>
             declare
@@ -731,10 +717,7 @@ package body Builder is
                      To_String (Feature_Names (index)));
          if not Features_Map.Contains (Feature_Names (index)) then
             Features_Map.Insert (Feature_Names (index), index);
-            --              Put_Line ("Set_Feature_Map feature added.");
          end if;
-         --           Put_Line ("Set_Feature_Map feature code: " &
-         --                       Class_Range'Image (Features.Element (Features_Array (index))));
       end loop;
    end Set_Feature_Map;
 
