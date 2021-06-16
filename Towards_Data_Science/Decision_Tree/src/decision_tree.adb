@@ -113,22 +113,23 @@ begin
 
     aQuestion := (Integer_Type, Diameter_Feature, Gain_Zero, 3);
     P_Rows := Partition (Training_Data, aQuestion);
+    New_Line;
     Put_Line ("Training_Data partitioned");
-    Put_Line ("Info gain Green" &
+    Put_Line ("Info gain dimension 3" &
                 Float'Image (Information_Gain
                 (P_Rows.True_Rows, P_Rows.False_Rows, Current_Uncertainty)));
     Print_Rows ("True rows: ", P_Rows.True_Rows);
     Print_Rows ("False rows: ", P_Rows.False_Rows);
     New_Line;
-    --
-    --     Question := (Colour_Feature, Red);
-    --     P_Rows := Partition (To_Vector (Training_Data), Question);
-    --     Put_Line ("Info gain Red" &
-    --                 Float'Image (Information_Gain
-    --                 (P_Rows.True_Rows, P_Rows.False_Rows, Current_Uncertainty)));
-    --     Print_Rows ("True rows: ", P_Rows.True_Rows);
-    --     Print_Rows ("False rows: ", P_Rows.False_Rows);
-    --
+
+    aQuestion := (UB_String_Type, Colour_Feature, Gain_Zero, UB ("Red"));
+    P_Rows := Partition (Training_Data, aQuestion);
+    Put_Line ("Info gain Red" &
+                Float'Image (Information_Gain
+                (P_Rows.True_Rows, P_Rows.False_Rows, Current_Uncertainty)));
+    Print_Rows ("True rows: ", P_Rows.True_Rows);
+    Print_Rows ("False rows: ", P_Rows.False_Rows);
+
     --     Best := Find_Best_Split (To_Vector (Training_Data));
     --     Put_Line ("Best_Split " & Float'Image (Best.Best_Gain) & ", " &
     --                 Feature_Type'Image (Best.Best_Question.Feature));
