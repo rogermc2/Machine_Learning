@@ -30,7 +30,7 @@ package body Builder is
 
     pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
 
-    Features      : Feature_Map;
+    Features_Map  : Feature_Name_Map;
     --     Feature_Types : Feature_Type_Map;
     Label_Types   : Label_Type_Map;
 
@@ -413,7 +413,7 @@ package body Builder is
         Put_Line ("Builder.Match, Feature: " & To_String (Feature_Name));
         Val_Type  := Self.Feature_Kind;
         Put_Line ("Builder.Match, Value type: " & Data_Type'Image (Val_Type));
-        Feat_Index := Features.Element (Feature_Name);
+        Feat_Index := Features_Map.Element (Feature_Name);
         Put_Line ("Builder.Match, Feat_Index: " & Class_Range'Image (Feat_Index));
         Example_Feature := Example_Features (Feat_Index);
         Put_Line ("Builder.Match, Example_Feature set");
@@ -718,13 +718,13 @@ package body Builder is
 
     procedure Set_Feature_Map (Rows : Rows_Vector) is
         Header_Row : constant Row_Data := Rows.First_Element;
-        Cols       : constant Feature_Data := Header_Row.Features;
+        Feature    : constant Feature_Names := Feature_Names (Header_Row.Features);
     begin
-        for index in Cols'Range loop
+        for index in Feature'Range loop
             Put_Line ("Set_Feature_Map feature: " &
-                        To_String (Cols (index)));
-            if not Features.Contains (Cols (index)) then
-                Features.Insert (Cols (index), index);
+                        To_String (Feature (index)));
+            if not Features_Map.Contains (Feature (index)) then
+                Features_Map.Insert (Feature (index), index);
                 --              Put_Line ("Set_Feature_Map feature added.");
             end if;
             --           Put_Line ("Set_Feature_Map feature code: " &
