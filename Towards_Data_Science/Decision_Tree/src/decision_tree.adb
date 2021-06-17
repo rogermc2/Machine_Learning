@@ -87,6 +87,7 @@ begin
     No_Mixing.Append (Mixing_Data);
     No_Mixing.Append (Mixing_Data);
 
+    New_Line;
     Put_Line ("No_Mixing Gini " & Float'Image (Gini (No_Mixing)));
     New_Line;
 

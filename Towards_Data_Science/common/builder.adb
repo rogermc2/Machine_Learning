@@ -271,6 +271,8 @@ package body Builder is
          for col in 1 .. Num_Features loop
             Feature_Name :=
               Feature_Name_Type (Rows.First_Element.Features (col));
+            Put_Line ("Builder.Find_Best_Split col" & Class_Range'Image (col)
+                      & "  Feature name " & To_String (Feature_Name));
             Feature_Data_Type := Get_Data_Type (Row2_Features (col));
             for row in
               Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
