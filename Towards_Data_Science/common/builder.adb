@@ -750,7 +750,9 @@ package body Builder is
                     Best     : in out Best_Data) is
       Split_Row :  Partitioned_Rows;
    begin
+      Put_Line ("Builder.Split");
       Print_Question (Question);
+      New_Line;
       Split_Row := Partition (Rows, Question);
       if not Split_Row.True_Rows.Is_Empty and then
         not Split_Row.False_Rows.Is_Empty then
