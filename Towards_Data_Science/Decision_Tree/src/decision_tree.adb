@@ -43,7 +43,7 @@ procedure Decision_Tree is
     Current_Uncertainty : Float;
     P_Rows              : Partitioned_Rows;
     Best                : Best_Data;
-    --     aTree               : Tree_Type;
+    aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
     --     Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
@@ -137,8 +137,8 @@ begin
                 To_String (Best_Question (Best).Feature_Name));
     Print_Best (Best);
 
-    --     aTree := Build_Tree (To_Vector (Training_Data));
-    --     Print_Tree (aTree);
+    aTree := Build_Tree (Training_Data);
+    Print_Tree (aTree);
     --
     --     Put_Line ("Classify tests, Training_Data (1)");
     --     Classified := Classify (Training_Data (1), aTree);

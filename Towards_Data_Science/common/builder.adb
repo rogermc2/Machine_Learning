@@ -100,9 +100,9 @@ package body Builder is
 
        begin
           New_Line;
-          Put_Line ("Build Tree");
+          Put_Line ("Building Tree");
           Recurse (Rows, Root_Curs);
-          Put_Line ("Tree built");
+--            Put_Line ("Tree built");
           return theTree;
        end Build_Tree;
 
