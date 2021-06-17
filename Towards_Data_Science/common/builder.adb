@@ -61,50 +61,50 @@ package body Builder is
     --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
     --  for each class, the number of times that the class appears in the rows
     --  from the training data that reach this leaf.
-    --     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
-    --        use Tree_Package;
-    --        theTree      : Tree_Type := Empty_Tree;
-    --        Root_Curs    : Tree_Cursor := Root (theTree);
-    --        Best_Split   : Best_Split_Data;
-    --        aLeaf        : Decision_Node_Type (Prediction_Kind);
-    --
-    --        procedure Recurse (Rows : Rows_Vector;
-    --                           Curs : in out Tree_Cursor) is
-    --           P_Rows       : Partitioned_Rows;
-    --           Node         : Decision_Node_Type;
-    --           Node_Curs    : Tree_Cursor;
-    --        begin
-    --           Best_Split := Find_Best_Split (Rows);
-    --           if Best_Split.Best_Gain = 0.0 then
-    --              aLeaf.Predictions := Class_Counts (Rows);
-    --              Put_Line ("Predictions" & Integer'Image (aLeaf.Predictions.First_Element));
-    --              theTree.Insert_Child (Parent   => Curs,
-    --                                    Before   => No_Element,
-    --                                    New_Item => aLeaf);
-    --           else
-    --              P_Rows := Partition (Rows, Best_Split.Best_Question);
-    --              Node.Question := Best_Split.Best_Question;
-    --              Node.True_Rows := P_Rows.True_Rows;
-    --              Node.False_Rows := P_Rows.False_Rows;
-    --              Print_Rows ("Node.True_Rows", Node.True_Rows);
-    --              Print_Rows ("Node.False_Rows", Node.False_Rows);
-    --              theTree.Insert_Child (Parent   => Curs,
-    --                                    Before   => No_Element,
-    --                                    New_Item => Node,
-    --                                    Position => Node_Curs);
-    --              Recurse (P_Rows.True_Rows, Node_Curs);
-    --              Recurse (P_Rows.False_Rows, Node_Curs);
-    --           end if;
-    --           New_Line;
-    --        end Recurse;
-    --
-    --     begin
-    --        New_Line;
-    --        Put_Line ("Build Tree");
-    --        Recurse (Rows, Root_Curs);
-    --        Put_Line ("Tree built");
-    --        return theTree;
-    --     end Build_Tree;
+       function Build_Tree (Rows : Rows_Vector) return Tree_Type is
+          use Tree_Package;
+          theTree      : Tree_Type := Empty_Tree;
+          Root_Curs    : Tree_Cursor := Root (theTree);
+          Best_Split   : Best_Data;
+          aLeaf        : Decision_Node_Type (Prediction_Kind);
+
+          procedure Recurse (Rows : Rows_Vector;
+                             Curs : in out Tree_Cursor) is
+             P_Rows       : Partitioned_Rows;
+             Node         : Decision_Node_Type;
+             Node_Curs    : Tree_Cursor;
+          begin
+             Best_Split := Find_Best_Split (Rows);
+             if Best_Split.Gain = 0.0 then
+                aLeaf.Predictions := UB_Class_Counts (Rows);
+                Put_Line ("Predictions" & Integer'Image (aLeaf.Predictions.First_Element));
+                theTree.Insert_Child (Parent   => Curs,
+                                      Before   => No_Element,
+                                      New_Item => aLeaf);
+             else
+                P_Rows := Partition (Rows, Best_Split.Question);
+                Node.Question := Best_Split.Question;
+                Node.True_Rows := P_Rows.True_Rows;
+                Node.False_Rows := P_Rows.False_Rows;
+                Print_Rows ("Node.True_Rows", Node.True_Rows);
+                Print_Rows ("Node.False_Rows", Node.False_Rows);
+                theTree.Insert_Child (Parent   => Curs,
+                                      Before   => No_Element,
+                                      New_Item => Node,
+                                      Position => Node_Curs);
+                Recurse (P_Rows.True_Rows, Node_Curs);
+                Recurse (P_Rows.False_Rows, Node_Curs);
+             end if;
+             New_Line;
+          end Recurse;
+
+       begin
+          New_Line;
+          Put_Line ("Build Tree");
+          Recurse (Rows, Root_Curs);
+          Put_Line ("Tree built");
+          return theTree;
+       end Build_Tree;
 
     --  ---------------------------------------------------------------------------
     --  Uncertainty is the uncertainty of the starting node minus
