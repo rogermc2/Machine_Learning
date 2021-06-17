@@ -137,6 +137,8 @@ begin
                 To_String (Best_Question (Best).Feature_Name));
     Print_Best (Best);
 
+    New_Line;
+    Put_Line ("Build Tree");
     aTree := Build_Tree (Training_Data);
     Print_Tree (aTree);
     --
