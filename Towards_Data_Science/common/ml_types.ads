@@ -82,13 +82,6 @@ package ML_Types is
       end case;
    end record;
 
-   type Best_Question_Data is record
-      Feature_Kind : Data_Type := Integer_Type;
-      Feature_Name : Feature_Name_Type;
-      Gain         : Float := 0.0;
-      Value        : Unbounded_String;
-   end record;
-
    type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       case Node_Type is
       when  Decision_Kind =>

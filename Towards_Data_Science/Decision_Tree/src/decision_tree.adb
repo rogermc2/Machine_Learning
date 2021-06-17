@@ -135,6 +135,7 @@ begin
     Best := Find_Best_Split (Training_Data);
     Put_Line ("Best_Split " & Float'Image (Gain (Best)) & ", " &
                 To_String (Best_Question (Best).Feature_Name));
+    Print_Best (Best);
 
     --     aTree := Build_Tree (To_Vector (Training_Data));
     --     Print_Tree (aTree);
