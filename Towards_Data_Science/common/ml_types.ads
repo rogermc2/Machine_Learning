@@ -1,7 +1,6 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
-with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -49,7 +48,7 @@ package ML_Types is
       end case;
    end record;
 
-   package Count_Package is new Ada.Containers.Indefinite_Ordered_Maps
+   package Count_Package is new Ada.Containers.Ordered_Maps
      (Data_Type, Natural);
 
    package Feature_Map_Package is new Ada.Containers.Ordered_Maps
@@ -85,11 +84,11 @@ package ML_Types is
    type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       case Node_Type is
       when  Decision_Kind =>
-         Question    : Question_Type;
+         Question    : Question_Data;
          True_Rows   : Rows_Vector := Rows_Package.Empty_Vector;
          False_Rows  : Rows_Vector := Rows_Package.Empty_Vector;
       when Prediction_Kind =>
-         Predictions : Count_Package.Map := Count_Package.Empty_Map;
+         Predictions : UB_Label_Map := UB_Label_Map_Package.Empty_Map;
       end case;
    end record;
 

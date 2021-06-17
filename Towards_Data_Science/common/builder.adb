@@ -71,7 +71,7 @@ package body Builder is
           procedure Recurse (Rows : Rows_Vector;
                              Curs : in out Tree_Cursor) is
              P_Rows       : Partitioned_Rows;
-             Node         : Decision_Node_Type;
+             Node         : Decision_Node_Type (Decision_Kind);
              Node_Curs    : Tree_Cursor;
           begin
              Best_Split := Find_Best_Split (Rows);

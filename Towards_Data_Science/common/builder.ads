@@ -24,7 +24,7 @@ package Builder is
     Builder_Exception : exception;
 
     function Best_Question (Data : Best_Data) return Question_Data ;
-    --     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
+    function Build_Tree (Rows : Rows_Vector) return Tree_Type;
     --     function Classify (aRow : Row_Data; aTree : Tree_Type)
     --                           return Count_Package.Map;
     function UB_Class_Counts (Rows : Rows_Vector) return UB_Label_Map;
