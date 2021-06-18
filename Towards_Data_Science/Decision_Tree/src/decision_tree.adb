@@ -54,7 +54,7 @@ begin
         Put_Line ("Header row features: " &
                     To_String (Header.Features (index)));
     end loop;
-    Print_UB_Class_Counts (Training_Data);
+    Utilities.Print_UB_Class_Counts (Training_Data);
     New_Line;
 
     aRaw_Question.Feature_Name := Colour_Feature;
@@ -70,8 +70,8 @@ begin
     Utilities.Print_Raw_Question (aRaw_Question);
 
     Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
-    Print_Rows ("True rows: ", Rows.True_Rows);
-    Print_Rows ("False rows: ", Rows.False_Rows);
+    Utilities.Print_Rows ("True rows: ", Rows.True_Rows);
+    Utilities.Print_Rows ("False rows: ", Rows.False_Rows);
 
     New_Line;
     Put_Line ("Partition example");
@@ -79,8 +79,8 @@ begin
     Utilities.Print_Raw_Question (aRaw_Question);
 
     Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
-    Print_Rows ("True rows: ", Rows.True_Rows);
-    Print_Rows ("False rows: ", Rows.False_Rows);
+    Utilities.Print_Rows ("True rows: ", Rows.True_Rows);
+    Utilities.Print_Rows ("False rows: ", Rows.False_Rows);
 
     Mixing_Feature (1) := UB ("Fruit");
     Mixing_Data.Features := Mixing_Feature;
@@ -96,7 +96,7 @@ begin
     Some_Mixing.Append (Mixing_Data);
     Mixing_Data.Label := UB ("Orange");
     Some_Mixing.Append (Mixing_Data);
-    Print_Rows ("Some_Mixing", Some_Mixing);
+    Utilities.Print_Rows ("Some_Mixing", Some_Mixing);
 
     Put_Line ("Some_Mixing Gini " & Float'Image (Gini (Some_Mixing)));
     New_Line;
@@ -120,8 +120,8 @@ begin
     Put_Line ("Info gain dimension 3" &
                 Float'Image (Information_Gain
                 (P_Rows.True_Rows, P_Rows.False_Rows, Current_Uncertainty)));
-    Print_Rows ("True rows: ", P_Rows.True_Rows);
-    Print_Rows ("False rows: ", P_Rows.False_Rows);
+    Utilities.Print_Rows ("True rows: ", P_Rows.True_Rows);
+    Utilities.Print_Rows ("False rows: ", P_Rows.False_Rows);
     New_Line;
 
     aQuestion := (UB_String_Type, Colour_Feature, Gain_Zero, UB ("Red"));
@@ -129,20 +129,20 @@ begin
     Put_Line ("Info gain Red" &
                 Float'Image (Information_Gain
                 (P_Rows.True_Rows, P_Rows.False_Rows, Current_Uncertainty)));
-    Print_Rows ("True rows: ", P_Rows.True_Rows);
-    Print_Rows ("False rows: ", P_Rows.False_Rows);
+    Utilities.Print_Rows ("True rows: ", P_Rows.True_Rows);
+    Utilities.Print_Rows ("False rows: ", P_Rows.False_Rows);
 
     New_Line;
     Put_Line ("Find_Best_Split");
     Best := Find_Best_Split (Training_Data);
     Put_Line ("Best_Split " & Float'Image (Gain (Best)) & ", " &
                 To_String (Best_Question (Best).Feature_Name));
-    Print_Best (Best);
+    Utilities.Print_Best (Best);
 
     New_Line;
     Put_Line ("Build Tree");
     aTree := Build_Tree (Training_Data);
-    Print_Tree (aTree);
+    Utilities.Print_Tree (aTree);
     --
     --     Put_Line ("Classify tests, Training_Data (1)");
     --     Classified := Classify (Training_Data (1), aTree);
