@@ -606,16 +606,6 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    procedure Print_Raw_Question (Self : Raw_Question) is
-    --  Example" Self = ("Colour", "Green"));
-        Col   : constant String := To_String (Self.Feature_Name);
-        Value : constant String := To_String (Self.Feature_Value);
-    begin
-        Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
-    end Print_Raw_Question;
-
-    --  --------------------------------------------------------------------------
-
     procedure Print_Row (Label : String; Row : Row_Data) is
     begin
         Put (Label);

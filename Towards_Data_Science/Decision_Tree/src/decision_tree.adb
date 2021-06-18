@@ -3,8 +3,9 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with ML_Types; use ML_Types;
 with Builder; use Builder;
+with ML_Types; use ML_Types;
+with Utilities;
 
 --  Decision tree models where the target variable can take a discrete set of
 --  values are called classification trees.
@@ -58,15 +59,15 @@ begin
 
     aRaw_Question.Feature_Name := Colour_Feature;
     aRaw_Question.Feature_Value := (UB ("Green"));
-    Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question (aRaw_Question);
     aRaw_Question.Feature_Name := Diameter_Feature;
     aRaw_Question.Feature_Value := (UB ("2"));
-    Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question (aRaw_Question);
 
     New_Line;
     Put_Line ("Partition example");
     aRaw_Question := (Colour_Feature, UB ("Red"));
-    Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question (aRaw_Question);
 
     Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
     Print_Rows ("True rows: ", Rows.True_Rows);
@@ -75,7 +76,7 @@ begin
     New_Line;
     Put_Line ("Partition example");
     aRaw_Question := (Diameter_Feature, UB ("3"));
-    Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question (aRaw_Question);
 
     Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
     Print_Rows ("True rows: ", Rows.True_Rows);
