@@ -87,11 +87,11 @@ package body Utilities is
 
     --  --------------------------------------------------------------------------
 
-   procedure Print_Question (Self : ML_Types.Question_Data) is
+   procedure Print_Question (Label : String; Self : ML_Types.Question_Data) is
       Col          : constant String := To_String (Self.Feature_Name);
       Feature_Kind : constant Data_Type := Self.Feature_Kind;
    begin
-      Put_Line ("Question data:");
+      Put_Line (Label & " question:");
       Put ("Feature " & Col & " = ");
       case Feature_Kind is
          when Integer_Type =>
