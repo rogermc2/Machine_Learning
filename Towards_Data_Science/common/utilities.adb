@@ -6,8 +6,6 @@ package body Utilities is
 
    use ML_Types;
 
-   --     procedure Print_Row (Label : String; Row : ML_Types.Row_Data);
-
    --  --------------------------------------------------------------------------
 
    procedure Print_Best (Self : Builder.Best_Data) is
@@ -120,19 +118,6 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   --      procedure Print_Row (Label : String; Row : ML_Types.Row_Data) is
-   --      begin
-   --          Put (Label);
-   --          Put (": (");
-   --          for feat in Row.Features'First .. Row.Features'Last (1) loop
-   --              Put (To_String (Row.Features (feat)));
-   --          end loop;
-   --          Put (") " & To_String (Row.Label));
-   --          New_Line;
-   --      end Print_Row;
-
-   --  --------------------------------------------------------------------------
-
    procedure Print_Rows (Label : String; Rows : ML_Types.Rows_Vector) is
       use Rows_Package;
       aRow : Row_Data;
@@ -163,13 +148,23 @@ package body Utilities is
             New_Line;
             Put_Line ("Leaf node");
          end if;
-         Put_Line ("Depth:" & Integer'Image (Integer (Depth (Curs))) & ", ");
+--           Put_Line ("Depth:" & Integer'Image (Integer (Depth (Curs))) & ", ");
          case Node.Node_Type is
             when  Decision_Kind =>
-               --              Print_Question (Node.Question);
-               Put_Line ("Decision:");
-               Print_Rows ("True Rows", Node.True_Rows);
-               Print_Rows ("False Rows", Node.False_Rows);
+                Put ("Is " & To_String (Node.Question.Feature_Name) & " >= ");
+                case Node.Question.Feature_Kind is
+                when Integer_Type =>
+                    Put (Integer'Image (Node.Question.Integer_Value));
+                when Float_Type =>
+                    Put (Float'Image (Node.Question.Float_Value));
+                when Boolean_Type =>
+                    Put (Boolean'Image (Node.Question.Boolean_Value));
+                when UB_String_Type =>
+                    Put (To_String (Node.Question.UB_String_Value));
+                end case;
+                Put_Line ("?");
+                Print_Rows ("True_Rows", Node.True_Rows);
+                Print_Rows ("False_Rows", Node.False_Rows);
             when Prediction_Kind =>
                Put_Line ("Prediction; " & Natural'Image
                          (Node.Predictions.First_Element));
