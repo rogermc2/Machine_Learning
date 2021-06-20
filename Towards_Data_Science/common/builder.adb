@@ -89,8 +89,10 @@ package body Builder is
             P_Rows := Partition (Rows, Node.Question);
             Node.True_Rows := P_Rows.True_Rows;
             Node.False_Rows := P_Rows.False_Rows;
-            Utilities.Print_Rows ("Builder.Build_Tree.Recurse Node.True_Rows", Node.True_Rows);
-            Utilities.Print_Rows ("Builder.Build_Tree.Recurse Node.False_Rows", Node.False_Rows);
+--              Utilities.Print_Rows ("Builder.Build_Tree.Recurse Node.True_Rows",
+--                                    Node.True_Rows);
+--              Utilities.Print_Rows ("Builder.Build_Tree.Recurse Node.False_Rows",
+--                                    Node.False_Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => Node,
