@@ -47,9 +47,9 @@ procedure Decision_Tree is
     aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
-    --     Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
-    --     Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
-    --     New_Line;
+       Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
+       Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
+       New_Line;
     for index in Header .Features'Range loop
         Put_Line ("Header row features: " &
                     To_String (Header.Features (index)));

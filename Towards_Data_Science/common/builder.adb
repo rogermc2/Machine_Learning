@@ -1,6 +1,5 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
-with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -35,12 +34,7 @@ package body Builder is
    Features_Map  : Feature_Name_Map;
    Label_Types   : Label_Type_Map;
 
-   function Get_Data_Type (Data : Unbounded_String) return Data_Type;
-   function Is_Boolean (Item : in Unbounded_String) return Boolean;
-   function Is_Float (Item : in Unbounded_String) return Boolean;
-   function Is_Integer (Item : in Unbounded_String) return Boolean;
    procedure Set_Feature_Map (Rows : Rows_Vector);
-
    procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                     Question : in out Question_Data;
                     Best     : in out Best_Data);
@@ -267,7 +261,7 @@ package body Builder is
          for col in 1 .. Num_Features loop
             Feature_Name :=
               Feature_Name_Type (Rows.First_Element.Features (col));
-            Feature_Data_Type := Get_Data_Type (Row2_Features (col));
+            Feature_Data_Type := Utilities.Get_Data_Type (Row2_Features (col));
             for row in
               Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
                Feature_Value := Rows.Element (row).Features (col);
@@ -299,24 +293,6 @@ package body Builder is
 
    --  ---------------------------------------------------------------------------
 
-   function Get_Data_Type (Data : Unbounded_String) return Data_Type is
-      theType : Data_Type;
-   begin
-      if Is_Integer (Data) then
-         theType := Integer_Type;
-      elsif Is_Float (Data) then
-         theType := Float_Type;
-      elsif Is_Boolean (Data) then
-         theType := Boolean_Type;
-      else
-         theType := UB_String_Type;
-      end if;
-
-      return theType;
-   end Get_Data_Type;
-
-   --  ---------------------------------------------------------------------------
-
    function Gain (Data : Best_Data) return Float is
    begin
       return Data.Gain;
@@ -343,35 +319,6 @@ package body Builder is
       Counts.Iterate (Calc_Impurity'Access);
       return Impurity;
    end Gini;
-
-   function Is_Boolean (Item : in Unbounded_String) return Boolean is
-      Item_String : constant String :=
-                      Ada.Characters.Handling.To_Upper (To_String (Item));
-   begin
-      return Item_String = "TRUE" or else Item_String = "FALSE";
-   end Is_Boolean;
-
-   --  ---------------------------------------------------------------------------
-
-   function Is_Float (Item : in Unbounded_String) return Boolean is
-      Item_String : constant String := To_String (Item);
-      use Ada.Strings;
-   begin
-      return Fixed.Count (Item_String, ".") = 1;
-   end Is_Float;
-
-   --  ---------------------------------------------------------------------------
-
-   function Is_Integer (Item : in Unbounded_String) return Boolean is
-      Item_String : constant String := To_String (Item);
-      Dig         : Boolean := True;
-   begin
-      for index in Item_String'Range loop
-         Dig := Dig and then
-           Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index));
-      end loop;
-      return Dig;
-   end Is_Integer;
 
    --  ---------------------------------------------------------------------------
    --  Match compares the feature value in an example to the
@@ -497,30 +444,6 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
-   --     procedure Print_Unique_Values (Rows    : Rows_Vector;
-   --                                    Feature : Feature_Type) is
-   --        use Value_Set_Package;
-   --        Values : constant Value_Set := Unique_Values (Rows, Feature);
-   --        Curs   : Cursor := Values.First;
-   --        Data   : Value_Data (Feature);
-   --     begin
-   --        Put ("Unique " & Feature_Type'Image (Feature)  & " Values:");
-   --        while Has_Element (Curs) loop
-   --           case Feature is
-   --              when Colour_Feature =>
-   --                 Data := Element (Curs);
-   --                 Put (" " & Colour_Type'Image (Data.Colour));
-   --              when Diameter_Feature  =>
-   --                 Data := Element (Curs);
-   --                 Put (Integer'Image (Data.Diameter) & " ");
-   --           end case;
-   --           Next (Curs);
-   --        end loop;
-   --        New_Line;
-   --     end Print_Unique_Values;
-
-   --  -----------------------------------------------------------------------
-
    procedure Set_Feature_Map (Rows : Rows_Vector) is
       Header_Row     : constant Row_Data := Rows.First_Element;
       Features       : constant Feature_Data_Array := Header_Row.Features;
@@ -580,6 +503,7 @@ package body Builder is
    --  --------------------------------------------------------------------------
 
    function To_Label (UB_String : Raw_Label) return Label_Data is
+      use Utilities;
       Value : constant String := To_String (UB_String);
       Label : Label_Data;
    begin
@@ -619,6 +543,7 @@ package body Builder is
    --  --------------------------------------------------------------------------
 
    function To_Question (Q : Raw_Question) return Question_Data is
+      use Utilities;
       Value  : constant String := To_String (Q.Feature_Value);
       Q_Data : Question_Data;
    begin
@@ -716,29 +641,6 @@ package body Builder is
    end UB_Class_Counts;
 
    --  ---------------------------------------------------------------------------
-
-   --     function Unique_Values (Rows    : Rows_Vector;
-   --                             Feature : Feature_Type) return Value_Set is
-   --        Data   : Row_Data;
-   --        Value  : Value_Data (Feature);
-   --        theSet : Value_Set;
-   --     begin
-   --
-   --        for index in Rows.First_Index .. Rows.Last_Index loop
-   --           Data := Rows.Element (index);
-   --           if Feature = Colour_Feature then
-   --              Value.Colour := Data.Colour;
-   --           else
-   --              Value.Diameter := Data.Diameter;
-   --           end if;
-   --           if not theSet.Contains (Value) then
-   --              theSet.Append (Value);
-   --           end if;
-   --        end loop;
-   --        return theSet;
-   --     end Unique_Values;
-
-   --  --------------------------------------------------------------------------
 
 begin
 

@@ -1,9 +1,17 @@
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
 with Builder;
 with ML_Types;
 
 package Utilities is
 
+   Utilities_Exception : exception;
+
+   function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type;
+   function Is_Boolean (Item : in Unbounded_String) return Boolean;
+   function Is_Integer (Item : in Unbounded_String) return Boolean;
+   function Is_Float (Item : in Unbounded_String) return Boolean;
    procedure Print_Best (Self : Builder.Best_Data);
    procedure Print_Classification
      (Classification : ML_Types.Count_Package.Map);
