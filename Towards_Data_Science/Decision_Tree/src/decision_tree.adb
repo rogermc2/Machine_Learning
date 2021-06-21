@@ -35,7 +35,7 @@ procedure Decision_Tree is
     Training_Data       : constant Rows_Vector :=
                             To_Rows_Vector (Training_Set, Header);
     Gain_Zero           : constant Float := 0.0;
-    Rows                : Partitioned_Rows;
+--      Rows                : Partitioned_Rows;
     Mixing_Data         : Row_Data (1);
     Mixing_Feature      : Feature_Data_Array (1 .. 1);
     No_Mixing           : Rows_Vector;
@@ -47,9 +47,9 @@ procedure Decision_Tree is
     aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
-       Print_Unique_Values (To_Vector (Training_Data), Colour_Feature);
-       Print_Unique_Values (To_Vector (Training_Data), Diameter_Feature);
-       New_Line;
+    Utilities.Print_Unique_Values (Training_Data, Colour_Feature);
+    Utilities.Print_Unique_Values (Training_Data, Diameter_Feature);
+    New_Line;
     for index in Header .Features'Range loop
         Put_Line ("Header row features: " &
                     To_String (Header.Features (index)));
@@ -69,18 +69,18 @@ begin
     aRaw_Question := (Colour_Feature, UB ("Red"));
     Utilities.Print_Raw_Question (aRaw_Question);
 
-    Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
-    Utilities.Print_Rows ("True rows: ", Rows.True_Rows);
-    Utilities.Print_Rows ("False rows: ", Rows.False_Rows);
+    P_Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
+    Utilities.Print_Rows ("True rows: ", P_Rows.True_Rows);
+    Utilities.Print_Rows ("False rows: ", P_Rows.False_Rows);
 
     New_Line;
     Put_Line ("Partition example");
     aRaw_Question := (Diameter_Feature, UB ("3"));
     Utilities.Print_Raw_Question (aRaw_Question);
 
-    Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
-    Utilities.Print_Rows ("True rows: ", Rows.True_Rows);
-    Utilities.Print_Rows ("False rows: ", Rows.False_Rows);
+    P_Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
+    Utilities.Print_Rows ("True rows: ", P_Rows.True_Rows);
+    Utilities.Print_Rows ("False rows: ", P_Rows.False_Rows);
 
     Mixing_Feature (1) := UB ("Fruit");
     Mixing_Data.Features := Mixing_Feature;

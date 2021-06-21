@@ -461,7 +461,7 @@ package body Builder is
       end loop;
    end Set_Feature_Map;
 
-   --  -------------------------------------------------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                     Question : in out Question_Data;

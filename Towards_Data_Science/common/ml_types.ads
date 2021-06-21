@@ -104,6 +104,5 @@ package ML_Types is
 
    package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
      (Unbounded_String);
---     subtype Strings_List is Strings_Package.List;
 
 end ML_Types;

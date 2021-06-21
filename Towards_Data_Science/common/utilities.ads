@@ -16,10 +16,12 @@ package Utilities is
    procedure Print_Classification
      (Classification : ML_Types.Count_Package.Map);
    function Print_Leaf (Counts : ML_Types.Count_Package.Map) return String;
-   procedure Print_Question (Label : String; Self : ML_Types.Question_Data);
+   procedure Print_Question (Message : String; Self : ML_Types.Question_Data);
    procedure Print_Raw_Question (Self : ML_Types.Raw_Question);
-   procedure Print_Rows (Label : String; Rows : ML_Types.Rows_Vector);
+   procedure Print_Rows (Message : String; Rows : ML_Types.Rows_Vector);
    procedure Print_Tree (aTree : ML_Types.Tree_Package.Tree);
    procedure Print_UB_Class_Counts (Rows : ML_Types.Rows_Vector);
+   procedure Print_Unique_Values (Rows    : ML_Types.Rows_Vector;
+                                  Feature : ML_Types.Feature_Name_Type);
 
 end Utilities;
