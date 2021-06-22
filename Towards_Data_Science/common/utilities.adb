@@ -219,8 +219,7 @@ package body Utilities is
          Level := Level + 1;
          Put_Line (" Level: " & Integer'Image (Level));
          if Is_Leaf  (Curs) then
-            Put ("Leaf node");
-            Put_Line (" prediction: " & Natural'Image
+            Put_Line ("    Leaf node prediction: " & Natural'Image
                       (Node.Predictions.First_Element));
          else
             --           Put_Line ("Depth:" & Integer'Image (Integer (Depth (Curs))) & ", ");

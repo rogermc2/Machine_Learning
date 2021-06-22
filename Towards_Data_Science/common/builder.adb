@@ -44,7 +44,7 @@ package body Builder is
    function To_Label (UB_String : Raw_Label) return Label_Data;
    --     function To_Row_Data (aRow : Unbounded_String) return Row_Data;
 
-   --  ---------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    function Best_Question (Data : Best_Data) return Question_Data is
    begin
@@ -109,6 +109,8 @@ package body Builder is
       end Recurse;
 
    begin
+      Best_Split := Find_Best_Split (Rows);
+      Top_Node.Question := Best_Split.Question;
       Top_Node.Rows := Rows;
       theTree.Insert_Child (Parent   => Curs,
                             Before   => No_Element,
