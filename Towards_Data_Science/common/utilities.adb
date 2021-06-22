@@ -212,11 +212,13 @@ package body Utilities is
    procedure Print_Tree (aTree : Tree_Type) is
       use Tree_Package;
       --          Tree_Curs  : Tree_Cursor := aTree.Root;
+      Level : Integer := 0;
       procedure Print_Node (Curs : Cursor) is
-         Node : constant Decision_Node_Type := Element (Curs);
+         Node : constant Tree_Node_Type := Element (Curs);
       begin
+         Level := Level + 1;
+         Put_Line (" Level: " & Integer'Image (Level));
          if Is_Leaf  (Curs) then
-            New_Line;
             Put ("Leaf node");
             Put_Line (" prediction: " & Natural'Image
                       (Node.Predictions.First_Element));
@@ -236,8 +238,10 @@ package body Utilities is
                   Put (To_String (Node.Question.UB_String_Value));
             end case;
             Put_Line ("?");
-            Print_Rows ("True_Rows", Node.True_Rows);
-            Print_Rows ("False_Rows", Node.False_Rows);
+            Print_Node (First_Child (Curs));
+            Print_Node (Last_Child (Curs));
+--              Print_Rows ("True_Rows", Node.True_Rows);
+--              Print_Rows ("False_Rows", Node.False_Rows);
             --                  when Prediction_Kind =>
             --                      Put_Line ("Prediction; " & Natural'Image
             --                                (Node.Predictions.First_Element));
@@ -249,7 +253,8 @@ package body Utilities is
       --  element in aTree starting with the root node and proceeding in a
       --  depth-first order.
       Put_Line ("Depth first tree traversal");
-      aTree.Iterate (Print_Node'Access);
+      Print_Node (First_Child (aTree.Root));
+--        aTree.Iterate (Print_Node'Access);
    end Print_Tree;
 
    --  ---------------------------------------------------------------------------

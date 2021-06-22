@@ -81,7 +81,7 @@ package ML_Types is
       end case;
    end record;
 
-   type Decision_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
+   type Tree_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       case Node_Type is
       when  Decision_Kind =>
          Question    : Question_Data;
@@ -98,7 +98,7 @@ package ML_Types is
    end record;
 
    package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
-     (Decision_Node_Type);
+     (Tree_Node_Type);
    subtype Tree_Type is Tree_Package.Tree;
    subtype Tree_Cursor is Tree_Package.Cursor;
 

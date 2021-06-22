@@ -61,12 +61,12 @@ package body Builder is
       theTree      : Tree_Type := Empty_Tree;
       Root_Curs    : Tree_Cursor := Root (theTree);
       Best_Split   : Best_Data;
-      aLeaf        : Decision_Node_Type (Prediction_Kind);
+      aLeaf        : Tree_Node_Type (Prediction_Kind);
 
       procedure Recurse (Rows : Rows_Vector;
                          Curs : in out Tree_Cursor) is
          P_Rows       : Partitioned_Rows;
-         Node         : Decision_Node_Type (Decision_Kind);
+         Node         : Tree_Node_Type (Decision_Kind);
          Node_Curs    : Tree_Cursor;
       begin
          Best_Split := Find_Best_Split (Rows);
