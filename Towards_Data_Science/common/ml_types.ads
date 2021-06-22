@@ -85,8 +85,7 @@ package ML_Types is
       case Node_Type is
       when  Decision_Kind =>
          Question    : Question_Data;
-         True_Rows   : Rows_Vector := Rows_Package.Empty_Vector;
-         False_Rows  : Rows_Vector := Rows_Package.Empty_Vector;
+         Rows        : Rows_Vector := Rows_Package.Empty_Vector;
       when Prediction_Kind =>
          Predictions : UB_Label_Map := UB_Label_Map_Package.Empty_Map;
       end case;

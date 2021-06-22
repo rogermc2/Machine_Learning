@@ -60,14 +60,18 @@ package body Builder is
       use Tree_Package;
       theTree      : Tree_Type := Empty_Tree;
       Root_Curs    : Tree_Cursor := Root (theTree);
+      Top_Node     : Tree_Node_Type (Decision_Kind);
       Best_Split   : Best_Data;
       aLeaf        : Tree_Node_Type (Prediction_Kind);
 
       procedure Recurse (Rows : Rows_Vector;
                          Curs : in out Tree_Cursor) is
-         P_Rows       : Partitioned_Rows;
-         Node         : Tree_Node_Type (Decision_Kind);
-         Node_Curs    : Tree_Cursor;
+         P_Rows          : Partitioned_Rows;
+         False_Node      : Tree_Node_Type (Decision_Kind);
+         True_Node       : Tree_Node_Type (Decision_Kind);
+         Node_Curs       : Tree_Cursor;
+         False_Node_Curs : Tree_Cursor;
+         True_Node_Curs  : Tree_Cursor;
       begin
          Best_Split := Find_Best_Split (Rows);
          if Best_Split.Gain = 0.0 then
@@ -77,26 +81,36 @@ package body Builder is
                                   Before   => No_Element,
                                   New_Item => aLeaf);
          else
-            Node.Question := Best_Split.Question;
-            Utilities.Print_Question ("Build_Tree", Node.Question);
+            True_Node.Question := Best_Split.Question;
+            False_Node.Question := Best_Split.Question;
+            Utilities.Print_Question ("Build_Tree", True_Node.Question);
             New_Line;
-            P_Rows := Partition (Rows, Node.Question);
-            Node.True_Rows := P_Rows.True_Rows;
-            Node.False_Rows := P_Rows.False_Rows;
+            P_Rows := Partition (Rows, True_Node.Question);
+            True_Node.Rows := P_Rows.True_Rows;
+            False_Node.Rows := P_Rows.False_Rows;
 --              Utilities.Print_Rows ("Builder.Build_Tree.Recurse Node.True_Rows",
 --                                    Node.True_Rows);
 --              Utilities.Print_Rows ("Builder.Build_Tree.Recurse Node.False_Rows",
 --                                    Node.False_Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
-                                  New_Item => Node,
-                                  Position => Node_Curs);
-            Recurse (P_Rows.True_Rows, Node_Curs);
-            Recurse (P_Rows.False_Rows, Node_Curs);
+                                  New_Item => True_Node,
+                                  Position => True_Node_Curs);
+            theTree.Insert_Child (Parent   => Curs,
+                                  Before   => No_Element,
+                                  New_Item => False_Node,
+                                  Position => False_Node_Curs);
+            Recurse (P_Rows.True_Rows, True_Node_Curs);
+            Recurse (P_Rows.False_Rows, False_Node_Curs);
          end if;
       end Recurse;
 
    begin
+      Top_Node.Rows := Rows;
+      theTree.Insert_Child (Parent   => Root_Curs,
+                            Before   => No_Element,
+                            New_Item => Top_Node,
+                            Position => Root_Curs);
       Recurse (Rows, Root_Curs);
       return theTree;
    end Build_Tree;

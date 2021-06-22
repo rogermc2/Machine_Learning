@@ -252,7 +252,7 @@ package body Utilities is
       --  Iterate calls Print_Node.all with a cursor that designates each
       --  element in aTree starting with the root node and proceeding in a
       --  depth-first order.
-      Put_Line ("Depth first tree traversal");
+      Put_Line ("Tree traversal");
       Print_Node (First_Child (aTree.Root));
 --        aTree.Iterate (Print_Node'Access);
    end Print_Tree;
