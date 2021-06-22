@@ -172,7 +172,7 @@ package body Utilities is
             Put_Line (Boolean'Image (Self.Boolean_Value));
          when UB_String_Type => Put_Line (To_String (Self.UB_String_Value));
       end case;
-      Put_Line (Float'Image (Self.Gain));
+      Put_Line ("Gain " & Float'Image (Self.Gain));
 
    end Print_Question;
 

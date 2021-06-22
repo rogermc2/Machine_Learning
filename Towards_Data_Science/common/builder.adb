@@ -59,10 +59,11 @@ package body Builder is
    function Build_Tree (Rows : Rows_Vector) return Tree_Type is
       use Tree_Package;
       theTree      : Tree_Type := Empty_Tree;
-      Root_Curs    : Tree_Cursor := Root (theTree);
+      Curs         : Tree_Cursor := Root (theTree);
       Top_Node     : Tree_Node_Type (Decision_Kind);
       Best_Split   : Best_Data;
       aLeaf        : Tree_Node_Type (Prediction_Kind);
+      Level        : Integer := 0;
 
       procedure Recurse (Rows : Rows_Vector;
                          Curs : in out Tree_Cursor) is
@@ -73,6 +74,8 @@ package body Builder is
          False_Node_Curs : Tree_Cursor;
          True_Node_Curs  : Tree_Cursor;
       begin
+         Level := Level + 1;
+         Put_Line ("Build_Tree level" & Integer'Image (Level));
          Best_Split := Find_Best_Split (Rows);
          if Best_Split.Gain = 0.0 then
             aLeaf.Predictions := UB_Class_Counts (Rows);
@@ -83,7 +86,7 @@ package body Builder is
          else
             True_Node.Question := Best_Split.Question;
             False_Node.Question := Best_Split.Question;
-            Utilities.Print_Question ("Build_Tree", True_Node.Question);
+            Utilities.Print_Question ("Build Tree best", True_Node.Question);
             New_Line;
             P_Rows := Partition (Rows, True_Node.Question);
             True_Node.Rows := P_Rows.True_Rows;
@@ -107,11 +110,11 @@ package body Builder is
 
    begin
       Top_Node.Rows := Rows;
-      theTree.Insert_Child (Parent   => Root_Curs,
+      theTree.Insert_Child (Parent   => Curs,
                             Before   => No_Element,
                             New_Item => Top_Node,
-                            Position => Root_Curs);
-      Recurse (Rows, Root_Curs);
+                            Position => Curs);
+      Recurse (Rows, Curs);
       return theTree;
    end Build_Tree;
 
