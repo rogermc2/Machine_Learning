@@ -157,31 +157,31 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   procedure Print_Question (Message : String; Self : ML_Types.Question_Data) is
-      Col          : constant String := To_String (Self.Feature_Name);
-      Feature_Kind : constant Data_Type := Self.Feature_Kind;
+   procedure Print_Question (Message : String; Question : ML_Types.Question_Data) is
+      Col          : constant String := To_String (Question.Feature_Name);
+      Feature_Kind : constant Data_Type := Question.Feature_Kind;
    begin
       Put_Line (Message & " question:");
-      Put ("Feature " & Col & " = ");
+      Put ("  Feature " & "'" & Col & "'" & " = ");
       case Feature_Kind is
          when Integer_Type =>
-            Put_Line (Integer'Image (Self.Integer_Value));
+            Put_Line (Integer'Image (Question.Integer_Value));
          when Float_Type =>
-            Put_Line (Float'Image (Self.Float_Value));
+            Put_Line (Float'Image (Question.Float_Value));
          when Boolean_Type =>
-            Put_Line (Boolean'Image (Self.Boolean_Value));
-         when UB_String_Type => Put_Line (To_String (Self.UB_String_Value));
+            Put_Line (Boolean'Image (Question.Boolean_Value));
+         when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
       end case;
-      Put_Line ("Gain " & Float'Image (Self.Gain));
+      Put_Line ("  Gain " & Float'Image (Question.Gain));
 
    end Print_Question;
 
    --  --------------------------------------------------------------------------
 
-   procedure Print_Raw_Question (Self : Raw_Question) is
+   procedure Print_Raw_Question (Question : Raw_Question) is
       --  Example" Self = ("Colour", "Green"));
-      Col   : constant String := To_String (Self.Feature_Name);
-      Value : constant String := To_String (Self.Feature_Value);
+      Col   : constant String := To_String (Question.Feature_Name);
+      Value : constant String := To_String (Question.Feature_Value);
    begin
       Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
    end Print_Raw_Question;

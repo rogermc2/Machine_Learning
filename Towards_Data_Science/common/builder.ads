@@ -39,13 +39,9 @@ package Builder is
     function Num_Features (aString : String) return Class_Range;
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                         return Partitioned_Rows;
-    --     procedure Print_Unique_Values (Rows    : Rows_Vector;
-    --                                    Feature : Feature_Class);
     function To_Question (Q : Raw_Question) return Question_Data;
     function To_Rows_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
                              return Rows_Vector;
-    --     function Unique_Values (Rows    : Rows_Vector;
-    --                             Feature : Feature_Class) return Value_Set;
 private
 
     type Best_Data is record
