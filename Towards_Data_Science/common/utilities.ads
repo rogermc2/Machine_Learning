@@ -18,7 +18,8 @@ package Utilities is
    function Print_Leaf (Counts : ML_Types.Count_Package.Map) return String;
    procedure Print_Question (Message : String;
                              Question : ML_Types.Question_Data);
-   procedure Print_Raw_Question (Question : ML_Types.Raw_Question);
+   procedure Print_Raw_Question
+      (Message : String; Question : ML_Types.Raw_Question);
    procedure Print_Rows (Message : String; Rows : ML_Types.Rows_Vector);
    procedure Print_Tree (aTree : ML_Types.Tree_Package.Tree);
    procedure Print_UB_Class_Counts (Rows : ML_Types.Rows_Vector);

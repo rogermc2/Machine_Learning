@@ -31,11 +31,9 @@ procedure Decision_Tree is
                             To_Unbounded_String ("Colour");
     Diameter_Feature    : constant Feature_Name_Type :=
                             To_Unbounded_String ("Diameter");
-    Header              : Row_Data;
-    Training_Data       : constant Rows_Vector :=
-                            To_Rows_Vector (Training_Set, Header);
+    Training_Data       : constant Rows_Vector := To_Rows_Vector (Training_Set);
+    Header              : constant Row_Data := Header_Row;
     Gain_Zero           : constant Float := 0.0;
---      Rows                : Partitioned_Rows;
     Mixing_Data         : Row_Data (1);
     Mixing_Feature      : Feature_Data_Array (1 .. 1);
     No_Mixing           : Rows_Vector;
@@ -49,7 +47,7 @@ procedure Decision_Tree is
 begin
     New_Line;
     Put ("Features:");
-    for index in Header .Features'Range loop
+    for index in Header.Features'Range loop
         Put (" " & To_String (Header.Features (index)));
     end loop;
     New_Line;
@@ -60,24 +58,26 @@ begin
 
     aRaw_Question.Feature_Name := Colour_Feature;
     aRaw_Question.Feature_Value := (UB ("Green"));
-    Utilities.Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question ("Raw question example 1", aRaw_Question);
     aRaw_Question.Feature_Name := Diameter_Feature;
     aRaw_Question.Feature_Value := (UB ("2"));
-    Utilities.Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question ("Raw question example 2",aRaw_Question);
 
     New_Line;
-    Put_Line ("Partition example");
+    Put_Line ("Partition example 1");
     aRaw_Question := (Colour_Feature, UB ("Red"));
-    Utilities.Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question ("Partition raw question", aRaw_Question);
 
+    Put_Line (" Calling Partition 1");
     P_Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
     Utilities.Print_Rows ("True rows: ", P_Rows.True_Rows);
     Utilities.Print_Rows ("False rows: ", P_Rows.False_Rows);
 
     New_Line;
-    Put_Line ("Partition example");
+    Put_Line ("Partition example 2");
     aRaw_Question := (Diameter_Feature, UB ("3"));
-    Utilities.Print_Raw_Question (aRaw_Question);
+    Utilities.Print_Raw_Question ("Partition example raw question", aRaw_Question);
+    Put_Line ("Partition aRaw_Question set");
 
     P_Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
     Utilities.Print_Rows ("True rows: ", P_Rows.True_Rows);

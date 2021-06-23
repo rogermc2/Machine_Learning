@@ -178,11 +178,12 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   procedure Print_Raw_Question (Question : Raw_Question) is
+   procedure Print_Raw_Question (Message : String; Question : Raw_Question) is
       --  Example" Self = ("Colour", "Green"));
       Col   : constant String := To_String (Question.Feature_Name);
       Value : constant String := To_String (Question.Feature_Value);
    begin
+      Put_Line (Message);
       Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
    end Print_Raw_Question;
 
@@ -195,11 +196,11 @@ package body Utilities is
       Put_Line (Message);
       for index in Rows.First_Index .. Rows.Last_Index loop
          aRow := Rows.Element (index);
-         Put ("(");
-         for feat in aRow.Features'First .. aRow.Features'Last (1) loop
+         Put ("Feature values: (");
+         for feat in aRow.Features'First .. aRow.Features'Last loop
             Put (To_String (aRow.Features (feat)));
          end loop;
-         Put (") " & To_String (aRow.Label));
+         Put ("), Label: " & To_String (aRow.Label));
          if index /= Rows.Last_Index then
             Put (", ");
          end if;

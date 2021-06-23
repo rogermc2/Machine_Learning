@@ -33,8 +33,9 @@ package body Builder is
 
     Features_Map  : Feature_Name_Map;
     Label_Types   : Label_Type_Map;
+    Header_Data   : Row_Data;
 
-    procedure Set_Feature_Map (Rows : Rows_Vector);
+    procedure Set_Feature_Map (Header_Row : Row_Data);
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
                      Best     : in out Best_Data);
@@ -59,7 +60,6 @@ package body Builder is
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
         theTree      : Tree_Type := Empty_Tree;
-        Header       : constant Row_Data := Rows.Element (Rows.First_Index);
         Curs         : Tree_Cursor := Root (theTree);
         Top_Node     : Tree_Node_Type (Decision_Kind);
         Best_Split   : Best_Data;
@@ -86,9 +86,12 @@ package body Builder is
             else
                 New_Line;
                 P_Rows := Partition (Rows, Best_Split.Question);
-                P_Rows.True_Rows.Prepend (Header);
-                Put_Line ("Finding best split for true rows.");
+                Utilities.Print_Rows
+                  ("Build_Tree P_Rows.True_Rows", ML_Types.Rows_Vector (P_Rows.True_Rows));
+
+                Put_Line ("Build_Tree finding best split for true rows.");
                 Best_Split := Find_Best_Split (P_Rows.True_Rows);
+                Put_Line ("Build_Tree found best split for true rows.");
                 True_Node.Rows := P_Rows.True_Rows;
                 True_Node.Question := Best_Split.Question;
                 True_Node.Rows := P_Rows.False_Rows;
@@ -101,7 +104,6 @@ package body Builder is
                 Recurse (P_Rows.True_Rows, True_Node_Curs);
 
                 Put_Line ("Finding best split for false rows.");
-                P_Rows.False_Rows.Prepend (Header);
                 Best_Split := Find_Best_Split (P_Rows.False_Rows);
                 False_Node.Rows := P_Rows.False_Rows;
                 False_Node.Question := Best_Split.Question;
@@ -127,7 +129,14 @@ package body Builder is
         return theTree;
     end Build_Tree;
 
-    --  ---------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
+
+    function Header_Row return Row_Data is
+    begin
+        return Header_Data;
+    end Header_Row;
+
+    --  --------------------------------------------------------------------
     --  Uncertainty is the uncertainty of the starting node minus
     --  the weighted impurity of two child nodes
     function Information_Gain (Left, Right         : Rows_Vector;
@@ -261,11 +270,10 @@ package body Builder is
         use Rows_Package;
         Current_Uncertainty   : constant Float := Gini (Rows);
         Cols                  : constant Row_Data := Rows.First_Element;
-        Row2                  : constant Row_Data :=
-                                  Rows.Element (Positive'Succ (Rows.First_Index));
+        Row1                  : constant Row_Data :=  Rows.Element (Rows.First_Index);
         Num_Features          : constant Class_Range := Cols.Class_Count;
-        Row2_Features         : constant Feature_Data_Array (1 .. Num_Features) :=
-                                  Row2.Features;
+        Row1_Features         : constant Feature_Data_Array (1 .. Num_Features) :=
+                                  Row1.Features;
         Feature_Value         : Unbounded_String;
         Feature_Name          : Feature_Name_Type;
         Feature_Data_Type     : Data_Type;
@@ -275,22 +283,17 @@ package body Builder is
         String_Question       : Question_Data (UB_String_Type);
         Best                  : Best_Data;
     begin
-        Set_Feature_Map (Rows);
-        --  Rows.First_Index contains column names
-        if Rows.Length < 2 then
-            raise Builder_Exception with
-              "Builder.Find_Best_Split called with empty rows vector";
-        end if;
+--          Set_Feature_Map (Header_Row);
 
+        Put_line ("Builder.Find_Best_Split");
         for col in 1 .. Num_Features loop
-            Feature_Name :=
-              Feature_Name_Type (Rows.First_Element.Features (col));
+            Feature_Name := Feature_Name_Type (Header_Data.Features (col));
             Put_line ("Builder.Find_Best_Split Feature_Name: " & "'" &
                         To_String (Feature_Name) & "'"  & " for col " &
                         Class_Range'Image (col));
-            Feature_Data_Type := Utilities.Get_Data_Type (Row2_Features (col));
+            Feature_Data_Type := Utilities.Get_Data_Type (Row1_Features (col));
             for row in
-              Positive'Succ (Rows.First_Index) .. Rows.Last_Index loop
+              Rows.First_Index .. Rows.Last_Index loop
                 Feature_Value := Rows.Element (row).Features (col);
                 case Feature_Data_Type is
                     when Boolean_Type =>
@@ -310,10 +313,10 @@ package body Builder is
                           (Rows, Feature_Value, Feature_Name, Current_Uncertainty,
                            String_Question, Best);
                 end case;
---                  Put_Line ("Builder.Find_Best_Split Best_Question for row" &
---                              Integer'Image (row));
---                  Utilities.Print_Question ("Builder.Find_Best_Split best",
---                                            Best_Question (Best));
+                --                  Put_Line ("Builder.Find_Best_Split Best_Question for row" &
+                --                              Integer'Image (row));
+                --                  Utilities.Print_Question ("Builder.Find_Best_Split best",
+                --                                            Best_Question (Best));
             end loop;
             Put_Line ("Builder.Find_Best_Split Best_Question for col" &
                         Class_Range'Image (col));
@@ -356,42 +359,43 @@ package body Builder is
     --  ---------------------------------------------------------------------------
     --  Match compares the feature value in an example to the
     --  feature value in a question.
-    function Match (Self : Question_Data; Example : Row_Data) return Boolean is
-        Feature_Name     : constant Feature_Name_Type := Self.Feature_Name;
+    function Match (Question : Question_Data; Example : Row_Data) return Boolean is
+        Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
         Example_Features : constant Feature_Data_Array := Example.Features;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
         Val_Type         : Data_Type;
         Matches          : Boolean := False;
     begin
-        Val_Type  := Self.Feature_Kind;
+        Val_Type  := Question.Feature_Kind;
         Feat_Index := Features_Map.Element (Feature_Name);
         Example_Feature := Example_Features (Feat_Index);
+--          Put_Line ("Builder.Match Example_Feature set");
         case Val_Type is
             when Integer_Type =>
                 declare
-                    Value : constant Integer := Self.Integer_Value;
+                    Value : constant Integer := Question.Integer_Value;
                 begin
                     Matches := Value =
                       Integer'Value (To_String (Example.Features (Feat_Index)));
                 end;
             when Float_Type =>
                 declare
-                    Value : constant Float := Self.Float_Value;
+                    Value : constant Float := Question.Float_Value;
                 begin
                     Matches := Value =
                       Float'Value (To_String (Example_Feature));
                 end;
             when Boolean_Type =>
                 declare
-                    Value : constant Boolean := Self.Boolean_Value;
+                    Value : constant Boolean := Question.Boolean_Value;
                 begin
                     Matches := Value =
                       Boolean'Value (To_String (Example_Feature));
                 end;
             when UB_String_Type =>
                 declare
-                    Value : constant Unbounded_String := Self.UB_String_Value;
+                    Value : constant Unbounded_String := Question.UB_String_Value;
                 begin
                     Matches := Value = Example_Feature;
                 end;
@@ -406,7 +410,6 @@ package body Builder is
     function Num_Features (aString : String) return Class_Range is
         use Ada.Strings;
     begin
-        --      : constant Class_Range :=
         return Class_Range (Fixed.Count (aString, ","));
     end Num_Features;
 
@@ -456,18 +459,19 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                        return Partitioned_Rows is
+                            return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;
     begin
-        for index in Integer'Succ (Rows.First_Index) .. Rows.Last_Index loop
+        for index in Rows.First_Index .. Rows.Last_Index loop
             Data := Rows.Element (index);
+--              Put_Line ("Builder.Partition index" & Integer'Image (index));
             if Match (aQuestion, Data) then
-                --              Put_Line ("Builder.Partition adding true row");
+                Put_Line ("Builder.Partition adding true row");
                 True_Rows.Append (Data);
             else
-                --              Put_Line ("Builder.Partition adding false row");
+                Put_Line ("Builder.Partition adding false row");
                 False_Rows.Append (Data);
             end if;
         end loop;
@@ -476,8 +480,7 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    procedure Set_Feature_Map (Rows : Rows_Vector) is
-        Header_Row     : constant Row_Data := Rows.First_Element;
+    procedure Set_Feature_Map (Header_Row : Row_Data) is
         Features       : constant Feature_Data_Array := Header_Row.Features;
         Feature_Names  : Feature_Names_Array (Features'Range);
     begin
@@ -623,18 +626,17 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    function To_Rows_Vector (Rows : Data_Rows; Header_Row : out Row_Data)
-                             return Rows_Vector is
+    function To_Rows_Vector (Rows : Data_Rows) return Rows_Vector is
         New_Vector  : Rows_Vector;
         First_Index : constant Positive := Rows'First;
         aRow        : Row_Data;
     begin
-        Header_Row := Parse_Header (To_String (Rows (Rows'First)));
-        for index in First_Index .. Rows'Last loop
+        Header_Data := Parse_Header (To_String (Rows (First_Index)));
+        for index in Positive'Succ (First_Index) .. Rows'Last loop
             aRow := Parse (To_String (Rows (index)));
             New_Vector.Append (aRow);
         end loop;
-        Set_Feature_Map (New_Vector);
+        Set_Feature_Map (Header_Data);
         return New_Vector;
     end To_Rows_Vector;
 
