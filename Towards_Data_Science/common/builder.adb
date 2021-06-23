@@ -35,6 +35,8 @@ package body Builder is
     Label_Types   : Label_Type_Map;
     Header_Data   : Row_Data;
 
+    function Parse (aString : String) return Row_Data;
+    function Parse_Header (Header : String) return Row_Data;
     procedure Set_Feature_Map (Header_Row : Row_Data);
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
@@ -356,7 +358,24 @@ package body Builder is
         return Impurity;
     end Gini;
 
-    --  ---------------------------------------------------------------------------
+   --  ---------------------------------------------------------------------------
+
+    function Initialize (Rows : Data_Rows) return Rows_Vector is
+        New_Vector  : Rows_Vector;
+        First_Index : constant Positive := Rows'First;
+        aRow        : Row_Data;
+    begin
+        Header_Data := Parse_Header (To_String (Rows (First_Index)));
+        for index in Positive'Succ (First_Index) .. Rows'Last loop
+            aRow := Parse (To_String (Rows (index)));
+            New_Vector.Append (aRow);
+        end loop;
+        Set_Feature_Map (Header_Data);
+        return New_Vector;
+    end Initialize;
+
+    --  --------------------------------------------------------------------------
+
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Question : Question_Data; Example : Row_Data) return Boolean is
@@ -621,22 +640,6 @@ package body Builder is
     --     begin
     --        return Parse (To_String (aRow));
     --     end To_Row_Data;
-
-    --  --------------------------------------------------------------------------
-
-    function To_Rows_Vector (Rows : Data_Rows) return Rows_Vector is
-        New_Vector  : Rows_Vector;
-        First_Index : constant Positive := Rows'First;
-        aRow        : Row_Data;
-    begin
-        Header_Data := Parse_Header (To_String (Rows (First_Index)));
-        for index in Positive'Succ (First_Index) .. Rows'Last loop
-            aRow := Parse (To_String (Rows (index)));
-            New_Vector.Append (aRow);
-        end loop;
-        Set_Feature_Map (Header_Data);
-        return New_Vector;
-    end To_Rows_Vector;
 
     --  --------------------------------------------------------------------------
 

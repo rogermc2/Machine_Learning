@@ -31,7 +31,7 @@ procedure Decision_Tree is
                             To_Unbounded_String ("Colour");
     Diameter_Feature    : constant Feature_Name_Type :=
                             To_Unbounded_String ("Diameter");
-    Training_Data       : constant Rows_Vector := To_Rows_Vector (Training_Set);
+    Training_Data       : constant Rows_Vector := Initialize (Training_Set);
     Header              : constant Row_Data := Header_Row;
     Gain_Zero           : constant Float := 0.0;
     Mixing_Data         : Row_Data (1);

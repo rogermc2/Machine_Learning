@@ -35,13 +35,13 @@ package Builder is
     function Header_Row return Row_Data;
     function Information_Gain (Left, Right : Rows_Vector;
                                Current_Uncertainty : Float) return float;
+    function Initialize (Rows : Data_Rows) return Rows_Vector;
     function Match (Question : Question_Data;
                     Example : Row_Data) return Boolean;
     function Num_Features (aString : String) return Class_Range;
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                         return Partitioned_Rows;
     function To_Question (Q : Raw_Question) return Question_Data;
-    function To_Rows_Vector (Rows : Data_Rows) return Rows_Vector;
 private
 
     type Best_Data is record
