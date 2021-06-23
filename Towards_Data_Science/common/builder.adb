@@ -531,10 +531,8 @@ package body Builder is
          if Question.Gain >= Best.Gain then
             Best := (Question, Question.Gain);
          end if;
-      else
-         if Best.Question.Feature_Name = To_Unbounded_String ("") then
+      elsif Best.Question.Feature_Name = To_Unbounded_String ("") then
             Best := (Question, 0.0);
-         end if;
       end if;
    end Split;
 
