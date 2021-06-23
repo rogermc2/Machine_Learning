@@ -283,7 +283,7 @@ package body Builder is
         String_Question       : Question_Data (UB_String_Type);
         Best                  : Best_Data;
     begin
---          Set_Feature_Map (Header_Row);
+        Set_Feature_Map (Header_Row);
 
         Put_line ("Builder.Find_Best_Split");
         for col in 1 .. Num_Features loop
@@ -313,10 +313,10 @@ package body Builder is
                           (Rows, Feature_Value, Feature_Name, Current_Uncertainty,
                            String_Question, Best);
                 end case;
-                --                  Put_Line ("Builder.Find_Best_Split Best_Question for row" &
-                --                              Integer'Image (row));
-                --                  Utilities.Print_Question ("Builder.Find_Best_Split best",
-                --                                            Best_Question (Best));
+                Put_Line ("Builder.Find_Best_Split Best_Question for row" &
+                            Integer'Image (row));
+                Utilities.Print_Question ("Builder.Find_Best_Split best",
+                                          Best_Question (Best));
             end loop;
             Put_Line ("Builder.Find_Best_Split Best_Question for col" &
                         Class_Range'Image (col));
@@ -370,7 +370,7 @@ package body Builder is
         Val_Type  := Question.Feature_Kind;
         Feat_Index := Features_Map.Element (Feature_Name);
         Example_Feature := Example_Features (Feat_Index);
---          Put_Line ("Builder.Match Example_Feature set");
+        --          Put_Line ("Builder.Match Example_Feature set");
         case Val_Type is
             when Integer_Type =>
                 declare
@@ -459,19 +459,17 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                            return Partitioned_Rows is
+                        return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;
     begin
         for index in Rows.First_Index .. Rows.Last_Index loop
             Data := Rows.Element (index);
---              Put_Line ("Builder.Partition index" & Integer'Image (index));
+            --              Put_Line ("Builder.Partition index" & Integer'Image (index));
             if Match (aQuestion, Data) then
-                Put_Line ("Builder.Partition adding true row");
                 True_Rows.Append (Data);
             else
-                Put_Line ("Builder.Partition adding false row");
                 False_Rows.Append (Data);
             end if;
         end loop;
