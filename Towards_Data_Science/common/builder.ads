@@ -27,7 +27,7 @@ package Builder is
     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
     --     function Classify (aRow : Row_Data; aTree : Tree_Type)
     --                           return Count_Package.Map;
-    function UB_Class_Counts (Rows : Rows_Vector) return UB_Label_Map;
+    function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map;
     --     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type);
     function Find_Best_Split (Rows : Rows_Vector) return Best_Data;
     function Gain (Data : Best_Data) return Float;

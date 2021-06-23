@@ -22,7 +22,7 @@ package Utilities is
       (Message : String; Question : ML_Types.Raw_Question);
    procedure Print_Rows (Message : String; Rows : ML_Types.Rows_Vector);
    procedure Print_Tree (aTree : ML_Types.Tree_Package.Tree);
-   procedure Print_UB_Class_Counts (Rows : ML_Types.Rows_Vector);
+   procedure Print_UB_Label_Counts (Rows : ML_Types.Rows_Vector);
    procedure Print_Unique_Values (Rows    : ML_Types.Rows_Vector;
                                   Feature : ML_Types.Feature_Name_Type);
 

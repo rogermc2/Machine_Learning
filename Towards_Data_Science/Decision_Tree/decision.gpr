@@ -6,7 +6,7 @@ project Decision is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-g", "-gnata", "-gnatru", "-fstack-check", "-gnatyBbcfhkpux");
+      for Default_Switches ("ada") use ("-g", "-gnata", "-gnatru", "-fstack-check", "-gnatw.okmu", "-gnatyBbcfhkpux");
    end Compiler;
 
    package Builder is

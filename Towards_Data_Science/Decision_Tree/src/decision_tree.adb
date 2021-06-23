@@ -17,7 +17,7 @@ procedure Decision_Tree is
       To_Unbounded_String;
 
     Training_Set : constant Data_Rows (1 .. 6) :=
-    --  Colour Diameter Label
+    --  Feature 1, Feature 2, Label
                      (UB ("Colour,Diameter,Fruit"),
                       UB ("Green, 3, Apple"),
                       UB ("Yellow, 3, Apple"),
@@ -41,7 +41,7 @@ procedure Decision_Tree is
     Lots_Of_Mixing      : Rows_Vector;
     Current_Uncertainty : Float;
     P_Rows              : Partitioned_Rows;
-    Best                : Best_Data;
+    Best_Test           : Best_Data;
     aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
@@ -53,7 +53,7 @@ begin
     New_Line;
     Utilities.Print_Unique_Values (Training_Data, Colour_Feature);
     Utilities.Print_Unique_Values (Training_Data, Diameter_Feature);
-    Utilities.Print_UB_Class_Counts (Training_Data);
+    Utilities.Print_UB_Label_Counts (Training_Data);
     New_Line;
 
     aRaw_Question.Feature_Name := Colour_Feature;
@@ -135,15 +135,16 @@ begin
 
     New_Line;
     Put_Line ("Find_Best_Split");
-    Best := Find_Best_Split (Training_Data);
-    Put_Line ("Best_Split " & Float'Image (Gain (Best)) & ", " &
-                To_String (Best_Question (Best).Feature_Name));
-    Utilities.Print_Best (Best);
+    Best_Test := Find_Best_Split (Training_Data);
+    Put_Line ("Best_Split " & Float'Image (Gain (Best_Test)) & ", " &
+                To_String (Best_Question (Best_Test).Feature_Name));
+    Utilities.Print_Best (Best_Test);
 
     New_Line;
     Put_Line ("Build Tree");
     aTree := Build_Tree (Training_Data);
     New_Line;
+
     Put_Line ("Print Tree");
     Utilities.Print_Tree (aTree);
     --
