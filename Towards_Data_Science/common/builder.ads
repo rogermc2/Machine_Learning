@@ -32,7 +32,7 @@ package Builder is
     function Find_Best_Split (Rows : Rows_Vector) return Best_Data;
     function Gain (Data : Best_Data) return Float;
     function Gini (Rows : Rows_Vector) return Float;
-    function Header_Row return Row_Data;
+    function Header_Row return Header_Data_Type;
     function Information_Gain (Left, Right : Rows_Vector;
                                Current_Uncertainty : Float) return float;
     function Initialize (Rows : Data_Rows) return Rows_Vector;

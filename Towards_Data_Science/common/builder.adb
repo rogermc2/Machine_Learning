@@ -33,11 +33,11 @@ package body Builder is
 
     Features_Map  : Feature_Name_Map;
     Label_Types   : Label_Type_Map;
-    Header_Data   : Row_Data;
+    Header_Data   : Header_Data_Type;
 
     function Parse (aString : String) return Row_Data;
-    function Parse_Header (Header : String) return Row_Data;
-    procedure Set_Feature_Map (Header_Row : Row_Data);
+    function Parse_Header (Header : String) return Header_Data_Type;
+    procedure Set_Feature_Map (Header_Row : Header_Data_Type);
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
                      Best     : in out Best_Data);
@@ -133,7 +133,7 @@ package body Builder is
 
     --  ------------------------------------------------------------------------
 
-    function Header_Row return Row_Data is
+    function Header_Row return Header_Data_Type is
     begin
         return Header_Data;
     end Header_Row;
@@ -455,12 +455,12 @@ package body Builder is
 
     --  ---------------------------------------------------------------------------
 
-    function Parse_Header (Header : String) return Row_Data is
+    function Parse_Header (Header : String) return Header_Data_Type is
         use Ada.Strings;
         Num_Features : constant Class_Range :=
                          Class_Range (Fixed.Count (Header, ","));
         Last         : constant Natural := Header'Length;
-        Header_Row   : Row_Data (Num_Features);
+        Header_Row   : Header_Data_Type (Num_Features);
         Pos_1        : Natural := Header'First;
         Pos_2        : Natural := Fixed.Index (Header (Pos_1 + 1 .. Last) , ",");
     begin
@@ -497,7 +497,7 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    procedure Set_Feature_Map (Header_Row : Row_Data) is
+    procedure Set_Feature_Map (Header_Row : Header_Data_Type) is
         Features       : constant Feature_Data_Array := Header_Row.Features;
         Feature_Names  : Feature_Names_Array (Features'Range);
     begin

@@ -8,15 +8,25 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 package ML_Types is
 
    Max_Features : constant Integer := 100;
+   type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
+   pragma Ordered (Data_Type);
+
    type Class_Range is new Positive range 1 .. Max_Features;
    type Feature_Name_Type is new Unbounded_String;
    type Feature_Names_Array is array (Class_Range range <>) of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
+   type Data_Type_Array is array (Class_Range range <>) of Data_Type;
    subtype Feature_Class is Class_Range;
    subtype Question_Type is Class_Range;
 
    type Node_Kind is (Decision_Kind, Prediction_Kind);
+
+   type Header_Data_Type (Class_Count : Class_Range := 2) is record
+      Features      : Feature_Data_Array (1 .. Class_Count);
+      Feature_Types : Data_Type_Array (1 .. Class_Count);
+      Label         : Unbounded_String;
+   end record;
 
    type Row_Data (Class_Count : Class_Range := 2) is record
       Features : Feature_Data_Array (1 .. Class_Count);
@@ -31,9 +41,6 @@ package ML_Types is
    type Features_Data (Class_Count : Class_Range := 2) is record
       Features   : Features_ID_Array (1 .. Class_Count);
    end record;
-
-   type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
-   pragma Ordered (Data_Type);
 
    package Label_Type_Package is new Ada.Containers.Ordered_Maps
      (Class_Range, Data_Type);

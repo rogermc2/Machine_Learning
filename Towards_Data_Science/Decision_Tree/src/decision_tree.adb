@@ -32,7 +32,7 @@ procedure Decision_Tree is
     Diameter_Feature    : constant Feature_Name_Type :=
                             To_Unbounded_String ("Diameter");
     Training_Data       : constant Rows_Vector := Initialize (Training_Set);
-    Header              : constant Row_Data := Header_Row;
+    Header              : constant Header_Data_Type := Header_Row;
     Gain_Zero           : constant Float := 0.0;
     Mixing_Data         : Row_Data (1);
     Mixing_Feature      : Feature_Data_Array (1 .. 1);
