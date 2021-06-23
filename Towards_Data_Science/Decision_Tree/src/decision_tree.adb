@@ -41,7 +41,7 @@ procedure Decision_Tree is
     Lots_Of_Mixing      : Rows_Vector;
     Current_Uncertainty : Float;
     P_Rows              : Partitioned_Rows;
-    Best                : Best_Data;
+    Best_Test           : Best_Data;
     aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
@@ -135,10 +135,10 @@ begin
 
     New_Line;
     Put_Line ("Find_Best_Split");
-    Best := Find_Best_Split (Training_Data);
-    Put_Line ("Best_Split " & Float'Image (Gain (Best)) & ", " &
-                To_String (Best_Question (Best).Feature_Name));
-    Utilities.Print_Best (Best);
+    Best_Test := Find_Best_Split (Training_Data);
+    Put_Line ("Best_Split " & Float'Image (Gain (Best_Test)) & ", " &
+                To_String (Best_Question (Best_Test).Feature_Name));
+    Utilities.Print_Best (Best_Test);
 
     New_Line;
     Put_Line ("Build Tree");
