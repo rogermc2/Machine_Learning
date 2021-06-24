@@ -204,6 +204,7 @@ package body Utilities is
             if index /= Rows.Last_Index then
                 Put (", ");
             end if;
+            New_Line;
         end loop;
         New_Line;
     end Print_Rows;
@@ -215,8 +216,8 @@ package body Utilities is
         Level : Integer := 0;
         procedure Print_Node (Curs : Cursor) is
             use UB_Label_Map_Package;
-            Node           : constant Tree_Node_Type := Element (Curs);
-            Prediction     : Unbounded_String;
+            Node       : constant Tree_Node_Type := Element (Curs);
+            Prediction : Unbounded_String;
 --              Value          : Natural;
         begin
             Level := Level + 1;
@@ -250,8 +251,6 @@ package body Utilities is
                 Put_Line ("?");
                 Print_Node (First_Child (Curs));
                 Print_Node (Last_Child (Curs));
-                --              Print_Rows ("True_Rows", Node.True_Rows);
-                --              Print_Rows ("False_Rows", Node.False_Rows);
                 --                  when Prediction_Kind =>
                 --                      Put_Line ("Prediction; " & Natural'Image
                 --                                (Node.Predictions.First_Element));
