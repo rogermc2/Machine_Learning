@@ -145,8 +145,8 @@ begin
     aTree := Build_Tree (Training_Data);
     New_Line;
 
---      Put_Line ("Print Tree");
---      Utilities.Print_Tree (aTree);
+    Put_Line ("Print Tree");
+    Utilities.Print_Tree (aTree);
     --
     --     Put_Line ("Classify tests, Training_Data (1)");
     --     Classified := Classify (Training_Data (1), aTree);

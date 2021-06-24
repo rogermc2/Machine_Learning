@@ -213,15 +213,14 @@ package body Utilities is
 
     procedure Print_Tree (aTree : Tree_Type) is
         use Tree_Package;
-        Level : Integer := 0;
+--          Level : Integer := 0;
         procedure Print_Node (Curs : Cursor) is
             use UB_Label_Map_Package;
             Node       : constant Tree_Node_Type := Element (Curs);
             Prediction : Unbounded_String;
---              Value          : Natural;
         begin
-            Level := Level + 1;
-            Put_Line (" Level: " & Integer'Image (Level));
+--              Level := Level + 1;
+--              Put_Line (" Level: " & Integer'Image (Level));
             if Is_Leaf  (Curs) then
                 Put_Line ("    Leaf node prediction: " & To_String (Node.Prediction));
 --                  for C in Prediction_Map.Iterate loop
@@ -234,9 +233,6 @@ package body Utilities is
 --                  end loop;
                 New_Line;
             else
-                --           Put_Line ("Depth:" & Integer'Image (Integer (Depth (Curs))) & ", ");
-                --                  case Node.Node_Type is
-                --                  when  Decision_Kind =>
                 Put ("Is " & To_String (Node.Question.Feature_Name) & " >= ");
                 case Node.Question.Feature_Kind is
                 when Integer_Type =>
@@ -251,19 +247,11 @@ package body Utilities is
                 Put_Line ("?");
                 Print_Node (First_Child (Curs));
                 Print_Node (Last_Child (Curs));
-                --                  when Prediction_Kind =>
-                --                      Put_Line ("Prediction; " & Natural'Image
-                --                                (Node.Predictions.First_Element));
-                --                  end case;
             end if;
         end Print_Node;
     begin
-        --  Iterate calls Print_Node.all with a cursor that designates each
-        --  element in aTree starting with the root node and proceeding in a
-        --  depth-first order.
         Put_Line ("Tree traversal");
         Print_Node (First_Child (aTree.Root));
-        --        aTree.Iterate (Print_Node'Access);
     end Print_Tree;
 
     --  ---------------------------------------------------------------------------
