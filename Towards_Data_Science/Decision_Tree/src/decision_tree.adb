@@ -17,7 +17,7 @@ procedure Decision_Tree is
       To_Unbounded_String;
 
     Training_Set : constant Data_Rows (1 .. 6) :=
-    --  Colour Diameter Label
+    --  Feature 1, Feature 2, Label
                      (UB ("Colour,Diameter,Fruit"),
                       UB ("Green, 3, Apple"),
                       UB ("Yellow, 3, Apple"),
@@ -53,7 +53,7 @@ begin
     New_Line;
     Utilities.Print_Unique_Values (Training_Data, Colour_Feature);
     Utilities.Print_Unique_Values (Training_Data, Diameter_Feature);
-    Utilities.Print_UB_Class_Counts (Training_Data);
+    Utilities.Print_UB_Label_Counts (Training_Data);
     New_Line;
 
     aRaw_Question.Feature_Name := Colour_Feature;

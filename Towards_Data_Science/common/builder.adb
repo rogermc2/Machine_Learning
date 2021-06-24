@@ -81,7 +81,7 @@ package body Builder is
          Put_Line ("Build_Tree level" & Integer'Image (Level));
          --           Best_Split := Find_Best_Split (Rows);
          if Best_Split.Gain = 0.0 then
-            Leaf.Predictions := UB_Class_Counts (Rows);
+            Leaf.Prediction := UB_Label_Counts (Rows);
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => Leaf);
@@ -355,9 +355,7 @@ package body Builder is
       end Calc_Impurity;
    begin
 
-      --        Print_Rows ("Gini Rows", Rows);
-      Counts := UB_Class_Counts (Rows);
-      --        Print_UB_Class_Counts (Rows);
+      Counts := UB_Label_Counts (Rows);
       Counts.Iterate (Calc_Impurity'Access);
       return Impurity;
    end Gini;
@@ -648,7 +646,7 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
-   function UB_Class_Counts (Rows : Rows_Vector) return UB_Label_Map is
+   function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map is
       use Rows_Package;
       use UB_Label_Map_Package;
       Label_Counts : UB_Label_Map;
@@ -678,7 +676,7 @@ package body Builder is
       end loop;
       --        Put_Line ("Label_Counts size "  & Integer'Image (Integer (Label_Counts.Length)));
       return Label_Counts;
-   end UB_Class_Counts;
+   end UB_Label_Counts;
 
    --  ---------------------------------------------------------------------------
 
