@@ -280,7 +280,7 @@ package body Utilities is
         Count_Cursor : UB_Label_Map_Package.Cursor := Counts.First;
         aCount       : Natural;
     begin
-        Put_Line ("Class_Counts:");
+        Put_Line ("Label Counts:");
         while Has_Element (Count_Cursor) loop
             aCount := Element (Count_Cursor);
             Put_Line (To_String ((Key (Count_Cursor))) &  ": " &
