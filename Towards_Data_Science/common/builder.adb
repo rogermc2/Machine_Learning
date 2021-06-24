@@ -31,9 +31,9 @@ package body Builder is
 
    pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
 
-   Features_Map  : Feature_Name_Map;
-   Label_Types   : Label_Type_Map;
-   Header_Data   : Header_Data_Type;
+   Features_Map     : Feature_Name_Map;
+--     Label_Data_Types : Label_Type_Map;
+   Header_Data      : Header_Data_Type;
 
    function Parse (aString : String) return Row_Data;
    function Parse_Header (Header : String) return Header_Data_Type;
@@ -76,12 +76,27 @@ package body Builder is
          False_Node_Curs : Tree_Cursor;
          True_Node_Curs  : Tree_Cursor;
          Leaf            : Tree_Node_Type (Prediction_Kind);
+         Best_Question   : Question_Data;
       begin
          Level := Level + 1;
          Put_Line ("Build_Tree level" & Integer'Image (Level));
          --           Best_Split := Find_Best_Split (Rows);
          if Best_Split.Gain = 0.0 then
-            Leaf.Prediction := UB_Label_Counts (Rows);
+            Best_Question := Best_Split.Question;
+            case Best_Question.Feature_Kind is
+            when Boolean_Type =>
+                    Leaf.Prediction := To_Unbounded_String
+                      (Boolean'Image (Best_Question.Boolean_Value));
+
+            when Float_Type =>
+                    Leaf.Prediction := To_Unbounded_String
+                      (Float'Image (Best_Question.Float_Value));
+            when Integer_Type =>
+                    Leaf.Prediction := To_Unbounded_String
+                      (Integer'Image (Best_Question.Integer_Value));
+            when UB_String_Type =>
+                    Leaf.Prediction := Best_Question.UB_String_Value;
+            end case;
             theTree.Insert_Child (Parent   => Curs,
                                   Before   => No_Element,
                                   New_Item => Leaf);
@@ -680,11 +695,11 @@ package body Builder is
 
    --  ---------------------------------------------------------------------------
 
-begin
+--  begin
 
-   Label_Types.Insert (1, Integer_Type);
-   Label_Types.Insert (2, Float_Type);
-   Label_Types.Insert (3, Boolean_Type);
-   Label_Types.Insert (4, UB_String_Type);
+--     Label_Data_Types.Insert (1, Integer_Type);
+--     Label_Data_Types.Insert (2, Float_Type);
+--     Label_Data_Types.Insert (3, Boolean_Type);
+--     Label_Data_Types.Insert (4, UB_String_Type);
 
 end Builder;

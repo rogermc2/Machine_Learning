@@ -216,25 +216,21 @@ package body Utilities is
         procedure Print_Node (Curs : Cursor) is
             use UB_Label_Map_Package;
             Node           : constant Tree_Node_Type := Element (Curs);
-            Prediction_Map : UB_Label_Map;
             Prediction     : Unbounded_String;
-            Value          : Natural;
+--              Value          : Natural;
         begin
             Level := Level + 1;
             Put_Line (" Level: " & Integer'Image (Level));
             if Is_Leaf  (Curs) then
-                Prediction_Map := Node.Prediction;
-                Prediction := To_Unbounded_String
-                  (Natural'Image (Prediction_Map.First_Element));
-                Put_Line ("    Leaf node prediction: " & To_String (Prediction));
-                for C in Prediction_Map.Iterate loop
-                    Value := Element (C);
-                    Put_Line ("Key = " & To_String (Key (C)) & ", Value = "  &
-                                Natural'Image (Value));
-                    if Natural'Image (Value) = Prediction then
-                        Put_Line ("Key found = " & To_String (Key (C)));
-                    end if;
-                end loop;
+                Put_Line ("    Leaf node prediction: " & To_String (Node.Prediction));
+--                  for C in Prediction_Map.Iterate loop
+--                      Value := Element (C);
+--                      Put_Line ("Key = " & To_String (Key (C)) & ", Value = "  &
+--                                  Natural'Image (Value));
+--                      if Natural'Image (Value) = Prediction then
+--                          Put_Line ("Key found = " & To_String (Key (C)));
+--                      end if;
+--                  end loop;
                 New_Line;
             else
                 --           Put_Line ("Depth:" & Integer'Image (Integer (Depth (Curs))) & ", ");
@@ -275,9 +271,9 @@ package body Utilities is
 
     procedure Print_UB_Label_Counts (Rows : Rows_Vector) is
         use UB_Label_Map_Package;
-        Counts       : constant UB_Label_Map :=
+        Label_Counts : constant UB_Label_Map :=
                          Builder.UB_Label_Counts (Rows);
-        Count_Cursor : UB_Label_Map_Package.Cursor := Counts.First;
+        Count_Cursor : UB_Label_Map_Package.Cursor := Label_Counts.First;
         aCount       : Natural;
     begin
         Put_Line ("Label Counts:");
