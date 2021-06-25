@@ -1,6 +1,5 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
-with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -24,7 +23,7 @@ with Utilities;
 
 package body Builder is
 
-   pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
+--     pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
 
    Features_Map     : Feature_Name_Map;
    Header_Data      : Header_Data_Type;
@@ -59,13 +58,23 @@ package body Builder is
       Top_Node     : Tree_Node_Type (Decision_Kind);
       Best_Split   : Best_Data;
       Level        : Integer := 0;
+      procedure Process_Node (Rows : Rows_Vector; Parent_Cursor : Tree_Cursor;
+                             Next_Cursor : out Tree_Cursor) is
+            Best : Best_Data;
+            Node : Tree_Node_Type (Decision_Kind);
+      begin
+            Best := Find_Best_Split (Rows);
+            Node.Question := Best_Split.Question;
+            Node.Rows := Rows;
 
-      procedure Recurse (Rows : Rows_Vector;
-                         Curs : Tree_Cursor) is
+            theTree.Insert_Child (Parent   => Parent_Cursor,
+                                  Before   => No_Element,
+                                  New_Item => Node,
+                                  Position => Next_Cursor);
+     end Process_Node;
+
+      procedure Recurse (Rows : Rows_Vector; Curs : Tree_Cursor) is
          P_Rows          : Partitioned_Rows;
-         False_Node      : Tree_Node_Type (Decision_Kind);
-         True_Node       : Tree_Node_Type (Decision_Kind);
-         Node_Curs       : Tree_Cursor;
          False_Node_Curs : Tree_Cursor;
          True_Node_Curs  : Tree_Cursor;
          Leaf            : Tree_Node_Type (Prediction_Kind);
@@ -77,7 +86,7 @@ package body Builder is
          if Best_Split.Gain = 0.0 then
             Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
             Best_Question := Best_Split.Question;
-            Utilities.Print_Question ("Best", Best_Question);
+            Utilities.Print_Question ("Best leaf", Best_Question);
             New_Line;
             case Best_Question.Feature_Kind is
                when Boolean_Type =>
@@ -103,26 +112,9 @@ package body Builder is
             Utilities.Print_Rows
               ("Build_Tree False_Rows", ML_Types.Rows_Vector (P_Rows.False_Rows));
 
-            Best_Split := Find_Best_Split (P_Rows.True_Rows);
-            True_Node.Question := Best_Split.Question;
-            True_Node.Rows := P_Rows.True_Rows;
+            Process_Node (P_Rows.True_Rows, Curs, True_Node_Curs);
+            Process_Node (P_Rows.False_Rows, Curs, False_Node_Curs);
 
-            Utilities.Print_Question ("Build True sub-tree best",
-                                      Best_Split.Question);
-            theTree.Insert_Child (Parent   => Curs,
-                                  Before   => No_Element,
-                                  New_Item => True_Node,
-                                  Position => True_Node_Curs);
-
-            Best_Split := Find_Best_Split (P_Rows.False_Rows);
-            False_Node.Question := Best_Split.Question;
-            False_Node.Rows := P_Rows.False_Rows;
-            Utilities.Print_Question ("Build False sub-tree, best",
-                                      False_Node.Question);
-            theTree.Insert_Child (Parent   => Curs,
-                                  Before   => No_Element,
-                                  New_Item => False_Node,
-                                  Position => False_Node_Curs);
             Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
             Recurse (P_Rows.True_Rows, True_Node_Curs);
             Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
@@ -285,22 +277,22 @@ package body Builder is
    --   Find_Best_Split finds the best question to ask by iterating over every
    --   feature / value and calculating the information gain.
    function Find_Best_Split (Rows : Rows_Vector) return Best_Data is
-      use Ada.Containers;
       use Rows_Package;
-      Current_Uncertainty   : constant Float := Gini (Rows);
-      Cols                  : constant Row_Data := Rows.First_Element;
-      Row1                  : constant Row_Data :=  Rows.Element (Rows.First_Index);
-      Num_Features          : constant Class_Range := Cols.Class_Count;
-      Row1_Features         : constant Feature_Data_Array (1 .. Num_Features) :=
+      Current_Uncertainty : constant Float := Gini (Rows);
+      Cols                : constant Row_Data := Rows.First_Element;
+      Row1                : constant Row_Data :=
+                                Rows.Element (Rows.First_Index);
+      Num_Features        : constant Class_Range := Cols.Class_Count;
+      Row1_Features       : constant Feature_Data_Array (1 .. Num_Features) :=
                                 Row1.Features;
-      Feature_Value         : Unbounded_String;
-      Feature_Name          : Feature_Name_Type;
-      Feature_Data_Type     : Data_Type;
-      Boolean_Question      : Question_Data (Boolean_Type);
-      Integer_Question      : Question_Data (Integer_Type);
-      Float_Question        : Question_Data (Float_Type);
-      String_Question       : Question_Data (UB_String_Type);
-      Best                  : Best_Data;
+      Feature_Value       : Unbounded_String;
+      Feature_Name        : Feature_Name_Type;
+      Feature_Data_Type   : Data_Type;
+      Boolean_Question    : Question_Data (Boolean_Type);
+      Integer_Question    : Question_Data (Integer_Type);
+      Float_Question      : Question_Data (Float_Type);
+      String_Question     : Question_Data (UB_String_Type);
+      Best                : Best_Data;
    begin
       Set_Feature_Map (Header_Row);
 
