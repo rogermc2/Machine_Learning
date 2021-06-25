@@ -1,7 +1,6 @@
 
 with Ada.Characters.Handling;
 with Ada.Containers;
-with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -215,9 +214,7 @@ package body Utilities is
         use Tree_Package;
 --          Level : Integer := 0;
         procedure Print_Node (Curs : Cursor) is
-            use UB_Label_Map_Package;
             Node       : constant Tree_Node_Type := Element (Curs);
-            Prediction : Unbounded_String;
         begin
 --              Level := Level + 1;
 --              Put_Line (" Level: " & Integer'Image (Level));
