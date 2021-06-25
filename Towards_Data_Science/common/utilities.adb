@@ -220,15 +220,6 @@ package body Utilities is
 --              Put_Line (" Level: " & Integer'Image (Level));
             if Is_Leaf  (Curs) then
                 Put_Line ("    Leaf node prediction: " & To_String (Node.Prediction));
---                  for C in Prediction_Map.Iterate loop
---                      Value := Element (C);
---                      Put_Line ("Key = " & To_String (Key (C)) & ", Value = "  &
---                                  Natural'Image (Value));
---                      if Natural'Image (Value) = Prediction then
---                          Put_Line ("Key found = " & To_String (Key (C)));
---                      end if;
---                  end loop;
-                New_Line;
             else
                 Put ("Is " & To_String (Node.Question.Feature_Name) & " >= ");
                 case Node.Question.Feature_Kind is
