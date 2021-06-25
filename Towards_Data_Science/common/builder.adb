@@ -59,7 +59,7 @@ package body Builder is
         Best_Split   : Best_Data;
         Level        : Integer := 0;
 
-        procedure Process_Node (Rows : Rows_Vector; Parent_Cursor : Tree_Cursor;
+        procedure Add_New_Node (Rows : Rows_Vector; Parent_Cursor : Tree_Cursor;
                                 Next_Cursor : out Tree_Cursor) is
             Best : Best_Data;
             Node : Tree_Node_Type (Decision_Kind);
@@ -72,7 +72,7 @@ package body Builder is
                                   Before   => No_Element,
                                   New_Item => Node,
                                   Position => Next_Cursor);
-        end Process_Node;
+        end Add_New_Node;
 
         procedure Recurse (Rows : Rows_Vector; Curs : Tree_Cursor) is
             P_Rows          : Partitioned_Rows;
@@ -113,8 +113,8 @@ package body Builder is
                 Utilities.Print_Rows
                   ("Build_Tree False_Rows", ML_Types.Rows_Vector (P_Rows.False_Rows));
 
-                Process_Node (P_Rows.True_Rows, Curs, True_Node_Curs);
-                Process_Node (P_Rows.False_Rows, Curs, False_Node_Curs);
+                Add_New_Node (P_Rows.True_Rows, Curs, True_Node_Curs);
+                Add_New_Node (P_Rows.False_Rows, Curs, False_Node_Curs);
 
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
                 Recurse (P_Rows.True_Rows, True_Node_Curs);
