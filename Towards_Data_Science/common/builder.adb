@@ -24,15 +24,9 @@ with Utilities;
 
 package body Builder is
 
-   --      type Boolean_Values_Type is array (Class_Range range <>) of Boolean;
-   --      type Float_Values_Type is array (Class_Range range <>) of Float;
-   --      type Integer_Values_Type is array (Class_Range range <>) of Integer;
-   --      type UB_Values_Type is array (Class_Range range <>) of Unbounded_String;
-
    pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
 
    Features_Map     : Feature_Name_Map;
-   --     Label_Data_Types : Label_Type_Map;
    Header_Data      : Header_Data_Type;
 
    function Parse (aString : String) return Row_Data;
@@ -45,7 +39,6 @@ package body Builder is
    function To_Float (Item : in Unbounded_String) return Float;
    function To_Integer (Item : in Unbounded_String) return Integer;
    function To_Label (UB_String : Raw_Label) return Label_Data;
-   --     function To_Row_Data (aRow : Unbounded_String) return Row_Data;
 
    --  -------------------------------------------------------------------------
 
@@ -145,6 +138,7 @@ package body Builder is
                             Before   => No_Element,
                             New_Item => Top_Node,
                             Position => Curs);
+      Utilities.Print_Question ("Top node question", Top_Node.Question);
       Recurse (Rows, Curs);
       return theTree;
    end Build_Tree;
@@ -660,13 +654,6 @@ package body Builder is
 
    --  --------------------------------------------------------------------------
 
-   --     function To_Row_Data (aRow : Unbounded_String) return Row_Data is
-   --     begin
-   --        return Parse (To_String (aRow));
-   --     end To_Row_Data;
-
-   --  --------------------------------------------------------------------------
-
    function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map is
       use Rows_Package;
       use UB_Label_Map_Package;
@@ -700,12 +687,5 @@ package body Builder is
    end UB_Label_Counts;
 
    --  ---------------------------------------------------------------------------
-
-   --  begin
-
-   --     Label_Data_Types.Insert (1, Integer_Type);
-   --     Label_Data_Types.Insert (2, Float_Type);
-   --     Label_Data_Types.Insert (3, Boolean_Type);
-   --     Label_Data_Types.Insert (4, UB_String_Type);
 
 end Builder;
