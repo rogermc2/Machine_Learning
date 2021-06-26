@@ -88,25 +88,17 @@ package body Builder is
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
                 Best_Question := Best_Split.Question;
                 Utilities.Print_Question ("Best leaf", Best_Question);
+                Leaf.Prediction := Rows.First_Element;
+                Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
-                case Best_Question.Feature_Kind is
-                when Boolean_Type =>
-                    Leaf.Prediction := To_Unbounded_String
-                      (Boolean'Image (Best_Question.Boolean_Value));
-                when Float_Type =>
-                    Leaf.Prediction := To_Unbounded_String
-                      (Float'Image (Best_Question.Float_Value));
-                when Integer_Type =>
-                    Leaf.Prediction := To_Unbounded_String
-                      (Integer'Image (Best_Question.Integer_Value));
-                when UB_String_Type =>
-                    Leaf.Prediction := Best_Question.UB_String_Value;
-                end case;
                 theTree.Insert_Child (Parent   => Curs,
                                       Before   => No_Element,
                                       New_Item => Leaf);
+
             else
                 New_Line;
+                Utilities.Print_Question ("Level" & Integer'Image (Level) &
+                                          " Question", Best_Split.Question);
                 P_Rows := Partition (Rows, Best_Split.Question);
                 Utilities.Print_Rows
                   ("Build_Tree True_Rows", ML_Types.Rows_Vector (P_Rows.True_Rows));
@@ -133,7 +125,7 @@ package body Builder is
                               New_Item => Top_Node,
                               Position => Curs);
         Utilities.Print_Question ("Top node question", Top_Node.Question);
-        Recurse (Rows, Curs);
+        Recurse (Top_Node.Rows, Curs);
         return theTree;
     end Build_Tree;
 
