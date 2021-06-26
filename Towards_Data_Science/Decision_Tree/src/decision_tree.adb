@@ -49,7 +49,7 @@ procedure Decision_Tree is
     Current_Uncertainty : Float;
     P_Rows              : Partitioned_Rows;
     Best_Test           : Best_Data;
-    aTree               : Tree_Type;
+--      aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
     New_Line;
