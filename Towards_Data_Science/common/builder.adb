@@ -25,12 +25,10 @@ package body Builder is
 
     --     pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
 
-    Features_Map     : Feature_Name_Map;
-    Header_Data      : Header_Data_Type;
+    Header_Data  : Header_Data_Type;
 
     function Parse (aString : String) return Row_Data;
     function Parse_Header (Header : String) return Header_Data_Type;
-    procedure Set_Feature_Map (Header_Row : Header_Data_Type);
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
                      Best     : in out Best_Data);
@@ -286,7 +284,6 @@ package body Builder is
         String_Question     : Question_Data (UB_String_Type);
         Best                : Best_Data;
     begin
-        Set_Feature_Map (Header_Row);
         --        Put_line ("Builder.Find_Best_Split");
         for col in 1 .. Num_Features loop
             Feature_Name := Feature_Name_Type (Header_Data.Features (col));
@@ -317,10 +314,10 @@ package body Builder is
                       (Rows, Feature_Value, Feature_Name, Current_Uncertainty,
                        String_Question, Best);
                 end case;
---                  Put_Line ("Builder.Find_Best_Split Best_Question for row" &
---                              Integer'Image (row));
---                  Utilities.Print_Question ("Builder.Find_Best_Split best",
---                                            Best_Question (Best));
+                --                  Put_Line ("Builder.Find_Best_Split Best_Question for row" &
+                --                              Integer'Image (row));
+                --                  Utilities.Print_Question ("Builder.Find_Best_Split best",
+                --                                            Best_Question (Best));
             end loop;
             --           Put_Line ("Builder.Find_Best_Split Best_Question for col" &
             --                       Class_Range'Image (col));
@@ -370,7 +367,6 @@ package body Builder is
             aRow := Parse (To_String (Rows (index)));
             New_Vector.Append (aRow);
         end loop;
-        Set_Feature_Map (Header_Data);
         return New_Vector;
     end Initialize;
 
@@ -378,17 +374,21 @@ package body Builder is
 
     --  Match compares the feature value in an example to the
     --  feature value in a question.
-    function Match (Question : Question_Data; Example : Row_Data) return Boolean is
+    function Match (Question : Question_Data; Example_Data : Row_Data)
+                    return Boolean is
         Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
-        Example_Features : constant Feature_Data_Array := Example.Features;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
         Val_Type         : Data_Type;
         Matches          : Boolean := False;
     begin
         Val_Type  := Question.Feature_Kind;
-        Feat_Index := Features_Map.Element (Feature_Name);
-        Example_Feature := Example_Features (Feat_Index);
+        for col in Header_Data.Features'Range loop
+            if Feature_Name_Type (Header_Data.Features (col)) = Feature_Name then
+                Feat_Index := col;
+            end if;
+        end loop;
+        Example_Feature := Example_Data.Features (Feat_Index);
         --          Put_Line ("Builder.Match Example_Feature set");
         case Val_Type is
             when Integer_Type =>
@@ -396,7 +396,7 @@ package body Builder is
                     Value : constant Integer := Question.Integer_Value;
                 begin
                     Matches := Value =
-                      Integer'Value (To_String (Example.Features (Feat_Index)));
+                      Integer'Value (To_String (Example_Feature));
                 end;
             when Float_Type =>
                 declare
@@ -495,24 +495,6 @@ package body Builder is
     end Partition;
 
     --  ------------------------------------------------------------------------
-
-    procedure Set_Feature_Map (Header_Row : Header_Data_Type) is
-        Features       : constant Feature_Data_Array := Header_Row.Features;
-        Feature_Names  : Feature_Names_Array (Features'Range);
-    begin
-        for index in Features'Range loop
-            Feature_Names (index) := Feature_Name_Type (Features (index));
-        end loop;
-        for index in Feature_Names'Range loop
-            --              Put_Line ("Set_Feature_Map feature: " &
-            --                          To_String (Feature_Names (index)));
-            if not Features_Map.Contains (Feature_Names (index)) then
-                Features_Map.Insert (Feature_Names (index), index);
-            end if;
-        end loop;
-    end Set_Feature_Map;
-
-    --  -------------------------------------------------------------------------
 
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
