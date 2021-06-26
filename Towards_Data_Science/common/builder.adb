@@ -31,7 +31,7 @@ package body Builder is
     function Parse_Header (Header : String) return Header_Data_Type;
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
-                     Best     : in out Best_Data);
+                     Best     : out Best_Data);
     function To_Boolean (Item : in Unbounded_String) return Boolean;
     function To_Float (Item : in Unbounded_String) return Float;
     function To_Integer (Item : in Unbounded_String) return Integer;
@@ -138,14 +138,14 @@ package body Builder is
     function Information_Gain (Left, Right         : Rows_Vector;
                                Current_Uncertainty : Float) return float is
         Left_Length : constant Float := Float (Left.Length);
-        P           : constant Float := Left_Length /
+        Prob        : constant Float := Left_Length /
           (Left_Length + Float (Right.Length));
     begin
         return Current_Uncertainty -
-          P * Gini (Left) - (1.0 - P) * Gini (Right);
+          Prob * Gini (Left) - (1.0 - Prob) * Gini (Right);
     end Information_Gain;
 
-    --  ---------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
     --  The root is a special node that is always present and has neither an
     --  associated element value nor any parent node.
     --  The root node provides a place to add nodes to an otherwise empty tree
@@ -215,7 +215,7 @@ package body Builder is
     procedure Process_Boolean_Value
       (Rows      : Rows_Vector; Value : Boolean;
        Feature   : Feature_Name_Type; Uncertainty : Float;
-       Question  : in out Question_Data; Best : in out Best_Data) is
+       Question  : in out Question_Data; Best : out Best_Data) is
     begin
         Question.Feature_Name := Feature;
         Question.Boolean_Value := Value;
@@ -498,7 +498,7 @@ package body Builder is
 
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
-                     Best     : in out Best_Data) is
+                     Best     : out Best_Data) is
         Split_Row :  Partitioned_Rows;
     begin
         Split_Row := Partition (Rows, Question);
