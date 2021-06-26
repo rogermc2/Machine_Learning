@@ -95,7 +95,7 @@ package ML_Types is
          Question    : Question_Data;
          Rows        : Rows_Vector := Rows_Package.Empty_Vector;
       when Prediction_Kind =>
-         Prediction : Unbounded_String := To_Unbounded_String ("");
+         Prediction : Row_Data;
       end case;
    end record;
 

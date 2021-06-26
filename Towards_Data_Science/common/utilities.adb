@@ -186,7 +186,19 @@ package body Utilities is
         Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
     end Print_Raw_Question;
 
-    --  --------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Prediction (Row : Row_Data) is
+    begin
+        Put ("Predict {");
+        for feat in Row.Features'First .. Row.Features'Last loop
+            Put (To_String (Row.Features (feat)));
+        end loop;
+        Put_Line ("}");
+
+    end Print_Prediction;
+
+    --  ------------------------------------------------------------------------
 
     procedure Print_Rows (Message : String; Rows : Rows_Vector) is
         use Rows_Package;
@@ -195,7 +207,7 @@ package body Utilities is
         Put_Line (Message);
         for index in Rows.First_Index .. Rows.Last_Index loop
             aRow := Rows.Element (index);
-            Put ("Feature values: (");
+            Put ("  Feature values: (");
             for feat in aRow.Features'First .. aRow.Features'Last loop
                 Put (To_String (aRow.Features (feat)));
             end loop;
@@ -208,33 +220,43 @@ package body Utilities is
         New_Line;
     end Print_Rows;
 
-    --  --------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
     procedure Print_Tree (aTree : Tree_Type) is
         use Tree_Package;
---          Level : Integer := 0;
+        Level  : Integer := 0;
+        Indent : Unbounded_String := To_Unbounded_String ("  ");
+        Point  : constant String := "-->";
+
         procedure Print_Node (Curs : Cursor) is
-            Node       : constant Tree_Node_Type := Element (Curs);
+            Node : constant Tree_Node_Type := Element (Curs);
         begin
---              Level := Level + 1;
---              Put_Line (" Level: " & Integer'Image (Level));
+            Level := Level + 1;
             if Is_Leaf  (Curs) then
-                Put_Line ("    Leaf node prediction: " & To_String (Node.Prediction));
+                Put_Line (" Level: " & Integer'Image (Level) & "P");
+                Print_Prediction (Node.Prediction);
             else
-                Put ("Is " & To_String (Node.Question.Feature_Name) & " >= ");
+                Put_Line (" Level: " & Integer'Image (Level));
+                Put ("Is " & To_String (Node.Question.Feature_Name));
                 case Node.Question.Feature_Kind is
                 when Integer_Type =>
-                    Put (Integer'Image (Node.Question.Integer_Value));
+                    Put (" >= " & Integer'Image (Node.Question.Integer_Value));
                 when Float_Type =>
-                    Put (Float'Image (Node.Question.Float_Value));
+                    Put (" >= " & Float'Image (Node.Question.Float_Value));
                 when Boolean_Type =>
-                    Put (Boolean'Image (Node.Question.Boolean_Value));
+                    Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
                 when UB_String_Type =>
-                    Put (To_String (Node.Question.UB_String_Value));
+                    Put (" = " & To_String (Node.Question.UB_String_Value));
                 end case;
                 Put_Line ("?");
+                Print_Rows ("Rows", Node.Rows);
+                Put (To_String (Indent) & Point);
+                Put_Line (Integer'Image (Level) & " True");
+
                 Print_Node (First_Child (Curs));
+                Put_Line (Integer'Image (Level) & " False");
                 Print_Node (Last_Child (Curs));
+                Indent := " " & Indent;
             end if;
         end Print_Node;
     begin
