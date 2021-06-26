@@ -77,14 +77,14 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
-    procedure Print_Best (Self : Builder.Best_Data) is
+    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data) is
         Question     : constant Question_Data :=
-                         Builder.Best_Question (Self);
+                         Builder.Best_Question (Best_Split);
         Feature      : constant String := To_String (Question.Feature_Name);
         Feature_Kind : constant Data_Type := Question.Feature_Kind;
     begin
         New_Line;
-        Put_Line ("Best question:");
+        Put_Line (Message & " best question:");
         Put (Feature & " = ");
         case Feature_Kind is
             when Integer_Type =>
@@ -95,7 +95,7 @@ package body Utilities is
                 Put_Line (Boolean'Image (Question.Boolean_Value));
             when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
         end case;
-        Put_Line ("Gain = " & Float'Image (Builder.Gain (Self)));
+        Put_Line ("Gain = " & Float'Image (Builder.Gain (Best_Split)));
 
     end Print_Best;
 
