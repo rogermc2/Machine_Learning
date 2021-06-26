@@ -54,8 +54,8 @@ package body Builder is
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
         theTree      : Tree_Type := Empty_Tree;
-        Curs         : Tree_Cursor := Root (theTree);
-        Top_Node     : Tree_Node_Type (Decision_Kind);
+        Top_Curs     : constant Tree_Cursor := Root (theTree);
+--          Top_Node     : Tree_Node_Type (Decision_Kind);
         Best_Split   : Best_Data;
         Level        : Integer := 0;
 
@@ -117,16 +117,9 @@ package body Builder is
         end Recurse;
 
     begin
-        Best_Split := Find_Best_Split (Rows);
-        Top_Node.Question := Best_Split.Question;
-        Top_Node.Rows := Rows;
-        theTree.Insert_Child (Parent   => Curs,
-                              Before   => No_Element,
-                              New_Item => Top_Node,
-                              Position => Curs);
-        Utilities.Print_Question ("Top node question", Top_Node.Question);
-        Recurse (Top_Node.Rows, Curs);
+        Recurse (Rows, Top_Curs);
         return theTree;
+
     end Build_Tree;
 
     --  ------------------------------------------------------------------------
