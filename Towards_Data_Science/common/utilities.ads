@@ -12,7 +12,7 @@ package Utilities is
    function Is_Boolean (Item : in Unbounded_String) return Boolean;
    function Is_Integer (Item : in Unbounded_String) return Boolean;
    function Is_Float (Item : in Unbounded_String) return Boolean;
-   procedure Print_Best (Self : Builder.Best_Data);
+   procedure Print_Best (Message : String; Best_Split : Builder.Best_Data);
    procedure Print_Classification
      (Classification : ML_Types.Count_Package.Map);
    function Print_Leaf (Counts : ML_Types.Count_Package.Map) return String;

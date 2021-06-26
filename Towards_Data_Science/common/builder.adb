@@ -55,17 +55,19 @@ package body Builder is
         use Tree_Package;
         theTree      : Tree_Type := Empty_Tree;
         Top_Curs     : constant Tree_Cursor := Root (theTree);
---          Top_Node     : Tree_Node_Type (Decision_Kind);
-        Best_Split   : Best_Data;
+        --          Top_Node     : Tree_Node_Type (Decision_Kind);
         Level        : Integer := 0;
 
         procedure Add_New_Node (Rows : Rows_Vector; Parent_Cursor : Tree_Cursor;
+                                Question : Question_Data;
                                 Next_Cursor : out Tree_Cursor) is
-            Best : Best_Data;
-            Node : Tree_Node_Type (Decision_Kind);
+            Best       : Best_Data;
+            Node       : Tree_Node_Type (Decision_Kind);
         begin
+            Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Best := Find_Best_Split (Rows);
-            Node.Question := Best_Split.Question;
+            Utilities.Print_Best ("Build_Tree.Add_New_Node", Best);
+            Node.Question := Question;
             Node.Rows := Rows;
 
             theTree.Insert_Child (Parent   => Parent_Cursor,
@@ -76,6 +78,7 @@ package body Builder is
 
         procedure Recurse (Rows : Rows_Vector; Curs : Tree_Cursor) is
             P_Rows          : Partitioned_Rows;
+            Best_Split      : Best_Data;
             False_Node_Curs : Tree_Cursor;
             True_Node_Curs  : Tree_Cursor;
             Leaf            : Tree_Node_Type (Prediction_Kind);
@@ -98,15 +101,17 @@ package body Builder is
             else
                 New_Line;
                 Utilities.Print_Question ("Level" & Integer'Image (Level) &
-                                          " Question", Best_Split.Question);
+                                            " Question", Best_Split.Question);
                 P_Rows := Partition (Rows, Best_Split.Question);
-                Utilities.Print_Rows
-                  ("Build_Tree True_Rows", ML_Types.Rows_Vector (P_Rows.True_Rows));
-                Utilities.Print_Rows
-                  ("Build_Tree False_Rows", ML_Types.Rows_Vector (P_Rows.False_Rows));
+                Utilities.Print_Rows ("Build_Tree True_Rows",
+                                      ML_Types.Rows_Vector (P_Rows.True_Rows));
+                Utilities.Print_Rows ("Build_Tree False_Rows",
+                                      ML_Types.Rows_Vector (P_Rows.False_Rows));
 
-                Add_New_Node (P_Rows.True_Rows, Curs, True_Node_Curs);
-                Add_New_Node (P_Rows.False_Rows, Curs, False_Node_Curs);
+                Add_New_Node (P_Rows.True_Rows, Curs,
+                              Best_Split.Question, True_Node_Curs);
+                Add_New_Node (P_Rows.False_Rows, Curs,
+                              Best_Split.Question, False_Node_Curs);
 
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
                 Recurse (P_Rows.True_Rows, True_Node_Curs);
@@ -282,7 +287,6 @@ package body Builder is
         Best                : Best_Data;
     begin
         Set_Feature_Map (Header_Row);
-
         --        Put_line ("Builder.Find_Best_Split");
         for col in 1 .. Num_Features loop
             Feature_Name := Feature_Name_Type (Header_Data.Features (col));
@@ -313,10 +317,10 @@ package body Builder is
                       (Rows, Feature_Value, Feature_Name, Current_Uncertainty,
                        String_Question, Best);
                 end case;
-                --              Put_Line ("Builder.Find_Best_Split Best_Question for row" &
-                --                          Integer'Image (row));
-                --              Utilities.Print_Question ("Builder.Find_Best_Split best",
-                --                                        Best_Question (Best));
+--                  Put_Line ("Builder.Find_Best_Split Best_Question for row" &
+--                              Integer'Image (row));
+--                  Utilities.Print_Question ("Builder.Find_Best_Split best",
+--                                            Best_Question (Best));
             end loop;
             --           Put_Line ("Builder.Find_Best_Split Best_Question for col" &
             --                       Class_Range'Image (col));
@@ -354,7 +358,7 @@ package body Builder is
         return Impurity;
     end Gini;
 
-    --  ---------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
     function Initialize (Rows : Data_Rows) return Rows_Vector is
         New_Vector  : Rows_Vector;
@@ -473,7 +477,7 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows is
+                        return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;
@@ -490,7 +494,7 @@ package body Builder is
         return (True_Rows, False_Rows);
     end Partition;
 
-    --  --------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
     procedure Set_Feature_Map (Header_Row : Header_Data_Type) is
         Features       : constant Feature_Data_Array := Header_Row.Features;
