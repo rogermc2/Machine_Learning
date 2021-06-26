@@ -37,7 +37,7 @@ package Builder is
                                Current_Uncertainty : Float) return float;
     function Initialize (Rows : Data_Rows) return Rows_Vector;
     function Match (Question : Question_Data;
-                    Example : Row_Data) return Boolean;
+                    Example_Data : Row_Data) return Boolean;
     function Num_Features (aString : String) return Class_Range;
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                         return Partitioned_Rows;

@@ -58,10 +58,6 @@ package ML_Types is
    package Count_Package is new Ada.Containers.Ordered_Maps
      (Data_Type, Natural);
 
-   package Feature_Map_Package is new Ada.Containers.Ordered_Maps
-     (Feature_Name_Type, Class_Range);
-   subtype Feature_Name_Map is Feature_Map_Package.Map;
-
    package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
      (Unbounded_String, Natural);
    subtype UB_Label_Map is UB_Label_Map_Package.Map;
