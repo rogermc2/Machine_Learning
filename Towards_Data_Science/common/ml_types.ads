@@ -86,13 +86,12 @@ package ML_Types is
    end record;
 
    type Tree_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
+      Rows : Rows_Vector := Rows_Package.Empty_Vector;
       case Node_Type is
       when  Decision_Kind =>
          Question    : Question_Data;
-         Rows        : Rows_Vector := Rows_Package.Empty_Vector;
       when Prediction_Kind =>
-         Prediction : Row_Data;
-         Num_Values : Natural := 0;
+         Prediction  : Row_Data;
       end case;
    end record;
 
