@@ -144,6 +144,7 @@ package body Builder is
                 Best_Question := Best_Split.Question;
                 Utilities.Print_Question ("Best leaf", Best_Question);
                 Leaf.Prediction := Rows.First_Element;
+                Leaf.Num_Values := Leaf.Num_Values + 1;
                 Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
                 theTree.Insert_Child (Parent   => Curs,

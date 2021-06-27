@@ -92,6 +92,7 @@ package ML_Types is
          Rows        : Rows_Vector := Rows_Package.Empty_Vector;
       when Prediction_Kind =>
          Prediction : Row_Data;
+         Num_Values : Natural := 0;
       end case;
    end record;
 
