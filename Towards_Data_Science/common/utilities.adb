@@ -188,13 +188,9 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Prediction (Row : Row_Data) is
+    procedure Print_Prediction (Prediction : Unbounded_String) is
     begin
-        Put ("Predict {");
-        for feat in Row.Features'First .. Row.Features'Last loop
-            Put (To_String (Row.Features (feat)));
-        end loop;
-        Put_Line ("}");
+        Put_Line ("Predict {" & To_String (Prediction) & "}");
 
     end Print_Prediction;
 
@@ -234,7 +230,7 @@ package body Utilities is
             Level := Level + 1;
             if Is_Leaf  (Curs) then
                 Put_Line (" Level: " & Integer'Image (Level) & "P");
-                Print_Prediction (Node.Prediction);
+                Print_Prediction (Node.Prediction.Label);
             else
                 Put_Line (" Level: " & Integer'Image (Level));
                 Put ("Is " & To_String (Node.Question.Feature_Name));
@@ -249,7 +245,7 @@ package body Utilities is
                     Put (" = " & To_String (Node.Question.UB_String_Value));
                 end case;
                 Put_Line ("?");
-                Print_Rows ("Rows", Node.Rows);
+--                  Print_Rows ("Rows", Node.Rows);
                 Put (To_String (Indent) & Point);
                 Put_Line (Integer'Image (Level) & " True");
 
