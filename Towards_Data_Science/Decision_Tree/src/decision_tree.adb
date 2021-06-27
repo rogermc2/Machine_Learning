@@ -25,11 +25,11 @@ procedure Decision_Tree is
                       UB ("Red, 1, Grape"),
                       UB ("Yellow, 3, Lemon"));
 
-    Training_Set2 : constant Data_Rows (1 .. 4) :=
-                     (UB ("Colour,Diameter,Fruit"),
-                      UB ("Green, 3, Apple"),
-                      UB ("Yellow, 3, Apple"),
-                      UB ("Yellow, 3, Lemon"));
+--      Training_Set2 : constant Data_Rows (1 .. 4) :=
+--                       (UB ("Colour,Diameter,Fruit"),
+--                        UB ("Green, 3, Apple"),
+--                        UB ("Yellow, 3, Apple"),
+--                        UB ("Yellow, 3, Lemon"));
 
     aRaw_Question       : Raw_Question;
     aQuestion           : Question_Data;  --  Default is integer data
@@ -37,8 +37,8 @@ procedure Decision_Tree is
                             To_Unbounded_String ("Colour");
     Diameter_Feature    : constant Feature_Name_Type :=
                             To_Unbounded_String ("Diameter");
-    Training_Data       : Rows_Vector := Initialize (Training_Set);
-    Training_Data2      : Rows_Vector;
+    Training_Data       : constant Rows_Vector := Initialize (Training_Set);
+--      Training_Data2      : Rows_Vector;
     Header              : constant Header_Data_Type := Header_Row;
     Gain_Zero           : constant Float := 0.0;
     Mixing_Data         : Row_Data (1);
@@ -49,7 +49,7 @@ procedure Decision_Tree is
     Current_Uncertainty : Float;
     P_Rows              : Partitioned_Rows;
     Best_Test           : Best_Data;
---      aTree               : Tree_Type;
+    aTree               : Tree_Type;
     --     Classified          : Count_Package.Map;
 begin
     New_Line;
@@ -147,28 +147,29 @@ begin
                 To_String (Best_Question (Best_Test).Feature_Name));
     Utilities.Print_Best ("Decision_Tree", Best_Test);
 
-    New_Line;
-    Training_Data2 := Initialize (Training_Set2);
-    Current_Uncertainty := Gini (Training_Data2);
-    Put_Line ("Current_Uncertainty (Gini) of Training_Data2 " &
-                Float'Image (Current_Uncertainty));
-
-    New_Line;
-    Put_Line ("Find_Best_Split 2");
-    Best_Test := Find_Best_Split (Training_Data2);
-    Put_Line ("Best_Split 2 " & Float'Image (Gain (Best_Test)) & ", " &
-                To_String (Best_Question (Best_Test).Feature_Name));
-    Utilities.Print_Best ("Decision_Tree 2", Best_Test);
-
-    Training_Data := Initialize (Training_Set);
-
 --      New_Line;
---      Put_Line ("Build Tree");
---      aTree := Build_Tree (Training_Data);
+--      Put_Line ("-------------------------------------------------------");
+--      Training_Data2 := Initialize (Training_Set2);
+--      Current_Uncertainty := Gini (Training_Data2);
+--      Put_Line ("Current_Uncertainty (Gini) of Training_Data2 " &
+--                  Float'Image (Current_Uncertainty));
+--
 --      New_Line;
+--      Put_Line ("Find_Best_Split 2");
+--      Best_Test := Find_Best_Split (Training_Data2);
+--      Put_Line ("Best_Split 2 " & Float'Image (Gain (Best_Test)) & ", " &
+--                  To_String (Best_Question (Best_Test).Feature_Name));
+--      Utilities.Print_Best ("Decision_Tree 2", Best_Test);
+--
+--      Training_Data := Initialize (Training_Set);
 
---      Put_Line ("Print Tree");
---      Utilities.Print_Tree (aTree);
+    New_Line;
+    Put_Line ("Build Tree");
+    aTree := Build_Tree (Training_Data);
+    New_Line;
+
+    Put_Line ("Print Tree");
+    Utilities.Print_Tree (aTree);
     --
     --     Put_Line ("Classify tests, Training_Data (1)");
     --     Classified := Classify (Training_Data (1), aTree);
