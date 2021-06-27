@@ -188,9 +188,10 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Prediction (Prediction : Unbounded_String) is
+    procedure Print_Prediction (Node : Tree_Node_Type) is
     begin
-        Put_Line ("Predict {" & To_String (Prediction) & "}");
+        Put_Line ("Predict {'" & To_String (Node.Prediction.Label) & "': " &
+                    Natural'Image (Node.Num_Values) & "}");
 
     end Print_Prediction;
 
@@ -230,7 +231,7 @@ package body Utilities is
             Level := Level + 1;
             if Is_Leaf  (Curs) then
                 Put_Line (" Level: " & Integer'Image (Level) & "P");
-                Print_Prediction (Node.Prediction.Label);
+                Print_Prediction (Node);
             else
                 Put_Line (" Level: " & Integer'Image (Level));
                 Put ("Is " & To_String (Node.Question.Feature_Name));
