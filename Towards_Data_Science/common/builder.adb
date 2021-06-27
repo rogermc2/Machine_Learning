@@ -457,7 +457,7 @@ package body Builder is
                 Pos_1 := Pos_2;
             end if;
         end loop;
-        Data_Row.Label := To_Unbounded_String (aString (Pos_1 + 1 .. Last));
+        Data_Row.Label := To_Unbounded_String (aString (Pos_1 + 2 .. Last));
         return Data_Row;
     end Parse;
 
