@@ -189,9 +189,12 @@ package body Utilities is
     --  ------------------------------------------------------------------------
 
     procedure Print_Prediction (Node : Tree_Node_Type; Indent : Natural := 0) is
-        Point  : constant String := "--> ";
-        Offset : String (1 .. Indent) := (others => ' ');
-        pos    : Natural := 1;
+        Point        : constant String := "--> ";
+        Num_Features : constant Positive := Node.Prediction.Features'Length;
+        Num_Rows     : constant Positive := Positive (Node.Rows.Length);
+        Offset       : String (1 .. Indent) := (others => ' ');
+        Prediction   : Unbounded_String;
+        pos          : Natural := 1;
     begin
         New_Line;
         if Indent > 0 then
@@ -202,8 +205,16 @@ package body Utilities is
             Put (Offset & Point);
         end if;
 
-        Put_Line ("Predict {'" & To_String (Node.Prediction.Label) &
-                    "': " & Natural'Image (Node.Num_Values) & "}");
+        Prediction := To_Unbounded_String ("Predict {");
+        for index in 1 .. Num_Features loop
+            Prediction := Prediction & "'" & To_String (Node.Prediction.Label) &
+              "':" & Natural'Image (Num_Rows);
+            if index < Num_Features then
+                Prediction := Prediction & ", ";
+            end if;
+        end loop;
+        Prediction := Prediction & "}";
+        Put_Line (To_String (Prediction));
 
     end Print_Prediction;
 

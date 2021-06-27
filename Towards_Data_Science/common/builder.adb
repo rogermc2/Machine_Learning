@@ -107,7 +107,6 @@ package body Builder is
         use Tree_Package;
         theTree      : Tree_Type := Empty_Tree;
         Top_Curs     : constant Tree_Cursor := Root (theTree);
-        --          Top_Node     : Tree_Node_Type (Decision_Kind);
         Level        : Integer := 0;
 
         procedure Add_New_Node (Rows        : Rows_Vector; Parent_Cursor : Tree_Cursor;
@@ -116,9 +115,9 @@ package body Builder is
             Best       : Best_Data;
             Node       : Tree_Node_Type (Decision_Kind);
         begin
-            Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
+--              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Best := Find_Best_Split (Rows);
-            Utilities.Print_Best ("Build_Tree.Add_New_Node", Best);
+--              Utilities.Print_Best ("Build_Tree.Add_New_Node", Best);
             Node.Question := Question;
             Node.Rows := Rows;
 
@@ -134,17 +133,15 @@ package body Builder is
             False_Node_Curs : Tree_Cursor;
             True_Node_Curs  : Tree_Cursor;
             Leaf            : Tree_Node_Type (Prediction_Kind);
-            Best_Question   : Question_Data;
         begin
             Level := Level + 1;
             Put_Line ("Build_Tree level" & Integer'Image (Level));
             Best_Split := Find_Best_Split (Rows);
             if Best_Split.Gain = 0.0 then
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
-                Best_Question := Best_Split.Question;
-                Utilities.Print_Question ("Best leaf", Best_Question);
+--                  Utilities.Print_Question ("Best leaf", Best_Question);
                 Leaf.Prediction := Rows.First_Element;
-                Leaf.Num_Values := Leaf.Num_Values + 1;
+                Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
                 theTree.Insert_Child (Parent   => Curs,
