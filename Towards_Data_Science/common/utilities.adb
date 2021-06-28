@@ -166,6 +166,18 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
+   procedure Print_Node (Node : Tree_Node_Type) is
+
+   begin
+   case Node.Node_Type is
+   when Prediction_Kind => null;
+   when Decision_Kind => null;
+   end case;
+   Print_Rows ("Rows", Node.Rows);
+   end Print_Node;
+
+   --  -------------------------------------------------------------------------
+
    procedure Print_Prediction (Node : Tree_Node_Type; Indent : Natural := 0) is
       use Prediction_Data_Package;
       Point        : constant String := "--> ";
@@ -274,7 +286,6 @@ package body Utilities is
          end if;
          New_Line;
       end loop;
-      New_Line;
    end Print_Rows;
 
    --  ------------------------------------------------------------------------
@@ -291,6 +302,7 @@ package body Utilities is
       begin
          Indent := Indent + 1;
          Level := Level + 1;
+         Print_Node (Node);
          if Is_Leaf  (Curs) then
             --              Put_Line (" Level: " & Integer'Image (Level) & "P");
             Print_Prediction (Node, Indent);
@@ -319,7 +331,6 @@ package body Utilities is
                   Put (" = " & To_String (Node.Question.UB_String_Value));
             end case;
             Put_Line ("?");
-            --                  Print_Rows ("Rows", Node.Rows);
             Put_Line (Integer'Image (Level) & " --> True:");
 
             Print_Node (First_Child (Curs));
@@ -332,7 +343,7 @@ package body Utilities is
       Print_Node (First_Child (aTree.Root));
    end Print_Tree;
 
-   --  ---------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    procedure Print_UB_Label_Counts (Rows : Rows_Vector) is
       use UB_Label_Map_Package;
@@ -350,7 +361,7 @@ package body Utilities is
       end loop;
    end Print_UB_Label_Counts;
 
-   --  --------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
    procedure Print_Unique_Values (Rows    : Rows_Vector;
                                   Feature : Feature_Name_Type) is
