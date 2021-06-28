@@ -297,24 +297,25 @@ package body Utilities is
       procedure Print_Node (Curs : Cursor; Indent : Natural := 0) is
          Node        : constant Tree_Node_Type := Element (Curs);
          This_Indent : Natural;
+         L           : constant Positive := Level + 1;
       begin
+         Level := L;
          if First then
             This_Indent := 0;
             First := False;
          else
             This_Indent := Indent + 1;
          end if;
-         Level := Level + 1;
          --           Print_Node (Node);
          declare
             Offset      : String (1 .. This_Indent + 1) := (others => ' ');
             pos         : Natural := 1;
          begin
             if Is_Leaf  (Curs) then
-               --              Put_Line (" Level: " & Integer'Image (Level) & "P");
+               Put_Line ("L" & Integer'Image (L) & "P");
                Print_Prediction (Node, This_Indent);
             else
-               --              Put_Line (" Level: " & Integer'Image (Level));
+               --              Put_Line (" Level: " & Integer'Image (L));
                if Indent > 0 then
                   while pos < This_Indent - 1 loop
                      Offset (pos .. pos + 1) := "  ";
@@ -325,6 +326,7 @@ package body Utilities is
                   end if;
                   Put (Offset);
                end if;
+
                Put ("Is " & To_String (Node.Question.Feature_Name));
                case Node.Question.Feature_Kind is
                when Integer_Type =>
@@ -337,13 +339,12 @@ package body Utilities is
                   Put (" = " & To_String (Node.Question.UB_String_Value));
                end case;
                Put_Line ("?");
+
+               Put_Line (Offset & "L" & Integer'Image (L) & "T");
                Put_Line (Offset & "--> True:");
-               --                 Put_Line (Integer'Image (Level) & " --> True:");
-               Put_Line (Offset & "First_Child");
                Print_Node (First_Child (Curs), This_Indent + 1);
+               Put_Line (Offset & "L" & Integer'Image (L) & "F");
                Put_Line (Offset & "--> False:");
-               --                 Put_Line (Integer'Image (Level) & " --> False:");
-               Put_Line (Offset & "Last_Child");
                Print_Node (Last_Child (Curs), This_Indent + 1);
             end if;
          end; --  declare block
