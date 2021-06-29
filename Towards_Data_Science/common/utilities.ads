@@ -15,7 +15,8 @@ package Utilities is
    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data);
    procedure Print_Classification
      (Classification : ML_Types.Count_Package.Map);
---     function Print_Leaf (Counts : ML_Types.Count_Package.Map) return String;
+   --     function Print_Leaf (Counts : ML_Types.Count_Package.Map) return String;
+   procedure Print_Node (Node : ML_Types.Tree_Node_Type);
    procedure Print_Question (Message : String;
                              Question : ML_Types.Question_Data);
    procedure Print_Raw_Question

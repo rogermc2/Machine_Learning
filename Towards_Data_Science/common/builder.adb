@@ -121,6 +121,8 @@ package body Builder is
             --              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Node.Question := Question;
             Node.Rows := Rows;
+         Put_Line ("Build_Tree.Add_New_Decision_Node  Num rows: " &
+                     Integer'Image (Integer (Node.Rows.Length)));
 
             theTree.Insert_Child (Parent   => Parent_Cursor,
                                   Before   => No_Element,
