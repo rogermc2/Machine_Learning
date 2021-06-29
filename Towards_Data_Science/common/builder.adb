@@ -87,15 +87,15 @@ package body Builder is
        Feature   : Feature_Name_Type; Uncertainty : Float;
        Question  : out Question_Data; Best : in out Best_Data) is
     begin
---          Put_line ("Builder.Best_String_Value Feature_Name: " & "'" &
---                      To_String (Feature) & "'"  & " value " &
---                      To_String (Value));
+        --          Put_line ("Builder.Best_String_Value Feature_Name: " & "'" &
+        --                      To_String (Feature) & "'"  & " value " &
+        --                      To_String (Value));
         Question.Feature_Name := Feature;
         Question.UB_String_Value := Value;
         Split (Rows, Uncertainty, Question, Best);
---          Utilities.Print_Question ("Builder.Best_String_Value", Question);
---          Utilities.Print_Best ("Builder.Best_String_Value", Best);
---          New_Line;
+        --          Utilities.Print_Question ("Builder.Best_String_Value", Question);
+        --          Utilities.Print_Best ("Builder.Best_String_Value", Best);
+        --          New_Line;
     end Best_String_Value;
 
     --  -------------------------------------------------------------------------
@@ -106,18 +106,16 @@ package body Builder is
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
         theTree      : Tree_Type := Empty_Tree;
-        Top_Curs     : constant Tree_Cursor := Root (theTree);
+        Top_Curs     : Tree_Cursor;
         Level        : Integer := 0;
 
-        procedure Add_New_Node (Rows        : Rows_Vector; Parent_Cursor : Tree_Cursor;
-                                Question    : Question_Data;
-                                Next_Cursor : out Tree_Cursor) is
-            Best       : Best_Data;
-            Node       : Tree_Node_Type (Decision_Kind);
+        procedure Add_New_Decision_Node (Rows        : Rows_Vector;
+                                         Parent_Cursor : Tree_Cursor;
+                                         Question    : Question_Data;
+                                         Next_Cursor : out Tree_Cursor) is
+            Node : Tree_Node_Type (Decision_Kind);
         begin
---              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
-            Best := Find_Best_Split (Rows);
---              Utilities.Print_Best ("Build_Tree.Add_New_Node", Best);
+            --              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Node.Question := Question;
             Node.Rows := Rows;
 
@@ -125,7 +123,7 @@ package body Builder is
                                   Before   => No_Element,
                                   New_Item => Node,
                                   Position => Next_Cursor);
-        end Add_New_Node;
+        end Add_New_Decision_Node;
 
         procedure Recurse (Rows : Rows_Vector; Curs : Tree_Cursor) is
             P_Rows          : Partitioned_Rows;
@@ -136,10 +134,12 @@ package body Builder is
         begin
             Level := Level + 1;
             Put_Line ("Build_Tree level" & Integer'Image (Level));
+            Utilities.Print_Rows ("Build_Tree", Rows);
             Best_Split := Find_Best_Split (Rows);
+            Utilities.Print_Best ("Best_Split", Best_Split);
             if Best_Split.Gain = 0.0 then
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
---                  Utilities.Print_Question ("Best leaf", Best_Question);
+                --                  Utilities.Print_Question ("Best leaf", Best_Question);
                 Leaf.Prediction := Rows.First_Element;
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
@@ -157,10 +157,10 @@ package body Builder is
                 Utilities.Print_Rows ("Build_Tree False_Rows",
                                       ML_Types.Rows_Vector (P_Rows.False_Rows));
 
-                Add_New_Node (P_Rows.True_Rows, Curs,
-                              Best_Split.Question, True_Node_Curs);
-                Add_New_Node (P_Rows.False_Rows, Curs,
-                              Best_Split.Question, False_Node_Curs);
+                Add_New_Decision_Node (P_Rows.True_Rows, Curs,
+                                       Best_Split.Question, True_Node_Curs);
+                Add_New_Decision_Node (P_Rows.False_Rows, Curs,
+                                       Best_Split.Question, False_Node_Curs);
 
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
                 Recurse (P_Rows.True_Rows, True_Node_Curs);
@@ -170,6 +170,8 @@ package body Builder is
         end Recurse;
 
     begin
+        Add_New_Decision_Node (Rows, Root (theTree),
+                               Find_Best_Split (Rows).Question, Top_Curs);
         Recurse (Rows, Top_Curs);
         return theTree;
 
@@ -192,11 +194,11 @@ package body Builder is
         Prob_Left    : constant Float := Left_Length /
           (Left_Length + Right_Length);
     begin
---          Put_Line ("Information_Gain Prob_Left" & Float'Image (Prob_Left));
---          Put_Line ("Information_Gain Gini (Left)" & Float'Image (Gini (Left)));
---          Put_Line ("Information_Gain Gini (Right)" & Float'Image (Gini (Right)));
---          Put_Line ("Information_Gain " & Float'Image (Current_Uncertainty -
---            Prob_Left * Gini (Left) - (1.0 - Prob_Left) * Gini (Right)));
+        --          Put_Line ("Information_Gain Prob_Left" & Float'Image (Prob_Left));
+        --          Put_Line ("Information_Gain Gini (Left)" & Float'Image (Gini (Left)));
+        --          Put_Line ("Information_Gain Gini (Right)" & Float'Image (Gini (Right)));
+        --          Put_Line ("Information_Gain " & Float'Image (Current_Uncertainty -
+        --            Prob_Left * Gini (Left) - (1.0 - Prob_Left) * Gini (Right)));
         return Current_Uncertainty -
           Prob_Left * Gini (Left) - (1.0 - Prob_Left) * Gini (Right);
     end Information_Gain;
@@ -299,9 +301,9 @@ package body Builder is
             for row in
               Rows.First_Index .. Rows.Last_Index loop
                 Feature_Value := Rows.Element (row).Features (col);
---                  Put_line ("Builder.Find_Best_Split Feature_Name: " & "'" &
---                              To_String (Feature_Name) & "'"  & " '" &
---                              To_String (Feature_Value) & "'");
+                --                  Put_line ("Builder.Find_Best_Split Feature_Name: " & "'" &
+                --                              To_String (Feature_Name) & "'"  & " '" &
+                --                              To_String (Feature_Value) & "'");
                 case Feature_Data_Type is
                 when Boolean_Type =>
                     Best_Boolean_Value
@@ -380,7 +382,7 @@ package body Builder is
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Question : Question_Data; Example_Data : Row_Data)
-                   return Boolean is
+                    return Boolean is
         Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
@@ -482,7 +484,7 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows is
+                        return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;
@@ -507,18 +509,18 @@ package body Builder is
         Split_Row :  Partitioned_Rows;
     begin
         Split_Row := Partition (Rows, Question);
---          Utilities.Print_Rows ("Split True_Rows", Split_Row.True_Rows);
---          Utilities.Print_Rows ("Split False_Rows", Split_Row.False_Rows);
+        --          Utilities.Print_Rows ("Split True_Rows", Split_Row.True_Rows);
+        --          Utilities.Print_Rows ("Split False_Rows", Split_Row.False_Rows);
         if not Split_Row.True_Rows.Is_Empty and then
           not Split_Row.False_Rows.Is_Empty then
             Question.Gain := Information_Gain
               (Split_Row.True_Rows, Split_Row.False_Rows, Uncertainty);
---              Put_Line ("Split and best Gain: " & Float'Image (Question.Gain)
---                        & ",  " & Float'Image (Best.Gain));
+            --              Put_Line ("Split and best Gain: " & Float'Image (Question.Gain)
+            --                        & ",  " & Float'Image (Best.Gain));
             --   Floating point = is not reliable
             if Question.Gain >= Best.Gain then
                 Best := (Question, Question.Gain);
---                  Utilities.Print_Question ("Split best", Question);
+                --                  Utilities.Print_Question ("Split best", Question);
             end if;
         elsif Best.Question.Feature_Name = To_Unbounded_String ("") then
             Best := (Question, 0.0);
