@@ -171,7 +171,6 @@ package body Utilities is
    begin
       Put_Line ("  Node data:");
       Put_Line ("  Num rows: " & Integer'Image (Integer (Node.Rows.Length)));
-      Put_Line ("  Last index: " & Integer'Image (Integer (Node.Rows.Last_Index)));
       Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
       case Node.Node_Type is
       when Prediction_Kind => null;

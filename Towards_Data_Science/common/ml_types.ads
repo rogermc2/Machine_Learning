@@ -75,6 +75,8 @@ package ML_Types is
 
    type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
       Feature_Name : Feature_Name_Type := To_Unbounded_String ("");
+      True_Rows    : Rows_Vector;
+      False_Rows   : Rows_Vector;
       Gain         : Float := 0.0;
       case Feature_Kind is
          when Integer_Type => Integer_Value : Integer := 0;
