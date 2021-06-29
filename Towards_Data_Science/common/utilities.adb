@@ -169,11 +169,13 @@ package body Utilities is
    procedure Print_Node (Node : Tree_Node_Type) is
 
    begin
+      Put_Line ("  Node data:");
+      Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
       case Node.Node_Type is
       when Prediction_Kind => null;
       when Decision_Kind => null;
       end case;
-      Print_Rows ("Rows", Node.Rows);
+      Print_Rows ("    Rows:", Node.Rows);
    end Print_Node;
 
    --  -------------------------------------------------------------------------
@@ -299,6 +301,8 @@ package body Utilities is
          This_Indent : Natural;
          L           : constant Positive := Level + 1;
       begin
+         Print_Node (Node);
+         New_Line;
          Level := L;
          if First then
             This_Indent := 0;
@@ -306,7 +310,7 @@ package body Utilities is
          else
             This_Indent := Indent + 1;
          end if;
-         --           Print_Node (Node);
+         Print_Node (Node);
          declare
             Offset      : String (1 .. This_Indent + 1) := (others => ' ');
             pos         : Natural := 1;
@@ -350,8 +354,11 @@ package body Utilities is
          end; --  declare block
       end Print_Node;
    begin
-      Put_Line ("Tree traversal");
       Print_Node (First_Child (aTree.Root));
+--        Put_Line ("First True Node");
+--        Print_Node (First_Child (aTree.Root));
+--        Put_Line ("First False Node");
+--        Print_Node (Last_Child (aTree.Root));
    end Print_Tree;
 
    --  -------------------------------------------------------------------------
