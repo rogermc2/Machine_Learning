@@ -105,9 +105,9 @@ package body Builder is
     --  from the training data that reach this leaf.
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
-        First_Split     : constant Best_Data := Find_Best_Split (Rows);
+--          First_Split     : constant Best_Data := Find_Best_Split (Rows);
         theTree         : Tree_Type := Empty_Tree;
-        Top_Curs        : Tree_Cursor;
+--          Top_Curs        : Tree_Cursor;
         Level           : Integer := 0;
 
         procedure Add_New_Decision_Node (Rows        : Rows_Vector;
@@ -136,7 +136,7 @@ package body Builder is
         begin
             Level := Level + 1;
             Put_Line ("Build_Tree level" & Integer'Image (Level));
-            Utilities.Print_Rows ("Build_Tree", Rows);
+            Utilities.Print_Rows ("Build_Tree rows", Rows);
             Best_Split := Find_Best_Split (Rows);
             Utilities.Print_Best ("Best_Split", Best_Split);
             if Best_Split.Gain = 0.0 then
@@ -171,14 +171,15 @@ package body Builder is
         end Recurse;
 
     begin
-        Add_New_Decision_Node (Rows, Root (theTree),
-                               First_Split.Question, Top_Curs);
-        Put_Line ("Top Node:");
-        Utilities.Print_Node (Element (Top_Curs));
-        Put_Line ("Recurse True_Rows :");
-        Recurse (First_Split.Question.True_Rows, Top_Curs);
-        Put_Line ("Recurse False_Rows :");
-        Recurse (First_Split.Question.False_Rows, Top_Curs);
+--          Add_New_Decision_Node (Rows, Root (theTree),
+--                                 First_Split.Question, Top_Curs);
+--          Put_Line ("Top Node:");
+--          Utilities.Print_Node (Element (Top_Curs));
+        Recurse (Rows, First_Child (theTree.Root));
+--          Put_Line ("Recurse True_Rows :");
+--          Recurse (First_Split.Question.True_Rows, Top_Curs);
+--          Put_Line ("Recurse False_Rows :");
+--          Recurse (First_Split.Question.False_Rows, Top_Curs);
         return theTree;
 
     end Build_Tree;
