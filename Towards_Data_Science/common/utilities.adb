@@ -301,8 +301,8 @@ package body Utilities is
          This_Indent : Natural;
          L           : constant Positive := Level + 1;
       begin
-         Print_Node (Node);
-         New_Line;
+--           Print_Node (Node);
+--           New_Line;
          Level := L;
          if First then
             This_Indent := 0;
@@ -310,7 +310,7 @@ package body Utilities is
          else
             This_Indent := Indent + 1;
          end if;
-         Print_Node (Node);
+
          declare
             Offset      : String (1 .. This_Indent + 1) := (others => ' ');
             pos         : Natural := 1;
@@ -355,10 +355,6 @@ package body Utilities is
       end Print_Node;
    begin
       Print_Node (First_Child (aTree.Root));
---        Put_Line ("First True Node");
---        Print_Node (First_Child (aTree.Root));
---        Put_Line ("First False Node");
---        Print_Node (Last_Child (aTree.Root));
    end Print_Tree;
 
    --  -------------------------------------------------------------------------
