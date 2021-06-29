@@ -105,22 +105,22 @@ package body Builder is
     --  from the training data that reach this leaf.
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
---          First_Split     : constant Best_Data := Find_Best_Split (Rows);
+        First_Split     : constant Best_Data := Find_Best_Split (Rows);
         theTree         : Tree_Type := Empty_Tree;
---          Top_Curs        : Tree_Cursor;
+        Top_Curs        : Tree_Cursor;
         Level           : Integer := 0;
 
         procedure Add_New_Decision_Node (Rows        : Rows_Vector;
                                          Parent_Cursor : Tree_Cursor;
                                          Question    : Question_Data;
                                          Next_Cursor : out Tree_Cursor) is
-            Node            : Tree_Node_Type (Decision_Kind);
+            Node  : Tree_Node_Type (Decision_Kind);
         begin
             --              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Node.Question := Question;
             Node.Rows := Rows;
-            Put_Line ("Build_Tree.Add_New_Decision_Node  Num rows: " &
-                     Integer'Image (Integer (Node.Rows.Length)));
+--              Put_Line ("Build_Tree.Add_New_Decision_Node  Num rows: " &
+--                       Integer'Image (Integer (Node.Rows.Length)));
 
             theTree.Insert_Child (Parent   => Parent_Cursor,
                                   Before   => No_Element,
@@ -171,10 +171,10 @@ package body Builder is
         end Recurse;
 
     begin
---          Add_New_Decision_Node (Rows, Root (theTree),
---                                 First_Split.Question, Top_Curs);
---          Put_Line ("Top Node:");
---          Utilities.Print_Node (Element (Top_Curs));
+        Add_New_Decision_Node (Rows, Root (theTree),
+                               First_Split.Question, Top_Curs);
+        Put_Line ("Top Node:");
+        Utilities.Print_Node (Element (Top_Curs));
         Recurse (Rows, First_Child (theTree.Root));
 --          Put_Line ("Recurse True_Rows :");
 --          Recurse (First_Split.Question.True_Rows, Top_Curs);
