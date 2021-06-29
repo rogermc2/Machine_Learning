@@ -105,15 +105,18 @@ package body Builder is
     --  from the training data that reach this leaf.
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
-        theTree      : Tree_Type := Empty_Tree;
-        Top_Curs     : Tree_Cursor;
-        Level        : Integer := 0;
+        First_Split     : constant Best_Data := Find_Best_Split (Rows);
+        First_Partition : constant Partitioned_Rows :=
+                            Partition (Rows, First_Split.Question);
+        theTree         : Tree_Type := Empty_Tree;
+        Top_Curs        : Tree_Cursor;
+        Level           : Integer := 0;
 
         procedure Add_New_Decision_Node (Rows        : Rows_Vector;
                                          Parent_Cursor : Tree_Cursor;
                                          Question    : Question_Data;
                                          Next_Cursor : out Tree_Cursor) is
-            Node : Tree_Node_Type (Decision_Kind);
+            Node            : Tree_Node_Type (Decision_Kind);
         begin
             --              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Node.Question := Question;
@@ -171,8 +174,9 @@ package body Builder is
 
     begin
         Add_New_Decision_Node (Rows, Root (theTree),
-                               Find_Best_Split (Rows).Question, Top_Curs);
-        Recurse (Rows, Top_Curs);
+                               First_Split.Question, Top_Curs);
+        Recurse (First_Partition.True_Rows, Top_Curs);
+        Recurse (First_Partition.False_Rows, Top_Curs);
         return theTree;
 
     end Build_Tree;
