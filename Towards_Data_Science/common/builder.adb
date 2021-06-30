@@ -105,10 +105,8 @@ package body Builder is
    --  from the training data that reach this leaf.
    function Build_Tree (Rows : Rows_Vector) return Tree_Type is
       use Tree_Package;
-      --        First_Split     : constant Best_Data := Find_Best_Split (Rows);
       theTree         : Tree_Type := Empty_Tree;
-      Top_Node        : Tree_Node_Type (Decision_Kind);
-      Top_Cursor      : Tree_Cursor;
+      Top_Cursor      : constant Tree_Cursor := theTree.Root;
       Level           : Integer := 0;
 
       procedure Add_New_Decision_Node (Rows          : Rows_Vector;
@@ -169,12 +167,6 @@ package body Builder is
       end Recurse;
 
    begin
-      Top_Node.Rows := Rows;
-      theTree.Insert_Child (Parent   => theTree.Root,
-                            Before   => No_Element,
-                            New_Item => Top_Node,
-                            Position => Top_Cursor);
-      Put_Line ("Build_Tree first node added");
       Recurse (Rows, Top_Cursor);
       return theTree;
 
