@@ -135,13 +135,12 @@ package body Builder is
             Leaf            : Tree_Node_Type (Prediction_Kind);
         begin
             Level := Level + 1;
-            Put_Line ("Build_Tree level" & Integer'Image (Level));
+--              Put_Line ("Build_Tree.Recurse level" & Integer'Image (Level));
             Utilities.Print_Rows ("Build_Tree rows", Rows);
             Best_Split := Find_Best_Split (Rows);
-            Utilities.Print_Best ("Best_Split", Best_Split);
+
             if Best_Split.Gain = 0.0 then
-                Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
-                --                  Utilities.Print_Question ("Best leaf", Best_Question);
+--                  Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
                 Leaf.Prediction := Rows.First_Element;
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
@@ -167,19 +166,14 @@ package body Builder is
                 Recurse (Best_Split.Question.True_Rows, True_Node_Curs);
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
                 Recurse (Best_Split.Question.False_Rows, False_Node_Curs);
+                New_Line;
             end if;
         end Recurse;
 
     begin
-        Add_New_Decision_Node (Rows, Root (theTree),
-                               First_Split.Question, Top_Curs);
-        Put_Line ("Top Node:");
-        Utilities.Print_Node (Element (Top_Curs));
+        Add_New_Decision_Node
+          (Rows, Root (theTree), First_Split.Question, Top_Curs);
         Recurse (Rows, First_Child (theTree.Root));
---          Put_Line ("Recurse True_Rows :");
---          Recurse (First_Split.Question.True_Rows, Top_Curs);
---          Put_Line ("Recurse False_Rows :");
---          Recurse (First_Split.Question.False_Rows, Top_Curs);
         return theTree;
 
     end Build_Tree;
