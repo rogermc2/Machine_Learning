@@ -329,6 +329,7 @@ package body Utilities is
                   Put (Offset);
                end if;
 
+               Put_Line (Offset & "L" & Integer'Image (L));
                Put ("Is " & To_String (Node.Question.Feature_Name));
                case Node.Question.Feature_Kind is
                when Integer_Type =>
