@@ -123,8 +123,8 @@ begin
                Float'Image (Current_Uncertainty));
 
    Empty_Rows.Clear;
-   aQuestion := (Integer_Type, Diameter_Feature,
-                 Empty_Rows, Empty_Rows, Gain_Zero, 3);
+   aQuestion := (Integer_Type, Diameter_Feature, Gain_Zero, 3);
+--                   Empty_Rows, Empty_Rows, Gain_Zero, 3);
    P_Rows := Partition (Training_Data, aQuestion);
    New_Line;
    Put_Line ("Training_Data partitioned");
@@ -136,9 +136,9 @@ begin
    New_Line;
 
    Empty_Rows.Clear;
-   aQuestion := (UB_String_Type, Colour_Feature,
-                 Empty_Rows, Empty_Rows, Gain_Zero, UB ("Red"));
-   P_Rows := Partition (Training_Data, aQuestion);
+   aQuestion := (UB_String_Type, Colour_Feature,Gain_Zero, UB ("Red"));
+--                   Empty_Rows, Empty_Rows, Gain_Zero, UB ("Red"));
+--     P_Rows := Partition (Training_Data, aQuestion);
    Put_Line ("Info gain Red" &
                Float'Image (Information_Gain
                (P_Rows.True_Rows, P_Rows.False_Rows, Current_Uncertainty)));

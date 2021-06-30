@@ -45,8 +45,10 @@ package Builder is
 private
 
     type Best_Data is record
-        Question : Question_Data;
-        Gain     : Float := 0.0;
+        Question   : Question_Data;
+        True_Rows  : Rows_Vector;
+        False_Rows : Rows_Vector;
+        Gain       : Float := 0.0;
     end record;
 
 end Builder;

@@ -119,9 +119,6 @@ package body Builder is
             --              Utilities.Print_Rows ("Build_Tree.Add_New_Node", Rows);
             Node.Question := Question;
             Node.Rows := Rows;
---              Put_Line ("Build_Tree.Add_New_Decision_Node  Num rows: " &
---                       Integer'Image (Integer (Node.Rows.Length)));
-
             theTree.Insert_Child (Parent   => Parent_Cursor,
                                   Before   => No_Element,
                                   New_Item => Node,
@@ -129,6 +126,7 @@ package body Builder is
         end Add_New_Decision_Node;
 
         procedure Recurse (Rows : Rows_Vector; Curs : Tree_Cursor) is
+            This_Curs       : constant Tree_Cursor := Curs;
             Best_Split      : Best_Data;
             False_Node_Curs : Tree_Cursor;
             True_Node_Curs  : Tree_Cursor;
@@ -136,7 +134,7 @@ package body Builder is
         begin
             Level := Level + 1;
 --              Put_Line ("Build_Tree.Recurse level" & Integer'Image (Level));
-            Utilities.Print_Rows ("Build_Tree rows", Rows);
+            Utilities.Print_Rows ("Build_Tree.Recurse rows", Rows);
             Best_Split := Find_Best_Split (Rows);
 
             if Best_Split.Gain = 0.0 then
@@ -145,34 +143,36 @@ package body Builder is
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
-                theTree.Insert_Child (Parent   => Curs,
+                theTree.Insert_Child (Parent   => This_Curs,
                                       Before   => No_Element,
                                       New_Item => Leaf);
             else
                 New_Line;
                 Utilities.Print_Question ("Level" & Integer'Image (Level) &
                                             " Best", Best_Split.Question);
-                Utilities.Print_Rows ("Build_Tree True_Rows",
-                                      ML_Types.Rows_Vector (Best_Split.Question.True_Rows));
-                Utilities.Print_Rows ("Build_Tree False_Rows",
-                                      ML_Types.Rows_Vector (Best_Split.Question.False_Rows));
+--                  Utilities.Print_Rows ("Build_Tree True_Rows",
+--                                        ML_Types.Rows_Vector (Best_Split.True_Rows));
+--                  Utilities.Print_Rows ("Build_Tree False_Rows",
+--                                        ML_Types.Rows_Vector (Best_Split.False_Rows));
 
-                Add_New_Decision_Node (Best_Split.Question.True_Rows, Curs,
+                Add_New_Decision_Node (Best_Split.True_Rows, This_Curs,
                                        Best_Split.Question, True_Node_Curs);
-                Add_New_Decision_Node (Best_Split.Question.False_Rows, Curs,
+                Add_New_Decision_Node (Best_Split.False_Rows, This_Curs,
                                        Best_Split.Question, False_Node_Curs);
 
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
-                Recurse (Best_Split.Question.True_Rows, True_Node_Curs);
+                Recurse (Best_Split.True_Rows, True_Node_Curs);
                 Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
-                Recurse (Best_Split.Question.False_Rows, False_Node_Curs);
+                Recurse (Best_Split.False_Rows, False_Node_Curs);
                 New_Line;
             end if;
         end Recurse;
 
     begin
         Add_New_Decision_Node
-          (Rows, Root (theTree), First_Split.Question, Top_Curs);
+        (Rows, Root (theTree), First_Split.Question, Top_Curs);
+
+      Put_Line ("Build_Tree first node added");
         Recurse (Rows, First_Child (theTree.Root));
         return theTree;
 
@@ -511,13 +511,14 @@ package body Builder is
     procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                      Question : in out Question_Data;
                      Best     : out Best_Data) is
+        Empty_Row :  Rows_Vector;
         Split_Row :  Partitioned_Rows;
     begin
         Split_Row := Partition (Rows, Question);
         --          Utilities.Print_Rows ("Split True_Rows", Split_Row.True_Rows);
         --          Utilities.Print_Rows ("Split False_Rows", Split_Row.False_Rows);
-        Question.True_Rows := Split_Row.True_Rows;
-        Question.False_Rows := Split_Row.False_Rows;
+--          Question.True_Rows := Split_Row.True_Rows;
+--          Question.False_Rows := Split_Row.False_Rows;
         if not Split_Row.True_Rows.Is_Empty and then
           not Split_Row.False_Rows.Is_Empty then
             Question.Gain := Information_Gain
@@ -526,11 +527,11 @@ package body Builder is
             --                        & ",  " & Float'Image (Best.Gain));
             --   Floating point = is not reliable
             if Question.Gain >= Best.Gain then
-                Best := (Question, Question.Gain);
+                Best := (Question, Split_Row.True_Rows, Split_Row.False_Rows, Question.Gain);
                 --                  Utilities.Print_Question ("Split best", Question);
             end if;
         elsif Best.Question.Feature_Name = To_Unbounded_String ("") then
-            Best := (Question, 0.0);
+            Best := (Question, Empty_Row, Empty_Row, 0.0);
         end if;
     end Split;
 
