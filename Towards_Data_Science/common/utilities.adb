@@ -170,7 +170,6 @@ package body Utilities is
 
    begin
       Put_Line ("  Node data:");
-      Put_Line ("  Num rows: " & Integer'Image (Integer (Node.Rows.Length)));
       Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
       case Node.Node_Type is
       when Prediction_Kind => null;
@@ -193,8 +192,7 @@ package body Utilities is
       pos          : Natural := 1;
       Found        : Boolean := False;
    begin
-      Print_Node (Node);
-      Put_Line ("Print_Prediction Num_Rows: " & Positive'Image (Num_Rows));
+--        Print_Node (Node);
       if Indent > 0 then
          while pos < Indent loop
             Offset (pos .. pos + 1) := "  ";
@@ -217,9 +215,7 @@ package body Utilities is
             Next (Curs);
          end loop;
 
-         Put_Line ("Print_Prediction Label: " & To_String (Label));
          if not Found then
-         Put_Line ("Print_Prediction Label not found");
             Data.Label := Label;
             Predictions.Append (Data);
          end if;
@@ -307,8 +303,6 @@ package body Utilities is
          This_Indent : Natural;
          L           : constant Positive := Level + 1;
       begin
---           Print_Node (Node);
---           New_Line;
          Level := L;
          if First then
             This_Indent := 0;
@@ -322,11 +316,8 @@ package body Utilities is
             pos         : Natural := 1;
          begin
             if Is_Leaf  (This_Curs) then
-               Put_Line ("L" & Integer'Image (L) & "P");
-               Print_Node (Node);
                Print_Prediction (Node, This_Indent);
             else
-               --              Put_Line (" Level: " & Integer'Image (L));
                if Indent > 0 then
                   while pos < This_Indent - 1 loop
                      Offset (pos .. pos + 1) := "  ";
@@ -338,7 +329,6 @@ package body Utilities is
                   Put (Offset);
                end if;
 
-               Print_Node (Node);
                Put ("Is " & To_String (Node.Question.Feature_Name));
                case Node.Question.Feature_Kind is
                when Integer_Type =>
@@ -355,6 +345,7 @@ package body Utilities is
                Put_Line (Offset & "L" & Integer'Image (L) & "T");
                Put_Line (Offset & "--> True:");
                Print_Node (First_Child (This_Curs), This_Indent + 1);
+
                Put_Line (Offset & "L" & Integer'Image (L) & "F");
                Put_Line (Offset & "--> False:");
                Print_Node (Last_Child (This_Curs), This_Indent + 1);
