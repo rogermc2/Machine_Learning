@@ -89,9 +89,10 @@ package ML_Types is
       Rows : Rows_Vector := Rows_Package.Empty_Vector;
       case Node_Type is
       when  Decision_Kind =>
-         Question    : Question_Data;
+         Question   : Question_Data;
+         Decision   : Boolean := False;
       when Prediction_Kind =>
-         Prediction  : Row_Data;
+         Prediction : Row_Data;
       end case;
    end record;
 
