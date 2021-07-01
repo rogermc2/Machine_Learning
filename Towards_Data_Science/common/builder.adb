@@ -23,8 +23,6 @@ with Utilities;
 
 package body Builder is
 
-   --     pragma Warnings (Off, "procedure ""Print_Row"" is not referenced");
-
    Header_Data  : Header_Data_Type;
 
    function Parse (aString : String) return Row_Data;
@@ -189,11 +187,6 @@ package body Builder is
       Prob_Left    : constant Float := Left_Length /
         (Left_Length + Right_Length);
    begin
-      --          Put_Line ("Information_Gain Prob_Left" & Float'Image (Prob_Left));
-      --          Put_Line ("Information_Gain Gini (Left)" & Float'Image (Gini (Left)));
-      --          Put_Line ("Information_Gain Gini (Right)" & Float'Image (Gini (Right)));
-      --          Put_Line ("Information_Gain " & Float'Image (Current_Uncertainty -
-      --            Prob_Left * Gini (Left) - (1.0 - Prob_Left) * Gini (Right)));
       return Current_Uncertainty -
         Prob_Left * Gini (Left) - (1.0 - Prob_Left) * Gini (Right);
    end Information_Gain;
@@ -404,8 +397,6 @@ package body Builder is
                Matches := Value = Example_Feature;
             end;
       end case;
-      --        Put_Line ("Example feature type : " & To_String (Example.Features (Feat_Type)));
-      --        Put_Line ("Match: " & Boolean'Image (Matches));
       return Matches;
    end Match;
 
@@ -467,19 +458,14 @@ package body Builder is
       False_Rows : Rows_Vector;
       Data       : Row_Data;
    begin
-      --          Utilities.Print_Rows ("Partition rows", Rows);
-      --          Utilities.Print_Question ("Partition", aQuestion);
       for index in Rows.First_Index .. Rows.Last_Index loop
          Data := Rows.Element (index);
-         --              Put_Line ("Builder.Partition index" & Integer'Image (index));
          if Match (aQuestion, Data) then
             True_Rows.Append (Data);
          else
             False_Rows.Append (Data);
          end if;
       end loop;
-      --          Utilities.Print_Rows ("Partition true rows", True_Rows);
-      --          Utilities.Print_Rows ("Partition false rows", False_Rows);
       return (True_Rows, False_Rows);
    end Partition;
 
@@ -492,10 +478,6 @@ package body Builder is
       Split_Rows :  Partitioned_Rows;
    begin
       Split_Rows := Partition (Rows, Question);
-      --          Utilities.Print_Rows ("Split True_Rows", Split_Row.True_Rows);
-      --          Utilities.Print_Rows ("Split False_Rows", Split_Row.False_Rows);
-      --          Question.True_Rows := Split_Row.True_Rows;
-      --          Question.False_Rows := Split_Row.False_Rows;
       if not Split_Rows.True_Rows.Is_Empty and then
         not Split_Rows.False_Rows.Is_Empty then
          Question.Gain := Information_Gain
@@ -579,28 +561,28 @@ package body Builder is
    begin
       if Is_Integer (Q.Feature_Value) then
          declare
-            QD  : Question_Data (Integer_Type);
+            QD : Question_Data (Integer_Type);
          begin
             QD.Integer_Value := Integer'Value (Value);
-            Q_Data :=  QD;
+            Q_Data := QD;
          end;
       elsif Is_Float (Q.Feature_Value) then
          declare
-            QD  : Question_Data (Float_Type);
+            QD : Question_Data (Float_Type);
          begin
             QD.Float_Value := Float'Value (Value);
             Q_Data := QD;
          end;
       elsif Is_Boolean (Q.Feature_Value) then
          declare
-            QD  : Question_Data (Boolean_Type);
+            QD : Question_Data (Boolean_Type);
          begin
             QD.Boolean_Value := Boolean'Value (Value);
             Q_Data := QD;
          end;
       else
          declare
-            QD  : Question_Data (UB_String_Type);
+            QD : Question_Data (UB_String_Type);
          begin
             QD.UB_String_Value := To_Unbounded_String (Value);
             Q_Data := QD;
@@ -637,12 +619,8 @@ package body Builder is
             Count := Label_Counts.Element (Label.UB_String_Value);
             Count := Count + 1;
             Label_Counts.Replace_Element (Count_Cursor, Count);
-            --              Put_Line ("Label replaced "  &
-            --                          Data_Type'Image (Label.Label_Kind) &  " " &
-            --                         Integer'Image (Label_Counts.Element (Label.UB_String_Value)));
          end if;
       end loop;
-      --        Put_Line ("Label_Counts size "  & Integer'Image (Integer (Label_Counts.Length)));
       return Label_Counts;
    end UB_Label_Counts;
 
