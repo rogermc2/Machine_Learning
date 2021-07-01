@@ -293,7 +293,6 @@ package body Utilities is
 
     procedure Print_Tree (aTree : Tree_Type) is
         use Tree_Package;
---          Level  : Integer := 0;
         First  : Boolean := True;
 
         procedure Print_Node (Curs : Cursor; Indent : Natural := 0) is
@@ -311,6 +310,7 @@ package body Utilities is
             declare
                 Offset : String (1 .. This_Indent + 1) := (others => ' ');
                 pos    : Natural := 1;
+                UB_String : Unbounded_String;
             begin
                 if Is_Leaf  (This_Curs) then
                     Print_Prediction (Node, This_Indent);
@@ -326,6 +326,10 @@ package body Utilities is
                         Put (Offset);
                     end if;
 
+                    if Node.Question.Feature_Kind = UB_String_Type then
+                        Put_Line ("Print_Tree UB_String: " &
+                                   To_String (Node.Question.UB_String_Value));
+                    end if;
                     Put ("Is " & To_String (Node.Question.Feature_Name));
                     case Node.Question.Feature_Kind is
                     when Integer_Type =>
@@ -335,7 +339,13 @@ package body Utilities is
                     when Boolean_Type =>
                         Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
                     when UB_String_Type =>
-                        Put (" = " & To_String (Node.Question.UB_String_Value));
+                        UB_String := Node.Question.UB_String_Value;
+                        if Is_Integer (UB_String) or else
+                          Is_Float (UB_String) then
+                            Put (" >= " & To_String (UB_String));
+                        else
+                            Put (" = " & To_String (UB_String));
+                        end if;
                     end case;
                     Put_Line ("?");
 
