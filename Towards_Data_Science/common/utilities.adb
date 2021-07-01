@@ -319,6 +319,7 @@ package body Utilities is
                 UB_String : Unbounded_String;
             begin
                 if Is_Leaf  (This_Curs) then
+--                      Put_Line ("Is_Leaf");
                     Print_Prediction (Node, This_Indent);
                 else
                     if Indent > 0 then
@@ -350,8 +351,11 @@ package body Utilities is
                         end if;
                     end case;
                     Put_Line ("?");
-
-                    Put_Line (Offset & "--> True:");
+                    if Node.Decision then
+                        Put_Line (Offset & "--> True:");
+                    else
+                        Put_Line (Offset & "--> False:");
+                    end if;
                     Print_Node (First_Child (This_Curs), This_Indent + 1);
 
                     if not Is_Leaf (First_Child (This_Curs)) then

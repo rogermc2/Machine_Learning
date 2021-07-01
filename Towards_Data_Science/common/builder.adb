@@ -110,11 +110,13 @@ package body Builder is
       procedure Add_New_Decision_Node (Rows          : Rows_Vector;
                                        Parent_Cursor : Tree_Cursor;
                                        Question      : Question_Data;
+                                       Decision      : Boolean;
                                        Next_Cursor   : out Tree_Cursor) is
          Node  : Tree_Node_Type (Decision_Kind);
       begin
          Node.Question := Question;
          Node.Rows := Rows;
+         Node.Decision := Decision;
          theTree.Insert_Child (Parent   => Parent_Cursor,
                                Before   => No_Element,
                                New_Item => Node,
@@ -152,9 +154,9 @@ package body Builder is
             --                                        ML_Types.Rows_Vector (Best_Split.False_Rows));
 
             Add_New_Decision_Node (Best_Split.True_Rows, This_Curs,
-                                   Best_Split.Question, True_Node_Curs);
+                                   Best_Split.Question, True, True_Node_Curs);
             Add_New_Decision_Node (Best_Split.False_Rows, This_Curs,
-                                   Best_Split.Question, False_Node_Curs);
+                                   Best_Split.Question, False, False_Node_Curs);
 
             Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
             Recurse (Best_Split.True_Rows, True_Node_Curs);
