@@ -63,7 +63,7 @@ package body Utilities is
         return Item_String = "TRUE" or else Item_String = "FALSE";
     end Is_Boolean;
 
-    --  ---------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
     function Is_Float (Item : in Unbounded_String) return Boolean is
         Item_String : constant String := To_String (Item);
@@ -72,16 +72,22 @@ package body Utilities is
         return Fixed.Count (Item_String, ".") = 1;
     end Is_Float;
 
-    --  ---------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
     function Is_Integer (Item : in Unbounded_String) return Boolean is
-        Item_String : constant String := To_String (Item);
+        UB_String   : Unbounded_String := Item;
         Dig         : Boolean := True;
     begin
-        for index in Item_String'Range loop
-            Dig := Dig and then
-              Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index));
-        end loop;
+        UB_String := Trim (UB_String, Ada.Strings.Left);
+        UB_String := Trim (UB_String, Ada.Strings.Right);
+        declare
+            Item_String : constant String := To_String (UB_String);
+        begin
+            for index in Item_String'Range loop
+                Dig := Dig and then
+                  Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index));
+            end loop;
+        end;
         return Dig;
     end Is_Integer;
 
@@ -326,10 +332,6 @@ package body Utilities is
                         Put (Offset);
                     end if;
 
---                      if Node.Question.Feature_Kind = UB_String_Type then
---                          Put_Line ("Print_Tree UB_String: " &
---                                     To_String (Node.Question.UB_String_Value));
---                      end if;
                     Put ("Is " & To_String (Node.Question.Feature_Name));
                     case Node.Question.Feature_Kind is
                     when Integer_Type =>
@@ -340,10 +342,6 @@ package body Utilities is
                         Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
                     when UB_String_Type =>
                         UB_String := Node.Question.UB_String_Value;
-                        UB_String := Trim (UB_String, Ada.Strings.Left);
-                        UB_String := Trim (UB_String, Ada.Strings.Right);
---                          Put ("  (UB_String: " &
---                                     To_String (UB_String) & ")  ");
                         if Is_Integer (UB_String) or else
                           Is_Float (UB_String) then
                             Put (" >= " & To_String (UB_String));
