@@ -308,8 +308,8 @@ package body Utilities is
             end if;
 
             declare
-                Offset : String (1 .. This_Indent + 1) := (others => ' ');
-                pos    : Natural := 1;
+                Offset    : String (1 .. This_Indent + 1) := (others => ' ');
+                pos       : Natural := 1;
                 UB_String : Unbounded_String;
             begin
                 if Is_Leaf  (This_Curs) then
@@ -326,10 +326,10 @@ package body Utilities is
                         Put (Offset);
                     end if;
 
-                    if Node.Question.Feature_Kind = UB_String_Type then
-                        Put_Line ("Print_Tree UB_String: " &
-                                   To_String (Node.Question.UB_String_Value));
-                    end if;
+--                      if Node.Question.Feature_Kind = UB_String_Type then
+--                          Put_Line ("Print_Tree UB_String: " &
+--                                     To_String (Node.Question.UB_String_Value));
+--                      end if;
                     Put ("Is " & To_String (Node.Question.Feature_Name));
                     case Node.Question.Feature_Kind is
                     when Integer_Type =>
@@ -340,6 +340,10 @@ package body Utilities is
                         Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
                     when UB_String_Type =>
                         UB_String := Node.Question.UB_String_Value;
+                        UB_String := Trim (UB_String, Ada.Strings.Left);
+                        UB_String := Trim (UB_String, Ada.Strings.Right);
+--                          Put ("  (UB_String: " &
+--                                     To_String (UB_String) & ")  ");
                         if Is_Integer (UB_String) or else
                           Is_Float (UB_String) then
                             Put (" >= " & To_String (UB_String));
