@@ -1,7 +1,6 @@
 
 with Ada.Characters.Handling;
 with Ada.Containers;
-with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -9,15 +8,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Utilities is
 
     use ML_Types;
-
-    type Prediction_Data is record
-        Label      : Unbounded_String;
-        Num_Copies : Natural := 1;
-    end record;
-
-    package Prediction_Data_Package is new
-      Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
-    subtype Prediction_Data_List is Prediction_Data_Package.List;
 
     type Value_Data (Feature_Kind : Data_Type := Integer_Type) is record
         Feature_Name : Feature_Name_Type;
@@ -115,22 +105,26 @@ package body Utilities is
 
     end Print_Best;
 
-    --  --------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
-    procedure Print_Classification
-      (Classification : Count_Package.Map) is
-        use Count_Package;
-        aCount : Natural;
+    procedure Print_Classification (Classification : Prediction_Data_List) is
+        use Prediction_Data_Package;
+        Curs        : Cursor := Classification.First;
+        Data        : Prediction_Data;
+        Predictions : Unbounded_String;
     begin
         Put_Line ("Classification:");
-        for index in Classification.First_Key .. Classification.Last_Key loop
-            if Classification.Contains (index) then
-                aCount := Classification.Element (index);
-                Put_Line (Data_Type'Image (index) &  ": " & Natural'Image (aCount));
-            else
-                Put_Line (Data_Type'Image (index) &  ": none");
+        while Has_Element (Curs) loop
+            Data := Element (Curs);
+            Predictions := Predictions & "'" & To_String (Data.Label) &
+              "':" & Natural'Image (Data.Num_Copies);
+            if not (Curs = Classification.Last) then
+                Predictions := Predictions & ", ";
             end if;
+            Next (Curs);
         end loop;
+        Predictions := Predictions & "}";
+        Put_Line (To_String (Predictions));
 
     exception
         when others =>

@@ -135,12 +135,10 @@ package body Builder is
             Leaf            : Tree_Node_Type (Prediction_Kind);
         begin
             Level := Level + 1;
-            --              Put_Line ("Build_Tree.Recurse level" & Integer'Image (Level));
             Utilities.Print_Rows ("Build_Tree.Recurse rows", Rows);
             Best_Split := Find_Best_Split (Rows);
 
             if Best_Split.Gain = 0.0 then
-                --                  Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
                 Leaf.Prediction := Rows.First_Element;
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
@@ -152,10 +150,6 @@ package body Builder is
                 New_Line;
                 Utilities.Print_Question ("Level" & Integer'Image (Level) &
                                             " Best", Best_Split.Question);
-                --                  Utilities.Print_Rows ("Build_Tree True_Rows",
-                --                                        ML_Types.Rows_Vector (Best_Split.True_Rows));
-                --                  Utilities.Print_Rows ("Build_Tree False_Rows",
-                --                                        ML_Types.Rows_Vector (Best_Split.False_Rows));
 
                 Add_New_Decision_Node (Best_Split.True_Rows, This_Curs,
                                        Best_Split.Question, True, True_Node_Curs);
@@ -226,45 +220,37 @@ package body Builder is
     --  A cursor keeps designating the same node (and element) as long as the
     --  node is part of the container even if the node is moved within the
     --  container.
-    --     function Classify (aRow : Row_Data; aTree : Tree_Type)
-    --                        return Count_Package.Map is
-    --        use Tree_Package;
-    --        --  The node at the root has no element so hence the call of First_Child.
-    --        First_Cursor     : constant Cursor := First_Child (Root (aTree));
-    --        True_Cursor      : constant Cursor := First_Child (First_Cursor);
-    --        False_Cursor     : constant Cursor := Last_Child (First_Cursor);
-    --        First_Node       : constant Decision_Node_Type := Element (First_Cursor);
-    --        Subtree          : Tree_Type;
-    --        Sub_Cursor       : constant Cursor := Root (Subtree);
-    --        Result           : Count_Package.Map;
-    --     begin
-    --        if Is_Leaf (First_Cursor) then
-    --  --           Put_Line ("Classify Leaf");
-    --           Result := First_Node.Predictions;
-    --        else
-    --           case First_Node.Node_Type is
-    --           when Prediction_Kind =>
-    --              null;
-    --           when Decision_Kind =>
-    --  --              Put ("Decision_Kind ");
-    --              if Match (First_Node.Question, aRow) then
-    --  --                 Put_Line ("Match");
-    --                 Subtree.Copy_Subtree (Sub_Cursor, No_Element, True_Cursor);
-    --              else
-    --  --                 Put_Line ("No match");
-    --                 Subtree.Copy_Subtree (Sub_Cursor, No_Element, False_Cursor);
-    --              end if;
-    --              Result := Classify (aRow, Subtree);
-    --           end case;
-    --        end if;
-    --        return Result;
-    --
-    --     exception
-    --           when others =>
-    --           Put_Line ("Print_Classification exception");
-    --           raise;
-    --        return Result;
-    --     end Classify;
+
+    function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
+                       return Prediction_Data_List is
+        use Tree_Package;
+        aNode  : constant Tree_Node_Type := Element (Node_Cursor);
+        Prediction : Prediction_Data;
+        Result     : Prediction_Data_List;
+    begin
+        if aNode.Node_Type = Prediction_Kind then
+            Prediction.Label := aNode.Prediction.Label;
+            if Result.Contains (Prediction) then
+                Prediction.Num_Copies := Prediction.Num_Copies + 1;
+            else
+                Prediction.Num_Copies := 1;
+            end if;
+            Result.Append (Prediction);
+        else
+            if Match (aNode.Question, aRow) then
+                Result := Classify (aRow, First_Child (Node_Cursor));
+            else
+                Result := Classify (aRow, Last_Child (Node_Cursor));
+            end if;
+        end if;
+        return Result;
+
+    exception
+        when others =>
+            Put_Line ("Print_Classification exception");
+            raise;
+            return Result;
+    end Classify;
 
     --  -----------------------------------------------------------------------
 
@@ -392,7 +378,6 @@ package body Builder is
             end if;
         end loop;
         Example_Feature := Example_Data.Features (Feat_Index);
-        --          Put_Line ("Builder.Match Example_Feature set");
         case Val_Type is
             when Integer_Type =>
                 declare

@@ -101,6 +101,15 @@ package ML_Types is
       False_Rows : Rows_Vector;
    end record;
 
+    type Prediction_Data is record
+        Label      : Unbounded_String;
+        Num_Copies : Natural := 1;
+    end record;
+
+    package Prediction_Data_Package is new
+      Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
+    subtype Prediction_Data_List is Prediction_Data_Package.List;
+
    package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
      (Tree_Node_Type);
    subtype Tree_Type is Tree_Package.Tree;
