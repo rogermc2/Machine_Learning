@@ -178,6 +178,7 @@ package body Utilities is
         Put_Line ("  Node data:");
         Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
         case Node.Node_Type is
+        when Top_Kind => null;
         when Prediction_Kind => null;
         when Decision_Kind => null;
         end case;
@@ -308,7 +309,6 @@ package body Utilities is
         begin
             if First then
                 This_Indent := 0;
-                First := False;
             else
                 This_Indent := Indent + 1;
             end if;
@@ -319,43 +319,47 @@ package body Utilities is
                 UB_String : Unbounded_String;
             begin
                 if Is_Leaf  (This_Curs) then
---                      Put_Line ("Is_Leaf");
                     Print_Prediction (Node, This_Indent);
                 else
-                    if Indent > 0 then
-                        while pos < This_Indent - 1 loop
-                            Offset (pos .. pos + 1) := "  ";
-                            pos := pos + 2;
-                        end loop;
-                        if pos < Indent + 1 then
-                            Offset (Indent) := ' ';
+                    if First then
+                        First := False;
+                    else
+                        if Indent > 0 then
+                            while pos < This_Indent - 1 loop
+                                Offset (pos .. pos + 1) := "  ";
+                                pos := pos + 2;
+                            end loop;
+                            if pos < Indent + 1 then
+                                Offset (Indent) := ' ';
+                            end if;
+                            Put (Offset);
                         end if;
-                        Put (Offset);
+
+                        Put ("Is " & To_String (Node.Question.Feature_Name));
+                        case Node.Question.Feature_Kind is
+                        when Integer_Type =>
+                            Put (" >= " & Integer'Image (Node.Question.Integer_Value));
+                        when Float_Type =>
+                            Put (" >= " & Float'Image (Node.Question.Float_Value));
+                        when Boolean_Type =>
+                            Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
+                        when UB_String_Type =>
+                            UB_String := Node.Question.UB_String_Value;
+                            if Is_Integer (UB_String) or else
+                              Is_Float (UB_String) then
+                                Put (" >= " & To_String (UB_String));
+                            else
+                                Put (" = " & To_String (UB_String));
+                            end if;
+                        end case;
+                        Put_Line ("?");
+                        if Node.Decision then
+                            Put_Line (Offset & "--> True:");
+                        else
+                            Put_Line (Offset & "--> False:");
+                        end if;
                     end if;
 
-                    Put ("Is " & To_String (Node.Question.Feature_Name));
-                    case Node.Question.Feature_Kind is
-                    when Integer_Type =>
-                        Put (" >= " & Integer'Image (Node.Question.Integer_Value));
-                    when Float_Type =>
-                        Put (" >= " & Float'Image (Node.Question.Float_Value));
-                    when Boolean_Type =>
-                        Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
-                    when UB_String_Type =>
-                        UB_String := Node.Question.UB_String_Value;
-                        if Is_Integer (UB_String) or else
-                          Is_Float (UB_String) then
-                            Put (" >= " & To_String (UB_String));
-                        else
-                            Put (" = " & To_String (UB_String));
-                        end if;
-                    end case;
-                    Put_Line ("?");
-                    if Node.Decision then
-                        Put_Line (Offset & "--> True:");
-                    else
-                        Put_Line (Offset & "--> False:");
-                    end if;
                     Print_Node (First_Child (This_Curs), This_Indent + 1);
 
                     if not Is_Leaf (First_Child (This_Curs)) then
@@ -365,6 +369,7 @@ package body Utilities is
                 end if;
             end; --  declare block
         end Print_Node;
+
     begin
         Print_Node (First_Child (aTree.Root));
     end Print_Tree;

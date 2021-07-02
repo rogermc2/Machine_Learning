@@ -104,7 +104,7 @@ package body Builder is
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
         theTree         : Tree_Type := Empty_Tree;
-        Top_Node        : Tree_Node_Type (Decision_Kind);
+        Top_Node        : Tree_Node_Type  (Top_Kind);
         Top_Split       : Best_Data;
         Next_Cursor     : Tree_Cursor;
         False_Node_Curs : Tree_Cursor;
