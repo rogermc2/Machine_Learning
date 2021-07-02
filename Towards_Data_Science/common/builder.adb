@@ -370,15 +370,27 @@ package body Builder is
         Example_Feature  : Unbounded_String;
         Val_Type         : Data_Type;
         Matches          : Boolean := False;
+        Found            : Boolean := False;
     begin
         Val_Type  := Question.Feature_Kind;
         for col in Header_Data.Features'Range loop
+            --              Put_Line ("Match Header_Data col: " & Class_Range'Image (col));
             if Feature_Name_Type (Header_Data.Features (col)) = Feature_Name then
                 Feat_Index := col;
+                Found := True;
             end if;
         end loop;
-        Example_Feature := Example_Data.Features (Feat_Index);
-        case Val_Type is
+
+        --          if not Found then
+        --              raise Builder_Exception with
+        --              "Builder.Match, invalid feature Question.Feature_Name: " &
+        --                To_String (Feature_Name);
+        --          end if;
+
+        --          Put_Line ("Match Header_Data Feat_Index: " & Class_Range'Image (Feat_Index));
+        if Found then
+            Example_Feature := Example_Data.Features (Feat_Index);
+            case Val_Type is
             when Integer_Type =>
                 declare
                     Value : constant Integer := Question.Integer_Value;
@@ -406,7 +418,8 @@ package body Builder is
                 begin
                     Matches := Value = Example_Feature;
                 end;
-        end case;
+            end case;
+        end if;
         return Matches;
     end Match;
 

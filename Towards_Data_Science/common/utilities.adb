@@ -113,7 +113,7 @@ package body Utilities is
         Data        : Prediction_Data;
         Predictions : Unbounded_String;
     begin
-        Put_Line ("Classification:");
+        Put ("Classification:  {");
         while Has_Element (Curs) loop
             Data := Element (Curs);
             Predictions := Predictions & "'" & To_String (Data.Label) &
