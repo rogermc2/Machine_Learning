@@ -367,7 +367,6 @@ package body Utilities is
         end Print_Node;
     begin
         Print_Node (First_Child (aTree.Root));
-        Print_Node (Last_Child (aTree.Root));
     end Print_Tree;
 
     --  -------------------------------------------------------------------------
