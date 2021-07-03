@@ -20,6 +20,7 @@ package Utilities is
                              Question : ML_Types.Question_Data);
    procedure Print_Raw_Question
       (Message : String; Question : ML_Types.Raw_Question);
+   procedure Print_Row (Message : String; aRow : ML_Types.Row_Data);
    procedure Print_Rows (Message : String; Rows : ML_Types.Rows_Vector);
    procedure Print_Tree (aTree : ML_Types.Tree_Package.Tree);
    procedure Print_UB_Label_Counts (Rows : ML_Types.Rows_Vector);

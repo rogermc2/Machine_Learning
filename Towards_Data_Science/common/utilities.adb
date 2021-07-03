@@ -271,6 +271,21 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
+    procedure Print_Row (Message : String; aRow : Row_Data) is
+    begin
+        Put_Line (Message);
+        Put ("  Feature values: ");
+        for feat in aRow.Features'First .. aRow.Features'Last loop
+            Put (To_String (aRow.Features (feat)));
+            if feat /= aRow.Features'Last then
+                Put (",");
+            end if;
+        end loop;
+        Put_Line ("; Label: " & To_String (aRow.Label));
+    end Print_Row;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Rows (Message : String; Rows : Rows_Vector) is
         use Rows_Package;
         aRow : Row_Data;

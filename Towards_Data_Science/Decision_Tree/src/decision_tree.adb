@@ -174,6 +174,7 @@ begin
 
     Put_Line ("Print Tree");
     Utilities.Print_Tree (aTree);
+    New_Line;
 
     Put_Line ("Classify tests, Training_Data (1)");
     Classified := Classify
