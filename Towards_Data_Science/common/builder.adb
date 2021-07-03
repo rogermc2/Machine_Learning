@@ -107,8 +107,6 @@ package body Builder is
         Top_Node        : Tree_Node_Type  (Top_Kind);
         Top_Split       : Best_Data;
         Next_Cursor     : Tree_Cursor;
-        False_Node_Curs : Tree_Cursor;
-        True_Node_Curs  : Tree_Cursor;
         Level           : Integer := 0;
 
         procedure Add_New_Decision_Node (Rows          : Rows_Vector;
@@ -166,24 +164,20 @@ package body Builder is
 
     begin
         Utilities.Print_Rows ("Build_Tree rows", Rows);
+        Top_Split := Find_Best_Split (Rows);
+        Utilities.Print_Question ("Level" & Integer'Image (Level) &
+                                    " Best", Top_Split.Question);
         Top_Node.Rows := Rows;
+        Top_Node.Question := Top_Split.Question;
         theTree.Insert_Child (Parent   => theTree.Root,
                               Before   => No_Element,
                               New_Item => Top_Node,
                               Position => Next_Cursor);
-        Top_Split := Find_Best_Split (Rows);
-        Utilities.Print_Question ("Level" & Integer'Image (Level) &
-                                    " Best", Top_Split.Question);
-
-        Add_New_Decision_Node (Top_Split.True_Rows, Next_Cursor,
-                               Top_Split.Question, True, True_Node_Curs);
-        Add_New_Decision_Node (Top_Split.False_Rows, Next_Cursor,
-                               Top_Split.Question, False, False_Node_Curs);
 
         Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
-        Recurse (Top_Split.True_Rows, True_Node_Curs);
+        Recurse (Top_Split.True_Rows, Next_Cursor);
         Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
-        Recurse (Top_Split.False_Rows, False_Node_Curs);
+        Recurse (Top_Split.False_Rows, Next_Cursor);
 
         return theTree;
 
@@ -259,21 +253,6 @@ package body Builder is
             raise;
             return Result;
     end Classify;
-
-    --  -----------------------------------------------------------------------
-
-    --     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type) is
-    --        aRow           : Row_Data;
-    --        Classification : Count_Package.Map;
-    --     begin
-    --        for row in Rows.First_Index .. Rows.Last_Index loop
-    --           aRow := Rows.Element (row);
-    --           Put_Line ("Evalution of row " & Integer'Image (row));
-    --           Classification := Classify (aRow, theTree);
-    --  --           Put_Line ("Actual: " & Label_Type'Image (aRow.Fruit) & "  Predicted: " &
-    --  --                       Print_Leaf (Classification));
-    --        end loop;
-    --     end Evaluate;
 
     --  -----------------------------------------------------------------------
     --   Find_Best_Split finds the best question to ask by iterating over every

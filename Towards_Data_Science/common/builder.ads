@@ -28,7 +28,6 @@ package Builder is
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
                        return ML_Types.Prediction_Data_List;
     function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map;
-    --     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type);
     function Find_Best_Split (Rows : Rows_Vector) return Best_Data;
     function Gain (Data : Best_Data) return Float;
     function Gini (Rows : Rows_Vector) return Float;

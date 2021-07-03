@@ -318,6 +318,7 @@ package body Utilities is
         begin
             if First then
                 This_Indent := 0;
+                First := False;
             else
                 This_Indent := Indent + 1;
             end if;
@@ -330,9 +331,9 @@ package body Utilities is
                 if Is_Leaf  (This_Curs) then
                     Print_Prediction (Node, This_Indent);
                 else
-                    if First then
-                        First := False;
-                    else
+--                      if First then
+--                          First := False;
+--                      else
                         if Indent > 0 then
                             while pos < This_Indent - 1 loop
                                 Offset (pos .. pos + 1) := "  ";
@@ -367,7 +368,7 @@ package body Utilities is
                         else
                             Put_Line (Offset & "--> False:");
                         end if;
-                    end if;
+--                      end if;
 
                     Print_Node (First_Child (This_Curs), This_Indent + 1);
 
