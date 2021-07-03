@@ -166,9 +166,11 @@ package body Builder is
         Utilities.Print_Rows ("Build_Tree rows", Rows);
         Top_Split := Find_Best_Split (Rows);
         Utilities.Print_Question ("Level" & Integer'Image (Level) &
-                                    " Best", Top_Split.Question);
+                                  " Best", Top_Split.Question);
         Top_Node.Rows := Rows;
         Top_Node.Question := Top_Split.Question;
+        Top_Node.Decision := True;
+
         theTree.Insert_Child (Parent   => theTree.Root,
                               Before   => No_Element,
                               New_Item => Top_Node,
@@ -224,7 +226,8 @@ package body Builder is
     begin
         New_Line;
         Utilities.Print_Row ("Builder.Classify row", aRow);
-        Put_Line ("Builder.Classify Node_Type " & Node_Kind'Image (aNode.Node_Type));
+        Put_Line ("Builder.Classify Node_Type " &
+                    Node_Kind'Image (aNode.Node_Type));
         if aNode.Node_Type = Prediction_Kind then
             Put_Line ("Builder.Classify label: " &
                         To_String (aNode.Prediction.Label));
@@ -237,7 +240,7 @@ package body Builder is
             Result.Append (Prediction);
         else
             Utilities.Print_Question ("Builder.Classify", aNode.Question);
-            Put_Line ("Builder.Classify decidion: " &
+            Put_Line ("Builder.Classify decision: " &
                         Boolean'Image (aNode.Decision));
             if Match (aNode.Question, aRow) then
                 Result := Classify (aRow, First_Child (Node_Cursor));
