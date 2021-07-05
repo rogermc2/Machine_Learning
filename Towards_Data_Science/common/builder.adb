@@ -162,6 +162,9 @@ package body Builder is
             Leaf.Rows := Branch_Rows;
             Utilities.Print_Rows ("Prediction", Branch_Rows);
             New_Line;
+            theTree.Insert_Child (Parent   => Branch_Cursor,
+                                  Before   => No_Element,
+                                  New_Item => Leaf);
             theTree.Replace_Element (Branch_Cursor, Leaf);
          else
             New_Line;
@@ -213,6 +216,89 @@ package body Builder is
       return theTree;
 
    end Build_Tree;
+
+   --  -------------------------------------------------------------------------
+   --  A Leaf node classifies data.
+   --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
+   --  for each class, the number of times that the class appears in the rows
+   --  from the training data that reach this leaf.
+   function Build_Tree2 (Rows : Rows_Vector) return Tree_Type is
+      use Tree_Package;
+      theTree      : Tree_Type := Empty_Tree;
+      Top_Node     : Tree_Node_Type  (Top_Kind);
+      Top_Split    : Best_Data;
+      Top_Cursor   : Tree_Cursor;
+
+      procedure Add_New_Decision_Node (Rows          : Rows_Vector;
+                                       Parent_Cursor : Tree_Cursor;
+                                       Question      : Question_Data;
+                                       Decision      : Boolean) is
+         Node  : Tree_Node_Type (Decision_Kind);
+      begin
+         Node.Question := Question;
+         Node.Rows := Rows;
+         Node.Branch := Decision;
+         theTree.Insert_Child (Parent   => Parent_Cursor,
+                               Before   => No_Element,
+                               New_Item => Node);
+      end Add_New_Decision_Node;
+
+      procedure Add_Level (Rows          : Rows_Vector; Best_Split : Best_Data;
+                           Parent_Cursor : Tree_Cursor) is
+         --  Branch_Cursor is a cursor to an existing node which is the head
+         --  of this branch
+         Leaf             : Tree_Node_Type (Prediction_Kind);
+         True_Split       : Best_Data;
+         False_Split      : Best_Data;
+         True_Split_Rows  : Rows_Vector;
+         False_Split_Rows : Rows_Vector;
+         False_Node_Curs  : Tree_Cursor;
+         True_Node_Curs   : Tree_Cursor;
+      begin
+         if Best_Split.Gain = 0.0 then
+            Leaf.Prediction := Rows.First_Element;
+            Leaf.Rows := Rows;
+            Utilities.Print_Rows ("Prediction", Rows);
+            New_Line;
+            theTree.Replace_Element (Parent_Cursor, Leaf);
+         else
+            New_Line;
+            Utilities.Print_Question ("Add_Level Best", Best_Split.Question);
+            True_Split_Rows := Best_Split.True_Rows;
+            False_Split_Rows := Best_Split.False_Rows;
+            Add_New_Decision_Node (True_Split_Rows, Parent_Cursor,
+                                   Best_Split.Question, True);
+            Add_New_Decision_Node (False_Split_Rows, Parent_Cursor,
+                                   Best_Split.Question, False);
+            True_Node_Curs := First_Child (Parent_Cursor);
+            False_Node_Curs:= Last_Child  (Parent_Cursor);
+            True_Split := Find_Best_Split (True_Split_Rows);
+            False_Split := Find_Best_Split (False_Split_Rows);
+            Add_Level (True_Split_Rows, True_Split, True_Node_Curs);
+            Add_Level (False_Split_Rows, False_Split, False_Node_Curs);
+            New_Line;
+         end if;
+      end Add_Level;
+
+   begin
+      Utilities.Print_Rows ("Build_Tree rows", Rows);
+      Top_Split := Find_Best_Split (Rows);
+      Utilities.Print_Question ("Top Level Best split", Top_Split.Question);
+      --  A decision node contains a question an a set of rows for the
+      --  question to interrogate.
+      Top_Node.Rows := Rows;
+      Top_Node.Question := Top_Split.Question;
+      Top_Node.Branch := True;
+
+      theTree.Insert_Child (Parent   => theTree.Root,
+                            Before   => No_Element,
+                            New_Item => Top_Node,
+                            Position => Top_Cursor);
+      --  Top_Cursor is a cursor to this inserted child
+      Add_Level (Rows, Top_Split, Top_Cursor);
+      return theTree;
+
+   end Build_Tree2;
 
    --  ------------------------------------------------------------------------
 
