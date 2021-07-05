@@ -375,6 +375,10 @@ package body Utilities is
         end Print_Tree_Node;
 
     begin
+        Put_Line ("Print_Tree, Number of root children" &
+                    Integer'Image (Integer (Child_Count (aTree.Root))));
+        Put_Line ("Print_Tree, Number of 1st child children" &
+                    Integer'Image (Integer (Child_Count (First_Child (aTree.Root)))));
         Print_Tree_Node (First_Child (aTree.Root));
     end Print_Tree;
 
@@ -460,7 +464,7 @@ package body Utilities is
                     end case;
                     Put_Line ("?");
 
-                    if Node.Decision then
+                    if Node.Branch then
                         Put_Line (Offset & "--> True:");
                     else
                         Put_Line (Offset & "--> False:");

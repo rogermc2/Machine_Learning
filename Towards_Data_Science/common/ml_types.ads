@@ -90,7 +90,7 @@ package ML_Types is
       case Node_Type is
       when  Top_Kind | Decision_Kind =>
          Question   : Question_Data;
-         Decision   : Boolean := False;
+         Branch     : Boolean := True;
       when Prediction_Kind =>
          Prediction : Row_Data;
       end case;

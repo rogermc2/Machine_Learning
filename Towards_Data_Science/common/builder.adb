@@ -103,11 +103,11 @@ package body Builder is
     --  from the training data that reach this leaf.
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
-        theTree         : Tree_Type := Empty_Tree;
-        Top_Node        : Tree_Node_Type  (Top_Kind);
-        Top_Split       : Best_Data;
-        Next_Cursor     : Tree_Cursor;
-        Level           : Integer := 0;
+        theTree     : Tree_Type := Empty_Tree;
+        Top_Node    : Tree_Node_Type  (Top_Kind);
+        Top_Split   : Best_Data;
+        Next_Cursor : Tree_Cursor;
+        Level       : Integer := 0;
 
         procedure Add_New_Decision_Node (Rows          : Rows_Vector;
                                          Parent_Cursor : Tree_Cursor;
@@ -118,7 +118,7 @@ package body Builder is
         begin
             Node.Question := Question;
             Node.Rows := Rows;
-            Node.Decision := Decision;
+            Node.Branch := Decision;
             theTree.Insert_Child (Parent   => Parent_Cursor,
                                   Before   => No_Element,
                                   New_Item => Node,
@@ -169,17 +169,25 @@ package body Builder is
                                   " Best", Top_Split.Question);
         Top_Node.Rows := Rows;
         Top_Node.Question := Top_Split.Question;
-        Top_Node.Decision := True;
+        Top_Node.Branch := True;
 
         theTree.Insert_Child (Parent   => theTree.Root,
                               Before   => No_Element,
                               New_Item => Top_Node,
                               Position => Next_Cursor);
 
+        Put_Line ("Build_Tree, Number of root children" &
+                    Integer'Image (Integer (Child_Count (theTree.Root))));
+        Put_Line ("Build_Tree, Number of 1st child children" &
+                    Integer'Image (Integer (Child_Count (First_Child (theTree.Root)))));
         Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
         Recurse (Top_Split.True_Rows, Next_Cursor);
-        Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
-        Recurse (Top_Split.False_Rows, Next_Cursor);
+        Put_Line ("Build_Tree, Recurse 1 Number of 1st child children" &
+                    Integer'Image (Integer (Child_Count (First_Child (theTree.Root)))));
+--          Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
+--          Recurse (Top_Split.False_Rows, Next_Cursor);
+--          Put_Line ("Build_Tree, Recurse 2 Number of 1st child children" &
+--                      Integer'Image (Integer (Child_Count (First_Child (theTree.Root)))));
 
         return theTree;
 
@@ -241,7 +249,7 @@ package body Builder is
         else
             Utilities.Print_Question ("Builder.Classify", aNode.Question);
             Put_Line ("Builder.Classify decision: " &
-                        Boolean'Image (aNode.Decision));
+                        Boolean'Image (aNode.Branch));
             if Match (aNode.Question, aRow) then
                 Result := Classify (aRow, First_Child (Node_Cursor));
             else
