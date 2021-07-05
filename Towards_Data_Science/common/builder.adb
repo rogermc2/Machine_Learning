@@ -126,13 +126,14 @@ package body Builder is
                                Position => Next_Cursor);
       end Add_New_Decision_Node;
 
-      procedure Add_Branch (False_Rows   : Rows_Vector;
-                            False_Cursor : Tree_Cursor);
+      procedure Add_Branch (Branch_Rows   : Rows_Vector;
+                            Branch_Cursor : Tree_Cursor);
 
       procedure Add_False_Branch (False_Rows   : Rows_Vector;
                                   False_Cursor : Tree_Cursor) is
       begin
          False_Level := False_Level + 1;
+         Put_Line ("Build_Tree level" & Integer'Image (False_Level) & "F");
          Add_Branch (False_Rows, False_Cursor);
       end Add_False_Branch;
 
@@ -140,11 +141,14 @@ package body Builder is
                                  True_Cursor : Tree_Cursor) is
       begin
          True_Level := True_Level + 1;
+         Put_Line ("Build_Tree level" & Integer'Image (False_Level) & "T");
          Add_Branch (True_Rows, True_Cursor);
       end Add_True_Branch;
 
-      procedure Add_Branch (False_Rows   : Rows_Vector;
-                                  False_Cursor : Tree_Cursor) is
+      procedure Add_Branch (Branch_Rows   : Rows_Vector;
+                            Branch_Cursor : Tree_Cursor) is
+         --  Branch_Cursor is a cursor to an existing node which is the head
+         --  of this branch
          Best_Split       : Best_Data;
          Leaf             : Tree_Node_Type (Prediction_Kind);
          True_Split_Rows  : Rows_Vector;
@@ -152,30 +156,24 @@ package body Builder is
          False_Node_Curs  : Tree_Cursor;
          True_Node_Curs   : Tree_Cursor;
       begin
-         False_Level := False_Level + 1;
-         Best_Split := Find_Best_Split (False_Rows);
+         Best_Split := Find_Best_Split (Branch_Rows);
          if Best_Split.Gain = 0.0 then
-            Leaf.Prediction := False_Rows.First_Element;
-            Leaf.Rows := False_Rows;
-            Utilities.Print_Rows ("Prediction", False_Rows);
+            Leaf.Prediction := Branch_Rows.First_Element;
+            Leaf.Rows := Branch_Rows;
+            Utilities.Print_Rows ("Prediction", Branch_Rows);
             New_Line;
-            theTree.Insert_Child (Parent   => False_Cursor,
-                                  Before   => No_Element,
-                                  New_Item => Leaf);
+            theTree.Replace_Element (Branch_Cursor, Leaf);
          else
             New_Line;
-            Utilities.Print_Question ("False Level" & Integer'Image (False_Level) &
-                                        " Best", Best_Split.Question);
+            Utilities.Print_Question ("Add_Branch Best", Best_Split.Question);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
-            Add_New_Decision_Node (True_Split_Rows, False_Cursor,
+            Add_New_Decision_Node (True_Split_Rows, Branch_Cursor,
                                    Best_Split.Question, True, True_Node_Curs);
-            Add_New_Decision_Node (False_Split_Rows, False_Cursor,
+            Add_New_Decision_Node (False_Split_Rows, Branch_Cursor,
                                    Best_Split.Question, False, False_Node_Curs);
 
-            Put_Line ("Build_Tree level" & Integer'Image (False_Level) & "T");
             Add_True_Branch (True_Split_Rows, True_Node_Curs);
-            Put_Line ("Build_Tree level" & Integer'Image (False_Level) & "F");
             Add_False_Branch (False_Split_Rows, False_Node_Curs);
             New_Line;
          end if;
@@ -184,8 +182,10 @@ package body Builder is
    begin
       Utilities.Print_Rows ("Build_Tree rows", Rows);
       Top_Split := Find_Best_Split (Rows);
-      Utilities.Print_Question ("Level" & Integer'Image (True_Level) &
-                                  " Best", Top_Split.Question);
+      Utilities.Print_Question ("Top Level" & Integer'Image (True_Level) &
+                                " Best", Top_Split.Question);
+      --  A decision node contains a question an a set of rows for the
+      --  question to interrogate.
       Top_Node.Rows := Rows;
       Top_Node.Question := Top_Split.Question;
       Top_Node.Branch := True;
@@ -200,13 +200,13 @@ package body Builder is
       Put_Line ("Build_Tree, Number of 1st child children" &
                   Integer'Image (Integer (Child_Count (First_Child (theTree.Root)))));
       --  Add true branch to top node
-      Put_Line ("Build_Tree level" & Integer'Image (True_Level) & "T");
+      Put_Line ("Build_Tree true level" & Integer'Image (True_Level) & "T");
       Add_True_Branch (Top_Split.True_Rows, Top_Cursor);
       Put_Line ("Build_Tree, Add_True_Branch Number of 1st child children" &
                   Integer'Image (Integer (Child_Count (First_Child (theTree.Root)))));
 
       --  Add false branch to top node
-      Put_Line ("Build_Tree level" & Integer'Image (False_Level) & "F");
+      Put_Line ("Build_Tree false level" & Integer'Image (False_Level) & "F");
       Add_False_Branch (Top_Split.False_Rows, Top_Cursor);
       Put_Line ("Build_Tree, Add_False_Branch Number of 1st child children" &
                  Integer'Image (Integer (Child_Count (First_Child (theTree.Root)))));
