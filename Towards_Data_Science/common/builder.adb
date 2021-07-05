@@ -126,9 +126,24 @@ package body Builder is
                                Position => Next_Cursor);
       end Add_New_Decision_Node;
 
-      procedure Add_True_Branch (True_Rows   : Rows_Vector;
-                                 True_Cursor : Tree_Cursor);
+      procedure Add_Branch (False_Rows   : Rows_Vector;
+                            False_Cursor : Tree_Cursor);
+
       procedure Add_False_Branch (False_Rows   : Rows_Vector;
+                                  False_Cursor : Tree_Cursor) is
+      begin
+         False_Level := False_Level + 1;
+         Add_Branch (False_Rows, False_Cursor);
+      end Add_False_Branch;
+
+      procedure Add_True_Branch (True_Rows   : Rows_Vector;
+                                 True_Cursor : Tree_Cursor) is
+      begin
+         True_Level := True_Level + 1;
+         Add_Branch (True_Rows, True_Cursor);
+      end Add_True_Branch;
+
+      procedure Add_Branch (False_Rows   : Rows_Vector;
                                   False_Cursor : Tree_Cursor) is
          Best_Split       : Best_Data;
          Leaf             : Tree_Node_Type (Prediction_Kind);
@@ -164,45 +179,7 @@ package body Builder is
             Add_False_Branch (False_Split_Rows, False_Node_Curs);
             New_Line;
          end if;
-      end Add_False_Branch;
-
-      procedure Add_True_Branch (True_Rows   : Rows_Vector;
-                                 True_Cursor : Tree_Cursor) is
-         Best_Split       : Best_Data;
-         Leaf             : Tree_Node_Type (Prediction_Kind);
-         True_Split_Rows  : Rows_Vector;
-         False_Split_Rows : Rows_Vector;
-         False_Node_Curs  : Tree_Cursor;
-         True_Node_Curs   : Tree_Cursor;
-      begin
-         True_Level := True_Level + 1;
-         Best_Split := Find_Best_Split (True_Rows);
-         if Best_Split.Gain = 0.0 then
-            Leaf.Prediction := Rows.First_Element;
-            Leaf.Rows := True_Rows;
-            Utilities.Print_Rows ("Prediction", True_Rows);
-            New_Line;
-            theTree.Insert_Child (Parent   => True_Cursor,
-                                  Before   => No_Element,
-                                  New_Item => Leaf);
-         else
-            New_Line;
-            Utilities.Print_Question ("True Level" & Integer'Image (True_Level) &
-                                        " Best", Best_Split.Question);
-            True_Split_Rows := Best_Split.True_Rows;
-            False_Split_Rows := Best_Split.False_Rows;
-            Add_New_Decision_Node (True_Split_Rows, True_Cursor,
-                                   Best_Split.Question, True, True_Node_Curs);
-            Add_New_Decision_Node (False_Split_Rows, True_Cursor,
-                                   Best_Split.Question, False, False_Node_Curs);
-
-            Put_Line ("Build_Tree level" & Integer'Image (True_Level) & "T");
-            Add_True_Branch (True_Split_Rows, True_Node_Curs);
-            Put_Line ("Build_Tree level" & Integer'Image (True_Level) & "F");
-            Add_False_Branch (False_Split_Rows, False_Node_Curs);
-            New_Line;
-         end if;
-      end Add_True_Branch;
+      end Add_Branch;
 
    begin
       Utilities.Print_Rows ("Build_Tree rows", Rows);
