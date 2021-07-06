@@ -126,8 +126,8 @@ package body Builder is
                             Parent_Cursor : Tree_Cursor) is
          --  Branch_Cursor is a cursor to an existing node which is the head
          --  of this branch
-         Leaf             : Tree_Node_Type (Prediction_Kind);
          Best_Split       : constant Best_Data := Find_Best_Split (Rows);
+         Leaf             : Tree_Node_Type (Prediction_Kind);
          True_Split       : Best_Data;
          False_Split      : Best_Data;
          True_Split_Rows  : Rows_Vector;
@@ -137,6 +137,8 @@ package body Builder is
       begin
          Put_Line ("Add_Branch parent Node_Kind: " &
                      Node_Kind'Image (Element (Parent_Cursor).Node_Type));
+         Put_Line ("Add_Branch Best_Split.Gain: " &
+                     Float'Image (Best_Split.Gain));
          Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
             Leaf.Prediction := Rows.First_Element;
