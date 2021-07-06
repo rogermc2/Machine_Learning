@@ -25,6 +25,7 @@ package Builder is
 
     function Best_Question (Data : Best_Data) return Question_Data;
     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
+    function Build_Tree2 (Rows : Rows_Vector) return Tree_Type;
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
                        return ML_Types.Prediction_Data_List;
     function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map;
