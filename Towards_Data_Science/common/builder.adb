@@ -104,7 +104,7 @@ package body Builder is
    function Build_Tree (Rows : Rows_Vector) return Tree_Type is
       use Tree_Package;
       theTree    : Tree_Type := Empty_Tree;
-      Top_Node   : Tree_Node_Type  (Top_Kind);
+      Top_Node   : Tree_Node_Type (Decision_Kind);
       Top_Split  : Best_Data;
       Top_Cursor : Tree_Cursor;
 
@@ -122,11 +122,12 @@ package body Builder is
                                New_Item => Node);
       end Add_New_Decision_Node;
 
-      procedure Add_Branch (Rows          : Rows_Vector; Best_Split : Best_Data;
+      procedure Add_Branch (Rows          : Rows_Vector;
                             Parent_Cursor : Tree_Cursor) is
          --  Branch_Cursor is a cursor to an existing node which is the head
          --  of this branch
          Leaf             : Tree_Node_Type (Prediction_Kind);
+         Best_Split       : constant Best_Data := Find_Best_Split (Rows);
          True_Split       : Best_Data;
          False_Split      : Best_Data;
          True_Split_Rows  : Rows_Vector;
@@ -134,6 +135,9 @@ package body Builder is
          False_Node_Curs  : Tree_Cursor;
          True_Node_Curs   : Tree_Cursor;
       begin
+         Put_Line ("Add_Branch parent Node_Kind: " &
+                     Node_Kind'Image (Element (Parent_Cursor).Node_Type));
+         Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
             Leaf.Prediction := Rows.First_Element;
             Leaf.Rows := Rows;
@@ -141,8 +145,12 @@ package body Builder is
             New_Line;
             theTree.Replace_Element (Parent_Cursor, Leaf);
          else
+            Utilities.Print_Question ("Add_Branch Best split",
+                                      Best_Split.Question);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
+            Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
+            Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
             Add_New_Decision_Node (True_Split_Rows, Parent_Cursor,
                                    Best_Split.Question, True);
             Add_New_Decision_Node (False_Split_Rows, Parent_Cursor,
@@ -151,8 +159,16 @@ package body Builder is
             False_Node_Curs:= Last_Child  (Parent_Cursor);
             True_Split := Find_Best_Split (True_Split_Rows);
             False_Split := Find_Best_Split (False_Split_Rows);
-            Add_Branch (True_Split_Rows, True_Split, True_Node_Curs);
-            Add_Branch (False_Split_Rows, False_Split, False_Node_Curs);
+            Put_Line ("Add_Branch True Node_Kind: " &
+                        Node_Kind'Image (Element (True_Node_Curs).Node_Type));
+      Put_Line ("Build_Tree True_Node_Curs: " &
+                 Node_Kind'Image (Element (True_Node_Curs).Node_Type));
+            Add_Branch (True_Split_Rows, True_Node_Curs);
+            Put_Line ("Add_Branch False Node_Kind: " &
+                        Node_Kind'Image (Element (True_Node_Curs).Node_Type));
+      Put_Line ("Build_Tree False_Node_Curs: " &
+                 Node_Kind'Image (Element (False_Node_Curs).Node_Type));
+            Add_Branch (False_Split_Rows, False_Node_Curs);
             New_Line;
          end if;
       end Add_Branch;
@@ -171,8 +187,21 @@ package body Builder is
                             Before   => No_Element,
                             New_Item => Top_Node,
                             Position => Top_Cursor);
+      Put_Line ("Build_Tree First_Child inserted: " &
+                 Node_Kind'Image (Element (First_Child (theTree.Root)).Node_Type));
       --  Top_Cursor is a cursor to this inserted child
-      Add_Branch (Rows, Top_Split, Top_Cursor);
+      Add_Branch (Top_Split.True_Rows, Top_Cursor);
+      Put_Line ("Build_Tree First_Child Top_Split: " &
+                 Node_Kind'Image (Element (First_Child (theTree.Root)).Node_Type));
+      Put_Line ("Build_Tree First_Child before false Top_Cursor: " &
+                 Node_Kind'Image (Element (Top_Cursor).Node_Type));
+      New_Line;
+      Add_Branch (Top_Split.False_Rows, Top_Cursor);
+      New_Line;
+      Put_Line ("Build_Tree First_Child after false: " &
+                 Node_Kind'Image (Element (First_Child (theTree.Root)).Node_Type));
+      Put_Line ("Build_Tree First_Child after false Top_Cursor: " &
+                 Node_Kind'Image (Element (Top_Cursor).Node_Type));
       return theTree;
 
    end Build_Tree;

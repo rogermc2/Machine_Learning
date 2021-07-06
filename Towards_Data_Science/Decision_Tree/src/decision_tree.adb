@@ -172,10 +172,6 @@ begin
     aTree := Build_Tree (Training_Data);
     New_Line;
 
---      Put_Line ("Print Nodes");
---      Utilities.Do_Node (Tree_Package.First_Child (aTree.Root));
---      New_Line;
-
     Put_Line ("Print Tree");
     Utilities.Print_Tree (aTree);
     New_Line;

@@ -172,7 +172,6 @@ package body Utilities is
         Put_Line ("  Node data:");
         Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
         case Node.Node_Type is
-            when Top_Kind => null;
             when Prediction_Kind => null;
             when Decision_Kind => null;
         end case;
@@ -312,8 +311,7 @@ package body Utilities is
         First  : Boolean := True;
 
         procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
-            This_Curs   : constant Cursor := Curs;
-            Node        : constant Tree_Node_Type := Element (This_Curs);
+            Node        : constant Tree_Node_Type := Element (Curs);
             True_Child  : Cursor;
             False_Child : Cursor;
             This_Indent : Natural;
@@ -330,11 +328,9 @@ package body Utilities is
                 pos       : Natural := 1;
                 UB_String : Unbounded_String;
             begin
-                if Is_Leaf  (This_Curs) then
+                if Is_Leaf  (Curs) then
                     Print_Prediction (Node, This_Indent);
                 else
-                    True_Child := First_Child (This_Curs);
-                    False_Child := Last_Child (This_Curs);
                     if Indent > 0 then
                         while pos < This_Indent - 1 loop
                             Offset (pos .. pos + 1) := "  ";
@@ -346,6 +342,8 @@ package body Utilities is
                         Put (Offset);
                     end if;
 
+                    put_Line ("Node type: " & Node_Kind'Image (Node.Node_Type));
+                    Print_Question ("Node", Node.Question);
                     Put ("Is " & To_String (Node.Question.Feature_Name));
                     case Node.Question.Feature_Kind is
                     when Integer_Type =>
@@ -364,10 +362,13 @@ package body Utilities is
                         end if;
                     end case;
                     Put_Line ("?");
+                    Print_Rows ("Rows", Node.Rows);
 
+                    True_Child := First_Child (Curs);
                     Put_Line (Offset & "--> True:");
                     Print_Tree_Node (True_Child, This_Indent + 1);
 
+                    False_Child := Next_Sibling (True_Child);
                     Put_Line (Offset & "--> False:");
                     Print_Tree_Node (False_Child, This_Indent + 1);
                 end if;
@@ -375,109 +376,11 @@ package body Utilities is
         end Print_Tree_Node;
 
     begin
-        Put_Line ("Print_Tree, Number of root children" &
-                    Integer'Image (Integer (Child_Count (aTree.Root))));
-        Put_Line ("Print_Tree, Number of 1st child children" &
-                    Integer'Image (Integer (Child_Count (First_Child (aTree.Root)))));
+        Put_Line ("Print_Tree parent First_Child: " &
+                     Node_Kind'Image (Element (First_Child (aTree.Root)).Node_Type));
+
         Print_Tree_Node (First_Child (aTree.Root));
     end Print_Tree;
-
-    --  -------------------------------------------------------------------------
-
-    procedure Do_Node (Node_Cursor : Tree_Cursor) is
-        use Tree_Package;
-        CN_First : Cursor;
-        CN_Last  : Cursor;
-        Level    : Integer := 0;
-
-        procedure Do_Element (N_Curs : Tree_Cursor) is
-            Node  : constant Tree_Node_Type := Element (N_Curs);
-        begin
-            Print_Node (Node);
-        end Do_Element;
-
-    begin
-        Level := Level + 1;
-        CN_First := First_Child (Node_Cursor);
-        CN_Last := Last_Child (Node_Cursor);
-        Put_Line ("Do_Node Level " & Integer'Image (Level));
-        Do_Node (CN_First);
-        Do_Node (CN_Last);
-        if not Is_Root (Node_Cursor) then
-            Do_Element (Node_Cursor);
-        end if;
-    end Do_Node;
-
-    --  -------------------------------------------------------------------------
-
-    procedure Print_Tree2 (aTree : Tree_Type) is
-        use Tree_Package;
-        First  : Boolean := True;
-        Indent : Natural := 0;
-
-        procedure Print_Node (Curs : Cursor) is
-            Node        : constant Tree_Node_Type := Element (Curs);
-            This_Indent : Natural;
-        begin
-            if First then
-                This_Indent := 0;
-                First := False;
-            else
-                Indent := Indent + 1;
-            end if;
-
-            declare
-                Offset    : String (1 .. This_Indent + 1) := (others => ' ');
-                pos       : Natural := 1;
-                UB_String : Unbounded_String;
-            begin
-                if Is_Leaf  (Curs) then
-                    Print_Prediction (Node, This_Indent);
-                else
-                    if Indent > 0 then
-                        while pos < This_Indent - 1 loop
-                            Offset (pos .. pos + 1) := "  ";
-                            pos := pos + 2;
-                        end loop;
-                        if pos < This_Indent + 1 then
-                            Offset (This_Indent) := ' ';
-                        end if;
-                        Put (Offset);
-                    end if;
-                    This_Indent := This_Indent + 1;
-                    Put ("Is " & To_String (Node.Question.Feature_Name));
-                    case Node.Question.Feature_Kind is
-                    when Integer_Type =>
-                        Put (" >= " & Integer'Image (Node.Question.Integer_Value));
-                    when Float_Type =>
-                        Put (" >= " & Float'Image (Node.Question.Float_Value));
-                    when Boolean_Type =>
-                        Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
-                    when UB_String_Type =>
-                        UB_String := Node.Question.UB_String_Value;
-                        if Is_Integer (UB_String) or else
-                          Is_Float (UB_String) then
-                            Put (" >= " & To_String (UB_String));
-                        else
-                            Put (" = " & To_String (UB_String));
-                        end if;
-                    end case;
-                    Put_Line ("?");
-
-                    if Node.Branch then
-                        Put_Line (Offset & "--> True:");
-                    else
-                        Put_Line (Offset & "--> False:");
-                    end if;
-
-                end if;
-            end; --  declare block
-        end Print_Node;
-
-    begin
-        Print_Node (First_Child (aTree.Root));
-        Iterate_Children (aTree.Root, Print_Node'Access);
-    end Print_Tree2;
 
     --  -------------------------------------------------------------------------
 
