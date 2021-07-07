@@ -99,6 +99,7 @@ package body Builder is
       use Tree_Package;
       theTree    : Tree_Type := Empty_Tree;
       Top_Split  : Best_Data;
+      First      : Boolean := True;
 
       procedure Add_New_Decision_Node (Rows          : Rows_Vector;
                                        Parent_Cursor : Tree_Cursor;
@@ -119,7 +120,7 @@ package body Builder is
                             Parent_Cursor : Tree_Cursor) is
          --  Parent_Cursor is a cursor to an existing node which is the head
          --  of this branch
-         This_Cursor      : Tree_Cursor := Parent_Cursor;
+         This_Cursor      : Tree_Cursor;
          Leaf             : Tree_Node_Type (Prediction_Kind);
          True_Split       : Best_Data;
          False_Split      : Best_Data;
@@ -127,21 +128,22 @@ package body Builder is
          False_Split_Rows : Rows_Vector;
          False_Node_Curs  : Tree_Cursor;
          True_Node_Curs   : Tree_Cursor;
-         First            : Boolean := True;
       begin
          if First then
-            Add_New_Decision_Node (Rows, theTree.Root,
+            Add_New_Decision_Node (Rows, Parent_Cursor,
                                    Best_Split.Question, True);
-            This_Cursor := First_Child (theTree.Root);
+            This_Cursor := First_Child (Parent_Cursor);
+            Add_Branch (Best_Split.True_Rows, Best_Split, This_Cursor);
+            Add_Branch (Best_Split.False_Rows, Best_Split, This_Cursor);
             First := False;
-         end if;
 
-         if Best_Split.Gain = 0.0 then
+         elsif Best_Split.Gain = 0.0 then
             Leaf.Prediction := Rows.First_Element;
             Leaf.Rows := Rows;
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
-            theTree.Insert_Child (This_Cursor, No_Element, Leaf);
+            theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
+
          else
             Utilities.Print_Question ("Add_Branch Best split",
                                       Best_Split.Question);
@@ -149,13 +151,13 @@ package body Builder is
             False_Split_Rows := Best_Split.False_Rows;
             Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
             Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
-            Add_New_Decision_Node (True_Split_Rows, This_Cursor,
+            Add_New_Decision_Node (True_Split_Rows, Parent_Cursor,
                                    Best_Split.Question, True);
-            Add_New_Decision_Node (False_Split_Rows, This_Cursor,
+            Add_New_Decision_Node (False_Split_Rows, Parent_Cursor,
                                    Best_Split.Question, False);
 
-            True_Node_Curs := First_Child (This_Cursor);
-            False_Node_Curs := Last_Child  (This_Cursor);
+            True_Node_Curs := First_Child (Parent_Cursor);
+            False_Node_Curs := Last_Child  (Parent_Cursor);
             True_Split := Find_Best_Split (True_Split_Rows);
             False_Split := Find_Best_Split (False_Split_Rows);
             Add_Branch (True_Split_Rows, True_Split, True_Node_Curs);
