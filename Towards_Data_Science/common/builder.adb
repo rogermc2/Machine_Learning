@@ -98,8 +98,6 @@ package body Builder is
    function Build_Tree (Rows : Rows_Vector) return Tree_Type is
       use Tree_Package;
       theTree    : Tree_Type := Empty_Tree;
-      Top_Split  : Best_Data;
-      First      : Boolean := True;
 
       procedure Add_New_Decision_Node (Rows          : Rows_Vector;
                                        Parent_Cursor : Tree_Cursor;
@@ -116,26 +114,23 @@ package body Builder is
       end Add_New_Decision_Node;
 
       procedure Add_Branch (Rows          : Rows_Vector;
-                            Best_Split    : Best_Data;
                             Parent_Cursor : Tree_Cursor) is
          --  Parent_Cursor is a cursor to an existing node which is the head
          --  of this branch
          This_Cursor      : Tree_Cursor;
+         Best_Split       : constant Best_Data := Find_Best_Split (Rows);
          Leaf             : Tree_Node_Type (Prediction_Kind);
-         True_Split       : Best_Data;
-         False_Split      : Best_Data;
          True_Split_Rows  : Rows_Vector;
          False_Split_Rows : Rows_Vector;
          False_Node_Curs  : Tree_Cursor;
          True_Node_Curs   : Tree_Cursor;
       begin
-         if First then
+         if Parent_Cursor = theTree.Root then
             Add_New_Decision_Node (Rows, Parent_Cursor,
                                    Best_Split.Question, True);
             This_Cursor := First_Child (Parent_Cursor);
-            Add_Branch (Best_Split.True_Rows, Best_Split, This_Cursor);
-            Add_Branch (Best_Split.False_Rows, Best_Split, This_Cursor);
-            First := False;
+            Add_Branch (Best_Split.True_Rows, This_Cursor);
+            Add_Branch (Best_Split.False_Rows, This_Cursor);
 
          elsif Best_Split.Gain = 0.0 then
             Leaf.Prediction := Rows.First_Element;
@@ -158,21 +153,14 @@ package body Builder is
 
             True_Node_Curs := First_Child (Parent_Cursor);
             False_Node_Curs := Last_Child  (Parent_Cursor);
-            True_Split := Find_Best_Split (True_Split_Rows);
-            False_Split := Find_Best_Split (False_Split_Rows);
-            Add_Branch (True_Split_Rows, True_Split, True_Node_Curs);
-            Add_Branch (False_Split_Rows, False_Split, False_Node_Curs);
+            Add_Branch (True_Split_Rows, True_Node_Curs);
+            Add_Branch (False_Split_Rows,False_Node_Curs);
             New_Line;
          end if;
       end Add_Branch;
 
    begin
-      Top_Split := Find_Best_Split (Rows);
---        Put_Line ("Build_Tree initial top Node Child_Count"
---                  & Integer'Image (Integer (Child_Count (theTree.Root))));
-      Add_Branch (Rows, Top_Split, theTree.Root);
---        Put_Line ("Build_Tree final top Node Child_Count"
---                  & Integer'Image (Integer (Child_Count (theTree.Root))));
+      Add_Branch (Rows, theTree.Root);
 
       return theTree;
 
