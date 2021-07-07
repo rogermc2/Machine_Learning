@@ -311,6 +311,7 @@ package body Utilities is
         First  : Boolean := True;
 
         procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
+            use Ada.Containers;
             Node        : constant Tree_Node_Type := Element (Curs);
             True_Child  : Cursor;
             False_Child : Cursor;
@@ -342,7 +343,6 @@ package body Utilities is
                         Put (Offset);
                     end if;
 
-                    put_Line ("Node type: " & Node_Kind'Image (Node.Node_Type));
                     Print_Question ("Node", Node.Question);
                     Put ("Is " & To_String (Node.Question.Feature_Name));
                     case Node.Question.Feature_Kind is
@@ -367,18 +367,16 @@ package body Utilities is
                     True_Child := First_Child (Curs);
                     Put_Line (Offset & "--> True:");
                     Print_Tree_Node (True_Child, This_Indent + 1);
-
-                    False_Child := Next_Sibling (True_Child);
-                    Put_Line (Offset & "--> False:");
-                    Print_Tree_Node (False_Child, This_Indent + 1);
+                    if Child_Count (Curs) > 1 then
+                        False_Child := Next_Sibling (True_Child);
+                        Put_Line (Offset & "--> False:");
+                        Print_Tree_Node (False_Child, This_Indent + 1);
+                    end if;
                 end if;
             end; --  declare block
         end Print_Tree_Node;
 
     begin
-        Put_Line ("Print_Tree parent First_Child: " &
-                     Node_Kind'Image (Element (First_Child (aTree.Root)).Node_Type));
-
         Print_Tree_Node (First_Child (aTree.Root));
     end Print_Tree;
 
