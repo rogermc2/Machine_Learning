@@ -134,8 +134,16 @@ package body Builder is
             Utilities.Print_Rows ("Add_Branch top node False_Split_Rows", False_Split_Rows);
             New_Line;
             This_Cursor := First_Child (Parent_Cursor);
+         Put_Line ("Add_Branch Root Child_Count"
+                   & Integer'Image (Integer (Child_Count (Parent_Cursor))));
+         Put_Line ("Add_Branch First_Child Child_Count"
+                   & Integer'Image (Integer (Child_Count (This_Cursor))));
             Add_Branch (Best_Split.True_Rows, This_Cursor);
+         Put_Line ("Add_Branch First_Child branch added Child_Count"
+                   & Integer'Image (Integer (Child_Count (This_Cursor))));
             Add_Branch (Best_Split.False_Rows, This_Cursor);
+         Put_Line ("Add_Branch First_Child 2nd  branch added Child_Count"
+                   & Integer'Image (Integer (Child_Count (This_Cursor))));
 
          elsif Best_Split.Gain = 0.0 then
             Leaf.Prediction := Rows.First_Element;

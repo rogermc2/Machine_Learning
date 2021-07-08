@@ -308,7 +308,6 @@ package body Utilities is
 
    procedure Print_Tree (aTree : Tree_Type) is
       use Tree_Package;
-      First  : Boolean := True;
       Level  : Integer := 0;
 
       procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
@@ -321,12 +320,11 @@ package body Utilities is
       begin
          Level := Level + 1;
          This_Level := Level;
---           Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level));
---           Put_Line ("Print_Tree_Node Child_Count"
---                     & Integer'Image (Integer (Child_Count (Curs))));
-         if First then
+         Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level));
+         Put_Line ("Print_Tree_Node Child_Count"
+                   & Integer'Image (Integer (Child_Count (Curs))));
+         if Curs = aTree.Root then
             This_Indent := 0;
-            First := False;
          else
             This_Indent := Indent + 1;
          end if;
@@ -337,8 +335,8 @@ package body Utilities is
             UB_String : Unbounded_String;
          begin
             if Is_Leaf  (Curs) then
---                 Put_Line ("Print_Tree_Node Level: " &
---                             Integer'Image (This_Level) & "P");
+               Put_Line ("Print_Tree_Node Level: " &
+                           Integer'Image (This_Level) & "P");
                Print_Prediction (Node, This_Indent);
             else
                if Indent > 0 then
@@ -372,15 +370,15 @@ package body Utilities is
                end case;
                Put_Line ("?");
                Print_Rows ("Rows", Node.Rows);
---                 Put_Line ("Print_Tree_Node Child_Count"
---                           & Integer'Image (Integer (Child_Count (Curs))));
+               Put_Line ("Print_Tree_Node Child_Count"
+                         & Integer'Image (Integer (Child_Count (Curs))));
 
                True_Child := First_Child (Curs);
---                 Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level) & "T");
+               Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level) & "T");
                Put_Line (Offset & "--> True:");
                Print_Tree_Node (True_Child, This_Indent + 1);
                if Child_Count (Curs) > 1 then
---                    Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level) & "F");
+                  Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level) & "F");
                   False_Child := Next_Sibling (True_Child);
 --                    False_Child := Last_Child (Curs);
                   Put_Line (Offset & "--> False:");
@@ -392,8 +390,8 @@ package body Utilities is
       end Print_Tree_Node;
 
    begin
---        Put_Line ("Print_Tree top Node Child_Count"
---                   & Integer'Image (Integer (Child_Count (aTree.Root))));
+      Put_Line ("Print_Tree top Node Child_Count"
+                 & Integer'Image (Integer (Child_Count (aTree.Root))));
       Print_Tree_Node (First_Child (aTree.Root));
    end Print_Tree;
 
