@@ -130,27 +130,31 @@ package body Builder is
                                       Best_Split.Question);
             Add_New_Decision_Node (Rows, Parent_Cursor,
                                    Best_Split.Question, True);
-            Utilities.Print_Rows ("Add_Branch top node True_Split_Rows", True_Split_Rows);
-            Utilities.Print_Rows ("Add_Branch top node False_Split_Rows", False_Split_Rows);
+            Utilities.Print_Rows ("Add_Branch top node True_Split_Rows",
+                                  Best_Split.True_Rows);
+            Utilities.Print_Rows ("Add_Branch top node False_Split_Rows",
+                                  Best_Split.False_Rows);
             New_Line;
             This_Cursor := First_Child (Parent_Cursor);
-         Put_Line ("Add_Branch Root Child_Count"
-                   & Integer'Image (Integer (Child_Count (Parent_Cursor))));
-         Put_Line ("Add_Branch First_Child Child_Count"
-                   & Integer'Image (Integer (Child_Count (This_Cursor))));
+--           Put_Line ("Add_Branch Root Child_Count"
+--                     & Integer'Image (Integer (Child_Count (Parent_Cursor))));
+--           Put_Line ("Add_Branch First_Child Child_Count"
+--                     & Integer'Image (Integer (Child_Count (This_Cursor))));
             Add_Branch (Best_Split.True_Rows, This_Cursor);
-         Put_Line ("Add_Branch First_Child branch added Child_Count"
-                   & Integer'Image (Integer (Child_Count (This_Cursor))));
+--           Put_Line ("Add_Branch First_Child branch added Child_Count"
+--                     & Integer'Image (Integer (Child_Count (This_Cursor))));
             Add_Branch (Best_Split.False_Rows, This_Cursor);
-         Put_Line ("Add_Branch First_Child 2nd  branch added Child_Count"
-                   & Integer'Image (Integer (Child_Count (This_Cursor))));
+--           Put_Line ("Add_Branch First_Child 2nd  branch added Child_Count"
+--                     & Integer'Image (Integer (Child_Count (This_Cursor))));
+--           Put_Line ("Add_Branch Root Child_Count"
+--                     & Integer'Image (Integer (Child_Count (Parent_Cursor))));
 
          elsif Best_Split.Gain = 0.0 then
             Leaf.Prediction := Rows.First_Element;
             Leaf.Rows := Rows;
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
-            theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
+            theTree.Replace_Element (Parent_Cursor, Leaf);
 
          else
             Utilities.Print_Question ("Add_Branch Best split",
