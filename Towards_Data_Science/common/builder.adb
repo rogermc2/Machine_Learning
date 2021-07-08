@@ -126,8 +126,13 @@ package body Builder is
          True_Node_Curs   : Tree_Cursor;
       begin
          if Parent_Cursor = theTree.Root then
+            Utilities.Print_Question ("Add_Branch top node Best split",
+                                      Best_Split.Question);
             Add_New_Decision_Node (Rows, Parent_Cursor,
                                    Best_Split.Question, True);
+            Utilities.Print_Rows ("Add_Branch top node True_Split_Rows", True_Split_Rows);
+            Utilities.Print_Rows ("Add_Branch top node False_Split_Rows", False_Split_Rows);
+            New_Line;
             This_Cursor := First_Child (Parent_Cursor);
             Add_Branch (Best_Split.True_Rows, This_Cursor);
             Add_Branch (Best_Split.False_Rows, This_Cursor);
