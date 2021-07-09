@@ -150,11 +150,31 @@ package body Builder is
 --                     & Integer'Image (Integer (Child_Count (Parent_Cursor))));
 
          elsif Best_Split.Gain = 0.0 then
+            New_Line;
+            Put_Line ("Add_Branch Best_Split.Gain = 0.0.");
             Leaf.Prediction := Rows.First_Element;
             Leaf.Rows := Rows;
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
-            theTree.Replace_Element (Parent_Cursor, Leaf);
+            if Is_Leaf (Parent_Cursor) then
+                    theTree.Replace_Element (Parent_Cursor, Leaf);
+            elsif Is_Leaf (First_Child (Parent_Cursor)) then
+                    theTree.Replace_Element (First_Child (Parent_Cursor), Leaf);
+            elsif Is_Leaf (Last_Child (Parent_Cursor)) then
+                    theTree.Replace_Element (Last_Child (Parent_Cursor), Leaf);
+            end if;
+            Put_Line ("Add_Branch after Replace_Element, Parent is leaf: " &
+                        Boolean'Image (Is_Leaf (Parent_Cursor)));
+            Put_Line ("Add_Branch Parent_Cursor Child is leaf: " &
+                        Boolean'Image (Is_Leaf (First_Child (Parent_Cursor))));
+            Put_Line ("Add_Branch after Replace_Element, Parent child count: " &
+                     Integer'Image (Integer (Child_Count (Parent_Cursor))));
+            New_Line;
+            Put_Line ("Add_Branch after Replace_Element, Element (Parent_Cursor): ");
+            Utilities.Print_Node (Element (Parent_Cursor));
+            Delete_Children (theTree, Parent_Cursor);
+            Put_Line ("Add_Branch after Delete_Children, Element (Parent_Cursor): ");
+            Utilities.Print_Node (Element (Parent_Cursor));
 
          else
             Utilities.Print_Question ("Add_Branch Best split",

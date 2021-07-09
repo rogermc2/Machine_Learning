@@ -350,6 +350,12 @@ package body Utilities is
                   Put (Offset);
                end if;
 
+               Put_Line ("Node type: " & Node_Kind'Image (Node.Node_Type));
+               if Node.Node_Type = Prediction_Kind then
+                       Print_Prediction (Node);
+               end if;
+
+               Print_Question ("Node", Node.Question);
                Print_Question ("Node", Node.Question);
                Put ("Is " & To_String (Node.Question.Feature_Name));
                case Node.Question.Feature_Kind is
