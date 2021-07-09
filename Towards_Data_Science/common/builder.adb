@@ -117,7 +117,6 @@ package body Builder is
                             Parent_Cursor : Tree_Cursor) is
          --  Parent_Cursor is a cursor to an existing node which is the head
          --  of this branch
-         This_Cursor      : Tree_Cursor;
          Best_Split       : constant Best_Data := Find_Best_Split (Rows);
          Leaf             : Tree_Node_Type (Prediction_Kind);
          True_Split_Rows  : Rows_Vector;
@@ -125,56 +124,17 @@ package body Builder is
          False_Node_Curs  : Tree_Cursor;
          True_Node_Curs   : Tree_Cursor;
       begin
-         if Parent_Cursor = theTree.Root then
-            Utilities.Print_Question ("Add_Branch top node Best split",
-                                      Best_Split.Question);
-            Add_New_Decision_Node (Rows, Parent_Cursor,
-                                   Best_Split.Question, True);
-            Utilities.Print_Rows ("Add_Branch top node True_Split_Rows",
-                                  Best_Split.True_Rows);
-            Utilities.Print_Rows ("Add_Branch top node False_Split_Rows",
-                                  Best_Split.False_Rows);
+         if Best_Split.Gain = 0.0 then
             New_Line;
-            This_Cursor := First_Child (Parent_Cursor);
---           Put_Line ("Add_Branch Root Child_Count"
---                     & Integer'Image (Integer (Child_Count (Parent_Cursor))));
---           Put_Line ("Add_Branch First_Child Child_Count"
---                     & Integer'Image (Integer (Child_Count (This_Cursor))));
-            Add_Branch (Best_Split.True_Rows, This_Cursor);
---           Put_Line ("Add_Branch First_Child branch added Child_Count"
---                     & Integer'Image (Integer (Child_Count (This_Cursor))));
-            Add_Branch (Best_Split.False_Rows, This_Cursor);
---           Put_Line ("Add_Branch First_Child 2nd  branch added Child_Count"
---                     & Integer'Image (Integer (Child_Count (This_Cursor))));
---           Put_Line ("Add_Branch Root Child_Count"
---                     & Integer'Image (Integer (Child_Count (Parent_Cursor))));
-
-         elsif Best_Split.Gain = 0.0 then
-            New_Line;
-            Put_Line ("Add_Branch Best_Split.Gain = 0.0.");
             Leaf.Prediction := Rows.First_Element;
             Leaf.Rows := Rows;
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
-            if Is_Leaf (Parent_Cursor) then
-                    theTree.Replace_Element (Parent_Cursor, Leaf);
-            elsif Is_Leaf (First_Child (Parent_Cursor)) then
-                    theTree.Replace_Element (First_Child (Parent_Cursor), Leaf);
-            elsif Is_Leaf (Last_Child (Parent_Cursor)) then
-                    theTree.Replace_Element (Last_Child (Parent_Cursor), Leaf);
+            if Parent_Cursor = theTree.Root then
+               theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
+            else
+               theTree.Replace_Element (Parent_Cursor, Leaf);
             end if;
-            Put_Line ("Add_Branch after Replace_Element, Parent is leaf: " &
-                        Boolean'Image (Is_Leaf (Parent_Cursor)));
-            Put_Line ("Add_Branch Parent_Cursor Child is leaf: " &
-                        Boolean'Image (Is_Leaf (First_Child (Parent_Cursor))));
-            Put_Line ("Add_Branch after Replace_Element, Parent child count: " &
-                     Integer'Image (Integer (Child_Count (Parent_Cursor))));
-            New_Line;
-            Put_Line ("Add_Branch after Replace_Element, Element (Parent_Cursor): ");
-            Utilities.Print_Node (Element (Parent_Cursor));
-            Delete_Children (theTree, Parent_Cursor);
-            Put_Line ("Add_Branch after Delete_Children, Element (Parent_Cursor): ");
-            Utilities.Print_Node (Element (Parent_Cursor));
 
          else
             Utilities.Print_Question ("Add_Branch Best split",
@@ -236,7 +196,7 @@ package body Builder is
    --  container.
 
    function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
-                       return Prediction_Data_List is
+                      return Prediction_Data_List is
       use Tree_Package;
       aNode      : constant Tree_Node_Type := Element (Node_Cursor);
       Prediction : Prediction_Data;
@@ -372,7 +332,7 @@ package body Builder is
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Question : Question_Data; Example_Data : Row_Data)
-                    return Boolean is
+                   return Boolean is
       Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
       Feat_Index       : Class_Range;
       Example_Feature  : Unbounded_String;
@@ -484,7 +444,7 @@ package body Builder is
    --  ---------------------------------------------------------------------------
 
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                        return Partitioned_Rows is
+                       return Partitioned_Rows is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
       Data       : Row_Data;
