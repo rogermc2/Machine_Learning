@@ -312,7 +312,7 @@ package body Utilities is
 
         procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
             use Ada.Containers;
-            Node        : constant Tree_Node_Type := Element (Curs);
+            Node        : Tree_Node_Type;
             This_Level  : Integer := 0;
             True_Child  : Cursor;
             False_Child : Cursor;
@@ -323,8 +323,10 @@ package body Utilities is
             Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level));
             if Curs = aTree.Root then
                 This_Indent := 0;
+                Node := Element (First_Child (Curs));
             else
                 This_Indent := Indent + 1;
+                Node := Element (Curs);
             end if;
 
             declare
@@ -349,6 +351,7 @@ package body Utilities is
                     end if;
 
                     if Node.Node_Type = Prediction_Kind then
+                        Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
                         Print_Prediction (Node);
                     else
                         Print_Question ("Node", Node.Question);
@@ -391,7 +394,7 @@ package body Utilities is
         end Print_Tree_Node;
 
     begin
-        Print_Tree_Node (First_Child (aTree.Root));
+        Print_Tree_Node (aTree.Root);
     end Print_Tree;
 
     --  -------------------------------------------------------------------------
