@@ -149,9 +149,9 @@ package body Builder is
                 True_Split_Rows := Best_Split.True_Rows;
                 False_Split_Rows := Best_Split.False_Rows;
                 Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
-                Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
                 Add_New_Decision_Node (True_Split_Rows, This_Cursor,
                                        Best_Split.Question, True);
+                Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
                 Add_New_Decision_Node (False_Split_Rows, This_Cursor,
                                        Best_Split.Question, False);
 
