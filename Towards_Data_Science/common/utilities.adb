@@ -321,8 +321,8 @@ package body Utilities is
          Level := Level + 1;
          This_Level := Level;
          Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level));
-         Put_Line ("Print_Tree_Node Child_Count"
-                   & Integer'Image (Integer (Child_Count (Curs))));
+--           Put_Line ("Print_Tree_Node Child_Count"
+--                     & Integer'Image (Integer (Child_Count (Curs))));
          if Curs = aTree.Root then
             This_Indent := 0;
          else
@@ -350,12 +350,10 @@ package body Utilities is
                   Put (Offset);
                end if;
 
-               Put_Line ("Node type: " & Node_Kind'Image (Node.Node_Type));
                if Node.Node_Type = Prediction_Kind then
                        Print_Prediction (Node);
                end if;
 
-               Print_Question ("Node", Node.Question);
                Print_Question ("Node", Node.Question);
                Put ("Is " & To_String (Node.Question.Feature_Name));
                case Node.Question.Feature_Kind is
@@ -376,8 +374,8 @@ package body Utilities is
                end case;
                Put_Line ("?");
                Print_Rows ("Rows", Node.Rows);
-               Put_Line ("Print_Tree_Node Child_Count"
-                         & Integer'Image (Integer (Child_Count (Curs))));
+--                 Put_Line ("Print_Tree_Node Child_Count"
+--                           & Integer'Image (Integer (Child_Count (Curs))));
 
                True_Child := First_Child (Curs);
                Put_Line ("Print_Tree_Node Level: " & Integer'Image (This_Level) & "T");
@@ -396,8 +394,8 @@ package body Utilities is
       end Print_Tree_Node;
 
    begin
-      Put_Line ("Print_Tree top Node Child_Count"
-                 & Integer'Image (Integer (Child_Count (aTree.Root))));
+--        Put_Line ("Print_Tree top Node Child_Count"
+--                   & Integer'Image (Integer (Child_Count (aTree.Root))));
       Print_Tree_Node (First_Child (aTree.Root));
    end Print_Tree;
 
