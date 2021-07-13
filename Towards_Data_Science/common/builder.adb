@@ -128,6 +128,7 @@ package body Builder is
             if Best_Split.Gain = 0.0 then
                 New_Line;
                 Leaf.Prediction := Rows.First_Element;
+                Leaf.Question := Best_Split.Question;
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
