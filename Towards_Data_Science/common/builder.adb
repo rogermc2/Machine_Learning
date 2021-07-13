@@ -120,6 +120,7 @@ package body Builder is
          --  of this branch
          Best_Split       : constant Best_Data := Find_Best_Split (Rows);
          Leaf             : Tree_Node_Type (Prediction_Kind);
+         Child_Cursor     : Tree_Cursor;
          True_Split_Rows  : Rows_Vector;
          False_Split_Rows : Rows_Vector;
       begin
@@ -131,24 +132,20 @@ package body Builder is
             Leaf.Rows := Rows;
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
---              if Parent_Cursor = theTree.Root then
-               theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
---              else
---                 theTree.Replace_Element (This_Cursor, Leaf);
---              end if;
+            theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
 
          else
-           Utilities.Print_Question ("Add_Branch Best split",
+            Utilities.Print_Question ("Add_Branch Best split",
                                       Best_Split.Question);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
             Add_New_Decision_Node (Parent_Cursor, Best_Split.Question,
-                                    True_Split_Rows, False_Split_Rows);
-
+                                   True_Split_Rows, False_Split_Rows);
+            Child_Cursor := Last_Child (Parent_Cursor);
             Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
-            Add_Branch (True_Split_Rows, Last_Child (Parent_Cursor));
+            Add_Branch (True_Split_Rows, Child_Cursor);
             Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
-            Add_Branch (False_Split_Rows, Last_Child (Parent_Cursor));
+            Add_Branch (False_Split_Rows, Child_Cursor);
             New_Line;
          end if;
       end Add_Branch;
@@ -192,7 +189,7 @@ package body Builder is
    --  container.
 
    function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
-                       return Prediction_Data_List is
+                      return Prediction_Data_List is
       use Tree_Package;
       aNode      : constant Tree_Node_Type := Element (Node_Cursor);
       Prediction : Prediction_Data;
@@ -328,7 +325,7 @@ package body Builder is
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Question : Question_Data; Example_Data : Row_Data)
-                    return Boolean is
+                   return Boolean is
       Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
       Feat_Index       : Class_Range;
       Example_Feature  : Unbounded_String;
@@ -440,7 +437,7 @@ package body Builder is
    --  ---------------------------------------------------------------------------
 
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                        return Partitioned_Rows is
+                       return Partitioned_Rows is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
       Data       : Row_Data;
