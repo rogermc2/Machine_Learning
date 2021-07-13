@@ -86,13 +86,15 @@ package ML_Types is
    end record;
 
    type Tree_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
-      Rows : Rows_Vector := Rows_Package.Empty_Vector;
+      Rows   : Rows_Vector := Rows_Package.Empty_Vector;
+      Branch : Boolean := True;
       case Node_Type is
-      when  Top_Kind | Decision_Kind =>
-         Question   : Question_Data;
-         Decision   : Boolean := False;
+      when Decision_Kind =>
+            Question : Question_Data;
       when Prediction_Kind =>
+         Prediction_Question : Question_Data;
          Prediction : Row_Data;
+      when Top_Kind => null;
       end case;
    end record;
 
@@ -100,6 +102,15 @@ package ML_Types is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
    end record;
+
+    type Prediction_Data is record
+        Label      : Unbounded_String;
+        Num_Copies : Natural := 1;
+    end record;
+
+    package Prediction_Data_Package is new
+      Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
+    subtype Prediction_Data_List is Prediction_Data_Package.List;
 
    package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
      (Tree_Node_Type);

@@ -1,7 +1,6 @@
 
 with Ada.Characters.Handling;
 with Ada.Containers;
-with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -9,15 +8,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Utilities is
 
     use ML_Types;
-
-    type Prediction_Data is record
-        Label      : Unbounded_String;
-        Num_Copies : Natural := 1;
-    end record;
-
-    package Prediction_Data_Package is new
-      Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
-    subtype Prediction_Data_List is Prediction_Data_Package.List;
 
     type Value_Data (Feature_Kind : Data_Type := Integer_Type) is record
         Feature_Name : Feature_Name_Type;
@@ -33,6 +23,7 @@ package body Utilities is
       (Class_Range, Value_Data);
     subtype Value_Set is Values_Package.Vector;
 
+    procedure Print_Results_Question (Question : ML_Types.Question_Data);
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_Set;
 
@@ -115,22 +106,26 @@ package body Utilities is
 
     end Print_Best;
 
-    --  --------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
-    procedure Print_Classification
-      (Classification : Count_Package.Map) is
-        use Count_Package;
-        aCount : Natural;
+    procedure Print_Classification (Classification : Prediction_Data_List) is
+        use Prediction_Data_Package;
+        Curs        : Cursor := Classification.First;
+        Data        : Prediction_Data;
+        Predictions : Unbounded_String;
     begin
-        Put_Line ("Classification:");
-        for index in Classification.First_Key .. Classification.Last_Key loop
-            if Classification.Contains (index) then
-                aCount := Classification.Element (index);
-                Put_Line (Data_Type'Image (index) &  ": " & Natural'Image (aCount));
-            else
-                Put_Line (Data_Type'Image (index) &  ": none");
+        Put ("Classification:  {");
+        while Has_Element (Curs) loop
+            Data := Element (Curs);
+            Predictions := Predictions & "'" & To_String (Data.Label) &
+              "':" & Natural'Image (Data.Num_Copies);
+            if not (Curs = Classification.Last) then
+                Predictions := Predictions & ", ";
             end if;
+            Next (Curs);
         end loop;
+        Predictions := Predictions & "}";
+        Put_Line (To_String (Predictions));
 
     exception
         when others =>
@@ -139,55 +134,24 @@ package body Utilities is
     end Print_Classification;
 
     --  --------------------------------------------------------------------------
-    --
-    --      function Print_Leaf (Counts : Count_Package.Map) return String is
-    --          use Count_Package;
-    --          Total         : Natural := 0;
-    --          aCount        : Natural;
-    --          aString       : Unbounded_String;
-    --          Prob          : Natural;
-    --      begin
-    --          Put_Line ("Counts size:" & Natural'Image (Natural (Counts.Length)));
-    --          for index in Counts.First_Key .. Counts.Last_Key loop
-    --              if Counts.Contains (index) then
-    --                  Total := Total + Counts.Element (index);
-    --                  --              Put_Line ("Total:" & Natural'Image (Total));
-    --              end if;
-    --          end loop;
-    --
-    --          --        Put_Line ("Probabilities:");
-    --          for index in Counts.First_Key .. Counts.Last_Key loop
-    --              if Counts.Contains (index) then
-    --                  aCount := Counts.Element (index);
-    --                  --              Put_Line ("aCount:" & Natural'Image (aCount));
-    --                  Prob := (100 * aCount) / Total;
-    --                  aString :=
-    --                    To_Unbounded_String (Natural'Image (Prob) & "%");
-    --                  --              Probabilities.Replace (index, Prob);
-    --                  --              Put_Line (To_String (aString));
-    --              end if;
-    --          end loop;
-    --          return To_String (aString);
-    --      end Print_Leaf;
-
-    --  --------------------------------------------------------------------------
 
     procedure Print_Node (Node : Tree_Node_Type) is
 
     begin
         Put_Line ("  Node data:");
         Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
-        case Node.Node_Type is
-        when Top_Kind => null;
-        when Prediction_Kind => null;
-        when Decision_Kind => null;
-        end case;
+        --          case Node.Node_Type is
+        --              when Prediction_Kind => null;
+        --              when Decision_Kind => null;
+        --              when Top_Kind => null;
+        --          end case;
         Print_Rows ("    Rows:", Node.Rows);
     end Print_Node;
 
     --  -------------------------------------------------------------------------
 
     procedure Print_Prediction (Node : Tree_Node_Type; Indent : Natural := 0) is
+        use ML_Types;
         use Prediction_Data_Package;
         Num_Rows     : constant Positive := Positive (Node.Rows.Length);
         Offset       : String (1 .. Indent) := (others => ' ');
@@ -207,6 +171,13 @@ package body Utilities is
             Put (Offset);
         end if;
 
+        Print_Results_Question (Node.Prediction_Question);
+
+        if Node.Branch then
+            Put_Line (Offset & "--> True:");
+        else
+            Put_Line (Offset & "--> False:");
+        end if;
         for index in 1 .. Num_Rows loop
             Label := Node.Rows.Element (index).Label;
             Curs := Predictions.First;
@@ -227,7 +198,7 @@ package body Utilities is
             end if;
         end loop;
 
-        Prediction := To_Unbounded_String ("Predict {");
+        Prediction := To_Unbounded_String (Offset & "    Predict {");
         Curs := Predictions.First;
         while Has_Element (Curs) loop
             Data := Element (Curs);
@@ -245,7 +216,8 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Question (Message : String; Question : ML_Types.Question_Data) is
+    procedure Print_Question (Message : String;
+                              Question : ML_Types.Question_Data) is
         Col          : constant String := To_String (Question.Feature_Name);
         Feature_Kind : constant Data_Type := Question.Feature_Kind;
     begin
@@ -277,6 +249,50 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
+    procedure Print_Results_Question (Question : ML_Types.Question_Data) is
+        UB_String : Unbounded_String;
+        begin
+        Put ("Is " & To_String (Question.Feature_Name));
+        case Question.Feature_Kind is
+            when Integer_Type =>
+                Put (" >= " & Integer'Image
+                     (Question.Integer_Value));
+            when Float_Type =>
+                Put (" >= " & Float'Image
+                     (Question.Float_Value));
+            when Boolean_Type =>
+                Put (" = " & Boolean'Image
+                     (Question.Boolean_Value));
+            when UB_String_Type =>
+                UB_String := Question.UB_String_Value;
+                if Is_Integer (UB_String) or else
+                  Is_Float (UB_String) then
+                    Put (" >= " & To_String (UB_String));
+                else
+                    Put (" = " & To_String (UB_String));
+                end if;
+        end case;
+        Put_Line ("?");
+
+    end Print_Results_Question;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Row (Message : String; aRow : Row_Data) is
+    begin
+        Put_Line (Message);
+        Put ("  Feature values: ");
+        for feat in aRow.Features'First .. aRow.Features'Last loop
+            Put (To_String (aRow.Features (feat)));
+            if feat /= aRow.Features'Last then
+                Put (",");
+            end if;
+        end loop;
+        Put_Line ("; Label: " & To_String (aRow.Label));
+    end Print_Row;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Rows (Message : String; Rows : Rows_Vector) is
         use Rows_Package;
         aRow : Row_Data;
@@ -300,78 +316,67 @@ package body Utilities is
 
     procedure Print_Tree (aTree : Tree_Type) is
         use Tree_Package;
-        First  : Boolean := True;
 
-        procedure Print_Node (Curs : Cursor; Indent : Natural := 0) is
-            This_Curs   : constant Cursor := Curs;
-            Node        : constant Tree_Node_Type := Element (This_Curs);
+        procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
+            use Ada.Containers;
+            This_Curs   : Cursor := Curs;
+            Node        : Tree_Node_Type;
+            True_Child  : Cursor;
+            False_Child : Cursor;
             This_Indent : Natural;
         begin
-            if First then
+            if This_Curs = aTree.Root then
                 This_Indent := 0;
+                Node := Element (First_Child (This_Curs));
             else
                 This_Indent := Indent + 1;
+                Node := Element (This_Curs);
             end if;
 
             declare
                 Offset    : String (1 .. This_Indent + 1) := (others => ' ');
                 pos       : Natural := 1;
-                UB_String : Unbounded_String;
             begin
                 if Is_Leaf  (This_Curs) then
                     Print_Prediction (Node, This_Indent);
                 else
-                    if First then
-                        First := False;
-                    else
-                        if Indent > 0 then
-                            while pos < This_Indent - 1 loop
-                                Offset (pos .. pos + 1) := "  ";
-                                pos := pos + 2;
-                            end loop;
-                            if pos < Indent + 1 then
-                                Offset (Indent) := ' ';
-                            end if;
-                            Put (Offset);
+                    if Indent > 0 then
+                        while pos < This_Indent - 1 loop
+                            Offset (pos .. pos + 1) := "  ";
+                            pos := pos + 2;
+                        end loop;
+                        if pos < Indent + 1 then
+                            Offset (Indent) := ' ';
                         end if;
-
-                        Put ("Is " & To_String (Node.Question.Feature_Name));
-                        case Node.Question.Feature_Kind is
-                        when Integer_Type =>
-                            Put (" >= " & Integer'Image (Node.Question.Integer_Value));
-                        when Float_Type =>
-                            Put (" >= " & Float'Image (Node.Question.Float_Value));
-                        when Boolean_Type =>
-                            Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
-                        when UB_String_Type =>
-                            UB_String := Node.Question.UB_String_Value;
-                            if Is_Integer (UB_String) or else
-                              Is_Float (UB_String) then
-                                Put (" >= " & To_String (UB_String));
-                            else
-                                Put (" = " & To_String (UB_String));
-                            end if;
-                        end case;
-                        Put_Line ("?");
-                        if Node.Decision then
-                            Put_Line (Offset & "--> True:");
-                        else
-                            Put_Line (Offset & "--> False:");
-                        end if;
+                        Put (Offset);
                     end if;
 
-                    Print_Node (First_Child (This_Curs), This_Indent + 1);
+                    if Node.Node_Type = Prediction_Kind then
+                        Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
+                        Print_Prediction (Node);
+                    else
+                        if This_Curs = aTree.Root then
+                            This_Curs := First_Child (This_Curs);
+                        end if;
+                        True_Child := First_Child (This_Curs);
+                        if Node.Node_Type /= Top_Kind then
+                            Print_Results_Question (Node.Question);
+                            Put_Line (Offset & "--> True:");
+                        end if;
 
-                    if not Is_Leaf (First_Child (This_Curs)) then
-                        Put_Line (Offset & "--> False:");
-                        Print_Node (Last_Child (This_Curs), This_Indent + 1);
+                        Print_Tree_Node (True_Child, This_Indent + 1);
+                        if Child_Count (This_Curs) > 1 then
+                            False_Child := Next_Sibling (True_Child);
+                            Put_Line (Offset & "--> False:");
+                            Print_Tree_Node (False_Child, This_Indent + 1);
+                        end if;
                     end if;
                 end if;
             end; --  declare block
-        end Print_Node;
+        end Print_Tree_Node;
 
     begin
-        Print_Node (First_Child (aTree.Root));
+        Print_Tree_Node (aTree.Root);
     end Print_Tree;
 
     --  -------------------------------------------------------------------------

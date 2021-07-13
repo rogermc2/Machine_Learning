@@ -85,112 +85,93 @@ package body Builder is
        Feature   : Feature_Name_Type; Uncertainty : Float;
        Question  : out Question_Data; Best : in out Best_Data) is
     begin
-        --          Put_line ("Builder.Best_String_Value Feature_Name: " & "'" &
-        --                      To_String (Feature) & "'"  & " value " &
-        --                      To_String (Value));
         Question.Feature_Name := Feature;
         Question.UB_String_Value := Value;
         Split (Rows, Uncertainty, Question, Best);
-        --          Utilities.Print_Question ("Builder.Best_String_Value", Question);
-        --          Utilities.Print_Best ("Builder.Best_String_Value", Best);
-        --          New_Line;
     end Best_String_Value;
 
-    --  -------------------------------------------------------------------------
-    --  A Leaf node classifies data.
+    --  ------------------------------------------------------------------------
+    --  A Leaf node classifies data
     --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
     --  for each class, the number of times that the class appears in the rows
     --  from the training data that reach this leaf.
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
-        theTree         : Tree_Type := Empty_Tree;
-        Top_Node        : Tree_Node_Type  (Top_Kind);
-        Top_Split       : Best_Data;
-        Next_Cursor     : Tree_Cursor;
-        False_Node_Curs : Tree_Cursor;
-        True_Node_Curs  : Tree_Cursor;
-        Level           : Integer := 0;
+        theTree   : Tree_Type := Empty_Tree;
+        Top_Node  : Tree_Node_Type (Top_Kind);
 
         procedure Add_New_Decision_Node (Rows          : Rows_Vector;
                                          Parent_Cursor : Tree_Cursor;
                                          Question      : Question_Data;
-                                         Decision      : Boolean;
-                                         Next_Cursor   : out Tree_Cursor) is
+                                         Decision      : Boolean) is
             Node  : Tree_Node_Type (Decision_Kind);
         begin
             Node.Question := Question;
             Node.Rows := Rows;
-            Node.Decision := Decision;
+            Node.Branch := Decision;
             theTree.Insert_Child (Parent   => Parent_Cursor,
                                   Before   => No_Element,
-                                  New_Item => Node,
-                                  Position => Next_Cursor);
+                                  New_Item => Node);
         end Add_New_Decision_Node;
 
-        procedure Recurse (Rows : Rows_Vector; Curs : Tree_Cursor) is
-            This_Curs       : constant Tree_Cursor := Curs;
-            Best_Split      : Best_Data;
-            False_Node_Curs : Tree_Cursor;
-            True_Node_Curs  : Tree_Cursor;
-            Leaf            : Tree_Node_Type (Prediction_Kind);
+        procedure Add_Branch (Rows          : Rows_Vector;
+                              Parent_Cursor : Tree_Cursor) is
+        --  Parent_Cursor is a cursor to an existing node which is the head
+        --  of this branch
+            Best_Split       : constant Best_Data := Find_Best_Split (Rows);
+            This_Cursor      : Tree_Cursor := Parent_Cursor;
+            Leaf             : Tree_Node_Type (Prediction_Kind);
+            True_Split_Rows  : Rows_Vector;
+            False_Split_Rows : Rows_Vector;
+            False_Node_Curs  : Tree_Cursor;
+            True_Node_Curs   : Tree_Cursor;
         begin
-            Level := Level + 1;
-            --              Put_Line ("Build_Tree.Recurse level" & Integer'Image (Level));
-            Utilities.Print_Rows ("Build_Tree.Recurse rows", Rows);
-            Best_Split := Find_Best_Split (Rows);
-
             if Best_Split.Gain = 0.0 then
-                --                  Put_Line ("Build_Tree level" & Integer'Image (Level) & "P");
+                New_Line;
                 Leaf.Prediction := Rows.First_Element;
+                Leaf.Prediction_Question := Best_Split.Question;
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
-                theTree.Insert_Child (Parent   => This_Curs,
-                                      Before   => No_Element,
-                                      New_Item => Leaf);
+                if Parent_Cursor = theTree.Root then
+                    theTree.Insert_Child (This_Cursor, No_Element, Leaf);
+                else
+                    theTree.Replace_Element (This_Cursor, Leaf);
+                end if;
+
             else
-                New_Line;
-                Utilities.Print_Question ("Level" & Integer'Image (Level) &
-                                            " Best", Best_Split.Question);
-                --                  Utilities.Print_Rows ("Build_Tree True_Rows",
-                --                                        ML_Types.Rows_Vector (Best_Split.True_Rows));
-                --                  Utilities.Print_Rows ("Build_Tree False_Rows",
-                --                                        ML_Types.Rows_Vector (Best_Split.False_Rows));
+                if This_Cursor = theTree.Root then
+                    --                      Add_New_Decision_Node (Rows, This_Cursor,
+                    --                                             Best_Split.Question, True);
+                    Top_Node.Rows := Rows;
+                    Top_Node.Branch := True;
+                    theTree.Insert_Child (Parent   => theTree.Root,
+                                          Before   => No_Element,
+                                          New_Item => Top_Node);
+                    This_Cursor := First_Child (theTree.Root);
+                end if;
 
-                Add_New_Decision_Node (Best_Split.True_Rows, This_Curs,
-                                       Best_Split.Question, True, True_Node_Curs);
-                Add_New_Decision_Node (Best_Split.False_Rows, This_Curs,
-                                       Best_Split.Question, False, False_Node_Curs);
+                Utilities.Print_Question ("Add_Branch Best split",
+                                          Best_Split.Question);
+                True_Split_Rows := Best_Split.True_Rows;
+                False_Split_Rows := Best_Split.False_Rows;
+                Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
+                Add_New_Decision_Node (True_Split_Rows, This_Cursor,
+                                       Best_Split.Question, True);
+                Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
+                Add_New_Decision_Node (False_Split_Rows, This_Cursor,
+                                       Best_Split.Question, False);
 
-                Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
-                Recurse (Best_Split.True_Rows, True_Node_Curs);
-                Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
-                Recurse (Best_Split.False_Rows, False_Node_Curs);
+                True_Node_Curs := First_Child (This_Cursor);
+                False_Node_Curs := Last_Child  (This_Cursor);
+                Add_Branch (True_Split_Rows, True_Node_Curs);
+                Add_Branch (False_Split_Rows, False_Node_Curs);
                 New_Line;
             end if;
-        end Recurse;
+        end Add_Branch;
 
     begin
-        Utilities.Print_Rows ("Build_Tree rows", Rows);
-        Top_Node.Rows := Rows;
-        theTree.Insert_Child (Parent   => theTree.Root,
-                              Before   => No_Element,
-                              New_Item => Top_Node,
-                              Position => Next_Cursor);
-        Top_Split := Find_Best_Split (Rows);
-        Utilities.Print_Question ("Level" & Integer'Image (Level) &
-                                    " Best", Top_Split.Question);
-
-        Add_New_Decision_Node (Top_Split.True_Rows, Next_Cursor,
-                               Top_Split.Question, True, True_Node_Curs);
-        Add_New_Decision_Node (Top_Split.False_Rows, Next_Cursor,
-                               Top_Split.Question, False, False_Node_Curs);
-
-        Put_Line ("Build_Tree level" & Integer'Image (Level) & "T");
-        Recurse (Top_Split.True_Rows, True_Node_Curs);
-        Put_Line ("Build_Tree level" & Integer'Image (Level) & "F");
-        Recurse (Top_Split.False_Rows, False_Node_Curs);
-
+        Add_Branch (Rows, theTree.Root);
         return theTree;
 
     end Build_Tree;
@@ -226,60 +207,46 @@ package body Builder is
     --  A cursor keeps designating the same node (and element) as long as the
     --  node is part of the container even if the node is moved within the
     --  container.
-    --     function Classify (aRow : Row_Data; aTree : Tree_Type)
-    --                        return Count_Package.Map is
-    --        use Tree_Package;
-    --        --  The node at the root has no element so hence the call of First_Child.
-    --        First_Cursor     : constant Cursor := First_Child (Root (aTree));
-    --        True_Cursor      : constant Cursor := First_Child (First_Cursor);
-    --        False_Cursor     : constant Cursor := Last_Child (First_Cursor);
-    --        First_Node       : constant Decision_Node_Type := Element (First_Cursor);
-    --        Subtree          : Tree_Type;
-    --        Sub_Cursor       : constant Cursor := Root (Subtree);
-    --        Result           : Count_Package.Map;
-    --     begin
-    --        if Is_Leaf (First_Cursor) then
-    --  --           Put_Line ("Classify Leaf");
-    --           Result := First_Node.Predictions;
-    --        else
-    --           case First_Node.Node_Type is
-    --           when Prediction_Kind =>
-    --              null;
-    --           when Decision_Kind =>
-    --  --              Put ("Decision_Kind ");
-    --              if Match (First_Node.Question, aRow) then
-    --  --                 Put_Line ("Match");
-    --                 Subtree.Copy_Subtree (Sub_Cursor, No_Element, True_Cursor);
-    --              else
-    --  --                 Put_Line ("No match");
-    --                 Subtree.Copy_Subtree (Sub_Cursor, No_Element, False_Cursor);
-    --              end if;
-    --              Result := Classify (aRow, Subtree);
-    --           end case;
-    --        end if;
-    --        return Result;
-    --
-    --     exception
-    --           when others =>
-    --           Put_Line ("Print_Classification exception");
-    --           raise;
-    --        return Result;
-    --     end Classify;
 
-    --  -----------------------------------------------------------------------
+    function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
+                       return Prediction_Data_List is
+        use Tree_Package;
+        aNode      : constant Tree_Node_Type := Element (Node_Cursor);
+        Prediction : Prediction_Data;
+        Result     : Prediction_Data_List;
+    begin
+        New_Line;
+        Utilities.Print_Row ("Builder.Classify row", aRow);
+        Put_Line ("Builder.Classify Node_Type " &
+                    Node_Kind'Image (aNode.Node_Type));
+        if aNode.Node_Type = Prediction_Kind then
+            Put_Line ("Builder.Classify label: " &
+                        To_String (aNode.Prediction.Label));
+            Prediction.Label := aNode.Prediction.Label;
+            if Result.Contains (Prediction) then
+                Prediction.Num_Copies := Prediction.Num_Copies + 1;
+            else
+                Prediction.Num_Copies := 1;
+            end if;
+            Result.Append (Prediction);
+        else
+            Utilities.Print_Question ("Builder.Classify", aNode.Question);
+            Put_Line ("Builder.Classify decision: " &
+                        Boolean'Image (aNode.Branch));
+            if Match (aNode.Question, aRow) then
+                Result := Classify (aRow, First_Child (Node_Cursor));
+            else
+                Result := Classify (aRow, Last_Child (Node_Cursor));
+            end if;
+        end if;
+        return Result;
 
-    --     procedure Evaluate (Rows : Rows_Vector; theTree : Tree_Type) is
-    --        aRow           : Row_Data;
-    --        Classification : Count_Package.Map;
-    --     begin
-    --        for row in Rows.First_Index .. Rows.Last_Index loop
-    --           aRow := Rows.Element (row);
-    --           Put_Line ("Evalution of row " & Integer'Image (row));
-    --           Classification := Classify (aRow, theTree);
-    --  --           Put_Line ("Actual: " & Label_Type'Image (aRow.Fruit) & "  Predicted: " &
-    --  --                       Print_Leaf (Classification));
-    --        end loop;
-    --     end Evaluate;
+    exception
+        when others =>
+            Put_Line ("Print_Classification exception");
+            raise;
+            return Result;
+    end Classify;
 
     --  -----------------------------------------------------------------------
     --   Find_Best_Split finds the best question to ask by iterating over every
@@ -384,16 +351,27 @@ package body Builder is
         Example_Feature  : Unbounded_String;
         Val_Type         : Data_Type;
         Matches          : Boolean := False;
+        Found            : Boolean := False;
     begin
         Val_Type  := Question.Feature_Kind;
         for col in Header_Data.Features'Range loop
+            --              Put_Line ("Match Header_Data col: " & Class_Range'Image (col));
             if Feature_Name_Type (Header_Data.Features (col)) = Feature_Name then
                 Feat_Index := col;
+                Found := True;
             end if;
         end loop;
-        Example_Feature := Example_Data.Features (Feat_Index);
-        --          Put_Line ("Builder.Match Example_Feature set");
-        case Val_Type is
+
+        --          if not Found then
+        --              raise Builder_Exception with
+        --              "Builder.Match, invalid feature Question.Feature_Name: " &
+        --                To_String (Feature_Name);
+        --          end if;
+
+        --          Put_Line ("Match Header_Data Feat_Index: " & Class_Range'Image (Feat_Index));
+        if Found then
+            Example_Feature := Example_Data.Features (Feat_Index);
+            case Val_Type is
             when Integer_Type =>
                 declare
                     Value : constant Integer := Question.Integer_Value;
@@ -421,7 +399,8 @@ package body Builder is
                 begin
                     Matches := Value = Example_Feature;
                 end;
-        end case;
+            end case;
+        end if;
         return Matches;
     end Match;
 
