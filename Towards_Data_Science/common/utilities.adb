@@ -23,6 +23,7 @@ package body Utilities is
       (Class_Range, Value_Data);
     subtype Value_Set is Values_Package.Vector;
 
+    procedure Print_Results_Question (Question : ML_Types.Question_Data);
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_Set;
 
@@ -157,7 +158,6 @@ package body Utilities is
         Curs         : Cursor;
         Data         : Prediction_Data;
         Label        : Unbounded_String;
-        UB_String    : Unbounded_String;
         Predictions  : Prediction_Data_List;
         Prediction   : Unbounded_String;
         pos          : Natural := 1;
@@ -171,27 +171,7 @@ package body Utilities is
             Put (Offset);
         end if;
 
-        Put ("Is " & To_String (Node.Prediction_Question.Feature_Name));
-        case Node.Prediction_Question.Feature_Kind is
-            when Integer_Type =>
-                Put (" >= " & Integer'Image
-                     (Node.Prediction_Question.Integer_Value));
-            when Float_Type =>
-                Put (" >= " & Float'Image
-                     (Node.Prediction_Question.Float_Value));
-            when Boolean_Type =>
-                Put (" = " & Boolean'Image
-                     (Node.Prediction_Question.Boolean_Value));
-            when UB_String_Type =>
-                UB_String := Node.Prediction_Question.UB_String_Value;
-                if Is_Integer (UB_String) or else
-                  Is_Float (UB_String) then
-                    Put (" >= " & To_String (UB_String));
-                else
-                    Put (" = " & To_String (UB_String));
-                end if;
-        end case;
-        Put_Line ("?");
+        Print_Results_Question (Node.Prediction_Question);
 
         if Node.Branch then
             Put_Line (Offset & "--> True:");
@@ -236,7 +216,8 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Question (Message : String; Question : ML_Types.Question_Data) is
+    procedure Print_Question (Message : String;
+                              Question : ML_Types.Question_Data) is
         Col          : constant String := To_String (Question.Feature_Name);
         Feature_Kind : constant Data_Type := Question.Feature_Kind;
     begin
@@ -265,6 +246,35 @@ package body Utilities is
         Put_Line (Message);
         Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
     end Print_Raw_Question;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Results_Question (Question : ML_Types.Question_Data) is
+        UB_String : Unbounded_String;
+        begin
+        Put ("Is " & To_String (Question.Feature_Name));
+        case Question.Feature_Kind is
+            when Integer_Type =>
+                Put (" >= " & Integer'Image
+                     (Question.Integer_Value));
+            when Float_Type =>
+                Put (" >= " & Float'Image
+                     (Question.Float_Value));
+            when Boolean_Type =>
+                Put (" = " & Boolean'Image
+                     (Question.Boolean_Value));
+            when UB_String_Type =>
+                UB_String := Question.UB_String_Value;
+                if Is_Integer (UB_String) or else
+                  Is_Float (UB_String) then
+                    Put (" >= " & To_String (UB_String));
+                else
+                    Put (" = " & To_String (UB_String));
+                end if;
+        end case;
+        Put_Line ("?");
+
+    end Print_Results_Question;
 
     --  ------------------------------------------------------------------------
 
@@ -326,7 +336,6 @@ package body Utilities is
             declare
                 Offset    : String (1 .. This_Indent + 1) := (others => ' ');
                 pos       : Natural := 1;
-                UB_String : Unbounded_String;
             begin
                 if Is_Leaf  (This_Curs) then
                     Print_Prediction (Node, This_Indent);
@@ -350,28 +359,8 @@ package body Utilities is
                             This_Curs := First_Child (This_Curs);
                         end if;
                         True_Child := First_Child (This_Curs);
-                        --                          Put_Line ("True_Child:");
-                        --                          Print_Node (Element (True_Child));
-                        --                          Print_Question ("", Node.Question);
                         if Node.Node_Type /= Top_Kind then
-                            Put ("Is " & To_String (Node.Question.Feature_Name));
-                            case Node.Question.Feature_Kind is
-                            when Integer_Type =>
-                                Put (" >= " & Integer'Image (Node.Question.Integer_Value));
-                            when Float_Type =>
-                                Put (" >= " & Float'Image (Node.Question.Float_Value));
-                            when Boolean_Type =>
-                                Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
-                            when UB_String_Type =>
-                                UB_String := Node.Question.UB_String_Value;
-                                if Is_Integer (UB_String) or else
-                                  Is_Float (UB_String) then
-                                    Put (" >= " & To_String (UB_String));
-                                else
-                                    Put (" = " & To_String (UB_String));
-                                end if;
-                            end case;
-                            Put_Line ("?");
+                            Print_Results_Question (Node.Question);
                             Put_Line (Offset & "--> True:");
                         end if;
 
