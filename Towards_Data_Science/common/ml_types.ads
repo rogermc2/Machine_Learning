@@ -20,7 +20,7 @@ package ML_Types is
    subtype Feature_Class is Class_Range;
    subtype Question_Type is Class_Range;
 
-   type Node_Kind is (Decision_Kind, Prediction_Kind);
+   type Node_Kind is (Top_Kind, Decision_Kind, Prediction_Kind);
 
    type Header_Data_Type (Class_Count : Class_Range := 2) is record
       Features      : Feature_Data_Array (1 .. Class_Count);
@@ -86,13 +86,15 @@ package ML_Types is
    end record;
 
    type Tree_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
-      Rows     : Rows_Vector := Rows_Package.Empty_Vector;
-      Question : Question_Data;
-         Branch     : Boolean := True;
+      Rows   : Rows_Vector := Rows_Package.Empty_Vector;
+      Branch : Boolean := True;
       case Node_Type is
-      when Decision_Kind => null;
+      when Decision_Kind =>
+            Question : Question_Data;
       when Prediction_Kind =>
+         Prediction_Question : Question_Data;
          Prediction : Row_Data;
+      when Top_Kind => null;
       end case;
    end record;
 

@@ -139,10 +139,11 @@ package body Utilities is
     begin
         Put_Line ("  Node data:");
         Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
-        case Node.Node_Type is
-            when Prediction_Kind => null;
-            when Decision_Kind => null;
-        end case;
+        --          case Node.Node_Type is
+        --              when Prediction_Kind => null;
+        --              when Decision_Kind => null;
+        --              when Top_Kind => null;
+        --          end case;
         Print_Rows ("    Rows:", Node.Rows);
     end Print_Node;
 
@@ -170,16 +171,19 @@ package body Utilities is
             Put (Offset);
         end if;
 
-        Put ("Is " & To_String (Node.Question.Feature_Name));
-        case Node.Question.Feature_Kind is
+        Put ("Is " & To_String (Node.Prediction_Question.Feature_Name));
+        case Node.Prediction_Question.Feature_Kind is
             when Integer_Type =>
-                Put (" >= " & Integer'Image (Node.Question.Integer_Value));
+                Put (" >= " & Integer'Image
+                     (Node.Prediction_Question.Integer_Value));
             when Float_Type =>
-                Put (" >= " & Float'Image (Node.Question.Float_Value));
+                Put (" >= " & Float'Image
+                     (Node.Prediction_Question.Float_Value));
             when Boolean_Type =>
-                Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
+                Put (" = " & Boolean'Image
+                     (Node.Prediction_Question.Boolean_Value));
             when UB_String_Type =>
-                UB_String := Node.Question.UB_String_Value;
+                UB_String := Node.Prediction_Question.UB_String_Value;
                 if Is_Integer (UB_String) or else
                   Is_Float (UB_String) then
                     Put (" >= " & To_String (UB_String));
@@ -346,30 +350,31 @@ package body Utilities is
                             This_Curs := First_Child (This_Curs);
                         end if;
                         True_Child := First_Child (This_Curs);
---                          Put_Line ("True_Child:");
---                          Print_Node (Element (True_Child));
---                          Print_Question ("", Node.Question);
+                        --                          Put_Line ("True_Child:");
+                        --                          Print_Node (Element (True_Child));
+                        --                          Print_Question ("", Node.Question);
+                        if Node.Node_Type /= Top_Kind then
+                            Put ("Is " & To_String (Node.Question.Feature_Name));
+                            case Node.Question.Feature_Kind is
+                            when Integer_Type =>
+                                Put (" >= " & Integer'Image (Node.Question.Integer_Value));
+                            when Float_Type =>
+                                Put (" >= " & Float'Image (Node.Question.Float_Value));
+                            when Boolean_Type =>
+                                Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
+                            when UB_String_Type =>
+                                UB_String := Node.Question.UB_String_Value;
+                                if Is_Integer (UB_String) or else
+                                  Is_Float (UB_String) then
+                                    Put (" >= " & To_String (UB_String));
+                                else
+                                    Put (" = " & To_String (UB_String));
+                                end if;
+                            end case;
+                            Put_Line ("?");
+                            Put_Line (Offset & "--> True:");
+                        end if;
 
-                        Put ("Is " & To_String (Node.Question.Feature_Name));
-                        case Node.Question.Feature_Kind is
-                        when Integer_Type =>
-                            Put (" >= " & Integer'Image (Node.Question.Integer_Value));
-                        when Float_Type =>
-                            Put (" >= " & Float'Image (Node.Question.Float_Value));
-                        when Boolean_Type =>
-                            Put (" = " & Boolean'Image (Node.Question.Boolean_Value));
-                        when UB_String_Type =>
-                            UB_String := Node.Question.UB_String_Value;
-                            if Is_Integer (UB_String) or else
-                              Is_Float (UB_String) then
-                                Put (" >= " & To_String (UB_String));
-                            else
-                                Put (" = " & To_String (UB_String));
-                            end if;
-                        end case;
-                        Put_Line ("?");
-
-                        Put_Line (Offset & "--> True:");
                         Print_Tree_Node (True_Child, This_Indent + 1);
                         if Child_Count (This_Curs) > 1 then
                             False_Child := Next_Sibling (True_Child);

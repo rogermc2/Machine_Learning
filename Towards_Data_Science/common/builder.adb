@@ -97,7 +97,8 @@ package body Builder is
     --  from the training data that reach this leaf.
     function Build_Tree (Rows : Rows_Vector) return Tree_Type is
         use Tree_Package;
-        theTree    : Tree_Type := Empty_Tree;
+        theTree   : Tree_Type := Empty_Tree;
+        Top_Node  : Tree_Node_Type (Top_Kind);
 
         procedure Add_New_Decision_Node (Rows          : Rows_Vector;
                                          Parent_Cursor : Tree_Cursor;
@@ -128,7 +129,7 @@ package body Builder is
             if Best_Split.Gain = 0.0 then
                 New_Line;
                 Leaf.Prediction := Rows.First_Element;
-                Leaf.Question := Best_Split.Question;
+                Leaf.Prediction_Question := Best_Split.Question;
                 Leaf.Rows := Rows;
                 Utilities.Print_Rows ("Prediction", Rows);
                 New_Line;
@@ -140,8 +141,13 @@ package body Builder is
 
             else
                 if This_Cursor = theTree.Root then
-                    Add_New_Decision_Node (Rows, This_Cursor,
-                                           Best_Split.Question, True);
+                    --                      Add_New_Decision_Node (Rows, This_Cursor,
+                    --                                             Best_Split.Question, True);
+                    Top_Node.Rows := Rows;
+                    Top_Node.Branch := True;
+                    theTree.Insert_Child (Parent   => theTree.Root,
+                                          Before   => No_Element,
+                                          New_Item => Top_Node);
                     This_Cursor := First_Child (theTree.Root);
                 end if;
 
@@ -203,7 +209,7 @@ package body Builder is
     --  container.
 
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
-                      return Prediction_Data_List is
+                       return Prediction_Data_List is
         use Tree_Package;
         aNode      : constant Tree_Node_Type := Element (Node_Cursor);
         Prediction : Prediction_Data;
@@ -339,7 +345,7 @@ package body Builder is
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Question : Question_Data; Example_Data : Row_Data)
-                   return Boolean is
+                    return Boolean is
         Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
@@ -451,7 +457,7 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows is
+                        return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;
