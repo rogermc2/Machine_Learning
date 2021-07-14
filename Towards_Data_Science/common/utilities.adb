@@ -327,11 +327,11 @@ package body Utilities is
       begin
          if This_Curs = aTree.Root then
             This_Indent := 0;
-            Node := Element (First_Child (This_Curs));
+            This_Curs := First_Child (This_Curs);
          else
             This_Indent := Indent + 1;
-            Node := Element (This_Curs);
          end if;
+         Node := Element (This_Curs);
 
          declare
             Offset    : String (1 .. This_Indent + 1) := (others => ' ');
@@ -355,9 +355,6 @@ package body Utilities is
                   Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
                   Print_Prediction (Node);
                else
-                  if This_Curs = aTree.Root then
-                     This_Curs := First_Child (This_Curs);
-                  end if;
                   True_Child := First_Child (This_Curs);
                   Print_Results_Question (Node.Question);
                   Put_Line (Offset & "--> True:");
