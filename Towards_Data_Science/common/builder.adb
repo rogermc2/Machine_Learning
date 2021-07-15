@@ -124,11 +124,8 @@ package body Builder is
       begin
          if Best_Split.Gain = 0.0 then
             New_Line;
-            Put_Line ("Parent of Prediction:");
-            Utilities.Print_Node (Element (Parent_Cursor));
             Leaf.Decision_Branch := False;
             Leaf.Prediction := Rows.First_Element;
-            Leaf.Question := Best_Split.Question;
             Leaf.Rows := Rows;
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
@@ -143,10 +140,8 @@ package body Builder is
             Child_Cursor := Last_Child (Parent_Cursor);
             Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
             Add_Branch (True_Split_Rows, Child_Cursor);
-            Put_Line ("True node added");
             Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
             Add_Branch (False_Split_Rows, Child_Cursor);
-            Put_Line ("False node added");
             New_Line;
          end if;
       end Add_Branch;
