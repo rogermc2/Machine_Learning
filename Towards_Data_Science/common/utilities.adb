@@ -320,28 +320,22 @@ package body Utilities is
 
     procedure Print_Tree (aTree : Tree_Type) is
         use Tree_Package;
+        This_Indent : Natural := 0;
 
         procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
             use Ada.Containers;
-            This_Curs   : Cursor := Curs;
             Node        : Tree_Node_Type;
             True_Child  : Cursor;
             False_Child : Cursor;
-            This_Indent : Natural;
         begin
-            if This_Curs = aTree.Root then
-                This_Indent := 0;
-                This_Curs := First_Child (This_Curs);
-            else
-                This_Indent := Indent + 1;
-            end if;
-            Node := Element (This_Curs);
+            This_Indent := Indent + 1;
+            Node := Element (Curs);
 
             declare
                 Offset    : String (1 .. This_Indent + 1) := (others => ' ');
                 pos       : Natural := 1;
             begin
-                if Is_Leaf  (This_Curs) then
+                if Is_Leaf  (Curs) then
                     Print_Prediction (Node, This_Indent);
                 else
                     if Indent > 0 then
@@ -362,12 +356,12 @@ package body Utilities is
                         Put_Line ("Print_Tree_Node printing question");
                         Print_Results_Question (Node.Question);
                         Put_Line (Offset & "--> True:");
-                        True_Child := First_Child (This_Curs);
+                        True_Child := First_Child (Curs);
                         Put_Line ("Print_Tree_Node printing True_Child");
                         Print_Tree_Node (True_Child, This_Indent + 1);
                         Put_Line ("Print_Tree_Node True_Child printed");
 
-                        if Child_Count (This_Curs) > 1 then
+                        if Child_Count (Curs) > 1 then
                             False_Child := Next_Sibling (True_Child);
                             Put_Line ("Print_Tree_Node printing False_Child");
                             Put_Line (Offset & "--> False:");
@@ -380,7 +374,7 @@ package body Utilities is
         end Print_Tree_Node;
 
     begin
-        Print_Tree_Node (aTree.Root);
+        Print_Tree_Node (First_Child (aTree.Root));
     end Print_Tree;
 
     --  -------------------------------------------------------------------------
