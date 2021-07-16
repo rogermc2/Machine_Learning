@@ -182,11 +182,11 @@ begin
     Utilities.Print_Classification (Classified);
     New_Line;
 
-    --     Put_Line ("Classify tests, Training_Data (2)");
-    --     Classified := Classify (Training_Data (2), aTree);
-    --     Put_Line ("Classify tests,  Classified");
-    --     Print_Classification (Classified);
-    --     New_Line;
+    Put_Line ("Classify tests, Training_Data (2)");
+    Classified := Classify (Training_Data (2), Tree_Package.First_Child (aTree.Root));
+    Put_Line ("Classify tests,  Classified");
+    Utilities.Print_Classification (Classified);
+    New_Line;
     --     Put_Line ("Classify tests,  Print_Leaf Training_Data (1)");
     --     Put_Line (Print_Leaf (Classify (Training_Data (1), aTree)));
     --     New_Line;
