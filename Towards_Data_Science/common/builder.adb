@@ -191,10 +191,10 @@ package body Builder is
       Prediction : Prediction_Data;
       Result     : Prediction_Data_List;
    begin
-      New_Line;
-      Utilities.Print_Row ("Builder.Classify row", aRow);
-      Put_Line ("Builder.Classify Node_Type " &
-                  Node_Kind'Image (aNode.Node_Type));
+--        New_Line;
+--        Utilities.Print_Row ("Builder.Classify row", aRow);
+--        Put_Line ("Builder.Classify Node_Type " &
+--                    Node_Kind'Image (aNode.Node_Type));
       if aNode.Node_Type = Prediction_Kind then
          Put_Line ("Builder.Classify label: " &
                      To_String (aNode.Prediction.Label));
@@ -206,9 +206,9 @@ package body Builder is
          end if;
          Result.Append (Prediction);
       else
-         Utilities.Print_Question ("Builder.Classify", aNode.Question);
-         Put_Line ("Builder.Classify decision: " &
-                     Boolean'Image (aNode.Decision_Branch));
+--           Utilities.Print_Question ("Builder.Classify", aNode.Question);
+--           Put_Line ("Builder.Classify decision: " &
+--                       Boolean'Image (aNode.Decision_Branch));
          if Match (aNode.Question, aRow) then
             Result := Classify (aRow, First_Child (Node_Cursor));
          else

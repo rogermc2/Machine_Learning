@@ -51,7 +51,7 @@ procedure Decision_Tree is
     P_Rows              : Partitioned_Rows;
     Best_Test           : Best_Data;
     aTree               : Tree_Type;
---      Classified          : Prediction_Data_List;
+    Classified          : Prediction_Data_List;
 begin
     New_Line;
     Put ("Features:");
@@ -176,11 +176,11 @@ begin
     Utilities.Print_Tree (aTree);
     New_Line;
 
---      Put_Line ("Classify tests, Training_Data (1)");
---      Classified := Classify
---        (Training_Data (1), Tree_Package.First_Child (aTree.Root));
---      Utilities.Print_Classification (Classified);
---      New_Line;
+    Put_Line ("Classify tests, Training_Data (1)");
+    Classified := Classify
+      (Training_Data (1), Tree_Package.First_Child (aTree.Root));
+    Utilities.Print_Classification (Classified);
+    New_Line;
 
     --     Put_Line ("Classify tests, Training_Data (2)");
     --     Classified := Classify (Training_Data (2), aTree);
