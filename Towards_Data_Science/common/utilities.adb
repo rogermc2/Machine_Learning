@@ -140,44 +140,31 @@ package body Utilities is
     begin
         Put_Line ("  Node data:");
         Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
-        --          case Node.Node_Type is
-        --              when Prediction_Kind => null;
-        --              when Decision_Kind => null;
-        --              when Top_Kind => null;
-        --          end case;
-        Print_Rows ("    Rows:", Node.Rows);
+        Print_Question ("    Question", Node.Question);
+        case Node.Node_Type is
+            when Prediction_Kind =>
+                Print_Rows ("        Rows:", Node.Rows);
+                Print_Row ("    Prediction:", Node.Prediction);
+            when Decision_Kind =>
+                Print_Rows ("    True Rows:", Node.True_Branch);
+                Print_Rows ("    False Rows:", Node.False_Branch);
+        end case;
+
     end Print_Node;
 
     --  -------------------------------------------------------------------------
 
-    procedure Print_Prediction (Node : Tree_Node_Type; Indent : Natural := 0) is
+    procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
         use ML_Types;
         use Prediction_Data_Package;
         Num_Rows     : constant Positive := Positive (Node.Rows.Length);
-        Offset       : String (1 .. Indent) := (others => ' ');
         Curs         : Cursor;
         Data         : Prediction_Data;
         Label        : Unbounded_String;
         Predictions  : Prediction_Data_List;
         Prediction   : Unbounded_String;
-        pos          : Natural := 1;
         Found        : Boolean := False;
     begin
-        if Indent > 0 then
-            while pos < Indent loop
-                Offset (pos .. pos + 1) := "  ";
-                pos := pos + 2;
-            end loop;
-            Put (Offset);
-        end if;
-
-        Print_Results_Question (Node.Prediction_Question);
-
-        if Node.Branch then
-            Put_Line (Offset & "--> True:");
-        else
-            Put_Line (Offset & "--> False:");
-        end if;
         for index in 1 .. Num_Rows loop
             Label := Node.Rows.Element (index).Label;
             Curs := Predictions.First;
@@ -198,7 +185,7 @@ package body Utilities is
             end if;
         end loop;
 
-        Prediction := To_Unbounded_String (Offset & "    Predict {");
+        Prediction := To_Unbounded_String (Offset  & "    Predict {");
         Curs := Predictions.First;
         while Has_Element (Curs) loop
             Data := Element (Curs);
@@ -216,7 +203,7 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Question (Message : String;
+    procedure Print_Question (Message  : String;
                               Question : ML_Types.Question_Data) is
         Col          : constant String := To_String (Question.Feature_Name);
         Feature_Kind : constant Data_Type := Question.Feature_Kind;
@@ -251,7 +238,7 @@ package body Utilities is
 
     procedure Print_Results_Question (Question : ML_Types.Question_Data) is
         UB_String : Unbounded_String;
-        begin
+    begin
         Put ("Is " & To_String (Question.Feature_Name));
         case Question.Feature_Kind is
             when Integer_Type =>
@@ -316,67 +303,55 @@ package body Utilities is
 
     procedure Print_Tree (aTree : Tree_Type) is
         use Tree_Package;
+        This_Indent : Natural := 0;
+        Last_Offset : Unbounded_String;
 
         procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
             use Ada.Containers;
-            This_Curs   : Cursor := Curs;
             Node        : Tree_Node_Type;
             True_Child  : Cursor;
             False_Child : Cursor;
-            This_Indent : Natural;
         begin
-            if This_Curs = aTree.Root then
-                This_Indent := 0;
-                Node := Element (First_Child (This_Curs));
+            This_Indent := Indent + 1;
+            Node := Element (Curs);
+            if Is_Leaf  (Curs) then
+                Print_Prediction (Node, To_String (Last_Offset));
             else
-                This_Indent := Indent + 1;
-                Node := Element (This_Curs);
-            end if;
-
-            declare
-                Offset    : String (1 .. This_Indent + 1) := (others => ' ');
-                pos       : Natural := 1;
-            begin
-                if Is_Leaf  (This_Curs) then
-                    Print_Prediction (Node, This_Indent);
-                else
-                    if Indent > 0 then
-                        while pos < This_Indent - 1 loop
-                            Offset (pos .. pos + 1) := "  ";
-                            pos := pos + 2;
-                        end loop;
-                        if pos < Indent + 1 then
-                            Offset (Indent) := ' ';
-                        end if;
-                        Put (Offset);
+                declare
+                    Offset    : String (1 .. This_Indent + 1) := (others => ' ');
+                    pos       : Natural := 1;
+                begin
+                    while pos < This_Indent - 1 loop
+                        Offset (pos .. pos + 2) := "   ";
+                        pos := pos + 2;
+                    end loop;
+                    if pos < Indent + 1 then
+                        Offset (Indent) := ' ';
                     end if;
+                    Put (Offset);
+                    Last_Offset := To_Unbounded_String (Offset);
 
                     if Node.Node_Type = Prediction_Kind then
                         Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
-                        Print_Prediction (Node);
+                        Print_Prediction (Node, Offset);
                     else
-                        if This_Curs = aTree.Root then
-                            This_Curs := First_Child (This_Curs);
-                        end if;
-                        True_Child := First_Child (This_Curs);
-                        if Node.Node_Type /= Top_Kind then
-                            Print_Results_Question (Node.Question);
-                            Put_Line (Offset & "--> True:");
-                        end if;
-
+                        Print_Results_Question (Node.Question);
+                        Put_Line (Offset & "--> True:");
+                        True_Child := First_Child (Curs);
                         Print_Tree_Node (True_Child, This_Indent + 1);
-                        if Child_Count (This_Curs) > 1 then
+
+                        if Child_Count (Curs) > 1 then
                             False_Child := Next_Sibling (True_Child);
                             Put_Line (Offset & "--> False:");
                             Print_Tree_Node (False_Child, This_Indent + 1);
                         end if;
                     end if;
-                end if;
-            end; --  declare block
+                end; --  declare block
+            end if;
         end Print_Tree_Node;
 
     begin
-        Print_Tree_Node (aTree.Root);
+        Print_Tree_Node (First_Child (aTree.Root));
     end Print_Tree;
 
     --  -------------------------------------------------------------------------
