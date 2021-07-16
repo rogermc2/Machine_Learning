@@ -191,13 +191,9 @@ package body Builder is
       Prediction : Prediction_Data;
       Result     : Prediction_Data_List;
    begin
---        New_Line;
---        Utilities.Print_Row ("Builder.Classify row", aRow);
---        Put_Line ("Builder.Classify Node_Type " &
---                    Node_Kind'Image (aNode.Node_Type));
       if aNode.Node_Type = Prediction_Kind then
-         Put_Line ("Builder.Classify label: " &
-                     To_String (aNode.Prediction.Label));
+--           Put_Line ("Builder.Classify label: " &
+--                       To_String (aNode.Prediction.Label));
          Prediction.Label := aNode.Prediction.Label;
          if Result.Contains (Prediction) then
             Prediction.Num_Copies := Prediction.Num_Copies + 1;
@@ -206,9 +202,6 @@ package body Builder is
          end if;
          Result.Append (Prediction);
       else
---           Utilities.Print_Question ("Builder.Classify", aNode.Question);
---           Put_Line ("Builder.Classify decision: " &
---                       Boolean'Image (aNode.Decision_Branch));
          if Match (aNode.Question, aRow) then
             Result := Classify (aRow, First_Child (Node_Cursor));
          else
@@ -575,7 +568,8 @@ package body Builder is
    end To_Question;
 
    --  --------------------------------------------------------------------------
-
+   --  Based on class_counts(rows)
+   --  UB_Label_Counts counts the number of each type of example in a dataset.
    function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map is
       use Rows_Package;
       use UB_Label_Map_Package;
