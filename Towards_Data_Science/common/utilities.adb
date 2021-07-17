@@ -219,7 +219,7 @@ package body Utilities is
       use Prediction_Data_Package;
       Curs         : Cursor;
       Data         : Prediction_Data;
-      Prediction_List  : constant Prediction_Data_List := Predictions (Node);
+      Prediction_List  : constant Prediction_Data_List := Node.Prediction_List;
       Prediction   : Unbounded_String;
    begin
       Prediction := To_Unbounded_String (Offset  & "    Predict {");

@@ -120,6 +120,7 @@ package body Builder is
             Leaf.Decision_Branch := False;
             Leaf.Prediction := Rows.First_Element;
             Leaf.Rows := Rows;
+            leaf.Prediction_List := Utilities.Predictions (Leaf);
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
             theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
