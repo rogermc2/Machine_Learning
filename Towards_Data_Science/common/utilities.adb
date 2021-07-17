@@ -84,6 +84,42 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
+   function Predictions (Node : Tree_Node_Type)
+    return Prediction_Data_List is
+      use ML_Types;
+      use Prediction_Data_Package;
+      Num_Rows        : constant Positive := Positive (Node.Rows.Length);
+      Curs            : Cursor;
+      Label           : Unbounded_String;
+      Data            : Prediction_Data;
+      thePredictions  : Prediction_Data_List;
+      Found           : Boolean := False;
+   begin
+      for index in 1 .. Num_Rows loop
+         Label := Node.Rows.Element (index).Label;
+         Curs := thePredictions.First;
+         Found := False;
+         while Has_Element (Curs) and then not Found loop
+            Data := Element (Curs);
+            Found := Element (Curs).Label = Label;
+            if Found then
+               Data.Num_Copies := Data.Num_Copies + 1;
+               thePredictions.Replace_Element (Curs, Data);
+            end if;
+            Next (Curs);
+         end loop;
+
+         if not Found then
+            Data.Label := Label;
+            thePredictions.Append (Data);
+         end if;
+      end loop;
+      return thePredictions;
+
+   end Predictions;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data) is
       Question     : constant Question_Data :=
                        Builder.Best_Question (Best_Split);
@@ -181,41 +217,18 @@ package body Utilities is
    procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
       use ML_Types;
       use Prediction_Data_Package;
-      Num_Rows     : constant Positive := Positive (Node.Rows.Length);
       Curs         : Cursor;
       Data         : Prediction_Data;
-      Label        : Unbounded_String;
-      Predictions  : Prediction_Data_List;
+      Prediction_List  : constant Prediction_Data_List := Predictions (Node);
       Prediction   : Unbounded_String;
-      Found        : Boolean := False;
    begin
-      for index in 1 .. Num_Rows loop
-         Label := Node.Rows.Element (index).Label;
-         Curs := Predictions.First;
-         Found := False;
-         while Has_Element (Curs) and then not Found loop
-            Data := Element (Curs);
-            Found := Element (Curs).Label = Label;
-            if Found then
-               Data.Num_Copies := Data.Num_Copies + 1;
-               Predictions.Replace_Element (Curs, Data);
-            end if;
-            Next (Curs);
-         end loop;
-
-         if not Found then
-            Data.Label := Label;
-            Predictions.Append (Data);
-         end if;
-      end loop;
-
       Prediction := To_Unbounded_String (Offset  & "    Predict {");
-      Curs := Predictions.First;
+      Curs := Prediction_List.First;
       while Has_Element (Curs) loop
          Data := Element (Curs);
          Prediction := Prediction & "'" & To_String (Data.Label) &
            "':" & Natural'Image (Data.Num_Copies);
-         if not (Curs = Predictions.Last) then
+         if not (Curs = Prediction_List.Last) then
             Prediction := Prediction & ", ";
          end if;
          Next (Curs);

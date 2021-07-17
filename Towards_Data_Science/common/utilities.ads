@@ -10,8 +10,10 @@ package Utilities is
 
    function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type;
    function Is_Boolean (Item : in Unbounded_String) return Boolean;
-   function Is_Integer (Item : in Unbounded_String) return Boolean;
    function Is_Float (Item : in Unbounded_String) return Boolean;
+   function Is_Integer (Item : in Unbounded_String) return Boolean;
+   function Predictions (Node : ML_Types.Tree_Node_Type)
+      return ML_Types.Prediction_Data_List;
    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data);
    procedure Print_Classification
       (Classification : ML_Types.Prediction_Data_List);
