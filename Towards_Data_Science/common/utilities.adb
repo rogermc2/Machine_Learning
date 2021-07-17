@@ -84,70 +84,6 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
-    --  Match compares the feature value in an example to the
-    --  feature value in a question.
-    function Match (Question : Question_Data; Header_Data : Header_Data_Type;
-                    Example_Data : Row_Data) return Boolean is
-        Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
-        Feat_Index       : Class_Range;
-        Example_Feature  : Unbounded_String;
-        Val_Type         : Data_Type;
-        Matches          : Boolean := False;
-        Found            : Boolean := False;
-    begin
-        Val_Type  := Question.Feature_Kind;
-        for col in Header_Data.Features'Range loop
-            --              Put_Line ("Match Header_Data col: " & Class_Range'Image (col));
-            if Feature_Name_Type (Header_Data.Features (col)) = Feature_Name then
-                Feat_Index := col;
-                Found := True;
-            end if;
-        end loop;
-
-        --          if not Found then
-        --              raise Builder_Exception with
-        --              "Builder.Match, invalid feature Question.Feature_Name: " &
-        --                To_String (Feature_Name);
-        --          end if;
-
-        --          Put_Line ("Match Header_Data Feat_Index: " & Class_Range'Image (Feat_Index));
-        if Found then
-            Example_Feature := Example_Data.Features (Feat_Index);
-            case Val_Type is
-                when Integer_Type =>
-                    declare
-                        Value : constant Integer := Question.Integer_Value;
-                    begin
-                        Matches := Value =
-                          Integer'Value (To_String (Example_Feature));
-                    end;
-                when Float_Type =>
-                    declare
-                        Value : constant Float := Question.Float_Value;
-                    begin
-                        Matches := Value =
-                          Float'Value (To_String (Example_Feature));
-                    end;
-                when Boolean_Type =>
-                    declare
-                        Value : constant Boolean := Question.Boolean_Value;
-                    begin
-                        Matches := Value =
-                          Boolean'Value (To_String (Example_Feature));
-                    end;
-                when UB_String_Type =>
-                    declare
-                        Value : constant Unbounded_String := Question.UB_String_Value;
-                    begin
-                        Matches := Value = Example_Feature;
-                    end;
-            end case;
-        end if;
-        return Matches;
-    end Match;
-
-    --  ---------------------------------------------------------------------------
-
     function Predictions (Node : Tree_Node_Type)
                                             return Prediction_Data_List is
         use ML_Types;
@@ -259,7 +195,7 @@ package body Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Print_Leaf_Data (Label_Counts : Prediction_Data_List)
+    function Prediction_String (Label_Counts : Prediction_Data_List)
                                                 return String is
         use Prediction_Data_Package;
         Count_Cursor : Cursor := Label_Counts.First;
@@ -282,7 +218,7 @@ package body Utilities is
             Next (Count_Cursor);
         end loop;
         return To_String (Leaf_Data);
-    end Print_Leaf_Data;
+    end Prediction_String;
 
     --  -------------------------------------------------------------------------
 

@@ -197,6 +197,6 @@ begin
                             Tree_Package.First_Child (aTree.Root)));
       New_Line;
       Put_Line ("Evaluate tests");
-      Evaluate (Training_Data, Tree_Package.First_Child (aTree.Root));
+      Evaluate_Predictions (Training_Data, aTree);
 
 end Decision_Tree;

@@ -221,7 +221,7 @@ package body Builder is
 
     --  -------------------------------------------------------------------------
 
-    procedure Evaluate (Data : Rows_Vector; aTree : Tree_Type) is
+    procedure Evaluate_Predictions (Data : Rows_Vector; aTree : Tree_Type) is
         use Rows_Package;
         aRow : Row_Data;
     begin
@@ -241,7 +241,7 @@ package body Builder is
                 Utilities.Print_Rows ("    True Rows:", Node.True_Branch);
                 Utilities.Print_Rows ("    False Rows:", Node.False_Branch);
         end case;
-    end Evaluate;
+    end Evaluate_Predictions;
 
     --  -----------------------------------------------------------------------
     --   Find_Best_Split finds the best question to ask by iterating over every
