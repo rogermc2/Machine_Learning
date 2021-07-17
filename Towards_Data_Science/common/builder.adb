@@ -119,7 +119,7 @@ package body Builder is
             New_Line;
             Leaf.Decision_Branch := False;
             Leaf.Prediction := Rows.First_Element;
-            Leaf.Rows := Rows;
+            --              Leaf.Rows := Rows;
             leaf.Prediction_List := Utilities.Predictions (Leaf);
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
@@ -191,7 +191,7 @@ package body Builder is
     --  container.
 
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
-                      return Prediction_Data_List is
+                       return Prediction_Data_List is
         use Tree_Package;
         --        use Prediction_Data_Package;
         aNode           : constant Tree_Node_Type := Element (Node_Cursor);
@@ -218,6 +218,30 @@ package body Builder is
             raise;
             return Prediction_List;
     end Classify;
+
+    --  -------------------------------------------------------------------------
+
+    procedure Evaluate (Data : Rows_Vector; aTree : Tree_Type) is
+        use Rows_Package;
+        aRow : Row_Data;
+    begin
+        for index in Data.First_Index .. Data.Last_Index loop
+            aRow := Data.Element (index);
+            --              Put_Line ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
+            --                          Utilities.Print_Leaf_Data (Classify (aRow, Node));
+        end loop;
+
+        Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
+        Utilities.Print_Question ("    Question", Node.Question);
+        case Node.Node_Type is
+            when Prediction_Kind =>
+                Utilities.Print_Rows ("        Rows:", Node.Rows);
+                Utilities.Print_Row ("    Prediction:", Node.Prediction);
+            when Decision_Kind =>
+                Utilities.Print_Rows ("    True Rows:", Node.True_Branch);
+                Utilities.Print_Rows ("    False Rows:", Node.False_Branch);
+        end case;
+    end Evaluate;
 
     --  -----------------------------------------------------------------------
     --   Find_Best_Split finds the best question to ask by iterating over every
@@ -316,7 +340,7 @@ package body Builder is
     --  Match compares the feature value in an example to the
     --  feature value in a question.
     function Match (Question : Question_Data; Example_Data : Row_Data)
-                   return Boolean is
+                    return Boolean is
         Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
         Feat_Index       : Class_Range;
         Example_Feature  : Unbounded_String;
@@ -428,7 +452,7 @@ package body Builder is
     --  ---------------------------------------------------------------------------
 
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows is
+                        return Partitioned_Rows is
         True_Rows  : Rows_Vector;
         False_Rows : Rows_Vector;
         Data       : Row_Data;

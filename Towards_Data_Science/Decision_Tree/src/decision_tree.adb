@@ -196,6 +196,7 @@ begin
       Utilities.Print_Leaf (Classify (Training_Data (2),
                             Tree_Package.First_Child (aTree.Root)));
       New_Line;
-   --     Put_Line ("Evaluate tests");
-   --     Evaluate (To_Vector (Training_Data), aTree);
+      Put_Line ("Evaluate tests");
+      Evaluate (Training_Data, Tree_Package.First_Child (aTree.Root));
+
 end Decision_Tree;
