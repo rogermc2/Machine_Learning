@@ -223,18 +223,20 @@ package body Builder is
 
     procedure Evaluate (aTree : Tree_Type; Test_Data : Rows_Vector) is
         use Rows_Package;
-        Top_Cursor : constant Tree_Cursor :=
+        Top  : constant Tree_Cursor :=
                        Tree_Package.First_Child (aTree.Root);
-        aRow       : Row_Data;  --  Features and Label
+        aRow : Row_Data;  --  Features and Label
     begin
         --  Data.First_Index is header row
         for index in Test_Data.First_Index .. Test_Data.Last_Index loop
             aRow := Test_Data.Element (index);
---              Put_Line ("Classify test,  Print_Leaf Data");
---              Utilities.Print_Leaf (Classify (Top_Cursor, aRow));
+            Utilities.Print_Row ("aRow", aRow);
+            Put_Line ("Classify test,  Print_Leaf Data");
+            Utilities.Print_Leaf (Classify (Top, aRow));
             Put_Line
               ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
-                 Utilities.Prediction_String (Classify (Top_Cursor, aRow)));
+                 Utilities.Prediction_String (Classify (Top, aRow)));
+            New_Line;
         end loop;
         New_Line;
 
