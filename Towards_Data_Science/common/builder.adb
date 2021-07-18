@@ -119,7 +119,7 @@ package body Builder is
             New_Line;
             Leaf.Decision_Branch := False;
             Leaf.Prediction := Rows.First_Element;
-            --              Leaf.Rows := Rows;
+            Leaf.Rows := Rows;
             leaf.Prediction_List := Utilities.Predictions (Leaf);
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
@@ -221,27 +221,20 @@ package body Builder is
 
     --  -------------------------------------------------------------------------
 
-    procedure Evaluate_Predictions (Data : Rows_Vector; aTree : Tree_Type) is
+    procedure Evaluate (Data : Rows_Vector; aTree : Tree_Type) is
+        use Tree_Package;
         use Rows_Package;
-        aRow : Row_Data;
+        Top_Cursor : constant Tree_Cursor := First_Child (aTree.Root);
+        aRow       : Row_Data;
     begin
-        for index in Data.First_Index .. Data.Last_Index loop
+        --  Data.First_Index is header row
+        for index in Positive'Succ (Data.First_Index) .. Data.Last_Index loop
             aRow := Data.Element (index);
-            --              Put_Line ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
-            --                          Utilities.Print_Leaf_Data (Classify (aRow, Node));
+            Put_Line ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
+                        Utilities.Prediction_String (Classify (aRow, Top_Cursor)));
         end loop;
 
-        Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
-        Utilities.Print_Question ("    Question", Node.Question);
-        case Node.Node_Type is
-            when Prediction_Kind =>
-                Utilities.Print_Rows ("        Rows:", Node.Rows);
-                Utilities.Print_Row ("    Prediction:", Node.Prediction);
-            when Decision_Kind =>
-                Utilities.Print_Rows ("    True Rows:", Node.True_Branch);
-                Utilities.Print_Rows ("    False Rows:", Node.False_Branch);
-        end case;
-    end Evaluate_Predictions;
+    end Evaluate;
 
     --  -----------------------------------------------------------------------
     --   Find_Best_Split finds the best question to ask by iterating over every

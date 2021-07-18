@@ -85,7 +85,7 @@ package body Utilities is
     --  ---------------------------------------------------------------------------
 
     function Predictions (Node : Tree_Node_Type)
-                                            return Prediction_Data_List is
+                          return Prediction_Data_List is
         use ML_Types;
         use Prediction_Data_Package;
         Num_Rows        : constant Positive := Positive (Node.Rows.Length);

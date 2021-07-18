@@ -13,7 +13,7 @@ package Builder is
     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
                        return ML_Types.Prediction_Data_List;
-    procedure Evaluate_Predictions (Data : Rows_Vector; aTree : Tree_Type);
+    procedure Evaluate (Data : Rows_Vector; aTree : Tree_Type);
     function Find_Best_Split (Rows : Rows_Vector) return Best_Data;
     function Gain (Data : Best_Data) return Float;
     function Gini (Rows : Rows_Vector) return Float;
