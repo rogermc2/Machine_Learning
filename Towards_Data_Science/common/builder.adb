@@ -190,7 +190,7 @@ package body Builder is
     --  node is part of the container even if the node is moved within the
     --  container.
 
-    function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
+    function Classify (Node_Cursor : Tree_Cursor; aRow : Row_Data)
                        return Predictions_List is
         use Tree_Package;
         --        use Prediction_Data_Package;
@@ -205,9 +205,9 @@ package body Builder is
             Predictions := aNode.Prediction_List;
         else
             if Match (aNode.Question, aRow) then
-                Predictions := Classify (aRow, First_Child (Node_Cursor));
+                Predictions := Classify (First_Child (Node_Cursor), aRow);
             else
-                Predictions := Classify (aRow, Last_Child (Node_Cursor));
+                Predictions := Classify (Last_Child (Node_Cursor), aRow);
             end if;
         end if;
         return Predictions;
@@ -225,15 +225,18 @@ package body Builder is
         use Rows_Package;
         Top_Cursor : constant Tree_Cursor :=
                        Tree_Package.First_Child (aTree.Root);
-        aRow       : Row_Data;
+        aRow       : Row_Data;  --  Features and Label
     begin
         --  Data.First_Index is header row
         for index in Test_Data.First_Index .. Test_Data.Last_Index loop
             aRow := Test_Data.Element (index);
+--              Put_Line ("Classify test,  Print_Leaf Data");
+--              Utilities.Print_Leaf (Classify (Top_Cursor, aRow));
             Put_Line
               ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
-                 Utilities.Prediction_String (Classify (aRow, Top_Cursor)));
+                 Utilities.Prediction_String (Classify (Top_Cursor, aRow)));
         end loop;
+        New_Line;
 
     end Evaluate;
 

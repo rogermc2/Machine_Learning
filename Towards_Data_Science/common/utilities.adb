@@ -200,23 +200,26 @@ package body Utilities is
         Count_Cursor : Cursor := Label_Counts.First;
         Prediction   : Prediction_Data;
         Total        : Natural := 0;
-        Leaf_Data    : Unbounded_String;
+        Leaf_Data    : Unbounded_String := To_Unbounded_String
+              ("{'");
     begin
         while Has_Element (Count_Cursor) loop
             Total := Total + Element (Count_Cursor).Num_Copies;
             Next (Count_Cursor);
         end loop;
-
         Count_Cursor := Label_Counts.First;
         while Has_Element (Count_Cursor) loop
             Prediction := Element (Count_Cursor);
-            Leaf_Data := To_Unbounded_String
-              ("{'" & To_String (Prediction.Label) & "': '" &
+            Leaf_Data := Leaf_Data & To_Unbounded_String
+              (To_String (Prediction.Label) & "': '" &
                  Integer'Image ((100 * Prediction.Num_Copies) / Total) &
-                 "%'}");
+                 "%'");
+            if Count_Cursor /= Label_Counts.Last then
+                Leaf_Data := Leaf_Data & ", ";
+            end if;
             Next (Count_Cursor);
         end loop;
-        return To_String (Leaf_Data);
+        return To_String (Leaf_Data) & "}";
     end Prediction_String;
 
     --  -------------------------------------------------------------------------

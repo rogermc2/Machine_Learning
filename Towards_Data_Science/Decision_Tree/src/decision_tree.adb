@@ -189,25 +189,28 @@ begin
 
     Put_Line ("Classify tests, Training_Data (1)");
     Classified := Classify
-      (Training_Data (1), Tree_Package.First_Child (aTree.Root));
+      (Tree_Package.First_Child (aTree.Root), Training_Data (1));
     Utilities.Print_Classification (Classified);
     New_Line;
 
     Put_Line ("Classify tests, Training_Data (2)");
-    Classified := Classify (Training_Data (2),
-                            Tree_Package.First_Child (aTree.Root));
+    Classified := Classify (Tree_Package.First_Child (aTree.Root),
+                            Training_Data (2));
     Put_Line ("Classify tests,  Classified");
     Utilities.Print_Classification (Classified);
     New_Line;
     Put_Line ("Classify tests,  Print_Leaf Training_Data (1)");
-    Utilities.Print_Leaf (Classify (Training_Data (1),
-                          Tree_Package.First_Child (aTree.Root)));
+    Utilities.Print_Leaf (Classify (Tree_Package.First_Child (aTree.Root),
+                          Training_Data (1)));
     New_Line;
     Put_Line ("Classify tests,  Print_Leaf Training_Data (2)");
-    Utilities.Print_Leaf (Classify (Training_Data (2),
-                          Tree_Package.First_Child (aTree.Root)));
+    Utilities.Print_Leaf (Classify (Tree_Package.First_Child (aTree.Root),
+                          Training_Data (2)));
     New_Line;
-    Put_Line ("Evaluate tests");
+    Put_Line ("Evaluate Training_Data");
+    Evaluate (aTree, Training_Data);
+    Put_Line ("Evaluate tests Testing_Data");
+    New_Line;
     Evaluate (aTree, Testing_Data);
 
 end Decision_Tree;
