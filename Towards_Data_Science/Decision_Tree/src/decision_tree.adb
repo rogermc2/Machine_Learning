@@ -33,12 +33,12 @@ procedure Decision_Tree is
 
     Testing_Set : constant Data_Rows (1 .. 6) :=
     --  Feature 1, Feature 2, Label
-                     (UB ("Colour,Diameter,Fruit"),
-                      UB ("Green, 3, Apple"),
-                      UB ("Yellow, 4, Apple"),
-                      UB ("Red, 2, Grape"),
-                      UB ("Red, 1, Grape"),
-                      UB ("Yellow, 3, Lemon"));
+                    (UB ("Colour,Diameter,Fruit"),
+                     UB ("Green, 3, Apple"),
+                     UB ("Yellow, 4, Apple"),
+                     UB ("Red, 2, Grape"),
+                     UB ("Red, 1, Grape"),
+                     UB ("Yellow, 3, Lemon"));
 
     Training_Data       : constant Rows_Vector := Initialize (Training_Set);
     --      Training_Data2      : Rows_Vector;
@@ -62,7 +62,7 @@ procedure Decision_Tree is
     P_Rows              : Partitioned_Rows;
     Best_Test           : Best_Data;
     aTree               : Tree_Type;
-    Classified          : Prediction_Data_List;
+    Classified          : Predictions_List;
 begin
     New_Line;
     Put ("Features:");
@@ -208,6 +208,6 @@ begin
                           Tree_Package.First_Child (aTree.Root)));
     New_Line;
     Put_Line ("Evaluate tests");
-    Evaluate (Testing_Data, aTree);
+    Evaluate (aTree, Testing_Data);
 
 end Decision_Tree;

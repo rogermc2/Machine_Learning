@@ -75,7 +75,8 @@ package ML_Types is
 
     package Prediction_Data_Package is new
       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
-    subtype Prediction_Data_List is Prediction_Data_Package.List;
+    subtype Predictions_List is Prediction_Data_Package.List;
+
     type Raw_Question is record
         Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
         Feature_Value : Unbounded_String;  --  e.g. "Green"
@@ -103,7 +104,7 @@ package ML_Types is
         when Prediction_Kind =>
             Rows            : Rows_Vector := Rows_Package.Empty_Vector;
             Prediction      : Row_Data;
-            Prediction_List : Prediction_Data_List;
+            Prediction_List : Predictions_List;
         end case;
     end record;
 

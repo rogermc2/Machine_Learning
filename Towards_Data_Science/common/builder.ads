@@ -12,8 +12,8 @@ package Builder is
     function Best_Question (Data : Best_Data) return Question_Data;
     function Build_Tree (Rows : Rows_Vector) return Tree_Type;
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
-                       return ML_Types.Prediction_Data_List;
-    procedure Evaluate (Data : Rows_Vector; aTree : Tree_Type);
+                       return ML_Types.Predictions_List;
+    procedure Evaluate (aTree : Tree_Type; Test_Data : Rows_Vector);
     function Find_Best_Split (Rows : Rows_Vector) return Best_Data;
     function Gain (Data : Best_Data) return Float;
     function Gini (Rows : Rows_Vector) return Float;

@@ -99,8 +99,8 @@ package body Builder is
         use Tree_Package;
         theTree   : Tree_Type := Empty_Tree;
 
-        procedure Add_New_Decision_Node (Parent_Cursor : Tree_Cursor;
-                                         Best_Split : Best_Data) is
+        procedure Add_Decision_Node (Parent_Cursor : Tree_Cursor;
+                                     Best_Split : Best_Data) is
             Node  : Tree_Node_Type (Decision_Kind);
         begin
             Node.Decision_Branch := True;
@@ -110,10 +110,10 @@ package body Builder is
             theTree.Insert_Child (Parent   => Parent_Cursor,
                                   Before   => No_Element,
                                   New_Item => Node);
-        end Add_New_Decision_Node;
+        end Add_Decision_Node;
 
-        procedure Add_New_Prediction_Node (Parent_Cursor : Tree_Cursor;
-                                           Rows          : Rows_Vector) is
+        procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
+                                       Rows      : Rows_Vector) is
             Leaf : Tree_Node_Type (Prediction_Kind);
         begin
             New_Line;
@@ -124,7 +124,7 @@ package body Builder is
             Utilities.Print_Rows ("Prediction", Rows);
             New_Line;
             theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
-        end Add_New_Prediction_Node;
+        end Add_Prediction_Node;
 
         procedure Add_Branch (Rows          : Rows_Vector;
                               Parent_Cursor : Tree_Cursor) is
@@ -136,11 +136,11 @@ package body Builder is
             False_Split_Rows : Rows_Vector;
         begin
             if Best_Split.Gain = 0.0 then
-                Add_New_Prediction_Node (Parent_Cursor, Rows);
+                Add_Prediction_Node (Parent_Cursor, Rows);
             else
                 Utilities.Print_Question ("Add_Branch Best split",
                                           Best_Split.Question);
-                Add_New_Decision_Node (Parent_Cursor, Best_Split);
+                Add_Decision_Node (Parent_Cursor, Best_Split);
                 True_Split_Rows := Best_Split.True_Rows;
                 False_Split_Rows := Best_Split.False_Rows;
                 Child_Cursor := Last_Child (Parent_Cursor);
@@ -191,47 +191,48 @@ package body Builder is
     --  container.
 
     function Classify (aRow : Row_Data; Node_Cursor : Tree_Cursor)
-                       return Prediction_Data_List is
+                       return Predictions_List is
         use Tree_Package;
         --        use Prediction_Data_Package;
-        aNode           : constant Tree_Node_Type := Element (Node_Cursor);
+        aNode       : constant Tree_Node_Type := Element (Node_Cursor);
         --        Prediction      : Prediction_Data;
-        Prediction_List : Prediction_Data_List;
+        Predictions : Predictions_List;
     begin
         if aNode.Node_Type = Prediction_Kind then
             --  isinstance(node, Leaf) -> if node is a leaf
             --           Put_Line ("Builder.Classify label: " &
             --                       To_String (aNode.Prediction.Label));
-            Prediction_List := aNode.Prediction_List;
+            Predictions := aNode.Prediction_List;
         else
             if Match (aNode.Question, aRow) then
-                Prediction_List := Classify (aRow, First_Child (Node_Cursor));
+                Predictions := Classify (aRow, First_Child (Node_Cursor));
             else
-                Prediction_List := Classify (aRow, Last_Child (Node_Cursor));
+                Predictions := Classify (aRow, Last_Child (Node_Cursor));
             end if;
         end if;
-        return Prediction_List;
+        return Predictions;
 
     exception
         when others =>
             Put_Line ("Print_Classification exception");
             raise;
-            return Prediction_List;
+            return Predictions;
     end Classify;
 
     --  -------------------------------------------------------------------------
 
-    procedure Evaluate (Data : Rows_Vector; aTree : Tree_Type) is
-        use Tree_Package;
+    procedure Evaluate (aTree : Tree_Type; Test_Data : Rows_Vector) is
         use Rows_Package;
-        Top_Cursor : constant Tree_Cursor := First_Child (aTree.Root);
+        Top_Cursor : constant Tree_Cursor :=
+                       Tree_Package.First_Child (aTree.Root);
         aRow       : Row_Data;
     begin
         --  Data.First_Index is header row
-        for index in Positive'Succ (Data.First_Index) .. Data.Last_Index loop
-            aRow := Data.Element (index);
-            Put_Line ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
-                        Utilities.Prediction_String (Classify (aRow, Top_Cursor)));
+        for index in Test_Data.First_Index .. Test_Data.Last_Index loop
+            aRow := Test_Data.Element (index);
+            Put_Line
+              ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
+                 Utilities.Prediction_String (Classify (aRow, Top_Cursor)));
         end loop;
 
     end Evaluate;

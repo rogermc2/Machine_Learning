@@ -84,15 +84,14 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
-    function Predictions (Node : Tree_Node_Type)
-                          return Prediction_Data_List is
+    function Predictions (Node : Tree_Node_Type) return Predictions_List is
         use ML_Types;
         use Prediction_Data_Package;
         Num_Rows        : constant Positive := Positive (Node.Rows.Length);
         Curs            : Cursor;
         Label           : Unbounded_String;
         Data            : Prediction_Data;
-        thePredictions  : Prediction_Data_List;
+        thePredictions  : Predictions_List;
         Found           : Boolean := False;
     begin
         for index in 1 .. Num_Rows loop
@@ -144,7 +143,7 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Classification (Classification : Prediction_Data_List) is
+    procedure Print_Classification (Classification : Predictions_List) is
         use Prediction_Data_Package;
         Curs        : Cursor := Classification.First;
         Data        : Prediction_Data;
@@ -171,7 +170,7 @@ package body Utilities is
 
     --  --------------------------------------------------------------------------
 
-    procedure Print_Leaf (Label_Counts : Prediction_Data_List) is
+    procedure Print_Leaf (Label_Counts : Predictions_List) is
         use Prediction_Data_Package;
         Count_Cursor : Cursor := Label_Counts.First;
         Prediction   : Prediction_Data;
@@ -195,8 +194,8 @@ package body Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Prediction_String (Label_Counts : Prediction_Data_List)
-                                                return String is
+    function Prediction_String (Label_Counts : Predictions_List)
+                                return String is
         use Prediction_Data_Package;
         Count_Cursor : Cursor := Label_Counts.First;
         Prediction   : Prediction_Data;
@@ -246,7 +245,7 @@ package body Utilities is
         use Prediction_Data_Package;
         Curs         : Cursor;
         Data         : Prediction_Data;
-        Prediction_List  : constant Prediction_Data_List := Node.Prediction_List;
+        Prediction_List  : constant Predictions_List := Node.Prediction_List;
         Prediction   : Unbounded_String;
     begin
         Prediction := To_Unbounded_String (Offset  & "    Predict {");
