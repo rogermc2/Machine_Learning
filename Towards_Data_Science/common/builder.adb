@@ -193,9 +193,7 @@ package body Builder is
     function Classify (Node_Cursor : Tree_Cursor; aRow : Row_Data)
                        return Predictions_List is
         use Tree_Package;
-        --        use Prediction_Data_Package;
         aNode       : constant Tree_Node_Type := Element (Node_Cursor);
-        --        Prediction      : Prediction_Data;
         Predictions : Predictions_List;
     begin
         if aNode.Node_Type = Prediction_Kind then
@@ -321,7 +319,7 @@ package body Builder is
 
     --  ------------------------------------------------------------------------
 
-    function Initialize (Rows : Data_Rows) return Rows_Vector is
+    function Initialize_Training_Data (Rows : Data_Rows) return Rows_Vector is
         New_Vector  : Rows_Vector;
         First_Index : constant Positive := Rows'First;
         aRow        : Row_Data;
@@ -332,7 +330,20 @@ package body Builder is
             New_Vector.Append (aRow);
         end loop;
         return New_Vector;
-    end Initialize;
+    end Initialize_Training_Data;
+
+    --  --------------------------------------------------------------------------
+
+    function Initialize_Test_Data (Rows : Data_Rows) return Rows_Vector is
+        New_Vector  : Rows_Vector;
+        aRow        : Row_Data;
+    begin
+        for index in Rows'First .. Rows'Last loop
+            aRow := Parse (To_String (Rows (index)));
+            New_Vector.Append (aRow);
+        end loop;
+        return New_Vector;
+    end Initialize_Test_Data;
 
     --  --------------------------------------------------------------------------
 

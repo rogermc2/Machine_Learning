@@ -31,18 +31,19 @@ procedure Decision_Tree is
     --                        UB ("Yellow, 3, Apple"),
     --                        UB ("Yellow, 3, Lemon"));
 
-    Testing_Set : constant Data_Rows (1 .. 6) :=
-    --  Feature 1, Feature 2, Label
-                    (UB ("Colour,Diameter,Fruit"),
-                     UB ("Green, 3, Apple"),
+    Testing_Set : constant Data_Rows (1 .. 5) :=
+             --  Feature 1, Feature 2, Label
+                    (UB ("Green, 3, Apple"),
                      UB ("Yellow, 4, Apple"),
                      UB ("Red, 2, Grape"),
                      UB ("Red, 1, Grape"),
                      UB ("Yellow, 3, Lemon"));
 
-    Training_Data       : constant Rows_Vector := Initialize (Training_Set);
+    Training_Data       : constant Rows_Vector :=
+                            Initialize_Training_Data (Training_Set);
     --      Training_Data2      : Rows_Vector;
-    Testing_Data        : constant Rows_Vector := Initialize (Testing_Set);
+    Testing_Data        : constant Rows_Vector :=
+                            Initialize_Test_Data (Testing_Set);
 
     aRaw_Question       : Raw_Question;
     aQuestion           : Question_Data;  --  Default is integer data

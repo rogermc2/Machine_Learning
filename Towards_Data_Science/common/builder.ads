@@ -19,8 +19,9 @@ package Builder is
     function Gini (Rows : Rows_Vector) return Float;
     function Header_Row return Header_Data_Type;
     function Information_Gain (Left, Right : Rows_Vector;
-                               Current_Uncertainty : Float) return float;
-    function Initialize (Rows : Data_Rows) return Rows_Vector;
+                               Current_Uncertainty : Float) return Float;
+    function Initialize_Training_Data (Rows : Data_Rows) return Rows_Vector;
+    function Initialize_Test_Data (Rows : Data_Rows) return Rows_Vector;
     function Match (Question : Question_Data;
                     Example_Data : Row_Data) return Boolean;
     function Num_Features (aString : String) return Class_Range;
