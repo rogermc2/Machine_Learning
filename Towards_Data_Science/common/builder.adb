@@ -198,8 +198,6 @@ package body Builder is
     begin
         if aNode.Node_Type = Prediction_Kind then
             --  isinstance(node, Leaf) -> if node is a leaf
-            --           Put_Line ("Builder.Classify label: " &
-            --                       To_String (aNode.Prediction.Label));
             Predictions := aNode.Prediction_List;
         else
             if Match (aNode.Question, aRow) then
@@ -228,13 +226,9 @@ package body Builder is
         --  Data.First_Index is header row
         for index in Test_Data.First_Index .. Test_Data.Last_Index loop
             aRow := Test_Data.Element (index);
---              Utilities.Print_Row ("aRow", aRow);
---              Put_Line ("Classify test,  Print_Leaf Data");
---              Utilities.Print_Leaf (Classify (Top, aRow));
             Put_Line
               ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
                  Utilities.Prediction_String (Classify (Top, aRow)));
---              New_Line;
         end loop;
         New_Line;
 
@@ -367,13 +361,6 @@ package body Builder is
             end if;
         end loop;
 
-        --          if not Found then
-        --              raise Builder_Exception with
-        --              "Builder.Match, invalid feature Question.Feature_Name: " &
-        --                To_String (Feature_Name);
-        --          end if;
-
-        --          Put_Line ("Match Header_Data Feat_Index: " & Class_Range'Image (Feat_Index));
         if Found then
             Example_Feature := Example_Data.Features (Feat_Index);
             case Val_Type is
