@@ -224,19 +224,19 @@ package body Builder is
     procedure Evaluate (aTree : Tree_Type; Test_Data : Rows_Vector) is
         use Rows_Package;
         Top  : constant Tree_Cursor :=
-                       Tree_Package.First_Child (aTree.Root);
+                 Tree_Package.First_Child (aTree.Root);
         aRow : Row_Data;  --  Features and Label
     begin
         --  Data.First_Index is header row
         for index in Test_Data.First_Index .. Test_Data.Last_Index loop
             aRow := Test_Data.Element (index);
-            Utilities.Print_Row ("aRow", aRow);
-            Put_Line ("Classify test,  Print_Leaf Data");
-            Utilities.Print_Leaf (Classify (Top, aRow));
+--              Utilities.Print_Row ("aRow", aRow);
+--              Put_Line ("Classify test,  Print_Leaf Data");
+--              Utilities.Print_Leaf (Classify (Top, aRow));
             Put_Line
               ("  Actual: " & To_String (aRow.Label) & ".  Predicted: " &
                  Utilities.Prediction_String (Classify (Top, aRow)));
-            New_Line;
+--              New_Line;
         end loop;
         New_Line;
 
@@ -368,30 +368,31 @@ package body Builder is
             case Val_Type is
             when Integer_Type =>
                 declare
-                    Value : constant Integer := Question.Integer_Value;
+                    Question_Value : constant Integer := Question.Integer_Value;
                 begin
-                    Matches := Value =
-                      Integer'Value (To_String (Example_Feature));
+                    Matches := Integer'Value (To_String (Example_Feature)) >=
+                      Question_Value;
                 end;
             when Float_Type =>
                 declare
-                    Value : constant Float := Question.Float_Value;
+                    Question_Value : constant Float := Question.Float_Value;
                 begin
-                    Matches := Value =
-                      Float'Value (To_String (Example_Feature));
+                    Matches := Float'Value (To_String (Example_Feature)) >=
+                      Question_Value;
                 end;
             when Boolean_Type =>
                 declare
-                    Value : constant Boolean := Question.Boolean_Value;
+                    Question_Value : constant Boolean := Question.Boolean_Value;
                 begin
-                    Matches := Value =
-                      Boolean'Value (To_String (Example_Feature));
+                    Matches := Boolean'Value (To_String (Example_Feature)) =
+                      Question_Value;
                 end;
             when UB_String_Type =>
                 declare
-                    Value : constant Unbounded_String := Question.UB_String_Value;
+                    Question_Value : constant Unbounded_String :=
+                                       Question.UB_String_Value;
                 begin
-                    Matches := Value = Example_Feature;
+                    Matches := Example_Feature = Question_Value;
                 end;
             end case;
         end if;
