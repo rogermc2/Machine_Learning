@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Builder; use Builder;
 with ML_Types; use ML_Types;
+
 with Utilities;
 
 --  Decision tree models where the target variable can take a discrete set of
@@ -71,6 +72,7 @@ begin
         Put (" " & To_String (Header.Features (index)));
     end loop;
     New_Line;
+
     Utilities.Print_Unique_Values (Training_Data, Colour_Feature);
     Utilities.Print_Unique_Values (Training_Data, Diameter_Feature);
     Utilities.Print_UB_Label_Counts (Training_Data);
