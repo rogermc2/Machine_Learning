@@ -84,6 +84,41 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
+    function Predictions (Node : Tree_Node_Type) return Predictions_List is
+        use ML_Types;
+        use Prediction_Data_Package;
+        Num_Rows        : constant Positive := Positive (Node.Rows.Length);
+        Curs            : Cursor;
+        Label           : Unbounded_String;
+        Data            : Prediction_Data;
+        thePredictions  : Predictions_List;
+        Found           : Boolean := False;
+    begin
+        for index in 1 .. Num_Rows loop
+            Label := Node.Rows.Element (index).Label;
+            Curs := thePredictions.First;
+            Found := False;
+            while Has_Element (Curs) and then not Found loop
+                Data := Element (Curs);
+                Found := Element (Curs).Label = Label;
+                if Found then
+                    Data.Num_Copies := Data.Num_Copies + 1;
+                    thePredictions.Replace_Element (Curs, Data);
+                end if;
+                Next (Curs);
+            end loop;
+
+            if not Found then
+                Data.Label := Label;
+                thePredictions.Append (Data);
+            end if;
+        end loop;
+        return thePredictions;
+
+    end Predictions;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Best (Message : String; Best_Split : Builder.Best_Data) is
         Question     : constant Question_Data :=
                          Builder.Best_Question (Best_Split);
@@ -108,7 +143,7 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Classification (Classification : Prediction_Data_List) is
+    procedure Print_Classification (Classification : Predictions_List) is
         use Prediction_Data_Package;
         Curs        : Cursor := Classification.First;
         Data        : Prediction_Data;
@@ -135,6 +170,60 @@ package body Utilities is
 
     --  --------------------------------------------------------------------------
 
+    procedure Print_Leaf (Label_Counts : Predictions_List) is
+        use Prediction_Data_Package;
+        Count_Cursor : Cursor := Label_Counts.First;
+        Prediction   : Prediction_Data;
+        Total        : Natural := 0;
+    begin
+        Put_Line ("Predictions:");
+        while Has_Element (Count_Cursor) loop
+            Total := Total + Element (Count_Cursor).Num_Copies;
+            Next (Count_Cursor);
+        end loop;
+
+        Count_Cursor := Label_Counts.First;
+        while Has_Element (Count_Cursor) loop
+            Prediction := Element (Count_Cursor);
+            Put_Line  ("{'" & To_String (Prediction.Label) & "': '" &
+                         Integer'Image ((100 * Prediction.Num_Copies) / Total) &
+                         "%'}");
+            Next (Count_Cursor);
+        end loop;
+    end Print_Leaf;
+
+    --  -------------------------------------------------------------------------
+
+    function Prediction_String (Label_Counts : Predictions_List)
+                                return String is
+        use Prediction_Data_Package;
+        Count_Cursor : Cursor := Label_Counts.First;
+        Prediction   : Prediction_Data;
+        Total        : Natural := 0;
+        Leaf_Data    : Unbounded_String := To_Unbounded_String
+              ("{'");
+    begin
+        while Has_Element (Count_Cursor) loop
+            Total := Total + Element (Count_Cursor).Num_Copies;
+            Next (Count_Cursor);
+        end loop;
+        Count_Cursor := Label_Counts.First;
+        while Has_Element (Count_Cursor) loop
+            Prediction := Element (Count_Cursor);
+            Leaf_Data := Leaf_Data & To_Unbounded_String
+              (To_String (Prediction.Label) & "': '" &
+                 Integer'Image ((100 * Prediction.Num_Copies) / Total) &
+                 "%'");
+            if Count_Cursor /= Label_Counts.Last then
+                Leaf_Data := Leaf_Data & ", ";
+            end if;
+            Next (Count_Cursor);
+        end loop;
+        return To_String (Leaf_Data) & "}";
+    end Prediction_String;
+
+    --  -------------------------------------------------------------------------
+
     procedure Print_Node (Node : Tree_Node_Type) is
 
     begin
@@ -157,41 +246,18 @@ package body Utilities is
     procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
         use ML_Types;
         use Prediction_Data_Package;
-        Num_Rows     : constant Positive := Positive (Node.Rows.Length);
         Curs         : Cursor;
         Data         : Prediction_Data;
-        Label        : Unbounded_String;
-        Predictions  : Prediction_Data_List;
+        Prediction_List  : constant Predictions_List := Node.Prediction_List;
         Prediction   : Unbounded_String;
-        Found        : Boolean := False;
     begin
-        for index in 1 .. Num_Rows loop
-            Label := Node.Rows.Element (index).Label;
-            Curs := Predictions.First;
-            Found := False;
-            while Has_Element (Curs) and then not Found loop
-                Data := Element (Curs);
-                Found := Element (Curs).Label = Label;
-                if Found then
-                    Data.Num_Copies := Data.Num_Copies + 1;
-                    Predictions.Replace_Element (Curs, Data);
-                end if;
-                Next (Curs);
-            end loop;
-
-            if not Found then
-                Data.Label := Label;
-                Predictions.Append (Data);
-            end if;
-        end loop;
-
         Prediction := To_Unbounded_String (Offset  & "    Predict {");
-        Curs := Predictions.First;
+        Curs := Prediction_List.First;
         while Has_Element (Curs) loop
             Data := Element (Curs);
             Prediction := Prediction & "'" & To_String (Data.Label) &
               "':" & Natural'Image (Data.Num_Copies);
-            if not (Curs = Predictions.Last) then
+            if not (Curs = Prediction_List.Last) then
                 Prediction := Prediction & ", ";
             end if;
             Next (Curs);
@@ -385,14 +451,14 @@ package body Utilities is
         while Has_Element (Curs) loop
             Data := Element (Curs);
             case Data.Feature_Kind is
-            when Boolean_Type =>
-                Put (" " & Boolean'Image (Data.Boolean_Value));
-            when Float_Type =>
-                Put (" " & Float'Image (Data.Float_Value));
-            when Integer_Type =>
-                Put (" " & Integer'Image (Data.Integer_Value));
-            when UB_String_Type =>
-                Put (" " & To_String (Data.UB_String_Value));
+                when Boolean_Type =>
+                    Put (" " & Boolean'Image (Data.Boolean_Value));
+                when Float_Type =>
+                    Put (" " & Float'Image (Data.Float_Value));
+                when Integer_Type =>
+                    Put (" " & Integer'Image (Data.Integer_Value));
+                when UB_String_Type =>
+                    Put (" " & To_String (Data.UB_String_Value));
             end case;
             Next (Curs);
         end loop;

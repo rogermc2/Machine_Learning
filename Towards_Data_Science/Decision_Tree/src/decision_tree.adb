@@ -31,14 +31,26 @@ procedure Decision_Tree is
     --                        UB ("Yellow, 3, Apple"),
     --                        UB ("Yellow, 3, Lemon"));
 
+    Testing_Set : constant Data_Rows (1 .. 5) :=
+             --  Feature 1, Feature 2, Label
+                    (UB ("Green, 3, Apple"),
+                     UB ("Yellow, 4, Apple"),
+                     UB ("Red, 2, Grape"),
+                     UB ("Red, 1, Grape"),
+                     UB ("Yellow, 3, Lemon"));
+
+    Training_Data       : constant Rows_Vector :=
+                            Initialize_Training_Data (Training_Set);
+    --      Training_Data2      : Rows_Vector;
+    Testing_Data        : constant Rows_Vector :=
+                            Initialize_Test_Data (Testing_Set);
+
     aRaw_Question       : Raw_Question;
     aQuestion           : Question_Data;  --  Default is integer data
     Colour_Feature      : constant Feature_Name_Type :=
                             To_Unbounded_String ("Colour");
     Diameter_Feature    : constant Feature_Name_Type :=
                             To_Unbounded_String ("Diameter");
-    Training_Data       : constant Rows_Vector := Initialize (Training_Set);
-    --      Training_Data2      : Rows_Vector;
     Header              : constant Header_Data_Type := Header_Row;
     Gain_Zero           : constant Float := 0.0;
     Mixing_Data         : Row_Data (1);
@@ -51,7 +63,7 @@ procedure Decision_Tree is
     P_Rows              : Partitioned_Rows;
     Best_Test           : Best_Data;
     aTree               : Tree_Type;
-    Classified          : Prediction_Data_List;
+    Classified          : Predictions_List;
 begin
     New_Line;
     Put ("Features:");
@@ -178,21 +190,27 @@ begin
 
     Put_Line ("Classify tests, Training_Data (1)");
     Classified := Classify
-      (Training_Data (1), Tree_Package.First_Child (aTree.Root));
+      (Tree_Package.First_Child (aTree.Root), Training_Data (1));
     Utilities.Print_Classification (Classified);
     New_Line;
 
-    --     Put_Line ("Classify tests, Training_Data (2)");
-    --     Classified := Classify (Training_Data (2), aTree);
-    --     Put_Line ("Classify tests,  Classified");
-    --     Print_Classification (Classified);
-    --     New_Line;
-    --     Put_Line ("Classify tests,  Print_Leaf Training_Data (1)");
-    --     Put_Line (Print_Leaf (Classify (Training_Data (1), aTree)));
-    --     New_Line;
-    --     Put_Line ("Classify tests,  Print_Leaf Training_Data (2)");
-    --     Put_Line (Print_Leaf (Classify (Training_Data (2), aTree)));
-    --     New_Line;
-    --     Put_Line ("Evaluate tests");
-    --     Evaluate (To_Vector (Training_Data), aTree);
+    Put_Line ("Classify tests, Training_Data (2)");
+    Classified := Classify (Tree_Package.First_Child (aTree.Root),
+                            Training_Data (2));
+    Utilities.Print_Classification (Classified);
+    New_Line;
+    Put_Line ("Classify tests %,  Print_Leaf Training_Data (1)");
+    Utilities.Print_Leaf (Classify (Tree_Package.First_Child (aTree.Root),
+                          Training_Data (1)));
+    New_Line;
+    Put_Line ("Classify tests %,  Print_Leaf Training_Data (2)");
+    Utilities.Print_Leaf (Classify (Tree_Package.First_Child (aTree.Root),
+                          Training_Data (2)));
+    New_Line;
+    Put_Line ("Evaluate Training_Data");
+    Evaluate (aTree, Training_Data);
+    Put_Line ("Evaluate tests Testing_Data");
+    New_Line;
+    Evaluate (aTree, Testing_Data);
+
 end Decision_Tree;
