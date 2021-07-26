@@ -21,11 +21,16 @@
 --  8. Divide the node on best question. Repeat again from step 1 again until we get pure node (leaf nodes).
 
 with Ada.Containers.Multiway_Trees;
+
+with Builder;
+with ML_Types;
+
 with Tree;
 
 package body Tree.TreeBuilder is
 
    function Gini (Rows : Validation.Attribute_List) return Float;
+   function Class_Counts (Rows : ML_Types.Rows_Vector) return ML_Types.UB_Label_Map renames Builder.UB_Label_Counts;
 
    procedure Build (Self          : Validation.Attribute_List;
                     aTree : in out Tree_Data;
