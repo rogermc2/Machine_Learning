@@ -77,6 +77,10 @@ package ML_Types is
       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
     subtype Predictions_List is Prediction_Data_Package.List;
 
+   Package String_Package is new Ada.Containers.Doubly_Linked_Lists
+     (Ada.Strings.Unbounded.Unbounded_String);
+   subtype String_List is  String_Package.List;
+
     type Raw_Question is record
         Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
         Feature_Value : Unbounded_String;  --  e.g. "Green"

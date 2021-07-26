@@ -467,6 +467,28 @@ package body Utilities is
 
     --  -----------------------------------------------------------------------
 
+   function Split_String (aString, Pattern : String) return String_List is
+      use Ada.Strings;
+      use Ada.Strings.Unbounded;
+      Last       : constant Integer := aString'Length;
+      A_Index    : Integer;
+      B_Index    : Integer := 1;
+      Split_List : String_List;
+   begin
+      for index in 1 .. Fixed.Count (aString, Pattern) loop
+         A_Index := Fixed.Index (aString (B_Index .. Last), Pattern);
+         --  process string slice in any way
+         Split_List.Append (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
+         B_Index := A_Index + Pattern'Length;
+      end loop;
+      --  process last string
+      Split_List.Append (To_Unbounded_String (aString (B_Index .. Last)));
+      return Split_List;
+
+   end Split_String;
+
+   --  -------------------------------------------------------------------------
+
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_Set is
         use Ada.Containers;

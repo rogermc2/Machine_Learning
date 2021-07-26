@@ -30,5 +30,6 @@ package Utilities is
     procedure Print_UB_Label_Counts (Rows : ML_Types.Rows_Vector);
     procedure Print_Unique_Values (Rows    : ML_Types.Rows_Vector;
                                    Feature : ML_Types.Feature_Name_Type);
+   function Split_String (aString, Pattern : String) return ML_Types.String_List;
 
 end Utilities;
