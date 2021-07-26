@@ -84,6 +84,46 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
+   procedure Load_CSV_Data (Data_File    : File_Type;
+                            Num_Features : ML_Types.Class_Range;
+                            Data : out ML_Types.Rows_Vector) is
+
+      use Ada.Strings.Unbounded;
+      use ML_Types;
+      use ML_Types.String_Package;
+      Values       : Feature_Data_Array (1 .. Num_Features);
+      CSV_Line     : String_List;
+      Curs         : ML_Types.String_Package.Cursor;
+   begin
+      while not End_Of_File (Data_File) loop
+         declare
+            Data_Line    : constant String := Get_Line (Data_File);
+            Value_Index  : Class_Range := 1;
+            Row          : Row_Data;
+         begin
+            CSV_Line := Utilities.Split_String (Data_Line, ",");
+            Curs := CSV_Line.First;
+            while Has_Element (Curs) loop
+               if Curs /= CSV_Line.Last then
+                  Values (Value_Index) := Element (Curs);
+                  Value_Index := Value_Index + 1;
+               else
+                  Row.Label := Element (Curs);
+               end if;
+               Next (Curs);
+            end loop;
+            Row.Features := Values;
+            Data.Append (Row);
+         end;
+      end loop;
+--        Put_Line ("Data length: " & Count_Type'Image (Data.Data.Length));
+--        Print_Data_Item (Data.Data, Num_Features, 15);
+--        Print_Data (Data.Data, Num_Features);
+
+   end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
     function Predictions (Node : Tree_Node_Type) return Predictions_List is
         use ML_Types;
         use Prediction_Data_Package;
