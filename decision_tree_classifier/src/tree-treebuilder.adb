@@ -27,7 +27,8 @@ package body Tree.TreeBuilder is
 
    function Gini (Rows : Validation.Attribute_List) return Float;
 
-   procedure Build (Self          : Validation.Attribute_List; aTree : in out Tree_Data;
+   procedure Build (Self          : Validation.Attribute_List;
+                    aTree : in out Tree_Data;
                     X, Y          : Sample_Matrix;
                     Sample_Weight : Classifier_Utilities.Float_Array;
                     X_Idx_Sorted  : Classifier_Utilities.Integer_Array) is
@@ -77,7 +78,8 @@ package body Tree.TreeBuilder is
 
    function Gini (Rows : Validation.Attribute_List) return Float is
       Data_Length    : Integer := Integer (Rows.Length);
-      Counts         : array (1 .. Data_Length) of Integer; --  := Class_Counts (Rows);
+      Counts         : array (1 .. Data_Length) of Integer :=
+                           Class_Counts (Rows);
       Impurity       : Float := 1.0;
       Prob_Of_Lable  : Float := 0.0;
    begin

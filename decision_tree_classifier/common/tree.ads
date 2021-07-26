@@ -11,7 +11,6 @@ package Tree is
       Num_Classes  : Integer := 0;
       Num_Outputs  : Integer := 0;
       Max_Classes  : Integer := 0;
-      Max_Classes  : Integer := 0;
-   end record
+   end record;
 
 end Tree;
