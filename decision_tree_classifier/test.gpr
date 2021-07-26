@@ -1,6 +1,6 @@
 project Test is
 
-   for Source_Dirs use ("test", "common");
+   for Source_Dirs use ("test", "support");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
    for Main use ("test_functions.adb");
