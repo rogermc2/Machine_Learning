@@ -46,7 +46,7 @@ package body Decision_Tree_Classifer is
       Expanded_Class_Weight : Float_List;
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
-      Y_Array               : Integer_Array (1 .. Integer (Num_Samples)) :=
+      Y                     : Label_Data_Array (1 .. Integer (Num_Samples)) :=
                                 Utilities.Label_Array (XY_Data);
       Y_Original            : Integer_Array_List;
       Classes_K             : Integer_List;
@@ -68,7 +68,7 @@ package body Decision_Tree_Classifer is
       Y := Classes_K;
 
       if Self.Parameters.Class_Weight /= Empty_Map then
-         Y_Original.Append (Y_Array);
+         Y_Original.Append (Y);
          Expanded_Class_Weight := Compute_Sample_Weight (No_Weight, Y_Original);
       end if;
       if Self.Parameters.Max_Leaf_Nodes > 0 then

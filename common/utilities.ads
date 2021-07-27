@@ -13,7 +13,8 @@ package Utilities is
    function Is_Boolean (Item : in Unbounded_String) return Boolean;
    function Is_Float (Item : in Unbounded_String) return Boolean;
    function Is_Integer (Item : in Unbounded_String) return Boolean;
-   function Label_Array (Data : ML_Types.Rows_Vector) return Label_Data_Array;
+   function Label_Array (Data : ML_Types.Rows_Vector)
+                         return  ML_Types.Label_Data_Array;
    procedure Load_CSV_Data (Data_File : File_Type;
                             Data      : out ML_Types.Rows_Vector);
    function Number_Of_Features (Rows : ML_Types.Rows_Vector)
