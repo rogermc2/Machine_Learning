@@ -6,6 +6,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Maths;
 
+with ML_Types;
+
 package Classifier_Utilities is
 
    subtype Class_Label is Unbounded_String;
@@ -46,6 +48,7 @@ package Classifier_Utilities is
 
    Value_Error : Exception;
 
+   procedure Clear (anArray : in out Label_Data_Array);
    function Compute_Sample_Weight (Class_Weight : Weight_Type;
                                    Y : Integer_Array_List;
                                    Indices      : Integer_List :=
@@ -59,8 +62,11 @@ package Classifier_Utilities is
    procedure Print_Float_List (Name  : String; theList : Float_List);
    function To_Float_List (A : Float_Array) return Float_List;
    function To_Array (L : Integer_List) return Integer_Array;
-   function Unique_Array (Nums : Integer_Array) return Integer_Array;
+   function Unique_Integer_Array (Nums : ML_Types.Label_Data_Array)
+                                  return Integer_Array;
    --  As Integer_List, indices are part of the returned list
    function Unique (Nums : Integer_List) return Integer_List;
+   function Unique_Integer (Nums : ML_Types.Label_Data_Array)
+                            return Integer_List;
 
 end Classifier_Utilities;

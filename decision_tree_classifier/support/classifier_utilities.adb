@@ -9,6 +9,15 @@ package body Classifier_Utilities is
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
 
    --  -------------------------------------------------------------------------
+
+   procedure Clear (anArray : in out Label_Data_Array) is
+   begin
+      for index in anArray'Range loop
+         anArray (index) := 0.0;
+      end loop;
+   end Clear;
+
+   --  -------------------------------------------------------------------------
    --  Compute_Class_Weight estimates class weights for unbalanced datasets.
    function Compute_Class_Weight (Class_Weight : Weight_Type;
                                   Y            : Integer_Array_List;
@@ -69,7 +78,7 @@ package body Classifier_Utilities is
             Y_Full (index_2) := Y_Array (index) (index_2);
          end loop;
          declare
-            Classes_Full : Integer_Array := Unique_Array (Y_Full);
+            Classes_Full : Integer_Array := Unique_Array Y_Full);
          begin
             if Class_Weight = Balanced_Weight or Num_Outputs = 1 then
                Class_Weight_K := 1.0;
@@ -142,7 +151,31 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Array (Nums : Integer_Array) return Integer_Array is
+   function Unique_Integer (Nums : ML_Types.Label_Data_Array)
+                            return Integer_List is
+      use Int_Sets;
+      use Integer_Package;
+      Unique_Set : Int_Sets.Set;
+--        Int_Curs   : Integer_Package.Cursor := Nums.First;
+      Set_Curs   : Int_Sets.Cursor;
+      Nums_List  : Integer_List;
+   begin
+      for index in Nums'First .. Nums'Last loop
+         Unique_Set.Include (Nums (index).Integer_Value);
+      end loop;
+
+      Set_Curs := Unique_Set.First;
+      while Has_Element (Set_Curs) loop
+         Nums_List.Append (Element (Set_Curs));
+         Next (Set_Curs);
+      end loop;
+      return Nums_List;
+   end Unique_Integer;
+
+   -------------------------------------------------------------------------
+
+   function Unique_Integer_Array (Nums : ML_Types.Label_Data_Array)
+                                  return Integer_Array is
       use Int_Sets;
       use Integer_Package;
       Nums_List  : Integer_List;
@@ -151,7 +184,7 @@ package body Classifier_Utilities is
       Set_Curs   : Int_Sets.Cursor;
    begin
       for index in Nums'Range loop
-         Unique_Set.Include (Nums (index));
+         Unique_Set.Include (Nums (index).Integer_Value);
       end loop;
 
       declare
@@ -166,7 +199,7 @@ package body Classifier_Utilities is
          end loop;
          return Unique_Array;
       end;
-   end Unique_Array;
+   end Unique_Integer_Array;
 
    --  -------------------------------------------------------------------------
 

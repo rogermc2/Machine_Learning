@@ -48,7 +48,7 @@ package body Decision_Tree_Classifer is
         (Num_Samples, Positive (Num_Features));
       Y                     : Label_Data_Array (1 .. Integer (Num_Samples)) :=
                                 Utilities.Label_Array (XY_Data);
-      Y_Original            : Integer_Array_List;
+      Y_Original            : Label_Data_Array := Y;
       Classes_K             : Integer_List;
       Max_Leaf_Nodes        : Integer := -1;
    begin
@@ -63,8 +63,8 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Num_Classes := 0;
 
    --  As Integer_List, indices are part of the returned list
-      Classes_K := Unique (Y);
-      Y.Clear;
+      Classes_K := Unique_Integer (Y);
+      Clear (Y);
       Y := Classes_K;
 
       if Self.Parameters.Class_Weight /= Empty_Map then
