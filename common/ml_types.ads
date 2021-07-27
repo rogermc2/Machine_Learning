@@ -55,6 +55,8 @@ package ML_Types is
         end case;
     end record;
 
+   type Label_Data_Array is array (Positive range <>) of Label_Data;
+
     package Count_Package is new Ada.Containers.Ordered_Maps
       (Data_Type, Natural);
 

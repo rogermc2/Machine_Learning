@@ -7,7 +7,7 @@ package Estimator is
    type Boolean_Matrix is array
      (Integer range <>, Integer range <>) of Boolean;
 
-   type Estimator_Data (Rows, Cols : Integer) is record
+   type Estimator_Data (Rows, Cols : Positive) is record
       Kind                : Estimator_Type := Unspecified_Estimator;
       Non_Deterministic   : Boolean := False;
       Requires_Positive_X : Boolean := False;

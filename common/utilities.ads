@@ -13,12 +13,15 @@ package Utilities is
    function Is_Boolean (Item : in Unbounded_String) return Boolean;
    function Is_Float (Item : in Unbounded_String) return Boolean;
    function Is_Integer (Item : in Unbounded_String) return Boolean;
+   function Label_Array (Data : ML_Types.Rows_Vector) return Label_Data_Array;
    procedure Load_CSV_Data (Data_File : File_Type;
-                            Data : out ML_Types.Rows_Vector);
+                            Data      : out ML_Types.Rows_Vector);
+   function Number_Of_Features (Rows : ML_Types.Rows_Vector)
+                                return ML_Types.Class_Range;
    function Predictions (Node : ML_Types.Tree_Node_Type)
-                          return ML_Types.Predictions_List;
+                         return ML_Types.Predictions_List;
    function Prediction_String (Label_Counts : ML_Types.Predictions_List)
-                                return String;
+                               return String;
    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data);
    procedure Print_Classification (Classification : ML_Types.Predictions_List);
    procedure Print_Leaf (Label_Counts : ML_Types.Predictions_List);

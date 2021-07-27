@@ -1,5 +1,6 @@
 --  Based on Python 3.7 sklearn tree _classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
+with Utilities;
 
 package body Decision_Tree_Classifer is
 
@@ -24,8 +25,10 @@ package body Decision_Tree_Classifer is
    --  Y :  a (n_samples, n_outputs) array of integer valued class labels
    --       for the training samples.
    --  Sample_Weight : array-like of shape (n_samples,), default=None
-   function Fit (Self : in out Classifier; X : Sample_Matrix;
-                  Y : in out Integer_List;
+   function Fit (Self : in out Classifier;
+--                   X    : Sample_Matrix;
+--                   Y    : in out Integer_List;
+                  XY_Data : ML_Types.Rows_Vector;
                   Sample_Weight : Float_Array;
                   Use_Weight   : Boolean := False;
                   Check_Input  : Boolean := True;
@@ -33,12 +36,18 @@ package body Decision_Tree_Classifer is
                  return Estimator.Estimator_Data is
       use Integer_Package;
       use Weight_Dictionary;
+      use ML_Types;
+      Num_Samples           : constant Positive := Positive (XY_Data.Length);
+      --        Num_Samples           : Integer := X'length;
+      aRow                  : Row_Data := XY_Data.Element (1);
+      Num_Features          : constant Class_Range :=
+                                Utilities.Number_Of_Features (XY_Data);
       Random_State          : Integer := Self.Parameters.Random_State;
-      Num_Samples           : Integer := X'length;
       Expanded_Class_Weight : Float_List;
-      theEstimator          : Estimator.Estimator_Data (X'length, X'length (2));
-      Y_Array               : Integer_Array (1 .. Integer (Y.Length)) :=
-                                To_Array (Y);
+      theEstimator          : Estimator.Estimator_Data
+        (Num_Samples, Positive (Num_Features));
+      Y_Array               : Integer_Array (1 .. Integer (Num_Samples)) :=
+                                Utilities.Label_Array (XY_Data);
       Y_Original            : Integer_Array_List;
       Classes_K             : Integer_List;
       Max_Leaf_Nodes        : Integer := -1;
@@ -49,7 +58,7 @@ package body Decision_Tree_Classifer is
       end if;
 
       Self.Attributes.Num_Features := Num_Samples;
-      Self.Attributes.Num_Outputs := Integer (Y.Length);
+      Self.Attributes.Num_Outputs := Integer (Num_Samples);
       Self.Attributes.Classes.Clear;
       Self.Attributes.Num_Classes := 0;
 
