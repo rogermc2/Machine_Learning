@@ -3,7 +3,7 @@ with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;
 
 package body Utilities is
 
@@ -94,7 +94,7 @@ package body Utilities is
          Data_Kind := Get_Data_Type (UB_Label);
          declare
             Label   : Label_Data (Data_Kind);
-            Label_S : String := To_String (Data.Element (index).Label);
+            Label_S : constant String := To_String (Data.Element (index).Label);
          begin
             case Label.Label_Kind is
                when Boolean_Type =>
@@ -162,7 +162,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Number_Of_Features (Rows : Rows_Vector) return Class_Range is
-      Data  : Row_Data := Rows.First_Element;
+      Data  : constant Row_Data := Rows.First_Element;
    begin
       return Data.Class_Count;
    end Number_Of_Features;

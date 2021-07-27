@@ -79,7 +79,7 @@ package ML_Types is
       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
     subtype Predictions_List is Prediction_Data_Package.List;
 
-   Package String_Package is new Ada.Containers.Doubly_Linked_Lists
+   package String_Package is new Ada.Containers.Doubly_Linked_Lists
      (Ada.Strings.Unbounded.Unbounded_String);
    subtype String_List is  String_Package.List;
 
