@@ -13,7 +13,7 @@ with Validation;
 
 package Tree is
 
-   Type State is (None);
+   type State is (None);
    type Data_Type is (Integer_Type, Float_Type, Enum_Type);
    type Feature_Type is (No_Feature, Auto_Feature, Sqrt_Feature, Log2_Feature);
 
