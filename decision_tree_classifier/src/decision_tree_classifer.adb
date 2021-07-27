@@ -4,9 +4,11 @@ with Utilities;
 
 package body Decision_Tree_Classifer is
 
+   --  -------------------------------------------------------------------------
+
    procedure Build_Tree (Self : in out Classifier) is
       Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
-      Splitter : Splitter_Type := Self.Parameters.Splitter;
+      Splitter  : Splitter_Type := Self.Parameters.Splitter;
    begin
       if Self.Parameters.Max_Leaf_Nodes < 0 then
          null;
@@ -15,24 +17,29 @@ package body Decision_Tree_Classifer is
       end if;
    end Build_Tree;
 
+   --  -------------------------------------------------------------------------
+
    procedure Check_Parameters is
    begin
       null;
    end Check_Parameters;
 
+   --  -------------------------------------------------------------------------
+   --  The Fit function adjusts weights according to data values so that
+   --  better accuracy can be achieved
    --  Based on tree._classes.py BaseDecisionTree.Fit
    --  X :  a (n_samples, n_features) matrix of training samples
    --  Y :  a (n_samples, n_outputs) array of integer valued class labels
    --       for the training samples.
    --  Sample_Weight : array-like of shape (n_samples,), default=None
-   function Fit (Self : in out Classifier;
---                   X    : Sample_Matrix;
---                   Y    : in out Integer_List;
-                  XY_Data : ML_Types.Rows_Vector;
-                  Sample_Weight : Float_Array;
-                  Use_Weight   : Boolean := False;
-                  Check_Input  : Boolean := True;
-                  X_Idx_Sorted : State := None)
+   function Fit (Self          : in out Classifier;
+                 --                   X    : Sample_Matrix;
+                 --                   Y    : in out Integer_List;
+                 XY_Data       : ML_Types.Rows_Vector;
+                 Sample_Weight : Float_Array;
+                 Use_Weight    : Boolean := False;
+                 Check_Input   : Boolean := True;
+                 X_Idx_Sorted  : State := None)
                  return Estimator.Estimator_Data is
       use Integer_Package;
       use Weight_Dictionary;
@@ -54,7 +61,7 @@ package body Decision_Tree_Classifer is
    begin
       if Self.Parameters.CCP_Alpha < 0.0 then
          raise Value_Error with
-         "Decision_Tree_Classifer.Fit CCP_Alpha must be greater than or equal to 0";
+           "Decision_Tree_Classifer.Fit CCP_Alpha must be greater than or equal to 0";
       end if;
 
       Self.Attributes.Num_Features := Num_Samples;
@@ -62,7 +69,7 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Classes.Clear;
       Self.Attributes.Num_Classes := 0;
 
-   --  As Integer_List, indices are part of the returned list
+      --  As Integer_List, indices are part of the returned list
       Classes_K := Unique_Integer (Y);
       Clear (Y);
       Y := Classes_K;

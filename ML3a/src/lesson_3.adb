@@ -38,6 +38,8 @@ begin
            (Positive (Data.Length), Positive (Number_Of_Features (Data)) + 1);
       begin
          Utilities.Load_CSV_Data (Data_File, Data);
+         --  Fit function adjusts weights according to data values so that
+         --  better accuracy can be achieved
          Estimate := Decision_Tree_Classifer.Fit (aClassifier, Data, Weights);
       end;
    end;
