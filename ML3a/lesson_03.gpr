@@ -1,4 +1,4 @@
-with "/Ada_Projects/machine_learning/decision_tree_classifier/classifier";
+with "../decision_tree_classifier/classifier";
 
 project Lesson_03 is
 

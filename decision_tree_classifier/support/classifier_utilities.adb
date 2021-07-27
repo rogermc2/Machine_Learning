@@ -10,10 +10,10 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Clear (anArray : in out Label_Data_Array) is
+   procedure Clear (anArray : in out ML_Types.Label_Data_Array) is
    begin
       for index in anArray'Range loop
-         anArray (index) := 0.0;
+         anArray (index).Float_Value := 0.0;
       end loop;
    end Clear;
 
@@ -78,7 +78,7 @@ package body Classifier_Utilities is
             Y_Full (index_2) := Y_Array (index) (index_2);
          end loop;
          declare
-            Classes_Full : Integer_Array := Unique_Array Y_Full);
+            Classes_Full : Integer_Array := Unique_Integer_Array (Y_Full);
          begin
             if Class_Weight = Balanced_Weight or Num_Outputs = 1 then
                Class_Weight_K := 1.0;
@@ -185,6 +185,34 @@ package body Classifier_Utilities is
    begin
       for index in Nums'Range loop
          Unique_Set.Include (Nums (index).Integer_Value);
+      end loop;
+
+      declare
+         Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
+         Unique_Index : Integer := 0;
+      begin
+         Set_Curs := Unique_Set.First;
+         while Has_Element (Set_Curs) loop
+            Unique_Index := Unique_Index + 1;
+            Unique_Array (Unique_Index) := Element (Set_Curs);
+            Next (Set_Curs);
+         end loop;
+         return Unique_Array;
+      end;
+   end Unique_Integer_Array;
+
+   --  -------------------------------------------------------------------------
+
+   function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array is
+      use Int_Sets;
+      use Integer_Package;
+      Nums_List  : Integer_List;
+      Unique_Set : Int_Sets.Set;
+      Int_Curs   : Integer_Package.Cursor;
+      Set_Curs   : Int_Sets.Cursor;
+   begin
+      for index in Nums'Range loop
+         Unique_Set.Include (Nums (index));
       end loop;
 
       declare

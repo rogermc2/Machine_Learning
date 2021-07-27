@@ -48,7 +48,7 @@ package Classifier_Utilities is
 
    Value_Error : Exception;
 
-   procedure Clear (anArray : in out Label_Data_Array);
+   procedure Clear (anArray : in out ML_Types.Label_Data_Array);
    function Compute_Sample_Weight (Class_Weight : Weight_Type;
                                    Y : Integer_Array_List;
                                    Indices      : Integer_List :=
@@ -64,6 +64,7 @@ package Classifier_Utilities is
    function To_Array (L : Integer_List) return Integer_Array;
    function Unique_Integer_Array (Nums : ML_Types.Label_Data_Array)
                                   return Integer_Array;
+   function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
    --  As Integer_List, indices are part of the returned list
    function Unique (Nums : Integer_List) return Integer_List;
    function Unique_Integer (Nums : ML_Types.Label_Data_Array)

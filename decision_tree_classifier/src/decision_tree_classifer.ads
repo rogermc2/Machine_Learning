@@ -111,7 +111,7 @@ package Decision_Tree_Classifer is
    function Fit (Self : in out Classifier;
 --                   X    : Sample_Matrix;
 --                    Y : in out Integer_List;
-                  XY_Data : ML_Types.Rows_Vector;
+                  XY_Data : in out ML_Types.Rows_Vector;
                   Sample_Weight : Float_Array;
                   Use_Weight   : Boolean := False;
                   Check_Input  : Boolean := True;

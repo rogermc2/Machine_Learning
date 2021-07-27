@@ -35,7 +35,7 @@ package body Decision_Tree_Classifer is
    function Fit (Self          : in out Classifier;
                  --                   X    : Sample_Matrix;
                  --                   Y    : in out Integer_List;
-                 XY_Data       : ML_Types.Rows_Vector;
+                 XY_Data       : in out ML_Types.Rows_Vector;
                  Sample_Weight : Float_Array;
                  Use_Weight    : Boolean := False;
                  Check_Input   : Boolean := True;
@@ -55,8 +55,9 @@ package body Decision_Tree_Classifer is
         (Num_Samples, Positive (Num_Features));
       Y                     : Label_Data_Array (1 .. Integer (Num_Samples)) :=
                                 Utilities.Label_Array (XY_Data);
-      Y_Original            : Label_Data_Array := Y;
+      XY_Original           : Rows_Vector := XY_Data;
       Classes_K             : Integer_List;
+      K_Index               : Positive;
       Max_Leaf_Nodes        : Integer := -1;
    begin
       if Self.Parameters.CCP_Alpha < 0.0 then
@@ -72,7 +73,13 @@ package body Decision_Tree_Classifer is
       --  As Integer_List, indices are part of the returned list
       Classes_K := Unique_Integer (Y);
       Clear (Y);
-      Y := Classes_K;
+      K_Index := Classes_K.First_Index;
+      for index in Y'Range loop
+            Y (index).Integer_Value := Classes_K.Element (K_Index);
+            if index /= Y'Last then
+                K_Index := K_Index + 1;
+            end if;
+      end loop;
 
       if Self.Parameters.Class_Weight /= Empty_Map then
          Y_Original.Append (Y);
