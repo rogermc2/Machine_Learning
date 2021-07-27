@@ -84,45 +84,52 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
-   procedure Load_CSV_Data (Data_File    : File_Type;
-                            Num_Features : ML_Types.Class_Range;
-                            Data : out ML_Types.Rows_Vector) is
+    procedure Load_CSV_Data (Data_File : File_Type;
+                             Data : out ML_Types.Rows_Vector) is
+        use Ada.Strings.Unbounded;
+        use ML_Types;
+        use ML_Types.String_Package;
+        Data_Line    : String := Get_Line (Data_File);
+        Num_Features : ML_Types.Class_Range;
+        CSV_Line     : String_List;
+        Curs         : ML_Types.String_Package.Cursor;
+    begin
+        Num_Features := Class_Range (Ada.Strings.Fixed.Count (Data_Line, ","));
+        declare
+            Values : Feature_Data_Array (1 .. Num_Features);
+        begin
+            while not End_Of_File (Data_File) loop
+                declare
+                    Value_Index  : Class_Range := 1;
+                    Row          : Row_Data;
+                begin
+                    CSV_Line := Utilities.Split_String (Data_Line, ",");
+                    Curs := CSV_Line.First;
+                    while Has_Element (Curs) loop
+                        if Curs /= CSV_Line.Last then
+                            Values (Value_Index) := Element (Curs);
+                            Value_Index := Value_Index + 1;
+                        else
+                            Row.Label := Element (Curs);
+                        end if;
 
-      use Ada.Strings.Unbounded;
-      use ML_Types;
-      use ML_Types.String_Package;
-      Values       : Feature_Data_Array (1 .. Num_Features);
-      CSV_Line     : String_List;
-      Curs         : ML_Types.String_Package.Cursor;
-   begin
-      while not End_Of_File (Data_File) loop
-         declare
-            Data_Line    : constant String := Get_Line (Data_File);
-            Value_Index  : Class_Range := 1;
-            Row          : Row_Data;
-         begin
-            CSV_Line := Utilities.Split_String (Data_Line, ",");
-            Curs := CSV_Line.First;
-            while Has_Element (Curs) loop
-               if Curs /= CSV_Line.Last then
-                  Values (Value_Index) := Element (Curs);
-                  Value_Index := Value_Index + 1;
-               else
-                  Row.Label := Element (Curs);
-               end if;
-               Next (Curs);
+                        if not End_Of_File (Data_File) then
+                            Data_Line := Get_Line (Data_File);
+                        end if;
+                        Next (Curs);
+                    end loop;
+                    Row.Features := Values;
+                    Data.Append (Row);
+                end;  --  declare block
             end loop;
-            Row.Features := Values;
-            Data.Append (Row);
-         end;
-      end loop;
---        Put_Line ("Data length: " & Count_Type'Image (Data.Data.Length));
---        Print_Data_Item (Data.Data, Num_Features, 15);
---        Print_Data (Data.Data, Num_Features);
+        end;  --  declare block
+        --        Put_Line ("Data length: " & Count_Type'Image (Data.Data.Length));
+        --        Print_Data_Item (Data.Data, Num_Features, 15);
+        --        Print_Data (Data.Data, Num_Features);
 
-   end Load_CSV_Data;
+    end Load_CSV_Data;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
     function Predictions (Node : Tree_Node_Type) return Predictions_List is
         use ML_Types;
@@ -241,7 +248,7 @@ package body Utilities is
         Prediction   : Prediction_Data;
         Total        : Natural := 0;
         Leaf_Data    : Unbounded_String := To_Unbounded_String
-              ("{'");
+          ("{'");
     begin
         while Has_Element (Count_Cursor) loop
             Total := Total + Element (Count_Cursor).Num_Copies;
@@ -507,27 +514,27 @@ package body Utilities is
 
     --  -----------------------------------------------------------------------
 
-   function Split_String (aString, Pattern : String) return String_List is
-      use Ada.Strings;
-      use Ada.Strings.Unbounded;
-      Last       : constant Integer := aString'Length;
-      A_Index    : Integer;
-      B_Index    : Integer := 1;
-      Split_List : String_List;
-   begin
-      for index in 1 .. Fixed.Count (aString, Pattern) loop
-         A_Index := Fixed.Index (aString (B_Index .. Last), Pattern);
-         --  process string slice in any way
-         Split_List.Append (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
-         B_Index := A_Index + Pattern'Length;
-      end loop;
-      --  process last string
-      Split_List.Append (To_Unbounded_String (aString (B_Index .. Last)));
-      return Split_List;
+    function Split_String (aString, Pattern : String) return String_List is
+        use Ada.Strings;
+        use Ada.Strings.Unbounded;
+        Last       : constant Integer := aString'Length;
+        A_Index    : Integer;
+        B_Index    : Integer := 1;
+        Split_List : String_List;
+    begin
+        for index in 1 .. Fixed.Count (aString, Pattern) loop
+            A_Index := Fixed.Index (aString (B_Index .. Last), Pattern);
+            --  process string slice in any way
+            Split_List.Append (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
+            B_Index := A_Index + Pattern'Length;
+        end loop;
+        --  process last string
+        Split_List.Append (To_Unbounded_String (aString (B_Index .. Last)));
+        return Split_List;
 
-   end Split_String;
+    end Split_String;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_Set is

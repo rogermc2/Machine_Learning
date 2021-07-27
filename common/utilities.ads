@@ -13,9 +13,8 @@ package Utilities is
    function Is_Boolean (Item : in Unbounded_String) return Boolean;
    function Is_Float (Item : in Unbounded_String) return Boolean;
    function Is_Integer (Item : in Unbounded_String) return Boolean;
-   procedure Load_CSV_Data (Data_File    : File_Type;
-                            Num_Features : ML_Types.Class_Range;
-                            Data         : out ML_Types.Rows_Vector);
+   procedure Load_CSV_Data (Data_File : File_Type;
+                            Data : out ML_Types.Rows_Vector);
    function Predictions (Node : ML_Types.Tree_Node_Type)
                           return ML_Types.Predictions_List;
    function Prediction_String (Label_Counts : ML_Types.Predictions_List)
