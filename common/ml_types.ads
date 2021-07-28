@@ -46,6 +46,20 @@ package ML_Types is
       (Class_Range, Data_Type);
     subtype Label_Type_Map is Label_Type_Package.Map;
 
+    type Value_Data (Feature_Kind : Data_Type := Integer_Type) is record
+        Feature_Name : Feature_Name_Type;
+        case Feature_Kind is
+            when Integer_Type => Integer_Value     : Integer;
+            when Float_Type => Float_Value         : Float;
+            when Boolean_Type => Boolean_Value     : Boolean;
+            when UB_String_Type => UB_String_Value : Unbounded_String;
+        end case;
+    end record;
+
+    package Values_Package is new Ada.Containers.Vectors
+      (Class_Range, Value_Data);
+    subtype Value_Set is Values_Package.Vector;
+
     type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
         case Value_Kind is
             when Integer_Type => Integer_Value : Integer;
@@ -59,7 +73,7 @@ package ML_Types is
       Ada.Containers.Doubly_Linked_Lists (Value_Record);
     subtype Value_Data_List is Value_Data_Package.List;
 
-   type Label_Data_Array is array (Positive range <>) of Value_Record;
+    type Label_Data_Array is array (Positive range <>) of Value_Record;
 
     package Count_Package is new Ada.Containers.Ordered_Maps
       (Data_Type, Natural);
@@ -83,22 +97,16 @@ package ML_Types is
       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
     subtype Predictions_List is Prediction_Data_Package.List;
 
-   package String_Package is new Ada.Containers.Doubly_Linked_Lists
-     (Ada.Strings.Unbounded.Unbounded_String);
-   subtype String_List is  String_Package.List;
+    package String_Package is new Ada.Containers.Doubly_Linked_Lists
+      (Ada.Strings.Unbounded.Unbounded_String);
+    subtype String_List is  String_Package.List;
 
-   type Data_Record (Feature_Kind, Label_Kind : Data_Type := Integer_Type) is record
-      Feature_Names  : String_List;
-      Label_Name     : Unbounded_String := To_Unbounded_String ("");
-      case Feature_Kind is
-         when others =>
-            Feature_Values : Value_Data_List;
-            case Label_Kind is
-            when others =>
-               Label_Values   : Value_Data_List;
-            end case;
-      end case;
-   end record;
+    type Data_Record (Feature_Kind, Label_Kind : Data_Type := Integer_Type) is record
+        Feature_Names  : String_List;
+        Label_Name     : Unbounded_String := To_Unbounded_String ("");
+        Feature_Values : Value_Data_List;
+        Label_Values   : Value_Data_List;
+    end record;
 
     type Raw_Question is record
         Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
@@ -109,11 +117,11 @@ package ML_Types is
         Feature_Name : Feature_Name_Type := To_Unbounded_String ("");
         Gain         : Float := 0.0;
         case Feature_Kind is
-            when Integer_Type => Integer_Value : Integer := 0;
-            when Float_Type => Float_Value : Float := 0.0;
-            when Boolean_Type => Boolean_Value : Boolean := False;
-            when UB_String_Type => UB_String_Value : Unbounded_String :=
-                                                           To_Unbounded_String ("");
+        when Integer_Type => Integer_Value : Integer := 0;
+        when Float_Type => Float_Value : Float := 0.0;
+        when Boolean_Type => Boolean_Value : Boolean := False;
+        when UB_String_Type => UB_String_Value : Unbounded_String :=
+                                                       To_Unbounded_String ("");
         end case;
     end record;
 

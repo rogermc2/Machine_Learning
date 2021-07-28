@@ -33,7 +33,7 @@ package body Builder is
     function To_Boolean (Item : in Unbounded_String) return Boolean;
     function To_Float (Item : in Unbounded_String) return Float;
     function To_Integer (Item : in Unbounded_String) return Integer;
-    function To_Label (UB_String : Raw_Label) return Label_Data;
+    function To_Label (UB_String : Raw_Label) return Value_Record;
 
     --  ------------------------------------------------------------------------
 
@@ -511,35 +511,35 @@ package body Builder is
 
     --  --------------------------------------------------------------------------
 
-    function To_Label (UB_String : Raw_Label) return Label_Data is
+    function To_Label (UB_String : Raw_Label) return Value_Record is
         use Utilities;
         Value : constant String := To_String (UB_String);
-        Label : Label_Data;
+        Label : Value_Record;
     begin
         if Is_Integer (UB_String) then
             declare
-                Label_I  : Label_Data (Integer_Type);
+                Label_I  : Value_Record (Integer_Type);
             begin
                 Label_I.Integer_Value := Integer'Value (Value);
                 Label :=  Label_I;
             end;
         elsif Is_Float (UB_String) then
             declare
-                Label_F  : Label_Data (Float_Type);
+                Label_F  : Value_Record (Float_Type);
             begin
                 Label_F.Float_Value := Float'Value (Value);
                 Label := Label_F;
             end;
         elsif Is_Boolean (UB_String) then
             declare
-                Label_B  : Label_Data (Boolean_Type);
+                Label_B  : Value_Record (Boolean_Type);
             begin
                 Label_B.Boolean_Value := Boolean'Value (Value);
                 Label := Label_B;
             end;
         else
             declare
-                Label_UB  : Label_Data (UB_String_Type);
+                Label_UB  : Value_Record (UB_String_Type);
             begin
                 Label_UB.UB_String_Value := UB_String;
                 Label := Label_UB;
@@ -600,13 +600,13 @@ package body Builder is
         Label_Counts : UB_Label_Map;
         Count_Cursor : UB_Label_Map_Package.Cursor;
         aRow         : Row_Data;
-        Label        : Label_Data;
+        Label        : Value_Record;
         Count        : Natural := 0;
     begin
         for index in Rows.First_Index .. Rows.Last_Index loop
             aRow := Rows.Element (index);
             Label := To_Label (aRow.Label);
-            if Label.Label_Kind /= UB_String_Type then
+            if Label.Value_Kind /= UB_String_Type then
                 raise Builder_Exception with
                   "Builder.UB_Class_Counts, Label_Kind is not UB_String_Type";
             else
