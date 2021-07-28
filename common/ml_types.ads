@@ -73,6 +73,11 @@ package ML_Types is
       Ada.Containers.Doubly_Linked_Lists (Value_Record);
     subtype Value_Data_List is Value_Data_Package.List;
 
+   use Value_Data_Package;
+    package Features_Data_Package is new
+      Ada.Containers.Doubly_Linked_Lists (Value_Data_List);
+   subtype Features_Data_List is Features_Data_Package.List;
+
     type Label_Data_Array is array (Positive range <>) of Value_Record;
 
     package Count_Package is new Ada.Containers.Ordered_Maps
@@ -101,10 +106,10 @@ package ML_Types is
       (Ada.Strings.Unbounded.Unbounded_String);
     subtype String_List is  String_Package.List;
 
-    type Data_Record (Feature_Kind, Label_Kind : Data_Type := Integer_Type) is record
+    type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
         Feature_Names  : String_List;
         Label_Name     : Unbounded_String := To_Unbounded_String ("");
-        Feature_Values : Value_Data_List;
+        Feature_Values : Features_Data_List;
         Label_Values   : Value_Data_List;
     end record;
 

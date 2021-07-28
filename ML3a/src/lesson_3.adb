@@ -23,25 +23,25 @@ begin
    Open (Data_File, In_File, "src/diabetes.csv");
    declare
       Line_1       : constant String := Get_Line (Data_File);
---        Labels       : constant String_List := Split_String (Line_1, ",");
       Num_Features : constant Integer := Fixed.Count (Line_1, ",");
+      Row_Data     : Rows_Vector;
+      Data         : Data_Record;
       Weights      : constant Classifier_Utilities.Float_Array (1 .. Num_Features) :=
                        (others => 0.0);
    begin
       Put_Line ("Feature Names:");
-      --        Utilities.Print_String_List (Labels);
+      Utilities.Load_CSV_Data (Data_File, Row_Data);
+      Data := Split_Row_Data (Row_Data);
       declare
-         Row_Data        : ML_Types.Rows_Vector;
-         Data            : Data_List;
          aClassifier : Classifier
            (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
          Estimate    : Estimator.Estimator_Data
-           (Positive (Data.Length), Positive (Number_Of_Features (Row_Data)) + 1);
+           (Positive (Row_Data.Length), Num_Features + 1);
       begin
-         Utilities.Load_CSV_Data (Data_File, Row_Data);
          --  Fit function adjusts weights according to data values so that
          --  better accuracy can be achieved
-         Estimate := Decision_Tree_Classifer.Fit (aClassifier, Data, Weights);
+         Estimate := Decision_Tree_Classifer.Fit
+           (aClassifier, Data.Feature_Values, Data.Label_Values, Weights);
       end;
    end;
 

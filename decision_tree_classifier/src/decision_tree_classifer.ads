@@ -108,13 +108,14 @@ package Decision_Tree_Classifer is
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
-   function Fit (Self : in out Classifier;
---                   X    : Sample_Matrix;
---                    Y : in out Integer_List;
-                  XY_Data : in out ML_Types.Rows_Vector;
-                  Sample_Weight : Float_Array;
-                  Use_Weight   : Boolean := False;
-                  Check_Input  : Boolean := True;
-                  X_Idx_Sorted : State := None) return Estimator.Estimator_Data;
+   function Fit (Self          : in out Classifier;
+                 --                   X    : Sample_Matrix;
+                 --                    Y : in out Integer_List;
+                 X             : ML_Types.Features_Data_List;
+                 Y             : in out ML_Types.Value_Data_List;
+                 Sample_Weight : Float_Array;
+                 Use_Weight    : Boolean := False;
+                 Check_Input   : Boolean := True;
+                 X_Idx_Sorted  : State := None) return Estimator.Estimator_Data;
 
 end Decision_Tree_Classifer;

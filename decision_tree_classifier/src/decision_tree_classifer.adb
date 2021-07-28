@@ -35,7 +35,8 @@ package body Decision_Tree_Classifer is
    function Fit (Self          : in out Classifier;
                  --                   X    : Sample_Matrix;
                  --                   Y    : in out Integer_List;
-                 XY_Data       : in out ML_Types.Rows_Vector;
+                 X             : ML_Types.Features_Data_List;
+                 Y             : in out ML_Types.Value_Data_List;
                  Sample_Weight : Float_Array;
                  Use_Weight    : Boolean := False;
                  Check_Input   : Boolean := True;
@@ -44,19 +45,18 @@ package body Decision_Tree_Classifer is
       use Integer_Package;
       use Weight_Dictionary;
       use ML_Types;
-      Num_Samples           : constant Positive := Positive (XY_Data.Length);
-      --        Num_Samples           : Integer := X'length;
-      aRow                  : Row_Data := XY_Data.Element (1);
+      Num_Samples           : constant Positive := Positive (X.Length);
+      Num_Outputs           : constant Positive := Positive (Y.Length);
+      Features              : Value_Data_List := X.First_Element;
       Num_Features          : constant Class_Range :=
-                                Utilities.Number_Of_Features (XY_Data);
+                                Class_Range (Features.Length);
       Random_State          : Integer := Self.Parameters.Random_State;
       Expanded_Class_Weight : Float_List;
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
-      Y                     : Label_Data_Array (1 .. Integer (Num_Samples)) :=
-                                Utilities.Label_Array (XY_Data);
-      XY_Original           : Rows_Vector := XY_Data;
-      Classes_K             : Integer_List;
+      Y_Original            : Value_Data_List := Y;
+      Classes               : Features_Data_List;
+      Classes_K             : Value_Data_List;
       K_Index               : Positive;
       Max_Leaf_Nodes        : Integer := -1;
    begin
@@ -70,9 +70,11 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Classes.Clear;
       Self.Attributes.Num_Classes := 0;
 
-      --  As Integer_List, indices are part of the returned list
-      Classes_K := Unique_Integer (Y);
-      Clear (Y);
+      --  return_inverse=True means also return the indices of the unique array
+      for k in 1 .. Num_Outputs loop
+         Classes_K := Unique_Value (Y);
+      end loop;
+      Y.Clear;
       K_Index := Classes_K.First_Index;
       for index in Y'Range loop
             Y (index).Integer_Value := Classes_K.Element (K_Index);
