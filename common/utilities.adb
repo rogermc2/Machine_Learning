@@ -93,10 +93,10 @@ package body Utilities is
          UB_Label := Data.Element (index).Label;
          Data_Kind := Get_Data_Type (UB_Label);
          declare
-            Label   : Label_Data (Data_Kind);
+            Label   : Value_Record (Data_Kind);
             Label_S : constant String := To_String (Data.Element (index).Label);
          begin
-            case Label.Label_Kind is
+            case Label.Value_Kind is
                when Boolean_Type =>
                   Label.Boolean_Value := Boolean'Value (Label_S);
                when Float_Type =>
@@ -549,6 +549,34 @@ package body Utilities is
       end loop;
       New_Line;
    end Print_Unique_Values;
+
+   --  -----------------------------------------------------------------------
+
+   function Split_Row_Data (Row_Data : ML_Types.Rows_Vector) return Data_Record is
+      use Rows_Package;
+      use Value_Data_Package;
+      aRow           : ML_Types.Row_Data := Row_Data.First_Element;
+--        Value          : Value_Record;
+      Feature_Values : Value_Data_List;
+      Label_Values   : Value_Data_List;
+      Data           : Data_Record;
+   begin
+      for index in aRow.Features'Range loop
+         Data.Feature_Names.Append (aRow.Features (index));
+      end loop;
+      Data.Label_Name := aRow.Label;
+      for index in Row_Data.First_Index + 1 .. Row_Data.Last_Index loop
+         aRow := Row_Data.Element (index);
+         declare
+            Features : constant Feature_Data_Array (1 .. aRow.Class_Count) :=
+                         aRow.Features;
+            Label    : constant Unbounded_String := aRow.Label;
+         begin
+            null;
+         end;
+      end loop;
+      return Data;
+   end Split_Row_Data;
 
    --  -----------------------------------------------------------------------
 

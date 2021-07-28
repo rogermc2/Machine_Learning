@@ -46,8 +46,8 @@ package ML_Types is
       (Class_Range, Data_Type);
     subtype Label_Type_Map is Label_Type_Package.Map;
 
-    type Label_Data (Label_Kind : Data_Type := Integer_Type) is record
-        case Label_Kind is
+    type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
+        case Value_Kind is
             when Integer_Type => Integer_Value : Integer;
             when Float_Type => Float_Value   : Float;
             when Boolean_Type => Boolean_Value : Boolean;
@@ -55,7 +55,11 @@ package ML_Types is
         end case;
     end record;
 
-   type Label_Data_Array is array (Positive range <>) of Label_Data;
+    package Value_Data_Package is new
+      Ada.Containers.Doubly_Linked_Lists (Value_Record);
+    subtype Value_Data_List is Value_Data_Package.List;
+
+   type Label_Data_Array is array (Positive range <>) of Value_Record;
 
     package Count_Package is new Ada.Containers.Ordered_Maps
       (Data_Type, Natural);
@@ -82,6 +86,19 @@ package ML_Types is
    package String_Package is new Ada.Containers.Doubly_Linked_Lists
      (Ada.Strings.Unbounded.Unbounded_String);
    subtype String_List is  String_Package.List;
+
+   type Data_Record (Feature_Kind, Label_Kind : Data_Type := Integer_Type) is record
+      Feature_Names  : String_List;
+      Label_Name     : Unbounded_String := To_Unbounded_String ("");
+      case Feature_Kind is
+         when others =>
+            Feature_Values : Value_Data_List;
+            case Label_Kind is
+            when others =>
+               Label_Values   : Value_Data_List;
+            end case;
+      end case;
+   end record;
 
     type Raw_Question is record
         Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"

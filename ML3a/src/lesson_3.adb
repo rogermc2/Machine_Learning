@@ -31,13 +31,14 @@ begin
       Put_Line ("Feature Names:");
       --        Utilities.Print_String_List (Labels);
       declare
-         Data        : ML_Types.Rows_Vector;
+         Row_Data        : ML_Types.Rows_Vector;
+         Data            : Data_List;
          aClassifier : Classifier
            (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
          Estimate    : Estimator.Estimator_Data
-           (Positive (Data.Length), Positive (Number_Of_Features (Data)) + 1);
+           (Positive (Data.Length), Positive (Number_Of_Features (Row_Data)) + 1);
       begin
-         Utilities.Load_CSV_Data (Data_File, Data);
+         Utilities.Load_CSV_Data (Data_File, Row_Data);
          --  Fit function adjusts weights according to data values so that
          --  better accuracy can be achieved
          Estimate := Decision_Tree_Classifer.Fit (aClassifier, Data, Weights);
