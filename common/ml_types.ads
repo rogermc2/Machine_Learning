@@ -82,14 +82,30 @@ package ML_Types is
 
     package Count_Package is new Ada.Containers.Ordered_Maps
       (Data_Type, Natural);
+    subtype Count_Map is Count_Package.Map;
 
-    package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
-      (Unbounded_String, Natural);
-    subtype UB_Label_Map is UB_Label_Map_Package.Map;
+    package Boolean_Label_Map_Package is new Ada.Containers.Ordered_Maps
+      (Boolean, Natural);
+   subtype Boolean_Label_Map is Boolean_Label_Map_Package.Map;
+
+    package Float_Label_Map_Package is new Ada.Containers.Ordered_Maps
+      (Float, Natural);
+    subtype Float_Label_Map is Float_Label_Map_Package.Map;
 
     package Integer_Label_Map_Package is new Ada.Containers.Ordered_Maps
       (Integer, Natural);
-    subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
+   subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
+
+    package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
+      (Unbounded_String, Natural);
+   subtype UB_Label_Map is UB_Label_Map_Package.Map;
+
+   type Label_Maps is record
+      Boolean_Map   : Boolean_Label_Map;
+      Float_Map     : Float_Label_Map;
+      Integer_Map   : Integer_Label_Map;
+      UB_String_Map : UB_Label_Map;
+   end record;
 
     subtype Raw_Label is Unbounded_String;
 
