@@ -104,21 +104,22 @@ package body Utilities is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
-      Data_Line    : String := Get_Line (Data_File);
+      First_Line   : String := Get_Line (Data_File);
       Num_Features : ML_Types.Class_Range;
       CSV_Line     : String_List;
       Curs         : ML_Types.String_Package.Cursor;
    begin
-      Num_Features := Class_Range (Ada.Strings.Fixed.Count (Data_Line, ","));
+      Num_Features := Class_Range (Ada.Strings.Fixed.Count (First_Line, ","));
       declare
-         Values : Feature_Data_Array (1 .. Num_Features);
+         Data_Line    : Unbounded_String := To_Unbounded_String (First_Line);
+         Values       : Feature_Data_Array (1 .. Num_Features);
       begin
          while not End_Of_File (Data_File) loop
             declare
                Value_Index  : Class_Range := 1;
-               Row          : Row_Data;
+               Row          : Row_Data (Num_Features);
             begin
-               CSV_Line := Utilities.Split_String (Data_Line, ",");
+               CSV_Line := Utilities.Split_String (To_String (Data_Line), ",");
                Curs := CSV_Line.First;
                while Has_Element (Curs) loop
                   if Curs /= CSV_Line.Last then
@@ -129,7 +130,7 @@ package body Utilities is
                   end if;
 
                   if not End_Of_File (Data_File) then
-                     Data_Line := Get_Line (Data_File);
+                     Data_Line := To_Unbounded_String (Get_Line (Data_File));
                   end if;
                   Next (Curs);
                end loop;

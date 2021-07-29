@@ -70,7 +70,6 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Classes.Clear;
       Self.Attributes.Num_Classes := 0;
 
-      --  return_inverse=True means also return the indices of the unique array
       for k in 1 .. Num_Outputs loop
          Classes_K := Unique_Value (Y);
       end loop;
