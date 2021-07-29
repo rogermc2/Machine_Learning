@@ -104,7 +104,7 @@ package body Utilities is
         use Ada.Strings.Unbounded;
         use ML_Types;
         use ML_Types.String_Package;
-        First_Line   : String := Get_Line (Data_File);
+        First_Line   : constant String := Get_Line (Data_File);
         Num_Features : ML_Types.Class_Range;
         CSV_Line     : String_List;
         Curs         : ML_Types.String_Package.Cursor;
@@ -430,7 +430,7 @@ package body Utilities is
         use Rows_Package;
         aRow : Row_Data;
     begin
-        Put_Line (Message);
+        Put_Line (Message & ":");
         for index in Rows.First_Index .. Rows.Last_Index loop
             aRow := Rows.Element (index);
             Put ("  Feature values: (");

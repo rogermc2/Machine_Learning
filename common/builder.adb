@@ -138,6 +138,9 @@ package body Builder is
             True_Split_Rows  : Rows_Vector;
             False_Split_Rows : Rows_Vector;
         begin
+            Put_Line ("Add_Branch Rows length: " &
+                        Integer'Image (Integer (Rows.Length)));
+            Utilities.Print_Rows ("Add_Branch Rows", Rows);
             if Best_Split.Gain = 0.0 then
                 Add_Prediction_Node (Parent_Cursor, Rows);
             else
@@ -147,9 +150,11 @@ package body Builder is
                 True_Split_Rows := Best_Split.True_Rows;
                 False_Split_Rows := Best_Split.False_Rows;
                 Child_Cursor := Last_Child (Parent_Cursor);
-                Utilities.Print_Rows ("Add_Branch True_Split_Rows", True_Split_Rows);
+                Utilities.Print_Rows ("Add_Branch True_Split_Rows",
+                                      True_Split_Rows);
                 Add_Branch (True_Split_Rows, Child_Cursor);
-                Utilities.Print_Rows ("Add_Branch False_Split_Rows", False_Split_Rows);
+                Utilities.Print_Rows ("Add_Branch False_Split_Rows",
+                                      False_Split_Rows);
                 Add_Branch (False_Split_Rows, Child_Cursor);
                 New_Line;
             end if;
@@ -259,8 +264,6 @@ package body Builder is
         Best                : Best_Data;
         Integer_Value       : Integer;
     begin
-        Put_Line ("Builder.Find_Best_Split Num_Features: " &
-                    Class_Range'Image (Num_Features));
         for col in 1 .. Num_Features loop
             --           Put_Line ("Builder.Find_Best_Split col: " & Class_Range'Image (col));
             Feature_Name := Feature_Name_Type (Header_Data.Features (col));
