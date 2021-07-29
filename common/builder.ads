@@ -27,6 +27,7 @@ package Builder is
     function Num_Features (aString : String) return Class_Range;
     function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                         return Partitioned_Rows;
+    procedure Set_Header_Data (Header_Line : String);
     function To_Question (Q : Raw_Question) return Question_Data;
     function UB_Label_Counts (Rows : Rows_Vector) return UB_Label_Map;
 

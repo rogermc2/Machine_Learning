@@ -110,6 +110,8 @@ package body Utilities is
       Curs         : ML_Types.String_Package.Cursor;
    begin
       Num_Features := Class_Range (Ada.Strings.Fixed.Count (First_Line, ","));
+      Builder.Set_Header_Data (First_Line);
+
       declare
          Data_Line    : Unbounded_String := To_Unbounded_String (First_Line);
          Values       : Feature_Data_Array (1 .. Num_Features);
