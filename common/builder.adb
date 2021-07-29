@@ -387,10 +387,13 @@ package body Builder is
 
    function Gini (Rows : Rows_Vector) return Float is
       use UB_Label_Map_Package;
-      Count_Maps : Label_Maps;
-      UB_Counts  : UB_Label_Map;
-      Rows_Size  : constant Float := Float (Rows.Length);
-      Impurity   : Float := 1.0;
+      Count_Maps     : constant Label_Maps := Class_Counts (Rows);
+      Boolean_Counts : constant Boolean_Label_Map := Count_Maps.Boolean_Map;
+      Float_Counts   : constant Float_Label_Map := Count_Maps.Float_Map;
+      Integer_Counts : constant Integer_Label_Map := Count_Maps.Integer_Map;
+      UB_Counts      : constant UB_Label_Map := Count_Maps.UB_String_Map;
+      Rows_Size      : constant Float := Float (Rows.Length);
+      Impurity       : Float := 1.0;
       procedure Calc_Impurity (Curs : UB_Label_Map_Package.Cursor) is
          Label_Probability : Float range 0.0 .. 1.0;
       begin
@@ -398,8 +401,6 @@ package body Builder is
          Impurity := Impurity - Label_Probability ** 2;
       end Calc_Impurity;
    begin
-      Count_Maps := Class_Counts (Rows);
-      UB_Counts := Count_Maps.UB_String_Map;
       UB_Counts.Iterate (Calc_Impurity'Access);
       return Impurity;
    end Gini;
