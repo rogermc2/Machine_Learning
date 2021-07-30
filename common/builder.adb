@@ -67,11 +67,8 @@ package body Builder is
       Question  : in out Question_Data; Best : in out Best_Data) is
    begin
       Question.Feature_Name := Feature;
-      Put_Line ("Builder.Best_Integer_Value Feature_Name set.");
       Question.Integer_Value := Value;
-      Put_Line ("Builder.Best_Integer_Value Integer_Value set.");
       Split (Rows, Uncertainty, Question, Best);
-      Put_Line ("Builder.Best_Integer_Value split.");
    end Best_Integer_Value;
 
    --  -----------------------------------------------------------------------
@@ -268,7 +265,7 @@ package body Builder is
    --  container.
 
    function Classify (Node_Cursor : Tree_Cursor; aRow : Row_Data)
-                       return Predictions_List is
+                      return Predictions_List is
       use Tree_Package;
       aNode       : constant Tree_Node_Type := Element (Node_Cursor);
       Predictions : Predictions_List;
@@ -386,22 +383,55 @@ package body Builder is
    --  -------------------------------------------------------------------------
 
    function Gini (Rows : Rows_Vector) return Float is
+      use Boolean_Label_Map_Package;
+      use Float_Label_Map_Package;
+      use Integer_Label_Map_Package;
       use UB_Label_Map_Package;
-      Count_Maps     : constant Label_Maps := Class_Counts (Rows);
-      Boolean_Counts : constant Boolean_Label_Map := Count_Maps.Boolean_Map;
-      Float_Counts   : constant Float_Label_Map := Count_Maps.Float_Map;
-      Integer_Counts : constant Integer_Label_Map := Count_Maps.Integer_Map;
-      UB_Counts      : constant UB_Label_Map := Count_Maps.UB_String_Map;
-      Rows_Size      : constant Float := Float (Rows.Length);
-      Impurity       : Float := 1.0;
-      procedure Calc_Impurity (Curs : UB_Label_Map_Package.Cursor) is
+      Count_Maps        : constant Label_Maps := Class_Counts (Rows);
+      Boolean_Counts    : constant Boolean_Label_Map := Count_Maps.Boolean_Map;
+      Float_Counts      : constant Float_Label_Map := Count_Maps.Float_Map;
+      Integer_Counts    : constant Integer_Label_Map := Count_Maps.Integer_Map;
+      UB_Counts         : constant UB_Label_Map := Count_Maps.UB_String_Map;
+      Rows_Size         : constant Float := Float (Rows.Length);
+      Impurity          : Float := 1.0;
+      procedure Calc_Boolean_Impurity (Curs : Boolean_Label_Map_Package.Cursor) is
          Label_Probability : Float range 0.0 .. 1.0;
       begin
          Label_Probability := Float (Element (Curs)) / Rows_Size;
          Impurity := Impurity - Label_Probability ** 2;
-      end Calc_Impurity;
+      end Calc_Boolean_Impurity;
+      procedure Calc_Float_Impurity (Curs : Float_Label_Map_Package.Cursor) is
+         Label_Probability : Float range 0.0 .. 1.0;
+      begin
+         Label_Probability := Float (Element (Curs)) / Rows_Size;
+         Impurity := Impurity - Label_Probability ** 2;
+      end Calc_Float_Impurity;
+      procedure Calc_Integer_Impurity (Curs : Integer_Label_Map_Package.Cursor) is
+         Label_Probability : Float range 0.0 .. 1.0;
+      begin
+         Label_Probability := Float (Element (Curs)) / Rows_Size;
+         Impurity := Impurity - Label_Probability ** 2;
+      end Calc_Integer_Impurity;
+      procedure Calc_UB_Impurity (Curs : UB_Label_Map_Package.Cursor) is
+         Label_Probability : Float range 0.0 .. 1.0;
+      begin
+         Label_Probability := Float (Element (Curs)) / Rows_Size;
+         Impurity := Impurity - Label_Probability ** 2;
+      end Calc_UB_Impurity;
    begin
-      UB_Counts.Iterate (Calc_Impurity'Access);
+      if not Boolean_Counts.Is_Empty then
+         Boolean_Counts.Iterate (Calc_Boolean_Impurity'Access);
+      end if;
+      if not Float_Counts.Is_Empty then
+         Float_Counts.Iterate (Calc_Float_Impurity'Access);
+      end if;
+      if not Integer_Counts.Is_Empty then
+         Integer_Counts.Iterate (Calc_Integer_Impurity'Access);
+      end if;
+      if not UB_Counts.Is_Empty then
+         UB_Counts.Iterate (Calc_UB_Impurity'Access);
+      end if;
+
       return Impurity;
    end Gini;
 
@@ -438,7 +468,7 @@ package body Builder is
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Question : Question_Data; Example_Data : Row_Data)
-                    return Boolean is
+                      return Boolean is
       Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
       Feat_Index       : Class_Range;
       Example_Feature  : Unbounded_String;
@@ -446,7 +476,12 @@ package body Builder is
       Matches          : Boolean := False;
       Found            : Boolean := False;
    begin
+      Utilities.Print_Question ("Builder.Match Question", Question);
+      Utilities.Print_Row ("Builder.Match Example_Data", Example_Data);
       Val_Type  := Question.Feature_Kind;
+      Put_line ("Builder.Match Val_Type: " & Data_Type'Image (Val_Type));
+      Put_line ("Builder.Match Example_Feature type: " &
+                  Data_Type'Image (Utilities.Get_Data_Type (Example_Feature)));
       if Utilities.Get_Data_Type (Example_Feature) = Val_Type then
          for col in Header_Data.Features'Range loop
             if Feature_Name_Type (Header_Data.Features (col)) = Feature_Name then
@@ -551,7 +586,7 @@ package body Builder is
    --  ---------------------------------------------------------------------------
 
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                        return Partitioned_Rows is
+                          return Partitioned_Rows is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
       Data       : Row_Data;
