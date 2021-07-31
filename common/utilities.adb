@@ -372,11 +372,17 @@ package body Utilities is
 
    procedure Print_Raw_Question (Message : String; Question : Raw_Question) is
       --  Example" Self = ("Colour", "Green"));
-      Col   : constant String := To_String (Question.Feature_Name);
-      Value : constant String := To_String (Question.Feature_Value);
+      Col       : constant String := To_String (Question.Feature_Name);
+      Value     : constant String := To_String (Question.Feature_Value);
+      Data_Kind : constant Data_Type := Get_Data_Type (Question.Feature_Value);
    begin
       Put_Line (Message);
-      Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
+      Put ("Raw_Question: Is " & Col);
+      case Data_Kind is
+      when Integer_Type | Float_Type => Put (" >= ");
+      when others => Put (" = ");
+      end case;
+      Put_Line (" " & Value);
    end Print_Raw_Question;
 
    --  ------------------------------------------------------------------------
