@@ -273,6 +273,25 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Value_Record (Message : String; Value : Value_Record) is
+      Value_Kind : constant Data_Type := Value.Value_Kind;
+   begin
+      New_Line;
+      Put_Line (Message & " value record:");
+      case Value_Kind is
+         when Integer_Type =>
+            Put_Line (Integer'Image (Value.Integer_Value));
+         when Float_Type =>
+            Put_Line (Float'Image (Value.Float_Value));
+         when Boolean_Type =>
+            Put_Line (Boolean'Image (Value.Boolean_Value));
+         when UB_String_Type => Put_Line (To_String (Value.UB_String_Value));
+      end case;
+
+   end Print_Value_Record;
+
+   --  ------------------------------------------------------------------------
+
    function Prediction_String (Label_Counts : Predictions_List)
                                 return String is
       use Prediction_Data_Package;
@@ -376,8 +395,8 @@ package body Utilities is
       Value     : constant String := To_String (Question.Feature_Value);
       Data_Kind : constant Data_Type := Get_Data_Type (Question.Feature_Value);
    begin
-      Put_Line (Message);
-      Put ("Raw_Question: Is " & Col);
+      Put (Message);
+      Put (" raw question: Is " & Col);
       case Data_Kind is
       when Integer_Type | Float_Type => Put (" >= ");
       when others => Put (" = ");
