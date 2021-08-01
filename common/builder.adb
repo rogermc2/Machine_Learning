@@ -116,13 +116,13 @@ package body Builder is
                                      Rows          : Rows_Vector) is
          Leaf : Tree_Node_Type (Prediction_Kind);
       begin
-         New_Line;
+--           New_Line;
          Leaf.Decision_Branch := False;
          Leaf.Prediction := Rows.First_Element;
          Leaf.Rows := Rows;
-         leaf.Prediction_List := Utilities.Predictions (Leaf);
-         Utilities.Print_Rows ("Prediction", Rows);
-         New_Line;
+         Leaf.Prediction_List := Utilities.Predictions (Leaf);
+--           Utilities.Print_Rows ("Prediction", Rows);
+--           New_Line;
          theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
       end Add_Prediction_Node;
 
@@ -135,25 +135,23 @@ package body Builder is
          True_Split_Rows  : Rows_Vector;
          False_Split_Rows : Rows_Vector;
       begin
-         Put_Line ("Add_Branch Rows length: " &
-                     Integer'Image (Integer (Rows.Length)));
-         Utilities.Print_Rows ("Add_Branch Rows", Rows);
+--           Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
             Add_Prediction_Node (Parent_Cursor, Rows);
          else
-            Utilities.Print_Question ("Add_Branch Best split",
-                                      Best_Split.Question);
+--              Utilities.Print_Question ("Add_Branch Best split",
+--                                        Best_Split.Question);
             Add_Decision_Node (Parent_Cursor, Best_Split);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
             Child_Cursor := Last_Child (Parent_Cursor);
-            Utilities.Print_Rows ("Add_Branch True_Split_Rows",
-                                  True_Split_Rows);
+--              Utilities.Print_Rows ("Add_Branch True_Split_Rows",
+--                                    True_Split_Rows);
             Add_Branch (True_Split_Rows, Child_Cursor);
-            Utilities.Print_Rows ("Add_Branch False_Split_Rows",
-                                  False_Split_Rows);
+--              Utilities.Print_Rows ("Add_Branch False_Split_Rows",
+--                                    False_Split_Rows);
             Add_Branch (False_Split_Rows, Child_Cursor);
-            New_Line;
+--              New_Line;
          end if;
       end Add_Branch;
 

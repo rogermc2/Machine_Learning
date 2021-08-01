@@ -554,6 +554,9 @@ package body Utilities is
             False_Child : Cursor;
         begin
             This_Indent := Indent + 1;
+            if This_Indent > 10 then
+                This_Indent := 1;
+            end if;
             Node := Element (Curs);
             if Is_Leaf  (Curs) then
                 Print_Prediction (Node, To_String (Last_Offset));
@@ -566,7 +569,7 @@ package body Utilities is
                         Offset (pos .. pos + 2) := "   ";
                         pos := pos + 2;
                     end loop;
-                    if pos < Indent + 1 then
+                    if This_Indent > 1 and then pos < This_Indent + 1 then
                         Offset (Indent) := ' ';
                     end if;
                     Put (Offset);
