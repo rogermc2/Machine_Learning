@@ -61,12 +61,14 @@ package Decision_Tree_Classifer is
       end case;
    end record;
 
-   type Parameter_Data (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
+   --  class BaseDecisionTree
+   type Base_Parameter_Data
+     (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
       Criterion                : Classifier_Criteria_Type := Gini_Criteria;
       Splitter                 : Splitter_Type := Best_Splitter;
       Max_Depth                : Integer := 0;
-      Min_Splits               : Split_Record (Split_Type);
-      Min_Leaves               : Leaf_Record (Leaf_Type);
+      Min_Samples_Split        : Split_Record (Split_Type);
+      Min_Samples_Leaf         : Leaf_Record (Leaf_Type);
       Min_Weight_Fraction_Leaf : Float := 0.0;
       Max_Features             : Tree.Features_Record (Feature_Type);
       Random_State             : Integer := 0;
@@ -80,6 +82,7 @@ package Decision_Tree_Classifer is
       CCP_Alpha                : Float := 0.0;
    end record;
 
+   --  class DecisionTree parameters additioanl to Base_Parameter_Data
    type Attribute_Data is record
       --  The classes labels (single output problem)
       --  or a list of arrays of class labels (multi-output problem).
@@ -97,8 +100,9 @@ package Decision_Tree_Classifer is
       Decision_Tree       : Tree.Tree_Data;
    end record;
 
+   --  class DecisionTreeClassifier
    type Classifier (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
-      Parameters : Parameter_Data (Split_Type, Leaf_Type, Feature_Type);
+      Parameters : Base_Parameter_Data (Split_Type, Leaf_Type, Feature_Type);
       Attributes : Attribute_Data;
    end record;
 
