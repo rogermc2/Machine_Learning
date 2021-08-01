@@ -513,7 +513,7 @@ package body Utilities is
         for feat in aRow.Features'First .. aRow.Features'Last loop
             Put (To_String (aRow.Features (feat)));
             if feat /= aRow.Features'Last then
-                Put (",");
+                Put (", ");
             end if;
         end loop;
         Put_Line ("; Label: " & To_String (aRow.Label));
