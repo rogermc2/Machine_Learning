@@ -1,31 +1,67 @@
 
 with Ada.Characters.Handling;
 with Ada.Containers;
-with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;
 
 package body Utilities is
 
     use ML_Types;
 
-    type Value_Data (Feature_Kind : Data_Type := Integer_Type) is record
-        Feature_Name : Feature_Name_Type;
-        case Feature_Kind is
-            when Integer_Type => Integer_Value     : Integer;
-            when Float_Type => Float_Value         : Float;
-            when Boolean_Type => Boolean_Value     : Boolean;
-            when UB_String_Type => UB_String_Value : Unbounded_String;
-        end case;
-    end record;
-
-    package Values_Package is new Ada.Containers.Vectors
-      (Class_Range, Value_Data);
-    subtype Value_Set is Values_Package.Vector;
-
     procedure Print_Results_Question (Question : ML_Types.Question_Data);
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_Set;
+
+    --  --------------------------------------------------------------------------
+
+    procedure Check_Rows (Rows : in out Rows_Vector) is
+        use Ada.Containers;
+        use Rows_Package;
+        Data          : Row_Data := Rows.First_Element;
+        Num_Features  : constant Class_Range := Data.Class_Count;
+        Feature_Types : Data_Type_Array (1 .. Num_Features);
+        Label_Type    : Data_Type := Get_Data_Type (Data.Label);
+        Data_Changed  : Boolean := False;
+    begin
+        if Rows.Length < 2 then
+            raise Utilities_Exception with
+              "Utilities.Check_Rows called with empty rows vector";
+        else
+            for index in 1 .. Num_Features loop
+                Feature_Types (index) := Get_Data_Type (Data.Features (index));
+            end loop;
+
+            for row in
+              Integer'Succ (Rows.First_Index) .. Rows.Last_Index loop
+                Data := Rows.Element (Integer (row));
+                Data_Changed := False;
+                --                  Print_Row ("Utilities.Check_Rows row", Data);
+                for col in Class_Range range 1 .. Num_Features loop
+                    if Get_Data_Type (Data.Features (col)) = Float_Type and
+                      Feature_Types (col) = Integer_Type then
+                        Data.Features (col) := Data.Features (col) & ".0";
+                        Feature_Types (col) := Float_Type;
+                        Data_Changed := True;
+                    elsif
+                      Get_Data_Type (Data.Features (col)) = Integer_Type and
+                      Feature_Types (col) = Float_Type then
+                        Data.Features (col) := Data.Features (col) & ".0";
+                        Data_Changed := True;
+                    end if;
+                end loop;
+
+                if Get_Data_Type (Data.Label) = Float_Type and
+                  Label_Type = Integer_Type then
+                    Data.Label := Data.Label & ".0";
+                    Label_Type := Float_Type;
+                    Data_Changed := True;
+                end if;
+                if Data_Changed then
+                    Rows.Replace_Element (row, Data);
+                end if;
+            end loop;
+        end if;
+    end Check_Rows;
 
     --  --------------------------------------------------------------------------
 
@@ -83,6 +119,100 @@ package body Utilities is
     end Is_Integer;
 
     --  ---------------------------------------------------------------------------
+
+    function Label_Array (Data : ML_Types.Rows_Vector) return Label_Data_Array is
+        Data_Array : Label_Data_Array (Data.First_Index .. Data.Last_Index);
+        UB_Label   : Unbounded_String;
+        Data_Kind  : Data_Type;
+    begin
+        for index in Data.First_Index .. Data.Last_Index loop
+            UB_Label := Data.Element (index).Label;
+            Data_Kind := Get_Data_Type (UB_Label);
+            declare
+                Label   : Value_Record (Data_Kind);
+                Label_S : constant String := To_String (Data.Element (index).Label);
+            begin
+                case Label.Value_Kind is
+                when Boolean_Type =>
+                    Label.Boolean_Value := Boolean'Value (Label_S);
+                when Float_Type =>
+                    Label.Float_Value := Float'Value (Label_S);
+                when Integer_Type =>
+                    Label.Integer_Value := Integer'Value (Label_S);
+                when UB_String_Type =>
+                    Label.UB_String_Value := Data.Element (index).Label;
+                end case;
+                Data_Array (index) := Label;
+            end; --  declare block
+        end loop;
+        return Data_Array;
+    end Label_Array;
+
+    --  ---------------------------------------------------------------------------
+
+    procedure Load_CSV_Data (Data_File : File_Type;
+                             Data      : out ML_Types.Rows_Vector) is
+        use Ada.Strings.Unbounded;
+        use ML_Types;
+        use ML_Types.String_Package;
+        Data_Line    : Unbounded_String :=
+                         To_Unbounded_String (Get_Line (Data_File));
+        Num_Features : ML_Types.Class_Range;
+        CSV_Line     : String_List;
+        Curs         : ML_Types.String_Package.Cursor;
+    begin
+        Num_Features :=
+          Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
+        Builder.Set_Header_Data (To_String (Data_Line));
+
+        declare
+            Values       : Feature_Data_Array (1 .. Num_Features);
+        begin
+            while not End_Of_File (Data_File) loop
+                declare
+                    Value_Index  : Class_Range := 1;
+                    Row          : Row_Data (Num_Features);
+                begin
+                    Data_Line := To_Unbounded_String (Get_Line (Data_File));
+                    CSV_Line := Utilities.Split_String
+                      (To_String (Data_Line), ",");
+                    Curs := CSV_Line.First;
+                    while Has_Element (Curs) loop
+                        if Curs /= CSV_Line.Last then
+                            Values (Value_Index) := Element (Curs);
+                            Value_Index := Value_Index + 1;
+                        else
+                            Row.Label := Element (Curs);
+                        end if;
+                        Next (Curs);
+                    end loop;
+                    Row.Features := Values;
+                    Data.Append (Row);
+                end;  --  declare block
+            end loop;
+        end;  --  declare block
+        --        Put_Line ("Data length: " & Count_Type'Image (Data.Data.Length));
+        --        Print_Data_Item (Data.Data, Num_Features, 15);
+        --        Print_Data (Data.Data, Num_Features);
+
+    end Load_CSV_Data;
+
+    --  -------------------------------------------------------------------------
+
+    function Number_Of_Features (Rows : Rows_Vector) return Class_Range is
+        Data  : constant Row_Data := Rows.First_Element;
+    begin
+        return Data.Class_Count;
+    end Number_Of_Features;
+
+    --  -------------------------------------------------------------------------
+
+    function Number_Of_Features (Rows : Value_Data_List) return Class_Range is
+    begin
+        return Class_Range (Rows.Length);
+    end Number_Of_Features;
+
+    --  -------------------------------------------------------------------------
 
     function Predictions (Node : Tree_Node_Type) return Predictions_List is
         use ML_Types;
@@ -194,6 +324,25 @@ package body Utilities is
 
     --  -------------------------------------------------------------------------
 
+    procedure Print_Value_Record (Message : String; Value : Value_Record) is
+        Value_Kind : constant Data_Type := Value.Value_Kind;
+    begin
+        New_Line;
+        Put_Line (Message & " value record:");
+        case Value_Kind is
+            when Integer_Type =>
+                Put_Line (Integer'Image (Value.Integer_Value));
+            when Float_Type =>
+                Put_Line (Float'Image (Value.Float_Value));
+            when Boolean_Type =>
+                Put_Line (Boolean'Image (Value.Boolean_Value));
+            when UB_String_Type => Put_Line (To_String (Value.UB_String_Value));
+        end case;
+
+    end Print_Value_Record;
+
+    --  ------------------------------------------------------------------------
+
     function Prediction_String (Label_Counts : Predictions_List)
                                 return String is
         use Prediction_Data_Package;
@@ -201,7 +350,7 @@ package body Utilities is
         Prediction   : Prediction_Data;
         Total        : Natural := 0;
         Leaf_Data    : Unbounded_String := To_Unbounded_String
-              ("{'");
+          ("{'");
     begin
         while Has_Element (Count_Cursor) loop
             Total := Total + Element (Count_Cursor).Num_Copies;
@@ -223,6 +372,26 @@ package body Utilities is
     end Prediction_String;
 
     --  -------------------------------------------------------------------------
+
+    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
+                                    Column : Class_Range) is
+        use Rows_Package;
+        aRow : Row_Data;
+    begin
+        Put_Line (Message & ":");
+        for index in Rows.First_Index .. Rows.Last_Index loop
+            aRow := Rows.Element (index);
+            Put ("  Feature value: ");
+            Put (To_String (aRow.Features (Column)));
+            if Column /= aRow.Features'Last then
+                Put (", ");
+            end if;
+            New_Line;
+        end loop;
+
+    end Print_Feature_Values;
+
+    --  ------------------------------------------------------------------------
 
     procedure Print_Node (Node : Tree_Node_Type) is
 
@@ -246,10 +415,10 @@ package body Utilities is
     procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
         use ML_Types;
         use Prediction_Data_Package;
-        Curs         : Cursor;
-        Data         : Prediction_Data;
+        Curs             : Cursor;
+        Data             : Prediction_Data;
         Prediction_List  : constant Predictions_List := Node.Prediction_List;
-        Prediction   : Unbounded_String;
+        Prediction       : Unbounded_String;
     begin
         Prediction := To_Unbounded_String (Offset  & "    Predict {");
         Curs := Prediction_List.First;
@@ -293,11 +462,17 @@ package body Utilities is
 
     procedure Print_Raw_Question (Message : String; Question : Raw_Question) is
     --  Example" Self = ("Colour", "Green"));
-        Col   : constant String := To_String (Question.Feature_Name);
-        Value : constant String := To_String (Question.Feature_Value);
+        Col       : constant String := To_String (Question.Feature_Name);
+        Value     : constant String := To_String (Question.Feature_Value);
+        Data_Kind : constant Data_Type := Get_Data_Type (Question.Feature_Value);
     begin
-        Put_Line (Message);
-        Put_Line ("Raw_Question: Is " & Col & " = " & " " & Value);
+        Put (Message);
+        Put (" raw question: Is " & Col);
+        case Data_Kind is
+        when Integer_Type | Float_Type => Put (" >= ");
+        when others => Put (" = ");
+        end case;
+        Put_Line (" " & Value);
     end Print_Raw_Question;
 
     --  ------------------------------------------------------------------------
@@ -338,7 +513,7 @@ package body Utilities is
         for feat in aRow.Features'First .. aRow.Features'Last loop
             Put (To_String (aRow.Features (feat)));
             if feat /= aRow.Features'Last then
-                Put (",");
+                Put (", ");
             end if;
         end loop;
         Put_Line ("; Label: " & To_String (aRow.Label));
@@ -350,19 +525,19 @@ package body Utilities is
         use Rows_Package;
         aRow : Row_Data;
     begin
-        Put_Line (Message);
+        Put_Line (Message & ":");
         for index in Rows.First_Index .. Rows.Last_Index loop
             aRow := Rows.Element (index);
             Put ("  Feature values: (");
             for feat in aRow.Features'First .. aRow.Features'Last loop
                 Put (To_String (aRow.Features (feat)));
+                if feat /= aRow.Features'Last then
+                    Put (", ");
+                end if;
             end loop;
-            Put ("), Label: " & To_String (aRow.Label));
-            if index /= Rows.Last_Index then
-                Put (", ");
-            end if;
-            New_Line;
+            Put_Line ("), Label: " & To_String (aRow.Label));
         end loop;
+
     end Print_Rows;
 
     --  ------------------------------------------------------------------------
@@ -379,6 +554,9 @@ package body Utilities is
             False_Child : Cursor;
         begin
             This_Indent := Indent + 1;
+            if This_Indent > 10 then
+                This_Indent := 1;
+            end if;
             Node := Element (Curs);
             if Is_Leaf  (Curs) then
                 Print_Prediction (Node, To_String (Last_Offset));
@@ -391,7 +569,7 @@ package body Utilities is
                         Offset (pos .. pos + 2) := "   ";
                         pos := pos + 2;
                     end loop;
-                    if pos < Indent + 1 then
+                    if This_Indent > 1 and then pos < This_Indent + 1 then
                         Offset (Indent) := ' ';
                     end if;
                     Put (Offset);
@@ -451,14 +629,14 @@ package body Utilities is
         while Has_Element (Curs) loop
             Data := Element (Curs);
             case Data.Feature_Kind is
-                when Boolean_Type =>
-                    Put (" " & Boolean'Image (Data.Boolean_Value));
-                when Float_Type =>
-                    Put (" " & Float'Image (Data.Float_Value));
-                when Integer_Type =>
-                    Put (" " & Integer'Image (Data.Integer_Value));
-                when UB_String_Type =>
-                    Put (" " & To_String (Data.UB_String_Value));
+            when Boolean_Type =>
+                Put (" " & Boolean'Image (Data.Boolean_Value));
+            when Float_Type =>
+                Put (" " & Float'Image (Data.Float_Value));
+            when Integer_Type =>
+                Put (" " & Integer'Image (Data.Integer_Value));
+            when UB_String_Type =>
+                Put (" " & To_String (Data.UB_String_Value));
             end case;
             Next (Curs);
         end loop;
@@ -466,6 +644,111 @@ package body Utilities is
     end Print_Unique_Values;
 
     --  -----------------------------------------------------------------------
+
+    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector) return Data_Record is
+        use Rows_Package;
+        use Value_Data_Package;
+        aRow           : ML_Types.Row_Data := Row_Data.First_Element;
+        Feature_Values : Value_Data_List;
+        Features_List  : Features_Data_List;
+        Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
+        Label_Type     : Data_Type;
+        Label_Values   : Value_Data_List;
+        Data           : Data_Record;
+    begin
+        for index in aRow.Features'Range loop
+            Data.Feature_Names.Append (aRow.Features (index));
+        end loop;
+        Data.Label_Name := aRow.Label;
+
+        for row_index in Row_Data.First_Index + 1 .. Row_Data.Last_Index loop
+            aRow := Row_Data.Element (row_index);
+            declare
+                Features                : constant Feature_Data_Array
+                  (1 .. aRow.Class_Count) := aRow.Features;
+                Label                   : constant Unbounded_String := aRow.Label;
+            begin
+                if row_index = Row_Data.First_Index + 1 then
+                    Label_Type := Get_Data_Type (aRow.Label);
+                end if;
+                for f_index in Features'Range loop
+                    if row_index = Row_Data.First_Index + 1 then
+                        Feature_Types (f_index) :=
+                          Get_Data_Type (aRow.Features (f_index));
+                    end if;
+
+                    declare
+                        Feat_String : constant Unbounded_String := Features (f_index);
+                        Value       : Value_Record (Feature_Types (f_index));
+                    begin
+                        case Feature_Types (f_index) is
+                        when Boolean_Type =>
+                            Value.Boolean_Value :=
+                              Boolean'Value (To_String (Feat_String));
+                        when Integer_Type =>
+                            Value.Integer_Value :=
+                              Integer'Value (To_String (Feat_String));
+                        when Float_Type =>
+                            Value.Float_Value :=
+                              Float'Value (To_String (Feat_String));
+                        when UB_String_Type =>
+                            Value.UB_String_Value := Feat_String;
+                        end case;
+                        Feature_Values.Append (Value);
+                    end;  --  declare block
+                end loop;
+                Features_List.Append (Feature_Values);
+
+                declare
+                    Label_Value    : Value_Record (Label_Type);
+                begin
+                    case Label_Type is
+                    when Boolean_Type =>
+                        Label_Value.Boolean_Value :=
+                          Boolean'Value (To_String (Label));
+                    when Integer_Type =>
+                        Label_Value.Integer_Value :=
+                          Integer'Value (To_String (Label));
+                    when Float_Type =>
+                        Label_Value.Float_Value :=
+                          Float'Value (To_String (Label));
+                    when UB_String_Type =>
+                        Label_Value.UB_String_Value := Label;
+                    end case;
+                    Label_Values.Append (Label_Value);
+                end;  --  declare block;
+            end;
+        end loop;
+
+        Data.Feature_Values := Features_List;
+        Data.Label_Values := Label_Values;
+        return Data;
+
+    end Split_Row_Data;
+
+    --  -----------------------------------------------------------------------
+
+    function Split_String (aString, Pattern : String) return String_List is
+        use Ada.Strings;
+        use Ada.Strings.Unbounded;
+        Last       : constant Integer := aString'Length;
+        A_Index    : Integer;
+        B_Index    : Integer := 1;
+        Split_List : String_List;
+    begin
+        for index in 1 .. Fixed.Count (aString, Pattern) loop
+            A_Index := Fixed.Index (aString (B_Index .. Last), Pattern);
+            --  process string slice in any way
+            Split_List.Append (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
+            B_Index := A_Index + Pattern'Length;
+        end loop;
+        --  process last string
+        Split_List.Append (To_Unbounded_String (aString (B_Index .. Last)));
+        return Split_List;
+
+    end Split_String;
+
+    --  -------------------------------------------------------------------------
 
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_Set is
@@ -489,8 +772,8 @@ package body Utilities is
                 theSet.Append (Value);
             end if;
         end Add_To_Set;
-    begin
 
+    begin
         if Rows.Length < 2 then
             raise Utilities_Exception with
               "Utilities.Unique_Values called with empty rows vector";

@@ -88,7 +88,7 @@ begin
     New_Line;
     Put_Line ("Partition example 1");
     aRaw_Question := (Colour_Feature, UB ("Red"));
-    Utilities.Print_Raw_Question ("Partition raw question", aRaw_Question);
+    Utilities.Print_Raw_Question ("Partition example 1", aRaw_Question);
 
     Put_Line (" Calling Partition 1");
     P_Rows := Partition (Training_Data, (To_Question (aRaw_Question)));
@@ -98,7 +98,7 @@ begin
     New_Line;
     Put_Line ("Partition example 2");
     aRaw_Question := (Diameter_Feature, UB ("3"));
-    Utilities.Print_Raw_Question ("Partition example raw question", aRaw_Question);
+    Utilities.Print_Raw_Question ("Partition example 2", aRaw_Question);
     Put_Line ("Partition aRaw_Question set");
 
     P_Rows := Partition (Training_Data, (To_Question (aRaw_Question)));

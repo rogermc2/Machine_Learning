@@ -46,8 +46,22 @@ package ML_Types is
       (Class_Range, Data_Type);
     subtype Label_Type_Map is Label_Type_Package.Map;
 
-    type Label_Data (Label_Kind : Data_Type := Integer_Type) is record
-        case Label_Kind is
+    type Value_Data (Feature_Kind : Data_Type := Integer_Type) is record
+        Feature_Name : Feature_Name_Type;
+        case Feature_Kind is
+            when Integer_Type => Integer_Value     : Integer;
+            when Float_Type => Float_Value         : Float;
+            when Boolean_Type => Boolean_Value     : Boolean;
+            when UB_String_Type => UB_String_Value : Unbounded_String;
+        end case;
+    end record;
+
+    package Values_Package is new Ada.Containers.Vectors
+      (Class_Range, Value_Data);
+    subtype Value_Set is Values_Package.Vector;
+
+    type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
+        case Value_Kind is
             when Integer_Type => Integer_Value : Integer;
             when Float_Type => Float_Value   : Float;
             when Boolean_Type => Boolean_Value : Boolean;
@@ -55,16 +69,43 @@ package ML_Types is
         end case;
     end record;
 
+    package Value_Data_Package is new
+      Ada.Containers.Doubly_Linked_Lists (Value_Record);
+    subtype Value_Data_List is Value_Data_Package.List;
+
+   use Value_Data_Package;
+    package Features_Data_Package is new
+      Ada.Containers.Doubly_Linked_Lists (Value_Data_List);
+   subtype Features_Data_List is Features_Data_Package.List;
+
+    type Label_Data_Array is array (Positive range <>) of Value_Record;
+
     package Count_Package is new Ada.Containers.Ordered_Maps
       (Data_Type, Natural);
+    subtype Count_Map is Count_Package.Map;
 
-    package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
-      (Unbounded_String, Natural);
-    subtype UB_Label_Map is UB_Label_Map_Package.Map;
+    package Boolean_Label_Map_Package is new Ada.Containers.Ordered_Maps
+      (Boolean, Natural);
+   subtype Boolean_Label_Map is Boolean_Label_Map_Package.Map;
+
+    package Float_Label_Map_Package is new Ada.Containers.Ordered_Maps
+      (Float, Natural);
+    subtype Float_Label_Map is Float_Label_Map_Package.Map;
 
     package Integer_Label_Map_Package is new Ada.Containers.Ordered_Maps
       (Integer, Natural);
-    subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
+   subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
+
+    package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
+      (Unbounded_String, Natural);
+   subtype UB_Label_Map is UB_Label_Map_Package.Map;
+
+   type Label_Maps is record
+      Boolean_Map   : Boolean_Label_Map;
+      Float_Map     : Float_Label_Map;
+      Integer_Map   : Integer_Label_Map;
+      UB_String_Map : UB_Label_Map;
+   end record;
 
     subtype Raw_Label is Unbounded_String;
 
@@ -77,6 +118,17 @@ package ML_Types is
       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
     subtype Predictions_List is Prediction_Data_Package.List;
 
+    package String_Package is new Ada.Containers.Doubly_Linked_Lists
+      (Ada.Strings.Unbounded.Unbounded_String);
+    subtype String_List is  String_Package.List;
+
+    type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
+        Feature_Names  : String_List;
+        Label_Name     : Unbounded_String := To_Unbounded_String ("");
+        Feature_Values : Features_Data_List;
+        Label_Values   : Value_Data_List;
+    end record;
+
     type Raw_Question is record
         Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
         Feature_Value : Unbounded_String;  --  e.g. "Green"
@@ -86,11 +138,11 @@ package ML_Types is
         Feature_Name : Feature_Name_Type := To_Unbounded_String ("");
         Gain         : Float := 0.0;
         case Feature_Kind is
-            when Integer_Type => Integer_Value : Integer := 0;
-            when Float_Type => Float_Value : Float := 0.0;
-            when Boolean_Type => Boolean_Value : Boolean := False;
-            when UB_String_Type => UB_String_Value : Unbounded_String :=
-                                                           To_Unbounded_String ("");
+        when Integer_Type => Integer_Value : Integer := 0;
+        when Float_Type => Float_Value : Float := 0.0;
+        when Boolean_Type => Boolean_Value : Boolean := False;
+        when UB_String_Type => UB_String_Value : Unbounded_String :=
+                                                       To_Unbounded_String ("");
         end case;
     end record;
 
