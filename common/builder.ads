@@ -10,7 +10,7 @@ package Builder is
     Builder_Exception : exception;
 
     function Best_Question (Data : Best_Data) return Question_Data;
-    function Build_Tree (Rows : Rows_Vector) return Tree_Type;
+    function Build_Tree (Rows : in out  Rows_Vector) return Tree_Type;
     function Classify (Node_Cursor : Tree_Cursor; aRow : Row_Data)
                        return ML_Types.Predictions_List;
     procedure Evaluate (aTree : Tree_Type; Test_Data : Rows_Vector);

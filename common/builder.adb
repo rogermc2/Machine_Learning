@@ -95,7 +95,7 @@ package body Builder is
    --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
    --  for each class, the number of times that the class appears in the rows
    --  from the training data that reach this leaf.
-   function Build_Tree (Rows : Rows_Vector) return Tree_Type is
+   function Build_Tree (Rows : in out Rows_Vector) return Tree_Type is
       use Tree_Package;
       theTree   : Tree_Type := Empty_Tree;
 
@@ -158,6 +158,7 @@ package body Builder is
       end Add_Branch;
 
    begin
+      Utilities.Check_Rows (Rows);
       Add_Branch (Rows, theTree.Root);
       return theTree;
 
