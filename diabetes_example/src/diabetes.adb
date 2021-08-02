@@ -8,7 +8,6 @@ with Builder;
 
 procedure Diabetes is
    use ML_Types;
-
    Data_File      : File_Type;
    Training_Data  : ML_Types.Rows_Vector;
    aTree          : Tree_Type;
@@ -19,7 +18,7 @@ begin
    Utilities.Load_CSV_Data (Data_File, Training_Data);
    Close (Data_File);
    Put_Line ("Build Tree");
-   aTree := Builder.Build_Tree (Training_Data);
+   aTree := Builder.Build_Tree (Training_Data, 3);
    New_Line;
 
    Put_Line ("Print Tree");

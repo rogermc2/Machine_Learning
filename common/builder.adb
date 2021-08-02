@@ -23,7 +23,8 @@ with Utilities;
 
 package body Builder is
 
-   Header_Data  : Header_Data_Type;
+   Header_Data : Header_Data_Type;
+   Num_Leaves  : Natural := 0;
 
    function Parse (aString : String) return Row_Data;
    function Parse_Header (Header : String) return Header_Data_Type;
@@ -95,7 +96,8 @@ package body Builder is
    --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
    --  for each class, the number of times that the class appears in the rows
    --  from the training data that reach this leaf.
-   function Build_Tree (Rows : in out Rows_Vector) return Tree_Type is
+   function Build_Tree (Rows : in out Rows_Vector;
+                        Max_Leaves : Natural := 0) return Tree_Type is
       use Tree_Package;
       theTree   : Tree_Type := Empty_Tree;
 
@@ -116,6 +118,9 @@ package body Builder is
                                      Rows          : Rows_Vector) is
          Leaf : Tree_Node_Type (Prediction_Kind);
       begin
+         if Max_Leaves > 0 then
+                Num_Leaves := Num_Leaves + 1;
+         end if;
 --           New_Line;
          Leaf.Decision_Branch := False;
          Leaf.Prediction := Rows.First_Element;
@@ -138,7 +143,7 @@ package body Builder is
 --           Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
             Add_Prediction_Node (Parent_Cursor, Rows);
-         else
+         elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
 --              Utilities.Print_Question ("Add_Branch Best split",
 --                                        Best_Split.Question);
             Add_Decision_Node (Parent_Cursor, Best_Split);
