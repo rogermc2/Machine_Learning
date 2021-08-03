@@ -37,20 +37,20 @@ package body Utilities is
                 Data_Changed := False;
                 --                  Print_Row ("Utilities.Check_Rows row", Data);
                 for col in Class_Range range 1 .. Num_Features loop
-                    if Get_Data_Type (Data.Features (col)) = Float_Type and
+                    if Get_Data_Type (Data.Features (col)) = Float_Type and then
                       Feature_Types (col) = Integer_Type then
                         Data.Features (col) := Data.Features (col) & ".0";
                         Feature_Types (col) := Float_Type;
                         Data_Changed := True;
                     elsif
-                      Get_Data_Type (Data.Features (col)) = Integer_Type and
+                      Get_Data_Type (Data.Features (col)) = Integer_Type and then
                       Feature_Types (col) = Float_Type then
                         Data.Features (col) := Data.Features (col) & ".0";
                         Data_Changed := True;
                     end if;
                 end loop;
 
-                if Get_Data_Type (Data.Label) = Float_Type and
+                if Get_Data_Type (Data.Label) = Float_Type and then
                   Label_Type = Integer_Type then
                     Data.Label := Data.Label & ".0";
                     Label_Type := Float_Type;
