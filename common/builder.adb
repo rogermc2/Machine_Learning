@@ -109,13 +109,15 @@ package body Builder is
          Node.Question := Best_Split.Question;
          Node.True_Branch := Best_Split.True_Rows;
          Node.False_Branch := Best_Split.False_Rows;
+         Node.Gini := Best_Split.Gini;
          theTree.Insert_Child (Parent   => Parent_Cursor,
                                Before   => No_Element,
                                New_Item => Node);
       end Add_Decision_Node;
 
       procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
-                                     Rows          : Rows_Vector) is
+                                     Rows          : Rows_Vector;
+                                     Best          : Best_Data) is
          Leaf : Tree_Node_Type (Prediction_Kind);
       begin
          if Max_Leaves > 0 then
@@ -125,6 +127,7 @@ package body Builder is
          Leaf.Decision_Branch := False;
          Leaf.Prediction := Rows.First_Element;
          Leaf.Rows := Rows;
+         leaf.Gini := Best.Gini;
          Leaf.Prediction_List := Utilities.Predictions (Leaf);
 --           Utilities.Print_Rows ("Prediction", Rows);
 --           New_Line;
@@ -142,7 +145,7 @@ package body Builder is
       begin
 --           Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
-            Add_Prediction_Node (Parent_Cursor, Rows);
+            Add_Prediction_Node (Parent_Cursor, Rows, Best_Split);
          elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
 --              Utilities.Print_Question ("Add_Branch Best split",
 --                                        Best_Split.Question);
@@ -373,6 +376,8 @@ package body Builder is
             end case;
          end loop;
       end loop;
+
+      Best.Gini := Current_Uncertainty;
       return Best;
 
    end Find_Best_Split;
@@ -622,10 +627,11 @@ package body Builder is
            (Split_Rows.True_Rows, Split_Rows.False_Rows, Uncertainty);
          --   Floating point = is not reliable
          if Question.Gain >= Best.Gain then
-            Best := (Question, Split_Rows.True_Rows, Split_Rows.False_Rows, Question.Gain);
+            Best := (Question, Split_Rows.True_Rows, Split_Rows.False_Rows,
+                     Best.Gini, Question.Gain);
          end if;
       elsif Best.Question.Feature_Name = To_Unbounded_String ("") then
-         Best := (Question, Empty_Row, Empty_Row, 0.0);
+         Best := (Question, Empty_Row, Empty_Row, Best.Gini, 0.0);
       end if;
    end Split;
 
