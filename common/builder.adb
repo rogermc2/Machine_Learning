@@ -116,8 +116,7 @@ package body Builder is
       end Add_Decision_Node;
 
       procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
-                                     Rows          : Rows_Vector;
-                                     Best          : Best_Data) is
+                                     Rows          : Rows_Vector) is
          Leaf : Tree_Node_Type (Prediction_Kind);
       begin
          if Max_Leaves > 0 then
@@ -127,7 +126,6 @@ package body Builder is
          Leaf.Decision_Branch := False;
          Leaf.Prediction := Rows.First_Element;
          Leaf.Rows := Rows;
-         leaf.Gini := Best.Gini;
          Leaf.Prediction_List := Utilities.Predictions (Leaf);
 --           Utilities.Print_Rows ("Prediction", Rows);
 --           New_Line;
@@ -145,7 +143,11 @@ package body Builder is
       begin
 --           Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
-            Add_Prediction_Node (Parent_Cursor, Rows, Best_Split);
+            Utilities.Print_Question ("Add_Branch prediction", Best_Split.Question);
+            Put_Line ("Add_Branch prediction Gini" &
+                        Float'Image (Best_Split.Gini));
+                        New_Line;
+            Add_Prediction_Node (Parent_Cursor, Rows);
          elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
 --              Utilities.Print_Question ("Add_Branch Best split",
 --                                        Best_Split.Question);
@@ -338,7 +340,6 @@ package body Builder is
       Integer_Value       : Integer;
    begin
       for col in 1 .. Num_Features loop
-         --           Put_Line ("Builder.Find_Best_Split col: " & Class_Range'Image (col));
          Feature_Name := Feature_Name_Type (Header_Data.Features (col));
          Feature_Data_Type := Utilities.Get_Data_Type (Row1_Features (col));
          for row in
@@ -346,30 +347,19 @@ package body Builder is
             Feature_Value := Rows.Element (row).Features (col);
             case Feature_Data_Type is
                when Boolean_Type =>
-                  --                    Put_Line ("Builder.Find_Best_Split Boolean_Type.");
                   Best_Boolean_Value
                     (Rows, To_Boolean (Feature_Value), Feature_Name,
                      Current_Uncertainty, Boolean_Question, Best);
                when Float_Type =>
-                  --                    Put_Line ("Builder.Find_Best_Split Float_Type.");
                   Best_Float_Value
                     (Rows, To_Float (Feature_Value), Feature_Name,
                      Current_Uncertainty, Float_Question, Best);
                when Integer_Type =>
-                  --                    Put_Line ("Builder.Find_Best_Split Integer_Type Feature_Value: "
-                  --                              & To_String (Feature_Value));
                   Integer_Value := To_Integer (Feature_Value);
-                  --                    Put_Line ("Builder.Find_Best_Split Integer_Value set.");
-                  --                    Put_Line ("Builder.Find_Best_Split Integer_Type Current_Uncertainty: "
-                  --                              & Float'Image (Current_Uncertainty));
-                  --                    Utilities.Print_Question ("Builder.Find_Best_Split Integer_Question",
-                  --                                              Integer_Question);
                   Best_Integer_Value
                     (Rows, Integer_Value, Feature_Name,
                      Current_Uncertainty, Integer_Question, Best);
-                  --                    Put_Line ("Builder.Find_Best_Split Integer_Type set.");
                when UB_String_Type =>
-                  --                    Put_Line ("Builder.Find_Best_Split UB_String_Type.");
                   Best_String_Value
                     (Rows, Feature_Value, Feature_Name, Current_Uncertainty,
                      String_Question, Best);

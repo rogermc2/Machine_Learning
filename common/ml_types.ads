@@ -148,10 +148,10 @@ package ML_Types is
 
     type Tree_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
       Decision_Branch : Boolean := True;
-      Gini            : Float := 0.0;
         case Node_Type is
         when Decision_Kind =>
             Question     : Question_Data;
+            Gini         : Float := 0.0;
             True_Branch  : Rows_Vector := Rows_Package.Empty_Vector;
             False_Branch : Rows_Vector := Rows_Package.Empty_Vector;
         when Prediction_Kind =>
