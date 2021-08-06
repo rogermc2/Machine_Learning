@@ -419,7 +419,9 @@ package body Utilities is
             when Prediction_Kind =>
                 Print_Row ("    Prediction:", Node.Prediction);
             when Decision_Kind =>
-                null;
+                Put_Line (Offset & "    Number of samples = " &
+                            Integer'Image (Integer (Node.True_Branch.Length) +
+                              Integer (Node.False_Branch.Length)));
         end case;
 
     end Print_Node_Data;
