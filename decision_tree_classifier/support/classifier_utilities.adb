@@ -108,8 +108,10 @@ package body Classifier_Utilities is
             --  Get class weights for the subsample, covering all classes in
             --  case some labels that were present in the original data are
             --  missing from the sample.
-            Y_Subsample.Append (Y.Element (Indices.Element (index_k)));
-            Classes_Subsample.Append (Unique_Values (Y_Subsample));
+            for index in Indices.First_Index .. Indices.Last_Index loop
+               Y_Subsample.Append (Y.Element (Indices.Element (index)));
+            end loop;
+            Classes_Subsample := Unique_Values (Y_Subsample);
             Class_K_Weights := Compute_Class_Weights
               (Weight_Kind, Y_Subsample, Classes_Subsample);
             Weight_K := 0.0;
