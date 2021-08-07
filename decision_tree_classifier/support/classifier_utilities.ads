@@ -55,6 +55,8 @@ package Classifier_Utilities is
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Float_List;
+   function Get_Column (Data       : ML_Types.List_Of_Value_Data_Lists;
+                        Data_Index : Positive) return ML_Types.Value_Data_List;
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
    procedure Print_Float_Array (Name          : String; anArray : Float_Array;
                                 Start, Finish : Integer);

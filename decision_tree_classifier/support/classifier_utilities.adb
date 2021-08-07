@@ -63,7 +63,7 @@ package body Classifier_Utilities is
       use Integer_Package;
       use Value_Data_Package;
       use Value_Lists_Data_Package;
-      Y_Lists_Curs          : Value_Lists_Data_Package.Cursor := Y.First;
+      Y_Lists_Curs          : Value_Lists_Data_Package.Cursor;
       Expanded_Class_Weight : Weight_Map;
       Sample_Weights        : Weight_Map;
       Num_Outputs           : Integer := Integer (Y.Length);
@@ -93,10 +93,7 @@ package body Classifier_Utilities is
 
       for index_k in 1 .. Num_Outputs loop
          --  y_full = y[:, k]
-         while Has_Element (Y_Lists_Curs) loop
-            Y_Full.Append (Element (Y_Lists_Curs));
-            Next (Y_Lists_Curs);
-         end loop;
+         Y_Full := Get_Column (Y, index_k);
          Classes_Full := Unique_Values (Y_Full);
          if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
             Class_Weight_K := 1.0;
@@ -125,6 +122,21 @@ package body Classifier_Utilities is
 
       return Sample_Weight;
    end Compute_Sample_Weight;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Column (Data       : ML_Types.List_Of_Value_Data_Lists;
+                        Data_Index : Positive)
+                        return ML_Types.Value_Data_List is
+      use ML_Types;
+      use Value_Lists_Data_Package;
+      theList : Value_Data_List;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         theList.Append (Data.Element (index));
+      end loop;
+      return theList;
+   end Get_Column;
 
    --  -------------------------------------------------------------------------
 
