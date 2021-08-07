@@ -154,12 +154,12 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Value (Nums : ML_Types.Value_Data_List)
-                          return ML_Types.Value_Data_List is
+   function Unique_Values (Values : ML_Types.Value_Data_List)
+                           return ML_Types.Value_Data_List is
       use ML_Types;
       use Int_Sets;
       use Value_Data_Package;
-      Nums_Curs         : Value_Data_Package.Cursor := Nums.First;
+      Nums_Curs         : Value_Data_Package.Cursor := Values.First;
       Num_Value         : Value_Record;
       Bool_Value        : Value_Record (Boolean_Type);
       Float_Value       : Value_Record (Float_Type);
@@ -216,7 +216,7 @@ package body Classifier_Utilities is
          UB_String_Sets.Next (UB_Strings_Curs);
       end loop;
       return Nums_List;
-   end Unique_Value;
+   end Unique_Values;
 
    -------------------------------------------------------------------------
 

@@ -672,7 +672,7 @@ package body Utilities is
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;
       Feature_Values : Value_Data_List;
-      Features_List  : Features_Data_List;
+      Features_List  : List_Of_Value_Data_Lists;
       Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
       Label_Type     : Data_Type;
       Label_Values   : Value_Data_List;

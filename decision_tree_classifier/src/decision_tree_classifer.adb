@@ -35,16 +35,18 @@ package body Decision_Tree_Classifer is
    function Fit (Self          : in out Classifier;
                  --                   X    : Sample_Matrix;
                  --                   Y    : in out Integer_List;
-                 X             : ML_Types.Features_Data_List;
+                 X             : ML_Types.List_Of_Value_Data_Lists;
                  Y             : in out ML_Types.Value_Data_List;
                  Sample_Weight : Float_Array;
                  Use_Weight    : Boolean := False;
                  Check_Input   : Boolean := True;
                  X_Idx_Sorted  : State := None)
                  return Estimator.Estimator_Data is
-      use Integer_Package;
-      use Weight_Dictionary;
+      use Ada.Containers;
       use ML_Types;
+      use Integer_Package;
+      use Value_Data_Package;
+      use Weight_Dictionary;
       Num_Samples           : constant Positive := Positive (X.Length);
       Num_Outputs           : constant Positive := Positive (Y.Length);
       Features              : Value_Data_List := X.First_Element;
@@ -55,9 +57,12 @@ package body Decision_Tree_Classifer is
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
       Y_Original            : Value_Data_List := Y;
-      Classes               : Features_Data_List;
+      Y_Encoded             : Value_Data_List;
+      Encode_Value          : Value_Record (Float_Type);
+      Classes               : List_Of_Value_Data_Lists;
       Classes_K             : Value_Data_List;
-      K_Index               : Positive;
+      Y_Cursor              : Value_Data_Package.Cursor;
+      K_Cursor              : Value_Data_Package.Cursor;
       Max_Leaf_Nodes        : Integer := -1;
    begin
       if Self.Parameters.CCP_Alpha < 0.0 then
@@ -70,20 +75,28 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Classes.Clear;
       Self.Attributes.Num_Classes := 0;
 
+      if Positive (Y.Length) /= Num_Samples then
+         raise Value_Error with
+           "Decision_Tree_Classifer.Fit Number of labels =" &
+           Count_Type'Image (Y.Length) & " does not match number of samples ="
+           & Integer'Image (Num_Samples);
+      end if;
+
       for k in 1 .. Num_Outputs loop
-         Classes_K := Unique_Value (Y);
+         Classes_K := Unique_Values (Y);
+         Y_Encoded := Classes_K;
+         Self.Attributes.Classes.Append (Classes_K);
       end loop;
       Y.Clear;
-      K_Index := Classes_K.First_Index;
-      for index in Y'Range loop
-            Y (index).Integer_Value := Classes_K.Element (K_Index);
-            if index /= Y'Last then
-                K_Index := K_Index + 1;
-            end if;
+
+      K_Cursor := Classes_K.First;
+      while  Has_Element (K_Cursor) loop
+            Y.Append (Element (K_Cursor));
+            Next (K_Cursor);
       end loop;
 
       if Self.Parameters.Class_Weight /= Empty_Map then
-         Y_Original.Append (Y);
+         Y_Original := Y;
          Expanded_Class_Weight := Compute_Sample_Weight (No_Weight, Y_Original);
       end if;
       if Self.Parameters.Max_Leaf_Nodes > 0 then

@@ -40,7 +40,7 @@ package Decision_Tree_Classifer is
 
    package UB_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
-   type Unbounded_List is new UB_Package.Vector with null record;
+   subtype Unbounded_List is UB_Package.Vector;
 
    type Split_Record (Split_Type : Tree.Data_Type) is record
       --  The minimum number of samples required to split an internal node.
@@ -86,7 +86,7 @@ package Decision_Tree_Classifer is
    type Attribute_Data is record
       --  The classes labels (single output problem)
       --  or a list of arrays of class labels (multi-output problem).
-      Classes             : Unbounded_List;
+      Classes             : ML_Types.Features_Data_List;
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
