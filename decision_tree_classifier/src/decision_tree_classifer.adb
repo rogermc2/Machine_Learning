@@ -58,7 +58,7 @@ package body Decision_Tree_Classifer is
         (Num_Samples, Positive (Num_Features));
       Y_Original            : List_Of_Value_Data_Lists;
       Y_Encoded             : Value_Data_List;
-      Encode_Value          : Value_Record (Float_Type);
+--        Encode_Value          : Value_Record (Float_Type);
       Classes               : List_Of_Value_Data_Lists;
       Classes_K             : Value_Data_List;
       K_Length              : Natural := 0;

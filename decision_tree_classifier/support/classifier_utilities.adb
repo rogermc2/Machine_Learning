@@ -13,7 +13,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Clear (anArray : in out ML_Types.Label_Data_Array) is
+   procedure Clear (anArray : in out ML_Types.Value_Data_Array) is
    begin
       for index in anArray'Range loop
          anArray (index).Float_Value := 0.0;
@@ -241,7 +241,7 @@ package body Classifier_Utilities is
 
    -------------------------------------------------------------------------
 
-   function Unique_Integer_Array (Nums : ML_Types.Label_Data_Array)
+   function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
                                   return Integer_Array is
       use Int_Sets;
       use Integer_Package;

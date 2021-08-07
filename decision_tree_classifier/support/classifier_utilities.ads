@@ -47,7 +47,7 @@ package Classifier_Utilities is
 
    Value_Error : Exception;
 
-   procedure Clear (anArray : in out ML_Types.Label_Data_Array);
+   procedure Clear (anArray : in out ML_Types.Value_Data_Array);
    function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
                                    Y              : ML_Types.List_Of_Value_Data_Lists;
                                    Class_Weights  : Weight_List :=
@@ -61,7 +61,7 @@ package Classifier_Utilities is
    procedure Print_Float_List (Name  : String; theList : Float_List);
    function To_Float_List (A : Float_Array) return Float_List;
    function To_Array (L : Integer_List) return Integer_Array;
-   function Unique_Integer_Array (Nums : ML_Types.Label_Data_Array)
+   function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
                                   return Integer_Array;
    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
    --  As Integer_List, indices are part of the returned list

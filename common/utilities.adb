@@ -65,6 +65,38 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
+   function Feature_Array (Data : ML_Types.Rows_Vector;
+                           Col_Num : Class_Range) return Value_Data_Array is
+      Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
+      UB_Feature : Unbounded_String;
+      Data_Kind  : Data_Type;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         UB_Feature := Data.Element (index).Features (Col_Num);
+         Data_Kind := Get_Data_Type (UB_Feature);
+         declare
+            Feature   : Value_Record (Data_Kind);
+            Feature_S : constant String :=
+                          To_String (Data.Element (index).Features (Col_Num));
+         begin
+            case Feature.Value_Kind is
+               when Boolean_Type =>
+                  Feature.Boolean_Value := Boolean'Value (Feature_S);
+               when Float_Type =>
+                  Feature.Float_Value := Float'Value (Feature_S);
+               when Integer_Type =>
+                  Feature.Integer_Value := Integer'Value (Feature_S);
+               when UB_String_Type =>
+                  Feature.UB_String_Value := To_Unbounded_String (Feature_S);
+            end case;
+            Data_Array (index) := Feature;
+         end; --  declare block
+      end loop;
+      return Data_Array;
+   end Feature_Array;
+
+   --  ---------------------------------------------------------------------------
+
    function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type is
       theType : Data_Type;
    begin
@@ -120,8 +152,8 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
-   function Label_Array (Data : ML_Types.Rows_Vector) return Label_Data_Array is
-      Data_Array : Label_Data_Array (Data.First_Index .. Data.Last_Index);
+   function Label_Array (Data : ML_Types.Rows_Vector) return Value_Data_Array is
+      Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
       UB_Label   : Unbounded_String;
       Data_Kind  : Data_Type;
    begin

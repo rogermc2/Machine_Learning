@@ -78,7 +78,7 @@ package ML_Types is
       Ada.Containers.Vectors (Positive, Value_Data_List);
    subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.Vector;
 
-    type Label_Data_Array is array (Positive range <>) of Value_Record;
+    type Value_Data_Array is array (Positive range <>) of Value_Record;
 
     package Count_Package is new Ada.Containers.Ordered_Maps
       (Data_Type, Natural);
