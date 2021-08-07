@@ -22,19 +22,18 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
    --  Compute_Class_Weight estimates class weights for unbalanced datasets.
-   function Compute_Class_Weight (Class_Weight : Weight_Type;
-                                  Y            : Integer_Array_List;
-                                  Classes      : Integer_List;
-                                  Weights      : Weight_List :=
-                                    Weight_Package.Empty_Vector)
-                                  return Float_List is
-      Weight : Float_List;
-      LE     : Encoder.Label_Encoder;
-      Y_Ind  : Integer_List;
+   function Compute_Class_Weights (Class_Weight : Weight_Type;
+                                   Y            : ML_Types.Value_Data_List;
+                                   Classes      : ML_Types.Value_Data_List)
+                                   return Weight_List is
+      Weights : Weight_List;
+      Weight  : Weight_Data :=  (To_Unbounded_String (""), 1.0);
+      LE      : Encoder.Label_Encoder;
+      Y_Ind   : Integer_List;
    begin
       if Class_Weight = No_Weight then
          for index in Classes.First_Index .. Classes.Last_Index loop
-            Weight.Append (1.0);
+            Weights.Append (Weight);
          end loop;
       elsif Class_Weight = Balanced_Weight then
          --           Y_Ind := Encoder.Fit_Transform (LE, Y);
@@ -42,8 +41,8 @@ package body Classifier_Utilities is
       else  --  user-defined dictionary
          null;
       end if;
-      return Weight;
-   end Compute_Class_Weight;
+      return Weights;
+   end Compute_Class_Weights;
 
    --  -------------------------------------------------------------------------
    --  Compute_Sample_Weight estimates sample weights by class for
@@ -73,6 +72,10 @@ package body Classifier_Utilities is
       Classes_Full          : Value_Data_List;
       Class_Weight_K        : Float;
       --        Weight_K              : Float;
+      Y_Subsample           : Value_Data_List;
+      Classes_Subsample     : Value_Data_List;
+      Weight_K              : Float;
+      Class_K_Weights       : Weight_List;
       Sample_Weight         : Float_List;
    begin
       --        if Class_Weight /= Balanced_Weight then
@@ -88,7 +91,7 @@ package body Classifier_Utilities is
            "class_weight should match number of outputs.";
       end if;
 
-      for index in 1 .. Num_Outputs loop
+      for index_k in 1 .. Num_Outputs loop
          --  y_full = y[:, k]
          while Has_Element (Y_Lists_Curs) loop
             Y_Full.Append (Element (Y_Lists_Curs));
@@ -99,7 +102,7 @@ package body Classifier_Utilities is
             Class_Weight_K := 1.0;
             --                 Class_Weight_K := Class_Weight;
          else
-            Class_Weight_K := Class_Weights.Element (index).Weight;
+            Class_Weight_K := Class_Weights.Element (index_k).Weight;
          end if;
 
          if Indices.Is_Empty then
@@ -108,13 +111,17 @@ package body Classifier_Utilities is
             --  Get class weights for the subsample, covering all classes in
             --  case some labels that were present in the original data are
             --  missing from the sample.
-            null;
+            Y_Subsample.Append (Y.Element (Indices.Element (index_k)));
+            Classes_Subsample.Append (Unique_Values (Y_Subsample));
+            Class_K_Weights := Compute_Class_Weights
+              (Weight_Kind, Y_Subsample, Classes_Subsample);
+            Weight_K := 0.0;
          end if;
       end loop;
 
---        for index in Y.First_Index .. Num_Outputs loop
---           Y_Full := Y_Array (index);
---        end loop;
+      --        for index in Y.First_Index .. Num_Outputs loop
+      --           Y_Full := Y_Array (index);
+      --        end loop;
 
       return Sample_Weight;
    end Compute_Sample_Weight;
