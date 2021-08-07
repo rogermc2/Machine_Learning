@@ -28,8 +28,7 @@ package Classifier_Utilities is
      (Positive, Integer_Array);
    subtype Integer_Array_List is Integer_Array_Package.Vector;
 
-   package Float_Package is new Ada.Containers.Vectors
-     (Positive, Float);
+   package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
 
    package Probabilities_Package is new Ada.Containers.Vectors (Positive, Float);
@@ -49,15 +48,15 @@ package Classifier_Utilities is
    Value_Error : Exception;
 
    procedure Clear (anArray : in out ML_Types.Label_Data_Array);
-   function Compute_Sample_Weight (Class_Weight : Weight_Type;
-                                   Y : Integer_Array_List;
-                                   Indices      : Integer_List :=
-                                     Integer_Package.Empty_Vector;
-                                   Weights : Weight_List :=
-                                     Weight_Package.Empty_Vector)
+   function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
+                                   Y              : ML_Types.List_Of_Value_Data_Lists;
+                                   Class_Weights  : Weight_List :=
+                                     Weight_Package.Empty_Vector;
+                                   Indices        : Integer_List :=
+                                     Integer_Package.Empty_Vector)
                                    return Float_List;
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
-   procedure Print_Float_Array (Name   : String; anArray : Float_Array;
+   procedure Print_Float_Array (Name          : String; anArray : Float_Array;
                                 Start, Finish : Integer);
    procedure Print_Float_List (Name  : String; theList : Float_List);
    function To_Float_List (A : Float_Array) return Float_List;
@@ -68,6 +67,6 @@ package Classifier_Utilities is
    --  As Integer_List, indices are part of the returned list
    function Unique (Nums : Integer_List) return Integer_List;
    function Unique_Values (Values : ML_Types.Value_Data_List)
-                            return ML_Types.Value_Data_List;
+                           return ML_Types.Value_Data_List;
 
 end Classifier_Utilities;

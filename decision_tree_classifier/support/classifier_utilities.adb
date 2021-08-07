@@ -46,22 +46,31 @@ package body Classifier_Utilities is
    end Compute_Class_Weight;
 
    --  -------------------------------------------------------------------------
-
-   function Compute_Sample_Weight (Class_Weight : Weight_Type;
-                                   Y            : Integer_Array_List;
-                                   Indices      : Integer_List :=
-                                     Integer_Package.Empty_Vector;
-                                   Weights      : Weight_List :=
-                                     Weight_Package.Empty_Vector)
+   --  Compute_Sample_Weight estimates sample weights by class for
+   --  unbalanced datasets.
+   --  y : array-like of shape (n_samples,) or (n_samples, n_outputs)
+   --   Array of original class labels per sample.
+   --  Class_Weight : dict, list of dicts, "balanced", or None, optional
+   --     Weights associated with classes
+   --  Indices : list of indices to be used in a subsample
+   function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
+                                   Y              : ML_Types.List_Of_Value_Data_Lists;
+                                   Class_Weights  : Weight_List :=
+                                     Weight_Package.Empty_Vector;
+                                   Indices        : Integer_List :=
+                                     Integer_Package.Empty_Vector)
                                    return Float_List is
+      use ML_Types;
       use Integer_Package;
-      Y_Curs                : Integer_Array_Package.Cursor := Y.First;
+      use Value_Data_Package;
+      use Value_Lists_Data_Package;
+      Y_Lists_Curs          : Value_Lists_Data_Package.Cursor := Y.First;
       Expanded_Class_Weight : Weight_Map;
       Sample_Weights        : Weight_Map;
-      Num_Outputs           : Integer := Y.Last_Index;
-      Y_Array               : array (1 .. Num_Outputs) of
-        Integer_Array (1 .. Y.First_Element'Length);
-      Y_Full                : Integer_Array (1 .. Y_Array (1)'Length);
+      Num_Outputs           : Integer := Integer (Y.Length);
+      Y_Array               : Value_Data_List;
+      Y_Full                : Value_Data_List;
+      Classes_Full          : Value_Data_List;
       Class_Weight_K        : Float;
       --        Weight_K              : Float;
       Sample_Weight         : Float_List;
@@ -72,35 +81,40 @@ package body Classifier_Utilities is
       --             " valid preset for class_weight which is balanced.";
       --        end if;
 
-      for index in Y_Array'Range loop
-         Y_Array (Index) := Y.Element (index);
-      end loop;
+      if Num_Outputs > 1 and then
+        Integer (Class_Weights.Length) /= Num_Outputs then
+         raise Value_Error with
+           "Compute_Sample_Weight; For multi-output, number of elements in " &
+           "class_weight should match number of outputs.";
+      end if;
 
-      for index in Y_Array'Range loop
-         for index_2 in Y_Array (index) (1) .. Y_Array (index)'Last loop
-            Y_Full (index_2) := Y_Array (index) (index_2);
+      for index in 1 .. Num_Outputs loop
+         --  y_full = y[:, k]
+         while Has_Element (Y_Lists_Curs) loop
+            Y_Full.Append (Element (Y_Lists_Curs));
+            Next (Y_Lists_Curs);
          end loop;
-         declare
-            Classes_Full : Integer_Array := Unique_Integer_Array (Y_Full);
-         begin
-            if Class_Weight = Balanced_Weight or Num_Outputs = 1 then
-               Class_Weight_K := 1.0;
-               --                 Class_Weight_K := Class_Weight;
-            elsif Class_Weight = List_Of_Weights then
-               Class_Weight_K := Weights.Element (index).Weight;
-            end if;
-         end;
+         Classes_Full := Unique_Values (Y_Full);
+         if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
+            Class_Weight_K := 1.0;
+            --                 Class_Weight_K := Class_Weight;
+         else
+            Class_Weight_K := Class_Weights.Element (index).Weight;
+         end if;
 
          if Indices.Is_Empty then
             null;
          else
+            --  Get class weights for the subsample, covering all classes in
+            --  case some labels that were present in the original data are
+            --  missing from the sample.
             null;
          end if;
       end loop;
 
-      for index in Y.First_Index .. Num_Outputs loop
-         Y_Full := Y_Array (index);
-      end loop;
+--        for index in Y.First_Index .. Num_Outputs loop
+--           Y_Full := Y_Array (index);
+--        end loop;
 
       return Sample_Weight;
    end Compute_Sample_Weight;

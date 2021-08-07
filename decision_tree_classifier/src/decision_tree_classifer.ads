@@ -86,7 +86,7 @@ package Decision_Tree_Classifer is
    type Attribute_Data is record
       --  The classes labels (single output problem)
       --  or a list of arrays of class labels (multi-output problem).
-      Classes             : ML_Types.Features_Data_List;
+      Classes             : ML_Types.List_Of_Value_Data_Lists;
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
@@ -94,7 +94,7 @@ package Decision_Tree_Classifer is
       --  The number of classes (for single output problems),
       --  or a list containing the number of classes for each
       --   output (for multi-output problems).
-      Num_Classes         : Integer;
+      Num_Classes         : Integer_List;
       Num_Features        : Integer;
       Num_Outputs         : Integer;
       Decision_Tree       : Tree.Tree_Data;
@@ -115,7 +115,7 @@ package Decision_Tree_Classifer is
    function Fit (Self          : in out Classifier;
                  --                   X    : Sample_Matrix;
                  --                    Y : in out Integer_List;
-                 X             : ML_Types.Features_Data_List;
+                 X             : ML_Types.List_Of_Value_Data_Lists;
                  Y             : in out ML_Types.Value_Data_List;
                  Sample_Weight : Float_Array;
                  Use_Weight    : Boolean := False;

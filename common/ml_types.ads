@@ -70,13 +70,13 @@ package ML_Types is
     end record;
 
     package Value_Data_Package is new
-      Ada.Containers.Doubly_Linked_Lists (Value_Record);
-    subtype Value_Data_List is Value_Data_Package.List;
+      Ada.Containers.Vectors (Positive, Value_Record);
+    subtype Value_Data_List is Value_Data_Package.Vector;
 
    use Value_Data_Package;
     package Value_Lists_Data_Package is new
-      Ada.Containers.Doubly_Linked_Lists (Value_Data_List);
-   subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.List;
+      Ada.Containers.Vectors (Positive, Value_Data_List);
+   subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.Vector;
 
     type Label_Data_Array is array (Positive range <>) of Value_Record;
 

@@ -44,7 +44,7 @@ package body Decision_Tree_Classifer is
                  return Estimator.Estimator_Data is
       use Ada.Containers;
       use ML_Types;
-      use Integer_Package;
+      use Classifier_Utilities.Integer_Package;
       use Value_Data_Package;
       use Weight_Dictionary;
       Num_Samples           : constant Positive := Positive (X.Length);
@@ -56,11 +56,12 @@ package body Decision_Tree_Classifer is
       Expanded_Class_Weight : Float_List;
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
-      Y_Original            : Value_Data_List := Y;
+      Y_Original            : List_Of_Value_Data_Lists;
       Y_Encoded             : Value_Data_List;
       Encode_Value          : Value_Record (Float_Type);
       Classes               : List_Of_Value_Data_Lists;
       Classes_K             : Value_Data_List;
+      K_Length              : Natural := 0;
       Y_Cursor              : Value_Data_Package.Cursor;
       K_Cursor              : Value_Data_Package.Cursor;
       Max_Leaf_Nodes        : Integer := -1;
@@ -73,7 +74,7 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Num_Features := Num_Samples;
       Self.Attributes.Num_Outputs := Integer (Num_Samples);
       Self.Attributes.Classes.Clear;
-      Self.Attributes.Num_Classes := 0;
+      Self.Attributes.Num_Classes.Clear;
 
       if Positive (Y.Length) /= Num_Samples then
          raise Value_Error with
@@ -85,7 +86,9 @@ package body Decision_Tree_Classifer is
       for k in 1 .. Num_Outputs loop
          Classes_K := Unique_Values (Y);
          Y_Encoded := Classes_K;
+         K_Length := Natural (Classes_K.Length);
          Self.Attributes.Classes.Append (Classes_K);
+         Self.Attributes.Num_Classes.Append (K_Length);
       end loop;
       Y.Clear;
 
@@ -95,8 +98,9 @@ package body Decision_Tree_Classifer is
             Next (K_Cursor);
       end loop;
 
+      Y_Original.Clear;
       if Self.Parameters.Class_Weight /= Empty_Map then
-         Y_Original := Y;
+         Y_Original.Append (Y);
          Expanded_Class_Weight := Compute_Sample_Weight (No_Weight, Y_Original);
       end if;
       if Self.Parameters.Max_Leaf_Nodes > 0 then
