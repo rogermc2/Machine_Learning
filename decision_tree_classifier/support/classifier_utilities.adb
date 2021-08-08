@@ -73,6 +73,8 @@ package body Classifier_Utilities is
         Y_Array               : Value_Data_List;
         Y_Full                : Value_Data_List;
         Classes_Full          : Value_Data_List;
+        aClass                : Value_Record;
+        Classes_Missing       : Value_Data_List;
         Class_Weight_K        : Float;
         Y_Subsample           : Value_Data_List;
         Classes_Subsample     : Value_Data_List;
@@ -98,6 +100,7 @@ package body Classifier_Utilities is
             --  y_full = y[:, k]
             Y_Full := Get_Column (Y, index_k);
             Classes_Full := Unique_Values (Y_Full);
+            Classes_Missing.Clear;
             if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
                 Class_Weight_K := 1.0;
                 --                 Class_Weight_K := Class_Weight;
@@ -124,10 +127,29 @@ package body Classifier_Utilities is
                   (Weight_Kind, Y_Subsample, Classes_Subsample);
                 --  TO DO
                 Weight_K := Class_K_Weights;
+                for index in Classes_Full.First_Index ..
+                  Classes_Full.Last_Index loop
+                  aClass := Classes_Full (index);
+                  if Find (Classes_Subsample, aClass) =
+                      Value_Data_Package.No_Element then
+                        Classes_Missing.Append (aClass);
+                  end if;
+                end loop;
             end if;
         end loop;
 
+        --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
         K_Indices := Search_Sorted_Value_List (Classes_Full, Y_Full);
+        Class_K_Weights := Weight_K;
+        Weight_K.Clear;
+        for index in Class_K_Weights.First_Index ..
+          Class_K_Weights.Last_Index loop
+            Weight_K.Append (Class_K_Weights (index));
+        end loop;
+
+        if not Classes_Missing.Is_Empty then
+            null;
+        end if;
 
         --        for index in Y.First_Index .. Num_Outputs loop
         --           Y_Full := Y_Array (index);
