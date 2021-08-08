@@ -73,6 +73,10 @@ package ML_Types is
       Ada.Containers.Vectors (Positive, Value_Record);
     subtype Value_Data_List is Value_Data_Package.Vector;
 
+    function "<" (L, R : Value_Record) return Boolean;
+    package Value_Data_Sorting is new
+      Value_Data_Package.Generic_Sorting ("<");
+
    use Value_Data_Package;
     package Value_Lists_Data_Package is new
       Ada.Containers.Vectors (Positive, Value_Data_List);
