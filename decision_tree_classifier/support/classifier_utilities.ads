@@ -28,6 +28,10 @@ package Classifier_Utilities is
      (Positive, Integer_Array);
    subtype Integer_Array_List is Integer_Array_Package.Vector;
 
+   package Boolean_Package is new Ada.Containers.Vectors
+     (Positive, Boolean);
+   subtype Boolean_List is Boolean_Package.Vector;
+
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
 
@@ -45,6 +49,11 @@ package Classifier_Utilities is
      (Positive, Weight_Data);
    subtype Weight_List is Weight_Package.Vector;
 
+   use Weight_Package;
+   package Weight_Lists_Package is new Ada.Containers.Vectors
+     (Positive, Weight_List);
+   subtype Weight_Lists_List is Weight_Lists_Package.Vector;
+
    Value_Error : Exception;
 
    procedure Clear (anArray : in out ML_Types.Value_Data_Array);
@@ -54,7 +63,7 @@ package Classifier_Utilities is
                                      Weight_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
-                                   return Float_List;
+                                   return Weight_Lists_List;
    function Get_Column (Data       : ML_Types.List_Of_Value_Data_Lists;
                         Data_Index : Positive) return ML_Types.Value_Data_List;
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
