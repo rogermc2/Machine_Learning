@@ -6,8 +6,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Encode (Values     : ML_Types.Value_Data_List;
-                    Uniques    : Integer_List :=
-                      Integer_Package.Empty_Vector;
+                    Uniques    : in out Integer_List;
                     Do_Encode  : Boolean := False) return Integer_List is
       New_Uniques : Integer_List := Uniques;
    begin
@@ -24,19 +23,21 @@ package body Label is
    function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
                  return Label_Encoder is
       Encoder_New : Label_Encoder;
+      Uniques     : Integer_List;
    begin
-      Encoder_New.Classes := Encode (Y);
+      Encoder_New.Classes := Encode (Y, Uniques);
       return Encoder_New;
    end Fit;
 
    --  -------------------------------------------------------------------------
    --  Fit_Transform fits label encoder and returns encoded labels
    function Fit_Transform (Self : in out Label_Encoder;
-                           Y    : Integer_List := Integer_Package.Empty_Vector)
+                           Y    : ML_Types.Value_Data_List)
                            return Integer_List is
-      Y_New : Integer_List := Y;
+      Y_New   : Integer_List;
+      Uniques : Integer_List;
    begin
-      Y_New := Encode (Y, Do_Encode => True);
+      Y_New := Encode (Y, Uniques, True);
       Self.Classes := Y_New;
       return Y_New;
    end Fit_Transform;
@@ -44,11 +45,12 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Inverse_Transform (Self : in out Label_Encoder;
-                               Y    : Integer_List := Integer_Package.Empty_Vector)
+                               Y    : ML_Types.Value_Data_List)
                                return Integer_List is
-      Y_New : Integer_List := Y;
+      Y_New   : Integer_List;
+      Uniques : Integer_List;
    begin
-      Y_New := Encode (Y, Do_Encode => True);
+      Y_New := Encode (Y, Uniques, Do_Encode => True);
       Self.Classes := Y_New;
       return Y_New;
    end Inverse_Transform;
@@ -56,11 +58,12 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : in out Label_Encoder;
-                       Y    : Integer_List := Integer_Package.Empty_Vector)
+                       Y    : ML_Types.Value_Data_List)
                        return Integer_List is
-      Y_New : Integer_List := Y;
+      Y_New   : Integer_List;
+      Uniques : Integer_List;
    begin
-      Y_New := Encode (Y, Do_Encode => True);
+      Y_New := Encode (Y, Uniques, Do_Encode => True);
       Self.Classes := Y_New;
       return Y_New;
    end Transform;
