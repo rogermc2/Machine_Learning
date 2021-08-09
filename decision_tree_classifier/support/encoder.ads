@@ -1,5 +1,5 @@
 
-with Classifier_Utilities; use Classifier_Utilities;
+with Classifier_Types; use Classifier_Types;
 
 package Encoder is
 
