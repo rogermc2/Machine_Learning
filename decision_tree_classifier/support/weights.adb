@@ -4,8 +4,8 @@ with Encoder;
 
 package body Weights is
 
-   function Get_Column (Data  : Weight_Lists_List; Data_Index : Positive)
-                        return  Float_Array;
+   function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
+                        Data  : out Weight_Data) return  Float_Array;
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
                                  return Weight_List;
 
@@ -154,14 +154,16 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Column (Data  : Weight_Lists_List; Data_Index : Positive)
+   function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
+                        Data    : out Weight_Data)
                         return  Float_Array is
       aList  : Weight_List;
-      Column : Float_Array (1 .. integer (Data.Length));
+      Column : Float_Array (1 .. integer (Weights.Length));
    begin
-      for index in 1 .. integer (Data.Length) loop
+      for index in 1 .. integer (Weights.Length) loop
          aList := Data.Element (index);
-         Column (index) := aList.Element (Data_Index).Weight;
+         Data := aList.Element (Data_Index);
+         Column (index) := Data.Weight;
       end loop;
       return Column;
    end Get_Column;
@@ -170,15 +172,19 @@ package body Weights is
 
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
                                  return Weight_List is
-      Col     : array (Lists.First_Index .. Lists.Last_Index) of Float;
+      Col     : Float_Array (Lists.First_Index .. Lists.Last_Index);
       Product : Float;
-      aRow    : Weight_List;
       theList : Weight_List;
+      Data    : Weight_Data;
    begin
-      for row in Lists.First_Index .. Lists.Last_Index loop
+      for index in Lists.First_Index .. Lists.Last_Index loop
+        Col := Get_Column (Lists, index, Data);
          Product := 1.0;
-         aRow := Lists.Element (row);
-         col (Lists.First_Index) := Product * aRow.Element (Lists.First_Index).Weight;
+         for col_index in Col'Range loop
+            Product := Product * Col (col_index);
+         end loop ;
+         Data.Weight := Product;
+         theList.Append (Data);
       end loop;
       return theList;
    end Reduce_Weight_Lists;
