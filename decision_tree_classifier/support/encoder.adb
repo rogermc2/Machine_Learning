@@ -18,6 +18,7 @@ package body Encoder is
 
    function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
                  return Label_Encoder is
+                 pragma Unreferenced (Self);
       theEncoder : Label_Encoder;
    begin
       theEncoder.Classes := Encode (Y);
@@ -25,14 +26,26 @@ package body Encoder is
    end Fit;
 
    --  -------------------------------------------------------------------------
+
+   function Fit (Self : Label_Encoder; X : Sample_Matrix)
+                 return Label_Encoder is
+       pragma Unreferenced (Self);
+      theEncoder : Label_Encoder;
+   begin
+      theEncoder.Classes := Encode (Y);
+      return theEncoder;
+   end Fit;
+
+   --  -------------------------------------------------------------------------
+
    --  Fit_Transform fits label encoder and returns encoded labels
    --  Y ignored
    function Fit_Transform (Self : in out Label_Encoder;
-                           X    : Sample_Matrix;
+                           X    : Sample_Matrix;  --   [n_samples, n_features]
                            Y    : ML_Types.Value_Data_List :=
                              ML_Types.Value_Data_Package.Empty_Vector)
                            return Sample_Matrix is
-      X_Out : Sample_Matrix := X;
+      X_Out : Sample_Matrix;
    begin
       --        Self.Classes := Y_New;
       return X_Out;
