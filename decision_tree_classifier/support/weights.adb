@@ -18,7 +18,7 @@ package body Weights is
       Weights : Weight_List;
 
       LE         : Encoder.Label_Encoder;
---        Y_Ind      : Sample_Matrix ;
+      --        Y_Ind      : Sample_Matrix ;
       Weight     : Weight_Data :=  (To_Unbounded_String (""), 1.0);
       Recip_Freq : Float;
    begin
@@ -27,7 +27,7 @@ package body Weights is
             Weights.Append (Weight);
          end loop;
       elsif Class_Weight = Balanced_Weight then
---           Y_Ind := Encoder.Fit_Transform (LE, Y);
+         --           Y_Ind := Encoder.Fit_Transform (LE, Y);
          Recip_Freq := Float (Y.Length);
       else  --  user-defined dictionary
          null;
@@ -93,10 +93,6 @@ package body Weights is
             Class_Weight_K := Class_Weights.Element (index_k).Weight;
          end if;
 
-         if not Is_Sorted (Classes_Full) then
-            Sort (Classes_Full);
-         end if;
-
          if Indices.Is_Empty then
             Weight_K := Compute_Class_Weights
               (Weight_Kind, Y_Subsample, Classes_Subsample);
@@ -104,6 +100,7 @@ package body Weights is
             for index in Indices.First_Index .. Indices.Last_Index loop
                Y_Subsample.Append (Y.Element (Indices.Element (index)));
             end loop;
+
             Classes_Subsample := Classifier_Utilities.Unique_Values (Y_Subsample);
             --  Get class weights for the subsample covering all classes in
             --  case some labels present in the original data are missing
@@ -132,23 +129,25 @@ package body Weights is
                end if;
             end loop;
 
-            if not Classes_Missing.Is_Empty then
-               --  Make missing classes weights zero
-               for index in Y_Full.First_Index .. Y_Full.Last_Index loop
-                  aClass := Y_Full (index);
-                  if not (Find (Classes_Missing, aClass) =
-                            Value_Data_Package.No_Element) then
-                     aWeight := Weight_K (index);
-                     aWeight.Weight := 0.0;
-                     Weight_K.Replace_Element (index, aWeight);
-                  end if;
-               end loop;
-            end if;
+         end if;
+
+         if not Classes_Missing.Is_Empty then
+            --  Make missing classes weights zero
+            for index in Y_Full.First_Index .. Y_Full.Last_Index loop
+               aClass := Y_Full (index);
+               if not (Find (Classes_Missing, aClass) =
+                         Value_Data_Package.No_Element) then
+                  aWeight := Weight_K (index);
+                  aWeight.Weight := 0.0;
+                  Weight_K.Replace_Element (index, aWeight);
+               end if;
+            end loop;
          end if;
          Expanded_Class_Weight.Append (Weight_K);
       end loop;
 
       return Reduce_Weight_Lists (Expanded_Class_Weight);
+
    end Compute_Sample_Weight;
 
    --  -------------------------------------------------------------------------
