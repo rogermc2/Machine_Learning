@@ -5,7 +5,7 @@ with Encoder;
 package body Weights is
 
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-                        Data  : out Weight_Data) return  Float_Array;
+                        Data     : out Weight_Data) return  Float_Array;
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
                                  return Weight_List;
 
@@ -16,17 +16,19 @@ package body Weights is
                                    Classes      : ML_Types.Value_Data_List)
                                    return Weight_List is
       Weights : Weight_List;
-      Weight  : Weight_Data :=  (To_Unbounded_String (""), 1.0);
-      LE      : Encoder.Label_Encoder;
-      Y_Ind   : Integer_List;
+
+      LE         : Encoder.Label_Encoder;
+--        Y_Ind      : Sample_Matrix ;
+      Weight     : Weight_Data :=  (To_Unbounded_String (""), 1.0);
+      Recip_Freq : Float;
    begin
       if Class_Weight = No_Weight then
          for index in Classes.First_Index .. Classes.Last_Index loop
             Weights.Append (Weight);
          end loop;
       elsif Class_Weight = Balanced_Weight then
-         --           Y_Ind := Encoder.Fit_Transform (LE, Y);
-         null;
+--           Y_Ind := Encoder.Fit_Transform (LE, Y);
+         Recip_Freq := Float (Y.Length);
       else  --  user-defined dictionary
          null;
       end if;
@@ -47,14 +49,12 @@ package body Weights is
                                      Weight_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
-                                   return Weight_Lists_List is
+                                   return Weight_List is
       use ML_Types;
       use Value_Data_Package;
       use Value_Data_Sorting;
-      Y_Lists_Curs          : Value_Lists_Data_Package.Cursor;
-      Sample_Weights        : Weight_Map;
-      Num_Outputs           : Integer := Integer (Y.Length);
-      Y_Array               : Value_Data_List;
+      --        Y_Lists_Curs          : Value_Lists_Data_Package.Cursor;
+      Num_Outputs           : constant Integer := Integer (Y.Length);
       Y_Full                : Value_Data_List;
       Classes_Full          : Value_Data_List;
       aClass                : Value_Record;
@@ -66,20 +66,19 @@ package body Weights is
       aWeight               : Weight_Data;
       K_Indices             : Integer_List;
       Class_K_Weights       : Weight_List;
-      Sample_Weight         : Float_List;
       Expanded_Class_Weight : Weight_Lists_List;
    begin
-      --        if Class_Weight /= Balanced_Weight then
-      --           raise Value_Error with
-      --             "Compute_Sample_Weight; Weight does not contain the only" &
-      --             " valid preset for class_weight which is balanced.";
-      --        end if;
+      if Weight_Kind /= Balanced_Weight then
+         raise Weights_Error with
+           "Compute_Sample_Weight; Weight does not contain the only" &
+           " valid preset for class_weight which is balanced.";
+      end if;
 
       if Num_Outputs > 1 and then
         Integer (Class_Weights.Length) /= Num_Outputs then
          raise Weights_Error with
-           "Compute_Sample_Weight; For multi-output, number of elements in " &
-           "class_weight should match number of outputs.";
+           "Weights.Compute_Sample_Weight; For multi-output, number of " &
+           "elements in class_weight should match number of outputs.";
       end if;
 
       for index_k in 1 .. Num_Outputs loop
@@ -87,9 +86,9 @@ package body Weights is
          Y_Full := Classifier_Utilities.Get_Column (Y, index_k);
          Classes_Full := Classifier_Utilities.Unique_Values (Y_Full);
          Classes_Missing.Clear;
+
          if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
-            Class_Weight_K := 1.0;
-            --                 Class_Weight_K := Class_Weight;
+            Class_Weight_K := Class_Weights.First_Element.Weight;
          else
             Class_Weight_K := Class_Weights.Element (index_k).Weight;
          end if;
@@ -149,19 +148,19 @@ package body Weights is
          Expanded_Class_Weight.Append (Weight_K);
       end loop;
 
-      return Expanded_Class_Weight;
+      return Reduce_Weight_Lists (Expanded_Class_Weight);
    end Compute_Sample_Weight;
 
    --  -------------------------------------------------------------------------
 
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-                        Data    : out Weight_Data)
+                        Data     : out Weight_Data)
                         return  Float_Array is
       aList  : Weight_List;
       Column : Float_Array (1 .. integer (Weights.Length));
    begin
       for index in 1 .. integer (Weights.Length) loop
-         aList := Data.Element (index);
+         aList := Weights.Element (index);
          Data := aList.Element (Data_Index);
          Column (index) := Data.Weight;
       end loop;
@@ -178,7 +177,7 @@ package body Weights is
       Data    : Weight_Data;
    begin
       for index in Lists.First_Index .. Lists.Last_Index loop
-        Col := Get_Column (Lists, index, Data);
+         Col := Get_Column (Lists, index, Data);
          Product := 1.0;
          for col_index in Col'Range loop
             Product := Product * Col (col_index);

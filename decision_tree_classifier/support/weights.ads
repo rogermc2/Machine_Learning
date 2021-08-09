@@ -35,6 +35,6 @@ package Weights is
                                      Weight_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
-                                   return Weight_Lists_List;
+                                   return Weight_List;
 
 end Weights;
