@@ -2,7 +2,8 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Classifier_Utilities; use Classifier_Utilities;
+with Classifier_Types; use Classifier_Types;
+with ML_Types;
 
 package Label is
 
@@ -15,8 +16,16 @@ package Label is
       Classes : Integer_List;
    end record;
 
+   function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
+                 return Label_Encoder;
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : Integer_List := Integer_Package.Empty_Vector)
                            return Integer_List;
+   function Inverse_Transform (Self : in out Label_Encoder;
+                               Y    : Integer_List := Integer_Package.Empty_Vector)
+                               return Integer_List;
+   function Transform (Self : in out Label_Encoder;
+                       Y    : Integer_List := Integer_Package.Empty_Vector)
+                       return Integer_List;
 
 end Label;

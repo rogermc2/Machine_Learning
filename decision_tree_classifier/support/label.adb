@@ -5,9 +5,9 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Encode (Values  : Integer_List;
-                     Uniques    : Integer_List :=
-                       Integer_Package.Empty_Vector;
+   function Encode (Values     : ML_Types.Value_Data_List;
+                    Uniques    : Integer_List :=
+                      Integer_Package.Empty_Vector;
                     Do_Encode  : Boolean := False) return Integer_List is
       New_Uniques : Integer_List := Uniques;
    begin
@@ -21,8 +21,8 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  Fit fits label encoder
-   function Fit (Self : Label_Encoder; Y    : Integer_List)
-                   return Label_Encoder is
+   function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
+                 return Label_Encoder is
       Encoder_New : Label_Encoder;
    begin
       Encoder_New.Classes := Encode (Y);
@@ -40,6 +40,30 @@ package body Label is
       Self.Classes := Y_New;
       return Y_New;
    end Fit_Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Inverse_Transform (Self : in out Label_Encoder;
+                               Y    : Integer_List := Integer_Package.Empty_Vector)
+                               return Integer_List is
+      Y_New : Integer_List := Y;
+   begin
+      Y_New := Encode (Y, Do_Encode => True);
+      Self.Classes := Y_New;
+      return Y_New;
+   end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Transform (Self : in out Label_Encoder;
+                       Y    : Integer_List := Integer_Package.Empty_Vector)
+                       return Integer_List is
+      Y_New : Integer_List := Y;
+   begin
+      Y_New := Encode (Y, Do_Encode => True);
+      Self.Classes := Y_New;
+      return Y_New;
+   end Transform;
 
    --  -------------------------------------------------------------------------
 
