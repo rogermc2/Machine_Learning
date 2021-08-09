@@ -12,27 +12,32 @@ package body Weights is
    --  -------------------------------------------------------------------------
    --  Compute_Class_Weight estimates class weights for unbalanced datasets.
    function Compute_Class_Weights (Class_Weight : Weight_Type;
+                                   Class_Weights : Weight_List;
                                    Y            : ML_Types.Value_Data_List;
                                    Classes      : ML_Types.Value_Data_List)
                                    return Weight_List is
-      Weights : Weight_List;
-
+      Y_Length   : constant Integer := Integer (Y.Length);
+      Weights    : Weight_List;
       LE         : Encoder.Label_Encoder;
-      --        Y_Ind      : Sample_Matrix ;
-      Weight     : Weight_Data :=  (To_Unbounded_String (""), 1.0);
+      Y_Ind      : Sample_Matrix (1 .. Y_Length, 1 .. Y_Length);
+      Weight     : Weight_Data := (To_Unbounded_String (""), 1.0);
       Recip_Freq : Float;
    begin
-      if Class_Weight = No_Weight then
+      if Class_Weight = No_Weight or Class_Weights.Is_Empty then
          for index in Classes.First_Index .. Classes.Last_Index loop
             Weights.Append (Weight);
          end loop;
+
       elsif Class_Weight = Balanced_Weight then
-         --           Y_Ind := Encoder.Fit_Transform (LE, Y);
+         Y_Ind := Encoder.Fit_Transform (LE, Y);
          Recip_Freq := Float (Y.Length);
+
       else  --  user-defined dictionary
          null;
       end if;
+
       return Weights;
+
    end Compute_Class_Weights;
 
    --  -------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 
 with Classifier_Types; use Classifier_Types;
+with ML_Types;
 
 package Encoder is
 
@@ -10,10 +11,12 @@ package Encoder is
       Classes : Integer_List;
    end record;
 
-   function Fit (Self : Label_Encoder; Y : Integer_List) return Label_Encoder;
+   function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
+                 return Label_Encoder;
    function Fit_Transform (Self : in out Label_Encoder;
                            X    : Sample_Matrix;
-                           Y    : Integer_List := Integer_Package.Empty_Vector)
+                           Y    : ML_Types.Value_Data_List :=
+                             ML_Types.Value_Data_Package.Empty_Vector)
                            return Sample_Matrix;
 
 end Encoder;
