@@ -1,6 +1,6 @@
 
 with Classifier_Utilities;
-with Encoder;
+with Label;
 
 package body Weights is
 
@@ -18,7 +18,7 @@ package body Weights is
                                    return Weight_List is
       Y_Length   : constant Integer := Integer (Y.Length);
       Weights    : Weight_List;
-      LE         : Encoder.Label_Encoder;
+      LE         : Label.Label_Encoder;
       Y_Ind      : Sample_Matrix (1 .. Y_Length, 1 .. Y_Length);
       Weight     : Weight_Data := (To_Unbounded_String (""), 1.0);
       Recip_Freq : Float;
@@ -29,7 +29,7 @@ package body Weights is
          end loop;
 
       elsif Class_Weight = Balanced_Weight then
-         Y_Ind := Encoder.Fit_Transform (LE, Y);
+         Y_Ind := Label.Fit_Transform (LE, Y);
          Recip_Freq := Float (Y.Length);
 
       else  --  user-defined dictionary
