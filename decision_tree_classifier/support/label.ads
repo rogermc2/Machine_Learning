@@ -16,14 +16,13 @@ package Label is
       Classes : Integer_List;
    end record;
 
-   function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
-                 return Label_Encoder;
+   function Fit (Y : ML_Types.Value_Data_List) return Label_Encoder;
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
                            return Integer_List;
-   function Inverse_Transform (Self : in out Label_Encoder;
-                               Y    : ML_Types.Value_Data_List)
-                               return Integer_List;
+--     function Inverse_Transform (Self : in out Label_Encoder;
+--                                 Y    : ML_Types.Value_Data_List)
+--                                 return Integer_List;
    function Transform (Self : in out Label_Encoder;
                        Y    : ML_Types.Value_Data_List)
                        return Integer_List;
