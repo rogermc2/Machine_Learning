@@ -18,7 +18,6 @@ package body Validation is
       use Attribute_Package;
       use Ada.Strings;
       Cursor     : Attribute_Cursor := Attribute_Cursor (Estimator.First);
-      Attributes_Length : constant Integer := Integer (Attributes.Length);
       Attr       : Attribute_List;
    begin
       if Is_Empty (Estimator) then
@@ -38,7 +37,7 @@ package body Validation is
          --  raise a NotFittedError with the given message.
          while Has_Element (Cursor) loop
             declare
-               Est : String := To_String (Element (Cursor));
+               Est :constant  String := To_String (Element (Cursor));
             begin
               if Fixed.Index (Est, "_") = Est'Last and not
                     (Est (1 .. 2) = "__") then

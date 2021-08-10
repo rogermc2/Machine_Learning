@@ -2,8 +2,6 @@
 with Ada.Numerics;
 with Ada.Numerics.Float_Random;
 
-with Quaternions;
-
 package body Maths is
    Radians_Per_Degree : constant Radian := Ada.Numerics.Pi / 180.0;
    Degrees_Per_Radian : constant Degree := 180.0 / Ada.Numerics.Pi;

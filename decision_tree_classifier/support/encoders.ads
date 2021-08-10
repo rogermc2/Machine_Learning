@@ -44,11 +44,11 @@ package Encoders is
 
     function Fit (Self : One_Hot_Encoder; Y : ML_Types.Value_Data_List)
                   return One_Hot_Encoder;
-    function Fit_Transform (Self : in out One_Hot_Encoder;
-                            X    : Sample_Matrix;
-                            Y    : ML_Types.Value_Data_List :=
-                              ML_Types.Value_Data_Package.Empty_Vector)
-                            return Sample_Matrix;
+--      function Fit_Transform (Self : in out One_Hot_Encoder;
+--                              X    : Sample_Matrix;
+--                              Y    : ML_Types.Value_Data_List :=
+--                                ML_Types.Value_Data_Package.Empty_Vector)
+--                              return Sample_Matrix;
     procedure Init (Self                 : in out One_Hot_Encoder;
                     Categories           : ML_Types.Value_Data_List;
                     Drop                 : ML_Types.Value_Data_List;

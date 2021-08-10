@@ -6,9 +6,8 @@
 --  The tree structure is used for predictions and feature importances.
 
 with Ada.Containers.Indefinite_Multiway_Trees;
-with Ada.Containers.Vectors;
 
-with Classifier_Utilities; use Classifier_Utilities;
+with Classifier_Types; use Classifier_Types;
 with Validation;
 
 package Tree is

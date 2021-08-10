@@ -7,7 +7,7 @@ package body Weights is
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
                         Data     : out Weight_Data) return  Float_Array;
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
-                                  return Weight_List;
+                                 return Weight_List;
 
    --  -------------------------------------------------------------------------
    --  Compute_Class_Weight estimates class weights for unbalanced datasets.
@@ -15,7 +15,7 @@ package body Weights is
                                    Class_Weights : Weight_List;
                                    Y             : ML_Types.Value_Data_List;
                                    Classes       : ML_Types.Value_Data_List)
-                                    return Weight_List is
+                                   return Weight_List is
       Weights      : Weight_List;
       LE           : Label.Label_Encoder;
       Y_Ind        : Natural_List;
@@ -60,7 +60,7 @@ package body Weights is
                                      Weight_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
-                                    return Weight_List is
+                                   return Weight_List is
       use ML_Types;
       use Value_Data_Package;
       Num_Outputs           : constant Integer := Integer (Y.Length);
@@ -118,14 +118,18 @@ package body Weights is
             Class_K_Weights := Compute_Class_Weights
               (Weight_Kind, Class_Weight_K, Y_Subsample, Classes_Subsample);
 
-            --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
+            --  weight_k = np.take
+            --    (compute_class_weight
+            --       (class_weight_k, classes=classes_subsample, y=y_subsample),
+            --     np.searchsorted(classes_subsample, classes_full),
+            --     mode='clip')
             K_Indices := Classifier_Utilities.Search_Sorted_Value_List
               (Classes_Full, Y_Full);
             Class_K_Weights := Weight_K;
             Weight_K.Clear;
             for index in Class_K_Weights.First_Index ..
               Class_K_Weights.Last_Index loop
-               Weight_K.Append (Class_K_Weights (index));
+               Weight_K.Append (Class_K_Weights (K_Indices (index)));
             end loop;
             --  TO DO
 
@@ -164,7 +168,7 @@ package body Weights is
 
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
                         Data     : out Weight_Data)
-                         return  Float_Array is
+                        return  Float_Array is
       aList  : Weight_List;
       Column : Float_Array (1 .. integer (Weights.Length));
    begin
@@ -179,7 +183,7 @@ package body Weights is
    --  -------------------------------------------------------------------------
 
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
-                                  return Weight_List is
+                                 return Weight_List is
       Col     : Float_Array (Lists.First_Index .. Lists.Last_Index);
       Product : Float;
       theList : Weight_List;

@@ -1,6 +1,8 @@
 --  Based on Python 3.7 sklearn tree _classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
-with Utilities;
+
+with Classifier_Types;
+with Classifier_Utilities;
 
 package body Decision_Tree_Classifer is
 
@@ -44,16 +46,16 @@ package body Decision_Tree_Classifer is
                  return Estimator.Estimator_Data is
       use Ada.Containers;
       use ML_Types;
-      use Classifier_Utilities.Integer_Package;
+      use Classifier_Types.Integer_Package;
       use Value_Data_Package;
-      use Weight_Dictionary;
+      use Weights.Weight_Dictionary;
       Num_Samples           : constant Positive := Positive (X.Length);
       Num_Outputs           : constant Positive := Positive (Y.Length);
       Features              : Value_Data_List := X.First_Element;
       Num_Features          : constant Class_Range :=
                                 Class_Range (Features.Length);
       Random_State          : Integer := Self.Parameters.Random_State;
-      Expanded_Class_Weight : Float_List;
+      Expanded_Class_Weight : Classifier_Types.Float_List;
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
       Y_Original            : List_Of_Value_Data_Lists;
@@ -84,7 +86,7 @@ package body Decision_Tree_Classifer is
       end if;
 
       for k in 1 .. Num_Outputs loop
-         Classes_K := Unique_Values (Y);
+         Classes_K := Classifier_Utilities.Unique_Values (Y);
          Y_Encoded := Classes_K;
          K_Length := Natural (Classes_K.Length);
          Self.Attributes.Classes.Append (Classes_K);
@@ -101,7 +103,8 @@ package body Decision_Tree_Classifer is
       Y_Original.Clear;
       if Self.Parameters.Class_Weight /= Empty_Map then
          Y_Original.Append (Y);
-         Expanded_Class_Weight := Compute_Sample_Weight (No_Weight, Y_Original);
+         Expanded_Class_Weight :=
+           Weights.Compute_Sample_Weight (Weights.No_Weight, Y_Original);
       end if;
       if Self.Parameters.Max_Leaf_Nodes > 0 then
          Max_Leaf_Nodes := Self.Parameters.Max_Leaf_Nodes;

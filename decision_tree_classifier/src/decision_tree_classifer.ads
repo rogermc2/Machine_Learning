@@ -16,20 +16,17 @@
 --  clf : DecisionTreeClassifier (random_state=0);
 --  clf := clf.fit (Data, Labels);
 
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Vectors;
-with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types;
 
+with Classifier_Types; use Classifier_Types;
 with Estimator;
 with Tree;
-with Classifier_Utilities;
-with Validation;
+with Weights;
 
 package Decision_Tree_Classifer is
-   use Classifier_Utilities;
    --  Gini Impurity is a measurement of the likelihood of an incorrect
    --  classification of a new instance of a random variable.
    type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
@@ -76,8 +73,8 @@ package Decision_Tree_Classifer is
       --  Impure means that data is mixture of different classes.
       Min_Impurity_Decrease    : Float := 0.0;
       Min_Impurity_Split       : Float := 0.0;
-      Class_Weight             : Weight_Dictionary.Map :=
-                                   Weight_Dictionary.Empty_Map;
+      Class_Weight             : Weights.Weight_Dictionary.Map :=
+                                   Weights.Weight_Dictionary.Empty_Map;
       Presort                  : String (1 .. 10) := "Deprecated";
       CCP_Alpha                : Float := 0.0;
    end record;

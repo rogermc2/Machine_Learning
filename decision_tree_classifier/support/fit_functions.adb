@@ -1,4 +1,6 @@
 
+with Classifier_Types;
+
 package body Fit_Functions is
 
    function Get_Default_Parameters (Func : Func_Access;
@@ -17,6 +19,7 @@ package body Fit_Functions is
       use Ada.Containers;
       use Param_Package;
       use Range_Package;
+      use Classifier_Types.Float_Package;
       X_Last  : Float := X.Last_Element;
       X_Min   : Float;
       X_Max   : Float;
