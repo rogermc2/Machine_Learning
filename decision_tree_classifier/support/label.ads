@@ -13,19 +13,18 @@ package Label is
    subtype Params_Map is Params_Dictionary.Map;
 
    type Label_Encoder is record
-      Classes : Integer_List;
+      Classes : Natural_List;
    end record;
 
-   function Fit (Self : Label_Encoder; Y : ML_Types.Value_Data_List)
-                 return Label_Encoder;
+   function Fit (Y : ML_Types.Value_Data_List) return Label_Encoder;
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
-                           return Integer_List;
-   function Inverse_Transform (Self : in out Label_Encoder;
-                               Y    : ML_Types.Value_Data_List)
-                               return Integer_List;
+                           return Natural_List;
+--     function Inverse_Transform (Self : in out Label_Encoder;
+--                                 Y    : ML_Types.Value_Data_List)
+--                                 return Integer_List;
    function Transform (Self : in out Label_Encoder;
                        Y    : ML_Types.Value_Data_List)
-                       return Integer_List;
+                       return Natural_List;
 
 end Label;

@@ -10,6 +10,37 @@ package body Classifier_Utilities is
    package UB_String_Sets is new Ada.Containers.Ordered_Sets (Unbounded_String);
 
    --  -------------------------------------------------------------------------
+   --  Bin_Count counts the number of occurrences of each value in Numbers.
+   --  Each bin gives the number of occurrences of its index value in Numbers.
+   function Bin_Count (Numbers : Natural_List) return Natural_List is
+        use Ada.Containers;
+        use Natural_Package;
+        aNumber    : Natural := 0;
+        Max_Number : Natural := 0;
+        Bins : Natural_List;
+   begin
+        for index in Numbers.First_Index .. Numbers.Last_Index loop
+            aNumber := Numbers.Element (index);
+            if aNumber > Max_Number then
+                Max_Number := aNumber;
+            end if;
+        end loop;
+
+        Bins.Set_Length (Count_Type (aNumber + 1));
+        for index in Bins.First_Index .. Bins.Last_Index loop
+            Bins (index) := 0;
+        end loop;
+
+        for index in Numbers.First_Index .. Numbers.Last_Index loop
+            aNumber := Numbers.Element (index);
+            Bins (aNumber + 1) := Bins (aNumber + 1) + 1;
+        end loop;
+
+      return Bins;
+
+   end Bin_Count;
+
+   --  -------------------------------------------------------------------------
 
    procedure Clear (anArray : in out ML_Types.Value_Data_Array) is
    begin
