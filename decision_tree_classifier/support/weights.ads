@@ -8,7 +8,7 @@ with ML_Types;
 
 package Weights is
 
-   type Weight_Type is (No_Weight, Balanced_Weight, Weight_Dict, List_Of_Weights);
+   type Weight_Type is (No_Weight, Balanced_Weight, Weight_Dict, Weights_List);
    type Weight_Data is record
       Label  : Classifier_Types.Class_Label := To_Unbounded_String ("None");
       Weight : Float := 1.0;

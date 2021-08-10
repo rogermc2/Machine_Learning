@@ -1,6 +1,5 @@
 
 with Ada.Containers.Indefinite_Vectors;
-with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -21,6 +20,9 @@ package Classifier_Types is
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
+
+   package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
+   subtype Natural_List is Natural_Package.Vector;
 
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;
