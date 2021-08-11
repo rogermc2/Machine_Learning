@@ -9,6 +9,7 @@ package Classifier_Utilities is
    Value_Error : Exception;
 
    function Bin_Count (Numbers : Natural_List) return Natural_List;
+   function Bin_Count (Numbers : ML_Types.Value_Data_List) return Natural_List;
    procedure Clear (anArray : in out ML_Types.Value_Data_Array);
    function Get_Column (Data       : ML_Types.List_Of_Value_Data_Lists;
                         Data_Index : Positive) return ML_Types.Value_Data_List;

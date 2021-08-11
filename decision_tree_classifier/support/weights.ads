@@ -29,6 +29,11 @@ package Weights is
 
    Weights_Error : exception;
 
+   function Compute_Class_Weights (Class_Weight  : Weight_Type;
+                                   Class_Weights : Weight_List;
+                                   Classes       : ML_Types.Value_Data_List;
+                                   Y             : ML_Types.Value_Data_List)
+                                   return Weight_List;
    function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
                                    Y              : ML_Types.List_Of_Value_Data_Lists;
                                    Class_Weights  : Weight_List :=

@@ -13,8 +13,8 @@ package body Weights is
    --  Compute_Class_Weight estimates class weights for unbalanced datasets.
    function Compute_Class_Weights (Class_Weight  : Weight_Type;
                                    Class_Weights : Weight_List;
-                                   Y             : ML_Types.Value_Data_List;
-                                   Classes       : ML_Types.Value_Data_List)
+                                   Classes       : ML_Types.Value_Data_List;
+                                   Y             : ML_Types.Value_Data_List)
                                    return Weight_List is
       use ML_Types;
       Weights          : Weight_List;
