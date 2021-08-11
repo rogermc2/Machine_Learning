@@ -3,6 +3,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Classifier_Types; use Classifier_Types;
 with ML_Types;
+with Weights;
 
 package Classifier_Utilities is
 
@@ -17,8 +18,10 @@ package Classifier_Utilities is
    procedure Print_Float_Array (Name          : String; anArray : Float_Array;
                                 Start, Finish : Integer);
    procedure Print_Float_List (Name  : String; theList : Float_List);
+   procedure Print_Natural_List (Name : String; theList : Natural_List);
+   procedure Print_Weights (Name : String; Data : Weights.Weight_List);
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                       return Integer_List;
+                                      return Integer_List;
    function To_Float_List (A : Float_Array) return Float_List;
    function To_Array (L : Integer_List) return Integer_Array;
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
