@@ -9,17 +9,18 @@ with ML_Types;
 package Weights is
 
    type Weight_Type is (No_Weight, Balanced_Weight, Weight_Dict, Weights_List);
-   type Weight_Data is record
-      Label  : Classifier_Types.Class_Label := To_Unbounded_String ("None");
-      Weight : Float := 1.0;
-   end record;
+--     type Weight_Data is record
+--        Label  : Classifier_Types.Class_Label := To_Unbounded_String ("None");
+--        Weight : Float := 1.0;
+--     end record;
 
    package Weight_Dictionary is new Ada.Containers.Ordered_Maps
      (Classifier_Types.Class_Label, Float);
    subtype Weight_Map is Weight_Dictionary.Map;
 
    package Weight_Package is new Ada.Containers.Vectors
-     (Positive, Weight_Data);
+     (Positive, Float);
+--       (Positive, Weight_Data);
    subtype Weight_List is Weight_Package.Vector;
 
    use Weight_Package;

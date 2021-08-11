@@ -411,15 +411,13 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
-      use Weights;
-      aWeight : Weight_Data;
+      aWeight : Float;
       Count   : Integer := 1;
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
          aWeight := Data.Element (Index);
-         Put (To_String (aWeight.Label) & ": " &
-                Float'Image (aWeight.Weight) & "   ");
+         Put (Float'Image (aWeight) & "   ");
          Count := Count + 1;
          if Count > 10 then
             New_Line;

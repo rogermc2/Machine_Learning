@@ -5,7 +5,7 @@ with Label;
 package body Weights is
 
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-                        Data     : out Weight_Data) return  Float_Array;
+                        Data     : out Float) return  Float_Array;
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
                                  return Weight_List;
 
@@ -20,10 +20,10 @@ package body Weights is
       Weights          : Weight_List;
       LE               : Label.Label_Encoder;
       Y_Ind            : Natural_List;
-      Blank_Weight     : constant Weight_Data := (To_Unbounded_String (""), 1.0);
+--        Blank_Weight     : constant Weight_Data := (To_Unbounded_String (""), 1.0);
       Recip_Freq       : Natural_List;
       Recip            : Natural;
-      aWeight          : Weight_Data;
+      aWeight          : Float;
       aClass           : Value_Record;
       Recip_Freq2      : Natural_List;
       Recip_Freq_Index : Positive;
@@ -31,7 +31,7 @@ package body Weights is
    begin
       if Class_Weight = No_Weight or Class_Weights.Is_Empty then
          for index in Classes.First_Index .. Classes.Last_Index loop
-            Weights.Append (Blank_Weight);
+            Weights.Append (1.0);
          end loop;
 
       elsif Class_Weight = Balanced_Weight then
@@ -54,9 +54,9 @@ package body Weights is
                     "Weights.Compute_Class_Weights invalid class type :" &
                   Data_Type'Image (aClass.Value_Kind);
                when Float_Type =>
-                  aWeight.Weight := aClass.Float_Value;
+                  aWeight := aClass.Float_Value;
                when Integer_Type =>
-                  aWeight.Weight := Float (aClass.Integer_Value);
+                  aWeight := Float (aClass.Integer_Value);
             end case;
             Weights.Append (aWeight);
          end loop;
@@ -96,7 +96,7 @@ package body Weights is
       Y_Subsample           : Value_Data_List;
       Classes_Subsample     : Value_Data_List;
       Weight_K              : Weight_List;
-      aWeight               : Weight_Data;
+      aWeight               : Float;
       K_Indices             : Integer_List;
       Class_K_Weights       : Weight_List;
       Expanded_Class_Weight : Weight_Lists_List;
@@ -178,8 +178,8 @@ package body Weights is
                aClass := Y_Full (index);
                if not (Find (Classes_Missing, aClass) =
                          Value_Data_Package.No_Element) then
-                  aWeight := Weight_K (index);
-                  aWeight.Weight := 0.0;
+--                    aWeight := Weight_K (index);
+                  aWeight := 0.0;
                   Weight_K.Replace_Element (index, aWeight);
                end if;
             end loop;
@@ -195,7 +195,8 @@ package body Weights is
    --  -------------------------------------------------------------------------
 
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-                        Data     : out Weight_Data)
+                        Data     : out Float)
+--                          Data     : out Weight_Data)
                         return  Float_Array is
       aList  : Weight_List;
       Column : Float_Array (1 .. integer (Weights.Length));
@@ -203,7 +204,7 @@ package body Weights is
       for index in 1 .. integer (Weights.Length) loop
          aList := Weights.Element (index);
          Data := aList.Element (Data_Index);
-         Column (index) := Data.Weight;
+         Column (index) := Data;
       end loop;
       return Column;
    end Get_Column;
@@ -215,7 +216,7 @@ package body Weights is
       Col     : Float_Array (Lists.First_Index .. Lists.Last_Index);
       Product : Float;
       theList : Weight_List;
-      Data    : Weight_Data;
+      Data    : Float;
    begin
       for index in Lists.First_Index .. Lists.Last_Index loop
          Col := Get_Column (Lists, index, Data);
@@ -223,7 +224,7 @@ package body Weights is
          for col_index in Col'Range loop
             Product := Product * Col (col_index);
          end loop ;
-         Data.Weight := Product;
+         Data := Product;
          theList.Append (Data);
       end loop;
       return theList;
