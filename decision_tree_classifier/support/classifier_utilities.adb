@@ -405,6 +405,7 @@ package body Classifier_Utilities is
             Count := 1;
          end if;
       end loop;
+      New_Line;
    end Print_Natural_List;
 
    --  ------------------------------------------------------------------------

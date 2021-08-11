@@ -46,7 +46,6 @@ package body Weights is
 
          Recip_Freq2 := Label.Transform (LE, Classes);
          for index in Weights.First_Index .. Weights.Last_Index loop
-            aWeight := Weights (index);
             Recip_Freq_Index := Recip_Freq2.Element (index);
             aClass := Classes.Element (Recip_Freq_Index);
             case aClass.Value_Kind is
@@ -59,7 +58,7 @@ package body Weights is
                when Integer_Type =>
                   aWeight.Weight := Float (aClass.Integer_Value);
             end case;
-            Weights.Replace_Element (index, aWeight);
+            Weights.Append (aWeight);
          end loop;
 
       else  --  user-defined dictionary
