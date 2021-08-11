@@ -22,6 +22,7 @@ package body Weights is
       Blank_Weight : constant Weight_Data := (To_Unbounded_String (""), 1.0);
       Recip_Freq   : Natural_List;
       Recip        : Natural;
+      Scale        : Natural;
    begin
       if Class_Weight = No_Weight or Class_Weights.Is_Empty then
          for index in Classes.First_Index .. Classes.Last_Index loop
@@ -31,10 +32,10 @@ package body Weights is
       elsif Class_Weight = Balanced_Weight then
          --  Find the weight of each class  present in Y.
          Y_Ind := Label.Fit_Transform (LE, Y);
+         Scale := Natural (Float (Y.Length) / Float (LE.Classes.Length));
          Recip_Freq := Classifier_Utilities.Bin_Count (Y_Ind);
          for index in Recip_Freq.First_Index .. Recip_Freq.Last_Index loop
-            Recip := Natural (Float (Y.Length) / Float (LE.Classes.Length)) *
-              Recip_Freq.Element (index);
+            Recip := Scale * Recip_Freq.Element (index);
             Recip_Freq.Replace_Element (index, Recip);
          end loop;
 
