@@ -16,13 +16,18 @@ package body Weights is
                                    Y             : ML_Types.Value_Data_List;
                                    Classes       : ML_Types.Value_Data_List)
                                    return Weight_List is
-      Weights      : Weight_List;
-      LE           : Label.Label_Encoder;
-      Y_Ind        : Natural_List;
-      Blank_Weight : constant Weight_Data := (To_Unbounded_String (""), 1.0);
-      Recip_Freq   : Natural_List;
-      Recip        : Natural;
-      Scale        : Natural;
+      use ML_Types;
+      Weights          : Weight_List;
+      LE               : Label.Label_Encoder;
+      Y_Ind            : Natural_List;
+      Blank_Weight     : constant Weight_Data := (To_Unbounded_String (""), 1.0);
+      Recip_Freq       : Natural_List;
+      Recip            : Natural;
+      aWeight          : Weight_Data;
+      aClass           : Value_Record;
+      Recip_Freq2      : Natural_List;
+      Recip_Freq_Index : Positive;
+      Scale            : Natural;
    begin
       if Class_Weight = No_Weight or Class_Weights.Is_Empty then
          for index in Classes.First_Index .. Classes.Last_Index loop
@@ -39,8 +44,27 @@ package body Weights is
             Recip_Freq.Replace_Element (index, Recip);
          end loop;
 
+         Recip_Freq2 := Label.Transform (LE, Classes);
+         for index in Weights.First_Index .. Weights.Last_Index loop
+            aWeight := Weights (index);
+            Recip_Freq_Index := Recip_Freq2.Element (index);
+            aClass := Classes.Element (Recip_Freq_Index);
+            case aClass.Value_Kind is
+               when Boolean_Type | UB_String_Type =>
+                  raise Weights_Error with
+                    "Weights.Compute_Class_Weights invalid class type :" &
+                  Data_Type'Image (aClass.Value_Kind);
+               when Float_Type =>
+                  aWeight.Weight := aClass.Float_Value;
+               when Integer_Type =>
+                  aWeight.Weight := Float (aClass.Integer_Value);
+            end case;
+            Weights.Replace_Element (index, aWeight);
+         end loop;
+
       else  --  user-defined dictionary
-         null;
+         raise Weights_Error with
+           "Weights.Compute_Class_Weights dictionary process not implemented.";
       end if;
 
       return Weights;
@@ -142,7 +166,7 @@ package body Weights is
             end loop;
          end if;
 
-         --  eight_k = weight_k[np.searchsorted(classes_full, y_full)]
+         --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
          Class_K_Weights := Weight_K;
          for index in Weight_K.First_Index .. Weight_K.Last_Index
          loop
