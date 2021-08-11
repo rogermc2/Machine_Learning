@@ -116,25 +116,22 @@ package body Weights is
             --  Get class weights for the subsample covering all classes in
             --  case some labels present in the original data are missing
             --  from the sample.
-            Class_K_Weights := Compute_Class_Weights
-              (Weight_Kind, Class_Weight_K, Y_Subsample, Classes_Subsample);
 
             --  weight_k = np.take
             --    (compute_class_weight
             --       (class_weight_k, classes=classes_subsample, y=y_subsample),
             --     np.searchsorted(classes_subsample, classes_full),
             --     mode='clip')
+            Class_K_Weights := Compute_Class_Weights
+              (Weight_Kind, Class_Weight_K, Y_Subsample, Classes_Subsample);
             K_Indices := Classifier_Utilities.Search_Sorted_Value_List
               (Classes_Full, Y_Full);
-            Class_K_Weights := Weight_K;
             Weight_K.Clear;
             for index in Class_K_Weights.First_Index ..
               Class_K_Weights.Last_Index loop
                Weight_K.Append (Class_K_Weights (K_Indices (index)));
             end loop;
-            --  TO DO
 
-            Weight_K := Class_K_Weights;
             for index in Classes_Full.First_Index ..
               Classes_Full.Last_Index loop
                aClass := Classes_Full (index);
@@ -143,8 +140,14 @@ package body Weights is
                   Classes_Missing.Append (aClass);
                end if;
             end loop;
-
          end if;
+
+         --  eight_k = weight_k[np.searchsorted(classes_full, y_full)]
+         Class_K_Weights := Weight_K;
+         for index in Weight_K.First_Index .. Weight_K.Last_Index
+         loop
+            Weight_K (index) := Class_K_Weights (K_Indices (index));
+         end loop;
 
          if not Classes_Missing.Is_Empty then
             --  Make missing classes weights zero
@@ -158,6 +161,7 @@ package body Weights is
                end if;
             end loop;
          end if;
+
          Expanded_Class_Weight.Append (Weight_K);
       end loop;
 
