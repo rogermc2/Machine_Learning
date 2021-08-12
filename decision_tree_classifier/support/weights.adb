@@ -39,8 +39,8 @@ package body Weights is
       elsif Weight_Kind = Balanced_Weight then
          --  Find the weight of each class  present in Y.
          Y_Ind := Label.Fit_Transform (LE, Y);
-         Classifier_Utilities.Print_Value_List ("Classes", Classes);
-         Classifier_Utilities.Print_Natural_List ("LE.Classes", LE.Classes);
+         Classifier_Utilities.Print_Value_List ("Compute_Class_Weights Classes", Classes);
+         Classifier_Utilities.Print_Natural_List ("Compute_Class_Weights LE.Classes", LE.Classes);
          Scale := Natural (Float (Y.Length) / Float (LE.Classes.Length));
          Recip_Freq := Classifier_Utilities.Bin_Count (Y_Ind);
          for index in Recip_Freq.First_Index .. Recip_Freq.Last_Index loop

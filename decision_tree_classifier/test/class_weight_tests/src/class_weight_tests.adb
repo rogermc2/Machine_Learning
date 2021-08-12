@@ -9,13 +9,15 @@ with Weights;
 package body Class_Weight_Tests is
 
    procedure Test_Compute_Class_Weight is
-      use Classifier_Types.Float_Package;
+      use Classifier_Types;
+      use Float_Package;
+      use Natural_Package;
       Y             : Value_Data_List;
       Value         : Value_Record (Integer_Type);
-      Class_Weights : Classifier_Types.Weight_List;
+      Class_Weights : Weight_List;
       Classes       : Value_Data_List;
-      Class_Counts  : Classifier_Types.Natural_List;
-      No_Weights    : Classifier_Types.Weight_List;
+      Class_Counts  : Natural_List;
+      No_Weights    : Weight_List;
       Dot_Product   : Float;
    begin
       Value.Integer_Value := 2;
@@ -32,12 +34,14 @@ package body Class_Weight_Tests is
       Class_Weights := Weights.Compute_Class_Weights
         (Weights.Balanced_Weight, No_Weights, Classes, Y);
       Class_Counts := Classifier_Utilities.Bin_Count (Y);
+      Delete_First (Class_Counts, 2);
       Dot_Product := Dot (Class_Weights, Class_Counts);
+      New_Line;
+      Put_Line ("Class_Weight_Tests");
       Print_Natural_List ("Class_Weight_Test Class_Counts", Class_Counts);
       Print_Weights ("Class_Weight_Test Class_Weights", Class_Weights);
-      Put_Line ("Class_Weight_Test Dot_Product: " &
-                  Float'Image (Dot_Product) & ", Y length: " &
-                  Integer'Image (Integer (Y.Length)));
+      Put_Line ("Class_Weight_Test Dot_Product: " & Float'Image (Dot_Product)
+                 & ", Y length: " & Integer'Image (Integer (Y.Length)));
 
    end Test_Compute_Class_Weight;
 
