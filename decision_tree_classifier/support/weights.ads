@@ -30,7 +30,7 @@ package Weights is
 
    Weights_Error : exception;
 
-   function Compute_Class_Weights (Class_Weight  : Weight_Type;
+   function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                    Class_Weights : Weight_List;
                                    Classes       : ML_Types.Value_Data_List;
                                    Y             : ML_Types.Value_Data_List)

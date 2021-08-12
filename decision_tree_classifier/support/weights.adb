@@ -1,6 +1,9 @@
 
+--  with Ada.Text_IO; use Ada.Text_IO;
+
 with Classifier_Utilities;
 with Label;
+--  with Utilities;
 
 package body Weights is
 
@@ -11,7 +14,7 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
    --  Compute_Class_Weight estimates class weights for unbalanced datasets.
-   function Compute_Class_Weights (Class_Weight  : Weight_Type;
+   function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                    Class_Weights : Weight_List;
                                    Classes       : ML_Types.Value_Data_List;
                                    Y             : ML_Types.Value_Data_List)
@@ -20,21 +23,20 @@ package body Weights is
       Weights          : Weight_List;
       LE               : Label.Label_Encoder;
       Y_Ind            : Natural_List;
---        Blank_Weight     : constant Weight_Data := (To_Unbounded_String (""), 1.0);
-      Recip_Freq       : Natural_List;
-      Recip            : Natural;
       aWeight          : Float;
       aClass           : Value_Record;
+      Recip_Freq       : Natural_List;
       Recip_Freq2      : Natural_List;
       Recip_Freq_Index : Positive;
+      Recip            : Natural;
       Scale            : Natural;
    begin
-      if Class_Weight = No_Weight or Class_Weights.Is_Empty then
+      if Weight_Kind = No_Weight then
          for index in Classes.First_Index .. Classes.Last_Index loop
             Weights.Append (1.0);
          end loop;
 
-      elsif Class_Weight = Balanced_Weight then
+      elsif Weight_Kind = Balanced_Weight then
          --  Find the weight of each class  present in Y.
          Y_Ind := Label.Fit_Transform (LE, Y);
          Scale := Natural (Float (Y.Length) / Float (LE.Classes.Length));
@@ -45,14 +47,14 @@ package body Weights is
          end loop;
 
          Recip_Freq2 := Label.Transform (LE, Classes);
-         for index in Weights.First_Index .. Weights.Last_Index loop
+         for index in Recip_Freq2.First_Index .. Recip_Freq2.Last_Index loop
             Recip_Freq_Index := Recip_Freq2.Element (index);
             aClass := Classes.Element (Recip_Freq_Index);
             case aClass.Value_Kind is
                when Boolean_Type | UB_String_Type =>
                   raise Weights_Error with
                     "Weights.Compute_Class_Weights invalid class type :" &
-                  Data_Type'Image (aClass.Value_Kind);
+                    Data_Type'Image (aClass.Value_Kind);
                when Float_Type =>
                   aWeight := aClass.Float_Value;
                when Integer_Type =>
@@ -62,6 +64,10 @@ package body Weights is
          end loop;
 
       else  --  user-defined dictionary
+         for index in Class_Weights.First_Index .. Class_Weights.Last_Index
+         loop
+            null;
+         end loop;
          raise Weights_Error with
            "Weights.Compute_Class_Weights dictionary process not implemented.";
       end if;
@@ -178,7 +184,7 @@ package body Weights is
                aClass := Y_Full (index);
                if not (Find (Classes_Missing, aClass) =
                          Value_Data_Package.No_Element) then
---                    aWeight := Weight_K (index);
+                  --                    aWeight := Weight_K (index);
                   aWeight := 0.0;
                   Weight_K.Replace_Element (index, aWeight);
                end if;
@@ -196,7 +202,7 @@ package body Weights is
 
    function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
                         Data     : out Float)
---                          Data     : out Weight_Data)
+     --                          Data     : out Weight_Data)
                         return  Float_Array is
       aList  : Weight_List;
       Column : Float_Array (1 .. integer (Weights.Length));
