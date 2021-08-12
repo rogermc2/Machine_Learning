@@ -20,16 +20,16 @@ package body Weights is
                                    Y             : ML_Types.Value_Data_List)
                                    return Weight_List is
       use ML_Types;
-      Weights          : Weight_List;
-      LE               : Label.Label_Encoder;
-      Y_Ind            : Natural_List;
-      aWeight          : Float;
-      aClass           : Value_Record;
-      Recip_Freq       : Natural_List;
-      Recip_Freq2      : Natural_List;
-      Recip_Freq_Index : Positive;
-      Recip            : Natural;
-      Scale            : Natural;
+      Weights             : Weight_List;
+      LE                  : Label.Label_Encoder;
+      Y_Ind               : Natural_List;
+      aWeight             : Float;
+      aClass              : Value_Record;
+      Recip_Freq          : Natural_List;
+      Transformed_Classes : Natural_List;
+      Recip_Freq_Index    : Positive;
+      Recip               : Natural;
+      Scale               : Natural;
    begin
       if Weight_Kind = No_Weight then
          for index in Classes.First_Index .. Classes.Last_Index loop
@@ -39,8 +39,10 @@ package body Weights is
       elsif Weight_Kind = Balanced_Weight then
          --  Find the weight of each class  present in Y.
          Y_Ind := Label.Fit_Transform (LE, Y);
-         Classifier_Utilities.Print_Value_List ("Compute_Class_Weights Classes", Classes);
-         Classifier_Utilities.Print_Natural_List ("Compute_Class_Weights LE.Classes", LE.Classes);
+         Classifier_Utilities.Print_Value_List
+           ("Compute_Class_Weights Classes", Classes);
+         Classifier_Utilities.Print_Natural_List
+           ("Compute_Class_Weights LE.Classes", LE.Classes);
          Scale := Natural (Float (Y.Length) / Float (LE.Classes.Length));
          Recip_Freq := Classifier_Utilities.Bin_Count (Y_Ind);
          for index in Recip_Freq.First_Index .. Recip_Freq.Last_Index loop
@@ -48,9 +50,13 @@ package body Weights is
             Recip_Freq.Replace_Element (index, Recip);
          end loop;
 
-         Recip_Freq2 := Label.Transform (LE, Classes);
-         for index in Recip_Freq2.First_Index .. Recip_Freq2.Last_Index loop
-            Recip_Freq_Index := Recip_Freq2.Element (index);
+         Transformed_Classes := Label.Transform (LE, Classes);
+         Classifier_Utilities.Print_Natural_List
+           ("Compute_Class_Weights LE transformed Classes", Transformed_Classes);
+         Weights.Clear;
+         for index in Transformed_Classes.First_Index ..
+           Transformed_Classes.Last_Index loop
+            Recip_Freq_Index := Transformed_Classes.Element (index);
             aClass := Classes.Element (Recip_Freq_Index);
             case aClass.Value_Kind is
                when Boolean_Type | UB_String_Type =>
@@ -64,6 +70,8 @@ package body Weights is
             end case;
             Weights.Append (aWeight);
          end loop;
+         Classifier_Utilities.Print_Weights
+           ("Compute_Class_Weights Weights", Weights);
 
       else  --  user-defined dictionary
          for index in Class_Weights.First_Index .. Class_Weights.Last_Index
