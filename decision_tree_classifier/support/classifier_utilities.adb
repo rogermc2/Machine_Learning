@@ -425,6 +425,33 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Value_List (Name    : String;
+                               theList : ML_Types.Value_Data_List) is
+      use ML_Types;
+      Value : Value_Record;
+      Count : Integer := 1;
+   begin
+      Put (Name & ": ");
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Value := theList.Element (Index);
+         case Value.Value_Kind is
+            when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
+            when Float_Type => Put (Float'Image (Value.Float_Value));
+            when Integer_Type => Put (Integer'Image (Value.Integer_Value));
+            when UB_String_Type => Put (To_String (Value.UB_String_Value));
+         end case;
+         Put ("   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+   end Print_Value_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Weights (Name : String; Data : Weight_List) is
       aWeight : Float;
       Count   : Integer := 1;
@@ -439,6 +466,7 @@ package body Classifier_Utilities is
             Count := 1;
          end if;
       end loop;
+      New_Line;
    end Print_Weights;
 
    --  ------------------------------------------------------------------------
