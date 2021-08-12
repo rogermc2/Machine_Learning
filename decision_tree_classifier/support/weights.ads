@@ -18,12 +18,11 @@ package Weights is
      (Classifier_Types.Class_Label, Float);
    subtype Weight_Map is Weight_Dictionary.Map;
 
-   package Weight_Package is new Ada.Containers.Vectors
-     (Positive, Float);
---       (Positive, Weight_Data);
-   subtype Weight_List is Weight_Package.Vector;
+--     package Weight_Package is new Ada.Containers.Vectors
+--       (Positive, Float);
+--     subtype Weight_List is Weight_Package.Vector;
 
-   use Weight_Package;
+   use Float_Package;
    package Weight_Lists_Package is new Ada.Containers.Vectors
      (Positive, Weight_List);
    subtype Weight_Lists_List is Weight_Lists_Package.Vector;
@@ -38,7 +37,7 @@ package Weights is
    function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
                                    Y              : ML_Types.List_Of_Value_Data_Lists;
                                    Class_Weights  : Weight_List :=
-                                     Weight_Package.Empty_Vector;
+                                     Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List;

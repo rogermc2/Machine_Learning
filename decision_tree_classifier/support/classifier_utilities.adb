@@ -43,7 +43,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Bin_Count (Numbers : ML_Types.Value_Data_List)
-                        return Natural_List is
+                       return Natural_List is
       use Ada.Containers;
       use ML_Types;
       use Natural_Package;
@@ -89,9 +89,24 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Dot (L : Weight_List;
+                 R : Natural_List) return Float is
+      use Float_Package;
+      Result : Float := 0.0;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result := Result + L.Element (index) * Float (R.Element (index));
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  -------------------------------------------------------------------------
+
    function Get_Column (Data       : ML_Types.List_Of_Value_Data_Lists;
                         Data_Index : Positive)
-                         return ML_Types.Value_Data_List is
+                        return ML_Types.Value_Data_List is
       use ML_Types;
       use Value_Lists_Data_Package;
       theList : Value_Data_List;
@@ -106,7 +121,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                       return Integer_List is
+                                      return Integer_List is
       use ML_Types;
       use Integer_Package;
       use Value_Data_Package;
@@ -180,7 +195,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Values (Values : ML_Types.Value_Data_List)
-                            return ML_Types.Value_Data_List is
+                           return ML_Types.Value_Data_List is
       use ML_Types;
       use Int_Sets;
       use Value_Data_Package;
@@ -252,7 +267,7 @@ package body Classifier_Utilities is
    -------------------------------------------------------------------------
 
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                   return Integer_Array is
+                                  return Integer_Array is
       use Int_Sets;
       Unique_Set : Int_Sets.Set;
       Set_Curs   : Int_Sets.Cursor;
@@ -410,7 +425,7 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
+   procedure Print_Weights (Name : String; Data : Weight_List) is
       aWeight : Float;
       Count   : Integer := 1;
    begin

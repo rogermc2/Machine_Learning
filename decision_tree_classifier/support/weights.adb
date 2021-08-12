@@ -87,7 +87,7 @@ package body Weights is
    function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
                                    Y              : ML_Types.List_Of_Value_Data_Lists;
                                    Class_Weights  : Weight_List :=
-                                     Weight_Package.Empty_Vector;
+                                     Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List is

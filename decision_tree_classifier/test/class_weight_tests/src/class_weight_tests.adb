@@ -7,12 +7,13 @@ with Weights;
 package body Class_Weight_Tests is
 
    procedure Test_Compute_Class_Weight is
+      use Classifier_Types.Float_Package;
       Y             : Value_Data_List;
       Value         : Value_Record (Integer_Type);
-      Class_Weights : Weights.Weight_List;
+      Class_Weights : Classifier_Types.Weight_List;
       Classes       : Value_Data_List;
       Class_Counts  : Classifier_Types.Natural_List;
-      No_Weights    : Weights.Weight_List;
+      No_Weights    : Classifier_Types.Weight_List;
    begin
       Value.Integer_Value := 2;
       Y.Append (Value);
