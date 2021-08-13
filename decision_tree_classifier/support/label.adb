@@ -20,14 +20,21 @@ package body Label is
       Encoded       : Natural_List;
    begin
       Inverse.Clear;
+      Encoded.Clear;
+      ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
       if Uniques.Is_Empty then
-         ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
-         Uniques := Classifier_Utilities.Unique_Values (Sorted_Values, Inverse);
-      elsif Check_Unknown then
-         null;
-      end if;
+         if Do_Encode then
+            Uniques := Classifier_Utilities.Unique_Values
+              (Sorted_Values, Encoded, Return_Inverse => True);
+         else
+            Uniques := Classifier_Utilities.Unique_Values (Sorted_Values, Inverse);
+         end if;
 
-      if Do_Encode then
+      elsif Do_Encode then
+         if Check_Unknown then
+            null;
+         end if;
+
          for index in Uniques.First_Index .. Uniques.Last_Index loop
             Encoded.Append (index);
          end loop;
@@ -52,7 +59,7 @@ package body Label is
    --  n_samples / (n_classes * np.bincount(y))
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
-                            return Natural_List is
+                        return Natural_List is
       Labels  : Natural_List;
       Uniques : ML_Types.Value_Data_List;
    begin
@@ -80,7 +87,7 @@ package body Label is
    --  n_samples / (n_classes * np.bincount(y))
    function Transform (Self : in out Label_Encoder;
                        Y    : ML_Types.Value_Data_List)
-                        return Natural_List is
+                    return Natural_List is
       Labels  : Natural_List;
       Uniques : ML_Types.Value_Data_List;
    begin
