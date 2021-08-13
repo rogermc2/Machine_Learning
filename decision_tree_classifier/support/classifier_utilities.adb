@@ -194,16 +194,16 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Values (Values : ML_Types.Value_Data_List;
-                           Inverse : out Natural_List;
+   function Unique_Values (Values         : ML_Types.Value_Data_List;
+                           Inverse        : out Natural_List;
                            Return_Inverse : Boolean := False)
                            return ML_Types.Value_Data_List is
       use ML_Types;
       use Int_Sets;
       use Value_Data_Package;
       use Value_Data_Sorting;
-      Nums_Curs         : Value_Data_Package.Cursor := Values.First;
-      Num_Value         : Value_Record;
+      Values_Curs       : Value_Data_Package.Cursor := Values.First;
+      aValue            : Value_Record;
       Bool_Value        : Value_Record (Boolean_Type);
       Float_Value       : Value_Record (Float_Type);
       Int_Value         : Value_Record (Integer_Type);
@@ -216,46 +216,43 @@ package body Classifier_Utilities is
       Floats_Curs       : Float_Sets.Cursor;
       Ints_Curs         : Int_Sets.Cursor;
       UB_Strings_Curs   : UB_String_Sets.Cursor;
-      Nums_List         : Value_Data_List;
+      Uniq_List         : Value_Data_List;
    begin
       Inverse.Clear;
 
-      while Has_Element (Nums_Curs) loop
-         Num_Value := Element (Nums_Curs);
-         case Num_Value.Value_Kind is
+      while Has_Element (Values_Curs) loop
+         aValue := Element (Values_Curs);
+         case aValue.Value_Kind is
             when Boolean_Type =>
-               Unique_Booleans.Include (Num_Value.Boolean_Value);
+               Unique_Booleans.Include (aValue.Boolean_Value);
             when Float_Type =>
-               Unique_Floats.Include (Num_Value.Float_Value);
+               Unique_Floats.Include (aValue.Float_Value);
             when Integer_Type =>
-               Unique_Integers.Include (Num_Value.Integer_Value);
+               Unique_Integers.Include (aValue.Integer_Value);
             when UB_String_Type =>
-               Unique_UB_Strings.Include (Num_Value.UB_String_Value);
+               Unique_UB_Strings.Include (aValue.UB_String_Value);
          end case;
-         Next (Nums_Curs);
+         Next (Values_Curs);
       end loop;
 
       Booleans_Curs := Unique_Booleans.First;
       while Bool_Sets.Has_Element (Booleans_Curs) loop
          Bool_Value.Boolean_Value := Bool_Sets.Element (Booleans_Curs);
-         Nums_List.Append (Bool_Value);
-         if Return_Inverse then
-            Inverse.Append (Nums_List.Last_Index);
-         end if;
+         Uniq_List.Append (Bool_Value);
          Bool_Sets.Next (Booleans_Curs);
       end loop;
 
       Floats_Curs := Unique_Floats.First;
       while Float_Sets.Has_Element (Floats_Curs) loop
          Float_Value.Float_Value := Float_Sets.Element (Floats_Curs);
-         Nums_List.Append (Float_Value);
+         Uniq_List.Append (Float_Value);
          Float_Sets.Next (Floats_Curs);
       end loop;
 
       Ints_Curs := Unique_Integers.First;
       while Int_Sets.Has_Element (Ints_Curs) loop
          Int_Value.Integer_Value := Int_Sets.Element (Ints_Curs);
-         Nums_List.Append (Int_Value);
+         Uniq_List.Append (Int_Value);
          Int_Sets.Next (Ints_Curs);
       end loop;
 
@@ -263,18 +260,28 @@ package body Classifier_Utilities is
       while UB_String_Sets.Has_Element (UB_Strings_Curs) loop
          UB_String_Value.UB_String_Value :=
            UB_String_Sets.Element (UB_Strings_Curs);
-         Nums_List.Append (UB_String_Value);
+         Uniq_List.Append (UB_String_Value);
          UB_String_Sets.Next (UB_Strings_Curs);
       end loop;
 
-      Sort (Nums_List);
-      return Nums_List;
+      Sort (Uniq_List);
+      if Return_Inverse then
+         Values_Curs := Values.First;
+         while Has_Element (Values_Curs) loop
+            aValue := Element (Values_Curs);
+            Inverse.Append (Uniq_List.Find_Index (aValue));
+            Next (Values_Curs);
+         end loop;
+      end if;
+
+      return Uniq_List;
+
    end Unique_Values;
 
    -------------------------------------------------------------------------
 
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                  return Integer_Array is
+                                     return Integer_Array is
       use Int_Sets;
       Unique_Set : Int_Sets.Set;
       Set_Curs   : Int_Sets.Cursor;
