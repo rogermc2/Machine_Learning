@@ -31,7 +31,9 @@ package Classifier_Utilities is
    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
    --  As Integer_List, indices are part of the returned list
    function Unique (Nums : Integer_List) return Integer_List;
-   function Unique_Values (Values : ML_Types.Value_Data_List)
+   function Unique_Values (Values : ML_Types.Value_Data_List;
+                           Inverse        : out Natural_List;
+                           Return_Inverse : Boolean := False)
                            return ML_Types.Value_Data_List;
 
 end Classifier_Utilities;

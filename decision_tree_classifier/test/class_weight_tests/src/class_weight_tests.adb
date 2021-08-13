@@ -18,6 +18,7 @@ package body Class_Weight_Tests is
       Classes       : Value_Data_List;
       Class_Counts  : Natural_List;
       No_Weights    : Weight_List;
+      Inverse       : Natural_List;
       Dot_Product   : Float;
    begin
       Value.Integer_Value := 2;
@@ -30,7 +31,8 @@ package body Class_Weight_Tests is
       Value.Integer_Value := 4;
       Y.Append (Value);
 
-      Classes := Unique_Values (Y);
+      Inverse.Clear;
+      Classes := Unique_Values (Y, Inverse);
       Class_Weights := Weights.Compute_Class_Weights
         (Weights.Balanced_Weight, No_Weights, Classes, Y);
       Class_Counts := Classifier_Utilities.Bin_Count (Y);

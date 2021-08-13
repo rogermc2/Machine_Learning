@@ -114,9 +114,11 @@ package body Weights is
       Weight_K              : Weight_List;
       aWeight               : Float;
       K_Indices             : Integer_List;
+      Inverse               : Natural_List;
       Class_K_Weights       : Weight_List;
       Expanded_Class_Weight : Weight_Lists_List;
    begin
+      Inverse.Clear;
       if Weight_Kind /= Balanced_Weight then
          raise Weights_Error with
            "Compute_Sample_Weight; Weight does not contain the only" &
@@ -133,7 +135,7 @@ package body Weights is
       for index_k in 1 .. Num_Outputs loop
          --  y_full = y[:, k]
          Y_Full := Classifier_Utilities.Get_Column (Y, index_k);
-         Classes_Full := Classifier_Utilities.Unique_Values (Y_Full);
+         Classes_Full := Classifier_Utilities.Unique_Values (Y_Full, Inverse);
          Classes_Missing.Clear;
 
          if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
@@ -151,7 +153,8 @@ package body Weights is
                Y_Subsample.Append (Y.Element (Indices.Element (index)));
             end loop;
 
-            Classes_Subsample := Classifier_Utilities.Unique_Values (Y_Subsample);
+            Classes_Subsample := Classifier_Utilities.Unique_Values
+              (Y_Subsample, Inverse);
             --  Get class weights for the subsample covering all classes in
             --  case some labels present in the original data are missing
             --  from the sample.

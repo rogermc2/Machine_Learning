@@ -194,7 +194,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Values (Values : ML_Types.Value_Data_List)
+   function Unique_Values (Values : ML_Types.Value_Data_List;
+                           Inverse : out Natural_List;
+                           Return_Inverse : Boolean := False)
                            return ML_Types.Value_Data_List is
       use ML_Types;
       use Int_Sets;
@@ -216,6 +218,8 @@ package body Classifier_Utilities is
       UB_Strings_Curs   : UB_String_Sets.Cursor;
       Nums_List         : Value_Data_List;
    begin
+      Inverse.Clear;
+
       while Has_Element (Nums_Curs) loop
          Num_Value := Element (Nums_Curs);
          case Num_Value.Value_Kind is
@@ -235,6 +239,9 @@ package body Classifier_Utilities is
       while Bool_Sets.Has_Element (Booleans_Curs) loop
          Bool_Value.Boolean_Value := Bool_Sets.Element (Booleans_Curs);
          Nums_List.Append (Bool_Value);
+         if Return_Inverse then
+            Inverse.Append (Nums_List.Last_Index);
+         end if;
          Bool_Sets.Next (Booleans_Curs);
       end loop;
 
