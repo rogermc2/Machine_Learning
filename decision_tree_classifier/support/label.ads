@@ -16,6 +16,8 @@ package Label is
       Classes : Natural_List;
    end record;
 
+   Label_Error : Exception;
+
    function Fit (Y : ML_Types.Value_Data_List) return Label_Encoder;
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)

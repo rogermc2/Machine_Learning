@@ -37,10 +37,14 @@ package body Weights is
          end loop;
 
       elsif Weight_Kind = Balanced_Weight then
-         --  Find the weight of each class  present in Y.
+         --  Find the weight of each class present in Y.
          Y_Ind := Label.Fit_Transform (LE, Y);
          Classifier_Utilities.Print_Value_List
+           ("Compute_Class_Weights Y", Y);
+         Classifier_Utilities.Print_Value_List
            ("Compute_Class_Weights Classes", Classes);
+         Classifier_Utilities.Print_Natural_List
+           ("Compute_Class_Weights Y_Ind", Y_Ind);
          Classifier_Utilities.Print_Natural_List
            ("Compute_Class_Weights LE.Classes", LE.Classes);
          Scale := Natural (Float (Y.Length) / Float (LE.Classes.Length));
