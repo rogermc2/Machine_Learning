@@ -1,5 +1,5 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Label;
@@ -20,16 +20,17 @@ package body Weights is
                                    Y             : ML_Types.Value_Data_List)
                                    return Weight_List is
       use ML_Types;
+      use Natural_Package;
       Weights             : Weight_List;
       LE                  : Label.Label_Encoder;
       Y_Ind               : Natural_List;
       aWeight             : Float;
       aClass              : Value_Record;
+      Bins                : Natural_List;
       Recip_Freq          : Natural_List;
       Transformed_Classes : Natural_List;
+      Class_Length        : Float;
       Recip_Freq_Index    : Positive;
-      Recip               : Natural;
-      Scale               : Natural;
    begin
       if Weight_Kind = No_Weight then
          for index in Classes.First_Index .. Classes.Last_Index loop
@@ -37,8 +38,11 @@ package body Weights is
          end loop;
 
       elsif Weight_Kind = Balanced_Weight then
-         --  Find the weight of each class present in Y.
+         --  Balanced class weights should be given by:
+         --  n_samples / (n_classes * Bin_Count (Y)); that is
+         --  Y.Length / (Classes.Length * Bin_Count (Y)).
          Y_Ind := Label.Fit_Transform (LE, Y);
+         New_Line;
          Classifier_Utilities.Print_Value_List
            ("Compute_Class_Weights Y", Y);
          Classifier_Utilities.Print_Value_List
@@ -47,11 +51,13 @@ package body Weights is
            ("Compute_Class_Weights Y_Ind", Y_Ind);
          Classifier_Utilities.Print_Natural_List
            ("Compute_Class_Weights LE.Classes", LE.Classes);
-         Scale := Natural (Float (Y.Length) / Float (LE.Classes.Length));
-         Recip_Freq := Classifier_Utilities.Bin_Count (Y_Ind);
-         for index in Recip_Freq.First_Index .. Recip_Freq.Last_Index loop
-            Recip := Scale * Recip_Freq.Element (index);
-            Recip_Freq.Replace_Element (index, Recip);
+         Class_Length := Float (LE.Classes.Length);
+         Bins := Classifier_Utilities.Bin_Count (Y_Ind);
+         Put_Line ("Compute_Class_Weights Class_Length" &
+                     Float'Image (Class_Length));
+         for index in Bins.First_Index .. Bins.Last_Index loop
+            Recip_Freq.Append (Natural (Float (Y.Length) /
+                                 Class_Length * Float (Bins.Element (index))));
          end loop;
 
          Transformed_Classes := Label.Transform (LE, Classes);
@@ -86,6 +92,7 @@ package body Weights is
            "Weights.Compute_Class_Weights dictionary process not implemented.";
       end if;
 
+      New_Line;
       return Weights;
 
    end Compute_Class_Weights;

@@ -1,11 +1,13 @@
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Classifier_Utilities;
 
 package body Label is
 
    function Encode_Check_Unknown
      (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
-       return ML_Types.Value_Data_List;
+      return ML_Types.Value_Data_List;
 
    --  -------------------------------------------------------------------------
    --  Values : values to factorize or encode.
@@ -30,11 +32,10 @@ package body Label is
       if Uniques.Is_Empty then
          if Do_Encode then
             Uniques := Classifier_Utilities.Unique_Values
-              (Sorted_Values, Encoded, Return_Inverse => True);
-            Classifier_Utilities.Print_Value_List
-              ("Label.Encode Uniques", Uniques);
-            Classifier_Utilities.Print_Natural_List
-              ("Label.Encode Encoded", Encoded);
+              (Sorted_Values, Inverse, Return_Inverse => True);
+            for index in Inverse.First_Index .. Inverse.Last_Index loop
+               Encoded.Append (Inverse.Element (index));
+            end loop;
          else
             Uniques :=
               Classifier_Utilities.Unique_Values (Sorted_Values, Inverse);
@@ -42,6 +43,7 @@ package body Label is
 
       elsif Do_Encode then
          if Check_Unknown then
+            Put_Line ("Label.Encode Check_Unknown.");
             Diff := Encode_Check_Unknown (Values, Uniques);
             if not Diff.Is_Empty then
                Classifier_Utilities.Print_Value_List
@@ -58,6 +60,11 @@ package body Label is
          end loop;
       end if;
 
+      Classifier_Utilities.Print_Value_List
+        ("Label.Encode Uniques", Uniques);
+      Classifier_Utilities.Print_Natural_List
+        ("Label.Encode Encoded", Encoded);
+
       return Encoded;
    end Encode;
 
@@ -65,7 +72,7 @@ package body Label is
 
    function Encode_Check_Unknown
      (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
-       return ML_Types.Value_Data_List is
+      return ML_Types.Value_Data_List is
       use ML_Types;
       No_Inverse  : Natural_List :=
                       Classifier_Types.Natural_Package.Empty_Vector;
@@ -100,16 +107,16 @@ package body Label is
    --  n_samples / (n_classes * np.bincount(y))
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
-                            return Natural_List is
+                           return Natural_List is
       Labels  : Natural_List;
       Uniques : ML_Types.Value_Data_List;
    begin
       Uniques.Clear;
       Labels := Encode (Y, Uniques, True);
-      Classifier_Utilities.Print_Natural_List
-        ("Label.Fit_Transform Labels", Labels);
       Classifier_Utilities.Print_Value_List
         ("Label.Fit_Transform Uniques", Uniques);
+      Classifier_Utilities.Print_Natural_List
+        ("Label.Fit_Transform Labels", Labels);
       Self.Classes := Labels;
       return Labels;
    end Fit_Transform;
@@ -132,7 +139,7 @@ package body Label is
    --  n_samples / (n_classes * np.bincount(y))
    function Transform (Self : in out Label_Encoder;
                        Y    : ML_Types.Value_Data_List)
-                        return Natural_List is
+                       return Natural_List is
       Labels  : Natural_List;
       Uniques : ML_Types.Value_Data_List;
    begin
