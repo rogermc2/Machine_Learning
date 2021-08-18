@@ -26,7 +26,7 @@ package body Classifier_Utilities is
          end if;
       end loop;
 
-      Bins.Set_Length (Count_Type (aNumber + 1));
+      Bins.Set_Length (Count_Type (Max_Number + 1));
       for index in Bins.First_Index .. Bins.Last_Index loop
          Bins (index) := 0;
       end loop;
@@ -64,7 +64,7 @@ package body Classifier_Utilities is
          end if;
       end loop;
 
-      Bins.Set_Length (Count_Type (aNumber + 1));
+      Bins.Set_Length (Count_Type (Max_Number + 1));
       for index in Bins.First_Index .. Bins.Last_Index loop
          Bins (index) := 0;
       end loop;
