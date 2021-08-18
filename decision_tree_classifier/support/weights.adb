@@ -23,7 +23,7 @@ package body Weights is
       use Natural_Package;
       Weights             : Weight_List;
       LE                  : Label.Label_Encoder;
-      Y_Ind               : Natural_List;
+      Y_Ind               : Value_Data_List;
       aWeight             : Float;
       aClass              : Value_Record;
       Bins                : Natural_List;
@@ -41,18 +41,21 @@ package body Weights is
          --  Balanced class weights should be given by:
          --  n_samples / (n_classes * Bin_Count (Y)); that is
          --  Y.Length / (Classes.Length * Bin_Count (Y)).
+         --  but, this is Recip_Freq
          Y_Ind := Label.Fit_Transform (LE, Y);
          New_Line;
          Classifier_Utilities.Print_Value_List
            ("Compute_Class_Weights Y", Y);
          Classifier_Utilities.Print_Value_List
            ("Compute_Class_Weights Classes", Classes);
-         Classifier_Utilities.Print_Natural_List
+         Classifier_Utilities.Print_Value_List
            ("Compute_Class_Weights Y_Ind", Y_Ind);
          Classifier_Utilities.Print_Natural_List
            ("Compute_Class_Weights LE.Classes", LE.Classes);
          Class_Length := Float (LE.Classes.Length);
          Bins := Classifier_Utilities.Bin_Count (Y_Ind);
+         Classifier_Utilities.Print_Natural_List
+           ("Compute_Class_Weights Bins", Bins);
          Put_Line ("Compute_Class_Weights Class_Length" &
                      Float'Image (Class_Length));
          for index in Bins.First_Index .. Bins.Last_Index loop
@@ -60,6 +63,8 @@ package body Weights is
                                  Class_Length * Float (Bins.Element (index))));
          end loop;
 
+         Classifier_Utilities.Print_Natural_List
+           ("Compute_Class_Weights Recip_Freq", Recip_Freq);
          Transformed_Classes := Label.Transform (LE, Classes);
          Classifier_Utilities.Print_Natural_List
            ("Compute_Class_Weights LE transformed Classes", Transformed_Classes);
