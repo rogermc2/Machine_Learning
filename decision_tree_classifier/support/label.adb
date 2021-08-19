@@ -20,6 +20,8 @@ package body Label is
    function Encode (Values        : ML_Types.Value_Data_List;
                     Encoded       : out Natural_List;
                     Do_Encode     : Boolean := False;
+                    Uniques_In    : ML_Types.Value_Data_List :=
+                      ML_Types.Value_Data_Package.Empty_Vector;
                     Check_Unknown : Boolean := True)
                     return ML_Types.Value_Data_List is
       Uniques       : ML_Types.Value_Data_List;
@@ -30,7 +32,7 @@ package body Label is
    begin
       Encoded := Classifier_Types.Natural_Package.Empty_Vector;
       ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
-      if Uniques.Is_Empty then
+      if Uniques_In.Is_Empty then
          if Do_Encode then
             Uniques := Classifier_Utilities.Unique_Values
               (Sorted_Values, Inverse, Return_Inverse => True);
@@ -45,10 +47,10 @@ package body Label is
       elsif Do_Encode then
          if Check_Unknown then
             Put_Line ("Label.Encode Check_Unknown.");
-            Diff := Encode_Check_Unknown (Values, Uniques);
+            Diff := Encode_Check_Unknown (Values, Uniques_In);
             if not Diff.Is_Empty then
                Classifier_Utilities.Print_Value_List
-                 ("Unique list", Uniques);
+                 ("Unique list", Uniques_In);
                Classifier_Utilities.Print_Value_List
                  ("Unseen labels", Diff);
                raise Label_Error with
