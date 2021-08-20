@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
+with Validation;
 
 package body Label is
 
@@ -119,18 +120,19 @@ package body Label is
    --  n_samples / (n_classes * np.bincount(y))
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
-                           return ML_Types.Value_Data_List is
-      Uniques  : ML_Types.Value_Data_List :=
-                   ML_Types.Value_Data_Package.Empty_Vector;
-      Labels   : Natural_List;
+                           return Natural_List is
+--        Uniques   : ML_Types.Value_Data_List :=
+--                     ML_Types.Value_Data_Package.Empty_Vector;
+      Y_Inverse : Natural_List;
    begin
-      Uniques := Encode (Y, Labels, True);
+--        Uniques := Encode (Y, Labels, True);
+        Self.Classes := Encode_Utils.Unique (Y, Y_Inverse, True);
       Classifier_Utilities.Print_Value_List
-        ("Label.Fit_Transform Uniques", Uniques);
+        ("Label.Fit_Transform Classes", Self.Classes);
       Classifier_Utilities.Print_Natural_List
-        ("Label.Fit_Transform Labels", Labels);
-      Self.Classes := Labels;
-      return Uniques;
+        ("Label.Fit_Transform Labels", Y_Inverse);
+--        Self.Classes := Labels;
+      return Y_Inverse;
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
@@ -156,8 +158,9 @@ package body Label is
       Uniques : ML_Types.Value_Data_List;
    begin
       pragma Warnings (Off, Uniques);
+      Validation.Check_Is_Fitted (Self);
       Uniques := Encode (Y, Labels, Do_Encode => True);
-      Self.Classes := Labels;
+--        Self.Classes := Labels;
       return Labels;
    end Transform;
 
