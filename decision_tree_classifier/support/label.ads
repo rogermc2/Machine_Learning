@@ -4,6 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Classifier_Types; use Classifier_Types;
 with ML_Types;
+with Estimator;
 
 package Label is
 
@@ -12,8 +13,13 @@ package Label is
      (Param_Label, Float);
    subtype Params_Map is Params_Dictionary.Map;
 
+   --  Label_Encoder should be used to encode target values, i.e. Y and
+   --  not the input X.
    type Label_Encoder is record
-      Classes : Natural_List;
+      --  Estimator_Kind declared in base.py class ClassifierMixin
+      Estimator_Kind : Estimator.Estimator_Type :=
+                         Estimator.Classifier_Estimator;
+      Classes        : Natural_List;
    end record;
 
    Label_Error : Exception;
@@ -22,9 +28,9 @@ package Label is
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
                            return ML_Types.Value_Data_List;
---     function Inverse_Transform (Self : in out Label_Encoder;
---                                 Y    : ML_Types.Value_Data_List)
---                                 return Integer_List;
+   --     function Inverse_Transform (Self : in out Label_Encoder;
+   --                                 Y    : ML_Types.Value_Data_List)
+   --                                 return Integer_List;
    function Transform (Self : in out Label_Encoder;
                        Y    : ML_Types.Value_Data_List)
                        return Natural_List;
