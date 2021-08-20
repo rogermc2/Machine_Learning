@@ -19,7 +19,7 @@ package Label is
       --  Estimator_Kind declared in base.py class ClassifierMixin
       Estimator_Kind : Estimator.Estimator_Type :=
                          Estimator.Classifier_Estimator;
-      Classes        : Natural_List;
+      Classes        : ML_Types.Value_Data_List;
    end record;
 
    Label_Error : Exception;

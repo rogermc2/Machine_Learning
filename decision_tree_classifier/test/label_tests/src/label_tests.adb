@@ -69,7 +69,7 @@ package body Label_Tests is
       Values.Append (Val);
       LE := Fit (Values);
       --        C_Fit := LE.Classes;
-      Print_Natural_List
+      Print_Value_List
         ("Label_Tests Test_Label_Encoder_Negative_Integers Classes",
          LE.Classes);
    end Test_Label_Encoder_Negative_Integers;

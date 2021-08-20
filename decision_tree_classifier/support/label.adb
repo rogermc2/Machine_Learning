@@ -1,7 +1,10 @@
 
+--  Adapted from scikit-learn/scikit-learn.git sklearn/preprocessing/_label.py
+
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
+with Encode_Utils;
 
 package body Label is
 
@@ -24,6 +27,7 @@ package body Label is
                       ML_Types.Value_Data_Package.Empty_Vector;
                     Check_Unknown : Boolean := True)
                     return ML_Types.Value_Data_List is
+
       Uniques       : ML_Types.Value_Data_List;
       Inverse       : Natural_List :=
                         Classifier_Types.Natural_Package.Empty_Vector;
@@ -34,14 +38,14 @@ package body Label is
       ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
       if Uniques_In.Is_Empty then
          if Do_Encode then
-            Uniques := Classifier_Utilities.Unique_Values
+            Uniques := Encode_Utils.Unique
               (Sorted_Values, Inverse, Return_Inverse => True);
             for index in Inverse.First_Index .. Inverse.Last_Index loop
                Encoded.Append (Inverse.Element (index));
             end loop;
          else
             Uniques :=
-              Classifier_Utilities.Unique_Values (Sorted_Values, Inverse);
+              Encode_Utils.Unique (Sorted_Values, Inverse);
          end if;
 
       elsif Do_Encode then
@@ -80,7 +84,7 @@ package body Label is
       No_Inverse  : Natural_List :=
                       Classifier_Types.Natural_Package.Empty_Vector;
       Unique_Vals : constant Value_Data_List :=
-                      Classifier_Utilities.Unique_Values (Values, No_Inverse);
+                      Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Value_Record;
       Diff        : Value_Data_List;
    begin
@@ -95,13 +99,17 @@ package body Label is
    end Encode_Check_Unknown;
 
    --  -------------------------------------------------------------------------
+   --  A Fit function adjusts weights according to data values so that better accuracy can be achieved.
    --  Fit fits label encoder
    function Fit (Y : ML_Types.Value_Data_List) return Label_Encoder is
       Encoder_New : Label_Encoder;
-      Uniques     :  ML_Types.Value_Data_List;
+      Y_Inverse   :  Natural_List :=
+                        Natural_Package.Empty_Vector;
+--        Uniques     :  ML_Types.Value_Data_List;
    begin
-      pragma Warnings (Off, Uniques);
-      Uniques := Encode (Y, Encoder_New.Classes);
+--        pragma Warnings (Off, Uniques);
+--        Encoder_New.Classes := Encode (Y, Encoder_New.Classes);
+        Encoder_New.Classes := Encode_Utils.Unique (Y, Y_Inverse);
       return Encoder_New;
    end Fit;
 
