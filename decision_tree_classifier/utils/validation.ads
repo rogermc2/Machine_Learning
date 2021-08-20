@@ -2,6 +2,8 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with Label;
+
 package Validation is
    --  Derived from python3.7/site-packages/sklearn/utils/Validation.py
 
@@ -22,7 +24,7 @@ package Validation is
    --  Otherwise raises a Not_Fitted_Error with the given message.
    --  This utility is meant to be used internally by estimators themselves.
    procedure Check_Is_Fitted
-     (Estimator  : Attribute_List;
+     (Estimator  : Label.Label_Encoder;
       Attributes : Attribute_Package.List := Attribute_Package.Empty_List;
       Msg        : Unbounded_String := Empty_String;
       All_Or_Any : State := All_States);

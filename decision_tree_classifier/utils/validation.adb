@@ -2,30 +2,32 @@
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with ML_Types;
+
 package body Validation is
 
-   Type Attribute_Cursor is new Attribute_Package.Cursor;
+   type Attribute_Cursor is new Attribute_Package.Cursor;
 
    --  Check_Is_Fitted checks if the estimator is fitted by verifying the
    --  presence of fitted attributes (ending with a trailing underscore).
    --  Otherwise raises a Not_Fitted_Error with the given message.
    procedure Check_Is_Fitted
-     (Estimator  : Attribute_List;
+     (Estimator  : Label.Label_Encoder;
       Attributes : Attribute_Package.List := Attribute_Package.Empty_List;
       Msg        : Unbounded_String := Empty_String;
       All_Or_Any : State := All_States) is
 
       use Attribute_Package;
       use Ada.Strings;
-      Cursor     : Attribute_Cursor := Attribute_Cursor (Estimator.First);
+      Classes    : ML_Types.Value_Data_List := Estimator.Classes;
+      Cursor     : Attribute_Cursor := Attribute_Cursor (Attributes.First);
       Attr       : Attribute_List;
    begin
-      if Is_Empty (Estimator) then
+      if Classes.Is_Empty then
          raise Not_Fitted_Error with
            "Validation.Check_Is_Fitted; Estimator is empty ";
       elsif Msg = Empty_String then
-         Put_Line ("Validation.Check_Is_Fitted, this " &
-                   To_String (Estimator.First_Element) & " instance is not fitted yet.");
+         Put_Line ("Validation.Check_Is_Fitted, this estimator is not fitted yet.");
          Put_Line ("Call 'fit' with appropriate arguments before using this estimator.");
       elsif Estimator.First_Element /= "Fit" then
          raise Not_Fitted_Error with "Validation.Check_Is_Fitted invalid estimator";
