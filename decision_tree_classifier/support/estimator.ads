@@ -2,6 +2,7 @@
 package Estimator is
 
    type Estimator_Type is (Classifier_Estimator, Regressor_Estimator,
+                           Transformer_Estimator, Cluster_Estimator,
                            Outlier_Detector_Estimator, Unspecified_Estimator);
 
    type Boolean_Matrix is array

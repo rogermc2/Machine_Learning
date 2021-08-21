@@ -5,7 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Validation;
 
 package body Label is
 
@@ -106,10 +105,7 @@ package body Label is
       Encoder_New : Label_Encoder;
       Y_Inverse   :  Natural_List :=
                         Natural_Package.Empty_Vector;
---        Uniques     :  ML_Types.Value_Data_List;
    begin
---        pragma Warnings (Off, Uniques);
---        Encoder_New.Classes := Encode (Y, Encoder_New.Classes);
         Encoder_New.Classes := Encode_Utils.Unique (Y, Y_Inverse);
       return Encoder_New;
    end Fit;
@@ -121,18 +117,15 @@ package body Label is
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
                            return Natural_List is
---        Uniques   : ML_Types.Value_Data_List :=
---                     ML_Types.Value_Data_Package.Empty_Vector;
-      Y_Inverse : Natural_List;
+      Encoded_Labels : Natural_List;
    begin
---        Uniques := Encode (Y, Labels, True);
-        Self.Classes := Encode_Utils.Unique (Y, Y_Inverse, True);
+        Self.Classes := Encode_Utils.Unique (Y, Encoded_Labels, True);
       Classifier_Utilities.Print_Value_List
         ("Label.Fit_Transform Classes", Self.Classes);
       Classifier_Utilities.Print_Natural_List
-        ("Label.Fit_Transform Labels", Y_Inverse);
---        Self.Classes := Labels;
-      return Y_Inverse;
+        ("Label.Fit_Transform Labels", Encoded_Labels);
+      return Encoded_Labels;
+
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
@@ -158,7 +151,6 @@ package body Label is
       Uniques : ML_Types.Value_Data_List;
    begin
       pragma Warnings (Off, Uniques);
-      Validation.Check_Is_Fitted (Self);
       Uniques := Encode (Y, Labels, Do_Encode => True);
 --        Self.Classes := Labels;
       return Labels;
