@@ -11,11 +11,9 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  A Fit function adjusts weights according to data values so that better accuracy can be achieved.
     --  Fit fits label encoder
-    function Fit (Encoder : in out Label_Encoder;
-                  Y : ML_Types.Value_Data_List) return Label_Encoder is
+    procedure Fit (Encoder : in out Label_Encoder; Y : ML_Types.Value_Data_List) is
     begin
         Encoder.Classes := Encode_Utils.Unique (Y);
-        return Encoder;
     end Fit;
 
     --  -------------------------------------------------------------------------
@@ -61,7 +59,7 @@ package body Label is
     begin
         pragma Warnings (Off, Uniques);
         if not Y.Is_Empty then
-            Uniques := Encode_Utils.Encode (Y, Labels, Do_Encode => True);
+            Uniques := Encode_Utils.Encode (Y, Labels, Uniques);
             --        Self.Classes := Labels;
         end if;
         return Labels;

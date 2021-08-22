@@ -25,7 +25,7 @@ package body Label_Tests is
       LE  : Label_Encoder;
       T   : Natural_List;
    begin
-      LE := Fit (Values);
+      Fit (LE, Values);
       --  test empty transform
       T := Transform (LE, Values);
       Put ("Label_Tests.Test_Label_Encoder_Empty_Array: ");
@@ -67,7 +67,7 @@ package body Label_Tests is
       Values.Append (Val);
       Val.Integer_Value := 0;
       Values.Append (Val);
-      LE := Fit (Values);
+      Fit (LE,Values);
       --        C_Fit := LE.Classes;
       Print_Value_List
         ("Label_Tests Test_Label_Encoder_Negative_Integers Classes",
