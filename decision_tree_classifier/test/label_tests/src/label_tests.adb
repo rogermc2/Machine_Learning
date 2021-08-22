@@ -35,13 +35,13 @@ package body Label_Tests is
          Put_Line ("Empty transform test failed");
       end if;
       --  test empty inverse transform
-      --        T := Inverse_Transform (LE, Values);
-      --        Put ("Label_Tests.Test_Label_Encoder_Empty_Array: ");
-      --        if T = Empty_Vector then
-      --           Put_Line ("Empty inverse transform test passed");
-      --        else
-      --           Put_Line ("Empty inverse transform test failed");
-      --        end if;
+      T := Inverse_Transform (LE, Values);
+      Put ("Label_Tests.Test_Label_Encoder_Empty_Array: ");
+      if T = Empty_Vector then
+         Put_Line ("Empty inverse transform test passed");
+      else
+         Put_Line ("Empty inverse transform test failed");
+      end if;
 
    end Test_Label_Encoder_Empty_Array;
 
