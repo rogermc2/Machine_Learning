@@ -24,6 +24,7 @@ package Classifier_Types is
 
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
+   package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");
 
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;

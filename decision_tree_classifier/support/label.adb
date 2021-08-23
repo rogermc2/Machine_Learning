@@ -1,5 +1,9 @@
 
 --  Adapted from scikit-learn/scikit-learn.git sklearn/preprocessing/_label.py
+--  A LabelEncoder encodes labels with a value between 0 and n_classes-1 where
+--  n is the number of distinct labels. If a label repeats it assigns the same
+--  value to as assigned earlier. The categorical values have been converted into
+--  numeric values.
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
@@ -9,7 +13,6 @@ with Encode_Utils;
 package body Label is
 
    --  -------------------------------------------------------------------------
-   --  A Fit function adjusts weights according to data values so that better accuracy can be achieved.
    --  Fit fits label encoder
    procedure Fit (Encoder : in out Label_Encoder; Y : ML_Types.Value_Data_List) is
    begin
@@ -25,7 +28,7 @@ package body Label is
                            return Natural_List is
       Encoded_Labels : Natural_List;
    begin
-      Self.Classes := Encode_Utils.Unique (Y, Encoded_Labels, True);
+      Self.Classes := Encode_Utils.Unique (Y, Encoded_Labels);
       Classifier_Utilities.Print_Value_List
         ("Label.Fit_Transform Classes", Self.Classes);
       Classifier_Utilities.Print_Natural_List
@@ -35,28 +38,32 @@ package body Label is
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
-
+   --   Inverse_Transform transforms labels back to original encoding
    function Inverse_Transform (Self : in out Label_Encoder;
-                               Y    : ML_Types.Value_Data_List)
-                               return Natural_List is
+                               Y    : Natural_List)
+                               return ML_Types.Value_Data_List is
       aRange  : Natural_List := Natural_Package.Empty_Vector;
-      Labels  : Natural_List := Natural_Package.Empty_Vector;
-      Diff    : ML_Types.Value_Data_List;
+      Diff    : Natural_List;
+      Result  : ML_Types.Value_Data_List :=
+                  ML_Types.Value_Data_Package.Empty_Vector;
    begin
-      for index in 1 .. Positive (Self.Classes.Length) loop
-         aRange.Append (index - 1);
-      end loop;
-
       if not Y.Is_Empty then
-         Diff := Encode_Utils.Unique (Y, aRange);
+         for index in 1 .. Positive (Self.Classes.Length) loop
+            aRange.Append (index - 1);
+         end loop;
+
+         Diff := Classifier_Utilities.Set_Diff (Y, aRange);
+         if not Diff.Is_Empty then
+            raise Label_Error with
+              "Label.Inverse_Transform Y contains previously unseen labels.";
+         end if;
+
+         for index in 1 .. Positive (Self.Classes.Length) loop
+            Result.Append (Self.Classes.Element (index));
+         end loop;
       end if;
 
-      if not Diff.Is_Empty then
-         raise Label_Error with
-         "Label.Inverse_Transform Y contains previously unseen labels.";
-      end if;
-
-      return Self.Classes.Element (Y);
+      return Result;
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------

@@ -2,6 +2,8 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Encode_Utils;
+
 package body Classifier_Utilities is
 
     --     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
@@ -398,5 +400,23 @@ package body Classifier_Utilities is
     end Print_Weights;
 
     --  ------------------------------------------------------------------------
+
+   function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
+      use Natural_Package;
+      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+      aVal        : Natural;
+      Diff        : Natural_List;
+   begin
+      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+         aVal := Unique_Vals.Element (index);
+         if not Uniques.Contains (aVal) then
+            Diff.Append (aVal);
+         end if;
+      end loop;
+
+      return Diff;
+   end Set_Diff;
+
+   --  -------------------------------------------------------------------------
 
 end Classifier_Utilities;

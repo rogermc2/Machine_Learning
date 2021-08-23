@@ -24,6 +24,7 @@ package Classifier_Utilities is
    procedure Print_Weights (Name : String; Data : Weight_List);
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
                                       return Integer_List;
+   function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
    function To_Float_List (A : Float_Array) return Float_List;
    function To_Array (L : Integer_List) return Integer_Array;
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)

@@ -17,7 +17,6 @@ package Label is
    --  not the input X.
    type Label_Encoder is record
       --  Estimator_Kind declared in base.py class ClassifierMixin
-      --  Encode labels with value between 0 and n_classes-1
       Estimator_Kind : Estimator.Estimator_Type :=
                          Estimator.Classifier_Estimator;
       Classes        : ML_Types.Value_Data_List;
@@ -29,9 +28,9 @@ package Label is
    function Fit_Transform (Self : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
                            return Natural_List;
-   --     function Inverse_Transform (Self : in out Label_Encoder;
-   --                                 Y    : ML_Types.Value_Data_List)
-   --                                 return Integer_List;
+   function Inverse_Transform  (Self : in out Label_Encoder;
+                               Y    : Natural_List)
+                               return ML_Types.Value_Data_List;
    function Transform (Self : in out Label_Encoder;
                        Y    : ML_Types.Value_Data_List)
                        return Natural_List;
