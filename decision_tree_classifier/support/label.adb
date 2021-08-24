@@ -72,11 +72,9 @@ package body Label is
                        Y    : ML_Types.Value_Data_List)
                        return Natural_List is
       Labels  : Natural_List := Natural_Package.Empty_Vector;
-      Uniques : ML_Types.Value_Data_List;
    begin
-      pragma Unreferenced (Uniques);
       if not Y.Is_Empty then
-         Uniques := Encode_Utils.Encode (Y, Labels, Self.Classes);
+         Labels := Encode_Utils.Encode (Y, Self.Classes);
       end if;
       return Labels;
    end Transform;

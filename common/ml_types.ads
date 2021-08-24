@@ -62,10 +62,11 @@ package ML_Types is
 
     type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
         case Value_Kind is
-            when Integer_Type => Integer_Value : Integer;
-            when Float_Type => Float_Value   : Float;
-            when Boolean_Type => Boolean_Value : Boolean;
-            when UB_String_Type => UB_String_Value : Unbounded_String;
+            when Integer_Type => Integer_Value : Integer := 0;
+            when Float_Type => Float_Value   : Float := 0.0;
+            when Boolean_Type => Boolean_Value : Boolean := False;
+            when UB_String_Type => UB_String_Value : Unbounded_String :=
+                                                           To_Unbounded_String ("");
         end case;
     end record;
 

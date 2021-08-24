@@ -17,6 +17,9 @@ package body Encode_Utils is
     function Encode_Check_Unknown
       (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
        return ML_Types.Value_Data_List;
+    function Map_To_Integer (Values        : ML_Types.Value_Data_List;
+                             Uniques       : ML_Types.Value_Data_List)
+                             return Natural_List;
 
     --  -------------------------------------------------------------------------
 
@@ -60,19 +63,20 @@ package body Encode_Utils is
     end Encode;
 
     --  -------------------------------------------------------------------------
-
     --  Values : values to encode.
     --  Uniques : unique values in Values; Uniques needs to be sorted.
     --  Check_Unknown : if True check Values for values that are not in Uniques
     --  and raise an error.
     function Encode (Values        : ML_Types.Value_Data_List;
-                     Encoded       : out Natural_List;
+--                       Encoded       : out Natural_List;
                      Uniques       : ML_Types.Value_Data_List;
                      Check_Unknown : Boolean := True)
-                     return ML_Types.Value_Data_List is
-        Sorted_Values : ML_Types.Value_Data_List := Values;
+                     return Natural_List is
+--          Sorted_Values : ML_Types.Value_Data_List := Values;
         Diff          : ML_Types.Value_Data_List;
+        Result        : Natural_List;
     begin
+        Result := Map_To_Integer (Values, Uniques);
         if Check_Unknown then
             Put_Line ("Encode_Utils.Encode Check_Unknown.");
             Diff := Encode_Check_Unknown (Values, Uniques);
@@ -86,18 +90,46 @@ package body Encode_Utils is
             end if;
         end if;
 
-        ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
-        for index in Uniques.First_Index .. Uniques.Last_Index loop
-            Encoded.Append (index);
-        end loop;
+--          ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
+--          for index in Uniques.First_Index .. Uniques.Last_Index loop
+--              Encoded.Append (index);
+--          end loop;
 
-        Classifier_Utilities.Print_Value_List
-          ("Encode_Utils.Encode Uniques", Uniques);
-        Classifier_Utilities.Print_Natural_List
-          ("Encode_Utils.Encode Encoded", Encoded);
-        return Uniques;
+--          Classifier_Utilities.Print_Value_List
+--            ("Encode_Utils.Encode Uniques", Uniques);
+--          Classifier_Utilities.Print_Natural_List
+--            ("Encode_Utils.Encode Encoded", Encoded);
+        return Result;
 
     end Encode;
+
+    --  -------------------------------------------------------------------------
+    --  Map each value based on its position in uniques.
+    function Map_To_Integer (Values        : ML_Types.Value_Data_List;
+                             Uniques       : ML_Types.Value_Data_List)
+                             return Natural_List is
+        use ML_Types;
+        use Value_Data_Package;
+        Values_Curs  : Value_Data_Package.Cursor := Values.First;
+        Uniques_Curs : Value_Data_Package.Cursor := Uniques.First;
+        Result       : Natural_List;
+        aValue       : Value_Record;
+    begin
+        Result.Set_Length (Values.Length);
+        for index in Result.First_Index .. Result.Last_Index loop
+            Result (index) := 0;
+        end loop;
+
+        while Has_Element (Values_Curs) loop
+            aValue := Element (Values_Curs);
+            Uniques_Curs := Uniques.Find (aValue);
+            Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs);
+            Next (Values_Curs);
+        end loop;
+
+        return Result;
+
+    end Map_To_Integer;
 
     --  -------------------------------------------------------------------------
 
