@@ -58,7 +58,7 @@ package ML_Types is
 
     package Values_Package is new Ada.Containers.Vectors
       (Class_Range, Value_Data);
-    subtype Value_Set is Values_Package.Vector;
+    subtype Value_List is Values_Package.Vector;
 
     type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
         case Value_Kind is

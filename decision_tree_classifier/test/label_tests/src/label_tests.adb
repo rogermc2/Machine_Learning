@@ -59,25 +59,31 @@ package body Label_Tests is
       use Classifier_Utilities;
       LE     : Label_Encoder;
       Values : Value_Data_List;
-      Val    : Value_Record (Integer_Type);
-      --        C_Fit  : Natural_List;
+--        Val    : Value_Record (Integer_Type);
+      Transformed  : Classifier_Types.Natural_List;
    begin
-      Val.Integer_Value := 1;
-      Values.Append (Val);
-      Values.Append (Val);
-      Val.Integer_Value := 4;
-      Values.Append (Val);
-      Val.Integer_Value := 5;
-      Values.Append (Val);
-      Val.Integer_Value := -1;
-      Values.Append (Val);
-      Val.Integer_Value := 0;
-      Values.Append (Val);
+--        Val.Integer_Value := 1;
+--        Values.Append (Val);
+--        Values.Append (Val);
+--        Val.Integer_Value := 4;
+--        Values.Append (Val);
+--        Val.Integer_Value := 5;
+--        Values.Append (Val);
+--        Val.Integer_Value := -1;
+--        Values.Append (Val);
+--        Val.Integer_Value := 0;
+--        Values.Append (Val);
+      Values := To_Integer_Value_List ((1, 4, 5, -1, 0));
       Fit (LE,Values);
-      --        C_Fit := LE.Classes;
       Print_Value_List
         ("Label_Tests Test_Label_Encoder_Negative_Integers Classes",
          LE.Classes);
+
+      Transformed := Transform
+          (To_Integer_Value_List ((0, 1, 4, 4, 5,  -1, -1)));
+      Print_Natural_List
+        ("Label_Tests Test_Label_Encoder_Negative_Integers transformed data",
+         Transformed);
    end Test_Label_Encoder_Negative_Integers;
 
    --  -------------------------------------------------------------------------

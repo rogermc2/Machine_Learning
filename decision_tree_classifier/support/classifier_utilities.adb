@@ -173,6 +173,34 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
+    function To_Integer_List (A : Integer_Array) return Integer_List is
+        A_List : Integer_List;
+    begin
+        for index in A'Range loop
+            A_List.Append (A (index));
+        end loop;
+        return A_List;
+
+    end To_Integer_List;
+
+    --  -------------------------------------------------------------------------
+
+    function To_Integer_Value_List (A : Integer_Array)
+                                    return ML_Types.Value_Data_List is
+        use ML_Types;
+        Data   : Value_Record (Integer_Type);
+        A_List : Value_Data_List;
+    begin
+        for index in A'Range loop
+            Data.Integer_Value := A (index);
+            A_List.Append (Data);
+        end loop;
+        return A_List;
+
+    end To_Integer_Value_List;
+
+    --  -------------------------------------------------------------------------
+
     function Unique (Nums : Integer_List) return Integer_List is
         use Int_Sets;
         use Integer_Package;
