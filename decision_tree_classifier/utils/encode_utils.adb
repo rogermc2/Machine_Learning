@@ -123,7 +123,7 @@ package body Encode_Utils is
         while Has_Element (Values_Curs) loop
             aValue := Element (Values_Curs);
             Uniques_Curs := Uniques.Find (aValue);
-            Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs);
+            Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs) - 1;
             Next (Values_Curs);
         end loop;
 
