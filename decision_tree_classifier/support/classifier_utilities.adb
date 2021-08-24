@@ -185,6 +185,18 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
+    function To_Natural_List (A : Natural_Array) return Natural_List is
+        A_List : Natural_List;
+    begin
+        for index in A'Range loop
+            A_List.Append (A (index));
+        end loop;
+        return A_List;
+
+    end To_Natural_List;
+
+    --  -------------------------------------------------------------------------
+
     function To_Integer_Value_List (A : Integer_Array)
                                     return ML_Types.Value_Data_List is
         use ML_Types;
@@ -198,6 +210,18 @@ package body Classifier_Utilities is
         return A_List;
 
     end To_Integer_Value_List;
+
+    --  -------------------------------------------------------------------------
+
+    function To_Natural_Value_List (A : Natural_Array)
+                                    return ML_Types.Value_Data_List is
+        Int_Array : Integer_Array (1 .. A'Length);
+    begin
+        for index in A'Range loop
+            Int_Array (index) := A (index);
+        end loop;
+        return To_Integer_Value_List (Int_Array);
+    end To_Natural_Value_List;
 
     --  -------------------------------------------------------------------------
 

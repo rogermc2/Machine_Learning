@@ -57,9 +57,12 @@ package body Label_Tests is
         use ML_Types;
         use Label;
         use Classifier_Utilities;
-        LE     : Label_Encoder;
-        Values : Value_Data_List;
-        Transformed  : Classifier_Types.Natural_List;
+        use Classifier_Types.Natural_Package;
+        Expected_Transform : constant Classifier_Types.Natural_List :=
+                               To_Natural_List ((1, 2, 3, 3, 4, 0, 0));
+        LE                 : Label_Encoder;
+        Values             : Value_Data_List;
+        Transformed        : Classifier_Types.Natural_List;
     begin
         Values := To_Integer_Value_List ((1, 4, 5, -1, 0));
         Fit (LE, Values);
@@ -70,9 +73,15 @@ package body Label_Tests is
 
         Transformed := Transform
           (LE, To_Integer_Value_List ((0, 1, 4, 4, 5, -1, -1)));
-        Print_Natural_List
-          ("Label_Tests Test_Label_Encoder_Negative_Integers transformed data",
-           Transformed);
+        Put
+          ("Label_Tests Test_Label_Encoder_Negative_Integers transform test ");
+        if Transformed = Expected_Transform then
+            Put_Line ("passed");
+        else
+            Put_Line ("failed");
+            Print_Natural_List ("Transformed data", Transformed);
+            Print_Natural_List ("Expected", Expected_Transform);
+        end if;
 
     end Test_Label_Encoder_Negative_Integers;
 

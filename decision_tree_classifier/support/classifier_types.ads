@@ -9,6 +9,7 @@ package Classifier_Types is
 
    type Integer_Array is array (Integer range <>) of Integer;
    type Float_Array is array (Integer range <>) of Float;
+   type Natural_Array is array (Integer range <>) of Natural;
 
    package Integer_Array_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Integer_Array);
