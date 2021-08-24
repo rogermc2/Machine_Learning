@@ -67,19 +67,14 @@ package body Label is
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
-   --  Balanced class weights should be given by
-   --  n_samples / (n_classes * np.bincount(y))
    --  Transform returns labels as normalized encodings
-   function Transform (Self : in out Label_Encoder;
-                       Y    : ML_Types.Value_Data_List)
+   function Transform (Y    : ML_Types.Value_Data_List)
                        return Natural_List is
       Labels  : Natural_List := Natural_Package.Empty_Vector;
       Uniques : ML_Types.Value_Data_List;
    begin
-      pragma Warnings (Off, Uniques);
       if not Y.Is_Empty then
          Uniques := Encode_Utils.Encode (Y, Labels, Uniques);
-         --        Self.Classes := Labels;
       end if;
       return Labels;
    end Transform;

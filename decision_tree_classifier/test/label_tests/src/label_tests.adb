@@ -20,24 +20,30 @@ package body Label_Tests is
    procedure Test_Label_Encoder_Empty_Array
      (Values : ML_Types.Value_Data_List) is
       use Classifier_Types;
+      use ML_Types;
+      use Value_Data_Package;
       use Natural_Package;
       use Label;
-      LE  : Label_Encoder;
-      T   : Natural_List;
+      Empty_List          : constant Natural_List :=
+                                Natural_Package.Empty_Vector;
+      LE                  : Label_Encoder;
+      Transformed         : Natural_List;
+      Inverse_Transformed : ML_Types.Value_Data_List;
    begin
       Fit (LE, Values);
       --  test empty transform
-      T := Transform (LE, Values);
+      Transformed := Transform (Values);
       Put ("Label_Tests.Test_Label_Encoder_Empty_Array: ");
-      if T = Empty_Vector then
+      if Transformed = Natural_Package.Empty_Vector then
          Put_Line ("Empty transform test passed");
       else
          Put_Line ("Empty transform test failed");
       end if;
+
       --  test empty inverse transform
-      T := Inverse_Transform (LE, Values);
+      Inverse_Transformed := Inverse_Transform (LE, Empty_List);
       Put ("Label_Tests.Test_Label_Encoder_Empty_Array: ");
-      if T = Empty_Vector then
+      if Inverse_Transformed = Value_Data_Package.Empty_Vector then
          Put_Line ("Empty inverse transform test passed");
       else
          Put_Line ("Empty inverse transform test failed");
