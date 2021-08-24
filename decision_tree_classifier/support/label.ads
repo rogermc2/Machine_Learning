@@ -31,7 +31,8 @@ package Label is
    function Inverse_Transform  (Self : in out Label_Encoder;
                                Y    : Natural_List)
                                return ML_Types.Value_Data_List;
-   function Transform (Y    : ML_Types.Value_Data_List)
+   function Transform (Self : in out Label_Encoder;
+                       Y    : ML_Types.Value_Data_List)
                        return Natural_List;
 
 end Label;

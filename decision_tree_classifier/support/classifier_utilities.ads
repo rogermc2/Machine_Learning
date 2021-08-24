@@ -19,6 +19,7 @@ package Classifier_Utilities is
                                  Start, Finish : Integer);
     procedure Print_Float_List (Name  : String; theList : Float_List);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
+    procedure Print_Integer_List (Name : String; theList : Integer_List);
     procedure Print_Value_List (Name    : String;
                                 theList : ML_Types.Value_Data_List);
     procedure Print_Weights (Name : String; Data : Weight_List);

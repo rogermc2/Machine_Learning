@@ -68,13 +68,15 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  Transform returns labels as normalized encodings
-   function Transform (Y    : ML_Types.Value_Data_List)
+   function Transform (Self : in out Label_Encoder;
+                       Y    : ML_Types.Value_Data_List)
                        return Natural_List is
       Labels  : Natural_List := Natural_Package.Empty_Vector;
       Uniques : ML_Types.Value_Data_List;
    begin
+      pragma Unreferenced (Uniques);
       if not Y.Is_Empty then
-         Uniques := Encode_Utils.Encode (Y, Labels, Uniques);
+         Uniques := Encode_Utils.Encode (Y, Labels, Self.Classes);
       end if;
       return Labels;
    end Transform;
