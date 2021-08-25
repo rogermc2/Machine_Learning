@@ -10,10 +10,10 @@ package body Label_Tests is
     --  -------------------------------------------------------------------------
 
     procedure Test_Label_Encoder (Values  : ML_Types.Value_Data_List;
-                                  Classes : ML_Types.Value_Data_List) is
---            use Classifier_Types;
-          use ML_Types.Value_Data_Package;
-    --        use Natural_Package;
+                                  Classes : Classifier_Types.Natural_List) is
+--          use Classifier_Types;
+        use ML_Types.Value_Data_Package;
+        use  Classifier_Types.Natural_Package;
         use Label;
         LE                  : Label_Encoder;
     begin
@@ -77,7 +77,7 @@ package body Label_Tests is
     begin
         Values := To_Integer_Value_List ((1, 4, 5, -1, 0));
         Fit (LE, Values);
-        Print_Value_List
+        Print_Natural_List
           ("Label_Tests Test_Label_Encoder_Negative_Integers Classes",
            LE.Classes);
         New_Line;

@@ -17,9 +17,6 @@ package body Encode_Utils is
     function Encode_Check_Unknown
       (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
        return ML_Types.Value_Data_List;
-    function Map_To_Integer (Values        : ML_Types.Value_Data_List;
-                             Uniques       : ML_Types.Value_Data_List)
-                             return Natural_List;
 
     --  -------------------------------------------------------------------------
 
@@ -68,11 +65,9 @@ package body Encode_Utils is
     --  Check_Unknown : if True check Values for values that are not in Uniques
     --  and raise an error.
     function Encode (Values        : ML_Types.Value_Data_List;
---                       Encoded       : out Natural_List;
                      Uniques       : ML_Types.Value_Data_List;
                      Check_Unknown : Boolean := True)
                      return Natural_List is
---          Sorted_Values : ML_Types.Value_Data_List := Values;
         Diff          : ML_Types.Value_Data_List;
         Result        : Natural_List;
     begin
@@ -90,23 +85,14 @@ package body Encode_Utils is
             end if;
         end if;
 
---          ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
---          for index in Uniques.First_Index .. Uniques.Last_Index loop
---              Encoded.Append (index);
---          end loop;
-
---          Classifier_Utilities.Print_Value_List
---            ("Encode_Utils.Encode Uniques", Uniques);
---          Classifier_Utilities.Print_Natural_List
---            ("Encode_Utils.Encode Encoded", Encoded);
         return Result;
 
     end Encode;
 
     --  -------------------------------------------------------------------------
     --  Map each value based on its position in uniques.
-    function Map_To_Integer (Values        : ML_Types.Value_Data_List;
-                             Uniques       : ML_Types.Value_Data_List)
+    function Map_To_Integer (Values  : ML_Types.Value_Data_List;
+                             Uniques : ML_Types.Value_Data_List)
                              return Natural_List is
         use ML_Types;
         use Value_Data_Package;

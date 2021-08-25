@@ -16,7 +16,7 @@ package body Label is
    --  Fit fits label encoder
    procedure Fit (Encoder : in out Label_Encoder; Y : ML_Types.Value_Data_List) is
    begin
-      Encoder.Classes := Encode_Utils.Unique (Y);
+      Encoder.Uniques := Encode_Utils.Unique (Y);
    end Fit;
 
    --  -------------------------------------------------------------------------
@@ -28,9 +28,10 @@ package body Label is
                            return Natural_List is
       Encoded_Labels : Natural_List;
    begin
-      Self.Classes := Encode_Utils.Unique (Y, Encoded_Labels);
+      Self.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
+      Self.Classes := Encode_Utils.Map_To_Integer (Y, Self.Uniques);
       Classifier_Utilities.Print_Value_List
-        ("Label.Fit_Transform Classes", Self.Classes);
+        ("Label.Fit_Transform Uniques", Self.Uniques);
       Classifier_Utilities.Print_Natural_List
         ("Label.Fit_Transform Labels", Encoded_Labels);
       return Encoded_Labels;
@@ -59,7 +60,7 @@ package body Label is
          end if;
 
          for index in 1 .. Positive (Self.Classes.Length) loop
-            Result.Append (Self.Classes.Element (index));
+            Result.Append (Self.Uniques.Element (index));
          end loop;
       end if;
 
@@ -74,7 +75,7 @@ package body Label is
       Labels  : Natural_List := Natural_Package.Empty_Vector;
    begin
       if not Y.Is_Empty then
-         Labels := Encode_Utils.Encode (Y, Self.Classes);
+         Labels := Encode_Utils.Encode (Y, Self.Uniques);
       end if;
       return Labels;
    end Transform;
