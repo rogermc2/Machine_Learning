@@ -11,14 +11,13 @@ package body Label_Tests is
 
     procedure Test_Label_Encoder (Values  : ML_Types.Value_Data_List;
                                   Classes : Classifier_Types.Natural_List) is
---          use Classifier_Types;
         use ML_Types.Value_Data_Package;
         use  Classifier_Types.Natural_Package;
         use Label;
-        LE                  : Label_Encoder;
+        LE : Label_Encoder (Encoder_Unique);
     begin
-        Fit (LE, Values);
         Put ("Label_Tests.Test_Label_Encoder: ");
+        Fit (LE, Values);
         if LE.Classes = Classes then
             Put_Line ("Class match test passed");
         else
@@ -37,7 +36,7 @@ package body Label_Tests is
         use Label;
         Empty_List          : constant Natural_List :=
                                 Natural_Package.Empty_Vector;
-        LE                  : Label_Encoder;
+        LE                  : Label_Encoder (Encoder_Unique);
         Transformed         : Natural_List;
         Inverse_Transformed : ML_Types.Value_Data_List;
     begin
@@ -71,7 +70,7 @@ package body Label_Tests is
         use Classifier_Types.Natural_Package;
         Expected_Transform : constant Classifier_Types.Natural_List :=
                                To_Natural_List ((1, 2, 3, 3, 4, 0, 0));
-        LE                 : Label_Encoder;
+        LE                 : Label_Encoder (Encoder_Unique);
         Values             : Value_Data_List;
         Transformed        : Classifier_Types.Natural_List;
     begin
