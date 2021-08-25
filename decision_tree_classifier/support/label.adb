@@ -38,7 +38,8 @@ with Encode_Utils;
 package body Label is
 
    --  -------------------------------------------------------------------------
-   --  Fit fits label encoder
+   --  Fit label encoder sets Encoder.Uniques to the unique values of
+   --  input vector Y
    procedure Fit (Encoder : in out Label_Encoder; Y : ML_Types.Value_Data_List) is
    begin
       Encoder.Uniques := Encode_Utils.Unique (Y);
