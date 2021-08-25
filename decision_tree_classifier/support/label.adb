@@ -4,6 +4,31 @@
 --  n is the number of distinct labels. If a label repeats it assigns the same
 --  value to as assigned earlier. The categorical values have been converted into
 --  numeric values.
+--    Examples
+--      --------
+--      `LabelEncoder` can be used to normalize labels:
+--      >>> from sklearn import preprocessing
+--      >>> le = preprocessing.LabelEncoder()
+--      >>> le.fit([1, 2, 2, 6])
+--      LabelEncoder()
+--      >>> le.classes_
+--      array([1, 2, 6])
+--      >>> le.transform([1, 1, 2, 6])
+--      array([0, 0, 1, 2]...)
+--      >>> le.inverse_transform([0, 0, 1, 2])
+--      array([1, 1, 2, 6])
+
+--      It can also be used to transform non-numerical labels (as long as they are
+--      hashable and comparable) to numerical labels.
+--      >>> le = preprocessing.LabelEncoder()
+--      >>> le.fit(["paris", "paris", "tokyo", "amsterdam"])
+--      LabelEncoder()
+--      >>> list(le.classes_)
+--      ['amsterdam', 'paris', 'tokyo']
+--      >>> le.transform(["tokyo", "tokyo", "paris"])
+--      array([2, 2, 1]...)
+--      >>> list(le.inverse_transform([2, 2, 1]))
+--      ['tokyo', 'tokyo', 'paris']
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
