@@ -7,12 +7,23 @@ with Label;
 
 package body Label_Tests is
 
-    procedure Test_Label_Encoder is
-    --        use Classifier_Types;
-    --        use Float_Package;
+    --  -------------------------------------------------------------------------
+
+    procedure Test_Label_Encoder (Values  : ML_Types.Value_Data_List;
+                                  Classes : ML_Types.Value_Data_List) is
+--            use Classifier_Types;
+          use ML_Types.Value_Data_Package;
     --        use Natural_Package;
+        use Label;
+        LE                  : Label_Encoder;
     begin
-        null;
+        Fit (LE, Values);
+        Put ("Label_Tests.Test_Label_Encoder: ");
+        if LE.Classes = Classes then
+            Put_Line ("Class match test passed");
+        else
+            Put_Line ("Class match test failed");
+        end if;
     end Test_Label_Encoder;
 
     --  -------------------------------------------------------------------------
