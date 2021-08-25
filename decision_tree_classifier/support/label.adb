@@ -42,7 +42,7 @@ package body Label is
     procedure Fit (Encoder : in out Label_Encoder;
                    Y : ML_Types.Value_Data_List) is
     begin
-        if Encoder.Kind = Class_Unique then
+        if Encoder.Encoder_Kind = Class_Unique then
             Encoder.Uniques := Encode_Utils.Unique (Y);
         else
             raise Label_Error with

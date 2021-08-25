@@ -10,15 +10,14 @@ package body Label_Tests is
     --  -------------------------------------------------------------------------
 
     procedure Test_Label_Encoder (Values  : ML_Types.Value_Data_List;
-                                  Classes : Classifier_Types.Natural_List) is
+                                  Classes : ML_Types.Value_Data_List) is
         use ML_Types.Value_Data_Package;
-        use  Classifier_Types.Natural_Package;
         use Label;
-        LE : Label_Encoder (Encoder_Unique);
+        LE : Label_Encoder (Class_Unique);
     begin
         Put ("Label_Tests.Test_Label_Encoder: ");
         Fit (LE, Values);
-        if LE.Classes = Classes then
+        if LE.Uniques = Classes then
             Put_Line ("Class match test passed");
         else
             Put_Line ("Class match test failed");
@@ -36,7 +35,7 @@ package body Label_Tests is
         use Label;
         Empty_List          : constant Natural_List :=
                                 Natural_Package.Empty_Vector;
-        LE                  : Label_Encoder (Encoder_Unique);
+        LE                  : Label_Encoder (Class_Unique);
         Transformed         : Natural_List;
         Inverse_Transformed : ML_Types.Value_Data_List;
     begin
@@ -70,15 +69,15 @@ package body Label_Tests is
         use Classifier_Types.Natural_Package;
         Expected_Transform : constant Classifier_Types.Natural_List :=
                                To_Natural_List ((1, 2, 3, 3, 4, 0, 0));
-        LE                 : Label_Encoder (Encoder_Unique);
+        LE                 : Label_Encoder (Class_Unique);
         Values             : Value_Data_List;
         Transformed        : Classifier_Types.Natural_List;
     begin
         Values := To_Integer_Value_List ((1, 4, 5, -1, 0));
         Fit (LE, Values);
-        Print_Natural_List
+        Print_Value_List
           ("Label_Tests Test_Label_Encoder_Negative_Integers Classes",
-           LE.Classes);
+           LE.Uniques);
         New_Line;
 
         Transformed := Transform
