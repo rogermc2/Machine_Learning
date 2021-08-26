@@ -10,7 +10,7 @@ package body Utilities is
 
    procedure Print_Results_Question (Question : ML_Types.Question_Data);
    function Unique_Values (Rows    : Rows_Vector;
-                           Feature : Feature_Name_Type) return Value_Set;
+                           Feature : Feature_Name_Type) return Value_List;
 
    --  --------------------------------------------------------------------------
 
@@ -675,7 +675,7 @@ package body Utilities is
    procedure Print_Unique_Values (Rows    : Rows_Vector;
                                   Feature : Feature_Name_Type) is
       use Values_Package;
-      Values : constant Value_Set := Unique_Values (Rows, Feature);
+      Values : constant Value_List := Unique_Values (Rows, Feature);
       Curs   : Cursor := Values.First;
       Data   : Value_Data;
    begin
@@ -805,7 +805,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Values (Rows    : Rows_Vector;
-                           Feature : Feature_Name_Type) return Value_Set is
+                           Feature : Feature_Name_Type) return Value_List is
       use Ada.Containers;
       use Rows_Package;
       use Values_Package;
@@ -818,7 +818,7 @@ package body Utilities is
       Feature_Name      : Feature_Name_Type;
       Feature_Data_Type : Data_Type;
       Value_String      : Unbounded_String;
-      theSet            : Value_Set;
+      theSet            : Value_List;
 
       procedure Add_To_Set (Value : Value_Data) is
       begin

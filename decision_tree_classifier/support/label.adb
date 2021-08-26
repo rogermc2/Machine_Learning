@@ -43,7 +43,7 @@ package body Label is
                    Y : ML_Types.Value_Data_List) is
     begin
         if Encoder.Encoder_Kind = Class_Unique then
-            Encoder.Uniques := Encode_Utils.Unique (Y);
+         Encoder.Uniques := Encode_Utils.Unique (Y);
         else
             raise Label_Error with
               "Label.Fit called with label encoder instead of unique encode";
