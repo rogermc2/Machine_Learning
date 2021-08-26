@@ -2,6 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
+with Encode_Utils;
 with Label;
 
 package body Label_Tests is
@@ -9,14 +10,14 @@ package body Label_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Label_Encoder (Values  : ML_Types.Value_Data_List;
-                                 Uniques : ML_Types.Value_Data_List;
                                  Classes : Classifier_Types.Natural_List) is
       use ML_Types.Value_Data_Package;
       use Classifier_Utilities;
       --          use Classifier_Types.Natural_Package;
       use Label;
-      LE_U : Label_Encoder (Class_Unique);
-      OK   : Boolean := True;
+      Uniques : constant ML_Types.Value_Data_List := Encode_Utils.Unique (Values);
+      LE_U    : Label_Encoder (Class_Unique);
+      OK      : Boolean := True;
    begin
       --          Put_Line ("Label_Tests.Test_Label_Encoder");
       Fit (LE_U, Values);
