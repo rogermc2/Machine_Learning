@@ -19,7 +19,8 @@ package body Label_Tests is
       LE_U    : Label_Encoder (Class_Unique);
       OK      : Boolean := True;
    begin
-      --          Put_Line ("Label_Tests.Test_Label_Encoder");
+      Print_Value_List ("Values", Values);
+      Print_Value_List ("Uniques", Uniques);
       Fit (LE_U, Values);
       for index in Uniques.First_Index .. Uniques.Last_Index loop
          OK := OK and LE_U.Uniques.Contains (Uniques.Element (index));
@@ -29,9 +30,7 @@ package body Label_Tests is
          Put_Line ("Class match test passed");
       else
          Put_Line ("Class match test failed");
-         Print_Value_List ("Values", Values);
-         Print_Value_List ("Uniques", LE_U.Uniques);
-         Print_Value_List ("Expected Uniques", Uniques);
+         Print_Value_List ("Fit Uniques", LE_U.Uniques);
       end if;
    end Test_Label_Encoder;
 
