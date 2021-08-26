@@ -15,8 +15,8 @@ package Label is
      (Param_Label, Float);
    subtype Params_Map is Params_Dictionary.Map;
 
-   --  Label_Encoder should be used to encode target values, i.e. Y and
-   --  not the input X.
+   --  Label_Encoder should be used to encode target values,
+   --  i.e. Y and not the input X.
    type Label_Encoder (Encoder_Kind : Class_Type) is record
       --  Estimator_Kind declared in base.py class ClassifierMixin
       Estimator_Kind : Estimator.Estimator_Type :=

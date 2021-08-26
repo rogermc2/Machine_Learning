@@ -59,7 +59,6 @@ package body Label is
                            return Natural_List is
         Encoded_Labels : Natural_List;
     begin
-        Self.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
         Self.Classes := Encode_Utils.Map_To_Integer (Y, Self.Uniques);
         Classifier_Utilities.Print_Value_List
           ("Label.Fit_Transform Uniques", Self.Uniques);
@@ -106,9 +105,15 @@ package body Label is
         Labels  : Natural_List := Natural_Package.Empty_Vector;
     begin
         if not Y.Is_Empty then
-            Labels := Encode_Utils.Encode (Y, Self.Uniques);
+            if Self.Encoder_Kind = Class_Label then
+                Labels := Encode_Utils.Encode (Y, Self.Classes);
+            else
+                raise Label_Error with
+                "Label.Transform requires class type: Class_Label.";
+            end if;
         end if;
         return Labels;
+
     end Transform;
 
     --  -------------------------------------------------------------------------
