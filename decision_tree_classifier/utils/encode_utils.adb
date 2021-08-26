@@ -73,7 +73,6 @@ package body Encode_Utils is
     begin
         Result := Map_To_Integer (Values, Uniques);
         if Check_Unknown then
-            Put_Line ("Encode_Utils.Encode Check_Unknown.");
             Diff := Encode_Check_Unknown (Values, Uniques);
             if not Diff.Is_Empty then
                 New_Line;

@@ -105,11 +105,11 @@ package body Label is
         Labels  : Natural_List := Natural_Package.Empty_Vector;
     begin
         if not Y.Is_Empty then
-            if Self.Encoder_Kind = Class_Label then
-                Labels := Encode_Utils.Encode (Y, Self.Classes);
+            if Self.Encoder_Kind = Class_Unique then
+                Labels := Encode_Utils.Encode (Y, Self.Uniques);
             else
                 raise Label_Error with
-                "Label.Transform requires class type: Class_Label.";
+                "Label.Transform called with invalid encoder type.";
             end if;
         end if;
         return Labels;

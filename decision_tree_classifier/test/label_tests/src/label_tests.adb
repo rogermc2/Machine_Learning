@@ -9,14 +9,17 @@ package body Label_Tests is
     --  -------------------------------------------------------------------------
 
     procedure Test_Label_Encoder (Values  : ML_Types.Value_Data_List;
+                                  Uniques : ML_Types.Value_Data_List;
                                   Classes : Classifier_Types.Natural_List) is
-        use Classifier_Types.Natural_Package;
+        use ML_Types.Value_Data_Package;
+--          use Classifier_Types.Natural_Package;
         use Label;
-        LE : Label_Encoder (Class_Label);
+        LE_U : Label_Encoder (Class_Unique);
     begin
-        LE.Classes := Transform (LE, Values);
+--          Put_Line ("Label_Tests.Test_Label_Encoder");
+        Fit (LE_U, Values);
         Put ("Label_Tests.Test_Label_Encoder: ");
-        if LE.Classes = Classes then
+        if LE_U.Uniques = Uniques then
             Put_Line ("Class match test passed");
         else
             Put_Line ("Class match test failed");
@@ -73,14 +76,13 @@ package body Label_Tests is
         Values             : constant Value_Data_List :=
                                To_Integer_Value_List ((1, 4, 5, -1, 0));
         LE_U               : Label_Encoder (Class_Unique);
-        LE_L               : Label_Encoder (Class_Label);
         Transformed        : Classifier_Types.Natural_List;
     begin
         Expected_Uniques := To_Integer_Value_List ((-1, 0, 1, 4, 5 ));
         New_Line;
         Fit (LE_U, Values);
         Put
-          ("Label_Tests Test_Label_Encoder_Negative_Integers Uniques test ");
+          ("Label_Tests Test_Label_Encoder_Negative_Integers, Uniques test ");
         if LE_U.Uniques = Expected_Uniques then
             Put_Line ("passed");
         else
@@ -90,9 +92,9 @@ package body Label_Tests is
         end if;
 
         Transformed := Transform
-          (LE_L, To_Integer_Value_List ((0, 1, 4, 4, 5, -1, -1)));
+          (LE_U, To_Integer_Value_List ((0, 1, 4, 4, 5, -1, -1)));
         Put
-          ("Label_Tests Test_Label_Encoder_Negative_Integers labels test ");
+          ("Label_Tests Test_Label_Encoder_Negative_Integers, Labels test ");
         if Transformed = Expected_Labels then
             Put_Line ("passed");
         else
