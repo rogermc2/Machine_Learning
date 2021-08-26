@@ -19,6 +19,7 @@ package body Label_Tests is
       LE_U    : Label_Encoder (Class_Unique);
       OK      : Boolean := True;
    begin
+      Put_Line ("Label_Tests.Test_Label_Encoder:");
       Print_Value_List ("Values", Values);
       Print_Value_List ("Uniques", Uniques);
       Fit (LE_U, Values);
