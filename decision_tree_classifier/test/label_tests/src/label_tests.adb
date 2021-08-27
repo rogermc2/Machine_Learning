@@ -15,13 +15,13 @@ package body Label_Tests is
       use Classifier_Utilities;
       use Classifier_Types.Natural_Package;
       use Label;
-      LE_U    : Label_Encoder (Class_Unique);
-      Labels : Classifier_Types.Natural_List;
-      OK      : Boolean := True;
+      LE_U              : Label_Encoder (Class_Unique);
+      Labels            : Classifier_Types.Natural_List;
+      Recovered_Values  : ML_Types.Value_Data_List;
+      OK                : Boolean := True;
    begin
       Put_Line ("Label_Tests.Test_Label_Encoder:");
       Print_Value_List ("Values", Values);
-      Print_Value_List ("Uniques", Classes);
       Fit (LE_U, Values);
       for index in Classes.First_Index .. Classes.Last_Index loop
          OK := OK and LE_U.Uniques.Contains (Classes.Element (index));
@@ -42,6 +42,17 @@ package body Label_Tests is
          Put_Line ("Label match test failed");
          Print_Natural_List ("Labels", Labels);
          Print_Natural_List ("Expected labels", Expected_Labels);
+      end if;
+
+      Recovered_Values := Inverse_Transform (LE_U, Labels);
+      Put ("Label_Tests.Test_Label_Encoder: ");
+      if Recovered_Values = Values then
+         Put_Line ("Label Inverse test passed");
+      else
+         Put_Line ("Label Inverse test failed");
+         Print_Natural_List ("Labels", Labels);
+         Print_Value_List ("Recovered values", Recovered_Values);
+         Print_Value_List ("Original values", Values);
       end if;
 
    end Test_Label_Encoder;

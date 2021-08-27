@@ -37,85 +37,85 @@ with Encode_Utils;
 
 package body Label is
 
-    --  -------------------------------------------------------------------------
-    --  Fit fits label encoder
-    procedure Fit (Encoder : in out Label_Encoder;
-                   Y : ML_Types.Value_Data_List) is
-    begin
-        if Encoder.Encoder_Kind = Class_Unique then
+   --  -------------------------------------------------------------------------
+   --  Fit fits label encoder
+   procedure Fit (Encoder : in out Label_Encoder;
+                  Y       : ML_Types.Value_Data_List) is
+   begin
+      if Encoder.Encoder_Kind = Class_Unique then
          Encoder.Uniques := Encode_Utils.Unique (Y);
-        else
+      else
+         raise Label_Error with
+           "Label.Fit called with label encoder instead of unique encode";
+      end if;
+   end Fit;
+
+   --  -------------------------------------------------------------------------
+   --  Fit_Transform fits label encoder and returns encoded labels
+   --  Balanced class weights should be given by
+   --  n_samples / (n_classes * np.bincount(y))
+   function Fit_Transform (Self : in out Label_Encoder;
+                           Y    : ML_Types.Value_Data_List)
+                            return Natural_List is
+      Encoded_Labels : Natural_List;
+   begin
+      Self.Classes := Encode_Utils.Map_To_Integer (Y, Self.Uniques);
+      Classifier_Utilities.Print_Value_List
+        ("Label.Fit_Transform Uniques", Self.Uniques);
+      Classifier_Utilities.Print_Natural_List
+        ("Label.Fit_Transform Labels", Encoded_Labels);
+      return Encoded_Labels;
+
+   end Fit_Transform;
+
+   --  -------------------------------------------------------------------------
+   --   Inverse_Transform transforms labels back to original encoding
+   function Inverse_Transform (Self    : in out Label_Encoder;
+                               Labels  : Natural_List)
+                                return ML_Types.Value_Data_List is
+      aRange  : Natural_List := Natural_Package.Empty_Vector;
+      Diff    : Natural_List;
+      Result  : ML_Types.Value_Data_List :=
+                  ML_Types.Value_Data_Package.Empty_Vector;
+   begin
+      if not Labels.Is_Empty then
+         for index in 1 .. Positive (Self.Uniques.Length) loop
+            aRange.Append (index - 1);
+         end loop;
+
+         Diff := Classifier_Utilities.Set_Diff (Labels, aRange);
+         if not Diff.Is_Empty then
             raise Label_Error with
-              "Label.Fit called with label encoder instead of unique encode";
-        end if;
-    end Fit;
+              "Label.Inverse_Transform Labels vector contains previously unseen labels.";
+         end if;
 
-    --  -------------------------------------------------------------------------
-    --  Fit_Transform fits label encoder and returns encoded labels
-    --  Balanced class weights should be given by
-    --  n_samples / (n_classes * np.bincount(y))
-    function Fit_Transform (Self : in out Label_Encoder;
-                            Y    : ML_Types.Value_Data_List)
-                           return Natural_List is
-        Encoded_Labels : Natural_List;
-    begin
-        Self.Classes := Encode_Utils.Map_To_Integer (Y, Self.Uniques);
-        Classifier_Utilities.Print_Value_List
-          ("Label.Fit_Transform Uniques", Self.Uniques);
-        Classifier_Utilities.Print_Natural_List
-          ("Label.Fit_Transform Labels", Encoded_Labels);
-        return Encoded_Labels;
+         for index in 1 .. Positive (Labels.Length) loop
+            Result.Append (Self.Uniques.Element (Labels.Element (index) + 1));
+         end loop;
+      end if;
+      return Result;
 
-    end Fit_Transform;
+   end Inverse_Transform;
 
-    --  -------------------------------------------------------------------------
-    --   Inverse_Transform transforms labels back to original encoding
-    function Inverse_Transform (Self : in out Label_Encoder;
-                                Y    : Natural_List)
-                               return ML_Types.Value_Data_List is
-        aRange  : Natural_List := Natural_Package.Empty_Vector;
-        Diff    : Natural_List;
-        Result  : ML_Types.Value_Data_List :=
-                    ML_Types.Value_Data_Package.Empty_Vector;
-    begin
-        if not Y.Is_Empty then
-            for index in 1 .. Positive (Self.Classes.Length) loop
-                aRange.Append (index - 1);
-            end loop;
+   --  -------------------------------------------------------------------------
+   --  Transform returns labels as normalized encodings
+   function Transform (Self : in out Label_Encoder;
+                       Y    : ML_Types.Value_Data_List)
+                        return Natural_List is
+      Labels  : Natural_List := Natural_Package.Empty_Vector;
+   begin
+      if not Y.Is_Empty then
+         if Self.Encoder_Kind = Class_Unique then
+            Labels := Encode_Utils.Encode (Y, Self.Uniques);
+         else
+            raise Label_Error with
+              "Label.Transform called with invalid encoder type.";
+         end if;
+      end if;
+      return Labels;
 
-            Diff := Classifier_Utilities.Set_Diff (Y, aRange);
-            if not Diff.Is_Empty then
-                raise Label_Error with
-                  "Label.Inverse_Transform Y contains previously unseen labels.";
-            end if;
+   end Transform;
 
-            for index in 1 .. Positive (Self.Classes.Length) loop
-                Result.Append (Self.Uniques.Element (index));
-            end loop;
-        end if;
-
-        return Result;
-    end Inverse_Transform;
-
-    --  -------------------------------------------------------------------------
-    --  Transform returns labels as normalized encodings
-    function Transform (Self : in out Label_Encoder;
-                        Y    : ML_Types.Value_Data_List)
-                       return Natural_List is
-        Labels  : Natural_List := Natural_Package.Empty_Vector;
-    begin
-        if not Y.Is_Empty then
-            if Self.Encoder_Kind = Class_Unique then
-                Labels := Encode_Utils.Encode (Y, Self.Uniques);
-            else
-                raise Label_Error with
-                "Label.Transform called with invalid encoder type.";
-            end if;
-        end if;
-        return Labels;
-
-    end Transform;
-
-    --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
 end Label;
