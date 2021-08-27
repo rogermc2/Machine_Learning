@@ -31,7 +31,7 @@ package Label is
 
    procedure Fit (Encoder : in out Label_Encoder;
                   Y       : ML_Types.Value_Data_List);
-   function Fit_Transform (Self : in out Label_Encoder;
+   function Fit_Transform (Encoder : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
                             return Natural_List;
    function Inverse_Transform  (Self : in out Label_Encoder;

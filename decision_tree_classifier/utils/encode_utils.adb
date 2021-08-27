@@ -284,13 +284,7 @@ package body Encode_Utils is
         end loop;
 
         Sort (Uniq_List);
-        Values_Curs := Values.First;
-        while Has_Element (Values_Curs) loop
-            aValue := Element (Values_Curs);
-            Inverse.Append (Uniq_List.Find_Index (aValue));
-            Next (Values_Curs);
-        end loop;
-
+        Inverse := Map_To_Integer (Values, Uniq_List);
         return Uniq_List;
 
     end Unique;

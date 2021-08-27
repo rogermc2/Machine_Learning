@@ -12,10 +12,12 @@ package body Label_Tests is
                                  Classes  : ML_Types.Value_Data_List;
                                  Expected_Labels : Classifier_Types.Natural_List) is
       use ML_Types.Value_Data_Package;
+      use Classifier_Types;
       use Classifier_Utilities;
       use Classifier_Types.Natural_Package;
       use Label;
       LE_U              : Label_Encoder (Class_Unique);
+--        LE_L              : Label_Encoder (Label.Class_Label);
       Labels            : Classifier_Types.Natural_List;
       Recovered_Values  : ML_Types.Value_Data_List;
       OK                : Boolean := True;
@@ -53,6 +55,18 @@ package body Label_Tests is
          Print_Natural_List ("Labels", Labels);
          Print_Value_List ("Recovered values", Recovered_Values);
          Print_Value_List ("Original values", Values);
+      end if;
+
+      LE_U.Uniques := ML_Types.Value_Data_Package.Empty_Vector;
+      Labels.Clear;
+      Labels := Fit_Transform (LE_U, Values);
+      Put ("Label_Tests.Test_Label_Encoder: ");
+      if Labels = Expected_Labels then
+         Put_Line ("Fit_Transform test passed");
+      else
+         Put_Line ("Fit_Transform test failed");
+         Print_Natural_List ("Labels", Labels);
+         Print_Natural_List ("Expected labels", Expected_Labels);
       end if;
 
    end Test_Label_Encoder;

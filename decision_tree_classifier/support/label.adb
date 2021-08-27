@@ -54,16 +54,18 @@ package body Label is
    --  Fit_Transform fits label encoder and returns encoded labels
    --  Balanced class weights should be given by
    --  n_samples / (n_classes * np.bincount(y))
-   function Fit_Transform (Self : in out Label_Encoder;
+   function Fit_Transform (Encoder : in out Label_Encoder;
                            Y    : ML_Types.Value_Data_List)
                             return Natural_List is
       Encoded_Labels : Natural_List;
    begin
-      Self.Classes := Encode_Utils.Map_To_Integer (Y, Self.Uniques);
-      Classifier_Utilities.Print_Value_List
-        ("Label.Fit_Transform Uniques", Self.Uniques);
-      Classifier_Utilities.Print_Natural_List
-        ("Label.Fit_Transform Labels", Encoded_Labels);
+      if Encoder.Encoder_Kind = Class_Unique then
+         Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
+      else
+         raise Label_Error with
+           "Label.Fit_Transform called with label encoder instead of unique encoder";
+      end if;
+
       return Encoded_Labels;
 
    end Fit_Transform;
