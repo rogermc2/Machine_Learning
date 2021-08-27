@@ -1,4 +1,5 @@
 
+--  Based on scikit-learn/sklearn/utils/tests
 with Class_Weight_Tests;
 
 procedure Test_Weight_Functions is

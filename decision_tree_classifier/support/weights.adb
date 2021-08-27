@@ -2,8 +2,8 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
+with Encode_Utils;
 with Label;
---  with Utilities;
 
 package body Weights is
 
@@ -19,11 +19,12 @@ package body Weights is
                                    Classes       : ML_Types.Value_Data_List;
                                    Y             : ML_Types.Value_Data_List)
                                    return Weight_List is
+      use Label;
       use ML_Types;
       use Natural_Package;
       Weights             : Weight_List;
-      LE                  : Label.Label_Encoder;
-      Y_Ind               : Value_Data_List;
+      LE                  : Label.Label_Encoder (Class_Unique);
+      Y_Ind               : Natural_List;
       aWeight             : Float;
       aClass              : Value_Record;
       Bins                : Natural_List;
@@ -48,11 +49,11 @@ package body Weights is
            ("Compute_Class_Weights Y", Y);
          Classifier_Utilities.Print_Value_List
            ("Compute_Class_Weights Classes", Classes);
-         Classifier_Utilities.Print_Value_List
-           ("Compute_Class_Weights Y_Ind", Y_Ind);
          Classifier_Utilities.Print_Natural_List
-           ("Compute_Class_Weights LE.Classes", LE.Classes);
-         Class_Length := Float (LE.Classes.Length);
+           ("Compute_Class_Weights Y_Ind", Y_Ind);
+         Classifier_Utilities.Print_Value_List
+           ("Compute_Class_Weights LE.Classes", LE.Uniques);
+         Class_Length := Float (LE.Uniques.Length);
          Bins := Classifier_Utilities.Bin_Count (Y_Ind);
          Classifier_Utilities.Print_Natural_List
            ("Compute_Class_Weights Bins", Bins);
@@ -151,7 +152,7 @@ package body Weights is
       for index_k in 1 .. Num_Outputs loop
          --  y_full = y[:, k]
          Y_Full := Classifier_Utilities.Get_Column (Y, index_k);
-         Classes_Full := Classifier_Utilities.Unique_Values (Y_Full, Inverse);
+         Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
          Classes_Missing.Clear;
 
          if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
@@ -169,8 +170,7 @@ package body Weights is
                Y_Subsample.Append (Y.Element (Indices.Element (index)));
             end loop;
 
-            Classes_Subsample := Classifier_Utilities.Unique_Values
-              (Y_Subsample, Inverse);
+            Classes_Subsample := Encode_Utils.Unique (Y_Subsample, Inverse);
             --  Get class weights for the subsample covering all classes in
             --  case some labels present in the original data are missing
             --  from the sample.

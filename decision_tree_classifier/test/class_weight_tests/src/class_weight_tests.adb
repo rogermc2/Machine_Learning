@@ -1,8 +1,10 @@
+--  Based on scikit-learn/sklearn/utils/tests
 
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
 with Classifier_Utilities; use Classifier_Utilities;
+with Encode_Utils;
 with ML_Types; use ML_Types;
 with Weights;
 
@@ -33,7 +35,7 @@ package body Class_Weight_Tests is
 
       New_Line;
       Put_Line ("Class_Weight_Tests");
-      Classes := Unique_Values (Y, Inverse);
+      Classes := Encode_Utils.Unique (Y, Inverse);
       Print_Value_List ("Test_Compute_Class_Weight, Classes", Classes);
       New_Line;
       Class_Weights := Weights.Compute_Class_Weights
