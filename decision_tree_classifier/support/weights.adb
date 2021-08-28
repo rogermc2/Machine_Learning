@@ -21,17 +21,15 @@ package body Weights is
                                    Y             : ML_Types.Value_Data_List)
                                    return Weight_List is
       use Label;
-      use ML_Types;
       use Natural_Package;
       Weights             : Weight_List;
       LE                  : Label.Label_Encoder (Class_Unique);
       Y_Index             : Natural_List;
       aWeight             : Float;
-      aClass              : Value_Record;
       Bins                : Natural_List;
       Recip_Freq          : Float_List;
       Transformed_Classes : Natural_List;
-      Class_Length        : Float;
+      Scale               : Float;
       Recip_Freq_Index    : Natural;
    begin
       if Weight_Kind = No_Weight then
@@ -46,44 +44,20 @@ package body Weights is
          --  Y.Length / (Classes.Length * Bin_Count (Y)).
          --  but, this is Recip_Freq
          Y_Index := Label.Fit_Transform (LE, Y);
---           Classifier_Utilities.Print_Value_List
---             ("Weights.Compute_Class_Weights Y", Y);
---           Classifier_Utilities.Print_Value_List
---             ("Weights.Compute_Class_Weights Classes", Classes);
---           Classifier_Utilities.Print_Natural_List
---             ("Weights.Compute_Class_Weights Y_Ind", Y_Index);
---           Classifier_Utilities.Print_Value_List
---             ("Weights.Compute_Class_Weights LE.Classes", LE.Uniques);
-         Class_Length := Float (LE.Uniques.Length);
          Bins := Classifier_Utilities.Bin_Count (Y_Index);
+         Scale := Float (Y.Length) / Float (LE.Uniques.Length);
          for index in Bins.First_Index .. Bins.Last_Index loop
-            Recip_Freq.Append (Float (Y.Length) /
-                               (Class_Length * Float (Bins.Element (index))));
+            Recip_Freq.Append (Scale / Float (Bins.Element (index)));
          end loop;
 
---           Classifier_Utilities.Print_Float_List
---             ("Weights.Compute_Class_Weights Recip_Freq", Recip_Freq);
          Transformed_Classes := Label.Transform (LE, Classes);
-
          Weights.Clear;
---           Classifier_Utilities.Print_Natural_List
---             ("Weights.Compute_Class_Weights LE transformed Classes",
---              Transformed_Classes);
          for index in Transformed_Classes.First_Index ..
            Transformed_Classes.Last_Index loop
             Recip_Freq_Index := Transformed_Classes.Element (index) + 1;
-            case aClass.Value_Kind is
-               when Boolean_Type | UB_String_Type =>
-                  raise Weights_Error with
-                    "Weights.Compute_Class_Weights invalid class type :" &
-                    Data_Type'Image (aClass.Value_Kind);
-               when Float_Type | Integer_Type =>
-                  aWeight := Float (Recip_Freq.Element (Recip_Freq_Index));
-            end case;
+            aWeight := Float (Recip_Freq.Element (Recip_Freq_Index));
             Weights.Append (aWeight);
          end loop;
---           Classifier_Utilities.Print_Weights
---             ("Weights.Compute_Class_Weights Weights", Weights);
 
       else  --  user-defined dictionary
          for index in Class_Weights.First_Index .. Class_Weights.Last_Index
