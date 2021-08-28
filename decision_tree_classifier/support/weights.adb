@@ -1,3 +1,4 @@
+--  Based on scikit-learn/sklearn/utils/class_weight.py
 
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -31,7 +32,7 @@ package body Weights is
       Recip_Freq          : Natural_List;
       Transformed_Classes : Natural_List;
       Class_Length        : Float;
-      Recip_Freq_Index    : Positive;
+      Recip_Freq_Index    : Natural;
    begin
       if Weight_Kind = No_Weight then
          for index in Classes.First_Index .. Classes.Last_Index loop
@@ -67,13 +68,14 @@ package body Weights is
          Classifier_Utilities.Print_Natural_List
            ("Compute_Class_Weights Recip_Freq", Recip_Freq);
          Transformed_Classes := Label.Transform (LE, Classes);
-         Classifier_Utilities.Print_Natural_List
-           ("Compute_Class_Weights LE transformed Classes", Transformed_Classes);
          Weights.Clear;
+         Classifier_Utilities.Print_Natural_List
+           ("Compute_Class_Weights LE transformed Classes",
+            Transformed_Classes);
          for index in Transformed_Classes.First_Index ..
            Transformed_Classes.Last_Index loop
             Recip_Freq_Index := Transformed_Classes.Element (index);
-            aClass := Classes.Element (Recip_Freq_Index);
+            aClass := Classes.Element (Recip_Freq_Index + 1);
             case aClass.Value_Kind is
                when Boolean_Type | UB_String_Type =>
                   raise Weights_Error with
