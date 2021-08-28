@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/utils/class_weight.py
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
@@ -29,7 +29,7 @@ package body Weights is
       aWeight             : Float;
       aClass              : Value_Record;
       Bins                : Natural_List;
-      Recip_Freq          : Natural_List;
+      Recip_Freq          : Float_List;
       Transformed_Classes : Natural_List;
       Class_Length        : Float;
       Recip_Freq_Index    : Natural;
@@ -46,32 +46,29 @@ package body Weights is
          --  Y.Length / (Classes.Length * Bin_Count (Y)).
          --  but, this is Recip_Freq
          Y_Index := Label.Fit_Transform (LE, Y);
-         New_Line;
-         Classifier_Utilities.Print_Value_List
-           ("Weights.Compute_Class_Weights Y", Y);
-         Classifier_Utilities.Print_Value_List
-           ("Weights.Compute_Class_Weights Classes", Classes);
-         Classifier_Utilities.Print_Natural_List
-           ("Weights.Compute_Class_Weights Y_Ind", Y_Index);
-         Classifier_Utilities.Print_Value_List
-           ("Weights.Compute_Class_Weights LE.Classes", LE.Uniques);
+--           Classifier_Utilities.Print_Value_List
+--             ("Weights.Compute_Class_Weights Y", Y);
+--           Classifier_Utilities.Print_Value_List
+--             ("Weights.Compute_Class_Weights Classes", Classes);
+--           Classifier_Utilities.Print_Natural_List
+--             ("Weights.Compute_Class_Weights Y_Ind", Y_Index);
+--           Classifier_Utilities.Print_Value_List
+--             ("Weights.Compute_Class_Weights LE.Classes", LE.Uniques);
          Class_Length := Float (LE.Uniques.Length);
          Bins := Classifier_Utilities.Bin_Count (Y_Index);
-         Classifier_Utilities.Print_Natural_List
-           ("Weights.Compute_Class_Weights Bins", Bins);
          for index in Bins.First_Index .. Bins.Last_Index loop
-            Recip_Freq.Append (Integer (Float (Y.Length) /
-                               (Class_Length * Float (Bins.Element (index)))));
+            Recip_Freq.Append (Float (Y.Length) /
+                               (Class_Length * Float (Bins.Element (index))));
          end loop;
 
-         Classifier_Utilities.Print_Natural_List
-           ("Weights.Compute_Class_Weights Recip_Freq", Recip_Freq);
+--           Classifier_Utilities.Print_Float_List
+--             ("Weights.Compute_Class_Weights Recip_Freq", Recip_Freq);
          Transformed_Classes := Label.Transform (LE, Classes);
 
          Weights.Clear;
-         Classifier_Utilities.Print_Natural_List
-           ("Weights.Compute_Class_Weights LE transformed Classes",
-            Transformed_Classes);
+--           Classifier_Utilities.Print_Natural_List
+--             ("Weights.Compute_Class_Weights LE transformed Classes",
+--              Transformed_Classes);
          for index in Transformed_Classes.First_Index ..
            Transformed_Classes.Last_Index loop
             Recip_Freq_Index := Transformed_Classes.Element (index) + 1;
@@ -85,8 +82,8 @@ package body Weights is
             end case;
             Weights.Append (aWeight);
          end loop;
-         Classifier_Utilities.Print_Weights
-           ("Weights.Compute_Class_Weights Weights", Weights);
+--           Classifier_Utilities.Print_Weights
+--             ("Weights.Compute_Class_Weights Weights", Weights);
 
       else  --  user-defined dictionary
          for index in Class_Weights.First_Index .. Class_Weights.Last_Index
@@ -97,7 +94,6 @@ package body Weights is
            "Weights.Compute_Class_Weights dictionary process not implemented.";
       end if;
 
-      New_Line;
       return Weights;
 
    end Compute_Class_Weights;
