@@ -29,7 +29,6 @@ package body Weights is
       aWeight             : Float;
       aClass              : Value_Record;
       Bins                : Natural_List;
-      Scale               : Integer;
       Recip_Freq          : Natural_List;
       Transformed_Classes : Natural_List;
       Class_Length        : Float;
@@ -60,11 +59,9 @@ package body Weights is
          Bins := Classifier_Utilities.Bin_Count (Y_Index);
          Classifier_Utilities.Print_Natural_List
            ("Weights.Compute_Class_Weights Bins", Bins);
-         Scale :=  Integer (Float (Y.Length) / Class_Length);
-         Put_Line ("Weights.Compute_Class_Weights Scale: " &
-                     Integer'Image (Scale));
          for index in Bins.First_Index .. Bins.Last_Index loop
-            Recip_Freq.Append (Scale * Bins.Element (index));
+            Recip_Freq.Append (Integer (Float (Y.Length) /
+                               (Class_Length * Float (Bins.Element (index)))));
          end loop;
 
          Classifier_Utilities.Print_Natural_List
@@ -78,16 +75,13 @@ package body Weights is
          for index in Transformed_Classes.First_Index ..
            Transformed_Classes.Last_Index loop
             Recip_Freq_Index := Transformed_Classes.Element (index) + 1;
-            aClass := Classes.Element (Recip_Freq_Index);
             case aClass.Value_Kind is
                when Boolean_Type | UB_String_Type =>
                   raise Weights_Error with
                     "Weights.Compute_Class_Weights invalid class type :" &
                     Data_Type'Image (aClass.Value_Kind);
-               when Float_Type =>
-                  aWeight := aClass.Float_Value;
-               when Integer_Type =>
-                  aWeight := Float (aClass.Integer_Value);
+               when Float_Type | Integer_Type =>
+                  aWeight := Float (Recip_Freq.Element (Recip_Freq_Index));
             end case;
             Weights.Append (aWeight);
          end loop;
