@@ -22,6 +22,7 @@ package body Class_Weight_Tests is
         No_Weights    : constant Weight_List := Float_Package.Empty_Vector;
         Labels        : Natural_List := Natural_Package.Empty_Vector;
         Dot_Product   : Float;
+        OK            : Boolean;
     begin
         New_Line;
         Put_Line ("Class_Weight_Tests");
@@ -30,14 +31,19 @@ package body Class_Weight_Tests is
 
         Class_Weights := Weights.Compute_Class_Weights
           (Weights.Balanced_Weight, No_Weights, Classes, Y);
-        Print_Weights ("Test_Compute_Class_Weight, Class_Weights", Class_Weights);
-        New_Line;
         Class_Counts := Classifier_Utilities.Bin_Count (Y);
-        Print_Natural_List ("Test_Compute_Class_Weight, Class_Counts", Class_Counts);
         Delete_First (Class_Counts, 2);
         Dot_Product := Dot (Class_Weights, Class_Counts);
-        Put_Line ("Test_Compute_Class_Weight, Dot_Product: " & Float'Image (Dot_Product)
-                  & ", Y length: " & Integer'Image (Integer (Y.Length)));
+        OK := Integer (Dot_Product + 10.0 ** (-10)) = Integer (Y.Length);
+        Put ("Test_Compute_Class_Weight, Weights test ");
+        if OK then
+            Put_Line ("passed.");
+        else
+            Put_Line ("failes.");
+            Put_Line ("Test_Compute_Class_Weight, Dot_Product: " &
+                        Float'Image (Dot_Product)
+                      & ", Y length: " & Integer'Image (Integer (Y.Length)));
+        end if;
 
     end Test_Compute_Class_Weight;
 
