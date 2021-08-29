@@ -106,11 +106,10 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Get_Column (Data       : ML_Types.List_Of_Value_Data_Lists;
+    function Get_Column (Data       : ML_Types.Value_Data_List;
                          Data_Index : Positive)
                         return ML_Types.Value_Data_List is
         use ML_Types;
-        use Value_Lists_Data_Package;
         theList : Value_Data_List;
     begin
         for index in Data.First_Index .. Data.Last_Index loop
@@ -467,6 +466,19 @@ package body Classifier_Utilities is
         end loop;
         New_Line;
     end Print_Weights;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Weights_Lists (Name : String;
+                                   Data : Weights.Weight_Lists_List) is
+    begin
+        Put_Line (Name & ": ");
+        for Index in Data.First_Index .. Data.Last_Index loop
+            Print_Weights ("", Data.Element (Index));
+        end loop;
+        New_Line;
+
+    end Print_Weights_Lists;
 
     --  ------------------------------------------------------------------------
 
