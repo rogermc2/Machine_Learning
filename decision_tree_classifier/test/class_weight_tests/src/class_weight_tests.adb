@@ -5,17 +5,14 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Classifier_Types;
 with Classifier_Utilities; use Classifier_Utilities;
 with Encode_Utils;
-with ML_Types; use ML_Types;
 with Weights;
 
 package body Class_Weight_Tests is
 
-    procedure Test_Compute_Class_Weight is
+    procedure Test_Compute_Class_Weight (Y : Value_Data_List) is
         use Classifier_Types;
         use Float_Package;
         use Natural_Package;
-        Y             : constant Value_Data_List :=
-                          To_Integer_Value_List ((2, 2, 2, 3, 3, 4));
         No_Weights    : constant Weight_List := Float_Package.Empty_Vector;
         Class_Weights : Weight_List;
         Classes       : Value_Data_List;
@@ -53,12 +50,10 @@ package body Class_Weight_Tests is
 
     --  ------------------------------------------------------------------------
 
-    procedure Test_Compute_Sample_Weight is
+    procedure Test_Compute_Sample_Weight (Y : Value_Data_List) is
         use Classifier_Types;
         use Float_Package;
         use Natural_Package;
-        Y              : constant Value_Data_List :=
-                           To_Integer_Value_List ((1, 1, 1, 2, 2, 2));
         No_Weights     : constant Weight_List := Float_Package.Empty_Vector;
         Classes        : Value_Data_List := Value_Data_Package.Empty_Vector;
         Class_Weights  : Weight_List := No_Weights;
