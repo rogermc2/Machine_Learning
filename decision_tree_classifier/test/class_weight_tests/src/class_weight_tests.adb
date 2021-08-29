@@ -35,14 +35,18 @@ package body Class_Weight_Tests is
         Delete_First (Class_Counts, 2);
         Dot_Product := Dot (Class_Weights, Class_Counts);
         OK := Integer (Dot_Product + 10.0 ** (-10)) = Integer (Y.Length);
+        OK := OK and (Class_Weights.Element (1) < Class_Weights.Element (2)) and
+          (Class_Weights.Element (2) < Class_Weights.Element (3));
+
         Put ("Test_Compute_Class_Weight, Weights test ");
         if OK then
             Put_Line ("passed.");
         else
-            Put_Line ("failes.");
+            Put_Line ("failed.");
             Put_Line ("Test_Compute_Class_Weight, Dot_Product: " &
                         Float'Image (Dot_Product)
                       & ", Y length: " & Integer'Image (Integer (Y.Length)));
+            Print_Weights ("Weights", Class_Weights);
         end if;
 
     end Test_Compute_Class_Weight;
