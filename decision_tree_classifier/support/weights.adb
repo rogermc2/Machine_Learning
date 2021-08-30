@@ -97,31 +97,29 @@ package body Weights is
       Classes_Missing       : Value_Data_List;
       Class_Weight          : constant Float := 1.0;
       Class_Weight_List     : Weight_List := Float_Package.Empty_Vector;
-      Weights               : Weight_List;
+      Class_Weights         : Weight_List;
       aWeight               : Float;
       Indices               : Integer_List;
-      Inverse               : Natural_List;
+      Inverse               : Natural_List := Natural_Package.Empty_Vector;
    begin
-      Inverse.Clear;
-
       Classes := Encode_Utils.Unique (Y, Inverse);
       Classes_Missing.Clear;
 
       --  Compute_Class_Weights input parameter is a Weight_List
       Class_Weight_List.Append (Class_Weight);
-      Weights := Compute_Class_Weights
+      Class_Weights := Compute_Class_Weights
         (Balanced_Weight, Class_Weight_List, Classes, Y);
 
       Classifier_Utilities.Print_Weights
-        ("Compute_Balanced_Sample_Weight Indices Weights", Weights);
+        ("Compute_Balanced_Sample_Weight Class_Weights", Class_Weights);
       Indices := Classifier_Utilities.Search_Sorted_Value_List
         (Classes, Y);
       Classifier_Utilities.Print_Integer_List
         ("Compute_Balanced_Sample_Weight Indices", Indices);
       Class_Weight_List.Clear;
       for index in Indices.First_Index .. Indices.Last_Index loop
-         if index <= Weights.Last_Index then
-            aWeight := Weights.Element (index);
+         if index <= Class_Weights.Last_Index then
+            aWeight := Class_Weights.Element (index);
             if not Class_Weight_List.Contains (aWeight) then
                Class_Weight_List.Append (aWeight);
             end if;
@@ -138,12 +136,12 @@ package body Weights is
             if not (Find (Classes_Missing, aClass) =
                       Value_Data_Package.No_Element) then
                aWeight := 0.0;
-               Weights.Replace_Element (index, aWeight);
+               Class_Weights.Replace_Element (index, aWeight);
             end if;
          end loop;
       end if;
 
-      return Weights;
+      return Class_Weights;
 
    end Compute_Balanced_Sample_Weight;
 
