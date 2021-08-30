@@ -53,26 +53,27 @@ package body Class_Weight_Tests is
     procedure Test_Compute_Sample_Weight (Y : Value_Data_List) is
         use Classifier_Types;
         use Float_Package;
-        use Natural_Package;
+--          use Natural_Package;
         use Weights;
         No_Weights     : constant Weight_List := Float_Package.Empty_Vector;
         Labels         : Natural_List;
-        Classes        : Value_Data_List := Encode_Utils.Unique (Y, Labels);
-        Class_Weights  : Weight_List := Compute_Class_Weights
+        Classes        : constant Value_Data_List := Encode_Utils.Unique (Y, Labels);
+        Class_Weights  : constant Weight_List := Compute_Class_Weights
           (Balanced_Weight, No_Weights, Classes, Y);
-        Num_Outputs : Integer := Integer (Classes.Length);
+        Num_Outputs : constant Integer := Integer (Classes.Length);
         Sample_Weights : Weight_List;
-        Class_Counts   : Natural_List;
-        Dot_Product    : Float;
-        OK            : Boolean;
+--          Class_Counts   : Natural_List;
+--          Dot_Product    : Float;
+--          OK            : Boolean;
     begin
         New_Line;
         Put_Line ("Sample Weight Tests");
         Sample_Weights := Compute_Sample_Weight
           (Weights.Balanced_Weight, Y, Num_Outputs, Class_Weights);
         --  Test with balanced classes
-        Print_Value_List ("Y", Y);
-        Print_Weights ("Balanced class weights", Sample_Weights);
+        Print_Value_List ("Balanced Weights Test, Y", Y);
+        Print_Weights ("Balanced Weights Test, Balanced class weights",
+                       Sample_Weights);
 
     end Test_Compute_Sample_Weight;
 

@@ -73,27 +73,21 @@ package body Weights is
     end Compute_Class_Weights;
 
     --  -------------------------------------------------------------------------
-    --  Compute_Sample_Weight estimates sample weights by class for
-    --  unbalanced datasets.
-    --  y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-    --   Array of original class labels per sample.
-    --  Class_Weight : dict, list of dicts, "balanced", or None, optional
-    --     Weights associated with classes
-    --  Indices : list of indices to be used in a subsample
+
     function Compute_Balanced_Sample_Weight (Y : ML_Types.Value_Data_List)
                                              return Weight_List is
         use ML_Types;
         use Value_Data_Package;
         use Float_Package;
         Y_Full                : Value_Data_List;
-        Classes               : Value_Data_List;
+--          Classes               : Value_Data_List;
         Classes_Full          : Value_Data_List;
         aClass                : Value_Record;
         Classes_Missing       : Value_Data_List;
         Class_Weight_K        : Float;
-        Class_Weight_K_List   : Weight_List;
-        Y_Subsample           : Value_Data_List;
-        Classes_Subsample     : Value_Data_List;
+        Class_Weight_K_List   : Weight_List := Float_Package.Empty_Vector;
+--          Y_Subsample           : Value_Data_List;
+--          Classes_Subsample     : Value_Data_List;
         Weight_K              : Weight_List;
         aWeight               : Float;
         K_Indices             : Integer_List;
@@ -103,40 +97,37 @@ package body Weights is
     begin
         Inverse.Clear;
 
-        Classes_Full := Encode_Utils.Unique (Y, Inverse);
         Y_Full := Y;
+        Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
         Classes_Missing.Clear;
 
         Class_Weight_K := 1.0;
 
         --  Compute_Class_Weights input parameter is a Weight_List
-        Class_Weight_K_List.Clear;
         Class_Weight_K_List.Append (Class_Weight_K);
-
         Weight_K := Compute_Class_Weights
           (Balanced_Weight, Class_Weight_K_List, Classes_Full, Y_Full);
 
         Classifier_Utilities.Print_Weights
-          ("Compute_Sample_Weight Indices Weight_K", Weight_K);
+          ("Compute_Balanced_Sample_Weight Indices Weight_K", Weight_K);
         --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
-
         K_Indices := Classifier_Utilities.Search_Sorted_Value_List
           (Classes_Full, Y_Full);
         Classifier_Utilities.Print_Integer_List
-          ("Compute_Sample_Weight K_Indices", K_Indices);
+          ("Compute_Balanced_Sample_Weight K_Indices", K_Indices);
         Class_K_Weights.Clear;
         for index in K_Indices.First_Index .. K_Indices.Last_Index loop
             if index <= Weight_K.Last_Index then
                 aWeight := Weight_K.Element (index);
-                Put_Line ("Compute_Sample_Weight aWeight" & Float'Image (aWeight));
+--                  Put_Line ("Compute_Balanced_Sample_Weight aWeight" & Float'Image (aWeight));
                 if not Class_K_Weights.Contains (aWeight) then
-                    Put_Line ("Compute_Sample_Weight add aWeight to Class_K_Weights");
+--                      Put_Line ("Compute_Balanced_Sample_Weight add aWeight to Class_K_Weights");
                     Class_K_Weights.Append (aWeight);
                 end if;
             end if;
         end loop;
         Classifier_Utilities.Print_Weights
-          ("Compute_Sample_Weight Indices Class_K_Weights", Class_K_Weights);
+          ("Compute_Balanced_Sample_Weight Indices Class_K_Weights", Class_K_Weights);
 
         if not Classes_Missing.Is_Empty then
             --  Make missing classes weights zero
@@ -152,8 +143,6 @@ package body Weights is
         end if;
 
         Expanded_Class_Weight.Append (Weight_K);
-
-        Put_Line ("Compute_Sample_Weight Reduce_Weight_Lists.");
         return Reduce_Weight_Lists (Expanded_Class_Weight);
 
     end Compute_Balanced_Sample_Weight;
@@ -192,9 +181,10 @@ package body Weights is
         Inverse               : Natural_List;
         Class_K_Weights       : Weight_List;
         Expanded_Class_Weight : Weight_Lists_List;
+        Result                : Weight_List;
     begin
         if Weight_Kind = Balanced_Weight then
-            Class_K_Weights := Compute_Balanced_Sample_Weight (Y);
+            Result := Compute_Balanced_Sample_Weight (Y);
         else
             Inverse.Clear;
             if Weight_Kind /= Balanced_Weight then
@@ -315,9 +305,10 @@ package body Weights is
 
                 Expanded_Class_Weight.Append (Weight_K);
             end loop;
+            Result := Reduce_Weight_Lists (Expanded_Class_Weight);
         end if;
-        Put_Line ("Compute_Sample_Weight Reduce_Weight_Lists.");
-        return Reduce_Weight_Lists (Expanded_Class_Weight);
+
+        return Result;
 
     end Compute_Sample_Weight;
 
@@ -354,15 +345,15 @@ package body Weights is
             Put_Line ("Reduce_Weight_Lists index:" & Integer'Image (index));
             Col := Get_Column (Lists, index, Data);
             Product := 1.0;
-            Put_Line ("Reduce_Weight_Lists Col set");
             for col_index in Col'Range loop
                 Product := Product * Col (col_index);
             end loop ;
             Data := Product;
             theList.Append (Data);
         end loop;
-        Put_Line ("Reduce_Weight_Lists done.");
+
         return theList;
+
     end Reduce_Weight_Lists;
 
     --  -------------------------------------------------------------------------
