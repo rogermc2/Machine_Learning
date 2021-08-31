@@ -36,7 +36,6 @@ package Weights is
                                    return Weight_List;
    function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
                                    Y             : ML_Types.Value_Data_List;
-                                   Num_Outputs   : Integer;
                                    Class_Weights : Weight_List :=
                                      Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
