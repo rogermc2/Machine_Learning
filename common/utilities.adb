@@ -65,7 +65,7 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   function Feature_Array (Data : ML_Types.Rows_Vector;
+   function Feature_Array (Data    : ML_Types.Rows_Vector;
                            Col_Num : Class_Range) return Value_Data_Array is
       Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
       UB_Feature : Unbounded_String;
@@ -360,7 +360,10 @@ package body Utilities is
       Value_Kind : constant Data_Type := Value.Value_Kind;
    begin
       New_Line;
-      Put_Line (Message & " value record:");
+      Put_Line (Message & " " & Data_Type'Image (Value.Value_Kind) &
+                  " value record:");
+      Put ("Output: " & Integer'Image (Value.Output));
+      Put ("  Value: ");
       case Value_Kind is
          when Integer_Type =>
             Put_Line (Integer'Image (Value.Integer_Value));

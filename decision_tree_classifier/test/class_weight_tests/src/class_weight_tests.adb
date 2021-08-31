@@ -60,10 +60,11 @@ package body Class_Weight_Tests is
       Classes        : constant Value_Data_List :=
                          Encode_Utils.Unique (Y, Labels);
       Class_Weights  : constant Weight_List := Compute_Class_Weights
-        (Balanced_Weight, No_Weights, Classes, Y);
+        (Weight_Kind, No_Weights, Classes, Y);
       Sample_Weights : Weight_List;
       --          OK            : Boolean;
    begin
+      Put_Line ("Class_Weight_Tests.Test_Compute_Sample_Weight");
       Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y, Class_Weights);
 
       Print_Value_List ("    Y", Y);
