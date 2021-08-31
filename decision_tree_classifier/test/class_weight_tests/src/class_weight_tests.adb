@@ -64,13 +64,10 @@ package body Class_Weight_Tests is
       Sample_Weights : Weight_List;
       --          OK            : Boolean;
    begin
-      New_Line;
-      Put_Line ("Sample Weight Tests");
       Sample_Weights := Compute_Sample_Weight  (Weight_Kind, Y, Class_Weights);
-      --  Test with balanced classes
-      Print_Value_List ("Balanced Weights Test, Y", Y);
-      Print_Weights ("Balanced Weights Test, Balanced class weights",
-                     Sample_Weights);
+
+      Print_Value_List ("Sample_Weight Test, Y", Y);
+      Print_Weights ("Sample_Weight Test", Sample_Weights);
 
    end Test_Compute_Sample_Weight;
 

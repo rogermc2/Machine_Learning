@@ -152,6 +152,11 @@ package body Weights is
    begin
       if Weight_Kind = Balanced_Weight then
          Result := Compute_Balanced_Sample_Weight (Y);
+      elsif Weight_Kind = No_Weight then
+         for index_k in 1 .. Num_Outputs loop
+            Result.Append (1.0);
+         end loop;
+
       else
          Inverse.Clear;
          if Weight_Kind /= Balanced_Weight then
