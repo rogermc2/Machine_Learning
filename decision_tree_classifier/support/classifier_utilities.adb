@@ -45,7 +45,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Bin_Count (Numbers : ML_Types.Value_Data_List)
-                       return Natural_List is
+                        return Natural_List is
         use Ada.Containers;
         use ML_Types;
         use Natural_Package;
@@ -108,7 +108,7 @@ package body Classifier_Utilities is
 
     function Get_Column (Data       : ML_Types.Value_Data_List;
                          Data_Index : Positive)
-                        return ML_Types.Value_Data_List is
+                         return ML_Types.Value_Data_List is
         use ML_Types;
         theList : Value_Data_List;
     begin
@@ -122,7 +122,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                      return Integer_List is
+                                       return Integer_List is
         use ML_Types;
         use Integer_Package;
         use Value_Data_Package;
@@ -184,18 +184,6 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function To_Natural_List (A : Natural_Array) return Natural_List is
-        A_List : Natural_List;
-    begin
-        for index in A'Range loop
-            A_List.Append (A (index));
-        end loop;
-        return A_List;
-
-    end To_Natural_List;
-
-    --  -------------------------------------------------------------------------
-
     function To_Integer_Value_List (A : Integer_Array)
                                     return ML_Types.Value_Data_List is
         use ML_Types;
@@ -212,8 +200,37 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
+    function To_Multi_Value_List (A : Multi_Value_Array)
+                                  return ML_Types.Value_Data_List is
+        use ML_Types;
+        Data   : Value_Record (Integer_Type);
+        A_List : Value_Data_List;
+    begin
+        for index in A'Range loop
+            Data.Integer_Value := A (index, 1);
+            Data.Output := A (index, 2);
+            A_List.Append (Data);
+        end loop;
+        return A_List;
+
+    end To_Multi_Value_List;
+
+    --  -------------------------------------------------------------------------
+
+    function To_Natural_List (A : Natural_Array) return Natural_List is
+        A_List : Natural_List;
+    begin
+        for index in A'Range loop
+            A_List.Append (A (index));
+        end loop;
+        return A_List;
+
+    end To_Natural_List;
+
+    --  -------------------------------------------------------------------------
+
     function To_Natural_Value_List (A : Natural_Array)
-                                    return ML_Types.Value_Data_List is
+                                return ML_Types.Value_Data_List is
         Int_Array : Integer_Array (1 .. A'Length);
     begin
         for index in A'Range loop
@@ -482,22 +499,22 @@ package body Classifier_Utilities is
 
     --  ------------------------------------------------------------------------
 
-   function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
-      use Natural_Package;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
-      aVal        : Natural;
-      Diff        : Natural_List;
-   begin
-      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
-         aVal := Unique_Vals.Element (index);
-         if not Uniques.Contains (aVal) then
-            Diff.Append (aVal);
-         end if;
-      end loop;
+    function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
+        use Natural_Package;
+        Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+        aVal        : Natural;
+        Diff        : Natural_List;
+    begin
+        for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+            aVal := Unique_Vals.Element (index);
+            if not Uniques.Contains (aVal) then
+                Diff.Append (aVal);
+            end if;
+        end loop;
 
-      return Diff;
-   end Set_Diff;
+        return Diff;
+    end Set_Diff;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
 end Classifier_Utilities;

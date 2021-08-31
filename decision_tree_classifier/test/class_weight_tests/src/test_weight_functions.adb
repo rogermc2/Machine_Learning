@@ -23,4 +23,9 @@ begin
    --  Test with `None` weights
    Class_Weight_Tests.Test_Compute_Sample_Weight
      (Weights.No_Weight, To_Integer_Value_List ((1, 1, 1, 2, 2, 2, 3)));
+   --  Test with multi-output of balanced classes
+   Class_Weight_Tests.Test_Compute_Sample_Weight
+     (Weights.Weights_List, To_Multi_Value_List (((1, 0), (1, 0), (1, 0),
+      (2, 1), (2, 1), (2, 1))));
+
 end Test_Weight_Functions;

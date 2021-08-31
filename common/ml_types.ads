@@ -61,12 +61,13 @@ package ML_Types is
     subtype Value_List is Values_Package.Vector;
 
     type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
+        Output : Integer := 0;
         case Value_Kind is
             when Integer_Type => Integer_Value : Integer := 0;
-            when Float_Type => Float_Value   : Float := 0.0;
+            when Float_Type => Float_Value : Float := 0.0;
             when Boolean_Type => Boolean_Value : Boolean := False;
-            when UB_String_Type => UB_String_Value : Unbounded_String :=
-                                                           To_Unbounded_String ("");
+            when UB_String_Type => UB_String_Value : Unbounded_String
+                  := To_Unbounded_String ("");
         end case;
     end record;
 
@@ -78,10 +79,10 @@ package ML_Types is
     package Value_Data_Sorting is new
       Value_Data_Package.Generic_Sorting ("<");
 
-   use Value_Data_Package;
+    use Value_Data_Package;
     package Value_Lists_Data_Package is new
       Ada.Containers.Vectors (Positive, Value_Data_List);
-   subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.Vector;
+    subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.Vector;
 
     type Value_Data_Array is array (Positive range <>) of Value_Record;
 
@@ -91,7 +92,7 @@ package ML_Types is
 
     package Boolean_Label_Map_Package is new Ada.Containers.Ordered_Maps
       (Boolean, Natural);
-   subtype Boolean_Label_Map is Boolean_Label_Map_Package.Map;
+    subtype Boolean_Label_Map is Boolean_Label_Map_Package.Map;
 
     package Float_Label_Map_Package is new Ada.Containers.Ordered_Maps
       (Float, Natural);
@@ -99,18 +100,18 @@ package ML_Types is
 
     package Integer_Label_Map_Package is new Ada.Containers.Ordered_Maps
       (Integer, Natural);
-   subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
+    subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
 
     package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
       (Unbounded_String, Natural);
-   subtype UB_Label_Map is UB_Label_Map_Package.Map;
+    subtype UB_Label_Map is UB_Label_Map_Package.Map;
 
-   type Label_Maps is record
-      Boolean_Map   : Boolean_Label_Map;
-      Float_Map     : Float_Label_Map;
-      Integer_Map   : Integer_Label_Map;
-      UB_String_Map : UB_Label_Map;
-   end record;
+    type Label_Maps is record
+        Boolean_Map   : Boolean_Label_Map;
+        Float_Map     : Float_Label_Map;
+        Integer_Map   : Integer_Label_Map;
+        UB_String_Map : UB_Label_Map;
+    end record;
 
     subtype Raw_Label is Unbounded_String;
 
@@ -152,7 +153,7 @@ package ML_Types is
     end record;
 
     type Tree_Node_Type (Node_Type : Node_Kind := Decision_Kind) is record
-      Decision_Branch : Boolean := True;
+        Decision_Branch : Boolean := True;
         case Node_Type is
         when Decision_Kind =>
             Question     : Question_Data;

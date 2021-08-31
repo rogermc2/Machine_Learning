@@ -66,8 +66,8 @@ package body Class_Weight_Tests is
    begin
       Sample_Weights := Compute_Sample_Weight  (Weight_Kind, Y, Class_Weights);
 
-      Print_Value_List ("Sample_Weight Test, Y", Y);
-      Print_Weights ("Sample_Weight Test", Sample_Weights);
+      Print_Value_List ("    Y", Y);
+      Print_Weights ("Weights", Sample_Weights);
 
    end Test_Compute_Sample_Weight;
 
