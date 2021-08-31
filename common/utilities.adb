@@ -362,7 +362,6 @@ package body Utilities is
       New_Line;
       Put_Line (Message & " " & Data_Type'Image (Value.Value_Kind) &
                   " value record:");
-      Put ("Output: " & Integer'Image (Value.Output));
       Put ("  Value: ");
       case Value_Kind is
          when Integer_Type =>

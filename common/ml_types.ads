@@ -61,7 +61,7 @@ package ML_Types is
     subtype Value_List is Values_Package.Vector;
 
     type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
-        Output : Integer := 0;
+--          Output : Integer := 0;
         case Value_Kind is
             when Integer_Type => Integer_Value : Integer := 0;
             when Float_Type => Float_Value : Float := 0.0;

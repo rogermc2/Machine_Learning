@@ -4,8 +4,8 @@ with Weights;
 
 package Class_Weight_Tests is
 
-   procedure Test_Compute_Class_Weight (Y : Value_Data_List);
+   procedure Test_Compute_Class_Weight (Y : List_Of_Value_Data_Lists);
    procedure Test_Compute_Sample_Weight (Weight_Kind    : Weights.Weight_Type;
-                                         Y              : Value_Data_List);
+                                         Y              : List_Of_Value_Data_Lists);
 
 end Class_Weight_Tests;

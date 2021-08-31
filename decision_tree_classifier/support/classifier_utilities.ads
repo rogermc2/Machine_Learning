@@ -36,11 +36,11 @@ package Classifier_Utilities is
     function To_Integer_List (A : Integer_Array) return Integer_List;
     function To_Natural_List (A : Natural_Array) return Natural_List;
     function To_Integer_Value_List (A : Integer_Array)
-                                    return ML_Types.Value_Data_List;
+                                    return ML_Types.List_Of_Value_Data_Lists;
     function To_Multi_Value_List (A : Multi_Value_Array)
-                                    return ML_Types.Value_Data_List;
+                                    return ML_Types.List_Of_Value_Data_Lists;
     function To_Natural_Value_List (A : Natural_Array)
-                                    return ML_Types.Value_Data_List;
+                                    return ML_Types.List_Of_Value_Data_Lists;
     function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
                                   return Integer_Array;
     function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;

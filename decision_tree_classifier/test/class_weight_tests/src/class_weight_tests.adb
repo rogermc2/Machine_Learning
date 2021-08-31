@@ -9,11 +9,12 @@ with Weights;
 
 package body Class_Weight_Tests is
 
-   procedure Test_Compute_Class_Weight (Y : Value_Data_List) is
+   procedure Test_Compute_Class_Weight (Y : List_Of_Value_Data_Lists) is
       use Classifier_Types;
       use Float_Package;
       use Natural_Package;
       No_Weights    : constant Weight_List := Float_Package.Empty_Vector;
+      Y_1           : constant Value_Data_List := Y.Element (1);
       Class_Weights : Weight_List;
       Classes       : Value_Data_List;
       Class_Counts  : Natural_List;
@@ -23,12 +24,12 @@ package body Class_Weight_Tests is
    begin
       New_Line;
       Put_Line ("Class Weight Tests");
-      Classes := Encode_Utils.Unique (Y, Labels);
+      Classes := Encode_Utils.Unique (Y_1, Labels);
       Print_Value_List ("Test_Compute_Class_Weight, Classes", Classes);
 
       Class_Weights := Weights.Compute_Class_Weights
-        (Weights.Balanced_Weight, No_Weights, Classes, Y);
-      Class_Counts := Classifier_Utilities.Bin_Count (Y);
+        (Weights.Balanced_Weight, No_Weights, Classes, Y_1);
+      Class_Counts := Classifier_Utilities.Bin_Count (Y_1);
       Delete_First (Class_Counts, 2);
       Dot_Product := Dot (Class_Weights, Class_Counts);
       OK := Integer (Dot_Product + 10.0 ** (-10)) = Integer (Y.Length);
@@ -51,23 +52,24 @@ package body Class_Weight_Tests is
    --  ------------------------------------------------------------------------
 
    procedure Test_Compute_Sample_Weight (Weight_Kind : Weights.Weight_Type;
-                                         Y           : Value_Data_List) is
+                                         Y           : List_Of_Value_Data_Lists) is
       use Classifier_Types;
       use Float_Package;
       use Weights;
       No_Weights     : constant Weight_List := Float_Package.Empty_Vector;
+      Y_1            : constant Value_Data_List := Y.Element (1);
       Labels         : Natural_List;
       Classes        : constant Value_Data_List :=
-                         Encode_Utils.Unique (Y, Labels);
+                         Encode_Utils.Unique (Y_1, Labels);
       Class_Weights  : constant Weight_List := Compute_Class_Weights
-        (Weight_Kind, No_Weights, Classes, Y);
+        (Weight_Kind, No_Weights, Classes, Y_1);
       Sample_Weights : Weight_List;
       --          OK            : Boolean;
    begin
       Put_Line ("Class_Weight_Tests.Test_Compute_Sample_Weight");
-      Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y, Class_Weights);
+      Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y_1, Class_Weights);
 
-      Print_Value_List ("    Y", Y);
+      Print_Value_List ("    Y", Y_1);
       Print_Weights ("Weights", Sample_Weights);
 
    end Test_Compute_Sample_Weight;
