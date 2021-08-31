@@ -206,6 +206,8 @@ package body Classifier_Utilities is
         Data   : Value_Record (Integer_Type);
         A_List : Value_Data_List;
     begin
+        Print_Multi_Value_Array ("Classifier_Utilities.To_Multi_Value_List, A",
+                                 A);
         for index in A'Range loop
             Data.Integer_Value := A (index, 1);
             Data.Output := A (index, 2);
@@ -230,7 +232,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Natural_Value_List (A : Natural_Array)
-                                return ML_Types.Value_Data_List is
+                                    return ML_Types.Value_Data_List is
         Int_Array : Integer_Array (1 .. A'Length);
     begin
         for index in A'Range loop
@@ -340,6 +342,8 @@ package body Classifier_Utilities is
         type Vector_Type is  array (Index_Type) of aliased Integer;
     procedure Print_Integer_Vector (Name : String; aVector : Vector_Type);
 
+    --  -------------------------------------------------------------------
+
     procedure Print_Integer_Vector (Name : String; aVector : Vector_Type) is
     begin
         if Name = "" then
@@ -354,18 +358,6 @@ package body Classifier_Utilities is
     end Print_Integer_Vector;
 
     --  -------------------------------------------------------------------
-
-    procedure Print_Integer_Array (Name : String; anArray : Integer_Array) is
-    begin
-        Put_Line (Name & ": ");
-        for Index in anArray'First .. anArray'Last loop
-            Put_Line (Integer'Image (Index) & ":  " &
-                        Integer'Image (anArray (Index)));
-        end loop;
-        New_Line;
-    end Print_Integer_Array;
-
-    --  ------------------------------------------------------------------------
 
     procedure Print_Float_Array (Name          : String; anArray : Float_Array;
                                  Start, Finish : Integer) is
@@ -403,6 +395,44 @@ package body Classifier_Utilities is
             end if;
         end loop;
     end Print_Float_List;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Integer_Array (Name : String; anArray : Integer_Array) is
+    begin
+        Put_Line (Name & ": ");
+        for Index in anArray'First .. anArray'Last loop
+            Put_Line (Integer'Image (Index) & ":  " &
+                        Integer'Image (anArray (Index)));
+        end loop;
+        New_Line;
+    end Print_Integer_Array;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Multi_Value_Array (Name : String;
+                                       anArray : Multi_Value_Array) is
+    begin
+        Put_Line ("anArray'Length: " & Integer'Image (Integer (anArray'Length))
+        & ", " & Integer'Image (Integer (anArray'Length (2))));
+        Put (Name);
+        if anArray'Length > 0 and anArray'First > 0 then
+            Put_Line (": ");
+            for Index in anArray'First .. anArray'Last loop
+                Put_Line ("Index: " & Integer'Image (Index));
+                Put_Line (Integer'Image (anArray (Index, 1)) & ",  " &
+                          Integer'Image (anArray (Index, 2)));
+            end loop;
+        elsif anArray'Length = 0 then
+            Put_Line (" is empty.");
+        else
+            raise Value_Error with
+              "Print_Multi_Value_Array called with invalid index: " &
+              Integer'Image (Integer (anArray'First));
+        end if;
+
+        New_Line;
+    end Print_Multi_Value_Array;
 
     --  ------------------------------------------------------------------------
 

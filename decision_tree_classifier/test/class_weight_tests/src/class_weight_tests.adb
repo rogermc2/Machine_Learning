@@ -64,7 +64,7 @@ package body Class_Weight_Tests is
       Sample_Weights : Weight_List;
       --          OK            : Boolean;
    begin
-      Sample_Weights := Compute_Sample_Weight  (Weight_Kind, Y, Class_Weights);
+      Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y, Class_Weights);
 
       Print_Value_List ("    Y", Y);
       Print_Weights ("Weights", Sample_Weights);

@@ -150,21 +150,17 @@ package body Weights is
       Expanded_Class_Weight : Weight_Lists_List;
       Result                : Weight_List;
    begin
-      if Weight_Kind = Balanced_Weight then
+      case Weight_Kind is
+      when Balanced_Weight =>
          Result := Compute_Balanced_Sample_Weight (Y);
-      elsif Weight_Kind = No_Weight then
+
+      when No_Weight =>
          for index_k in 1 .. Num_Outputs loop
             Result.Append (1.0);
          end loop;
 
-      else
+      when Weights_List =>
          Inverse.Clear;
-         if Weight_Kind /= Balanced_Weight then
-            raise Weights_Error with
-              "Compute_Sample_Weight; Weight does not contain the only" &
-              " valid preset for class_weight which is balanced.";
-         end if;
-
          if Num_Outputs > 1 and then
            Integer (Class_Weights.Length) /= Num_Outputs then
             raise Weights_Error with
@@ -278,7 +274,10 @@ package body Weights is
             Expanded_Class_Weight.Append (Weight_K);
          end loop;
          Result := Reduce_Weight_Lists (Expanded_Class_Weight);
-      end if;
+         when Weight_Dict =>
+            raise Weights_Error with
+              "Weights.Compute_Sample_Weight Dictionary is not implemented";
+      end case;
 
       return Result;
 
