@@ -274,6 +274,7 @@ package body Weights is
             Expanded_Class_Weight.Append (Weight_K);
          end loop;
          Result := Reduce_Weight_Lists (Expanded_Class_Weight);
+
          when Weight_Dict =>
             raise Weights_Error with
               "Weights.Compute_Sample_Weight Dictionary is not implemented";
