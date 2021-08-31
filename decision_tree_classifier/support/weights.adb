@@ -160,6 +160,7 @@ package body Weights is
          end loop;
 
       when Weights_List =>
+        Put_Line ("Compute_Sample_Weight Weights_List");
          Inverse.Clear;
          if Num_Outputs > 1 and then
            Integer (Class_Weights.Length) /= Num_Outputs then

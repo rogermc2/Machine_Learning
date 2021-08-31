@@ -206,8 +206,6 @@ package body Classifier_Utilities is
         Data   : Value_Record (Integer_Type);
         A_List : Value_Data_List;
     begin
-        Print_Multi_Value_Array ("Classifier_Utilities.To_Multi_Value_List, A",
-                                 A);
         for index in A'Range loop
             Data.Integer_Value := A (index, 1);
             Data.Output := A (index, 2);
@@ -413,13 +411,10 @@ package body Classifier_Utilities is
     procedure Print_Multi_Value_Array (Name : String;
                                        anArray : Multi_Value_Array) is
     begin
-        Put_Line ("anArray'Length: " & Integer'Image (Integer (anArray'Length))
-        & ", " & Integer'Image (Integer (anArray'Length (2))));
         Put (Name);
         if anArray'Length > 0 and anArray'First > 0 then
             Put_Line (": ");
             for Index in anArray'First .. anArray'Last loop
-                Put_Line ("Index: " & Integer'Image (Index));
                 Put_Line (Integer'Image (anArray (Index, 1)) & ",  " &
                           Integer'Image (anArray (Index, 2)));
             end loop;
