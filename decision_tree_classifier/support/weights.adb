@@ -180,7 +180,9 @@ package body Weights is
       when No_Weight =>
          Put_Line ("Compute_Sample_Weight No_Weight");
          for index_k in 1 .. Num_Outputs loop
-            Result.Append (1.0);
+            for index in 1 .. Y.Element (1).Length loop
+               Result.Append (1.0);
+            end loop;
          end loop;
 
          when Weight_Dict =>
