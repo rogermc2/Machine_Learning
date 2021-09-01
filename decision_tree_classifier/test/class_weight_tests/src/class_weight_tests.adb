@@ -14,7 +14,7 @@ package body Class_Weight_Tests is
       use Float_Package;
       use Natural_Package;
       No_Weights    : constant Weight_List := Float_Package.Empty_Vector;
-      Y_1           : constant Value_Data_List := Y.Element (1);
+      Y_1           : Value_Data_List;
       Class_Weights : Weight_List;
       Classes       : Value_Data_List;
       Class_Counts  : Natural_List;
@@ -24,6 +24,15 @@ package body Class_Weight_Tests is
    begin
       New_Line;
       Put_Line ("Class Weight Tests");
+      if Integer (Y.Length) = 0 then
+         raise Class_Weight_Error with
+         "Class_Weight_Tests.Test_Compute_Class_Weight called with empty data vector.";
+      end if;
+
+      Put_Line ("Y length: " & Integer'Image (Integer (Y.Length)));
+
+      Print_Multi_Value_List ("Y", Y);
+      Y_1 := Y.Element (1);
       Classes := Encode_Utils.Unique (Y_1, Labels);
       Print_Value_List ("Test_Compute_Class_Weight, Classes", Classes);
 

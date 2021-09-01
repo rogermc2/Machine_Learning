@@ -457,6 +457,18 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Multi_Value_List
+     (Name    : String; Multi_List : ML_Types.List_Of_Value_Data_Lists) is
+   begin
+      Put_Line (Name & ": ");
+      for index in Multi_List.First_Index .. Multi_List.Last_Index loop
+         Print_Value_List ("", Multi_List.Element (index));
+      end loop;
+      New_Line;
+   end Print_Multi_Value_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Natural_List (Name : String; theList : Natural_List) is
       Count : Integer := 1;
    begin
