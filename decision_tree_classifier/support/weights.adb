@@ -97,7 +97,7 @@ package body Weights is
      (Y : ML_Types.List_Of_Value_Data_Lists) return Weight_List is
       use ML_Types;
       use Float_Package;
-      Num_Outputs  : constant Integer := Integer (Y.Length);
+      Num_Lists    : constant Integer := Integer (Y.Length);
       Y_Full       : Value_Data_List;
       Classes_Full : Value_Data_List;
       Inverse      : Natural_List := Natural_Package.Empty_Vector;
@@ -107,18 +107,26 @@ package body Weights is
       Weights      : Weight_List;
       Expanded_Class_Weight : Weight_List;
    begin
-      Put_Line ("Weights.Compute_Balanced_Sample_Weight");
-      for index_k in 1 .. Num_Outputs loop
+      Put_Line ("Weights.Compute_Balanced_Sample_Weight, Num_Lists: " &
+               Integer'Image (Num_Lists));
+      for index_k in 1 .. Num_Lists loop
+         Weights.Clear;
          Y_Full := Y.Element (index_k);
          Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
          Weight_K := Compute_Balanced_Class_Weights (Classes_Full, Y_Full);
+         Classifier_Utilities.Print_Weights
+              ("Weights.Compute_Balanced_Sample_Weight, Weight_K", Weight_K);
          --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
          K_Indices := Classifier_Utilities.Search_Sorted_Value_List
            (Classes_Full, Y_Full);
-         for y_index in Y.First_Index .. Y.Last_Index loop
+         Classifier_Utilities.Print_Integer_List
+              ("Weights.Compute_Balanced_Sample_Weight, K_Indices", K_Indices);
+         for y_index in Y_Full.First_Index .. Y_Full.Last_Index loop
             aWeight := Weight_K.Element (K_Indices.Element (y_index));
             Weights.Append (aWeight);
          end loop;
+         Classifier_Utilities.Print_Weights
+              ("Weights.Compute_Balanced_Sample_Weight, Weights", Weights);
 
          Expanded_Class_Weight.Append (Weights);
       end loop;

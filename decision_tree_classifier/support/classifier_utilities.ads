@@ -12,9 +12,10 @@ package Classifier_Utilities is
    function Bin_Count (Numbers : Natural_List) return Natural_List;
    function Bin_Count (Numbers : ML_Types.Value_Data_List) return Natural_List;
    procedure Clear (anArray : in out ML_Types.Value_Data_Array);
+   function Compare_Float_Lists (L, R : Float_List) return Boolean;
    function Dot (L : Weight_List; R : Natural_List) return Float;
-   function Get_Column (Data       : ML_Types.Value_Data_List;
-                        Data_Index : Positive) return ML_Types.Value_Data_List;
+--     function Get_Column (Data       : ML_Types.Value_Data_List;
+--                          Data_Index : Positive) return ML_Types.Value_Data_List;
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
    procedure Print_Float_Array (Name          : String; anArray : Float_Array;
                                 Start, Finish : Integer);
