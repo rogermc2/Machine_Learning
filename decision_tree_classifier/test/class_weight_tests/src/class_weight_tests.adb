@@ -65,20 +65,21 @@ package body Class_Weight_Tests is
       use Classifier_Types;
       use Float_Package;
       use Weights;
-      No_Weights     : constant Weight_List := Float_Package.Empty_Vector;
-      Y_1            : constant Value_Data_List := Y.Element (1);
-      Labels         : Natural_List;
-      Classes        : constant Value_Data_List :=
-                         Encode_Utils.Unique (Y_1, Labels);
-      Class_Weights  : constant Weight_List := Compute_Class_Weights
-        (Weight_Kind, No_Weights, Classes, Y_1);
+--        No_Weights     : constant Weight_List := Float_Package.Empty_Vector;
+--        Y_1            : constant Value_Data_List := Y.Element (1);
+--        Labels         : Natural_List;
+--        Classes        : constant Value_Data_List :=
+--                           Encode_Utils.Unique (Y_1, Labels);
+--        Class_Weights  : constant Weight_List := Compute_Class_Weights
+--          (Weight_Kind, No_Weights, Classes, Y_1);
       Sample_Weights : Weight_List;
       --          OK            : Boolean;
    begin
       Put_Line ("Class_Weight_Tests.Test_Compute_Sample_Weight");
-      Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y_1, Class_Weights);
+--        Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y_1, Class_Weights);
+      Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y);
 
-      Print_Value_List ("    Y", Y_1);
+--        Print_Value_List ("    Y", Y_1);
       Print_Weights ("Weights", Sample_Weights);
 
    end Test_Compute_Sample_Weight;

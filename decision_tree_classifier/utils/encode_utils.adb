@@ -292,8 +292,6 @@ package body Encode_Utils is
          UB_String_Sets.Next (UB_Strings_Curs);
       end loop;
 
-      Classifier_Utilities.Print_Value_List ("Encode_Utils.Unique list",
-                                             Uniq_List);
       Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);
       return Uniq_List;

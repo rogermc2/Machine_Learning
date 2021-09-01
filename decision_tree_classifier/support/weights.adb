@@ -83,8 +83,8 @@ package body Weights is
 
          when Weights_List =>
             Put_Line ("Weights.Compute_Class_Weight.Weights_List");
---              Weights := Compute_Class_Weights
---                (Weights_List, Float_Package.Empty_Vector, Classes, Y);
+            --              Weights := Compute_Class_Weights
+            --                (Weights_List, Float_Package.Empty_Vector, Classes, Y);
       end case;
 
       return Weights;
@@ -93,30 +93,38 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   function Compute_Balanced_Sample_Weight (Y : ML_Types.Value_Data_List)
-                                            return Weight_List is
+   function Compute_Balanced_Sample_Weight
+     (Y : ML_Types.List_Of_Value_Data_Lists) return Weight_List is
       use ML_Types;
-      use Value_Data_Package;
       use Float_Package;
-      Classes   : Value_Data_List;
-      Inverse   : Natural_List := Natural_Package.Empty_Vector;
-      K_Indices : Integer_List;
-      Weight_K  : Weight_List;
-      aWeight   : Float;
-      Weights   : Weight_List;
+      Num_Outputs  : constant Integer := Integer (Y.Length);
+      Y_Full       : Value_Data_List;
+      Classes_Full : Value_Data_List;
+      Inverse      : Natural_List := Natural_Package.Empty_Vector;
+      K_Indices    : Integer_List;
+      Weight_K     : Weight_List;
+      aWeight      : Float;
+      Weights      : Weight_List;
+      Expanded_Class_Weight : Weight_List;
    begin
-      Classes := Encode_Utils.Unique (Y, Inverse);
-      Weight_K := Compute_Balanced_Class_Weights (Classes, Y);
+      Put_Line ("Weights.Compute_Balanced_Sample_Weight");
+      for index_k in 1 .. Num_Outputs loop
+         Y_Full := Y.Element (index_k);
+         Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
+         Weight_K := Compute_Balanced_Class_Weights (Classes_Full, Y_Full);
+         --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
+         K_Indices := Classifier_Utilities.Search_Sorted_Value_List
+           (Classes_Full, Y_Full);
+         for y_index in Y.First_Index .. Y.Last_Index loop
+            aWeight := Weight_K.Element (K_Indices.Element (y_index));
+            Weights.Append (aWeight);
+         end loop;
+
+         Expanded_Class_Weight.Append (Weights);
+      end loop;
       --  end of Python k loop
 
-      --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
-      K_Indices := Classifier_Utilities.Search_Sorted_Value_List (Classes, Y);
-      for y_index in Y.First_Index .. Y.Last_Index loop
-         aWeight := Weight_K.Element (K_Indices.Element (y_index));
-         Weights.Append (aWeight);
-      end loop;
-
-      return Weights;
+      return Expanded_Class_Weight;
 
    end Compute_Balanced_Sample_Weight;
 
@@ -129,7 +137,7 @@ package body Weights is
    --     Weights associated with classes
    --  Indices : list of indices to be used in a subsample
    function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
-                                   Y              : ML_Types.Value_Data_List;
+                                   Y              : ML_Types.List_Of_Value_Data_Lists;
                                    Class_Weights  : Weight_List :=
                                      Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
@@ -185,7 +193,7 @@ package body Weights is
                --  y_full = y[:, k]
                Put_Line ("Compute_Sample_Weight index_k: " &
                            Integer'Image (index_k));
-               Y_Full := Classifier_Utilities.Get_Column (Y, index_k);
+               Y_Full := Y.Element (index_k);
                Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
                Classes_Missing.Clear;
                Classifier_Utilities.Print_Value_List
@@ -230,7 +238,7 @@ package body Weights is
                   Classifier_Utilities.Print_Weights
                     ("Compute_Sample_Weight Indices Class_K_Weights", Class_K_Weights);
                   K_Indices := Classifier_Utilities.Search_Sorted_Value_List
-                    (Classes, Y);
+                    (Classes, Y_Full);
                   Classifier_Utilities.Print_Integer_List
                     ("Compute_Sample_Weight Indices K_Indices", K_Indices);
 
