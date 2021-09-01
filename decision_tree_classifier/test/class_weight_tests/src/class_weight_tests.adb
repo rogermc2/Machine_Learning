@@ -71,6 +71,7 @@ package body Class_Weight_Tests is
          Put_Line ("passed.");
       else
          Put_Line ("failed.");
+         Print_Weights ("Expected", Expected_Weights);
          Print_Weights ("Weights", Sample_Weights);
       end if;
 
