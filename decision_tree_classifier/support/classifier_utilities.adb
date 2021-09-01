@@ -196,7 +196,7 @@ package body Classifier_Utilities is
          A_List.Append (Data);
       end loop;
 
-      Multi_List.Append (Multi_List);
+      Multi_List.Append (A_List);
       return Multi_List;
 
    end To_Integer_Value_List;
