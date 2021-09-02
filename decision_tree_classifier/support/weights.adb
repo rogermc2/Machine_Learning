@@ -112,8 +112,6 @@ package body Weights is
          Y_Full := Y.Element (index_k);
          Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
          Weight_K := Compute_Balanced_Class_Weights (Classes_Full, Y_Full);
-         Classifier_Utilities.Print_Weights
-           ("Weights.Compute_Balanced_Sample_Weight, Weight_K", Weight_K);
          --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
          K_Indices := Classifier_Utilities.Search_Sorted_Value_List
            (Classes_Full, Y_Full);
@@ -123,8 +121,8 @@ package body Weights is
             aWeight := Weight_K.Element (K_Indices.Element (y_index));
             Weights.Append (aWeight);
          end loop;
-         Classifier_Utilities.Print_Weights
-           ("Weights.Compute_Balanced_Sample_Weight, Weights", Weights);
+--           Classifier_Utilities.Print_Weights
+--             ("Weights.Compute_Balanced_Sample_Weight, Weights", Weights);
 
          Expanded_Class_Weight.Append (Weights);
       end loop;
