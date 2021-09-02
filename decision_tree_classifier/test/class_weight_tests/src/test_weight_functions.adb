@@ -8,10 +8,10 @@ with Class_Weight_Tests;
 with Weights;
 
 procedure Test_Weight_Functions is
-   BC3                     : constant Float := 7.0 / 9.0;
-   BC1                     : constant Float := 7.0 / 3.0;
-   BC3_Sq                  : constant Float := BC3 ** 2;
-   BC1_Sq                  : constant Float := BC1 ** 2;
+   WUB3                    : constant Float := 7.0 / 9.0;
+   WUB1                    : constant Float := 7.0 / 3.0;
+   WUB3_Sq                 : constant Float := WUB3 ** 2;
+   WUB1_Sq                 : constant Float := WUB1 ** 2;
    Multi_Values            : Classifier_Types.Multi_Value_Array (1..6, 1..2);
    Multi_Values_UB         : Classifier_Types.Multi_Value_Array (1..7, 1..2);
    Expected_Sample_Weights : Classifier_Types.Weight_List;
@@ -38,7 +38,7 @@ begin
    --  Bin count 3: 7 / (3 * 3) = 0.7777.....
    --  Bin count 1: 7 / (3 * 1) = 2.3333.....
    Expected_Sample_Weights := To_Float_List
-     ((BC3, BC3, BC3, BC3, BC3, BC3, BC1));
+     ((WUB3, WUB3, WUB3, WUB3, WUB3, WUB3, WUB1));
    Class_Weight_Tests.Test_Compute_Sample_Weight
      (Weights.Balanced_Weight, To_Integer_Value_List ((1, 1, 1, 2, 2, 2, 3)),
       Expected_Sample_Weights);
@@ -65,7 +65,7 @@ begin
    Put_Line ("Multi-output sample weights unbalanced classes tests");
    Multi_Values_UB := ((1, 0), (1, 0), (1, 0), (2, 1), (2, 1), (2, 1), (3, -1));
    Expected_Sample_Weights := To_Float_List
-     ((BC3_Sq, BC3_Sq, BC3_Sq, BC3_Sq, BC3_Sq, BC3_Sq, BC1_Sq));
+     ((WUB3_Sq, WUB3_Sq, WUB3_Sq, WUB3_Sq, WUB3_Sq, WUB3_Sq, WUB1_Sq));
    Class_Weight_Tests.Test_Compute_Sample_Weight
      (Weights.Balanced_Weight, To_Multi_Value_List (Multi_Values_UB),
       Expected_Sample_Weights);
