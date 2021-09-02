@@ -1,14 +1,15 @@
 
---  Based on Python 3.7 sklearn tree _tree.pxd class Tree
+--  Based on scikit-learn/sklearn/tree _tree.pxd class Tree
 --  pxd files are like C header files.
 --  They contain Cython declarations and, sometimes, code sections that
 --  are only meant for inclusion in Cython modules.
+--  The Tree object is a binary tree structure constructed by the TreeBuilder.
 --  The tree structure is used for predictions and feature importances.
 
 with Ada.Containers.Indefinite_Multiway_Trees;
 
 with Classifier_Types; use Classifier_Types;
-with Validation;
+--  with Validation;
 
 package Tree is
 

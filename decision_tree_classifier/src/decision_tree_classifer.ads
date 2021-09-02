@@ -23,7 +23,7 @@ with ML_Types;
 
 with Classifier_Types; use Classifier_Types;
 with Estimator;
-with Tree;
+with TreeBuilder;
 with Weights;
 
 package Decision_Tree_Classifer is
