@@ -63,8 +63,8 @@ package body Class_Weight_Tests is
       use Weights;
       Sample_Weights   : Weight_List;
    begin
-      Put_Line ("Class_Weight_Tests.Test_Compute_Sample_Weight");
       Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y);
+      New_Line;
       Put ("Test_Compute_Class_Weight, Weights test ");
       if Classifier_Utilities.Compare_Float_Lists
         (Sample_Weights, Expected_Weights) then

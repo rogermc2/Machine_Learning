@@ -26,14 +26,15 @@ begin
 
    --  Test with unbalanced classes
    Put_Line ("Unbalanced sample weight tests");
-   Expected_Sample_Weights := To_Float_List ((0.7777, 0.7777, 0.7777, 0.7777, 0.7777, 0.7777, 2.3333));
+   Expected_Sample_Weights := To_Float_List
+     ((0.777777, 0.777777, 0.777777, 0.777777, 0.777777, 0.777777, 2.333333));
    Class_Weight_Tests.Test_Compute_Sample_Weight
      (Weights.Balanced_Weight, To_Integer_Value_List ((1, 1, 1, 2, 2, 2, 3)),
       Expected_Sample_Weights);
    New_Line;
-   Put_Line ("'None' sample weight tests");
 
    --  Test with `None` weights
+   Put_Line ("'None' sample weight tests");
    Expected_Sample_Weights := To_Float_List ((1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0));
    Class_Weight_Tests.Test_Compute_Sample_Weight
      (Weights.No_Weight, To_Integer_Value_List ((1, 1, 1, 2, 2, 2, 3)),
