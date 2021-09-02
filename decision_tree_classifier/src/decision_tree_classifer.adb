@@ -1,4 +1,4 @@
---  Based on Python 3.7 sklearn tree _classes.py
+--  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Classifier_Types;
