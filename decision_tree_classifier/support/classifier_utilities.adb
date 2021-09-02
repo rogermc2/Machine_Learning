@@ -94,13 +94,28 @@ package body Classifier_Utilities is
     function Compare_Float_Lists (L, R : Float_List) return Boolean is
         use Ada.Containers;
         use Float_Package;
-        OK : Boolean := R.Length = L.Length;
+        Diff     : Float := 0.0;
+        Max_Diff : Float := 0.0;
+        OK       : Boolean := R.Length = L.Length;
     begin
         if OK then
             for index in L.First_Index .. L.Last_Index loop
-                OK := OK and
-                  (Abs (R.Element (index) - L.Element (index)) < 10.0 ** (-10));
+                Diff := Abs (R.Element (index) - L.Element (index));
+                OK := OK and (Diff < 1.5 * 10.0 ** (-6));
+                if Diff > Max_Diff then
+                    Max_Diff := Diff;
+                end if;
             end loop;
+
+            if not OK then
+                Put ("Classifier_Utilities.Compare_Float_Lists test ");
+                Put_Line ("failed with error: " & Float'Image (Max_Diff));
+            end if;
+        else
+            Put ("Classifier_Utilities.Compare_Float_Lists ");
+            Put_Line ("test failed with different length lists, Left: "
+                      & Count_Type'Image (L.Length) & ", Right: " &
+                        Count_Type'Image (R.Length));
         end if;
 
         return OK;
