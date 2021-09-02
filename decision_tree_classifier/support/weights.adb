@@ -8,8 +8,8 @@ with Label;
 
 package body Weights is
 
-   function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-                        Data     : out Float) return  Float_Array;
+--     function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
+--                          Data     : out Float) return  Float_Array;
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
                                  return Weight_List;
 
@@ -97,15 +97,15 @@ package body Weights is
      (Y : ML_Types.List_Of_Value_Data_Lists) return Weight_List is
       use ML_Types;
       use Float_Package;
-      Num_Lists    : constant Integer := Integer (Y.Length);
-      Y_Full       : Value_Data_List;
-      Classes_Full : Value_Data_List;
-      Inverse      : Natural_List := Natural_Package.Empty_Vector;
-      K_Indices    : Integer_List;
-      Weight_K     : Weight_List;
-      aWeight      : Float;
-      Weights      : Weight_List;
-      Expanded_Class_Weight : Weight_List;
+      Num_Lists             : constant Integer := Integer (Y.Length);
+      Y_Full                : Value_Data_List;
+      Classes_Full          : Value_Data_List;
+      Inverse               : Natural_List := Natural_Package.Empty_Vector;
+      K_Indices             : Integer_List;
+      Weight_K              : Weight_List;
+      aWeight               : Float;
+      Weights               : Weight_List;
+      Expanded_Class_Weight : Weight_Lists_List;
    begin
       Put_Line ("Weights.Compute_Balanced_Sample_Weight, Num_Lists: " &
                Integer'Image (Num_Lists));
@@ -132,7 +132,7 @@ package body Weights is
       end loop;
       --  end of Python k loop
 
-      return Expanded_Class_Weight;
+      return Reduce_Weight_Lists (Expanded_Class_Weight);
 
    end Compute_Balanced_Sample_Weight;
 
@@ -314,45 +314,48 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-                        Data     : out Float)
-     --                          Data     : out Weight_Data)
-                        return  Float_Array is
-      aList  : Weight_List;
-      Column : Float_Array (1 .. integer (Weights.Length));
-   begin
-      for index in 1 .. integer (Weights.Length) loop
-         aList := Weights.Element (index);
-         Data := aList.Element (Data_Index);
-         Column (index) := Data;
-      end loop;
-      return Column;
-   end Get_Column;
+--     function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
+--                          Data     : out Float)
+--       --                          Data     : out Weight_Data)
+--                          return  Float_Array is
+--        aList  : Weight_List;
+--        Column : Float_Array (1 .. integer (Weights.Length));
+--     begin
+--        for index in 1 .. integer (Weights.Length) loop
+--           aList := Weights.Element (index);
+--           Data := aList.Element (Data_Index);
+--           Column (index) := Data;
+--        end loop;
+--        return Column;
+--     end Get_Column;
 
    --  -------------------------------------------------------------------------
 
    function Reduce_Weight_Lists (Lists : Weight_Lists_List)
                                  return Weight_List is
-      Col     : Float_Array (Lists.First_Index .. Lists.Last_Index);
-      Product : Float;
-      theList : Weight_List;
-      Data    : Float;
+      use Ada.Containers;
+      List_Length  : constant Count_Type := Lists.Element (1).Length;
+      aList        : Weight_List;
+      Value        : Float;
+      Reduced_List : Weight_List;
    begin
       Classifier_Utilities.Print_Weights_Lists
         ("Reduce_Weight_Lists Lists", Lists);
+         for index in 1 .. List_Length loop
+            Reduced_List.Append (1.0) ;
+         end loop;
+
       for index in Lists.First_Index .. Lists.Last_Index loop
-         theList := Lists.Element (index);
+         aList := Lists.Element (index);
          Put_Line ("Reduce_Weight_Lists index:" & Integer'Image (index));
-         Col := Get_Column (Lists, index, Data);
-         Product := 1.0;
-         for col_index in Col'Range loop
-            Product := Product * Col (col_index);
-         end loop ;
-         Data := Product;
-         theList.Append (Data);
+         for index_2 in 1 .. Integer (List_Length) loop
+            Value := Reduced_List.Element (index_2) * aList.Element (index_2);
+            Reduced_List.Replace_Element (index_2,Value);
+         end loop;
+
       end loop;
 
-      return theList;
+      return Reduced_List;
 
    end Reduce_Weight_Lists;
 
