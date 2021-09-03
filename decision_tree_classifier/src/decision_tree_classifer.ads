@@ -20,10 +20,10 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types;
+with Tree;
 
 with Classifier_Types; use Classifier_Types;
 with Estimator;
-with TreeBuilder;
 with Weights;
 
 package Decision_Tree_Classifer is
@@ -109,7 +109,7 @@ package Decision_Tree_Classifer is
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
-   function Fit (Self          : in out Classifier;
+   function Fit (aClassifier   : in out Classifier;
                  --                   X    : Sample_Matrix;
                  --                    Y : in out Integer_List;
                  X             : ML_Types.List_Of_Value_Data_Lists;

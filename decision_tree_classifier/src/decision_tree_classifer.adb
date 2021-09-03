@@ -2,15 +2,15 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Classifier_Types;
-with Classifier_Utilities;
+with Encode_Utils;
 
 package body Decision_Tree_Classifer is
 
    --  -------------------------------------------------------------------------
 
    procedure Build_Tree (Self : in out Classifier) is
-      Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
-      Splitter  : Splitter_Type := Self.Parameters.Splitter;
+--        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
+--        Splitter  : Splitter_Type := Self.Parameters.Splitter;
    begin
       if Self.Parameters.Max_Leaf_Nodes < 0 then
          null;
@@ -34,7 +34,7 @@ package body Decision_Tree_Classifer is
    --  Y :  a (n_samples, n_outputs) array of integer valued class labels
    --       for the training samples.
    --  Sample_Weight : array-like of shape (n_samples,), default=None
-   function Fit (Self          : in out Classifier;
+   function Fit (aClassifier   : in out Classifier;
                  --                   X    : Sample_Matrix;
                  --                   Y    : in out Integer_List;
                  X             : ML_Types.List_Of_Value_Data_Lists;
@@ -54,29 +54,29 @@ package body Decision_Tree_Classifer is
       Features              : Value_Data_List := X.First_Element;
       Num_Features          : constant Class_Range :=
                                 Class_Range (Features.Length);
-      Random_State          : Integer := Self.Parameters.Random_State;
+      Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
       Y_Original            : List_Of_Value_Data_Lists;
       Y_Encoded             : Value_Data_List;
 --        Encode_Value          : Value_Record (Float_Type);
-      Classes               : List_Of_Value_Data_Lists;
+--        Classes               : Integer_List;
       Classes_K             : Value_Data_List;
       K_Length              : Natural := 0;
-      Y_Cursor              : Value_Data_Package.Cursor;
+--        Y_Cursor              : Value_Data_Package.Cursor;
       K_Cursor              : Value_Data_Package.Cursor;
       Max_Leaf_Nodes        : Integer := -1;
    begin
-      if Self.Parameters.CCP_Alpha < 0.0 then
+      if aClassifier.Parameters.CCP_Alpha < 0.0 then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit CCP_Alpha must be greater than or equal to 0";
       end if;
 
-      Self.Attributes.Num_Features := Num_Samples;
-      Self.Attributes.Num_Outputs := Integer (Num_Samples);
-      Self.Attributes.Classes.Clear;
-      Self.Attributes.Num_Classes.Clear;
+      aClassifier.Attributes.Num_Features := Num_Samples;
+      aClassifier.Attributes.Num_Outputs := Integer (Num_Samples);
+      aClassifier.Attributes.Classes.Clear;
+      aClassifier.Attributes.Num_Classes.Clear;
 
       if Positive (Y.Length) /= Num_Samples then
          raise Value_Error with
@@ -86,11 +86,11 @@ package body Decision_Tree_Classifer is
       end if;
 
       for k in 1 .. Num_Outputs loop
-         Classes_K := Classifier_Utilities.Unique_Values (Y);
+         Classes_K := Encode_Utils.Unique (Y);
          Y_Encoded := Classes_K;
          K_Length := Natural (Classes_K.Length);
-         Self.Attributes.Classes.Append (Classes_K);
-         Self.Attributes.Num_Classes.Append (K_Length);
+         aClassifier.Attributes.Classes.Append (Classes_K);
+         aClassifier.Attributes.Num_Classes.Append (K_Length);
       end loop;
       Y.Clear;
 
@@ -101,17 +101,17 @@ package body Decision_Tree_Classifer is
       end loop;
 
       Y_Original.Clear;
-      if Self.Parameters.Class_Weight /= Empty_Map then
+      if aClassifier.Parameters.Class_Weight /= Empty_Map then
          Y_Original.Append (Y);
          Expanded_Class_Weight :=
            Weights.Compute_Sample_Weight (Weights.No_Weight, Y_Original);
       end if;
-      if Self.Parameters.Max_Leaf_Nodes > 0 then
-         Max_Leaf_Nodes := Self.Parameters.Max_Leaf_Nodes;
+      if aClassifier.Parameters.Max_Leaf_Nodes > 0 then
+         Max_Leaf_Nodes := aClassifier.Parameters.Max_Leaf_Nodes;
       end if;
 
       Check_Parameters;
-      Build_Tree (Self);
+      Build_Tree (aClassifier);
 
       return theEstimator;
    end Fit;

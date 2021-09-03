@@ -73,13 +73,13 @@ package Tree is
    --  Predict class probabilities of the input samples X.
    --  The predicted class probability is the fraction of samples of the same
    --   class in a leaf.
-   function Predict_Probability (Self : Validation.Attribute_List;
-                                  X    : Sample_Matrix;
+--     function Predict_Probability (Self : Validation.Attribute_List;
+   function Predict_Probability (X    : Sample_Matrix;
                                  Check_Input : Boolean := True)
                                  return Probabilities_List;
    --  Predict class log-probabilities of the input samples X.
-   function Predict_Log_Probability (Self : Validation.Attribute_List;
-                                     X    : Sample_Matrix)
+--     function Predict_Log_Probability (Self : Validation.Attribute_List;
+   function Predict_Log_Probability (X    : Sample_Matrix)
                                      return Probabilities_List;
 
 end Tree;
