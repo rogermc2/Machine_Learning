@@ -78,7 +78,7 @@ package Decision_Tree_Classifer is
       CCP_Alpha                : Float := 0.0;
    end record;
 
-   --  class DecisionTree parameters additioanl to Base_Parameter_Data
+   --  class DecisionTree parameters additional to Base_Parameter_Data
    type Attribute_Data is record
       --  The classes labels (single output problem)
       --  or a list of arrays of class labels (multi-output problem).
@@ -86,13 +86,13 @@ package Decision_Tree_Classifer is
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
-      Max_Features        : Integer;
+      Max_Features        : Natural := 0;
       --  The number of classes (for single output problems),
       --  or a list containing the number of classes for each
       --   output (for multi-output problems).
       Num_Classes         : Integer_List;
-      Num_Features        : Integer;
-      Num_Outputs         : Integer;
+      Num_Features        : Natural := 0;
+      Num_Outputs         : Natural := 0;
       Decision_Tree       : Tree.Tree_Data;
    end record;
 
