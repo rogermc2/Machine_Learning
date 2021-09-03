@@ -73,8 +73,7 @@ package Decision_Tree_Classifer is
       --  Impure means that data is mixture of different classes.
       Min_Impurity_Decrease    : Float := 0.0;
       Min_Impurity_Split       : Float := 0.0;
-      Class_Weight             : Weights.Weight_Dictionary.Map :=
-                                   Weights.Weight_Dictionary.Empty_Map;
+      Class_Weight             : Weights.Weight_Type := Weights.No_Weight;
       Presort                  : String (1 .. 10) := "Deprecated";
       CCP_Alpha                : Float := 0.0;
    end record;
@@ -110,13 +109,10 @@ package Decision_Tree_Classifer is
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
    function Fit (aClassifier   : in out Classifier;
-                 --                   X    : Sample_Matrix;
-                 --                    Y : in out Integer_List;
                  X             : ML_Types.List_Of_Value_Data_Lists;
-                 Y             : in out ML_Types.Value_Data_List;
-                 Sample_Weight : Float_Array;
-                 Use_Weight    : Boolean := False;
-                 Check_Input   : Boolean := True;
-                 X_Idx_Sorted  : State := None) return Estimator.Estimator_Data;
+                 Y             : in out ML_Types.List_Of_Value_Data_Lists;
+                 Sample_Weight : in out Classifier_Types.Weight_List;
+                 Check_Input   : Boolean := False)
+                 return Estimator.Estimator_Data;
 
 end Decision_Tree_Classifer;

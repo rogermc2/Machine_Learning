@@ -9,8 +9,8 @@ package body Decision_Tree_Classifer is
    --  -------------------------------------------------------------------------
 
    procedure Build_Tree (Self : in out Classifier) is
---        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
---        Splitter  : Splitter_Type := Self.Parameters.Splitter;
+      --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
+      --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
    begin
       if Self.Parameters.Max_Leaf_Nodes < 0 then
          null;
@@ -29,43 +29,38 @@ package body Decision_Tree_Classifer is
    --  -------------------------------------------------------------------------
    --  The Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
-   --  Based on tree._classes.py BaseDecisionTree.Fit
+   --  Based on tree/_classes.py BaseDecisionTree.Fit
    --  X :  a (n_samples, n_features) matrix of training samples
    --  Y :  a (n_samples, n_outputs) array of integer valued class labels
    --       for the training samples.
    --  Sample_Weight : array-like of shape (n_samples,), default=None
    function Fit (aClassifier   : in out Classifier;
-                 --                   X    : Sample_Matrix;
-                 --                   Y    : in out Integer_List;
                  X             : ML_Types.List_Of_Value_Data_Lists;
-                 Y             : in out ML_Types.Value_Data_List;
-                 Sample_Weight : Float_Array;
-                 Use_Weight    : Boolean := False;
-                 Check_Input   : Boolean := True;
-                 X_Idx_Sorted  : State := None)
+                 Y             : in out ML_Types.List_Of_Value_Data_Lists;
+                 Sample_Weight : in out Classifier_Types.Weight_List;
+                 Check_Input   : Boolean := False)
                  return Estimator.Estimator_Data is
       use Ada.Containers;
       use ML_Types;
+      use Classifier_Types;
       use Classifier_Types.Integer_Package;
       use Value_Data_Package;
-      use Weights.Weight_Dictionary;
-      Num_Samples           : constant Positive := Positive (X.Length);
+      use Weights;
       Num_Outputs           : constant Positive := Positive (Y.Length);
-      Features              : Value_Data_List := X.First_Element;
       Num_Features          : constant Class_Range :=
-                                Class_Range (Features.Length);
-      Random_State          : Integer := aClassifier.Parameters.Random_State;
+                                Class_Range (X.Length);
+      Num_Samples           : constant Positive :=
+                                Positive (X.Element (1).Length);
+--        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
-      Y_Original            : List_Of_Value_Data_Lists;
-      Y_Encoded             : Value_Data_List;
---        Encode_Value          : Value_Record (Float_Type);
---        Classes               : Integer_List;
+      Y_Original            : List_Of_Value_Data_Lists := Y;
+      Y_Encoded             : List_Of_Value_Data_Lists;
+      --        Encode_Value          : Value_Record (Float_Type);
+      Y_K                   : Value_Data_List;
       Classes_K             : Value_Data_List;
-      K_Length              : Natural := 0;
---        Y_Cursor              : Value_Data_Package.Cursor;
-      K_Cursor              : Value_Data_Package.Cursor;
+      Inverse               : Natural_List;
       Max_Leaf_Nodes        : Integer := -1;
    begin
       if aClassifier.Parameters.CCP_Alpha < 0.0 then
@@ -73,8 +68,12 @@ package body Decision_Tree_Classifer is
            "Decision_Tree_Classifer.Fit CCP_Alpha must be greater than or equal to 0";
       end if;
 
+      if Check_Input then
+         null;
+      end if;
+
       aClassifier.Attributes.Num_Features := Num_Samples;
-      aClassifier.Attributes.Num_Outputs := Integer (Num_Samples);
+      aClassifier.Attributes.Num_Outputs := Num_Outputs;
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
 
@@ -86,31 +85,40 @@ package body Decision_Tree_Classifer is
       end if;
 
       for k in 1 .. Num_Outputs loop
-         Classes_K := Encode_Utils.Unique (Y);
-         Y_Encoded := Classes_K;
-         K_Length := Natural (Classes_K.Length);
+         Y_K := Y.Element (k);
+         Classes_K := Encode_Utils.Unique (Y_K, Inverse);
+         Y_Encoded.Replace_Element (k, Classes_K);
          aClassifier.Attributes.Classes.Append (Classes_K);
-         aClassifier.Attributes.Num_Classes.Append (K_Length);
       end loop;
-      Y.Clear;
+      Y := Y_Encoded;
 
-      K_Cursor := Classes_K.First;
-      while  Has_Element (K_Cursor) loop
-            Y.Append (Element (K_Cursor));
-            Next (K_Cursor);
-      end loop;
+      if aClassifier.Parameters.Class_Weight /= No_Weight then
+         Expanded_Class_Weight := Weights.Compute_Sample_Weight
+           (aClassifier.Parameters.Class_Weight, Y_Original);
+      end if;
 
       Y_Original.Clear;
-      if aClassifier.Parameters.Class_Weight /= Empty_Map then
+      if aClassifier.Parameters.Class_Weight /= Weights.No_Weight then
+         --  y_original = np.copy(y)
          Y_Original.Append (Y);
          Expanded_Class_Weight :=
            Weights.Compute_Sample_Weight (Weights.No_Weight, Y_Original);
       end if;
+
       if aClassifier.Parameters.Max_Leaf_Nodes > 0 then
          Max_Leaf_Nodes := aClassifier.Parameters.Max_Leaf_Nodes;
       end if;
 
       Check_Parameters;
+
+      if not Expanded_Class_Weight.Is_Empty then
+         if Sample_Weight.Is_Empty then
+            Sample_Weight := Expanded_Class_Weight;
+         else
+            null;
+         end if;
+      end if;
+
       Build_Tree (aClassifier);
 
       return theEstimator;
