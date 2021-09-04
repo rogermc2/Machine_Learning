@@ -5,14 +5,14 @@ with Classifier_Types;
 package Criterion is
 
     type Criterion_Class is record
-        Y                         : ML_Types.List_Of_Value_Data_Lists;
-        Classes                   : ML_Types.Value_Data_List;
-        Samples                   : ML_Types.Rows_Vector;
-        Num_Outputs               : Natural := 0;
-        Num_Weighted_Node_Samples : Natural := 0;
-        Num_Weighted_Left         : Natural := 0;
-        Num_Weighted_Right        : Natural := 0;
-        Sample_Weight             : Classifier_Types.Weight_List;
+        Y                     : ML_Types.List_Of_Value_Data_Lists;
+        Classes               : ML_Types.Value_Data_List;
+        Sample_Indices        : Classifier_Types.Natural_List;
+        Num_Outputs           : Natural := 0;
+        Weighted_Node_Samples : Float := 0.0;
+        Num_Weighted_Left     : Natural := 0;
+        Num_Weighted_Right    : Natural := 0;
+        Sample_Weight         : Classifier_Types.Weight_List;
         --  For classification criteria, Sum_Total is the sum of the weighted
         --  count of each label.
         --  For regression, Sum_Total is the sum of w*y.
