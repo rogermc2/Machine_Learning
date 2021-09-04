@@ -9,6 +9,14 @@ package body Node_Splitter is
     begin
         Self.Start := Start;
         Self.Stop := Stop;
+
+        Self.Criteria.Y := Self.Y;
+        Self.Criteria.Sample_Weight := Self.Sample_Weight;
+        Self.Criteria.Num_Weighted_Node_Samples := Self.Num_Weighted_Samples;
+        Self.Criteria.Start := Self.Start;
+        Self.Criteria.Stop := Self.Stop;
+        Self.Criteria.Samples := Self.Samples;
+
         if Weighted_Node_Samples.Is_Empty then
             Weighted_Node_Samples.Append
               (Float (Self.Criteria.Num_Weighted_Node_Samples));
@@ -16,6 +24,7 @@ package body Node_Splitter is
             Weighted_Node_Samples.Replace_Element
               (1, Float (Self.Criteria.Num_Weighted_Node_Samples));
         end if;
+
     end Reset_Node;
 
     --  -------------------------------------------------------------------------
@@ -64,6 +73,7 @@ package body Node_Splitter is
                 J_Index := J_Index + Num_Found_Constants;
                 Current.Feature := Features.Element (F_Index);
             end if;
+
         end loop;
 
     end Split_Node;

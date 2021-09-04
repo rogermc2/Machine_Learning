@@ -25,6 +25,7 @@ package Node_Splitter is
         Num_Weighted_Samples : Natural := 0;
         Start                : Natural := 0;
         Stop                 : Natural := 0;
+        Y                    : ML_Types.List_Of_Value_Data_Lists;
         Sample_Weight        : Classifier_Types.Weight_List;
     end record;
 
