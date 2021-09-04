@@ -13,4 +13,5 @@ package Maths is
    function Degrees (Angle : Radian) return Degree;
    function Radians (Angle : Degree) return Radian;
    function Random_Float return Float;
+   function Random_Integer return Integer;
 end Maths;

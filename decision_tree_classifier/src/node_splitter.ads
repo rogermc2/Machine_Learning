@@ -3,10 +3,12 @@
 
 with ML_Types;
 with Classifier_Types;
+with Criterion;
 
 package Node_Splitter is
 
     type Split_Record is record
+        Feature           : ML_Types.Value_Data_List;
         Threshold         : Natural := 0;
         Improvement       : Natural := 0;
         Improvement_Left  : Natural := 0;
@@ -14,12 +16,15 @@ package Node_Splitter is
     end record;
 
     type Split_Class is record
-        Num_Features         : Natural := 0;
+        Criteria             : Criterion.Criterion_Class;
+        Features             : ML_Types.List_Of_Value_Data_Lists;
         Max_Features         : Natural := 0;  --  Number of features to test
         Min_Leaf_Samples     : Natural := 0;
         Min_Leaf_Weight      : Natural := 0;
         Samples              : ML_Types.Rows_Vector;
         Num_Weighted_Samples : Natural := 0;
+        Start                : Natural := 0;
+        Stop                 : Natural := 0;
         Sample_Weight        : Classifier_Types.Weight_List;
     end record;
 

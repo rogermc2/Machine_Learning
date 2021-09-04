@@ -6,7 +6,7 @@ package body Maths is
    Radians_Per_Degree : constant Radian := Ada.Numerics.Pi / 180.0;
    Degrees_Per_Radian : constant Degree := 180.0 / Ada.Numerics.Pi;
 
-   Gen : Ada.Numerics.Float_Random.Generator;
+   Gen     : Ada.Numerics.Float_Random.Generator;
 
    --  ------------------------------------------------------------------------
 
@@ -36,6 +36,13 @@ package body Maths is
    begin
       return 2.0 * Float (Random (Gen)) - 1.0;
    end Random_Float;
+
+   --  ------------------------------------------------------------------------
+
+   function Random_Integer return Integer is
+   begin
+      return Integer (Random_Float);
+   end Random_Integer;
 
    --  ------------------------------------------------------------------------
 
