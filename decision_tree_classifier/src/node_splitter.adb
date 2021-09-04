@@ -1,7 +1,7 @@
 
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
-package body Splitter is
+package body Node_Splitter is
 
     procedure Split_Node (Self : Split_Class; Impurity : Float;
                           theSplit : Split_Record;
@@ -34,4 +34,4 @@ package body Splitter is
 
     end Split_Node;
 
-end Splitter;
+end Node_Splitter;

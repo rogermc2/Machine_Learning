@@ -4,7 +4,7 @@
 with ML_Types;
 with Classifier_Types;
 
-package Splitter is
+package Node_Splitter is
 
     type Split_Record is record
         Threshold         : Natural := 0;
@@ -27,4 +27,4 @@ package Splitter is
                           theSplit : Split_Record;
                           Num_Constant_Features :  ML_Types.Value_Data_List);
 
-end Splitter;
+end Node_Splitter;
