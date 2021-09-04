@@ -1,4 +1,6 @@
 
+--  Based on scikit-learn/sklearn/tree _splitter.pxd class Splitter
+
 with ML_Types;
 with Classifier_Types;
 
@@ -12,6 +14,7 @@ package Splitter is
     end record;
 
     type Split_Class is record
+        Num_Features         : Natural := 0;
         Max_Features         : Natural := 0;  --  Number of features to test
         Min_Leaf_Samples     : Natural := 0;
         Min_Leaf_Weight      : Natural := 0;
@@ -21,6 +24,7 @@ package Splitter is
     end record;
 
     procedure Split_Node (Self : Split_Class; Impurity : Float;
-                          theSplit : Split_Class);
+                          theSplit : Split_Record;
+                          Num_Constant_Features :  ML_Types.Value_Data_List);
 
 end Splitter;
