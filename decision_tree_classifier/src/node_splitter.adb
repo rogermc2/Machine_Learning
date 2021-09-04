@@ -105,7 +105,7 @@ package body Node_Splitter is
             for index in Self.Start .. Self.Stop loop
                Features_X.Replace_Element
                  (Features_X.To_Cursor (Self.Sample_Indices.Element (index)),
-                  Current.Feature);
+                  self.Feature_Values.Element (Current.Feature_Index));
             end loop;
 
          end if;
