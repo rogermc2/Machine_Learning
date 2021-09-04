@@ -6,13 +6,16 @@
 --  Tree_Builder controls the various stopping criteria and the node splitting
 --  evaluation order, e.g. depth-first or best-first.
 
-with ML_Types; use ML_Types;
+with ML_Types;
+with Classifier_Types;
 with Tree;
 
 package Tree_Build is
 
-    type Tree_Builder is record
-        --  Minimum samples in an internal node
+    type Type_Of_Tree is (Depth_First_Tree, Best_First_Tree);
+
+    type Tree_Builder (Tree_Kind : Type_Of_Tree := Depth_First_Tree) is record
+    --  Minimum samples in an internal node
         Min_Samples_Split     : Natural := 0;
         Min_Samples_Leaf      : Natural := 0;
         Min_Weight_Leaf       : Natural := 0;
@@ -20,7 +23,13 @@ package Tree_Build is
         Min_Impurity_Decrease : Natural := 0;
     end record;
 
-    function Build (aBuilder : Tree_Builder; theTree : Tree.Tree_Data;
-                     Rows : in out Rows_Vector) return Tree_Type;
+    procedure Build_Best_First_Tree
+      (aBuilder : in out Tree_Builder; X, Y : ML_Types.List_Of_Value_Data_Lists;
+       Sample_Weight : Classifier_Types.Weight_List;
+       theTree : in out Tree.Tree_Data);
+    procedure Build_Depth_First_Tree
+      (aBuilder : in out Tree_Builder; X, Y : ML_Types.List_Of_Value_Data_Lists;
+       Sample_Weight : Classifier_Types.Weight_List;
+       theTree : in out Tree.Tree_Data);
 
 end Tree_Build;
