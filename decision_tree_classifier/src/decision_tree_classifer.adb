@@ -11,7 +11,13 @@ package body Decision_Tree_Classifer is
     procedure Build_Tree (Self : in out Classifier) is
     --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
     --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
+        theTree   : Tree.Tree_Data
+          (Self.Attributes.Num_Features, Self.Attributes.Num_Outputs,
+           Tree.Index_Range (Self.Attributes.Classes.Length));
     begin
+        --  if is_classifier(self):
+        Self.Attributes.Decision_Tree := theTree;
+
         if Self.Parameters.Max_Leaf_Nodes < 0 then
             null;
         else
@@ -27,7 +33,7 @@ package body Decision_Tree_Classifer is
     end Check_Parameters;
 
     --  -------------------------------------------------------------------------
-
+    --  if is_classification: part of Python BasesDecisionTree.Fit
     procedure Classification_Fit
       (aClassifier   : in out Classifier;
        Y : in out ML_Types.List_Of_Value_Data_Lists; Num_Outputs : Positive;
@@ -102,8 +108,8 @@ package body Decision_Tree_Classifer is
             null;
         end if;
 
-        aClassifier.Attributes.Num_Features := Num_Samples;
-        aClassifier.Attributes.Num_Outputs := Num_Outputs;
+        aClassifier.Attributes.Num_Features := Tree.Index_Range (Num_Samples);
+        aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
         aClassifier.Attributes.Classes.Clear;
         aClassifier.Attributes.Num_Classes.Clear;
 

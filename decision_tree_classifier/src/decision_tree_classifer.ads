@@ -91,8 +91,8 @@ package Decision_Tree_Classifer is
       --  or a list containing the number of classes for each
       --   output (for multi-output problems).
       Num_Classes         : Integer_List;
-      Num_Features        : Natural := 0;
-      Num_Outputs         : Natural := 0;
+      Num_Features        : Tree.Index_Range := 1;
+      Num_Outputs         : Tree.Index_Range := 1;
       Decision_Tree       : Tree.Tree_Data;
    end record;
 
