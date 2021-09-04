@@ -7,11 +7,11 @@ with Tree_Build;
 
 package body Decision_Tree_Classifer is
 
-    procedure Build_Best_First_Tree
+    procedure Build_Best_First
       (X, Y : ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : Classifier_Types.Weight_List;
        aTree : in out Tree.Tree_Data);
-    procedure Build_Depth_First_Tree
+    procedure Build_Depth_First
       (X, Y : ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : Classifier_Types.Weight_List;
        aTree : in out Tree.Tree_Data);
@@ -31,36 +31,37 @@ package body Decision_Tree_Classifer is
         Self.Attributes.Decision_Tree := theTree;
 
         if Self.Parameters.Max_Leaf_Nodes < 0 then
-            Build_Depth_First_Tree (X, Y, Sample_Weight, theTree);
+            Build_Depth_First (X, Y, Sample_Weight, theTree);
         else
-            Build_Best_First_Tree (X, Y, Sample_Weight, theTree);
+            Build_Best_First (X, Y, Sample_Weight, theTree);
         end if;
     end Build_Tree;
 
     --  -------------------------------------------------------------------------
 
-    procedure Build_Best_First_Tree
+    procedure Build_Best_First
       (X, Y : ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : Classifier_Types.Weight_List;
        aTree : in out Tree.Tree_Data) is
         use Tree_Build;
         Builder : Tree_Builder (Best_First_Tree);
     begin
-        Build (Builder, X, Y, Sample_Weight, aTree);
+        Build_Best_First_Tree (Builder, X, Y, Sample_Weight, aTree);
 
-    end Build_Best_First_Tree;
+    end Build_Best_First;
 
     --  -------------------------------------------------------------------------
 
-    procedure Build_Depth_First_Tree
+    procedure Build_Depth_First
       (X, Y : ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : Classifier_Types.Weight_List;
        aTree : in out Tree.Tree_Data) is
         use Tree_Build;
         Builder : Tree_Builder (Depth_First_Tree);
     begin
-        Build (Builder, X, Y, Sample_Weight, aTree);
-    end Build_Depth_First_Tree;
+        Build_Depth_First_Tree (Builder, X, Y, Sample_Weight, aTree);
+
+    end Build_Depth_First;
 
     --  -------------------------------------------------------------------------
 
