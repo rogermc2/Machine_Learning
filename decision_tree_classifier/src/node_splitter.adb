@@ -4,8 +4,15 @@ with Maths;
 
 package body Node_Splitter is
 
+    Feature_Threshold : constant Float := 10.0 ** (-7);
+
     procedure Replacement_Sort (Self : Split_Class;
                                 Data : in out ML_Types.Value_Data_List;
+                                Current : Split_Record;
+                                Start, Stop : Positive);
+
+    procedure Replacement_Sort (Self : Split_Class;
+                                Data : in out Classifier_Types.Natural_List;
                                 Current : Split_Record;
                                 Start, Stop : Positive);
 
@@ -63,6 +70,30 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
+    procedure Replacement_Sort (Self : Split_Class;
+                                Data : in out Classifier_Types.Natural_List;
+                                Current : Split_Record;
+                                Start, Stop : Positive) is
+        use Classifier_Types;
+        use Natural_Package;
+        use Natural_Sorting;
+        Temp : Natural_List;
+    begin
+        for index in Self.Start .. Self.Stop loop
+            Temp.Append (Data.Element (index));
+        end loop;
+
+        Sort (Temp);
+        for index in Start .. Stop loop
+            Data.Replace_Element
+              (Data.To_Cursor (Self.Sample_Indices.Element (index)),
+               Temp.Element (Current.Feature_Index));
+        end loop;
+
+    end Replacement_Sort;
+
+    --  -------------------------------------------------------------------------
+
     procedure Reset_Node (Self                  : in out Split_Class; Start, Stop : Natural;
                           Weighted_Node_Samples : in out Classifier_Types.Weight_List) is
     begin
@@ -101,14 +132,16 @@ package body Node_Splitter is
         Features_X           : Value_Data_List := Self.Feature_Values;
         Current              : Split_Record;
         Max_Features         : Natural := Self.Max_Features;
-        Num_Known_Constants  : Natural :=
-                                 Num_Constant_Features.Element (1).Integer_Value;
+        Num_Known_Constants  : Natural
+          :=  Num_Constant_Features.Element (1).Integer_Value;
         Num_Total_Constants  : Natural := Num_Known_Constants;
         Num_Visited_Features : Natural := 0;
         Num_Found_Constants  : Natural := 0;
         Num_Drawn_Constants  : Natural := 0;
         F_Index              : Natural := Num_Features;
         J_Index              : Natural;
+        Swap                 : Natural;
+        Threshold            : Value_Record;
     begin
         --  Sample up to Max_Features without replacement using a
         --  Fisher-Yates-based algorithm.
@@ -143,6 +176,32 @@ package body Node_Splitter is
 
                 Replacement_Sort (Self, Features_X, Current, Self.Start,
                                   Self.Stop);
+                Replacement_Sort (Self, Samples, Current, Self.Start,
+                                  Self.Stop);
+                if Features_X.First_Element.Value_Kind = Float_Type then
+                    Threshold.Float_Value :=
+                      Features_X.First_Element.Float_Value +
+                        Feature_Threshold;
+                else
+                    Threshold := Features_X.First_Element;
+                end if;
+
+                if Features_X.Last_Element <= Threshold then
+                    Swap := Features.Element (J_Index);
+                    Features.Replace_Element
+                      (J_Index, Features.Element (Num_Total_Constants));
+                    Features.Replace_Element (Num_Total_Constants, Swap);
+                    Num_Found_Constants := Num_Found_Constants + 1;
+                    Num_Total_Constants := Num_Total_Constants + 1;
+                else
+                    F_Index := F_Index - 1;
+                    Swap := Features.Element (F_Index);
+                    Features.Replace_Element (F_Index,
+                                              Features.Element (J_Index));
+                    Features.Replace_Element (J_Index, Swap);
+                    --  Evaluate all splits
+
+                end if;
             end if;
 
         end loop;

@@ -9,7 +9,7 @@ package Criterion is
         Classes               : ML_Types.Value_Data_List;
         Sample_Indices        : Classifier_Types.Natural_List;
         Num_Outputs           : Natural := 0;
-        Weighted_Node_Samples : Float := 0.0;
+        Num_Weighted_Node_Samples : Natural := 0;
         Num_Weighted_Left     : Natural := 0;
         Num_Weighted_Right    : Natural := 0;
         Sample_Weight         : Classifier_Types.Weight_List;
@@ -24,10 +24,12 @@ package Criterion is
         Sum_Right                 : Classifier_Types.Natural_List;
         Sum_Stride                : Natural := 0;
         Start                     : Natural := 0;
+        Pos                       : Natural := 0;
         Stop                      : Natural := 0;
     end record;
 
     function Gini_Node_Impurity (Criteria : in out Criterion_Class)
                                  return Float;
+    procedure Reset (Criteria : in out Criterion_Class);
 
 end Criterion;

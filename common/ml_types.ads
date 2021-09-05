@@ -75,6 +75,8 @@ package ML_Types is
     subtype Value_Data_List is Value_Data_Package.Vector;
 
     function "<" (L, R : Value_Record) return Boolean;
+    function "<=" (L, R : Value_Record) return Boolean;
+
     package Value_Data_Sorting is new
       Value_Data_Package.Generic_Sorting ("<");
 

@@ -34,4 +34,31 @@ package body Criterion is
 
     end Gini_Node_Impurity;
 
+    --  ------------------------------------------------------------------------
+
+    procedure Reset (Criteria : in out Criterion_Class) is
+        Sum_Total_Index : Natural := 1;
+        Sum_Left_Index  : Natural := 1;
+        Sum_Right_Index : Natural := 1;
+    begin
+        Criteria.Pos := Criteria.Start;
+        Criteria.Num_Weighted_Left := 0;
+        Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples;
+
+        for k in 1 .. Criteria.Num_Outputs loop
+            for index in 1 .. Criteria.Classes.Length loop
+                Criteria.Sum_Left.Replace_Element (Sum_Left_Index, 0);
+                Criteria.Sum_Right.Replace_Element
+                  (Sum_Right_Index, Criteria.Sum_Total.Element (Sum_Total_Index));
+            end loop;
+
+            Sum_Total_Index := Sum_Total_Index + Criteria.Sum_Stride;
+            Sum_Left_Index := Sum_Left_Index + Criteria.Sum_Stride;
+            Sum_Right_Index := Sum_Right_Index + Criteria.Sum_Stride;
+        end loop;
+
+    end Reset;
+
+    --  ------------------------------------------------------------------------
+
 end Criterion;
