@@ -62,9 +62,11 @@ package body Node_Splitter is
       use Maths.Float_Math_Functions;
       use ML_Types;
       use ML_Types.Value_Data_Package;
+      use ML_Types.Value_Data_Sorting;
       Features             : Classifier_Types.Natural_List :=
                                Self.Feature_Indices;
       Features_X           : Value_Data_List := Self.Feature_Values;
+      Node_Features_X      : Value_Data_List;
       Current              : Split_Record;
       Num_Features         : Natural := Natural (Features.Length);
       Max_Features         : Natural := Self.Max_Features;
@@ -108,6 +110,17 @@ package body Node_Splitter is
                   self.Feature_Values.Element (Current.Feature_Index));
             end loop;
 
+            Node_Features_X.Clear;
+            for index in Self.Start .. Self.Stop loop
+               Node_Features_X.Append (Features_X.Element (index));
+            end loop;
+
+            Sort (Node_Features_X);
+            for index in Self.Start .. Self.Stop loop
+               Features_X.Replace_Element
+                 (Features_X.To_Cursor (Self.Sample_Indices.Element (index)),
+                  Node_Features_X.Element (Current.Feature_Index));
+            end loop;
          end if;
 
       end loop;
