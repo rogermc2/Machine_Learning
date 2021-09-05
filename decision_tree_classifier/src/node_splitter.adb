@@ -1,5 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
+with Ada.Containers;
+
 with Maths;
 
 package body Node_Splitter is
@@ -21,9 +23,11 @@ package body Node_Splitter is
     procedure Init (Self          : in out Splitter_Class;
                     X, Y          : ML_Types.List_Of_Value_Data_Lists;
                     Sample_Weight : Classifier_Types.Weight_List) is
+        use Ada.Containers;
         Num_Samples      : constant Positive := Positive (X.Element (1).Length);
+        Num_Features     : constant Positive := Positive (X.Length);
         Samples          : Classifier_Types.Natural_List;
-        Weighted_Samples : Natural := 0;
+        Weighted_Samples : Float := 0.0;
         J                : Natural := 0;
     begin
         for index in 1 .. Num_Samples loop
@@ -35,12 +39,24 @@ package body Node_Splitter is
                 Weighted_Samples :=
                   Weighted_Samples + Sample_Weight.Element (index);
             else
-                Weighted_Samples := Weighted_Samples + 1;
+                Weighted_Samples := Weighted_Samples + 1.0;
             end if;
         end loop;
 
         Self.Num_Samples := J;
-        Self.Num_Weighted_Samples := Weighted_Samples;
+        Self.Weighted_Samples := Weighted_Samples;
+
+        Self.Feature_Indices.Clear;
+        for index in 1 .. Num_Features loop
+            Self.Feature_Indices.Append (index);
+        end loop;
+        Self.Feature_Values.Clear;
+        Self.Feature_Values.Set_Length (Count_Type (Num_Samples));
+        Self.Constant_Features.Clear;
+        Self.Constant_Features.Set_Length (Count_Type (Num_Features));
+
+        Self.Y := Y;
+        Self.Sample_Weight := Sample_Weight;
 
     end Init;
 
@@ -102,7 +118,7 @@ package body Node_Splitter is
         Self.Start := Start;
         Self.Stop := Stop;
 
-        Criterion.Reset;
+        Criterion.Reset (Self.Criteria);
 
         if Weighted_Node_Samples.Is_Empty then
             Weighted_Node_Samples.Append (Self.Criteria.Weighted_Node_Samples);
@@ -115,7 +131,8 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Split_Node (Self                  : Split_Class; Impurity : Float;
+    procedure Split_Node (Self                  : in out Splitter_Class;
+                          Impurity : Float;
                           theSplit              : Split_Record;
                           Num_Constant_Features : ML_Types.Value_Data_List) is
         use ML_Types;
