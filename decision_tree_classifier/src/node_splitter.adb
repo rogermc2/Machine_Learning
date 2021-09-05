@@ -6,24 +6,24 @@ package body Node_Splitter is
 
     Feature_Threshold : constant Float := 10.0 ** (-7);
 
-    procedure Replacement_Sort (Self : Split_Class;
+    procedure Replacement_Sort (Self : Splitter_Class;
                                 Data : in out ML_Types.Value_Data_List;
                                 Current : Split_Record;
                                 Start, Stop : Positive);
 
-    procedure Replacement_Sort (Self : Split_Class;
+    procedure Replacement_Sort (Self : Splitter_Class;
                                 Data : in out Classifier_Types.Natural_List;
                                 Current : Split_Record;
                                 Start, Stop : Positive);
 
     --  -------------------------------------------------------------------------
 
-    procedure Init (Self          : in out Split_Class;
+    procedure Init (Self          : in out Splitter_Class;
                     X, Y          : ML_Types.List_Of_Value_Data_Lists;
                     Sample_Weight : Classifier_Types.Weight_List) is
         Num_Samples      : constant Positive := Positive (X.Element (1).Length);
         Samples          : Classifier_Types.Natural_List;
-        Weighted_Samples : Float := 0.0;
+        Weighted_Samples : Natural := 0;
         J                : Natural := 0;
     begin
         for index in 1 .. Num_Samples loop
@@ -35,18 +35,18 @@ package body Node_Splitter is
                 Weighted_Samples :=
                   Weighted_Samples + Sample_Weight.Element (index);
             else
-                Weighted_Samples := Weighted_Samples + 1.0;
+                Weighted_Samples := Weighted_Samples + 1;
             end if;
         end loop;
 
         Self.Num_Samples := J;
-        Self.Weighted_Samples := Weighted_Samples;
+        Self.Num_Weighted_Samples := Weighted_Samples;
 
     end Init;
 
     --  -------------------------------------------------------------------------
 
-    procedure Replacement_Sort (Self : Split_Class;
+    procedure Replacement_Sort (Self : Splitter_Class;
                                 Data : in out ML_Types.Value_Data_List;
                                 Current : Split_Record;
                                 Start, Stop : Positive) is
@@ -70,7 +70,7 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Replacement_Sort (Self : Split_Class;
+    procedure Replacement_Sort (Self : Splitter_Class;
                                 Data : in out Classifier_Types.Natural_List;
                                 Current : Split_Record;
                                 Start, Stop : Positive) is
@@ -94,18 +94,15 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Reset_Node (Self                  : in out Split_Class; Start, Stop : Natural;
-                          Weighted_Node_Samples : in out Classifier_Types.Weight_List) is
+    procedure Reset_Node
+      (Self   : in out Splitter_Class; Start, Stop : Natural;
+       Weighted_Node_Samples : in out Classifier_Types.Weight_List) is
+        use Classifier_Types.Float_Package;
     begin
         Self.Start := Start;
         Self.Stop := Stop;
 
-        Self.Criteria.Y := Self.Y;
-        Self.Criteria.Sample_Weight := Self.Sample_Weight;
-        Self.Criteria.Weighted_Node_Samples := Self.Weighted_Samples;
-        Self.Criteria.Start := Self.Start;
-        Self.Criteria.Stop := Self.Stop;
-        Self.Criteria.Sample_Indices := Self.Sample_Indices;
+        Criterion.Reset;
 
         if Weighted_Node_Samples.Is_Empty then
             Weighted_Node_Samples.Append (Self.Criteria.Weighted_Node_Samples);
@@ -200,7 +197,7 @@ package body Node_Splitter is
                                               Features.Element (J_Index));
                     Features.Replace_Element (J_Index, Swap);
                     --  Evaluate all splits
-
+                    Criterion.Reset (Self.Criteria);
                 end if;
             end if;
 
