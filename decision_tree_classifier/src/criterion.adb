@@ -119,4 +119,11 @@ package body Criterion is
 
     --  ------------------------------------------------------------------------
 
+    procedure Update (Criteria : in out Criterion_Class) is
+    begin
+        null;
+    end Update;
+
+    --  ------------------------------------------------------------------------
+
 end Criterion;

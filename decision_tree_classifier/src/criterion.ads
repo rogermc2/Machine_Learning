@@ -39,5 +39,6 @@ package Criterion is
                     Num_Weighted_Samples, Start, Stop : Natural;
                     Sample_Indices : Classifier_Types.Natural_List);
     procedure Reset (Criteria : in out Criterion_Class);
+    procedure Update (Criteria : in out Criterion_Class);
 
 end Criterion;

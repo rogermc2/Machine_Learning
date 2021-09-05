@@ -154,6 +154,7 @@ package body Node_Splitter is
         Num_Drawn_Constants  : Natural := 0;
         F_Index              : Natural := Num_Features;
         J_Index              : Natural;
+        P_Index              : Positive;
         Swap                 : Natural;
         Threshold            : Value_Record;
     begin
@@ -215,6 +216,26 @@ package body Node_Splitter is
                     Features.Replace_Element (J_Index, Swap);
                     --  Evaluate all splits
                     Criterion.Reset (Self.Criteria);
+                    P_Index := Self.Start;
+                    while P_Index <= Self.Stop loop
+                        while P_Index + 1 <= Self.Stop and
+                          Features.Element (P_Index + 1) <=
+                          Features.Element (P_Index) loop
+                            P_Index := P_Index + 1;
+                        end loop;
+                        P_Index := P_Index + 1;
+                        if P_Index < Self.Stop then
+                            Current.Pos := P_Index;
+                            --  Reject if Min_Leaf_Samples is not guaranteed
+                            if (Current.Pos - Self.Start) >=
+                              Self.Min_Leaf_Samples and
+                              (Self.Stop - Current.Pos) >=
+                              Self.Min_Leaf_Samples then
+                                Null;
+                                --  self.criterion.update(current.pos)
+                            end if;
+                        end if;
+                    end loop;
                 end if;
             end if;
 
