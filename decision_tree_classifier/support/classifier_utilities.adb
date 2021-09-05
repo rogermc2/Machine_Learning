@@ -138,21 +138,6 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
-    --     function Get_Column (Data       : ML_Types.Value_Data_List;
-    --                          Data_Index : Positive)
-    --                           return ML_Types.Value_Data_List is
-    --        use ML_Types;
-    --        theList : Value_Data_List;
-    --     begin
-    --        for index in Data.First_Index .. Data.Last_Index loop
-    --           theList.Append (Data.Element (Data_Index));
-    --        end loop;
-    --        return theList;
-    --
-    --     end Get_Column;
-
-    --  -------------------------------------------------------------------------
-
     function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
                                        return Integer_List is
         use ML_Types;
