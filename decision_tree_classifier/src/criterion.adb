@@ -8,7 +8,7 @@ package body Criterion is
    --  current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
                                 return Float is
-      Sum_Total : constant Classifier_Types.Natural_List :=
+      Sum_Total : constant Classifier_Types.List_Of_Natural_Lists :=
                     Criteria.Sum_Total;
       Count_K   : Float;
       Gini      : Float := 0.0;
@@ -129,9 +129,10 @@ package body Criterion is
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
       use ML_Types;
-      Sum_Left    : Classifier_Types.Natural_List := Criteria.Sum_Left;
-      Sum_Right   : Classifier_Types.Natural_List := Criteria.Sum_Right;
-      Sum_Total   : Classifier_Types.Natural_List := Criteria.Sum_Total;
+      Sum_Left    : Classifier_Types.Natural_List :=
+                        Criteria.Sum_Left.Element (1);
+      Sum_Right   : Classifier_Types.Natural_List;
+      Sum_Total   : Classifier_Types.Natural_List;
       i           : Positive;
       Label_Index : Positive;
       Values      : Value_Data_List;
@@ -174,6 +175,17 @@ package body Criterion is
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left - Weight;
          end loop;
       end if;
+
+      --  Update right part statistics
+      Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples -
+          Criteria.Num_Weighted_Left;
+      for k in 1 .. Criteria.Num_Outputs loop
+            for c in 1 .. Criteria.Num_Classes.Element (k) loop
+               Sum_Right.Replace_Element
+                 (c, Sum_Total.Element (c) - Sum_Left.Element (c));
+            end loop;
+
+      end loop;
 
    end Update;
 

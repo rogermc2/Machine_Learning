@@ -22,9 +22,10 @@ package Criterion is
         --  Sum_Total [k] is equal to
         --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
         --  where k is the output index.
-        Sum_Total                 : Classifier_Types.Natural_List;
-        Sum_Left                  : Classifier_Types.Natural_List;
-        Sum_Right                 : Classifier_Types.Natural_List;
+        Sum_Total                 : Classifier_Types.List_Of_Natural_Lists;
+        Sum_Left                  : Classifier_Types.List_Of_Natural_Lists;
+        Sum_Right                 : Classifier_Types.List_Of_Natural_Lists;
+        Num_Classes               : Classifier_Types.Natural_List;
         Stride                    : Natural := 0;
         Start                     : Natural := 0;
         Pos                       : Natural := 0;
