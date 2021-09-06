@@ -26,7 +26,6 @@ package Criterion is
         Sum_Left                  : Classifier_Types.List_Of_Natural_Lists;
         Sum_Right                 : Classifier_Types.List_Of_Natural_Lists;
         Num_Classes               : Classifier_Types.Natural_List;
-        Stride                    : Natural := 0;
         Start                     : Natural := 0;
         Pos                       : Natural := 0;
         Stop                      : Natural := 0;

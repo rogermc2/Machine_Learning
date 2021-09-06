@@ -1,4 +1,6 @@
 
+with Ada.Containers;
+
 with ML_Types;
 
 package body Criterion is
@@ -8,17 +10,21 @@ package body Criterion is
    --  current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
                                 return Float is
+      use Ada.Containers;
       use Classifier_Types.Natural_Package;
       Sum_Total : Classifier_Types.Natural_List;
       Count_K   : Float;
       Gini      : Float := 0.0;
       Sq_Count  : Float := 0.0;
    begin
+      Sum_Total := Criteria.Sum_Total.Element (1);
       for index_k in Positive range 1 .. Criteria.Num_Outputs loop
          Sq_Count := 0.0;
          Sum_Total := Criteria.Sum_Total.Element (index_k);
-         if Natural (Criteria.Classes.Length) > Criteria.Stride then
-            Criteria.Stride  := Natural (Criteria.Classes.Length);
+         if Criteria.Classes.Length > Sum_Total.Length then
+            Sum_Total.Set_Length (Criteria.Classes.Length);
+--           if Natural (Criteria.Classes.Length) > Criteria.Stride then
+--              Criteria.Stride  := Natural (Criteria.Classes.Length);
          end if;
 
          for Class_Index in Criteria.Classes.First_Index ..
@@ -44,7 +50,6 @@ package body Criterion is
                    Sample_Indices                    : Classifier_Types.Natural_List) is
       Y_I             : ML_Types.Value_Data_List;
       Sum_Total       : Classifier_Types.Natural_List;
-      Sum_Total_Index : Natural := 1;
       i               : Natural;
       w               : Positive := 1;
       c               : ML_Types.Value_Record;
@@ -63,13 +68,13 @@ package body Criterion is
       Criteria.Num_Weighted_Left := 0;
       Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples;
 
+      Criteria.Sum_Total.Clear;
       for k in 1 .. Criteria.Num_Outputs loop
-         Sum_Total := Criteria.Sum_Total.Element (k);
+         Sum_Total.Clear;
          for index in 1 .. Criteria.Classes.Length loop
-            Sum_Total.Replace_Element (Sum_Total_Index, 0);
-            Sum_Total_Index := Sum_Total_Index + Criteria.Stride;
+            Sum_Total.Append (0);
          end loop;
-         Criteria.Sum_Total.Replace_Element (k, Sum_Total);
+         Criteria.Sum_Total.Append (Sum_Total);
       end loop;
 
       Criteria.Weighted_Node_Samples := 0;
@@ -82,12 +87,10 @@ package body Criterion is
          end if;
 
          for k in 1 .. Criteria.Num_Outputs loop
-            Sum_Total := Criteria.Sum_Total.Element (p);
             c := Y_I.Element (k);
-            Sum_Total_Index := c.Integer_Value;
+            Sum_Total := Criteria.Sum_Total.Element (k);
             Sum_Total.Replace_Element
-              (Sum_Total_Index,
-               Sum_Total.Element (Sum_Total_Index + w));
+              (c.Integer_Value, Sum_Total.Element (c.Integer_Value) + w);
             Criteria.Sum_Total.Replace_Element (k, Sum_Total);
          end loop;
 
@@ -158,10 +161,11 @@ package body Criterion is
 
             Values := Criteria.Y.Element (i);
             for k in 1 .. Criteria.Num_Outputs loop
-               Label_Index := (k -1) * Criteria.Stride +
-                 Values.Element (k).Integer_Value;
+               Sum_Left := Criteria.Sum_Left.Element (k);
+               Label_Index := Values.Element (k).Integer_Value;
                Sum_Left.Replace_Element
                  (Label_Index, Sum_Left.Element (Label_Index) + Weight);
+               Criteria.Sum_Left.Replace_Element (k, Sum_Left);
             end loop;
 
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
@@ -177,10 +181,11 @@ package body Criterion is
 
             Values := Criteria.Y.Element (i);
             for k in 1 .. Criteria.Num_Outputs loop
-               Label_Index := (k -1) * Criteria.Stride +
-                 Values.Element (k).Integer_Value;
+               Sum_Left := Criteria.Sum_Left.Element (k);
+               Label_Index := Values.Element (k).Integer_Value;
                Sum_Left.Replace_Element
                  (Label_Index, Sum_Left.Element (Label_Index) - Weight);
+               Criteria.Sum_Left.Replace_Element (k, Sum_Left);
             end loop;
 
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left - Weight;
