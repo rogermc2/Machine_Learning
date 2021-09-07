@@ -76,10 +76,12 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure Process_A (Self   : in out Splitter_Class;
-                        P_Index : in out Natural;
+                        P : Natural;
                         Features : Classifier_Types.Natural_List;
                         Features_X  : ML_Types.Value_Data_List;
-                        Current, Best  : in out Split_Record) is
+                        Cur : Split_Record; Best : in out Split_Record) is
+      P_Index : Natural := P;
+      Current : Split_Record := Cur;
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
    begin
