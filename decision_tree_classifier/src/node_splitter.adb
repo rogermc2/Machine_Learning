@@ -69,7 +69,7 @@ package body Node_Splitter is
       theSplit.Improvement := -Float'Last;
       theSplit.Pos := Start;
       theSplit.Feature_Index := 1;
-      theSplit.Threshold := 0;
+      theSplit.Threshold := 0.0;
 
    end Init_Split;
 
@@ -151,34 +151,35 @@ package body Node_Splitter is
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
 
-      Samples              : Classifier_Types.Natural_List :=
-                               Self.Sample_Indices;
-      Features             : Classifier_Types.Natural_List :=
-                               Self.Feature_Indices;
-      Features_X           : Value_Data_List := Self.Feature_Values;
-      Current              : Split_Record;
-      Max_Features         : Natural := Self.Max_Features;
-      Num_Known_Constants  : Natural
+      Samples                   : Classifier_Types.Natural_List :=
+                                    Self.Sample_Indices;
+      Features                  : Classifier_Types.Natural_List :=
+                                    Self.Feature_Indices;
+      Features_X                : Value_Data_List := Self.Feature_Values;
+      Best                      : Split_Record;
+      Current                   : Split_Record;
+      Max_Features              : Natural := Self.Max_Features;
+      Num_Known_Constants       : Natural
         :=  Num_Constant_Features.Element (1).Integer_Value;
-      Num_Total_Constants  : Natural := Num_Known_Constants;
-      Num_Visited_Features : Natural := 0;
-      Num_Found_Constants  : Natural := 0;
-      Num_Drawn_Constants  : Natural := 0;
-      Start_Positive       : Natural;
-      Stop_Negative        : Natural;
-      F_I                  : Natural := Num_Features;
-      F_J                  : Natural;
-      P_Index              : Positive;
-      Swap                 : Natural;
-      Compare_Value        : Value_Record;
-      Current_Proxy_Improvement : Float;
+      Num_Total_Constants       : Natural := Num_Known_Constants;
+      Num_Visited_Features      : Natural := 0;
+      Num_Found_Constants       : Natural := 0;
+      Num_Drawn_Constants       : Natural := 0;
+      F_I                       : Natural := Num_Features;
+      F_J                       : Natural;
+      P_Index                   : Positive;
+      Swap                      : Natural;
+      Compare_Value             : Value_Record;
+      Current_Proxy_Improvement : Float := -Float'Last;
+      Best_Proxy_Improvement    : Float := -Float'Last;
+      Partition_End             : Natural;
    begin
       --  Skip CPU intensive evaluation of the impurity criterion for
       --  features that have already been detected as constant
       --  (hence not suitable for good splitting) by ancestor nodes and save
       --  the information on newly discovered constant features to avoid
       --  computation on descendant nodes.
-      Init_Split (theSplit, Start_Positive);
+      Init_Split (Best, Self.Stop);
 
       --  L323
       while F_I > Num_Total_Constants and
@@ -229,7 +230,7 @@ package body Node_Splitter is
                Features.Replace_Element (Num_Total_Constants, Swap);
                Num_Found_Constants := Num_Found_Constants + 1;
                Num_Total_Constants := Num_Total_Constants + 1;
-            --  L372
+               --  L372
             else
                F_I := F_I - 1;
                Swap := Features.Element (F_I);
@@ -263,14 +264,45 @@ package body Node_Splitter is
                              Self.Min_Leaf_Weight) then
                            Current_Proxy_Improvement :=
                              Criterion.Proxy_Impurity_Improvement (Self.Criteria);
+                           if Current_Proxy_Improvement >
+                             Best_Proxy_Improvement then
+                              Best_Proxy_Improvement := Current_Proxy_Improvement;
+                              --  411 use sum of halves to avoid infinite value
+                              Current.Threshold :=
+                                0.5 * Features_X.Element (P_Index - 1).Float_Value +
+                                0.5 * Features_X.Element (P_Index).Float_Value;
+                              if (Current.Threshold = Features_X.Element (P_Index).Float_Value) or
+                                (Features_X.Element (P_Index).Float_Value = Float'Last) or
+                                (Features_X.Element (P_Index).Float_Value = -Float'Last) then
+                                 Current.Threshold := Features_X.Element (P_Index - 1).Float_Value;
+                              end if;
+                              Best := Current;
+                           end if;
                         end if;
                      end if;
                   end if;
                end loop;
             end if;
          end if;
-
       end loop;
+
+      if Best.Pos < Self.Stop then
+         Partition_End := Self.Stop;
+         P_Index := Self.Start;
+         while P_Index < Partition_End loop
+            if (Self.X.Element
+                  (Self.Sample_Indices.Element (P_Index)) <= Best.Threshold) or
+              (Best.Feature_Index <= Best.Threshold) then
+               P_Index := P_Index + 1;
+            else
+               Partition_End := Partition_End - 1;
+               Swap := Samples.Element (P_Index);
+               Samples.Replace_Element
+                 (P_Index, Samples.Element (Partition_End));
+               Samples.Replace_Element (Partition_End, Swap);
+            end if;
+         end loop;
+      end if;
 
    end Split_Node;
 
