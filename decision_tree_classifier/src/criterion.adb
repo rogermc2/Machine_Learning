@@ -132,10 +132,7 @@ package body Criterion is
                       New_Pos  : Positive) is
         use ML_Types;
         Sum_Left    : Float;
-        Sum_Right   : Float;
-        Sum_Total   : Float;
         i           : Positive;
-        Label_Index : Positive;
         Values      : Value_Data_List;
         Weight      : Float := 1.0;
     begin
@@ -149,8 +146,8 @@ package body Criterion is
                 Values := Criteria.Y.Element (i);
                 for k in 1 .. Criteria.Num_Outputs loop
                     Sum_Left := Criteria.Sum_Left.Element (k);
-                    Label_Index := Values.Element (k).Integer_Value;
-                    Sum_Left := Sum_Left + Weight;
+                    Sum_Left :=
+                      Sum_Left + Values.Element (k).Float_Value * Weight;
                     Criteria.Sum_Left.Replace_Element (k, Sum_Left);
                 end loop;
 
@@ -168,8 +165,8 @@ package body Criterion is
                 Values := Criteria.Y.Element (i);
                 for k in 1 .. Criteria.Num_Outputs loop
                     Sum_Left := Criteria.Sum_Left.Element (k);
-                    Label_Index := Values.Element (k).Integer_Value;
-                    Sum_Left := Sum_Left.Element (Label_Index) - Weight;
+                    Sum_Left :=
+                      Sum_Left - Values.Element (k).Float_Value * Weight;
                     Criteria.Sum_Left.Replace_Element (k, Sum_Left);
                 end loop;
 
@@ -182,7 +179,8 @@ package body Criterion is
           Criteria.Weighted_Left;
         for k in 1 .. Criteria.Num_Outputs loop
             for c in 1 .. Criteria.Num_Classes.Element (k) loop
-                Sum_Right := Sum_Total.Element (c) - Sum_Left;
+                Criteria.Sum_Left.Replace_Element
+                  (c, Criteria.Sum_Total.Element (c) - Sum_Left);
             end loop;
         end loop;
 
