@@ -173,6 +173,7 @@ package body Node_Splitter is
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
       Partition_End             : Natural;
+      X_1                       : ML_Types.Value_Data_List;
    begin
       --  Skip CPU intensive evaluation of the impurity criterion for
       --  features that have already been detected as constant
@@ -290,9 +291,10 @@ package body Node_Splitter is
          Partition_End := Self.Stop;
          P_Index := Self.Start;
          while P_Index < Partition_End loop
-            if (Self.X.Element
-                  (Self.Sample_Indices.Element (P_Index)) <= Best.Threshold) or
-              (Best.Feature_Index <= Best.Threshold) then
+            X_1 := Self.X.Element
+              (Self.Sample_Indices.Element (P_Index));
+            if X_1.Element (Self.Sample_Indices.Element (P_Index)).Float_Value
+              <= Best.Threshold then
                P_Index := P_Index + 1;
             else
                Partition_End := Partition_End - 1;

@@ -32,7 +32,7 @@ package Node_Splitter is
       Y                    : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight        : Classifier_Types.Weight_List;
       --  BaseDenseSplitter elements
-      X                    : ML_Types.Value_Data_List;
+      X                    : ML_Types.List_Of_Value_Data_Lists;
       Total_Samples        : Natural := 0;
    end record;
 
