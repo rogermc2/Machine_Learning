@@ -41,6 +41,8 @@ package Criterion is
                    Sample_Weight    : Classifier_Types.Weight_List;
                    Weighted_Samples : Float; Start, Stop : Natural;
                    Sample_Indices   : Classifier_Types.Natural_List);
+   function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
+                                        return Float;
    procedure Reset (Criteria : in out Criterion_Class);
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive);
