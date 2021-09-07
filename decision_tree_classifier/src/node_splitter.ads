@@ -20,7 +20,7 @@ package Node_Splitter is
         Criteria             : Criterion.Criterion_Class;
         Max_Features         : Natural := 0;  --  Number of features to test
         Min_Leaf_Samples     : Natural := 0;
-        Min_Leaf_Weight      : Natural := 0;
+        Min_Leaf_Weight      : Float := 0.0;
         Sample_Indices       : Classifier_Types.Natural_List;
         Feature_Indices      : Classifier_Types.Natural_List;
         Constant_Features    : Classifier_Types.Natural_List;

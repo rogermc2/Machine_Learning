@@ -262,7 +262,7 @@ package body Node_Splitter is
                           (Self.Criteria.Weighted_Right >=
                              Self.Min_Leaf_Weight) then
                            Current_Proxy_Improvement :=
-                             Self.Criteria.p
+                             Criterion.Proxy_Impurity_Improvement (Self.Criteria);
                         end if;
                      end if;
                   end if;
