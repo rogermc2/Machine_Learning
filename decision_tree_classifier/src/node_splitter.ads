@@ -26,19 +26,19 @@ package Node_Splitter is
         Constant_Features    : Classifier_Types.Natural_List;
         Feature_Values       : ML_Types.Value_Data_List;
         Num_Samples          : Natural := 0;
-        Weighted_Samples     : Float := 0.0;
+        Weighted_Samples     : Natural := 0;
         Start                : Natural := 0;
         Stop                 : Natural := 0;
         Y                    : ML_Types.List_Of_Value_Data_Lists;
-        Sample_Weight        : Classifier_Types.Weight_List;
+        Sample_Weight        : Classifier_Types.Natural_List;
     end record;
 
     procedure Init (Self          : in out Splitter_Class;
                     X, Y          : ML_Types.List_Of_Value_Data_Lists;
-                    Sample_Weight : Classifier_Types.Weight_List);
+                    Sample_Weight : Classifier_Types.Natural_List);
     procedure Reset_Node
-      (Self   : in out Splitter_Class; Start, Stop : Natural;
-       Weighted_Node_Samples : in out Classifier_Types.Weight_List);
+      (Split  : in out Splitter_Class; Start, Stop : Natural;
+       Weighted_Node_Samples : in out Classifier_Types.Natural_List);
     procedure Split_Node (Self                  : in out Splitter_Class;
                           Impurity : Float; theSplit : Split_Record;
                           Num_Constant_Features :  ML_Types.Value_Data_List);

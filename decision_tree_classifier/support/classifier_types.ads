@@ -25,6 +25,11 @@ package Classifier_Types is
    subtype Float_List is Float_Package.Vector;
    subtype Weight_List is Float_Package.Vector;
 
+   use Float_Package;
+   package Weight_List_Package is new
+      Ada.Containers.Vectors (Positive, Weight_List);
+   subtype List_Of_Weight_Lists is Weight_List_Package.Vector;
+
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
    package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");

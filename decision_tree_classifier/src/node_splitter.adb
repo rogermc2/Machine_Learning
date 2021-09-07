@@ -22,24 +22,24 @@ package body Node_Splitter is
 
     procedure Init (Self          : in out Splitter_Class;
                     X, Y          : ML_Types.List_Of_Value_Data_Lists;
-                    Sample_Weight : Classifier_Types.Weight_List) is
+                    Sample_Weight : Classifier_Types.Natural_List) is
         use Ada.Containers;
         Num_Samples      : constant Positive := Positive (X.Element (1).Length);
         Num_Features     : constant Positive := Positive (X.Length);
         Samples          : Classifier_Types.Natural_List;
-        Weighted_Samples : Float := 0.0;
+        Weighted_Samples : Natural := 0;
         J                : Natural := 0;
     begin
         for index in 1 .. Num_Samples loop
             if Sample_Weight.Is_Empty then
-                if Sample_Weight.Element (index)  > 0.0 then
+                if Sample_Weight.Element (index)  > 0 then
                     Samples.Append (index);
                     J := J + 1;
                 end if;
                 Weighted_Samples :=
                   Weighted_Samples + Sample_Weight.Element (index);
             else
-                Weighted_Samples := Weighted_Samples + 1.0;
+                Weighted_Samples := Weighted_Samples + 1;
             end if;
         end loop;
 
@@ -111,21 +111,18 @@ package body Node_Splitter is
     --  -------------------------------------------------------------------------
 
     procedure Reset_Node
-      (Self   : in out Splitter_Class; Start, Stop : Natural;
-       Weighted_Node_Samples : in out Classifier_Types.Weight_List) is
+      (Split  : in out Splitter_Class; Start, Stop : Natural;
+       Weighted_Node_Samples : in out Classifier_Types.Natural_List) is
         use Classifier_Types.Float_Package;
     begin
-        Self.Start := Start;
-        Self.Stop := Stop;
+        Split.Start := Start;
+        Split.Stop := Stop;
 
-        Criterion.Reset (Self.Criteria);
+      Criterion.Init (Split.Criteria, Split.Y, Split.Sample_Weight,
+                      Split.Weighted_Samples, Split.Sample_Indices,
+                      Start, Stop);
 
-        if Weighted_Node_Samples.Is_Empty then
-            Weighted_Node_Samples.Append (Self.Criteria.Weighted_Node_Samples);
-        else
-            Weighted_Node_Samples.Replace_Element
-              (1, Self.Criteria.Weighted_Node_Samples);
-        end if;
+            Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 
     end Reset_Node;
 
