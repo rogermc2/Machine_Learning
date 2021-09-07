@@ -16,7 +16,7 @@ package Criterion is
       Weighted_Samples          : Float := 0.0;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Classifier_Types.Weight_List;
-      Weighted_Node_Samples     : Classifier_Types.Weight_List;
+      Weighted_Node_Samples     : Float := 0.0;
       --  For classification criteria, Sum_Total is the sum of the weighted
       --  count of each label.
       --  For regression, Sum_Total is the sum of w*y.
