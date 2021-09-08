@@ -212,8 +212,8 @@ package body Node_Splitter is
       Features                  : Classifier_Types.Natural_List :=
                                     Self.Feature_Indices;
       Features_X                : Value_Data_List := Self.Feature_Values;
-      Best                      : Split_Record;
-      Current                   : Split_Record;
+      Best_Split                : Split_Record;
+      Current_Split             : Split_Record;
       Num_Known_Constants       : constant Natural := Natural (Known_Constants.Length);
       Num_Total_Constants       : Natural := Num_Known_Constants;
       Num_Visited_Features      : Natural := 0;
@@ -232,7 +232,7 @@ package body Node_Splitter is
       --  (hence not suitable for good splitting) by ancestor nodes and save
       --  the information on newly discovered constant features to avoid
       --  computation on descendant nodes.
-      Init_Split (Best, Self.Stop);
+      Init_Split (Best_Split, Self.Stop);
 
       --  L323
       while F_I > Num_Total_Constants and
@@ -256,16 +256,16 @@ package body Node_Splitter is
             --  L351
          else
             F_J := F_J + Num_Found_Constants;
-            Current.Feature_Index := Features.Element (F_J);
+            Current_Split.Feature_Index := Features.Element (F_J);
             Features_X.Clear;
             for index in Self.Start .. Self.Stop loop
                Features_X.Append
-                 (self.Feature_Values.Element (Current.Feature_Index));
+                 (Self.Feature_Values.Element (Current_Split.Feature_Index));
             end loop;
             --  L364
-            Replacement_Sort (Self, Features_X, Current, Self.Start,
+            Replacement_Sort (Self, Features_X, Current_Split, Self.Start,
                               Self.Stop);
-            Replacement_Sort (Self, Samples, Current, Self.Start,
+            Replacement_Sort (Self, Samples, Current_Split, Self.Start,
                               Self.Stop);
             --  L367  Features_X is a value_data_list
             if Features_X.First_Element.Value_Kind = Float_Type then
@@ -295,19 +295,20 @@ package body Node_Splitter is
                Criterion.Reset (Self.Criteria);
                P_Index := Self.Start;
                --  L381
-               Process_A (Self, P_Index, Features, Features_X, Current, Best);
+               Process_A (Self, P_Index, Features, Features_X,
+                          Current_Split, Best_Split);
             end if;
          end if;
       end loop;
 
-      if Best.Pos < Self.Stop then
+      if Best_Split.Pos < Self.Stop then
          Partition_End := Self.Stop;
          P_Index := Self.Start;
          while P_Index < Partition_End loop
             X_1 := Self.X.Element
               (Self.Sample_Indices.Element (P_Index));
             if X_1.Element (Self.Sample_Indices.Element (P_Index)).Float_Value
-              <= Best.Threshold then
+              <= Best_Split.Threshold then
                P_Index := P_Index + 1;
             else
                Partition_End := Partition_End - 1;
@@ -319,9 +320,9 @@ package body Node_Splitter is
          end loop;
 
          Criterion.Reset (Self.Criteria);
-         Criterion.Update (Self.Criteria, Best.Pos);
+         Criterion.Update (Self.Criteria, Best_Split.Pos);
          Criterion.Children_Impurity
-           (Self.Criteria, Best.Impurity_Left, Best.Impurity_Right);
+           (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
       end if;
 
       --  Respect invariant for constant features: the original order of
@@ -340,7 +341,7 @@ package body Node_Splitter is
 
       Constant_Features.Replace_Element
         (1, Constant_Features.Element (Num_Total_Constants));
-      return Best;
+      return Best_Split;
 
    end Split_Node;
 
