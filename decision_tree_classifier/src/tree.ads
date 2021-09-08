@@ -81,5 +81,6 @@ package Tree is
 --     function Predict_Log_Probability (Self : Validation.Attribute_List;
    function Predict_Log_Probability (X    : Sample_Matrix)
                                      return Probabilities_List;
+   procedure Resize (Self : in out Tree_Data; Capacity : Positive);
 
 end Tree;

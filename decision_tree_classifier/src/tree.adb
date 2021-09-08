@@ -61,6 +61,13 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
+   procedure Resize (Self : in out Tree_Data; Capacity : Positive) is
+   begin
+      null;
+   end Resize;
+
+   --  -------------------------------------------------------------------------
+
 --     function Validate_X_Predict (Self         : Validation.Attribute_List;
 --                                   X           : Sample_Matrix;
 --                                   Check_Input : Boolean := True)
