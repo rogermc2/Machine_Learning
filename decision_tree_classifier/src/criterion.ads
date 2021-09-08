@@ -33,6 +33,8 @@ package Criterion is
       Sq_Sum_Total              : Float := 0.0;
    end record;
 
+   procedure Children_Impurity (Criteria                      : Criterion_Class;
+                                Impurity_Left, Impurity_Right : out Float);
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
                                  return Float;
    procedure Init (Criteria         : in out Criterion_Class;
