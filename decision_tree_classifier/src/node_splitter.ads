@@ -44,6 +44,7 @@ package Node_Splitter is
      (Split                 : in out Splitter_Class; Start, Stop : Natural;
       Weighted_Node_Samples : in out Float);
    function Split_Node (Self              : in out Splitter_Class;
+                        Impurity          : Float;
                         Constant_Features : in out ML_Types.Value_Data_List)
                          return Split_Record;
 

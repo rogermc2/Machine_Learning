@@ -37,6 +37,9 @@ package Criterion is
                                 Impurity_Left, Impurity_Right : out Float);
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
                                  return Float;
+   function Impurity_Improvement
+      (Criteria : Criterion_Class;
+       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Init (Criteria         : in out Criterion_Class;
                    Y                : ML_Types.List_Of_Value_Data_Lists;
                    --  Sample_Weight contains the weight of each sample

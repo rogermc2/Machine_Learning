@@ -20,10 +20,10 @@ package body Tree_Build is
       Start, Stop       : Positive; Impurity : in out Float;
       Is_First, Is_Left : Boolean;
       Parent            : ML_Types.Tree_Node_Type; Depth : Positive) is
-      Node_Samples          : Positive := Stop - Start;
-      Is_Leaf               : Boolean;
-      aSplit                : Node_Splitter.Split_Record;
-      Num_Constant_Features : Natural := 0;
+      Node_Samples      : Positive := Stop - Start;
+      Is_Leaf           : Boolean;
+      aSplit            : Node_Splitter.Split_Record;
+      Constant_Features : ML_Types.Value_Data_List;
    begin
       Node_Splitter.Reset_Node (Splitter, Start, Stop,
                                 Splitter.Weighted_Samples);
@@ -37,8 +37,8 @@ package body Tree_Build is
         (Impurity <= Epsilon);
 
       if not Is_Leaf then
-         Node_Splitter.Split_Node
-           (Self, Impurity, aSplit, Num_Constant_Features);
+         aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
+                                             Constant_Features);
       end if;
 
    end Add_Split_Node;
