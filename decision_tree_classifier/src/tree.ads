@@ -49,7 +49,7 @@ package Tree is
    type Values_Array is array
      (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
 
-   type Tree_Data (Capacity, Num_Outputs, Max_Num_Classes : Index_Range := 1) is record
+   type Tree_Class (Capacity, Num_Outputs, Max_Num_Classes : Index_Range := 1) is record
       Num_Features    : Integer := 0;
       Num_Classes     : Integer := 0;
       Max_Depth       : Integer := 0;
@@ -58,7 +58,7 @@ package Tree is
       Values          : Values_Array
         (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
         := (others => (others => (others => 0.0)));
-      Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
+--        Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
    end record;
 
    Value_Error : Exception;
@@ -81,6 +81,6 @@ package Tree is
 --     function Predict_Log_Probability (Self : Validation.Attribute_List;
    function Predict_Log_Probability (X    : Sample_Matrix)
                                      return Probabilities_List;
-   procedure Resize (Self : in out Tree_Data; Capacity : Positive);
+   procedure Resize (Self : in out Tree_Class; Capacity : Positive);
 
 end Tree;

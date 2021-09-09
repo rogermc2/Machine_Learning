@@ -433,12 +433,14 @@ package body Utilities is
       Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
       Print_Question ("    Question", Node.Question);
       case Node.Node_Type is
-         when Prediction_Kind =>
+         when Prediction_Node =>
             Print_Rows ("        Rows:", Node.Rows);
             Print_Row ("    Prediction:", Node.Prediction);
-         when Decision_Kind =>
+         when Decision_Node =>
             Print_Rows ("    True Rows:", Node.True_Branch);
             Print_Rows ("    False Rows:", Node.False_Branch);
+        when Undefined_Node =>
+            Put_Line (" is not defined.");
       end case;
 
    end Print_Node;
@@ -450,9 +452,9 @@ package body Utilities is
    begin
       Put_Line (Offset & "    gini = " & Float'Image (Node.Gini));
       case Node.Node_Type is
-         when Prediction_Kind =>
+         when Prediction_Node =>
             Print_Row ("    Prediction:", Node.Prediction);
-         when Decision_Kind =>
+         when Decision_Node =>
             Put_Line (Offset & "    samples = " &
                         Integer'Image (Integer (Node.True_Branch.Length) +
                           Integer (Node.False_Branch.Length)));
@@ -460,6 +462,8 @@ package body Utilities is
                         Integer'Image (Integer (Node.True_Branch.Length)) & ","
                       & Integer'Image (Integer (Node.False_Branch.Length))
                       & "]");
+        when Undefined_Node =>
+            Put_Line (" is not defined.");
       end case;
 
    end Print_Node_Data;
@@ -629,7 +633,7 @@ package body Utilities is
                Put (Offset);
                Last_Offset := To_Unbounded_String (Offset);
 
-               if Node.Node_Type = Prediction_Kind then
+               if Node.Node_Type = Prediction_Node then
                   Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
                   Print_Prediction (Node, Offset);
                else

@@ -103,7 +103,7 @@ package body Builder is
 
       procedure Add_Decision_Node (Parent_Cursor : Tree_Cursor;
                                    Best_Split    : Best_Data) is
-         Node  : Tree_Node_Type (Decision_Kind);
+         Node  : Tree_Node_Type (Decision_Node);
       begin
          Node.Decision_Branch := True;
          Node.Question := Best_Split.Question;
@@ -117,7 +117,7 @@ package body Builder is
 
       procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
                                      Rows          : Rows_Vector) is
-         Leaf : Tree_Node_Type (Prediction_Kind);
+         Leaf : Tree_Node_Type (Prediction_Node);
       begin
          if Max_Leaves > 0 then
                 Num_Leaves := Num_Leaves + 1;
@@ -279,7 +279,7 @@ package body Builder is
       aNode       : constant Tree_Node_Type := Element (Node_Cursor);
       Predictions : Predictions_List;
    begin
-      if aNode.Node_Type = Prediction_Kind then
+      if aNode.Node_Type = Prediction_Node then
          --  isinstance(node, Leaf) -> if node is a leaf
          Predictions := aNode.Prediction_List;
       else

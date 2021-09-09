@@ -14,7 +14,7 @@ package body Tree_Build is
 
    --  ------------------------------------------------------------------------
 
-   function Add_Node (Self                  : in out Tree.Tree_Data;
+   function Add_Node (Self                  : in out Tree.Tree_Class;
                       Parent                : ML_Types.Tree_Node_Type;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature               : Positive;
@@ -38,7 +38,7 @@ package body Tree_Build is
    procedure Add_Split_Node
      (Self              : in out Tree_Builder;
       Splitter          : in out Node_Splitter.Splitter_Class;
-      aTree             : in out Tree.Tree_Data;
+      aTree             : in out Tree.Tree_Class;
       Start, Stop       : Positive; Impurity : in out Float;
       Is_First, Is_Left : Boolean;
       Parent            : ML_Types.Tree_Node_Type; Depth : Positive) is
@@ -79,7 +79,7 @@ package body Tree_Build is
 
    procedure Build_Tree
      (aBuilder      : in out Tree_Builder;
-      theTree       : in out Tree.Tree_Data;
+      theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
       Max_Split_Nodes : Natural := aBuilder.Max_Leaf_Nodes -1;
@@ -95,7 +95,7 @@ package body Tree_Build is
 
    procedure Build_Best_First_Tree
      (aBuilder      : in out Tree_Builder;
-      theTree       : in out Tree.Tree_Data;
+      theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
    begin
@@ -106,7 +106,7 @@ package body Tree_Build is
 
    procedure Build_Depth_First_Tree
      (aBuilder      : in out Tree_Builder;
-      theTree       : in out Tree.Tree_Data;
+      theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
       Start         : Positive;
