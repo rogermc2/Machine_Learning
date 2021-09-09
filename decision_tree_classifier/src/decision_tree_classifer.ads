@@ -1,5 +1,5 @@
 
---  Based on Python 3.7 sklearn tree _classes.py
+--  Based on scikit-learn/sklearn/tree tree _classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 --  Decision Trees (DTs) are a non-parametric supervised learning method used
 --  for classification and regression.
