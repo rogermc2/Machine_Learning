@@ -9,6 +9,7 @@
 with Ada.Containers.Indefinite_Multiway_Trees;
 
 with Classifier_Types; use Classifier_Types;
+with ML_Types;
 --  with Validation;
 
 package Tree is
@@ -36,7 +37,7 @@ package Tree is
       Num_Node_Samples          : Integer := 0;
       Weighted_Num_Node_Samples : Integer := 0;
       Depth                     : Integer := 0;
---        Parent                    : Tree_Node;
+      --        Parent                    : Tree_Node;
       Is_Left                   : Integer := 0;
       Threshold                 : Float := 0.0;
       Impurity                  : Float := Float'Large;  --  "Infinity"
@@ -49,39 +50,48 @@ package Tree is
    type Values_Array is array
      (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
 
+   type Tree_Attributes is private;
    type Tree_Class (Capacity, Num_Outputs, Max_Num_Classes : Index_Range := 1)
-    is record
-      Num_Features    : Integer := 0;
-      Num_Classes     : Integer := 0;
-      Max_Depth       : Integer := 0;
-      Node_Count      : Integer := 0;
+   is record
+      Num_Features    : Natural := 0;
+      Classes         : ML_Types.Value_Data_List;
+      Max_Depth       : Natural := 0;
+      Node_Count      : Natural := 0;
       Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
       Values          : Values_Array
         (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
         := (others => (others => (others => 0.0)));
---        Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
+      --        Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
+      Attributes      : Tree_Attributes;
    end record;
 
    Value_Error : Exception;
 
---     procedure Fit moved to fit_functions
---     procedure Fit (Self          : Validation.Attribute_List;
---                    X, Y          : Sample_Matrix;
---                    Sample_Weight : State := None;
---                    Check_Input   : Boolean := True;
---                    X_Idx_Sorted  : State := None);
+   --     procedure Fit moved to fit_functions
+   --     procedure Fit (Self          : Validation.Attribute_List;
+   --                    X, Y          : Sample_Matrix;
+   --                    Sample_Weight : State := None;
+   --                    Check_Input   : Boolean := True;
+   --                    X_Idx_Sorted  : State := None);
 
    --  Predict class probabilities of the input samples X.
    --  The predicted class probability is the fraction of samples of the same
    --   class in a leaf.
---     function Predict_Probability (Self : Validation.Attribute_List;
-   function Predict_Probability (X    : Sample_Matrix;
+   --     function Predict_Probability (Self : Validation.Attribute_List;
+   function Predict_Probability (X           : Sample_Matrix;
                                  Check_Input : Boolean := True)
                                  return Probabilities_List;
    --  Predict class log-probabilities of the input samples X.
---     function Predict_Log_Probability (Self : Validation.Attribute_List;
+   --     function Predict_Log_Probability (Self : Validation.Attribute_List;
    function Predict_Log_Probability (X    : Sample_Matrix)
                                      return Probabilities_List;
    procedure Resize (Self : in out Tree_Class; Capacity : Positive);
+private
+
+   type Tree_Attributes is record
+      Node_Count : Natural := 0;
+      Capacity   : Natural := 0;
+      Max_Depth  : Natural := 0;
+   end record;
 
 end Tree;

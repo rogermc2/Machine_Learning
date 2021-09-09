@@ -93,7 +93,7 @@ package Decision_Tree_Classifer is
       Num_Classes         : Integer_List;
       Num_Features        : Tree.Index_Range := 1;
       Num_Outputs         : Tree.Index_Range := 1;
-      Decision_Tree       : Tree.Tree_Data;
+      Decision_Tree       : Tree.Tree_Class;
    end record;
 
    --  class DecisionTreeClassifier
