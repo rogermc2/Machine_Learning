@@ -24,11 +24,11 @@ package Tree_Build is
       Min_Impurity_Decrease : Float := 0.0;
    end record;
 
-   procedure Build_Tree
-     (aBuilder      : in out Tree_Builder;
-      theTree       : in out Tree.Tree_Class;
-      X, Y          : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : Classifier_Types.Weight_List);
+--     procedure Build_Tree
+--       (aBuilder      : in out Tree_Builder;
+--        theTree       : in out Tree.Tree_Class;
+--        X, Y          : ML_Types.List_Of_Value_Data_Lists;
+--        Sample_Weight : Classifier_Types.Weight_List);
    procedure Build_Best_First_Tree
      (aBuilder      : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;

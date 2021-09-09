@@ -49,12 +49,13 @@ package Tree is
    type Values_Array is array
      (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
 
-   type Tree_Class (Capacity, Num_Outputs, Max_Num_Classes : Index_Range := 1) is record
+   type Tree_Class (Capacity, Num_Outputs, Max_Num_Classes : Index_Range := 1)
+    is record
       Num_Features    : Integer := 0;
       Num_Classes     : Integer := 0;
       Max_Depth       : Integer := 0;
       Node_Count      : Integer := 0;
-      Nodes           : Tree_Package.Tree;
+      Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
       Values          : Values_Array
         (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
         := (others => (others => (others => 0.0)));
