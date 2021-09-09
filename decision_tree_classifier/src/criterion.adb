@@ -152,6 +152,17 @@ package body Criterion is
 
     --  ------------------------------------------------------------------------
 
+   procedure Node_Value (Self : Criterion_Class; Value : out Float) is
+   begin
+      Value := 0.0;
+      for index in 1 .. Self.Num_Outputs loop
+         Value := Value + Self.Sum_Total.Element (index);
+      end loop;
+
+   end Node_Value;
+
+    --  -------------------------------------------------------------------------
+
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float is
         Impurity_Left  : Float;

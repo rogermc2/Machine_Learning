@@ -40,12 +40,13 @@ package Node_Splitter is
    procedure Init (Self          : in out Splitter_Class;
                    X, Y          : ML_Types.List_Of_Value_Data_Lists;
                    Sample_Weight : Classifier_Types.Weight_List);
+   procedure Node_Value (Self : Splitter_Class; Value : out Float);
    procedure Reset_Node
      (Split                 : in out Splitter_Class; Start, Stop : Natural;
       Weighted_Node_Samples : in out Float);
    function Split_Node (Self              : in out Splitter_Class;
                         Impurity          : Float;
                         Constant_Features : in out ML_Types.Value_Data_List)
-                         return Split_Record;
+                        return Split_Record;
 
 end Node_Splitter;

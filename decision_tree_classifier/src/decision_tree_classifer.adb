@@ -44,10 +44,9 @@ package body Decision_Tree_Classifer is
      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List;
       aTree         : in out Tree.Tree_Data) is
-      use Tree_Build;
-      Builder : Tree_Builder (Best_First_Tree);
+      Builder       : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
    begin
-      Build_Best_First_Tree (Builder, X, Y, Sample_Weight, aTree);
+      Tree_Build.Build_Best_First_Tree (Builder, X, Y, Sample_Weight, aTree);
 
    end Build_Best_First;
 
@@ -57,10 +56,9 @@ package body Decision_Tree_Classifer is
      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List;
       aTree         : in out Tree.Tree_Data) is
-      use Tree_Build;
-      Builder : Tree_Builder (Depth_First_Tree);
+      Builder       : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
    begin
-      Build_Depth_First_Tree (Builder, X, Y, Sample_Weight, aTree);
+      Tree_Build.Build_Depth_First_Tree (Builder, X, Y, Sample_Weight, aTree);
 
    end Build_Depth_First;
 

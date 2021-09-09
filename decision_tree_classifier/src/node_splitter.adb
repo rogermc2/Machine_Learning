@@ -75,6 +75,13 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
+   procedure Node_Value (Self : Splitter_Class; Value : out Float) is
+   begin
+      Criterion.Node_Value (Self.Criteria, Value);
+   end Node_Value;
+
+    --  -------------------------------------------------------------------------
+
     procedure Process_A (Self        : in out Splitter_Class;
                          P           : Natural;
                          Features    : Classifier_Types.Natural_List;
