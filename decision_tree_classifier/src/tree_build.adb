@@ -72,7 +72,7 @@ package body Tree_Build is
                              aSplit.Threshold, Impurity, Node_Samples,
                              Splitter.Weighted_Samples);
         Node_Splitter.Node_Value (Splitter, Node_Val);
-        aTree.Values (1, 1, 1) := Node_Val;
+--          aTree.Values (1, 1, 1) := Node_Val;
     end Add_Split_Node;
 
     --  ------------------------------------------------------------------------

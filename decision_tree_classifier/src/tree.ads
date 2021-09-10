@@ -58,9 +58,10 @@ package Tree is
       Max_Depth       : Natural := 0;
       Node_Count      : Natural := 0;
       Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
-      Values          : Values_Array
-        (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
-        := (others => (others => (others => 0.0)));
+      --  Values declaration causes runtime problem
+--        Values          : Values_Array
+--          (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
+--          := (others => (others => (others => 0.0)));
       --        Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
       Attributes      : Tree_Attributes;
    end record;
