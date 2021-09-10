@@ -1,7 +1,10 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
+--  with Ada.Text_IO; use Ada.Text_IO;
+
 with Classifier_Types;
+with Classifier_Utilities;
 with Encode_Utils;
 with Tree_Build;
 
@@ -83,6 +86,8 @@ package body Decision_Tree_Classifer is
       Classes_K  : Value_Data_List;
       Inverse    : Natural_List;
    begin
+      Y_Encoded.Clear;
+      Y_Encoded.Set_Length (Ada.Containers.Count_Type (Num_Outputs));
       for k in 1 .. Num_Outputs loop
          Y_K := Y.Element (k);
          Classes_K := Encode_Utils.Unique (Y_K, Inverse);
@@ -122,12 +127,11 @@ package body Decision_Tree_Classifer is
       use ML_Types;
       use Classifier_Types;
       use Classifier_Types.Integer_Package;
-      use Value_Data_Package;
       Num_Outputs           : constant Positive := Positive (Y.Length);
       Num_Features          : constant Class_Range :=
                                 Class_Range (X.Length);
       Num_Samples           : constant Positive :=
-                                Positive (X.Element (1).Length);
+                                Positive (Y.Length);
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       theEstimator          : Estimator.Estimator_Data
@@ -150,12 +154,15 @@ package body Decision_Tree_Classifer is
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
 
+       Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
+       Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (2)", X.Element (2));
       if Positive (Y.Length) /= Num_Samples then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit Number of labels =" &
            Count_Type'Image (Y.Length) & " does not match number of samples ="
            & Integer'Image (Num_Samples);
       end if;
+      Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
 
       Classification_Fit (aClassifier, Y, Num_Outputs, Y_Encoded,
                           Expanded_Class_Weight);
