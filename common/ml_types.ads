@@ -86,6 +86,8 @@ package ML_Types is
    subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.Vector;
 
    type Value_Data_Array is array (Positive range <>) of Value_Record;
+   type Value_Data_Array_2D is array (Positive range <>, Positive range <>)
+     of Value_Record;
 
    package Count_Package is new Ada.Containers.Ordered_Maps
      (Data_Type, Natural);

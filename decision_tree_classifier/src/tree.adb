@@ -75,7 +75,7 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
-   procedure Resize (Self : in out Tree_Data; Capacity : Positive) is
+   procedure Resize (Self : in out Tree_Class; Capacity : Positive) is
    begin
       null;
    end Resize;

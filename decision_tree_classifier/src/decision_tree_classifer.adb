@@ -10,11 +10,11 @@ package body Decision_Tree_Classifer is
    procedure Build_Best_First
      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List;
-      aTree         : in out Tree.Tree_Data);
+      aTree         : in out Tree.Tree_Class);
    procedure Build_Depth_First
      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List;
-      aTree         : in out Tree.Tree_Data);
+      aTree         : in out Tree.Tree_Class);
 
    --  -------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@ package body Decision_Tree_Classifer is
                          Sample_Weight : Classifier_Types.Weight_List) is
       --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
       --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
-      theTree   : Tree.Tree_Data
+      theTree   : Tree.Tree_Class
         (Self.Attributes.Num_Features, Self.Attributes.Num_Outputs,
          Tree.Index_Range (Self.Attributes.Classes.Length));
    begin
@@ -43,10 +43,10 @@ package body Decision_Tree_Classifer is
    procedure Build_Best_First
      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List;
-      aTree         : in out Tree.Tree_Data) is
+      aTree         : in out Tree.Tree_Class) is
       Builder       : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
    begin
-      Tree_Build.Build_Best_First_Tree (Builder, X, Y, Sample_Weight, aTree);
+      Tree_Build.Build_Best_First_Tree (Builder, aTree, X, Y, Sample_Weight);
 
    end Build_Best_First;
 
@@ -55,10 +55,10 @@ package body Decision_Tree_Classifer is
    procedure Build_Depth_First
      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List;
-      aTree         : in out Tree.Tree_Data) is
+      aTree         : in out Tree.Tree_Class) is
       Builder       : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
    begin
-      Tree_Build.Build_Depth_First_Tree (Builder, X, Y, Sample_Weight, aTree);
+      Tree_Build.Build_Depth_First_Tree (Builder, aTree, X, Y, Sample_Weight);
 
    end Build_Depth_First;
 
@@ -133,7 +133,6 @@ package body Decision_Tree_Classifer is
       theEstimator          : Estimator.Estimator_Data
         (Num_Samples, Positive (Num_Features));
       Y_Encoded             : List_Of_Value_Data_Lists;
-      --        Encode_Value          : Value_Record (Float_Type);
       Max_Leaf_Nodes        : Integer := -1;
    begin
       if aClassifier.Parameters.CCP_Alpha < 0.0 then
