@@ -31,7 +31,7 @@ package body Classifier_Tests is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
       aTree    : Classifier (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-      Result   : Estimator.Estimator_Data (6, 2);
+      Result   : Estimator.Estimator_Data (1, 2);
       X        : constant List_Of_Value_Data_Lists := To_Multi_Value_List (X_Array);
       Y        : List_Of_Value_Data_Lists;
       Expected : List_Of_Value_Data_Lists;
@@ -41,7 +41,7 @@ package body Classifier_Tests is
       Y := To_Integer_Value_List (Y_Array);
       Expected := To_Integer_Value_List (True_Result);
       Result := Fit (aTree, X, Y, Weights);
-      Print_Float_List ("", Weights);
+      Print_Float_List ("Classification_Tests.Test_Classification_Toy weights", Weights);
 
    end Test_Classification_Toy;
 
