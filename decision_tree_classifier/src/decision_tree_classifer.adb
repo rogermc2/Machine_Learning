@@ -186,7 +186,12 @@ package body Decision_Tree_Classifer is
          end if;
       end if;
 
+      Classifier_Utilities.Print_Boolean_Matrix
+          ("Decision_Tree_Classifer.Fit Estimator X Types ", theEstimator.X_Types);
       Build_Tree (aClassifier, X, Y, Sample_Weight);
+
+      Classifier_Utilities.Print_Boolean_Matrix
+          ("Decision_Tree_Classifer.Fit Estimator X Types ", theEstimator.X_Types);
 
       return theEstimator;
    end Fit;

@@ -267,79 +267,20 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Unique (Nums : Integer_List) return Integer_List is
-        use Int_Sets;
-        use Integer_Package;
-        Unique_Set : Int_Sets.Set;
-        Int_Curs   : Integer_Package.Cursor := Nums.First;
-        Set_Curs   : Int_Sets.Cursor;
-        Nums_List  : Integer_List;
+    procedure Print_Boolean_Matrix (Name : String;
+                                    aMatrix : Estimator.Boolean_Matrix) is
     begin
-        while Has_Element (Int_Curs) loop
-            Unique_Set.Include (Element (Int_Curs));
-            Next (Int_Curs);
-        end loop;
-
-        Set_Curs := Unique_Set.First;
-        while Has_Element (Set_Curs) loop
-            Nums_List.Append (Element (Set_Curs));
-            Next (Set_Curs);
-        end loop;
-        return Nums_List;
-    end Unique;
-
-    --  -------------------------------------------------------------------------
-
-    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                   return Integer_Array is
-        use Int_Sets;
-        Unique_Set : Int_Sets.Set;
-        Set_Curs   : Int_Sets.Cursor;
-    begin
-        for index in Nums'Range loop
-            Unique_Set.Include (Nums (index).Integer_Value);
-        end loop;
-
-        declare
-            Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
-            Unique_Index : Integer := 0;
-        begin
-            Set_Curs := Unique_Set.First;
-            while Has_Element (Set_Curs) loop
-                Unique_Index := Unique_Index + 1;
-                Unique_Array (Unique_Index) := Element (Set_Curs);
-                Next (Set_Curs);
+        Put_Line (Name & ": ");
+        for row in aMatrix'First .. aMatrix'Last loop
+            for col in aMatrix'First (2)  .. aMatrix'Last (2) loop
+                Put (Boolean'Image (aMatrix (row, col)) & "  ");
             end loop;
-            return Unique_Array;
-        end;
-    end Unique_Integer_Array;
-
-    --  -------------------------------------------------------------------------
-
-    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array is
-        use Int_Sets;
-        Unique_Set : Int_Sets.Set;
-        Set_Curs   : Int_Sets.Cursor;
-    begin
-        for index in Nums'Range loop
-            Unique_Set.Include (Nums (index));
+            New_Line;
         end loop;
+        New_Line;
+    end Print_Boolean_Matrix;
 
-        declare
-            Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
-            Unique_Index : Integer := 0;
-        begin
-            Set_Curs := Unique_Set.First;
-            while Has_Element (Set_Curs) loop
-                Unique_Index := Unique_Index + 1;
-                Unique_Array (Unique_Index) := Element (Set_Curs);
-                Next (Set_Curs);
-            end loop;
-            return Unique_Array;
-        end;
-    end Unique_Integer_Array;
-
-    --  -------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
     generic
         type Index_Type is (<>);
@@ -577,6 +518,80 @@ package body Classifier_Utilities is
 
         return Diff;
     end Set_Diff;
+
+    --  -------------------------------------------------------------------------
+
+    function Unique (Nums : Integer_List) return Integer_List is
+        use Int_Sets;
+        use Integer_Package;
+        Unique_Set : Int_Sets.Set;
+        Int_Curs   : Integer_Package.Cursor := Nums.First;
+        Set_Curs   : Int_Sets.Cursor;
+        Nums_List  : Integer_List;
+    begin
+        while Has_Element (Int_Curs) loop
+            Unique_Set.Include (Element (Int_Curs));
+            Next (Int_Curs);
+        end loop;
+
+        Set_Curs := Unique_Set.First;
+        while Has_Element (Set_Curs) loop
+            Nums_List.Append (Element (Set_Curs));
+            Next (Set_Curs);
+        end loop;
+        return Nums_List;
+    end Unique;
+
+    --  -------------------------------------------------------------------------
+
+    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
+                                   return Integer_Array is
+        use Int_Sets;
+        Unique_Set : Int_Sets.Set;
+        Set_Curs   : Int_Sets.Cursor;
+    begin
+        for index in Nums'Range loop
+            Unique_Set.Include (Nums (index).Integer_Value);
+        end loop;
+
+        declare
+            Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
+            Unique_Index : Integer := 0;
+        begin
+            Set_Curs := Unique_Set.First;
+            while Has_Element (Set_Curs) loop
+                Unique_Index := Unique_Index + 1;
+                Unique_Array (Unique_Index) := Element (Set_Curs);
+                Next (Set_Curs);
+            end loop;
+            return Unique_Array;
+        end;
+    end Unique_Integer_Array;
+
+    --  -------------------------------------------------------------------------
+
+    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array is
+        use Int_Sets;
+        Unique_Set : Int_Sets.Set;
+        Set_Curs   : Int_Sets.Cursor;
+    begin
+        for index in Nums'Range loop
+            Unique_Set.Include (Nums (index));
+        end loop;
+
+        declare
+            Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
+            Unique_Index : Integer := 0;
+        begin
+            Set_Curs := Unique_Set.First;
+            while Has_Element (Set_Curs) loop
+                Unique_Index := Unique_Index + 1;
+                Unique_Array (Unique_Index) := Element (Set_Curs);
+                Next (Set_Curs);
+            end loop;
+            return Unique_Array;
+        end;
+    end Unique_Integer_Array;
 
     --  -------------------------------------------------------------------------
 
