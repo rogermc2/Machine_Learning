@@ -3,6 +3,7 @@
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
+with Builder;
 with Classifier_Types;
 with Classifier_Utilities;
 with Encode_Utils;
@@ -23,21 +24,37 @@ package body Decision_Tree_Classifer is
 
    procedure Build_Tree (Self          : in out Classifier;
                          X, Y          : ML_Types.List_Of_Value_Data_Lists;
-                         Sample_Weight : Classifier_Types.Weight_List) is
+                         Sample_Weight : Classifier_Types.Weight_List;
+                        Max_Leaves : Natural) is
+      use ML_Types;
       --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
       --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
       theTree   : Tree.Tree_Class
         (Self.Attributes.Num_Features, Self.Attributes.Num_Outputs,
          Tree.Index_Range (Self.Attributes.Classes.Length));
+      Feature_Values : Value_Data_List;
+      aRow           : Row_Data (Class_Range (X.Element (1).Length));
+      Rows           : Rows_Vector;
+      Row_Tree       : ML_Types.Tree_Type;
    begin
+      --  L346
       --  if is_classifier(self):
       Self.Attributes.Decision_Tree := theTree;
 
+      --  L390
       if Self.Parameters.Max_Leaf_Nodes < 0 then
          Build_Depth_First (X, Y, Sample_Weight, theTree);
       else
          Build_Best_First (X, Y, Sample_Weight, theTree);
       end if;
+
+      --  L408
+      --        Builder.Build_Tree (Self, X, y , Sample_Weight)
+      for index in 1 .. Positive (X.Length) loop
+         Feature_Values := X.Element (index);
+         aRow.Features (Class_Range (index)) := Feature_Values;
+      end loop;
+      Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
 
    end Build_Tree;
 
@@ -86,6 +103,7 @@ package body Decision_Tree_Classifer is
       Classes_K  : Value_Data_List;
       Inverse    : Natural_List;
    begin
+      --  L206
       Y_Encoded.Clear;
       Y_Encoded.Set_Length (Ada.Containers.Count_Type (Num_Outputs));
       for k in 1 .. Num_Outputs loop
@@ -102,6 +120,7 @@ package body Decision_Tree_Classifer is
            Weights.Compute_Sample_Weight (Weights.No_Weight, Y_Original);
       end if;
 
+      --  L215
       if aClassifier.Parameters.Class_Weight /= No_Weight then
          Expanded_Class_Weight := Weights.Compute_Sample_Weight
            (aClassifier.Parameters.Class_Weight, Y_Original);
@@ -134,40 +153,51 @@ package body Decision_Tree_Classifer is
       Y_Encoded             : List_Of_Value_Data_Lists;
       Max_Leaf_Nodes        : Integer := -1;
    begin
+      --  L154
       if aClassifier.Parameters.CCP_Alpha < 0.0 then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit CCP_Alpha must be greater than or equal to 0";
       end if;
 
+      --  L156
       if Check_Input then
          null;
       end if;
 
+      --  L184
       aClassifier.Attributes.Num_Features := Tree.Index_Range (Num_Samples);
       aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
       aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
+     --  L201
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
 
        Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
-       Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (2)", X.Element (2));
+      Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (2)", X.Element (2));
+
+      --  L293
       if Positive (Y.Length) /= Num_Samples then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit Number of labels =" &
            Count_Type'Image (Y.Length) & " does not match number of samples ="
            & Integer'Image (Num_Samples);
       end if;
+
       Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
 
+      --  L206
       Classification_Fit (aClassifier, Y, Num_Outputs, Y_Encoded,
                           Expanded_Class_Weight);
+      --  L218
 
+      --  L226
       if aClassifier.Parameters.Max_Leaf_Nodes > 0 then
          Max_Leaf_Nodes := aClassifier.Parameters.Max_Leaf_Nodes;
       end if;
 
       Check_Parameters;
 
+      --  L318
       if not Expanded_Class_Weight.Is_Empty then
          if Sample_Weight.Is_Empty then
             Sample_Weight := Expanded_Class_Weight;
@@ -181,7 +211,9 @@ package body Decision_Tree_Classifer is
          end if;
       end if;
 
+      --  L343
       Build_Tree (aClassifier, X, Y, Sample_Weight);
+      --  L410
 
    end Fit;
 
