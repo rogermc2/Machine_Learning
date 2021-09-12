@@ -23,7 +23,6 @@ with ML_Types;
 with Tree;
 
 with Classifier_Types; use Classifier_Types;
-with Estimator;
 with Weights;
 
 package Decision_Tree_Classifer is
@@ -108,11 +107,10 @@ package Decision_Tree_Classifer is
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
-   function Fit (aClassifier   : in out Classifier;
+   procedure Fit (aClassifier   : in out Classifier;
                  X             : ML_Types.List_Of_Value_Data_Lists;
                  Y             : in out ML_Types.List_Of_Value_Data_Lists;
                  Sample_Weight : in out Classifier_Types.Weight_List;
-                 Check_Input   : Boolean := False)
-                 return Estimator.Estimator_Data;
+                 Check_Input   : Boolean := False);
 
 end Decision_Tree_Classifer;

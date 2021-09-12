@@ -117,25 +117,20 @@ package body Decision_Tree_Classifer is
    --  Y :  a (n_samples, n_outputs) array of integer valued class labels
    --       for the training samples.
    --  Sample_Weight : array-like of shape (n_samples,), default=None
-   function Fit (aClassifier   : in out Classifier;
+   procedure Fit (aClassifier   : in out Classifier;
                  X             : ML_Types.List_Of_Value_Data_Lists;
                  Y             : in out ML_Types.List_Of_Value_Data_Lists;
                  Sample_Weight : in out Classifier_Types.Weight_List;
-                 Check_Input   : Boolean := False)
-                  return Estimator.Estimator_Data is
+                 Check_Input   : Boolean := False) is
       use Ada.Containers;
       use ML_Types;
       use Classifier_Types;
       use Classifier_Types.Integer_Package;
       Num_Outputs           : constant Positive := Positive (Y.Length);
-      Num_Features          : constant Class_Range :=
-                                Class_Range (X.Length);
       Num_Samples           : constant Positive :=
                                 Positive (Y.Length);
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
-      theEstimator          : Estimator.Estimator_Data
-        (Num_Samples, Positive (Num_Features));
       Y_Encoded             : List_Of_Value_Data_Lists;
       Max_Leaf_Nodes        : Integer := -1;
    begin
@@ -187,10 +182,6 @@ package body Decision_Tree_Classifer is
       end if;
 
       Build_Tree (aClassifier, X, Y, Sample_Weight);
-
-      Classifier_Utilities.Print_Boolean_Matrix
-          ("Decision_Tree_Classifer.Fit Estimator X Types ", theEstimator.X_Types);
-      return theEstimator;
 
    end Fit;
 
