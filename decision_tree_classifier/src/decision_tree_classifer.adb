@@ -3,7 +3,7 @@
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Builder;
+--  with Builder;
 with Classifier_Types;
 with Classifier_Utilities;
 with Encode_Utils;
@@ -11,31 +11,20 @@ with Tree_Build;
 
 package body Decision_Tree_Classifer is
 
-    procedure Build_Best_First
-      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List;
-       aTree         : in out Tree.Tree_Class);
-    procedure Build_Depth_First
-      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List;
-       aTree         : in out Tree.Tree_Class);
-
     --  -------------------------------------------------------------------------
 
     procedure Build_Tree (Self          : in out Classifier;
                           X, Y          : ML_Types.List_Of_Value_Data_Lists;
-                          Sample_Weight : Classifier_Types.Weight_List;
-                          Max_Leaves : Natural := 0) is
-        use ML_Types;
+                          Sample_Weight : Classifier_Types.Weight_List) is
         --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
         --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
         theTree   : Tree.Tree_Class
           (Self.Attributes.Num_Features, Self.Attributes.Num_Outputs,
            Tree.Index_Range (Self.Attributes.Classes.Length));
-        Feature_Values : Value_Data_List;
-        aRow           : Row_Data (Class_Range (X.Element (1).Length));
-        Rows           : Rows_Vector;
-        Row_Tree       : ML_Types.Tree_Type;
+--          Feature_Values : Value_Data_List;
+--          aRow           : Row_Data (Class_Range (X.Element (1).Length));
+--          Rows           : Rows_Vector;
+--          Row_Tree       : ML_Types.Tree_Type;
     begin
         --  L346
         --  if is_classifier(self):
@@ -43,50 +32,36 @@ package body Decision_Tree_Classifer is
 
         --  L390
         if Self.Parameters.Max_Leaf_Nodes < 0 then
-            Build_Depth_First (X, Y, Sample_Weight, theTree);
+            declare
+                Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
+            begin
+                --  L419  Depth First case
+                --  Builder.Build_Tree (Self, X, y , Sample_Weight)
+                Tree_Build.Build_Depth_First_Tree (Builder, theTree, X, Y, Sample_Weight);
+            end;
         else
-            Build_Best_First (X, Y, Sample_Weight, theTree);
+            declare
+                Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
+            begin
+                --  L419  Best First case
+                --  Builder.Build_Tree (Self, X, y , Sample_Weight)
+                Tree_Build.Build_Best_First_Tree (Builder, theTree, X, Y, Sample_Weight);
+            end;
         end if;
 
-        --  L408
-        --        Builder.Build_Tree (Self, X, y , Sample_Weight)
-        for index in 1 .. Positive (X.Length) loop
-            Feature_Values := X.Element (index);
-            for index2 in Feature_Values.First_Index ..
-              Feature_Values.Last_Index loop
-                aRow.Features (Class_Range (index)) :=
-                  Feature_Values.Element (index2).UB_String_Value;
-                Rows.Append (aRow);
-            end loop;
-        end loop;
-
-        Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
+--          for index in 1 .. Positive (X.Length) loop
+--              Feature_Values := X.Element (index);
+--              for index2 in Feature_Values.First_Index ..
+--                Feature_Values.Last_Index loop
+--                  aRow.Features (Class_Range (index)) :=
+--                    Feature_Values.Element (index2).UB_String_Value;
+--                  Rows.Append (aRow);
+--              end loop;
+--          end loop;
+--
+--          Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
 
     end Build_Tree;
-
-    --  -------------------------------------------------------------------------
-
-    procedure Build_Best_First
-      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List;
-       aTree         : in out Tree.Tree_Class) is
-        Builder       : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
-    begin
-        Tree_Build.Build_Best_First_Tree (Builder, aTree, X, Y, Sample_Weight);
-
-    end Build_Best_First;
-
-    --  -------------------------------------------------------------------------
-
-    procedure Build_Depth_First
-      (X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List;
-       aTree         : in out Tree.Tree_Class) is
-        Builder       : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
-    begin
-        Tree_Build.Build_Depth_First_Tree (Builder, aTree, X, Y, Sample_Weight);
-
-    end Build_Depth_First;
 
     --  -------------------------------------------------------------------------
 
