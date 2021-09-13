@@ -49,16 +49,6 @@ package body Decision_Tree_Classifer is
             end;
         end if;
 
---          for index in 1 .. Positive (X.Length) loop
---              Feature_Values := X.Element (index);
---              for index2 in Feature_Values.First_Index ..
---                Feature_Values.Last_Index loop
---                  aRow.Features (Class_Range (index)) :=
---                    Feature_Values.Element (index2).UB_String_Value;
---                  Rows.Append (aRow);
---              end loop;
---          end loop;
---
 --          Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
 
     end Build_Tree;

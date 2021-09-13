@@ -183,8 +183,13 @@ package body Tree_Build is
        theTree       : in out Tree.Tree_Class;
        X, Y          : ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : Classifier_Types.Weight_List) is
-       use ML_Types.Tree_Package;
-        Ada_Tree      : ML_Types.Tree_Type := Empty_Tree;
+        use ML_Types;
+        use ML_Types.Tree_Package;
+        Ada_Tree         : Tree_Type := Empty_Tree;
+        Feature_Values   : Value_Data_List;
+        Label_Values     : Value_Data_List;
+        aRow             : Row_Data;
+        Rows             : Rows_Vector;
         Initial_Capacity : Positive := 2047;
         Start         : Positive;
         Stop          : Positive;
@@ -198,11 +203,24 @@ package body Tree_Build is
         aSplitter     : Node_Splitter.Splitter_Class;
     begin
         --  L 147
---          if theTree.Max_Depth <= 10 then
---              Initial_Capacity := 2 ** (theTree.Max_Depth + 1) - 1;
---          end if;
---
---          Tree.Resize (theTree, Initial_Capacity);
+        --          if theTree.Max_Depth <= 10 then
+        --              Initial_Capacity := 2 ** (theTree.Max_Depth + 1) - 1;
+        --          end if;
+        --
+        --          Tree.Resize (theTree, Initial_Capacity);
+
+        for index in 1 .. Positive (X.Length) loop
+            Feature_Values := X.Element (index);
+            Label_Values := Y.Element (index);
+            for index2 in Feature_Values.First_Index ..
+              Feature_Values.Last_Index loop
+                aRow.Features (Class_Range (index)) :=
+                  Feature_Values.Element (index2).UB_String_Value;
+                  aRow.Label :=
+                  Label_Values.Element (index2).UB_String_Value;
+                Rows.Append (aRow);
+            end loop;
+        end loop;
 
         Add_Branch (Rows, Ada_Tree.Root);
 
