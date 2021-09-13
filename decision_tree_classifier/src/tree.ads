@@ -30,8 +30,8 @@ package Tree is
    end record;
 
    type Tree_Node (Feature_Sel : Data_Type) is record
-      Left_Child_ID             : Integer := 0;
-      Right_Child_ID            : Integer := 0;
+--        Left_Child_ID             : Integer := 0;
+--        Right_Child_ID            : Integer := 0;
       --  Feature used for splitting the node
       Feature                   : Features_Record (Feature_Sel);
       Num_Node_Samples          : Integer := 0;
