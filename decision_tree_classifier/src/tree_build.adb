@@ -87,24 +87,40 @@ package body Tree_Build is
    --      end Add_Prediction_Node;
 
    --  ----------------------------------------------------------------------
-
-   procedure Add_Node (Parent_Cursor         : ML_Types.Tree_Cursor;
---                         Self                  : in out Tree.Tree_Class;
---                         Parent                : ML_Types.Tree_Node_Type;
-                         Is_Left, Is_Leaf      : Boolean;
+   --   node_samples : array of int, shape [node_count]
+   --   node_samples[i] holds the number of training samples reaching node i.
+   --
+   --   weighted_node_samples : array of int, shape [node_count]
+   --   weighted_node_samples[i] holds the weighted number of training samples
+   --   reaching node i.
+   procedure Add_Node (theTree               : in out Tree.Tree_Class;
+                       Parent_Cursor         : ML_Types.Tree_Cursor;
+                       --                         Self                  : in out Tree.Tree_Class;
+                       --                         Parent                : ML_Types.Tree_Node_Type;
+                       Is_Left, Is_Leaf      : Boolean;
                        Feature               : Positive;
                        Impurity, Threshold   : Float;
-                       Node_Samples          : Positive;
-                       Weighted_Node_Samples : Positive) is
+                       Node_Samples          : Natural;
+                       Weighted_Node_Samples : Natural) is
 
       use Tree;
+      use Tree_Package;
       --          Node_ID  : Index_Range := Index_Range (Self.Node_Count);
       aNode : Tree_Node (Float_Type);
+      Pos   : Cursor;
    begin
       aNode.Impurity := Impurity;
       aNode.Num_Node_Samples := Node_Samples;
       aNode.Weighted_Num_Node_Samples := Weighted_Node_Samples;
 
+      if Is_Left then
+         theTree.Nodes.Insert_Child (Parent   => Parent_Cursor,
+                                     Before   => No_Element,
+                                     New_Item => aNode,
+                                     Position => Pos);
+      else
+         null;
+      end if;
    end Add_Node;
 
    --  ------------------------------------------------------------------------
@@ -118,7 +134,7 @@ package body Tree_Build is
       --         Parent            : ML_Types.Tree_Node_Type;
       Depth             : Positive) is
       --          Node_ID           : Natural;
-      Node_Samples      : Positive := Stop - Start;
+      Node_Samples      : Natural := Stop - Start;
       Node_Val          : Float;
       Is_Leaf           : Boolean;
       aSplit            : Node_Splitter.Split_Record;
@@ -142,9 +158,9 @@ package body Tree_Build is
            aSplit.Improvement + Epsilon < Self.Min_Impurity_Decrease;
       end if;
 
-      Add_Node (aTree, Is_Left, Is_Leaf, aSplit.Feature_Index,
-                aSplit.Threshold, Impurity, Node_Samples,
-                Splitter.Weighted_Samples);
+--        Add_Node (aTree.Nodes.Root, Is_Left, Is_Leaf, aSplit.Feature_Index,
+--                  aSplit.Threshold, Impurity, Node_Samples,
+--                  Splitter.Weighted_Samples);
       Node_Splitter.Node_Value (Splitter, Node_Val);
       --          aTree.Values (1, 1, 1) := Node_Val;
    end Add_Split_Node;
