@@ -29,9 +29,11 @@ package Tree is
       end case;
    end record;
 
-   type Tree_Node (Feature_Sel : Data_Type) is record
---        Left_Child_ID             : Integer := 0;
---        Right_Child_ID            : Integer := 0;
+   type Tree_Node (Feature_Sel : Data_Type := Integer_Type;
+                   Kind        : ML_Types.Node_Kind := ML_Types.Undefined_Node)
+   is record
+      --        Left_Child_ID             : Integer := 0;
+      --        Right_Child_ID            : Integer := 0;
       --  Feature used for splitting the node
       Feature                   : Features_Record (Feature_Sel);
       Num_Node_Samples          : Integer := 0;
@@ -46,7 +48,9 @@ package Tree is
 
    package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
      (Tree_Node);
-   --     type Tree_List is new Tree_Package.Vector with null record;
+   subtype Tree_Type is Tree_Package.Tree;
+   subtype Tree_Cursor is Tree_Package.Cursor;
+
    type Values_Array is array
      (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
 
@@ -59,9 +63,9 @@ package Tree is
       Node_Count      : Natural := 0;
       Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
       --  Values declaration causes runtime problem
---        Values          : Values_Array
---          (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
---          := (others => (others => (others => 0.0)));
+      --        Values          : Values_Array
+      --          (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
+      --          := (others => (others => (others => 0.0)));
       --        Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
       Attributes      : Tree_Attributes;
    end record;

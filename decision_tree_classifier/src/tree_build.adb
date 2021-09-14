@@ -87,40 +87,43 @@ package body Tree_Build is
    --      end Add_Prediction_Node;
 
    --  ----------------------------------------------------------------------
-   --   node_samples : array of int, shape [node_count]
-   --   node_samples[i] holds the number of training samples reaching node i.
-   --
-   --   weighted_node_samples : array of int, shape [node_count]
-   --   weighted_node_samples[i] holds the weighted number of training samples
-   --   reaching node i.
+   --  node_samples : array of int, shape [node_count]
+   --  node_samples[i] holds the number of training samples reaching node i.
+   --  weighted_node_samples : array of int, shape [node_count]
+   --  weighted_node_samples[i] holds the weighted number of training samples
+   --  reaching node i.
+   --  Parent_Cursor is a cursor to an existing node which is the head
+   --  of this node's branch Tree.
+   --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    procedure Add_Node (theTree               : in out Tree.Tree_Class;
-                       Parent_Cursor         : ML_Types.Tree_Cursor;
+                       Parent_Cursor         : Tree.Tree_Cursor;
                        --                         Self                  : in out Tree.Tree_Class;
-                       --                         Parent                : ML_Types.Tree_Node_Type;
+                       --                         Parent
+                       Type_Of_Feature       : Tree.Data_Type;
+                       Type_Of_Node          : ML_Types.Node_Kind;
                        Is_Left, Is_Leaf      : Boolean;
                        Feature               : Positive;
                        Impurity, Threshold   : Float;
                        Node_Samples          : Natural;
                        Weighted_Node_Samples : Natural) is
-
       use Tree;
       use Tree_Package;
-      --          Node_ID  : Index_Range := Index_Range (Self.Node_Count);
-      aNode : Tree_Node (Float_Type);
-      Pos   : Cursor;
+      New_Node     : Tree_Node (Type_Of_Feature, Type_Of_Node);
+--        Child_Cursor : Tree_Cursor := Last_Child (Parent_Cursor);
    begin
-      aNode.Impurity := Impurity;
-      aNode.Num_Node_Samples := Node_Samples;
-      aNode.Weighted_Num_Node_Samples := Weighted_Node_Samples;
+      New_Node.Impurity := Impurity;
+      New_Node.Num_Node_Samples := Node_Samples;
+      New_Node.Weighted_Num_Node_Samples := Weighted_Node_Samples;
 
       if Is_Left then
          theTree.Nodes.Insert_Child (Parent   => Parent_Cursor,
                                      Before   => No_Element,
-                                     New_Item => aNode,
-                                     Position => Pos);
+                                     New_Item => New_Node);
       else
-         null;
+         theTree.Nodes.Append_Child (Parent   => Parent_Cursor,
+                                     New_Item => New_Node);
       end if;
+
    end Add_Node;
 
    --  ------------------------------------------------------------------------
@@ -158,9 +161,9 @@ package body Tree_Build is
            aSplit.Improvement + Epsilon < Self.Min_Impurity_Decrease;
       end if;
 
---        Add_Node (aTree.Nodes.Root, Is_Left, Is_Leaf, aSplit.Feature_Index,
---                  aSplit.Threshold, Impurity, Node_Samples,
---                  Splitter.Weighted_Samples);
+      --        Add_Node (aTree.Nodes.Root, Is_Left, Is_Leaf, aSplit.Feature_Index,
+      --                  aSplit.Threshold, Impurity, Node_Samples,
+      --                  Splitter.Weighted_Samples);
       Node_Splitter.Node_Value (Splitter, Node_Val);
       --          aTree.Values (1, 1, 1) := Node_Val;
    end Add_Split_Node;
