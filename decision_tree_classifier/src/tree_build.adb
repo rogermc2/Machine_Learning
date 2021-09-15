@@ -20,6 +20,7 @@ package body Tree_Build is
       --  Parent_Cursor is a cursor to an existing node which is the head
       --  of this branch
       use ML_Types;
+      use Tree_Package;
       Best_Split       : constant Best_Data := Find_Best_Split (Rows);
       Child_Cursor     : Tree_Cursor;
       True_Split_Rows  : Rows_Vector;
@@ -190,6 +191,14 @@ package body Tree_Build is
 
    --  ------------------------------------------------------------------------
 
+   procedure Add_To_Frontier (Rec : Priority_Heap.Priority_Record;
+                              Frontier : in out Priority_Heap.Frontier_List) is
+   begin
+      Frontier.Append (Rec);
+   end Add_To_Frontier;
+
+   --  ------------------------------------------------------------------------
+
    --     procedure Build_Tree
    --       (aBuilder      : in out Tree_Builder;
    --        theTree       : in out Tree.Tree_Class;
@@ -211,21 +220,49 @@ package body Tree_Build is
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
+      use Priority_Heap;
+      use Frontier_Package;
+      use Tree.Tree_Package;
       Splitter         : Node_Splitter.Splitter_Class;
-      Heap_Record      : Priority_Heap.Priority_Heap_Record;
-      Split_Node_Left  : Priority_Heap.Priority_Heap_Record;
-      Split_Node_Right : Priority_Heap.Priority_Heap_Record;
+      Heap_Record      : Priority_Record;
+      Split_Node_Left  : Priority_Record;
+      Split_Node_Right : Priority_Record;
       Max_Split_Nodes  : Natural;
-      New_Node         : Tree.Tree_Node;
-      Impurity         : Natural := 0;
-      Res              : Priority_Heap.Priority_Heap_Record;
+      Node             : Tree.Tree_Node;
+      Impurity         : Float := 0.0;
+      Frontier         : Priority_Heap.Frontier_List;
+      Curs             : Frontier_Cursor;
    begin
       Init_Best_First_Tree (Best_Builder, Splitter);
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
 
-      Add_Split_Node (Best_Builder, theTree, theTree.Nodes.Root,
-                      Splitter, Impurity, True, True, 0, Res);
+      Add_Split_Node (Best_Builder, theTree, Last_Child (theTree.Nodes.Root),
+                      Splitter, Impurity, True, True, 1, Split_Node_Left);
+      Add_To_Frontier (Split_Node_Left, Frontier);
+
+      Curs := Frontier.First;
+      while Has_Element (Curs) loop
+         Heap_Record := Element (Curs);
+         Node := Heap_Record.Node;
+         if not Node.Is_Leaf then
+            Max_Split_Nodes := Max_Split_Nodes - 1;
+            Add_Split_Node
+              (Best_Builder, theTree, Last_Child (theTree.Nodes.Root), Splitter, Node.Impurity,
+               False, Node.Is_Left, Node.Depth + 1, Split_Node_Left);
+            --  tree.nodes may have changed
+            Heap_Record := Element (Curs);
+            Node := Heap_Record.Node;
+            Add_Split_Node
+              (Best_Builder, theTree, Last_Child (theTree.Nodes.Root),
+               Splitter, Heap_Record.Impurity_Right, False, False,
+               Node.Depth + 1, Split_Node_Right);
+            Add_To_Frontier (Split_Node_Right, Frontier);
+         end if;
+
+         Next (Curs);
+      end loop;
+
    end Build_Best_First_Tree;
 
    --  ------------------------------------------------------------------------

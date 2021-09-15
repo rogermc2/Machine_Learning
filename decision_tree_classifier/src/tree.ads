@@ -33,13 +33,11 @@ package Tree is
                     Feature_Sel : Data_Type := Integer_Type;
                     Kind        : ML_Types.Node_Kind := ML_Types.Undefined_Node)
     is record
-    --        Left_Child_ID             : Integer := 0;
-    --        Right_Child_ID            : Integer := 0;
         Num_Node_Samples          : Integer := 0;
         Weighted_Num_Node_Samples : Integer := 0;
         Depth                     : Integer := 0;
         --        Parent                    : Tree_Node;
-        Is_Left                   : Integer := 0;
+        Is_Left                   : Boolean := True;
         Impurity                  : Float := Float'Large;  --  "Infinity"
         Num_Constant_Features     : Integer := 0;
         case Is_Leaf is
