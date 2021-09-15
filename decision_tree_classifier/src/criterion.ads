@@ -27,9 +27,6 @@ package Criterion is
       Sum_Left                  : Classifier_Types.Weight_List;
       Sum_Right                 : Classifier_Types.Weight_List;
       Num_Classes               : Classifier_Types.Natural_List;
-      Start                     : Natural := 0;
-      Pos                       : Natural := 0;
-      Stop                      : Natural := 0;
       Sq_Sum_Total              : Float := 0.0;
    end record;
 
@@ -44,13 +41,12 @@ package Criterion is
                    Y                : ML_Types.List_Of_Value_Data_Lists;
                    --  Sample_Weight contains the weight of each sample
                    Sample_Weight    : Classifier_Types.Weight_List;
-                   Weighted_Samples : Float; Start, Stop : Natural;
+                   Weighted_Samples : Float;
                    Sample_Indices   : Classifier_Types.Natural_List);
    procedure Node_Value (Self : Criterion_Class; Value : out Float);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;
    procedure Reset (Criteria : in out Criterion_Class);
-   procedure Update (Criteria : in out Criterion_Class;
-                     New_Pos  : Positive);
+   procedure Update (Criteria : in out Criterion_Class);
 
 end Criterion;

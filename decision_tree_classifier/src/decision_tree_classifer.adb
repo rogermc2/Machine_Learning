@@ -18,9 +18,7 @@ package body Decision_Tree_Classifer is
                           Sample_Weight : Classifier_Types.Weight_List) is
         --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
         --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
-        theTree   : Tree.Tree_Class
-          (Self.Attributes.Num_Features, Self.Attributes.Num_Outputs,
-           Tree.Index_Range (Self.Attributes.Classes.Length));
+        theTree   : Tree.Tree_Class;
 --          Feature_Values : Value_Data_List;
 --          aRow           : Row_Data (Class_Range (X.Element (1).Length));
 --          Rows           : Rows_Vector;

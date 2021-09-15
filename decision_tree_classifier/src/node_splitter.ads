@@ -26,9 +26,7 @@ package Node_Splitter is
       Constant_Features    : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
       Num_Samples          : Natural := 0;
-      Weighted_Samples     : Natural := 0;
-      Start                : Natural := 0;
-      Stop                 : Natural := 0;
+      Weighted_Samples     : Float := 0.0;
       Y                    : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight        : Classifier_Types.Weight_List;
       Node_Impurity        : Float;
@@ -42,8 +40,8 @@ package Node_Splitter is
                    Sample_Weight : Classifier_Types.Weight_List);
    procedure Node_Value (Self : Splitter_Class; Value : out Float);
    procedure Reset_Node
-     (Split                 : in out Splitter_Class; Start, Stop : Natural;
-      Weighted_Node_Samples : in out Natural);
+     (Split                 : in out Splitter_Class;
+      Weighted_Node_Samples : in out Float);
    function Split_Node (Self              : in out Splitter_Class;
                         Impurity          : Float;
                         Constant_Features : in out ML_Types.Value_Data_List)

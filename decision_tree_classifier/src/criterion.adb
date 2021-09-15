@@ -95,21 +95,18 @@ package body Criterion is
                     Y                : ML_Types.List_Of_Value_Data_Lists;
                     --  Sample_Weight contains the weight of each sample
                     Sample_Weight    : Classifier_Types.Weight_List;
-                    Weighted_Samples : Float; Start, Stop : Natural;
+                    Weighted_Samples : Float;
                     Sample_Indices   : Classifier_Types.Natural_List) is
-        Y_I       : ML_Types.Value_Data_List;
+--          Y_I       : ML_Types.Value_Data_List;
         Sum_Total : Classifier_Types.Weight_List;
-        i         : Natural;
-        Weight    : float := 1.0;
-        Y_Ik      : Float;
-        W_Ik      : Float;
+--          i         : Natural;
+--          Weight    : float := 1.0;
+--          Y_Ik      : Float;
+--          W_Ik      : Float;
     begin
         Criteria.Y := Y;
         Criteria.Sample_Weight := Sample_Weight;
         Criteria.Sample_Indices := Sample_Indices;
-        Criteria.Start := Start;
-        Criteria.Stop := Stop;
-        Criteria.Num_Node_Samples := Stop - Start;
         Criteria.Weighted_Samples := Weighted_Samples;
         Criteria.Num_Weighted_Node_Samples := 0;
 
@@ -124,27 +121,27 @@ package body Criterion is
             Criteria.Sum_Total.Append (Sum_Total);
         end loop;
 
-        for p in Start .. Stop loop
-            i := Criteria.Sample_Indices.Element (p);
-            Y_I := Y.Element (i);
-
-            --  Weight is originally set to be 1.0, meaning that if no
-            --  sample weights are given, the default weight of each sample is 1.0
-            if not Sample_Weight.Is_Empty then
-                Weight := Sample_Weight.Element (i);
-            end if;
-
-            for k in 1 .. Criteria.Num_Outputs loop
-                Y_Ik := Float (Y_I.Element (k).Integer_Value);
-                W_Ik := Y_Ik * Weight;
-                Sum_Total.Replace_Element
-                  (k, Sum_Total.Element (k) + W_Ik);
-                Criteria.Sq_Sum_Total := Criteria.Sq_Sum_Total + Y_Ik * W_Ik;
-            end loop;
-
-            Criteria.Weighted_Node_Samples :=
-              Criteria.Weighted_Node_Samples + Weight;
-        end loop;
+--          for p in Start .. Stop loop
+--              i := Criteria.Sample_Indices.Element (p);
+--              Y_I := Y.Element (i);
+--
+--              --  Weight is originally set to be 1.0, meaning that if no
+--              --  sample weights are given, the default weight of each sample is 1.0
+--              if not Sample_Weight.Is_Empty then
+--                  Weight := Sample_Weight.Element (i);
+--              end if;
+--
+--              for k in 1 .. Criteria.Num_Outputs loop
+--                  Y_Ik := Float (Y_I.Element (k).Integer_Value);
+--                  W_Ik := Y_Ik * Weight;
+--                  Sum_Total.Replace_Element
+--                    (k, Sum_Total.Element (k) + W_Ik);
+--                  Criteria.Sq_Sum_Total := Criteria.Sq_Sum_Total + Y_Ik * W_Ik;
+--              end loop;
+--
+--              Criteria.Weighted_Node_Samples :=
+--                Criteria.Weighted_Node_Samples + Weight;
+--          end loop;
 
         Reset (Criteria);
 
@@ -187,7 +184,6 @@ package body Criterion is
 
         Criteria.Weighted_Left := 0.0;
         Criteria.Weighted_Right := Criteria.Weighted_Node_Samples;
-        Criteria.Pos := Criteria.Start;
 
     end Reset;
 
@@ -200,51 +196,50 @@ package body Criterion is
 
     --  ------------------------------------------------------------------------
     --  Update statistics by moving samples[pos:new_pos] to the left child.
-    procedure Update (Criteria : in out Criterion_Class;
-                      New_Pos  : Positive) is
-        use ML_Types;
+    procedure Update (Criteria : in out Criterion_Class) is
+--          use ML_Types;
         Sum_Left    : Float;
-        i           : Positive;
-        Values      : Value_Data_List;
-        Weight      : Float := 1.0;
+--          i           : Positive;
+--          Values      : Value_Data_List;
+--          Weight      : Float := 1.0;
     begin
-        if (New_Pos - Criteria.Pos) <= (Criteria.Stop - New_Pos) then
-            for p in Criteria.Pos .. New_Pos loop
-                i := Criteria.Sample_Indices.Element (p);
-                if not Criteria.Sample_Weight.Is_Empty then
-                    Weight := Criteria.Sample_Weight.Element (i);
-                end if;
-
-                Values := Criteria.Y.Element (i);
-                for k in 1 .. Criteria.Num_Outputs loop
-                    Sum_Left := Criteria.Sum_Left.Element (k);
-                    Sum_Left :=
-                      Sum_Left + Values.Element (k).Float_Value * Weight;
-                    Criteria.Sum_Left.Replace_Element (k, Sum_Left);
-                end loop;
-
-                Criteria.Weighted_Left := Criteria.Weighted_Left + Weight;
-            end loop;
-
-        else
-            Reverse_Reset (Criteria);
-            for p in reverse Criteria.Stop .. New_Pos loop
-                i := Criteria.Sample_Indices.Element (p);
-                if not Criteria.Sample_Weight.Is_Empty then
-                    Weight := Criteria.Sample_Weight.Element (i);
-                end if;
-
-                Values := Criteria.Y.Element (i);
-                for k in 1 .. Criteria.Num_Outputs loop
-                    Sum_Left := Criteria.Sum_Left.Element (k);
-                    Sum_Left :=
-                      Sum_Left - Values.Element (k).Float_Value * Weight;
-                    Criteria.Sum_Left.Replace_Element (k, Sum_Left);
-                end loop;
-
-                Criteria.Weighted_Left := Criteria.Weighted_Left - Weight;
-            end loop;
-        end if;
+--          if (New_Pos - Criteria.Pos) <= (Criteria.Stop - New_Pos) then
+--              for p in Criteria.Pos .. New_Pos loop
+--                  i := Criteria.Sample_Indices.Element (p);
+--                  if not Criteria.Sample_Weight.Is_Empty then
+--                      Weight := Criteria.Sample_Weight.Element (i);
+--                  end if;
+--
+--                  Values := Criteria.Y.Element (i);
+--                  for k in 1 .. Criteria.Num_Outputs loop
+--                      Sum_Left := Criteria.Sum_Left.Element (k);
+--                      Sum_Left :=
+--                        Sum_Left + Values.Element (k).Float_Value * Weight;
+--                      Criteria.Sum_Left.Replace_Element (k, Sum_Left);
+--                  end loop;
+--
+--                  Criteria.Weighted_Left := Criteria.Weighted_Left + Weight;
+--              end loop;
+--
+--          else
+--              Reverse_Reset (Criteria);
+--              for p in reverse Criteria.Stop .. New_Pos loop
+--                  i := Criteria.Sample_Indices.Element (p);
+--                  if not Criteria.Sample_Weight.Is_Empty then
+--                      Weight := Criteria.Sample_Weight.Element (i);
+--                  end if;
+--
+--                  Values := Criteria.Y.Element (i);
+--                  for k in 1 .. Criteria.Num_Outputs loop
+--                      Sum_Left := Criteria.Sum_Left.Element (k);
+--                      Sum_Left :=
+--                        Sum_Left - Values.Element (k).Float_Value * Weight;
+--                      Criteria.Sum_Left.Replace_Element (k, Sum_Left);
+--                  end loop;
+--
+--                  Criteria.Weighted_Left := Criteria.Weighted_Left - Weight;
+--              end loop;
+--          end if;
 
         --  Update right part statistics
         Criteria.Weighted_Right := Criteria.Weighted_Node_Samples -

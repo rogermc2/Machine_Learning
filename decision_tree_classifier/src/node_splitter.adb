@@ -10,13 +10,11 @@ package body Node_Splitter is
 
     procedure Replacement_Sort (Self        : Splitter_Class;
                                 Data        : in out ML_Types.Value_Data_List;
-                                Current     : Split_Record;
-                                Start, Stop : Positive);
+                                Current     : Split_Record);
 
     procedure Replacement_Sort (Self        : Splitter_Class;
                                 Data        : in out Classifier_Types.Natural_List;
-                                Current     : Split_Record;
-                                Start, Stop : Positive);
+                                Current     : Split_Record);
 
     --  -------------------------------------------------------------------------
 
@@ -62,12 +60,11 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Init_Split (theSplit : in out Split_Record; Start : Natural) is
+    procedure Init_Split (theSplit : in out Split_Record) is
     begin
         theSplit.Impurity_Left := Float'Last;
         theSplit.Impurity_Right := Float'Last;
         theSplit.Improvement := -Float'Last;
-        theSplit.Pos := Start;
         theSplit.Feature_Index := 1;
         theSplit.Threshold := 0.0;
 
@@ -87,52 +84,54 @@ package body Node_Splitter is
                          Features    : Classifier_Types.Natural_List;
                          Features_X  : ML_Types.Value_Data_List;
                          Cur         : Split_Record; Best : in out Split_Record) is
-        P_Index                   : Natural := P;
-        Current                   : Split_Record := Cur;
-        Current_Proxy_Improvement : Float := -Float'Last;
-        Best_Proxy_Improvement    : Float := -Float'Last;
+--          P_Index                   : Natural := P;
+--          Current                   : Split_Record := Cur;
+--          Current_Proxy_Improvement : Float := -Float'Last;
+--          Best_Proxy_Improvement    : Float := -Float'Last;
     begin
+      null;
         --  Features is a list of feature indices
-        while P_Index <= Self.Stop loop
-            while P_Index + 1 <= Self.Stop and
-              Features.Element (P_Index + 1) <=
-              Features.Element (P_Index) loop
-                P_Index := P_Index + 1;
-            end loop;
-            --  L388
-            P_Index := P_Index + 1;
-            if P_Index <= Self.Stop then
-                Current.Pos := P_Index;
-                --  L395 Reject if Min_Leaf_Samples is not guaranteed
-                if (Current.Pos - Self.Start) >=
-                  Self.Min_Leaf_Samples and
-                  (Self.Stop - Current.Pos) >= Self.Min_Leaf_Samples then
-                    Criterion.Update (Self.Criteria, Current.Pos);
-                    --  L402 Reject if min_weight_leaf is not satisfied
-                    if (Self.Criteria.Weighted_Left >=
-                          Self.Min_Leaf_Weight) and
-                      (Self.Criteria.Weighted_Right >=
-                         Self.Min_Leaf_Weight) then
-                        Current_Proxy_Improvement :=
-                          Criterion.Proxy_Impurity_Improvement (Self.Criteria);
-                        if Current_Proxy_Improvement >
-                          Best_Proxy_Improvement then
-                            Best_Proxy_Improvement := Current_Proxy_Improvement;
-                            --  411 use sum of halves to avoid infinite value
-                            Current.Threshold :=
-                              0.5 * Features_X.Element (P_Index - 1).Float_Value +
-                              0.5 * Features_X.Element (P_Index).Float_Value;
-                            if (Current.Threshold = Features_X.Element (P_Index).Float_Value) or
-                              (Features_X.Element (P_Index).Float_Value = Float'Last) or
-                              (Features_X.Element (P_Index).Float_Value = -Float'Last) then
-                                Current.Threshold := Features_X.Element (P_Index - 1).Float_Value;
-                            end if;
-                            Best := Current;
-                        end if;
-                    end if;
-                end if;
-            end if;
-        end loop;
+--          while P_Index <= Self.Stop loop
+--              while P_Index + 1 <= Self.Stop and
+--                Features.Element (P_Index + 1) <=
+--                Features.Element (P_Index) loop
+--                  P_Index := P_Index + 1;
+--              end loop;
+--              --  L388
+--              P_Index := P_Index + 1;
+--              if P_Index <= Self.Stop then
+--                  Current.Pos := P_Index;
+--                  --  L395 Reject if Min_Leaf_Samples is not guaranteed
+--                  if (Current.Pos - Self.Start) >=
+--                    Self.Min_Leaf_Samples and
+--                    (Self.Stop - Current.Pos) >= Self.Min_Leaf_Samples then
+--                      Criterion.Update (Self.Criteria, Current.Pos);
+--                      --  L402 Reject if min_weight_leaf is not satisfied
+--                      if (Self.Criteria.Weighted_Left >=
+--                            Self.Min_Leaf_Weight) and
+--                        (Self.Criteria.Weighted_Right >=
+--                           Self.Min_Leaf_Weight) then
+--                          Current_Proxy_Improvement :=
+--                            Criterion.Proxy_Impurity_Improvement (Self.Criteria);
+--                          if Current_Proxy_Improvement >
+--                            Best_Proxy_Improvement then
+--                              Best_Proxy_Improvement := Current_Proxy_Improvement;
+--                              --  411 use sum of halves to avoid infinite value
+--                              Current.Threshold :=
+--                                0.5 * Features_X.Element (P_Index - 1).Float_Value +
+--                                0.5 * Features_X.Element (P_Index).Float_Value;
+--                              if (Current.Threshold = Features_X.Element (P_Index).Float_Value) or
+--                                (Features_X.Element (P_Index).Float_Value = Float'Last) or
+--                                (Features_X.Element (P_Index).Float_Value = -Float'Last) then
+--                                  Current.Threshold := Features_X.Element (P_Index - 1).Float_Value;
+--                              end if;
+--                              Best := Current;
+--                          end if;
+--                      end if;
+--                  end if;
+--              end if;
+        --          end loop;
+
     end Process_A;
 
     --  -------------------------------------------------------------------------
@@ -141,37 +140,37 @@ package body Node_Splitter is
                          Best_Split : in out Split_Record;
                          Samples     : in out Classifier_Types.Natural_List;
                          Impurity    : Float) is
-        Partition_End : Natural;
-        P_Index       : Positive;
-        X_1           : ML_Types.Value_Data_List;
-        Swap          : Natural;
+--          Partition_End : Natural;
+--          P_Index       : Positive;
+--          X_1           : ML_Types.Value_Data_List;
+--          Swap          : Natural;
     begin
-        if Best_Split.Pos < Self.Stop then
-            Partition_End := Self.Stop;
-            P_Index := Self.Start;
-            while P_Index < Partition_End loop
-                X_1 := Self.X.Element
-                  (Self.Sample_Indices.Element (P_Index));
-                if X_1.Element (Self.Sample_Indices.Element (P_Index)).Float_Value
-                  <= Best_Split.Threshold then
-                    P_Index := P_Index + 1;
-                else
-                    Partition_End := Partition_End - 1;
-                    Swap := Samples.Element (P_Index);
-                    Samples.Replace_Element
-                      (P_Index, Samples.Element (Partition_End));
-                    Samples.Replace_Element (Partition_End, Swap);
-                end if;
-            end loop;
+--          if Best_Split.Pos < Self.Stop then
+--              Partition_End := Self.Stop;
+--              P_Index := Self.Start;
+--              while P_Index < Partition_End loop
+--                  X_1 := Self.X.Element
+--                    (Self.Sample_Indices.Element (P_Index));
+--                  if X_1.Element (Self.Sample_Indices.Element (P_Index)).Float_Value
+--                    <= Best_Split.Threshold then
+--                      P_Index := P_Index + 1;
+--                  else
+--                      Partition_End := Partition_End - 1;
+--                      Swap := Samples.Element (P_Index);
+--                      Samples.Replace_Element
+--                        (P_Index, Samples.Element (Partition_End));
+--                      Samples.Replace_Element (Partition_End, Swap);
+--                  end if;
+--              end loop;
 
             Criterion.Reset (Self.Criteria);
-            Criterion.Update (Self.Criteria, Best_Split.Pos);
+            Criterion.Update (Self.Criteria);
             Criterion.Children_Impurity
               (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
             Best_Split.Improvement := Criterion.Impurity_Improvement
               (Self.Criteria, Impurity, Best_Split.Impurity_Left,
                Best_Split.Impurity_Right);
-        end if;
+--          end if;
 
     end Process_B;
 
@@ -179,19 +178,18 @@ package body Node_Splitter is
 
     procedure Replacement_Sort (Self        : Splitter_Class;
                                 Data        : in out ML_Types.Value_Data_List;
-                                Current     : Split_Record;
-                                Start, Stop : Positive) is
+                                Current     : Split_Record) is
         use ML_Types;
         use Value_Data_Package;
         use Value_Data_Sorting;
         Temp : Value_Data_List;
     begin
-        for index in Self.Start .. Self.Stop loop
+        for index in Data.First_Index .. Data.Last_Index loop
             Temp.Append (Data.Element (index));
         end loop;
 
         Sort (Temp);
-        for index in Start .. Stop loop
+        for index in Data.First_Index .. Data.Last_Index loop
             Data.Replace_Element
               (Data.To_Cursor (Self.Sample_Indices.Element (index)),
                Temp.Element (Current.Feature_Index));
@@ -203,19 +201,18 @@ package body Node_Splitter is
 
     procedure Replacement_Sort (Self        : Splitter_Class;
                                 Data        : in out Classifier_Types.Natural_List;
-                                Current     : Split_Record;
-                                Start, Stop : Positive) is
+                                Current     : Split_Record) is
         use Classifier_Types;
         use Natural_Package;
         use Natural_Sorting;
         Temp : Natural_List;
     begin
-        for index in Self.Start .. Self.Stop loop
+        for index in Data.First_Index .. Data.Last_Index loop
             Temp.Append (Data.Element (index));
         end loop;
 
         Sort (Temp);
-        for index in Start .. Stop loop
+        for index in Data.First_Index .. Data.Last_Index loop
             Data.Replace_Element
               (Data.To_Cursor (Self.Sample_Indices.Element (index)),
                Temp.Element (Current.Feature_Index));
@@ -226,15 +223,11 @@ package body Node_Splitter is
     --  -------------------------------------------------------------------------
 
     procedure Reset_Node
-      (Split                 : in out Splitter_Class; Start, Stop : Natural;
+      (Split                 : in out Splitter_Class;
        Weighted_Node_Samples : in out Float) is
     begin
-        Split.Start := Start;
-        Split.Stop := Stop;
-
         Criterion.Init (Split.Criteria, Split.Y, Split.Sample_Weight,
-                        Split.Weighted_Samples, Start, Stop,
-                        Split.Sample_Indices);
+                        Split.Weighted_Samples, Split.Sample_Indices);
 
         Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 
@@ -278,7 +271,7 @@ package body Node_Splitter is
         --  (hence not suitable for good splitting) by ancestor nodes and save
         --  the information on newly discovered constant features to avoid
         --  computation on descendant nodes.
-        Init_Split (Best_Split, Self.Stop);
+        Init_Split (Best_Split);
 
         --  L323
         while F_I > Num_Total_Constants and
@@ -304,15 +297,13 @@ package body Node_Splitter is
                 F_J := F_J + Num_Found_Constants;
                 Current_Split.Feature_Index := Features.Element (F_J);
                 Features_X.Clear;
-                for index in Self.Start .. Self.Stop loop
+                for index in Features.First_Index .. Features.Last_Index loop
                     Features_X.Append
                       (Self.Feature_Values.Element (Current_Split.Feature_Index));
                 end loop;
                 --  L364
-                Replacement_Sort (Self, Features_X, Current_Split, Self.Start,
-                                  Self.Stop);
-                Replacement_Sort (Self, Samples, Current_Split, Self.Start,
-                                  Self.Stop);
+                Replacement_Sort (Self, Features_X, Current_Split);
+                Replacement_Sort (Self, Samples, Current_Split);
                 --  L367  Features_X is a value_data_list
                 if Features_X.First_Element.Value_Kind = Float_Type then
                     Compare_Value.Float_Value :=
@@ -339,7 +330,6 @@ package body Node_Splitter is
 
                     --  Evaluate all splits
                     Criterion.Reset (Self.Criteria);
-                    P_Index := Self.Start;
                     --  L381
                     Process_A (Self, P_Index, Features, Features_X,
                                Current_Split, Best_Split);

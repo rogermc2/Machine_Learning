@@ -5,6 +5,8 @@
 --  Tree_Builder controls the various stopping criteria and the node splitting
 --  evaluation order, e.g. depth-first or best-first.
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with ML_Types;
 with Priority_Heap;
 with Tree;
@@ -69,7 +71,7 @@ package body Tree_Build is
 
    --  ----------------------------------------------------------------------
 
-   procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
+   procedure Add_Prediction_Node (Parent_Cursor : Tree.Tree_Cursor;
                                   Rows          : ML_Types.Rows_Vector) is
       use ML_Types;
       Leaf : Tree_Node_Type (Prediction_Node);
@@ -105,15 +107,15 @@ package body Tree_Build is
                        Feature               : Tree.Features_Record;
                        Impurity, Threshold   : Float;
                        Node_Samples          : Natural;
-                       Weighted_Node_Samples : Natural) is
+                       Weighted_Node_Samples : Float) is
       use Tree;
       use Tree_Package;
-      New_Node : Tree_Node (Is_Leaf, Type_Of_Feature, Type_Of_Node);
+      New_Node : Tree_Node (Is_Leaf, Type_Of_Feature);
       --        Child_Cursor : Tree_Cursor := Last_Child (Parent_Cursor);
    begin
       New_Node.Impurity := Impurity;
       New_Node.Num_Node_Samples := Node_Samples;
-      New_Node.Weighted_Num_Node_Samples := Weighted_Node_Samples;
+      New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
 
       if not Is_Leaf then
          New_Node.Feature := Feature;
@@ -142,7 +144,7 @@ package body Tree_Build is
       Is_First, Is_Left : Boolean;
       Depth             : Positive;
       Res               : in out Priority_Heap.Priority_Record) is
-      Node_Samples      : constant Natural := Stop - Start;
+      Node_Samples      : Natural;
       Node_Val          : Float;
       Type_Of_Feature   : Tree.Data_Type;
       Type_Of_Node      : ML_Types.Node_Kind;
@@ -151,8 +153,7 @@ package body Tree_Build is
       aSplit            : Node_Splitter.Split_Record;
       Constant_Features : ML_Types.Value_Data_List;
    begin
-      Node_Splitter.Reset_Node (Splitter, Start, Stop,
-                                Splitter.Weighted_Samples);
+      Node_Splitter.Reset_Node (Splitter, Splitter.Weighted_Samples);
       if Is_First then
          Impurity := Splitter.Node_Impurity;
       end if;
@@ -165,7 +166,7 @@ package body Tree_Build is
       if not Is_Leaf then
          aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
                                              Constant_Features);
-         Is_Leaf := aSplit.Pos >= Stop or
+         Is_Leaf :=
            aSplit.Improvement + Epsilon < theBuilder.Min_Impurity_Decrease;
       end if;
 
@@ -290,7 +291,7 @@ package body Tree_Build is
       Impurity         : Float;
       Threshold        : Float;
       Node_Samples     : Natural;
-      Weighted_Samples : Natural;
+      Weighted_Samples : Float;
       Depth            : Positive;
       Is_Leaf          : Boolean := False;
       aSplitter        : Node_Splitter.Splitter_Class;
