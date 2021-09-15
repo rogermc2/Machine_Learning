@@ -7,6 +7,7 @@
 
 with ML_Types;
 with Node_Splitter;
+with Priority_Heap;
 with Tree;
 
 package body Tree_Build is
@@ -139,8 +140,9 @@ package body Tree_Build is
       Splitter          : in out Node_Splitter.Splitter_Class;
       Start, Stop       : Positive; Impurity : in out Float;
       Is_First, Is_Left : Boolean;
-      Depth             : Positive) is
-      Node_Samples      : Natural := Stop - Start;
+      Depth             : Positive;
+      Res               : in out Priority_Heap.Priority_Heap_Record) is
+      Node_Samples      : constant Natural := Stop - Start;
       Node_Val          : Float;
       Type_Of_Feature   : Tree.Data_Type;
       Type_Of_Node      : ML_Types.Node_Kind;
@@ -172,6 +174,18 @@ package body Tree_Build is
                 Node_Samples, Splitter.Weighted_Samples);
       Node_Splitter.Node_Value (Splitter, Node_Val);
       --          aTree.Values (1, 1, 1) := Node_Val;
+
+      Res.Is_Leaf := Is_Leaf;
+      if Is_Leaf then
+         Res.Improvement := 0.0;
+         Res.Impurity_Left := Impurity;
+         Res.Impurity_Right := Impurity;
+      else
+         Res.Depth := Depth;
+         Res.Improvement := aSplit.Improvement;
+         Res.Impurity_Left := aSplit.Impurity_Left;
+         Res.Impurity_Right := aSplit.Impurity_Right;
+      end if;
 
    end Add_Split_Node;
 
