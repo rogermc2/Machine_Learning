@@ -29,16 +29,22 @@ package body Classifier_Tests is
    procedure Test_Classification_Toy  is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
-      aTree    : Classifier (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-      X        : constant List_Of_Value_Data_Lists := To_Multi_Value_List (X_Array);
-      Y        : List_Of_Value_Data_Lists;
       Expected : List_Of_Value_Data_Lists;
+      theTree  : Classifier (Tree.Integer_Type, Tree.Integer_Type,
+                             Tree.Integer_Type);
+      X        : constant List_Of_Value_Data_Lists :=
+                       To_Multi_Value_List (X_Array);
+      Y        : List_Of_Value_Data_Lists;
+      Classes  : Value_Data_List;
       Weights  : Weight_List;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Y := To_Integer_Value_List (Y_Array);
+      Tree.Init (theTree.Attributes.Decision_Tree,
+                 Integer (X.Element (1).Length), Tree.Index_Range (Y.Length),
+                 Classes);
       Expected := To_Integer_Value_List (True_Result);
-      Fit (aTree, X, Y, Weights);
+      Fit (theTree, X, Y, Weights);
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights", Weights);
 
    end Test_Classification_Toy;

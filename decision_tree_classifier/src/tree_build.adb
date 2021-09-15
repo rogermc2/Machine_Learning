@@ -142,7 +142,7 @@ package body Tree_Build is
       Is_First, Is_Left : Boolean;
       Depth             : Positive;
       Res               : in out Priority_Heap.Priority_Record) is
---        Node_Samples      : constant Natural := Stop - Start;
+      Node_Samples      : constant Natural := Stop - Start;
       Node_Val          : Float;
       Type_Of_Feature   : Tree.Data_Type;
       Type_Of_Node      : ML_Types.Node_Kind;

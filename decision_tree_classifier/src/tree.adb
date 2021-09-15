@@ -11,15 +11,16 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
-   procedure Init (Self    : out Tree_Class; Num_Features : Positive;
-                   Classes : ML_Types.Value_Data_List) is
+   procedure Init (Self         : out Tree_Class;
+                   Num_Features : Positive; Num_Outputs : Index_Range;
+                   Classes      : ML_Types.Value_Data_List) is
    begin
       Self.Num_Features := Num_Features;
+      Self.Num_Outputs := Num_Outputs;
       Self.Classes.Clear;
       Self.Classes := Classes;
       Self.Attributes.Node_Count := 0;
       Self.Attributes.Max_Depth := 0;
-      Self.Attributes.Capacity := 0;
    end Init;
 
    --  -------------------------------------------------------------------------
@@ -34,6 +35,9 @@ package body Tree is
    begin
       --        Validation.Check_Is_Fitted (Self);
       --        X := Validate_X_Predict (Self, X, Check_Input);
+      if Check_Input then
+         null;
+      end if;
 
       return Probabilities;
    end Predict;
