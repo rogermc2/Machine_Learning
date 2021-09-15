@@ -141,8 +141,8 @@ package body Tree_Build is
       Impurity          : in out Float;
       Is_First, Is_Left : Boolean;
       Depth             : Positive;
-      Res               : in out Priority_Heap.Priority_Heap_Record) is
-      Node_Samples      : constant Natural := Stop - Start;
+      Res               : in out Priority_Heap.Priority_Record) is
+--        Node_Samples      : constant Natural := Stop - Start;
       Node_Val          : Float;
       Type_Of_Feature   : Tree.Data_Type;
       Type_Of_Node      : ML_Types.Node_Kind;
@@ -237,7 +237,7 @@ package body Tree_Build is
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
 
-      Add_Split_Node (Best_Builder, theTree, Last_Child (theTree.Nodes.Root),
+      Add_Split_Node (Best_Builder, theTree, theTree.Nodes.Root,
                       Splitter, Impurity, True, True, 1, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
 
