@@ -6,7 +6,6 @@
 --  evaluation order, e.g. depth-first or best-first.
 
 with ML_Types;
-with Node_Splitter;
 with Priority_Heap;
 with Tree;
 
@@ -15,77 +14,77 @@ package body Tree_Build is
    Epsilon : constant Float := 10.0 ** (-10);
 
    --  ------------------------------------------------------------------------
-   --
-   --      procedure Add_Branch (Rows          : ML_Types.Rows_Vector;
-   --                            Parent_Cursor : ML_Types.Tree_Cursor) is
-   --      --  Parent_Cursor is a cursor to an existing node which is the head
-   --      --  of this branch
-   --          use ML_Types;
-   --          Best_Split       : constant Best_Data := Find_Best_Split (Rows);
-   --          Child_Cursor     : Tree_Cursor;
-   --          True_Split_Rows  : Rows_Vector;
-   --          False_Split_Rows : Rows_Vector;
-   --      begin
-   --          --           Utilities.Print_Rows ("Add_Branch Rows", Rows);
-   --          if Best_Split.Gain = 0.0 then
-   --              Utilities.Print_Question ("Add_Branch prediction", Best_Split.Question);
-   --              Put_Line ("Add_Branch prediction Gini" &
-   --                          Float'Image (Best_Split.Gini));
-   --              New_Line;
-   --              Add_Prediction_Node (Parent_Cursor, Rows);
-   --          elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
-   --              --              Utilities.Print_Question ("Add_Branch Best split",
-   --              --                                        Best_Split.Question);
-   --              Add_Decision_Node (Parent_Cursor, Best_Split);
-   --              True_Split_Rows := Best_Split.True_Rows;
-   --              False_Split_Rows := Best_Split.False_Rows;
-   --              Child_Cursor := Last_Child (Parent_Cursor);
-   --              --              Utilities.Print_Rows ("Add_Branch True_Split_Rows",
-   --              --                                    True_Split_Rows);
-   --              Add_Branch (True_Split_Rows, Child_Cursor);
-   --              --              Utilities.Print_Rows ("Add_Branch False_Split_Rows",
-   --              --                                    False_Split_Rows);
-   --              Add_Branch (False_Split_Rows, Child_Cursor);
-   --              --              New_Line;
-   --          end if;
-   --      end Add_Branch;
-   --
-   --      --  ----------------------------------------------------------------------
-   --
-   --      procedure Add_Decision_Node (Parent_Cursor : ML_Types.Tree_Cursor;
-   --                                   Best_Split    : Best_Data) is
-   --          use ML_Types;
-   --          Node  : Tree_Node_Type (Decision_Node);
-   --      begin
-   --          Node.Decision_Branch := True;
-   --          Node.Question := Best_Split.Question;
-   --          Node.True_Branch := Best_Split.True_Rows;
-   --          Node.False_Branch := Best_Split.False_Rows;
-   --          Node.Gini := Best_Split.Gini;
-   --          theTree.Insert_Child (Parent   => Parent_Cursor,
-   --                                Before   => No_Element,
-   --                                New_Item => Node);
-   --      end Add_Decision_Node;
-   --
-   --      --  ----------------------------------------------------------------------
-   --
-   --      procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
-   --                                     Rows          : ML_Types.Rows_Vector) is
-   --          use ML_Types;
-   --          Leaf : Tree_Node_Type (Prediction_Node);
-   --      begin
-   --          if Max_Leaves > 0 then
-   --              Num_Leaves := Num_Leaves + 1;
-   --          end if;
-   --          --           New_Line;
-   --          Leaf.Decision_Branch := False;
-   --          Leaf.Prediction := Rows.First_Element;
-   --          Leaf.Rows := Rows;
-   --          Leaf.Prediction_List := Utilities.Predictions (Leaf);
-   --          --           Utilities.Print_Rows ("Prediction", Rows);
-   --          --           New_Line;
-   --          theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
-   --      end Add_Prediction_Node;
+
+   procedure Add_Branch (Rows          : ML_Types.Rows_Vector;
+                         Parent_Cursor : ML_Types.Tree_Cursor) is
+      --  Parent_Cursor is a cursor to an existing node which is the head
+      --  of this branch
+      use ML_Types;
+      Best_Split       : constant Best_Data := Find_Best_Split (Rows);
+      Child_Cursor     : Tree_Cursor;
+      True_Split_Rows  : Rows_Vector;
+      False_Split_Rows : Rows_Vector;
+   begin
+      --           Utilities.Print_Rows ("Add_Branch Rows", Rows);
+      if Best_Split.Gain = 0.0 then
+         Utilities.Print_Question ("Add_Branch prediction", Best_Split.Question);
+         Put_Line ("Add_Branch prediction Gini" &
+                     Float'Image (Best_Split.Gini));
+         New_Line;
+         Add_Prediction_Node (Parent_Cursor, Rows);
+      elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
+         --              Utilities.Print_Question ("Add_Branch Best split",
+         --                                        Best_Split.Question);
+         Add_Decision_Node (Parent_Cursor, Best_Split);
+         True_Split_Rows := Best_Split.True_Rows;
+         False_Split_Rows := Best_Split.False_Rows;
+         Child_Cursor := Last_Child (Parent_Cursor);
+         --              Utilities.Print_Rows ("Add_Branch True_Split_Rows",
+         --                                    True_Split_Rows);
+         Add_Branch (True_Split_Rows, Child_Cursor);
+         --              Utilities.Print_Rows ("Add_Branch False_Split_Rows",
+         --                                    False_Split_Rows);
+         Add_Branch (False_Split_Rows, Child_Cursor);
+         --              New_Line;
+      end if;
+   end Add_Branch;
+
+   --  ----------------------------------------------------------------------
+
+   procedure Add_Decision_Node (Parent_Cursor : ML_Types.Tree_Cursor;
+                                Best_Split    : Best_Data) is
+      use ML_Types;
+      Node  : Tree_Node_Type (Decision_Node);
+   begin
+      Node.Decision_Branch := True;
+      Node.Question := Best_Split.Question;
+      Node.True_Branch := Best_Split.True_Rows;
+      Node.False_Branch := Best_Split.False_Rows;
+      Node.Gini := Best_Split.Gini;
+      theTree.Insert_Child (Parent   => Parent_Cursor,
+                            Before   => No_Element,
+                            New_Item => Node);
+   end Add_Decision_Node;
+
+   --  ----------------------------------------------------------------------
+
+   procedure Add_Prediction_Node (Parent_Cursor : Tree_Cursor;
+                                  Rows          : ML_Types.Rows_Vector) is
+      use ML_Types;
+      Leaf : Tree_Node_Type (Prediction_Node);
+   begin
+      if Max_Leaves > 0 then
+         Num_Leaves := Num_Leaves + 1;
+      end if;
+      --           New_Line;
+      Leaf.Decision_Branch := False;
+      Leaf.Prediction := Rows.First_Element;
+      Leaf.Rows := Rows;
+      Leaf.Prediction_List := Utilities.Predictions (Leaf);
+      --           Utilities.Print_Rows ("Prediction", Rows);
+      --           New_Line;
+      theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
+   end Add_Prediction_Node;
 
    --  ----------------------------------------------------------------------
    --  Based on scikit-learn/sklearn/tree _tree.pyx _add_node
@@ -208,18 +207,18 @@ package body Tree_Build is
    --  ------------------------------------------------------------------------
 
    procedure Build_Best_First_Tree
-     (aBuilder      : in out Tree_Builder;
+     (Best_Builder  : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
    begin
-      null;
+      Init_Best_First_Tree ();
    end Build_Best_First_Tree;
 
    --  ------------------------------------------------------------------------
 
    procedure Build_Depth_First_Tree
-     (aBuilder      : in out Tree_Builder;
+     (Depth_Builder : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
@@ -271,6 +270,45 @@ package body Tree_Build is
                 Weighted_Samples);
 
    end Build_Depth_First_Tree;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Init_Best_First_Tree
+     (Best_Builder       : in out Tree_Builder;
+      Splitter           : Node_Splitter.Splitter_Class;
+      Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
+      Min_Weight_Leaf : Float := 0.0;
+      Max_Depth, Max_Leaf_Nodes : Natural := 0;
+      Min_Impurity_Decrease               : Float := 0.0) is
+   begin
+      Best_Builder.Splitter := Splitter;
+      Best_Builder.Min_Samples_Split := Min_Samples_Split;
+      Best_Builder.Min_Samples_Leaf := Min_Samples_Leaf;
+      Best_Builder.Min_Weight_Leaf := Min_Weight_Leaf;
+      Best_Builder.Max_Depth := Max_Depth;
+      Best_Builder.Max_Leaf_Nodes := Max_Leaf_Nodes;
+      Best_Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
+
+   end Init_Best_First_Tree;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Init_Depth_First_Tree
+     (Depth_Builder      : in out Tree_Builder;
+      Splitter           : Node_Splitter.Splitter_Class;
+      Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
+      Min_Weight_Leaf : Float := 0.0;
+      Max_Depth : Natural := 0;
+      Min_Impurity_Decrease               : Float := 0.0) is
+   begin
+      Depth_Builder.Splitter := Splitter;
+      Depth_Builder.Min_Samples_Split := Min_Samples_Split;
+      Depth_Builder.Min_Samples_Leaf := Min_Samples_Leaf;
+      Depth_Builder.Min_Weight_Leaf := Min_Weight_Leaf;
+      Depth_Builder.Max_Depth := Max_Depth;
+      Depth_Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
+
+   end Init_Depth_First_Tree;
 
    --  ------------------------------------------------------------------------
 
