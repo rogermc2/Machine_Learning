@@ -9,6 +9,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 with Priority_Heap;
+with Utilities;
 with Tree;
 
 package body Tree_Build is
@@ -278,13 +279,8 @@ package body Tree_Build is
       Ada_Tree         : Tree_Type := Empty_Tree;
       Type_Of_Feature  : Tree.Data_Type;
       Feature          : Tree.Features_Record (Type_Of_Feature);
-      Feature_Values   : Value_Data_List;
-      Label_Values     : Value_Data_List;
-      aRow             : Row_Data;
       Rows             : Rows_Vector;
       Initial_Capacity : Positive := 2047;
-      Start            : Positive;
-      Stop             : Positive;
       Is_First         : Boolean;
       Is_Left          : Boolean;
       Parent           : ML_Types.Tree_Node_Type;
@@ -303,18 +299,7 @@ package body Tree_Build is
       --
       --          Tree.Resize (theTree, Initial_Capacity);
 
-      for index in 1 .. Positive (X.Length) loop
-         Feature_Values := X.Element (index);
-         Label_Values := Y.Element (index);
-         for index2 in Feature_Values.First_Index ..
-           Feature_Values.Last_Index loop
-            aRow.Features (Class_Range (index)) :=
-              Feature_Values.Element (index2).UB_String_Value;
-            aRow.Label :=
-              Label_Values.Element (index2).UB_String_Value;
-            Rows.Append (aRow);
-         end loop;
-      end loop;
+      Rows := Utilities.XY_To_Rows (X, Y);
 
       Add_Node (theTree, theTree.Nodes.Root, Type_Of_Feature, Decision_Node,
                 True, False, Feature, Impurity, Threshold, Node_Samples,

@@ -439,7 +439,7 @@ package body Utilities is
          when Decision_Node =>
             Print_Rows ("    True Rows:", Node.True_Branch);
             Print_Rows ("    False Rows:", Node.False_Branch);
-        when Undefined_Node =>
+         when Undefined_Node =>
             Put_Line (" is not defined.");
       end case;
 
@@ -462,7 +462,7 @@ package body Utilities is
                         Integer'Image (Integer (Node.True_Branch.Length)) & ","
                       & Integer'Image (Integer (Node.False_Branch.Length))
                       & "]");
-        when Undefined_Node =>
+         when Undefined_Node =>
             Put_Line (" is not defined.");
       end case;
 
@@ -895,7 +895,35 @@ package body Utilities is
          end loop;
       end if;
       return theSet;
+
    end Unique_Values;
+
+   --  --------------------------------------------------------------------------
+
+   function XY_To_Rows (X, Y : ML_Types.List_Of_Value_Data_Lists)
+                        return Rows_Vector is
+
+      Feature_Values   : Value_Data_List;
+      Label_Values     : Value_Data_List;
+      aRow             : Row_Data;
+      Rows             : Rows_Vector;
+   begin
+      for index in 1 .. Positive (X.Length) loop
+         Feature_Values := X.Element (index);
+         Label_Values := Y.Element (index);
+         for index2 in Feature_Values.First_Index ..
+           Feature_Values.Last_Index loop
+            aRow.Features (Class_Range (index)) :=
+              Feature_Values.Element (index2).UB_String_Value;
+            aRow.Label :=
+              Label_Values.Element (index2).UB_String_Value;
+            Rows.Append (aRow);
+         end loop;
+      end loop;
+
+      return Rows;
+
+   end XY_To_Rows;
 
    --  --------------------------------------------------------------------------
 

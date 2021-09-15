@@ -57,6 +57,10 @@ package Decision_Tree_Classifer is
       end case;
    end record;
 
+   type Max_Features_Type is (Max_Features_Int, Max_Features_Float,
+                              Max_Features_Auto, Max_Features_Sqrt,
+                              Max_Features_Log_Sq, Max_Features_None);
+
    --  class BaseDecisionTree
    type Base_Parameter_Data
      (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
@@ -112,5 +116,7 @@ package Decision_Tree_Classifer is
                  Y             : in out ML_Types.List_Of_Value_Data_Lists;
                  Sample_Weight : in out Classifier_Types.Weight_List;
                  Check_Input   : Boolean := False);
+   procedure Init (aClassifier  : in out Classifier;
+                   Random_State : Integer);
 
 end Decision_Tree_Classifer;

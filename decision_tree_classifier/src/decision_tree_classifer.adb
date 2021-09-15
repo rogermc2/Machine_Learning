@@ -188,4 +188,12 @@ package body Decision_Tree_Classifer is
 
     --  -------------------------------------------------------------------------
 
+   procedure Init (aClassifier  : in out Classifier;
+                   Random_State : Integer) is
+   begin
+      aClassifier.Parameters.Random_State := Random_State;
+   end Init;
+
+    --  -------------------------------------------------------------------------
+
 end Decision_Tree_Classifer;

@@ -49,6 +49,9 @@ package Utilities is
                                  Value   : ML_Types.Value_Record);
    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector)
                              return ML_Types.Data_Record;
-   function Split_String (aString, Pattern : String) return ML_Types.String_List;
+   function Split_String (aString, Pattern : String)
+                          return ML_Types.String_List;
+   function XY_To_Rows (X, Y : ML_Types.List_Of_Value_Data_Lists)
+                        return ML_Types.Rows_Vector;
 
 end Utilities;
