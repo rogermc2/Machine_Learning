@@ -137,7 +137,7 @@ package body Tree_Build is
       theTree           : in out Tree.Tree_Class;
       Parent_Cursor     : Tree.Tree_Cursor;
       Splitter          : in out Node_Splitter.Splitter_Class;
-      Start, Stop       : Positive; Impurity : in out Float;
+      Impurity          : in out Float;
       Is_First, Is_Left : Boolean;
       Depth             : Positive;
       Res               : in out Priority_Heap.Priority_Heap_Record) is
@@ -211,8 +211,21 @@ package body Tree_Build is
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
+      Splitter         : Node_Splitter.Splitter_Class;
+      Heap_Record      : Priority_Heap.Priority_Heap_Record;
+      Split_Node_Left  : Priority_Heap.Priority_Heap_Record;
+      Split_Node_Right : Priority_Heap.Priority_Heap_Record;
+      Max_Split_Nodes  : Natural;
+      New_Node         : Tree.Tree_Node;
+      Impurity         : Natural := 0;
+      Res              : Priority_Heap.Priority_Heap_Record;
    begin
-      Init_Best_First_Tree ();
+      Init_Best_First_Tree (Best_Builder, Splitter);
+      Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
+      Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
+
+      Add_Split_Node (Best_Builder, theTree, theTree.Nodes.Root,
+                      Splitter, Impurity, True, True, 0, Res);
    end Build_Best_First_Tree;
 
    --  ------------------------------------------------------------------------
@@ -279,7 +292,7 @@ package body Tree_Build is
       Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
       Min_Weight_Leaf : Float := 0.0;
       Max_Depth, Max_Leaf_Nodes : Natural := 0;
-      Min_Impurity_Decrease               : Float := 0.0) is
+      Min_Impurity_Decrease : Float := 0.0) is
    begin
       Best_Builder.Splitter := Splitter;
       Best_Builder.Min_Samples_Split := Min_Samples_Split;
