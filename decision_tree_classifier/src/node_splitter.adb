@@ -253,7 +253,6 @@ package body Node_Splitter is
         Features                  : Classifier_Types.Natural_List :=
                                       Self.Feature_Indices;
         Features_X                : Value_Data_List := Self.Feature_Values;
-        Best_Split                : Split_Record;
         Current_Split             : Split_Record;
         Num_Known_Constants       : constant Natural := Natural (Known_Constants.Length);
         Num_Total_Constants       : Natural := Num_Known_Constants;
@@ -265,6 +264,7 @@ package body Node_Splitter is
         P_Index                   : Positive;
         Swap                      : Natural;
         Compare_Value             : Value_Record;
+        Best_Split                : Split_Record;
     begin
         --  Skip CPU intensive evaluation of the impurity criterion for
         --  features that have already been detected as constant
