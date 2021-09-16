@@ -23,7 +23,8 @@ package Node_Splitter is
       Max_Features         : Natural := 0;  --  Number of features to test
       Min_Leaf_Samples     : Natural := 0;
       Min_Leaf_Weight      : Float := 0.0;
-      Sample_Indices       : Classifier_Types.Natural_List;
+      X_Samples            : ML_Types.List_Of_Value_Data_Lists;
+      Y_Samples            : ML_Types.List_Of_Value_Data_Lists;
       Feature_Indices      : Classifier_Types.Natural_List;
       Constant_Features    : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
