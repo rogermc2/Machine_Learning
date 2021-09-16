@@ -11,18 +11,21 @@ with Tree_Build;
 
 package body Decision_Tree_Classifer is
 
+    procedure Prune_Tree (Self : in out Classifier);
+
     --  -------------------------------------------------------------------------
     --  Based on class.py fit L350 Build tree
     procedure Build_Tree (Self          : in out Classifier;
                           X, Y          : ML_Types.List_Of_Value_Data_Lists;
                           Sample_Weight : Classifier_Types.Weight_List) is
---             Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
---             Splitter  : Splitter_Type := Self.Parameters.Splitter;
+       use Tree;
+    --             Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
+    --             Splitter  : Splitter_Type := Self.Parameters.Splitter;
         theTree   : Tree.Tree_Class;
---          Feature_Values : Value_Data_List;
---          aRow           : Row_Data (Class_Range (X.Element (1).Length));
---          Rows           : Rows_Vector;
---          Row_Tree       : ML_Types.Tree_Type;
+        --          Feature_Values : Value_Data_List;
+        --          aRow           : Row_Data (Class_Range (X.Element (1).Length));
+        --          Rows           : Rows_Vector;
+        --          Row_Tree       : ML_Types.Tree_Type;
     begin
         --  L387
         --  if is_classifier(self):
@@ -39,7 +42,6 @@ package body Decision_Tree_Classifer is
                 Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
             begin
                 --  L419  Depth First case
-                --  Builder.Build_Tree (Self, X, y , Sample_Weight)
                 Tree_Build.Build_Depth_First_Tree (Builder, theTree, X, Y, Sample_Weight);
             end;
         else
@@ -47,12 +49,18 @@ package body Decision_Tree_Classifer is
                 Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
             begin
                 --  L419  Best First case
-                --  Builder.Build_Tree (Self, X, y , Sample_Weight)
                 Tree_Build.Build_Best_First_Tree (Builder, theTree, X, Y, Sample_Weight);
             end;
         end if;
 
---          Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
+        --  L420
+        if Self.Attributes.Num_Outputs = 1 then  --  and is_Classifer (Self)
+            null;
+        end if;
+
+        Prune_Tree (Self);
+
+        --          Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
 
     end Build_Tree;
 
@@ -193,11 +201,19 @@ package body Decision_Tree_Classifer is
 
     --  -------------------------------------------------------------------------
 
-   procedure Init (aClassifier  : in out Classifier;
-                   Random_State : Integer) is
-   begin
-      aClassifier.Parameters.Random_State := Random_State;
-   end Init;
+    procedure Init (aClassifier  : in out Classifier;
+                    Random_State : Integer) is
+    begin
+        aClassifier.Parameters.Random_State := Random_State;
+    end Init;
+
+    --  -------------------------------------------------------------------------
+    --  Based on class.py fit 545 _prune_tree
+    --  Prune tree using Minimal Cost-Complexity Pruning.
+    procedure Prune_Tree (Self : in out Classifier) is
+    begin
+        null;
+    end Prune_Tree;
 
     --  -------------------------------------------------------------------------
 
