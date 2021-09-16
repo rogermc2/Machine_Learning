@@ -1,17 +1,19 @@
 
 --  Based on scikit-learn/sklearn/tree _splitter.pxd class Splitter
 
+with Ada.Strings.Unbounded;
 with ML_Types;
 with Classifier_Types;
 with Criterion;
 
 package Node_Splitter is
+   use Ada.Strings.Unbounded;
 
    type Split_Record is record
-      Feature_Index  : Natural := 0;
+      Feature        : Unbounded_String := To_Unbounded_String ("");
       Pos            : Positive := 1;
       Threshold      : Float;
-      Improvement    : Float;
+      Improvement    : Float := 0.0;
       Impurity_Left  : Float;
       Impurity_Right : Float;
    end record;

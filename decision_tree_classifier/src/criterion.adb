@@ -96,17 +96,18 @@ package body Criterion is
                     --  Sample_Weight contains the weight of each sample
                     Sample_Weight    : Classifier_Types.Weight_List;
                     Weighted_Samples : Float;
-                    Sample_Indices   : Classifier_Types.Natural_List) is
---          Y_I       : ML_Types.Value_Data_List;
+                    X_Samples        : ML_Types.List_Of_Value_Data_Lists;
+                    Y_Samples        : ML_Types.List_Of_Value_Data_Lists) is
+        Y_I       : ML_Types.Value_Data_List;
         Sum_Total : Classifier_Types.Weight_List;
---          i         : Natural;
---          Weight    : float := 1.0;
---          Y_Ik      : Float;
---          W_Ik      : Float;
+        Weight    : Float := 1.0;
+        Y_Ik      : Float;
+        W_Ik      : Float;
     begin
         Criteria.Y := Y;
         Criteria.Sample_Weight := Sample_Weight;
-        Criteria.Sample_Indices := Sample_Indices;
+        Criteria.X_Samples := X_Samples;
+        Criteria.Y_Samples := Y_Samples;
         Criteria.Weighted_Samples := Weighted_Samples;
         Criteria.Num_Weighted_Node_Samples := 0;
 
@@ -121,27 +122,26 @@ package body Criterion is
             Criteria.Sum_Total.Append (Sum_Total);
         end loop;
 
---          for p in Start .. Stop loop
---              i := Criteria.Sample_Indices.Element (p);
---              Y_I := Y.Element (i);
---
---              --  Weight is originally set to be 1.0, meaning that if no
---              --  sample weights are given, the default weight of each sample is 1.0
---              if not Sample_Weight.Is_Empty then
---                  Weight := Sample_Weight.Element (i);
---              end if;
---
---              for k in 1 .. Criteria.Num_Outputs loop
---                  Y_Ik := Float (Y_I.Element (k).Integer_Value);
---                  W_Ik := Y_Ik * Weight;
---                  Sum_Total.Replace_Element
---                    (k, Sum_Total.Element (k) + W_Ik);
---                  Criteria.Sq_Sum_Total := Criteria.Sq_Sum_Total + Y_Ik * W_Ik;
---              end loop;
---
---              Criteria.Weighted_Node_Samples :=
---                Criteria.Weighted_Node_Samples + Weight;
---          end loop;
+        for i in X_Samples.First_Index .. X_Samples.Last_Index loop
+            Y_I := Y.Element (i);
+
+            --  Weight is originally set to be 1.0, meaning that if no
+            --  sample weights are given, the default weight of each sample is 1.0
+            if not Sample_Weight.Is_Empty then
+                Weight := Sample_Weight.Element (i);
+            end if;
+
+            for k in 1 .. Criteria.Num_Outputs loop
+                Y_Ik := Float (Y_I.Element (k).Integer_Value);
+                W_Ik := Y_Ik * Weight;
+                Sum_Total.Replace_Element
+                  (k, Sum_Total.Element (k) + W_Ik);
+                Criteria.Sq_Sum_Total := Criteria.Sq_Sum_Total + Y_Ik * W_Ik;
+            end loop;
+
+            Criteria.Weighted_Node_Samples :=
+              Criteria.Weighted_Node_Samples + Weight;
+        end loop;
 
         Reset (Criteria);
 

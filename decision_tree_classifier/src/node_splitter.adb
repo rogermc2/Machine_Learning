@@ -65,7 +65,6 @@ package body Node_Splitter is
         theSplit.Impurity_Left := Float'Last;
         theSplit.Impurity_Right := Float'Last;
         theSplit.Improvement := -Float'Last;
-        theSplit.Feature_Index := 1;
         theSplit.Threshold := 0.0;
 
     end Init_Split;
@@ -83,7 +82,8 @@ package body Node_Splitter is
                          P           : Natural;
                          Features    : Classifier_Types.Natural_List;
                          Features_X  : ML_Types.Value_Data_List;
-                         Cur         : Split_Record; Best : in out Split_Record) is
+                         Cur         : Split_Record;
+                         Best        : in out Split_Record) is
 --          P_Index                   : Natural := P;
 --          Current                   : Split_Record := Cur;
 --          Current_Proxy_Improvement : Float := -Float'Last;

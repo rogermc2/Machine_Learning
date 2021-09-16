@@ -6,8 +6,10 @@ package body Data_Splitter is
       Test_Size         : Float := 0.0;
       Default_Test_Size : Float := 0.0;
       Train_Size        : Float := 0.0;
-      Train_Set         : ML_Types.List_Of_Value_Data_Lists;
-      Test_Set          : ML_Types.List_Of_Value_Data_Lists;
+      X_Train_Set       : ML_Types.List_Of_Value_Data_Lists;
+      Y_Train_Set       : ML_Types.List_Of_Value_Data_Lists;
+      X_Test_Set        : ML_Types.List_Of_Value_Data_Lists;
+      Y_Test_Set        : ML_Types.List_Of_Value_Data_Lists;
    end record;
 
    --  -------------------------------------------------------------------------------
