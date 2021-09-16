@@ -12,23 +12,28 @@ with Tree_Build;
 package body Decision_Tree_Classifer is
 
     --  -------------------------------------------------------------------------
-
+    --  Based on class.py fit L350 Build tree
     procedure Build_Tree (Self          : in out Classifier;
                           X, Y          : ML_Types.List_Of_Value_Data_Lists;
                           Sample_Weight : Classifier_Types.Weight_List) is
-        --        Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
-        --        Splitter  : Splitter_Type := Self.Parameters.Splitter;
+--             Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
+--             Splitter  : Splitter_Type := Self.Parameters.Splitter;
         theTree   : Tree.Tree_Class;
 --          Feature_Values : Value_Data_List;
 --          aRow           : Row_Data (Class_Range (X.Element (1).Length));
 --          Rows           : Rows_Vector;
 --          Row_Tree       : ML_Types.Tree_Type;
     begin
-        --  L346
+        --  L387
         --  if is_classifier(self):
         Self.Attributes.Decision_Tree := theTree;
 
-        --  L390
+        --  L388
+        theTree.Num_Features := Natural (Self.Attributes.Num_Features);
+        theTree.Num_Outputs := Self.Attributes.Num_Outputs;
+        Self.Attributes.Decision_Tree := theTree;
+
+        --  L398
         if Self.Parameters.Max_Leaf_Nodes < 0 then
             declare
                 Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
