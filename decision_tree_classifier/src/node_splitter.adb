@@ -87,23 +87,17 @@ package body Node_Splitter is
                         Cur         : Split_Record;
                         Best        : in out Split_Record) is
       use ML_Types;
-      Criteria            : Criterion.Criterion_Class;
-      P_Index            : Natural := Features.First_Index;
-      P1_Index           : Natural;
-      Current            : Split_Record := Cur;
-      --          Current_Proxy_Improvement : Float := -Float'Last;
-      --          Best_Proxy_Improvement    : Float := -Float'Last;
+      Criteria                  : Criterion.Criterion_Class;
+      P_Index                   : Natural := Features.First_Index;
+      P1_Index                  : Natural;
+      Current                   : Split_Record := Cur;
+      Current_Proxy_Improvement : Float := -Float'Last;
+      Best_Proxy_Improvement    : Float := -Float'Last;
    begin
       --  L380 Evaluate all splits
       Criterion.Reset (Self.Criteria);
       Criteria := Self.Criteria;
-      --  Features is a list of feature indices
-      --          while P_Index <= Self.Stop loop
-      --              while P_Index + 1 <= Self.Stop and
-      --                Features.Element (P_Index + 1) <=
-      --                Features.Element (P_Index) loop
-      --                  P_Index := P_Index + 1;
-      --              end loop;
+
       while P_Index <= Features.Last_Index loop
          P1_Index := P_Index + 1;
          while P1_Index <= Features.Last_Index loop
@@ -132,51 +126,57 @@ package body Node_Splitter is
          end loop;
 
          P_Index := P_Index + 1;
+         --  L395
          if P_Index <= Features.Last_Index then
             Current.Pos := P_Index;
-            --  Reject if min_samples_leaf is not guaranteed
-            if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
-              Self.Criteria.Weighted_Right >= Self.Min_Leaf_Weight then
+            --  L398 Reject if min_samples_leaf is not guaranteed
+            if Self.Criteria.Position >= Self.Min_Leaf_Samples and
+              Features.Last_Index >= Self.Min_Leaf_Samples then
                Criteria.Position := Current.Pos;
                Criterion.Update (Self.Criteria, Criteria);
+
+               --  L405 Reject if min_weight_leaf is not satisfied
+               if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
+                 Self.Criteria.Weighted_Right >= Self.Min_Leaf_Weight then
+                  Current_Proxy_Improvement := Self.Criteria.Proxy_Improvement;
+                  if Current_Proxy_Improvement > Best_Proxy_Improvement then
+                     Best_Proxy_Improvement := Current_Proxy_Improvement;
+                     --  L415
+                     case Features_X.Element (P1_Index).Value_Kind is
+
+                     when Float_Type =>
+                        Current.Threshold :=
+                          0.5 * (Features_X.Element (P_Index - 1).Float_Value +
+                                     Features_X.Element (P_Index).Float_Value);
+                        if Current.Threshold =
+                          Features_X.Element (P_Index).Float_Value or
+                          Current.Threshold = Float'Last or
+                          Current.Threshold = (-Float'Last) then
+                           Current.Threshold :=
+                             Features_X.Element (P_Index - 1).Float_Value;
+                        end if;
+
+                     when Integer_Type =>
+                        Current.Threshold :=
+                          0.5 * Float (Features_X.Element (P_Index - 1).Integer_Value +
+                                           Features_X.Element (P_Index).Integer_Value);
+                        if Current.Threshold =
+                          Float (Features_X.Element (P_Index).Integer_Value) or
+                          Current.Threshold = Float'Last or
+                          Current.Threshold = (-Float'Last) then
+                           Current.Threshold :=
+                             Float
+                               (Features_X.Element (P_Index - 1).Integer_Value);
+                        end if;
+                     when Boolean_Type | UB_String_Type => null;
+                     end case;
+                     --  L422
+                     Best := Current;
+                  end if;
+               end if;
             end if;
          end if;
       end loop;
-
-      --              --  L388
-      --              P_Index := P_Index + 1;
-      --              if P_Index <= Self.Stop then
-      --                  Current.Pos := P_Index;
-      --                  --  L395 Reject if Min_Leaf_Samples is not guaranteed
-      --                  if (Current.Pos - Self.Start) >=
-      --                    Self.Min_Leaf_Samples and
-      --                    (Self.Stop - Current.Pos) >= Self.Min_Leaf_Samples then
-      --                      Criterion.Update (Self.Criteria, Current.Pos);
-      --                      --  L402 Reject if min_weight_leaf is not satisfied
-      --                      if (Self.Criteria.Weighted_Left >=
-      --                            Self.Min_Leaf_Weight) and
-      --                        (Self.Criteria.Weighted_Right >=
-      --                           Self.Min_Leaf_Weight) then
-      --                          Current_Proxy_Improvement :=
-      --                            Criterion.Proxy_Impurity_Improvement (Self.Criteria);
-      --                          if Current_Proxy_Improvement >
-      --                            Best_Proxy_Improvement then
-      --                              Best_Proxy_Improvement := Current_Proxy_Improvement;
-      --                              --  411 use sum of halves to avoid infinite value
-      --                              Current.Threshold :=
-      --                                0.5 * Features_X.Element (P_Index - 1).Float_Value +
-      --                                0.5 * Features_X.Element (P_Index).Float_Value;
-      --                              if (Current.Threshold = Features_X.Element (P_Index).Float_Value) or
-      --                                (Features_X.Element (P_Index).Float_Value = Float'Last) or
-      --                                (Features_X.Element (P_Index).Float_Value = -Float'Last) then
-      --                                  Current.Threshold := Features_X.Element (P_Index - 1).Float_Value;
-      --                              end if;
-      --                              Best := Current;
-      --                          end if;
-      --                      end if;
-      --                  end if;
-      --              end if;
-      --          end loop;
 
    end Process_A;
 
@@ -192,6 +192,7 @@ package body Node_Splitter is
       --          X_1           : ML_Types.Value_Data_List;
       --          Swap          : Natural;
    begin
+      --  Reorganize into samples[start:best.pos] + samples[best.pos:end]
       --          if Best_Split.Pos < Self.Stop then
       --              Partition_End := Self.Stop;
       --              P_Index := Self.Start;
@@ -211,7 +212,7 @@ package body Node_Splitter is
       --              end loop;
 
       Criterion.Reset (Self.Criteria);
---        Criterion.Update (Self.Criteria);
+      --        Criterion.Update (Self.Criteria);
       Criterion.Children_Impurity
         (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
       Best_Split.Improvement := Criterion.Impurity_Improvement
@@ -293,7 +294,7 @@ package body Node_Splitter is
    function Split_Node (Self              : in out Splitter_Class;
                         Impurity          : Float;
                         Constant_Features : in out ML_Types.Value_Data_List)
-                        return Split_Record is
+                     return Split_Record is
       use ML_Types;
       use ML_Types.Value_Data_Package;
       Num_Features              : constant Natural :=
