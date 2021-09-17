@@ -7,7 +7,8 @@ package Criterion is
    type Criterion_Class is record
       Y                         : ML_Types.List_Of_Value_Data_Lists;
       Classes                   : ML_Types.Value_Data_List;
-      Sample_Indices            : Classifier_Types.Natural_List;
+      X_Samples                 : ML_Types.List_Of_Value_Data_Lists;
+      Y_Samples                 : ML_Types.List_Of_Value_Data_Lists;
       Num_Outputs               : Natural := 0;
       Num_Weighted_Node_Samples : Natural := 0;
       Num_Node_Samples          : Natural := 0;
@@ -42,7 +43,8 @@ package Criterion is
                    --  Sample_Weight contains the weight of each sample
                    Sample_Weight    : Classifier_Types.Weight_List;
                    Weighted_Samples : Float;
-                   Sample_Indices   : Classifier_Types.Natural_List);
+                   X_Samples        : ML_Types.List_Of_Value_Data_Lists;
+                   Y_Samples        : ML_Types.List_Of_Value_Data_Lists);
    procedure Node_Value (Self : Criterion_Class; Value : out Float);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;

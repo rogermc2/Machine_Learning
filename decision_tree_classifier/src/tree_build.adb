@@ -18,19 +18,24 @@ package body Tree_Build is
 
    --  ------------------------------------------------------------------------
 
-   procedure Add_Branch (Rows          : ML_Types.Rows_Vector;
-                         Parent_Cursor : ML_Types.Tree_Cursor) is
+   procedure Add_Branch (Rows              : ML_Types.Rows_Vector;
+                         Parent_Cursor     : ML_Types.Tree_Cursor;
+                         Splitter          : in out Node_Splitter.Splitter_Class;
+                         Impurity          : Float;
+                         Constant_Features : in out ML_Types.Value_Data_List) is
       --  Parent_Cursor is a cursor to an existing node which is the head
       --  of this branch
       use ML_Types;
+      use Node_Splitter;
       use Tree_Package;
-      Best_Split       : constant Best_Data := Find_Best_Split (Rows);
+      Best_Split       : constant Split_Record :=
+                           Split_Node (Splitter, Impurity, Constant_Features);
       Child_Cursor     : Tree_Cursor;
       True_Split_Rows  : Rows_Vector;
       False_Split_Rows : Rows_Vector;
    begin
       --           Utilities.Print_Rows ("Add_Branch Rows", Rows);
-      if Best_Split.Gain = 0.0 then
+      if Best_Split.Improvement = 0.0 then
          Utilities.Print_Question ("Add_Branch prediction", Best_Split.Question);
          Put_Line ("Add_Branch prediction Gini" &
                      Float'Image (Best_Split.Gini));
@@ -193,27 +198,11 @@ package body Tree_Build is
 
    --  ------------------------------------------------------------------------
 
-   procedure Add_To_Frontier (Rec : Priority_Heap.Priority_Record;
+   procedure Add_To_Frontier (Rec      : Priority_Heap.Priority_Record;
                               Frontier : in out Priority_Heap.Frontier_List) is
    begin
       Frontier.Append (Rec);
    end Add_To_Frontier;
-
-   --  ------------------------------------------------------------------------
-
-   --     procedure Build_Tree
-   --       (aBuilder      : in out Tree_Builder;
-   --        theTree       : in out Tree.Tree_Class;
-   --        X, Y          : ML_Types.List_Of_Value_Data_Lists;
-   --        Sample_Weight : Classifier_Types.Weight_List) is
-   --        Max_Split_Nodes : Natural := aBuilder.Max_Leaf_Nodes -1;
-   --        Splitter        : Node_Splitter.Splitter_Class;
-   --        Capacity        : Positive := Max_Split_Nodes + aBuilder.Max_Leaf_Nodes;
-   --     begin
-   --        Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
-   --        Tree.Resize (theTree, Capacity);
-   --
-   --     end Build_Tree;
 
    --  ------------------------------------------------------------------------
 
@@ -299,23 +288,26 @@ package body Tree_Build is
       --
       --          Tree.Resize (theTree, Initial_Capacity);
 
-      Rows := Utilities.XY_To_Rows (X, Y);
+      --        Rows := Utilities.XY_To_Rows (X, Y);
+      --
+      --        Add_Node (theTree, theTree.Nodes.Root, Type_Of_Feature, Decision_Node,
+      --                  True, False, Feature, Impurity, Threshold, Node_Samples,
+      --                  Weighted_Samples);
 
-      Add_Node (theTree, theTree.Nodes.Root, Type_Of_Feature, Decision_Node,
-                True, False, Feature, Impurity, Threshold, Node_Samples,
-                Weighted_Samples);
+      --  L163
+      Node_Splitter.Init (Depth_Builder.Splitter, X, Y, Sample_Weight);
 
    end Build_Depth_First_Tree;
 
    --  ------------------------------------------------------------------------
 
    procedure Init_Best_First_Tree
-     (Best_Builder       : in out Tree_Builder;
-      Splitter           : Node_Splitter.Splitter_Class;
+     (Best_Builder                        : in out Tree_Builder;
+      Splitter                            : Node_Splitter.Splitter_Class;
       Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
-      Min_Weight_Leaf : Float := 0.0;
-      Max_Depth, Max_Leaf_Nodes : Natural := 0;
-      Min_Impurity_Decrease : Float := 0.0) is
+      Min_Weight_Leaf                     : Float := 0.0;
+      Max_Depth, Max_Leaf_Nodes           : Natural := 0;
+      Min_Impurity_Decrease               : Float := 0.0) is
    begin
       Best_Builder.Splitter := Splitter;
       Best_Builder.Min_Samples_Split := Min_Samples_Split;
@@ -330,11 +322,11 @@ package body Tree_Build is
    --  ------------------------------------------------------------------------
 
    procedure Init_Depth_First_Tree
-     (Depth_Builder      : in out Tree_Builder;
-      Splitter           : Node_Splitter.Splitter_Class;
+     (Depth_Builder                       : in out Tree_Builder;
+      Splitter                            : Node_Splitter.Splitter_Class;
       Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
-      Min_Weight_Leaf : Float := 0.0;
-      Max_Depth : Natural := 0;
+      Min_Weight_Leaf                     : Float := 0.0;
+      Max_Depth                           : Natural := 0;
       Min_Impurity_Decrease               : Float := 0.0) is
    begin
       Depth_Builder.Splitter := Splitter;
