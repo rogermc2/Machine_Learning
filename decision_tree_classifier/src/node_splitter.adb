@@ -52,8 +52,8 @@ package body Node_Splitter is
       end loop;
       Self.Feature_Values.Clear;
       Self.Feature_Values.Set_Length (Count_Type (Num_Samples));
-      Self.Constant_Features.Clear;
-      Self.Constant_Features.Set_Length (Count_Type (Num_Features));
+      Self.Constant_Features_I.Clear;
+      Self.Constant_Features_I.Set_Length (Count_Type (Num_Features));
 
       Self.Y := Y;
       Self.Sample_Weight := Sample_Weight;
@@ -307,9 +307,10 @@ package body Node_Splitter is
 
       X_Sample                  : ML_Types.Value_Data_List;
       Y_Sample                  : ML_Types.Value_Data_List;
-      Features                  : Classifier_Types.Natural_List :=
+      Features_I                : Classifier_Types.Natural_List :=
                                     Self.Feature_Indices;
       Features_X                : Value_Data_List := Self.Feature_Values;
+      Feature                   : Value_Data_List;
       Num_Known_Constants       : constant Natural :=
                                     Natural (Known_Constants.Length);
       Num_Total_Constants       : Natural := Num_Known_Constants;
@@ -348,24 +349,21 @@ package body Node_Splitter is
            Maths.Random_Integer mod (F_I - Num_Found_Constants);
 
          if F_J < Num_Known_Constants then
-            Swap := Num_Drawn_Constants;
-            Features.Replace_Element
-              (Num_Drawn_Constants, Features.Element (F_J));
-            Features.Replace_Element (F_J, Features.Element (Swap));
+--              Swap := Num_Drawn_Constants;
+--              Features.Replace_Element
+--                (Num_Drawn_Constants, Features.Element (F_J));
+--              Features.Replace_Element (F_J, Features.Element (Swap));
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
 
          else  --  L355
             F_J := F_J + Num_Found_Constants;
             Current_Split.Feature.Clear;
-            for row in Features.First_Index .. Features.Last_Index loop
-               Features_X := X_Samples.Element (row);
-               Current_Split.Feature.Append (Features_X.Element (F_J));
+            for row in Self.Start_Index .. Self.End_Index loop
+               Feature := Self.X_Samples (row);
+               Features_X.Replace_Element (row) :=
+                 Feature.Element (Current_Split.Feature);
             end loop;
             --  Sort samples along current feature
-            Features_X.Clear;
-            for index in Features.First_Index .. Features.Last_Index loop
-               Features_X.Append (Self.Feature_Values.Element (F_J));
-            end loop;
             --  L368
             Replacement_Sort (Self, Features_X, Current_Split);
             for index in X_Samples.First_Index .. X_Samples.Last_Index loop
