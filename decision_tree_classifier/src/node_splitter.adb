@@ -187,38 +187,37 @@ package body Node_Splitter is
                         X_Samples   : ML_Types.List_Of_Value_Data_Lists;
                         Y_Samples   : ML_Types.List_Of_Value_Data_Lists;
                         Impurity    : Float) is
-      --          Partition_End : Natural;
-      --          P_Index       : Positive;
-      --          X_1           : ML_Types.Value_Data_List;
-      --          Swap          : Natural;
+      Partition_End : Natural;
+      P_Index       : Positive;
+      X_1           : ML_Types.Value_Data_List;
+      Swap          : Natural;
    begin
-      --  Reorganize into samples[start:best.pos] + samples[best.pos:end]
-      --          if Best_Split.Pos < Self.Stop then
-      --              Partition_End := Self.Stop;
-      --              P_Index := Self.Start;
-      --              while P_Index < Partition_End loop
-      --                  X_1 := Self.X.Element
-      --                    (Self.Sample_Indices.Element (P_Index));
-      --                  if X_1.Element (Self.Sample_Indices.Element (P_Index)).Float_Value
-      --                    <= Best_Split.Threshold then
-      --                      P_Index := P_Index + 1;
-      --                  else
-      --                      Partition_End := Partition_End - 1;
-      --                      Swap := Samples.Element (P_Index);
-      --                      Samples.Replace_Element
-      --                        (P_Index, Samples.Element (Partition_End));
-      --                      Samples.Replace_Element (Partition_End, Swap);
-      --                  end if;
-      --              end loop;
+      --  L424 Reorganize into samples[start:best.pos] + samples[best.pos:end]
+      if Best_Split.Pos < X_Samples.Last_Index then
+         Partition_End := X_Samples.Last_Index;
+         P_Index := X_Samples.First_Index;
+         while P_Index < Partition_End loop
+            X_1 := Self.X.Element (P_Index);
+            if X_1.Element (Best_Split.Feature).Float_Value
+              <= Best_Split.Threshold then
+               P_Index := P_Index + 1;
+            else
+               Partition_End := Partition_End - 1;
+               Swap := Samples.Element (P_Index);
+               Samples.Replace_Element
+                 (P_Index, Samples.Element (Partition_End));
+               Samples.Replace_Element (Partition_End, Swap);
+            end if;
+         end loop;
 
-      Criterion.Reset (Self.Criteria);
-      --        Criterion.Update (Self.Criteria);
-      Criterion.Children_Impurity
-        (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
-      Best_Split.Improvement := Criterion.Impurity_Improvement
-        (Self.Criteria, Impurity, Best_Split.Impurity_Left,
-         Best_Split.Impurity_Right);
-      --          end if;
+         Criterion.Reset (Self.Criteria);
+         --        Criterion.Update (Self.Criteria);
+         Criterion.Children_Impurity
+           (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
+         Best_Split.Improvement := Criterion.Impurity_Improvement
+           (Self.Criteria, Impurity, Best_Split.Impurity_Left,
+            Best_Split.Impurity_Right);
+      end if;
 
    end Process_B;
 
@@ -294,7 +293,7 @@ package body Node_Splitter is
    function Split_Node (Self              : in out Splitter_Class;
                         Impurity          : Float;
                         Constant_Features : in out ML_Types.Value_Data_List)
-                     return Split_Record is
+                        return Split_Record is
       use ML_Types;
       use ML_Types.Value_Data_Package;
       Num_Features              : constant Natural :=
