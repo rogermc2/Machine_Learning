@@ -196,7 +196,8 @@ package body Criterion is
 
     --  ------------------------------------------------------------------------
     --  Update statistics by moving samples[pos:new_pos] to the left child.
-    procedure Update (Criteria : in out Criterion_Class) is
+    procedure Update (Criteria : in out Criterion_Class;
+                      New_Criteria : Criterion_Class) is
 --          use ML_Types;
         Sum_Left    : Float;
 --          i           : Positive;

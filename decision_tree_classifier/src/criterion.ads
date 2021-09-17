@@ -24,6 +24,7 @@ package Criterion is
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
       --  where k is the output index.
+      Position                  : Natural := 0;
       Sum_Total                 : Classifier_Types.Weight_List;
       Sum_Left                  : Classifier_Types.Weight_List;
       Sum_Right                 : Classifier_Types.Weight_List;
@@ -49,6 +50,7 @@ package Criterion is
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;
    procedure Reset (Criteria : in out Criterion_Class);
-   procedure Update (Criteria : in out Criterion_Class);
+   procedure Update (Criteria : in out Criterion_Class;
+                     New_Criteria : Criterion_Class);
 
 end Criterion;

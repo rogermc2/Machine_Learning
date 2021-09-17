@@ -82,16 +82,21 @@ package body Node_Splitter is
 
    procedure Process_A (Self        : in out Splitter_Class;
                         --                          P           : Natural;
-                        --                          Features    : Classifier_Types.Natural_List;
+                        Features    : Classifier_Types.Natural_List;
                         Features_X  : ML_Types.Value_Data_List;
                         Cur         : Split_Record;
                         Best        : in out Split_Record) is
-      --          P_Index                   : Natural := P;
-      --          Current                   : Split_Record := Cur;
+      use ML_Types;
+      Criteria            : Criterion.Criterion_Class;
+      P_Index            : Natural := Features.First_Index;
+      P1_Index           : Natural;
+      Current            : Split_Record := Cur;
       --          Current_Proxy_Improvement : Float := -Float'Last;
       --          Best_Proxy_Improvement    : Float := -Float'Last;
    begin
-      null;
+      --  L380 Evaluate all splits
+      Criterion.Reset (Self.Criteria);
+      Criteria := Self.Criteria;
       --  Features is a list of feature indices
       --          while P_Index <= Self.Stop loop
       --              while P_Index + 1 <= Self.Stop and
@@ -99,6 +104,45 @@ package body Node_Splitter is
       --                Features.Element (P_Index) loop
       --                  P_Index := P_Index + 1;
       --              end loop;
+      while P_Index <= Features.Last_Index loop
+         P1_Index := P_Index + 1;
+         while P1_Index <= Features.Last_Index loop
+            case Features_X.Element (P1_Index).Value_Kind is
+               when Boolean_Type =>
+                  if not Features_X.Element (P_Index).Boolean_Value and
+                    Features_X.Element (P1_Index).Boolean_Value then
+                     P_Index := P_Index + 1;
+                  end if;
+               when Float_Type =>
+                  if Features_X.Element (P1_Index).Float_Value <=
+                    Features_X.Element (P_Index).Float_Value + Feature_Threshold then
+                     P_Index := P_Index + 1;
+                  end if;
+               when Integer_Type =>
+                  if Features_X.Element (P1_Index).Integer_Value <=
+                    Features_X.Element (P_Index).Integer_Value then
+                     P_Index := P_Index + 1;
+                  end if;
+               when UB_String_Type =>
+                  if Features_X.Element (P1_Index).UB_String_Value <=
+                    Features_X.Element (P_Index).UB_String_Value then
+                     P_Index := P_Index + 1;
+                  end if;
+            end case;
+         end loop;
+
+         P_Index := P_Index + 1;
+         if P_Index <= Features.Last_Index then
+            Current.Pos := P_Index;
+            --  Reject if min_samples_leaf is not guaranteed
+            if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
+              Self.Criteria.Weighted_Right >= Self.Min_Leaf_Weight then
+               Criteria.Position := Current.Pos;
+               Criterion.Update (Self.Criteria, Criteria);
+            end if;
+         end if;
+      end loop;
+
       --              --  L388
       --              P_Index := P_Index + 1;
       --              if P_Index <= Self.Stop then
@@ -167,7 +211,7 @@ package body Node_Splitter is
       --              end loop;
 
       Criterion.Reset (Self.Criteria);
-      Criterion.Update (Self.Criteria);
+--        Criterion.Update (Self.Criteria);
       Criterion.Children_Impurity
         (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
       Best_Split.Improvement := Criterion.Impurity_Improvement
@@ -194,9 +238,9 @@ package body Node_Splitter is
       Sort (Temp);
       for index in Data.First_Index .. Data.Last_Index loop
          null;
---           Data.Replace_Element
---             (Data.To_Cursor (Self.Feature_Values.Element (index)),
---              Temp.Element (Current.Feature_Index));
+         --           Data.Replace_Element
+         --             (Data.To_Cursor (Self.Feature_Values.Element (index)),
+         --              Temp.Element (Current.Feature_Index));
       end loop;
 
    end Replacement_Sort;
@@ -352,7 +396,7 @@ package body Node_Splitter is
                --  Evaluate all splits
                Criterion.Reset (Self.Criteria);
                --  L381
-               Process_A (Self, Features_X, Current_Split, Best_Split);
+               Process_A (Self, Features, Features_X, Current_Split, Best_Split);
             end if;
          end if;
       end loop;
