@@ -10,7 +10,7 @@ package Node_Splitter is
    use Ada.Strings.Unbounded;
 
    type Split_Record is record
-      Feature        : Unbounded_String := To_Unbounded_String ("");
+      Feature        : ML_Types.Value_Data_List;
       Pos            : Positive := 1;
       Threshold      : Float;
       Improvement    : Float := 0.0;

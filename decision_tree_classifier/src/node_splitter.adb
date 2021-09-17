@@ -81,7 +81,6 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure Process_A (Self        : in out Splitter_Class;
-                        --                          P           : Natural;
                         Features    : Classifier_Types.Natural_List;
                         Features_X  : ML_Types.Value_Data_List;
                         Cur         : Split_Record;
@@ -311,8 +310,8 @@ package body Node_Splitter is
       Features                  : Classifier_Types.Natural_List :=
                                     Self.Feature_Indices;
       Features_X                : Value_Data_List := Self.Feature_Values;
-      Current_Split             : Split_Record;
-      Num_Known_Constants       : constant Natural := Natural (Known_Constants.Length);
+      Num_Known_Constants       : constant Natural :=
+                                    Natural (Known_Constants.Length);
       Num_Total_Constants       : Natural := Num_Known_Constants;
       Num_Visited_Features      : Natural := 0;
       Num_Found_Constants       : Natural := 0;
@@ -321,6 +320,7 @@ package body Node_Splitter is
       F_J                       : Natural;
       Swap                      : Natural;
       Compare_Value             : Value_Record;
+      Current_Split             : Split_Record;
       Best_Split                : Split_Record;
    begin
       --  Skip CPU intensive evaluation of the impurity criterion for
@@ -330,12 +330,16 @@ package body Node_Splitter is
       --  computation on descendant nodes.
       Init_Split (Best_Split);
 
-      --  L323
+      --  Sample up to max_features without replacement using a
+      --  Fisher-Yates-based algorithm using local variables F_I and F_J
+      --  L326
+      --  At least one drawn feature must be non constant.
+      --  Constant features are at start of Features.
+      --  F_I features index decrements down from end of features until all
+      --  non-constant features have been processed.
       while F_I > Num_Total_Constants and
-        (Num_Visited_Features < Max_Features or
-         --   At least one drawn features must be non constant.
-           Num_Visited_Features <= Num_Found_Constants + Num_Drawn_Constants)
-      loop
+        (Num_Visited_Features < Max_Features or Num_Visited_Features <=
+           Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L342
@@ -349,17 +353,20 @@ package body Node_Splitter is
               (Num_Drawn_Constants, Features.Element (F_J));
             Features.Replace_Element (F_J, Features.Element (Swap));
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
-            --  L351
-         else
+
+         else  --  L355
             F_J := F_J + Num_Found_Constants;
-            --              Current_Split.Feature_Index := Features.Element (F_J);
+            Current_Split.Feature.Clear;
+            for row in Features.First_Index .. Features.Last_Index loop
+               Features_X := X_Samples.Element (row);
+               Current_Split.Feature.Append (Features_X.Element (F_J));
+            end loop;
+            --  Sort samples along current feature
             Features_X.Clear;
             for index in Features.First_Index .. Features.Last_Index loop
-               null;
-               --                 Features_X.Append
-               --                   (Self.Feature_Values.Element (Current_Split.Feature_Index));
+               Features_X.Append (Self.Feature_Values.Element (F_J));
             end loop;
-            --  L364
+            --  L368
             Replacement_Sort (Self, Features_X, Current_Split);
             for index in X_Samples.First_Index .. X_Samples.Last_Index loop
                X_Sample := X_Samples.Element (index);
@@ -401,7 +408,7 @@ package body Node_Splitter is
          end if;
       end loop;
 
-      --  L421
+      --  L421 Reorganize into samples[start:best.pos] + samples[best.pos:end]
       Process_B (Self, Best_Split, X_Samples, Y_Samples, Impurity);
 
       --  L443
