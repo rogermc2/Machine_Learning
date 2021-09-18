@@ -92,9 +92,9 @@ package body Node_Splitter is
         Criteria := Self.Criteria;
         P1_Index := Self.Start_Index;
 
-        while P_Index <= Features.Last_Index loop
+        while P_Index <= Self.End_Index loop
             P1_Index := P_Index + 1;
-            while P1_Index <= Features.Last_Index loop
+            while P1_Index <= Self.End_Index loop
                 case Features_X.Element (P1_Index).Value_Kind is
                 when Boolean_Type =>
                     if not Features_X.Element (P_Index).Boolean_Value and
@@ -117,54 +117,59 @@ package body Node_Splitter is
                         P_Index := P_Index + 1;
                     end if;
                 end case;
-            end loop;
+            end loop; --  P1_Index
 
             P_Index := P_Index + 1;
-            --  L395
-            if P_Index <= Features.Last_Index then
+            --  L393
+            if P_Index <= Self.End_Index then
                 Current.Pos_I := P_Index;
                 --  L398 Reject if min_samples_leaf is not guaranteed
-                if Self.Criteria.Position >= Self.Min_Leaf_Samples and
-                  Features.Last_Index >= Self.Min_Leaf_Samples then
+                if Cur.Pos_I -  Self.Start_Index >= Self.Min_Leaf_Samples and
+                  Self.End_Index - Cur.Pos_I >= Self.Min_Leaf_Samples then
+                    --  L401
                     Criteria.Position := Current.Pos_I;
                     Criterion.Update (Self.Criteria, Criteria);
 
                     --  L405 Reject if min_weight_leaf is not satisfied
                     if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
                       Self.Criteria.Weighted_Right >= Self.Min_Leaf_Weight then
-                        Current_Proxy_Improvement := Self.Criteria.Proxy_Improvement;
-                        if Current_Proxy_Improvement > Best_Proxy_Improvement then
+                        Current_Proxy_Improvement :=
+                          Self.Criteria.Proxy_Improvement;
+
+                        if Current_Proxy_Improvement >
+                          Best_Proxy_Improvement then
                             Best_Proxy_Improvement := Current_Proxy_Improvement;
                             --  L415
                             case Features_X.Element (P1_Index).Value_Kind is
 
                             when Float_Type =>
-                                Current.Threshold :=
-                                  0.5 * (Features_X.Element (P_Index - 1).Float_Value +
-                                             Features_X.Element (P_Index).Float_Value);
+                                Current.Threshold := 0.5 *
+                                  (Features_X.Element (P_Index - 1).Float_Value
+                                   + Features_X.Element (P_Index).Float_Value);
                                 if Current.Threshold =
                                   Features_X.Element (P_Index).Float_Value or
                                   Current.Threshold = Float'Last or
                                   Current.Threshold = (-Float'Last) then
-                                    Current.Threshold :=
-                                      Features_X.Element (P_Index - 1).Float_Value;
+                                    Current.Threshold := Features_X.Element
+                                      (P_Index - 1).Float_Value;
                                 end if;
 
                             when Integer_Type =>
-                                Current.Threshold :=
-                                  0.5 * Float (Features_X.Element (P_Index - 1).Integer_Value +
-                                                   Features_X.Element (P_Index).Integer_Value);
+                                Current.Threshold := 0.5 * Float
+                                  (Features_X.Element (P_Index - 1).Integer_Value
+                                   + Features_X.Element (P_Index).Integer_Value);
                                 if Current.Threshold =
-                                  Float (Features_X.Element (P_Index).Integer_Value) or
-                                  Current.Threshold = Float'Last or
-                                  Current.Threshold = (-Float'Last) then
+                                  Float (Features_X.Element (P_Index).
+                                             Integer_Value) or
+                                    Current.Threshold = Float'Last or
+                                    Current.Threshold = (-Float'Last) then
                                     Current.Threshold :=
-                                      Float
-                                        (Features_X.Element (P_Index - 1).Integer_Value);
+                                      Float (Features_X.Element (P_Index - 1).
+                                                 Integer_Value);
                                 end if;
                             when Boolean_Type | UB_String_Type => null;
                             end case;
-                            --  L422
+                            --  L420
                             Best := Current;
                         end if;
                     end if;
@@ -178,41 +183,46 @@ package body Node_Splitter is
 
     procedure Process_B (Self        : in out Splitter_Class;
                          Best_Split  : in out Split_Record;
-                         X_Samples   : ML_Types.List_Of_Value_Data_Lists;
-                         Y_Samples   : ML_Types.List_Of_Value_Data_Lists;
+                         X_Samples   : in out ML_Types.List_Of_Value_Data_Lists;
                          Impurity    : Float) is
-    --          Partition_End : Natural;
-    --          P_Index       : Positive;
-    --          X_1           : ML_Types.Value_Data_List;
-    --          Swap          : Natural;
+        Partition_End : Natural;
+        P_Index       : Positive;
+        X_1           : ML_Types.Value_Data_List;
+        Swap          : ML_Types.Value_Data_List;
+        Crit          : Criterion.Criterion_Class;
     begin
         --  Reorganize into samples[start:best.pos] + samples[best.pos:end]
-        --          if Best_Split.Pos < Self.Stop then
-        --              Partition_End := Self.Stop;
-        --              P_Index := Self.Start;
-        --              while P_Index < Partition_End loop
-        --                  X_1 := Self.X.Element
-        --                    (Self.Sample_Indices.Element (P_Index));
-        --                  if X_1.Element (Self.Sample_Indices.Element (P_Index)).Float_Value
-        --                    <= Best_Split.Threshold then
-        --                      P_Index := P_Index + 1;
-        --                  else
-        --                      Partition_End := Partition_End - 1;
-        --                      Swap := Samples.Element (P_Index);
-        --                      Samples.Replace_Element
-        --                        (P_Index, Samples.Element (Partition_End));
-        --                      Samples.Replace_Element (Partition_End, Swap);
-        --                  end if;
-        --              end loop;
+        if Best_Split.Pos_I < Self.End_Index then
+            Partition_End := Self.End_Index;
+            P_Index := Self.Start_Index;
+            while P_Index < Partition_End loop
+                X_1 := Self.X.Element
+                  (Self.Sample_Indices.Element (P_Index));
+                if X_1.Element
+                  (Self.Sample_Indices.Element (P_Index)).Float_Value <=
+                    Best_Split.Threshold then
+                    P_Index := P_Index + 1;
+                else
+                    Partition_End := Partition_End - 1;
+                    Swap := X_Samples.Element (P_Index);
+                    X_Samples.Replace_Element
+                      (P_Index, X_Samples.Element (Partition_End));
+                    X_Samples.Replace_Element (Partition_End, Swap);
+                end if;
+            end loop;
 
-        Criterion.Reset (Self.Criteria);
-        --        Criterion.Update (Self.Criteria);
-        Criterion.Children_Impurity
-          (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
-        Best_Split.Improvement := Criterion.Impurity_Improvement
-          (Self.Criteria, Impurity, Best_Split.Impurity_Left,
-           Best_Split.Impurity_Right);
-        --          end if;
+            --  L436
+            Criterion.Reset (Self.Criteria);
+            Crit := Self.Criteria;
+            Crit.Position := Best_Split.Pos_I;
+            Criterion.Update (Self.Criteria, Crit);
+
+            Criterion.Children_Impurity
+              (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
+            Best_Split.Improvement := Criterion.Impurity_Improvement
+              (Self.Criteria, Impurity, Best_Split.Impurity_Left,
+               Best_Split.Impurity_Right);
+        end if;
 
     end Process_B;
 
@@ -271,8 +281,6 @@ package body Node_Splitter is
                                       Constant_Features;
         X_Samples                 : ML_Types.List_Of_Value_Data_Lists :=
                                       Self.X_Samples;
-        Y_Samples                 : ML_Types.List_Of_Value_Data_Lists :=
-                                      Self.Y_Samples;
 
         X_Sample                  : ML_Types.Value_Data_List;
         Y_Sample                  : ML_Types.Value_Data_List;
@@ -330,8 +338,8 @@ package body Node_Splitter is
                 end loop;
 
                 --  L367
-               Replacement_Sort (X_Sample, Y_Sample,
-                                 Self.Start_Index, Self.End_Index);
+                Replacement_Sort (X_Sample, Y_Sample,
+                                  Self.Start_Index, Self.End_Index);
 
                 --  L369  Features_X is a value_data_list
                 if Features_X.First_Element.Value_Kind = Float_Type then
@@ -369,7 +377,7 @@ package body Node_Splitter is
         end loop;
 
         --  L421
-        Process_B (Self, Best_Split, X_Samples, Y_Samples, Impurity);
+        Process_B (Self, Best_Split, X_Samples, Impurity);
 
         --  L443
         --  Respect invariant for constant features: the original order of
