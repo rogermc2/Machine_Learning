@@ -267,17 +267,15 @@ package body Node_Splitter is
     --  BestSplitter.Split_Node samples up to max_features without replacement
     --  using a Fisher-Yates-based algorithm (using the local variables `f_i`
     --  and `f_j` to compute a permutation of the `features` array).
-    function Split_Node (Self              : in out Splitter_Class;
-                         Impurity          : Float;
-                         Constant_Features : in out ML_Types.Value_Data_List)
+    function Split_Node (Self                  : in out Splitter_Class;
+                         Impurity              : Float;
+                         Num_Constant_Features : in out Natural)
                          return Split_Record is
         use ML_Types;
         use ML_Types.Value_Data_Package;
         Num_Features              : constant Natural :=
                                       Natural (Self.Feature_Indices.Length);
         Max_Features              : constant Natural := Self.Max_Features;
-        Known_Constants           : constant ML_Types.Value_Data_List :=
-                                      Constant_Features;
         X_Samples                 : ML_Types.List_Of_Value_Data_Lists :=
                                       Self.X_Samples;
 
@@ -287,7 +285,7 @@ package body Node_Splitter is
                                       Self.Feature_Indices;
         Features_X                : Value_Data_List := Self.Feature_Values;
         Current_Split             : Split_Record;
-        Num_Known_Constants       : constant Natural := Natural (Known_Constants.Length);
+        Num_Known_Constants       : constant Natural := Num_Constant_Features;
         Num_Total_Constants       : Natural := Num_Known_Constants;
         Num_Visited_Features      : Natural := 0;
         Num_Found_Constants       : Natural := 0;
@@ -378,7 +376,7 @@ package body Node_Splitter is
         --  L421
         Process_B (Self, Best_Split, X_Samples, Impurity);
 
-        --  L443
+        --  L448
         --  Respect invariant for constant features: the original order of
         --  element in features[:n_known_constants] must be preserved for
         --  sibling and child nodes.
@@ -393,8 +391,7 @@ package body Node_Splitter is
               (index, Features.Element (index));
         end loop;
 
-        Constant_Features.Replace_Element
-          (1, Constant_Features.Element (Num_Total_Constants));
+        Num_Constant_Features := Num_Total_Constants;
         return Best_Split;
 
     end Split_Node;

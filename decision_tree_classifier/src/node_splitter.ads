@@ -50,9 +50,9 @@ package Node_Splitter is
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
       Weighted_Node_Samples : in out Float);
-   function Split_Node (Self              : in out Splitter_Class;
-                        Impurity          : Float;
-                        Constant_Features : in out ML_Types.Value_Data_List)
+   function Split_Node (Self                  : in out Splitter_Class;
+                        Impurity              : Float;
+                        Num_Constant_Features : in out Natural)
                         return Split_Record;
 
 end Node_Splitter;
