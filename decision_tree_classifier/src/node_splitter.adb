@@ -8,10 +8,6 @@ package body Node_Splitter is
 
     Feature_Threshold : constant Float := 10.0 ** (-7);
 
-    procedure Replacement_Sort (Self        : Splitter_Class;
-                                Data        : in out ML_Types.Value_Data_List;
-                                Current     : Split_Record);
-
     procedure Replacement_Sort (X : in out ML_Types.Value_Data_List;
                                 Y : in out ML_Types.Value_Data_List;
                                 Start, Stop : Positive);
@@ -79,7 +75,6 @@ package body Node_Splitter is
     --  -------------------------------------------------------------------------
 
     procedure Process_A (Self        : in out Splitter_Class;
-                         --                          P           : Natural;
                          Features    : Classifier_Types.Natural_List;
                          Features_X  : ML_Types.Value_Data_List;
                          Cur         : Split_Record;
@@ -92,9 +87,10 @@ package body Node_Splitter is
         Current_Proxy_Improvement : Float := -Float'Last;
         Best_Proxy_Improvement    : Float := -Float'Last;
     begin
-        --  L380 Evaluate all splits
+        --  L379 Evaluate all splits
         Criterion.Reset (Self.Criteria);
         Criteria := Self.Criteria;
+        P1_Index := Self.Start_Index;
 
         while P_Index <= Features.Last_Index loop
             P1_Index := P_Index + 1;
@@ -222,30 +218,6 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Replacement_Sort (Self    : Splitter_Class;
-                                Data    : in out ML_Types.Value_Data_List;
-                                Current : Split_Record) is
-        use ML_Types;
-        use Value_Data_Package;
-        use Value_Data_Sorting;
-        Temp : Value_Data_List;
-    begin
-        for index in Data.First_Index .. Data.Last_Index loop
-            Temp.Append (Data.Element (index));
-        end loop;
-
-        Sort (Temp);
-        for index in Data.First_Index .. Data.Last_Index loop
-            null;
-            --           Data.Replace_Element
-            --             (Data.To_Cursor (Self.Feature_Values.Element (index)),
-            --              Temp.Element (Current.Feature_Index));
-        end loop;
-
-    end Replacement_Sort;
-
-    --  -------------------------------------------------------------------------
-
     procedure Replacement_Sort (X : in out ML_Types.Value_Data_List;
                                 Y : in out ML_Types.Value_Data_List;
                                 Start, Stop : Positive) is
@@ -263,8 +235,8 @@ package body Node_Splitter is
         Sort (Temp_X);
         Sort (Temp_Y);
         for index in Start .. Stop loop
-            X.Replace_Element (index,Temp_X.Element (index));
-            Y.Replace_Element (index,Temp_Y.Element (index));
+            X.Replace_Element (index, Temp_X.Element (index));
+            Y.Replace_Element (index, Temp_Y.Element (index));
         end loop;
 
     end Replacement_Sort;
@@ -289,7 +261,7 @@ package body Node_Splitter is
     function Split_Node (Self              : in out Splitter_Class;
                          Impurity          : Float;
                          Constant_Features : in out ML_Types.Value_Data_List)
-                        return Split_Record is
+                         return Split_Record is
         use ML_Types;
         use ML_Types.Value_Data_Package;
         Num_Features              : constant Natural :=
@@ -345,28 +317,23 @@ package body Node_Splitter is
                   (Num_Drawn_Constants, Features.Element (F_J));
                 Features.Replace_Element (F_J, Features.Element (Swap));
                 Num_Drawn_Constants := Num_Drawn_Constants + 1;
-                --  L351
+                --  L356
             else
                 F_J := F_J + Num_Found_Constants;
-                --              Current_Split.Feature_Index := Features.Element (F_J);
-                Features_X.Clear;
-                for index in Features.First_Index .. Features.Last_Index loop
-                    null;
-                    --                 Features_X.Append
-                    --                   (Self.Feature_Values.Element (Current_Split.Feature_Index));
-                end loop;
-                --  L367
-                Replacement_Sort (Self, Features_X, Current_Split);
+                Current_Split.Feature_Index := Features.Element (F_J);
+
+                --  L364
                 for index in X_Samples.First_Index .. X_Samples.Last_Index loop
-                    X_Sample := X_Samples.Element (index);
-                    Y_Sample := Y_Samples.Element (index);
-                    Replacement_Sort (X_Sample, Y_Sample,
-                                      Self.Start_Index, Self.End_Index);
-                    X_Samples.Replace_Element (index, X_Sample);
-                    Y_Samples.Replace_Element (index, Y_Sample);
+                    X_Sample := Self.X_Samples.Element (F_I);
+                    Features_X.Replace_Element
+                      (Index, X_Sample.Element (Current_Split.Feature_Index));
                 end loop;
 
-                --  L367  Features_X is a value_data_list
+                --  L367
+               Replacement_Sort (X_Sample, Y_Sample,
+                                 Self.Start_Index, Self.End_Index);
+
+                --  L369  Features_X is a value_data_list
                 if Features_X.First_Element.Value_Kind = Float_Type then
                     Compare_Value.Float_Value :=
                       Features_X.First_Element.Float_Value +
@@ -374,8 +341,10 @@ package body Node_Splitter is
                 else
                     Compare_Value := Features_X.First_Element;
                 end if;
-                --  Still L367
-                if Features_X.Last_Element <= Compare_Value then
+
+                --  Still L369
+                if Features_X.Element (Features_X.Last_Index - 1) <=
+                  Compare_Value then
                     Swap := Features.Element (F_J);
                     Features.Replace_Element
                       (F_J, Features.Element (Num_Total_Constants));
@@ -383,8 +352,8 @@ package body Node_Splitter is
 
                     Num_Found_Constants := Num_Found_Constants + 1;
                     Num_Total_Constants := Num_Total_Constants + 1;
-                    --  L372
-                else
+
+                else  --  L374
                     F_I := F_I - 1;
                     Swap := Features.Element (F_I);
                     Features.Replace_Element (F_I, Features.Element (F_J));
@@ -393,7 +362,8 @@ package body Node_Splitter is
                     --  Evaluate all splits
                     Criterion.Reset (Self.Criteria);
                     --  L381
-                    Process_A (Self, Features, Features_X, Current_Split, Best_Split);
+                    Process_A (Self, Features, Features_X, Current_Split,
+                               Best_Split);
                 end if;
             end if;
         end loop;
