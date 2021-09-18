@@ -60,8 +60,6 @@ package body Decision_Tree_Classifer is
 
         Prune_Tree (Self);
 
-        --          Row_Tree := Builder.Build_Tree (Rows, Max_Leaves);
-
     end Build_Tree;
 
     --  -------------------------------------------------------------------------

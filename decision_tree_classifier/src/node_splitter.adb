@@ -74,20 +74,20 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Process_A (Self        : in out Splitter_Class;
-                         Features    : Classifier_Types.Natural_List;
-                         Features_X  : ML_Types.Value_Data_List;
-                         Cur         : Split_Record;
-                         Best        : in out Split_Record) is
+    procedure Process_A (Self       : in out Splitter_Class;
+                         Features   : Classifier_Types.Natural_List;
+                         Features_X : ML_Types.Value_Data_List;
+                         Current    : Split_Record;
+                         Best       : in out Split_Record) is
         use ML_Types;
         Criteria                  : Criterion.Criterion_Class;
         P_Index                   : Natural := Features.First_Index;
         P1_Index                  : Natural;
-        Current                   : Split_Record := Cur;
         Current_Proxy_Improvement : Float := -Float'Last;
         Best_Proxy_Improvement    : Float := -Float'Last;
     begin
         --  L379 Evaluate all splits
+        Best := Current;
         Criterion.Reset (Self.Criteria);
         Criteria := Self.Criteria;
         P1_Index := Self.Start_Index;
@@ -122,12 +122,12 @@ package body Node_Splitter is
             P_Index := P_Index + 1;
             --  L393
             if P_Index <= Self.End_Index then
-                Current.Pos_I := P_Index;
+                Best.Pos_I := P_Index;
                 --  L398 Reject if min_samples_leaf is not guaranteed
-                if Cur.Pos_I -  Self.Start_Index >= Self.Min_Leaf_Samples and
-                  Self.End_Index - Cur.Pos_I >= Self.Min_Leaf_Samples then
+                if Current.Pos_I - Self.Start_Index >= Self.Min_Leaf_Samples and
+                  Self.End_Index - Current.Pos_I >= Self.Min_Leaf_Samples then
                     --  L401
-                    Criteria.Position := Current.Pos_I;
+                    Criteria.Position := Best.Pos_I;
                     Criterion.Update (Self.Criteria, Criteria);
 
                     --  L405 Reject if min_weight_leaf is not satisfied
@@ -143,34 +143,33 @@ package body Node_Splitter is
                             case Features_X.Element (P1_Index).Value_Kind is
 
                             when Float_Type =>
-                                Current.Threshold := 0.5 *
+                                Best.Threshold := 0.5 *
                                   (Features_X.Element (P_Index - 1).Float_Value
                                    + Features_X.Element (P_Index).Float_Value);
-                                if Current.Threshold =
+                                if Best.Threshold =
                                   Features_X.Element (P_Index).Float_Value or
-                                  Current.Threshold = Float'Last or
-                                  Current.Threshold = (-Float'Last) then
-                                    Current.Threshold := Features_X.Element
+                                  Best.Threshold = Float'Last or
+                                  Best.Threshold = (-Float'Last) then
+                                    Best.Threshold := Features_X.Element
                                       (P_Index - 1).Float_Value;
                                 end if;
 
                             when Integer_Type =>
-                                Current.Threshold := 0.5 * Float
+                                Best.Threshold := 0.5 * Float
                                   (Features_X.Element (P_Index - 1).Integer_Value
                                    + Features_X.Element (P_Index).Integer_Value);
-                                if Current.Threshold =
+                                if Best.Threshold =
                                   Float (Features_X.Element (P_Index).
                                              Integer_Value) or
-                                    Current.Threshold = Float'Last or
-                                    Current.Threshold = (-Float'Last) then
-                                    Current.Threshold :=
+                                    Best.Threshold = Float'Last or
+                                    Best.Threshold = (-Float'Last) then
+                                    Best.Threshold :=
                                       Float (Features_X.Element (P_Index - 1).
                                                  Integer_Value);
                                 end if;
                             when Boolean_Type | UB_String_Type => null;
                             end case;
                             --  L420
-                            Best := Current;
                         end if;
                     end if;
                 end if;
