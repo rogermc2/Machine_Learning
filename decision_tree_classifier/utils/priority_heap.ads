@@ -13,6 +13,9 @@ package Priority_Heap is
       Impurity_Left  : Float;
       Impurity_Right : Float;
       Improvement    : Float;
+      Start          : Positive := 1;
+      Stop           : Positive := 1;
+      Position       : Positive := 1;
    end record;
 
    package Frontier_Package is new

@@ -30,7 +30,7 @@ package Tree is
    end record;
 
    type Tree_Node
-     (Is_Leaf : Boolean := False; Feature_Sel : Data_Type := Integer_Type)
+     (Is_Leaf : Boolean := False)
    is record
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Num_Node_Samples          : Integer := 0;
@@ -43,8 +43,8 @@ package Tree is
       case Is_Leaf is
          when False =>
             --  Feature used for splitting the node
-            Feature   : Features_Record (Feature_Sel);
-            Threshold : Float := 0.0;
+            Feature_Index : Positive := 1;
+            Threshold     : Float := 0.0;
          when True => null;
       end case;
    end record;
