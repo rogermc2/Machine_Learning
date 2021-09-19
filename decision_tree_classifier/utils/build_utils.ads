@@ -1,6 +1,5 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
-with Ada.Containers.Vectors;
 
 with Tree;
 
@@ -38,8 +37,8 @@ package Build_Utils is
    subtype Frontier_Cursor is Frontier_Package.Cursor;
 
    package Stack_Package is new
-     Ada.Containers.Vectors (Positive, Stack_Record);
-   subtype Stack_Vector is Stack_Package.Vector;
+     Ada.Containers.Doubly_Linked_Lists (Stack_Record);
+   subtype Stack_List is Stack_Package.List;
    subtype Stack_Cursor is Stack_Package.Cursor;
 
 end Build_Utils;

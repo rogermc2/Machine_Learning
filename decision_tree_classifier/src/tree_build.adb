@@ -271,39 +271,100 @@ package body Tree_Build is
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
-      use ML_Types;
       use Build_Utils;
       use Build_Utils.Stack_Package;
-      --        use ML_Types.Tree_Package;
-      Feature_Index    : Positive;
-      Is_First         : Boolean;
-      Is_Left          : Boolean;
-      Parent           : ML_Types.Tree_Node_Type;
-      Impurity         : Float;
-      Threshold        : Float;
-      Num_Node_Samples : Natural;
-      Weighted_Samples : Float;
-      Depth            : Positive;
-      Is_Leaf          : Boolean := False;
-      Splitter         : Node_Splitter.Splitter_Class;
-
-      Stack            : Stack_Vector;
+      First             : Boolean := True;
+      Is_Left           : Boolean := True;
+      Parent            : Tree.Tree_Cursor;
+      Impurity          : Float := Float'Last;
+      Num_Node_Samples  : Natural := 0;
+      Weighted_Samples  : Float := 0.0;
+      Constant_Features : Natural := 0;
+      Start             : Positive := 1;
+      Stop              : Positive := 1;
+      Depth             : Natural := 0;
+      Max_Depth_Seen    : Natural := 0;
+      Is_Leaf           : Boolean := False;
+      Splitter          : Node_Splitter.Splitter_Class;
+      Split             : Node_Splitter.Split_Record;
+      Node              : Stack_Record;
+      Stack             : Stack_List;
       Stack_Curs        : Build_Utils.Stack_Cursor := Stack.First;
-      Node             : Stack_Record;
-      Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
+      Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Depth_First_Tree (Depth_Builder, Splitter);
+      Num_Node_Samples := Splitter.Num_Samples;
 
       Node.Node_Cursor := Node_Cursor;
       Node.Stop := Num_Node_Samples;
+      Stack.Append (Node);
 
-      while Stack_Package.Has_Element (Stack_Cursor) loop
-      Node_Cursor := Add_Node (theTree, theTree.Nodes.Root, True, False,
-                               Feature_Index, Impurity, Threshold, Node_Samples,
-                               Weighted_Samples);
+      while Has_Element (Stack_Curs) loop
+         Node := Element (Stack_Curs);
+         Start := Node.Start;
+         Stop := Node.Stop;
+         Depth := Node.Depth;
+         Parent := Node.Parent;
+         Is_Left := Node.Is_Left;
+         Constant_Features := Node.Num_Constant_Features;
+
+         Node_Splitter.Reset_Node (Splitter, Weighted_Samples);
+         if First then
+            Impurity := Splitter.Node_Impurity;
+            First := False;
+         else
+            Impurity := Node.Impurity;
+         end if;
+
+         Is_Leaf := Depth >= Depth_Builder.Max_Depth or
+           Num_Node_Samples < Depth_Builder.Min_Samples_Split or
+           Num_Node_Samples < 2 * Depth_Builder.Min_Samples_Leaf or
+           Weighted_Samples < 2.0 * Depth_Builder.Min_Weight_Leaf or
+           Impurity <= Epsilon;
+
+         if not Is_Leaf then
+            Split := Node_Splitter.Split_Node (Splitter, Impurity,
+                                               Constant_Features);
+            Is_Leaf := Split.Pos_I >= Stop or
+              Split.Improvement + Epsilon < Depth_Builder.Min_Impurity_Decrease;
+         end if;
+
+         Node_Cursor := Add_Node (theTree, Parent, Is_Left, Is_Leaf,
+                                  Split.Feature_Index, Impurity,
+                                  Split.Threshold, Num_Node_Samples,
+                                  Weighted_Samples);
+
+         if not Is_Leaf then
+            --  Right child
+            Node.Parent := Parent;
+            Node.Node_Cursor := Node_Cursor;
+            Node.Start := Split.Pos_I;
+            Node.Stop := Stop;
+            Node.Depth := Depth + 1;
+            Node.Is_Left := False;
+            Node.Impurity := Split.Impurity_Right;
+            Node.Num_Constant_Features := Constant_Features;
+            Stack.Append (Node);
+
+            --  Left child
+            Node.Start := Start;
+            Node.Stop := Split.Pos_I;
+            Node.Depth := Depth + 1;
+            Node.Is_Left := True;
+            Node.Impurity := Split.Impurity_Left;
+            Stack.Append (Node);
+         end if;
+
+         if Depth > Max_Depth_Seen then
+            Max_Depth_Seen := Depth;
+         end if;
+
+         Next (Stack_Curs);
       end loop;
+
+      theTree.Max_Depth := Max_Depth_Seen;
 
    end Build_Depth_First_Tree;
 
