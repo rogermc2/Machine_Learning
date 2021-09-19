@@ -10,7 +10,6 @@ with Ada.Containers.Indefinite_Multiway_Trees;
 
 with Classifier_Types; use Classifier_Types;
 with ML_Types;
---  with Validation;
 
 package Tree is
 
@@ -36,7 +35,6 @@ package Tree is
       Num_Node_Samples          : Integer := 0;
       Weighted_Num_Node_Samples : Integer := 0;
       Depth                     : Integer := 0;
-      --        Parent                    : Tree_Node;
       Is_Left                   : Boolean := True;
       Impurity                  : Float := Float'Large;  --  "Infinity"
       Num_Constant_Features     : Integer := 0;

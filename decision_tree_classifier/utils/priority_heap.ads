@@ -6,7 +6,8 @@ with Tree;
 package Priority_Heap is
 
    type Priority_Record is record
-      Node           : Tree.Tree_Node;
+      Node_Cursor    : Tree.Tree_Cursor;
+      Node_Params    : Tree.Tree_Node;
       Depth          : Natural;
       Is_Leaf        : Boolean := False;
       Impurity       : Float;
