@@ -272,27 +272,38 @@ package body Tree_Build is
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : Classifier_Types.Weight_List) is
       use ML_Types;
---        use ML_Types.Tree_Package;
+      use Build_Utils;
+      use Build_Utils.Stack_Package;
+      --        use ML_Types.Tree_Package;
       Feature_Index    : Positive;
       Is_First         : Boolean;
       Is_Left          : Boolean;
       Parent           : ML_Types.Tree_Node_Type;
       Impurity         : Float;
       Threshold        : Float;
-      Node_Samples     : Natural;
+      Num_Node_Samples : Natural;
       Weighted_Samples : Float;
       Depth            : Positive;
       Is_Leaf          : Boolean := False;
       Splitter         : Node_Splitter.Splitter_Class;
+
+      Stack            : Stack_Vector;
+      Stack_Curs        : Build_Utils.Stack_Cursor := Stack.First;
+      Node             : Stack_Record;
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Depth_First_Tree (Depth_Builder, Splitter);
 
+      Node.Node_Cursor := Node_Cursor;
+      Node.Stop := Num_Node_Samples;
+
+      while Stack_Package.Has_Element (Stack_Cursor) loop
       Node_Cursor := Add_Node (theTree, theTree.Nodes.Root, True, False,
                                Feature_Index, Impurity, Threshold, Node_Samples,
                                Weighted_Samples);
+      end loop;
 
    end Build_Depth_First_Tree;
 

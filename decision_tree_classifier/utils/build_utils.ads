@@ -1,5 +1,6 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Containers.Vectors;
 
 with Tree;
 
@@ -25,9 +26,9 @@ package Build_Utils is
       Node_Params           : Tree.Tree_Node;
       Start                 : Positive := 1;
       Stop                  : Positive := 1;
-      Depth                 : Natural;
+      Depth                 : Natural := 0;
       Is_Left               : Boolean := True;
-      Impurity              : Float;
+      Impurity              : Float := Float'Last;
       Num_Constant_Features : Natural := 0;
    end record;
 
@@ -35,5 +36,10 @@ package Build_Utils is
      Ada.Containers.Doubly_Linked_Lists (Priority_Record);
    subtype Frontier_List is Frontier_Package.List;
    subtype Frontier_Cursor is Frontier_Package.Cursor;
+
+   package Stack_Package is new
+     Ada.Containers.Vectors (Positive, Stack_Record);
+   subtype Stack_Vector is Stack_Package.Vector;
+   subtype Stack_Cursor is Stack_Package.Cursor;
 
 end Build_Utils;
