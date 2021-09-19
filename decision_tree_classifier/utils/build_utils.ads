@@ -3,7 +3,7 @@ with Ada.Containers.Doubly_Linked_Lists;
 
 with Tree;
 
-package Priority_Heap is
+package Build_Utils is
 
    type Priority_Record is record
       Node_Cursor    : Tree.Tree_Cursor;
@@ -19,9 +19,21 @@ package Priority_Heap is
       Position       : Positive := 1;
    end record;
 
+   type Stack_Record is record
+      Parent                : Tree.Tree_Cursor;
+      Node_Cursor           : Tree.Tree_Cursor;
+      Node_Params           : Tree.Tree_Node;
+      Start                 : Positive := 1;
+      Stop                  : Positive := 1;
+      Depth                 : Natural;
+      Is_Left               : Boolean := True;
+      Impurity              : Float;
+      Num_Constant_Features : Natural := 0;
+   end record;
+
    package Frontier_Package is new
      Ada.Containers.Doubly_Linked_Lists (Priority_Record);
    subtype Frontier_List is Frontier_Package.List;
    subtype Frontier_Cursor is Frontier_Package.Cursor;
 
-end Priority_Heap;
+end Build_Utils;
