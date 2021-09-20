@@ -33,19 +33,19 @@ package Node_Splitter is
       Feature_Values       : ML_Types.Value_Data_List;
       Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
-      Y                    : ML_Types.List_Of_Value_Data_Lists;
+      Target_Y             : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight        : Classifier_Types.Weight_List;
       Node_Impurity        : Float;
       Start_Index          : Positive := 1;
       End_Index            : Positive := 1;
       --  BaseDenseSplitter elements
-      X                    : ML_Types.List_Of_Value_Data_Lists;
+      Input_X              : ML_Types.List_Of_Value_Data_Lists;
       Total_Samples        : Natural := 0;
    end record;
 
-   procedure Init (Self          : in out Splitter_Class;
-                   X, Y          : ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight : Classifier_Types.Weight_List);
+   procedure Init (Self              : in out Splitter_Class;
+                   Input_X, Target_Y : ML_Types.List_Of_Value_Data_Lists;
+                   Sample_Weight     : Classifier_Types.Weight_List);
    procedure Node_Value (Self : Splitter_Class; Value : out Float);
    procedure Reset_Node
      (Split                 : in out Splitter_Class;

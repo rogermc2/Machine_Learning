@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -15,30 +16,38 @@ package body Node_Splitter is
     --  -------------------------------------------------------------------------
 
     procedure Init (Self          : in out Splitter_Class;
-                    X, Y          : ML_Types.List_Of_Value_Data_Lists;
+                    Input_X, Target_Y : ML_Types.List_Of_Value_Data_Lists;
                     Sample_Weight : Classifier_Types.Weight_List) is
         use Ada.Containers;
-        Num_Samples      : constant Positive := Positive (X.Element (1).Length);
-        Num_Features     : constant Positive := Positive (X.Length);
+        Num_Samples      : constant Positive := Positive (Input_X.Element (1).Length);
+        Num_Features     : constant Positive := Positive (Input_X.Length);
         Samples          : Classifier_Types.Natural_List;
         Weighted_Samples : Float := 0.0;
-        J                : Natural := 0;
+        J                : Positive := 1;
     begin
+        Samples.Set_Length (Count_Type (Num_Samples));
         for index in 1 .. Num_Samples loop
-            if not Sample_Weight.Is_Empty then
-                if Sample_Weight.Element (index)  > 0.0 then
-                    Samples.Append (index);
-                    J := J + 1;
-                end if;
+            --  Only work with positively weighted samples.
+            if Sample_Weight.Is_Empty or else
+              Sample_Weight.Element (index) > 0.0 then
+              Samples.Replace_Element (J, index);
+              J := J + 1;
+            end if;
+
+            if Sample_Weight.Is_Empty then
+                Weighted_Samples := Weighted_Samples + 1.0;
+            else
                 Weighted_Samples :=
                   Weighted_Samples + Sample_Weight.Element (index);
-            else
-                Weighted_Samples := Weighted_Samples + 1.0;
             end if;
         end loop;
 
+        --  Number of samples is the number of positively weighted samples.
         Self.Num_Samples := J;
         Self.Weighted_Samples := Weighted_Samples;
+        Put_Line ("Node_Splitter.Init Self.Num_Samples, Weighted_Samples: " &
+                    Integer'Image (Self.Num_Samples) & ", " &
+                    Float'Image (Weighted_Samples));
 
         Self.Feature_Indices.Clear;
         for index in 1 .. Num_Features loop
@@ -49,7 +58,7 @@ package body Node_Splitter is
         Self.Constant_Features_I.Clear;
         Self.Constant_Features_I.Set_Length (Count_Type (Num_Features));
 
-        Self.Y := Y;
+        Self.Target_Y := Target_Y;
         Self.Sample_Weight := Sample_Weight;
 
     end Init;
@@ -195,7 +204,7 @@ package body Node_Splitter is
             Partition_End := Self.End_Index;
             P_Index := Self.Start_Index;
             while P_Index < Partition_End loop
-                X_1 := Self.X.Element
+                X_1 := Self.Input_X.Element
                   (Self.Sample_Indices.Element (P_Index));
                 if X_1.Element
                   (Self.Sample_Indices.Element (P_Index)).Float_Value <=
@@ -256,8 +265,9 @@ package body Node_Splitter is
       (Split                 : in out Splitter_Class;
        Weighted_Node_Samples : in out Float) is
     begin
-        Criterion.Init (Split.Criteria, Split.Y, Split.Sample_Weight,
-                        Split.Weighted_Samples, Split.X_Samples, Split.Y_Samples);
+        Criterion.Init
+          (Split.Criteria, Split.Target_Y, Split.Sample_Weight,
+           Split.Weighted_Samples, Split.X_Samples, Split.Y_Samples);
 
         Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 
