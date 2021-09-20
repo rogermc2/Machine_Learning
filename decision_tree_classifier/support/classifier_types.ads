@@ -46,6 +46,5 @@ package Classifier_Types is
    type Probabilities_List is new Probabilities_Package.Vector with null record;
 
    type Probability_Array is array (Integer range <>) of Float;
-   type Sample_Matrix is array (Integer range <>, Integer range <>) of Integer;
 
 end Classifier_Types;

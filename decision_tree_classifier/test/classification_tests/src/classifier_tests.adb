@@ -41,16 +41,12 @@ package body Classifier_Tests is
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Init (theTree, Random_State => 0);
       Y := To_Integer_Value_List (Y_Array);
---        Tree.Init (theTree.Attributes.Decision_Tree,
---                   Integer (X.Element (1).Length), Tree.Index_Range (Y.Length),
---                   Classes);
       Expected := To_Integer_Value_List (True_Result);
       Fit (theTree, X, Y, Weights);
-      Print_Float_List ("Classification_Tests.Test_Classification_Toy weights", Weights);
+      Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
+                        Weights);
 
    end Test_Classification_Toy;
-
-   --  -------------------------------------------------------------------------
 
    --  -------------------------------------------------------------------------
 

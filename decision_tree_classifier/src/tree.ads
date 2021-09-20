@@ -7,8 +7,8 @@
 --  The tree structure is used for predictions and feature importances.
 
 with Ada.Containers.Indefinite_Multiway_Trees;
+with Ada.Containers.Vectors;
 
-with Classifier_Types; use Classifier_Types;
 with ML_Types;
 
 package Tree is
@@ -52,6 +52,11 @@ package Tree is
    subtype Tree_Type is Tree_Package.Tree;
    subtype Tree_Cursor is Tree_Package.Cursor;
 
+   use Tree_Package;
+   package Tree_Cursor_Package is new Ada.Containers.Vectors
+     (Positive, Tree_Cursor);
+   subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
+
    type Values_Array is array
      (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
 
@@ -75,9 +80,9 @@ package Tree is
 
    Value_Error : Exception;
 
-   procedure Init (Self         : out Tree_Class;
-                   Num_Features : Positive; Num_Outputs : Index_Range;
-                   Classes      : ML_Types.Value_Data_List);
+   function Apply (Self : Tree_Class;
+                   X    : ML_Types.List_Of_Value_Data_Lists)
+                   return Tree_Cursor_List;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
@@ -85,19 +90,10 @@ package Tree is
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
 
-   --  Predict class probabilities of the input samples X.
-   --  The predicted class probability is the fraction of samples of the same
-   --   class in a leaf.
-   function Predict (X : Sample_Matrix; Check_Input : Boolean := True)
-                     return Probabilities_List;
-   function Predict_Probability (X           : Sample_Matrix;
-                                 Check_Input : Boolean := True)
-                                 return Probabilities_List;
-   --  Predict class log-probabilities of the input samples X.
-   --     function Predict_Log_Probability (Self : Validation.Attribute_List;
-   function Predict_Log_Probability (X    : Sample_Matrix)
-                                     return Probabilities_List;
-   procedure Resize (Self : in out Tree_Class; Capacity : Positive);
+   function Predict (Self : Tree_Class;
+                     X    : ML_Types.List_Of_Value_Data_Lists)
+                     return ML_Types.Value_Data_List;
+
 private
 
    type Tree_Attributes is record

@@ -112,11 +112,14 @@ package Decision_Tree_Classifer is
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
    procedure Fit (aClassifier   : in out Classifier;
-                 X             : ML_Types.List_Of_Value_Data_Lists;
-                 Y             : in out ML_Types.List_Of_Value_Data_Lists;
-                 Sample_Weight : in out Classifier_Types.Weight_List;
-                 Check_Input   : Boolean := False);
+                  X             : ML_Types.List_Of_Value_Data_Lists;
+                  Y             : in out ML_Types.List_Of_Value_Data_Lists;
+                  Sample_Weight : in out Classifier_Types.Weight_List;
+                  Check_Input   : Boolean := False);
    procedure Init (aClassifier  : in out Classifier;
                    Random_State : Integer);
+   function Predict (Self : in out Classifier;
+                     X    : ML_Types.List_Of_Value_Data_Lists)
+                     return ML_Types.Value_Data_List;
 
 end Decision_Tree_Classifer;

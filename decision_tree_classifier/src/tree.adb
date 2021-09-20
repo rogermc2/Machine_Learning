@@ -1,91 +1,66 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
-with Maths;
+--  with Maths;
 
 package body Tree is
 
-   --     function Validate_X_Predict (Self         : Validation.Attribute_List;
-   --                                   X           : Sample_Matrix;
-   --                                   Check_Input : Boolean := True)
-   --                                  return Sample_Matrix;
+   function Apply_Dense (Self : Tree_Class;
+                         X    : ML_Types.List_Of_Value_Data_Lists)
+                         return Tree_Cursor_List;
 
    --  -------------------------------------------------------------------------
-
-   procedure Init (Self         : out Tree_Class;
-                   Num_Features : Positive; Num_Outputs : Index_Range;
-                   Classes      : ML_Types.Value_Data_List) is
+   --  Apply finds the terminal region (=leaf node) for each sample in X.
+   function Apply (Self : Tree_Class;
+                   X    : ML_Types.List_Of_Value_Data_Lists)
+                   return Tree_Cursor_List is
    begin
-      Self.Num_Features := Num_Features;
-      Self.Num_Outputs := Num_Outputs;
-      Self.Classes.Clear;
-      Self.Classes := Classes;
-      Self.Attributes.Node_Count := 0;
-      Self.Attributes.Max_Depth := 0;
-   end Init;
+      return Apply_Dense (Self, X);
+   end Apply;
 
    --  -------------------------------------------------------------------------
-   --  For a classification model, the predicted class for each sample in X is
-   --  returned. For a regression model, the predicted value based on X is
-   --   returned.
-   --     function Predict (Self : Validation.Attribute_List;
-   function Predict (X : Sample_Matrix; Check_Input : Boolean := True)
-                     return Probabilities_List is
+
+   function Apply_Dense (Self : Tree_Class;
+                         X    : ML_Types.List_Of_Value_Data_Lists)
+                         return Tree_Cursor_List is
+      use ML_Types;
+      use Tree_Package;
+      Node_Cursor : Tree_Cursor;
+      Node        : Tree_Node;
+      Feature     : Positive;
+      Samples     : Value_Data_List;
+      Target      : Tree_Cursor_List;
+   begin
+      for index in X.First_Index .. X.Last_Index loop
+         Samples := X.Element (index);
+         Node_Cursor := Self.Nodes.Root;
+         Node := Element (Node_Cursor);
+         Feature := Node.Feature_Index;
+         while not Element (First_Child (Node_Cursor)).Is_Leaf loop
+            if Samples.Element (Feature).Float_Value <= Node.Threshold then
+               Node_Cursor := First_Child (Node_Cursor);
+            else
+               Node_Cursor := Last_Child (Node_Cursor);
+            end if;
+         end loop;
+         Target.Append (Node_Cursor);
+      end loop;
+      return Target;
+
+   end Apply_Dense;
+
+   --  -------------------------------------------------------------------------
+
+   function Predict (Self : Tree_Class;
+                     X    : ML_Types.List_Of_Value_Data_Lists)
+                     return ML_Types.Value_Data_List is
+      use ML_Types;
       --        N_Samples       : constant Integer := X'Length;
-      Probabilities   : Probabilities_List;
+      Target   : Value_Data_List;
    begin
-      --        Validation.Check_Is_Fitted (Self);
-      --        X := Validate_X_Predict (Self, X, Check_Input);
-      if Check_Input then
-         null;
-      end if;
-
-      return Probabilities;
+      return Target;
    end Predict;
 
    --  -------------------------------------------------------------------------
-
-   --  Predict class log-probabilities of the input samples X.
-   --     function Predict_Log_Probability (Self : Validation.Attribute_List;
-   function Predict_Log_Probability (X    : Sample_Matrix) return Probabilities_List is
-      use Maths.Float_Math_Functions;
-      --        Prob   : constant Probability_Array := Predict_Probability (Self, X);
-      --        Result : Probability_Array (1 .. Prob'Length) := (others => 0.0);
-      --        Probabilities     : constant Probabilities_List := Predict_Probability (Self, X);
-      Probabilities     : constant Probabilities_List := Predict_Probability (X);
-      Log_Probabilities : Probabilities_List;
-   begin
-      for index in Probabilities.First_Index .. Probabilities.Last_Index loop
-         Log_Probabilities.Append (Log (Probabilities.Element (index)));
-      end loop;
-      return Log_Probabilities;
-   end Predict_Log_Probability;
-
-   --  -------------------------------------------------------------------------
-   --  Predict class probabilities of the input samples X.
-   --  The predicted class probability is the fraction of samples of the same
-   --   class in a leaf.
-   --     function Predict_Probability (Self        : Validation.Attribute_List;
-   function Predict_Probability (X           : Sample_Matrix;
-                                 Check_Input : Boolean := True)
-                                 return Probabilities_List is
-      --        Result : Probability_Array (1 .. Integer (Self.Length)) := (others => 0.0);
-      Probabilities   : Probabilities_List;
-   begin
-      --        Validation.Check_Is_Fitted (Self);
-      --        X := Validate_X_Predict (Self, X, Check_Input)
-
-      return Probabilities;
-   end Predict_Probability;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Resize (Self : in out Tree_Class; Capacity : Positive) is
-   begin
-      null;
-   end Resize;
-
-   --  -------------------------------------------------------------------------
-
    --     function Validate_X_Predict (Self         : Validation.Attribute_List;
    --                                   X           : Sample_Matrix;
    --                                   Check_Input : Boolean := True)
