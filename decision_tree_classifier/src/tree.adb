@@ -4,6 +4,9 @@
 
 package body Tree is
 
+   type Value_Array is array
+     (Natural range <>, Index_Range range <>, Natural range <>) of Float;
+
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
                          return Tree_Cursor_List;
@@ -51,13 +54,27 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
---     function Get_Values (Self : Tree_Class) return Values_List is
---          Values : Values_List;
---     begin
---
---        return Values;
---
---     end Get_Values;
+   function Get_Value_Array (Self : Tree_Class) return Value_Array is
+      Values      : Value_Array
+        (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features);
+      Values_Data : constant Values_List := Self.Values;
+      Outputs     : Output_List;
+      Classes     : Class_List;
+   begin
+      for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
+         Outputs := Values_Data (v_index);
+         for o_index in Outputs.First_Index .. Outputs.Last_Index loop
+            Classes := Outputs (o_index);
+            for c_index in Classes.First_Index .. Classes.Last_Index loop
+               Values (v_index, Index_Range (o_index), c_index) :=
+                 Classes (c_index);
+            end loop;
+         end loop;
+      end loop;
+
+      return Values;
+
+   end Get_Value_Array;
 
    --  -------------------------------------------------------------------------
 
@@ -71,18 +88,18 @@ package body Tree is
       --  Apply finds the terminal region (=leaf node) for each sample in X.
       --  Leaf_Cursors is a list of feature cursors, each cursor corresponding to
       --  a leaf noode of X
+      Values       : constant Value_Array
+        (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
+        := Get_Value_Array (Self);
       Leaf_Cursors : Tree_Cursor_List := Apply (Self, X);
       Leaf_Cursor  : Tree_Cursor := Leaf_Cursors.First_Element;
       Leaf         : Tree_Node := Element (Leaf_Cursor);
-      Values       : Values_List := Self.Values;  -- List of outputs
-      Outputs      : Output_List;                 -- List of classes
-      Classes      : Class_List;                  -- List of floats
       Target       : Value_Data_List;
    begin
-        for index in Leaf_Cursors.First_Index .. Leaf_Cursors.Last_Index loop
-            Leaf_Cursor := Leaf_Cursors.Element (index);
-            Leaf := Element (Leaf_Cursor);
-        end loop;
+      for index in Leaf_Cursors.First_Index .. Leaf_Cursors.Last_Index loop
+         Leaf_Cursor := Leaf_Cursors.Element (index);
+         Leaf := Element (Leaf_Cursor);
+      end loop;
       return Target;
    end Predict;
 
