@@ -57,8 +57,19 @@ package Tree is
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
 
-   type Values_Array is array
-     (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
+   package Class_Package is new Ada.Containers.Vectors
+     (Positive, Float);
+   subtype Class_List is Class_Package.Vector;
+
+   use Class_Package;
+   package Output_Package is new Ada.Containers.Vectors
+     (Positive, Class_List);
+   subtype Output_List is Output_Package.Vector;
+
+   use Output_Package;
+   package Values_Package is new Ada.Containers.Vectors
+     (Positive, Output_List);
+   subtype Values_List is Values_Package.Vector;
 
    type Tree_Attributes is private;
    type Tree_Class is record
@@ -70,11 +81,7 @@ package Tree is
       Max_Depth       : Natural := 0;
       Node_Count      : Natural := 0;
       Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
-      --  Values declaration causes runtime problem
-      --        Values          : Values_Array
-      --          (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
-      --          := (others => (others => (others => 0.0)));
-      --        Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
+      Values          : Values_List;
       Attributes      : Tree_Attributes;
    end record;
 
