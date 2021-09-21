@@ -9,13 +9,13 @@ package body Tree is
 
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
-                         return Tree_Cursor_List;
+                         return Out_Array;
 
    --  -------------------------------------------------------------------------
    --  Apply finds the terminal region (=leaf node) for each sample in X.
    function Apply (Self : Tree_Class;
                    X    : ML_Types.List_Of_Value_Data_Lists)
-                   return Tree_Cursor_List is
+                   return Out_Array is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -24,14 +24,14 @@ package body Tree is
 
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
-                         return Tree_Cursor_List is
+                         return Out_Array is
       use ML_Types;
       use Tree_Package;
       Node_Cursor  : Tree_Cursor;
       Node         : Tree_Node;
       Feature      : Positive;
       Samples      : Value_Data_List;
-      Leaf_Cursors : Tree_Cursor_List;
+      Out_Data     : Out_Array (1 .. Positive (X.Length));
    begin
       for index in X.First_Index .. X.Last_Index loop
          Samples := X.Element (index);
@@ -45,10 +45,10 @@ package body Tree is
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
          end loop;
-         Leaf_Cursors.Append (Node_Cursor);
+         Out_Data (index) := Element (Node_Cursor).Node_Index;
       end loop;
 
-      return Leaf_Cursors;
+      return Out_Data;
 
    end Apply_Dense;
 
@@ -91,16 +91,19 @@ package body Tree is
       Values       : constant Value_Array
         (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
         := Get_Value_Array (Self);
-      Leaf_Cursors : Tree_Cursor_List := Apply (Self, X);
-      Leaf_Cursor  : Tree_Cursor := Leaf_Cursors.First_Element;
-      Leaf         : Tree_Node := Element (Leaf_Cursor);
+      Leaf_Data    : Out_Array (1 .. Positive (X.Length)) := Apply (Self, X);
+--        Leaf_Cursor  : Tree_Cursor := Leaf_Cursors.First_Element;
+--        Leaf         : Tree_Node := Element (Leaf_Cursor);
       Target       : Value_Data_List;
    begin
-      for index in Leaf_Cursors.First_Index .. Leaf_Cursors.Last_Index loop
-         Leaf_Cursor := Leaf_Cursors.Element (index);
-         Leaf := Element (Leaf_Cursor);
+      for index in 1 .. Positive (X.Length) loop
+         null;
+--           Leaf_Cursor := Leaf_Cursors.Element (index);
+--           Leaf := Element (Leaf_Cursor);
       end loop;
+
       return Target;
+
    end Predict;
 
    --  -------------------------------------------------------------------------

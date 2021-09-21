@@ -16,6 +16,7 @@ package Tree is
    type State is (None);
    type Data_Type is (Integer_Type, Float_Type, Enum_Type);
    type Feature_Type is (No_Feature, Auto_Feature, Sqrt_Feature, Log2_Feature);
+   type Out_Array is array (Integer range <>) of Positive;
 
    Max_Array_Size : constant Integer := 4000;
    type Index_Range is range 1 .. Max_Array_Size;
@@ -90,7 +91,7 @@ package Tree is
 
    function Apply (Self : Tree_Class;
                    X    : ML_Types.List_Of_Value_Data_Lists)
-                   return Tree_Cursor_List;
+                   return Out_Array;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
