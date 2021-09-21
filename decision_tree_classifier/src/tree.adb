@@ -24,11 +24,11 @@ package body Tree is
                          return Tree_Cursor_List is
       use ML_Types;
       use Tree_Package;
-      Node_Cursor : Tree_Cursor;
-      Node        : Tree_Node;
-      Feature     : Positive;
-      Samples     : Value_Data_List;
-      Target      : Tree_Cursor_List;
+      Node_Cursor  : Tree_Cursor;
+      Node         : Tree_Node;
+      Feature      : Positive;
+      Samples      : Value_Data_List;
+      Leaf_Cursors : Tree_Cursor_List;
    begin
       for index in X.First_Index .. X.Last_Index loop
          Samples := X.Element (index);
@@ -42,21 +42,48 @@ package body Tree is
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
          end loop;
-         Target.Append (Node_Cursor);
+         Leaf_Cursors.Append (Node_Cursor);
       end loop;
-      return Target;
+
+      return Leaf_Cursors;
 
    end Apply_Dense;
+
+   --  -------------------------------------------------------------------------
+
+--     function Get_Values (Self : Tree_Class) return Values_List is
+--          Values : Values_List;
+--     begin
+--
+--        return Values;
+--
+--     end Get_Values;
 
    --  -------------------------------------------------------------------------
 
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List is
+      --  X is a list of samples
+      --  Each sample is a list of feature values, one value per feature
       use ML_Types;
-      --        N_Samples       : constant Integer := X'Length;
-      Target   : Value_Data_List;
+      --  N_Samples       : constant Integer := X'Length;
+      --  Apply finds the terminal region (=leaf node) for each sample in X.
+      --  Leaf_Cursors is a list of feature cursors, each cursor corresponding to
+      --  a leaf noode of X
+      Leaf_Cursors : Tree_Cursor_List := Apply (Self, X);
+      Leaf_Cursor  : Tree_Cursor := Leaf_Cursors.First_Element;
+      Leaf         : Tree_Node := Element (Leaf_Cursor);
+      Values       : Values_List := Self.Values;
+      Outputs      : Output_List;
+      Classes      : Class_List;
+      Target       : Value_Data_List;
    begin
+        for index in Leaf_Cursors.First_Index .. Leaf_Cursors.Last_Index loop
+            Leaf_Cursor := Leaf_Cursors.Element (index);
+            Leaf := Element (Leaf_Cursor);
+            Classes.Append (Leaf.Feature_Index);
+        end loop;
       return Target;
    end Predict;
 
