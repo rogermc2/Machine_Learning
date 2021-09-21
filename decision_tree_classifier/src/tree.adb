@@ -74,15 +74,14 @@ package body Tree is
       Leaf_Cursors : Tree_Cursor_List := Apply (Self, X);
       Leaf_Cursor  : Tree_Cursor := Leaf_Cursors.First_Element;
       Leaf         : Tree_Node := Element (Leaf_Cursor);
-      Values       : Values_List := Self.Values;
-      Outputs      : Output_List;
-      Classes      : Class_List;
+      Values       : Values_List := Self.Values;  -- List of outputs
+      Outputs      : Output_List;                 -- List of classes
+      Classes      : Class_List;                  -- List of floats
       Target       : Value_Data_List;
    begin
         for index in Leaf_Cursors.First_Index .. Leaf_Cursors.Last_Index loop
             Leaf_Cursor := Leaf_Cursors.Element (index);
             Leaf := Element (Leaf_Cursor);
-            Classes.Append (Leaf.Feature_Index);
         end loop;
       return Target;
    end Predict;

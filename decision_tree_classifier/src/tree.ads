@@ -31,6 +31,7 @@ package Tree is
    type Tree_Node
      (Is_Leaf : Boolean := False)
    is record
+      Node_Index                : Natural := 0;
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Num_Node_Samples          : Integer := 0;
       Weighted_Num_Node_Samples : Integer := 0;
