@@ -9,13 +9,13 @@ package body Tree is
 
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
-                         return Out_Array;
+                         return Leaf_Cursor_Array;
 
    --  -------------------------------------------------------------------------
    --  Apply finds the terminal region (=leaf node) for each sample in X.
    function Apply (Self : Tree_Class;
                    X    : ML_Types.List_Of_Value_Data_Lists)
-                   return Out_Array is
+                   return Leaf_Cursor_Array is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -24,14 +24,14 @@ package body Tree is
 
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
-                         return Out_Array is
+                         return Leaf_Cursor_Array is
       use ML_Types;
       use Tree_Package;
       Node_Cursor  : Tree_Cursor;
       Node         : Tree_Node;
       Feature      : Positive;
       Samples      : Value_Data_List;
-      Out_Data     : Out_Array (1 .. Positive (X.Length));
+      Leaf_Cursors : Leaf_Cursor_Array (1 .. Positive (X.Length));
    begin
       for index in X.First_Index .. X.Last_Index loop
          Samples := X.Element (index);
@@ -45,10 +45,10 @@ package body Tree is
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
          end loop;
-         Out_Data (index) := Element (Node_Cursor).Node_Index;
+         Leaf_Cursors (index) := Node_Cursor;
       end loop;
 
-      return Out_Data;
+      return Leaf_Cursors;
 
    end Apply_Dense;
 
@@ -88,18 +88,27 @@ package body Tree is
       --  Apply finds the terminal region (=leaf node) for each sample in X.
       --  Leaf_Cursors is a list of feature cursors, each cursor corresponding to
       --  a leaf noode of X
-      Values       : constant Value_Array
+      Leaf_Values  : constant Value_Array
         (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
         := Get_Value_Array (Self);
-      Leaf_Data    : Out_Array (1 .. Positive (X.Length)) := Apply (Self, X);
---        Leaf_Cursor  : Tree_Cursor := Leaf_Cursors.First_Element;
---        Leaf         : Tree_Node := Element (Leaf_Cursor);
+      Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
+        of Float;
+      Leaf_Cursors : constant Leaf_Cursor_Array (1 .. Positive (X.Length)) :=
+                       Apply (Self, X);
+      Leaf_Cursor  : Tree_Cursor;
+      Leaf         : Tree_Node;
       Target       : Value_Data_List;
    begin
+--        for o_index in 1 .. Self.Num_Outputs loop
+--           for c_index in 1 .. Self.Num_Features loop
+--              Axis_0 (o_index, c_index) :=
+--                Leaf_Cursors (1, o_index, c_index);
+--           end loop;
+--        end loop;
+
       for index in 1 .. Positive (X.Length) loop
-         null;
---           Leaf_Cursor := Leaf_Cursors.Element (index);
---           Leaf := Element (Leaf_Cursor);
+         Leaf := Element (Leaf_Cursors (index));
+         Target.Append (Leaf);
       end loop;
 
       return Target;
