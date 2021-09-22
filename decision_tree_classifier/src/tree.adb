@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
---  with Maths;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Tree is
 
@@ -30,12 +30,24 @@ package body Tree is
       Samples      : Value_Data_List;
       Leaf_Cursors : Leaf_Cursor_Array (1 .. Positive (X.Length));
    begin
+      if Integer (Child_Count (Self.Nodes.Root)) = 0 then
+         raise Value_Error with
+         "Tree.Apply_Dense Self.Nodes tree is empty";
+      end if;
+
       for index in X.First_Index .. X.Last_Index loop
+         Put_Line ("Tree.Apply_Dense index" & Integer'Image (index));
          Samples := X.Element (index);
-         Node_Cursor := Self.Nodes.Root;
-         Node := Element (Node_Cursor);
-         Feature := Node.Feature_Index;
-         while not Element (First_Child (Node_Cursor)).Is_Leaf loop
+         Put_Line ("Tree.Apply_Dense Samples set");
+         Node_Cursor := First_Child (Self.Nodes.Root);
+         Put_Line ("Tree.Apply_Dense Node_Cursor set");
+         Put_Line ("Tree.Apply_Dense Node_Cursor Has_Element; " &
+                  Boolean'Image (Has_Element (Node_Cursor)));
+         while Has_Element (Node_Cursor) and then
+           not Element (Node_Cursor).Is_Leaf loop
+            Put_Line ("Tree.Apply_Dense not leaf");
+            Node := Element (Node_Cursor);
+            Feature := Node.Feature_Index;
             if Samples.Element (Feature).Float_Value <= Node.Threshold then
                Node_Cursor := First_Child (Node_Cursor);
             else
@@ -44,7 +56,7 @@ package body Tree is
          end loop;
          Leaf_Cursors (index) := Node_Cursor;
       end loop;
-
+      New_Line;
       return Leaf_Cursors;
 
    end Apply_Dense;
@@ -90,13 +102,17 @@ package body Tree is
 --          := Get_Value_Array (Self);
 --        Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
 --          of Float;
-      Leaf_Cursors : constant Leaf_Cursor_Array (1 .. N_Samples) :=
-                          Apply (Self, X);
-      Leaf         : Tree_Node;
+      Leaf_Cursors  : Leaf_Cursor_Array (1 .. N_Samples);
+      Leaf          : Tree_Node;
       Feature_Index : Positive;
       Features_List : Value_Data_List;
       Target        : Value_Data_List;
    begin
+      if Integer (Child_Count (Self.Nodes.Root)) = 0 then
+         raise Value_Error with
+         "Tree.Predict Self.Nodes tree is empty";
+      end if;
+      Leaf_Cursors := Apply (Self, X);
 --        for o_index in 1 .. Self.Num_Outputs loop
 --           for c_index in 1 .. Self.Num_Features loop
 --              Axis_0 (o_index, c_index) :=
@@ -105,8 +121,11 @@ package body Tree is
 --        end loop;
 
       for index in 1 .. N_Samples loop
+         Put_Line ("Tree.Predict index" & Integer'Image (index));
          Leaf := Element (Leaf_Cursors (index));
          Feature_Index := Leaf.Feature_Index;
+         Put_Line ("Tree.Predict Feature_Index" &
+                     Integer'Image (Feature_Index));
          Features_List := X.Element (index);
          Target.Append (Features_List (Feature_Index));
       end loop;

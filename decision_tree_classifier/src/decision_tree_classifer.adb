@@ -152,8 +152,10 @@ package body Decision_Tree_Classifer is
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
 
-      Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
-      Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit X (2)", X.Element (2));
+      Classifier_Utilities.Print_Value_List
+        ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
+      Classifier_Utilities.Print_Value_List
+        ("Decision_Tree_Classifer.Fit X (2)", X.Element (2));
 
       --  L293
       if Positive (Y.Length) /= Num_Samples then
@@ -211,9 +213,8 @@ package body Decision_Tree_Classifer is
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List is
-      Prediction : ML_Types.Value_Data_List;
    begin
-      return Prediction;
+      return Tree.Predict (Self.Attributes.Decision_Tree, X);
    end Predict;
 
    --  -------------------------------------------------------------------------
