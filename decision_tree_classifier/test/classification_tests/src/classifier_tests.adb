@@ -35,7 +35,7 @@ package body Classifier_Tests is
       X        : constant List_Of_Value_Data_Lists :=
                        To_Multi_Value_List (X_Array);
       Y        : List_Of_Value_Data_Lists;
---        Classes  : Value_Data_List;
+      Classes  : Value_Data_List;
       Weights  : Weight_List;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
@@ -45,6 +45,9 @@ package body Classifier_Tests is
       Fit (theTree, X, Y, Weights);
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
                         Weights);
+      Classes := Predict (theTree, X);
+      Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
+                        Classes);
 
    end Test_Classification_Toy;
 
