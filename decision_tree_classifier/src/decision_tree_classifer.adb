@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Builder;
 with Classifier_Types;
@@ -126,12 +126,11 @@ package body Decision_Tree_Classifer is
       use Classifier_Types;
       use Classifier_Types.Integer_Package;
       Num_Outputs           : constant Positive := Positive (Y.Length);
-      Num_Samples           : constant Positive :=
-                                Positive (Y.Length);
+      Num_Samples           : constant Positive := Positive (X.Length);
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       Y_Encoded             : List_Of_Value_Data_Lists;
-      Max_Leaf_Nodes        : Integer := -1;
+      Max_Leaf_Nodes        : Natural := 0;
    begin
       --  L154
       if aClassifier.Parameters.CCP_Alpha < 0.0 then
@@ -151,6 +150,10 @@ package body Decision_Tree_Classifer is
       --  L201
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
+      Put_Line
+        ("Decision_Tree_Classifer.Fit Num_Samples, Num_Outputs: " &
+        Tree.Index_Range'Image (aClassifier.Attributes.Num_Features) &
+        Tree.Index_Range'Image (aClassifier.Attributes.Num_Outputs));
 
       Classifier_Utilities.Print_Value_List
         ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
@@ -165,11 +168,15 @@ package body Decision_Tree_Classifer is
            & Integer'Image (Num_Samples);
       end if;
 
-      Classifier_Utilities.Print_Value_List ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
+      Classifier_Utilities.Print_Value_List
+        ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
 
       --  L206
       Classification_Fit (aClassifier, Y, Num_Outputs, Y_Encoded,
                           Expanded_Class_Weight);
+      Classifier_Utilities.Print_Float_List
+        ("Decision_Tree_Classifer.Fit Expanded_Class_Weight",
+         Expanded_Class_Weight);
       --  L218
 
       --  L226

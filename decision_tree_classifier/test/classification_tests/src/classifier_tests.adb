@@ -11,11 +11,11 @@ package body Classifier_Tests is
    use Classifier_Types;
    use ML_Types;
 
---     type Clf_Criterions is (Gini, Entropy);
---     type Reg_Criterions is (Squared_Error, Absolute_Error,
---                             Friedman_Mse, Poisson);
---     type Clf_Trees is (Decision_Tree_Classifier, Extra_Tree_Classifier);
---     type Reg_Trees is (Decision_Tree_Regressor, Extra_Tree_Regressor);
+   --     type Clf_Criterions is (Gini, Entropy);
+   --     type Reg_Criterions is (Squared_Error, Absolute_Error,
+   --                             Friedman_Mse, Poisson);
+   --     type Clf_Trees is (Decision_Tree_Classifier, Extra_Tree_Classifier);
+   --     type Reg_Trees is (Decision_Tree_Regressor, Extra_Tree_Regressor);
 
    X_Array     : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
                    ((-2, -1), (-1, -1), (-1, -2), (1, 1), (1, 2), (2, 1));
@@ -33,7 +33,7 @@ package body Classifier_Tests is
       theTree  : Classifier (Tree.Integer_Type, Tree.Integer_Type,
                              Tree.Integer_Type);
       X        : constant List_Of_Value_Data_Lists :=
-                       To_Multi_Value_List (X_Array);
+                   To_Multi_Value_List (X_Array);
       Y        : List_Of_Value_Data_Lists;
       Classes  : Value_Data_List;
       Weights  : Weight_List;
@@ -43,6 +43,9 @@ package body Classifier_Tests is
       Y := To_Integer_Value_List (Y_Array);
       Expected := To_Integer_Value_List (True_Result);
       Fit (theTree, X, Y, Weights);
+      Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
+                Integer'Image
+                  (Integer (theTree.Attributes.Decision_Tree.Nodes.Node_Count)));
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
                         Weights);
       Classes := Predict (theTree, X);
