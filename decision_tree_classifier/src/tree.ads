@@ -16,6 +16,7 @@ package Tree is
    type State is (None);
    type Data_Type is (Integer_Type, Float_Type, Enum_Type);
    type Feature_Type is (No_Feature, Auto_Feature, Sqrt_Feature, Log2_Feature);
+   type Value_Array (<>) is private;
 
    Max_Array_Size : constant Integer := 4000;
    type Index_Range is range 1 .. Max_Array_Size;
@@ -77,9 +78,7 @@ package Tree is
    type Tree_Class is record
       Num_Features    : Natural := 0;
       Classes         : ML_Types.Value_Data_List;
-      --        Capacity        : Index_Range := 1;
       Num_Outputs     : Index_Range := 1;
-      --        Max_Num_Classes  : Index_Range := 1;
       Max_Depth       : Natural := 0;
       Node_Count      : Natural := 0;
       Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
@@ -98,7 +97,7 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
-
+   function Get_Value_Array (Self : Tree_Class) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;
@@ -109,5 +108,8 @@ private
       Node_Count : Natural := 0;
       Max_Depth  : Natural := 0;
    end record;
+
+   type Value_Array is array
+     (Natural range <>, Index_Range range <>, Natural range <>) of Float;
 
 end Tree;

@@ -4,9 +4,6 @@
 
 package body Tree is
 
-   type Value_Array is array
-     (Natural range <>, Index_Range range <>, Natural range <>) of Float;
-
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
                          return Leaf_Cursor_Array;
@@ -84,20 +81,21 @@ package body Tree is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       use ML_Types;
-      --  N_Samples       : constant Integer := X'Length;
+      N_Samples       : constant Natural := Natural (X.Length);
       --  Apply finds the terminal region (=leaf node) for each sample in X.
       --  Leaf_Cursors is a list of feature cursors, each cursor corresponding to
       --  a leaf noode of X
-      Leaf_Values  : constant Value_Array
-        (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
-        := Get_Value_Array (Self);
-      Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
-        of Float;
-      Leaf_Cursors : constant Leaf_Cursor_Array (1 .. Positive (X.Length)) :=
-                       Apply (Self, X);
-      Leaf_Cursor  : Tree_Cursor;
+--        Leaf_Values  : constant Value_Array
+--          (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
+--          := Get_Value_Array (Self);
+--        Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
+--          of Float;
+      Leaf_Cursors : constant Leaf_Cursor_Array (1 .. N_Samples) :=
+                          Apply (Self, X);
       Leaf         : Tree_Node;
-      Target       : Value_Data_List;
+      Feature_Index : Positive;
+      Features_List : Value_Data_List;
+      Target        : Value_Data_List;
    begin
 --        for o_index in 1 .. Self.Num_Outputs loop
 --           for c_index in 1 .. Self.Num_Features loop
@@ -106,9 +104,11 @@ package body Tree is
 --           end loop;
 --        end loop;
 
-      for index in 1 .. Positive (X.Length) loop
+      for index in 1 .. N_Samples loop
          Leaf := Element (Leaf_Cursors (index));
-         Target.Append (Leaf);
+         Feature_Index := Leaf.Feature_Index;
+         Features_List := X.Element (index);
+         Target.Append (Features_List (Feature_Index));
       end loop;
 
       return Target;
