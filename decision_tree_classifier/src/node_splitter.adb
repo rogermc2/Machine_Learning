@@ -15,12 +15,23 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Init (Self                            : in out Splitter_Class;
+   procedure C_Init (Self                            : in out Splitter_Class;
                    Criteria                        : Criterion.Criterion_Class;
                    Max_Features,  Min_Leaf_Samples : Natural;
-                   Min_Leaf_Weight                 : Float;
-                   Input_X, Target_Y               : ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight                   : Classifier_Types.Weight_List) is
+                   Min_Leaf_Weight : Float) is
+   begin
+      Self.Criteria := Criteria;
+      Self.Max_Features := Max_Features;
+      Self.Min_Leaf_Samples := Min_Leaf_Samples;
+      Self.Min_Leaf_Weight := Min_Leaf_Weight;
+
+   end C_Init;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Init (Self              : in out Splitter_Class;
+                   Input_X, Target_Y : ML_Types.List_Of_Value_Data_Lists;
+                   Sample_Weight     : Classifier_Types.Weight_List) is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Element (1).Length);
       Num_Features     : constant Positive := Positive (Input_X.Length);
@@ -28,13 +39,6 @@ package body Node_Splitter is
       Weighted_Samples : Float := 0.0;
       J                : Positive := 1;
    begin
-      --  __cinit__
-      Self.Criteria := Criteria;
-      Self.Max_Features := Max_Features;
-      Self.Min_Leaf_Samples := Min_Leaf_Samples;
-      Self.Min_Leaf_Weight := Min_Leaf_Weight;
-
-      --  init
       Samples.Set_Length (Count_Type (Num_Samples));
       for index in 1 .. Num_Samples loop
          --  Only work with positively weighted samples.

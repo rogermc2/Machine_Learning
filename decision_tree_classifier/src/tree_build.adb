@@ -233,7 +233,7 @@ package body Tree_Build is
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Depth_First_Tree
         (Depth_Builder, Splitter, Min_Samples_Split, Min_Samples_Leaf,
-         Min_Weight_Leaf, Max_Depth, Min_Impurity_Decrease);
+         Min_Weight_Leaf, Max_Depth, Max_Leaf_Nodes, Min_Impurity_Decrease);
       Num_Node_Samples := Splitter.Num_Samples;
 
       Node.Node_Cursor := Node_Cursor;

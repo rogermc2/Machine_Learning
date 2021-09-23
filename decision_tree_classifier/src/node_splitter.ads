@@ -43,14 +43,13 @@ package Node_Splitter is
       Total_Samples        : Natural := 0;
    end record;
 
-   procedure Init (Self                            : in out Splitter_Class;
-                   --  __cinit__
-                   Criteria                        : Criterion.Criterion_Class;
-                   Max_Features,  Min_Leaf_Samples : Natural;
-                   Min_Leaf_Weight                 : Float;
-                   --  init
-                   Input_X, Target_Y               : ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight                   : Classifier_Types.Weight_List);
+   procedure C_Init (Self                            : in out Splitter_Class;
+                     Criteria                        : Criterion.Criterion_Class;
+                     Max_Features,  Min_Leaf_Samples : Natural;
+                     Min_Leaf_Weight                 : Float);
+   procedure Init (Self               : in out Splitter_Class;
+                   Input_X, Target_Y  : ML_Types.List_Of_Value_Data_Lists;
+                   Sample_Weight      : Classifier_Types.Weight_List);
    procedure Node_Value (Self : Splitter_Class; Value : out Float);
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
