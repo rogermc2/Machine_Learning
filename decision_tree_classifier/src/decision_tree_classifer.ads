@@ -23,6 +23,7 @@ with ML_Types;
 with Tree;
 
 with Classifier_Types; use Classifier_Types;
+with Node_Splitter;
 with Weights;
 
 package Decision_Tree_Classifer is
@@ -65,7 +66,8 @@ package Decision_Tree_Classifer is
    type Base_Parameter_Data
      (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
       Criterion                : Classifier_Criteria_Type := Gini_Criteria;
-      Splitter                 : Splitter_Type := Best_Splitter;
+      Splitter_Kind            : Splitter_Type := Best_Splitter;
+      Splitter                 : Node_Splitter.Splitter_Class;
       Max_Depth                : Integer := 0;
       Min_Samples_Split        : Split_Record (Split_Type);
       Min_Samples_Leaf         : Leaf_Record (Leaf_Type);
