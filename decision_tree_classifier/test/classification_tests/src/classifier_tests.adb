@@ -47,7 +47,6 @@ package body Classifier_Tests is
 
       Init (theTree, Max_Leaf_Nodes => Num_Samples,
             Random_State => 0);
-      Put_Line ("Classification_Tests.Test_Classification_Toy INITIALIZED");
       Y := To_Integer_Value_List (Y_Array);
       Expected := To_Integer_Value_List (True_Result);
       Fit (theTree, X, Y, Weights);

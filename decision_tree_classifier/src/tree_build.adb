@@ -152,11 +152,6 @@ package body Tree_Build is
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
    begin
-      if Best_Builder.Max_Leaf_Nodes = 0 then
-         raise Tree_Build_Error with
-           "Tree_Build.Build_Best_First_Tree called with empty X vector.";
-      end if;
-
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Best_First_Tree (Best_Builder, Splitter);
       if Best_Builder.Max_Leaf_Nodes <= 0 then

@@ -47,8 +47,7 @@ package body Decision_Tree_Classifer is
       else
          declare
             Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
-         begin
-            --  L419  Best First case
+         begin            --  L419  Best First case
             Tree_Build.Build_Best_First_Tree (Builder, theTree, X, Y, Sample_Weight);
          end;
       end if;
@@ -179,6 +178,8 @@ package body Decision_Tree_Classifer is
       --  L206
       Classification_Fit (aClassifier, Y, Num_Outputs, Y_Encoded,
                           Expanded_Class_Weight);
+      Classifier_Utilities.Print_Value_List
+        ("Decision_Tree_Classifer.Fit after Classification_Fit Y (1)", Y.Element (1));
       Classifier_Utilities.Print_Float_List
         ("Decision_Tree_Classifer.Fit Expanded_Class_Weight",
          Expanded_Class_Weight);
