@@ -152,11 +152,16 @@ package body Tree_Build is
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
    begin
+      if Best_Builder.Max_Leaf_Nodes = 0 then
+         raise Tree_Build_Error with
+           "Tree_Build.Build_Best_First_Tree called with empty X vector.";
+      end if;
+
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Best_First_Tree (Best_Builder, Splitter);
       if Best_Builder.Max_Leaf_Nodes <= 0 then
          raise Tree_Build_Error with
-         "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
+           "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
       end if;
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
 
@@ -298,16 +303,17 @@ package body Tree_Build is
    --  ------------------------------------------------------------------------
 
    procedure Init_Best_First_Tree
-     (Best_Builder                        : in out Tree_Builder;
-      Splitter                            : Node_Splitter.Splitter_Class;
-      Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
-      Min_Weight_Leaf                     : Float := 0.0;
-      Max_Depth, Max_Leaf_Nodes           : Natural := 0;
-      Min_Impurity_Decrease               : Float := 0.0) is
+     (Best_Builder          : in out Tree_Builder;
+      Splitter              : Node_Splitter.Splitter_Class;
+      Min_Samples_Split     : Natural := 0;
+      Min_Weight_Leaf       : Float := 0.0;
+      Max_Depth             : Natural := 0;
+      Max_Leaf_Nodes        : Natural := 0;
+      Min_Impurity_Decrease : Float := 0.0) is
    begin
       Best_Builder.Splitter := Splitter;
       Best_Builder.Min_Samples_Split := Min_Samples_Split;
-      Best_Builder.Min_Samples_Leaf := Min_Samples_Leaf;
+      Best_Builder.Min_Samples_Leaf := Splitter.Min_Leaf_Samples;
       Best_Builder.Min_Weight_Leaf := Min_Weight_Leaf;
       Best_Builder.Max_Depth := Max_Depth;
       Best_Builder.Max_Leaf_Nodes := Max_Leaf_Nodes;

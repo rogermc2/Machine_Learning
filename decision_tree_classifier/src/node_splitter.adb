@@ -44,6 +44,7 @@ package body Node_Splitter is
 
         --  Number of samples is the number of positively weighted samples.
         Self.Num_Samples := J;
+        Self.Min_Leaf_Samples := Num_Samples;
         Self.Weighted_Samples := Weighted_Samples;
         Put_Line ("Node_Splitter.Init Self.Num_Samples, Weighted_Samples: " &
                     Integer'Image (Self.Num_Samples) & ", " &

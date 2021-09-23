@@ -117,6 +117,7 @@ package Decision_Tree_Classifer is
                   Sample_Weight : in out Classifier_Types.Weight_List;
                   Check_Input   : Boolean := False);
    procedure Init (aClassifier  : in out Classifier;
+                   Max_Leaf_Nodes : Positive;
                    Random_State : Integer);
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)

@@ -214,9 +214,11 @@ package body Decision_Tree_Classifer is
    --  -------------------------------------------------------------------------
 
    procedure Init (aClassifier  : in out Classifier;
+                   Max_Leaf_Nodes : Positive;
                    Random_State : Integer) is
    begin
       aClassifier.Parameters.Random_State := Random_State;
+      aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
    end Init;
 
    --  -------------------------------------------------------------------------
