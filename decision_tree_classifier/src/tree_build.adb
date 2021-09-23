@@ -154,6 +154,10 @@ package body Tree_Build is
    begin
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Best_First_Tree (Best_Builder, Splitter);
+      if Best_Builder.Max_Leaf_Nodes <= 0 then
+         raise Tree_Build_Error with
+         "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
+      end if;
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
 
       Add_Split_Node (Best_Builder, Splitter, theTree, Impurity,

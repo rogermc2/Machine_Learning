@@ -25,6 +25,8 @@ package Tree_Build is
       Min_Impurity_Decrease : Float := 0.0;
    end record;
 
+   Tree_Build_Error : Exception;
+
 --     procedure Build_Tree
 --       (aBuilder      : in out Tree_Builder;
 --        theTree       : in out Tree.Tree_Class;

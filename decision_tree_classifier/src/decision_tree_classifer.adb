@@ -73,7 +73,8 @@ package body Decision_Tree_Classifer is
    --  if is_classification: part of Python BasesDecisionTree.Fit
    procedure Classification_Fit
      (aClassifier           : in out Classifier;
-      Y                     : in out ML_Types.List_Of_Value_Data_Lists; Num_Outputs : Positive;
+      Y                     : in out ML_Types.List_Of_Value_Data_Lists;
+      Num_Outputs           : Positive;
       Y_Encoded             : out ML_Types.List_Of_Value_Data_Lists;
       Expanded_Class_Weight : out Classifier_Types.Float_List) is
       use ML_Types;
@@ -86,16 +87,19 @@ package body Decision_Tree_Classifer is
       --  L206
       Y_Encoded.Clear;
       Y_Encoded.Set_Length (Ada.Containers.Count_Type (Num_Outputs));
-      for k in 1 .. Num_Outputs loop
+      for k in 1 .. Integer (Y.Length) loop
          Y_K := Y.Element (k);
          Classes_K := Encode_Utils.Unique (Y_K, Inverse);
          Y_Encoded.Replace_Element (k, Classes_K);
          aClassifier.Attributes.Classes.Append (Classes_K);
       end loop;
       Y := Y_Encoded;
+      Classifier_Utilities.Print_Value_List
+        ("Decision_Tree_Classifer.Classification_Fit Y (1)", Y.Element (1));
 
+      Put_Line ("Decision_Tree_Classifer.Classification_Fit Class_Weight: " &
+                  Weights.Weight_Type'Image (aClassifier.Parameters.Class_Weight));
       if aClassifier.Parameters.Class_Weight /= Weights.No_Weight then
-         --  y_original = np.copy(y)
          Expanded_Class_Weight :=
            Weights.Compute_Sample_Weight (Weights.No_Weight, Y_Original);
       end if;
@@ -126,9 +130,9 @@ package body Decision_Tree_Classifer is
       use Classifier_Types;
       use Classifier_Types.Integer_Package;
       Num_Samples           : constant Positive :=
-                                  Positive (X.Element (1).Length);
+                                Positive (X.Element (1).Length);
       Num_Outputs           : constant Positive :=
-                                  Positive (Y.Element (1).Length);
+                                Positive (Y.Element (1).Length);
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       Y_Encoded             : List_Of_Value_Data_Lists;
@@ -154,8 +158,8 @@ package body Decision_Tree_Classifer is
       aClassifier.Attributes.Num_Classes.Clear;
       Put_Line
         ("Decision_Tree_Classifer.Fit Num_Samples, Num_Outputs: " &
-        Tree.Index_Range'Image (aClassifier.Attributes.Num_Features) &
-        Tree.Index_Range'Image (aClassifier.Attributes.Num_Outputs));
+           Tree.Index_Range'Image (aClassifier.Attributes.Num_Features) &
+           Tree.Index_Range'Image (aClassifier.Attributes.Num_Outputs));
 
       Classifier_Utilities.Print_Value_List
         ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
@@ -165,10 +169,10 @@ package body Decision_Tree_Classifer is
         ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
 
       --  L293
-      if Positive (Y.Length) /= Num_Samples then
+      if Positive (Num_Outputs) /= Num_Samples then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit Number of labels =" &
-           Count_Type'Image (Y.Length) & " does not match number of samples ="
+           Integer'Image (Num_Outputs) & " does not match number of samples ="
            & Integer'Image (Num_Samples);
       end if;
 
