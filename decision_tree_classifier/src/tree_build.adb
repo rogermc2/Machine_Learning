@@ -5,7 +5,7 @@
 --  Tree_Builder controls the various stopping criteria and the node splitting
 --  evaluation order, e.g. depth-first or best-first.
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 with Build_Utils;
@@ -158,8 +158,10 @@ package body Tree_Build is
          raise Tree_Build_Error with
            "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
       end if;
-      Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
 
+      Put_Line ("Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes: " &
+               Integer'Image (Best_Builder.Max_Leaf_Nodes));
+      Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
       Add_Split_Node (Best_Builder, Splitter, theTree, Impurity,
                       True, True, theTree.Nodes.Root, 1, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
@@ -303,7 +305,6 @@ package body Tree_Build is
       Min_Samples_Split     : Natural := 0;
       Min_Weight_Leaf       : Float := 0.0;
       Max_Depth             : Natural := 0;
-      Max_Leaf_Nodes        : Natural := 0;
       Min_Impurity_Decrease : Float := 0.0) is
    begin
       Best_Builder.Splitter := Splitter;
@@ -311,7 +312,7 @@ package body Tree_Build is
       Best_Builder.Min_Samples_Leaf := Splitter.Min_Leaf_Samples;
       Best_Builder.Min_Weight_Leaf := Min_Weight_Leaf;
       Best_Builder.Max_Depth := Max_Depth;
-      Best_Builder.Max_Leaf_Nodes := Max_Leaf_Nodes;
+      Best_Builder.Max_Leaf_Nodes := Splitter.Min_Leaf_Samples;
       Best_Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
 
    end Init_Best_First_Tree;
