@@ -40,11 +40,14 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Decision_Tree := theTree;
 
       --  L398
-      if Self.Parameters.Max_Leaf_Nodes < 0 then
+      if Self.Parameters.Max_Leaf_Nodes <= 0 then
          declare
             Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
          begin
             --  L419  Depth First case
+            Tree_Build.Init_Depth_First_Tree
+              (Builder, Splitter, Min_Samples_Split, Min_Samples_Leaf,
+                Min_Weight_Leaf, Max_Depth, Min_Impurity_Decrease);
             Tree_Build.Build_Depth_First_Tree
               (Builder, theTree, X, Y, Sample_Weight);
          end;

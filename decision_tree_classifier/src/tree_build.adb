@@ -145,15 +145,14 @@ package body Tree_Build is
       Split_Node_Left  : Priority_Record;
       Split_Node_Right : Priority_Record;
       Max_Split_Nodes  : Natural;
-      Min_Leaf_Weight  : Float := 0.0;
       Impurity         : Float := 0.0;
       Frontier         : Build_Utils.Frontier_List;
       Current_Node     : Tree.Tree_Node;
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
    begin
+      --  L332
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
-      Init_Best_First_Tree (Best_Builder, Splitter);
       if Best_Builder.Max_Leaf_Nodes <= 0 then
          raise Tree_Build_Error with
            "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
@@ -215,12 +214,6 @@ package body Tree_Build is
       Stop              : Positive := 1;
       Depth             : Natural := 0;
       Max_Depth_Seen    : Natural := 0;
-      Max_Leaf_Nodes    : Natural := 0;
-      Min_Samples_Split : Natural := 0;
-      Min_Samples_Leaf  : Natural := 0;
-      Min_Weight_Leaf   : Float := 0.0;
-      Max_Depth         : Natural := 0;
-      Min_Impurity_Decrease : Float := 0.0;
       Is_Leaf           : Boolean := False;
       Splitter          : Node_Splitter.Splitter_Class;
       Split             : Node_Splitter.Split_Record;
@@ -231,9 +224,6 @@ package body Tree_Build is
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
-      Init_Depth_First_Tree
-        (Depth_Builder, Splitter, Min_Samples_Split, Min_Samples_Leaf,
-         Min_Weight_Leaf, Max_Depth, Max_Leaf_Nodes, Min_Impurity_Decrease);
       Num_Node_Samples := Splitter.Num_Samples;
 
       Node.Node_Cursor := Node_Cursor;
@@ -308,7 +298,7 @@ package body Tree_Build is
    end Build_Depth_First_Tree;
 
    --  ------------------------------------------------------------------------
-
+   --  __cinit__  Only call for python declaraton constructor arguments
    procedure Init_Best_First_Tree
      (Best_Builder          : in out Tree_Builder;
       Splitter              : Node_Splitter.Splitter_Class;
