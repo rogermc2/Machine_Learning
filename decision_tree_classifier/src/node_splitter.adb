@@ -15,20 +15,6 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure C_Init (Self                            : in out Splitter_Class;
-                   Criteria                        : Criterion.Criterion_Class;
-                   Max_Features,  Min_Leaf_Samples : Natural;
-                   Min_Leaf_Weight : Float) is
-   begin
-      Self.Criteria := Criteria;
-      Self.Max_Features := Max_Features;
-      Self.Min_Leaf_Samples := Min_Leaf_Samples;
-      Self.Min_Leaf_Weight := Min_Leaf_Weight;
-
-   end C_Init;
-
-   --  -------------------------------------------------------------------------
-
    procedure Init (Self              : in out Splitter_Class;
                    Input_X, Target_Y : ML_Types.List_Of_Value_Data_Lists;
                    Sample_Weight     : Classifier_Types.Weight_List) is
