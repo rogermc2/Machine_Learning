@@ -51,6 +51,7 @@ package body Decision_Tree_Classifer is
             Tree_Build.Build_Depth_First_Tree
               (Builder, theTree, X, Y, Sample_Weight);
          end;
+
       else
          declare
             Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);

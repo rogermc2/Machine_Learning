@@ -219,18 +219,24 @@ package body Tree_Build is
       Split             : Node_Splitter.Split_Record;
       Node              : Stack_Record;
       Stack             : Stack_List;
-      Stack_Curs        : Build_Utils.Stack_Cursor := Stack.First;
+      Stack_Curs        : Build_Utils.Stack_Cursor;
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Num_Node_Samples := Splitter.Num_Samples;
+      Put_Line ("Tree_Build.Build_Depth_First_Tree Num_Node_Samples: " &
+                 Integer'Image (Integer (Num_Node_Samples)));
 
       Node.Node_Cursor := Node_Cursor;
       Node.Stop := Num_Node_Samples;
       Stack.Append (Node);
+      Stack_Curs := Stack.First;
+      Put_Line ("Tree_Build.Build_Depth_First_Tree Stack size: " &
+                 Integer'Image (Integer (Stack.Length)));
 
       while Has_Element (Stack_Curs) loop
+         Put_Line ("Tree_Build.Build_Depth_First_Tree Stack_Curs");
          Node := Element (Stack_Curs);
          Start := Node.Start;
          Stop := Node.Stop;
