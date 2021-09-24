@@ -54,7 +54,7 @@ package Decision_Tree_Classifer is
          when Tree.Integer_Type =>  Min_Leaf       : Integer := 1;
          when Tree.Float_Type => Min_Fraction_Leaf : Float := 1.0;
          when Tree.Enum_Type => null;
-         when others    => null;
+         when others => null;
       end case;
    end record;
 
@@ -74,7 +74,7 @@ package Decision_Tree_Classifer is
       Min_Weight_Fraction_Leaf : Float := 0.0;
       Max_Features             : Tree.Features_Record (Feature_Type);
       Random_State             : Integer := 0;
-      Max_Leaf_Nodes           : Integer := 0;
+      Max_Leaf_Nodes           : Integer := -1;  --  < 0 means unsppecified
       --  Impure means that data is mixture of different classes.
       Min_Impurity_Decrease    : Float := 0.0;
       Min_Impurity_Split       : Float := 0.0;
@@ -118,9 +118,9 @@ package Decision_Tree_Classifer is
                   Y             : in out ML_Types.List_Of_Value_Data_Lists;
                   Sample_Weight : in out Classifier_Types.Weight_List;
                   Check_Input   : Boolean := False);
-   procedure Init (aClassifier  : in out Classifier;
-                   Max_Leaf_Nodes : Positive;
-                   Random_State : Integer);
+   procedure Init (aClassifier    : in out Classifier;
+                   Max_Leaf_Nodes : Integer := -1;
+                   Random_State   : Integer := 0);
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;

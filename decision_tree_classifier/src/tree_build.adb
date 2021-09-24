@@ -312,7 +312,7 @@ package body Tree_Build is
       Min_Samples_Leaf      : Natural := 0;
       Min_Weight_Leaf       : Float := 0.0;
       Max_Depth             : Natural := 0;
-      Max_Leaf_Nodes        : Natural := 0;
+      Max_Leaf_Nodes        : Integer := -1;
       Min_Impurity_Decrease : Float := 0.0) is
    begin
       Best_Builder.Splitter := Splitter;

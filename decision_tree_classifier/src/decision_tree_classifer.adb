@@ -3,7 +3,6 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Builder;
 with Classifier_Types;
 with Classifier_Utilities;
 with Encode_Utils;
@@ -23,12 +22,11 @@ package body Decision_Tree_Classifer is
                          X, Y              : ML_Types.List_Of_Value_Data_Lists;
                          Sample_Weight     : Classifier_Types.Weight_List) is
       use Tree;
-      --             Criterion : Classifier_Criteria_Type := Self.Parameters.Criterion;
-      Splitter              : Node_Splitter.Splitter_Class := Self.Parameters.Splitter;
+      Max_Leaf_Nodes        : constant Integer := Self.Parameters.Max_Leaf_Nodes;
+      Splitter              : Node_Splitter.Splitter_Class :=
+                                Self.Parameters.Splitter;
       theTree               : Tree.Tree_Class;
-      Max_Leaf_Nodes        : Natural := 0;
       Min_Impurity_Decrease : Float := 0.0;
-      --          Feature_Values : Value_Data_List;
    begin
       --  L387
       --  if is_classifier(self):
@@ -40,7 +38,7 @@ package body Decision_Tree_Classifer is
       Self.Attributes.Decision_Tree := theTree;
 
       --  L398
-      if Self.Parameters.Max_Leaf_Nodes <= 0 then
+      if Max_Leaf_Nodes < 0 then
          declare
             Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
          begin
@@ -148,7 +146,7 @@ package body Decision_Tree_Classifer is
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       Y_Encoded             : List_Of_Value_Data_Lists;
-      Max_Leaf_Nodes        : Natural := 0;
+      Max_Leaf_Nodes        : integer := -1;
       Min_Samples_Split     : Natural := 0;
       Min_Samples_Leaf      : Natural := 0;
       Min_Weight_Leaf       : Float := 0.0;
@@ -203,9 +201,7 @@ package body Decision_Tree_Classifer is
       --  L218
 
       --  L226
-      if aClassifier.Parameters.Max_Leaf_Nodes > 0 then
-         Max_Leaf_Nodes := aClassifier.Parameters.Max_Leaf_Nodes;
-      end if;
+      Max_Leaf_Nodes := aClassifier.Parameters.Max_Leaf_Nodes;
 
       Check_Parameters;
 
@@ -233,8 +229,8 @@ package body Decision_Tree_Classifer is
    --  -------------------------------------------------------------------------
 
    procedure Init (aClassifier    : in out Classifier;
-                   Max_Leaf_Nodes : Positive;
-                   Random_State   : Integer) is
+                   Max_Leaf_Nodes : Integer := -1;
+                   Random_State   : Integer := 0) is
    begin
       aClassifier.Parameters.Random_State := Random_State;
       aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;

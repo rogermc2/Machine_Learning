@@ -45,8 +45,7 @@ package body Classifier_Tests is
               "Classification_Tests.Test_Classification_Toy called with empty X vector.";
         end if;
 
-        Init (theTree, Max_Leaf_Nodes => Num_Samples,
-              Random_State => 0);
+        Init (theTree, Random_State => 0);
         Y := To_Integer_Value_List (Y_Array);
         Expected := To_Integer_Value_List (True_Result);
         Fit (theTree, X, Y, Weights);
