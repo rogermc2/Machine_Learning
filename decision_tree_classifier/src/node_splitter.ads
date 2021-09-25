@@ -42,6 +42,9 @@ package Node_Splitter is
       Input_X              : ML_Types.List_Of_Value_Data_Lists;
       Total_Samples        : Natural := 0;
    end record;
+
+   Node_Splitter_Error : Exception;
+
    procedure Init (Self               : in out Splitter_Class;
                    Input_X, Target_Y  : ML_Types.List_Of_Value_Data_Lists;
                    Sample_Weight      : Classifier_Types.Weight_List);

@@ -30,7 +30,6 @@ package body Ada_Tree_Build is
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
-      Put_Line ("Ada_Tree_Build.Build_Tree Splitter initialized");
       Init_Tree (Builder, Splitter);
       Put_Line ("Ada_Tree_Build.Build_Tree Builder initialized");
       Best_Split := Split_Node (Splitter, Float'Last, Num_Constant_Features);
