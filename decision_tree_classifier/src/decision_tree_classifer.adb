@@ -3,6 +3,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Ada_Tree_Build;
 with Classifier_Types;
 with Classifier_Utilities;
 with Encode_Utils;
@@ -139,6 +140,7 @@ package body Decision_Tree_Classifer is
       use ML_Types;
       use Classifier_Types;
       use Classifier_Types.Integer_Package;
+      theTree               : Tree.Tree_Class;
       Num_Samples           : constant Positive :=
                                 Positive (X.Element (1).Length);
       Num_Outputs           : constant Positive :=
@@ -220,8 +222,9 @@ package body Decision_Tree_Classifer is
       end if;
 
       --  L350
-      Build_Tree (aClassifier, Min_Samples_Split, Min_Samples_Leaf,
-                  Min_Weight_Leaf, Max_Depth, X, Y, Sample_Weight);
+--        Build_Tree (aClassifier, Min_Samples_Split, Min_Samples_Leaf,
+--                    Min_Weight_Leaf, Max_Depth, X, Y, Sample_Weight);
+      Ada_Tree_Build.Build_Tree (theTree, X, Y, Sample_Weight);
       --  L410
 
    end Fit;

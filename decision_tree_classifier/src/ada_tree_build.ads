@@ -19,17 +19,8 @@ package Ada_Tree_Build is
     Ada_Tree_Build_Error : Exception;
 
     procedure Build_Tree
-      (Builder       : in out Tree_Builder;
-       theTree       : in out Tree.Tree_Class;
+      (theTree       : in out Tree.Tree_Class;
        X, Y          : ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : Classifier_Types.Weight_List);
-    procedure Init_Tree
-      (Builder               : in out Tree_Builder;
-       Splitter              : Node_Splitter.Splitter_Class;
-       Min_Samples_Split     : Natural := 0;
-       Min_Samples_Leaf      : Natural := 0;
-       Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Natural := 0;
-       Min_Impurity_Decrease : Float := 0.0);
 
 end Ada_Tree_Build;
