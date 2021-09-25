@@ -85,11 +85,11 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Process_A (Self       : in out Splitter_Class;
-                        Features   : Classifier_Types.Natural_List;
-                        Features_X : ML_Types.Value_Data_List;
-                        Current    : Split_Record;
-                        Best       : in out Split_Record) is
+   procedure Find_Best_Split (Self       : in out Splitter_Class;
+                              Features   : Classifier_Types.Natural_List;
+                              Features_X : ML_Types.Value_Data_List;
+                              Current    : Split_Record;
+                              Best       : in out Split_Record) is
       use ML_Types;
       Criteria                  : Criterion.Criterion_Class;
       P_Index                   : Natural := Features.First_Index;
@@ -101,6 +101,7 @@ package body Node_Splitter is
       Best := Current;
       Criterion.Reset (Self.Criteria);
       Criteria := Self.Criteria;
+      --  Set of features to be split : Self.Start_Index through Self.End_Index
       P1_Index := Self.Start_Index;
 
       while P_Index <= Self.End_Index loop
@@ -132,6 +133,7 @@ package body Node_Splitter is
 
          P_Index := P_Index + 1;
          --  L393
+         --  Best.Pos_I is the start of right node data
          if P_Index <= Self.End_Index then
             Best.Pos_I := P_Index;
             --  L398 Reject if min_samples_leaf is not guaranteed
@@ -152,7 +154,6 @@ package body Node_Splitter is
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L415
                      case Features_X.Element (P1_Index).Value_Kind is
-
                         when Float_Type =>
                            Best.Threshold := 0.5 *
                              (Features_X.Element (P_Index - 1).Float_Value
@@ -178,6 +179,7 @@ package body Node_Splitter is
                                 Float (Features_X.Element (P_Index - 1).
                                            Integer_Value);
                            end if;
+
                         when Boolean_Type | UB_String_Type => null;
                      end case;
                      --  L420
@@ -187,7 +189,7 @@ package body Node_Splitter is
          end if;
       end loop;
 
-   end Process_A;
+   end Find_Best_Split;
 
    --  -------------------------------------------------------------------------
 
@@ -239,23 +241,24 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure Process_Constants
-     (Self                                            : in out Splitter_Class;
-      Features                                        : in out Classifier_Types.Natural_List;
-      Current_Split                                   : in out Split_Record;
-      Num_Features, Num_Known_Constants, Max_Features : Natural;
+     (Self                : in out Splitter_Class;
+      Features            : in out Classifier_Types.Natural_List;
+      Current_Split       : in out Split_Record;
+      Num_Features, Num_Known_Constants,
+      Max_Features        : Natural;
       Num_Visited_Features, Num_Drawn_Constants, Num_Found_Constants,
-      Num_Total_Constants                             : in out Natural;
-      Best_Split                                      : in out Split_Record) is
+      Num_Total_Constants : in out Natural;
+      Best_Split          : in out Split_Record) is
       use ML_Types;
-      X_Samples                 : constant ML_Types.List_Of_Value_Data_Lists :=
-                                    Self.X_Samples;
-      Features_X                : Value_Data_List := Self.Feature_Values;
-      X_Sample                  : ML_Types.Value_Data_List;
-      Y_Sample                  : ML_Types.Value_Data_List;
-      F_I                       : Natural := Num_Features;
-      F_J                       : Natural;
-      Compare_Value             : Value_Record;
-      Swap                      : Natural;
+      X_Samples     : constant ML_Types.List_Of_Value_Data_Lists :=
+                        Self.X_Samples;
+      Features_X    : Value_Data_List := Self.Feature_Values;
+      X_Sample      : ML_Types.Value_Data_List;
+      Y_Sample      : ML_Types.Value_Data_List;
+      F_I           : Natural := Num_Features;
+      F_J           : Natural;
+      Compare_Value : Value_Record;
+      Swap          : Natural;
    begin
       --  L323
       while F_I > Num_Total_Constants and
@@ -321,8 +324,8 @@ package body Node_Splitter is
                --  Evaluate all splits
                Criterion.Reset (Self.Criteria);
                --  L381
-               Process_A (Self, Features, Features_X, Current_Split,
-                          Best_Split);
+               Find_Best_Split (Self, Features, Features_X, Current_Split,
+                                Best_Split);
             end if;
          end if;
       end loop;
@@ -392,11 +395,6 @@ package body Node_Splitter is
       Num_Drawn_Constants       : Natural := 0;
       Best_Split                : Split_Record;
    begin
-      --  Skip CPU intensive evaluation of the impurity criterion for
-      --  features that have already been detected as constant
-      --  (hence not suitable for good splitting) by ancestor nodes and save
-      --  the information on newly discovered constant features to avoid
-      --  computation on descendant nodes.
       Init_Split (Best_Split);
 
       --  L323
