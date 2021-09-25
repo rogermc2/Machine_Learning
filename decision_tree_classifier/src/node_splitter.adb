@@ -193,53 +193,6 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Process_B (Self        : in out Splitter_Class;
-                        Best_Split  : in out Split_Record;
-                        X_Samples   : in out ML_Types.List_Of_Value_Data_Lists;
-                        Impurity    : Float) is
-      Partition_End : Natural;
-      P_Index       : Positive;
-      X_1           : ML_Types.Value_Data_List;
-      Swap          : ML_Types.Value_Data_List;
-      Crit          : Criterion.Criterion_Class;
-   begin
-      --  Reorganize into samples[start:best.pos] + samples[best.pos:end]
-      if Best_Split.Pos_I < Self.End_Index then
-         Partition_End := Self.End_Index;
-         P_Index := Self.Start_Index;
-         while P_Index < Partition_End loop
-            X_1 := Self.Input_X.Element
-              (Self.Sample_Indices.Element (P_Index));
-            if X_1.Element
-              (Self.Sample_Indices.Element (P_Index)).Float_Value <=
-                Best_Split.Threshold then
-               P_Index := P_Index + 1;
-            else
-               Partition_End := Partition_End - 1;
-               Swap := X_Samples.Element (P_Index);
-               X_Samples.Replace_Element
-                 (P_Index, X_Samples.Element (Partition_End));
-               X_Samples.Replace_Element (Partition_End, Swap);
-            end if;
-         end loop;
-
-         --  L436
-         Criterion.Reset (Self.Criteria);
-         Crit := Self.Criteria;
-         Crit.Position := Best_Split.Pos_I;
-         Criterion.Update (Self.Criteria, Crit);
-
-         Criterion.Children_Impurity
-           (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
-         Best_Split.Improvement := Criterion.Impurity_Improvement
-           (Self.Criteria, Impurity, Best_Split.Impurity_Left,
-            Best_Split.Impurity_Right);
-      end if;
-
-   end Process_B;
-
-   --  -------------------------------------------------------------------------
-
    procedure Process_Constants
      (Self                : in out Splitter_Class;
       Features            : in out Classifier_Types.Natural_List;
@@ -334,6 +287,54 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
+   procedure Reorganize_Samples (Self        : in out Splitter_Class;
+                                 Best_Split  : in out Split_Record;
+                                 X_Samples   : in out
+                                   ML_Types.List_Of_Value_Data_Lists;
+                                 Impurity    : Float) is
+      Partition_End : Natural;
+      P_Index       : Positive;
+      X_1           : ML_Types.Value_Data_List;
+      Swap          : ML_Types.Value_Data_List;
+      Crit          : Criterion.Criterion_Class;
+   begin
+      --  Reorganize into samples[start:best.pos] + samples[best.pos:end]
+      if Best_Split.Pos_I < Self.End_Index then
+         Partition_End := Self.End_Index;
+         P_Index := Self.Start_Index;
+         while P_Index < Partition_End loop
+            X_1 := Self.Input_X.Element
+              (Self.Sample_Indices.Element (P_Index));
+            if X_1.Element
+              (Self.Sample_Indices.Element (P_Index)).Float_Value <=
+                Best_Split.Threshold then
+               P_Index := P_Index + 1;
+            else
+               Partition_End := Partition_End - 1;
+               Swap := X_Samples.Element (P_Index);
+               X_Samples.Replace_Element
+                 (P_Index, X_Samples.Element (Partition_End));
+               X_Samples.Replace_Element (Partition_End, Swap);
+            end if;
+         end loop;
+
+         --  L436
+         Criterion.Reset (Self.Criteria);
+         Crit := Self.Criteria;
+         Crit.Position := Best_Split.Pos_I;
+         Criterion.Update (Self.Criteria, Crit);
+
+         Criterion.Children_Impurity
+           (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
+         Best_Split.Improvement := Criterion.Impurity_Improvement
+           (Self.Criteria, Impurity, Best_Split.Impurity_Left,
+            Best_Split.Impurity_Right);
+      end if;
+
+   end Reorganize_Samples;
+
+   --  -------------------------------------------------------------------------
+
    procedure Replacement_Sort (X           : in out ML_Types.Value_Data_List;
                                Y           : in out ML_Types.Value_Data_List;
                                Start, Stop : Positive) is
@@ -404,7 +405,7 @@ package body Node_Splitter is
          Num_Found_Constants, Num_Total_Constants, Best_Split);
 
       --  L421
-      Process_B (Self, Best_Split, X_Samples, Impurity);
+      Reorganize_Samples (Self, Best_Split, X_Samples, Impurity);
 
       --  L448
       --  Respect invariant for constant features: the original order of
