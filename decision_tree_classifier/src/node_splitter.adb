@@ -54,6 +54,7 @@ package body Node_Splitter is
       for index in 1 .. Num_Features loop
          Self.Feature_Indices.Append (index);
       end loop;
+
       Self.Feature_Values.Clear;
       Self.Feature_Values.Set_Length (Count_Type (Num_Samples));
       Self.Constant_Features_I.Clear;
@@ -237,89 +238,31 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Replacement_Sort (X           : in out ML_Types.Value_Data_List;
-                               Y           : in out ML_Types.Value_Data_List;
-                               Start, Stop : Positive) is
+   procedure Process_Constants
+     (Self                                            : in out Splitter_Class;
+      Features                                        : in out Classifier_Types.Natural_List;
+      Current_Split                                   : in out Split_Record;
+      Num_Features, Num_Known_Constants, Max_Features : Natural;
+      Num_Visited_Features, Num_Drawn_Constants, Num_Found_Constants,
+      Num_Total_Constants                             : in out Natural;
+      Best_Split                                      : in out Split_Record) is
       use ML_Types;
-      use Value_Data_Package;
-      use Value_Data_Sorting;
-      Temp_X : Value_Data_List;
-      Temp_Y : Value_Data_List;
-   begin
-      for index in Start .. Stop loop
-         Temp_X.Append (X.Element (index));
-         Temp_Y.Append (Y.Element (index));
-      end loop;
-
-      Sort (Temp_X);
-      Sort (Temp_Y);
-      for index in Start .. Stop loop
-         X.Replace_Element (index, Temp_X.Element (index));
-         Y.Replace_Element (index, Temp_Y.Element (index));
-      end loop;
-
-   end Replacement_Sort;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Reset_Node
-     (Split                 : in out Splitter_Class;
-      Weighted_Node_Samples : in out Float) is
-   begin
-      Criterion.Init
-        (Split.Criteria, Split.Target_Y, Split.Sample_Weight,
-         Split.Weighted_Samples, Split.X_Samples, Split.Y_Samples);
-
-      Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
-
-   end Reset_Node;
-
-   --  -------------------------------------------------------------------------
-   --  BestSplitter.Split_Node samples up to max_features without replacement
-   --  using a Fisher-Yates-based algorithm (using the local variables `f_i`
-   --  and `f_j` to compute a permutation of the `features` array).
-   function Split_Node (Self                  : in out Splitter_Class;
-                        Impurity              : Float;
-                        Num_Constant_Features : in out Natural)
-                         return Split_Record is
-      use ML_Types;
-      use ML_Types.Value_Data_Package;
-      Num_Features              : constant Natural :=
-                                    Natural (Self.Feature_Indices.Length);
-      Max_Features              : constant Natural := Self.Max_Features;
-      X_Samples                 : ML_Types.List_Of_Value_Data_Lists :=
+      X_Samples                 : constant ML_Types.List_Of_Value_Data_Lists :=
                                     Self.X_Samples;
-
+      Features_X                : Value_Data_List := Self.Feature_Values;
       X_Sample                  : ML_Types.Value_Data_List;
       Y_Sample                  : ML_Types.Value_Data_List;
-      Features                  : Classifier_Types.Natural_List :=
-                                    Self.Feature_Indices;
-      Features_X                : Value_Data_List := Self.Feature_Values;
-      Current_Split             : Split_Record;
-      Num_Known_Constants       : constant Natural := Num_Constant_Features;
-      Num_Total_Constants       : Natural := Num_Known_Constants;
-      Num_Visited_Features      : Natural := 0;
-      Num_Found_Constants       : Natural := 0;
-      Num_Drawn_Constants       : Natural := 0;
       F_I                       : Natural := Num_Features;
       F_J                       : Natural;
-      Swap                      : Natural;
       Compare_Value             : Value_Record;
-      Best_Split                : Split_Record;
+      Swap                      : Natural;
    begin
-      --  Skip CPU intensive evaluation of the impurity criterion for
-      --  features that have already been detected as constant
-      --  (hence not suitable for good splitting) by ancestor nodes and save
-      --  the information on newly discovered constant features to avoid
-      --  computation on descendant nodes.
-      Init_Split (Best_Split);
-
       --  L323
       while F_I > Num_Total_Constants and
         (Num_Visited_Features < Max_Features or
-         --   At least one drawn features must be non constant.
-           Num_Visited_Features <= Num_Found_Constants + Num_Drawn_Constants)
-      loop
+         --   At least one drawn feature must be non constant.
+           Num_Visited_Features <=
+             Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L342
@@ -383,6 +326,84 @@ package body Node_Splitter is
             end if;
          end if;
       end loop;
+
+   end Process_Constants;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Replacement_Sort (X           : in out ML_Types.Value_Data_List;
+                               Y           : in out ML_Types.Value_Data_List;
+                               Start, Stop : Positive) is
+      use ML_Types;
+      use Value_Data_Package;
+      use Value_Data_Sorting;
+      Temp_X : Value_Data_List;
+      Temp_Y : Value_Data_List;
+   begin
+      for index in Start .. Stop loop
+         Temp_X.Append (X.Element (index));
+         Temp_Y.Append (Y.Element (index));
+      end loop;
+
+      Sort (Temp_X);
+      Sort (Temp_Y);
+      for index in Start .. Stop loop
+         X.Replace_Element (index, Temp_X.Element (index));
+         Y.Replace_Element (index, Temp_Y.Element (index));
+      end loop;
+
+   end Replacement_Sort;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Reset_Node
+     (Split                 : in out Splitter_Class;
+      Weighted_Node_Samples : in out Float) is
+   begin
+      Criterion.Init
+        (Split.Criteria, Split.Target_Y, Split.Sample_Weight,
+         Split.Weighted_Samples, Split.X_Samples, Split.Y_Samples);
+
+      Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
+
+   end Reset_Node;
+
+   --  -------------------------------------------------------------------------
+   --  BestSplitter.Split_Node samples up to max_features without replacement
+   --  using a Fisher-Yates-based algorithm (using the local variables `f_i`
+   --  and `f_j` to compute a permutation of the `features` array).
+   function Split_Node (Self                  : in out Splitter_Class;
+                        Impurity              : Float;
+                        Num_Constant_Features : in out Natural)
+                        return Split_Record is
+      Num_Features              : constant Natural :=
+                                    Natural (Self.Feature_Indices.Length);
+      Max_Features              : constant Natural := Self.Max_Features;
+      X_Samples                 : ML_Types.List_Of_Value_Data_Lists :=
+                                    Self.X_Samples;
+
+      Features                  : Classifier_Types.Natural_List :=
+                                    Self.Feature_Indices;
+      Current_Split             : Split_Record;
+      Num_Known_Constants       : constant Natural := Num_Constant_Features;
+      Num_Total_Constants       : Natural := Num_Known_Constants;
+      Num_Visited_Features      : Natural := 0;
+      Num_Found_Constants       : Natural := 0;
+      Num_Drawn_Constants       : Natural := 0;
+      Best_Split                : Split_Record;
+   begin
+      --  Skip CPU intensive evaluation of the impurity criterion for
+      --  features that have already been detected as constant
+      --  (hence not suitable for good splitting) by ancestor nodes and save
+      --  the information on newly discovered constant features to avoid
+      --  computation on descendant nodes.
+      Init_Split (Best_Split);
+
+      --  L323
+      Process_Constants
+        (Self, Features, Current_Split, Num_Features, Num_Known_Constants,
+         Max_Features, Num_Visited_Features, Num_Drawn_Constants,
+         Num_Found_Constants, Num_Total_Constants, Best_Split);
 
       --  L421
       Process_B (Self, Best_Split, X_Samples, Impurity);
