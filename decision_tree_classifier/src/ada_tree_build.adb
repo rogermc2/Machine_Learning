@@ -38,16 +38,19 @@ package body Ada_Tree_Build is
       Constant_Features : Integer := Parent_Node.Num_Constant_Features;
       Num_Node_Samples  : constant Natural := Stop - Start;
       Weighted_Node_Samples : Float := 0.0;
---        Child_Cursor : Tree.Tree_Cursor;
+      Child_Cursor : Tree.Tree_Cursor;
    begin
-      Reset_Node (Splitter, Weighted_Node_Samples);
+      --  L208
+      Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
       if Best_Split.Improvement = 0.0 then
          Add_Prediction_Node (theTree, Parent_Cursor, X, Y);
       else
          Add_Decision_Node (theTree, Parent_Cursor, Best_Split);
---           Child_Cursor := Last_Child (Parent_Cursor);
---           Add_Branch (theTree, Splitter, True_Split_Rows, Child_Cursor);
---           Add_Branch (theTree, Splitter,False_Split_Rows, Child_Cursor);
+         Child_Cursor := Last_Child (Parent_Cursor);
+         Add_Branch (theTree, Splitter, X, Y,
+                     Num_Constant_Features, Child_Cursor);
+         Add_Branch (theTree, Splitter, X, Y,
+                     Num_Constant_Features, Child_Cursor);
       end if;
    end Add_Branch;
 
