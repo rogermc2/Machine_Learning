@@ -11,8 +11,7 @@ package body Node_Splitter is
 
    Feature_Threshold : constant Float := 10.0 ** (-7);
 
-   procedure Replacement_Sort (X           : in out ML_Types.Value_Data_List;
-                               Y           : in out ML_Types.Value_Data_List;
+   procedure Replacement_Sort (Data        : in out ML_Types.Value_Data_List;
                                Start, Stop : Positive);
 
    --  -------------------------------------------------------------------------
@@ -24,19 +23,15 @@ package body Node_Splitter is
       Num_Samples      : constant Positive := Positive (Input_X.Element (1).Length);
       Num_Features     : constant Positive := Positive (Input_X.Length);
       Weighted_Samples : Float := 0.0;
-      --          J                : Positive := 1;
    begin
-      --        Self.Sample_Indices.Set_Length (Count_Type (Num_Samples));
       Self.Samples.Clear;
       Self.Num_Samples := 0;
       for index in 1 .. Num_Samples loop
          --  Only work with positively weighted samples.
          if Sample_Weight.Is_Empty or else
            Sample_Weight.Element (index) > 0.0 then
-            --                  Self.Sample_Indices.Replace_Element (J, index);
             Self.Samples.Append (index);
             Self.Num_Samples := Self.Num_Samples + 1;
-            --                  J := J + 1;
          end if;
 
          if Sample_Weight.Is_Empty then
@@ -48,7 +43,6 @@ package body Node_Splitter is
       end loop;
 
       --  Number of samples is the number of positively weighted samples.
-      --          Self.Num_Samples := J;
       Self.Min_Leaf_Samples := Num_Samples;
       Self.Weighted_Samples := Weighted_Samples;
       Put_Line ("Node_Splitter.Init Self.Num_Samples, Weighted_Samples: " &
@@ -65,6 +59,7 @@ package body Node_Splitter is
       Self.Constant_Features_I.Clear;
       Self.Constant_Features_I.Set_Length (Count_Type (Num_Features));
 
+      Self.X := Input_X;
       Self.Y := Target_Y;
       Self.Sample_Weight := Sample_Weight;
 
@@ -210,7 +205,6 @@ package body Node_Splitter is
       use ML_Types;
       Sample_Index  : Natural;
       X_Sample      : Natural;
-      Y_Sample      : Classifier_Types.Natural_List;
       X_Features    : Value_Data_List;
       F_I           : Natural := Num_Features;
       F_J           : Natural;
@@ -256,11 +250,11 @@ package body Node_Splitter is
                X_Sample := Self.Samples.Element (Sample_Index);
                X_Features := Self.X.Element (X_Sample);
                Self.Feature_Values.Replace_Element
-                 (Features (index), Self.X.Element (Current_Split.Feature_Index));
+                 (Features (index), X_Features (Current_Split.Feature_Index));
             end loop;
 
             --  L367
-            Replacement_Sort (X_Sample, Y_Sample,
+            Replacement_Sort (Self.Feature_Values,
                               Self.Start_Index, Self.End_Index);
 
             --  L369  Feature_Values is a value_data_list
@@ -349,25 +343,20 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Replacement_Sort (X           : in out ML_Types.Value_Data_List;
-                               Y           : in out ML_Types.Value_Data_List;
+   procedure Replacement_Sort (Data        : in out ML_Types.Value_Data_List;
                                Start, Stop : Positive) is
       use ML_Types;
       use Value_Data_Package;
       use Value_Data_Sorting;
-      Temp_X : Value_Data_List;
-      Temp_Y : Value_Data_List;
+      Temp : Value_Data_List;
    begin
       for index in Start .. Stop loop
-         Temp_X.Append (X.Element (index));
-         Temp_Y.Append (Y.Element (index));
+         Temp.Append (Data.Element (index));
       end loop;
 
-      Sort (Temp_X);
-      Sort (Temp_Y);
+      Sort (Temp);
       for index in Start .. Stop loop
-         X.Replace_Element (index, Temp_X.Element (index));
-         Y.Replace_Element (index, Temp_Y.Element (index));
+         Data.Replace_Element (index, Temp.Element (index));
       end loop;
 
    end Replacement_Sort;
@@ -411,7 +400,7 @@ package body Node_Splitter is
    begin
       if Integer (X_Samples.Length) = 0 then
          raise Node_Splitter_Error with
-           "Node_Splitter.Split_Node called with empty Self.X_Samples";
+           "Node_Splitter.Split_Node called with empty Self.X";
       end if;
       Init_Split (Best_Split);
 

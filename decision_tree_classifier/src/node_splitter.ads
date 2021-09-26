@@ -26,8 +26,6 @@ package Node_Splitter is
       Min_Leaf_Samples     : Natural := 0;
       Min_Leaf_Weight      : Float := 0.0;
       Samples              : Classifier_Types.Natural_List;
---        X_Samples            : ML_Types.List_Of_Value_Data_Lists;
---        Y_Samples            : ML_Types.List_Of_Value_Data_Lists;
       Feature_Indices      : Classifier_Types.Natural_List;
       Constant_Features_I  : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
