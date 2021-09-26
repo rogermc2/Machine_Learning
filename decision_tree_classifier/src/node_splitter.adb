@@ -208,8 +208,10 @@ package body Node_Splitter is
       Num_Total_Constants : in out Natural;
       Best_Split          : in out Split_Record) is
       use ML_Types;
-      X_Sample      : ML_Types.Value_Data_List;
-      Y_Sample      : ML_Types.Value_Data_List;
+      Sample_Index  : Natural;
+      X_Sample      : Natural;
+      Y_Sample      : Classifier_Types.Natural_List;
+      X_Features    : Value_Data_List;
       F_I           : Natural := Num_Features;
       F_J           : Natural;
       Compare_Value : Value_Record;
@@ -250,9 +252,11 @@ package body Node_Splitter is
             for index in Self.Start_Index .. Self.End_Index loop
                Put_Line ("Node_Splitter.Process_Constants X_Samples index"
                          & Integer'Image (index));
-               X_Sample := Self.X.Element (F_I);
+               Sample_Index := Self.Samples.Element (F_I);
+               X_Sample := Self.Samples.Element (Sample_Index);
+               X_Features := Self.X.Element (X_Sample);
                Self.Feature_Values.Replace_Element
-                 (Index, Self.X.Element (Current_Split.Feature_Index));
+                 (Features (index), Self.X.Element (Current_Split.Feature_Index));
             end loop;
 
             --  L367
