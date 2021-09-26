@@ -30,7 +30,7 @@ package body Node_Splitter is
          --  Only work with positively weighted samples.
          if Sample_Weight.Is_Empty or else
            Sample_Weight.Element (index) > 0.0 then
-            Self.Samples.Append (index);
+            Self.Sample_Indices.Append (index);
             Self.Num_Samples := Self.Num_Samples + 1;
          end if;
 
@@ -140,8 +140,7 @@ package body Node_Splitter is
             if Current.Pos_I - Self.Start_Index >= Self.Min_Leaf_Samples and
               Self.End_Index - Current.Pos_I >= Self.Min_Leaf_Samples then
                --  L401
-               Criteria.Position := Best.Pos_I;
-               Criterion.Update (Self.Criteria, Criteria);
+               Criterion.Update (Self.Criteria, Best.Pos_I);
 
                --  L405 Reject if min_weight_leaf is not satisfied
                if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
@@ -246,8 +245,8 @@ package body Node_Splitter is
             for index in Self.Start_Index .. Self.End_Index loop
                Put_Line ("Node_Splitter.Process_Constants X_Samples index"
                          & Integer'Image (index));
-               Sample_Index := Self.Samples.Element (F_I);
-               X_Sample := Self.Samples.Element (Sample_Index);
+               Sample_Index := Self.Sample_Indices.Element (F_I);
+               X_Sample := Self.Sample_Indices.Element (Sample_Index);
                X_Features := Self.X.Element (X_Sample);
                Self.Feature_Values.Replace_Element
                  (Features (index), X_Features (Current_Split.Feature_Index));
@@ -312,9 +311,9 @@ package body Node_Splitter is
          Partition_End := Self.End_Index;
          P_Index := Self.Start_Index;
          while P_Index < Partition_End loop
-            X_1 := Self.X.Element (Self.Samples.Element (P_Index));
+            X_1 := Self.X.Element (Self.Sample_Indices.Element (P_Index));
             if X_1.Element
-              (Self.Samples.Element (P_Index)).Float_Value <=
+              (Self.Sample_Indices.Element (P_Index)).Float_Value <=
                 Best_Split.Threshold then
                P_Index := P_Index + 1;
             else
@@ -330,7 +329,7 @@ package body Node_Splitter is
          Criterion.Reset (Self.Criteria);
          Crit := Self.Criteria;
          Crit.Position := Best_Split.Pos_I;
-         Criterion.Update (Self.Criteria, Crit);
+         Criterion.Update (Self.Criteria, Crit.Position);
 
          Criterion.Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
@@ -371,8 +370,8 @@ package body Node_Splitter is
       Split.Start_Index := Start;
       Split.End_Index := Stop;
       Criterion.Init
-        (Split.Criteria, Split.Y, Split.Sample_Weight,
-         Split.Weighted_Samples, Split.Samples, Start, Stop);
+        (Split.Criteria, Split.Y, Split.Samples, Split.Sample_Weight,
+         Split.Weighted_Samples, Start, Stop);
 
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 

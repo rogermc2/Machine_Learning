@@ -25,7 +25,8 @@ package Node_Splitter is
       Max_Features         : Natural := 0;  --  Number of features to test
       Min_Leaf_Samples     : Natural := 0;
       Min_Leaf_Weight      : Float := 0.0;
-      Samples              : Classifier_Types.Natural_List;
+      Sample_Indices       : Classifier_Types.Natural_List;
+      Samples              : ML_Types.List_Of_Value_Data_Lists;
       Feature_Indices      : Classifier_Types.Natural_List;
       Constant_Features_I  : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
@@ -49,6 +50,7 @@ package Node_Splitter is
    procedure Node_Value (Self : Splitter_Class; Value : out Float);
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
+      Start, Stop           : Natural;
       Weighted_Node_Samples : in out Float);
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;

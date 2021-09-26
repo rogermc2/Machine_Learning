@@ -7,8 +7,8 @@ package Criterion is
    type Criterion_Class is record
       Y                         : ML_Types.List_Of_Value_Data_Lists;
       Classes                   : ML_Types.Value_Data_List;
-      X_Samples                 : ML_Types.List_Of_Value_Data_Lists;
-      Y_Samples                 : ML_Types.List_Of_Value_Data_Lists;
+      Samples                   : ML_Types.List_Of_Value_Data_Lists;
+      Sample_Indices            : Classifier_Types.Natural_List;
       Num_Outputs               : Natural := 0;
       Num_Weighted_Node_Samples : Natural := 0;
       Num_Node_Samples          : Natural := 0;
@@ -25,6 +25,8 @@ package Criterion is
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
       --  where k is the output index.
+      Start                     : Natural := 0;
+      Stop                      : Natural := 0;
       Position                  : Natural := 0;
       Sum_Total                 : Classifier_Types.Weight_List;
       Sum_Left                  : Classifier_Types.Weight_List;
@@ -42,7 +44,7 @@ package Criterion is
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Init (Criteria         : in out Criterion_Class;
                    Y                : ML_Types.List_Of_Value_Data_Lists;
-                   Samples          : Classifier_Types.Natural_List;
+                   Samples          : ML_Types.List_Of_Value_Data_Lists;
                    --  Sample_Weight contains the weight of each sample
                    Sample_Weight    : Classifier_Types.Weight_List;
                    Weighted_Samples : Float;
@@ -52,6 +54,6 @@ package Criterion is
                                         return Float;
    procedure Reset (Criteria : in out Criterion_Class);
    procedure Update (Criteria : in out Criterion_Class;
-                     New_Criteria : Criterion_Class);
+                     New_Pos  : Positive);
 
 end Criterion;
