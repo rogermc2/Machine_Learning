@@ -365,11 +365,14 @@ package body Node_Splitter is
 
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
+      Start, Stop           : Natural;
       Weighted_Node_Samples : in out Float) is
    begin
+      Split.Start_Index := Start;
+      Split.End_Index := Stop;
       Criterion.Init
         (Split.Criteria, Split.Y, Split.Sample_Weight,
-         Split.Weighted_Samples, Split.X, Split.Y);
+         Split.Weighted_Samples, Split.Samples, Start, Stop);
 
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 

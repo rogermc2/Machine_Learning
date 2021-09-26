@@ -34,7 +34,9 @@ package Tree is
    is record
       Node_Index                : Natural := 0;
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
-      Num_Node_Samples          : Integer := 0;
+      Samples_Start             : Natural := 0;
+      Samples_End               : Natural := 0;
+--        Num_Node_Samples          : Integer := 0;
       Weighted_Num_Node_Samples : Integer := 0;
       Depth                     : Integer := 0;
       Is_Left                   : Boolean := True;

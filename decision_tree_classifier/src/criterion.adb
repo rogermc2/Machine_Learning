@@ -93,11 +93,11 @@ package body Criterion is
 
     procedure Init (Criteria         : in out Criterion_Class;
                     Y                : ML_Types.List_Of_Value_Data_Lists;
+                    Samples          : Classifier_Types.Natural_List;
                     --  Sample_Weight contains the weight of each sample
                     Sample_Weight    : Classifier_Types.Weight_List;
                     Weighted_Samples : Float;
-                    X_Samples        : ML_Types.List_Of_Value_Data_Lists;
-                    Y_Samples        : ML_Types.List_Of_Value_Data_Lists) is
+                    Start, Stop      : Natural) is
         Y_I       : ML_Types.Value_Data_List;
         Sum_Total : Classifier_Types.Weight_List;
         Weight    : Float := 1.0;

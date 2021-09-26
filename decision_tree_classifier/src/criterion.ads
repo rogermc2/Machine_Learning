@@ -42,11 +42,11 @@ package Criterion is
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Init (Criteria         : in out Criterion_Class;
                    Y                : ML_Types.List_Of_Value_Data_Lists;
+                   Samples          : Classifier_Types.Natural_List;
                    --  Sample_Weight contains the weight of each sample
                    Sample_Weight    : Classifier_Types.Weight_List;
                    Weighted_Samples : Float;
-                   X_Samples        : ML_Types.List_Of_Value_Data_Lists;
-                   Y_Samples        : ML_Types.List_Of_Value_Data_Lists);
+                   Start, Stop      : Natural);
    procedure Node_Value (Self : Criterion_Class; Value : out Float);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;
