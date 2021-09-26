@@ -13,33 +13,31 @@ package body Ada_Tree_Build is
                                 Best_Split    : Node_Splitter.Split_Record) ;
    procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Type;
                                   Parent_Cursor : Tree.Tree_Cursor;
-                                  Start, Stop   : in out Natural);
+                                  Start, Stop   : Natural);
 
    --  ------------------------------------------------------------------
 
    procedure Add_Branch (theTree               : in out Tree.Tree_Type;
-                         Splitter              : in out Node_Splitter.Splitter_Class;
+                         Splitter              : in out
+                           Node_Splitter.Splitter_Class;
                          Start, Stop           : in out Natural;
---                           X, Y                  : ML_Types.List_Of_Value_Data_Lists;
                          Num_Constant_Features : in out Natural;
                          Parent_Cursor         : Tree.Tree_Cursor) is
       --  Parent_Cursor is a cursor to an existing node which is the head
       --  of this branch
       use Node_Splitter;
       use Tree.Tree_Package;
-      Best_Split    : constant Split_Record
+      Best_Split            : constant Split_Record
         := Split_Node (Splitter, Float'Last, Num_Constant_Features);
       --  Parent_Node corresponds to popped stack_record?
       --  L199
-      Parent_Node       : constant Tree.Tree_Node := Element (Parent_Cursor);
---        Start             : constant Natural := Parent_Node.Samples_Start;
---        Stop              : constant Natural := Parent_Node.Samples_End;
-      Parent_Is_Left    : constant Boolean := Parent_Node.Is_Left;
-      Parent_Impurity   : constant Float := Parent_Node.Impurity;
-      Constant_Features : Integer := Parent_Node.Num_Constant_Features;
-      Num_Node_Samples  : constant Natural := Stop - Start;
+      Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
+      Parent_Is_Left        : constant Boolean := Parent_Node.Is_Left;
+      Parent_Impurity       : constant Float := Parent_Node.Impurity;
+      Constant_Features     : Integer := Parent_Node.Num_Constant_Features;
+      Num_Node_Samples      : constant Natural := Stop - Start;
       Weighted_Node_Samples : Float := 0.0;
-      Child_Cursor : Tree.Tree_Cursor;
+      Child_Cursor          : Tree.Tree_Cursor;
    begin
       --  L208
       Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
@@ -64,9 +62,9 @@ package body Ada_Tree_Build is
       use Tree.Tree_Package;
       Node  : Tree_Node;
    begin
---        Node.Question := Best_Split.Question;
---        Node.True_Branch := Best_Split.True_Rows;
---        Node.False_Branch := Best_Split.False_Rows;
+      --        Node.Question := Best_Split.Question;
+      --        Node.True_Branch := Best_Split.True_Rows;
+      --        Node.False_Branch := Best_Split.False_Rows;
       Node.Impurity := Best_Split.Improvement;
       theTree.Insert_Child (Parent   => Parent_Cursor,
                             Before   => No_Element,
@@ -77,14 +75,14 @@ package body Ada_Tree_Build is
 
    procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Type;
                                   Parent_Cursor : Tree.Tree_Cursor;
-                                  Start, Stop   : in out Natural) is
+                                  Start, Stop   : Natural) is
       use Tree;
       use Tree_Package;
       Leaf : Tree_Node (Is_Leaf => True);
    begin
---        if Max_Leaves > 0 then
---           Num_Leaves := Num_Leaves + 1;
---        end if;
+      --        if Max_Leaves > 0 then
+      --           Num_Leaves := Num_Leaves + 1;
+      --        end if;
       --           New_Line;
       Leaf.Samples_Start := Start;
       Leaf.Samples_End := Stop;
@@ -114,6 +112,8 @@ package body Ada_Tree_Build is
       Splitter              : Splitter_Class;
       Num_Constant_Features : Natural := 0;
       Impurity              : Float;
+      Start                 : Positive := 1;
+      Stop                  : Positive := X.Element(1).Last_Index;
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
@@ -125,7 +125,8 @@ package body Ada_Tree_Build is
       Classifier_Utilities.Print_Value_List
         ("Ada_Tree_Build.Build_Tree Feature_Values", Splitter.Feature_Values);
       Impurity := Splitter.Node_Impurity;
-      Add_Branch (Splitter, 1, X.Element(1).Last_Index, theTree.Nodes.Root, Num_Constant_Features);
+      Add_Branch (theTree.Nodes, Splitter, Start, Stop,
+                  Num_Constant_Features, theTree.Nodes.Root);
    end Build_Tree;
 
    --  ------------------------------------------------------------------
