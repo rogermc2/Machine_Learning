@@ -12,55 +12,56 @@ with Tree;
 
 package Tree_Build is
 
-    type Type_Of_Tree is (Depth_First_Tree, Best_First_Tree);
+   type Type_Of_Tree is (Depth_First_Tree, Best_First_Tree);
 
-    type Tree_Builder (Tree_Kind : Type_Of_Tree := Depth_First_Tree) is record
-        Splitter              : Node_Splitter.Splitter_Class;
-        --  Minimum samples in an internal node
-        Min_Samples_Split     : Natural := 0;
-        Min_Samples_Leaf      : Natural := 0;
-        Min_Weight_Leaf       : Float := 0.0;
-        Max_Depth             : Natural := 0;
-        Min_Impurity_Decrease : Float := 0.0;
-        case Tree_Kind is
-            when Best_First_Tree =>
-                Max_Leaf_Nodes : Natural := 0;
-            when Depth_First_Tree => null;
-        end case;
-    end record;
+   type Tree_Builder (Tree_Kind : Type_Of_Tree := Depth_First_Tree) is record
+      Splitter              : Node_Splitter.Splitter_Class;
+      --  Minimum samples in an internal node
+      Min_Samples_Split     : Natural := 0;
+      Min_Samples_Leaf      : Natural := 0;
+      Min_Weight_Leaf       : Float := 0.0;
+      Max_Depth             : Natural := 0;
+      Min_Impurity_Decrease : Float := 0.0;
+      case Tree_Kind is
+         when Best_First_Tree =>
+            Max_Leaf_Nodes : Natural := 0;
+         when Depth_First_Tree => null;
+      end case;
+   end record;
 
-    Tree_Build_Error : Exception;
+   Tree_Build_Error : Exception;
 
-    --     procedure Build_Tree
-    --       (aBuilder      : in out Tree_Builder;
-    --        theTree       : in out Tree.Tree_Class;
-    --        X, Y          : ML_Types.List_Of_Value_Data_Lists;
-    --        Sample_Weight : Classifier_Types.Weight_List);
-    procedure Build_Best_First_Tree
-      (Best_Builder  : in out Tree_Builder;
-       theTree       : in out Tree.Tree_Class;
-       X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List);
-    procedure Build_Depth_First_Tree
-      (Depth_Builder : in out Tree_Builder;
-       theTree       : in out Tree.Tree_Class;
-       X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List);
-    procedure Init_Best_First_Tree
-      (Best_Builder          : in out Tree_Builder;
-       Splitter              : Node_Splitter.Splitter_Class;
-       Min_Samples_Split     : Natural := 0;
-       Min_Samples_Leaf      : Natural := 0;
-       Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Natural := 0;
-       Max_Leaf_Nodes        : Integer := -1;  --  -1 means undefined
-       Min_Impurity_Decrease : Float := 0.0);
-    procedure Init_Depth_First_Tree
-      (Depth_Builder                       : in out Tree_Builder;
-       Splitter                            : Node_Splitter.Splitter_Class;
-       Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
-       Min_Weight_Leaf                     : Float := 0.0;
-       Max_Depth                           : Natural := 0;
-       Min_Impurity_Decrease               : Float := 0.0);
+   function Add_Node (theTree               : in out Tree.Tree_Class;
+                      Parent_Cursor         : Tree.Tree_Cursor;
+                      Is_Left, Is_Leaf      : Boolean;
+                      Feature_Index         : Positive;
+                      Impurity, Threshold   : Float;
+                      Weighted_Node_Samples : Float) return Tree.Tree_Cursor;
+   procedure Build_Best_First_Tree
+     (Best_Builder  : in out Tree_Builder;
+      theTree       : in out Tree.Tree_Class;
+      X, Y          : ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weight : Classifier_Types.Weight_List);
+   procedure Build_Depth_First_Tree
+     (Depth_Builder : in out Tree_Builder;
+      theTree       : in out Tree.Tree_Class;
+      X, Y          : ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weight : Classifier_Types.Weight_List);
+   procedure Init_Best_First_Tree
+     (Best_Builder          : in out Tree_Builder;
+      Splitter              : Node_Splitter.Splitter_Class;
+      Min_Samples_Split     : Natural := 0;
+      Min_Samples_Leaf      : Natural := 0;
+      Min_Weight_Leaf       : Float := 0.0;
+      Max_Depth             : Natural := 0;
+      Max_Leaf_Nodes        : Integer := -1;  --  -1 means undefined
+      Min_Impurity_Decrease : Float := 0.0);
+   procedure Init_Depth_First_Tree
+     (Depth_Builder                       : in out Tree_Builder;
+      Splitter                            : Node_Splitter.Splitter_Class;
+      Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
+      Min_Weight_Leaf                     : Float := 0.0;
+      Max_Depth                           : Natural := 0;
+      Min_Impurity_Decrease               : Float := 0.0);
 
 end Tree_Build;

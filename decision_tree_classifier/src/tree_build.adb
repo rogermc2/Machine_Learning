@@ -1,4 +1,4 @@
---  Based on scikit-learn/sklearn/tree _tree.pxd class DepthFirstTreeBuilder
+--  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -80,7 +80,8 @@ package body Tree_Build is
       Num_Constant_Features : Natural := 0;
    begin
       --  L429
-      Node_Splitter.Reset_Node (Splitter, Splitter.Weighted_Samples);
+      Node_Splitter.Reset_Node (Splitter, Splitter.Start_Index,
+                                Splitter.End_Index, Splitter.Weighted_Samples);
 
       if Is_First then
          Impurity := Splitter.Node_Impurity;
@@ -247,7 +248,7 @@ package body Tree_Build is
          Is_Left := Node.Is_Left;
          Constant_Features := Node.Num_Constant_Features;
 
-         Node_Splitter.Reset_Node (Splitter, Weighted_Samples);
+         Node_Splitter.Reset_Node (Splitter, Start, Stop, Weighted_Samples);
          if First then
             Impurity := Splitter.Node_Impurity;
             First := False;
