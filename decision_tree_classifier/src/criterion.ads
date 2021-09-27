@@ -49,6 +49,7 @@ package Criterion is
                    Sample_Weight    : Classifier_Types.Weight_List;
                    Weighted_Samples : Float;
                    Start, Stop      : Natural);
+   function Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self : Criterion_Class; Value : out Float);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;

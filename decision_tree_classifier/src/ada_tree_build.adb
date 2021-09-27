@@ -11,6 +11,8 @@ package body Ada_Tree_Build is
 
    Epsilon : constant Float := 10.0 ** (-10);
 
+   First : Boolean := True;
+
    procedure Add_Decision_Node (theTree       : in out Tree.Tree_Type;
                                 Parent_Cursor : Tree.Tree_Cursor;
                                 Best_Split    : Node_Splitter.Split_Record) ;
@@ -40,8 +42,7 @@ package body Ada_Tree_Build is
       use Tree.Tree_Package;
       Splitter              : Node_Splitter.Splitter_Class :=
                                 Builder.Splitter;
-      Split                 : Split_Record
-        := Split_Node (Splitter, Float'Last, Num_Constant_Features);
+      Split                 : Split_Record;
       --  Parent_Node corresponds to popped stack_record?
       --  L199
       Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
@@ -56,8 +57,15 @@ package body Ada_Tree_Build is
       Child_Cursor          : Tree.Tree_Cursor;
    begin
       --  L208
+      --  Reset_Node resets splitter to use samples (Start .. Stop)
       Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
+      if First then
+            Impurity := Splitter.Criteria.;
+            First := False;
+      end if;
+
       if Split.Improvement = 0.0 then
+         --  L357?
          Add_Prediction_Node (theTree, Parent_Cursor, Start, Stop);
       else
          Split := Node_Splitter.Split_Node (Splitter, Parent_Impurity,

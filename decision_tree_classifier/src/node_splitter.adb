@@ -78,6 +78,13 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
+   function Node_Impurity (Self : Splitter_Class) return Float is
+   begin
+      return Criterion.Node_Impurity (Self.Criteria);
+   end Node_Impurity;
+
+   --  -------------------------------------------------------------------------
+
    procedure Node_Value (Self : Splitter_Class; Value : out Float) is
    begin
       Criterion.Node_Value (Self.Criteria, Value);
