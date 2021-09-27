@@ -6,7 +6,7 @@ package Criterion is
 
    type Criterion_Class is record
       Y                         : ML_Types.List_Of_Value_Data_Lists;
-      Classes                   : ML_Types.Value_Data_List;
+      Classes                   : ML_Types.List_Of_Value_Data_Lists;
       Samples                   : ML_Types.List_Of_Value_Data_Lists;
       Sample_Indices            : Classifier_Types.Natural_List;
       Num_Outputs               : Natural := 0;
@@ -28,9 +28,9 @@ package Criterion is
       Start                     : Natural := 0;
       Stop                      : Natural := 0;
       Position                  : Natural := 0;
-      Sum_Total                 : Classifier_Types.Weight_List;
-      Sum_Left                  : Classifier_Types.Weight_List;
-      Sum_Right                 : Classifier_Types.Weight_List;
+      Sum_Total                 : Classifier_Types.List_Of_Weight_Lists;
+      Sum_Left                  : Classifier_Types.List_Of_Weight_Lists;
+      Sum_Right                 : Classifier_Types.List_Of_Weight_Lists;
       Num_Classes               : Classifier_Types.Natural_List;
       Sq_Sum_Total              : Float := 0.0;
    end record;
