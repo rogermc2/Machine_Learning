@@ -251,12 +251,18 @@ package body Criterion is
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
       use ML_Types;
-      Left_List   : Classifier_Types.Weight_List;
-      Sum_Left    : Float;
+      use Classifier_Types;
+      use Float_Package;
+      use Weight_List_Package;
+      Left_List   : Weight_List;
+      Right_List  : Weight_List;
+      Total_List  : Weight_List;
+      Sum         : Float;
       i           : Positive;
       Values      : Value_Data_List;
       Weight      : Float := 1.0;
    begin
+      --  L439
       if (New_Pos - Criteria.Position) <= (Criteria.Stop - New_Pos) then
          for p in Criteria.Position .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
@@ -269,11 +275,11 @@ package body Criterion is
               Criteria.Sum_Left.Last_Index loop
                Left_List := Criteria.Sum_Left.Element (k);
                for s in Left_List.First_Index .. Left_List.Last_Index loop
-                  Sum_Left := Left_List.Element (s);
-                  Sum_Left :=
-                    Sum_Left + Values.Element (s).Float_Value * Weight;
+                  Sum := Left_List.Element (s);
+                  Sum := Sum + Values.Element (s).Float_Value * Weight;
+                  Left_List.Replace_Element (s, Sum);
                end loop;
-               Criteria.Sum_Left.Replace_Element (k, Sum_Left);
+               Criteria.Sum_Left.Replace_Element (k, Left_List);
             end loop;
 
             Criteria.Weighted_Left := Criteria.Weighted_Left + Weight;
@@ -292,11 +298,11 @@ package body Criterion is
               Criteria.Sum_Left.Last_Index loop
                Left_List := Criteria.Sum_Left.Element (k);
                for s in Left_List.First_Index .. Left_List.Last_Index loop
-                  Sum_Left := Left_List.Element (s);
-                  Sum_Left :=
-                    Sum_Left - Values.Element (s).Float_Value * Weight;
+                  Sum := Left_List.Element (s);
+                  Sum := Sum - Values.Element (s).Float_Value * Weight;
+                  Left_List.Replace_Element (s, Sum);
                end loop;
-               Criteria.Sum_Left.Replace_Element (k, Sum_Left);
+               Criteria.Sum_Left.Replace_Element (k, Left_List);
             end loop;
 
             Criteria.Weighted_Left := Criteria.Weighted_Left - Weight;
@@ -307,11 +313,14 @@ package body Criterion is
       Criteria.Weighted_Right := Criteria.Weighted_Node_Samples -
         Criteria.Weighted_Left;
       for k in 1 .. Criteria.Num_Outputs loop
-         for c in 1 .. Criteria.Num_Classes.Element (k) loop
-            null;
-            --              Criteria.Sum_Left.Replace_Element
-            --                (c, Criteria.Sum_Total.Element (c) - Sum_Left);
+         Right_List := Criteria.Sum_Right.Element (k);
+         Total_List := Criteria.Sum_Total.Element (k);
+         for s in Right_List.First_Index .. Right_List.Last_Index loop
+            Sum := Right_List.Element (s);
+            Sum := Sum - Values.Element (s).Float_Value * Weight;
+            Right_List.Replace_Element (s, Total_List.Element (s) - Sum);
          end loop;
+         Criteria.Sum_Right.Replace_Element (k, Right_List);
       end loop;
 
    end Update;
