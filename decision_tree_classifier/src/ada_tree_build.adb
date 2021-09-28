@@ -42,6 +42,9 @@ package body Ada_Tree_Build is
       use Node_Splitter;
       use Tree;
       use Nodes_Package;
+      use Values_Package;
+      use Output_Package;
+      use Class_Package;
       Splitter              : Node_Splitter.Splitter_Class :=
                                 Builder.Splitter;
       Split                 : Split_Record;
@@ -57,9 +60,14 @@ package body Ada_Tree_Build is
       Feature_Index         : Positive := 1;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
+      Classes               : Class_List;
+      Outputs               : Output_List;
       Value                 : Classifier_Types.Float_List;
+      --  A Values_List is a list of Output_Lists of Class_Lists of Floats;
       Depth                 : Positive := Parent_Node.Depth;
       Child_Cursor          : Tree.Tree_Cursor;
+      Output_Index          : Positive := 1;
+      Class_Index           : Positive := 1;
    begin
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
@@ -91,6 +99,14 @@ package body Ada_Tree_Build is
       --  L237 Store values for all nodes to facilitate tree/model
       --  inspection and interpretation
       Node_Value (Splitter, Value);
+      --  Update theTree.Values
+      Outputs := theTree.Values.Element (Output_Index);
+      Classes.Clear;
+      for index in Value.First_Index .. Value.Last_Index loop
+         Classes.Append  (Value.Element (index));
+      end loop;
+      Outputs.Replace_Element (Class_Index, Classes);
+      theTree.Values.Replace_Element (Output_Index, Outputs);
 
       --  L241 Nodes already added by Tree_Build.Add_Node
 
