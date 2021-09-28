@@ -48,7 +48,8 @@ package Node_Splitter is
                    Input_X, Target_Y  : ML_Types.List_Of_Value_Data_Lists;
                    Sample_Weight      : Classifier_Types.Weight_List);
    function Node_Impurity (Self : Splitter_Class) return Float;
-   procedure Node_Value (Self : Splitter_Class; Value : out Float);
+   procedure Node_Value (Self : Splitter_Class;
+                         Value : out Classifier_Types.Float_List);
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
       Start, Stop           : Natural;

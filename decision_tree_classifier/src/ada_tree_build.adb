@@ -57,7 +57,7 @@ package body Ada_Tree_Build is
       Feature_Index         : Positive := 1;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
-      Value                 : Float := 0.0;
+      Value                 : Classifier_Types.Float_List;
       Depth                 : Positive := Parent_Node.Depth;
       Child_Cursor          : Tree.Tree_Cursor;
    begin
