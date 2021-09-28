@@ -11,7 +11,8 @@ package body Ada_Tree_Build is
 
    Epsilon : constant Float := 10.0 ** (-10);
 
-   First : Boolean := True;
+   First          : Boolean := True;
+   Max_Depth_Seen : Natural := 0;
 
    procedure Add_Decision_Node (theTree       : in out Tree.Tree_Class;
                                 Parent_Cursor : Tree.Tree_Cursor;
@@ -56,6 +57,8 @@ package body Ada_Tree_Build is
       Feature_Index         : Positive := 1;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
+      Value                 : Float := 0.0;
+      Depth                 : Positive := Parent_Node.Depth;
       Child_Cursor          : Tree.Tree_Cursor;
    begin
       --  L208
@@ -67,7 +70,7 @@ package body Ada_Tree_Build is
       end if;
 
       --  L210
-      Is_Leaf := Parent_Node.Depth >= Builder.Max_Depth or
+      Is_Leaf := Depth >= Builder.Max_Depth or
         Num_Node_Samples < Builder.Min_Samples_Split or
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
@@ -80,31 +83,43 @@ package body Ada_Tree_Build is
          Is_Leaf := Split.Pos_I >= Stop or
            Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
       end if;
-
+      --  L229
       Child_Cursor := Tree_Build.Add_Node
-        (theTree, Parent_Cursor, Is_Left, Is_Leaf, Split.Feature_Index,
+        (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf, Split.Feature_Index,
          Impurity, Split.Threshold, Weighted_Node_Samples);
 
-      if Split.Improvement = 0.0 then
-         --  L357?
-         Add_Prediction_Node (theTree, Parent_Cursor, Start, Stop);
-      else
-         Split := Node_Splitter.Split_Node (Splitter, Parent_Impurity,
-                                            Constant_Features);
-         Is_Leaf := Split.Pos_I >= Stop or
-           Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
-         Child_Cursor :=
-           Tree_Build.Add_Node (theTree, Parent_Cursor, Is_Left, Is_Leaf,
-                                Feature_Index, Split.Impurity_Left, Split.Threshold,
-                                Weighted_Node_Samples);
+      --  L237 Store values for all nodes to facilitate tree/model
+      --  inspection and interpretation
+      Node_Value (Splitter, Value);
 
-         Add_Decision_Node (theTree, Parent_Cursor, Split);
-         Child_Cursor := Last_Child (Parent_Cursor);
-         Add_Branch (theTree, Builder, Start, Stop,
-                     Num_Constant_Features, Child_Cursor);
-         Add_Branch (theTree, Builder, Start, Stop,
-                     Num_Constant_Features, Child_Cursor);
+      --  L241 Nodes already added by Tree_Build.Add_Node
+
+      --  L254
+      if Depth > Max_Depth_Seen then
+            Max_Depth_Seen := Depth;
       end if;
+
+--        if Split.Improvement = 0.0 then
+--           --  L357?
+--           Add_Prediction_Node (theTree, Parent_Cursor, Start, Stop);
+--        else
+--           Split := Node_Splitter.Split_Node (Splitter, Parent_Impurity,
+--                                              Constant_Features);
+--           Is_Leaf := Split.Pos_I >= Stop or
+--             Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
+--           Child_Cursor :=
+--             Tree_Build.Add_Node (theTree, Parent_Cursor, Is_Left, Is_Leaf,
+--                                  Feature_Index, Split.Impurity_Left, Split.Threshold,
+--                                  Weighted_Node_Samples);
+--
+--           Add_Decision_Node (theTree, Parent_Cursor, Split);
+--           Child_Cursor := Last_Child (Parent_Cursor);
+--           Add_Branch (theTree, Builder, Start, Stop,
+--                       Num_Constant_Features, Child_Cursor);
+--           Add_Branch (theTree, Builder, Start, Stop,
+--                       Num_Constant_Features, Child_Cursor);
+--        end if;
+
    end Add_Branch;
 
    --  ------------------------------------------------------------------

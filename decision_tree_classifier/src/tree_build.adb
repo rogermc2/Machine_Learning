@@ -22,6 +22,7 @@ package body Tree_Build is
    --  of this node's branch Tree.
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    function Add_Node (theTree               : in out Tree.Tree_Class;
+                      Depth                 : in out Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
@@ -53,9 +54,9 @@ package body Tree_Build is
          --              Put_Line ("Tree_Build.Add_Node Append_Child");
          theTree.Nodes.Append_Child (Parent   => Parent_Cursor,
                                      New_Item => New_Node);
-         --              Put_Line ("Tree_Build.Add_Node Appended");
          Node_Cursor := Last_Child (Parent_Cursor);
       end if;
+      Depth := Depth + 1;
 
       return Node_Cursor;
 
@@ -70,7 +71,7 @@ package body Tree_Build is
       Impurity              : in out Float;
       Is_First, Is_Left     : Boolean;
       Parent_Cursor         : Tree.Tree_Cursor;
-      Depth                 : Positive;
+      Depth                 : in out Positive;
       Res                   : in out Build_Utils.Priority_Record) is
 
       Num_Node_Samples      : constant Natural :=
@@ -99,9 +100,10 @@ package body Tree_Build is
            aSplit.Improvement + Epsilon < theBuilder.Min_Impurity_Decrease;
       end if;
 
-      Res.Node_Cursor := Add_Node (theTree, Parent_Cursor, Is_Left, Is_Leaf,
-                                   aSplit.Feature_Index, Impurity, aSplit.Threshold,
-                                   Splitter.Weighted_Samples);
+      Res.Node_Cursor := Add_Node
+          (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf,
+          aSplit.Feature_Index, Impurity, aSplit.Threshold,
+          Splitter.Weighted_Samples);
       Res.Start := Splitter.Start_Index;
       Res.Stop := Splitter.End_Index;
       Res.Depth := Depth;
@@ -151,6 +153,7 @@ package body Tree_Build is
       Impurity         : Float := 0.0;
       Frontier         : Build_Utils.Frontier_List;
       Current_Node     : Tree.Tree_Node;
+      Depth            : Positive := 1;
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
    begin
@@ -165,7 +168,7 @@ package body Tree_Build is
                   Integer'Image (Best_Builder.Max_Leaf_Nodes));
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
       Add_Split_Node (Best_Builder, Splitter, theTree, Impurity,
-                      True, True, theTree.Nodes.Root, 1, Split_Node_Left);
+                      True, True, theTree.Nodes.Root, Depth, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
 
       Curs := Frontier.First;
@@ -177,18 +180,19 @@ package body Tree_Build is
             Put_Line ("Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes: " &
                         Integer'Image (Max_Split_Nodes));
             Max_Split_Nodes := Max_Split_Nodes - 1;
+            Depth := Current_Node.Depth + 1;
             Add_Split_Node
-              (Best_Builder, Splitter, theTree, Current_Node.Impurity,
-               False, Current_Node.Is_Left, Node_Cursor,
-               Current_Node.Depth + 1, Split_Node_Left);
+              (Best_Builder, Splitter, theTree, Current_Node.Impurity, False,
+               Current_Node.Is_Left, Node_Cursor, Depth, Split_Node_Left);
             --  tree.nodes may have changed
             Heap_Record := Element (Curs);
             Current_Node := Heap_Record.Node_Params;
             Node_Cursor := Heap_Record.Node_Cursor;
+            Depth := Current_Node.Depth + 1;
             Add_Split_Node
               (Best_Builder, Splitter, theTree,
-               Heap_Record.Impurity_Right, False, False, Node_Cursor,
-               Current_Node.Depth + 1, Split_Node_Right);
+               Heap_Record.Impurity_Right, False, False, Node_Cursor, Depth,
+               Split_Node_Right);
             Add_To_Frontier (Split_Node_Right, Frontier);
          end if;
 
@@ -270,7 +274,7 @@ package body Tree_Build is
          end if;
 
          Put_Line ("Tree_Build.Build_Depth_First_Tree Add_Node");
-         Node_Cursor := Add_Node (theTree, Parent, Is_Left, Is_Leaf,
+         Node_Cursor := Add_Node (theTree, Depth, Parent, Is_Left, Is_Leaf,
                                   Split.Feature_Index, Impurity,
                                   Split.Threshold, Weighted_Samples);
          Put_Line ("Tree_Build.Build_Depth_First_Tree Node added, Is_Left, Is_Leaf: "
