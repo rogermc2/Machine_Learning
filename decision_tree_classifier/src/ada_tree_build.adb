@@ -66,6 +66,25 @@ package body Ada_Tree_Build is
          First := False;
       end if;
 
+      --  L210
+      Is_Leaf := Parent_Node.Depth >= Builder.Max_Depth or
+        Num_Node_Samples < Builder.Min_Samples_Split or
+        Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
+        Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
+        --  if Impurity == 0.0 with tolerance for rounding errors
+        Impurity <= Epsilon;
+
+      --  L222
+      if not Is_Leaf then
+         Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
+         Is_Leaf := Split.Pos_I >= Stop or
+           Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
+      end if;
+
+      Child_Cursor := Tree_Build.Add_Node
+        (theTree, Parent_Cursor, Is_Left, Is_Leaf, Split.Feature_Index,
+         Impurity, Split.Threshold, Weighted_Node_Samples);
+
       if Split.Improvement = 0.0 then
          --  L357?
          Add_Prediction_Node (theTree, Parent_Cursor, Start, Stop);
@@ -102,8 +121,8 @@ package body Ada_Tree_Build is
       --        Node.False_Branch := Best_Split.False_Rows;
       Node.Impurity := Best_Split.Improvement;
       theTree.Nodes.Insert_Child (Parent   => Parent_Cursor,
-                            Before   => No_Element,
-                            New_Item => Node);
+                                  Before   => No_Element,
+                                  New_Item => Node);
    end Add_Decision_Node;
 
    --  ------------------------------------------------------------------
