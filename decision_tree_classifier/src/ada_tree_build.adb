@@ -115,6 +115,9 @@ package body Ada_Tree_Build is
             Max_Depth_Seen := Depth;
       end if;
 
+      Add_Branch (theTree, Builder, Start, Stop, Num_Constant_Features,
+                  Child_Cursor);
+
 --        if Split.Improvement = 0.0 then
 --           --  L357?
 --           Add_Prediction_Node (theTree, Parent_Cursor, Start, Stop);
