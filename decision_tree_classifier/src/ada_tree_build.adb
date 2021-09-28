@@ -115,8 +115,10 @@ package body Ada_Tree_Build is
             Max_Depth_Seen := Depth;
       end if;
 
-      Add_Branch (theTree, Builder, Start, Stop, Num_Constant_Features,
-                  Child_Cursor);
+      if not Is_Leaf then
+         Add_Branch (theTree, Builder, Start, Stop, Num_Constant_Features,
+                     Child_Cursor);
+      end if;
 
 --        if Split.Improvement = 0.0 then
 --           --  L357?
