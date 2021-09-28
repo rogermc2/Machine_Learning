@@ -13,10 +13,10 @@ package body Ada_Tree_Build is
 
    First : Boolean := True;
 
-   procedure Add_Decision_Node (theTree       : in out Tree.Tree_Type;
+   procedure Add_Decision_Node (theTree       : in out Tree.Tree_Class;
                                 Parent_Cursor : Tree.Tree_Cursor;
                                 Best_Split    : Node_Splitter.Split_Record) ;
-   procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Type;
+   procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Class;
                                   Parent_Cursor : Tree.Tree_Cursor;
                                   Start, Stop   : Natural);
    procedure Init_Tree_Builder
@@ -31,7 +31,7 @@ package body Ada_Tree_Build is
    --  ------------------------------------------------------------------
 
    procedure Add_Branch
-     (theTree               : in out Tree.Tree_Type;
+     (theTree               : in out Tree.Tree_Class;
       Builder               : in out Tree_Builder;
       Start, Stop           : in out Natural;
       Num_Constant_Features : in out Natural;
@@ -39,7 +39,8 @@ package body Ada_Tree_Build is
       --  Parent_Cursor is a cursor to an existing node which is the head
       --  of this branch
       use Node_Splitter;
-      use Tree.Tree_Package;
+      use Tree;
+      use Nodes_Package;
       Splitter              : Node_Splitter.Splitter_Class :=
                                 Builder.Splitter;
       Split                 : Split_Record;
@@ -49,10 +50,11 @@ package body Ada_Tree_Build is
       Parent_Is_Left        : constant Boolean := Parent_Node.Is_Left;
       Parent_Impurity       : constant Float := Parent_Node.Impurity;
       Constant_Features     : Integer := Parent_Node.Num_Constant_Features;
-      Num_Node_Samples      : constant Natural := Stop - Start;
+      Num_Node_Samples      : constant Natural := Stop - Start;  --  L207
       Is_Leaf               : Boolean := False;
       Is_Left               : Boolean := True;
       Feature_Index         : Positive := 1;
+      Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
       Child_Cursor          : Tree.Tree_Cursor;
    begin
@@ -60,8 +62,8 @@ package body Ada_Tree_Build is
       --  Reset_Node resets splitter to use samples (Start .. Stop)
       Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
       if First then
-            Impurity := Splitter.Criteria.;
-            First := False;
+         Impurity := Node_Impurity (Splitter);
+         First := False;
       end if;
 
       if Split.Improvement = 0.0 then
@@ -72,9 +74,10 @@ package body Ada_Tree_Build is
                                             Constant_Features);
          Is_Leaf := Split.Pos_I >= Stop or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
-         Tree_Build.Add_Node (theTree, Parent_Cursor, Is_Left, Is_Leaf,
-                              Feature_Index, Split.Impurity_Left, Split.Threshold,
-                             Weighted_Node_Samples);
+         Child_Cursor :=
+           Tree_Build.Add_Node (theTree, Parent_Cursor, Is_Left, Is_Leaf,
+                                Feature_Index, Split.Impurity_Left, Split.Threshold,
+                                Weighted_Node_Samples);
 
          Add_Decision_Node (theTree, Parent_Cursor, Split);
          Child_Cursor := Last_Child (Parent_Cursor);
@@ -87,29 +90,29 @@ package body Ada_Tree_Build is
 
    --  ------------------------------------------------------------------
 
-   procedure Add_Decision_Node (theTree       : in out Tree.Tree_Type;
+   procedure Add_Decision_Node (theTree       : in out Tree.Tree_Class;
                                 Parent_Cursor : Tree.Tree_Cursor;
                                 Best_Split    : Node_Splitter.Split_Record) is
       use Tree;
-      use Tree.Tree_Package;
+      use Tree.Nodes_Package;
       Node  : Tree_Node;
    begin
       --        Node.Question := Best_Split.Question;
       --        Node.True_Branch := Best_Split.True_Rows;
       --        Node.False_Branch := Best_Split.False_Rows;
       Node.Impurity := Best_Split.Improvement;
-      theTree.Insert_Child (Parent   => Parent_Cursor,
+      theTree.Nodes.Insert_Child (Parent   => Parent_Cursor,
                             Before   => No_Element,
                             New_Item => Node);
    end Add_Decision_Node;
 
    --  ------------------------------------------------------------------
 
-   procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Type;
+   procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Class;
                                   Parent_Cursor : Tree.Tree_Cursor;
                                   Start, Stop   : Natural) is
       use Tree;
-      use Tree_Package;
+      use Nodes_Package;
       Leaf : Tree_Node (Is_Leaf => True);
    begin
       --        if Max_Leaves > 0 then
@@ -119,7 +122,7 @@ package body Ada_Tree_Build is
       Leaf.Samples_Start := Start;
       Leaf.Samples_End := Stop;
 
-      theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
+      theTree.Nodes.Insert_Child (Parent_Cursor, No_Element, Leaf);
    end Add_Prediction_Node;
 
    --  ------------------------------------------------------------------
@@ -146,7 +149,7 @@ package body Ada_Tree_Build is
       Classifier_Utilities.Print_Value_List
         ("Ada_Tree_Build.Build_Tree Feature_Values", Splitter.Feature_Values);
       Impurity := Splitter.Node_Impurity;
-      Add_Branch (theTree.Nodes, Builder, Start, Stop,
+      Add_Branch (theTree, Builder, Start, Stop,
                   Num_Constant_Features, theTree.Nodes.Root);
    end Build_Tree;
 

@@ -51,13 +51,13 @@ package Tree is
       end case;
    end record;
 
-   package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
+   package Nodes_Package is new Ada.Containers.Indefinite_Multiway_Trees
      (Tree_Node);
-   subtype Tree_Type is Tree_Package.Tree;
-   subtype Tree_Cursor is Tree_Package.Cursor;
+   subtype Tree_Nodes is Nodes_Package.Tree;
+   subtype Tree_Cursor is Nodes_Package.Cursor;
    type Leaf_Cursor_Array is array (Integer range <>) of Tree_Cursor;
 
-   use Tree_Package;
+   use Nodes_Package;
    package Tree_Cursor_Package is new Ada.Containers.Vectors
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
@@ -83,7 +83,7 @@ package Tree is
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Natural := 0;
       Node_Count      : Natural := 0;
-      Nodes           : Tree_Package.Tree;  -- Ada Multiway Tree
+      Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
       Values          : Values_List;
       Attributes      : Tree_Attributes;
    end record;

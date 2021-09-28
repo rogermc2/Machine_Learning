@@ -28,11 +28,11 @@ package body Tree_Build is
                       Impurity, Threshold   : Float;
                       Weighted_Node_Samples : Float) return Tree.Tree_Cursor is
       use Tree;
-      use Tree_Package;
+      use Tree.Nodes_Package;
       New_Node    : Tree_Node (Is_Leaf);
       Node_Cursor : Tree.Tree_Cursor;
    begin
-      --  L735
+      --  _Tree L735
       theTree.Node_Count := theTree.Node_Count + 1;
       New_Node.Node_Index := theTree.Node_Count;
       New_Node.Impurity := Impurity;

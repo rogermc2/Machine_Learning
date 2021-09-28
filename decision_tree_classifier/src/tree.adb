@@ -23,7 +23,7 @@ package body Tree is
                          X    : ML_Types.List_Of_Value_Data_Lists)
                          return Leaf_Cursor_Array is
       use ML_Types;
-      use Tree_Package;
+      use Nodes_Package;
       Node_Cursor  : Tree_Cursor;
       Node         : Tree_Node;
       Feature      : Positive;

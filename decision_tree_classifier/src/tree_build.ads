@@ -31,7 +31,7 @@ package Tree_Build is
 
    Tree_Build_Error : Exception;
 
-   function Add_Node (theTree               : in out Tree.Tree_Class;
+   function Add_Node (theTree             : in out Tree.Tree_Class;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
