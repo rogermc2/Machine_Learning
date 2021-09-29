@@ -109,7 +109,7 @@ package body Criterion is
        Sample_Weight    : Classifier_Types.Weight_List;
        Weighted_Samples : Float;
        Start, Stop      : Natural) is
-        Num_Outputs  : constant Positive := Positive (Y.Element (1).Length);
+        Num_Outputs  : constant Positive := Positive (Y.Length);
         Y_I          : Positive;
         Y_I_Sample   : ML_Types.Value_Data_List;
         Y_Ik         : ML_Types.Value_Record;

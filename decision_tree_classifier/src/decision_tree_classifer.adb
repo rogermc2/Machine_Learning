@@ -137,10 +137,9 @@ package body Decision_Tree_Classifer is
       use Classifier_Types;
       use Classifier_Types.Integer_Package;
       theTree               : Tree.Tree_Class;
-      Num_Samples           : constant Positive :=
-                                Positive (X (1).Length);
-      Num_Outputs           : constant Positive :=
-                                Positive (X.Length);
+      Num_Samples           : constant Positive :=  Positive (X (1).Length);
+      Num_Outputs           : constant Positive := Positive (Y.Length);
+      Num_Labels            : constant Positive := Positive (Y.Element (1).Length);
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       Y_Encoded             : List_Of_Value_Data_Lists;
@@ -184,10 +183,10 @@ package body Decision_Tree_Classifer is
         ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
 
       --  L293
-      if Positive (Y.Element (1).Length) /= Num_Samples then
+      if Num_Labels /= Num_Samples then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit Number of labels =" &
-           Integer'Image (Num_Outputs) & " does not match number of samples ="
+           Integer'Image (Num_Labels) & " does not match number of samples ="
            & Integer'Image (Num_Samples);
       end if;
 
