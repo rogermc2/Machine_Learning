@@ -9,7 +9,6 @@ package Criterion is
         Classes                   : ML_Types.List_Of_Value_Data_Lists;
         Samples                   : ML_Types.List_Of_Value_Data_Lists;
         Sample_Indices            : Classifier_Types.Natural_List;
-        Num_Outputs               : Natural := 0;
         Num_Weighted_Node_Samples : Natural := 0;
         Num_Node_Samples          : Natural := 0;
         Weighted_Left             : Float := 0.0;
