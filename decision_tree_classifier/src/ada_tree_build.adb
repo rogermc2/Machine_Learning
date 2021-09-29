@@ -194,9 +194,15 @@ package body Ada_Tree_Build is
         Top_Node_Cursor       : Cursor;
     begin
         --  L163
+        Put_Line ("Ada_Tree_Build.Build_Tree Y size" &
+                    Integer'Image (Integer (Y.Length)) & " x " &
+                    Integer'Image (Integer (Y.Element (1).Length)));
         Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
         Init_Tree_Builder (Builder, Splitter);
         Put_Line ("Ada_Tree_Build.Build_Tree Builder initialized");
+        Put_Line ("Ada_Tree_Build.Build_Tree Y size" &
+                    Integer'Image (Integer (Y.Length)) & " x " &
+                    Integer'Image (Integer (Y.Element (1).Length)));
 
         Classifier_Utilities.Print_Natural_List
           ("Ada_Tree_Build.Build_Tree Feature_Indices", Splitter.Feature_Indices);

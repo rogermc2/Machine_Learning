@@ -15,8 +15,6 @@ package Classifier_Utilities is
     procedure Clear (anArray : in out ML_Types.Value_Data_Array);
     function Compare_Float_Lists (L, R : Float_List) return Boolean;
     function Dot (L : Weight_List; R : Natural_List) return Float;
-    --     function Get_Column (Data       : ML_Types.Value_Data_List;
-    --                          Data_Index : Positive) return ML_Types.Value_Data_List;
     procedure Print_Boolean_Matrix (Name : String;
                                     aMatrix : Estimator.Boolean_Matrix);
     procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
@@ -27,7 +25,7 @@ package Classifier_Utilities is
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
     procedure Print_Multi_Value_List
-      (Name    : String; Multi_List : ML_Types.List_Of_Value_Data_Lists);
+      (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
     procedure Print_Value_List (Name    : String;
                                 theList : ML_Types.Value_Data_List);

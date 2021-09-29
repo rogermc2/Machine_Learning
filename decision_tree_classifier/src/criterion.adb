@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Classifier_Utilities;
+with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -127,6 +127,9 @@ package body Criterion is
 
         Criteria.Sq_Sum_Total := 0.0;
         Criteria.Sum_Total.Clear;
+        Put_Line ("Criterion.Classification_Init Y size" &
+                    Integer'Image (Integer (Y.Length)) & " x " &
+                    Integer'Image (Integer (Y.Element (1).Length)));
         Put_Line ("Criterion.Classification_Init Num_Outputs" &
                     Integer'Image (Num_Outputs));
 
@@ -138,11 +141,11 @@ package body Criterion is
             end loop;
             Criteria.Sum_Total.Append (Sum_Total);
         end loop;
-        Put_Line ("Criterion.Classification_Init Sample_Indices length" &
+        Put_Line ("Criterion.Classification_Init Sample_Indices length: " &
                     Integer'Image (Integer (Sample_Indices.Length)));
         --  L773
         for p in Start .. Stop loop
-            Put_Line ("Criterion.Classification_Init p" & Integer'Image (p));
+            Put_Line ("Criterion.Classification_Init p: " & Integer'Image (p));
             Y_I := Sample_Indices.Element (p);
 
             --  Weight is originally set to be 1.0, meaning that if no
@@ -151,11 +154,16 @@ package body Criterion is
                 Weight := Sample_Weight.Element (Y_I);
             end if;
 
+            Put_Line ("Criterion.Classification_Init Y_I: " & Integer'Image (Y_I));
             Y_I_Sample := Y.Element (Y_I);
+            Put_Line ("Criterion.Classification_Init Y_I_Sample length: " &
+                        Integer'Image (Integer (Y_I_Sample.Length)));
+            Classifier_Utilities.Print_Value_List
+              ("Criterion.Classification_Init Y_I_Sample", Y_I_Sample);
+
             for k in 1 .. Num_Outputs loop
                 Y_Ik := Y_I_Sample.Element (k);
-                Put_Line ("Criterion.Classification_Init k" &
-                            Integer'Image (k));
+                Put_Line ("Criterion.Classification_Init k: " & Integer'Image (k));
                 case Y_Ik.Value_Kind is
                 when ML_Types.Float_Type =>
                     W_Ik := Y_Ik.Float_Value * Weight;

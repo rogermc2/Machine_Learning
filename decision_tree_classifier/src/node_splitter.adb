@@ -376,6 +376,9 @@ package body Node_Splitter is
       Start, Stop           : Natural;
       Weighted_Node_Samples : in out Float) is
    begin
+      Put_Line ("Node_Splitter.Reset_Node Y size" &
+                    Integer'Image (Integer (Split.Y.Length)) & " x " &
+                    Integer'Image (Integer (Split.Y.Element (1).Length)));
       Split.Start_Index := Start;
       Split.End_Index := Stop;
       Put_Line ("Node_Splitter.Reset_Node Samples length" &

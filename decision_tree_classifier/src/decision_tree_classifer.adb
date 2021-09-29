@@ -24,7 +24,7 @@ package body Decision_Tree_Classifer is
                          Sample_Weight     : Classifier_Types.Weight_List) is
       use Tree;
       Max_Leaf_Nodes        : constant Integer := Self.Parameters.Max_Leaf_Nodes;
-      Splitter              : Node_Splitter.Splitter_Class :=
+      Splitter              : constant Node_Splitter.Splitter_Class :=
                                 Self.Parameters.Splitter;
       theTree               : Tree.Tree_Class;
       Min_Impurity_Decrease : Float := 0.0;
@@ -98,7 +98,7 @@ package body Decision_Tree_Classifer is
       --  L206
       Y_Encoded.Clear;
       Y_Encoded.Set_Length (Ada.Containers.Count_Type (Num_Outputs));
-      for k in 1 .. Integer (Y.Length) loop
+      for k in Y.First_Index .. Y.Last_Index loop
          Y_K := Y.Element (k);
          Classes_K := Encode_Utils.Unique (Y_K, Inverse);
          Y_Encoded.Replace_Element (k, Classes_K);
@@ -142,9 +142,9 @@ package body Decision_Tree_Classifer is
       use Classifier_Types.Integer_Package;
       theTree               : Tree.Tree_Class;
       Num_Samples           : constant Positive :=
-                                Positive (X.Element (1).Length);
+                                Positive (X (1).Length);
       Num_Outputs           : constant Positive :=
-                                Positive (Y.Element (1).Length);
+                                Positive (X.Length);
       --        Random_State          : Integer := aClassifier.Parameters.Random_State;
       Expanded_Class_Weight : Classifier_Types.Float_List;
       Y_Encoded             : List_Of_Value_Data_Lists;
@@ -185,7 +185,7 @@ package body Decision_Tree_Classifer is
         ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
 
       --  L293
-      if Positive (Num_Outputs) /= Num_Samples then
+      if Positive (Y.Element (1).Length) /= Num_Samples then
          raise Value_Error with
            "Decision_Tree_Classifer.Fit Number of labels =" &
            Integer'Image (Num_Outputs) & " does not match number of samples ="
@@ -196,7 +196,8 @@ package body Decision_Tree_Classifer is
       Classification_Fit (aClassifier, Y, Num_Outputs, Y_Encoded,
                           Expanded_Class_Weight);
       Classifier_Utilities.Print_Value_List
-        ("Decision_Tree_Classifer.Fit after Classification_Fit Y (1)", Y.Element (1));
+        ("Decision_Tree_Classifer.Fit after Classification_Fit Y (1)",
+         Y.Element (1));
       Classifier_Utilities.Print_Float_List
         ("Decision_Tree_Classifer.Fit Expanded_Class_Weight",
          Expanded_Class_Weight);
@@ -222,8 +223,6 @@ package body Decision_Tree_Classifer is
       end if;
 
       --  L350
---        Build_Tree (aClassifier, Min_Samples_Split, Min_Samples_Leaf,
---                    Min_Weight_Leaf, Max_Depth, X, Y, Sample_Weight);
       Ada_Tree_Build.Build_Tree (theTree, X, Y, Sample_Weight);
       --  L410
 
