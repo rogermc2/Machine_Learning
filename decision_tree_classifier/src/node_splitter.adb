@@ -24,14 +24,13 @@ package body Node_Splitter is
       Num_Features     : constant Positive := Positive (Input_X.Length);
       Weighted_Samples : Float := 0.0;
    begin
-      Self.Samples.Clear;
-      Self.Num_Samples := 0;
-      for index in 1 .. Num_Samples loop
+      Self.Sample_Indices.Clear;
+      for index in Input_X.Element (1).First_Index ..
+          Input_X.Element (1).Last_Index loop
          --  Only work with positively weighted samples.
          if Sample_Weight.Is_Empty or else
            Sample_Weight.Element (index) > 0.0 then
             Self.Sample_Indices.Append (index);
-            Self.Num_Samples := Self.Num_Samples + 1;
          end if;
 
          if Sample_Weight.Is_Empty then
@@ -41,12 +40,13 @@ package body Node_Splitter is
               Weighted_Samples + Sample_Weight.Element (index);
          end if;
       end loop;
+      Put_Line ("Node_Splitter.Init Sample_Indices.Length: " &
+                  Integer'Image (Integer (Self.Sample_Indices.Length)));
 
       --  Number of samples is the number of positively weighted samples.
-      Self.Min_Leaf_Samples := Num_Samples;
+      Self.Min_Leaf_Samples := Natural (Self.Sample_Indices.Length);
       Self.Weighted_Samples := Weighted_Samples;
-      Put_Line ("Node_Splitter.Init Self.Num_Samples, Weighted_Samples: " &
-                  Integer'Image (Self.Num_Samples) & ", " &
+      Put_Line ("Node_Splitter.Init Samples.Length, Weighted_Samples: " &
                   Float'Image (Weighted_Samples));
 
       Self.Feature_Indices.Clear;
@@ -80,6 +80,7 @@ package body Node_Splitter is
 
    function Node_Impurity (Self : Splitter_Class) return Float is
    begin
+      Put_Line ("Node_Splitter.Node_Impurity");
       return Criterion.Node_Impurity (Self.Criteria);
    end Node_Impurity;
 
@@ -369,7 +370,7 @@ package body Node_Splitter is
    end Replacement_Sort;
 
    --  -------------------------------------------------------------------------
-
+   --  Reset_Node resets the splitter Split based on node Split.Samples[start:end].
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
       Start, Stop           : Natural;
@@ -377,10 +378,13 @@ package body Node_Splitter is
    begin
       Split.Start_Index := Start;
       Split.End_Index := Stop;
-      Criterion.Init
-        (Split.Criteria, Split.Y, Split.Samples, Split.Sample_Weight,
+      Put_Line ("Node_Splitter.Reset_Node Samples length" &
+                    Integer'Image (Integer (Split.Sample_Indices.Length)));
+      Criterion.Classification_Init
+        (Split.Criteria, Split.Y, Split.Sample_Indices, Split.Sample_Weight,
          Split.Weighted_Samples, Start, Stop);
 
+      Put_Line ("Node_Splitter Weighted_Node_Samples");
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 
    end Reset_Node;

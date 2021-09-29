@@ -50,14 +50,9 @@ package body Ada_Tree_Build is
         Split                 : Split_Record;
         --  Parent_Node corresponds to popped stack_record?
         --  L199
-        Parent_Node           : Tree.Tree_Node := Element (Parent_Cursor);
-        Parent_Is_Left        : Boolean;
-        Parent_Impurity       : Float;
-        Constant_Features     : Integer;
+        Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
         Num_Node_Samples      : constant Natural := Stop - Start;  --  L207
         Is_Leaf               : Boolean := False;
-        Is_Left               : Boolean := True;
-        Feature_Index         : Positive := 1;
         Impurity              : Float := Float'Last;
         Weighted_Node_Samples : Float := 0.0;
         Classes               : Class_List;
@@ -69,13 +64,9 @@ package body Ada_Tree_Build is
         Output_Index          : Positive := 1;
         Class_Index           : Positive := 1;
     begin
-        Put_Line ("Ada_Tree_Build.Add_Branch");
-        Parent_Is_Left := Parent_Node.Is_Left;
-        Put_Line ("Ada_Tree_Build.Add_Branch Parent_Is_Left");
-        Parent_Impurity := Parent_Node.Impurity;
-        Constant_Features := Parent_Node.Num_Constant_Features;
         --  L208
         --  Reset_Node resets splitter to use samples (Start .. Stop)
+        Put_Line ("Ada_Tree_Build.Add_Branch Reset_Node");
         Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
         if First then
             Impurity := Node_Impurity (Splitter);
@@ -99,7 +90,7 @@ package body Ada_Tree_Build is
         end if;
         --  L229
         Child_Cursor := Tree_Build.Add_Node
-          (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf, Split.Feature_Index,
+          (theTree, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
            Impurity, Split.Threshold, Weighted_Node_Samples);
 
         --  L237 Store values for all nodes to facilitate tree/model

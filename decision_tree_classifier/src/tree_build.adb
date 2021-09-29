@@ -231,7 +231,7 @@ package body Tree_Build is
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
-      Num_Node_Samples := Splitter.Num_Samples;
+      Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
       Put_Line ("Tree_Build.Build_Depth_First_Tree Num_Node_Samples: " &
                   Integer'Image (Integer (Num_Node_Samples)));
 

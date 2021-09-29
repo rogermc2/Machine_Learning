@@ -1,8 +1,10 @@
 
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+--  with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -47,7 +49,7 @@ package body Criterion is
     --  Node_Impurity evaluates the Gini criterion as the impurity of the
     --  current node
     function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                return Float is
+                                 return Float is
         use Ada.Containers;
         Sum_Total : Classifier_Types.Weight_List;
         Count_K   : Float;
@@ -91,23 +93,26 @@ package body Criterion is
     end Impurity_Improvement;
 
     --  ------------------------------------------------------------------------
-    --  L742
-    procedure Init (Criteria         : in out Criterion_Class;
-                    Y                : ML_Types.List_Of_Value_Data_Lists;
-                    Samples          : ML_Types.List_Of_Value_Data_Lists;
-                    --  Sample_Weight contains the weight of each sample
-                    Sample_Weight    : Classifier_Types.Weight_List;
-                    Weighted_Samples : Float;
-                    Start, Stop      : Natural) is
-        Y_I         : ML_Types.Value_Data_List;
-        Sum_Total   : Classifier_Types.Weight_List;
-        Weight      : Float := 1.0;
-        Y_Ik        : Float;
-        W_Ik        : Float;
+    --  L508
+    procedure Classification_Init
+      (Criteria         : in out Criterion_Class;
+       Y                : ML_Types.List_Of_Value_Data_Lists;
+       Sample_Indices   : Classifier_Types.Natural_List;
+       --  Sample_Weight contains the weight of each sample
+       Sample_Weight    : Classifier_Types.Weight_List;
+       Weighted_Samples : Float;
+       Start, Stop      : Natural) is
+        Y_I          : Positive;
+        Y_I_Sample   : ML_Types.Value_Data_List;
+        Y_Ik         : ML_Types.Value_Record;
+        Sum_Total    : Classifier_Types.Weight_List;
+        Weight       : Float := 1.0;
+        W_Ik         : Float;
     begin
         Criteria.Y := Y;
+        Criteria.Num_Outputs := Natural (Y.Length);
         Criteria.Sample_Weight := Sample_Weight;
-        Criteria.Samples := Samples;
+        Criteria.Sample_Indices := Sample_Indices;
         Criteria.Start := Start;
         Criteria.Stop := Stop;
         Criteria.Weighted_Samples := Weighted_Samples;
@@ -115,7 +120,10 @@ package body Criterion is
 
         Criteria.Sq_Sum_Total := 0.0;
         Criteria.Sum_Total.Clear;
+        Put_Line ("Criterion.Classification_Init Num_Outputs" &
+                    Integer'Image (Criteria.Num_Outputs));
 
+        --  L779
         for k in 1 .. Criteria.Num_Outputs loop
             Sum_Total.Append (0.0);
             for index in 1 .. Criteria.Classes.Length loop
@@ -123,22 +131,39 @@ package body Criterion is
             end loop;
             Criteria.Sum_Total.Append (Sum_Total);
         end loop;
-
+        Put_Line ("Criterion.Classification_Init Sample_Indices length" &
+                    Integer'Image (Integer (Sample_Indices.Length)));
+        --  L773
         for p in Start .. Stop loop
-            Y_I := Samples.Element (p);
+            Put_Line ("Criterion.Classification_Init p" & Integer'Image (p));
+            Y_I := Sample_Indices.Element (p);
 
             --  Weight is originally set to be 1.0, meaning that if no
             --  sample weights are given, the default weight of each sample is 1.0
             if not Sample_Weight.Is_Empty then
-                Weight := Sample_Weight.Element (p);
+                Weight := Sample_Weight.Element (Y_I);
             end if;
 
+            Y_I_Sample := Y.Element (Y_I);
             for k in 1 .. Criteria.Num_Outputs loop
-                Y_Ik := Float (Y_I.Element (k).Integer_Value);
-                W_Ik := Y_Ik * Weight;
+                Y_Ik := Y_I_Sample.Element (k);
+                Put_Line ("Criterion.Classification_Init k" &
+                            Integer'Image (k));
+                case Y_Ik.Value_Kind is
+                when ML_Types.Float_Type =>
+                    W_Ik := Y_Ik.Float_Value * Weight;
+                when others => null;
+                end case;
+
                 Sum_Total.Replace_Element
                   (k, Sum_Total.Element (k) + W_Ik);
-                Criteria.Sq_Sum_Total := Criteria.Sq_Sum_Total + Y_Ik * W_Ik;
+
+                case Y_Ik.Value_Kind is
+                when ML_Types.Float_Type =>
+                    Criteria.Sq_Sum_Total :=
+                      Criteria.Sq_Sum_Total + Y_Ik.Float_Value * W_Ik;
+                when others => null;
+                end case;
             end loop;
 
             Criteria.Weighted_Node_Samples :=
@@ -147,7 +172,7 @@ package body Criterion is
 
         Reset (Criteria);
 
-    end Init;
+    end Classification_Init;
 
     --  ------------------------------------------------------------------------
     --  Node_Impurity evaluate the cross-entropy criterion as impurity of the
@@ -160,10 +185,15 @@ package body Criterion is
         Count_K        : Float := 0.0;
         Entropy        : Float := 0.0;
     begin
+        Put_Line ("Criterion.Node_Impurity");
         for index in Self.Classes.First_Index .. Self.Classes.Last_Index loop
+            Put_Line ("Criterion.Node_Impurity index" &
+                        Integer'Image (index));
             Class_List := Self.Classes.Element (index);
             Sum_Total_List := Self.Sum_Total.Element (index);
             for c in Class_List.First_Index .. Class_List.Last_Index loop
+                Put_Line ("Criterion.Node_Impurity c" &
+                            Integer'Image (c));
                 Count_K := Sum_Total_List.Element (c);
                 if Count_K > 0.0 then
                     Count_K := Count_K / Self.Weighted_Node_Samples;
@@ -194,7 +224,7 @@ package body Criterion is
     --  -------------------------------------------------------------------------
 
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                        return Float is
+                                         return Float is
         Impurity_Left  : Float;
         Impurity_Right : Float;
     begin

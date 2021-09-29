@@ -29,6 +29,7 @@ package body Classifier_Tests is
     procedure Test_Classification_Toy  is
         use Classifier_Utilities;
         use Decision_Tree_Classifer;
+
         Expected    : List_Of_Value_Data_Lists;
         theTree     : Classifier (Tree.Integer_Type, Tree.Integer_Type,
                                   Tree.Integer_Type);
