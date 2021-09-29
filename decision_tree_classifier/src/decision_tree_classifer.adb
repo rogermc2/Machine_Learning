@@ -85,7 +85,6 @@ package body Decision_Tree_Classifer is
    procedure Classification_Fit
      (aClassifier           : in out Classifier;
       Y                     : in out ML_Types.List_Of_Value_Data_Lists;
-      Num_Outputs           : Positive;
       Y_Encoded             : out ML_Types.List_Of_Value_Data_Lists;
       Expanded_Class_Weight : out Classifier_Types.Float_List) is
       use ML_Types;
@@ -97,7 +96,7 @@ package body Decision_Tree_Classifer is
    begin
       --  L206
       Y_Encoded.Clear;
-      Y_Encoded.Set_Length (Ada.Containers.Count_Type (Num_Outputs));
+      Y_Encoded.Set_Length (Y.Length);
       for k in Y.First_Index .. Y.Last_Index loop
          Y_K := Y.Element (k);
          Classes_K := Encode_Utils.Unique (Y_K, Inverse);
@@ -105,9 +104,6 @@ package body Decision_Tree_Classifer is
          aClassifier.Attributes.Classes.Append (Classes_K);
       end loop;
       Y := Y_Encoded;
-      Classifier_Utilities.Print_Value_List
-        ("Decision_Tree_Classifer.Classification_Fit Y (1)", Y.Element (1));
-
       Put_Line ("Decision_Tree_Classifer.Classification_Fit Class_Weight: " &
                   Weights.Weight_Type'Image (aClassifier.Parameters.Class_Weight));
       if aClassifier.Parameters.Class_Weight /= Weights.No_Weight then
@@ -172,6 +168,9 @@ package body Decision_Tree_Classifer is
       --  L201
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
+      Put_Line ("Decision_Tree_Classifer.Fit Y length: " &
+                  Integer'Image (Integer (Y.Length)));
+
       Put_Line
         ("Decision_Tree_Classifer.Fit Num_Samples, Num_Outputs: " &
            Tree.Index_Range'Image (aClassifier.Attributes.Num_Features) &
@@ -193,8 +192,9 @@ package body Decision_Tree_Classifer is
       end if;
 
       --  L206
-      Classification_Fit (aClassifier, Y, Num_Outputs, Y_Encoded,
-                          Expanded_Class_Weight);
+      Classification_Fit (aClassifier, Y, Y_Encoded, Expanded_Class_Weight);
+      Put_Line ("Decision_Tree_Classifer.Fit after Classification_Fit Y length: " &
+                  Integer'Image (Integer (Y.Length)));
       Classifier_Utilities.Print_Value_List
         ("Decision_Tree_Classifer.Fit after Classification_Fit Y (1)",
          Y.Element (1));
