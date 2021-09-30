@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Classifier_Utilities;
+with Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -103,9 +103,9 @@ package body Criterion is
        Weighted_Samples : Float;
        Start, Stop      : Natural) is
         Num_Outputs  : constant Positive := Positive (Y.Length);
-        Y_I          : Positive;
-        Y_I_Sample   : ML_Types.Value_Data_List;
-        Y_Ik         : ML_Types.Value_Record;
+        Y_I_Index    : Positive;
+        Y_Ik         : ML_Types.Value_Data_List;
+        Y_I          : ML_Types.Value_Record;
         Sum_Total    : Classifier_Types.Weight_List;
         Weight       : Float := 1.0;
         W_Ik         : Float;
@@ -127,42 +127,42 @@ package body Criterion is
         Put_Line ("Criterion.Classification_Init Num_Outputs" &
                     Integer'Image (Num_Outputs));
 
-        --  L779
+        --  L771
         for k in 1 .. Num_Outputs loop
-            Sum_Total.Append (Sum_Total);
+            Sum_Total.Append (0.0);
         end loop;
-        Put_Line ("Criterion.Classification_Init Sum_Total length: " &
-                    Integer'Image (Integer (Sum_Total.Length)));
         Put_Line ("Criterion.Classification_Init Sample_Indices length: " &
                     Integer'Image (Integer (Sample_Indices.Length)));
         --  L773
         Put_Line ("Criterion.Classification_Init Start, Stop" &
-                    Integer'Image (Start) & " x " & Integer'Image (Stop));
+                    Integer'Image (Start) & ", " & Integer'Image (Stop));
         for p in Start .. Stop loop
             Put_Line ("Criterion.Classification_Init p: " & Integer'Image (p));
-            Y_I := Sample_Indices.Element (p);
+            Y_I_Index := Sample_Indices.Element (p);
+            Put_Line ("Criterion.Classification_Init Y_I_Index: " &
+                        Integer'Image (Y_I_Index));
 
             --  Weight is originally set to be 1.0, meaning that if no
             --  sample weights are given, the default weight of each sample is 1.0
             if not Sample_Weight.Is_Empty then
-                Weight := Sample_Weight.Element (Y_I);
+                Weight := Sample_Weight.Element (Y_I_Index);
             end if;
 
-            Put_Line ("Criterion.Classification_Init Y_I: " & Integer'Image (Y_I));
-            Y_I_Sample := Y.Element (Y_I);
-            Put_Line ("Criterion.Classification_Init Y_I_Sample length: " &
-                        Integer'Image (Integer (Y_I_Sample.Length)));
-            Classifier_Utilities.Print_Value_List
-              ("Criterion.Classification_Init Y_I_Sample", Y_I_Sample);
+            for k in 1 .. Num_Outputs loop
+                Put_Line ("Criterion.Classification_Init k: " &
+                            Integer'Image (k));
+                Y_Ik := Y.Element (k);
+                Put_Line ("Criterion.Classification_Init Y_Ik length: " &
+                    Integer'Image (Integer (Y_Ik.Length)));
+                Y_I := Y_Ik.Element (Y_I_Index);
+                Utilities.Print_Value_Record
+                  ("Criterion.Classification_Init Y_I", Y_I);
 
-            for k in Y_I_Sample.First_Index .. Y_I_Sample.Last_Index loop
-                Y_Ik := Y_I_Sample.Element (k);
-                Put_Line ("Criterion.Classification_Init k: " & Integer'Image (k));
-                case Y_Ik.Value_Kind is
+                case Y_I.Value_Kind is
                 when ML_Types.Float_Type =>
-                    W_Ik := Y_Ik.Float_Value * Weight;
+                    W_Ik := Y_I.Float_Value * Weight;
                 when ML_Types.Integer_Type =>
-                    W_Ik := Float (Y_Ik.Integer_Value) * Weight;
+                    W_Ik := Float (Y_I.Integer_Value) * Weight;
                 when others => null;
                 end case;
 
@@ -170,15 +170,14 @@ package body Criterion is
                             Integer'Image (Integer (Sum_Total.Length)));
                 Sum_Total.Replace_Element
                   (k, Sum_Total.Element (k) + W_Ik);
-                Put_Line ("Criterion.Classification_Init Element replaced");
 
-                case Y_Ik.Value_Kind is
+                case Y_I.Value_Kind is
                 when ML_Types.Float_Type =>
                     Criteria.Sq_Sum_Total :=
-                      Criteria.Sq_Sum_Total + Y_Ik.Float_Value * W_Ik;
+                      Criteria.Sq_Sum_Total + Y_I.Float_Value * W_Ik;
                 when ML_Types.Integer_Type =>
                     Criteria.Sq_Sum_Total :=
-                      Criteria.Sq_Sum_Total + Float (Y_Ik.Integer_Value) * W_Ik;
+                      Criteria.Sq_Sum_Total + Float (Y_I.Integer_Value) * W_Ik;
                 when others => null;
                 end case;
                 Put_Line ("Criterion.Classification_Init end loop k");

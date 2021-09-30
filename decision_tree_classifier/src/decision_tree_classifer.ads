@@ -107,7 +107,8 @@ package Decision_Tree_Classifer is
       Attributes : Attribute_Data;
    end record;
 
-   Value_Error : Exception;
+   Classifier_Error : Exception;
+   Value_Error      : Exception;
 
    --  BaseDecisionTree.Fit (super of class DecisionTreeClassifier)
    --  Fit builds a decision tree classifier from the training set (X, Y).
