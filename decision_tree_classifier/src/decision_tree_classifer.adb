@@ -98,7 +98,9 @@ package body Decision_Tree_Classifer is
       Classes_K             : Value_Data_List;
       Inverse               : Natural_List;
       Expanded_Class_Weight : Weight_List;
-      Min_Split             : Natural;
+      Min_Sample_Leaf       : Natural;
+      Min_Sample_Split      : Natural;
+      Max_Features          : Natural := 0;
    begin
       --  L207
       aClassifier.Attributes.Classes.Clear;
@@ -129,6 +131,8 @@ package body Decision_Tree_Classifer is
                raise Value_Error with
                  "Decision_Tree_Classifer.Base_Fit, Min_Samples_Leaf must be at least 1";
             end if;
+            Min_Sample_Leaf := aClassifier.Parameters.Min_Samples_Leaf.Min_Leaf;
+
          when Tree.Float_Type =>
             --  L243
             if aClassifier.Parameters.Min_Samples_Leaf.Min_Fraction_Leaf <= 0.0 or
@@ -136,6 +140,9 @@ package body Decision_Tree_Classifer is
                raise Value_Error with
                  "Decision_Tree_Classifer.Base_Fit, Min_Samples_Leaf must be in (0.0, 0.5]";
             end if;
+            Min_Sample_Leaf :=
+              Integer (Float'Ceiling
+                       (aClassifier.Parameters.Min_Samples_Leaf.Min_Fraction_Leaf));
          when others =>
             raise Value_Error with
               "Decision_Tree_Classifer.Base_Fit, invalid Min_Samples_Leaf Leaf_Type";
@@ -148,23 +155,43 @@ package body Decision_Tree_Classifer is
                raise Value_Error with
                  "Decision_Tree_Classifer.Base_Fit, Min_Samples_Split must be at least 2";
             end if;
-            Min_Split := aClassifier.Parameters.Min_Samples_Split.Min_Split;
+            Min_Sample_Split := aClassifier.Parameters.Min_Samples_Split.Min_Split;
          when Tree.Float_Type =>
-            --  260
+            --  L253
             if aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split <= 0.0 or
               aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split > 1.0 then
                raise Value_Error with
                  "Decision_Tree_Classifer.Base_Fit, Min_Samples_Split must be in (0.0, 1.0]";
             end if;
-            Min_Split :=
+            --  260
+            Min_Sample_Split :=
               Integer (Float'Ceiling
                        (aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split));
-            if Min_Split < 2 then
-               Min_Split := 2;
+            if Min_Sample_Split < 2 then
+               Min_Sample_Split := 2;
             end if;
          when others =>
             raise Value_Error with
               "Decision_Tree_Classifer.Base_Fit, invalid Min_Samples_Split Split_Type";
+      end case;
+
+      --  L263
+      if Min_Sample_Split < 2 * Min_Sample_Leaf then
+         Min_Sample_Split := 2 * Min_Sample_Leaf;
+      end if;
+
+      case aClassifier.Parameters.Max_Features.Feature_Kind is
+         when Tree.Enum_Type => null;
+         when Tree.Float_Type =>
+            if aClassifier.Parameters.Max_Features.Fraction_Features > 0.0 then
+               Max_Features := Integer (aClassifier.Parameters.Max_Features.Fraction_Features) *
+                 Integer (aClassifier.Attributes.Num_Features);
+               if Max_Features < 1 then
+                  Max_Features := 1;
+               end if;
+            end if;
+         when Tree.Integer_Type =>
+            Max_Features := aClassifier.Parameters.Max_Features.Max_Features;
       end case;
 
    end Base_Fit;
@@ -206,10 +233,10 @@ package body Decision_Tree_Classifer is
       Expanded_Class_Weight : Classifier_Types.Float_List;
       Y_Encoded             : List_Of_Value_Data_Lists;
       Max_Leaf_Nodes        : integer := -1;
-      Min_Samples_Split     : Natural := 0;
-      Min_Samples_Leaf      : Natural := 0;
-      Min_Weight_Leaf       : Float := 0.0;
-      Max_Depth             : Natural := 0;
+      --        Min_Samples_Split     : Natural := 0;
+      --        Min_Samples_Leaf      : Natural := 0;
+      --        Min_Weight_Leaf       : Float := 0.0;
+      --        Max_Depth             : Natural := 0;
    begin
       --  L154
       if aClassifier.Parameters.CCP_Alpha < 0.0 then
@@ -306,7 +333,7 @@ package body Decision_Tree_Classifer is
    --  Prune tree using Minimal Cost-Complexity Pruning.
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
-                      return ML_Types.Value_Data_List is
+                     return ML_Types.Value_Data_List is
    begin
       return Tree.Predict (Self.Attributes.Decision_Tree, X);
    end Predict;
