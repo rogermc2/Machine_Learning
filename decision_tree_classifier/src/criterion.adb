@@ -258,8 +258,7 @@ package body Criterion is
     --  ------------------------------------------------------------------------
 
     procedure Reset (Criteria : in out Criterion_Class) is
-        Num_Outputs  : constant Positive :=
-                         Positive (Criteria.Y.Element (1).Length);
+        Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
         Left_List  : Classifier_Types.Weight_List;
         Right_List : Classifier_Types.Weight_List;
     begin
@@ -284,8 +283,7 @@ package body Criterion is
     --  ------------------------------------------------------------------------
 
     procedure Reverse_Reset (Criteria : in out Criterion_Class) is
-        Num_Outputs  : constant Positive :=
-                         Positive (Criteria.Y.Element (1).Length);
+        Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
         Left_List  : Classifier_Types.Weight_List;
         Right_List : Classifier_Types.Weight_List;
     begin
@@ -311,8 +309,7 @@ package body Criterion is
         use Classifier_Types;
         use Float_Package;
         use Weight_List_Package;
-        Num_Outputs  : constant Positive :=
-                         Positive (Criteria.Y.Element (1).Length);
+        Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
         Left_List   : Weight_List;
         Right_List  : Weight_List;
         Total_List  : Weight_List;
