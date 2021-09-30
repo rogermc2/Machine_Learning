@@ -80,8 +80,7 @@ package body Node_Splitter is
 
    function Node_Impurity (Self : Splitter_Class) return Float is
    begin
-      Put_Line ("Node_Splitter.Node_Impurity");
-      return Criterion.Node_Impurity (Self.Criteria);
+      return Criterion.Entropy_Node_Impurity (Self.Criteria);
    end Node_Impurity;
 
    --  -------------------------------------------------------------------------
@@ -340,7 +339,7 @@ package body Node_Splitter is
          Crit.Position := Best_Split.Pos_I;
          Criterion.Update (Self.Criteria, Crit.Position);
 
-         Criterion.Children_Impurity
+         Criterion.Classify_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
@@ -384,8 +383,8 @@ package body Node_Splitter is
       Put_Line ("Node_Splitter.Reset_Node Samples length" &
                     Integer'Image (Integer (Split.Sample_Indices.Length)));
       Criterion.Classification_Init
-        (Split.Criteria, Split.Y, Split.Sample_Indices, Split.Sample_Weight,
-         Split.Weighted_Samples, Start, Stop);
+        (Split.Criteria, Split.Y, Split.Sample_Indices,
+        Split.Sample_Weight, Split.Weighted_Samples, Start, Stop);
 
       Put_Line ("Node_Splitter Weighted_Node_Samples");
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;

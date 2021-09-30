@@ -28,6 +28,7 @@ package Node_Splitter is
       Sample_Indices       : Classifier_Types.Natural_List;  --  Samples
       Feature_Indices      : Classifier_Types.Natural_List;
       Constant_Features_I  : Classifier_Types.Natural_List;
+      Num_Classes          : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
       Weighted_Samples     : Float := 0.0;
       Y                    : ML_Types.List_Of_Value_Data_Lists;

@@ -6,7 +6,7 @@ package Criterion is
 
     type Criterion_Class is record
         Y                         : ML_Types.List_Of_Value_Data_Lists;
-        Classes                   : ML_Types.List_Of_Value_Data_Lists;
+        --          Classes                   : ML_Types.List_Of_Value_Data_Lists;
         Samples                   : ML_Types.List_Of_Value_Data_Lists;
         Sample_Indices            : Classifier_Types.Natural_List;
         Num_Weighted_Node_Samples : Natural := 0;
@@ -30,12 +30,16 @@ package Criterion is
         Sum_Total                 : Classifier_Types.List_Of_Weight_Lists;
         Sum_Left                  : Classifier_Types.List_Of_Weight_Lists;
         Sum_Right                 : Classifier_Types.List_Of_Weight_Lists;
-        Num_Classes               : Classifier_Types.Natural_List;
         Sq_Sum_Total              : Float := 0.0;
+        --  Classification Criterion_Class
+        Num_Classes               : Classifier_Types.Natural_List;
     end record;
 
-    procedure Children_Impurity (Criteria                      : Criterion_Class;
-                                 Impurity_Left, Impurity_Right : out Float);
+    Criterion_Error : Exception;
+
+    procedure Classify_Children_Impurity (Criteria       : Criterion_Class;
+                                          Impurity_Left,
+                                          Impurity_Right : out Float);
     function Gini_Node_Impurity (Criteria : in out Criterion_Class)
                                  return Float;
     function Impurity_Improvement
@@ -50,7 +54,7 @@ package Criterion is
        Sample_Weight    : Classifier_Types.Weight_List;
        Weighted_Samples : Float;
        Start, Stop      : Natural);
-    function Node_Impurity (Self : Criterion_Class) return Float;
+    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
     procedure Node_Value (Self : Criterion_Class;
                           Value : out Classifier_Types.Float_List);
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
