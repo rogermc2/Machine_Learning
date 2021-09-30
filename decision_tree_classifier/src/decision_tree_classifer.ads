@@ -68,13 +68,13 @@ package Decision_Tree_Classifer is
       Criterion                : Classifier_Criteria_Type := Gini_Criteria;
       Splitter_Kind            : Splitter_Type := Best_Splitter;
       Splitter                 : Node_Splitter.Splitter_Class;
-      Max_Depth                : Integer := 0;
+      Max_Depth                : Integer := -1;  --  < 0 means unspecified
       Min_Samples_Split        : Split_Record (Split_Type);
       Min_Samples_Leaf         : Leaf_Record (Leaf_Type);
       Min_Weight_Fraction_Leaf : Float := 0.0;
       Max_Features             : Tree.Features_Record (Feature_Type);
       Random_State             : Integer := 0;
-      Max_Leaf_Nodes           : Integer := -1;  --  < 0 means unsppecified
+      Max_Leaf_Nodes           : Integer := -1;  --  < 0 means unspecified
       --  Impure means that data is mixture of different classes.
       Min_Impurity_Decrease    : Float := 0.0;
       Min_Impurity_Split       : Float := 0.0;
