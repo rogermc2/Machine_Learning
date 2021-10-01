@@ -28,7 +28,9 @@ package body Decision_Tree_Classifer is
                          X, Y              : ML_Types.List_Of_Value_Data_Lists;
                          Sample_Weight     : Classifier_Types.Weight_List) is
       use Tree;
-      Max_Leaf_Nodes        : constant Integer := Self.Parameters.Max_Leaf_Nodes;
+      Max_Leaf_Nodes        : constant Integer :=
+                                Self.Parameters.Max_Leaf_Nodes;
+      --  L370
       Splitter              : constant Node_Splitter.Splitter_Class :=
                                 Self.Parameters.Splitter;
       theTree               : Tree.Tree_Class;
@@ -114,6 +116,15 @@ package body Decision_Tree_Classifer is
       Min_Weight_Leaf       : Float;
       Sum_Sample_Weight     : Float := 0.0;
    begin
+      if Integer (X.Length) < 1 then
+            raise Value_Error with
+              "Decision_Tree_Classifer.Base_Fit, X is empty";
+      end if;
+
+      if Integer (Y.Length) < 1 then
+            raise Value_Error with
+              "Decision_Tree_Classifer.Base_Fit, Y is empty";
+      end if;
       --  L184
       aClassifier.Attributes.Num_Features := Tree.Index_Range (X.Element (1).Length);
       --  L207
@@ -133,6 +144,7 @@ package body Decision_Tree_Classifer is
 
       --  L218
       Y_Copy := Y_Encoded;
+      Put_Line ("Decision_Tree_Classifer.Base_Fit Y_Copy set");
       if aClassifier.Parameters.Class_Weight /= Weights.No_Weight then
          Expanded_Class_Weight :=
            Weights.Compute_Sample_Weight (Weights.No_Weight, Y_Original);
@@ -144,6 +156,7 @@ package body Decision_Tree_Classifer is
       end if;
 
       Base_Fit_Checks (aClassifier, X, Y, Sample_Weight);
+      Put_Line ("Decision_Tree_Classifer.Base_Fit Y_Original Base_Fit_Checks done");
 
       if Expanded_Class_Weight.Is_Empty then
          if Sample_Weight.Is_Empty then
@@ -173,8 +186,10 @@ package body Decision_Tree_Classifer is
       end if;
 
       --  L343
-      Build_Tree (aClassifier, Min_Sample_Split.Min_Split, Min_Sample_Leaf.Min_Leaf,
-                  Min_Weight_Leaf, Max_Depth, X, Y, Sample_Weight);
+--        Build_Tree (aClassifier, Min_Sample_Split.Min_Split, Min_Sample_Leaf.Min_Leaf,
+--                    Min_Weight_Leaf, Max_Depth, X, Y, Sample_Weight);
+      Ada_Tree_Build.Build_Tree (aClassifier.Attributes.Decision_Tree,
+                                 X, Y, Sample_Weight);
 
    end Base_Fit;
 
@@ -232,7 +247,7 @@ package body Decision_Tree_Classifer is
             raise Value_Error with
               "Decision_Tree_Classifer.Base_Fit_Checks, Min_Samples_Split must be in (0.0, 1.0]";
          end if;
-         --  260
+         --  L260
          Min_Sample_Split.Min_Split :=
            Integer (Float'Ceiling
                     (aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split));
@@ -265,19 +280,24 @@ package body Decision_Tree_Classifer is
 
       --  L291
       aClassifier.Parameters.Max_Features := Max_Features;
+      Put_Line ("Decision_Tree_Classifer.Base_Fit_Checks Max_Features set");
 
+      Put_Line ("Decision_Tree_Classifer.Base_Fit_Checks Y length: " &
+               Integer'Image (Integer (Y.Length)));
       if Positive (Y.Element (1).Length) /= Num_Samples then
          raise Value_Error with
            "Decision_Tree_Classifer.Base_Fit_Checks, number of labels " &
            Integer'Image (Integer (Y.Element (1).Length)) &
            " does not match number of samples " & Integer'Image (Num_Samples);
       end if;
+      Put_Line ("Decision_Tree_Classifer.Base_Fit_Checks number of labels checked");
 
       if aClassifier.Parameters.Min_Weight_Fraction_Leaf <= 0.0 or
         aClassifier.Parameters.Min_Weight_Fraction_Leaf > 5.0 then
          raise Value_Error with
            "Decision_Tree_Classifer.v, Min_Weight_Fraction_Leaf must be in (0.0, 5.0]";
       end if;
+      Put_Line ("Decision_Tree_Classifer.Base_Fit_Checks Min_Weight_Fraction_Leaf checked");
 
       if Max_Features.Max_Features <= 0 or
         Max_Features.Max_Features > Integer (aClassifier.Attributes.Num_Features) then
@@ -289,6 +309,7 @@ package body Decision_Tree_Classifer is
          raise Value_Error with
            "Decision_Tree_Classifer.Base_Fit_Checks, Max_Leaf_Nodes should be > 1";
       end if;
+      Put_Line ("Decision_Tree_Classifer.Base_Fit_Checks L315");
 
       --  L315
       if not Sample_Weight.Is_Empty then
@@ -349,6 +370,15 @@ package body Decision_Tree_Classifer is
       --        Min_Weight_Leaf       : Float := 0.0;
       --        Max_Depth             : Natural := 0;
    begin
+      if Integer (X.Length) < 1 then
+            raise Value_Error with
+              "Decision_Tree_Classifer.Fit, X is empty";
+      end if;
+
+      if Integer (Y.Length) < 1 then
+            raise Value_Error with
+              "Decision_Tree_Classifer.Fit, Y is empty";
+      end if;
       --  L154
       if aClassifier.Parameters.CCP_Alpha < 0.0 then
          raise Value_Error with
