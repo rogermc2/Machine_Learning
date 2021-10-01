@@ -1,11 +1,12 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
 with Decision_Tree_Classifer;
-with Tree;
 with ML_Types;
+with Tree;
 
 package body Classifier_Tests is
     use Classifier_Types;
@@ -31,7 +32,7 @@ package body Classifier_Tests is
         use Decision_Tree_Classifer;
 
         Expected    : List_Of_Value_Data_Lists;
-        theTree     : Classifier (Tree.Integer_Type, Tree.Integer_Type,
+        theTree     : Base_Decision_Tree.Classifier (Tree.Integer_Type, Tree.Integer_Type,
                                   Tree.Integer_Type);
         X           : constant List_Of_Value_Data_Lists :=
                         To_Multi_Value_List (X_Array);
