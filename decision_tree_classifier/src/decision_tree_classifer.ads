@@ -68,8 +68,7 @@ package Decision_Tree_Classifer is
       (aClassifier   : in out Base_Decision_Tree.Classifier;
        X             : ML_Types.List_Of_Value_Data_Lists;
        Y             : in out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : out Classifier_Types.Float_List;
-                  Check_Input   : Boolean := False);
+       Sample_Weight : out Classifier_Types.Float_List);
    procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
                    Max_Leaf_Nodes : Integer := -1;
                    Random_State   : Integer := 0);
