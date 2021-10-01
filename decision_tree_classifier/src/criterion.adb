@@ -273,7 +273,7 @@ package body Criterion is
          Left_List := Criteria.Sum_Left.Element (k);
          Right_List := Criteria.Sum_Right.Element (k);
          for s in Left_List.First_Index .. Left_List.Last_Index loop
-         Put_Line ("Criterion.Reset s: " & Integer'Image (s));
+            Put_Line ("Criterion.Reset s: " & Integer'Image (s));
             Left_List.Append (0.0);
             Right_List.Append (Criteria.Sum_Total.Element (s));
          end loop;

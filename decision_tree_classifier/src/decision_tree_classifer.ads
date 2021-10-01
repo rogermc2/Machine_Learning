@@ -114,10 +114,12 @@ package Decision_Tree_Classifer is
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
-   procedure Fit (aClassifier   : in out Classifier;
-                  X             : ML_Types.List_Of_Value_Data_Lists;
-                  Y             : in out ML_Types.List_Of_Value_Data_Lists;
-                  Sample_Weight : in out Classifier_Types.Weight_List;
+
+    procedure Classification_Fit
+      (aClassifier   : in out Classifier;
+       X             : ML_Types.List_Of_Value_Data_Lists;
+       Y             : in out ML_Types.List_Of_Value_Data_Lists;
+       Sample_Weight : out Classifier_Types.Float_List;
                   Check_Input   : Boolean := False);
    procedure Init (aClassifier    : in out Classifier;
                    Max_Leaf_Nodes : Integer := -1;

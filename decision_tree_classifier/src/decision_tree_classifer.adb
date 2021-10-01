@@ -5,7 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Ada_Tree_Build;
 with Classifier_Types;
-with Classifier_Utilities;
 with Encode_Utils;
 with Tree_Build;
 
@@ -13,7 +12,7 @@ package body Decision_Tree_Classifer is
 
     procedure Base_Fit_Checks
       (aClassifier   : in out Classifier;
-       X             : in out ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.List_Of_Value_Data_Lists;
        Y             : in out ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : in out Classifier_Types.Float_List);
     procedure Classification_Part
@@ -96,7 +95,7 @@ package body Decision_Tree_Classifer is
     --  L150
     procedure Base_Fit
       (aClassifier   : in out Classifier;
-       X             : in out ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.List_Of_Value_Data_Lists;
        Y             : in out ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : in out Classifier_Types.Float_List) is
         Num_Samples           : constant Positive :=
@@ -173,7 +172,7 @@ package body Decision_Tree_Classifer is
 
     procedure Base_Fit_Checks
       (aClassifier   : in out Classifier;
-       X             : in out ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.List_Of_Value_Data_Lists;
        Y             : in out ML_Types.List_Of_Value_Data_Lists;
        Sample_Weight : in out Classifier_Types.Float_List) is
         Num_Samples           : constant Positive :=
@@ -345,131 +344,19 @@ package body Decision_Tree_Classifer is
     --  L884
     procedure Classification_Fit
       (aClassifier   : in out Classifier;
-       X             : in out ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.List_Of_Value_Data_Lists;
        Y             : in out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : out Classifier_Types.Float_List) is
+       Sample_Weight : out Classifier_Types.Float_List;
+       Check_Input   : Boolean := False) is
     begin
         --  L929
-        Base_Fit  (aClassifier, X, Y, Sample_Weight);
-    end Classification_Fit;
-
-    --  -------------------------------------------------------------------------
-    --  The Fit function adjusts weights according to data values so that
-    --  better accuracy can be achieved
-    --  Based on tree/_classes.py BaseDecisionTree.Fit
-    --  X :  a (n_samples, n_features) matrix of training samples
-    --  Y :  a (n_samples, n_outputs) array of integer valued class labels
-    --       for the training samples.
-    --  Sample_Weight : array-like of shape (n_samples,), default=None
-    procedure Fit (aClassifier   : in out Classifier;
-                   X             : ML_Types.List_Of_Value_Data_Lists;
-                   Y             : in out ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight : in out Classifier_Types.Weight_List;
-                   Check_Input   : Boolean := False) is
-        use Ada.Containers;
-        use ML_Types;
-        use Classifier_Types;
-        use Classifier_Types.Integer_Package;
-        theTree               : Tree.Tree_Class;
-        Num_Samples           : constant Positive :=  Positive (X (1).Length);
-        Num_Outputs           : constant Positive := Positive (Y.Length);
-        Num_Labels            : constant Positive := Positive (Y.Element (1).Length);
-        --        Random_State          : Integer := aClassifier.Parameters.Random_State;
-        Expanded_Class_Weight : Classifier_Types.Float_List;
-        Y_Encoded             : List_Of_Value_Data_Lists;
-        Max_Leaf_Nodes        : integer := -1;
-        --        Min_Samples_Split     : Natural := 0;
-        --        Min_Samples_Leaf      : Natural := 0;
-        --        Min_Weight_Leaf       : Float := 0.0;
-        --        Max_Depth             : Natural := 0;
-    begin
-        if Integer (X.Length) < 1 then
-            raise Value_Error with
-              "Decision_Tree_Classifer.Fit, X is empty";
-        end if;
-
-        if Integer (Y.Length) < 1 then
-            raise Value_Error with
-              "Decision_Tree_Classifer.Fit, Y is empty";
-        end if;
-        --  L154
-        if aClassifier.Parameters.CCP_Alpha < 0.0 then
-            raise Value_Error with
-              "Decision_Tree_Classifer.Fit CCP_Alpha must be greater than or equal to 0";
-        end if;
-
-        --  L156
-        if Check_Input then
-            null;
-        end if;
-
-        --  L184
-        aClassifier.Attributes.Num_Features := Tree.Index_Range (Num_Samples);
-        aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
-        aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
-        --  L201
-        aClassifier.Attributes.Classes.Clear;
-        aClassifier.Attributes.Num_Classes.Clear;
-        Put_Line ("Decision_Tree_Classifer.Fit Y length: " &
-                    Integer'Image (Integer (Y.Length)));
-        Put_Line ("Decision_Tree_Classifer.Fit Y.Element (1) length: " &
-                    Integer'Image (Integer (Y.Element (1).Length)));
-
-        Put_Line
-          ("Decision_Tree_Classifer.Fit Num_Samples, Num_Outputs: " &
-             Tree.Index_Range'Image (aClassifier.Attributes.Num_Features) &
-             Tree.Index_Range'Image (aClassifier.Attributes.Num_Outputs));
-
-        Classifier_Utilities.Print_Value_List
-          ("Decision_Tree_Classifer.Fit X (1)", X.Element (1));
-        Classifier_Utilities.Print_Value_List
-          ("Decision_Tree_Classifer.Fit X (2)", X.Element (2));
-        Classifier_Utilities.Print_Value_List
-          ("Decision_Tree_Classifer.Fit Y (1)", Y.Element (1));
-
-        if Num_Labels /= Num_Samples then
-            raise Classifier_Error with
-              "Decision_Tree_Classifer.Fit Number of labels =" &
-              Integer'Image (Num_Labels) & " does not match number of samples ="
-              & Integer'Image (Num_Samples);
-        end if;
-
-        --  L206
-        Classification_Part (aClassifier, Y, Y_Encoded, Expanded_Class_Weight);
-        --  L222
-        Put_Line ("Decision_Tree_Classifer.Fit after Classification_Fit Y length: " &
-                    Integer'Image (Integer (Y.Length)));
-        Classifier_Utilities.Print_Value_List
-          ("Decision_Tree_Classifer.Fit after Classification_Fit Y (1)",
-           Y.Element (1));
-        Classifier_Utilities.Print_Float_List
-          ("Decision_Tree_Classifer.Fit Expanded_Class_Weight",
-           Expanded_Class_Weight);
-
-        --  L226
-        Max_Leaf_Nodes := aClassifier.Parameters.Max_Leaf_Nodes;
-
-        Check_Parameters;
-
-        --  L318
-        if not Expanded_Class_Weight.Is_Empty then
-            if Sample_Weight.Is_Empty then
-                Sample_Weight := Expanded_Class_Weight;
-            else
-                for index in Sample_Weight.First_Index ..
-                  Sample_Weight.Last_Index loop
-                    Sample_Weight.Replace_Element
-                      (index, Sample_Weight.Element (index) *
-                           Expanded_Class_Weight.Element (index)) ;
-                end loop;
-            end if;
-        end if;
+      Base_Fit  (aClassifier, X, Y, Sample_Weight);
 
         --  L350
-        Ada_Tree_Build.Build_Tree (theTree, X, Y, Sample_Weight);
+      Ada_Tree_Build.Build_Tree (aClassifier.Attributes.Decision_Tree,
+                                 X, Y, Sample_Weight);
         --  L410
-
-    end Fit;
+    end Classification_Fit;
 
     --  -------------------------------------------------------------------------
 

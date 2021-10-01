@@ -49,7 +49,7 @@ package body Classifier_Tests is
         Init (theTree, Random_State => 0);
         Y := To_Integer_Value_List (Y_Array);
         Expected := To_Integer_Value_List (True_Result);
-        Fit (theTree, X, Y, Weights);
+        Classification_Fit (theTree, X, Y, Weights);
         Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                     Integer'Image
                     (Integer (theTree.Attributes.Decision_Tree.Nodes.Node_Count)));
