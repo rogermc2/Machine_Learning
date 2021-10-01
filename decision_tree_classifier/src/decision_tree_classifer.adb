@@ -172,6 +172,10 @@ package body Decision_Tree_Classifer is
            Sum_Sample_Weight * aClassifier.Parameters.Min_Weight_Fraction_Leaf;
       end if;
 
+      --  L343
+      Build_Tree (aClassifier, Min_Sample_Split.Min_Split, Min_Sample_Leaf.Min_Leaf,
+                  Min_Weight_Leaf, Max_Depth, X, Y, Sample_Weight);
+
    end Base_Fit;
 
    --  -------------------------------------------------------------------------
@@ -293,6 +297,12 @@ package body Decision_Tree_Classifer is
               "Decision_Tree_Classifer.Base_Fit_Checks, Sample_Weight lenghth " &
               "should be the same as the number of X samples";
          end if;
+      end if;
+
+      --  L350
+      if aClassifier.Parameters.Min_Impurity_Decrease < 0.0 then
+         raise Value_Error with
+           "Decision_Tree_Classifer.Base_Fit_Checks, Min_Impurity_Decrease should be >= 0";
       end if;
 
    end Base_Fit_Checks;
@@ -434,7 +444,7 @@ package body Decision_Tree_Classifer is
    --  Prune tree using Minimal Cost-Complexity Pruning.
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
-                  return ML_Types.Value_Data_List is
+                     return ML_Types.Value_Data_List is
    begin
       return Tree.Predict (Self.Attributes.Decision_Tree, X);
    end Predict;
