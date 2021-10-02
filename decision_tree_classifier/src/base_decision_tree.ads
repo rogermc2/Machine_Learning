@@ -117,6 +117,7 @@ package Base_Decision_Tree is
                        Sample_Weight : in out Classifier_Types.Float_List);
    procedure Init (aClassifier    : in out Classifier;
                    Max_Leaf_Nodes : Integer := -1;
+                   Min_Weight_Fraction_Leaf : Float := 0.0;
                    Random_State   : Integer := 0);
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)

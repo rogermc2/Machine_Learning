@@ -38,7 +38,7 @@ package body Classifier_Tests is
                           To_Multi_Value_List (X_Array);
       Y               : List_Of_Value_Data_Lists;
       Num_Samples     : constant Natural := Natural (X.Element (1).Length);
-      Classes         : Value_Data_List;
+--        Classes         : Value_Data_List;
       Weights         : Weight_List;
       Probabilities   : List_Of_Value_Data_Lists;
    begin
@@ -58,6 +58,9 @@ package body Classifier_Tests is
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
                         Weights);
       Probabilities := Predict_Probability (theTree, X);
+      Classifier_Utilities.Print_Multi_Value_List
+          ("Classification_Tests.Test_Classification_Toy Probabilities",
+          Probabilities);
       --          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
       --                            Classes);
 

@@ -27,7 +27,8 @@ package body Decision_Tree_Classifer is
                    Max_Leaf_Nodes : Integer := -1;
                    Random_State   : Integer := 0) is
    begin
-      Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes, Random_State);
+      Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes,
+                               Random_State => Random_State);
    end Init;
 
    --  -------------------------------------------------------------------------
