@@ -205,14 +205,19 @@ package body Criterion is
       Count_K        : Float := 0.0;
       Entropy        : Float := 0.0;
    begin
-      Put_Line ("Criterion.Node_Impurity");
       for index in Self.Y.First_Index .. Self.Y.Last_Index loop
-         Put_Line ("Criterion.Node_Impurity index" &
+         Put_Line ("Criterion.Entropy_Node_Impurity index" &
                      Integer'Image (index));
          Class_List := Self.Y.Element (index);
+         Put_Line ("Criterion.Entropy_Node_Impurity Class_List length" &
+                     Integer'Image (Integer (Class_List.Length)));
+         Put_Line ("Criterion.Entropy_Node_Impurity Self.Sum_Total length" &
+                     Integer'Image (Integer (Self.Sum_Total.Length)));
          Sum_Total_List := Self.Sum_Total.Element (index);
+         Put_Line ("Criterion.Entropy_Node_Impurity Sum_Total_List length" &
+                     Integer'Image (Integer (Sum_Total_List.Length)));
          for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Put_Line ("Criterion.Node_Impurity c" &
+            Put_Line ("Criterion.Entropy_Node_Impurity c" &
                         Integer'Image (c));
             Count_K := Sum_Total_List.Element (c);
             if Count_K > 0.0 then
@@ -266,23 +271,20 @@ package body Criterion is
       Criteria.Sum_Right.Clear;
       for k in 1 .. Num_Outputs loop
          Put_Line ("Criterion.Reset k: " & Integer'Image (k));
-         Put_Line ("Criterion.Reset Sum_Left length: " &
-                     Integer'Image (Integer (Criteria.Sum_Left.Length)));
-         Put_Line ("Criterion.Reset Sum_Right length: " &
-                     Integer'Image (Integer (Criteria.Sum_Right.Length)));
-         Left_List := Criteria.Sum_Left.Element (k);
-         Right_List := Criteria.Sum_Right.Element (k);
-         for s in Left_List.First_Index .. Left_List.Last_Index loop
+         Left_List.Clear;
+         Right_List.Clear;
+         for s in 1 .. Criteria.Num_Classes.Element (k) loop
             Put_Line ("Criterion.Reset s: " & Integer'Image (s));
             Left_List.Append (0.0);
             Right_List.Append (Criteria.Sum_Total.Element (s));
          end loop;
          Criteria.Sum_Left.Append (Left_List);
-         Criteria.Sum_Right.Append (Left_List);
+         Criteria.Sum_Right.Append (Right_List);
       end loop;
 
       Criteria.Weighted_Left := 0.0;
       Criteria.Weighted_Right := Criteria.Weighted_Node_Samples;
+      Put_Line ("Criterion.Reset done");
 
    end Reset;
 
