@@ -73,7 +73,8 @@ package Decision_Tree_Classifer is
    procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
                    Max_Leaf_Nodes : Integer := -1;
                    Random_State   : Integer := 0);
-   procedure Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                  X    : ML_Types.List_Of_Value_Data_Lists);
+   function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
+                                  X    : ML_Types.List_Of_Value_Data_Lists)
+                                 return ML_Types.List_Of_Value_Data_Lists;
 
 end Decision_Tree_Classifer;

@@ -8,38 +8,78 @@ with Classifier_Types;
 
 package body Decision_Tree_Classifer is
 
-    --  -------------------------------------------------------------------------
-    --  L884
-    procedure Classification_Fit
-      (aClassifier   : in out Base_Decision_Tree.Classifier;
-       X             : ML_Types.List_Of_Value_Data_Lists;
-       Y             : in out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : out Classifier_Types.Float_List) is
-    begin
-        --  L929
-        Base_Decision_Tree.Base_Fit  (aClassifier, X, Y, Sample_Weight);
+   --  -------------------------------------------------------------------------
+   --  L884
+   procedure Classification_Fit
+     (aClassifier   : in out Base_Decision_Tree.Classifier;
+      X             : ML_Types.List_Of_Value_Data_Lists;
+      Y             : in out ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weight : out Classifier_Types.Float_List) is
+   begin
+      --  L929
+      Base_Decision_Tree.Base_Fit  (aClassifier, X, Y, Sample_Weight);
 
-    end Classification_Fit;
+   end Classification_Fit;
 
-    --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-    procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
-                    Max_Leaf_Nodes : Integer := -1;
-                    Random_State   : Integer := 0) is
-    begin
-        Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes, Random_State);
-    end Init;
+   procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
+                   Max_Leaf_Nodes : Integer := -1;
+                   Random_State   : Integer := 0) is
+   begin
+      Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes, Random_State);
+   end Init;
 
-    --  -------------------------------------------------------------------------
-    --  L930
-    procedure Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                   X    : ML_Types.List_Of_Value_Data_Lists) is
-        Proba     : ML_Types.Value_Data_List;
-        All_Proba : ML_Types.Value_Data_List;
-    begin
-        Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
-    end Predict_Probability;
+   --  -------------------------------------------------------------------------
+   --  L930 Predict_Probability predicts class probabilities of the
+   --  input samples X.
+   --  The predicted class probability is the fraction of samples of the same
+   --  class in a leaf.
+   function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
+                                 X    : ML_Types.List_Of_Value_Data_Lists)
+                                 return ML_Types.List_Of_Value_Data_Lists is
+      use ML_Types;
+      Proba      : Value_Data_List;
+      All_Proba  : List_Of_Value_Data_Lists;
+      Data       : Value_Record;
+      Normalizer : Float := 0.0;
+   begin
+      Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
+      for OP_Index in 1 .. Self.Attributes.Num_Outputs loop
+         for index in Proba.First_Index .. Proba.Last_Index loop
+            Data := Proba.Element (index);
+            case Data.Value_Kind is
+               when Float_Type =>
+                  Normalizer := Normalizer + Data.Float_Value;
+               when Integer_Type =>
+                  Normalizer := Normalizer + Float (Data.Integer_Value);
+               when others => null;
+            end case;
+         end loop;
+         if Normalizer <= 0.0 then
+             Normalizer := 1.0;
+         end if;
 
-    --  -------------------------------------------------------------------------
+         for index in Proba.First_Index .. Proba.Last_Index loop
+            Data := Proba.Element (index);
+            case Data.Value_Kind is
+               when Float_Type =>
+                  Data.Float_Value := Data.Float_Value / Normalizer;
+               when Integer_Type =>
+                  Data.Integer_Value :=
+                    Integer (Float (Data.Integer_Value) / Normalizer);
+               when others => null;
+            end case;
+            Proba.Replace_Element (index, Data);
+         end loop;
+         All_Proba.Append (Proba);
+
+      end loop;
+
+      return All_Proba;
+
+   end Predict_Probability;
+
+   --  -------------------------------------------------------------------------
 
 end Decision_Tree_Classifer;
