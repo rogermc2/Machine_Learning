@@ -3,9 +3,9 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Ada_Tree_Build;
 with Classifier_Types;
 with Encode_Utils;
---  with Tree_Build;
 
 package body Base_Decision_Tree is
 
@@ -18,68 +18,69 @@ package body Base_Decision_Tree is
       (aClassifier : in out Classifier;
        Y, Y_Encoded : in out ML_Types.List_Of_Value_Data_Lists;
        Expanded_Class_Weight : in out Classifier_Types.Float_List);
+    procedure Prune_Tree (aClassifier : in out Classifier);
 
     --  -------------------------------------------------------------------------
     --  Based on class.py fit L350 Build tree
---      procedure Build_Tree (Self              : in out Classifier;
---                            Min_Samples_Split : Natural;
---                            Min_Samples_Leaf  : Natural;
---                            Min_Weight_Leaf   : Float;
---                            Max_Depth         : Natural;
---                            X, Y              : ML_Types.List_Of_Value_Data_Lists;
---                            Sample_Weight     : Classifier_Types.Weight_List) is
---          use Tree;
---          Max_Leaf_Nodes        : constant Integer :=
---                                    Self.Parameters.Max_Leaf_Nodes;
---          --  L370
---          Splitter              : constant Node_Splitter.Splitter_Class :=
---                                    Self.Parameters.Splitter;
---          theTree               : Tree.Tree_Class;
---          Min_Impurity_Decrease : constant Float := 0.0;
---      begin
---          --  L387
---          --  if is_classifier(self):
---          Self.Attributes.Decision_Tree := theTree;
---
---          --  L388
---          theTree.Num_Features := Natural (Self.Attributes.Num_Features);
---          theTree.Num_Outputs := Self.Attributes.Num_Outputs;
---          Self.Attributes.Decision_Tree := theTree;
---
---          --  L398
---          if Max_Leaf_Nodes < 0 then
---              declare
---                  Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
---              begin
---                  --  L419  Depth First case
---                  Tree_Build.Init_Depth_First_Tree
---                    (Builder, Splitter, Min_Samples_Split, Min_Samples_Leaf,
---                     Min_Weight_Leaf, Max_Depth, Min_Impurity_Decrease);
---                  Tree_Build.Build_Depth_First_Tree
---                    (Builder, theTree, X, Y, Sample_Weight);
---              end;
---
---          else
---              declare
---                  Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
---              begin            --  L419  Best First case
---                  Tree_Build.Init_Best_First_Tree
---                    (Builder, Self.Parameters.Splitter, Min_Samples_Split,
---                     Min_Samples_Leaf, Min_Weight_Leaf, Max_Depth, Max_Leaf_Nodes,
---                     Min_Impurity_Decrease);
---                  Tree_Build.Build_Best_First_Tree
---                    (Builder, theTree, X, Y, Sample_Weight);
---              end;
---          end if;
---
---          --  L420
---          if Self.Attributes.Num_Outputs = 1 then  --  and is_Classifer (Self)
---              null;
---          end if;
---
---          Prune_Tree (Self);
---
---      end Build_Tree;
+    --      procedure Build_Tree (Self              : in out Classifier;
+    --                            Min_Samples_Split : Natural;
+    --                            Min_Samples_Leaf  : Natural;
+    --                            Min_Weight_Leaf   : Float;
+    --                            Max_Depth         : Natural;
+    --                            X, Y              : ML_Types.List_Of_Value_Data_Lists;
+    --                            Sample_Weight     : Classifier_Types.Weight_List) is
+    --          use Tree;
+    --          Max_Leaf_Nodes        : constant Integer :=
+    --                                    Self.Parameters.Max_Leaf_Nodes;
+    --          --  L370
+    --          Splitter              : constant Node_Splitter.Splitter_Class :=
+    --                                    Self.Parameters.Splitter;
+    --          theTree               : Tree.Tree_Class;
+    --          Min_Impurity_Decrease : constant Float := 0.0;
+    --      begin
+    --          --  L387
+    --          --  if is_classifier(self):
+    --          Self.Attributes.Decision_Tree := theTree;
+    --
+    --          --  L388
+    --          theTree.Num_Features := Natural (Self.Attributes.Num_Features);
+    --          theTree.Num_Outputs := Self.Attributes.Num_Outputs;
+    --          Self.Attributes.Decision_Tree := theTree;
+    --
+    --          --  L398
+    --          if Max_Leaf_Nodes < 0 then
+    --              declare
+    --                  Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
+    --              begin
+    --                  --  L419  Depth First case
+    --                  Tree_Build.Init_Depth_First_Tree
+    --                    (Builder, Splitter, Min_Samples_Split, Min_Samples_Leaf,
+    --                     Min_Weight_Leaf, Max_Depth, Min_Impurity_Decrease);
+    --                  Tree_Build.Build_Depth_First_Tree
+    --                    (Builder, theTree, X, Y, Sample_Weight);
+    --              end;
+    --
+    --          else
+    --              declare
+    --                  Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
+    --              begin            --  L419  Best First case
+    --                  Tree_Build.Init_Best_First_Tree
+    --                    (Builder, Self.Parameters.Splitter, Min_Samples_Split,
+    --                     Min_Samples_Leaf, Min_Weight_Leaf, Max_Depth, Max_Leaf_Nodes,
+    --                     Min_Impurity_Decrease);
+    --                  Tree_Build.Build_Best_First_Tree
+    --                    (Builder, theTree, X, Y, Sample_Weight);
+    --              end;
+    --          end if;
+    --
+    --          --  L420
+    --          if Self.Attributes.Num_Outputs = 1 then  --  and is_Classifer (Self)
+    --              null;
+    --          end if;
+    --
+    --          Prune_Tree (Self);
+    --
+    --      end Build_Tree;
 
     --  -------------------------------------------------------------------------
     --  if is_classification: part of Python BasesDecisionTree.Fit
@@ -99,7 +100,7 @@ package body Base_Decision_Tree is
         --          Max_Leaf_Nodes        : Integer := aClassifier.Parameters.Max_Leaf_Nodes;
         --          Min_Sample_Leaf       : Leaf_Record (Tree.Integer_Type);
         --          Min_Sample_Split      : Split_Record (Tree.Integer_Type);
---          Max_Features          : Tree.Features_Record (Tree.Integer_Type);
+        --          Max_Features          : Tree.Features_Record (Tree.Integer_Type);
         Min_Weight_Leaf       : Float;
         Sum_Sample_Weight     : Float := 0.0;
     begin
@@ -150,6 +151,16 @@ package body Base_Decision_Tree is
             Min_Weight_Leaf :=
               Sum_Sample_Weight * aClassifier.Parameters.Min_Weight_Fraction_Leaf;
         end if;
+
+        --  L410
+        Ada_Tree_Build.Build_Tree (aClassifier.Attributes.Decision_Tree,
+                                   X, Y, Sample_Weight);
+
+        if Integer (aClassifier.Attributes.Num_Outputs) = 1 then
+            null;
+        end if;
+
+        Prune_Tree (aClassifier);
 
     end Base_Fit;
 
@@ -337,13 +348,19 @@ package body Base_Decision_Tree is
 
     --  -------------------------------------------------------------------------
     --  Based on class.py fit L431 Predict
-    --  Prune tree using Minimal Cost-Complexity Pruning.
     function Predict (Self : in out Classifier;
                       X    : ML_Types.List_Of_Value_Data_Lists)
                       return ML_Types.Value_Data_List is
     begin
         return Tree.Predict (Self.Attributes.Decision_Tree, X);
     end Predict;
+
+    --  -------------------------------------------------------------------------
+    --  Prune tree using Minimal Cost-Complexity Pruning.
+    procedure Prune_Tree (aClassifier : in out Classifier) is
+    begin
+        null;
+    end Prune_Tree;
 
     --  -------------------------------------------------------------------------
 

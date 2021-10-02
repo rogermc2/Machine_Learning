@@ -56,9 +56,9 @@ package body Classifier_Tests is
                     (Integer (theTree.Attributes.Decision_Tree.Nodes.Node_Count)));
         Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
                           Weights);
-        Classes := Predict (theTree, X);
-        Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
-                          Classes);
+        Predict_Probability (theTree, X);
+--          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
+--                            Classes);
 
     end Test_Classification_Toy;
 

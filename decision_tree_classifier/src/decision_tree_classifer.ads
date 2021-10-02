@@ -1,4 +1,5 @@
 
+with Classifier_Types;
 --  Based on scikit-learn/sklearn/tree tree _classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 --  Decision Trees (DTs) are a non-parametric supervised learning method used
@@ -23,7 +24,7 @@ with ML_Types;
 with Tree;
 
 with Base_Decision_Tree;
-with Classifier_Types; use Classifier_Types;
+with Classifier_Types;
 
 package Decision_Tree_Classifer is
    --  Gini Impurity is a measurement of the likelihood of an incorrect
@@ -72,8 +73,7 @@ package Decision_Tree_Classifer is
    procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
                    Max_Leaf_Nodes : Integer := -1;
                    Random_State   : Integer := 0);
-   function Predict (Self : in out Base_Decision_Tree.Classifier;
-                     X    : ML_Types.List_Of_Value_Data_Lists)
-                     return ML_Types.Value_Data_List;
+   procedure Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
+                                  X    : ML_Types.List_Of_Value_Data_Lists);
 
 end Decision_Tree_Classifer;
