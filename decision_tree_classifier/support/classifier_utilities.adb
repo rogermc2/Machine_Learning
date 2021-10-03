@@ -3,6 +3,7 @@ with Ada.Containers.Ordered_Sets;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
+with Tree;
 
 package body Classifier_Utilities is
 
@@ -443,6 +444,94 @@ package body Classifier_Utilities is
     end Print_Natural_List;
 
     --  ------------------------------------------------------------------------
+
+   procedure Print_Node (Node : Tree.Tree_Node; Offset : String) is
+      use ML_Types;
+      use Tree;
+      use Values_Package;
+      Values      : constant Value_List := Node.Values;
+      Curs        : Values_Package.Cursor := Values.First;
+      Data        : Value_Data;
+      Data_String : Unbounded_String;
+   begin
+      Data_String := To_Unbounded_String (Offset  & "    Predict {");
+      while Has_Element (Curs) loop
+         Data := Element (Curs);
+         Data_String := Data_String & "'" & To_String (Data.Label) &
+           "':" & Natural'Image (Data.Num_Copies);
+         if not (Curs = Values.Last) then
+            Data_String := Data_String & ", ";
+         end if;
+         Next (Curs);
+      end loop;
+      Data_String := Data_String & "}";
+      Put_Line (To_String (Data_String));
+
+   end Print_Node;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Tree (aTree : Tree.Tree_Class) is
+      use Tree;
+      use Nodes_Package;
+      Nodes       : Tree.Nodes_Package.Tree := aTree.Nodes;
+      This_Indent : Natural := 0;
+      Last_Offset : Unbounded_String;
+
+      procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
+         use Ada.Containers;
+         Node         : Tree_Node;
+         True_Child   : Cursor;
+         False_Child  : Cursor;
+      begin
+         This_Indent := Indent + 1;
+         if This_Indent > 10 then
+            This_Indent := 1;
+         end if;
+         Node := Element (Curs);
+         if Is_Leaf  (Curs) then
+            Print_Prediction (Node, To_String (Last_Offset));
+         else
+            declare
+               Offset    : String (1 .. This_Indent + 1) := (others => ' ');
+               pos       : Natural := 1;
+            begin
+               while pos < This_Indent - 1 loop
+                  Offset (pos .. pos + 2) := "   ";
+                  pos := pos + 2;
+               end loop;
+               if This_Indent > 1 and then pos < This_Indent + 1 then
+                  Offset (Indent) := ' ';
+               end if;
+               Put (Offset);
+               Last_Offset := To_Unbounded_String (Offset);
+
+               if Node.Node_Type = Prediction_Node then
+                  Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
+                  Print_Prediction (Node, Offset);
+               else
+                  Print_Results_Question (Node.Question);
+                  Put_Line (Offset & "--> True:");
+                  Print_Node_Data (Node, Offset);
+                  True_Child := First_Child (Curs);
+                  Print_Tree_Node (True_Child, This_Indent + 1);
+
+                  if Child_Count (Curs) > 1 then
+                     False_Child := Next_Sibling (True_Child);
+                     Put_Line (Offset & "--> False:");
+                     Print_Node_Data (Node, Offset);
+                     Print_Tree_Node (False_Child, This_Indent + 1);
+                  end if;
+               end if;
+            end; --  declare block
+         end if;
+      end Print_Tree_Node;
+
+   begin
+      Print_Tree_Node (First_Child (aTree.Root));
+   end Print_Tree;
+
+   --  -------------------------------------------------------------------------
 
     procedure Print_Value_List (Name    : String;
                                 theList : ML_Types.Value_Data_List) is

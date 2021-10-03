@@ -30,16 +30,11 @@ package Tree is
       end case;
    end record;
 
---     use Classifier_Types.Float_Package;
---     package Values_Package is new Ada.Containers.Vectors
---       (Positive, Classifier_Types.Float_List);
---     subtype Values_List is Values_Package.Vector;
    subtype Values_List is Classifier_Types.Float_List;
 
    type Tree_Node
      (Is_Leaf : Boolean := False)
    is record
---        Node_Index                : Natural := 0;
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Samples_Start             : Natural := 0;
       Samples_End               : Natural := 0;

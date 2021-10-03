@@ -1,11 +1,11 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 
 package body Node_Splitter is
 
