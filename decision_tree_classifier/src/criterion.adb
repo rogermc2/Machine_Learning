@@ -4,6 +4,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Utilities;
+
+with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -216,6 +218,7 @@ package body Criterion is
          Sum_Total_List := Self.Sum_Total.Element (index);
          Put_Line ("Criterion.Entropy_Node_Impurity Sum_Total_List length" &
                      Integer'Image (Integer (Sum_Total_List.Length)));
+
          for c in Class_List.First_Index .. Class_List.Last_Index loop
             Put_Line ("Criterion.Entropy_Node_Impurity c" &
                         Integer'Image (c));
@@ -284,6 +287,10 @@ package body Criterion is
 
       Criteria.Weighted_Left := 0.0;
       Criteria.Weighted_Right := Criteria.Weighted_Node_Samples;
+      Put_Line ("Criterion.Reset Sum_Total length" &
+                     Integer'Image (Integer (Criteria.Sum_Total.Length)));
+      Classifier_Utilities.Print_Weights_Lists ("Sum_Total",
+                                                 Criteria.Sum_Total);
       Put_Line ("Criterion.Reset done");
 
    end Reset;
@@ -307,6 +314,7 @@ package body Criterion is
          Criteria.Sum_Left.Append (Left_List);
          Criteria.Sum_Right.Append (Left_List);
       end loop;
+
    end Reverse_Reset;
 
    --  ------------------------------------------------------------------------
@@ -316,7 +324,7 @@ package body Criterion is
       use ML_Types;
       use Classifier_Types;
       use Float_Package;
-      use Weight_List_Package;
+      use Weights.Weight_Lists_Package;
       Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
       Left_List    : Weight_List;
       Right_List   : Weight_List;

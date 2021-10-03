@@ -1,6 +1,7 @@
 
 with ML_Types;
 with Classifier_Types;
+with Weights;
 
 package Criterion is
 
@@ -27,9 +28,9 @@ package Criterion is
         Start                     : Natural := 0;
         Stop                      : Natural := 0;
         Position                  : Natural := 0;
-        Sum_Total                 : Classifier_Types.List_Of_Weight_Lists;
-        Sum_Left                  : Classifier_Types.List_Of_Weight_Lists;
-        Sum_Right                 : Classifier_Types.List_Of_Weight_Lists;
+        Sum_Total                 : Weights.Weight_Lists_List;
+        Sum_Left                  : Weights.Weight_Lists_List;
+        Sum_Right                 : Weights.Weight_Lists_List;
         Sq_Sum_Total              : Float := 0.0;
         --  Classification Criterion_Class
         Num_Classes               : Classifier_Types.Natural_List;
