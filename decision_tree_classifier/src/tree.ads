@@ -39,7 +39,7 @@ package Tree is
    type Tree_Node
      (Is_Leaf : Boolean := False)
    is record
-      Node_Index                : Natural := 0;
+--        Node_Index                : Natural := 0;
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Samples_Start             : Natural := 0;
       Samples_End               : Natural := 0;
@@ -82,7 +82,6 @@ package Tree is
    --     package Values_Package is new Ada.Containers.Vectors
    --       (Positive, Output_List);
    --     subtype Values_List is Values_Package.Vector;
-   subtype Node_Index is Positive;
 
    type Tree_Attributes is private;
    type Tree_Class is record

@@ -33,7 +33,6 @@ package Tree_Build is
 
    function Add_Node (theTree               : in out Tree.Tree_Class;
                       Splitter              : Node_Splitter.Splitter_Class;
-                      Node_ID               : out Tree.Node_Index;
                       Depth                 : in out Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;

@@ -23,7 +23,6 @@ package body Tree_Build is
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    function Add_Node (theTree               : in out Tree.Tree_Class;
                       Splitter              : Node_Splitter.Splitter_Class;
-                      Node_ID               : out Tree.Node_Index;
                       Depth                 : in out Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
@@ -37,8 +36,6 @@ package body Tree_Build is
    begin
       --  _Tree L735
       theTree.Node_Count := theTree.Node_Count + 1;
-      New_Node.Node_Index := theTree.Node_Count;
-      Node_ID := New_Node.Node_Index;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       Node_Splitter.Node_Value (Splitter, New_Node.Values);
@@ -83,7 +80,6 @@ package body Tree_Build is
       Is_Leaf               : Boolean;
       aSplit                : Node_Splitter.Split_Record;
       Num_Constant_Features : Natural := 0;
-      Node_ID               : Tree.Node_Index;
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Splitter.Start_Index,
@@ -106,7 +102,7 @@ package body Tree_Build is
       end if;
 
       Res.Node_Cursor := Add_Node
-          (theTree, Splitter, Node_ID, Depth, Parent_Cursor, Is_Left, Is_Leaf,
+          (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
           aSplit.Feature_Index, Impurity, aSplit.Threshold,
           Splitter.Weighted_Samples);
       Res.Start := Splitter.Start_Index;
@@ -233,7 +229,6 @@ package body Tree_Build is
       Stack             : Stack_List;
       Stack_Curs        : Build_Utils.Stack_Cursor;
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
-      Node_ID           : Tree.Node_Index := 1;
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
@@ -280,7 +275,7 @@ package body Tree_Build is
          end if;
 
          Put_Line ("Tree_Build.Build_Depth_First_Tree Add_Node");
-         Node_Cursor := Add_Node (theTree, Splitter, Depth, Node_ID, Parent, Is_Left, Is_Leaf,
+         Node_Cursor := Add_Node (theTree, Splitter, Depth, Parent, Is_Left, Is_Leaf,
                                   Split.Feature_Index, Impurity,
                                   Split.Threshold, Weighted_Samples);
          Put_Line ("Tree_Build.Build_Depth_First_Tree Node added, Is_Left, Is_Leaf: "

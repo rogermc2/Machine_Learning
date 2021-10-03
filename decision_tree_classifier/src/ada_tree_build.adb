@@ -56,11 +56,8 @@ package body Ada_Tree_Build is
       Is_Leaf               : Boolean := False;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
---        Values                : Classifier_Types.Float_List;
       Depth                 : Natural := Parent_Node.Depth;
       Child_Cursor          : Tree.Tree_Cursor;
-      Node_ID               : Tree.Node_Index := 1;
-      --        Class_Index           : Positive := 1;
    begin
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
@@ -86,7 +83,7 @@ package body Ada_Tree_Build is
       end if;
       --  L229
       Child_Cursor := Tree_Build.Add_Node
-        (theTree, Splitter, Node_ID, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
+        (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
          Impurity, Split.Threshold, Weighted_Node_Samples);
 
       --  L237 Store values for all nodes to facilitate tree/model
