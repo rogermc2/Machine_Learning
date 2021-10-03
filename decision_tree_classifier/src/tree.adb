@@ -32,7 +32,7 @@ package body Tree is
    begin
       if Integer (Child_Count (Self.Nodes.Root)) = 0 then
          raise Value_Error with
-         "Tree.Apply_Dense Self.Nodes tree is empty";
+           "Tree.Apply_Dense Self.Nodes tree is empty";
       end if;
 
       for index in X.First_Index .. X.Last_Index loop
@@ -42,7 +42,7 @@ package body Tree is
          Node_Cursor := First_Child (Self.Nodes.Root);
          Put_Line ("Tree.Apply_Dense Node_Cursor set");
          Put_Line ("Tree.Apply_Dense Node_Cursor Has_Element; " &
-                  Boolean'Image (Has_Element (Node_Cursor)));
+                     Boolean'Image (Has_Element (Node_Cursor)));
          while Has_Element (Node_Cursor) and then
            not Element (Node_Cursor).Is_Leaf loop
             Put_Line ("Tree.Apply_Dense not leaf");
@@ -65,19 +65,13 @@ package body Tree is
 
    function Get_Value_Array (Self : Tree_Class) return Value_Array is
       Values      : Value_Array
-        (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features);
-      Values_Data : constant Values_List := Self.Values;
-      Outputs     : Output_List;
-      Classes     : Class_List;
+        (1 .. Positive (Self.Values.Length), 1 .. Self.Num_Features);
+      Values_Data : Classifier_Types.Float_List;
    begin
       for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
-         Outputs := Values_Data (v_index);
-         for o_index in Outputs.First_Index .. Outputs.Last_Index loop
-            Classes := Outputs (o_index);
-            for c_index in Classes.First_Index .. Classes.Last_Index loop
-               Values (v_index, Index_Range (o_index), c_index) :=
-                 Classes (c_index);
-            end loop;
+         Values_Data := Self.Values.Element (v_index);
+         for c_index in Values_Data.First_Index .. Values_Data.Last_Index loop
+            Values (v_index, c_index) := Values_Data.Element (c_index);
          end loop;
       end loop;
 
@@ -97,28 +91,28 @@ package body Tree is
       --  Apply finds the terminal region (=leaf node) for each sample in X.
       --  Leaf_Cursors is a list of feature cursors, each cursor corresponding to
       --  a leaf noode of X
---        Leaf_Values  : constant Value_Array
---          (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
---          := Get_Value_Array (Self);
---        Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
---          of Float;
-      Leaf_Cursors  : Leaf_Cursor_Array (1 .. N_Samples);
-      Leaf          : Tree_Node;
-      Feature_Index : Positive;
-      Features_List : Value_Data_List;
-      Target        : Value_Data_List;
+      --        Leaf_Values  : constant Value_Array
+      --          (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
+      --          := Get_Value_Array (Self);
+      --        Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
+      --          of Float;
+      Leaf_Cursors    : Leaf_Cursor_Array (1 .. N_Samples);
+      Leaf            : Tree_Node;
+      Feature_Index   : Positive;
+      Features_List   : Value_Data_List;
+      Target          : Value_Data_List;
    begin
       if Integer (Child_Count (Self.Nodes.Root)) = 0 then
          raise Value_Error with
-         "Tree.Predict Self.Nodes tree is empty";
+           "Tree.Predict Self.Nodes tree is empty";
       end if;
       Leaf_Cursors := Apply (Self, X);
---        for o_index in 1 .. Self.Num_Outputs loop
---           for c_index in 1 .. Self.Num_Features loop
---              Axis_0 (o_index, c_index) :=
---                Leaf_Cursors (1, o_index, c_index);
---           end loop;
---        end loop;
+      --        for o_index in 1 .. Self.Num_Outputs loop
+      --           for c_index in 1 .. Self.Num_Features loop
+      --              Axis_0 (o_index, c_index) :=
+      --                Leaf_Cursors (1, o_index, c_index);
+      --           end loop;
+      --        end loop;
 
       for index in 1 .. N_Samples loop
          Put_Line ("Tree.Predict index" & Integer'Image (index));

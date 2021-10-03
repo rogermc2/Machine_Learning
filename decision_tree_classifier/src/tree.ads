@@ -9,6 +9,7 @@
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Vectors;
 
+with Classifier_Types;
 with ML_Types;
 
 package Tree is
@@ -36,7 +37,7 @@ package Tree is
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Samples_Start             : Natural := 0;
       Samples_End               : Natural := 0;
---        Num_Node_Samples          : Integer := 0;
+      --        Num_Node_Samples          : Integer := 0;
       Weighted_Num_Node_Samples : Integer := 0;
       Depth                     : Integer := 0;
       Is_Left                   : Boolean := True;
@@ -71,9 +72,14 @@ package Tree is
      (Positive, Class_List);
    subtype Output_List is Output_Package.Vector;
 
-   use Output_Package;
+   --     use Output_Package;
+   --     package Values_Package is new Ada.Containers.Vectors
+   --       (Positive, Output_List);
+   --     subtype Values_List is Values_Package.Vector;
+   subtype Node_Index is Positive;
+   use Classifier_Types.Float_Package;
    package Values_Package is new Ada.Containers.Vectors
-     (Positive, Output_List);
+     (Node_Index, Classifier_Types.Float_List);
    subtype Values_List is Values_Package.Vector;
 
    type Tree_Attributes is private;
@@ -112,6 +118,6 @@ private
    end record;
 
    type Value_Array is array
-     (Natural range <>, Index_Range range <>, Natural range <>) of Float;
+     (Natural range <>, Natural range <>) of Float;
 
 end Tree;
