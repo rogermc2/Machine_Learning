@@ -386,8 +386,8 @@ package body Node_Splitter is
         (Split.Criteria, Split.Y, Split.Sample_Indices,
         Split.Sample_Weight, Split.Weighted_Samples, Start, Stop);
 
-      Put_Line ("Node_Splitter Weighted_Node_Samples");
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
+      Put_Line ("Node_Splitter.Reset_Node done");
 
    end Reset_Node;
 

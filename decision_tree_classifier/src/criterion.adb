@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Utilities;
+--  with Utilities;
 
 with Classifier_Utilities;
 with ML_Types;
@@ -132,10 +132,7 @@ package body Criterion is
       Put_Line ("Criterion.Classification_Init Start, Stop" &
                   Integer'Image (Start) & ", " & Integer'Image (Stop));
       for p in Start .. Stop loop
-         Put_Line ("Criterion.Classification_Init p: " & Integer'Image (p));
          Y_I_Index := Sample_Indices.Element (p);
-         Put_Line ("Criterion.Classification_Init Y_I_Index: " &
-                     Integer'Image (Y_I_Index));
 
          --  Weight is originally set to be 1.0, meaning that if no
          --  sample weights are given, the default weight of each sample is 1.0
@@ -144,14 +141,8 @@ package body Criterion is
          end if;
 
          for k in 1 .. Num_Outputs loop
-            Put_Line ("Criterion.Classification_Init k: " &
-                        Integer'Image (k));
             Y_Ik := Y.Element (k);
-            Put_Line ("Criterion.Classification_Init Y_Ik length: " &
-                        Integer'Image (Integer (Y_Ik.Length)));
             Y_I := Y_Ik.Element (Y_I_Index);
-            Utilities.Print_Value_Record
-              ("Criterion.Classification_Init Y_I", Y_I);
 
             case Y_I.Value_Kind is
                when ML_Types.Float_Type =>
@@ -161,8 +152,6 @@ package body Criterion is
                when others => null;
             end case;
 
-            Put_Line ("Criterion.Classification_Init Sum_Total length: " &
-                        Integer'Image (Integer (Criteria.Sum_Total.Length)));
             Criteria.Sum_Total.Replace_Element
               (k, Criteria.Sum_Total.Element (k) + W_Ik);
 
@@ -175,19 +164,13 @@ package body Criterion is
                     Criteria.Sq_Sum_Total + Float (Y_I.Integer_Value) * W_Ik;
                when others => null;
             end case;
-            Put_Line ("Criterion.Classification_Init end loop k");
          end loop;
-         Put_Line ("Criterion.Classification_Init loop k done");
 
          Criteria.Weighted_Node_Samples :=
            Criteria.Weighted_Node_Samples + Weight;
       end loop;
-      Put_Line ("Criterion.Classification_Init outer loop done");
 
       Reset (Criteria);
-      Put_Line ("Criterion.Classification_Init Criteria reset");
-      Put_Line ("Criterion.Classification_Init Sum_Total length" &
-                  Integer'Image (Integer (Criteria.Sum_Total.Length)));
 
    end Classification_Init;
 
@@ -203,14 +186,13 @@ package body Criterion is
    begin
       for index in Self.Y.First_Index .. Self.Y.Last_Index loop
          Class_List := Self.Y.Element (index);
-
-         for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Count_K := Self.Sum_Total.Element (c);
-            if Count_K > 0.0 then
+         Count_K := Self.Sum_Total.Element (index);
+         if Count_K > 0.0 then
+            for c in Class_List.First_Index .. Class_List.Last_Index loop
                Count_K := Count_K / Self.Weighted_Node_Samples;
                Entropy := Entropy - Count_K * Log (Count_K);
-            end if;
-         end loop;
+            end loop;
+         end if;
       end loop;
       return Entropy / Float (Self.Sum_Total.Length);
 
@@ -259,7 +241,6 @@ package body Criterion is
       Put_Line ("Criterion.Reset Sum_Total length" &
                   Integer'Image (Integer (Criteria.Sum_Total.Length)));
       Classifier_Utilities.Print_Weights ("Sum_Total", Criteria.Sum_Total);
-      Put_Line ("Criterion.Reset done");
 
    end Reset;
 

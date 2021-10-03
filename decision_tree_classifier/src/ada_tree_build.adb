@@ -68,6 +68,7 @@ package body Ada_Tree_Build is
         --  Reset_Node resets splitter to use samples (Start .. Stop)
         Put_Line ("Ada_Tree_Build.Add_Branch Reset_Node");
         Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
+        Put_Line ("Ada_Tree_Build.Add_Branch Reset_Node done");
         if First then
             Impurity := Node_Impurity (Splitter);
             First := False;
@@ -75,6 +76,7 @@ package body Ada_Tree_Build is
         Put_Line ("Ada_Tree_Build.Add_Branch First done");
 
         --  L210
+        Put_Line ("Ada_Tree_Build.Add_Branch L210");
         Is_Leaf := Depth >= Builder.Max_Depth or
           Num_Node_Samples < Builder.Min_Samples_Split or
           Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
@@ -83,12 +85,14 @@ package body Ada_Tree_Build is
           Impurity <= Epsilon;
 
         --  L222
+        Put_Line ("Ada_Tree_Build.Add_Branch L222");
         if not Is_Leaf then
             Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
             Is_Leaf := Split.Pos_I >= Stop or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
         end if;
         --  L229
+        Put_Line ("Ada_Tree_Build.Add_Branch L229");
         Child_Cursor := Tree_Build.Add_Node
           (theTree, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
            Impurity, Split.Threshold, Weighted_Node_Samples);
