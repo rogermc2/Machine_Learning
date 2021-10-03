@@ -24,7 +24,7 @@ package body Classifier_Tests is
    Y_Array     : constant Integer_Array (1 .. 6) := (-1, -1, -1, 1, 1, 1);
    --     T_Array     : constant Multi_Value_Array (1 .. 3, 1 .. 2) :=
    --                     ((-1, -1), (2, 2), (3, 2));
-   True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
+--     True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
 
    --  -------------------------------------------------------------------------
 
