@@ -91,7 +91,6 @@ package Tree is
       Max_Depth       : Natural := 0;
       Node_Count      : Natural := 0;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
-      Values          : Values_List;
       Attributes      : Tree_Attributes;
    end record;
 
@@ -106,7 +105,7 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
-   function Get_Value_Array (Self : Tree_Class) return Value_Array;
+   function Get_Value_Array (Self : Tree_Node) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;

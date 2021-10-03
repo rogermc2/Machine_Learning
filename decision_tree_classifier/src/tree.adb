@@ -63,9 +63,8 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Value_Array (Self : Tree_Class) return Value_Array is
-      Values      : Value_Array
-        (1 .. Positive (Self.Values.Length));
+   function Get_Value_Array (Self : Tree_Node) return Value_Array is
+      Values : Value_Array (1 .. Positive (Self.Values.Length));
       Values_Data : Values_List;
    begin
       for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
