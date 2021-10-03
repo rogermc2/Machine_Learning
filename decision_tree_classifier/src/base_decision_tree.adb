@@ -94,7 +94,7 @@ package body Base_Decision_Tree is
       Sample_Weight : in out Classifier_Types.Float_List) is
       Y_Encoded             : ML_Types.List_Of_Value_Data_Lists;
       --  L205
-      Expanded_Class_Weight : Weight_List;
+      Expanded_Class_Weight : Weights.Weight_List;
       Sum_Sample_Weight     : Float := 0.0;
    begin
       if Integer (X.Length) < 1 then

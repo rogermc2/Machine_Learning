@@ -18,7 +18,7 @@ package body Node_Splitter is
 
    procedure Init (Self              : in out Splitter_Class;
                    Input_X, Target_Y : ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight     : Classifier_Types.Weight_List) is
+                   Sample_Weight     : Weights.Weight_List) is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Element (1).Length);
       Num_Features     : constant Positive := Positive (Input_X.Length);
@@ -339,7 +339,7 @@ package body Node_Splitter is
          Crit.Position := Best_Split.Pos_I;
          Criterion.Update (Self.Criteria, Crit.Position);
 
-         Criterion.Classify_Children_Impurity
+         Criterion.Gini_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,

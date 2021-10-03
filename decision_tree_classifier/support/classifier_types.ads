@@ -23,7 +23,6 @@ package Classifier_Types is
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
-   subtype Weight_List is Float_Package.Vector;
 
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;

@@ -5,6 +5,7 @@ with Ada.Strings.Unbounded;
 with ML_Types;
 with Classifier_Types;
 with Criterion;
+with Weights;
 
 package Node_Splitter is
    use Ada.Strings.Unbounded;
@@ -32,7 +33,7 @@ package Node_Splitter is
       Feature_Values       : ML_Types.Value_Data_List;
       Weighted_Samples     : Float := 0.0;
       Y                    : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight        : Classifier_Types.Weight_List;
+      Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float;
       Start_Index          : Positive := 1;
       End_Index            : Positive := 1;
@@ -45,7 +46,7 @@ package Node_Splitter is
 
    procedure Init (Self               : in out Splitter_Class;
                    Input_X, Target_Y  : ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight      : Classifier_Types.Weight_List);
+                   Sample_Weight      : Weights.Weight_List);
    function Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self : Splitter_Class;
                          Value : out Classifier_Types.Float_List);

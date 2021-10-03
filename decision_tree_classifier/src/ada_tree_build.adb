@@ -1,8 +1,8 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Types;
 with Classifier_Utilities;
-
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -182,7 +182,7 @@ package body Ada_Tree_Build is
     procedure Build_Tree
       (theTree       : in out Tree.Tree_Class;
        X, Y          : ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : Classifier_Types.Weight_List) is
+       Sample_Weight : Weights.Weight_List) is
        use Tree.Nodes_Package;
         use Node_Splitter;
         Builder               : Tree_Builder;

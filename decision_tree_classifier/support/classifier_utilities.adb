@@ -123,7 +123,7 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Dot (L : Weight_List;
+    function Dot (L : Weights.Weight_List;
                   R : Natural_List) return Float is
         use Float_Package;
         Result : Float := 0.0;
@@ -471,7 +471,7 @@ package body Classifier_Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Weights (Name : String; Data : Weight_List) is
+    procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
         aWeight : Float;
         Count   : Integer := 1;
     begin

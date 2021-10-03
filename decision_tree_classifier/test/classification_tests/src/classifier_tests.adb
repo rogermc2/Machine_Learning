@@ -7,6 +7,7 @@ with Classifier_Utilities;
 with Decision_Tree_Classifer;
 with ML_Types;
 with Tree;
+with Weights;
 
 package body Classifier_Tests is
    use Classifier_Types;
@@ -31,7 +32,7 @@ package body Classifier_Tests is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
 
-      Expected        : List_Of_Value_Data_Lists;
+--        Expected        : List_Of_Value_Data_Lists;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       X               : constant List_Of_Value_Data_Lists :=
@@ -39,7 +40,7 @@ package body Classifier_Tests is
       Y               : List_Of_Value_Data_Lists;
       Num_Samples     : constant Natural := Natural (X.Element (1).Length);
 --        Classes         : Value_Data_List;
-      Weights         : Weight_List;
+      Weight_Values   : Weights.Weight_List;
       Probabilities   : List_Of_Value_Data_Lists;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
@@ -50,13 +51,13 @@ package body Classifier_Tests is
 
       Init (theTree, Random_State => 0);
       Y := To_Integer_Value_List (Y_Array);
-      Expected := To_Integer_Value_List (True_Result);
-      Classification_Fit (theTree, X, Y, Weights);
+--        Expected := To_Integer_Value_List (True_Result);
+      Classification_Fit (theTree, X, Y, Weight_Values);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                   Integer'Image
                   (Integer (theTree.Attributes.Decision_Tree.Nodes.Node_Count)));
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
-                        Weights);
+                        Weight_Values);
       Probabilities := Predict_Probability (theTree, X);
       Classifier_Utilities.Print_Multi_Value_List
           ("Classification_Tests.Test_Classification_Toy Probabilities",

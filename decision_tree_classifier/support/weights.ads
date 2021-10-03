@@ -19,6 +19,7 @@ package Weights is
    subtype Weight_Map is Weight_Dictionary.Map;
 
    use Float_Package;
+   subtype Weight_List is Float_Package.Vector;
    package Weight_Lists_Package is new Ada.Containers.Vectors
      (Positive, Weight_List);
    subtype Weight_Lists_List is Weight_Lists_Package.Vector;

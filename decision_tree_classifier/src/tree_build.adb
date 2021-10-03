@@ -142,7 +142,7 @@ package body Tree_Build is
      (Best_Builder  : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : Classifier_Types.Weight_List) is
+      Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Frontier_Package;
       Splitter         : Node_Splitter.Splitter_Class;
@@ -207,7 +207,7 @@ package body Tree_Build is
      (Depth_Builder : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X, Y          : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : Classifier_Types.Weight_List) is
+      Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Build_Utils.Stack_Package;
       First             : Boolean := True;

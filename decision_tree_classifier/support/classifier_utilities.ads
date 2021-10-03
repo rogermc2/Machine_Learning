@@ -14,7 +14,7 @@ package Classifier_Utilities is
     function Bin_Count (Numbers : ML_Types.Value_Data_List) return Natural_List;
     procedure Clear (anArray : in out ML_Types.Value_Data_Array);
     function Compare_Float_Lists (L, R : Float_List) return Boolean;
-    function Dot (L : Weight_List; R : Natural_List) return Float;
+    function Dot (L : Weights.Weight_List; R : Natural_List) return Float;
     procedure Print_Boolean_Matrix (Name : String;
                                     aMatrix : Estimator.Boolean_Matrix);
     procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
@@ -29,7 +29,7 @@ package Classifier_Utilities is
     procedure Print_Natural_List (Name : String; theList : Natural_List);
     procedure Print_Value_List (Name    : String;
                                 theList : ML_Types.Value_Data_List);
-    procedure Print_Weights (Name : String; Data : Weight_List);
+    procedure Print_Weights (Name : String; Data : Weights.Weight_List);
     procedure Print_Weights_Lists (Name : String;
                                    Data : Weights.Weight_Lists_List);
     function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)

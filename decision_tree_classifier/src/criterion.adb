@@ -12,14 +12,12 @@ package body Criterion is
 
    --  ------------------------------------------------------------------------
    --  L637
-   procedure Classify_Children_Impurity (Criteria       : Criterion_Class;
-                                         Impurity_Left,
-                                         Impurity_Right : out Float) is
+   procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
+                                     Impurity_Left,
+                                     Impurity_Right : out Float) is
       use Maths.Float_Math_Functions;
       Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
       Class_List     : ML_Types.Value_Data_List;
-      Left_List      : Classifier_Types.Weight_List;
-      Right_List     : Classifier_Types.Weight_List;
       Count_K        : Float;
       Entropy_Left   : Float := 0.0;
       Entropy_Right  : Float := 0.0;
@@ -27,16 +25,14 @@ package body Criterion is
       --  L662
       for k in Criteria.Y.First_Index .. Criteria.Y.Last_Index loop
          Class_List := Criteria.Y.Element (k);
-         Left_List := Criteria.Sum_Left.Element (k);
-         Right_List := Criteria.Sum_Right.Element (k);
          for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Count_K := Left_List.Element (c);
+            Count_K := Criteria.Sum_Left.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Weighted_Left;
                Entropy_Left := Entropy_Left - Count_K * Log (Count_K);
             end if;
 
-            Count_K := Right_List.Element (c);
+            Count_K := Criteria.Sum_Right.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Weighted_Right;
                Entropy_Right := Entropy_Right - Count_K * Log (Count_K);
@@ -47,15 +43,14 @@ package body Criterion is
       Impurity_Left := Entropy_Left / Float (Num_Outputs);
       Impurity_Right := Entropy_Right / Float (Num_Outputs);
 
-   end Classify_Children_Impurity;
+   end Gini_Children_Impurity;
 
    --  ------------------------------------------------------------------------
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
    --   of the current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                 return Float is
+                                return Float is
       Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
-      Sum_Total      : Classifier_Types.Weight_List;
       Count_K        : Float;
       Gini           : Float := 0.0;
       Sq_Count       : Float := 0.0;
@@ -63,10 +58,9 @@ package body Criterion is
       --  623
       for index_k in Criteria.Y.First_Index .. Criteria.Y.Last_Index loop
          Sq_Count := 0.0;
-         Sum_Total := Criteria.Sum_Total.Element (index_k);
          for Class_Index in Criteria.Num_Classes.First_Index ..
            Criteria.Num_Classes.Last_Index loop
-            Count_K := Float (Sum_Total.Element (Class_Index));
+            Count_K := Float (Criteria.Sum_Total.Element (Class_Index));
             Sq_Count := Sq_Count + Count_K ** 2;
          end loop;
 
@@ -101,14 +95,13 @@ package body Criterion is
       Y                : ML_Types.List_Of_Value_Data_Lists;
       Sample_Indices   : Classifier_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample
-      Sample_Weight    : Classifier_Types.Weight_List;
+      Sample_Weight    : Weights.Weight_List;
       Weighted_Samples : Float;
       Start, Stop      : Natural) is
       Num_Outputs  : constant Positive := Positive (Y.Length);
       Y_I_Index    : Positive;
       Y_Ik         : ML_Types.Value_Data_List;
       Y_I          : ML_Types.Value_Record;
-      Sum_Total    : Classifier_Types.Weight_List;
       Weight       : Float := 1.0;
       W_Ik         : Float;
    begin
@@ -131,7 +124,7 @@ package body Criterion is
 
       --  L771
       for k in 1 .. Num_Outputs loop
-         Sum_Total.Append (0.0);
+         Criteria.Sum_Total.Append (0.0);
       end loop;
       Put_Line ("Criterion.Classification_Init Sample_Indices length: " &
                   Integer'Image (Integer (Sample_Indices.Length)));
@@ -169,9 +162,9 @@ package body Criterion is
             end case;
 
             Put_Line ("Criterion.Classification_Init Sum_Total length: " &
-                        Integer'Image (Integer (Sum_Total.Length)));
-            Sum_Total.Replace_Element
-              (k, Sum_Total.Element (k) + W_Ik);
+                        Integer'Image (Integer (Criteria.Sum_Total.Length)));
+            Criteria.Sum_Total.Replace_Element
+              (k, Criteria.Sum_Total.Element (k) + W_Ik);
 
             case Y_I.Value_Kind is
                when ML_Types.Float_Type =>
@@ -193,6 +186,8 @@ package body Criterion is
 
       Reset (Criteria);
       Put_Line ("Criterion.Classification_Init Criteria reset");
+      Put_Line ("Criterion.Classification_Init Sum_Total length" &
+                  Integer'Image (Integer (Criteria.Sum_Total.Length)));
 
    end Classification_Init;
 
@@ -203,33 +198,21 @@ package body Criterion is
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float is
       use Maths.Float_Math_Functions;
       Class_List     : ML_Types.Value_Data_List;
-      Sum_Total_List : Classifier_Types.Weight_List;
       Count_K        : Float := 0.0;
       Entropy        : Float := 0.0;
    begin
       for index in Self.Y.First_Index .. Self.Y.Last_Index loop
-         Put_Line ("Criterion.Entropy_Node_Impurity index" &
-                     Integer'Image (index));
          Class_List := Self.Y.Element (index);
-         Put_Line ("Criterion.Entropy_Node_Impurity Class_List length" &
-                     Integer'Image (Integer (Class_List.Length)));
-         Put_Line ("Criterion.Entropy_Node_Impurity Self.Sum_Total length" &
-                     Integer'Image (Integer (Self.Sum_Total.Length)));
-         Sum_Total_List := Self.Sum_Total.Element (index);
-         Put_Line ("Criterion.Entropy_Node_Impurity Sum_Total_List length" &
-                     Integer'Image (Integer (Sum_Total_List.Length)));
 
          for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Put_Line ("Criterion.Entropy_Node_Impurity c" &
-                        Integer'Image (c));
-            Count_K := Sum_Total_List.Element (c);
+            Count_K := Self.Sum_Total.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Self.Weighted_Node_Samples;
                Entropy := Entropy - Count_K * Log (Count_K);
             end if;
          end loop;
       end loop;
-      return Entropy / Float (Sum_Total_List.Length);
+      return Entropy / Float (Self.Sum_Total.Length);
 
    end Entropy_Node_Impurity;
 
@@ -237,15 +220,11 @@ package body Criterion is
 
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Classifier_Types.Float_List) is
-      Sum_Total_List : Classifier_Types.Weight_List;
    begin
       Value.Clear;
       for index in Self.Sum_Total.First_Index .. Self.Sum_Total.Last_Index loop
-         Sum_Total_List := Self.Sum_Total.Element (index);
-         for s in Sum_Total_List.First_Index .. Sum_Total_List.Last_Index loop
-            Value.Append (Sum_Total_List.Element (s) /
-                            Self.Weighted_Node_Samples);
-         end loop;
+         Value.Append (Self.Sum_Total.Element (index) /
+                         Self.Weighted_Node_Samples);
       end loop;
 
    end Node_Value;
@@ -253,44 +232,33 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                         return Float is
+                                        return Float is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
-      Classify_Children_Impurity (Criteria, Impurity_Left, Impurity_Right);
+      Gini_Children_Impurity (Criteria, Impurity_Left, Impurity_Right);
       return -Criteria.Weighted_Right * Impurity_Right -
         Criteria.Weighted_Left * Impurity_Left;
 
    end Proxy_Impurity_Improvement;
 
    --  ------------------------------------------------------------------------
-
+   --  L348
    procedure Reset (Criteria : in out Criterion_Class) is
       Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
-      Left_List    : Classifier_Types.Weight_List;
-      Right_List   : Classifier_Types.Weight_List;
    begin
       Criteria.Sum_Left.Clear;
       Criteria.Sum_Right.Clear;
       for k in 1 .. Num_Outputs loop
-         Put_Line ("Criterion.Reset k: " & Integer'Image (k));
-         Left_List.Clear;
-         Right_List.Clear;
-         for s in 1 .. Criteria.Num_Classes.Element (k) loop
-            Put_Line ("Criterion.Reset s: " & Integer'Image (s));
-            Left_List.Append (0.0);
-            Right_List.Append (Criteria.Sum_Total.Element (s));
-         end loop;
-         Criteria.Sum_Left.Append (Left_List);
-         Criteria.Sum_Right.Append (Right_List);
+         Criteria.Sum_Left.Append (0.0);
+         Criteria.Sum_Right.Append (Criteria.Sum_Total.Element (k));
       end loop;
 
       Criteria.Weighted_Left := 0.0;
       Criteria.Weighted_Right := Criteria.Weighted_Node_Samples;
       Put_Line ("Criterion.Reset Sum_Total length" &
-                     Integer'Image (Integer (Criteria.Sum_Total.Length)));
-      Classifier_Utilities.Print_Weights_Lists ("Sum_Total",
-                                                 Criteria.Sum_Total);
+                  Integer'Image (Integer (Criteria.Sum_Total.Length)));
+      Classifier_Utilities.Print_Weights ("Sum_Total", Criteria.Sum_Total);
       Put_Line ("Criterion.Reset done");
 
    end Reset;
@@ -299,20 +267,12 @@ package body Criterion is
 
    procedure Reverse_Reset (Criteria : in out Criterion_Class) is
       Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
-      Left_List    : Classifier_Types.Weight_List;
-      Right_List   : Classifier_Types.Weight_List;
    begin
       Criteria.Sum_Left.Clear;
       Criteria.Sum_Right.Clear;
       for index in 1 .. Num_Outputs loop
-         Left_List := Criteria.Sum_Left.Element (index);
-         Right_List := Criteria.Sum_Right.Element (index);
-         for s in Left_List.First_Index .. Left_List.Last_Index loop
-            Right_List.Append (0.0);
-            Left_List.Append (Criteria.Sum_Total (index));
-         end loop;
-         Criteria.Sum_Left.Append (Left_List);
-         Criteria.Sum_Right.Append (Left_List);
+         Criteria.Sum_Right.Append (0.0);
+         Criteria.Sum_Left.Append (Criteria.Sum_Total (index));
       end loop;
 
    end Reverse_Reset;
@@ -322,13 +282,7 @@ package body Criterion is
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
       use ML_Types;
-      use Classifier_Types;
-      use Float_Package;
-      use Weights.Weight_Lists_Package;
       Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
-      Left_List    : Weight_List;
-      Right_List   : Weight_List;
-      Total_List   : Weight_List;
       Sum          : Float;
       i            : Positive;
       Values       : Value_Data_List;
@@ -345,13 +299,11 @@ package body Criterion is
             Values := Criteria.Y.Element (i);
             for k in Criteria.Sum_Left.First_Index ..
               Criteria.Sum_Left.Last_Index loop
-               Left_List := Criteria.Sum_Left.Element (k);
-               for s in Left_List.First_Index .. Left_List.Last_Index loop
-                  Sum := Left_List.Element (s);
+               Sum := Criteria.Sum_Left.Element (k);
+               for s in Values.First_Index .. Values.Last_Index loop
                   Sum := Sum + Values.Element (s).Float_Value * Weight;
-                  Left_List.Replace_Element (s, Sum);
                end loop;
-               Criteria.Sum_Left.Replace_Element (k, Left_List);
+               Criteria.Sum_Left.Replace_Element (k, Sum);
             end loop;
 
             Criteria.Weighted_Left := Criteria.Weighted_Left + Weight;
@@ -368,13 +320,11 @@ package body Criterion is
             Values := Criteria.Y.Element (i);
             for k in Criteria.Sum_Left.First_Index ..
               Criteria.Sum_Left.Last_Index loop
-               Left_List := Criteria.Sum_Left.Element (k);
-               for s in Left_List.First_Index .. Left_List.Last_Index loop
-                  Sum := Left_List.Element (s);
+               Sum := Criteria.Sum_Left.Element (k);
+               for s in Values.First_Index .. Values.Last_Index loop
                   Sum := Sum - Values.Element (s).Float_Value * Weight;
-                  Left_List.Replace_Element (s, Sum);
                end loop;
-               Criteria.Sum_Left.Replace_Element (k, Left_List);
+               Criteria.Sum_Left.Replace_Element (k, Sum);
             end loop;
 
             Criteria.Weighted_Left := Criteria.Weighted_Left - Weight;
@@ -385,14 +335,11 @@ package body Criterion is
       Criteria.Weighted_Right := Criteria.Weighted_Node_Samples -
         Criteria.Weighted_Left;
       for k in 1 .. Num_Outputs loop
-         Right_List := Criteria.Sum_Right.Element (k);
-         Total_List := Criteria.Sum_Total.Element (k);
-         for s in Right_List.First_Index .. Right_List.Last_Index loop
-            Sum := Right_List.Element (s);
+         Sum := Criteria.Sum_Total.Element (k);
+         for s in Values.First_Index .. Values.Last_Index loop
             Sum := Sum - Values.Element (s).Float_Value * Weight;
-            Right_List.Replace_Element (s, Total_List.Element (s) - Sum);
          end loop;
-         Criteria.Sum_Right.Replace_Element (k, Right_List);
+         Criteria.Sum_Right.Replace_Element (k, Sum);
       end loop;
 
    end Update;
