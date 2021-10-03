@@ -38,14 +38,6 @@ package Criterion is
 
    Criterion_Error : Exception;
 
-   procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
-                                     Impurity_Left,
-                                     Impurity_Right : out Float);
-   function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                 return Float;
-   function Impurity_Improvement
-     (Criteria                                       : Criterion_Class;
-      Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Classification_Init
      (Criteria         : in out Criterion_Class;
       Y                : ML_Types.List_Of_Value_Data_Lists;
@@ -55,6 +47,14 @@ package Criterion is
       Sample_Weight    : Weights.Weight_List;
       Weighted_Samples : Float;
       Start, Stop      : Natural);
+   procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
+                                     Impurity_Left,
+                                     Impurity_Right : out Float);
+   function Gini_Node_Impurity (Criteria : in out Criterion_Class)
+                                 return Float;
+   function Impurity_Improvement
+     (Criteria                                       : Criterion_Class;
+      Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Classifier_Types.Float_List);

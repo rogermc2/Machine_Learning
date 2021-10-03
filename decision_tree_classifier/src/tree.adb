@@ -36,16 +36,10 @@ package body Tree is
       end if;
 
       for index in X.First_Index .. X.Last_Index loop
-         Put_Line ("Tree.Apply_Dense index" & Integer'Image (index));
          Samples := X.Element (index);
-         Put_Line ("Tree.Apply_Dense Samples set");
          Node_Cursor := First_Child (Self.Nodes.Root);
-         Put_Line ("Tree.Apply_Dense Node_Cursor set");
-         Put_Line ("Tree.Apply_Dense Node_Cursor Has_Element; " &
-                     Boolean'Image (Has_Element (Node_Cursor)));
          while Has_Element (Node_Cursor) and then
            not Element (Node_Cursor).Is_Leaf loop
-            Put_Line ("Tree.Apply_Dense not leaf");
             Node := Element (Node_Cursor);
             Feature := Node.Feature_Index;
             if Node.Is_Leaf and then Samples.Element (Feature).Float_Value <= Node.Threshold then
@@ -103,20 +97,11 @@ package body Tree is
            "Tree.Predict Self.Nodes tree is empty";
       end if;
       Leaf_Cursors := Apply (Self, X);
-      --        for o_index in 1 .. Self.Num_Outputs loop
-      --           for c_index in 1 .. Self.Num_Features loop
-      --              Axis_0 (o_index, c_index) :=
-      --                Leaf_Cursors (1, o_index, c_index);
-      --           end loop;
-      --        end loop;
 
       for index in 1 .. N_Samples loop
-         Put_Line ("Tree.Predict index" & Integer'Image (index));
          Leaf := Element (Leaf_Cursors (index));
          if not Leaf.Is_Leaf then
             Feature_Index := Leaf.Feature_Index;
-            Put_Line ("Tree.Predict Feature_Index" &
-                        Integer'Image (Feature_Index));
             Features_List := X.Element (index);
             Target.Append (Features_List (Feature_Index));
          end if;
@@ -125,23 +110,6 @@ package body Tree is
       return Target;
 
    end Predict;
-
-   --  -------------------------------------------------------------------------
-   --     function Validate_X_Predict (Self         : Validation.Attribute_List;
-   --                                   X           : Sample_Matrix;
-   --                                   Check_Input : Boolean := True)
-   --                                  return Sample_Matrix is
-   --        Self_Length  : constant Integer := Integer (Self.Length);
-   --        N_Features : constant Integer := X'Length (2);
-   --     begin
-   --        if N_Features /= Self_Length then
-   --           raise Value_Error with
-   --             "Number of features of the model must match the input." &
-   --             " Model n_features is " & Integer'Image (Self_Length) &
-   --             "and input n_features is " & Integer'Image (N_Features);
-   --        end if;
-   --        return X;
-   --     end Validate_X_Predict;
 
    --  -------------------------------------------------------------------------
 

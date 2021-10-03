@@ -40,14 +40,10 @@ package body Node_Splitter is
               Weighted_Samples + Sample_Weight.Element (index);
          end if;
       end loop;
-      Put_Line ("Node_Splitter.Init Sample_Indices.Length: " &
-                  Integer'Image (Integer (Self.Sample_Indices.Length)));
 
       --  Number of samples is the number of positively weighted samples.
       Self.Min_Leaf_Samples := Natural (Self.Sample_Indices.Length);
       Self.Weighted_Samples := Weighted_Samples;
-      Put_Line ("Node_Splitter.Init Samples.Length, Weighted_Samples: " &
-                  Float'Image (Weighted_Samples));
 
       Self.Feature_Indices.Clear;
       for index in 1 .. Num_Features loop
@@ -230,9 +226,6 @@ package body Node_Splitter is
          --  Draw a feature at random;
          F_J := Num_Drawn_Constants +
            Maths.Random_Integer mod (F_I - Num_Found_Constants);
-         Put_Line ("Node_Splitter.Process_Constants F_J" & Integer'Image (F_J));
-         Classifier_Utilities.Print_Natural_List
-           ("Node_Splitter.Process_Constants Features", Features);
          if F_J < Num_Known_Constants then
             Swap := Num_Drawn_Constants;
             Features.Replace_Element
@@ -246,13 +239,9 @@ package body Node_Splitter is
                F_J := 1;
             end if;
             Current_Split.Feature_Index := Features.Element (F_J);
-            Put_Line ("Node_Splitter.Process_Constants Feature_Index"
-                      & Integer'Image (Current_Split.Feature_Index));
 
             --  L364
             for index in Self.Start_Index .. Self.End_Index loop
-               Put_Line ("Node_Splitter.Process_Constants X_Samples index"
-                         & Integer'Image (index));
                Sample_Index := Self.Sample_Indices.Element (F_I);
                X_Sample := Self.Sample_Indices.Element (Sample_Index);
                X_Features := Self.X.Element (X_Sample);
@@ -375,19 +364,13 @@ package body Node_Splitter is
       Start, Stop           : Natural;
       Weighted_Node_Samples : in out Float) is
    begin
-      Put_Line ("Node_Splitter.Reset_Node Y size" &
-                    Integer'Image (Integer (Split.Y.Length)) & " x " &
-                    Integer'Image (Integer (Split.Y.Element (1).Length)));
       Split.Start_Index := Start;
       Split.End_Index := Stop;
-      Put_Line ("Node_Splitter.Reset_Node Samples length" &
-                    Integer'Image (Integer (Split.Sample_Indices.Length)));
       Criterion.Classification_Init
         (Split.Criteria, Split.Y, Split.Sample_Indices,
         Split.Sample_Weight, Split.Weighted_Samples, Start, Stop);
 
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
-      Put_Line ("Node_Splitter.Reset_Node done");
 
    end Reset_Node;
 

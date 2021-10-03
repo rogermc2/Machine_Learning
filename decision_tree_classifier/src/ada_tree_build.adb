@@ -1,9 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Classifier_Types;
-with Classifier_Utilities;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -15,12 +13,6 @@ package body Ada_Tree_Build is
    First          : Boolean := True;
    Max_Depth_Seen : Natural := 0;
 
-   --     procedure Add_Decision_Node (theTree       : in out Tree.Tree_Class;
-   --                                  Parent_Cursor : Tree.Tree_Cursor;
-   --                                  Best_Split    : Node_Splitter.Split_Record) ;
-   --     procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Class;
-   --                                    Parent_Cursor : Tree.Tree_Cursor;
-   --                                    Start, Stop   : Natural);
    procedure Init_Tree_Builder
      (Builder               : in out Tree_Builder;
       Splitter              : Node_Splitter.Splitter_Class;
@@ -43,9 +35,6 @@ package body Ada_Tree_Build is
       use Node_Splitter;
       use Tree;
       use Nodes_Package;
-      --          use Values_Package;
-      --          use Output_Package;
-      --          use Class_Package;
       Splitter              : Node_Splitter.Splitter_Class :=
                                 Builder.Splitter;
       Split                 : Split_Record;
@@ -86,15 +75,9 @@ package body Ada_Tree_Build is
         (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
          Impurity, Split.Threshold, Weighted_Node_Samples);
 
-      --  L237 Store values for all nodes to facilitate tree/model
-      --  inspection and interpretation
---        Node_Value (Splitter, Values);
-      --  Update theTree.Values
---        theTree.Values.Replace_Element (Node_ID, Values);
       --  L241 Nodes already added by Tree_Build.Add_Node
 
       --  L254
-      Put_Line ("Ada_Tree_Build.Add_Branch L254");
       if Depth > Max_Depth_Seen then
          Max_Depth_Seen := Depth;
       end if;
@@ -104,65 +87,7 @@ package body Ada_Tree_Build is
                      Child_Cursor);
       end if;
 
-      --        if Split.Improvement = 0.0 then
-      --           --  L357?
-      --           Add_Prediction_Node (theTree, Parent_Cursor, Start, Stop);
-      --        else
-      --           Split := Node_Splitter.Split_Node (Splitter, Parent_Impurity,
-      --                                              Constant_Features);
-      --           Is_Leaf := Split.Pos_I >= Stop or
-      --             Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
-      --           Child_Cursor :=
-      --             Tree_Build.Add_Node (theTree, Parent_Cursor, Is_Left, Is_Leaf,
-      --                                  Feature_Index, Split.Impurity_Left, Split.Threshold,
-      --                                  Weighted_Node_Samples);
-      --
-      --           Add_Decision_Node (theTree, Parent_Cursor, Split);
-      --           Child_Cursor := Last_Child (Parent_Cursor);
-      --           Add_Branch (theTree, Builder, Start, Stop,
-      --                       Num_Constant_Features, Child_Cursor);
-      --           Add_Branch (theTree, Builder, Start, Stop,
-      --                       Num_Constant_Features, Child_Cursor);
-      --        end if;
-
    end Add_Branch;
-
-   --  ------------------------------------------------------------------
-
-   --      procedure Add_Decision_Node (theTree       : in out Tree.Tree_Class;
-   --                                   Parent_Cursor : Tree.Tree_Cursor;
-   --                                   Best_Split    : Node_Splitter.Split_Record) is
-   --          use Tree;
-   --          use Tree.Nodes_Package;
-   --          Node  : Tree_Node;
-   --      begin
-   --          --        Node.Question := Best_Split.Question;
-   --          --        Node.True_Branch := Best_Split.True_Rows;
-   --          --        Node.False_Branch := Best_Split.False_Rows;
-   --          Node.Impurity := Best_Split.Improvement;
-   --          theTree.Nodes.Insert_Child (Parent   => Parent_Cursor,
-   --                                      Before   => No_Element,
-   --                                      New_Item => Node);
-   --      end Add_Decision_Node;
-
-   --  ------------------------------------------------------------------
-
-   --      procedure Add_Prediction_Node (theTree       : in out Tree.Tree_Class;
-   --                                     Parent_Cursor : Tree.Tree_Cursor;
-   --                                     Start, Stop   : Natural) is
-   --          use Tree;
-   --          use Nodes_Package;
-   --          Leaf : Tree_Node (Is_Leaf => True);
-   --      begin
-   --          --        if Max_Leaves > 0 then
-   --          --           Num_Leaves := Num_Leaves + 1;
-   --          --        end if;
-   --          --           New_Line;
-   --          Leaf.Samples_Start := Start;
-   --          Leaf.Samples_End := Stop;
-   --
-   --          theTree.Nodes.Insert_Child (Parent_Cursor, No_Element, Leaf);
-   --      end Add_Prediction_Node;
 
    --  ------------------------------------------------------------------
 
@@ -181,20 +106,9 @@ package body Ada_Tree_Build is
       Top_Node_Cursor       : Cursor;
    begin
       --  L163
-      Put_Line ("Ada_Tree_Build.Build_Tree Y size" &
-                  Integer'Image (Integer (Y.Length)) & " x " &
-                  Integer'Image (Integer (Y.Element (1).Length)));
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Tree_Builder (Builder, Splitter);
-      Put_Line ("Ada_Tree_Build.Build_Tree Builder initialized");
-      Put_Line ("Ada_Tree_Build.Build_Tree Y size" &
-                  Integer'Image (Integer (Y.Length)) & " x " &
-                  Integer'Image (Integer (Y.Element (1).Length)));
 
-      Classifier_Utilities.Print_Natural_List
-        ("Ada_Tree_Build.Build_Tree Feature_Indices", Splitter.Feature_Indices);
-      Classifier_Utilities.Print_Value_List
-        ("Ada_Tree_Build.Build_Tree Feature_Values", Splitter.Feature_Values);
       Top_Node.Impurity := Splitter.Node_Impurity;
       theTree.Nodes.Prepend_Child (theTree.Nodes.Root, Top_Node);
       Top_Node_Cursor := Last_Child (theTree.Nodes.Root);

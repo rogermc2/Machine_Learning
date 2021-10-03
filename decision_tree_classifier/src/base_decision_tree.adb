@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -21,68 +21,6 @@ package body Base_Decision_Tree is
       Y, Y_Encoded          : in out ML_Types.List_Of_Value_Data_Lists;
       Expanded_Class_Weight : in out Classifier_Types.Float_List);
    procedure Prune_Tree (aClassifier : in out Classifier);
-
-   --  -------------------------------------------------------------------------
-   --  Based on class.py fit L350 Build tree
-   --      procedure Build_Tree (Self              : in out Classifier;
-   --                            Min_Samples_Split : Natural;
-   --                            Min_Samples_Leaf  : Natural;
-   --                            Min_Weight_Leaf   : Float;
-   --                            Max_Depth         : Natural;
-   --                            X, Y              : ML_Types.List_Of_Value_Data_Lists;
-   --                            Sample_Weight     : Classifier_Types.Weight_List) is
-   --          use Tree;
-   --          Max_Leaf_Nodes        : constant Integer :=
-   --                                    Self.Parameters.Max_Leaf_Nodes;
-   --          --  L370
-   --          Splitter              : constant Node_Splitter.Splitter_Class :=
-   --                                    Self.Parameters.Splitter;
-   --          theTree               : Tree.Tree_Class;
-   --          Min_Impurity_Decrease : constant Float := 0.0;
-   --      begin
-   --          --  L387
-   --          --  if is_classifier(self):
-   --          Self.Attributes.Decision_Tree := theTree;
-   --
-   --          --  L388
-   --          theTree.Num_Features := Natural (Self.Attributes.Num_Features);
-   --          theTree.Num_Outputs := Self.Attributes.Num_Outputs;
-   --          Self.Attributes.Decision_Tree := theTree;
-   --
-   --          --  L398
-   --          if Max_Leaf_Nodes < 0 then
-   --              declare
-   --                  Builder : Tree_Build.Tree_Builder (Tree_Build.Depth_First_Tree);
-   --              begin
-   --                  --  L419  Depth First case
-   --                  Tree_Build.Init_Depth_First_Tree
-   --                    (Builder, Splitter, Min_Samples_Split, Min_Samples_Leaf,
-   --                     Min_Weight_Leaf, Max_Depth, Min_Impurity_Decrease);
-   --                  Tree_Build.Build_Depth_First_Tree
-   --                    (Builder, theTree, X, Y, Sample_Weight);
-   --              end;
-   --
-   --          else
-   --              declare
-   --                  Builder : Tree_Build.Tree_Builder (Tree_Build.Best_First_Tree);
-   --              begin            --  L419  Best First case
-   --                  Tree_Build.Init_Best_First_Tree
-   --                    (Builder, Self.Parameters.Splitter, Min_Samples_Split,
-   --                     Min_Samples_Leaf, Min_Weight_Leaf, Max_Depth, Max_Leaf_Nodes,
-   --                     Min_Impurity_Decrease);
-   --                  Tree_Build.Build_Best_First_Tree
-   --                    (Builder, theTree, X, Y, Sample_Weight);
-   --              end;
-   --          end if;
-   --
-   --          --  L420
-   --          if Self.Attributes.Num_Outputs = 1 then  --  and is_Classifer (Self)
-   --              null;
-   --          end if;
-   --
-   --          Prune_Tree (Self);
-   --
-   --      end Build_Tree;
 
    --  -------------------------------------------------------------------------
    --  if is_classification: part of Python BasesDecisionTree.Fit
@@ -107,12 +45,12 @@ package body Base_Decision_Tree is
            "Base_Decision_Tree.Base_Fit, Y is empty";
       end if;
       --  L184
-      aClassifier.Attributes.Num_Features := Tree.Index_Range (X.Element (1).Length);
+      aClassifier.Attributes.Num_Features :=
+        Tree.Index_Range (X.Element (1).Length);
       --  L207
       Classification_Part (aClassifier, Y, Y_Encoded, Expanded_Class_Weight);
 
       Base_Fit_Checks (aClassifier, X, Y, Sample_Weight);
-      Put_Line ("Base_Decision_Tree.Base_Fit Y_Original Base_Fit_Checks done");
 
       if Expanded_Class_Weight.Is_Empty then
          if Sample_Weight.Is_Empty then
@@ -231,17 +169,13 @@ package body Base_Decision_Tree is
 
       --  L291
       aClassifier.Parameters.Max_Features := Max_Features;
-      Put_Line ("Base_Decision_Tree.Base_Fit_Checks Max_Features set");
 
-      Put_Line ("Base_Decision_Tree.Base_Fit_Checks Y length: " &
-                  Integer'Image (Integer (Y.Length)));
       if Positive (Y.Element (1).Length) /= Num_Samples then
          raise Value_Error with
            "Base_Decision_Tree.Base_Fit_Checks, number of labels " &
            Integer'Image (Integer (Y.Element (1).Length)) &
            " does not match number of samples " & Integer'Image (Num_Samples);
       end if;
-      Put_Line ("Base_Decision_Tree.Base_Fit_Checks number of labels checked");
 
       --  L298
       if aClassifier.Parameters.Min_Weight_Fraction_Leaf < 0.0 or
@@ -251,7 +185,6 @@ package body Base_Decision_Tree is
            & Float'Image (aClassifier.Parameters.Min_Weight_Fraction_Leaf) &
            " but should be in (0.0, 5.0]";
       end if;
-      Put_Line ("Base_Decision_Tree.Base_Fit_Checks Min_Weight_Fraction_Leaf checked");
 
       if Max_Features.Max_Features <= 0 or
         Max_Features.Max_Features > Integer (aClassifier.Attributes.Num_Features) then
@@ -264,8 +197,6 @@ package body Base_Decision_Tree is
          raise Value_Error with
            "Base_Decision_Tree.Base_Fit_Checks, Max_Leaf_Nodes should be > 1";
       end if;
-      Put_Line ("Base_Decision_Tree.Base_Fit_Checks L315");
-
       --  L315
       if not Sample_Weight.Is_Empty then
          if Integer (Sample_Weight.Length) /= Num_Samples then

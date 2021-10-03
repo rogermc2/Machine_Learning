@@ -69,20 +69,6 @@ package Tree is
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
 
-   package Class_Package is new Ada.Containers.Vectors
-     (Positive, Float);
-   subtype Class_List is Class_Package.Vector;
-
-   use Class_Package;
-   package Output_Package is new Ada.Containers.Vectors
-     (Positive, Class_List);
-   subtype Output_List is Output_Package.Vector;
-
-   --     use Output_Package;
-   --     package Values_Package is new Ada.Containers.Vectors
-   --       (Positive, Output_List);
-   --     subtype Values_List is Values_Package.Vector;
-
    type Tree_Attributes is private;
    type Tree_Class is record
       Num_Features    : Natural := 0;
