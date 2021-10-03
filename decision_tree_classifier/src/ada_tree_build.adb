@@ -2,7 +2,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Types;
+--  with Classifier_Types;
 with Classifier_Utilities;
 with Node_Splitter;
 with Tree;
@@ -56,7 +56,7 @@ package body Ada_Tree_Build is
       Is_Leaf               : Boolean := False;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
-      Values                : Classifier_Types.Float_List;
+--        Values                : Classifier_Types.Float_List;
       Depth                 : Natural := Parent_Node.Depth;
       Child_Cursor          : Tree.Tree_Cursor;
       Node_ID               : Tree.Node_Index := 1;
@@ -86,14 +86,14 @@ package body Ada_Tree_Build is
       end if;
       --  L229
       Child_Cursor := Tree_Build.Add_Node
-        (theTree, Node_ID, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
+        (theTree, Splitter, Node_ID, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
          Impurity, Split.Threshold, Weighted_Node_Samples);
 
       --  L237 Store values for all nodes to facilitate tree/model
       --  inspection and interpretation
-      Node_Value (Splitter, Values);
+--        Node_Value (Splitter, Values);
       --  Update theTree.Values
-      theTree.Values.Replace_Element (Node_ID, Values);
+--        theTree.Values.Replace_Element (Node_ID, Values);
       --  L241 Nodes already added by Tree_Build.Add_Node
 
       --  L254

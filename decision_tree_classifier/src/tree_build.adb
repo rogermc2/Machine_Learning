@@ -22,6 +22,7 @@ package body Tree_Build is
    --  of this node's branch Tree.
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    function Add_Node (theTree               : in out Tree.Tree_Class;
+                      Splitter              : Node_Splitter.Splitter_Class;
                       Node_ID               : out Tree.Node_Index;
                       Depth                 : in out Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
@@ -40,6 +41,7 @@ package body Tree_Build is
       Node_ID := New_Node.Node_Index;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
+      Node_Splitter.Node_Value (Splitter, New_Node.Values);
 
       if not Is_Leaf then
          New_Node.Feature_Index := Feature_Index;
@@ -104,7 +106,7 @@ package body Tree_Build is
       end if;
 
       Res.Node_Cursor := Add_Node
-          (theTree, Node_ID, Depth, Parent_Cursor, Is_Left, Is_Leaf,
+          (theTree, Splitter, Node_ID, Depth, Parent_Cursor, Is_Left, Is_Leaf,
           aSplit.Feature_Index, Impurity, aSplit.Threshold,
           Splitter.Weighted_Samples);
       Res.Start := Splitter.Start_Index;
@@ -278,7 +280,7 @@ package body Tree_Build is
          end if;
 
          Put_Line ("Tree_Build.Build_Depth_First_Tree Add_Node");
-         Node_Cursor := Add_Node (theTree, Depth, Node_ID, Parent, Is_Left, Is_Leaf,
+         Node_Cursor := Add_Node (theTree, Splitter, Depth, Node_ID, Parent, Is_Left, Is_Leaf,
                                   Split.Feature_Index, Impurity,
                                   Split.Threshold, Weighted_Samples);
          Put_Line ("Tree_Build.Build_Depth_First_Tree Node added, Is_Left, Is_Leaf: "

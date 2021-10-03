@@ -48,7 +48,7 @@ package body Tree is
             Put_Line ("Tree.Apply_Dense not leaf");
             Node := Element (Node_Cursor);
             Feature := Node.Feature_Index;
-            if Samples.Element (Feature).Float_Value <= Node.Threshold then
+            if Node.Is_Leaf and then Samples.Element (Feature).Float_Value <= Node.Threshold then
                Node_Cursor := First_Child (Node_Cursor);
             else
                Node_Cursor := Last_Child (Node_Cursor);
@@ -65,14 +65,11 @@ package body Tree is
 
    function Get_Value_Array (Self : Tree_Class) return Value_Array is
       Values      : Value_Array
-        (1 .. Positive (Self.Values.Length), 1 .. Self.Num_Features);
-      Values_Data : Classifier_Types.Float_List;
+        (1 .. Positive (Self.Values.Length));
+      Values_Data : Values_List;
    begin
       for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
-         Values_Data := Self.Values.Element (v_index);
-         for c_index in Values_Data.First_Index .. Values_Data.Last_Index loop
-            Values (v_index, c_index) := Values_Data.Element (c_index);
-         end loop;
+         Values (v_index) := Values_Data.Element (v_index);
       end loop;
 
       return Values;
@@ -117,11 +114,13 @@ package body Tree is
       for index in 1 .. N_Samples loop
          Put_Line ("Tree.Predict index" & Integer'Image (index));
          Leaf := Element (Leaf_Cursors (index));
-         Feature_Index := Leaf.Feature_Index;
-         Put_Line ("Tree.Predict Feature_Index" &
-                     Integer'Image (Feature_Index));
-         Features_List := X.Element (index);
-         Target.Append (Features_List (Feature_Index));
+         if not Leaf.Is_Leaf then
+            Feature_Index := Leaf.Feature_Index;
+            Put_Line ("Tree.Predict Feature_Index" &
+                        Integer'Image (Feature_Index));
+            Features_List := X.Element (index);
+            Target.Append (Features_List (Feature_Index));
+         end if;
       end loop;
 
       return Target;

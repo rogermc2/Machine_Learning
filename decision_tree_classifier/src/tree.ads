@@ -30,6 +30,12 @@ package Tree is
       end case;
    end record;
 
+--     use Classifier_Types.Float_Package;
+--     package Values_Package is new Ada.Containers.Vectors
+--       (Positive, Classifier_Types.Float_List);
+--     subtype Values_List is Values_Package.Vector;
+   subtype Values_List is Classifier_Types.Float_List;
+
    type Tree_Node
      (Is_Leaf : Boolean := False)
    is record
@@ -37,7 +43,7 @@ package Tree is
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Samples_Start             : Natural := 0;
       Samples_End               : Natural := 0;
-      --        Num_Node_Samples          : Integer := 0;
+      Values                    : Values_List;
       Weighted_Num_Node_Samples : Integer := 0;
       Depth                     : Integer := 0;
       Is_Left                   : Boolean := True;
@@ -77,10 +83,6 @@ package Tree is
    --       (Positive, Output_List);
    --     subtype Values_List is Values_Package.Vector;
    subtype Node_Index is Positive;
-   use Classifier_Types.Float_Package;
-   package Values_Package is new Ada.Containers.Vectors
-     (Node_Index, Classifier_Types.Float_List);
-   subtype Values_List is Values_Package.Vector;
 
    type Tree_Attributes is private;
    type Tree_Class is record
@@ -118,6 +120,6 @@ private
    end record;
 
    type Value_Array is array
-     (Natural range <>, Natural range <>) of Float;
+     (Natural range <>) of Float;
 
 end Tree;
