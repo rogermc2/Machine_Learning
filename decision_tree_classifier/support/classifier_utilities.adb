@@ -449,32 +449,36 @@ package body Classifier_Utilities is
       Curs        : Float_Package.Cursor := Values.First;
       Data        : Float;
       UB_Offset   : constant Unbounded_String :=
-                        To_Unbounded_String (Offset);
+                      To_Unbounded_String (Offset);
       Data_String : Unbounded_String;
    begin
       Data_String := UB_Offset & "Node type: " &
-          ML_Types.Node_Kind'Image (Node.Kind);
+        ML_Types.Node_Kind'Image (Node.Kind);
       Put_Line (To_String (Data_String));
       Data_String := UB_Offset & "Impurity: " &  Float'Image (Node.Impurity);
       Put_Line (To_String (Data_String));
 
+      Put_Line (Offset & "Values_List length: " &
+                  Integer'Image (Integer (Values.Length)));
       Data_String := UB_Offset;
       if Node.Is_Leaf then
-            Data_String := Data_String & "Prediction ";
+         Data_String := Data_String & "Prediction ";
       end if;
 
-      Data_String := Data_String & "Values {";
-      while Has_Element (Curs) loop
-         Data := Element (Curs);
-         Data_String := Data_String & "'" & Float'Image (Data);
-         if not (Curs = Values.Last) then
-            Data_String := Data_String & ", ";
-         end if;
-         Next (Curs);
-      end loop;
+      if Integer (Values.Length) > 0 then
+         Data_String := Data_String & "Values {";
+         while Has_Element (Curs) loop
+            Data := Element (Curs);
+            Data_String := Data_String & Float'Image (Data);
+            if not (Curs = Values.Last) then
+               Data_String := Data_String & ", ";
+            end if;
+            Next (Curs);
+         end loop;
 
-      Data_String := Data_String & "}";
-      Put_Line (To_String (Data_String));
+         Data_String := Data_String & " }";
+         Put_Line (To_String (Data_String));
+      end if;
       New_Line;
 
    end Print_Node;
@@ -487,14 +491,11 @@ package body Classifier_Utilities is
       use Nodes_Package;
       Tree_Nodes  : constant Tree.Tree_Class := aTree.Attributes.Decision_Tree;
       This_Indent : Natural := 0;
---        Last_Offset : Unbounded_String;
+      Node_Count  : Natural := 0;
 
       procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
          use Ada.Containers;
-         Node            : Tree_Node;
-         True_Child_Curs : Cursor;
-         True_Child      : Tree_Node;
-         False_Child     : Tree_Node;
+         Node : Tree_Node;
       begin
          This_Indent := Indent + 1;
          if This_Indent > 10 then
@@ -503,29 +504,25 @@ package body Classifier_Utilities is
 
          Node := Element (Curs);
          declare
-            Offset    : String (1 .. This_Indent + 1) := (others => ' ');
-            pos       : Natural := 1;
+            Offset : String (1 .. This_Indent + 1) := (others => ' ');
+            pos    : Natural := 1;
          begin
             while pos < This_Indent - 1 loop
                Offset (pos .. pos + 2) := "   ";
                pos := pos + 2;
             end loop;
+
             if This_Indent > 1 and then pos < This_Indent + 1 then
                Offset (Indent) := ' ';
             end if;
-            Put (Offset);
---              Last_Offset := To_Unbounded_String (Offset);
-
+            Node_Count := Node_Count + 1;
+            Put_Line (Offset & "Node " & Integer'Image (Node_Count));
             Print_Node (Node, Offset);
-            True_Child_Curs := First_Child (Curs);
-            True_Child := Element (True_Child_Curs);
-            Offset := Offset;
-            Print_Node (True_Child, Offset & "   ");
-
-            if Child_Count (Curs) > 1 then
-               False_Child := Element (Next_Sibling (True_Child_Curs));
-               Put_Line (Offset & "--> False:");
-               Print_Node (False_Child, Offset);
+            if not Is_Leaf (Curs) then
+               Print_Tree_Node (First_Child (Curs));
+               if Child_Count (Curs) > 1 then
+                  Print_Tree_Node (Next_Sibling (First_Child (Curs)));
+               end if;
             end if;
          end; --  declare block
       end Print_Tree_Node;
@@ -638,7 +635,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                               return Integer_Array is
+                                  return Integer_Array is
       use Int_Sets;
       Unique_Set : Int_Sets.Set;
       Set_Curs   : Int_Sets.Cursor;
