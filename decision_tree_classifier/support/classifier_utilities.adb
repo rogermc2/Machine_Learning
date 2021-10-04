@@ -448,14 +448,22 @@ package body Classifier_Utilities is
       Values      : constant Values_List := Node.Values;
       Curs        : Float_Package.Cursor := Values.First;
       Data        : Float;
+      UB_Offset   : constant Unbounded_String :=
+                        To_Unbounded_String (Offset);
       Data_String : Unbounded_String;
    begin
-      Data_String := To_Unbounded_String (Offset);
-      if Node.Is_Leaf then
-            Data_String := Data_String & "    Predict ";
-      end if;
-      Data_String := Data_String & "{";
+      Data_String := UB_Offset & "Node type: " &
+          ML_Types.Node_Kind'Image (Node.Kind);
+      Put_Line (To_String (Data_String));
+      Data_String := UB_Offset & "Impurity: " &  Float'Image (Node.Impurity);
+      Put_Line (To_String (Data_String));
 
+      Data_String := UB_Offset;
+      if Node.Is_Leaf then
+            Data_String := Data_String & "Prediction ";
+      end if;
+
+      Data_String := Data_String & "Values {";
       while Has_Element (Curs) loop
          Data := Element (Curs);
          Data_String := Data_String & "'" & Float'Image (Data);
@@ -464,8 +472,10 @@ package body Classifier_Utilities is
          end if;
          Next (Curs);
       end loop;
+
       Data_String := Data_String & "}";
       Put_Line (To_String (Data_String));
+      New_Line;
 
    end Print_Node;
 
@@ -509,12 +519,13 @@ package body Classifier_Utilities is
             Print_Node (Node, Offset);
             True_Child_Curs := First_Child (Curs);
             True_Child := Element (True_Child_Curs);
-            Print_Node (True_Child, Integer'Image (This_Indent + 1));
+            Offset := Offset;
+            Print_Node (True_Child, Offset & "   ");
 
             if Child_Count (Curs) > 1 then
                False_Child := Element (Next_Sibling (True_Child_Curs));
                Put_Line (Offset & "--> False:");
-               Print_Node (False_Child, Integer'Image (This_Indent + 1));
+               Print_Node (False_Child, Offset);
             end if;
          end; --  declare block
       end Print_Tree_Node;
