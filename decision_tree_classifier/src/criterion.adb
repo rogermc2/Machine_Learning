@@ -20,8 +20,8 @@ package body Criterion is
       Start, Stop      : Natural) is
       Num_Outputs  : constant Positive := Positive (Y.Length);
       Y_I_Index    : Positive;
-      Y_Ik         : Classifier_Types.Natural_List;
-      Y_I          : Positive;
+      Y_I          : Classifier_Types.Natural_List;
+      Y_Ik         : Positive;
       Weight       : Float := 1.0;
       W_Ik         : Float;
    begin
@@ -51,17 +51,17 @@ package body Criterion is
          if not Sample_Weight.Is_Empty then
             Weight := Sample_Weight.Element (Y_I_Index);
          end if;
-      end loop;
 
-      for k in 1 .. Num_Outputs loop
-         Y_Ik := Y.Element (k);
-         Y_I := Y_Ik.Element (Y_I_Index);
-         W_Ik := Float (Y_I) * Weight;
+         Y_I := Y.Element (Y_I_Index);
+         for k in 1 .. Num_Outputs loop
+            Y_Ik := Y_I.Element (k);
+            W_Ik := Float (Y_Ik) * Weight;
 
-         Criteria.Sum_Total.Replace_Element
-           (k, Criteria.Sum_Total.Element (k) + W_Ik);
-         Criteria.Sq_Sum_Total :=
-           Criteria.Sq_Sum_Total + Float (Y_I) * W_Ik;
+            Criteria.Sum_Total.Replace_Element
+              (k, Criteria.Sum_Total.Element (k) + W_Ik);
+            Criteria.Sq_Sum_Total :=
+              Criteria.Sq_Sum_Total + Float (Y_Ik) * W_Ik;
+         end loop;
 
          Criteria.Weighted_Node_Samples :=
            Criteria.Weighted_Node_Samples + Weight;
@@ -110,7 +110,7 @@ package body Criterion is
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
    --   of the current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                   return Float is
+                                return Float is
       Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
       Count_K        : Float;
       Gini           : Float := 0.0;
@@ -189,7 +189,7 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                           return Float is
+                                        return Float is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
