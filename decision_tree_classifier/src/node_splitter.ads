@@ -49,7 +49,7 @@ package Node_Splitter is
                    Sample_Weight      : Weights.Weight_List);
    function Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self : Splitter_Class;
-                         Value : out Classifier_Types.Float_List);
+                         Values : out Classifier_Types.Float_List);
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
       Start, Stop           : Natural;

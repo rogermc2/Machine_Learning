@@ -1,9 +1,9 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is

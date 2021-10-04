@@ -56,6 +56,7 @@ package body Classifier_Tests is
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                   Integer'Image
                   (Integer (theTree.Attributes.Decision_Tree.Nodes.Node_Count)));
+      Print_Tree ("The Tree", theTree);
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
                         Weight_Values);
       Probabilities := Predict_Probability (theTree, X);
