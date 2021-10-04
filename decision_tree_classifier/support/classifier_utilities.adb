@@ -450,7 +450,12 @@ package body Classifier_Utilities is
       Data        : Float;
       Data_String : Unbounded_String;
    begin
-      Data_String := To_Unbounded_String (Offset  & "    Predict {");
+      Data_String := To_Unbounded_String (Offset);
+      if Node.Is_Leaf then
+            Data_String := Data_String & "    Predict ";
+      end if;
+      Data_String := Data_String & "{";
+
       while Has_Element (Curs) loop
          Data := Element (Curs);
          Data_String := Data_String & "'" & Float'Image (Data);
