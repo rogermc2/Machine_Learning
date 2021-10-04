@@ -5,6 +5,7 @@
 --  Tree_Builder controls the various stopping criteria and the node splitting
 --  evaluation order, e.g. depth-first or best-first.
 
+with Classifier_Types;
 with ML_Types;
 with Node_Splitter;
 with Tree;
@@ -42,12 +43,14 @@ package Tree_Build is
    procedure Build_Best_First_Tree
      (Best_Builder  : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
-      X, Y          : ML_Types.List_Of_Value_Data_Lists;
+      X             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : Weights.Weight_List);
    procedure Build_Depth_First_Tree
      (Depth_Builder : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
-      X, Y          : ML_Types.List_Of_Value_Data_Lists;
+      X             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : Weights.Weight_List);
    procedure Init_Best_First_Tree
      (Best_Builder          : in out Tree_Builder;

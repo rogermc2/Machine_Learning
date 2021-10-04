@@ -142,7 +142,8 @@ package body Tree_Build is
    procedure Build_Best_First_Tree
      (Best_Builder  : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
-      X, Y          : ML_Types.List_Of_Value_Data_Lists;
+      X             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Frontier_Package;
@@ -159,7 +160,7 @@ package body Tree_Build is
       Curs             : Frontier_Cursor;
    begin
       --  L332
-      Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
+      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       if Best_Builder.Max_Leaf_Nodes <= 0 then
          raise Tree_Build_Error with
            "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
@@ -207,7 +208,8 @@ package body Tree_Build is
    procedure Build_Depth_First_Tree
      (Depth_Builder : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
-      X, Y          : ML_Types.List_Of_Value_Data_Lists;
+      X             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Build_Utils.Stack_Package;
@@ -231,7 +233,7 @@ package body Tree_Build is
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
       --  L163
-      Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
+      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
       Put_Line ("Tree_Build.Build_Depth_First_Tree Num_Node_Samples: " &
                   Integer'Image (Integer (Num_Node_Samples)));

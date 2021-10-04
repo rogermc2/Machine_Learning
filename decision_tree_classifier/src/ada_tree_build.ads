@@ -1,4 +1,5 @@
 
+with Classifier_Types;
 with ML_Types;
 with Node_Splitter;
 with Tree;
@@ -20,7 +21,8 @@ package Ada_Tree_Build is
 
     procedure Build_Tree
       (theTree       : in out Tree.Tree_Class;
-       X, Y          : ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.List_Of_Value_Data_Lists;
+       Y             : Classifier_Types.List_Of_Natural_Lists;
        Sample_Weight : Weights.Weight_List);
 
 end Ada_Tree_Build;

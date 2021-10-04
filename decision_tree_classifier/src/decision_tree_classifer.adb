@@ -13,11 +13,12 @@ package body Decision_Tree_Classifer is
    procedure Classification_Fit
      (aClassifier   : in out Base_Decision_Tree.Classifier;
       X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : in out ML_Types.List_Of_Value_Data_Lists;
+      Y             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : out Classifier_Types.Float_List) is
    begin
       --  L929
-      Base_Decision_Tree.Base_Fit  (aClassifier, X, Y, Sample_Weight);
+      Base_Decision_Tree.Base_Fit  (aClassifier, X, Y, Y_Encoded, Sample_Weight);
 
    end Classification_Fit;
 

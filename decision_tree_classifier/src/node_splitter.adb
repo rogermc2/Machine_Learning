@@ -16,9 +16,10 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Init (Self              : in out Splitter_Class;
-                   Input_X, Target_Y : ML_Types.List_Of_Value_Data_Lists;
-                   Sample_Weight     : Weights.Weight_List) is
+   procedure Init (Self          : in out Splitter_Class;
+                   Input_X       : ML_Types.List_Of_Value_Data_Lists;
+                   Target_Y      : Classifier_Types.List_Of_Natural_Lists;
+                   Sample_Weight : Weights.Weight_List) is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Element (1).Length);
       Num_Features     : constant Positive := Positive (Input_X.Length);

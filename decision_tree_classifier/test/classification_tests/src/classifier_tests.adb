@@ -38,6 +38,7 @@ package body Classifier_Tests is
       X               : constant List_Of_Value_Data_Lists :=
                           To_Multi_Value_List (X_Array);
       Y               : List_Of_Value_Data_Lists;
+      Y_Encoded       : Classifier_Types.List_Of_Natural_Lists;
       Num_Samples     : constant Natural := Natural (X.Length);
 --        Classes         : Value_Data_List;
       Weight_Values   : Weights.Weight_List;
@@ -52,7 +53,7 @@ package body Classifier_Tests is
       Init (theTree, Random_State => 0);
       Y := To_Integer_Value_List (Y_Array);
 --        Expected := To_Integer_Value_List (True_Result);
-      Classification_Fit (theTree, X, Y, Weight_Values);
+      Classification_Fit (theTree, X, Y, Y_Encoded, Weight_Values);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                   Integer'Image (Integer
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));

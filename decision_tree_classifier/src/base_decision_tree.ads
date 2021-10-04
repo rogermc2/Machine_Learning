@@ -113,7 +113,8 @@ package Base_Decision_Tree is
 
    procedure Base_Fit (aClassifier   : in out Classifier;
                        X             : ML_Types.List_Of_Value_Data_Lists;
-                       Y             : in out ML_Types.List_Of_Value_Data_Lists;
+                       Y             : ML_Types.List_Of_Value_Data_Lists;
+                       Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
                        Sample_Weight : in out Classifier_Types.Float_List);
    procedure Init (aClassifier    : in out Classifier;
                    Max_Leaf_Nodes : Integer := -1;

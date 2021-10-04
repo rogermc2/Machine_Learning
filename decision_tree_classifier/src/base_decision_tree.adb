@@ -14,11 +14,12 @@ package body Base_Decision_Tree is
    procedure Base_Fit_Checks
      (aClassifier   : in out Classifier;
       X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : in out ML_Types.List_Of_Value_Data_Lists;
+      Y             : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : in out Classifier_Types.Float_List);
    procedure Classification_Part
      (aClassifier           : in out Classifier;
-      Y, Y_Encoded          : in out ML_Types.List_Of_Value_Data_Lists;
+      Y                     : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded             : in out Classifier_Types.List_Of_Natural_Lists;
       Expanded_Class_Weight : in out Classifier_Types.Float_List);
    procedure Prune_Tree (aClassifier : in out Classifier);
 
@@ -28,9 +29,9 @@ package body Base_Decision_Tree is
    procedure Base_Fit
      (aClassifier   : in out Classifier;
       X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : in out ML_Types.List_Of_Value_Data_Lists;
+      Y             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : in out Classifier_Types.Float_List) is
-      Y_Encoded             : ML_Types.List_Of_Value_Data_Lists;
       --  L205
       Expanded_Class_Weight : Weights.Weight_List;
       Sum_Sample_Weight     : Float := 0.0;
@@ -76,7 +77,7 @@ package body Base_Decision_Tree is
 
       --  L410
       Ada_Tree_Build.Build_Tree (aClassifier.Attributes.Decision_Tree,
-                                 X, Y, Sample_Weight);
+                                 X, Y_Encoded, Sample_Weight);
 
       if Integer (aClassifier.Attributes.Num_Outputs) = 1 then
          null;
@@ -91,7 +92,7 @@ package body Base_Decision_Tree is
    procedure Base_Fit_Checks
      (aClassifier   : in out Classifier;
       X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : in out ML_Types.List_Of_Value_Data_Lists;
+      Y             : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : in out Classifier_Types.Float_List) is
       use Maths.Float_Math_Functions;
       Num_Samples           : constant Positive := Positive (X.Length);
@@ -217,7 +218,8 @@ package body Base_Decision_Tree is
    --  L200
    procedure Classification_Part
      (aClassifier           : in out Classifier;
-      Y, Y_Encoded          : in out ML_Types.List_Of_Value_Data_Lists;
+      Y                     : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded             : in out Classifier_Types.List_Of_Natural_Lists;
       Expanded_Class_Weight : in out Classifier_Types.Float_List) is
       use Weights;
       Y_Original : ML_Types.List_Of_Value_Data_Lists;
@@ -225,7 +227,6 @@ package body Base_Decision_Tree is
       Classes_K  : ML_Types.Value_Data_List;
       Inverse    : Natural_List;
    begin
-
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Num_Classes.Clear;
 
@@ -233,10 +234,11 @@ package body Base_Decision_Tree is
          Y_Original := Y;
       end if;
 
+      --  L208
       for k in Y.First_Index .. Y.Last_Index loop
          Y_K := Y.Element (k);
          Classes_K := Encode_Utils.Unique (Y_K, Inverse);
-         Y_Encoded.Append (Classes_K);
+         Y_Encoded.Append (Inverse);
          aClassifier.Attributes.Classes.Append (Classes_K);
       end loop;
 

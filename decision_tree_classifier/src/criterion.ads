@@ -6,8 +6,7 @@ with Weights;
 package Criterion is
 
    type Criterion_Class is record
-      Y                         : ML_Types.List_Of_Value_Data_Lists;
-      --          Classes                   : ML_Types.List_Of_Value_Data_Lists;
+      Y                         : Classifier_Types.List_Of_Natural_Lists;
       Samples                   : ML_Types.List_Of_Value_Data_Lists;
       Sample_Indices            : Classifier_Types.Natural_List;
       Num_Weighted_Node_Samples : Natural := 0;
@@ -40,7 +39,7 @@ package Criterion is
 
    procedure Classification_Init
      (Criteria         : in out Criterion_Class;
-      Y                : ML_Types.List_Of_Value_Data_Lists;
+      Y                : Classifier_Types.List_Of_Natural_Lists;
       --  Samples:
       Sample_Indices   : Classifier_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample

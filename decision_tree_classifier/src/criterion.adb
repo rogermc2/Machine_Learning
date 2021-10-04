@@ -12,7 +12,7 @@ package body Criterion is
    --  L508
    procedure Classification_Init
      (Criteria         : in out Criterion_Class;
-      Y                : ML_Types.List_Of_Value_Data_Lists;
+      Y                : Classifier_Types.List_Of_Natural_Lists;
       Sample_Indices   : Classifier_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight    : Weights.Weight_List;
@@ -20,8 +20,8 @@ package body Criterion is
       Start, Stop      : Natural) is
       Num_Outputs  : constant Positive := Positive (Y.Length);
       Y_I_Index    : Positive;
-      Y_Ik         : ML_Types.Value_Data_List;
-      Y_I          : ML_Types.Value_Record;
+      Y_Ik         : Classifier_Types.Natural_List;
+      Y_I          : Positive;
       Weight       : Float := 1.0;
       W_Ik         : Float;
    begin
@@ -51,32 +51,17 @@ package body Criterion is
          if not Sample_Weight.Is_Empty then
             Weight := Sample_Weight.Element (Y_I_Index);
          end if;
+      end loop;
 
-         for k in 1 .. Num_Outputs loop
-            Y_Ik := Y.Element (k);
-            Y_I := Y_Ik.Element (Y_I_Index);
+      for k in 1 .. Num_Outputs loop
+         Y_Ik := Y.Element (k);
+         Y_I := Y_Ik.Element (Y_I_Index);
+         W_Ik := Float (Y_I) * Weight;
 
-            case Y_I.Value_Kind is
-               when ML_Types.Float_Type =>
-                  W_Ik := Y_I.Float_Value * Weight;
-               when ML_Types.Integer_Type =>
-                  W_Ik := Float (Y_I.Integer_Value) * Weight;
-               when others => null;
-            end case;
-
-            Criteria.Sum_Total.Replace_Element
-              (k, Criteria.Sum_Total.Element (k) + W_Ik);
-
-            case Y_I.Value_Kind is
-               when ML_Types.Float_Type =>
-                  Criteria.Sq_Sum_Total :=
-                    Criteria.Sq_Sum_Total + Y_I.Float_Value * W_Ik;
-               when ML_Types.Integer_Type =>
-                  Criteria.Sq_Sum_Total :=
-                    Criteria.Sq_Sum_Total + Float (Y_I.Integer_Value) * W_Ik;
-               when others => null;
-            end case;
-         end loop;
+         Criteria.Sum_Total.Replace_Element
+           (k, Criteria.Sum_Total.Element (k) + W_Ik);
+         Criteria.Sq_Sum_Total :=
+           Criteria.Sq_Sum_Total + Float (Y_I) * W_Ik;
 
          Criteria.Weighted_Node_Samples :=
            Criteria.Weighted_Node_Samples + Weight;
@@ -93,7 +78,7 @@ package body Criterion is
                                      Impurity_Right : out Float) is
       use Maths.Float_Math_Functions;
       Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
-      Class_List     : ML_Types.Value_Data_List;
+      Class_List     : Classifier_Types.Natural_List;
       Count_K        : Float;
       Entropy_Left   : Float := 0.0;
       Entropy_Right  : Float := 0.0;
@@ -125,7 +110,7 @@ package body Criterion is
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
    --   of the current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                 return Float is
+                                   return Float is
       Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
       Count_K        : Float;
       Gini           : Float := 0.0;
@@ -170,7 +155,7 @@ package body Criterion is
    --  The smaller the impurity the better.
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float is
       use Maths.Float_Math_Functions;
-      Class_List     : ML_Types.Value_Data_List;
+      Class_List     : Classifier_Types.Natural_List;
       Count_K        : Float := 0.0;
       Entropy        : Float := 0.0;
    begin
@@ -204,7 +189,7 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                         return Float is
+                                           return Float is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
@@ -249,11 +234,10 @@ package body Criterion is
    --  Update statistics by moving samples[pos:new_pos] to the left child.
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
-      use ML_Types;
       Num_Outputs  : constant Positive := Positive (Criteria.Y.Length);
       Sum          : Float;
       i            : Positive;
-      Values       : Value_Data_List;
+      Values       : Classifier_Types.Natural_List;
       Weight       : Float := 1.0;
    begin
       --  L439
@@ -269,7 +253,7 @@ package body Criterion is
               Criteria.Sum_Left.Last_Index loop
                Sum := Criteria.Sum_Left.Element (k);
                for s in Values.First_Index .. Values.Last_Index loop
-                  Sum := Sum + Values.Element (s).Float_Value * Weight;
+                  Sum := Sum + Float (Values.Element (s)) * Weight;
                end loop;
                Criteria.Sum_Left.Replace_Element (k, Sum);
             end loop;
@@ -290,7 +274,7 @@ package body Criterion is
               Criteria.Sum_Left.Last_Index loop
                Sum := Criteria.Sum_Left.Element (k);
                for s in Values.First_Index .. Values.Last_Index loop
-                  Sum := Sum - Values.Element (s).Float_Value * Weight;
+                  Sum := Sum - Float (Values.Element (s)) * Weight;
                end loop;
                Criteria.Sum_Left.Replace_Element (k, Sum);
             end loop;
@@ -305,7 +289,7 @@ package body Criterion is
       for k in 1 .. Num_Outputs loop
          Sum := Criteria.Sum_Total.Element (k);
          for s in Values.First_Index .. Values.Last_Index loop
-            Sum := Sum - Values.Element (s).Float_Value * Weight;
+            Sum := Sum - Float (Values.Element (s)) * Weight;
          end loop;
          Criteria.Sum_Right.Replace_Element (k, Sum);
       end loop;
