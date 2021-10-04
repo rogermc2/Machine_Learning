@@ -221,21 +221,19 @@ package body Classifier_Utilities is
    function To_Multi_Value_List (A : Multi_Value_Array)
                                  return ML_Types.List_Of_Value_Data_Lists is
       use ML_Types;
-      Data_A : Value_Record (Integer_Type);
-      Data_B : Value_Record (Integer_Type);
-      A_List : Value_Data_List;
-      B_List : Value_Data_List;
-      Lists  : ML_Types.List_Of_Value_Data_Lists;
+      Value    : Value_Record (Integer_Type);
+      Row_List : List_Of_Value_Data_Lists;
+      Col_List : Value_Data_List;
    begin
-      for index in A'Range loop
-         Data_A.Integer_Value := A (index, 1);
-         Data_B.Integer_Value := A (index, 2);
-         A_List.Append (Data_A);
-         B_List.Append (Data_B);
+      for row in A'Range loop
+         Col_List.Clear;
+         for col in A'Range (2) loop
+            Value.Integer_Value := A (row, col);
+            Col_List.Append (Value);
+         end loop;
+         Row_List.Append (Col_List);
       end loop;
-      Lists.Append (A_List);
-      Lists.Append (B_List);
-      return Lists;
+      return Row_List;
 
    end To_Multi_Value_List;
 

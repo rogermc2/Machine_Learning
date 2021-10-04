@@ -94,8 +94,7 @@ package body Base_Decision_Tree is
       Y             : in out ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : in out Classifier_Types.Float_List) is
       use Maths.Float_Math_Functions;
-      Num_Samples           : constant Positive :=
-                                Positive (X.Element (1).Length);
+      Num_Samples           : constant Positive := Positive (X.Length);
       --  L226
       Max_Leaf_Nodes        : constant Integer := aClassifier.Parameters.Max_Leaf_Nodes;
       Min_Sample_Leaf       : Leaf_Record (Tree.Integer_Type);

@@ -38,7 +38,7 @@ package body Classifier_Tests is
       X               : constant List_Of_Value_Data_Lists :=
                           To_Multi_Value_List (X_Array);
       Y               : List_Of_Value_Data_Lists;
-      Num_Samples     : constant Natural := Natural (X.Element (1).Length);
+      Num_Samples     : constant Natural := Natural (X.Length);
 --        Classes         : Value_Data_List;
       Weight_Values   : Weights.Weight_List;
       Probabilities   : List_Of_Value_Data_Lists;
