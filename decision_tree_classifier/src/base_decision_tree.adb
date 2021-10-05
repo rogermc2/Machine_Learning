@@ -170,10 +170,10 @@ package body Base_Decision_Tree is
       --  L291
       aClassifier.Parameters.Max_Features := Max_Features;
 
-      if Positive (Y.Element (1).Length) /= Num_Samples then
+      if Positive (Y.Length) /= Num_Samples then
          raise Value_Error with
            "Base_Decision_Tree.Base_Fit_Checks, number of labels " &
-           Integer'Image (Integer (Y.Element (1).Length)) &
+           Integer'Image (Integer (Y.Length)) &
            " does not match number of samples " & Integer'Image (Num_Samples);
       end if;
 
