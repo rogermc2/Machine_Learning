@@ -440,6 +440,19 @@ package body Classifier_Utilities is
 
     --  ------------------------------------------------------------------------
 
+    procedure Print_List_Of_Natural_Lists (Name : String;
+                                           Data : List_Of_Natural_Lists) is
+    begin
+        Put_Line (Name & ": ");
+        for Index in Data.First_Index .. Data.Last_Index loop
+            Print_Natural_List ("", Data.Element (Index));
+        end loop;
+        New_Line;
+
+    end Print_List_Of_Natural_Lists;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Node (Node : Tree.Tree_Node; Offset : String) is
         use Tree;
         use Float_Package;
