@@ -111,7 +111,6 @@ package body Node_Splitter is
       P1_Index := Self.Start_Index;
 
       while P_Index <= Self.End_Index loop
-         P1_Index := P_Index + 1;
          while P1_Index <= Self.End_Index loop
             case Features_X.Element (P1_Index).Value_Kind is
                when Boolean_Type =>
@@ -192,6 +191,7 @@ package body Node_Splitter is
                end if;
             end if;
          end if;
+         P1_Index := P_Index + 1;
       end loop;
 
    end Find_Best_Split;

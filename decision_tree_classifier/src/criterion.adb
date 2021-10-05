@@ -36,10 +36,6 @@ package body Criterion is
 
         Criteria.Sq_Sum_Total := 0.0;
         Criteria.Sum_Total.Clear;
-        --          Classifier_Utilities.Print_Natural_List
-        --            ("Criteria.Classification_Init Y" , Y.Element (1));
-        --          Put_Line ("Criteria.Classification_Init Num_Outputs" &
-        --                      Integer'Image (Num_Outputs));
         --  L771
         for k in 1 .. Num_Outputs loop
             Criteria.Sum_Total.Append (0.0);
@@ -48,8 +44,6 @@ package body Criterion is
         --  L773
         for p in Start .. Stop loop
             Y_I_Index := Sample_Indices.Element (p);
-            --              Put_Line ("Criteria.Classification_Init p, Y_I_Index" &
-            --                          Integer'Image (p) & ", " & Integer'Image (Y_I_Index));
 
             --  Weight is originally set to be 1.0, meaning that if no
             --  sample weights are given, the default weight of each sample is 1.0
@@ -58,14 +52,8 @@ package body Criterion is
             end if;
 
             Y_I := Y.Element (Y_I_Index);
-            --              Classifier_Utilities.Print_Natural_List
-            --                ("Criteria.Classification_Init Y_I" , Y_I);
-            --              Put_Line ("Criteria.Classification_Init Y_I length: " &
-            --                          Integer'Image (Integer (Y_I.Length)));
             for k in 1 .. Num_Outputs loop
-                --                  Put_Line ("Criteria.Classification_Init k" & Integer'Image (k));
                 Y_Ik := Y_I.Element (k);
-                --                  Put_Line ("Criteria.Classification_Init Y_Ik" & Integer'Image (Y_Ik));
                 W_Ik := Float (Y_Ik) * Weight;
 
                 Criteria.Sum_Total.Replace_Element

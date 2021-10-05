@@ -76,7 +76,9 @@ package body Base_Decision_Tree is
             end loop;
         end if;
 
-        --  L410
+      --  L410
+--        Classifier_Utilities.Print_List_Of_Natural_Lists
+--          ("Base_Decision_Tree.Base_Fit, Y_Encoded", Y_Encoded);
         Ada_Tree_Build.Build_Tree (aClassifier.Attributes.Decision_Tree,
                                    X, Y_Encoded, Sample_Weight);
 

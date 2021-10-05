@@ -13,8 +13,8 @@ package Node_Splitter is
    type Split_Record is record
       Feature_Index  : Positive := 1;
       Start_Index    : Positive := 1;  --  Left start?
-      End_Index      : Positive := 1;
       Pos_I          : Positive := 1;  --  Right start?
+      End_Index      : Positive := 1;  --  Right end?
       Threshold      : Float;
       Improvement    : Float := 0.0;
       Impurity_Left  : Float;

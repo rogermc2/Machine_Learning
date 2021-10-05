@@ -115,12 +115,11 @@ package body Encode_Utils is
               ("Value record not found in Uniques",
                aValue);
          else
-            Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs) - 1;
+            Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs);
          end if;
          Next (Values_Curs);
       end loop;
 
---        Put_Line ("Encode_Utils.Map_To_Integer done");
       return Result;
 
    end Map_To_Integer;
