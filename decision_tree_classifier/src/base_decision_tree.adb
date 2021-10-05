@@ -7,7 +7,7 @@ with Maths;
 
 with Ada_Tree_Build;
 with Classifier_Types;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with Encode_Utils;
 
 package body Base_Decision_Tree is
@@ -77,8 +77,6 @@ package body Base_Decision_Tree is
         end if;
 
         --  L410
-        Classifier_Utilities.Print_List_Of_Natural_Lists
-        ("Base_Decidion_Tree.Base_Fit Y_Encoded", Y_Encoded);
         Ada_Tree_Build.Build_Tree (aClassifier.Attributes.Decision_Tree,
                                    X, Y_Encoded, Sample_Weight);
 
@@ -236,10 +234,10 @@ package body Base_Decision_Tree is
         Y_Encoded.Clear;
 
         --  L208
-        for class in Y.First_Index .. Y.Last_Index loop
-            for k in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+        for k in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
                 Y_C.Append (0);
-            end loop;
+        end loop;
+        for class in Y.First_Index .. Y.Last_Index loop
             Y_Encoded.Append (Y_C);
         end loop;
 
