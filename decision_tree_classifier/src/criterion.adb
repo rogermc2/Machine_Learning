@@ -177,7 +177,7 @@ package body Criterion is
    --  ------------------------------------------------------------------------
    --  L214 __cinit__
    procedure Init (Criteria : in out Criterion_Class;
-                   Classes  : Classifier_Types.Natural_List) is
+                   Classes  : ML_Types.List_Of_Value_Data_Lists) is
    begin
       --  L252
       Criteria.Classes.Clear;

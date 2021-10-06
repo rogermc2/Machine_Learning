@@ -19,6 +19,7 @@ with ML_Types;
 with Tree;
 
 with Classifier_Types; use Classifier_Types;
+with Criterion;
 with Node_Splitter;
 with Weights;
 
@@ -61,7 +62,8 @@ package Base_Decision_Tree is
    --  class BaseDecisionTree
    type Base_Parameter_Data
      (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
-      Criterion                : Classifier_Criteria_Type := Gini_Criteria;
+      Criterion_Kind           : Classifier_Criteria_Type := Gini_Criteria;
+      Critera                  : Criterion.Criterion_Class;
       Splitter_Kind            : Splitter_Type := Best_Splitter;
       Splitter                 : Node_Splitter.Splitter_Class;
       Max_Depth                : Integer := -1;  --  < 0 means unspecified
@@ -91,7 +93,7 @@ package Base_Decision_Tree is
       --  The number of classes (for single output problems),
       --  or a list containing the number of classes for each
       --   output (for multi-output problems).
-      Num_Classes         : Integer_List;
+      --        Num_Classes         : Integer_List;
       Num_Features        : Tree.Index_Range := 1;
       Num_Outputs         : Tree.Index_Range := 1;
       Decision_Tree       : Tree.Tree_Class;
@@ -111,15 +113,17 @@ package Base_Decision_Tree is
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
 
-   procedure Base_Fit (aClassifier   : in out Classifier;
-                       X             : ML_Types.List_Of_Value_Data_Lists;
-                       Y             : ML_Types.List_Of_Value_Data_Lists;
-                       Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
-                       Sample_Weight : in out Classifier_Types.Float_List);
-   procedure Init (aClassifier    : in out Classifier;
-                   Max_Leaf_Nodes : Integer := -1;
+   procedure Base_Fit
+     (aClassifier   : in out Classifier;
+      X             : ML_Types.List_Of_Value_Data_Lists;
+      Y             : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
+      Classes       : out ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weight : in out Classifier_Types.Float_List);
+   procedure Init (aClassifier              : in out Classifier;
+                   Max_Leaf_Nodes           : Integer := -1;
                    Min_Weight_Fraction_Leaf : Float := 0.0;
-                   Random_State   : Integer := 0);
+                   Random_State             : Integer := 0);
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;

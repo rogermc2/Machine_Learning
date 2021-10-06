@@ -15,10 +15,11 @@ package body Decision_Tree_Classifer is
       X             : ML_Types.List_Of_Value_Data_Lists;
       Y             : ML_Types.List_Of_Value_Data_Lists;
       Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
+      Classes       : out ML_Types.List_Of_Value_Data_Lists;
       Sample_Weight : out Classifier_Types.Float_List) is
    begin
       --  L929
-      Base_Decision_Tree.Base_Fit  (aClassifier, X, Y, Y_Encoded, Sample_Weight);
+      Base_Decision_Tree.Base_Fit  (aClassifier, X, Y, Y_Encoded, Classes, Sample_Weight);
 
    end Classification_Fit;
 
@@ -60,7 +61,7 @@ package body Decision_Tree_Classifer is
             end case;
          end loop;
          if Normalizer <= 0.0 then
-             Normalizer := 1.0;
+            Normalizer := 1.0;
          end if;
 
          for index in Proba.First_Index .. Proba.Last_Index loop
