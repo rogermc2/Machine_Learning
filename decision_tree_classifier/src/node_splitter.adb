@@ -18,7 +18,7 @@ package body Node_Splitter is
 
    procedure Init (Self          : in out Splitter_Class;
                    Input_X       : ML_Types.List_Of_Value_Data_Lists;
-                   Target_Y      : Classifier_Types.List_Of_Natural_Lists;
+                   Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
                    Sample_Weight : Weights.Weight_List) is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Length);
@@ -58,7 +58,7 @@ package body Node_Splitter is
       Self.Constant_Features_I.Set_Length (Count_Type (Num_Features));
 
       Self.X := Input_X;
-      Self.Y := Target_Y;
+      Self.Y_Encoded := Y_Encoded;
       Self.Sample_Weight := Sample_Weight;
 
    end Init;
@@ -370,7 +370,7 @@ package body Node_Splitter is
       Split.Start_Index := Start;
       Split.End_Index := Stop;
       Criterion.Classification_Init
-        (Split.Criteria, Split.Y, Split.Sample_Indices,
+        (Split.Criteria, Split.Y_Encoded, Split.Sample_Indices,
         Split.Sample_Weight, Split.Weighted_Samples, Start, Stop);
 
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;

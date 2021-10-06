@@ -94,7 +94,7 @@ package body Ada_Tree_Builder is
    procedure Build_Tree
      (theTree       : in out Tree.Tree_Class;
       X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight : Weights.Weight_List) is
       use Tree.Nodes_Package;
       use Node_Splitter;
@@ -107,7 +107,7 @@ package body Ada_Tree_Builder is
       Top_Node_Cursor       : Cursor;
    begin
       --  L163
-      Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
+      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Init_Tree_Builder (Builder, Splitter);
 
       Top_Node.Samples_Start := Splitter.Start_Index;

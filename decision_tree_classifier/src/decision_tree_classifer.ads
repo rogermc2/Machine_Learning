@@ -66,12 +66,12 @@ package Decision_Tree_Classifer is
    Value_Error      : Exception;
 
     procedure Classification_Fit
-      (aClassifier   : in out Base_Decision_Tree.Classifier;
-       X             : ML_Types.List_Of_Value_Data_Lists;
-       Y             : ML_Types.List_Of_Value_Data_Lists;
-       Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
-       Classes       : out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weight : out Classifier_Types.Float_List);
+      (aClassifier    : in out Base_Decision_Tree.Classifier;
+       X              : ML_Types.List_Of_Value_Data_Lists;
+       Y              : ML_Types.List_Of_Value_Data_Lists;
+       Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
+       Classes        : out ML_Types.List_Of_Value_Data_Lists;
+       Sample_Weights : out Classifier_Types.Float_List);
    procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
                    Max_Leaf_Nodes : Integer := -1;
                    Random_State   : Integer := 0);

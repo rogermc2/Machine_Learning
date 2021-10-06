@@ -32,7 +32,7 @@ package Node_Splitter is
       Num_Classes          : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
       Weighted_Samples     : Float := 0.0;
-      Y                    : Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded            : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float;
       Start_Index          : Positive := 1;
@@ -46,7 +46,7 @@ package Node_Splitter is
 
    procedure Init (Self          : in out Splitter_Class;
                    Input_X       : ML_Types.List_Of_Value_Data_Lists;
-                   Target_Y      : Classifier_Types.List_Of_Natural_Lists;
+                   Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
                    Sample_Weight : Weights.Weight_List);
    function Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self : Splitter_Class;

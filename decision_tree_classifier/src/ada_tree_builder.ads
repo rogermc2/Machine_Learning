@@ -22,7 +22,7 @@ package Ada_Tree_Builder is
     procedure Build_Tree
       (theTree       : in out Tree.Tree_Class;
        X             : ML_Types.List_Of_Value_Data_Lists;
-       Y             : Classifier_Types.List_Of_Natural_Lists;
+       Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
        Sample_Weight : Weights.Weight_List);
 
 end Ada_Tree_Builder;

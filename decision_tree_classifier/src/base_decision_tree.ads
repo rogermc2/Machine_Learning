@@ -90,10 +90,6 @@ package Base_Decision_Tree is
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
       Max_Features        : Natural := 0;
-      --  The number of classes (for single output problems),
-      --  or a list containing the number of classes for each
-      --   output (for multi-output problems).
-      --        Num_Classes         : Integer_List;
       Num_Features        : Tree.Index_Range := 1;
       Num_Outputs         : Tree.Index_Range := 1;
       Decision_Tree       : Tree.Tree_Class;
@@ -114,12 +110,12 @@ package Base_Decision_Tree is
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
 
    procedure Base_Fit
-     (aClassifier   : in out Classifier;
-      X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : ML_Types.List_Of_Value_Data_Lists;
-      Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
-      Classes       : out ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : in out Classifier_Types.Float_List);
+     (aClassifier    : in out Classifier;
+      X              : ML_Types.List_Of_Value_Data_Lists;
+      Y              : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
+      Classes        : out ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weights : out Classifier_Types.Float_List);
    procedure Init (aClassifier              : in out Classifier;
                    Max_Leaf_Nodes           : Integer := -1;
                    Min_Weight_Fraction_Leaf : Float := 0.0;

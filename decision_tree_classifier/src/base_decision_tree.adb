@@ -14,28 +14,28 @@ with Encode_Utils;
 package body Base_Decision_Tree is
 
    procedure Base_Fit_Checks
-     (aClassifier   : in out Classifier;
-      X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : in out Classifier_Types.Float_List);
+     (aClassifier    : in out Classifier;
+      X              : ML_Types.List_Of_Value_Data_Lists;
+      Y              : ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weights : in out Classifier_Types.Float_List);
    procedure Classification_Part
-     (aClassifier           : in out Classifier;
-      Y                     : ML_Types.List_Of_Value_Data_Lists;
-      Y_Encoded             : out Classifier_Types.List_Of_Natural_Lists;
-      Classes               : out ML_Types.List_Of_Value_Data_Lists;
-      Expanded_Class_Weight : in out Classifier_Types.Float_List);
+     (aClassifier            : in out Classifier;
+      Y                      : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded              : out Classifier_Types.List_Of_Natural_Lists;
+      Classes                : out ML_Types.List_Of_Value_Data_Lists;
+      Expanded_Class_Weights : in out Classifier_Types.Float_List);
    procedure Prune_Tree (aClassifier : in out Classifier);
 
    --  -------------------------------------------------------------------------
    --  if is_classification: part of _classes.py BasesDecisionTree.Fit
    --  L150
    procedure Base_Fit
-     (aClassifier   : in out Classifier;
-      X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : ML_Types.List_Of_Value_Data_Lists;
-      Y_Encoded     : out Classifier_Types.List_Of_Natural_Lists;
-      Classes       : out ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : in out Classifier_Types.Float_List) is
+     (aClassifier    : in out Classifier;
+      X              : ML_Types.List_Of_Value_Data_Lists;
+      Y              : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
+      Classes        : out ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weights : out Classifier_Types.Float_List) is
       --  L205
       Expanded_Class_Weight : Weights.Weight_List;
       Sum_Sample_Weight     : Float := 0.0;
@@ -49,6 +49,7 @@ package body Base_Decision_Tree is
          raise Value_Error with
            "Base_Decision_Tree.Base_Fit, Y is empty";
       end if;
+
       --  L184
       aClassifier.Attributes.Num_Features :=
         Tree.Index_Range (X.Element (1).Length);
@@ -56,27 +57,27 @@ package body Base_Decision_Tree is
       Classification_Part (aClassifier, Y, Y_Encoded,
                            Classes, Expanded_Class_Weight);
 
-      Base_Fit_Checks (aClassifier, X, Y, Sample_Weight);
+      Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
 
       if Expanded_Class_Weight.Is_Empty then
-         if Sample_Weight.Is_Empty then
-            Sample_Weight := Expanded_Class_Weight;
+         if Sample_Weights.Is_Empty then
+            Sample_Weights := Expanded_Class_Weight;
          else
-            for index in Sample_Weight.First_Index ..
-              Sample_Weight.Last_Index loop
-               Sample_Weight.Replace_Element
-                 (index, Sample_Weight.Element (index) *
+            for index in Sample_Weights.First_Index ..
+              Sample_Weights.Last_Index loop
+               Sample_Weights.Replace_Element
+                 (index, Sample_Weights.Element (index) *
                       Expanded_Class_Weight.Element (index));
             end loop;
          end if;
       end if;
 
       --  L325
-      if not Sample_Weight.Is_Empty then
+      if not Sample_Weights.Is_Empty then
          Sum_Sample_Weight := 0.0;
-         for index in Sample_Weight.First_Index ..
-           Sample_Weight.Last_Index loop
-            Sum_Sample_Weight := Sum_Sample_Weight + Sample_Weight.Element (index);
+         for index in Sample_Weights.First_Index ..
+           Sample_Weights.Last_Index loop
+            Sum_Sample_Weight := Sum_Sample_Weight + Sample_Weights.Element (index);
          end loop;
       end if;
 
@@ -84,7 +85,7 @@ package body Base_Decision_Tree is
       --        Classifier_Utilities.Print_List_Of_Natural_Lists
       --          ("Base_Decision_Tree.Base_Fit, Y_Encoded", Y_Encoded);
       Ada_Tree_Builder.Build_Tree (aClassifier.Attributes.Decision_Tree,
-                                   X, Y_Encoded, Sample_Weight);
+                                   X, Y_Encoded, Sample_Weights);
 
       if Integer (aClassifier.Attributes.Num_Outputs) = 1 then
          null;
@@ -97,10 +98,10 @@ package body Base_Decision_Tree is
    --  -------------------------------------------------------------------------
 
    procedure Base_Fit_Checks
-     (aClassifier   : in out Classifier;
-      X             : ML_Types.List_Of_Value_Data_Lists;
-      Y             : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weight : in out Classifier_Types.Float_List) is
+     (aClassifier    : in out Classifier;
+      X              : ML_Types.List_Of_Value_Data_Lists;
+      Y              : ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weights : in out Classifier_Types.Float_List) is
       use Maths.Float_Math_Functions;
       Num_Samples           : constant Positive := Positive (X.Length);
       --  L226
@@ -205,8 +206,8 @@ package body Base_Decision_Tree is
            "Base_Decision_Tree.Base_Fit_Checks, Max_Leaf_Nodes should be > 1";
       end if;
       --  L315
-      if not Sample_Weight.Is_Empty then
-         if Integer (Sample_Weight.Length) /= Num_Samples then
+      if not Sample_Weights.Is_Empty then
+         if Integer (Sample_Weights.Length) /= Num_Samples then
             raise Value_Error with
               "Base_Decision_Tree.Base_Fit_Checks, Sample_Weight lenghth " &
               "should be the same as the number of X samples";
@@ -224,11 +225,11 @@ package body Base_Decision_Tree is
    --  -------------------------------------------------------------------------
    --  based on L200 of _classes.py BasesDecisionTree.Fit
    procedure Classification_Part
-     (aClassifier           : in out Classifier;
-      Y                     : ML_Types.List_Of_Value_Data_Lists;
-      Y_Encoded             : out Classifier_Types.List_Of_Natural_Lists;
-      Classes               : out ML_Types.List_Of_Value_Data_Lists;
-      Expanded_Class_Weight : in out Classifier_Types.Float_List) is
+     (aClassifier            : in out Classifier;
+      Y                      : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded              : out Classifier_Types.List_Of_Natural_Lists;
+      Classes                : out ML_Types.List_Of_Value_Data_Lists;
+      Expanded_Class_Weights : in out Classifier_Types.Float_List) is
       use Weights;
       Y_K        : ML_Types.Value_Data_List;
       Classes_K  : ML_Types.Value_Data_List;
@@ -237,10 +238,9 @@ package body Base_Decision_Tree is
       Inverse_K  : Natural;
    begin
       aClassifier.Attributes.Classes.Clear;
---        aClassifier.Attributes.Num_Classes.Clear;
       Y_Encoded.Clear;
 
-      --  L208
+      --  L208  Initialize Y_Encoded
       for k in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
          Y_C.Append (0);
       end loop;
@@ -248,8 +248,11 @@ package body Base_Decision_Tree is
          Y_Encoded.Append (Y_C);
       end loop;
 
+      --  For each ouput
       for k in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
          Y_K.Clear;
+         --  for this output's set of sample values generate
+         --  a Class and an encoded version of Y
          for class in Y.First_Index .. Y.Last_Index loop
             Y_K.Append (Y.Element (class).Element (k));
          end loop;
@@ -265,7 +268,7 @@ package body Base_Decision_Tree is
 
       --  L218
       if aClassifier.Parameters.Class_Weight /= No_Weight then
-         Expanded_Class_Weight :=
+         Expanded_Class_Weights :=
            Weights.Compute_Sample_Weight (No_Weight, Y);
       end if;
 
