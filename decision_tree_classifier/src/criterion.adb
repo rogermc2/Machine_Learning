@@ -1,5 +1,5 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -109,7 +109,7 @@ package body Criterion is
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
    --   of the current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                 return Float is
+                                return Float is
       Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
       Count_K        : Float;
       Gini           : Float := 0.0;
@@ -142,17 +142,23 @@ package body Criterion is
       Count_K        : Float := 0.0;
       Entropy        : Float := 0.0;
    begin
+      Put_Line ("Criterion.Entropy_Node_Impurity");
+      Put_Line ("Criterion.Entropy_Node_Impurity Y: " &
+                  Integer'Image (Integer (Self.Y.Length)) & " x" &
+                  Integer'Image (Integer (Self.Y.Element (1).Length)));
       --  Y structure samples (rows) x outputs (columns)
       for index in Self.Y.Element (1).First_Index ..
         Self.Y.Element (1).Last_Index loop
+         Put_Line ("Criterion.Entropy_Node_Impurity index" & Integer'Image (index));
          Class_List := Self.Classes.Element (index);
-         Count_K := Self.Sum_Total.Element (index);
-         if Count_K > 0.0 then
-            for c in Class_List.First_Index .. Class_List.Last_Index loop
+         for c in Class_List.First_Index .. Class_List.Last_Index loop
+            Put_Line ("Criterion.Entropy_Node_Impurity c" & Integer'Image (index));
+            Count_K := Self.Sum_Total.Element (c);
+            if Count_K > 0.0 then
                Count_K := Count_K / Self.Weighted_Node_Samples;
                Entropy := Entropy - Count_K * Log (Count_K);
-            end loop;
-         end if;
+            end if;
+         end loop;
       end loop;
 
       return Entropy / Float (Self.Sum_Total.Length);
@@ -204,7 +210,7 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                         return Float is
+                                        return Float is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
