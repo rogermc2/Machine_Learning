@@ -51,7 +51,8 @@ package body Ada_Tree_Builder is
    begin
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
-      Reset_Node (Splitter, Start, Stop, Weighted_Node_Samples);
+      Reset_Node (Splitter, Start, Stop, theTree.Classes,
+                  Weighted_Node_Samples);
       if First then
          Impurity := Node_Impurity (Splitter);
          First := False;

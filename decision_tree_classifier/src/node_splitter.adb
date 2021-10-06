@@ -365,8 +365,10 @@ package body Node_Splitter is
    procedure Reset_Node
      (Split                 : in out Splitter_Class;
       Start, Stop           : Natural;
+      Classes               : ML_Types.List_Of_Value_Data_Lists;
       Weighted_Node_Samples : in out Float) is
    begin
+      Criterion.Init (Split.Criteria, Classes);
       Split.Start_Index := Start;
       Split.End_Index := Stop;
       Criterion.Classification_Init

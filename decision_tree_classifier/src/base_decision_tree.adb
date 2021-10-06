@@ -81,6 +81,8 @@ package body Base_Decision_Tree is
          end loop;
       end if;
 
+      aClassifier.Attributes.Decision_Tree.Classes :=
+        aClassifier.Attributes.Classes;
       --  L410
       --        Classifier_Utilities.Print_List_Of_Natural_Lists
       --          ("Base_Decision_Tree.Base_Fit, Y_Encoded", Y_Encoded);

@@ -67,7 +67,7 @@ package Tree is
    type Tree_Attributes is private;
    type Tree_Class is record
       Num_Features    : Natural := 0;
-      Classes         : ML_Types.Value_Data_List;
+      Classes         : ML_Types.List_Of_Value_Data_Lists;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Natural := 0;
 --        Node_Count      : Natural := 0;

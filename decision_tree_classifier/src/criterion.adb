@@ -25,7 +25,6 @@ package body Criterion is
       Weight       : Float := 1.0;
       W_Ik         : Float;
    begin
-
       Criteria.Y := Y;
       Criteria.Sample_Weight := Sample_Weight;
       Criteria.Sample_Indices := Sample_Indices;
@@ -195,10 +194,7 @@ package body Criterion is
                    Classes  : ML_Types.List_Of_Value_Data_Lists) is
    begin
       --  L252
-      Criteria.Classes.Clear;
-      for index in Classes.First_Index .. Classes.Last_Index loop
-         Criteria.Classes.Append (Classes.Element (index));
-      end loop;
+      Criteria.Classes := Classes;
 
    end Init;
 
