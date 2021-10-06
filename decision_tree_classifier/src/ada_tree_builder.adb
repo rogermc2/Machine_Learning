@@ -110,7 +110,6 @@ package body Ada_Tree_Builder is
       Node_Splitter.Init (Splitter, X, Y, Sample_Weight);
       Init_Tree_Builder (Builder, Splitter);
 
-      Top_Node.Impurity := Splitter.Node_Impurity;
       Top_Node.Samples_Start := Splitter.Start_Index;
       Top_Node.Samples_End := Splitter.End_Index;
       theTree.Nodes.Prepend_Child (theTree.Nodes.Root, Top_Node);

@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -21,13 +21,14 @@ package body Node_Splitter is
                    Target_Y      : Classifier_Types.List_Of_Natural_Lists;
                    Sample_Weight : Weights.Weight_List) is
       use Ada.Containers;
-      Num_Samples      : constant Positive := Positive (Input_X.Element (1).Length);
-      Num_Features     : constant Positive := Positive (Input_X.Length);
+      Num_Samples      : constant Positive := Positive (Input_X.Length);
+      Num_Features     : constant Positive :=
+                             Positive (Input_X.Element (1).Length);
       Weighted_Samples : Float := 0.0;
    begin
       Self.Sample_Indices.Clear;
-      for index in Input_X.Element (1).First_Index ..
-          Input_X.Element (1).Last_Index loop
+      --  For each sample (row)
+      for index in Input_X.First_Index .. Input_X.Last_Index loop
          --  Only work with positively weighted samples.
          if Sample_Weight.Is_Empty or else
            Sample_Weight.Element (index) > 0.0 then
@@ -371,7 +372,6 @@ package body Node_Splitter is
       Criterion.Classification_Init
         (Split.Criteria, Split.Y, Split.Sample_Indices,
         Split.Sample_Weight, Split.Weighted_Samples, Start, Stop);
-      Put_Line ("Node_Splitter.Reset_Node, node reset initialised Classification_Init done");
 
       Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
 
