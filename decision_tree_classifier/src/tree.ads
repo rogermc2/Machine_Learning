@@ -70,7 +70,7 @@ package Tree is
       Classes         : ML_Types.Value_Data_List;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Natural := 0;
-      Node_Count      : Natural := 0;
+--        Node_Count      : Natural := 0;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
       Attributes      : Tree_Attributes;
    end record;

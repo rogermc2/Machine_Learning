@@ -27,8 +27,6 @@ package body Ada_Tree_Builder is
    procedure Add_Branch
      (theTree               : in out Tree.Tree_Class;
       Builder               : in out Tree_Builder;
-      Start, Stop           : in out Natural;
-      Num_Constant_Features : in out Natural;
       Parent_Cursor         : in out Tree.Tree_Cursor) is
       --  Parent_Cursor is a cursor to an existing node which is the head
       --  of this branch
@@ -41,7 +39,10 @@ package body Ada_Tree_Builder is
       --  Parent_Node corresponds to popped stack_record?
       --  L199
       Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
+      Start                 : constant Natural := Parent_Node.Samples_Start;
+      Stop                  : constant Natural := Parent_Node.Samples_End;
       Num_Node_Samples      : constant Natural := Stop - Start;  --  L207
+      Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
       Is_Leaf               : Boolean := False;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
@@ -83,8 +84,7 @@ package body Ada_Tree_Builder is
       end if;
 
       if not Is_Leaf then
-         Add_Branch (theTree, Builder, Start, Stop, Num_Constant_Features,
-                     Child_Cursor);
+         Add_Branch (theTree, Builder, Child_Cursor);
       end if;
 
    end Add_Branch;
@@ -100,9 +100,6 @@ package body Ada_Tree_Builder is
       use Node_Splitter;
       Builder               : Tree_Builder;
       Splitter              : Splitter_Class;
-      Num_Constant_Features : Natural := 0;
-      Start                 : Positive := 1;
-      Stop                  : Positive := X.Element (1).Last_Index;
       Top_Node              : Tree.Tree_Node;
       Top_Node_Cursor       : Cursor;
    begin
@@ -114,8 +111,7 @@ package body Ada_Tree_Builder is
       Top_Node.Samples_End := Splitter.End_Index;
       theTree.Nodes.Prepend_Child (theTree.Nodes.Root, Top_Node);
       Top_Node_Cursor := Last_Child (theTree.Nodes.Root);
-      Add_Branch (theTree, Builder, Start, Stop,
-                  Num_Constant_Features, Top_Node_Cursor);
+      Add_Branch (theTree, Builder, Top_Node_Cursor);
 
    end Build_Tree;
 

@@ -35,7 +35,7 @@ package body Tree_Build is
       Node_Cursor : Tree.Tree_Cursor;
    begin
       --  _Tree L735
-      theTree.Node_Count := theTree.Node_Count + 1;
+--        theTree.Node_Count := theTree.Node_Count + 1;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       Node_Splitter.Node_Value (Splitter, New_Node.Values);
