@@ -6,7 +6,7 @@ with Node_Splitter;
 with Tree;
 with Tree_Build;
 
-package body Ada_Tree_Build is
+package body Ada_Tree_Builder is
 
    Epsilon : constant Float := 10.0 ** (-10);
 
@@ -142,4 +142,4 @@ package body Ada_Tree_Build is
 
    --  ------------------------------------------------------------------
 
-end Ada_Tree_Build;
+end Ada_Tree_Builder;

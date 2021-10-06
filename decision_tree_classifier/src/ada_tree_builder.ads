@@ -5,7 +5,7 @@ with Node_Splitter;
 with Tree;
 with Weights;
 
-package Ada_Tree_Build is
+package Ada_Tree_Builder is
 
     type Tree_Builder is record
         Splitter              : Node_Splitter.Splitter_Class;
@@ -25,4 +25,4 @@ package Ada_Tree_Build is
        Y             : Classifier_Types.List_Of_Natural_Lists;
        Sample_Weight : Weights.Weight_List);
 
-end Ada_Tree_Build;
+end Ada_Tree_Builder;
