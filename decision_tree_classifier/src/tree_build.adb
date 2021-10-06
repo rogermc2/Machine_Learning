@@ -46,13 +46,10 @@ package body Tree_Build is
       end if;
 
       if Is_Left then
-         --              Put_Line ("Tree_Build.Add_Node Prepend_Child");
          theTree.Nodes.Prepend_Child (Parent   => Parent_Cursor,
                                       New_Item => New_Node);
-         --              Put_Line ("Tree_Build.Add_Node Prepended");
          Node_Cursor := First_Child (Parent_Cursor);
       else
-         --              Put_Line ("Tree_Build.Add_Node Append_Child");
          theTree.Nodes.Append_Child (Parent   => Parent_Cursor,
                                      New_Item => New_Node);
          Node_Cursor := Last_Child (Parent_Cursor);

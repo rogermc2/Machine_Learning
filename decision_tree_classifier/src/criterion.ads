@@ -32,7 +32,7 @@ package Criterion is
       Sum_Right                 : Weights.Weight_List;
       Sq_Sum_Total              : Float := 0.0;
       --  Classification Criterion_Class
-      Num_Classes               : Classifier_Types.Natural_List;
+      Classes                   : Classifier_Types.Natural_List;
    end record;
 
    Criterion_Error : Exception;
@@ -54,6 +54,8 @@ package Criterion is
    function Impurity_Improvement
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
+   procedure Init (Criteria : in out Criterion_Class;
+                   Classes  : Classifier_Types.Natural_List);
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Classifier_Types.Float_List);
