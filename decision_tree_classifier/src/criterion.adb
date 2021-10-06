@@ -1,5 +1,5 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -52,15 +52,24 @@ package body Criterion is
          end if;
 
          Y_I := Y.Element (Y_I_Index);
+      Put_Line ("Criterion.Reset_Node.Classification_Init Y_I set");
          for k in 1 .. Num_Outputs loop
+            Put_Line ("Criterion.Reset_Node.Classification_Init k: " &
+                     Integer'Image (k));
             Y_Ik := Y_I.Element (k);
+            Put_Line ("Criterion.Reset_Node.Classification_Init Y_Ik set");
             W_Ik := Float (Y_Ik) * Weight;
+            Put_Line ("Criterion.Reset_Node.Classification_Init Sum_Total length: " &
+                     Integer'Image (Integer (Criteria.Sum_Total.Length)));
 
             Criteria.Sum_Total.Replace_Element
               (k, Criteria.Sum_Total.Element (k) + W_Ik);
+            Put_Line ("Criterion.Reset_Node.Classification_Init Sum_Total k set ");
             Criteria.Sq_Sum_Total :=
               Criteria.Sq_Sum_Total + Float (Y_Ik) * W_Ik;
+            Put_Line ("Criterion.Reset_Node.Classification_Init Sq_Sum_Total k set ");
          end loop;
+      Put_Line ("Criterion.Reset_Node.Classification_Init Sq_Sum_Total set");
 
          Criteria.Weighted_Node_Samples :=
            Criteria.Weighted_Node_Samples + Weight;
