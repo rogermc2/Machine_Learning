@@ -142,10 +142,18 @@ package body Criterion is
       Count_K        : Float := 0.0;
       Entropy        : Float := 0.0;
    begin
+      if Self.Classes.Is_Empty then
+         raise Criterion_Error with
+           "Criterion.Entropy_Node_Impurity Criterion Classes is empty";
+      end if;
       Put_Line ("Criterion.Entropy_Node_Impurity");
       Put_Line ("Criterion.Entropy_Node_Impurity Y: " &
                   Integer'Image (Integer (Self.Y.Length)) & " x" &
                   Integer'Image (Integer (Self.Y.Element (1).Length)));
+      Put_Line ("Criterion.Entropy_Node_Impurity Classes length: " &
+                  Integer'Image (Integer (Self.Classes.Length)));
+      Put_Line ("Criterion.Entropy_Node_Impurity Classes (1) length: " &
+                  Integer'Image (Integer (Self.Classes.Element (1).Length)));
       --  Y structure samples (rows) x outputs (columns)
       for index in Self.Y.Element (1).First_Index ..
         Self.Y.Element (1).Last_Index loop
