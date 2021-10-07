@@ -424,7 +424,7 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Multi_Value_List
+   procedure Print_List_Of_Value_Lists
      (Name    : String; Multi_List : ML_Types.List_Of_Value_Data_Lists) is
    begin
       Put_Line (Name & ": ");
@@ -432,7 +432,7 @@ package body Classifier_Utilities is
          Print_Value_List ("", Multi_List.Element (index));
       end loop;
       New_Line;
-   end Print_Multi_Value_List;
+   end Print_List_Of_Value_Lists;
 
    --  ------------------------------------------------------------------------
 

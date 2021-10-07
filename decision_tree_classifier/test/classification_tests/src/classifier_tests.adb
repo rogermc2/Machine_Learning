@@ -61,7 +61,7 @@ package body Classifier_Tests is
       Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
                         Weight_Values);
       Probabilities := Predict_Probability (theTree, X);
-      Classifier_Utilities.Print_Multi_Value_List
+      Classifier_Utilities.Print_List_Of_Value_Lists
           ("Classification_Tests.Test_Classification_Toy Probabilities",
           Probabilities);
       --          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",

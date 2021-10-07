@@ -7,7 +7,7 @@ with Maths;
 
 with Ada_Tree_Builder;
 with Classifier_Types;
---  with Classifier_Utilities;
+with Classifier_Utilities;
 with Criterion;
 with Encode_Utils;
 
@@ -272,6 +272,10 @@ package body Base_Decision_Tree is
 
          end loop;
       end loop;
+
+      Classifier_Utilities.Print_List_Of_Natural_Lists
+        ("Base_Decision_Tree.Classification_Part Y_Encoded", Y_Encoded);
+      Classifier_Utilities.Print_List_Of_Value_Lists  ("Base_Decision_Tree.Classification_Part Classes", Classes);
 
       --  L218
       if aClassifier.Parameters.Class_Weight /= No_Weight then

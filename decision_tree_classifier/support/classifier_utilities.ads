@@ -27,7 +27,7 @@ package Classifier_Utilities is
                                            Data : List_Of_Natural_Lists);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
-    procedure Print_Multi_Value_List
+    procedure Print_List_Of_Value_Lists
       (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
