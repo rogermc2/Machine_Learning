@@ -1,13 +1,13 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Ada_Tree_Builder;
 with Classifier_Types;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with Criterion;
 with Encode_Utils;
 
@@ -258,8 +258,6 @@ package body Base_Decision_Tree is
          Y_Encoded.Replace_Element (row, Column);
       end loop;
 
-      Classifier_Utilities.Print_List_Of_Value_Lists
-        ("Base_Decision_Tree.Classification_Part Y", Y);
       OP_Row.Set_Length (Num_Outputs);
       for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
          Yk_Row.Clear;
@@ -280,19 +278,20 @@ package body Base_Decision_Tree is
 
          for row in Classes_Row.First_Index .. Classes_Row.Last_Index loop
             Value := Classes_Row (row);
+            if Classes (row).Is_Empty then
+               Classes (row).Set_Length (Num_Outputs);
+            end if;
             OP_Row := Classes (row);
-            Put_Line ("Base_Decision_Tree.Classification_Part OP_Row length" &
-                     Integer'Image (Integer (OP_Row.Length)));
             OP_Row.Replace_Element (col, Value);
             Classes.Replace_Element (row, OP_Row);
          end loop;
       end loop;
       aClassifier.Attributes.Classes := Classes;
 
-      Classifier_Utilities.Print_List_Of_Natural_Lists
-        ("Base_Decision_Tree.Classification_Part Y_Encoded", Y_Encoded);
-      Classifier_Utilities.Print_List_Of_Value_Lists
-        ("Base_Decision_Tree.Classification_Part Classes", Classes);
+--        Classifier_Utilities.Print_List_Of_Natural_Lists
+--          ("Base_Decision_Tree.Classification_Part Y_Encoded", Y_Encoded);
+--        Classifier_Utilities.Print_List_Of_Value_Lists
+--          ("Base_Decision_Tree.Classification_Part Classes", Classes);
 
       --  L218
       if aClassifier.Parameters.Class_Weight /= No_Weight then
