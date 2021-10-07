@@ -233,10 +233,10 @@ package body Base_Decision_Tree is
       Classes                : out ML_Types.List_Of_Value_Data_Lists;
       Expanded_Class_Weights : in out Classifier_Types.Float_List) is
       use Weights;
-      Y_K        : ML_Types.Value_Data_List;
-      Classes_K  : ML_Types.Value_Data_List;
-      Column     : Natural_List;
-      Inverse    : Natural_List;
+      Y_Row       : ML_Types.Value_Data_List;
+      Classes_Row : ML_Types.Value_Data_List;
+      Column      : Natural_List;
+      Inverse     : Natural_List;
    begin
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
@@ -252,25 +252,25 @@ package body Base_Decision_Tree is
          Y_Encoded.Replace_Element (row, Column);
       end loop;
 
-      for row in Y_Encoded.First_Index .. Y_Encoded.Last_Index loop
+      for row in Y.First_Index .. Y.Last_Index loop
          Column.Clear;
-         Y_K := Y.Element (row);
-         for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
-            Classes_K := Encode_Utils.Unique (Y_K, Inverse);
+         Y_Row := Y.Element (row);
+         Classes_Row := Encode_Utils.Unique (Y_Row, Inverse);
+--           for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
             Y_Encoded.Replace_Element (row, Inverse);
-            aClassifier.Attributes.Classes.Append (Classes_K);
+            aClassifier.Attributes.Classes.Append (Classes_Row);
             if Classes.Is_Empty then
-               Classes.Append (Classes_K);
+               Classes.Append (Classes_Row);
 
             else
                for class_row in Classes.First_Index .. Classes.Last_Index loop
                   if Classes.Element (class_row).Is_Empty then
-                     Classes.Replace_Element (class_row, Classes_K);
+                     Classes.Replace_Element (class_row, Classes_Row);
                   end if;
                end loop;
             end if;
 
-         end loop;
+--           end loop;
       end loop;
 
       Classifier_Utilities.Print_List_Of_Natural_Lists
