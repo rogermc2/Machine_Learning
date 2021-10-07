@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -252,9 +252,14 @@ package body Base_Decision_Tree is
          Y_Encoded.Replace_Element (row, Column);
       end loop;
 
+         Classifier_Utilities.Print_List_Of_Value_Lists
+           ("Base_Decision_Tree.Classification_Part Y", Y);
       for row in Y.First_Index .. Y.Last_Index loop
+         Put_Line ("Base_Decision_Tree.Classification_Part row" & Integer'Image (row));
          Column.Clear;
          Y_Row := Y.Element (row);
+         Classifier_Utilities.Print_Value_List
+           ("Base_Decision_Tree.Classification_Part Y_Row", Y_Row);
          Classes_Row := Encode_Utils.Unique (Y_Row, Inverse);
 --           for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
             Y_Encoded.Replace_Element (row, Inverse);
