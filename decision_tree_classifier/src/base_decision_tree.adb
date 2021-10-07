@@ -235,36 +235,41 @@ package body Base_Decision_Tree is
       use Weights;
       Y_K        : ML_Types.Value_Data_List;
       Classes_K  : ML_Types.Value_Data_List;
-      Y_C        : Natural_List;
+      Column     : Natural_List;
       Inverse    : Natural_List;
-      Inverse_K  : Natural;
    begin
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
+      Classes.Clear;
+      Y_Encoded.Set_Length (Y.Length);
 
       --  L208  Initialize Y_Encoded
-      for k in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
-         Y_C.Append (0);
-      end loop;
-      for class in Y.First_Index .. Y.Last_Index loop
-         Y_Encoded.Append (Y_C);
+      for row in Y.First_Index .. Y.Last_Index loop
+         Column.Clear;
+         for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+            Column.Append (col);
+         end loop;
+         Y_Encoded.Replace_Element (row, Column);
       end loop;
 
-      --  For each ouput
-      for k in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
-         Y_K.Clear;
-         --  for this output's set of sample values generate
-         --  a Class and an encoded version of Y
-         for class in Y.First_Index .. Y.Last_Index loop
-            Y_K.Append (Y.Element (class).Element (k));
-         end loop;
-         Classes_K := Encode_Utils.Unique (Y_K, Inverse);
-         aClassifier.Attributes.Classes.Append (Classes_K);
-         for class in Y.First_Index .. Y.Last_Index loop
-            Inverse_K := Inverse.Element (class);
-            Y_C := Y_Encoded.Element (class);
-            Y_C.Replace_Element (k, Inverse_K);
-            Y_Encoded.Replace_Element (class, Y_C);
+      for row in Y_Encoded.First_Index .. Y_Encoded.Last_Index loop
+         Column.Clear;
+         Y_K := Y.Element (row);
+         for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+            Classes_K := Encode_Utils.Unique (Y_K, Inverse);
+            Y_Encoded.Replace_Element (row, Inverse);
+            aClassifier.Attributes.Classes.Append (Classes_K);
+            if Classes.Is_Empty then
+               Classes.Append (Classes_K);
+
+            else
+               for class_row in Classes.First_Index .. Classes.Last_Index loop
+                  if Classes.Element (class_row).Is_Empty then
+                     Classes.Replace_Element (class_row, Classes_K);
+                  end if;
+               end loop;
+            end if;
+
          end loop;
       end loop;
 
@@ -299,7 +304,7 @@ package body Base_Decision_Tree is
    --  Based on class.py fit L431 Predict
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
-                      return ML_Types.Value_Data_List is
+                     return ML_Types.Value_Data_List is
    begin
       return Tree.Predict (Self.Attributes.Decision_Tree, X);
    end Predict;
