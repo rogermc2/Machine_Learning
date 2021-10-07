@@ -145,7 +145,7 @@ package body Criterion is
          raise Criterion_Error with
            "Criterion.Entropy_Node_Impurity Criterion Classes is empty";
       end if;
-      Put_Line ("Criterion.Entropy_Node_Impurity");
+
       Put_Line ("Criterion.Entropy_Node_Impurity Y: " &
                   Integer'Image (Integer (Self.Y.Length)) & " x" &
                   Integer'Image (Integer (Self.Y.Element (1).Length)));
