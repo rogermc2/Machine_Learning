@@ -23,7 +23,7 @@ package body Node_Splitter is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Num_Features     : constant Positive :=
-                             Positive (Input_X.Element (1).Length);
+                           Positive (Input_X.Element (1).Length);
       Weighted_Samples : Float := 0.0;
    begin
       Self.Sample_Indices.Clear;
@@ -84,8 +84,8 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure Node_Value
-     (Self : Splitter_Class;
-     Values : out Classifier_Types.Float_List) is
+     (Self   : Splitter_Class;
+      Values : out Classifier_Types.Float_List) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;
@@ -145,7 +145,7 @@ package body Node_Splitter is
 
          P_Index := P_Index + 1;
          --  L393
-         if P_Index <= Self.End_Index then
+         if P_Index < Self.End_Index then
             Best.Pos_I := P_Index;
             --  Best.Pos_I is the start index of the right node's data
             --  L398 Accept if min_samples_leaf is guaranteed
@@ -172,8 +172,23 @@ package body Node_Splitter is
                              Features_X.Element (P_Index).Float_Value or
                              Best.Threshold = Float'Last or
                              Best.Threshold = (-Float'Last) then
-                              Best.Threshold := Features_X.Element
-                                (P_Index - 1).Float_Value;
+                              case Features_X.Element
+                                (P_Index - 1).Value_Kind is
+                                 when Float_Type =>
+                                    Best.Threshold := Features_X.Element
+                                      (P_Index - 1).Float_Value;
+                                 when Integer_Type =>
+                                    Best.Threshold := Float (Features_X.Element
+                                                             (P_Index - 1).Integer_Value);
+                                 when Boolean_Type =>
+                                    if Features_X.Element
+                                      (P_Index - 1).Boolean_Value then
+                                       Best.Threshold := 1.0;
+                                    else
+                                       Best.Threshold := 0.0;
+                                    end if;
+                                 when UB_String_Type => null;
+                              end case;
                            end if;
 
                         when Integer_Type =>
@@ -291,7 +306,7 @@ package body Node_Splitter is
                Criterion.Reset (Self.Criteria);
                --  L381
                Find_Best_Split (Self, Features, Self.Feature_Values,
-                                 Current_Split, Best_Split);
+                                Current_Split, Best_Split);
             end if;
          end if;
       end loop;
@@ -378,7 +393,7 @@ package body Node_Splitter is
       Splitter.End_Index := Stop;
       Criterion.Classification_Init
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
-          Splitter.Sample_Weight, Splitter.Weighted_Samples, Start, Stop);
+         Splitter.Sample_Weight, Splitter.Weighted_Samples, Start, Stop);
 
       Weighted_Node_Samples := Splitter.Criteria.Weighted_Node_Samples;
 
@@ -391,7 +406,7 @@ package body Node_Splitter is
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
-                         return Split_Record is
+                        return Split_Record is
       Num_Features              : constant Natural :=
                                     Natural (Self.Feature_Indices.Length);
       Max_Features              : constant Natural := Self.Max_Features;

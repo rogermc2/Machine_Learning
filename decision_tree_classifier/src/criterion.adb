@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Classifier_Utilities;
+with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -146,20 +146,17 @@ package body Criterion is
            "Criterion.Entropy_Node_Impurity Criterion Classes is empty";
       end if;
 
-      Put_Line ("Criterion.Entropy_Node_Impurity Y: " &
-                  Integer'Image (Integer (Self.Y.Length)) & " x" &
-                  Integer'Image (Integer (Self.Y.Element (1).Length)));
-      Put_Line ("Criterion.Entropy_Node_Impurity Classes length: " &
-                  Integer'Image (Integer (Self.Classes.Length)));
-      Put_Line ("Criterion.Entropy_Node_Impurity Classes (1) length: " &
-                  Integer'Image (Integer (Self.Classes.Element (1).Length)));
+      Classifier_Utilities.Print_List_Of_Value_Lists ("Classes", Self.Classes);
       --  Y structure samples (rows) x outputs (columns)
-      for index in Self.Y.Element (1).First_Index ..
-        Self.Y.Element (1).Last_Index loop
-         Put_Line ("Criterion.Entropy_Node_Impurity index" & Integer'Image (index));
+      for index in Self.Y.Element (1).First_Index .. Self.Y.Element (1).Last_Index loop
+         Put_Line ("Criterion.Entropy_Node_Impurity index" &
+                    Integer'Image (index));
          Class_List := Self.Classes.Element (index);
+         Classifier_Utilities.Print_Value_List ("Class_List", Class_List);
+         Put_Line ("Criterion.Entropy_Node_Impurity Class_List length" &
+                     Integer'Image (Integer (Class_List.Length)));
          for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Put_Line ("Criterion.Entropy_Node_Impurity c" & Integer'Image (index));
+            Put_Line ("Criterion.Entropy_Node_Impurity c" & Integer'Image (c));
             Count_K := Self.Sum_Total.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Self.Weighted_Node_Samples;

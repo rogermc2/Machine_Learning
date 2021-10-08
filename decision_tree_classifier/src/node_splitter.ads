@@ -16,9 +16,9 @@ package Node_Splitter is
       Pos_I          : Positive := 1;  --  Right start?
       End_Index      : Positive := 1;  --  Right end?
       Threshold      : Float;
-      Improvement    : Float := 0.0;
-      Impurity_Left  : Float;
-      Impurity_Right : Float;
+      Improvement    : Float := -Float'Last;
+      Impurity_Left  : Float := -Float'Last;
+      Impurity_Right : Float := -Float'Last;
    end record;
 
    type Splitter_Class is record
