@@ -59,12 +59,13 @@ package body Ada_Tree_Builder is
       end if;
 
       --  L210
-      Is_Leaf := Depth >= Builder.Max_Depth or
+      Is_Leaf := Parent_Node.Is_Leaf or else
+          (Depth >= Builder.Max_Depth or
         Num_Node_Samples < Builder.Min_Samples_Split or
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
         --  if Impurity == 0.0 with tolerance for rounding errors
-        Impurity <= Epsilon;
+        Impurity <= Epsilon);
 
       --  L222
       if not Is_Leaf then
