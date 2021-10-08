@@ -85,7 +85,7 @@ package body Node_Splitter is
 
    procedure Node_Value
      (Self   : Splitter_Class;
-      Values : out Classifier_Types.Float_List) is
+      Values : out Classifier_Types.List_Of_Float_Lists) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;
