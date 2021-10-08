@@ -27,7 +27,7 @@ package Criterion is
       Start                     : Natural := 0;
       Stop                      : Natural := 0;
       Position                  : Natural := 0;
-      Sum_Total                 : Weights.Weight_Lists_List;
+      Sum_Total                 : Weights.Weight_List;
       Sum_Left                  : Weights.Weight_List;
       Sum_Right                 : Weights.Weight_List;
       Sq_Sum_Total              : Float := 0.0;
