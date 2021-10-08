@@ -58,7 +58,7 @@ package body Node_Splitter is
       Self.Constant_Features_I.Set_Length (Count_Type (Num_Features));
 
       Self.X := Input_X;
-      Self.Y_Encoded := Y_Encoded;
+      Self.Y := Y_Encoded;
       Self.Sample_Weight := Sample_Weight;
 
    end Init;
@@ -98,7 +98,6 @@ package body Node_Splitter is
                               Current    : Split_Record;
                               Best       : in out Split_Record) is
       use ML_Types;
-      Criteria                  : Criterion.Criterion_Class;
       P_Index                   : Natural := Features.First_Index;
       P1_Index                  : Natural;
       Current_Proxy_Improvement : Float := -Float'Last;
@@ -107,7 +106,6 @@ package body Node_Splitter is
       --  L379 Evaluate all splits
       Best := Current;
       Criterion.Reset (Self.Criteria);
-      Criteria := Self.Criteria;
       --  Set of features to be split : Self.Start_Index through Self.End_Index
       P1_Index := Self.Start_Index;
 
@@ -115,21 +113,29 @@ package body Node_Splitter is
          while P1_Index <= Self.End_Index loop
             case Features_X.Element (P1_Index).Value_Kind is
                when Boolean_Type =>
+                  --  if current X value is false and next X value is true
+                  --  increment X index
                   if not Features_X.Element (P_Index).Boolean_Value and
                     Features_X.Element (P1_Index).Boolean_Value then
                      P_Index := P_Index + 1;
                   end if;
                when Float_Type =>
+                  --  if current X is less than or or equal to next X
+                  --  increment X index
                   if Features_X.Element (P1_Index).Float_Value <=
                     Features_X.Element (P_Index).Float_Value + Feature_Threshold then
                      P_Index := P_Index + 1;
                   end if;
                when Integer_Type =>
+                  --  if current X is less than or or equal to next X
+                  --  increment X index
                   if Features_X.Element (P1_Index).Integer_Value <=
                     Features_X.Element (P_Index).Integer_Value then
                      P_Index := P_Index + 1;
                   end if;
                when UB_String_Type =>
+                  --  if current X is less than or or equal to next X
+                  --  increment X index
                   if Features_X.Element (P1_Index).UB_String_Value <=
                     Features_X.Element (P_Index).UB_String_Value then
                      P_Index := P_Index + 1;
@@ -139,23 +145,22 @@ package body Node_Splitter is
 
          P_Index := P_Index + 1;
          --  L393
-         --  Best.Pos_I is the start of right node data
          if P_Index <= Self.End_Index then
             Best.Pos_I := P_Index;
-            --  L398 Reject if min_samples_leaf is not guaranteed
+            --  Best.Pos_I is the start index of the right node's data
+            --  L398 Accept if min_samples_leaf is guaranteed
             if Current.Pos_I - Self.Start_Index >= Self.Min_Leaf_Samples and
               Self.End_Index - Current.Pos_I >= Self.Min_Leaf_Samples then
                --  L401
                Criterion.Update (Self.Criteria, Best.Pos_I);
 
-               --  L405 Reject if min_weight_leaf is not satisfied
+               --  L405 Accept if min_weight_leaf is satisfied
                if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
                  Self.Criteria.Weighted_Right >= Self.Min_Leaf_Weight then
                   Current_Proxy_Improvement :=
-                    Self.Criteria.Proxy_Improvement;
-
-                  if Current_Proxy_Improvement >
-                    Best_Proxy_Improvement then
+                    Criterion.Proxy_Impurity_Improvement (Self.Criteria);
+                  --  L412  Note: Improvements are negative values.
+                  if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L415
                      case Features_X.Element (P1_Index).Value_Kind is
@@ -363,19 +368,19 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
    --  Reset_Node resets the splitter Split based on node Split.Samples[start:end].
    procedure Reset_Node
-     (Split                 : in out Splitter_Class;
+     (Splitter              : in out Splitter_Class;
       Start, Stop           : Natural;
       Classes               : ML_Types.List_Of_Value_Data_Lists;
       Weighted_Node_Samples : in out Float) is
    begin
-      Criterion.Init (Split.Criteria, Classes);
-      Split.Start_Index := Start;
-      Split.End_Index := Stop;
+      Criterion.Init (Splitter.Criteria, Classes);
+      Splitter.Start_Index := Start;
+      Splitter.End_Index := Stop;
       Criterion.Classification_Init
-        (Split.Criteria, Split.Y_Encoded, Split.Sample_Indices,
-        Split.Sample_Weight, Split.Weighted_Samples, Start, Stop);
+        (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
+          Splitter.Sample_Weight, Splitter.Weighted_Samples, Start, Stop);
 
-      Weighted_Node_Samples := Split.Criteria.Weighted_Node_Samples;
+      Weighted_Node_Samples := Splitter.Criteria.Weighted_Node_Samples;
 
    end Reset_Node;
 
