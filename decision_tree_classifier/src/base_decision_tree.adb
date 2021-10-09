@@ -84,8 +84,6 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
       --  L410
-      --        Classifier_Utilities.Print_List_Of_Natural_Lists
-      --          ("Base_Decision_Tree.Base_Fit, Y_Encoded", Y_Encoded);
       Ada_Tree_Builder.Build_Tree (aClassifier.Attributes.Decision_Tree,
                                    X, Y_Encoded, Sample_Weights);
 
@@ -237,12 +235,10 @@ package body Base_Decision_Tree is
       Num_Outputs : constant Count_Type := Y.Element (1).Length;
       Y_Row       : ML_Types.Value_Data_List;
       Yk_Row      : ML_Types.Value_Data_List;
---        Classes_Row : ML_Types.Value_Data_List;
       YE_Row      : Natural_List;
       OP_Row      : ML_Types.Value_Data_List;
       Column      : Natural_List;
       Inverse     : Natural_List;
---        Value       : ML_Types.Value_Record;
    begin
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
@@ -266,10 +262,6 @@ package body Base_Decision_Tree is
             Yk_Row.Append (Y_Row.Element (col));
          end loop;
          Classes.Append (Encode_Utils.Unique (Yk_Row, Inverse));
---           Classes_Row := Encode_Utils.Unique (Yk_Row, Inverse);
---           if Classes.Is_Empty then
---              Classes.Set_Length (Classes_Row.Length);
---           end if;
 
          for row in Y.First_Index .. Y.Last_Index loop
             YE_Row := Y_Encoded.Element (row);
@@ -277,22 +269,8 @@ package body Base_Decision_Tree is
             Y_Encoded.Replace_Element (row, YE_Row);
          end loop;
 
---           for row in Classes_Row.First_Index .. Classes_Row.Last_Index loop
---              Value := Classes_Row (row);
---              if Classes (row).Is_Empty then
---                 Classes (row).Set_Length (Num_Outputs);
---              end if;
---              OP_Row := Classes (row);
---              OP_Row.Replace_Element (col, Value);
---              Classes.Replace_Element (row, OP_Row);
---           end loop;
       end loop;
       aClassifier.Attributes.Classes := Classes;
-
---        Classifier_Utilities.Print_List_Of_Natural_Lists
---          ("Base_Decision_Tree.Classification_Part Y_Encoded", Y_Encoded);
---        Classifier_Utilities.Print_List_Of_Value_Lists
---          ("Base_Decision_Tree.Classification_Part Classes", Classes);
 
       --  L218
       if aClassifier.Parameters.Class_Weight /= No_Weight then

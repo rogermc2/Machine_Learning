@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Node_Splitter;
 with Tree;
@@ -108,18 +108,13 @@ package body Ada_Tree_Builder is
       --  L163
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Init_Tree_Builder (Builder, Splitter);
-      Put_Line ("Ada_Tree_Builder.Build_Tree Builder initialized");
 
       Top_Node.Samples_Start := Splitter.Start_Index;
       Top_Node.Samples_End := Splitter.End_Index;
       theTree.Nodes.Prepend_Child (theTree.Nodes.Root, Top_Node);
       Top_Node_Cursor := Last_Child (theTree.Nodes.Root);
 
-      Put_Line ("Ada_Tree_Builder.Build_Tree Tree length" &
-               Integer'Image (Integer (theTree.Nodes.Node_Count)));
       Add_Branch (theTree, Builder, Top_Node_Cursor);
-      Put_Line ("Ada_Tree_Builder.Build_Tree Tree length after Add_Branch" &
-               Integer'Image (Integer (theTree.Nodes.Node_Count)));
 
    end Build_Tree;
 

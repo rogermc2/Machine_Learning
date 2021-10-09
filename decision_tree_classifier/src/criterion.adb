@@ -3,7 +3,7 @@
 
 with Maths;
 
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -158,7 +158,6 @@ package body Criterion is
            "Criterion.Entropy_Node_Impurity Criterion Classes is empty";
       end if;
 
-      Classifier_Utilities.Print_List_Of_Value_Lists ("Classes", Self.Classes);
       --  Y structure samples (rows) x outputs (columns)
       for index in Self.Y.Element (1).First_Index .. Self.Y.Element (1).Last_Index loop
          Class_List := Self.Classes.Element (index);
