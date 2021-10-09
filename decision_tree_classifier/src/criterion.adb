@@ -1,5 +1,5 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -161,18 +161,10 @@ package body Criterion is
       Classifier_Utilities.Print_List_Of_Value_Lists ("Classes", Self.Classes);
       --  Y structure samples (rows) x outputs (columns)
       for index in Self.Y.Element (1).First_Index .. Self.Y.Element (1).Last_Index loop
-         Put_Line ("Criterion.Entropy_Node_Impurity index" &
-                     Integer'Image (index));
          Class_List := Self.Classes.Element (index);
          Sum_Total_K := Self.Sum_Total.Element (index);
-         Classifier_Utilities.Print_Value_List ("Class_List", Class_List);
-         Put_Line ("Criterion.Entropy_Node_Impurity Class_List length" &
-                     Integer'Image (Integer (Class_List.Length)));
          for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Put_Line ("Criterion.Entropy_Node_Impurity c" & Integer'Image (c));
             Count_K := Sum_Total_K.Element (c);
-            Put_Line ("Criterion.Entropy_Node_Impurity Count_K" &
-                        Float'Image (Count_K));
             if Count_K > 0.0 then
                Count_K := Count_K / Self.Weighted_Node_Samples;
                Entropy := Entropy - Count_K * Log (Count_K);

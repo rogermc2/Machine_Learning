@@ -2,8 +2,8 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Base_Decision_Tree;
 with Encode_Utils;
-with Tree;
 
 package body Classifier_Utilities is
 
@@ -506,9 +506,19 @@ package body Classifier_Utilities is
 
     procedure Print_Tree (Name  : String;
                           aTree : Base_Decision_Tree.Classifier) is
+      Tree_Nodes  : constant Tree.Tree_Class :=
+                      aTree.Attributes.Decision_Tree;
+    begin
+      Print_Tree (Name, Tree_Nodes);
+    end Print_Tree;
+
+    --  -------------------------------------------------------------------------
+
+    procedure Print_Tree (Name  : String;
+                          aTree : Tree.Tree_Class) is
         use Tree;
         use Nodes_Package;
-        Tree_Nodes  : constant Tree.Tree_Class := aTree.Attributes.Decision_Tree;
+        Tree_Nodes  : constant Tree.Tree_Nodes := aTree.Nodes;
         This_Indent : Natural := 0;
         Node_Count  : Natural := 0;
 
@@ -548,7 +558,7 @@ package body Classifier_Utilities is
 
     begin
         Put_Line (Name);
-        Print_Tree_Node (First_Child (Tree_Nodes.Nodes.Root));
+        Print_Tree_Node (First_Child (Tree_Nodes.Root));
     end Print_Tree;
 
     --  -------------------------------------------------------------------------
