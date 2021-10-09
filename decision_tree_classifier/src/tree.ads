@@ -38,7 +38,7 @@ package Tree is
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       Samples_Start             : Natural := 0;
       Samples_End               : Natural := 0;
-      Values                    : Values_List;
+      Values                    : Classifier_Types.List_Of_Float_Lists;
       Weighted_Num_Node_Samples : Integer := 0;
       Depth                     : Integer := 0;
       Is_Left                   : Boolean := True;
