@@ -470,11 +470,6 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_Node (Node : Tree.Tree_Node; Offset : String) is
-      use Float_Package;
-      Values      : List_Of_Float_Lists;
-      Values_K    : Float_List;
-      Curs        : Float_Package.Cursor := Values_K.First;
-      Data        : Float;
       UB_Offset   : constant Unbounded_String :=
                       To_Unbounded_String (Offset);
       Data_String : Unbounded_String;
@@ -485,40 +480,9 @@ package body Classifier_Utilities is
 
       Data_String := UB_Offset & "Impurity: " &  Float'Image (Node.Impurity);
       Put_Line (To_String (Data_String));
-
-      --          Put_Line (Offset & "Values_List length: " &
-      --                      Integer'Image (Integer (Values.Length)));
       Data_String := UB_Offset;
       if Node.Is_Leaf then
          Data_String := Data_String & "Prediction ";
-      end if;
-
-      Values := Node.Values;
-      if Values.Is_Empty then
-         Put_Line ("Node values: none.");
-      else
-         for index in Values.First_Index .. Values.Last_Index loop
-            if Integer (Values.Length) > 1 then
-               Put_Line ("Output " & Integer'Image (index) & " values: ");
-            else
-               Put_Line ("Node values:");
-            end if;
-
-            Values_K := Values.Element (index);
-            Curs :=Values_K.First;
-            Data_String := Data_String & "Values {";
-            while Has_Element (Curs) loop
-               Data := Element (Curs);
-               Data_String := Data_String & Float'Image (Data);
-               if not (Curs = Values_K.Last) then
-                  Data_String := Data_String & ", ";
-               end if;
-               Next (Curs);
-            end loop;
-         end loop;
-
-         Data_String := Data_String & " }";
-         Put_Line (To_String (Data_String));
       end if;
       New_Line;
 
@@ -540,11 +504,18 @@ package body Classifier_Utilities is
                          aTree : Tree.Tree_Class) is
       use Tree;
       use Nodes_Package;
+      use Float_Package;
       Tree_Nodes  : constant Tree.Tree_Nodes := aTree.Nodes;
+      Values      : constant List_Of_Float_Lists := aTree.Values;
+      Values_K    : Float_List;
+      Curs        : Float_Package.Cursor := Values_K.First;
+      Data        : Float;
+      Data_String : Unbounded_String;
       This_Indent : Natural := 0;
       Node_Count  : Natural := 0;
 
-      procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
+      procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
+                                 Indent : Natural := 0) is
          use Ada.Containers;
          Node : Tree_Node;
       begin
@@ -580,6 +551,32 @@ package body Classifier_Utilities is
 
    begin
       Put_Line (Name);
+      if Values.Is_Empty then
+         Put_Line ("Node values: none.");
+      else
+         for index in Values.First_Index .. Values.Last_Index loop
+            if Integer (Values.Length) > 1 then
+               Put_Line ("Output " & Integer'Image (index) & " values: ");
+            else
+               Put_Line ("Node values:");
+            end if;
+
+            Values_K := Values.Element (index);
+            Curs :=Values_K.First;
+            Data_String := Data_String & "Values {";
+            while Has_Element (Curs) loop
+               Data := Element (Curs);
+               Data_String := Data_String & Float'Image (Data);
+               if not (Curs = Values_K.Last) then
+                  Data_String := Data_String & ", ";
+               end if;
+               Next (Curs);
+            end loop;
+         end loop;
+
+         Data_String := Data_String & " }";
+         Put_Line (To_String (Data_String));
+      end if;
       Print_Tree_Node (First_Child (Tree_Nodes.Root));
 
    end Print_Tree;

@@ -42,7 +42,7 @@ package body Tree_Build is
       New_Node.Num_Node_Samples := Num_Node_Samples;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241
-      Node_Splitter.Node_Value (Splitter, New_Node.Values);
+      Node_Splitter.Node_Value (Splitter, theTree.Values);
       New_Node.Samples_Start := Start;
       New_Node.Samples_End := Start + Num_Node_Samples - 1;
 

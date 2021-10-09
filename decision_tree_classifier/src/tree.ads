@@ -34,17 +34,19 @@ package Tree is
 
    type Tree_Node (Is_Leaf : Boolean := False) is record
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
-      Samples_Start             : Positive := 1;
-      Samples_End               : Positive := 1;
-      Values                    : Classifier_Types.List_Of_Float_Lists;
-      Weighted_Num_Node_Samples : Natural := 0;
-      Depth                     : Natural := 0;
-      Is_Left                   : Boolean := True;
+      --  from _Tree Node struct
       Impurity                  : Float := Float'Large;
       Num_Node_Samples          : Positive := 1;
+      Weighted_Num_Node_Samples : Natural := 0;
+
+      Samples_Start             : Positive := 1;
+      Samples_End               : Positive := 1;
+      Depth                     : Natural := 0;
+      Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
       case Is_Leaf is
          when False =>
+            --  from _Tree Node struct
             --  Feature used for splitting the node
             Feature_Index : Positive := 1;
             Threshold     : Float := 0.0;
@@ -69,8 +71,8 @@ package Tree is
       Classes         : ML_Types.List_Of_Value_Data_Lists;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Natural := 0;
---        Node_Count      : Natural := 0;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
+      Values          : Classifier_Types.List_Of_Float_Lists;
       Attributes      : Tree_Attributes;
    end record;
 
@@ -85,7 +87,7 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
-   function Get_Value_Array (Self : Tree_Node) return Value_Array;
+   function Get_Value_Array (Self : Tree_Class) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;
