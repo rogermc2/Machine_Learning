@@ -513,7 +513,7 @@ package body Classifier_Utilities is
       Data_String : Unbounded_String;
       This_Indent : Natural := 0;
       Node_Count  : Natural := 0;
-
+      --  Print_Tree_Node is recursive
       procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
                                  Indent : Natural := 0) is
          use Ada.Containers;
@@ -552,13 +552,13 @@ package body Classifier_Utilities is
    begin
       Put_Line (Name);
       if Values.Is_Empty then
-         Put_Line ("Node values: none.");
+         Put_Line ("Values: none.");
       else
          for index in Values.First_Index .. Values.Last_Index loop
             if Integer (Values.Length) > 1 then
                Put_Line ("Output " & Integer'Image (index) & " values: ");
             else
-               Put_Line ("Node values:");
+               Put_Line ("Values:");
             end if;
 
             Values_K := Values.Element (index);
@@ -577,6 +577,8 @@ package body Classifier_Utilities is
          Data_String := Data_String & " }";
          Put_Line (To_String (Data_String));
       end if;
+      New_Line;
+
       Print_Tree_Node (First_Child (Tree_Nodes.Root));
 
    end Print_Tree;
