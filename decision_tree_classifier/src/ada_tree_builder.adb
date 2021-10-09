@@ -2,6 +2,7 @@
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Utilities;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -111,6 +112,9 @@ package body Ada_Tree_Builder is
 
       Top_Node.Samples_Start := Splitter.Start_Index;
       Top_Node.Samples_End := Splitter.End_Index;
+      Node_Value (Splitter, Top_Node.Values);
+      Classifier_Utilities.Print_List_Of_Float_Lists
+          ("Ada_Tree_Builder.Build_Tree Top_Node.Values", Top_Node.Values);
       theTree.Nodes.Prepend_Child (theTree.Nodes.Root, Top_Node);
       Top_Node_Cursor := Last_Child (theTree.Nodes.Root);
 
