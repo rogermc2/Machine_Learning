@@ -1,8 +1,8 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -40,8 +40,8 @@ package body Ada_Tree_Builder is
       --  Parent_Node corresponds to popped stack_record?
       --  L199
       Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
-      Start                 : constant Natural := Parent_Node.Samples_Start;
-      Stop                  : constant Natural := Parent_Node.Samples_End;
+      Start                 : constant Positive := Parent_Node.Samples_Start;
+      Stop                  : constant Positive := Parent_Node.Samples_End;
       Num_Node_Samples      : constant Natural := Stop - Start;  --  L207
       Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
       Is_Leaf               : Boolean := False;
@@ -52,6 +52,8 @@ package body Ada_Tree_Builder is
    begin
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
+      Put_Line ("Ada_Tree_Builder.Add_Branch Start: " &
+               Integer'Image (Start));
       Reset_Node (Splitter, Start, Stop, theTree.Classes,
                   Weighted_Node_Samples);
       if First then
@@ -76,8 +78,10 @@ package body Ada_Tree_Builder is
       end if;
       --  L229
       Child_Cursor := Tree_Build.Add_Node
-        (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
-         Impurity, Split.Threshold, Weighted_Node_Samples);
+        (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
+         Split.Feature_Index, Impurity, Split.Threshold,
+         Parent_Node.Samples_Start, Splitter.Num_Samples,
+         Weighted_Node_Samples);
 
       --  L241 Node.Values already added by Tree_Build.Add_Node
 
@@ -101,23 +105,18 @@ package body Ada_Tree_Builder is
       Sample_Weight : Weights.Weight_List) is
       use Tree.Nodes_Package;
       use Node_Splitter;
-      Builder               : Tree_Builder;
-      Splitter              : Splitter_Class;
-      Top_Node              : Tree.Tree_Node;
-      Top_Node_Cursor       : Cursor;
+      Builder          : Tree_Builder;
+      Splitter         : Splitter_Class;
+      Top_Node_Cursor  : Cursor;
+      Depth            : Natural := 0;
    begin
       --  L163
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Init_Tree_Builder (Builder, Splitter);
 
-      Top_Node.Samples_Start := Splitter.Start_Index;
-      Top_Node.Samples_End := Splitter.End_Index;
-      Node_Value (Splitter, Top_Node.Values);
-      Classifier_Utilities.Print_List_Of_Float_Lists
-          ("Ada_Tree_Builder.Build_Tree Top_Node.Values", Top_Node.Values);
-      theTree.Nodes.Prepend_Child (theTree.Nodes.Root, Top_Node);
-      Top_Node_Cursor := Last_Child (theTree.Nodes.Root);
-
+      Top_Node_Cursor := Tree_Build.Add_Node
+        (theTree, Splitter, Depth, theTree.Nodes.Root, True, False, 1,
+         Float'Last, 0.0, 1, Splitter.Num_Samples, Splitter.Weighted_Samples);
       Add_Branch (theTree, Builder, Top_Node_Cursor);
 
    end Build_Tree;

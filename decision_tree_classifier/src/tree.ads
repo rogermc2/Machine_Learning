@@ -32,17 +32,16 @@ package Tree is
 
    subtype Values_List is Classifier_Types.Float_List;
 
-   type Tree_Node
-     (Is_Leaf : Boolean := False)
-   is record
+   type Tree_Node (Is_Leaf : Boolean := False) is record
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
-      Samples_Start             : Natural := 0;
-      Samples_End               : Natural := 0;
+      Samples_Start             : Positive := 1;
+      Samples_End               : Positive := 1;
       Values                    : Classifier_Types.List_Of_Float_Lists;
-      Weighted_Num_Node_Samples : Integer := 0;
-      Depth                     : Integer := 0;
+      Weighted_Num_Node_Samples : Natural := 0;
+      Depth                     : Natural := 0;
       Is_Left                   : Boolean := True;
-      Impurity                  : Float := Float'Large;  --  "Infinity"
+      Impurity                  : Float := Float'Large;
+      Num_Node_Samples          : Positive := 1;
       Num_Constant_Features     : Integer := 0;
       case Is_Leaf is
          when False =>

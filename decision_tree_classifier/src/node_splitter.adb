@@ -16,16 +16,21 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Init (Self          : in out Splitter_Class;
-                   Input_X       : ML_Types.List_Of_Value_Data_Lists;
-                   Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
-                   Sample_Weight : Weights.Weight_List) is
+   procedure Init (Self             : in out Splitter_Class;
+                   Input_X          : ML_Types.List_Of_Value_Data_Lists;
+                   Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
+                   Sample_Weight    : Weights.Weight_List;
+                   Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Num_Features     : constant Positive :=
                            Positive (Input_X.Element (1).Length);
       Weighted_Samples : Float := 0.0;
    begin
+      Self.Min_Leaf_Samples := Min_Leaf_Samples;
+      --  Min_Leaf_Samples is the minimum number of samples that each leaf can
+      --  have, where splits which would result in having less samples in a
+      --  leaf are not considered.
       Self.Sample_Indices.Clear;
       --  For each sample (row)
       for index in Input_X.First_Index .. Input_X.Last_Index loop
@@ -44,7 +49,7 @@ package body Node_Splitter is
       end loop;
 
       --  Number of samples is the number of positively weighted samples.
-      Self.Min_Leaf_Samples := Natural (Self.Sample_Indices.Length);
+      Self.Num_Samples := Natural (Self.Sample_Indices.Length);
       Self.Weighted_Samples := Weighted_Samples;
 
       Self.Feature_Indices.Clear;
@@ -384,7 +389,7 @@ package body Node_Splitter is
    --  Reset_Node resets the splitter Split based on node Split.Samples[start:end].
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
-      Start, Stop           : Natural;
+      Start, Stop           : Positive;
       Classes               : ML_Types.List_Of_Value_Data_Lists;
       Weighted_Node_Samples : in out Float) is
    begin

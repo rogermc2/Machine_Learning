@@ -31,6 +31,7 @@ package Node_Splitter is
       Constant_Features_I  : Classifier_Types.Natural_List;
       Num_Classes          : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
+      Num_Samples          : Positive := 1;
       Weighted_Samples     : Float := 0.0;
       --  encoded version of sample Y
       Y                    : Classifier_Types.List_Of_Natural_Lists;
@@ -45,16 +46,17 @@ package Node_Splitter is
 
    Node_Splitter_Error : Exception;
 
-   procedure Init (Self          : in out Splitter_Class;
-                   Input_X       : ML_Types.List_Of_Value_Data_Lists;
-                   Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
-                   Sample_Weight : Weights.Weight_List);
+   procedure Init (Self             : in out Splitter_Class;
+                   Input_X          : ML_Types.List_Of_Value_Data_Lists;
+                   Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
+                   Sample_Weight    : Weights.Weight_List;
+                   Min_Leaf_Samples : Positive := 1);
    function Node_Impurity (Self : Splitter_Class) return Float;
-   procedure Node_Value (Self : Splitter_Class;
+   procedure Node_Value (Self   : Splitter_Class;
                          Values : out Classifier_Types.List_Of_Float_Lists);
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
-      Start, Stop           : Natural;
+      Start, Stop           : Positive;
       Classes               : ML_Types.List_Of_Value_Data_Lists;
       Weighted_Node_Samples : in out Float);
    function Split_Node (Self                  : in out Splitter_Class;
