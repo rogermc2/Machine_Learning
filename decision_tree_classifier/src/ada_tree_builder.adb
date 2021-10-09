@@ -78,7 +78,7 @@ package body Ada_Tree_Builder is
         (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf, Split.Feature_Index,
          Impurity, Split.Threshold, Weighted_Node_Samples);
 
-      --  L241 Nodes already added by Tree_Build.Add_Node
+      --  L241 Node.Values already added by Tree_Build.Add_Node
 
       --  L254
       if Depth > Max_Depth_Seen then

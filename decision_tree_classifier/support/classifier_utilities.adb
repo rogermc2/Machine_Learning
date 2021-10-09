@@ -411,6 +411,19 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_List_Of_Float_Lists (Name : String;
+                                          Data : List_Of_Float_Lists) is
+   begin
+      Put_Line (Name & ": ");
+      for Index in Data.First_Index .. Data.Last_Index loop
+         Print_Float_List ("", Data.Element (Index));
+      end loop;
+      New_Line;
+
+   end Print_List_Of_Float_Lists;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_List_Of_Natural_Lists (Name : String;
                                           Data : List_Of_Natural_Lists) is
    begin
@@ -469,6 +482,7 @@ package body Classifier_Utilities is
       Data_String := UB_Offset & "Node type: " &
         ML_Types.Node_Kind'Image (Node.Kind);
       Put_Line (To_String (Data_String));
+
       Data_String := UB_Offset & "Impurity: " &  Float'Image (Node.Impurity);
       Put_Line (To_String (Data_String));
 
@@ -480,12 +494,14 @@ package body Classifier_Utilities is
       end if;
 
       Values := Node.Values;
-      if not Values.Is_Empty then
+      if Values.Is_Empty then
+         Put_Line ("Node values: none.");
+      else
          for index in Values.First_Index .. Values.Last_Index loop
             if Integer (Values.Length) > 1 then
                Put_Line ("Output " & Integer'Image (index) & " values: ");
             else
-               Put_Line ("Values:");
+               Put_Line ("Node values:");
             end if;
 
             Values_K := Values.Element (index);

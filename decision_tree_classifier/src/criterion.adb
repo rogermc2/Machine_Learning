@@ -212,8 +212,7 @@ package body Criterion is
       for index in Self.Sum_Total.First_Index .. Self.Sum_Total.Last_Index loop
          Sum_Total_K := Self.Sum_Total.Element (index);
          Value_K.Clear;
-         for index_2 in Self.Sum_Total.First_Index ..
-           Self.Sum_Total.Last_Index loop
+         for index_2 in Sum_Total_K.First_Index .. Sum_Total_K.Last_Index loop
             Value_K.Append (Sum_Total_K.Element (index_2) /
                               Self.Weighted_Node_Samples);
          end loop;

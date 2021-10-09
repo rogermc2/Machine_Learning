@@ -26,6 +26,8 @@ package Classifier_Utilities is
     procedure Print_Integer_List (Name : String; theList : Integer_List);
     procedure Print_List_Of_Natural_Lists (Name : String;
                                            Data : List_Of_Natural_Lists);
+    procedure Print_List_Of_Float_Lists (Name : String;
+                                           Data : List_Of_Float_Lists);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
     procedure Print_List_Of_Value_Lists

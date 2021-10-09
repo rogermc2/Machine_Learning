@@ -2,6 +2,7 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+--  with Classifier_Utilities;
 with ML_Types;
 with Build_Utils;
 --  with Utilities;
@@ -35,9 +36,9 @@ package body Tree_Build is
       Node_Cursor : Tree.Tree_Cursor;
    begin
       --  _Tree L735
---        theTree.Node_Count := theTree.Node_Count + 1;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
+      --  _Tree L241
       Node_Splitter.Node_Value (Splitter, New_Node.Values);
 
       if not Is_Leaf then
