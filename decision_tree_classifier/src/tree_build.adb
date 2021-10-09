@@ -39,7 +39,6 @@ package body Tree_Build is
    begin
       --  _Tree L738
       New_Node.Impurity := Impurity;
-      New_Node.Num_Node_Samples := Num_Node_Samples;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241
       Node_Splitter.Node_Value (Splitter, theTree.Values);

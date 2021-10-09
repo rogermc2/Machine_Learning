@@ -36,9 +36,9 @@ package Tree is
       Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       --  from _Tree Node struct
       Impurity                  : Float := Float'Large;
-      Num_Node_Samples          : Positive := 1;
+--        Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
-
+      --  From Tree Utils StackRecord struct
       Samples_Start             : Positive := 1;
       Samples_End               : Positive := 1;
       Depth                     : Natural := 0;
