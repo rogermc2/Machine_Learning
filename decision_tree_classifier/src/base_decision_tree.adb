@@ -117,6 +117,7 @@ package body Base_Decision_Tree is
       --  L226
       if aClassifier.Parameters.Max_Depth < 0 then
          Max_Depth := Integer'Last;
+         aClassifier.Parameters.Max_Depth := Max_Depth;
       else
          Max_Depth := aClassifier.Parameters.Max_Depth;
       end if;
