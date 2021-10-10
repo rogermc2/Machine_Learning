@@ -329,27 +329,46 @@ package body Node_Splitter is
                                  Impurity    : Float) is
       Partition_End : Natural;
       P_Index       : Positive;
+      Sample_I      : Natural;
       X_1           : ML_Types.Value_Data_List;
+      X             : ML_Types.Value_Record;
       Swap          : ML_Types.Value_Data_List;
       Crit          : Criterion.Criterion_Class;
    begin
-      --  Reorganize into samples[start:best.pos] + samples[best.pos:end]
+      --  L425 Reorganize into samples[start:best.pos] + samples[best.pos:end]
       if Best_Split.Pos_I < Self.End_Index then
          Partition_End := Self.End_Index;
          P_Index := Self.Start_Index;
          while P_Index < Partition_End loop
-            X_1 := Self.X.Element (Self.Sample_Indices.Element (P_Index));
-            if X_1.Element
-              (Self.Sample_Indices.Element (P_Index)).Float_Value <=
-                Best_Split.Threshold then
-               P_Index := P_Index + 1;
-            else
-               Partition_End := Partition_End - 1;
-               Swap := X_Samples.Element (P_Index);
-               X_Samples.Replace_Element
-                 (P_Index, X_Samples.Element (Partition_End));
-               X_Samples.Replace_Element (Partition_End, Swap);
-            end if;
+            Sample_I := Self.Sample_Indices.Element (P_Index);
+            X_1 := Self.X.Element (Sample_I);
+            X := X_1.Element (Best_Split.Feature);
+            case X.Value_Kind is
+               when ML_Types.Float_Type =>
+                  if X.Float_Value <=
+                    Best_Split.Threshold then
+                     P_Index := P_Index + 1;
+                  else
+                     Partition_End := Partition_End - 1;
+                     Swap := X_Samples.Element (P_Index);
+                     X_Samples.Replace_Element
+                       (P_Index, X_Samples.Element (Partition_End));
+                     X_Samples.Replace_Element (Partition_End, Swap);
+                  end if;
+               when ML_Types.Integer_Type =>
+                  if Float (X.Integer_Value) <= Best_Split.Threshold then
+                     P_Index := P_Index + 1;
+                  else
+                     Partition_End := Partition_End - 1;
+                     Swap := X_Samples.Element (P_Index);
+                     X_Samples.Replace_Element
+                       (P_Index, X_Samples.Element (Partition_End));
+                     X_Samples.Replace_Element (Partition_End, Swap);
+                  end if;
+               when others =>
+                  raise Node_Splitter_Error with
+                    "Node_Splitter.Reorganize_Samples X.Value_Kind is invalid";
+            end case;
          end loop;
 
          --  L436
