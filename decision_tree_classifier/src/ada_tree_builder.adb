@@ -20,7 +20,7 @@ package body Ada_Tree_Builder is
        Min_Samples_Split     : Natural := 0;
        Min_Samples_Leaf      : Natural := 0;
        Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Natural := 0;
+       Max_Depth             : Positive := 1000;
        Min_Impurity_Decrease : Float := 0.0);
 
     --  ------------------------------------------------------------------
@@ -62,24 +62,16 @@ package body Ada_Tree_Builder is
         end if;
 
         --  L210
-        Put_Line ("Ada_Tree_Builder.Add_Branch Parent_Node.Is_Leaf: " &
-                    Boolean'Image (Parent_Node.Is_Leaf));
-        Put_Line ("Ada_Tree_Builder.Add_Branch Depth: " &
-                    Integer'Image (Depth));
-
-        Put_Line ("Ada_Tree_Builder.Add_Branch Max_Depth: " &
-                    Integer'Image (Builder.Max_Depth));
         Is_Leaf := Parent_Node.Is_Leaf or else
           (Depth >= Builder.Max_Depth or
              Num_Node_Samples < Builder.Min_Samples_Split or
                Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
                  Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
                  --  if Impurity == 0.0 with tolerance for rounding errors
-             Impurity <= Epsilon);
+             abs (Impurity) <= Epsilon);
 
-
-        Put_Line ("Ada_Tree_Builder.Add_Branch Is_Leaf: " &
-                    Boolean'Image (Is_Leaf));
+--          Put_Line ("Ada_Tree_Builder.Add_Branch Is_Leaf: " &
+--                      Boolean'Image (Is_Leaf));
 
         --  L222
         if not Is_Leaf then
@@ -142,7 +134,7 @@ package body Ada_Tree_Builder is
        Min_Samples_Split     : Natural := 0;
        Min_Samples_Leaf      : Natural := 0;
        Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Natural := 0; --  -1 means undefined
+       Max_Depth             : Positive := 1000;
        Min_Impurity_Decrease : Float := 0.0) is
 
     begin

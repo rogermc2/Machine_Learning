@@ -13,7 +13,7 @@ package Ada_Tree_Builder is
         Min_Samples_Split     : Natural := 0;
         Min_Samples_Leaf      : Natural := 0;
         Min_Weight_Leaf       : Float := 0.0;
-        Max_Depth             : Natural := 0;
+        Max_Depth             : Natural := 1000;
         Min_Impurity_Decrease : Float := 0.0;
     end record;
 
