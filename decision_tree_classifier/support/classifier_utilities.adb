@@ -490,6 +490,24 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Split_Record (Name : String;
+                                 Data : Node_Splitter.Split_Record) is
+   begin
+      Put_Line (Name & ": ");
+        Put_Line ("Feature_Index: " & Integer'image (Data.Feature_Index));
+        Put_Line ("Feature_Index: " & Integer'image (Data.Start_Index));
+        Put_Line ("Feature_Index: " & Integer'image (Data.End_Index));
+        Put_Line ("Feature_Index: " & Integer'image (Data.Pos_I));
+        Put_Line ("Feature_Index: " & Float'image (Data.Threshold));
+        Put_Line ("Feature_Index: " & Float'image (Data.Improvement));
+        Put_Line ("Feature_Index: " & Float'image (Data.Impurity_Left));
+        Put_Line ("Feature_Index: " & Float'image (Data.Impurity_Right));
+      New_Line;
+
+   end Print_Split_Record;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Tree (Name  : String;
                          aTree : Base_Decision_Tree.Classifier) is
       Tree_Nodes  : constant Tree.Tree_Class :=

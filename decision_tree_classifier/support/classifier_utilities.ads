@@ -5,6 +5,7 @@ with Classifier_Types; use Classifier_Types;
 with Estimator;
 with ML_Types;
 with Base_Decision_Tree;
+with Node_Splitter;
 with Tree;
 with Weights;
 
@@ -33,6 +34,8 @@ package Classifier_Utilities is
     procedure Print_List_Of_Value_Lists
       (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
+   procedure Print_Split_Record (Name : String;
+                                 Data : Node_Splitter.Split_Record);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
     procedure Print_Tree (Name  : String; aTree : Tree.Tree_Class);
     procedure Print_Value_List (Name    : String;
