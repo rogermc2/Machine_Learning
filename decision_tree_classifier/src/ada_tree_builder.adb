@@ -70,14 +70,17 @@ package body Ada_Tree_Builder is
                  --  if Impurity == 0.0 with tolerance for rounding errors
              abs (Impurity) <= Epsilon);
 
+        Put_Line ("Ada_Tree_Builder.Add_Branch L222");
         --  L222
         if not Is_Leaf then
             Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
+            Put_Line ("Ada_Tree_Builder.Add_Branch node split");
             Classifier_Utilities.Print_Split_Record
               ("Ada_Tree_Builder.Add_Branch, Split", Split);
             Is_Leaf := Split.Pos_I >= Stop or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
         end if;
+        Put_Line ("Ada_Tree_Builder.Add_Branch L229");
         --  L229
         Child_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
@@ -86,6 +89,7 @@ package body Ada_Tree_Builder is
 
         --  L241 Node.Values already added by Tree_Build.Add_Node
 
+        Put_Line ("Ada_Tree_Builder.Add_Branch L254");
         --  L254
         if Depth > Max_Depth_Seen then
             Max_Depth_Seen := Depth;

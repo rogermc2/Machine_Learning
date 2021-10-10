@@ -7,32 +7,32 @@ package Criterion is
 
    type Criterion_Class is record
       Y                         : Classifier_Types.List_Of_Natural_Lists;
-      Samples                   : ML_Types.List_Of_Value_Data_Lists;
-      Sample_Indices            : Classifier_Types.Natural_List;
-      Num_Weighted_Node_Samples : Natural := 0;
-      Num_Node_Samples          : Natural := 0;
-      Weighted_Left             : Float := 0.0;
-      Weighted_Right            : Float := 0.0;
-      Weighted_Samples          : Float := 0.0;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
-      Weighted_Node_Samples     : Float := 0.0;
-      Proxy_Improvement         : Float := -Float'Last;
+      Samples                   : ML_Types.List_Of_Value_Data_Lists;
+      Start                     : Natural := 0;
+      Stop                      : Natural := 0;
+      Position                  : Natural := 0;
+      Num_Node_Samples          : Natural := 0;
+      Num_Weighted_Samples      : Float := 0.0;
+      Num_Weighted_Node_Samples : Float := 0.0;
+      Num_Weighted_Left         : Float := 0.0;
+      Num_Weighted_Right        : Float := 0.0;
+--        Weighted_Node_Samples     : Weights.Weight_List;
       --  For classification criteria, Sum_Total is the sum of the weighted
       --  count of each label.
       --  For regression, Sum_Total is the sum of w*y.
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
       --  where k is the output index.
-      Start                     : Natural := 0;
-      Stop                      : Natural := 0;
-      Position                  : Natural := 0;
-      Sum_Total                 : Weights.Weight_Lists_List;
+      Sum_Total                 : Weights.Weight_List;
       Sum_Left                  : Weights.Weight_List;
       Sum_Right                 : Weights.Weight_List;
       Sq_Sum_Total              : Float := 0.0;
       --  Classification Criterion_Class
       Classes                   : ML_Types.List_Of_Value_Data_Lists;
+      Sample_Indices            : Classifier_Types.Natural_List;
+      Proxy_Improvement         : Float := -Float'Last;
    end record;
 
    Criterion_Error : Exception;

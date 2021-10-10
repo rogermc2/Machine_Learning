@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -375,10 +375,13 @@ package body Node_Splitter is
          Criterion.Reset (Self.Criteria);
          Crit := Self.Criteria;
          Crit.Position := Best_Split.Pos_I;
+      Put_Line ("Node_Splitter.Reorganize_Samples position set");
          Criterion.Update (Self.Criteria, Crit.Position);
+      Put_Line ("Node_Splitter.Reorganize_Samples Criterion.Updated");
 
          Criterion.Gini_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
+      Put_Line ("Node_Splitter.Reorganize_Samples Gini_Children_Impurity done");
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
@@ -439,9 +442,11 @@ package body Node_Splitter is
         (Self, Features, Current_Split, Num_Features, Num_Known_Constants,
          Max_Features, Num_Visited_Features, Num_Drawn_Constants,
          Num_Found_Constants, Num_Total_Constants, Best_Split);
+      Put_Line ("Node_Splitter.Split_Node L421");
 
       --  L421
       Reorganize_Samples (Self, Best_Split, X_Samples, Impurity);
+      Put_Line ("Node_Splitter.Split_Node reorganized");
 
       --  L448
       --  Respect invariant for constant features: the original order of
