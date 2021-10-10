@@ -20,7 +20,7 @@ package body Ada_Tree_Builder is
        Min_Samples_Split     : Natural := 0;
        Min_Samples_Leaf      : Natural := 0;
        Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Positive := 1000;
+       Max_Depth             : Integer := -1;
        Min_Impurity_Decrease : Float := 0.0);
 
     --  ------------------------------------------------------------------
@@ -107,6 +107,7 @@ package body Ada_Tree_Builder is
       (theTree       : in out Tree.Tree_Class;
        X             : ML_Types.List_Of_Value_Data_Lists;
        Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+       Max_Depth     : Integer;
        Sample_Weight : Weights.Weight_List) is
         use Tree.Nodes_Package;
         use Node_Splitter;
@@ -117,7 +118,7 @@ package body Ada_Tree_Builder is
     begin
         --  L163
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
-        Init_Tree_Builder (Builder, Splitter);
+        Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
         Top_Node_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, theTree.Nodes.Root, True, False, 1,
@@ -134,7 +135,7 @@ package body Ada_Tree_Builder is
        Min_Samples_Split     : Natural := 0;
        Min_Samples_Leaf      : Natural := 0;
        Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Positive := 1000;
+       Max_Depth             : Integer := -1;
        Min_Impurity_Decrease : Float := 0.0) is
 
     begin

@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -243,6 +243,10 @@ package body Node_Splitter is
       Swap          : Natural;
    begin
       --  L323
+      Put_Line ("Node_Splitter.Process_Constants F_I, Num_Total_Constants: "
+                & Integer'Image (F_I) & ", " &
+                  Integer'Image (Num_Total_Constants));
+
       while F_I > Num_Total_Constants and
         (Num_Visited_Features < Max_Features or
          --   At least one drawn feature must be non constant.
@@ -252,25 +256,40 @@ package body Node_Splitter is
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L342
          --  Draw a feature at random;
-         F_J := Num_Drawn_Constants +
+         F_J := Num_Drawn_Constants + 1 +
            Maths.Random_Integer mod (F_I - Num_Found_Constants);
+         Put_Line ("Node_Splitter.Process_Constants, Num_Known_Constants: "
+                   & Integer'Image (Num_Known_Constants));
+
          if F_J < Num_Known_Constants then
             Swap := Num_Drawn_Constants;
+            Put_Line ("Node_Splitter.Process_Constants Swap: "
+                      & Integer'Image (Swap));
             Features.Replace_Element
               (Num_Drawn_Constants, Features.Element (F_J));
+            Put_Line ("Node_Splitter.Process_Constants Num_Drawn_Constants: "
+                      & Integer'Image (Num_Drawn_Constants));
             Features.Replace_Element (F_J, Features.Element (Swap));
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
             --  L356
          else
             F_J := F_J + Num_Found_Constants;
+            Put_Line ("Node_Splitter.Process_Constants F_J: " &
+                        Integer'Image (F_J));
             if F_J = 0 then
                F_J := 1;
             end if;
             Current_Split.Feature_Index := Features.Element (F_J);
+            Put_Line ("Node_Splitter.Process_Constants Feature_Index: " &
+                        Integer'Image (Current_Split.Feature_Index));
 
             --  L364
             for index in Self.Start_Index .. Self.End_Index loop
+               Put_Line ("Node_Splitter.Process_Constants index: "
+                          & Integer'Image (index));
                Sample_Index := Self.Sample_Indices.Element (F_I);
+               Put_Line ("Node_Splitter.Process_Constants Sample_Index: "
+                          & Integer'Image (Sample_Index));
                X_Sample := Self.Sample_Indices.Element (Sample_Index);
                X_Features := Self.X.Element (X_Sample);
                Self.Feature_Values.Replace_Element
@@ -439,6 +458,7 @@ package body Node_Splitter is
          Max_Features, Num_Visited_Features, Num_Drawn_Constants,
          Num_Found_Constants, Num_Total_Constants, Best_Split);
 
+      Put_Line ("Node_Splitter.Split_Node Process_Constants done.");
       --  L421
       Reorganize_Samples (Self, Best_Split, X_Samples, Impurity);
 

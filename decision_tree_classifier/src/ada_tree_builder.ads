@@ -13,7 +13,7 @@ package Ada_Tree_Builder is
         Min_Samples_Split     : Natural := 0;
         Min_Samples_Leaf      : Natural := 0;
         Min_Weight_Leaf       : Float := 0.0;
-        Max_Depth             : Natural := 1000;
+        Max_Depth             : Integer := -1;
         Min_Impurity_Decrease : Float := 0.0;
     end record;
 
@@ -23,6 +23,7 @@ package Ada_Tree_Builder is
       (theTree       : in out Tree.Tree_Class;
        X             : ML_Types.List_Of_Value_Data_Lists;
        Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+       Max_Depth     : Integer;
        Sample_Weight : Weights.Weight_List);
 
 end Ada_Tree_Builder;

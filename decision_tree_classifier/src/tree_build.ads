@@ -21,7 +21,7 @@ package Tree_Build is
       Min_Samples_Split     : Natural := 0;
       Min_Samples_Leaf      : Natural := 0;
       Min_Weight_Leaf       : Float := 0.0;
-      Max_Depth             : Natural := 1000;
+      Max_Depth             : Integer := -1;
       Min_Impurity_Decrease : Float := 0.0;
       case Tree_Kind is
          when Best_First_Tree =>
@@ -59,7 +59,7 @@ package Tree_Build is
       Min_Samples_Split     : Natural := 0;
       Min_Samples_Leaf      : Natural := 0;
       Min_Weight_Leaf       : Float := 0.0;
-      Max_Depth             : Natural := 1000;
+      Max_Depth             : Integer := -1;
       Max_Leaf_Nodes        : Integer := -1;  --  -1 means undefined
       Min_Impurity_Decrease : Float := 0.0);
    procedure Init_Depth_First_Tree
@@ -67,7 +67,7 @@ package Tree_Build is
       Splitter                            : Node_Splitter.Splitter_Class;
       Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
       Min_Weight_Leaf                     : Float := 0.0;
-      Max_Depth                           : Natural := 1000;
+      Max_Depth                           : Integer := -1;
       Min_Impurity_Decrease               : Float := 0.0);
 
 end Tree_Build;

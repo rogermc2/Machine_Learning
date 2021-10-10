@@ -77,15 +77,17 @@ package body Base_Decision_Tree is
          Sum_Sample_Weight := 0.0;
          for index in Sample_Weights.First_Index ..
            Sample_Weights.Last_Index loop
-            Sum_Sample_Weight := Sum_Sample_Weight + Sample_Weights.Element (index);
+            Sum_Sample_Weight :=
+              Sum_Sample_Weight + Sample_Weights.Element (index);
          end loop;
       end if;
 
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
       --  L410
-      Ada_Tree_Builder.Build_Tree (aClassifier.Attributes.Decision_Tree,
-                                   X, Y_Encoded, Sample_Weights);
+      Ada_Tree_Builder.Build_Tree
+        (aClassifier.Attributes.Decision_Tree, X, Y_Encoded,
+         aClassifier.Parameters.Max_Depth, Sample_Weights);
 
       if Integer (aClassifier.Attributes.Num_Outputs) = 1 then
          null;
@@ -105,12 +107,20 @@ package body Base_Decision_Tree is
       use Maths.Float_Math_Functions;
       Num_Samples           : constant Positive := Positive (X.Length);
       --  L226
+      Max_Depth             : Natural;
       Max_Leaf_Nodes        : constant Integer := aClassifier.Parameters.Max_Leaf_Nodes;
       Min_Sample_Leaf       : Leaf_Record (Tree.Integer_Type);
       Min_Sample_Split      : Split_Record (Tree.Integer_Type);
       Max_Features          : Tree.Features_Record (Tree.Integer_Type);
       Sqrt_Num_Features     : Natural;
    begin
+      --  L226
+      if aClassifier.Parameters.Max_Depth < 0 then
+         Max_Depth := Integer'Last;
+      else
+         Max_Depth := aClassifier.Parameters.Max_Depth;
+      end if;
+
       --  L235
       case aClassifier.Parameters.Min_Samples_Leaf.Leaf_Type is
          when Tree.Integer_Type =>
@@ -200,6 +210,12 @@ package body Base_Decision_Tree is
            "Base_Decision_Tree.Base_Fit_Checks, Max_Features is not in (0, Num_Features)";
       end if;
 
+      --  L301
+      if Max_Depth <= 0  then
+         raise Value_Error with
+           "Base_Decision_Tree.Base_Fit_Checks, must be greater than 0.";
+      end if;
+
       --  L305
       if Max_Leaf_Nodes /= -1 and Max_Leaf_Nodes < 2 then
          raise Value_Error with
@@ -284,7 +300,7 @@ package body Base_Decision_Tree is
 
    exception
       when others => raise Classifier_Error with
-         "Base_Decision_Tree.Classification_Part error";
+           "Base_Decision_Tree.Classification_Part error";
 
    end Classification_Part;
 
@@ -307,7 +323,7 @@ package body Base_Decision_Tree is
    --  Based on class.py fit L431 Predict
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
-                      return ML_Types.Value_Data_List is
+                     return ML_Types.Value_Data_List is
    begin
       return Tree.Predict (Self.Attributes.Decision_Tree, X);
    end Predict;
