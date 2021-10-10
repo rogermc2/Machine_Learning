@@ -81,9 +81,8 @@ package body Ada_Tree_Builder is
         --  L229
         Child_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
-           Split.Feature_Index, Impurity, Split.Threshold,
-           Parent_Node.Samples_Start, Splitter.Num_Samples,
-           Weighted_Node_Samples);
+           Split.Feature, Impurity, Split.Threshold, Parent_Node.Samples_Start,
+           Splitter.Num_Samples, Weighted_Node_Samples);
 
         --  L241 Node.Values already added by Tree_Build.Add_Node
 

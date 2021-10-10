@@ -227,15 +227,15 @@ package body Node_Splitter is
    procedure Process_Constants
      (Self                : in out Splitter_Class;
       Features            : in out Classifier_Types.Natural_List;
-      Current_Split       : in out Split_Record;
+      Current             : in out Split_Record;
       Num_Features, Num_Known_Constants,
       Max_Features        : Natural;
       Num_Visited_Features, Num_Drawn_Constants, Num_Found_Constants,
       Num_Total_Constants : in out Natural;
       Best_Split          : in out Split_Record) is
       use ML_Types;
-      Sample_Index  : Natural;
-      X_Sample      : Natural;
+      Samples_I     : Positive;
+      X_Samples     : Natural;
       X_Features    : Value_Data_List;
       F_I           : Natural := Num_Features;
       F_J           : Natural;
@@ -260,6 +260,8 @@ package body Node_Splitter is
            Maths.Random_Integer mod (F_I - Num_Found_Constants);
          Put_Line ("Node_Splitter.Process_Constants, Num_Known_Constants: "
                    & Integer'Image (Num_Known_Constants));
+         Put_Line ("Node_Splitter.Process_Constants, Num_Drawn_Constants: "
+                   & Integer'Image (Num_Drawn_Constants));
 
          if F_J < Num_Known_Constants then
             Swap := Num_Drawn_Constants;
@@ -274,30 +276,32 @@ package body Node_Splitter is
             --  L356
          else
             F_J := F_J + Num_Found_Constants;
-            Put_Line ("Node_Splitter.Process_Constants F_J: " &
+            Put_Line ("Node_Splitter.Process_Constants else F_J: " &
                         Integer'Image (F_J));
             if F_J = 0 then
                F_J := 1;
             end if;
-            Current_Split.Feature_Index := Features.Element (F_J);
-            Put_Line ("Node_Splitter.Process_Constants Feature_Index: " &
-                        Integer'Image (Current_Split.Feature_Index));
+
+            Current.Feature := Features.Element (F_J);
+            Put_Line ("Node_Splitter.Process_Constants Feature: " &
+                        Integer'Image (Current.Feature));
 
             --  L364
             for index in Self.Start_Index .. Self.End_Index loop
                Put_Line ("Node_Splitter.Process_Constants index: "
-                          & Integer'Image (index));
-               Sample_Index := Self.Sample_Indices.Element (F_I);
-               Put_Line ("Node_Splitter.Process_Constants Sample_Index: "
-                          & Integer'Image (Sample_Index));
-               X_Sample := Self.Sample_Indices.Element (Sample_Index);
-               X_Features := Self.X.Element (X_Sample);
+                         & Integer'Image (index));
+               Samples_I := Self.Sample_Indices.Element (F_I);
+               Put_Line ("Node_Splitter.Process_Constants Samples_I: "
+                         & Integer'Image (Samples_I));
+               X_Samples := Self.Sample_Indices.Element (Samples_I);
+               --  X_Features is a Value_Data_List
+               X_Features := Self.X.Element (X_Samples);
                Self.Feature_Values.Replace_Element
-                 (Features (index), X_Features (Current_Split.Feature_Index));
+                 (Features (index), X_Features (Current.Feature));
             end loop;
 
             --  L367
-            Replacement_Sort (Self.Feature_Values,
+            Replacement_Sort (X_Features,
                               Self.Start_Index, Self.End_Index);
 
             --  L369  Feature_Values is a value_data_list
@@ -330,7 +334,7 @@ package body Node_Splitter is
                Criterion.Reset (Self.Criteria);
                --  L381
                Find_Best_Split (Self, Features, Self.Feature_Values,
-                                Current_Split, Best_Split);
+                                Current, Best_Split);
             end if;
          end if;
       end loop;

@@ -11,7 +11,7 @@ package Node_Splitter is
    use Ada.Strings.Unbounded;
 
    type Split_Record is record
-      Feature_Index  : Positive := 1;
+      Feature        : Positive := 1;
       Start_Index    : Positive := 1;  --  Left start?
       Pos_I          : Positive := 1;  --  Right start?
       End_Index      : Positive := 1;  --  Right end?

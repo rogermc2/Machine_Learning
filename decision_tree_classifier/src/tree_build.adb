@@ -106,8 +106,8 @@ package body Tree_Build is
 
       Res.Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
-         aSplit.Feature_Index, Impurity, aSplit.Threshold,
-         Parent_Node.Samples_Start, Splitter.Num_Samples, Splitter.Weighted_Samples);
+         aSplit.Feature, Impurity, aSplit.Threshold, Parent_Node.Samples_Start,
+         Splitter.Num_Samples, Splitter.Weighted_Samples);
       Res.Start := Splitter.Start_Index;
       Res.Stop := Splitter.End_Index;
       Res.Depth := Depth;
@@ -282,8 +282,8 @@ package body Tree_Build is
 
          Node_Cursor := Add_Node
            (theTree, Splitter, Depth, Parent, Is_Left, Is_Leaf,
-            Split.Feature_Index, Impurity, Split.Threshold,
-            Start, Splitter.Num_Samples, Weighted_Samples);
+            Split.Feature, Impurity, Split.Threshold, Start,
+            Splitter.Num_Samples, Weighted_Samples);
 
          if not Is_Leaf then
             --  Right child
