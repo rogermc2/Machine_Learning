@@ -58,7 +58,7 @@ package Criterion is
                    Classes  : ML_Types.List_Of_Value_Data_Lists);
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
-                         Value : out Classifier_Types.List_Of_Float_Lists);
+                         Value : out Classifier_Types.Float_List);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                          return Float;
    procedure Reset (Criteria : in out Criterion_Class);
