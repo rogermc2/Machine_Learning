@@ -494,13 +494,13 @@ package body Classifier_Utilities is
                                  Data : Node_Splitter.Split_Record) is
    begin
       Put_Line (Name & ": ");
-      Put_Line ("Feature_Index: " & Integer'image (Data.Feature));
-      Put_Line ("Start_Index: " & Integer'image (Data.Start_Index));
-      Put_Line ("End_Index: " & Integer'image (Data.End_Index));
-      Put_Line ("Pos_I: " & Integer'image (Data.Pos_I));
-      Put_Line ("Threshold: " & Float'image (Data.Threshold));
-      Put_Line ("Improvement: " & Float'image (Data.Improvement));
-      Put_Line ("Impurity_Left: " & Float'image (Data.Impurity_Left));
+      Put_Line ("Feature_Index:  " & Integer'image (Data.Feature));
+      Put_Line ("Start_Index:    " & Integer'image (Data.Start_Index));
+      Put_Line ("End_Index:      " & Integer'image (Data.End_Index));
+      Put_Line ("Pos_I:          " & Integer'image (Data.Pos_I));
+      Put_Line ("Threshold:      " & Float'image (Data.Threshold));
+      Put_Line ("Improvement:    " & Float'image (Data.Improvement));
+      Put_Line ("Impurity_Left:  " & Float'image (Data.Impurity_Left));
       Put_Line ("Impurity_Right: " & Float'image (Data.Impurity_Right));
       New_Line;
 

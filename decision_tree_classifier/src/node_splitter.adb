@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -441,7 +441,6 @@ package body Node_Splitter is
          Num_Found_Constants, Num_Total_Constants, Best_Split);
       --  L421
       Reorganize_Samples (Self, Best_Split, X_Samples, Impurity);
-      Put_Line ("Node_Splitter.Split_Node reorganized");
 
       --  L448
       --  Respect invariant for constant features: the original order of
