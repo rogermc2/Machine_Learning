@@ -25,9 +25,9 @@ package Criterion is
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
       --  where k is the output index.
-      Sum_Total                 : Weights.Weight_List;
-      Sum_Left                  : Weights.Weight_List;
-      Sum_Right                 : Weights.Weight_List;
+      Sum_Total                 : Weights.Weight_Lists_List;
+      Sum_Left                  : Weights.Weight_Lists_List;
+      Sum_Right                 : Weights.Weight_Lists_List;
       Sq_Sum_Total              : Float := 0.0;
       --  Classification Criterion_Class
       Classes                   : ML_Types.List_Of_Value_Data_Lists;
@@ -58,7 +58,7 @@ package Criterion is
                    Classes  : ML_Types.List_Of_Value_Data_Lists);
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
-                         Value : out Classifier_Types.Float_List);
+                         Value : out Classifier_Types.List_Of_Float_Lists);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                          return Float;
    procedure Reset (Criteria : in out Criterion_Class);

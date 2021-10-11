@@ -56,6 +56,8 @@ package body Ada_Tree_Builder is
                     Integer'Image (Start));
         Reset_Node (Splitter, Start, Stop, theTree.Classes,
                     Weighted_Node_Samples);
+
+        Put_Line ("Ada_Tree_Builder.Add_Branch node reset");
         if First then
             Impurity := Node_Impurity (Splitter);
             First := False;
