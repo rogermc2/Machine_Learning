@@ -439,8 +439,6 @@ package body Node_Splitter is
         (Self, Features, Current_Split, Num_Features, Num_Known_Constants,
          Max_Features, Num_Visited_Features, Num_Drawn_Constants,
          Num_Found_Constants, Num_Total_Constants, Best_Split);
-      Put_Line ("Node_Splitter.Split_Node L421");
-
       --  L421
       Reorganize_Samples (Self, Best_Split, X_Samples, Impurity);
       Put_Line ("Node_Splitter.Split_Node reorganized");

@@ -57,7 +57,6 @@ package body Ada_Tree_Builder is
         Reset_Node (Splitter, Start, Stop, theTree.Classes,
                     Weighted_Node_Samples);
 
-        Put_Line ("Ada_Tree_Builder.Add_Branch node reset");
         if First then
             Impurity := Node_Impurity (Splitter);
             First := False;
@@ -72,7 +71,6 @@ package body Ada_Tree_Builder is
                  --  if Impurity == 0.0 with tolerance for rounding errors
              abs (Impurity) <= Epsilon);
 
-        Put_Line ("Ada_Tree_Builder.Add_Branch L222");
         --  L222
         if not Is_Leaf then
             Split := Split_Node (Splitter, Impurity, Num_Constant_Features);

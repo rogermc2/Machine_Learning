@@ -241,8 +241,6 @@ package body Criterion is
       Num_Outputs : constant Positive :=
                       Positive (Criteria.Y.Element (1).Length);
       Sum_Left_K  : Classifier_Types.Float_List;
-      Sum_Right_K : Classifier_Types.Float_List;
-      Sum_K       : Classifier_Types.Float_List;
    begin
       Criteria.Position := Criteria.Start;
       Criteria.Num_Weighted_Left := 0.0;
@@ -252,16 +250,13 @@ package body Criterion is
       Criteria.Sum_Right.Clear;
       for k in 1 .. Num_Outputs loop
          Sum_Left_K.Clear;
-         Sum_K := Criteria.Sum_Total.Element (k);
-         for c in Criteria.Classes.First_Index ..
-           Criteria.Classes.Last_Index loop
+         for c in Criteria.Classes.Element (k).First_Index ..
+           Criteria.Classes.Element (k).Last_Index loop
             Sum_Left_K.Append (0.0);
-            Sum_Right_K.Append (Sum_K);
          end loop;
          Criteria.Sum_Left.Append (Sum_Left_K);
-         Criteria.Sum_Right.Append (Sum_Right_K);
       end loop;
-
+      Criteria.Sum_Right := Criteria.Sum_Total;
    end Reset;
 
    --  ------------------------------------------------------------------------
@@ -278,8 +273,8 @@ package body Criterion is
       Criteria.Sum_Right.Clear;
       for index in 1 .. Num_Outputs loop
          Sum_Right_K.Clear;
-         for c in Criteria.Classes.First_Index ..
-           Criteria.Classes.Last_Index loop
+         for c in Criteria.Classes.Element (index).First_Index ..
+           Criteria.Classes.Element (index).Last_Index loop
             Sum_Right_K.Append (0.0);
          end loop;
          Criteria.Sum_Right.Append (Sum_Right_K);
@@ -322,7 +317,7 @@ package body Criterion is
             end loop;
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
          end loop;
-      else  --  452
+      else  --  L452
          Reverse_Reset (Criteria);
          for p in reverse Criteria.Stop .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
@@ -345,12 +340,9 @@ package body Criterion is
          end loop;
       end if;
 
-      Put_Line ("Criterion.Update Update right part statistics");
-      --  L 467 Update right part statistics
+      --  L467 Update right part statistics
       Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples -
         Criteria.Num_Weighted_Right;
-      Put_Line ("Criterion.Update Sum_Total length: " &
-                  Integer'Image (Integer (Criteria.Sum_Total.Length)));
       for k in 1 .. Num_Outputs loop
          Sum_Left_K := Criteria.Sum_Left.Element (k);
          Sum_Right_K := Criteria.Sum_Right.Element (k);
@@ -360,9 +352,10 @@ package body Criterion is
             Sum_Right_K.Replace_Element (class_index, Sum_K.Element (class_index) -
                                            Sum_Left_K.Element (class_index));
          end loop;
-         Put_Line ("Criterion.Update Update sum right set");
+         Put_Line ("Criterion.Update sum right set");
       end loop;
       Criteria.Position := New_Pos;
+      Put_Line ("Criterion.Update done");
 
    end Update;
 
