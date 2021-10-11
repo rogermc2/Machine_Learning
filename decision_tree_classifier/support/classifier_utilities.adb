@@ -525,6 +525,7 @@ package body Classifier_Utilities is
       use Float_Package;
       Tree_Nodes  : constant Tree.Tree_Nodes := aTree.Nodes;
       Values      : constant List_Of_Float_Lists := aTree.Values;
+      Node_Values : Float_List;
       Data        : Float;
       Data_String : Unbounded_String;
       This_Indent : Natural := 0;
@@ -533,7 +534,7 @@ package body Classifier_Utilities is
       procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
                                  Indent : Natural := 0) is
          use Ada.Containers;
-         Node : Tree_Node;
+         Node        : Tree_Node;
       begin
          This_Indent := Indent + 1;
          if This_Indent > 10 then
@@ -571,22 +572,21 @@ package body Classifier_Utilities is
          Put_Line ("Values: none.");
       else
          for index in Values.First_Index .. Values.Last_Index loop
-            if Integer (Values.Length) > 1 then
-               Put_Line ("Output " & Integer'Image (index) & " values: ");
-            else
-               Put_Line ("Values:");
-            end if;
+            Node_Values := Values.Element (index);
+            Put_Line ("Values:");
 
-            Data_String := Data_String & "Values {";
-            Data := Values.Element (index);
-            Data_String := Data_String & Float'Image (Data);
-            if not (index = Values.Last_Index) then
-               Data_String := Data_String & ", ";
-            end if;
+            for v_index in Node_Values.First_Index .. Node_Values.Last_Index loop
+               Data_String := Data_String & "Values {";
+               Data := Node_Values.Element (v_index);
+               Data_String := Data_String & Float'Image (Data);
+               if not (index = Node_Values.Last_Index) then
+                  Data_String := Data_String & ", ";
+               end if;
+            end loop;
+
+            Data_String := Data_String & " }";
+            Put_Line (To_String (Data_String));
          end loop;
-
-         Data_String := Data_String & " }";
-         Put_Line (To_String (Data_String));
       end if;
       New_Line;
 

@@ -395,13 +395,11 @@ package body Node_Splitter is
       Weighted_Node_Samples : in out Float) is
    begin
       Criterion.Init (Splitter.Criteria, Classes);
-      Put_Line ("Node_Splitter.Reset_Node criterion intialized");
       Splitter.Start_Index := Start;
       Splitter.End_Index := Stop;
       Criterion.Classification_Init
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
          Splitter.Sample_Weight, Splitter.Weighted_Samples, Start, Stop);
-      Put_Line ("Node_Splitter.Reset_Node classification intialized");
 
       Weighted_Node_Samples := Splitter.Criteria.Num_Weighted_Node_Samples;
 

@@ -36,11 +36,12 @@ package body Criterion is
       Criteria.Sq_Sum_Total := 0.0;
       Criteria.Sum_Total.Clear;
       --  L325
-      for c in Criteria.Classes.First_Index ..
-        Criteria.Classes.Last_Index loop
-         Sum_Total_K.Append (0.0);
-      end loop;
       for row in 1 .. Num_Outputs loop
+         Sum_Total_K.Clear;
+         for c in Criteria.Classes.Element (row).First_Index ..
+           Criteria.Classes.Element (row).Last_Index loop
+            Sum_Total_K.Append (0.0);
+         end loop;
          Criteria.Sum_Total.Append (Sum_Total_K);
       end loop;
 
@@ -243,11 +244,14 @@ package body Criterion is
       Sum_Right_K : Classifier_Types.Float_List;
       Sum_K       : Classifier_Types.Float_List;
    begin
+      Criteria.Position := Criteria.Start;
+      Criteria.Num_Weighted_Left := 0.0;
+      Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples;
+
       Criteria.Sum_Left.Clear;
       Criteria.Sum_Right.Clear;
       for k in 1 .. Num_Outputs loop
          Sum_Left_K.Clear;
-         Sum_Right_K := Criteria.Sum_Right.Element (k);
          Sum_K := Criteria.Sum_Total.Element (k);
          for c in Criteria.Classes.First_Index ..
            Criteria.Classes.Last_Index loop
@@ -257,9 +261,6 @@ package body Criterion is
          Criteria.Sum_Left.Append (Sum_Left_K);
          Criteria.Sum_Right.Append (Sum_Right_K);
       end loop;
-
-      Criteria.Num_Weighted_Left := 0.0;
-      Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples;
 
    end Reset;
 
@@ -357,7 +358,7 @@ package body Criterion is
          for class_index in Criteria.Classes.Element (k).First_Index ..
            Criteria.Classes.Element (k).Last_Index loop
             Sum_Right_K.Replace_Element (class_index, Sum_K.Element (class_index) -
-              Sum_Left_K.Element (class_index));
+                                           Sum_Left_K.Element (class_index));
          end loop;
          Put_Line ("Criterion.Update Update sum right set");
       end loop;
