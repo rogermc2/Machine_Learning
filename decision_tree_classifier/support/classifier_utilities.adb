@@ -43,7 +43,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Bin_Count (Numbers : ML_Types.Value_Data_List)
-                        return Natural_List is
+                       return Natural_List is
       use Ada.Containers;
       use ML_Types;
       use Natural_Package;
@@ -137,7 +137,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                       return Integer_List is
+                                      return Integer_List is
       use ML_Types;
       use Integer_Package;
       use Value_Data_Package;
@@ -200,7 +200,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : Integer_Array)
-                                    return ML_Types.List_Of_Value_Data_Lists is
+                                   return ML_Types.List_Of_Value_Data_Lists is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
@@ -219,7 +219,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Multi_Value_List (A : Multi_Value_Array)
-                                  return ML_Types.List_Of_Value_Data_Lists is
+                                 return ML_Types.List_Of_Value_Data_Lists is
       use ML_Types;
       Value    : Value_Record (Integer_Type);
       Row_List : List_Of_Value_Data_Lists;
@@ -252,7 +252,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_Value_List (A : Natural_Array)
-                                    return ML_Types.List_Of_Value_Data_Lists is
+                                   return ML_Types.List_Of_Value_Data_Lists is
       Int_Array : Integer_Array (1 .. A'Length);
    begin
       for index in A'Range loop
@@ -412,7 +412,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_List_Of_Float_Lists (Name : String;
-                                          Data : List_Of_Float_Lists) is
+                                        Data : List_Of_Float_Lists) is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
@@ -494,14 +494,14 @@ package body Classifier_Utilities is
                                  Data : Node_Splitter.Split_Record) is
    begin
       Put_Line (Name & ": ");
-        Put_Line ("Feature_Index: " & Integer'image (Data.Feature));
-        Put_Line ("Start_Index: " & Integer'image (Data.Start_Index));
-        Put_Line ("End_Index: " & Integer'image (Data.End_Index));
-        Put_Line ("Pos_I: " & Integer'image (Data.Pos_I));
-        Put_Line ("Threshold: " & Float'image (Data.Threshold));
-        Put_Line ("Improvement: " & Float'image (Data.Improvement));
-        Put_Line ("Impurity_Left: " & Float'image (Data.Impurity_Left));
-        Put_Line ("Impurity_Right: " & Float'image (Data.Impurity_Right));
+      Put_Line ("Feature_Index: " & Integer'image (Data.Feature));
+      Put_Line ("Start_Index: " & Integer'image (Data.Start_Index));
+      Put_Line ("End_Index: " & Integer'image (Data.End_Index));
+      Put_Line ("Pos_I: " & Integer'image (Data.Pos_I));
+      Put_Line ("Threshold: " & Float'image (Data.Threshold));
+      Put_Line ("Improvement: " & Float'image (Data.Improvement));
+      Put_Line ("Impurity_Left: " & Float'image (Data.Impurity_Left));
+      Put_Line ("Impurity_Right: " & Float'image (Data.Impurity_Right));
       New_Line;
 
    end Print_Split_Record;
@@ -524,9 +524,7 @@ package body Classifier_Utilities is
       use Nodes_Package;
       use Float_Package;
       Tree_Nodes  : constant Tree.Tree_Nodes := aTree.Nodes;
-      Values      : constant List_Of_Float_Lists := aTree.Values;
-      Values_K    : Float_List;
-      Curs        : Float_Package.Cursor := Values_K.First;
+      Values      : constant Float_List := aTree.Values;
       Data        : Float;
       Data_String : Unbounded_String;
       This_Indent : Natural := 0;
@@ -579,17 +577,12 @@ package body Classifier_Utilities is
                Put_Line ("Values:");
             end if;
 
-            Values_K := Values.Element (index);
-            Curs :=Values_K.First;
             Data_String := Data_String & "Values {";
-            while Has_Element (Curs) loop
-               Data := Element (Curs);
-               Data_String := Data_String & Float'Image (Data);
-               if not (Curs = Values_K.Last) then
-                  Data_String := Data_String & ", ";
-               end if;
-               Next (Curs);
-            end loop;
+            Data := Values.Element (index);
+            Data_String := Data_String & Float'Image (Data);
+            if not (index = Values.Last_Index) then
+               Data_String := Data_String & ", ";
+            end if;
          end loop;
 
          Data_String := Data_String & " }";
@@ -704,7 +697,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                   return Integer_Array is
+                                  return Integer_Array is
       use Int_Sets;
       Unique_Set : Int_Sets.Set;
       Set_Curs   : Int_Sets.Cursor;

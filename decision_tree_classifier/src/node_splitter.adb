@@ -88,7 +88,7 @@ package body Node_Splitter is
 
    procedure Node_Value
      (Self   : Splitter_Class;
-      Values : out Classifier_Types.List_Of_Float_Lists) is
+      Values : out Classifier_Types.Float_List) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;
@@ -162,8 +162,8 @@ package body Node_Splitter is
                Criterion.Update (Self.Criteria, Best.Pos_I);
 
                --  L405 Accept if min_weight_leaf is satisfied
-               if Self.Criteria.Weighted_Left >= Self.Min_Leaf_Weight and
-                 Self.Criteria.Weighted_Right >= Self.Min_Leaf_Weight then
+               if Self.Criteria.Num_Weighted_Left >= Self.Min_Leaf_Weight and
+                 Self.Criteria.Num_Weighted_Right >= Self.Min_Leaf_Weight then
                   Current_Proxy_Improvement :=
                     Criterion.Proxy_Impurity_Improvement (Self.Criteria);
                   --  L412  Note: Improvements are negative values.
@@ -375,13 +375,10 @@ package body Node_Splitter is
          Criterion.Reset (Self.Criteria);
          Crit := Self.Criteria;
          Crit.Position := Best_Split.Pos_I;
-      Put_Line ("Node_Splitter.Reorganize_Samples position set");
          Criterion.Update (Self.Criteria, Crit.Position);
-      Put_Line ("Node_Splitter.Reorganize_Samples Criterion.Updated");
 
          Criterion.Gini_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
-      Put_Line ("Node_Splitter.Reorganize_Samples Gini_Children_Impurity done");
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
@@ -404,7 +401,7 @@ package body Node_Splitter is
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
          Splitter.Sample_Weight, Splitter.Weighted_Samples, Start, Stop);
 
-      Weighted_Node_Samples := Splitter.Criteria.Weighted_Node_Samples;
+      Weighted_Node_Samples := Splitter.Criteria.Num_Weighted_Node_Samples;
 
    end Reset_Node;
 
