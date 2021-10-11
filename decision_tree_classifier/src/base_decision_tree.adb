@@ -309,11 +309,13 @@ package body Base_Decision_Tree is
 
    procedure Init (aClassifier              : in out Classifier;
                    Max_Leaf_Nodes           : Integer := -1;
+                   Max_Depth                : Integer := -1;
                    Min_Weight_Fraction_Leaf : Float := 0.0;
                    Random_State             : Integer := 0) is
    begin
       aClassifier.Parameters.Random_State := Random_State;
       aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
+      aClassifier.Parameters.Max_Depth := Max_Depth;
       aClassifier.Parameters.Min_Weight_Fraction_Leaf :=
         Min_Weight_Fraction_Leaf;
       aClassifier.Parameters.Min_Samples_Split.Min_Split := 2;

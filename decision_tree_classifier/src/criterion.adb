@@ -82,36 +82,40 @@ package body Criterion is
                                      Impurity_Left,
                                      Impurity_Right : out Float) is
       use Maths.Float_Math_Functions;
-      Num_Outputs    : constant Positive := Positive (Criteria.Y.Length);
-      Class_List     : Classifier_Types.Natural_List;
+      Num_Outputs    : constant Positive :=
+                         Positive (Criteria.Y.Element (1).Length);
+      Class_List     : ML_Types.Value_Data_List;
       Sum_Left_K     : Classifier_Types.Float_List;
       Sum_Right_K    : Classifier_Types.Float_List;
       Count_K        : Float;
-      Entropy_Left   : Float := 0.0;
-      Entropy_Right  : Float := 0.0;
+      Sq_Count_Left  : Float;
+      Sq_Count_Right : Float;
    begin
       --  L662
-      for k in Criteria.Y.First_Index .. Criteria.Y.Last_Index loop
-         Class_List := Criteria.Y.Element (k);
+      for k in Criteria.Classes.First_Index ..
+        Criteria.Classes.Last_Index loop
+         Sq_Count_Left := 0.0;
+         Sq_Count_Right := 0.0;
+         Class_List := Criteria.Classes.Element (k);
          Sum_Left_K := Criteria.Sum_Left.Element (k);
          Sum_Right_K := Criteria.Sum_Right.Element (k);
          for c in Class_List.First_Index .. Class_List.Last_Index loop
             Count_K := Sum_Left_K.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Num_Weighted_Left;
-               Entropy_Left := Entropy_Left - Count_K * Log (Count_K);
+               Sq_Count_Left := Sq_Count_Left - Count_K * Log (Count_K);
             end if;
 
             Count_K := Sum_Right_K.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Num_Weighted_Right;
-               Entropy_Right := Entropy_Right - Count_K * Log (Count_K);
+               Sq_Count_Right := Sq_Count_Right - Count_K * Log (Count_K);
             end if;
          end loop;
       end loop;
 
-      Impurity_Left := Entropy_Left / Float (Num_Outputs);
-      Impurity_Right := Entropy_Right / Float (Num_Outputs);
+      Impurity_Left := Sq_Count_Left / Float (Num_Outputs);
+      Impurity_Right := Sq_Count_Right / Float (Num_Outputs);
 
    end Gini_Children_Impurity;
 

@@ -28,9 +28,10 @@ package body Decision_Tree_Classifer is
 
    procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
                    Max_Leaf_Nodes : Integer := -1;
+                   Max_Depth      : Integer := -1;
                    Random_State   : Integer := 0) is
    begin
-      Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes,
+      Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes, Max_Depth,
                                Random_State => Random_State);
    end Init;
 

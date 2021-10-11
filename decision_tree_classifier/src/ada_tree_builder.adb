@@ -62,7 +62,7 @@ package body Ada_Tree_Builder is
             First := False;
         end if;
 
-        --  L210
+      --  L210
         Is_Leaf := Parent_Node.Is_Leaf or else
           (Depth >= Builder.Max_Depth or
              Num_Node_Samples < Builder.Min_Samples_Split or
@@ -79,23 +79,24 @@ package body Ada_Tree_Builder is
               ("Ada_Tree_Builder.Add_Branch, Split", Split);
             Is_Leaf := Split.Pos_I >= Stop or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
-        end if;
-        Put_Line ("Ada_Tree_Builder.Add_Branch L229");
+--          end if;
+         Put_Line ("Ada_Tree_Builder.Add_Branch L229");
         --  L229
-        Child_Cursor := Tree_Build.Add_Node
+         Child_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
            Split.Feature, Impurity, Split.Threshold, Parent_Node.Samples_Start,
            Splitter.Num_Samples, Weighted_Node_Samples);
 
         --  L241 Node.Values already added by Tree_Build.Add_Node
 
-        Put_Line ("Ada_Tree_Builder.Add_Branch L254");
+         Put_Line ("Ada_Tree_Builder.Add_Branch L254");
         --  L254
         if Depth > Max_Depth_Seen then
             Max_Depth_Seen := Depth;
         end if;
 
-        if not Is_Leaf then
+--        if not Is_Leaf then
+         null;
             Add_Branch (theTree, Builder, Child_Cursor);
         end if;
 

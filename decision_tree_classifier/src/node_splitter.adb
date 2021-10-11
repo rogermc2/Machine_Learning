@@ -376,16 +376,13 @@ package body Node_Splitter is
          Crit := Self.Criteria;
          Crit.Position := Best_Split.Pos_I;
          Criterion.Update (Self.Criteria, Crit.Position);
-         Put_Line ("Node_Splitter.Reorganize_Samples Gini_Children_Impurity");
 
          Criterion.Gini_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
-         Put_Line ("Node_Splitter.Reorganize_Samples Gini_Children_Impuritye done");
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
       end if;
-      Put_Line ("Node_Splitter.Reorganize_Samples done");
 
    end Reorganize_Samples;
 
