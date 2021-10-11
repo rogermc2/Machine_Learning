@@ -1,5 +1,5 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -287,7 +287,8 @@ package body Criterion is
    --  Update statistics by moving samples[pos:new_pos] to the left child.
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
-      Num_Outputs : constant Positive := Positive (Criteria.Y.Length);
+      Num_Outputs : constant Positive :=
+                        Positive (Criteria.Y.Element (1).Length);
       i           : Positive;
       Y_I         : Classifier_Types.Natural_List;
       Y_Ik        : Natural;
@@ -352,10 +353,9 @@ package body Criterion is
             Sum_Right_K.Replace_Element (class_index, Sum_K.Element (class_index) -
                                            Sum_Left_K.Element (class_index));
          end loop;
-         Put_Line ("Criterion.Update sum right set");
+         Criteria.Sum_Right.Replace_Element (k, Sum_Right_K);
       end loop;
       Criteria.Position := New_Pos;
-      Put_Line ("Criterion.Update done");
 
    end Update;
 
