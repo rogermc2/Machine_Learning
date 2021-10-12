@@ -30,20 +30,25 @@ package body Tree_Build is
                       Is_Left, Is_Leaf        : Boolean;
                       Feature_Index           : Positive;
                       Impurity, Threshold     : Float;
-                      Start, Num_Node_Samples : Positive;
+                      Start, Stop             : Positive;
                       Weighted_Node_Samples   : Float) return Tree.Tree_Cursor is
       use Tree;
-      use Tree.Nodes_Package;
+      use Nodes_Package;
       New_Node    : Tree_Node (Is_Leaf);
       Node_Cursor : Tree.Tree_Cursor;
    begin
+      if not Has_Element (Parent_Cursor) then
+         raise Tree_Build_Error with
+           "Tree_Build.Build_Best_First_Tree, parent cursor has no element.";
+      end if;
+
       --  _Tree L738
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241
       Node_Splitter.Node_Value (Splitter, theTree.Values);
       New_Node.Samples_Start := Start;
-      New_Node.Samples_End := Start + Num_Node_Samples - 1;
+      New_Node.Samples_End := Stop;
 
       if not Is_Leaf then
          New_Node.Feature_Index := Feature_Index;

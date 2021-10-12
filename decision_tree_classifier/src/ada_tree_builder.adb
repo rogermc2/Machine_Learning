@@ -78,15 +78,19 @@ package body Ada_Tree_Builder is
          Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
          Classifier_Utilities.Print_Split_Record
            ("Ada_Tree_Builder.Add_Branch, Split", Split);
-         Is_Leaf := Split.Pos_I >= Stop or
+         Is_Leaf := Split.Pos_I = Parent_Node.Samples_Start or
+           Split.Pos_I >= Stop or
            Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
       end if;
 
+      Put_Line ("Ada_Tree_Builder.Add_Branch start, Split.Pos_I: " &
+                  Integer'Image (Parent_Node.Samples_Start) & ", " &
+               Integer'Image (Split.Pos_I));
       --  L229
       Left_Child_Cursor := Tree_Build.Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
          Split.Feature, Impurity, Split.Threshold, Parent_Node.Samples_Start,
-         Splitter.Num_Samples, Weighted_Node_Samples);
+         Split.Pos_I, Weighted_Node_Samples);
 
       --  L241 Node.Values already added by Tree_Build.Add_Node
 
@@ -95,14 +99,16 @@ package body Ada_Tree_Builder is
          Max_Depth_Seen := Depth;
       end if;
 
-      Right_Child_Cursor := Tree_Build.Add_Node
-        (theTree, Splitter, Depth, Parent_Cursor, False, Is_Leaf,
-         Split.Feature, Impurity, Split.Threshold,
-         Parent_Node.Samples_Start, Splitter.Num_Samples,
-         Weighted_Node_Samples);
+      if not Is_Leaf then
+         Right_Child_Cursor := Tree_Build.Add_Node
+           (theTree, Splitter, Depth, Parent_Cursor, False, Is_Leaf,
+            Split.Feature, Impurity, Split.Threshold,
+            Split.Pos_I + 1, Parent_Node.Samples_End,
+            Weighted_Node_Samples);
 
-      if Depth > Max_Depth_Seen then
-         Max_Depth_Seen := Depth;
+         if Depth > Max_Depth_Seen then
+            Max_Depth_Seen := Depth;
+         end if;
       end if;
 
       if not Element (Left_Child_Cursor).Is_Leaf then
