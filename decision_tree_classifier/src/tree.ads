@@ -33,10 +33,8 @@ package Tree is
    subtype Values_List is Classifier_Types.Float_List;
 
    type Tree_Node (Is_Leaf : Boolean := False) is record
-      Kind                      : ML_Types.Node_Kind := ML_Types.Undefined_Node;
       --  from _Tree Node struct
       Impurity                  : Float := Float'Large;
---        Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
       --  From Tree Utils StackRecord struct
       Samples_Start             : Positive := 1;

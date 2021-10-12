@@ -43,7 +43,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Bin_Count (Numbers : ML_Types.Value_Data_List)
-                       return Natural_List is
+                        return Natural_List is
         use Ada.Containers;
         use ML_Types;
         use Natural_Package;
@@ -137,7 +137,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                      return Integer_List is
+                                       return Integer_List is
         use ML_Types;
         use Integer_Package;
         use Value_Data_Package;
@@ -200,7 +200,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Integer_Value_List (A : Integer_Array)
-                                   return ML_Types.List_Of_Value_Data_Lists is
+                                    return ML_Types.List_Of_Value_Data_Lists is
         use ML_Types;
         Data       : Value_Record (Integer_Type);
         B_List     : Value_Data_List;
@@ -219,7 +219,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Multi_Value_List (A : Multi_Value_Array)
-                                 return ML_Types.List_Of_Value_Data_Lists is
+                                  return ML_Types.List_Of_Value_Data_Lists is
         use ML_Types;
         Value    : Value_Record (Integer_Type);
         Row_List : List_Of_Value_Data_Lists;
@@ -252,7 +252,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Natural_Value_List (A : Natural_Array)
-                                   return ML_Types.List_Of_Value_Data_Lists is
+                                    return ML_Types.List_Of_Value_Data_Lists is
         Int_Array : Integer_Array (1 .. A'Length);
     begin
         for index in A'Range loop
@@ -472,17 +472,32 @@ package body Classifier_Utilities is
     procedure Print_Node (Node : Tree.Tree_Node; Offset : String) is
         UB_Offset   : constant Unbounded_String :=
                         To_Unbounded_String (Offset);
-        Data_String : Unbounded_String;
     begin
-        Data_String := UB_Offset & "Node type: " &
-          ML_Types.Node_Kind'Image (Node.Kind);
-        Put_Line (To_String (Data_String));
+        Put_Line (To_String (UB_Offset & "Number of weighted samples:" &
+                    Integer'Image (Node.Weighted_Num_Node_Samples)));
+        Put_Line (To_String (UB_Offset & "Start:" &
+                    Integer'Image (Node.Samples_Start)));
+        Put_Line (To_String (UB_Offset & "Stop:" &
+                    Integer'Image (Node.Samples_End)));
+        if Node.Is_Left then
+            Put_Line (To_String (UB_Offset & "True branch"));
+        else
+            Put_Line (To_String (UB_Offset & "False branch"));
+        end if;
+        Put_Line (To_String (UB_Offset & "Number of constant features:" &
+                    Integer'Image (Node.Num_Constant_Features)));
+        Put_Line (To_String (UB_Offset & "Depth:" &
+                    Integer'Image (Node.Depth)));
+        Put_Line (To_String (UB_Offset & "Impurity: " &
+                    Float'Image (Node.Impurity)));
 
-        Data_String := UB_Offset & "Impurity: " &  Float'Image (Node.Impurity);
-        Put_Line (To_String (Data_String));
-        Data_String := UB_Offset;
         if Node.Is_Leaf then
-            Data_String := Data_String & "Prediction ";
+            Put_Line (To_String (UB_Offset & "Prediction "));
+        else
+            Put_Line (To_String (UB_Offset & "Feature index: " &
+                        Integer'Image (Node.Feature_Index)));
+            Put_Line (To_String (UB_Offset & "Threshold: " &
+                        Float'Image (Node.Threshold)));
         end if;
 
     end Print_Node;
@@ -696,7 +711,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                  return Integer_Array is
+                                   return Integer_Array is
         use Int_Sets;
         Unique_Set : Int_Sets.Set;
         Set_Curs   : Int_Sets.Cursor;
