@@ -1,12 +1,12 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
---  with Classifier_Utilities;
+with Classifier_Utilities;
 
 package body Node_Splitter is
 
@@ -68,11 +68,13 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Init_Split (theSplit : in out Split_Record) is
+   procedure Init_Split (theSplit : in out Split_Record; Start : Positive) is
    begin
+      theSplit.Pos_I := Start;
       theSplit.Impurity_Left := Float'Last;
       theSplit.Impurity_Right := Float'Last;
       theSplit.Improvement := -Float'Last;
+      theSplit.Feature := 1;
       theSplit.Threshold := 0.0;
 
    end Init_Split;
@@ -432,7 +434,11 @@ package body Node_Splitter is
          raise Node_Splitter_Error with
            "Node_Splitter.Split_Node called with empty Self.X";
       end if;
-      Init_Split (Best_Split);
+      Put_Line ("Node_Splitter.Split_Node, End_Index:" &
+                  Integer'Image (Self.End_Index));
+        Init_Split (Best_Split, Self.End_Index);
+         Classifier_Utilities.Print_Split_Record
+           ("Node_Splitter.Split_Node, Best_Split initialized", Best_Split);
 
       --  L323
       Process_Constants

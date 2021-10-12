@@ -53,10 +53,10 @@ package body Ada_Tree_Builder is
    begin
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
-      Put_Line ("Ada_Tree_Builder.Add_Branch Start: " &
-                  Integer'Image (Start));
       Reset_Node (Splitter, Start, Stop, theTree.Classes,
                   Weighted_Node_Samples);
+      Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop: " &
+                  Integer'Image (Start) & ", " & Integer'Image (Stop));
 
       if First then
          Impurity := Node_Impurity (Splitter);
