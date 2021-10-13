@@ -70,7 +70,7 @@ package body Node_Splitter is
 
    procedure Init_Split (theSplit : in out Split_Record; Start : Positive) is
    begin
-      theSplit.Pos_I := Start;
+      theSplit.Pos_I := Start + 1;
       theSplit.Impurity_Left := Float'Last;
       theSplit.Impurity_Right := Float'Last;
       theSplit.Improvement := -Float'Last;
@@ -313,6 +313,12 @@ package body Node_Splitter is
       Classes               : ML_Types.List_Of_Value_Data_Lists;
       Weighted_Node_Samples : in out Float) is
    begin
+      if Stop < Start then
+         raise Node_Splitter_Error with
+           "Node_Splitter.Reset_Node, stop index" & Integer'Image (Stop) &
+         " should not be less than start index" & Integer'Image (Start);
+      end if;
+
       Criterion.Init (Splitter.Criteria, Classes);
       Splitter.Start_Index := Start;
       Splitter.End_Index := Stop;

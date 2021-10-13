@@ -23,15 +23,15 @@ package body Tree_Build is
     --  of this node's branch Tree.
     --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
     --  L720
-    function Add_Node (theTree                 : in out Tree.Tree_Class;
-                       Splitter                : Node_Splitter.Splitter_Class;
-                       Depth                   : in out Natural;
-                       Parent_Cursor           : Tree.Tree_Cursor;
-                       Is_Left, Is_Leaf        : Boolean;
-                       Feature_Index           : Positive;
-                       Impurity, Threshold     : Float;
-                       Start, Position         : Positive;
-                       Weighted_Node_Samples   : Float) return Tree.Tree_Cursor is
+    function Add_Node (theTree               : in out Tree.Tree_Class;
+                       Splitter              : Node_Splitter.Splitter_Class;
+                       Depth                 : in out Natural;
+                       Parent_Cursor         : Tree.Tree_Cursor;
+                       Is_Left, Is_Leaf      : Boolean;
+                       Feature_Index         : Positive;
+                       Impurity, Threshold   : Float;
+                       Start, Stop           : Positive;
+                       Weighted_Node_Samples : Float) return Tree.Tree_Cursor is
         use Tree;
         use Nodes_Package;
         New_Node    : Tree_Node (Is_Leaf);
@@ -49,7 +49,7 @@ package body Tree_Build is
         Node_Splitter.Node_Value (Splitter, New_Node.Values);
 
         New_Node.Samples_Start := Start;
-        New_Node.Num_Node_Samples := Position - Start + 1;
+        New_Node.Num_Node_Samples := Stop - Start + 1;
 
         if not Is_Leaf then
             New_Node.Feature_Index := Feature_Index;
