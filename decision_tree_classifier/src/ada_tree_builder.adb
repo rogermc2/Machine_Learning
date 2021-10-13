@@ -53,10 +53,17 @@ package body Ada_Tree_Builder is
       Right_Child_Cursor    : Tree.Tree_Cursor;
       Position              : Positive;
    begin
+      if Parent_Node.Num_Node_Samples < Start then
+            raise Ada_Tree_Build_Error with
+              "Ada_Tree_Builder.Add_Branch, Num_Node_Samples" &
+              Integer'Image (Parent_Node.Num_Node_Samples) &
+              " is less than Samples_Start" &
+              Integer'Image (Parent_Node.Samples_Start) & "!";
+      end if;
+      Put_Line ("Ada_Tree_Builder.Add_Branch Start, parent Num_Node_Samples: "
+                & Integer'Image (Start) & ", " &
+                  Integer'Image (Parent_Node.Num_Node_Samples));
       Stop := Parent_Node.Num_Node_Samples + 1 - Start;
---        Put_Line ("Ada_Tree_Builder.Add_Branch Start, parent Num_Node_Samples: "
---                  & Integer'Image (Start) & ", " &
---                    Integer'Image (Parent_Node.Num_Node_Samples));
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
       Reset_Node (Splitter, Start, Stop, theTree.Classes,

@@ -20,7 +20,7 @@ package Criterion is
       Num_Weighted_Right        : Float := 0.0;
 --        Weighted_Node_Samples     : Weights.Weight_List;
       --  For classification criteria, Sum_Total is the sum of the weighted
-      --  count of each label.
+      --  count of each class.
       --  For regression, Sum_Total is the sum of w*y.
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]

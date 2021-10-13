@@ -1,5 +1,5 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -25,7 +25,6 @@ package body Criterion is
       Y_Ik         : Natural;
       Weight       : Float := 1.0;
    begin
-      Put_Line ("Criterion.Classification_Init");
       Criteria.Y := Y;
       Criteria.Sample_Weight := Sample_Weight;
       Criteria.Sample_Indices := Sample_Indices;
@@ -36,9 +35,7 @@ package body Criterion is
 
       Criteria.Sq_Sum_Total := 0.0;
       Criteria.Sum_Total.Clear;
-      Classifier_Utilities.Print_List_Of_Value_Lists
-        ("Criterion.Classification_Init, Criteria.Classes",
-         Criteria.Classes);
+
       --  L325
       for row in 1 .. Num_Outputs loop
          Sum_Total_K.Clear;
@@ -131,7 +128,7 @@ package body Criterion is
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
    --   of the current node
    function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                 return Float is
+                                return Float is
       Num_Outputs   : constant Positive := Positive (Criteria.Y.Length);
       Sum_Total_K   : Weights.Weight_List;
       Count_K       : Float;
@@ -243,7 +240,7 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                         return Float is
+                                        return Float is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
@@ -309,7 +306,7 @@ package body Criterion is
                       Positive (Criteria.Y.Element (1).Length);
       i           : Positive;
       Y_I         : Classifier_Types.Natural_List;
-      Y_Ik        : Natural;
+      Y_Ik        : Natural;  --  Class index
       Sum_Left_K  : Classifier_Types.Float_List;
       Sum_Right_K : Classifier_Types.Float_List;
       Sum_K       : Classifier_Types.Float_List;
@@ -317,7 +314,6 @@ package body Criterion is
    begin
       --  L439
       if (New_Pos - Criteria.Position) <= (Criteria.Stop - New_Pos) then
-         Put_Line ("Criterion.Update L439");
          for p in Criteria.Position .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
@@ -325,27 +321,16 @@ package body Criterion is
             end if;
 
             Y_I := Criteria.Y.Element (i);
-            Put_Line ("Criterion.Update Y_I set");
             for k in 1 .. Num_Outputs loop
-               Y_Ik := Y_I.Element (k);
-               Put_Line ("Criterion.Update k, Y_Ik:" & Integer'Image (k) &
-                        ", " & Integer'Image (Y_Ik));
-               Put_Line ("Criterion.Update Criteria.Sum_Left length:" &
-                           Integer'Image (Integer (Criteria.Sum_Left.Length)));
-               Sum_Left_K := Criteria.Sum_Left.Element (Y_Ik);
-               Classifier_Utilities.Print_Float_List ("Sum_Left_K", Sum_Left_K);
-               for c in Criteria.Classes.First_Index ..
-                 Criteria.Classes.Last_Index loop
-                  Put_Line ("Criterion.Update c:" & Integer'Image (c));
-                  Sum_Left_K.Replace_Element
-                    (c, Sum_Left_K.Element (c) + Weight);
-               end loop;
+               Sum_Left_K := Criteria.Sum_Left.Element (k);
+               Y_Ik := Y_I.Element (k);  --  Class index
+               Sum_Left_K.Replace_Element
+                 (Y_Ik, Sum_Left_K.Element (Y_Ik) + Weight);
                Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
             end loop;
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
          end loop;
       else  --  L452
-         Put_Line ("Criterion.Update L452");
          Reverse_Reset (Criteria);
          for p in reverse Criteria.Stop .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
@@ -357,11 +342,9 @@ package body Criterion is
             for k in 1 .. Num_Outputs loop
                Y_Ik := Y_I.Element (k);
                Sum_Left_K := Criteria.Sum_Left.Element (k);
-               for c in Criteria.Classes.First_Index ..
-                 Criteria.Classes.Last_Index loop
-                  Sum_Left_K.Replace_Element
-                    (c, Sum_Left_K.Element (c) - Weight);
-               end loop;
+               Sum_Left_K.Replace_Element
+                 (Y_Ik, Sum_Left_K.Element (Y_Ik) - Weight);
+               Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
             end loop;
 
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left - Weight;
