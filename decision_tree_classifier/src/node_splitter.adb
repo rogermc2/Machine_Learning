@@ -161,8 +161,10 @@ package body Node_Splitter is
             if Current.Pos_I - Self.Start_Index >= Self.Min_Leaf_Samples and
               Self.End_Index - Current.Pos_I >= Self.Min_Leaf_Samples then
                --  L401
+               Put_Line ("Node_Splitter.Split_Node Find_Best_Split L401");
                Criterion.Update (Self.Criteria, Best.Pos_I);
 
+               Put_Line ("Node_Splitter.Split_Node Find_Best_Split L405");
                --  L405 Accept if min_weight_leaf is satisfied
                if Self.Criteria.Num_Weighted_Left >= Self.Min_Leaf_Weight and
                  Self.Criteria.Num_Weighted_Right >= Self.Min_Leaf_Weight then
@@ -438,6 +440,7 @@ package body Node_Splitter is
 
                --  Evaluate all splits
                Criterion.Reset (Self.Criteria);
+               Put_Line ("Node_Splitter.Split_Node L381");
                --  L381
                Find_Best_Split (Self, Self.Feature_Values, Current_Split,
                                 Best_Split);

@@ -43,7 +43,7 @@ package body Ada_Tree_Builder is
       Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
       Start                 : constant Positive := Parent_Node.Samples_Start;
       Stop                  : Positive;
-      Num_Node_Samples      : Positive;
+--        Num_Node_Samples      : Positive;
       Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
       Is_Leaf               : Boolean := False;
       Impurity              : Float := Float'Last;
@@ -53,11 +53,10 @@ package body Ada_Tree_Builder is
       Right_Child_Cursor    : Tree.Tree_Cursor;
       Position              : Positive;
    begin
-      Put_Line ("Ada_Tree_Builder.Add_Branch Start, parent Num_Node_Samples: "
-                & Integer'Image (Start) & ", " &
-                  Integer'Image (Parent_Node.Num_Node_Samples));
       Stop := Parent_Node.Num_Node_Samples + 1 - Start;
-      Num_Node_Samples := Stop - Start + 1;  --  L207
+--        Put_Line ("Ada_Tree_Builder.Add_Branch Start, parent Num_Node_Samples: "
+--                  & Integer'Image (Start) & ", " &
+--                    Integer'Image (Parent_Node.Num_Node_Samples));
       --  L208
       --  Reset_Node resets splitter to use samples (Start .. Stop)
       Reset_Node (Splitter, Start, Stop, theTree.Classes,
@@ -74,14 +73,15 @@ package body Ada_Tree_Builder is
       --  L210
       Is_Leaf := Parent_Node.Is_Leaf or else
         (Depth >= Builder.Max_Depth or
-           Num_Node_Samples < Builder.Min_Samples_Split or
-             Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
+           Parent_Node.Num_Node_Samples < Builder.Min_Samples_Split or
+             Parent_Node.Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
                Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
                --  if Impurity == 0.0 with tolerance for rounding errors
          abs (Impurity) <= Epsilon);
 
       --  L222
       if not Is_Leaf then
+         Put_Line ("Ada_Tree_Builder.Add_Branch L222 split");
          Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
          Classifier_Utilities.Print_Split_Record
            ("Ada_Tree_Builder.Add_Branch, Split", Split);
@@ -102,6 +102,7 @@ package body Ada_Tree_Builder is
                      Integer'Image (Position));
       end if;
 
+      Put_Line ("Ada_Tree_Builder.Add_Branch L229");
       --  L229  _tree.add_node just generates a new initialized node
       --        right and left children are added to the tree (stack) at
       --        L245 and L251 respectively
