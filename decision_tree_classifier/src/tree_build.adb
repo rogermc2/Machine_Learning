@@ -45,8 +45,9 @@ package body Tree_Build is
         --  _Tree L738
         New_Node.Impurity := Impurity;
         New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
-        --  _Tree L241
-        Node_Splitter.Node_Value (Splitter, theTree.Values);
+        --  _Tree L241 stores values in tree.values indexed by node id
+        Node_Splitter.Node_Value (Splitter, New_Node.Values);
+
         New_Node.Samples_Start := Start;
         New_Node.Num_Node_Samples := Num_Node_Samples;
 

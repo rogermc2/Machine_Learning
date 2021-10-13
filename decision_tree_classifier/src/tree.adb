@@ -57,17 +57,17 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Value_Array (Self : Tree_Class) return Value_Array is
-      Values : Value_Array (1 .. Positive (Self.Values.Length));
-      Values_Data : Values_List;
-   begin
-      for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
-         Values (v_index) := Values_Data.Element (v_index);
-      end loop;
-
-      return Values;
-
-   end Get_Value_Array;
+--     function Get_Value_Array (Self : Tree_Class) return Value_Array is
+--        Values : Value_Array (1 .. Positive (Self.Values.Length));
+--        Values_Data : Values_List;
+--     begin
+--        for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
+--           Values (v_index) := Values_Data.Element (v_index);
+--        end loop;
+--
+--        return Values;
+--
+--     end Get_Value_Array;
 
    --  -------------------------------------------------------------------------
 

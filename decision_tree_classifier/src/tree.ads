@@ -31,6 +31,7 @@ package Tree is
    end record;
 
    subtype Values_List is Classifier_Types.Float_List;
+   subtype List_Of_Values_Lists is Classifier_Types.List_Of_Float_Lists;
 
    type Tree_Node (Is_Leaf : Boolean := False) is record
       --  from _Tree Node struct
@@ -42,6 +43,7 @@ package Tree is
       Depth                     : Natural := 0;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
+      Values                    : List_Of_Values_Lists;
       case Is_Leaf is
          when False =>
             --  from _Tree Node struct
@@ -70,7 +72,7 @@ package Tree is
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Integer := -1;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
-      Values          : Classifier_Types.List_Of_Float_Lists;
+--        Values          : List_Of_Values_Lists;
       Attributes      : Tree_Attributes;
    end record;
 
@@ -85,7 +87,7 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
-   function Get_Value_Array (Self : Tree_Class) return Value_Array;
+--     function Get_Value_Array (Self : Tree_Class) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;

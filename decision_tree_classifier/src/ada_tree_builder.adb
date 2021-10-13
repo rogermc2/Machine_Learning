@@ -84,11 +84,11 @@ package body Ada_Tree_Builder is
             Is_Leaf := Split.Pos_I = Parent_Node.Samples_Start or
               Position >= Stop or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
-        end if;
-
-        Put_Line ("Ada_Tree_Builder.Add_Branch start, Position: " &
+            Put_Line ("Ada_Tree_Builder.Add_Branch start, Position: " &
                     Integer'Image (Parent_Node.Samples_Start) & ", " &
                     Integer'Image (Position));
+        end if;
+
         --  L229  _tree.add_node just generates a new initialized node
         --        right and left children are added to the tree (stack) at
         --        L245 and L251 respectively
@@ -115,13 +115,11 @@ package body Ada_Tree_Builder is
             end if;
 
             if not Element (Left_Child_Cursor).Is_Leaf then
-                Put_Line ("Ada_Tree_Builder.Add_Branch adding left branch.");
                 --  Add left branch
                 Add_Branch (theTree, Builder, Left_Child_Cursor);
             end if;
 
             if not Element (Right_Child_Cursor).Is_Leaf then
-                Put_Line ("Ada_Tree_Builder.Add_Branch adding right branch.");
                 --  Add right branch
                 Add_Branch (theTree, Builder, Right_Child_Cursor);
             end if;
@@ -146,6 +144,11 @@ package body Ada_Tree_Builder is
         --  L163
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
         Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
+
+        --  L208
+        --  Reset_Node resets splitter to use samples (Start .. Stop)
+        Reset_Node (Splitter, 1, Splitter.Num_Samples, theTree.Classes,
+                    Splitter.Weighted_Samples);
 
         Top_Node_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, theTree.Nodes.Root, True, False, 1,

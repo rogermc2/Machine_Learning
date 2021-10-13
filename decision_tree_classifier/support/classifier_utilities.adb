@@ -473,6 +473,12 @@ package body Classifier_Utilities is
         UB_Offset   : constant Unbounded_String :=
                         To_Unbounded_String (Offset);
     begin
+        Put (To_String (UB_Offset & "Type of node: "));
+        if Node.Is_Leaf then
+            Put_Line ("Leaf");
+        else
+            Put_Line ("Decision");
+        end if;
         Put_Line (To_String (UB_Offset & "Number of weighted samples:" &
                     Integer'Image (Node.Weighted_Num_Node_Samples)));
         Put_Line (To_String (UB_Offset & "Start:" &
@@ -536,7 +542,7 @@ package body Classifier_Utilities is
         use Nodes_Package;
         use Float_Package;
         Tree_Nodes  : constant Tree.Tree_Nodes := aTree.Nodes;
-        Values      : constant List_Of_Float_Lists := aTree.Values;
+--          Values      : constant List_Of_Float_Lists := aTree.Values;
         Node_Values : Float_List;
         Data        : Float;
         Data_String : Unbounded_String;
@@ -546,7 +552,8 @@ package body Classifier_Utilities is
         procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
                                    Indent : Natural := 0) is
             use Ada.Containers;
-            Node : constant Tree_Node := Element (Curs);
+            Node   : constant Tree_Node := Element (Curs);
+            Values : constant List_Of_Float_Lists := Node.Values;
         begin
             This_Indent := Indent + 1;
             if This_Indent > 10 then
