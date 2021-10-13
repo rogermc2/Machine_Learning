@@ -42,13 +42,14 @@ package body Ada_Tree_Builder is
       --  L199
       Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
       Start                 : constant Positive := Parent_Node.Samples_Start;
-      Stop                  : constant Positive := Parent_Node.Samples_End;
-      Num_Node_Samples      : constant Natural := Stop - Start;  --  L207
+      Stop                  : constant Positive :=
+                                  Parent_Node.Num_Node_Samples - Start + 1;
+      Num_Node_Samples      : constant Natural := Stop - Start + 1;  --  L207
       Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
       Is_Leaf               : Boolean := False;
       Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
-      --          Depth                 : Natural := Parent_Node.De
+      --          Depth                 : Natural := Parent_Node.Depth
       Left_Child_Cursor     : Tree.Tree_Cursor;
       Right_Child_Cursor    : Tree.Tree_Cursor;
    begin
@@ -86,11 +87,13 @@ package body Ada_Tree_Builder is
       Put_Line ("Ada_Tree_Builder.Add_Branch start, Split.Pos_I: " &
                   Integer'Image (Parent_Node.Samples_Start) & ", " &
                Integer'Image (Split.Pos_I));
-      --  L229
+      --  L229  _tree.add_node just generates a new initialized node
+      --        right and left children are added to the tree (stack) at
+      --        L245 and L251 respectively
       Left_Child_Cursor := Tree_Build.Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
          Split.Feature, Impurity, Split.Threshold, Parent_Node.Samples_Start,
-         Split.Pos_I, Weighted_Node_Samples);
+         Split.Pos_I - 1, Weighted_Node_Samples);
 
       --  L241 Node.Values already added by Tree_Build.Add_Node
 
@@ -103,7 +106,7 @@ package body Ada_Tree_Builder is
          Right_Child_Cursor := Tree_Build.Add_Node
            (theTree, Splitter, Depth, Parent_Cursor, False, Is_Leaf,
             Split.Feature, Impurity, Split.Threshold,
-            Split.Pos_I + 1, Parent_Node.Samples_End,
+            Split.Pos_I, Parent_Node.Num_Node_Samples,
             Weighted_Node_Samples);
 
          if Depth > Max_Depth_Seen then

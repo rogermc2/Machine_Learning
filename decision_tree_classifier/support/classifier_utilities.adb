@@ -477,8 +477,8 @@ package body Classifier_Utilities is
                     Integer'Image (Node.Weighted_Num_Node_Samples)));
         Put_Line (To_String (UB_Offset & "Start:" &
                     Integer'Image (Node.Samples_Start)));
-        Put_Line (To_String (UB_Offset & "Stop:" &
-                    Integer'Image (Node.Samples_End)));
+        Put_Line (To_String (UB_Offset & "Number of samples:" &
+                    Integer'Image (Node.Num_Node_Samples)));
         if Node.Is_Left then
             Put_Line (To_String (UB_Offset & "True branch"));
         else

@@ -39,7 +39,7 @@ package Tree_Build is
                       Is_Left, Is_Leaf        : Boolean;
                       Feature_Index           : Positive;
                       Impurity, Threshold     : Float;
-                      Start, Stop             : Positive;
+                      Start, Num_Node_Samples : Positive;
                       Weighted_Node_Samples   : Float) return Tree.Tree_Cursor;
    procedure Build_Best_First_Tree
      (Best_Builder  : in out Tree_Builder;

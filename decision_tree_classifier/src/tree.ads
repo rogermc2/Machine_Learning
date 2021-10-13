@@ -35,10 +35,10 @@ package Tree is
    type Tree_Node (Is_Leaf : Boolean := False) is record
       --  from _Tree Node struct
       Impurity                  : Float := Float'Large;
+      Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
       --  From Tree Utils StackRecord struct
       Samples_Start             : Positive := 1;
-      Samples_End               : Positive := 1;
       Depth                     : Natural := 0;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
