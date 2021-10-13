@@ -30,7 +30,7 @@ package body Tree_Build is
                        Is_Left, Is_Leaf        : Boolean;
                        Feature_Index           : Positive;
                        Impurity, Threshold     : Float;
-                       Start, Num_Node_Samples : Positive;
+                       Start, Position         : Positive;
                        Weighted_Node_Samples   : Float) return Tree.Tree_Cursor is
         use Tree;
         use Nodes_Package;
@@ -49,7 +49,7 @@ package body Tree_Build is
         Node_Splitter.Node_Value (Splitter, New_Node.Values);
 
         New_Node.Samples_Start := Start;
-        New_Node.Num_Node_Samples := Num_Node_Samples;
+        New_Node.Num_Node_Samples := Position - Start + 1;
 
         if not Is_Leaf then
             New_Node.Feature_Index := Feature_Index;

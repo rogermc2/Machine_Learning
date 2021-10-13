@@ -42,9 +42,8 @@ package body Ada_Tree_Builder is
         --  L199
         Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
         Start                 : constant Positive := Parent_Node.Samples_Start;
-        Stop                  : constant Positive :=
-                                  Parent_Node.Num_Node_Samples - Start + 1;
-        Num_Node_Samples      : constant Natural := Stop - Start + 1;  --  L207
+        Stop                  : Positive;
+        Num_Node_Samples      : Positive;
         Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
         Is_Leaf               : Boolean := False;
         Impurity              : Float := Float'Last;
@@ -54,12 +53,18 @@ package body Ada_Tree_Builder is
         Right_Child_Cursor    : Tree.Tree_Cursor;
         Position              : Positive;
     begin
+        Put_Line ("Ada_Tree_Builder.Add_Branch Start, parent Num_Node_Samples: "
+                  & Integer'Image (Start) & ", " &
+                  Integer'Image (Parent_Node.Num_Node_Samples));
+        Stop := Parent_Node.Num_Node_Samples + 1 - Start;
+        Num_Node_Samples := Stop - Start + 1;  --  L207
         --  L208
         --  Reset_Node resets splitter to use samples (Start .. Stop)
         Reset_Node (Splitter, Start, Stop, theTree.Classes,
                     Weighted_Node_Samples);
-        Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop: " &
-                    Integer'Image (Start) & ", " & Integer'Image (Stop));
+        Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop, Num_Node_Samples: "
+                  & Integer'Image (Start) & ", " & Integer'Image (Stop)  &
+                    ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
         if First then
             Impurity := Node_Impurity (Splitter);
@@ -81,21 +86,29 @@ package body Ada_Tree_Builder is
             Classifier_Utilities.Print_Split_Record
               ("Ada_Tree_Builder.Add_Branch, Split", Split);
             Position := Split.Pos_I;
-            Is_Leaf := Split.Pos_I = Parent_Node.Samples_Start or
+            if Position <= Parent_Node.Samples_Start then
+                raise Ada_Tree_Build_Error with
+                  "Ada_Tree_Builder.Add_Branch, invalid Split.Pos_I" &
+                  Integer'Image (Split.Pos_I) &
+                  " should be greater than Samples_Start" &
+                  Integer'Image (Parent_Node.Samples_Start);
+            end if;
+            Is_Leaf := Position = Parent_Node.Samples_Start or
               Position >= Stop or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
             Put_Line ("Ada_Tree_Builder.Add_Branch start, Position: " &
-                    Integer'Image (Parent_Node.Samples_Start) & ", " &
-                    Integer'Image (Position));
+                        Integer'Image (Parent_Node.Samples_Start) & ", " &
+                        Integer'Image (Position));
         end if;
 
         --  L229  _tree.add_node just generates a new initialized node
         --        right and left children are added to the tree (stack) at
         --        L245 and L251 respectively
+
         Left_Child_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
            Split.Feature, Impurity, Split.Threshold, Parent_Node.Samples_Start,
-           Parent_Node.Num_Node_Samples, Weighted_Node_Samples);
+           Position - 1, Weighted_Node_Samples);
 
         --  L241 Node.Values already added by Tree_Build.Add_Node
 
