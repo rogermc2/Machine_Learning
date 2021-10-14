@@ -32,6 +32,8 @@ package Classifier_Utilities is
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
     procedure Print_List_Of_Value_Lists
+      (Name : String; Multi_List : Tree.List_Of_Values_Lists);
+    procedure Print_List_Of_Value_Data_Lists
       (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
     procedure Print_Node (Message : String; Node : Tree.Tree_Node);
@@ -39,8 +41,9 @@ package Classifier_Utilities is
                                   Data : Node_Splitter.Split_Record);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
     procedure Print_Tree (Name  : String; aTree : Tree.Tree_Class);
-    procedure Print_Value_List (Name    : String;
-                                theList : ML_Types.Value_Data_List);
+    procedure Print_Value_List (Name : String; theList : Tree.Values_List);
+    procedure Print_Value_Data_List (Name    : String;
+                                     theList : ML_Types.Value_Data_List);
     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
     procedure Print_Weights_Lists (Name : String;
                                    Data : Weights.Weight_Lists_List);

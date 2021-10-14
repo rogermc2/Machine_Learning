@@ -202,9 +202,9 @@ package body Weights is
                Y_Full := Y.Element (index_k);
                Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
                Classes_Missing.Clear;
-               Classifier_Utilities.Print_Value_List
+               Classifier_Utilities.Print_Value_Data_List
                  ("Compute_Sample_Weight Y_Full", Y_Full);
-               Classifier_Utilities.Print_Value_List
+               Classifier_Utilities.Print_Value_Data_List
                  ("Compute_Sample_Weight Classes_Full", Classes_Full);
 
                if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then

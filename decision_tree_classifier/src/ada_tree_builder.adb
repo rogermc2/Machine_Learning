@@ -40,7 +40,7 @@ package body Ada_Tree_Builder is
         Split                 : Split_Record;
         --  Parent_Node corresponds to popped stack_record?
         --  L199
-        Parent_Node           : constant Tree.Tree_Node := Element (Parent_Cursor);
+        Parent_Node           : Tree.Tree_Node := Element (Parent_Cursor);
         Start                 : constant Positive := Parent_Node.Samples_Start;
         Stop                  : constant Positive :=
                                   Start + Parent_Node.Num_Node_Samples - 1;
@@ -94,8 +94,9 @@ package body Ada_Tree_Builder is
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
         else  --  L222
             Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
+            Parent_Node := Element (Parent_Cursor);
             Classifier_Utilities.Print_Node
-              ("Ada_Tree_Builder.Add_Branch, Leaf Node", Parent_Node);
+              ("Ada_Tree_Builder.Add_Branch, changed to Leaf Node", Parent_Node);
         end if;
 
         --  L229  _tree.add_node just generates a new initialized node

@@ -438,14 +438,27 @@ package body Classifier_Utilities is
     --  ------------------------------------------------------------------------
 
     procedure Print_List_Of_Value_Lists
-      (Name    : String; Multi_List : ML_Types.List_Of_Value_Data_Lists) is
+      (Name : String; Multi_List : Tree.List_Of_Values_Lists) is
+    begin
+        Print_List_Of_Float_Lists (Name, Multi_List);
+--          Put_Line (Name & ": ");
+--          for index in Multi_List.First_Index .. Multi_List.Last_Index loop
+--              Print_Value_List ("", Multi_List.Element (index));
+--          end loop;
+--          New_Line;
+    end Print_List_Of_Value_Lists;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_List_Of_Value_Data_Lists
+      (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists) is
     begin
         Put_Line (Name & ": ");
         for index in Multi_List.First_Index .. Multi_List.Last_Index loop
-            Print_Value_List ("", Multi_List.Element (index));
+            Print_Value_Data_List ("", Multi_List.Element (index));
         end loop;
         New_Line;
-    end Print_List_Of_Value_Lists;
+    end Print_List_Of_Value_Data_Lists;
 
     --  ------------------------------------------------------------------------
 
@@ -498,7 +511,8 @@ package body Classifier_Utilities is
                     Float'Image (Node.Impurity)));
 
         if Node.Is_Leaf then
-            Put_Line (To_String (UB_Offset & "Prediction "));
+            Print_List_Of_Value_Lists (To_String (UB_Offset & "Prediction: "),
+                                       Node.Values);
         else
             Put_Line (To_String (UB_Offset & "Feature index: " &
                         Integer'Image (Node.Feature_Index)));
@@ -626,7 +640,25 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     procedure Print_Value_List (Name    : String;
-                                theList : ML_Types.Value_Data_List) is
+                                theList : Tree.Values_List) is
+        Count : Integer := 1;
+    begin
+        Put (Name & ": ");
+        for Index in theList.First_Index .. theList.Last_Index loop
+            Put ("   " & Float'Image (theList.Element (Index)));
+            Count := Count + 1;
+            if Count > 10 then
+                New_Line;
+                Count := 1;
+            end if;
+        end loop;
+        New_Line;
+    end Print_Value_List;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Value_Data_List (Name    : String;
+                                     theList : ML_Types.Value_Data_List) is
         use ML_Types;
         Value : Value_Record;
         Count : Integer := 1;
@@ -648,7 +680,8 @@ package body Classifier_Utilities is
             end if;
         end loop;
         New_Line;
-    end Print_Value_List;
+
+    end Print_Value_Data_List;
 
     --  ------------------------------------------------------------------------
 
