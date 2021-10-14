@@ -34,7 +34,7 @@ package Tree_Build is
 
     function Add_Node (theTree                 : in out Tree.Tree_Class;
                        Splitter                : Node_Splitter.Splitter_Class;
-                       Depth                   : in out Natural;
+                       Depth                   : in out Positive;
                        Parent_Cursor           : Tree.Tree_Cursor;
                        Is_Left, Is_Leaf        : Boolean;
                        Feature_Index           : Positive;
