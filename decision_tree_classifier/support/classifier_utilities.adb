@@ -469,7 +469,7 @@ package body Classifier_Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Node (Node : Tree.Tree_Node; Offset : String) is
+    procedure Print_Node (Node : Tree.Tree_Node; Offset : String := "") is
         UB_Offset   : constant Unbounded_String :=
                         To_Unbounded_String (Offset);
     begin
@@ -506,6 +506,16 @@ package body Classifier_Utilities is
                         Float'Image (Node.Threshold)));
         end if;
 
+    end Print_Node;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Node (Message : String; Node : Tree.Tree_Node) is
+    begin
+        New_Line;
+        Put_Line (Message);
+        Print_Node (node);
+        New_Line;
     end Print_Node;
 
     --  ------------------------------------------------------------------------

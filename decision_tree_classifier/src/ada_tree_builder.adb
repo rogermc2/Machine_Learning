@@ -92,6 +92,9 @@ package body Ada_Tree_Builder is
          Is_Leaf := Position = Parent_Node.Samples_Start or
            Position >= Stop or
            Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
+      else  --  L222
+           Classifier_Utilities.Print_Node
+              ("Ada_Tree_Builder.Add_Branch, Leaf Node", Parent_Node);
       end if;
 
       --  L229  _tree.add_node just generates a new initialized node
