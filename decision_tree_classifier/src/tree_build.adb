@@ -114,9 +114,10 @@ package body Tree_Build is
           (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
            aSplit.Feature, Impurity, aSplit.Threshold, Parent_Node.Samples_Start,
            Splitter.Num_Samples, Splitter.Weighted_Samples);
+        Res.Node_Params := Element (Res.Node_Cursor);
         Res.Start := Splitter.Start_Index;
         Res.Stop := Splitter.End_Index;
-        Res.Depth := Depth;
+        Res.Depth := Depth + 1;
         Res.Impurity := Impurity;
         Res.Is_Leaf := Is_Leaf;
 
