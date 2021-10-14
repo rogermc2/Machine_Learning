@@ -326,6 +326,25 @@ package body Tree_Build is
     end Build_Depth_First_Tree;
 
     --  ------------------------------------------------------------------------
+
+    procedure Change_To_Leaf_Node (aTree : in out Tree.Tree_Class;
+                                   Node_Cursor : in out Tree.Tree_Cursor) is
+        use Tree.Nodes_Package;
+        Old_Node  : constant Tree.Tree_Node := Element (Node_Cursor);
+        Leaf_Node : Tree.Tree_Node (True);
+    begin
+        Leaf_Node.Impurity := Old_Node.Impurity;
+        Leaf_Node.Num_Node_Samples := Old_Node.Num_Node_Samples;
+        Leaf_Node. Weighted_Num_Node_Samples := Old_Node.Weighted_Num_Node_Samples;
+        Leaf_Node.Samples_Start := Old_Node.Samples_Start;
+        Leaf_Node.Depth := Old_Node.Depth;
+        Leaf_Node.Num_Constant_Features := Old_Node.Num_Constant_Features;
+        Leaf_Node.Values := Old_Node.Values;
+        aTree.Nodes.Replace_Element (Node_Cursor, Leaf_Node);
+
+    end Change_To_Leaf_Node;
+
+    --  ------------------------------------------------------------------------
     --  __cinit__  Only call for python declaraton constructor arguments
     procedure Init_Best_First_Tree
       (Best_Builder          : in out Tree_Builder;
