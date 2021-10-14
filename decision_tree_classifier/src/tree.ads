@@ -40,7 +40,7 @@ package Tree is
       Weighted_Num_Node_Samples : Natural := 0;
       --  From Tree Utils StackRecord struct
       Samples_Start             : Positive := 1;
-      Depth                     : Natural := 0;
+      Depth                     : Positive := 1;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
       Values                    : List_Of_Values_Lists;

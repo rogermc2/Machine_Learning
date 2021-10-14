@@ -12,8 +12,8 @@ package body Ada_Tree_Builder is
     Epsilon : constant Float := 10.0 ** (-10);
 
     First          : Boolean := True;
-    Depth          : Natural := 0;
-    Max_Depth_Seen : Natural := 0;
+    Depth          : Positive := 1;
+    Max_Depth_Seen : Positive := 1;
 
     procedure Init_Tree_Builder
       (Builder               : in out Tree_Builder;
@@ -48,7 +48,7 @@ package body Ada_Tree_Builder is
         Is_Leaf               : Boolean := False;
         Impurity              : Float := Float'Last;
         Weighted_Node_Samples : Float := 0.0;
-        --          Depth                 : Natural := Parent_Node.Depth
+        --          Depth                 : Positive := Parent_Node.Depth
         Left_Child_Cursor     : Tree.Tree_Cursor;
         Right_Child_Cursor    : Tree.Tree_Cursor;
         Position              : Positive := Stop;
