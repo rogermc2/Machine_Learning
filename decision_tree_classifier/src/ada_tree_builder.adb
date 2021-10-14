@@ -51,7 +51,7 @@ package body Ada_Tree_Builder is
         --          Depth                 : Natural := Parent_Node.Depth
         Left_Child_Cursor     : Tree.Tree_Cursor;
         Right_Child_Cursor    : Tree.Tree_Cursor;
-        Position              : Positive;
+        Position              : Positive := Stop;
     begin
         --  L208
         --  Reset_Node resets splitter to use samples (Start .. Stop)
