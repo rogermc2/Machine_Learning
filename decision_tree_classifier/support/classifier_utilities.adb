@@ -415,8 +415,9 @@ package body Classifier_Utilities is
                                          Data : List_Of_Float_Lists) is
     begin
         Put_Line (Name & ": ");
-        for Index in Data.First_Index .. Data.Last_Index loop
-            Print_Float_List ("", Data.Element (Index));
+        for index in Data.First_Index .. Data.Last_Index loop
+            Print_Float_List ("List" & Integer'Image (index) & ": ",
+                              Data.Element (index));
         end loop;
         New_Line;
 
@@ -441,11 +442,6 @@ package body Classifier_Utilities is
       (Name : String; Multi_List : Tree.List_Of_Values_Lists) is
     begin
         Print_List_Of_Float_Lists (Name, Multi_List);
---          Put_Line (Name & ": ");
---          for index in Multi_List.First_Index .. Multi_List.Last_Index loop
---              Print_Value_List ("", Multi_List.Element (index));
---          end loop;
---          New_Line;
     end Print_List_Of_Value_Lists;
 
     --  ------------------------------------------------------------------------
@@ -455,7 +451,8 @@ package body Classifier_Utilities is
     begin
         Put_Line (Name & ": ");
         for index in Multi_List.First_Index .. Multi_List.Last_Index loop
-            Print_Value_Data_List ("", Multi_List.Element (index));
+            Print_Value_Data_List ("List" & Integer'Image (index),
+                                   Multi_List.Element (index));
         end loop;
         New_Line;
     end Print_List_Of_Value_Data_Lists;
@@ -466,7 +463,7 @@ package body Classifier_Utilities is
         Count : Integer := 1;
     begin
         if Name'Length > 0 then
-            Put_Line (Name & ": ");
+            Put (Name & ": ");
         end if;
 
         for Index in theList.First_Index .. theList.Last_Index loop
@@ -709,7 +706,8 @@ package body Classifier_Utilities is
     begin
         Put_Line (Name & ": ");
         for Index in Data.First_Index .. Data.Last_Index loop
-            Print_Weights ("", Data.Element (Index));
+            Print_Weights ("Output" & Integer'Image (index),
+                           Data.Element (Index));
         end loop;
         New_Line;
 

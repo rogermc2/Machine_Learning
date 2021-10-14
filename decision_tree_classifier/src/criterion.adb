@@ -1,5 +1,5 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -23,6 +23,7 @@ package body Criterion is
       Y_I_Index    : Positive;
       Y_I          : Classifier_Types.Natural_List;
       Y_Ik         : Natural;
+      Class_K      : ML_Types.Value_Data_List;
       Weight       : Float := 1.0;
    begin
       Criteria.Y := Y;
@@ -49,6 +50,8 @@ package body Criterion is
       --  L329
       for p in Start .. Stop loop
          Y_I_Index := Sample_Indices.Element (p);
+         Put_Line ("Criterion.Classification_Init Y_I_Index: " &
+                     Integer'Image (Y_I_Index));
 
          --  Weight is originally set to be 1.0, meaning that if no
          --  sample weights are given, the default weight of each sample is 1.0
@@ -58,11 +61,19 @@ package body Criterion is
 
          --  L338 Count weighted class frequency for each target
          Y_I := Y.Element (Y_I_Index);
+         Classifier_Utilities.Print_Natural_List
+              ("Criterion.Classification_Init Y_I", Y_I);
          for k in 1 .. Num_Outputs loop
             Sum_Total_K := Criteria.Sum_Total.Element (k);
             Y_Ik := Y_I.Element (k);
-            for c in Criteria.Classes.First_Index ..
-              Criteria.Classes.Last_Index loop
+            Put_Line ("Criterion.Classification_Init Y_Ik" &
+                        Integer'Image (Y_Ik));
+            Classifier_Utilities.Print_List_Of_Value_Data_Lists
+                  ("Criterion.Classification_Init Criteria.Classes",
+                   Criteria.Classes);
+            Class_K := Criteria.Classes.Element (k);
+            for c in Class_K.First_Index .. Class_K.Last_Index loop
+               Put_Line ("Criterion.Classification_Init c" & Integer'Image (c));
                Sum_Total_K.Replace_Element
                  (c, Sum_Total_K.Element (Y_Ik) + Weight);
             end loop;
