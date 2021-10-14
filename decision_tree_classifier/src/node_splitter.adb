@@ -424,8 +424,8 @@ package body Node_Splitter is
               (Self.Feature_Values.Last_Index - 1) <= Compare_Value then
                Swap := Features.Element (F_J);
                Features.Replace_Element
-                 (F_J, Features.Element (Num_Total_Constants));
-               Features.Replace_Element (Num_Total_Constants, Swap);
+                 (F_J, Features.Element (Num_Total_Constants + 1));
+               Features.Replace_Element (Num_Total_Constants + 1, Swap);
 
                Num_Found_Constants := Num_Found_Constants + 1;
                Num_Total_Constants := Num_Total_Constants + 1;
