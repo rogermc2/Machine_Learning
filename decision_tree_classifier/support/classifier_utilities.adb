@@ -416,7 +416,7 @@ package body Classifier_Utilities is
     begin
         Put_Line (Name & ": ");
         for index in Data.First_Index .. Data.Last_Index loop
-            Print_Float_List ("List" & Integer'Image (index) & ": ",
+            Print_Float_List ("List" & Integer'Image (index),
                               Data.Element (index));
         end loop;
         New_Line;
