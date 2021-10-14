@@ -25,7 +25,7 @@ package body Tree_Build is
    --  L720
    function Add_Node (theTree               : in out Tree.Tree_Class;
                       Splitter              : Node_Splitter.Splitter_Class;
-                      Depth                 : in out Positive;
+                      Depth                 : Positive;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
@@ -43,6 +43,7 @@ package body Tree_Build is
       end if;
 
       --  _Tree L738
+      New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241 stores values in tree.values indexed by node id
@@ -65,7 +66,6 @@ package body Tree_Build is
                                      New_Item => New_Node);
          Node_Cursor := Last_Child (Parent_Cursor);
       end if;
-      Depth := Depth + 1;
 
       return Node_Cursor;
 
@@ -80,7 +80,7 @@ package body Tree_Build is
       Impurity              : in out Float;
       Is_First, Is_Left     : Boolean;
       Parent_Cursor         : Tree.Tree_Cursor;
-      Depth                 : in out Positive;
+      Depth                 : Positive;
       Res                   : in out Build_Utils.Priority_Record) is
       use Tree.Nodes_Package;
       Parent_Node           : constant Tree.Tree_Node :=
