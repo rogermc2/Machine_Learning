@@ -245,6 +245,8 @@ package body Node_Splitter is
       --  L425 Reorganize into samples[start:best.pos] + samples[best.pos:end]
       Classifier_Utilities.Print_Natural_List
         ("Node_Splitter Reorganize_Samples, X_Samples", X_Samples);
+      Classifier_Utilities.Print_Split_Record
+        ("Node_Splitter.Reorganize_Samples, L425 Best_Split", Best_Split);
       if Best_Split.Pos_I < Self.End_Index then
          Partition_End := Self.End_Index;
          P_Index := Self.Start_Index;
@@ -288,13 +290,13 @@ package body Node_Splitter is
          Crit := Self.Criteria;
          Crit.Position := Best_Split.Pos_I;
          Criterion.Update (Self.Criteria, Crit.Position);
-
          Criterion.Gini_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
       end if;
+
       Put_Line ("Node_Splitter Reorganize_Samples, start, pos, end" &
                   Integer'Image (Self.Start_Index) & ", " &
                   Integer'Image (Best_Split.Pos_I) & ", " &
@@ -438,7 +440,6 @@ package body Node_Splitter is
 
                --  Evaluate all splits
                Criterion.Reset (Self.Criteria);
-               Put_Line ("Node_Splitter.Split_Node L381");
                --  L381
                Find_Best_Split (Self, Self.Feature_Values, Current_Split,
                                 Best_Split);
@@ -468,8 +469,6 @@ package body Node_Splitter is
       end if;
 
       Num_Constant_Features := Num_Total_Constants;
-      Classifier_Utilities.Print_Split_Record
-        ("Node_Splitter.Split_Node, Best_Split final", Best_Split);
       return Best_Split;
 
    end Split_Node;
