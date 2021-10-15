@@ -125,9 +125,9 @@ package body Tree_Build is
 
       if Is_Left then
          Start := Parent_Node.Samples_Start;
-         Stop := aSplit.Pos_I - 1;
+         Stop := aSplit.Split_Row - 1;
       else
-         Start := aSplit.Pos_I;
+         Start := aSplit.Split_Row;
          Stop := Parent_Node.Samples_Start + Parent_Node.Num_Node_Samples - 1;
       end if;
 
@@ -157,7 +157,7 @@ package body Tree_Build is
          Res.Impurity_Left := Impurity;
          Res.Impurity_Right := Impurity;
       else
-         Res.Position := aSplit.Pos_I;
+         Res.Position := aSplit.Split_Row;
          Res.Improvement := aSplit.Improvement;
          Res.Impurity_Left := aSplit.Impurity_Left;
          Res.Impurity_Right := aSplit.Impurity_Right;
@@ -309,7 +309,7 @@ package body Tree_Build is
          if not Is_Leaf then
             Split := Node_Splitter.Split_Node (Splitter, Impurity,
                                                Constant_Features);
-            Is_Leaf := Split.Pos_I >= Stop or
+            Is_Leaf := Split.Split_Row >= Stop or
               Split.Improvement + Epsilon < Depth_Builder.Min_Impurity_Decrease;
          end if;
 
@@ -322,7 +322,7 @@ package body Tree_Build is
             --  Right child
             Node.Parent := Parent;
             Node.Node_Cursor := Node_Cursor;
-            Node.Start := Split.Pos_I;
+            Node.Start := Split.Split_Row;
             Node.Stop := Stop;
             Node.Depth := Depth + 1;
             Node.Is_Left := False;
@@ -332,7 +332,7 @@ package body Tree_Build is
 
             --  Left child
             Node.Start := Start;
-            Node.Stop := Split.Pos_I;
+            Node.Stop := Split.Split_Row;
             Node.Depth := Depth + 1;
             Node.Is_Left := True;
             Node.Impurity := Split.Impurity_Left;

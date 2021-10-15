@@ -536,11 +536,11 @@ package body Classifier_Utilities is
     begin
         Put_Line (Name & ": ");
         Put_Line ("Feature_Index:  " & Integer'image (Data.Feature));
-        Put_Line ("Position:       " & Integer'image (Data.Pos_I));
+        Put_Line ("Split Row:      " & Integer'image (Data.Split_Row));
         Put_Line ("Threshold:      " & Float'image (Data.Threshold));
         Put_Line ("Improvement:    " & Float'image (Data.Improvement));
-        Put_Line ("Impurity_Left:  " & Float'image (Data.Impurity_Left));
-        Put_Line ("Impurity_Right: " & Float'image (Data.Impurity_Right));
+        Put_Line ("Impurity Left:  " & Float'image (Data.Impurity_Left));
+        Put_Line ("Impurity Right: " & Float'image (Data.Impurity_Right));
         New_Line;
 
     end Print_Split_Record;

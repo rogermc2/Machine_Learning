@@ -40,9 +40,9 @@ package body Ada_Tree_Builder is
         --  Parent_Node corresponds to popped stack_record?
         --  L199
         Parent_Node           : Tree.Tree_Node := Element (Parent_Cursor);
-        Start                 : constant Positive := Parent_Node.Samples_Start;
-        Stop                  : constant Positive :=
-                                  Start + Parent_Node.Num_Node_Samples - 1;
+        Start_Row                 : constant Positive := Parent_Node.Samples_Start;
+        End_Row                  : constant Positive :=
+                                  Start_Row + Parent_Node.Num_Node_Samples - 1;
         Depth                 : constant Positive := Parent_Node.Depth + 1;
         Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
         Is_Leaf               : Boolean := False;
@@ -50,17 +50,17 @@ package body Ada_Tree_Builder is
         Weighted_Node_Samples : Float := 0.0;
         Left_Child_Cursor     : Tree.Tree_Cursor;
         Right_Child_Cursor    : Tree.Tree_Cursor;
-        Position              : Positive := Stop;
+        Split_Row              : Positive := End_Row;
     begin
-        Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop, Num_Node_Samples: "
-                  & Integer'Image (Start) & ", " & Integer'Image (Stop)  &
+        Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples: "
+                  & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
                     ", " & Integer'Image (Parent_Node.Num_Node_Samples));
         --  L208
-        --  Reset_Node resets splitter to use samples (Start .. Stop)
-        Reset_Node (Splitter, Start, Stop, theTree.Classes,
+        --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
+        Reset_Node (Splitter, Start_Row, End_Row, theTree.Classes,
                     Weighted_Node_Samples);
-        Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop, Num_Node_Samples reset: "
-                  & Integer'Image (Start) & ", " & Integer'Image (Stop)  &
+        Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples reset: "
+                  & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
                     ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
         if First then
@@ -82,19 +82,19 @@ package body Ada_Tree_Builder is
             Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
             Classifier_Utilities.Print_Split_Record
               ("Ada_Tree_Builder.Add_Branch, Split", Split);
-            Position := Split.Pos_I;
---              Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop, Num_Node_Samples: "
---                        & Integer'Image (Start) & ", " & Integer'Image (Stop)  &
+            Split_Row := Split.Split_Row;
+--              Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples: "
+--                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
 --                          ", " & Integer'Image (Parent_Node.Num_Node_Samples));
-            if Position <= Start then
+            if Split_Row <= Start_Row then
                 raise Ada_Tree_Build_Error with
-                  "Ada_Tree_Builder.Add_Branch, invalid Split.Pos_I" &
-                  Integer'Image (Position) &
-                  " should be greater than Samples_Start" & Integer'Image (Start);
+                  "Ada_Tree_Builder.Add_Branch, invalid Split.Split_Row" &
+                  Integer'Image (Split_Row) &
+                  " should be greater than Samples_Start" & Integer'Image (Start_Row);
             end if;
 
-            Is_Leaf := Position = Parent_Node.Samples_Start or
-              Position >= Stop or
+            Is_Leaf := Split_Row = Parent_Node.Samples_Start or
+              Split_Row >= End_Row or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
         else  --  L222
             Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
@@ -106,14 +106,14 @@ package body Ada_Tree_Builder is
         --  L229  _tree.add_node just generates a new initialized node
         --        right and left children are added to the tree (stack) at
         --        L245 and L251 respectively
---          Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start, Position, Num_Node_Samples:"
---                    & Integer'Image (Start) & ", " & Integer'Image (Position) &
+--          Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
+--                    & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
 --                      ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
         Left_Child_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
-           Split.Feature, Impurity, Split.Threshold, Start,
-           Start + Position - 1, Weighted_Node_Samples);
+           Split.Feature, Impurity, Split.Threshold, Start_Row,
+           Start_Row + Split_Row - 1, Weighted_Node_Samples);
 
         --  L241 Node.Values already added by Tree_Build.Add_Node
 
@@ -124,12 +124,12 @@ package body Ada_Tree_Builder is
 
         if not Is_Leaf then
             --  Add right node
---              Put_Line ("Ada_Tree_Builder.Add_Branch L254, Position, Stop:"
---                 & Integer'Image (Position) & Integer'Image (Stop));
+--              Put_Line ("Ada_Tree_Builder.Add_Branch L254, Split_Row, End_Row:"
+--                 & Integer'Image (Split_Row) & Integer'Image (End_Row));
 
             Right_Child_Cursor := Tree_Build.Add_Node
               (theTree, Splitter, Depth, Parent_Cursor, False, Is_Leaf,
-               Split.Feature, Impurity, Split.Threshold, Position, Stop,
+               Split.Feature, Impurity, Split.Threshold, Split_Row, End_Row,
                Weighted_Node_Samples);
              Put_Line ("Ada_Tree_Builder.Add_Branch right node added");
 
@@ -174,7 +174,7 @@ package body Ada_Tree_Builder is
         Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
         --  L208
-        --  Reset_Node resets splitter to use samples (Start .. Stop)
+        --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
         Reset_Node (Splitter, 1, Splitter.Num_Samples, theTree.Classes,
                     Splitter.Weighted_Samples);
 

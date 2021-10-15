@@ -12,7 +12,7 @@ package Node_Splitter is
 
    type Split_Record is record
       Feature        : Positive := 1;
-      Pos_I          : Positive := 2;  --  Right start?
+      Split_Row      : Positive := 2;  --  Right start?
       Threshold      : Float;
       Improvement    : Float := -Float'Last;
       Impurity_Left  : Float := -Float'Last;
