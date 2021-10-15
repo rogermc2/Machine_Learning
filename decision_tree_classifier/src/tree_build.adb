@@ -42,6 +42,12 @@ package body Tree_Build is
            "Tree_Build.Add_Node, parent cursor is null.";
       end if;
 
+      if Stop <  Start then
+         raise Tree_Build_Error with
+           "Tree_Build.Add_Node invalid stop value:" & Integer'Image (Stop) &
+           " should not be less than start value:" & Integer'Image (Start);
+      end if;
+
       --  _Tree L738
       New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
@@ -49,8 +55,10 @@ package body Tree_Build is
       --  _Tree L241 stores values in tree.values indexed by node id
       Node_Splitter.Node_Value (Splitter, New_Node.Values);
 
+      Put_Line ("Tree_Build.Add_Node, Start, Stop:" &
+               Integer'Image (Start) & ", " & Integer'Image (Stop));
       New_Node.Samples_Start := Start;
-      New_Node.Num_Node_Samples := Stop - Start + 1;
+      New_Node.Num_Node_Samples := 1 + Stop - Start;
 
       if not Is_Leaf then
          New_Node.Feature_Index := Feature_Index;
@@ -267,16 +275,12 @@ package body Tree_Build is
       --  L163
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
-      Put_Line ("Tree_Build.Build_Depth_First_Tree Num_Node_Samples: " &
-                  Integer'Image (Integer (Num_Node_Samples)));
 
       Node.Parent := Node_Cursor;
       Node.Start := 1;
       Node.Stop := Num_Node_Samples;
       Stack.Append (Node);
       Stack_Curs := Stack.First;
-      Put_Line ("Tree_Build.Build_Depth_First_Tree Stack size: " &
-                  Integer'Image (Integer (Stack.Length)));
 
       while Has_Element (Stack_Curs) loop
          Node := Element (Stack_Curs);
@@ -338,8 +342,6 @@ package body Tree_Build is
          if Depth > Max_Depth_Seen then
             Max_Depth_Seen := Depth;
          end if;
-         Put_Line ("Tree_Build.Build_Depth_First_Tree loop end Stack size: " &
-                     Integer'Image (Integer (Stack.Length)));
 
          Next (Stack_Curs);
       end loop;
