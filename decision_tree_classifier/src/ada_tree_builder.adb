@@ -80,12 +80,14 @@ package body Ada_Tree_Builder is
          Classifier_Utilities.Print_Split_Record
            ("Ada_Tree_Builder.Add_Branch, Split", Split);
          Position := Split.Pos_I;
-         if Position <= Parent_Node.Samples_Start then
+         Put_Line ("Ada_Tree_Builder.Add_Branch Start, Stop, Num_Node_Samples: "
+                & Integer'Image (Start) & ", " & Integer'Image (Stop)  &
+                  ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+         if Position <= Start then
             raise Ada_Tree_Build_Error with
               "Ada_Tree_Builder.Add_Branch, invalid Split.Pos_I" &
               Integer'Image (Split.Pos_I) &
-              " should be greater than Samples_Start" &
-              Integer'Image (Parent_Node.Samples_Start);
+              " should be greater than Samples_Start" & Integer'Image (Start);
          end if;
 
          Is_Leaf := Position = Parent_Node.Samples_Start or
