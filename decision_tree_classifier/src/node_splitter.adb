@@ -1,12 +1,13 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
+--  with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
---  with Classifier_Utilities;
+with Classifier_Utilities;
 
 package body Node_Splitter is
 
@@ -369,18 +370,20 @@ package body Node_Splitter is
       Features             : Classifier_Types.Natural_List :=
                                Self.Feature_Indices;
       X_Features           : Value_Data_List;
+      X_F_Start            : Value_Record;
+      X_F_End              : Value_Record;
       Current_Split        : Split_Record;
+      X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
-      X_Sample_I           : Natural;
       F_I                  : Natural := Num_Features;
       F_J                  : Natural;
-      Compare_Value        : ML_Types.Value_Record;
       Swap                 : Natural;
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Num_Total_Constants  : Natural := Num_Known_Constants;
       Num_Visited_Features : Natural := 0;
       Num_Found_Constants  : Natural := 0;
       Num_Drawn_Constants  : Natural := 0;
+      LE                   : Boolean;
       Best_Split           : Split_Record;
    begin
       if Integer (Self.Sample_Indices.Length) = 0 then
@@ -388,7 +391,7 @@ package body Node_Splitter is
            "Node_Splitter.Split_Node called with empty Sample_Indices";
       end if;
 
-      Init_Split (Current_Split, Self.End_Row);
+      Init_Split (Current_Split, End_Row);
       --          Classifier_Utilities.Print_Split_Record
       --            ("Node_Splitter.Split_Node, Best_Split initialized", Best_Split);
 
@@ -420,34 +423,48 @@ package body Node_Splitter is
 
             --  L358 Sort samples along Current.Feature index;
             Current_Split.Feature := Features.Element (F_J);
-
+            Classifier_Utilities.Print_Natural_List
+              ("Node_Splitter.Split_Node Features", Features);
             --  L364
-            for index in Self.Start_Row .. Self.End_Row loop
-               X_Sample_I := Self.Sample_Indices.Element (index);
-               X_Samples := Self.X.Element (X_Sample_I);
+            for index in Start_Row .. End_Row loop
+               X_Samples_Row := Self.Sample_Indices.Element (index);
+               X_Samples := Self.X.Element (X_Samples_Row);
                --  X_Features is a Value_Data_List
                X_Features.Append (X_Samples (Current_Split.Feature));
             end loop;
+            Classifier_Utilities.Print_Natural_List
+              ("Node_Splitter.Split_Node, Sample_Indices", Self.Sample_Indices);
+            Classifier_Utilities.Print_Value_Data_List
+              ("Node_Splitter.Split_Node, X_Features", X_Features);
 
             --  L367
             Sort (X_Features);
+            Classifier_Utilities.Print_Value_Data_List
+              ("Node_Splitter.Split_Node, sorted X_Features", X_Features);
 
             --  L369  Feature_Values is a value_data_list
-            case X_Features.First_Element.Value_Kind is
+            X_F_Start := X_Features.Element (Start_Row);
+            X_F_End := X_Features.Element (End_Row - 1);
+            Put_Line ("Node_Splitter.Split_Node, Start_Row, End_Row: " &
+                        Integer'Image (Start_Row) &  ", " &
+                        Integer'Image (End_Row));
+
+            case X_F_Start.Value_Kind is
                when Float_Type =>
-                  Compare_Value.Float_Value :=
-                    X_Features.First_Element.Float_Value + Feature_Threshold;
+                  LE := X_F_End.Float_Value  <= X_F_Start.Float_Value + Feature_Threshold;
+
+               when Integer_Type =>
+                  LE := X_F_End.Integer_Value <= X_F_Start.Integer_Value;
+
                when others =>
-                  Compare_Value := X_Features.First_Element;
+                  raise Node_Splitter_Error with
+                    "Node_Splitter.Reset_Node, invalid X_Features" &
+                    Data_Type'Image (X_F_Start.Value_Kind);
             end case;
             Self.Feature_Values := X_Features;
 
-            Put_Line ("Node_Splitter.Split_Node Feature_Values.Last_Index,"
-                      & " Compare_Value" & Integer'Image (Self.Feature_Values.Last_Index) &
-                        ", " & Integer'Image (Compare_Value.Integer_Value));
             --  Still L369
-            if Self.Feature_Values.Element
-              (Self.Feature_Values.Last_Index - 1).Integer_Value <= Compare_Value.Integer_Value then
+            if LE then
                Swap := Features.Element (F_J);
                Features.Replace_Element
                  (F_J, Features.Element (Num_Total_Constants + 1));
@@ -474,7 +491,7 @@ package body Node_Splitter is
       --  L421  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-      if Best_Split.Split_Row <= Self.Start_Row then
+      if Best_Split.Split_Row <= Start_Row then
          raise Node_Splitter_Error with
            "Node_Splitter.Split_Node, invalid position" &
            Integer'Image (Best_Split.Split_Row) &
