@@ -50,7 +50,8 @@ package body Ada_Tree_Builder is
       Weighted_Node_Samples  : Float := 0.0;
       Left_Child_Cursor      : Tree.Tree_Cursor;
       Right_Child_Cursor     : Tree.Tree_Cursor;
-      Child_Node             : Tree.Tree_Node;
+      Left_Child             : Tree.Tree_Node;
+      Right_Child            : Tree.Tree_Node;
       Split_Row              : Positive;
    begin
       Assert (Start_Row <= Parent_Node.Num_Node_Samples,
@@ -95,6 +96,7 @@ package body Ada_Tree_Builder is
                    "is not in the row index range " &
                    Integer'Image (Start_Row + 1) & " .. " &
                    Integer'Image (End_Row));
+
          Classifier_Utilities.Print_Split_Record
            ("Ada_Tree_Builder.Add_Branch, Split", Split);
          Split_Row := Split.Split_Row;
@@ -123,8 +125,14 @@ package body Ada_Tree_Builder is
         (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
          Split.Feature, Impurity, Split.Threshold, Start_Row,
          Start_Row + Split_Row - 1, Weighted_Node_Samples);
-
       --  L241 Node.Values already added by Tree_Build.Add_Node
+
+      Left_Child := Element (Left_Child_Cursor);
+      Assert (Left_Child.Samples_Start <= Left_Child.Num_Node_Samples,
+              "Ada_Tree_Builder.Add_Branch left child Start_Row index "
+              & Integer'Image (Left_Child.Samples_Start) &
+                " is greater than left child number of Node_Samples " &
+                Integer'Image (Left_Child.Num_Node_Samples));
 
       --  L254
       if Depth > Max_Depth_Seen then
@@ -135,43 +143,32 @@ package body Ada_Tree_Builder is
          --  Add right node
          Put_Line ("Ada_Tree_Builder.Add_Branch L254, Split_Row, End_Row:"
                    & Integer'Image (Split_Row) & Integer'Image (End_Row));
-         Assert (Split.Split_Row <= End_Row,
-                 "Ada_Tree_Builder.Add_Branch, Split_Row index " &
-                   Integer'Image (Split_Row) &
-                   "is greater than last row index " &
-                   Integer'Image (End_Row));
          Right_Child_Cursor := Tree_Build.Add_Node
            (theTree, Splitter, Depth, Parent_Cursor, False, False,
             Split.Feature, Impurity, Split.Threshold, Split_Row, End_Row,
             Weighted_Node_Samples);
          Put_Line ("Ada_Tree_Builder.Add_Branch right node added");
+         Right_Child := Element (Right_Child_Cursor);
+         Assert (Right_Child.Samples_Start <= Right_Child.Num_Node_Samples,
+                 "Ada_Tree_Builder.Add_Branch right child Start_Row index "
+                 & Integer'Image (Right_Child.Samples_Start) &
+                   " is greater than right child number of Node_Samples " &
+                   Integer'Image (Right_Child.Num_Node_Samples));
 
          if Depth > Max_Depth_Seen then
             Max_Depth_Seen := Depth;
          end if;
 
-         Child_Node := Element (Left_Child_Cursor);
-         if not Child_Node.Is_Leaf then
+         if not Left_Child.Is_Leaf then
             --  Add left branch
             Put_Line ("Ada_Tree_Builder.Add_Branch adding left branch");
-            Assert (Child_Node.Samples_Start <= Child_Node.Num_Node_Samples,
-                    "Ada_Tree_Builder.Add_Branch left child Start_Row index "
-                    & Integer'Image (Child_Node.Samples_Start) &
-                      " is greater than left child number of Node_Samples " &
-                      Integer'Image (Child_Node.Num_Node_Samples));
             Add_Branch (theTree, Builder, Left_Child_Cursor);
             Put_Line ("Ada_Tree_Builder.Add_Branch left branch added");
          end if;
 
-         Child_Node := Element (Right_Child_Cursor);
-         if not Child_Node.Is_Leaf then
+         if not Right_Child.Is_Leaf then
             --  Add right branch
             Put_Line ("Ada_Tree_Builder.Add_Branch adding right branch");
-            Assert (Child_Node.Samples_Start <= Child_Node.Num_Node_Samples,
-                    "Ada_Tree_Builder.Add_Branch right child Start_Row index "
-                    & Integer'Image (Child_Node.Samples_Start) &
-                      " is greater than right child number of Node_Samples " &
-                      Integer'Image (Child_Node.Num_Node_Samples));
             Add_Branch (theTree, Builder, Right_Child_Cursor);
             Put_Line ("Ada_Tree_Builder.Add_Branch right branch added");
          end if;
