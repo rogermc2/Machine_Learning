@@ -1,5 +1,5 @@
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -48,7 +48,6 @@ package body Criterion is
 
         --  L329
         for p in Start_Row .. End_Row loop
-            Put_Line ("Criterion.Classification_Init, p: " & Integer'Image (p));
             Y_I_Index := Sample_Indices.Element (p);
 
             --  Weight is originally set to be 1.0, meaning that if no
@@ -57,29 +56,23 @@ package body Criterion is
                 Weight := Sample_Weight.Element (Y_I_Index);
             end if;
 
-            Put_Line ("Criterion.Classification_Init, Start_Row, End_Row: "
-                      & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
             --  L338 Count weighted class frequency for each target
             Y_I := Y.Element (Y_I_Index);
             for k in 1 .. Num_Outputs loop
-                Put_Line ("Criterion.Classification_Init, k: "
-                          & Integer'Image (k));
                 Sum_Total_K := Criteria.Sum_Total.Element (k);
                 Y_Ik := Y_I.Element (k);  --  Y_Ik corresponds to c
                 Sum_Total_K.Replace_Element
                   (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
                 Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
-                Put_Line ("Criterion.Classification_Init, k: "
-                          & Integer'Image (k));
             end loop;
 
             Criteria.Num_Weighted_Node_Samples :=
               Criteria.Num_Weighted_Node_Samples + Weight;
         end loop;
 
-        Classifier_Utilities.Print_Weights_Lists
-          ("Criterion.Classification_Init, Criteria.Sum_Total",
-           Criteria.Sum_Total);
+--          Classifier_Utilities.Print_Weights_Lists
+--            ("Criterion.Classification_Init, Criteria.Sum_Total",
+--             Criteria.Sum_Total);
 
         Reset (Criteria);
 

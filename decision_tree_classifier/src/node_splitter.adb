@@ -1,12 +1,12 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 
 package body Node_Splitter is
 
@@ -261,10 +261,10 @@ package body Node_Splitter is
       Crit          : Criterion.Criterion_Class;
    begin
       --  L425 Reorganize into samples[start:best.pos] + samples[best.pos:end]
-      Classifier_Utilities.Print_Natural_List
-        ("Node_Splitter Reorder_Rows, X_Samples", X_Samples);
-      Classifier_Utilities.Print_Split_Record
-        ("Node_Splitter.Reorder_Rows, L425 Best_Split", Best_Split);
+--        Classifier_Utilities.Print_Natural_List
+--          ("Node_Splitter Reorder_Rows, X_Samples", X_Samples);
+--        Classifier_Utilities.Print_Split_Record
+--          ("Node_Splitter.Reorder_Rows, L425 Best_Split", Best_Split);
       if Best_Split.Split_Row < Self.End_Index then
          Partition_End := Self.End_Index;
          P_Index := Self.Start_Index;
@@ -315,13 +315,13 @@ package body Node_Splitter is
             Best_Split.Impurity_Right);
       end if;
 
-      Put_Line ("Node_Splitter Reorder_Rows, start, pos, end" &
-                  Integer'Image (Self.Start_Index) & ", " &
-                  Integer'Image (Best_Split.Split_Row) & ", " &
-                  Integer'Image (Self.End_Index));
-      Classifier_Utilities.Print_Natural_List
-        ("Node_Splitter Reorder_Rows, reorganised X_Samples",
-         X_Samples);
+--        Put_Line ("Node_Splitter Reorder_Rows, start, pos, end" &
+--                    Integer'Image (Self.Start_Index) & ", " &
+--                    Integer'Image (Best_Split.Split_Row) & ", " &
+--                    Integer'Image (Self.End_Index));
+--        Classifier_Utilities.Print_Natural_List
+--          ("Node_Splitter Reorder_Rows, reorganised X_Samples",
+--           X_Samples);
 
    end Reorder_Rows;
 
@@ -342,8 +342,6 @@ package body Node_Splitter is
       Criterion.Init (Splitter.Criteria, Classes);
       Splitter.Start_Index := Start_Row;
       Splitter.End_Index := End_Row;
-        Put_Line ("Node_Splitter.Reset_Node, Start_Row, End_Row: "
-                  & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       Criterion.Classification_Init
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
          Splitter.Sample_Weight, Splitter.Weighted_Samples, Start_Row, End_Row);
