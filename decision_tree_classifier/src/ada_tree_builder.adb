@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
@@ -42,7 +43,7 @@ package body Ada_Tree_Builder is
         Parent_Node           : Tree.Tree_Node := Element (Parent_Cursor);
         Start_Row             : constant Positive := Parent_Node.Samples_Start;
         End_Row               : constant Positive :=
-                                   Parent_Node.Num_Node_Samples - Start_Row + 1;
+                                  Parent_Node.Num_Node_Samples - Start_Row + 1;
         Depth                 : constant Positive := Parent_Node.Depth + 1;
         Num_Constant_Features : Natural := Parent_Node.Num_Constant_Features;
         Is_Leaf               : Boolean := False;
@@ -70,6 +71,7 @@ package body Ada_Tree_Builder is
 
         --  L210
         Is_Leaf := Parent_Node.Is_Leaf or else
+          Splitter.End_Row <= Splitter.Start_Row or else
           (Depth >= Builder.Max_Depth or Splitter.Num_Samples = 1 or
              Parent_Node.Num_Node_Samples < Builder.Min_Samples_Split or
                Parent_Node.Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
@@ -83,15 +85,14 @@ package body Ada_Tree_Builder is
             Classifier_Utilities.Print_Split_Record
               ("Ada_Tree_Builder.Add_Branch, Split", Split);
             Split_Row := Split.Split_Row;
---              Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples: "
---                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
---                          ", " & Integer'Image (Parent_Node.Num_Node_Samples));
-            if Split_Row <= Start_Row then
-                raise Ada_Tree_Build_Error with
-                  "Ada_Tree_Builder.Add_Branch, invalid Split.Split_Row" &
-                  Integer'Image (Split_Row) &
-                  " should be greater than Samples_Start" & Integer'Image (Start_Row);
-            end if;
+            --              Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples: "
+            --                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
+            --                          ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+            Assert (Split_Row >= Start_Row,
+                    "Ada_Tree_Builder.Add_Branch, invalid Split_Row" &
+                      Integer'Image (Split_Row) &
+                      " should be greater than Start_Row" &
+                      Integer'Image (Start_Row));
 
             Is_Leaf := Split_Row = Parent_Node.Samples_Start or
               Split_Row >= End_Row or
@@ -106,9 +107,9 @@ package body Ada_Tree_Builder is
         --  L229  _tree.add_node just generates a new initialized node
         --        right and left children are added to the tree (stack) at
         --        L245 and L251 respectively
---          Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
---                    & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
---                      ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+        --          Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
+        --                    & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
+        --                      ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
         Left_Child_Cursor := Tree_Build.Add_Node
           (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
@@ -124,14 +125,14 @@ package body Ada_Tree_Builder is
 
         if not Is_Leaf then
             --  Add right node
---              Put_Line ("Ada_Tree_Builder.Add_Branch L254, Split_Row, End_Row:"
---                 & Integer'Image (Split_Row) & Integer'Image (End_Row));
+            --              Put_Line ("Ada_Tree_Builder.Add_Branch L254, Split_Row, End_Row:"
+            --                 & Integer'Image (Split_Row) & Integer'Image (End_Row));
 
             Right_Child_Cursor := Tree_Build.Add_Node
               (theTree, Splitter, Depth, Parent_Cursor, False, Is_Leaf,
                Split.Feature, Impurity, Split.Threshold, Split_Row, End_Row,
                Weighted_Node_Samples);
-             Put_Line ("Ada_Tree_Builder.Add_Branch right node added");
+            Put_Line ("Ada_Tree_Builder.Add_Branch right node added");
 
             if Depth > Max_Depth_Seen then
                 Max_Depth_Seen := Depth;
