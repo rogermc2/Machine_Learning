@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -102,17 +102,17 @@ package body Node_Splitter is
                               Current    : in out Split_Record;
                               Best       : in out Split_Record) is
       use ML_Types;
-      P_Index                   : Natural := Self.Start_Index;
+      P_Index                   : Natural := Self.Start_Row;
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
       LE                        : Boolean;
    begin
-      if Current.Split_Row <= Self.Start_Index then
+      if Current.Split_Row <= Self.Start_Row then
          raise Node_Splitter_Error with
            "Node_Splitter.Find_Best_Split start, current position" &
            Integer'Image (Current.Split_Row) &
-           " should be greater than Start_Index" &
-           Integer'Image (Self.Start_Index);
+           " should be greater than Start_Row" &
+           Integer'Image (Self.Start_Row);
       end if;
 
       --  L379 Evaluate all splits
@@ -121,9 +121,9 @@ package body Node_Splitter is
 
       --  Set of features to be split :
       --  P_Index: Self.Start_Index through Self.End_Index
-      while P_Index <= Self.End_Index loop
+      while P_Index <= Self.End_Row loop
          LE := True;
-         while P_Index + 1 < Self.End_Index and LE loop
+         while P_Index + 1 < Self.End_Row and LE loop
             case Features_X.Element (P_Index + 1).Value_Kind is
                when Boolean_Type =>
                   --  if current X value is false and next X value is true
@@ -163,12 +163,12 @@ package body Node_Splitter is
 
          P_Index := P_Index + 1;
          --  L393
-         if P_Index < Self.End_Index then
+         if P_Index < Self.End_Row then
             Best.Split_Row := P_Index;
             --  Best.Pos_I is the start index of the right node's data
             --  L398 Accept if min_samples_leaf is guaranteed
-            if Current.Split_Row - Self.Start_Index >= Self.Min_Leaf_Samples and
-              Self.End_Index - Current.Split_Row >= Self.Min_Leaf_Samples then
+            if Current.Split_Row - Self.Start_Row >= Self.Min_Leaf_Samples and
+              Self.End_Row - Current.Split_Row >= Self.Min_Leaf_Samples then
                --  L401
                Criterion.Update (Self.Criteria, Best.Split_Row);
 
@@ -234,12 +234,12 @@ package body Node_Splitter is
          end if;
       end loop;
 
-      if Best.Split_Row <= Self.Start_Index then
+      if Best.Split_Row <= Self.Start_Row then
          raise Node_Splitter_Error with
            "Node_Splitter.Find_Best_Split, final position" &
            Integer'Image (Best.Split_Row) &
            " should be greater than Start_Index" &
-           Integer'Image (Self.Start_Index);
+           Integer'Image (Self.Start_Row);
       end if;
 
    end Find_Best_Split;
@@ -261,13 +261,13 @@ package body Node_Splitter is
       Crit          : Criterion.Criterion_Class;
    begin
       --  L425 Reorganize into samples[start:best.pos] + samples[best.pos:end]
---        Classifier_Utilities.Print_Natural_List
---          ("Node_Splitter Reorder_Rows, X_Samples", X_Samples);
---        Classifier_Utilities.Print_Split_Record
---          ("Node_Splitter.Reorder_Rows, L425 Best_Split", Best_Split);
-      if Best_Split.Split_Row < Self.End_Index then
-         Partition_End := Self.End_Index;
-         P_Index := Self.Start_Index;
+      --        Classifier_Utilities.Print_Natural_List
+      --          ("Node_Splitter Reorder_Rows, X_Samples", X_Samples);
+      --        Classifier_Utilities.Print_Split_Record
+      --          ("Node_Splitter.Reorder_Rows, L425 Best_Split", Best_Split);
+      if Best_Split.Split_Row < Self.End_Row then
+         Partition_End := Self.End_Row;
+         P_Index := Self.Start_Row;
          while P_Index < Partition_End loop
             Sample_P := Self.Sample_Indices.Element (P_Index);
             X_1 := Self.X.Element (Sample_P);
@@ -315,13 +315,13 @@ package body Node_Splitter is
             Best_Split.Impurity_Right);
       end if;
 
---        Put_Line ("Node_Splitter Reorder_Rows, start, pos, end" &
---                    Integer'Image (Self.Start_Index) & ", " &
---                    Integer'Image (Best_Split.Split_Row) & ", " &
---                    Integer'Image (Self.End_Index));
---        Classifier_Utilities.Print_Natural_List
---          ("Node_Splitter Reorder_Rows, reorganised X_Samples",
---           X_Samples);
+      --        Put_Line ("Node_Splitter Reorder_Rows, start, pos, end" &
+      --                    Integer'Image (Self.Start_Index) & ", " &
+      --                    Integer'Image (Best_Split.Split_Row) & ", " &
+      --                    Integer'Image (Self.End_Index));
+      --        Classifier_Utilities.Print_Natural_List
+      --          ("Node_Splitter Reorder_Rows, reorganised X_Samples",
+      --           X_Samples);
 
    end Reorder_Rows;
 
@@ -340,8 +340,8 @@ package body Node_Splitter is
       end if;
 
       Criterion.Init (Splitter.Criteria, Classes);
-      Splitter.Start_Index := Start_Row;
-      Splitter.End_Index := End_Row;
+      Splitter.Start_Row := Start_Row;
+      Splitter.End_Row := End_Row;
       Criterion.Classification_Init
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
          Splitter.Sample_Weight, Splitter.Weighted_Samples, Start_Row, End_Row);
@@ -357,14 +357,15 @@ package body Node_Splitter is
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
-                         return Split_Record is
+                        return Split_Record is
       use ML_Types;
       use Value_Data_Package;
       use Value_Data_Sorting;
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Max_Features         : constant Natural := Self.Max_Features;
-
+      Start_Row            : constant Positive := Self.Start_Row;
+      End_Row              : constant Positive := Self.End_Row;
       Features             : Classifier_Types.Natural_List :=
                                Self.Feature_Indices;
       X_Features           : Value_Data_List;
@@ -387,7 +388,7 @@ package body Node_Splitter is
            "Node_Splitter.Split_Node called with empty Sample_Indices";
       end if;
 
-      Init_Split (Current_Split, Self.End_Index);
+      Init_Split (Current_Split, Self.End_Row);
       --          Classifier_Utilities.Print_Split_Record
       --            ("Node_Splitter.Split_Node, Best_Split initialized", Best_Split);
 
@@ -421,7 +422,7 @@ package body Node_Splitter is
             Current_Split.Feature := Features.Element (F_J);
 
             --  L364
-            for index in Self.Start_Index .. Self.End_Index loop
+            for index in Self.Start_Row .. Self.End_Row loop
                X_Sample_I := Self.Sample_Indices.Element (index);
                X_Samples := Self.X.Element (X_Sample_I);
                --  X_Features is a Value_Data_List
@@ -430,18 +431,23 @@ package body Node_Splitter is
 
             --  L367
             Sort (X_Features);
+
             --  L369  Feature_Values is a value_data_list
-            if X_Features.First_Element.Value_Kind = Float_Type then
-               Compare_Value.Float_Value :=
-                 X_Features.First_Element.Float_Value + Feature_Threshold;
-            else
-               Compare_Value := X_Features.First_Element;
-            end if;
+            case X_Features.First_Element.Value_Kind is
+               when Float_Type =>
+                  Compare_Value.Float_Value :=
+                    X_Features.First_Element.Float_Value + Feature_Threshold;
+               when others =>
+                  Compare_Value := X_Features.First_Element;
+            end case;
             Self.Feature_Values := X_Features;
 
+            Put_Line ("Node_Splitter.Split_Node Feature_Values.Last_Index,"
+                      & " Compare_Value" & Integer'Image (Self.Feature_Values.Last_Index) &
+                        ", " & Integer'Image (Compare_Value.Integer_Value));
             --  Still L369
             if Self.Feature_Values.Element
-              (Self.Feature_Values.Last_Index - 1) <= Compare_Value then
+              (Self.Feature_Values.Last_Index - 1).Integer_Value <= Compare_Value.Integer_Value then
                Swap := Features.Element (F_J);
                Features.Replace_Element
                  (F_J, Features.Element (Num_Total_Constants + 1));
@@ -468,12 +474,12 @@ package body Node_Splitter is
       --  L421  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-      if Best_Split.Split_Row <= Self.Start_Index then
+      if Best_Split.Split_Row <= Self.Start_Row then
          raise Node_Splitter_Error with
            "Node_Splitter.Split_Node, invalid position" &
            Integer'Image (Best_Split.Split_Row) &
-           " should be greater than Start_Index" &
-           Integer'Image (Self.Start_Index);
+           " should be greater than Start_Row" &
+           Integer'Image (Self.Start_Row);
       end if;
 
       --  L448

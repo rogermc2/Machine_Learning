@@ -104,7 +104,7 @@ package body Tree_Build is
    begin
       --  L429
       Node_Splitter.Reset_Node
-        (Splitter, Splitter.Start_Index, Splitter.End_Index, theTree.Classes,
+        (Splitter, Splitter.Start_Row, Splitter.End_Row, theTree.Classes,
          Splitter.Weighted_Samples);
 
       if Is_First then
@@ -145,8 +145,8 @@ package body Tree_Build is
          aSplit.Feature, Impurity, aSplit.Threshold, Parent_Node.Samples_Start,
          Splitter.Num_Samples, Splitter.Weighted_Samples);
       Res.Node_Params := Element (Res.Node_Cursor);
-      Res.Start := Splitter.Start_Index;
-      Res.Stop := Splitter.End_Index;
+      Res.Start := Splitter.Start_Row;
+      Res.Stop := Splitter.End_Row;
       Res.Depth := Depth + 1;
       Res.Impurity := Impurity;
       Res.Is_Leaf := Is_Leaf;

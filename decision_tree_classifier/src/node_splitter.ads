@@ -35,8 +35,8 @@ package Node_Splitter is
       Y                    : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float;
-      Start_Index          : Positive := 1;
-      End_Index            : Positive := 1;
+      Start_Row            : Positive := 1;
+      End_Row              : Positive := 1;
       --  BaseDenseSplitter elements
       X                    : ML_Types.List_Of_Value_Data_Lists;
       Total_Samples        : Natural := 0;
