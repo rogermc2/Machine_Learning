@@ -52,7 +52,7 @@ package body Ada_Tree_Builder is
         Right_Child_Cursor    : Tree.Tree_Cursor;
         Split_Row              : Positive := End_Row;
     begin
-        Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples: "
+        Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
                   & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
                     ", " & Integer'Image (Parent_Node.Num_Node_Samples));
         --  L208

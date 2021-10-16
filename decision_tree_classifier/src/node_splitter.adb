@@ -329,22 +329,24 @@ package body Node_Splitter is
    --  Reset_Node resets the splitter Split based on node Split.Samples[start:end].
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
-      Start, Stop           : Positive;
+      Start_Row, End_Row    : Positive;
       Classes               : ML_Types.List_Of_Value_Data_Lists;
       Weighted_Node_Samples : in out Float) is
    begin
-      if Stop < Start then
+      if End_Row < Start_Row then
          raise Node_Splitter_Error with
-           "Node_Splitter.Reset_Node, stop index" & Integer'Image (Stop) &
-           " should not be less than start index" & Integer'Image (Start);
+           "Node_Splitter.Reset_Node, stop index" & Integer'Image (End_Row) &
+           " should not be less than start index" & Integer'Image (End_Row);
       end if;
 
       Criterion.Init (Splitter.Criteria, Classes);
-      Splitter.Start_Index := Start;
-      Splitter.End_Index := Stop;
+      Splitter.Start_Index := Start_Row;
+      Splitter.End_Index := End_Row;
+        Put_Line ("Node_Splitter.Reset_Node, Start_Row, End_Row: "
+                  & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       Criterion.Classification_Init
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
-         Splitter.Sample_Weight, Splitter.Weighted_Samples, Start, Stop);
+         Splitter.Sample_Weight, Splitter.Weighted_Samples, Start_Row, End_Row);
 
       Weighted_Node_Samples := Splitter.Criteria.Num_Weighted_Node_Samples;
 
