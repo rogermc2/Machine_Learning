@@ -70,7 +70,7 @@ package body Ada_Tree_Builder is
 
         --  L210
         Is_Leaf := Parent_Node.Is_Leaf or else
-          (Depth >= Builder.Max_Depth or
+          (Depth >= Builder.Max_Depth or Splitter.Num_Samples = 1 or
              Parent_Node.Num_Node_Samples < Builder.Min_Samples_Split or
                Parent_Node.Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
                  Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or

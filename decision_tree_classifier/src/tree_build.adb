@@ -112,7 +112,7 @@ package body Tree_Build is
       end if;
 
       Is_Leaf := (Depth >= theBuilder.Max_Depth) or
-        (Splitter.Num_Samples < theBuilder.Min_Samples_Split) or
+        (Splitter.Num_Samples = 1 or Splitter.Num_Samples < theBuilder.Min_Samples_Split) or
         (Splitter.Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
         (Impurity <= Epsilon);
 

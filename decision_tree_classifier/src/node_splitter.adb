@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
---  with Ada.Assertions;  use Ada.Assertions;
+with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -386,6 +386,10 @@ package body Node_Splitter is
       LE                   : Boolean;
       Best_Split           : Split_Record;
    begin
+      Assert (End_Row > Start_Row,
+              "Node_Splitter.Split_Node called with End_Row " &
+              Integer'Image (End_Row) & " <= Start_Row " &
+              Integer'Image (Start_Row));
       if Integer (Self.Sample_Indices.Length) = 0 then
          raise Node_Splitter_Error with
            "Node_Splitter.Split_Node called with empty Sample_Indices";
@@ -443,11 +447,11 @@ package body Node_Splitter is
               ("Node_Splitter.Split_Node, sorted X_Features", X_Features);
 
             --  L369  Feature_Values is a value_data_list
-            X_F_Start := X_Features.Element (Start_Row);
-            X_F_End := X_Features.Element (End_Row - 1);
             Put_Line ("Node_Splitter.Split_Node, Start_Row, End_Row: " &
                         Integer'Image (Start_Row) &  ", " &
                         Integer'Image (End_Row));
+            X_F_Start := X_Features.Element (Start_Row);
+            X_F_End := X_Features.Element (End_Row - 1);
 
             case X_F_Start.Value_Kind is
                when Float_Type =>
