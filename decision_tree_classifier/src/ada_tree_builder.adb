@@ -54,11 +54,6 @@ package body Ada_Tree_Builder is
       Right_Child            : Tree.Tree_Node;
       Split_Row              : Positive;
    begin
-      Assert (Start_Row <= Parent_Node.Num_Node_Samples,
-              "Ada_Tree_Builder.Add_Branch, Start_Row index " &
-                Integer'Image (Start_Row) &
-                " is greater than Number of Node_Samples " &
-                Integer'Image (Parent_Node.Num_Node_Samples));
       End_Row := Parent_Node.Num_Node_Samples - Start_Row + 1;
       Split_Row := End_Row;
       Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
@@ -128,11 +123,6 @@ package body Ada_Tree_Builder is
       --  L241 Node.Values already added by Tree_Build.Add_Node
 
       Left_Child := Element (Left_Child_Cursor);
-      Assert (Left_Child.Samples_Start <= Left_Child.Num_Node_Samples,
-              "Ada_Tree_Builder.Add_Branch left child Start_Row index "
-              & Integer'Image (Left_Child.Samples_Start) &
-                " is greater than left child number of Node_Samples " &
-                Integer'Image (Left_Child.Num_Node_Samples));
 
       --  L254
       if Depth > Max_Depth_Seen then
@@ -149,11 +139,6 @@ package body Ada_Tree_Builder is
             Weighted_Node_Samples);
          Put_Line ("Ada_Tree_Builder.Add_Branch right node added");
          Right_Child := Element (Right_Child_Cursor);
-         Assert (Right_Child.Samples_Start <= Right_Child.Num_Node_Samples,
-                 "Ada_Tree_Builder.Add_Branch right child Start_Row index "
-                 & Integer'Image (Right_Child.Samples_Start) &
-                   " is greater than right child number of Node_Samples " &
-                   Integer'Image (Right_Child.Num_Node_Samples));
 
          if Depth > Max_Depth_Seen then
             Max_Depth_Seen := Depth;
