@@ -60,8 +60,7 @@ package body Ada_Tree_Builder is
                     ", " & Integer'Image (Parent_Node.Num_Node_Samples));
         --  L208
         --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-        Reset_Node (Splitter, Start_Row, End_Row, theTree.Classes,
-                    Weighted_Node_Samples);
+        Reset_Node (Splitter, Start_Row, End_Row, Weighted_Node_Samples);
         Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples reset: "
                   & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
                     ", " & Integer'Image (Parent_Node.Num_Node_Samples));
@@ -178,7 +177,7 @@ package body Ada_Tree_Builder is
 
         --  L208
         --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-        Reset_Node (Splitter, 1, Splitter.Num_Samples, theTree.Classes,
+        Reset_Node (Splitter, 1, Splitter.Num_Samples,
                     Splitter.Weighted_Samples);
 
         Top_Node_Cursor := Tree_Build.Add_Node

@@ -10,9 +10,10 @@ package Criterion is
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
       Samples                   : ML_Types.List_Of_Value_Data_Lists;
-      Start_Row                 : Natural := 0;
-      End_Row                   : Natural := 0;
-      Split_Row                 : Natural := 0;
+      Num_Outputs               : Positive := 1;
+      Start_Row                 : Positive := 1;
+      End_Row                   : Positive := 1;
+      Split_Row                 : Positive := 1;
       Num_Node_Samples          : Natural := 0;
       Num_Weighted_Samples      : Float := 0.0;
       Num_Weighted_Node_Samples : Float := 0.0;
@@ -55,6 +56,7 @@ package Criterion is
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Init (Criteria : in out Criterion_Class;
+                   Num_Outputs : Positive;
                    Classes  : ML_Types.List_Of_Value_Data_Lists);
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;

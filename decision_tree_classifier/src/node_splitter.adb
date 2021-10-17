@@ -15,6 +15,20 @@ package body Node_Splitter is
 
     --  -------------------------------------------------------------------------
 
+    procedure C_Init (Self          : in out Splitter_Class;
+                      Criteria      : Criterion.Criterion_Class;
+                      Max_Features  : Positive := 1;
+                      Min_Leaf_Samples : Positive := 1;
+                      Min_Leaf_Weight : Float := 0.0) is
+    begin
+        Self.Criteria := Criteria;
+        Self.Max_Features := Max_Features;
+        Self.Min_Leaf_Samples := Min_Leaf_Samples;
+        Self.Min_Leaf_Weight := Min_Leaf_Weight;
+    end C_Init;
+
+    --  -------------------------------------------------------------------------
+
     procedure Init (Self             : in out Splitter_Class;
                     Input_X          : ML_Types.List_Of_Value_Data_Lists;
                     Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
@@ -319,7 +333,6 @@ package body Node_Splitter is
     procedure Reset_Node
       (Splitter              : in out Splitter_Class;
        Start_Row, End_Row    : Positive;
-       Classes               : ML_Types.List_Of_Value_Data_Lists;
        Weighted_Node_Samples : in out Float) is
     begin
         if End_Row < Start_Row then
@@ -328,7 +341,6 @@ package body Node_Splitter is
               " should not be less than start index" & Integer'Image (End_Row);
         end if;
 
-        Criterion.Init (Splitter.Criteria, Classes);
         Splitter.Start_Row := Start_Row;
         Splitter.End_Row := End_Row;
         Criterion.Classification_Init
@@ -346,7 +358,7 @@ package body Node_Splitter is
     function Split_Node (Self                  : in out Splitter_Class;
                          Impurity              : Float;
                          Num_Constant_Features : in out Natural)
-                        return Split_Record is
+                         return Split_Record is
         use ML_Types;
         use Value_Data_Package;
         use Value_Data_Sorting;
@@ -384,8 +396,8 @@ package body Node_Splitter is
         end if;
 
         Init_Split (Current_Split, Start_Row);
---          Classifier_Utilities.Print_Split_Record
---            ("Node_Splitter.Split_Node Current_Split", Current_Split);
+        --          Classifier_Utilities.Print_Split_Record
+        --            ("Node_Splitter.Split_Node Current_Split", Current_Split);
 
         --  L323
         while F_I > Num_Total_Constants and
@@ -477,10 +489,10 @@ package body Node_Splitter is
             end if;
         end loop;
 
---          Classifier_Utilities.Print_Split_Record
---            ("Node_Splitter.Split_Node L421, ", Current_Split);
---          Classifier_Utilities.Print_Split_Record
---            ("Node_Splitter.Split_Node L421, Best_Split", Best_Split);
+        --          Classifier_Utilities.Print_Split_Record
+        --            ("Node_Splitter.Split_Node L421, ", Current_Split);
+        --          Classifier_Utilities.Print_Split_Record
+        --            ("Node_Splitter.Split_Node L421, Best_Split", Best_Split);
 
         --  L421  Reorganize into samples
         --        (start .. best.pos) + samples (best.pos .. end)
