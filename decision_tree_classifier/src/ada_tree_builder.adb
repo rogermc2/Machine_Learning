@@ -41,8 +41,9 @@ package body Ada_Tree_Builder is
       --  Parent_Node corresponds to popped stack_record?
       --  L199
       Parent_Node            : Tree.Tree_Node := Element (Parent_Cursor);
-      Start_Row              : constant Positive := Parent_Node.Samples_Start;
-      End_Row                : Positive;
+      Start_Row              : Positive := Parent_Node.Samples_Start;
+      End_Row                : Positive :=
+                                 Start_Row + Parent_Node.Num_Node_Samples - 1;
       Depth                  : constant Positive := Parent_Node.Depth + 1;
       Num_Constant_Features  : Natural := Parent_Node.Num_Constant_Features;
       Is_Leaf                : Boolean := False;
@@ -52,10 +53,8 @@ package body Ada_Tree_Builder is
       Right_Child_Cursor     : Tree.Tree_Cursor;
       Left_Child             : Tree.Tree_Node;
       Right_Child            : Tree.Tree_Node;
-      Split_Row              : Positive;
+      Split_Row              : Positive := End_Row;
    begin
-      End_Row := Parent_Node.Num_Node_Samples - Start_Row + 1;
-      Split_Row := End_Row;
       Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
                 & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
                   ", " & Integer'Image (Parent_Node.Num_Node_Samples));
@@ -63,9 +62,9 @@ package body Ada_Tree_Builder is
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Splitter, Start_Row, End_Row, theTree.Classes,
                   Weighted_Node_Samples);
-      Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples reset: "
-                & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
-                  ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+      --        Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples reset: "
+      --                  & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
+      --                    ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
       if First then
          Impurity := Node_Impurity (Splitter);
@@ -85,30 +84,34 @@ package body Ada_Tree_Builder is
       --  L222
       if not Is_Leaf then
          Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
-         Assert (Split.Split_Row > Start_Row and Split.Split_Row <= End_Row,
+         Start_Row := Splitter.Start_Row;
+         End_Row := Splitter.End_Row;
+         Split_Row := Split.Split_Row;
+         Put_Line ("Ada_Tree_Builder.Add_Branch L222 not leaf Start_Row, End_Row "
+                   & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
+         Assert (Split_Row > Start_Row and Split_Row <= End_Row,
                  "Ada_Tree_Builder.Add_Branch, Split_Row index " &
                    Integer'Image (Split_Row) &
-                   "is not in the row index range " &
+                   " is not in the row index range " &
                    Integer'Image (Start_Row + 1) & " .. " &
                    Integer'Image (End_Row));
 
          Classifier_Utilities.Print_Split_Record
            ("Ada_Tree_Builder.Add_Branch, Split", Split);
-         Split_Row := Split.Split_Row;
-         --              Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples: "
-         --                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
-         --                          ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
+         Put_Line ("Ada_Tree_Builder.Add_Branch L222 is leaf test");
          Is_Leaf := Split_Row = Parent_Node.Samples_Start or
            Split_Row >= End_Row or
            Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
       else  --  L222
+         Put_Line ("Ada_Tree_Builder.Add_Branch L222 else");
          Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
          Parent_Node := Element (Parent_Cursor);
          Classifier_Utilities.Print_Node
            ("Ada_Tree_Builder.Add_Branch, changed to Leaf Node", Parent_Node);
       end if;
 
+      Put_Line ("Ada_Tree_Builder.Add_Branch L229");
       --  L229  _tree.add_node just generates a new initialized node
       --        right and left children are added to the tree (stack) at
       --        L245 and L251 respectively
@@ -124,6 +127,7 @@ package body Ada_Tree_Builder is
 
       Left_Child := Element (Left_Child_Cursor);
 
+      Put_Line ("Ada_Tree_Builder.Add_Branch L254");
       --  L254
       if Depth > Max_Depth_Seen then
          Max_Depth_Seen := Depth;
@@ -137,7 +141,6 @@ package body Ada_Tree_Builder is
            (theTree, Splitter, Depth, Parent_Cursor, False, False,
             Split.Feature, Impurity, Split.Threshold, Split_Row, End_Row,
             Weighted_Node_Samples);
-         Put_Line ("Ada_Tree_Builder.Add_Branch right node added");
          Right_Child := Element (Right_Child_Cursor);
 
          if Depth > Max_Depth_Seen then
@@ -146,16 +149,12 @@ package body Ada_Tree_Builder is
 
          if not Left_Child.Is_Leaf then
             --  Add left branch
-            Put_Line ("Ada_Tree_Builder.Add_Branch adding left branch");
             Add_Branch (theTree, Builder, Left_Child_Cursor);
-            Put_Line ("Ada_Tree_Builder.Add_Branch left branch added");
          end if;
 
          if not Right_Child.Is_Leaf then
             --  Add right branch
-            Put_Line ("Ada_Tree_Builder.Add_Branch adding right branch");
             Add_Branch (theTree, Builder, Right_Child_Cursor);
-            Put_Line ("Ada_Tree_Builder.Add_Branch right branch added");
          end if;
       end if;
 
