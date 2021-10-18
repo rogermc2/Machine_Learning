@@ -101,7 +101,7 @@ package body Tree_Build is
       Values                : Tree.List_Of_Values_Lists;
    begin
       --  L429
-      Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row, theTree.Classes,
+      Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
                                 Splitter.Weighted_Samples);
       if Is_First then
          Impurity := Splitter.Node_Impurity;
@@ -283,8 +283,7 @@ package body Tree_Build is
          Is_Left := Node.Is_Left;
          Constant_Features := Node.Num_Constant_Features;
 
-         Node_Splitter.Reset_Node (Splitter, Start, Stop,
-                                   theTree.Classes, Weighted_Samples);
+         Node_Splitter.Reset_Node (Splitter, Start, Stop, Weighted_Samples);
          if First then
             Impurity := Splitter.Node_Impurity;
             First := False;

@@ -54,8 +54,8 @@ package Criterion is
    function Impurity_Improvement
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
-   procedure Init (Criteria : in out Criterion_Class;
-                   Classes  : ML_Types.List_Of_Value_Data_Lists);
+   procedure C_Init (Criteria : in out Criterion_Class;
+                     Classes  : ML_Types.List_Of_Value_Data_Lists);
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Classifier_Types.List_Of_Float_Lists);

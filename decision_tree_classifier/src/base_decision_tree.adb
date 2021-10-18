@@ -240,6 +240,39 @@ package body Base_Decision_Tree is
    end Base_Fit_Checks;
 
    --  -------------------------------------------------------------------------
+
+   procedure C_Init (aClassifier              : in out Classifier;
+                     Criteria                 : Criterion.Criterion_Class;
+                     Splitter                 : Node_Splitter.Splitter_Class;
+                     Min_Samples_Split        : Split_Record;
+                     Min_Leaf_Samples         : Leaf_Record;
+                     Max_Features             : Tree.Features_Record;
+                     Class_Weight             : Weights.Weight_Type :=
+                       Weights.No_Weight;
+                     Max_Depth                : Integer := -1;
+                     Min_Weight_Fraction_Leaf : Float := 0.0;
+                     Max_Leaf_Nodes           : Integer := -1;
+                     Min_Impurity_Decrease    : Float := 0.0;
+                     CCP_Alpha                : Float := 0.0;
+                     Random_State             : Integer := 0) is
+   begin
+      aClassifier.Parameters.Critera := Criteria;
+      aClassifier.Parameters.Splitter := Splitter;
+      aClassifier.Parameters.Max_Depth := Max_Depth;
+      aClassifier.Parameters.Min_Samples_Split := Min_Samples_Split;
+      aClassifier.Parameters.Min_Samples_Leaf := Min_Leaf_Samples;
+      aClassifier.Parameters.Min_Weight_Fraction_Leaf :=
+        Min_Weight_Fraction_Leaf;
+      aClassifier.Parameters.Max_Features := Max_Features;
+      aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
+      aClassifier.Parameters.Min_Impurity_Decrease := Min_Impurity_Decrease;
+      aClassifier.Parameters.Class_Weight := Class_Weight;
+      aClassifier.Parameters.CCP_Alpha := CCP_Alpha;
+      aClassifier.Parameters.Random_State := Random_State;
+
+   end C_Init;
+
+   --  -------------------------------------------------------------------------
    --  based on L200 of _classes.py BasesDecisionTree.Fit
    procedure Classification_Part
      (aClassifier            : in out Classifier;
@@ -295,8 +328,8 @@ package body Base_Decision_Tree is
            Weights.Compute_Sample_Weight (No_Weight, Y);
       end if;
 
-      Criterion.Init (aClassifier.Parameters.Critera,
-                      aClassifier.Attributes.Classes);
+      Criterion.C_Init (aClassifier.Parameters.Critera,
+                        aClassifier.Attributes.Classes);
       Classes := aClassifier.Attributes.Classes;
 
    exception
@@ -304,23 +337,6 @@ package body Base_Decision_Tree is
            "Base_Decision_Tree.Classification_Part error";
 
    end Classification_Part;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Init (aClassifier              : in out Classifier;
-                   Max_Leaf_Nodes           : Integer := -1;
-                   Max_Depth                : Integer := -1;
-                   Min_Weight_Fraction_Leaf : Float := 0.0;
-                   Random_State             : Integer := 0) is
-   begin
-      aClassifier.Parameters.Random_State := Random_State;
-      aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
-      aClassifier.Parameters.Max_Depth := Max_Depth;
-      aClassifier.Parameters.Min_Weight_Fraction_Leaf :=
-        Min_Weight_Fraction_Leaf;
-      aClassifier.Parameters.Min_Samples_Split.Min_Split := 2;
-      aClassifier.Parameters.Min_Samples_Leaf.Min_Leaf := 1;
-   end Init;
 
    --  -------------------------------------------------------------------------
    --  Based on class.py fit L431 Predict

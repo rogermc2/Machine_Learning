@@ -116,11 +116,20 @@ package Base_Decision_Tree is
       Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
       Classes        : out ML_Types.List_Of_Value_Data_Lists;
       Sample_Weights : out Classifier_Types.Float_List);
-   procedure Init (aClassifier              : in out Classifier;
-                   Max_Leaf_Nodes           : Integer := -1;
-                   Max_Depth                : Integer := -1;
-                   Min_Weight_Fraction_Leaf : Float := 0.0;
-                   Random_State             : Integer := 0);
+   procedure C_Init (aClassifier              : in out Classifier;
+                     Criteria                 : Criterion.Criterion_Class;
+                     Splitter                 : Node_Splitter.Splitter_Class;
+                     Min_Samples_Split        : Split_Record;
+                     Min_Leaf_Samples         : Leaf_Record;
+                     Max_Features             : Tree.Features_Record;
+                     Class_Weight             : Weights.Weight_Type :=
+                       Weights.No_Weight;
+                     Max_Depth                : Integer := -1;
+                     Min_Weight_Fraction_Leaf : Float := 0.0;
+                     Max_Leaf_Nodes           : Integer := -1;
+                     Min_Impurity_Decrease    : Float := 0.0;
+                     CCP_Alpha                : Float := 0.0;
+                     Random_State             : Integer := 0);
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List;

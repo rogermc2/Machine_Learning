@@ -200,13 +200,13 @@ package body Criterion is
 
     --  ------------------------------------------------------------------------
     --  L214 __cinit__
-    procedure Init (Criteria : in out Criterion_Class;
+    procedure C_Init (Criteria : in out Criterion_Class;
                     Classes  : ML_Types.List_Of_Value_Data_Lists) is
     begin
         --  L252
         Criteria.Classes := Classes;
 
-    end Init;
+    end C_Init;
 
     --  -------------------------------------------------------------------------
 

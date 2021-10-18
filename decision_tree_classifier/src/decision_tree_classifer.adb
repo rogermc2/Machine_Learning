@@ -5,6 +5,9 @@
 
 with Base_Decision_Tree;
 with Classifier_Types;
+with Criterion;
+with Node_Splitter;
+with Weights;
 
 package body Decision_Tree_Classifer is
 
@@ -30,9 +33,26 @@ package body Decision_Tree_Classifer is
                    Max_Leaf_Nodes : Integer := -1;
                    Max_Depth      : Integer := -1;
                    Random_State   : Integer := 0) is
+      Criteria      : Criterion.Criterion_Class;
+      Splitter      : Node_Splitter.Splitter_Class;
+      Input_X       : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+      Sample_Weight : Weights.Weight_List;
+      Min_Split     : Base_Decision_Tree.Split_Record (Tree.Integer_Type);
+      Min_Leaves    : Base_Decision_Tree.Leaf_Record (Tree.Integer_Type);
+      Max_Features  : Tree.Features_Record (Tree.Integer_Type);
    begin
-      Base_Decision_Tree.Init (aClassifier, Max_Leaf_Nodes, Max_Depth,
-                               Random_State => Random_State);
+      Criterion.C_Init (Criteria, aClassifier.Attributes.Classes);
+      Node_Splitter.Init (Splitter, Input_X, Y_Encoded, Sample_Weight);
+      Base_Decision_Tree.C_Init (aClassifier       => aClassifier,
+                                 Criteria          => Criteria,
+                                 Splitter          => Splitter,
+                                 Min_Samples_Split => Min_Split,
+                                 Min_Leaf_Samples  => Min_Leaves,
+                                 Max_Features      => Max_Features,
+                                 Max_Depth         => Max_Depth,
+                                 Max_Leaf_Nodes    => Max_Leaf_Nodes,
+                                 Random_State       => Random_State);
    end Init;
 
    --  -------------------------------------------------------------------------
