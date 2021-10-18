@@ -1,9 +1,7 @@
 
 with Classifier_Types;
-with ML_Types;
 with Node_Splitter;
 with Tree;
-with Weights;
 
 package Ada_Tree_Builder is
 
@@ -21,9 +19,8 @@ package Ada_Tree_Builder is
 
     procedure Build_Tree
       (theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.List_Of_Value_Data_Lists;
+       Splitter      : in out Node_Splitter.Splitter_Class;
        Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
-       Max_Depth     : Integer;
-       Sample_Weight : Weights.Weight_List);
+       Max_Depth     : Integer);
 
 end Ada_Tree_Builder;

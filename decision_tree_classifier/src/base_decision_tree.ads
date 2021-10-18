@@ -122,7 +122,8 @@ package Base_Decision_Tree is
                      Splitter                 : Node_Splitter.Splitter_Class;
                      Min_Samples_Split        : Positive := 2;
                      Min_Leaf_Samples         : Positive := 1;
-                     Max_Features             : Tree.Index_Range;
+                     Max_Features             : Tree.Index_Range :=
+                       Tree.Index_Range'Last;
                      Class_Weight             : Weights.Weight_Type :=
                        Weights.No_Weight;
                      Max_Depth                : Integer := -1;

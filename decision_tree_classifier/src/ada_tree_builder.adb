@@ -4,7 +4,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
-with Criterion;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -165,22 +164,15 @@ package body Ada_Tree_Builder is
     --  L133 DepthFirstTreeBuilder.build
     procedure Build_Tree
       (theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.List_Of_Value_Data_Lists;
+       Splitter      : in out Node_Splitter.Splitter_Class;
        Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
-       Max_Depth     : Integer;
-       Sample_Weight : Weights.Weight_List) is
+       Max_Depth     : Integer) is
         use Tree.Nodes_Package;
         use Node_Splitter;
         Depth            : constant Positive := 1;
         Builder          : Tree_Builder;
-        Criteria         : Criterion.Criterion_Class;
-        Splitter         : Splitter_Class;
         Top_Node_Cursor  : Cursor;
     begin
-        Criterion.C_Init (Criteria, theTree.Num_Outputs, theTree.Classes);
-        --  L163
-        Node_Splitter.C_Init (Splitter, Criteria);
-        Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
         Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
         Put_Line ("Ada_Tree_Builder.Build_Tree L208");

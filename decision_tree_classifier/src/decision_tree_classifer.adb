@@ -28,6 +28,8 @@ package body Decision_Tree_Classifer is
 
     end Classification_Fit;
 
+    --  -------------------------------------------------------------------------
+
     --  L852 DecisionTreeClassifier.__init__
     procedure C_Init (aClassifier              : in out Base_Decision_Tree.Classifier;
                       Criteria                 : Criterion.Criterion_Class;
