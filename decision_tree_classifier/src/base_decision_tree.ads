@@ -67,8 +67,8 @@ package Base_Decision_Tree is
       Splitter_Kind            : Splitter_Type := Best_Splitter;
       Splitter                 : Node_Splitter.Splitter_Class;
       Max_Depth                : Integer := -1;  --  < 0 means unspecified
-      Min_Samples_Split        : Natural := 0;
-      Min_Samples_Leaf         : Natural := 0;
+      Min_Samples_Split        : Positive := 2;
+      Min_Samples_Leaf         : Positive := 1;
       Min_Weight_Fraction_Leaf : Float := 0.0;
       Max_Features             : Tree.Index_Range := 1;
       Random_State             : Integer := 0;
@@ -119,7 +119,7 @@ package Base_Decision_Tree is
    procedure C_Init (aClassifier              : in out Classifier;
                      Criteria                 : Criterion.Criterion_Class;
                      Splitter                 : Node_Splitter.Splitter_Class;
-                     Min_Samples_Split        : Positive := 1;
+                     Min_Samples_Split        : Positive := 2;
                      Min_Leaf_Samples         : Positive := 1;
                      Max_Features             : Tree.Index_Range;
                      Class_Weight             : Weights.Weight_Type :=

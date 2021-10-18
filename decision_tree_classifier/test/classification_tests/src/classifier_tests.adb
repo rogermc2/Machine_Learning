@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
@@ -45,14 +46,13 @@ package body Classifier_Tests is
         Probabilities   : List_Of_Value_Data_Lists;
     begin
         Put_Line ("Classification_Tests.Test_Classification_Toy:");
-        if Num_Samples = 0 then
-            raise Classifier_Test_Error with
-              "Classification_Tests.Test_Classification_Toy called with empty X vector.";
-        end if;
+        Assert (Num_Samples > 0,
+                "Classification_Tests.Test_Classification_Toy called with empty X vector.");
 
         C_Init (theTree, X, Max_Depth => 5, Random_State => 0);
         Y := To_Integer_Value_List (Y_Array);
         --        Expected := To_Integer_Value_List (True_Result);
+        --  L230
         Classification_Fit (theTree, X, Y, Y_Encoded, Classes, Weight_Values);
         Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                     Integer'Image (Integer

@@ -10,8 +10,8 @@ package Ada_Tree_Builder is
     type Tree_Builder is record
         Splitter              : Node_Splitter.Splitter_Class;
         --  Minimum samples in an internal node
-        Min_Samples_Split     : Natural := 0;
-        Min_Samples_Leaf      : Natural := 0;
+        Min_Samples_Split     : Positive := 2;
+        Min_Samples_Leaf      : Positive := 1;
         Min_Weight_Leaf       : Float := 0.0;
         Max_Depth             : Integer := -1;
         Min_Impurity_Decrease : Float := 0.0;

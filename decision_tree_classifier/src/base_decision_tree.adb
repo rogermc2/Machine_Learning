@@ -111,7 +111,7 @@ package body Base_Decision_Tree is
       Max_Depth             : Natural;
       Max_Leaf_Nodes        : constant Integer := aClassifier.Parameters.Max_Leaf_Nodes;
       Min_Sample_Leaf       : constant Positive := 1;
-      Min_Sample_Split      : Natural := 0;
+      Min_Sample_Split      : Positive := 1;
       Max_Features          : Index_Range := Tree.Index_Range'Last;
       Sqrt_Num_Features     : Index_Range := 1;
    begin
@@ -207,7 +207,7 @@ package body Base_Decision_Tree is
    procedure C_Init (aClassifier              : in out Classifier;
                      Criteria                 : Criterion.Criterion_Class;
                      Splitter                 : Node_Splitter.Splitter_Class;
-                     Min_Samples_Split        : Positive := 1;
+                     Min_Samples_Split        : Positive := 2;
                      Min_Leaf_Samples         : Positive := 1;
                      Max_Features             : Tree.Index_Range;
                      Class_Weight             : Weights.Weight_Type :=

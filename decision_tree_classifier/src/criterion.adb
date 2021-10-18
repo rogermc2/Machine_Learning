@@ -1,5 +1,6 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -11,24 +12,24 @@ package body Criterion is
     --  -------------------------------------------------------------------------
     --  L214 __cinit__
     procedure C_Init (Criteria : in out Criterion_Class;
-                   Num_Outputs : Positive;
-                   Classes  : ML_Types.List_Of_Value_Data_Lists) is
+                      Num_Outputs : Positive;
+                      Classes  : ML_Types.List_Of_Value_Data_Lists) is
     begin
-      --  L252
-      Criteria.Num_Outputs := Num_Outputs;
-      Criteria.Classes := Classes;
+        --  L252
+        Criteria.Num_Outputs := Num_Outputs;
+        Criteria.Classes := Classes;
 
     end C_Init;
 
     --  ------------------------------------------------------------------------
     --  L59, L214, 280
     procedure Classification_Init
-      (Criteria            : in out Criterion_Class;
-       Y                   : Classifier_Types.List_Of_Natural_Lists;
-       Sample_Indices      : Classifier_Types.Natural_List;
+      (Criteria           : in out Criterion_Class;
+       Y                  : Classifier_Types.List_Of_Natural_Lists;
+       Sample_Indices     : Classifier_Types.Natural_List;
        --  Sample_Weight contains the weight of each sample
-       Sample_Weight       : Weights.Weight_List;
-       Weighted_Samples    : Float;
+       Sample_Weight      : Weights.Weight_List;
+       Weighted_Samples   : Float;
        Start_Row, End_Row : Natural) is
         Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
         Sum_Total_K     : Classifier_Types.Float_List;
@@ -37,6 +38,7 @@ package body Criterion is
         Y_Ik            : Natural;
         Weight          : Float := 1.0;
     begin
+        Put_Line ("Criterion.Classification_Init");
         Criteria.Y := Y;
         Criteria.Sample_Weight := Sample_Weight;
         Criteria.Sample_Indices := Sample_Indices;
@@ -48,6 +50,9 @@ package body Criterion is
         Criteria.Sq_Sum_Total := 0.0;
         Criteria.Sum_Total.Clear;
 
+        Put_Line ("Criterion.Classification_Init L325");
+        Assert (not Criteria.Classes.Is_Empty,
+                "Criterion.Classification_Init Classes is empty");
         --  L325
         for row in 1 .. Num_Outputs loop
             Sum_Total_K.Clear;
@@ -58,6 +63,7 @@ package body Criterion is
             Criteria.Sum_Total.Append (Sum_Total_K);
         end loop;
 
+        Put_Line ("Criterion.Classification_Init L329");
         --  L329
         for p in Start_Row .. End_Row loop
             Y_I_Index := Sample_Indices.Element (p);
@@ -82,9 +88,9 @@ package body Criterion is
               Criteria.Num_Weighted_Node_Samples + Weight;
         end loop;
 
---          Classifier_Utilities.Print_Weights_Lists
---            ("Criterion.Classification_Init, Criteria.Sum_Total",
---             Criteria.Sum_Total);
+        --          Classifier_Utilities.Print_Weights_Lists
+        --            ("Criterion.Classification_Init, Criteria.Sum_Total",
+        --             Criteria.Sum_Total);
 
         Reset (Criteria);
 
@@ -137,7 +143,7 @@ package body Criterion is
     --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
     --   of the current node
     function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                return Float is
+                                 return Float is
         Num_Outputs   : constant Positive := Positive (Criteria.Y.Length);
         Sum_Total_K   : Weights.Weight_List;
         Count_K       : Float;
@@ -239,7 +245,7 @@ package body Criterion is
     --  -------------------------------------------------------------------------
 
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                        return Float is
+                                         return Float is
         Impurity_Left  : Float;
         Impurity_Right : Float;
     begin

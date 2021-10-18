@@ -18,8 +18,8 @@ package body Ada_Tree_Builder is
    procedure Init_Tree_Builder
      (Builder               : in out Tree_Builder;
       Splitter              : Node_Splitter.Splitter_Class;
-      Min_Samples_Split     : Natural := 0;
-      Min_Samples_Leaf      : Natural := 0;
+      Min_Samples_Split     : Positive := 2;
+      Min_Samples_Leaf      : Positive := 1;
       Min_Weight_Leaf       : Float := 0.0;
       Max_Depth             : Integer := -1;
       Min_Impurity_Decrease : Float := 0.0);
@@ -140,9 +140,7 @@ package body Ada_Tree_Builder is
               (theTree, Splitter, Depth, Parent_Cursor, False, False,
                Split.Feature, Impurity, Split.Threshold, Split_Row, End_Row,
                Weighted_Node_Samples);
-            Put_Line ("Ada_Tree_Builder.Add_Branch set Right_Child");
             Right_Child := Element (Right_Child_Cursor);
-            Put_Line ("Ada_Tree_Builder.Add_Branch Right_Child set");
 
             if Depth > Max_Depth_Seen then
                Max_Depth_Seen := Depth;
@@ -181,9 +179,11 @@ package body Ada_Tree_Builder is
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
+      Put_Line ("Ada_Tree_Builder.Build_Tree L208");
       --  L208
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Splitter, 1, Splitter.Num_Samples, Splitter.Weighted_Samples);
+      Put_Line ("Ada_Tree_Builder.Build_Tree L208 reset");
 
       Top_Node_Cursor := Tree_Build.Add_Node
         (theTree, Splitter, Depth, theTree.Nodes.Root, True, False, 1,
@@ -197,8 +197,8 @@ package body Ada_Tree_Builder is
    procedure Init_Tree_Builder
      (Builder               : in out Tree_Builder;
       Splitter              : Node_Splitter.Splitter_Class;
-      Min_Samples_Split     : Natural := 0;
-      Min_Samples_Leaf      : Natural := 0;
+      Min_Samples_Split     : Positive := 2;
+      Min_Samples_Leaf      : Positive := 1;
       Min_Weight_Leaf       : Float := 0.0;
       Max_Depth             : Integer := -1;
       Min_Impurity_Decrease : Float := 0.0) is
