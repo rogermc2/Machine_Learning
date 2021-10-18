@@ -29,7 +29,7 @@ package Node_Splitter is
       Constant_Features_I  : Classifier_Types.Natural_List;
       Num_Classes          : Classifier_Types.Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
-      Num_Samples          : Positive := 1;
+      Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
       --  encoded version of sample Y
       Y                    : Classifier_Types.List_Of_Natural_Lists;
@@ -44,6 +44,11 @@ package Node_Splitter is
 
    Node_Splitter_Error : Exception;
 
+    procedure C_Init (Self          : in out Splitter_Class;
+                      Criteria      : Criterion.Criterion_Class;
+                      Max_Features  : Positive := 1;
+                      Min_Leaf_Samples : Positive := 1;
+                      Min_Leaf_Weight : Float := 0.0);
    procedure Init (Self             : in out Splitter_Class;
                    Input_X          : ML_Types.List_Of_Value_Data_Lists;
                    Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;

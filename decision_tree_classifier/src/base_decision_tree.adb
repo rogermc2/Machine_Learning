@@ -328,8 +328,6 @@ package body Base_Decision_Tree is
            Weights.Compute_Sample_Weight (No_Weight, Y);
       end if;
 
-      Criterion.C_Init (aClassifier.Parameters.Critera,
-                        aClassifier.Attributes.Classes);
       Classes := aClassifier.Attributes.Classes;
 
    exception
