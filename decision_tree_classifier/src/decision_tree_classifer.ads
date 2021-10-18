@@ -89,7 +89,8 @@ package Decision_Tree_Classifer is
        Y              : ML_Types.List_Of_Value_Data_Lists;
        Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
        Classes        : out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weights : out Classifier_Types.Float_List);
+       Sample_Weights : out Classifier_Types.Float_List;
+       Max_Depth      : Integer := -1);
     procedure Init (aClassifier       : in out Base_Decision_Tree.Classifier;
                     Input_X           : ML_Types.List_Of_Value_Data_Lists;
                     Max_Leaf_Nodes    : Integer := -1;

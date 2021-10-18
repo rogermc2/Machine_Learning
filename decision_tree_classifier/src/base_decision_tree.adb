@@ -7,7 +7,7 @@ with Maths;
 
 with Ada_Tree_Builder;
 with Classifier_Types;
---  with Classifier_Utilities;
+with Classifier_Utilities;
 with Criterion;
 with Encode_Utils;
 
@@ -35,7 +35,8 @@ package body Base_Decision_Tree is
       Y              : ML_Types.List_Of_Value_Data_Lists;
       Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
       Classes        : out ML_Types.List_Of_Value_Data_Lists;
-      Sample_Weights : out Classifier_Types.Float_List) is
+      Sample_Weights : out Classifier_Types.Float_List;
+      Max_Depth      : Integer := -1) is
       --  L205
       Expanded_Class_Weight : Weights.Weight_List;
       Sum_Sample_Weight     : Float := 0.0;
@@ -50,6 +51,7 @@ package body Base_Decision_Tree is
            "Base_Decision_Tree.Base_Fit, Y is empty";
       end if;
 
+      aClassifier.Parameters.Max_Depth := Max_Depth;
       --  L184
       aClassifier.Attributes.Num_Features :=
         Tree.Index_Range (X.Element (1).Length);
@@ -292,6 +294,8 @@ package body Base_Decision_Tree is
       end if;
 
       Classes := aClassifier.Attributes.Classes;
+      Classifier_Utilities.Print_List_Of_Natural_Lists ("Y_Encoded", Y_Encoded);
+      Classifier_Utilities.Print_List_Of_Value_Data_Lists ("Classes", Classes);
 
    exception
       when others => raise Classifier_Error with

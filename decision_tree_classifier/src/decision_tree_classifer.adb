@@ -19,11 +19,12 @@ package body Decision_Tree_Classifer is
        Y              : ML_Types.List_Of_Value_Data_Lists;
        Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
        Classes        : out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weights : out Classifier_Types.Float_List) is
+       Sample_Weights : out Classifier_Types.Float_List;
+       Max_Depth      : Integer := -1) is
     begin
         --  L929
         Base_Decision_Tree.Base_Fit (aClassifier, X, Y, Y_Encoded, Classes,
-                                     Sample_Weights);
+                                     Sample_Weights, Max_Depth);
 
     end Classification_Fit;
 
