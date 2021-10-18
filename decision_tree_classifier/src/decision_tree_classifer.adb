@@ -27,7 +27,7 @@ package body Decision_Tree_Classifer is
 
     end Classification_Fit;
 
-    --  L112 BaseDecisionTree.__init__
+    --  L852 DecisionTreeClassifier.__init__
     procedure C_Init (aClassifier              : in out Base_Decision_Tree.Classifier;
                       Criteria                 : Criterion.Criterion_Class;
                       Splitter                 : Node_Splitter.Splitter_Class;
@@ -38,13 +38,27 @@ package body Decision_Tree_Classifer is
                       Max_Features             : Tree.Index_Range :=
                         Tree.Index_Range'Last;
                       Max_Leaf_Nodes           : Integer := -1;
+                      Class_Weight             : Weights.Weight_Type :=
+                        Weights.No_Weight;
                       Min_Impurity_Decrease    : Float := 0.0;
-                      Class_Weight             : Float := 0.0;
                       CCP_Alpha                : Float := 0.0;
                       Random_State             : Integer := 0) is
     begin
-        null;
+        aClassifier.Parameters.Critera := Criteria;
+        aClassifier.Parameters.Splitter := Splitter;
+        aClassifier.Parameters.Max_Depth := Max_Depth;
+        aClassifier.Parameters.Min_Samples_Split := Min_Split_Samples;
+        aClassifier.Parameters.Min_Samples_Leaf := Min_Leaf_Samples;
+        aClassifier.Parameters.Min_Weight_Fraction_Leaf := Min_Leaf_Weight_Fraction;
+        aClassifier.Parameters.Max_Features := Max_Features;
+        aClassifier.Parameters.Max_Leaf_Nodes := Max_Leaf_Nodes;
+        aClassifier.Parameters.Min_Impurity_Decrease := Min_Impurity_Decrease;
+        aClassifier.Parameters.Class_Weight := Class_Weight;
+        aClassifier.Parameters.CCP_Alpha := CCP_Alpha;
+        aClassifier.Parameters.Random_State := Random_State;
+
     end C_Init;
+
     --  -------------------------------------------------------------------------
 
     procedure Init (aClassifier       : in out Base_Decision_Tree.Classifier;
@@ -54,8 +68,8 @@ package body Decision_Tree_Classifer is
                     Min_Samples_Split : Positive := 2;
                     Min_Leaves        : Positive := 1;
                     Random_State      : Integer := 0) is
-        Num_Outputs     : constant Positive :=
-                            Positive (Input_X.Element (1).Length);
+        Num_Outputs     : constant Tree.Index_Range :=
+                            Tree.Index_Range (Input_X.Element (1).Length);
         Min_Leaf_Weight : constant Float := 0.0;
         Max_Features    : constant Tree.Index_Range := 1;
         Criteria        : Criterion.Criterion_Class;
@@ -87,7 +101,7 @@ package body Decision_Tree_Classifer is
     --  class in a leaf.
     function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                   X    : ML_Types.List_Of_Value_Data_Lists)
-                                 return ML_Types.List_Of_Value_Data_Lists is
+                                  return ML_Types.List_Of_Value_Data_Lists is
         use ML_Types;
         Proba      : Value_Data_List;
         All_Proba  : List_Of_Value_Data_Lists;

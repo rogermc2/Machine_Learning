@@ -1,6 +1,7 @@
 
 with ML_Types;
 with Classifier_Types;
+with Tree;
 with Weights;
 
 package Criterion is
@@ -10,7 +11,7 @@ package Criterion is
         --  Sample_Weight contains the weight of each sample
         Sample_Weight             : Weights.Weight_List;
         Samples                   : ML_Types.List_Of_Value_Data_Lists;
-        Num_Outputs               : Positive := 1;
+        Num_Outputs               : Tree.Index_Range := 1;
         Start_Row                 : Natural := 0;
         End_Row                   : Natural := 0;
         Split_Row                 : Natural := 0;
@@ -19,7 +20,6 @@ package Criterion is
         Num_Weighted_Node_Samples : Float := 0.0;
         Num_Weighted_Left         : Float := 0.0;
         Num_Weighted_Right        : Float := 0.0;
-        --        Weighted_Node_Samples     : Weights.Weight_List;
         --  For classification criteria, Sum_Total is the sum of the weighted
         --  count of each class.
         --  For regression, Sum_Total is the sum of w*y.
@@ -39,7 +39,7 @@ package Criterion is
     Criterion_Error : Exception;
 
     procedure C_Init (Criteria  : in out Criterion_Class;
-                      Num_Outputs : Positive;
+                      Num_Outputs : Tree.Index_Range;
                       Classes     : ML_Types.List_Of_Value_Data_Lists);
     procedure Classification_Init
       (Criteria            : in out Criterion_Class;

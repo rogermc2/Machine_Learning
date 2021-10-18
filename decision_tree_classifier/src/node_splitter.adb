@@ -345,7 +345,8 @@ package body Node_Splitter is
         Splitter.End_Row := End_Row;
         Criterion.Classification_Init
           (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
-           Splitter.Sample_Weight, Splitter.Weighted_Samples, Start_Row, End_Row);
+           Splitter.Sample_Weight, Splitter.Weighted_Samples,
+           Start_Row, End_Row);
 
         Weighted_Node_Samples := Splitter.Criteria.Num_Weighted_Node_Samples;
 
@@ -381,7 +382,7 @@ package body Node_Splitter is
         Swap                 : Natural;
         Num_Known_Constants  : constant Natural := Num_Constant_Features;
         Num_Total_Constants  : Natural := Num_Known_Constants;
-        Num_Visited_Features : Index_Range := 1;
+        Num_Visited_Features : Natural := 0;
         Num_Found_Constants  : Natural := 0;
         Num_Drawn_Constants  : Natural := 0;
         LE                   : Boolean;
@@ -402,10 +403,10 @@ package body Node_Splitter is
 
         --  L323
         while F_I > Num_Total_Constants and
-          (Num_Visited_Features < Max_Features or
+          (Num_Visited_Features < Natural (Max_Features) or
            --   At least one drawn feature must be non constant.
              Num_Visited_Features <=
-               Index_Range (Num_Found_Constants + Num_Drawn_Constants)) loop
+               Num_Found_Constants + Num_Drawn_Constants) loop
             --  L329
             Num_Visited_Features := Num_Visited_Features + 1;
             --  L342

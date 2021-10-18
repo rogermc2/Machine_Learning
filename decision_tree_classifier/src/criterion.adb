@@ -12,7 +12,7 @@ package body Criterion is
     --  -------------------------------------------------------------------------
     --  L214 __cinit__
     procedure C_Init (Criteria : in out Criterion_Class;
-                      Num_Outputs : Positive;
+                      Num_Outputs : Tree.Index_Range;
                       Classes  : ML_Types.List_Of_Value_Data_Lists) is
     begin
         --  L252

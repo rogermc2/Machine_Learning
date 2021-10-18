@@ -49,8 +49,8 @@ package body Classifier_Tests is
         Assert (Num_Samples > 0,
                 "Classification_Tests.Test_Classification_Toy called with empty X vector.");
 
-        C_Init (theTree, X, Max_Depth => 5, Random_State => 0);
         Y := To_Integer_Value_List (Y_Array);
+        --  L229
         --        Expected := To_Integer_Value_List (True_Result);
         --  L230
         Classification_Fit (theTree, X, Y, Y_Encoded, Classes, Weight_Values);

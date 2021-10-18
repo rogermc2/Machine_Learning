@@ -27,6 +27,7 @@ with Base_Decision_Tree;
 with Criterion;
 with Classifier_Types;
 with Node_Splitter;
+with Weights;
 
 package Decision_Tree_Classifer is
 --  Gini Impurity is a measurement of the likelihood of an incorrect
@@ -77,8 +78,9 @@ package Decision_Tree_Classifer is
                       Max_Features             : Tree.Index_Range :=
                         Tree.Index_Range'Last;
                       Max_Leaf_Nodes           : Integer := -1;
+                      Class_Weight             : Weights.Weight_Type :=
+                        Weights.No_Weight;
                       Min_Impurity_Decrease    : Float := 0.0;
-                      Class_Weight             : Float := 0.0;
                       CCP_Alpha                : Float := 0.0;
                       Random_State             : Integer := 0);
     procedure Classification_Fit
