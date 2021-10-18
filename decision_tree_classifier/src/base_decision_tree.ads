@@ -67,10 +67,10 @@ package Base_Decision_Tree is
       Splitter_Kind            : Splitter_Type := Best_Splitter;
       Splitter                 : Node_Splitter.Splitter_Class;
       Max_Depth                : Integer := -1;  --  < 0 means unspecified
-      Min_Samples_Split        : Split_Record (Split_Type);
-      Min_Samples_Leaf         : Leaf_Record (Leaf_Type);
+      Min_Samples_Split        : Natural := 0;
+      Min_Samples_Leaf         : Natural := 0;
       Min_Weight_Fraction_Leaf : Float := 0.0;
-      Max_Features             : Tree.Features_Record (Feature_Type);
+      Max_Features             : Tree.Index_Range := 1;
       Random_State             : Integer := 0;
       Max_Leaf_Nodes           : Integer := -1;  --  < 0 means unspecified
       --  Impure means that data is mixture of different classes.
@@ -89,7 +89,7 @@ package Base_Decision_Tree is
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
-      Max_Features        : Natural := 0;
+      Max_Features        : Positive := 1;
       Num_Features        : Tree.Index_Range := 1;
       Num_Outputs         : Tree.Index_Range := 1;
       Decision_Tree       : Tree.Tree_Class;
@@ -119,9 +119,9 @@ package Base_Decision_Tree is
    procedure C_Init (aClassifier              : in out Classifier;
                      Criteria                 : Criterion.Criterion_Class;
                      Splitter                 : Node_Splitter.Splitter_Class;
-                     Min_Samples_Split        : Split_Record;
-                     Min_Leaf_Samples         : Leaf_Record;
-                     Max_Features             : Tree.Features_Record;
+                     Min_Samples_Split        : Positive := 1;
+                     Min_Leaf_Samples         : Positive := 1;
+                     Max_Features             : Tree.Index_Range;
                      Class_Weight             : Weights.Weight_Type :=
                        Weights.No_Weight;
                      Max_Depth                : Integer := -1;

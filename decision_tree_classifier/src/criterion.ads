@@ -10,6 +10,7 @@ package Criterion is
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
       Samples                   : ML_Types.List_Of_Value_Data_Lists;
+      Num_Outputs               : Positive := 1;
       Start_Row                 : Natural := 0;
       End_Row                   : Natural := 0;
       Split_Row                 : Natural := 0;
@@ -37,6 +38,9 @@ package Criterion is
 
    Criterion_Error : Exception;
 
+   procedure C_Init (Criteria  : in out Criterion_Class;
+                   Num_Outputs : Positive;
+                   Classes     : ML_Types.List_Of_Value_Data_Lists);
    procedure Classification_Init
      (Criteria            : in out Criterion_Class;
       Y                   : Classifier_Types.List_Of_Natural_Lists;
@@ -54,9 +58,6 @@ package Criterion is
    function Impurity_Improvement
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
-   procedure Init (Criteria : in out Criterion_Class;
-                   Num_Outputs : Positive;
-                   Classes  : ML_Types.List_Of_Value_Data_Lists);
    function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Classifier_Types.List_Of_Float_Lists);

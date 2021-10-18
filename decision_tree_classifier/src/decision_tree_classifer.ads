@@ -29,11 +29,11 @@ with Classifier_Types;
 package Decision_Tree_Classifer is
    --  Gini Impurity is a measurement of the likelihood of an incorrect
    --  classification of a new instance of a random variable.
---     type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
---     type Regressor_Criteria_Type is (MSE_Criteria, Friedman_MSE_Criteria, MAE_Criteria);
---     type Splitter_Type is (Best_Splitter, Random_Splitter);
---     Type State is (None);
---     Type Weight_Type is (None);
+   --     type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
+   --     type Regressor_Criteria_Type is (MSE_Criteria, Friedman_MSE_Criteria, MAE_Criteria);
+   --     type Splitter_Type is (Best_Splitter, Random_Splitter);
+   --     Type State is (None);
+   --     Type Weight_Type is (None);
 
    package UB_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
@@ -65,19 +65,22 @@ package Decision_Tree_Classifer is
    Classifier_Error : Exception;
    Value_Error      : Exception;
 
-    procedure Classification_Fit
-      (aClassifier    : in out Base_Decision_Tree.Classifier;
-       X              : ML_Types.List_Of_Value_Data_Lists;
-       Y              : ML_Types.List_Of_Value_Data_Lists;
-       Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
-       Classes        : out ML_Types.List_Of_Value_Data_Lists;
-       Sample_Weights : out Classifier_Types.Float_List);
-   procedure Init (aClassifier    : in out Base_Decision_Tree.Classifier;
-                   Max_Leaf_Nodes : Integer := -1;
-                   Max_Depth      : Integer := -1;
-                   Random_State   : Integer := 0);
+   procedure C_Init (aClassifier    : in out Base_Decision_Tree.Classifier;
+                     Input_X        : ML_Types.List_Of_Value_Data_Lists;
+                     Max_Leaf_Nodes : Integer := -1;
+                     Max_Depth      : Integer := -1;
+                     Min_Samples_Split : Positive := 1;
+                     Min_Leaves        : Positive := 1;
+                     Random_State   : Integer := 0);
+   procedure Classification_Fit
+     (aClassifier    : in out Base_Decision_Tree.Classifier;
+      X              : ML_Types.List_Of_Value_Data_Lists;
+      Y              : ML_Types.List_Of_Value_Data_Lists;
+      Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
+      Classes        : out ML_Types.List_Of_Value_Data_Lists;
+      Sample_Weights : out Classifier_Types.Float_List);
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                  X    : ML_Types.List_Of_Value_Data_Lists)
+                                 X    : ML_Types.List_Of_Value_Data_Lists)
                                  return ML_Types.List_Of_Value_Data_Lists;
 
 end Decision_Tree_Classifer;

@@ -5,6 +5,7 @@ with Ada.Strings.Unbounded;
 with ML_Types;
 with Classifier_Types;
 with Criterion;
+with Tree;
 with Weights;
 
 package Node_Splitter is
@@ -21,7 +22,7 @@ package Node_Splitter is
 
    type Splitter_Class is record
       Criteria             : Criterion.Criterion_Class;
-      Max_Features         : Natural := 0;  --  Number of features to test
+      Max_Features         : Tree.Index_Range := 1;  --  Number of features to test
       Min_Leaf_Samples     : Natural := 0;
       Min_Leaf_Weight      : Float := 0.0;
       Sample_Indices       : Classifier_Types.Natural_List;  --  Samples
@@ -46,7 +47,7 @@ package Node_Splitter is
 
     procedure C_Init (Self          : in out Splitter_Class;
                       Criteria      : Criterion.Criterion_Class;
-                      Max_Features  : Positive := 1;
+                      Max_Features  : Tree.Index_Range := 1;
                       Min_Leaf_Samples : Positive := 1;
                       Min_Leaf_Weight : Float := 0.0);
    procedure Init (Self             : in out Splitter_Class;

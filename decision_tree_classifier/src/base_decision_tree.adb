@@ -105,14 +105,15 @@ package body Base_Decision_Tree is
       Y              : ML_Types.List_Of_Value_Data_Lists;
       Sample_Weights : in out Classifier_Types.Float_List) is
       use Maths.Float_Math_Functions;
+      use Tree;
       Num_Samples           : constant Positive := Positive (X.Length);
       --  L226
       Max_Depth             : Natural;
       Max_Leaf_Nodes        : constant Integer := aClassifier.Parameters.Max_Leaf_Nodes;
-      Min_Sample_Leaf       : Leaf_Record (Tree.Integer_Type);
-      Min_Sample_Split      : Split_Record (Tree.Integer_Type);
-      Max_Features          : Tree.Features_Record (Tree.Integer_Type);
-      Sqrt_Num_Features     : Natural;
+      Min_Sample_Leaf       : constant Positive := 1;
+      Min_Sample_Split      : Natural := 0;
+      Max_Features          : Index_Range := Tree.Index_Range'Last;
+      Sqrt_Num_Features     : Index_Range := 1;
    begin
       --  L226
       if aClassifier.Parameters.Max_Depth < 0 then
@@ -123,67 +124,29 @@ package body Base_Decision_Tree is
       end if;
 
       --  L235
-      case aClassifier.Parameters.Min_Samples_Leaf.Leaf_Type is
-         when Tree.Integer_Type =>
-            if aClassifier.Parameters.Min_Samples_Leaf.Min_Leaf < 1 then
+            if aClassifier.Parameters.Min_Samples_Leaf < 1 then
                raise Value_Error with
                  "Base_Decision_Tree.Base_Fit_Checks, Min_Samples_Leaf must be at least 1";
             end if;
-            Min_Sample_Leaf.Min_Leaf := aClassifier.Parameters.Min_Samples_Leaf.Min_Leaf;
-
-         when Tree.Float_Type =>
-            --  L243
-            if aClassifier.Parameters.Min_Samples_Leaf.Min_Fraction_Leaf <= 0.0 or
-              aClassifier.Parameters.Min_Samples_Leaf.Min_Fraction_Leaf > 0.5 then
-               raise Value_Error with
-                 "Base_Decision_Tree.Base_Fit_Checks, Min_Fraction_Leaf must be in (0.0, 0.5]";
-            end if;
-            Min_Sample_Leaf.Min_Leaf :=
-              Integer (Float'Ceiling
-                       (aClassifier.Parameters.Min_Samples_Leaf.Min_Fraction_Leaf));
-         when others =>
-            raise Value_Error with
-              "Base_Decision_Tree.Base_Fit_Checks, invalid Min_Samples_Leaf Leaf_Type";
-      end case;
 
       --  L250
-      case aClassifier.Parameters.Min_Samples_Split.Split_Type is
-         when Tree.Integer_Type =>
-            if aClassifier.Parameters.Min_Samples_Split.Min_Split < 2 then
+            if aClassifier.Parameters.Min_Samples_Split < 2 then
                raise Value_Error with
                  "Base_Decision_Tree.Base_Fit_Checks, Min_Samples_Split must be at least 2";
             end if;
-            Min_Sample_Split.Min_Split := aClassifier.Parameters.Min_Samples_Split.Min_Split;
-         when Tree.Float_Type =>
-            --  L253
-            if aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split <= 0.0 or
-              aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split > 1.0 then
-               raise Value_Error with
-                 "Base_Decision_Tree.Base_Fit_Checks, Min_Fraction_Split must be in (0.0, 1.0]";
-            end if;
-            --  L260
-            Min_Sample_Split.Min_Split :=
-              Integer (Float'Ceiling
-                       (aClassifier.Parameters.Min_Samples_Split.Min_Fraction_Split));
-            if Min_Sample_Split.Min_Split < 2 then
-               Min_Sample_Split.Min_Split := 2;
-            end if;
-         when others =>
-            raise Value_Error with
-              "Base_Decision_Tree.Base_Fit_Checks, invalid Min_Samples_Split Split_Type";
-      end case;
+            Min_Sample_Split := aClassifier.Parameters.Min_Samples_Split;
 
       --  L263
-      if Min_Sample_Split.Min_Split < 2 * Min_Sample_Leaf.Min_Leaf then
-         Min_Sample_Split.Min_Split := 2 * Min_Sample_Leaf.Min_Leaf;
+      if Min_Sample_Split < 2 * Min_Sample_Leaf then
+         Min_Sample_Split := 2 * Min_Sample_Leaf;
       end if;
 
       Sqrt_Num_Features :=
-        Natural (Sqrt (Float (aClassifier.Attributes.Num_Features)));
+        Tree.Index_Range (Sqrt (Float (aClassifier.Attributes.Num_Features)));
       if Sqrt_Num_Features > 1 then
-         Max_Features.Max_Features := Sqrt_Num_Features;
+         Max_Features := Sqrt_Num_Features;
       else
-         Max_Features.Max_Features := 1;
+         Max_Features := 1;
       end if;
 
       --  L291
@@ -205,8 +168,8 @@ package body Base_Decision_Tree is
            " but should be in (0.0, 5.0]";
       end if;
 
-      if Max_Features.Max_Features <= 0 or
-        Max_Features.Max_Features > Integer (aClassifier.Attributes.Num_Features) then
+      if Max_Features <= 0 or
+         Max_Features > aClassifier.Attributes.Num_Features then
          raise Value_Error with
            "Base_Decision_Tree.Base_Fit_Checks, Max_Features is not in (0, Num_Features)";
       end if;
@@ -244,9 +207,9 @@ package body Base_Decision_Tree is
    procedure C_Init (aClassifier              : in out Classifier;
                      Criteria                 : Criterion.Criterion_Class;
                      Splitter                 : Node_Splitter.Splitter_Class;
-                     Min_Samples_Split        : Split_Record;
-                     Min_Leaf_Samples         : Leaf_Record;
-                     Max_Features             : Tree.Features_Record;
+                     Min_Samples_Split        : Positive := 1;
+                     Min_Leaf_Samples         : Positive := 1;
+                     Max_Features             : Tree.Index_Range;
                      Class_Weight             : Weights.Weight_Type :=
                        Weights.No_Weight;
                      Max_Depth                : Integer := -1;

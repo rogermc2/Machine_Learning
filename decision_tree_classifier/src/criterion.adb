@@ -8,6 +8,18 @@ with ML_Types;
 
 package body Criterion is
 
+    --  -------------------------------------------------------------------------
+    --  L214 __cinit__
+    procedure C_Init (Criteria : in out Criterion_Class;
+                   Num_Outputs : Positive;
+                   Classes  : ML_Types.List_Of_Value_Data_Lists) is
+    begin
+      --  L252
+      Criteria.Num_Outputs := Num_Outputs;
+      Criteria.Classes := Classes;
+
+    end C_Init;
+
     --  ------------------------------------------------------------------------
     --  L59, L214, 280
     procedure Classification_Init
@@ -199,16 +211,6 @@ package body Criterion is
     end Impurity_Improvement;
 
     --  ------------------------------------------------------------------------
-    --  L214 __cinit__
-    procedure C_Init (Criteria : in out Criterion_Class;
-                    Classes  : ML_Types.List_Of_Value_Data_Lists) is
-    begin
-        --  L252
-        Criteria.Classes := Classes;
-
-    end C_Init;
-
-    --  -------------------------------------------------------------------------
 
     procedure Node_Value (Self  : Criterion_Class;
                           Value : out Classifier_Types.List_Of_Float_Lists) is
