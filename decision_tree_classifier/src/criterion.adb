@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is
@@ -230,8 +230,6 @@ package body Criterion is
             end loop;
             Value.Append (Total_K);
         end loop;
-        Classifier_Utilities.Print_List_Of_Float_Lists
-          ("Criterion.Node_Value, Value",  Value);
 
     end Node_Value;
 

@@ -36,7 +36,7 @@ package body Classifier_Tests is
       --        Expected        : List_Of_Value_Data_Lists;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-      Max_Depth       : constant Positive := 5;
+--        Max_Depth       : constant Positive := 5;
       X               : constant List_Of_Value_Data_Lists :=
                           To_Multi_Value_List (X_Array);
       Y               : List_Of_Value_Data_Lists;
@@ -54,8 +54,7 @@ package body Classifier_Tests is
       --  L229
       --        Expected := To_Integer_Value_List (True_Result);
       --  L230
-      Classification_Fit (theTree, X, Y, Y_Encoded, Classes, Weight_Values,
-                          Max_Depth);
+      Classification_Fit (theTree, X, Y, Y_Encoded, Classes, Weight_Values);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                   Integer'Image (Integer
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
