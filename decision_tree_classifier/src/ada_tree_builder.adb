@@ -43,7 +43,7 @@ package body Ada_Tree_Builder is
         Parent_Node            : Tree.Tree_Node := Element (Parent_Cursor);
         Start_Row              : constant Positive := Parent_Node.Samples_Start;
         End_Row                : constant Positive :=
-                                   Start_Row + Parent_Node.Num_Node_Samples - 1;
+                                   Parent_Node.Num_Node_Samples;
         Depth                  : constant Positive := Parent_Node.Depth + 1;
         Num_Constant_Features  : Natural := Parent_Node.Num_Constant_Features;
         Is_Leaf                : Boolean := False;
@@ -60,6 +60,9 @@ package body Ada_Tree_Builder is
             --                     & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
             --                       ", " & Integer'Image (Parent_Node.Num_Node_Samples));
             --  L208
+            Put_Line ("Ada_Tree_Builder.Add_Branch L208 Start_Row, End_Row, Num_Node_Samples: "
+                      & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
+                        ", " & Integer'Image (Parent_Node.Num_Node_Samples));
             --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
             Reset_Node (Splitter, Start_Row, End_Row, Weighted_Node_Samples);
             Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples reset: "

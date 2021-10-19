@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -38,7 +38,6 @@ package body Criterion is
         Y_Ik            : Natural;
         Weight          : Float := 1.0;
     begin
-        Put_Line ("Criterion.Classification_Init");
         Criteria.Y := Y;
         Criteria.Sample_Weight := Sample_Weight;
         Criteria.Sample_Indices := Sample_Indices;
@@ -50,7 +49,6 @@ package body Criterion is
         Criteria.Sq_Sum_Total := 0.0;
         Criteria.Sum_Total.Clear;
 
-        Put_Line ("Criterion.Classification_Init L325");
         Assert (not Criteria.Classes.Is_Empty,
                 "Criterion.Classification_Init Criteria.Classes is empty");
         --  L325
@@ -63,7 +61,6 @@ package body Criterion is
             Criteria.Sum_Total.Append (Sum_Total_K);
         end loop;
 
-        Put_Line ("Criterion.Classification_Init L329");
         --  L329
         for p in Start_Row .. End_Row loop
             Y_I_Index := Sample_Indices.Element (p);
@@ -87,10 +84,6 @@ package body Criterion is
             Criteria.Num_Weighted_Node_Samples :=
               Criteria.Num_Weighted_Node_Samples + Weight;
         end loop;
-
-        --          Classifier_Utilities.Print_Weights_Lists
-        --            ("Criterion.Classification_Init, Criteria.Sum_Total",
-        --             Criteria.Sum_Total);
 
         Reset (Criteria);
 
