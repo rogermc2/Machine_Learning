@@ -52,7 +52,7 @@ package body Criterion is
 
         Put_Line ("Criterion.Classification_Init L325");
         Assert (not Criteria.Classes.Is_Empty,
-                "Criterion.Classification_Init Classes is empty");
+                "Criterion.Classification_Init Criteria.Classes is empty");
         --  L325
         for row in 1 .. Num_Outputs loop
             Sum_Total_K.Clear;

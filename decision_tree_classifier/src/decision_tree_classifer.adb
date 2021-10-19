@@ -62,42 +62,7 @@ package body Decision_Tree_Classifer is
 
     end C_Init;
 
-    --  -------------------------------------------------------------------------
-
-    procedure Init (aClassifier       : in out Base_Decision_Tree.Classifier;
-                    Input_X           : ML_Types.List_Of_Value_Data_Lists;
-                    Max_Leaf_Nodes    : Integer := -1;
-                    Max_Depth         : Integer := -1;
-                    Min_Samples_Split : Positive := 2;
-                    Min_Leaves        : Positive := 1;
-                    Random_State      : Integer := 0) is
-        Num_Outputs     : constant Tree.Index_Range :=
-                            Tree.Index_Range (Input_X.Element (1).Length);
-        Min_Leaf_Weight : constant Float := 0.0;
-        Max_Features    : constant Tree.Index_Range := 1;
-        Criteria        : Criterion.Criterion_Class;
-        Splitter        : Node_Splitter.Splitter_Class;
-        Y_Encoded       : Classifier_Types.List_Of_Natural_Lists;
-        Sample_Weight   : Weights.Weight_List;
-    begin
-        Criterion.C_Init (Criteria, Num_Outputs, aClassifier.Attributes.Classes);
-        Node_Splitter.C_Init (Splitter, Criteria,
-                              aClassifier.Parameters.Max_Features,
-                              aClassifier.Parameters.Min_Samples_Leaf,
-                              Min_Leaf_Weight);
-        Node_Splitter.Init (Splitter, Input_X, Y_Encoded, Sample_Weight);
-        Base_Decision_Tree.C_Init (aClassifier       => aClassifier,
-                                   Criteria          => Criteria,
-                                   Splitter          => Splitter,
-                                   Min_Samples_Split => Min_Samples_Split,
-                                   Min_Leaf_Samples  => Min_Leaves,
-                                   Max_Features      => Max_Features,
-                                   Max_Depth         => Max_Depth,
-                                   Max_Leaf_Nodes    => Max_Leaf_Nodes,
-                                   Random_State       => Random_State);
-    end Init;
-
-    --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
     --  L930 Predict_Probability predicts class probabilities of the
     --  input samples X.
     --  The predicted class probability is the fraction of samples of the same
