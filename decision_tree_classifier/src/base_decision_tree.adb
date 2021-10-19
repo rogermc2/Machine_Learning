@@ -53,6 +53,10 @@ package body Base_Decision_Tree is
               "Base_Decision_Tree.Base_Fit, Y is empty";
         end if;
 
+        --  L207  Generates Y_Encoded and Classes
+        Classification_Part (aClassifier, Y, Y_Encoded,
+                             Classes, Expanded_Class_Weight);
+        Criterion.C_Init (Criteria, Tree.Index_Range (Y_Encoded.Length), Classes);
         --  L163
         Node_Splitter.C_Init (Splitter, Criteria);
         C_Init (aClassifier, Criteria, Splitter, Max_Depth => Max_Depth);
@@ -60,15 +64,9 @@ package body Base_Decision_Tree is
         --  L184
         aClassifier.Attributes.Num_Features :=
           Tree.Index_Range (X.Element (1).Length);
-
-        --  L207  Generates Y_Encoded and Classes
-        Classification_Part (aClassifier, Y, Y_Encoded,
-                             Classes, Expanded_Class_Weight);
-        Criterion.C_Init (Criteria, Tree.Index_Range (Y_Encoded.Length), Classes);
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
-
         if Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
                 Sample_Weights := Expanded_Class_Weight;
