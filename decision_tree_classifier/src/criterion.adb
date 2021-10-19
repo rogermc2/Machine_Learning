@@ -256,7 +256,7 @@ package body Criterion is
     end Proxy_Impurity_Improvement;
 
     --  ------------------------------------------------------------------------
-    --  L348
+    --  L348 Reset the criterion to pos=start
     procedure Reset (Criteria : in out Criterion_Class) is
         Num_Outputs : constant Positive :=
                         Positive (Criteria.Y.Element (1).Length);
