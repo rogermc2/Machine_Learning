@@ -43,7 +43,7 @@ package body Ada_Tree_Builder is
         Parent_Node            : Tree.Tree_Node := Element (Parent_Cursor);
         Start_Row              : constant Positive := Parent_Node.Samples_Start;
         End_Row                : constant Positive :=
-                                   Parent_Node.Num_Node_Samples;
+                                   Start_Row + Parent_Node.Num_Node_Samples - 1;
         Depth                  : constant Positive := Parent_Node.Depth + 1;
         Num_Constant_Features  : Natural := Parent_Node.Num_Constant_Features;
         Is_Leaf                : Boolean := False;

@@ -352,7 +352,7 @@ package body Node_Splitter is
                 "Node_Splitter.Reset_Node, stop index" &
                   Integer'Image (End_Row) &
                   " should not be less than start index" &
-                  Integer'Image (End_Row));
+                  Integer'Image (Start_Row));
 
         Splitter.Start_Row := Start_Row;
         Splitter.End_Row := End_Row;
