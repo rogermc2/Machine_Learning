@@ -84,7 +84,13 @@ package body Ada_Tree_Builder is
             abs (Impurity) <= Epsilon;
 
             --  L222
-            if not Is_Leaf then
+            if Is_Leaf then
+                Put_Line ("Ada_Tree_Builder.Add_Branch L222 else");
+                Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
+                Parent_Node := Element (Parent_Cursor);
+                Classifier_Utilities.Print_Node
+                  ("Ada_Tree_Builder.Add_Branch, L222 else changed to Leaf Node", Parent_Node);
+            else  --  L222 not leaf
                 Put_Line ("Ada_Tree_Builder.Add_Branch L222");
                 Split := Split_Node (Splitter, Impurity, Num_Constant_Features);
                 Put_Line ("Ada_Tree_Builder.Add_Branch L222 node");
@@ -101,38 +107,31 @@ package body Ada_Tree_Builder is
                 Classifier_Utilities.Print_Split_Record
                   ("Ada_Tree_Builder.Add_Branch, Split", Split);
 
-                Put_Line ("Ada_Tree_Builder.Add_Branch L222 is leaf test");
                 Is_Leaf := Split_Row = Parent_Node.Samples_Start or
                   Split_Row >= End_Row or
                   Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
-            else  --  L222
-                Put_Line ("Ada_Tree_Builder.Add_Branch L222 else");
-                Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
-                Parent_Node := Element (Parent_Cursor);
-                Classifier_Utilities.Print_Node
-                  ("Ada_Tree_Builder.Add_Branch, changed to Leaf Node", Parent_Node);
-            end if;
 
-            Put_Line ("Ada_Tree_Builder.Add_Branch L229");
-            --  L229  _tree.add_node just generates a new initialized node
-            --        right and left children are added to the tree (stack) at
-            --        L245 and L251 respectively
-            --          Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
-            --                    & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
-            --                      ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+                Put_Line ("Ada_Tree_Builder.Add_Branch L229");
+                --  L229  _tree.add_node just generates a new initialized node
+                --        right and left children are added to the tree (stack) at
+                --        L245 and L251 respectively
+                Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
+                          & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
+                            ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
-            Left_Child_Cursor := Tree_Build.Add_Node
-              (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
-               Split.Feature, Impurity, Split.Threshold, Start_Row,
-               Start_Row + Split_Row - 1, Weighted_Node_Samples);
-            --  L241 Node.Values already added by Tree_Build.Add_Node
+                Left_Child_Cursor := Tree_Build.Add_Node
+                  (theTree, Splitter, Depth, Parent_Cursor, True, Is_Leaf,
+                   Split.Feature, Impurity, Split.Threshold, Start_Row,
+                   Split_Row - 1, Weighted_Node_Samples);
+                --  L241 Node.Values already added by Tree_Build.Add_Node
 
-            Left_Child := Element (Left_Child_Cursor);
+                Left_Child := Element (Left_Child_Cursor);
 
-            Put_Line ("Ada_Tree_Builder.Add_Branch L254");
-            --  L254
-            if Depth > Max_Depth_Seen then
-                Max_Depth_Seen := Depth;
+                Put_Line ("Ada_Tree_Builder.Add_Branch L254");
+                --  L254
+                if Depth > Max_Depth_Seen then
+                    Max_Depth_Seen := Depth;
+                end if;
             end if;
 
             if not Is_Leaf then
