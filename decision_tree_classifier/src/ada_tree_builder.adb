@@ -144,12 +144,12 @@ package body Ada_Tree_Builder is
                     --  Add left branch
                     Add_Branch (theTree, Builder, Left_Child_Cursor);
                 else
-                    Put_Line ("Ada_Tree_Builder.Add_Branch Left_Child is leaf");
+                    Put_Line ("Ada_Tree_Builder.Add_Branch last Left_Child is leaf");
                 end if;
 
                 if not Right_Child.Is_Leaf then
                     --  Add right branch
-                    Put_Line ("Ada_Tree_Builder.Add_Branch Right_Child");
+                    Put_Line ("Ada_Tree_Builder.Add_Branch last Right_Child");
                     Add_Branch (theTree, Builder, Right_Child_Cursor);
                 else
                     Put_Line ("Ada_Tree_Builder.Add_Branch Right_Child is leaf");
