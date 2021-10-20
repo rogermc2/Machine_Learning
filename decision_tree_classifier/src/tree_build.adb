@@ -45,6 +45,8 @@ package body Tree_Build is
                 " is less than start index" & Integer'Image (Start));
 
       --  _Tree L738
+      Put_Line ("Tree_Build.Add_Node, Is_Left: " & Boolean'Image (Is_Left));
+      New_Node.Is_Left := Is_Left;
       New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
@@ -53,9 +55,9 @@ package body Tree_Build is
 
       New_Node.Samples_Start := Start;
       New_Node.Num_Node_Samples := 1 + Stop - Start;
-      Put_Line ("Tree_Build.Add_Node, Start, Stop, Num_Node_Samples:" &
-                  Integer'Image (Start) & ", " & Integer'Image (Stop) &
-                  ", " & Integer'Image (New_Node.Num_Node_Samples));
+--        Put_Line ("Tree_Build.Add_Node, Start, Stop, Num_Node_Samples:" &
+--                    Integer'Image (Start) & ", " & Integer'Image (Stop) &
+--                    ", " & Integer'Image (New_Node.Num_Node_Samples));
 
       if not Is_Leaf then
          New_Node.Feature_Index := Feature_Index;
@@ -125,6 +127,8 @@ package body Tree_Build is
          Start_Row := aSplit.Split_Row;
       end if;
 
+      Put_Line ("Tree_Build.Add_Split_Node adding left node: " &
+        Boolean'Image (Is_Left));
       Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, aSplit.Improvement, aSplit.Threshold, Start_Row,
@@ -134,6 +138,8 @@ package body Tree_Build is
       New_Node.Values := Values;
       Replace_Element (theTree.Nodes, Node_Cursor, New_Node);
 
+      Put_Line ("Tree_Build.Add_Split_Node adding left node to Res: " &
+        Boolean'Image (Is_Left));
       Res.Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, Impurity, aSplit.Threshold, Start_Row, End_Row,

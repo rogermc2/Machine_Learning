@@ -111,6 +111,7 @@ package body Ada_Tree_Builder is
 --                            & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
 --                              ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
+                Put_Line ("Ada_Tree_Builder.Add_Branch L229 Left_Child");
                 Left_Child_Cursor := Tree_Build.Add_Node
                   (theTree, Builder.Splitter, Depth, Parent_Cursor, True,
                    Is_Leaf, Split.Feature, Impurity, Split.Threshold, Start_Row,
@@ -127,8 +128,7 @@ package body Ada_Tree_Builder is
 
             if not Is_Leaf then
                 --  Add right node
-                Put_Line ("Ada_Tree_Builder.Add_Branch L254, Split_Row, End_Row:"
-                          & Integer'Image (Split_Row) & Integer'Image (End_Row));
+                Put_Line ("Ada_Tree_Builder.Add_Branch L254 Right_Child");
                 Is_Leaf := Split_Row = End_Row;
                 Right_Child_Cursor := Tree_Build.Add_Node
                   (theTree, Builder.Splitter, Depth, Parent_Cursor, False,
