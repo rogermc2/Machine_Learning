@@ -563,7 +563,6 @@ package body Classifier_Utilities is
         use Nodes_Package;
         use Float_Package;
         Tree_Nodes  : constant Tree.Tree_Nodes := aTree.Nodes;
---          Values      : constant List_Of_Float_Lists := aTree.Values;
         Node_Values : Float_List;
         Data        : Float;
         Data_String : Unbounded_String;
