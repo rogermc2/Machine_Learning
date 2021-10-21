@@ -5,6 +5,7 @@
 
 with Base_Decision_Tree;
 with Classifier_Types;
+with Classifier_Utilities;
 with Criterion;
 with Node_Splitter;
 with Weights;
@@ -60,8 +61,8 @@ package body Decision_Tree_Classifer is
    end C_Init;
 
    --  -------------------------------------------------------------------------
-   --  L930 Predict_Probability predicts class probabilities of the
-   --  input samples X.
+   --  _classes.py L930 Predict_Probability predicts class probabilities
+   --   of the input samples X.
    --  The predicted class probability is the fraction of samples of the same
    --  class in a leaf.
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
@@ -75,6 +76,8 @@ package body Decision_Tree_Classifer is
    begin
       --  L954
       Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Classifier_Utilities.Print_Value_Data_List ("Decision_Tree_Classifer.Predict_Probability, Proba",
+                                                 Proba);
       for OP_Index in 1 .. Self.Attributes.Num_Outputs loop
          for index in Proba.First_Index .. Proba.Last_Index loop
             Data := Proba.Element (index);

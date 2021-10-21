@@ -1,6 +1,9 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Text_IO; use Ada.Text_IO;
+
+with Classifier_Utilities;
 
 package body Tree is
 
@@ -30,10 +33,8 @@ package body Tree is
       Samples      : Value_Data_List;
       Leaf_Cursors : Leaf_Cursor_Array (1 .. Positive (X.Length));
    begin
-      if Integer (Child_Count (Self.Nodes.Root)) = 0 then
-         raise Value_Error with
-           "Tree.Apply_Dense Self.Nodes tree is empty";
-      end if;
+      Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
+           "Tree.Apply_Dense Self.Nodes tree is empty");
 
       for index in X.First_Index .. X.Last_Index loop
          Samples := X.Element (index);
@@ -57,20 +58,20 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
---     function Get_Value_Array (Self : Tree_Class) return Value_Array is
---        Values : Value_Array (1 .. Positive (Self.Values.Length));
---        Values_Data : Values_List;
---     begin
---        for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
---           Values (v_index) := Values_Data.Element (v_index);
---        end loop;
---
---        return Values;
---
---     end Get_Value_Array;
+   --     function Get_Value_Array (Self : Tree_Class) return Value_Array is
+   --        Values : Value_Array (1 .. Positive (Self.Values.Length));
+   --        Values_Data : Values_List;
+   --     begin
+   --        for v_index in Values_Data.First_Index .. Values_Data.Last_Index loop
+   --           Values (v_index) := Values_Data.Element (v_index);
+   --        end loop;
+   --
+   --        return Values;
+   --
+   --     end Get_Value_Array;
 
    --  -------------------------------------------------------------------------
-
+   --  _tree L763
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
                      return ML_Types.Value_Data_List is
@@ -81,31 +82,34 @@ package body Tree is
       --  Apply finds the terminal region (=leaf node) for each sample in X.
       --  Leaf_Cursors is a list of feature cursors, each cursor corresponding to
       --  a leaf noode of X
-      --        Leaf_Values  : constant Value_Array
-      --          (1 .. Self.Node_Count, 1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
-      --          := Get_Value_Array (Self);
-      --        Axis_0       : array (1 .. Self.Num_Outputs, 1 .. Self.Num_Features)
-      --          of Float;
       Leaf_Cursors    : Leaf_Cursor_Array (1 .. N_Samples);
       Leaf            : Tree_Node;
       Feature_Index   : Positive;
       Features_List   : Value_Data_List;
       Target          : Value_Data_List;
    begin
-      if Integer (Child_Count (Self.Nodes.Root)) = 0 then
-         raise Value_Error with
-           "Tree.Predict Self.Nodes tree is empty";
-      end if;
+      Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
+              "Tree.Predict Self.Nodes tree is empty");
+
+      Classifier_Utilities.Print_List_Of_Value_Data_Lists
+        ("Tree.Predict Self.Nodes X", X);
+
       Leaf_Cursors := Apply (Self, X);
+      Put_Line ("Tree.Predict Self.Nodes Leaf_Cursors length" &
+                  Integer'Image (Integer (Leaf_Cursors'Length)));
 
       for index in 1 .. N_Samples loop
+         Put_Line ("Tree.Predict Self.Nodes index" & Integer'Image (index));
          Leaf := Element (Leaf_Cursors (index));
-         if not Leaf.Is_Leaf then
+         if Leaf.Is_Leaf then
+            Put_Line ("Tree.Predict Self.Nodes Leaf.Feature_Index" &
+                        Integer'Image (index));
             Feature_Index := Leaf.Feature_Index;
             Features_List := X.Element (index);
             Target.Append (Features_List (Feature_Index));
          end if;
       end loop;
+      Classifier_Utilities.Print_Value_Data_List ("Tree.Predict Target", Target);
 
       return Target;
 
