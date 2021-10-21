@@ -44,7 +44,7 @@ package body Ada_Tree_Builder is
                                    Start_Row + Parent_Node.Num_Node_Samples - 1;
         Depth                  : constant Positive := Parent_Node.Depth + 1;
         Num_Constant_Features  : Natural := Parent_Node.Num_Constant_Features;
-        Is_Leaf                : Boolean := False;
+        Is_Leaf_Node                : Boolean := False;
         Impurity               : Float := Float'Last;
         Weighted_Node_Samples  : Float := 0.0;
         Left_Child_Cursor      : Tree.Tree_Cursor;
@@ -53,7 +53,7 @@ package body Ada_Tree_Builder is
         Right_Child            : Tree.Tree_Node;
         Split_Row              : Positive := End_Row;
     begin
-        if not Parent_Node.Is_Leaf then
+        if not Parent_Node.Leaf_Node then
             --           Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
             --                     & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
             --                       ", " & Integer'Image (Parent_Node.Num_Node_Samples));
@@ -70,7 +70,7 @@ package body Ada_Tree_Builder is
             end if;
 
             --  L210
-            Is_Leaf := Depth >= Builder.Max_Depth or
+            Is_Leaf_Node := Depth >= Builder.Max_Depth or
               Builder.Splitter.Num_Samples = 1 or
               Parent_Node.Num_Node_Samples < Builder.Min_Samples_Split or
               Parent_Node.Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
@@ -79,7 +79,7 @@ package body Ada_Tree_Builder is
             abs (Impurity) <= Epsilon;
 
             --  L222
-            if Is_Leaf then
+            if Is_Leaf_Node then
                 Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
                 Parent_Node := Element (Parent_Cursor);
             else  --  L222 not leaf
@@ -96,7 +96,7 @@ package body Ada_Tree_Builder is
 --                  Classifier_Utilities.Print_Split_Record
 --                    ("Ada_Tree_Builder.Add_Branch, Split", Split);
 
-                Is_Leaf := Split_Row = Parent_Node.Samples_Start or
+                Is_Leaf_Node := Split_Row = Parent_Node.Samples_Start or
                   Split_Row >= End_Row or
                   Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
 
@@ -109,7 +109,7 @@ package body Ada_Tree_Builder is
 
                 Left_Child_Cursor := Tree_Build.Add_Node
                   (theTree, Builder.Splitter, Depth, Parent_Cursor, True,
-                   Is_Leaf, Split.Feature, Impurity, Split.Threshold, Start_Row,
+                   Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Start_Row,
                    Split_Row - 1, Weighted_Node_Samples);
                 --  L241 Node.Values already added by Tree_Build.Add_Node
 
@@ -121,10 +121,10 @@ package body Ada_Tree_Builder is
                 end if;
 
                 --  Add right node
-                Is_Leaf := Split_Row = End_Row;
+                Is_Leaf_Node := Split_Row = End_Row;
                 Right_Child_Cursor := Tree_Build.Add_Node
                   (theTree, Builder.Splitter, Depth, Parent_Cursor, False,
-                   Is_Leaf, Split.Feature, Impurity, Split.Threshold, Split_Row,
+                   Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Split_Row,
                    End_Row, Weighted_Node_Samples);
                 Right_Child := Element (Right_Child_Cursor);
 
@@ -133,14 +133,13 @@ package body Ada_Tree_Builder is
                 end if;
             end if;
 
-            if not Is_Leaf then
-
-                if not Left_Child.Is_Leaf then
+            if not Is_Leaf_Node then
+                if not Left_Child.Leaf_Node then
                     --  Add left branch
                     Add_Branch (theTree, Builder, Left_Child_Cursor);
                 end if;
 
-                if not Right_Child.Is_Leaf then
+                if not Right_Child.Leaf_Node then
                     --  Add right branch
                     Add_Branch (theTree, Builder, Right_Child_Cursor);
                 end if;

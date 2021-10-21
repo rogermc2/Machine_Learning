@@ -33,7 +33,7 @@ package Tree is
    subtype Values_List is Classifier_Types.Float_List;
    subtype List_Of_Values_Lists is Classifier_Types.List_Of_Float_Lists;
 
-   type Tree_Node (Is_Leaf : Boolean := False) is record
+   type Tree_Node (Leaf_Node : Boolean := False) is record
       --  from _Tree Node struct
       Impurity                  : Float := Float'Large;
       Num_Node_Samples          : Positive := 1;
@@ -44,7 +44,7 @@ package Tree is
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
       Values                    : List_Of_Values_Lists;
-      case Is_Leaf is
+      case Leaf_Node is
          when False =>
             --  from _Tree Node struct
             --  Feature used for splitting the node

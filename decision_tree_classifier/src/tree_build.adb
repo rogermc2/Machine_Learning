@@ -209,7 +209,7 @@ package body Tree_Build is
          Heap_Record := Element (Curs);
          Current_Node := Heap_Record.Node_Params;
          Node_Cursor := Heap_Record.Node_Cursor;
-         if not Current_Node.Is_Leaf then
+         if not Current_Node.Leaf_Node then
             Max_Split_Nodes := Max_Split_Nodes - 1;
             Depth := Current_Node.Depth + 1;
             Add_Split_Node

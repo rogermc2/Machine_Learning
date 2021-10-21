@@ -520,7 +520,7 @@ package body Classifier_Utilities is
                       To_Unbounded_String (Offset);
    begin
       Put (To_String (UB_Offset & "Type of node: "));
-      if Node.Is_Leaf then
+      if Node.Leaf_Node then
          Put_Line ("Leaf");
       else
          Put_Line ("Decision");
@@ -543,7 +543,7 @@ package body Classifier_Utilities is
       Put_Line (To_String (UB_Offset & "Impurity: " &
                   Float'Image (Node.Impurity)));
 
-      if Node.Is_Leaf then
+      if Node.Leaf_Node then
          Print_List_Of_Value_Lists (To_String (UB_Offset & "Prediction: "),
                                     Node.Values);
       else

@@ -51,10 +51,10 @@ package body Tree is
          while Not_Leaf loop
             Node := Element (Node_Cursor);
             Left_Cursor := First_Child (Node_Cursor);
-            Not_Leaf := not Element (Left_Cursor).Is_Leaf;
+            Not_Leaf := not Element (Left_Cursor).Leaf_Node;
             if Not_Leaf then
                Left_Node := Element (Left_Cursor);
-               if not Left_Node.Is_Leaf then
+               if not Left_Node.Leaf_Node then
                   Assert (Feature.Value_Kind = Float_Type or
                             Feature.Value_Kind = Integer_Type,
                           "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -127,7 +127,7 @@ package body Tree is
       for index in 1 .. N_Samples loop
          Put_Line ("Tree.Predict Self.Nodes index" & Integer'Image (index));
          Leaf := Element (Leaf_Cursors (index));
-         if Leaf.Is_Leaf then
+         if Leaf.Leaf_Node then
             Put_Line ("Tree.Predict Self.Nodes Leaf.Feature_Index" &
                         Integer'Image (index));
             Feature_Index := Leaf.Feature_Index;
