@@ -33,12 +33,12 @@ package body Base_Decision_Tree is
       (aClassifier    : in out Classifier;
        X              : ML_Types.List_Of_Value_Data_Lists;
        Y              : ML_Types.List_Of_Value_Data_Lists;
-       Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
-       Classes        : out ML_Types.List_Of_Value_Data_Lists;
        Sample_Weights : out Classifier_Types.Float_List;
        Max_Depth      : Integer := -1) is
-        Criteria       : Criterion.Criterion_Class;
-        Splitter       : Node_Splitter.Splitter_Class;
+        Criteria              : Criterion.Criterion_Class;
+        Splitter              : Node_Splitter.Splitter_Class;
+        Y_Encoded             : Classifier_Types.List_Of_Natural_Lists;
+        Classes               : ML_Types.List_Of_Value_Data_Lists;
         --  L205
         Expanded_Class_Weight : Weights.Weight_List;
         Sum_Sample_Weight     : Float := 0.0;

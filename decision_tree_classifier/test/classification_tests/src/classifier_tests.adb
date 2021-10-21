@@ -8,7 +8,6 @@ with Classifier_Utilities;
 with Decision_Tree_Classifer;
 with ML_Types;
 with Tree;
-with Weights;
 
 package body Classifier_Tests is
    use Classifier_Types;
@@ -40,10 +39,7 @@ package body Classifier_Tests is
       X               : constant List_Of_Value_Data_Lists :=
                           To_Multi_Value_List (X_Array);
       Y               : List_Of_Value_Data_Lists;
-      Y_Encoded       : Classifier_Types.List_Of_Natural_Lists;
       Num_Samples     : constant Natural := Natural (X.Length);
-      Classes         : ML_Types.List_Of_Value_Data_Lists;
-      Weight_Values   : Weights.Weight_List;
       Probabilities   : List_Of_Value_Data_Lists;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
@@ -54,13 +50,11 @@ package body Classifier_Tests is
       --  L229
       --        Expected := To_Integer_Value_List (True_Result);
       --  L230
-      Classification_Fit (theTree, X, Y, Y_Encoded, Classes, Weight_Values);
+      Classification_Fit (theTree, X, Y);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                   Integer'Image (Integer
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
       Print_Tree ("The Tree", theTree);
-      Print_Float_List ("Classification_Tests.Test_Classification_Toy weights",
-                        Weight_Values);
       Probabilities := Predict_Probability (theTree, X);
       Classifier_Utilities.Print_List_Of_Value_Data_Lists
         ("Classification_Tests.Test_Classification_Toy Probabilities",

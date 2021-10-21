@@ -113,8 +113,6 @@ package Base_Decision_Tree is
      (aClassifier    : in out Classifier;
       X              : ML_Types.List_Of_Value_Data_Lists;
       Y              : ML_Types.List_Of_Value_Data_Lists;
-      Y_Encoded      : out Classifier_Types.List_Of_Natural_Lists;
-      Classes        : out ML_Types.List_Of_Value_Data_Lists;
       Sample_Weights : out Classifier_Types.Float_List;
       Max_Depth      : Integer := -1);
    procedure C_Init (aClassifier              : in out Classifier;
