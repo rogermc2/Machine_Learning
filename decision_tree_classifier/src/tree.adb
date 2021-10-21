@@ -30,16 +30,12 @@ package body Tree is
       use ML_Types;
       use Nodes_Package;
       Num_Samples  : constant Positive := Positive (X.Length);
-      Record_Kind  : constant  ML_Types.Data_Type :=
-                              X.Element (1).Element (1).Value_Kind;
       Node_Cursor  : Tree_Cursor;
       Node         : Tree_Node;
       Feature      : Positive;
-      Init_Record  : Value_Record (Record_Kind);
       Sample       : Value_Data_List;
-      Output       : Value_Data_List :=
-                         Value_Data_Package.To_Vector (Init_Record,
-                         Count_Type (Num_Samples));
+      Output       : List_Of_Value_Data_Lists :=
+                       Classifier_Utilities.Init_Samples_Copy (X);
       Leaf_Cursors : Leaf_Cursor_Array (1 .. Num_Samples);
    begin
       Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
