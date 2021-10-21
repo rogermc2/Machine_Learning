@@ -1,12 +1,11 @@
-
 project Classifier is
 
-   for Source_Dirs use ("src", "support", "../common");
+   for Source_Dirs use ("src", "support", "utils", "../common");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatyclux");
+      for Default_Switches ("ada") use ("-gnatw.cfkmu", "-gnatyclux");
    end Compiler;
 
 end Classifier;

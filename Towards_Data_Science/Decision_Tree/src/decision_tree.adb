@@ -40,7 +40,7 @@ procedure Decision_Tree is
                      UB ("Red, 1, Grape"),
                      UB ("Yellow, 3, Lemon"));
 
-    Training_Data       : constant Rows_Vector :=
+    Training_Data       : Rows_Vector :=
                             Initialize_Training_Data (Training_Set);
     --      Training_Data2      : Rows_Vector;
     Testing_Data        : constant Rows_Vector :=

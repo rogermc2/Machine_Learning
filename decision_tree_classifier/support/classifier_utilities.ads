@@ -1,73 +1,69 @@
 
-with Ada.Containers.Indefinite_Vectors;
-with Ada.Containers.Ordered_Maps;
-with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Maths;
-
+with Classifier_Types; use Classifier_Types;
+with Estimator;
 with ML_Types;
+with Base_Decision_Tree;
+with Node_Splitter;
+with Tree;
+with Weights;
 
 package Classifier_Utilities is
 
-   subtype Class_Label is Unbounded_String;
-   type Weight_Type is (No_Weight, Balanced_Weight, Weight_Dict, List_Of_Weights);
-   type Weight_Data is record
-      Label  : Class_Label := To_Unbounded_String ("None");
-      Weight : Float := 1.0;
-   end record;
+    Value_Error : Exception;
 
-   type Integer_Array is array (Integer range <>) of Integer;
-   type Float_Array is array (Integer range <>) of Float;
-
-   package Integer_Package is new Ada.Containers.Vectors
-     (Positive, Integer);
-   subtype Integer_List is Integer_Package.Vector;
-
-   package Integer_Array_Package is new Ada.Containers.Indefinite_Vectors
-     (Positive, Integer_Array);
-   subtype Integer_Array_List is Integer_Array_Package.Vector;
-
-   package Float_Package is new Ada.Containers.Vectors
-     (Positive, Float);
-   subtype Float_List is Float_Package.Vector;
-
-   package Probabilities_Package is new Ada.Containers.Vectors (Positive, Float);
-   type Probabilities_List is new Probabilities_Package.Vector with null record;
-
-   type Probability_Array is array (Integer range <>) of Float;
-   type Sample_Matrix is array (Integer range <>, Integer range <>) of Integer;
-
-   package Weight_Dictionary is new Ada.Containers.Ordered_Maps
-     (Class_Label, Float);
-   subtype Weight_Map is Weight_Dictionary.Map;
-
-   package Weight_Package is new Ada.Containers.Vectors
-     (Positive, Weight_Data);
-   subtype Weight_List is Weight_Package.Vector;
-
-   Value_Error : Exception;
-
-   procedure Clear (anArray : in out ML_Types.Label_Data_Array);
-   function Compute_Sample_Weight (Class_Weight : Weight_Type;
-                                   Y : Integer_Array_List;
-                                   Indices      : Integer_List :=
-                                     Integer_Package.Empty_Vector;
-                                   Weights : Weight_List :=
-                                     Weight_Package.Empty_Vector)
-                                   return Float_List;
-   procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
-   procedure Print_Float_Array (Name   : String; anArray : Float_Array;
-                                Start, Finish : Integer);
-   procedure Print_Float_List (Name  : String; theList : Float_List);
-   function To_Float_List (A : Float_Array) return Float_List;
-   function To_Array (L : Integer_List) return Integer_Array;
-   function Unique_Integer_Array (Nums : ML_Types.Label_Data_Array)
-                                  return Integer_Array;
-   function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
-   --  As Integer_List, indices are part of the returned list
-   function Unique (Nums : Integer_List) return Integer_List;
-   function Unique_Value (Nums : ML_Types.Value_Data_List)
-                            return ML_Types.Value_Data_List;
+    function Bin_Count (Numbers : Natural_List) return Natural_List;
+    function Bin_Count (Numbers : ML_Types.Value_Data_List) return Natural_List;
+    procedure Clear (anArray : in out ML_Types.Value_Data_Array);
+    function Compare_Float_Lists (L, R : Float_List) return Boolean;
+    function Dot (L : Weights.Weight_List; R : Natural_List) return Float;
+    procedure Print_Boolean_Matrix (Name    : String;
+                                    aMatrix : Estimator.Boolean_Matrix);
+    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
+    procedure Print_Float_Array (Name          : String; anArray : Float_Array;
+                                 Start, Finish : Integer);
+    procedure Print_Float_List (Name  : String; theList : Float_List);
+    procedure Print_Integer_List (Name : String; theList : Integer_List);
+    procedure Print_List_Of_Natural_Lists (Name : String;
+                                           Data : List_Of_Natural_Lists);
+    procedure Print_List_Of_Float_Lists (Name : String;
+                                         Data : List_Of_Float_Lists);
+    procedure Print_Multi_Value_Array (Name    : String;
+                                       anArray : Multi_Value_Array);
+    procedure Print_List_Of_Value_Lists
+      (Name : String; Multi_List : Tree.List_Of_Values_Lists);
+    procedure Print_List_Of_Value_Data_Lists
+      (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists);
+    procedure Print_Natural_List (Name : String; theList : Natural_List);
+    procedure Print_Node (Message : String; Node : Tree.Tree_Node);
+    procedure Print_Split_Record (Name : String;
+                                  Data : Node_Splitter.Split_Record);
+    procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
+    procedure Print_Tree (Name  : String; aTree : Tree.Tree_Class);
+    procedure Print_Value_List (Name : String; theList : Tree.Values_List);
+    procedure Print_Value_Data_List (Name    : String;
+                                     theList : ML_Types.Value_Data_List);
+    procedure Print_Weights (Name : String; Data : Weights.Weight_List);
+    procedure Print_Weights_Lists (Name : String;
+                                   Data : Weights.Weight_Lists_List);
+    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
+                                       return Integer_List;
+    function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
+    function To_Array (L : Integer_List) return Integer_Array;
+    function To_Float_List (A : Float_Array) return Float_List;
+    function To_Integer_List (A : Integer_Array) return Integer_List;
+    function To_Natural_List (A : Natural_Array) return Natural_List;
+    function To_Integer_Value_List (A : Integer_Array)
+                                    return ML_Types.List_Of_Value_Data_Lists;
+    function To_Multi_Value_List (A : Multi_Value_Array)
+                                  return ML_Types.List_Of_Value_Data_Lists;
+    function To_Natural_Value_List (A : Natural_Array)
+                                    return ML_Types.List_Of_Value_Data_Lists;
+    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
+                                   return Integer_Array;
+    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
+    --  As Integer_List, indices are part of the returned list
+    function Unique (Nums : Integer_List) return Integer_List;
 
 end Classifier_Utilities;

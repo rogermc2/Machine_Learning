@@ -3,10 +3,10 @@
 
 package body Models is
 
-   function Linear_Function (B, X : Classifier_Utilities.Float_List)
-                             return Classifier_Utilities.Float_List is
+   function Linear_Function (B, X : Classifier_Types.Float_List)
+                             return Classifier_Types.Float_List is
       B_Sum : Float := 0.0;
-      Y      : Classifier_Utilities.Float_List;
+      Y     : Classifier_Types.Float_List;
    begin
       for index in B.First_Index + 1 .. B.Last_Index loop
          B_Sum := B_Sum + B (index);

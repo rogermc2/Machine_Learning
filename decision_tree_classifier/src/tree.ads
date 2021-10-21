@@ -1,21 +1,23 @@
 
---  Based on Python 3.7 sklearn tree _tree.pxd class Tree
+--  Based on scikit-learn/sklearn/tree _tree.pxd class Tree
 --  pxd files are like C header files.
 --  They contain Cython declarations and, sometimes, code sections that
 --  are only meant for inclusion in Cython modules.
+--  The Tree object is a binary tree structure constructed by the TreeBuilder.
 --  The tree structure is used for predictions and feature importances.
 
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Vectors;
 
-with Classifier_Utilities; use Classifier_Utilities;
-with Validation;
+with Classifier_Types;
+with ML_Types;
 
 package Tree is
 
    type State is (None);
    type Data_Type is (Integer_Type, Float_Type, Enum_Type);
    type Feature_Type is (No_Feature, Auto_Feature, Sqrt_Feature, Log2_Feature);
+   type Value_Array (<>) is private;
 
    Max_Array_Size : constant Integer := 4000;
    type Index_Range is range 1 .. Max_Array_Size;
@@ -28,58 +30,75 @@ package Tree is
       end case;
    end record;
 
-   type Tree_Node (Feature_Sel : Data_Type) is record
-      Left_Child_ID             : Integer := 0;
-      Right_Child_ID            : Integer := 0;
-      --  Feature used for splitting the node
-      Feature                   : Features_Record (Feature_Sel);
-      Num_Node_Samples          : Integer := 0;
-      Weighted_Num_Node_Samples : Integer := 0;
-      Depth                     : Integer := 0;
---        Parent                    : Tree_Node;
-      Is_Left                   : Integer := 0;
-      Threshold                 : Float := 0.0;
-      Impurity                  : Float := Float'Large;  --  "Infinity"
+   subtype Values_List is Classifier_Types.Float_List;
+   subtype List_Of_Values_Lists is Classifier_Types.List_Of_Float_Lists;
+
+   type Tree_Node (Is_Leaf : Boolean := False) is record
+      --  from _Tree Node struct
+      Impurity                  : Float := Float'Large;
+      Num_Node_Samples          : Positive := 1;
+      Weighted_Num_Node_Samples : Natural := 0;
+      --  From Tree Utils StackRecord struct
+      Samples_Start             : Positive := 1;
+      Depth                     : Positive := 1;
+      Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
+      Values                    : List_Of_Values_Lists;
+      case Is_Leaf is
+         when False =>
+            --  from _Tree Node struct
+            --  Feature used for splitting the node
+            Feature_Index : Positive := 1;
+            Threshold     : Float := 0.0;
+         when True => null;
+      end case;
    end record;
 
-   package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
+   package Nodes_Package is new Ada.Containers.Indefinite_Multiway_Trees
      (Tree_Node);
-   --     type Tree_List is new Tree_Package.Vector with null record;
-   type Values_Array is array
-     (Index_Range range <>, Index_Range range <>, Index_Range range <>) of float;
+   subtype Tree_Nodes is Nodes_Package.Tree;
+   subtype Tree_Cursor is Nodes_Package.Cursor;
+   type Leaf_Cursor_Array is array (Integer range <>) of Tree_Cursor;
 
-   type Tree_Data (Capacity, Num_Outputs, Max_Num_Classes : Index_Range := 1) is record
-      Num_Features    : Integer := 0;
-      Num_Classes     : Integer := 0;
-      Max_Depth       : Integer := 0;
-      Node_Count      : Integer := 0;
-      Nodes           : Tree_Package.Tree;
-      Values          : Values_Array
-        (1 .. Capacity, 1 .. Num_Outputs, 1 .. Max_Num_Classes)
-        := (others => (others => (others => 0.0)));
-      Value_Stride    : Integer := Integer (Num_Outputs * Max_Num_Classes);
+   use Nodes_Package;
+   package Tree_Cursor_Package is new Ada.Containers.Vectors
+     (Positive, Tree_Cursor);
+   subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
+
+   type Tree_Attributes is private;
+   type Tree_Class is record
+      Num_Features    : Natural := 0;
+      Classes         : ML_Types.List_Of_Value_Data_Lists;
+      Num_Outputs     : Index_Range := 1;
+      Max_Depth       : Integer := -1;
+      Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
+      Attributes      : Tree_Attributes;
    end record;
 
    Value_Error : Exception;
 
---     procedure Fit moved to fit_functions
---     procedure Fit (Self          : Validation.Attribute_List;
---                    X, Y          : Sample_Matrix;
---                    Sample_Weight : State := None;
---                    Check_Input   : Boolean := True;
---                    X_Idx_Sorted  : State := None);
+   function Apply (Self : Tree_Class;
+                   X    : ML_Types.List_Of_Value_Data_Lists)
+                   return Leaf_Cursor_Array;
+   --     procedure Fit moved to fit_functions
+   --     procedure Fit (Self          : Validation.Attribute_List;
+   --                    X, Y          : Sample_Matrix;
+   --                    Sample_Weight : State := None;
+   --                    Check_Input   : Boolean := True;
+   --                    X_Idx_Sorted  : State := None);
+--     function Get_Value_Array (Self : Tree_Class) return Value_Array;
+   function Predict (Self : Tree_Class;
+                     X    : ML_Types.List_Of_Value_Data_Lists)
+                     return ML_Types.Value_Data_List;
 
-   --  Predict class probabilities of the input samples X.
-   --  The predicted class probability is the fraction of samples of the same
-   --   class in a leaf.
-   function Predict_Probability (Self : Validation.Attribute_List;
-                                  X    : Sample_Matrix;
-                                 Check_Input : Boolean := True)
-                                 return Probabilities_List;
-   --  Predict class log-probabilities of the input samples X.
-   function Predict_Log_Probability (Self : Validation.Attribute_List;
-                                     X    : Sample_Matrix)
-                                     return Probabilities_List;
+private
+
+   type Tree_Attributes is record
+      Node_Count : Natural := 0;
+      Max_Depth  : Natural := 0;
+   end record;
+
+   type Value_Array is array
+     (Natural range <>) of Float;
 
 end Tree;
