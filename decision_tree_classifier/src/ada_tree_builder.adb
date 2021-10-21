@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Classifier_Utilities;
 with Node_Splitter;
@@ -59,10 +59,10 @@ package body Ada_Tree_Builder is
             --                       ", " & Integer'Image (Parent_Node.Num_Node_Samples));
             --  L208
             --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
+--              New_Line;
             Reset_Node (Builder.Splitter, Start_Row, End_Row, Weighted_Node_Samples);
---              Put_Line ("Ada_Tree_Builder.Add_Branch Start_Row, End_Row, Num_Node_Samples reset: "
---                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
---                          ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+--              Put_Line ("Ada_Tree_Builder.Add_Branch Reset_Node Start_Row, End_Row: "
+--                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
 
             if First then
                 Impurity := Node_Impurity (Builder.Splitter);
@@ -82,14 +82,10 @@ package body Ada_Tree_Builder is
             if Is_Leaf then
                 Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
                 Parent_Node := Element (Parent_Cursor);
---                  Classifier_Utilities.Print_Node
---                    ("Ada_Tree_Builder.Add_Branch, L222 else changed to Leaf Node", Parent_Node);
             else  --  L222 not leaf
                 Split := Split_Node (Builder.Splitter, Impurity,
                                      Num_Constant_Features);
                 Split_Row := Split.Split_Row;
---                  Put_Line ("Ada_Tree_Builder.Add_Branch L222 not leaf Start_Row, End_Row "
---                            & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
                 Assert (Split_Row > Start_Row and Split_Row <= End_Row,
                         "Ada_Tree_Builder.Add_Branch L222, Split_Row index " &
                           Integer'Image (Split_Row) &
@@ -111,7 +107,6 @@ package body Ada_Tree_Builder is
 --                            & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
 --                              ", " & Integer'Image (Parent_Node.Num_Node_Samples));
 
-                Put_Line ("Ada_Tree_Builder.Add_Branch L229 Left_Child");
                 Left_Child_Cursor := Tree_Build.Add_Node
                   (theTree, Builder.Splitter, Depth, Parent_Cursor, True,
                    Is_Leaf, Split.Feature, Impurity, Split.Threshold, Start_Row,
@@ -124,11 +119,8 @@ package body Ada_Tree_Builder is
                 if Depth > Max_Depth_Seen then
                     Max_Depth_Seen := Depth;
                 end if;
-            end if;
 
-            if not Is_Leaf then
                 --  Add right node
-                Put_Line ("Ada_Tree_Builder.Add_Branch L254 Right_Child");
                 Is_Leaf := Split_Row = End_Row;
                 Right_Child_Cursor := Tree_Build.Add_Node
                   (theTree, Builder.Splitter, Depth, Parent_Cursor, False,
@@ -139,24 +131,22 @@ package body Ada_Tree_Builder is
                 if Depth > Max_Depth_Seen then
                     Max_Depth_Seen := Depth;
                 end if;
+            end if;
+
+            if not Is_Leaf then
 
                 if not Left_Child.Is_Leaf then
                     --  Add left branch
                     Add_Branch (theTree, Builder, Left_Child_Cursor);
-                else
-                    Put_Line ("Ada_Tree_Builder.Add_Branch last Left_Child is leaf");
                 end if;
 
                 if not Right_Child.Is_Leaf then
                     --  Add right branch
-                    Put_Line ("Ada_Tree_Builder.Add_Branch last Right_Child");
                     Add_Branch (theTree, Builder, Right_Child_Cursor);
-                else
-                    Put_Line ("Ada_Tree_Builder.Add_Branch Right_Child is leaf");
                 end if;
             end if;
         end if;
-        New_Line;
+--          New_Line;
 
     end Add_Branch;
 
