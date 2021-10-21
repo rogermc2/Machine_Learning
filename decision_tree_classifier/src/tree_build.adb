@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Classifier_Utilities;
 with ML_Types;
@@ -45,7 +45,6 @@ package body Tree_Build is
                 " is less than start index" & Integer'Image (Start));
 
       --  _Tree L738
-      Put_Line ("Tree_Build.Add_Node L738, Is_Left: " & Boolean'Image (Is_Left));
       New_Node.Is_Left := Is_Left;
       New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
@@ -127,8 +126,6 @@ package body Tree_Build is
          Start_Row := aSplit.Split_Row;
       end if;
 
-      Put_Line ("Tree_Build.Add_Split_Node adding left node: " &
-        Boolean'Image (Is_Left));
       Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, aSplit.Improvement, aSplit.Threshold, Start_Row,
@@ -138,8 +135,6 @@ package body Tree_Build is
       New_Node.Values := Values;
       Replace_Element (theTree.Nodes, Node_Cursor, New_Node);
 
-      Put_Line ("Tree_Build.Add_Split_Node adding left node to Res: " &
-        Boolean'Image (Is_Left));
       Res.Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, Impurity, aSplit.Threshold, Start_Row, End_Row,
@@ -204,8 +199,6 @@ package body Tree_Build is
            "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
       end if;
 
-      Put_Line ("Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes: " &
-                  Integer'Image (Best_Builder.Max_Leaf_Nodes));
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
       Add_Split_Node (Best_Builder, Splitter, theTree, Impurity,
                       True, True, theTree.Nodes.Root, Depth, Split_Node_Left);
@@ -217,8 +210,6 @@ package body Tree_Build is
          Current_Node := Heap_Record.Node_Params;
          Node_Cursor := Heap_Record.Node_Cursor;
          if not Current_Node.Is_Leaf then
-            Put_Line ("Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes: " &
-                        Integer'Image (Max_Split_Nodes));
             Max_Split_Nodes := Max_Split_Nodes - 1;
             Depth := Current_Node.Depth + 1;
             Add_Split_Node

@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 package body Tree is
 
@@ -50,7 +50,7 @@ package body Tree is
          end loop;
          Leaf_Cursors (index) := Node_Cursor;
       end loop;
-      New_Line;
+
       return Leaf_Cursors;
 
    end Apply_Dense;
