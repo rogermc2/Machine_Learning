@@ -31,9 +31,12 @@ package body Tree is
       use Nodes_Package;
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
+      Left_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
+      Left_Node      : Tree_Node;
       Sample         : Value_Data_List;
       Feature        : Value_Record;
+      Not_Leaf       : Boolean := True;
       Split          : Boolean;
       Output_Cursors : Leaf_Cursor_Array (1 .. Num_Samples);
    begin
@@ -44,25 +47,30 @@ package body Tree is
       for index in X.First_Index .. X.Last_Index loop
          Sample := X.Element (index);
          Node_Cursor := First_Child (Self.Nodes.Root);
-         while Has_Element (Node_Cursor) and then
-           not Element (Node_Cursor).Is_Leaf loop
+--           while Not_Leaf and then Has_Element (Node_Cursor) loop
+         while Not_Leaf loop
             Node := Element (Node_Cursor);
-            Feature := Sample.Element (Node.Feature_Index);
-            if Node.Is_Leaf then
-               Assert (Feature.Value_Kind = Float_Type or
-                         Feature.Value_Kind = Integer_Type,
-                       "Tree.Apply_Dense Self.Nodes invalid feature data type");
-               case Feature.Value_Kind is
-               when Float_Type =>
-                  Split := Feature.Float_Value <= Node.Threshold;
-               when Integer_Type =>
-                  Split := Float (Feature.Integer_Value) <= Node.Threshold;
-               when others => null;
-               end case;
-               if Split then
-                  Node_Cursor := First_Child (Node_Cursor);
-               else
-                  Node_Cursor := Last_Child (Node_Cursor);
+            Left_Cursor := First_Child (Node_Cursor);
+            Not_Leaf := not Element (Left_Cursor).Is_Leaf;
+            if Not_Leaf then
+               Left_Node := Element (Left_Cursor);
+               if not Left_Node.Is_Leaf then
+                  Assert (Feature.Value_Kind = Float_Type or
+                            Feature.Value_Kind = Integer_Type,
+                          "Tree.Apply_Dense Self.Nodes invalid feature data type");
+                  Feature := Sample.Element (Node.Feature_Index);
+                  case Feature.Value_Kind is
+                  when Float_Type =>
+                     Split := Feature.Float_Value <= Node.Threshold;
+                  when Integer_Type =>
+                     Split := Float (Feature.Integer_Value) <= Node.Threshold;
+                  when others => null;
+                  end case;
+                  if Split then
+                     Node_Cursor := First_Child (Node_Cursor);
+                  else
+                     Node_Cursor := Last_Child (Node_Cursor);
+                  end if;
                end if;
             end if;
          end loop;
@@ -92,7 +100,7 @@ package body Tree is
    --  _tree L763
    function Predict (Self : Tree_Class;
                      X    : ML_Types.List_Of_Value_Data_Lists)
-                     return ML_Types.Value_Data_List is
+                  return ML_Types.Value_Data_List is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       use ML_Types;
