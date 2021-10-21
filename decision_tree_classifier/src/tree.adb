@@ -12,7 +12,7 @@ package body Tree is
                          return Leaf_Cursor_Array;
 
    --  -------------------------------------------------------------------------
-   --  Apply finds the terminal region (=leaf node) for each sample in X.
+   --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    function Apply (Self : Tree_Class;
                    X    : ML_Types.List_Of_Value_Data_Lists)
                    return Leaf_Cursor_Array is
@@ -21,29 +21,40 @@ package body Tree is
    end Apply;
 
    --  -------------------------------------------------------------------------
-
+   --  L777
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.List_Of_Value_Data_Lists)
                          return Leaf_Cursor_Array is
+      --  X is a list of samples of features
+      use Ada.Containers;
       use ML_Types;
       use Nodes_Package;
+      Num_Samples  : constant Positive := Positive (X.Length);
+      Record_Kind  : constant  ML_Types.Data_Type :=
+                              X.Element (1).Element (1).Value_Kind;
       Node_Cursor  : Tree_Cursor;
       Node         : Tree_Node;
       Feature      : Positive;
-      Samples      : Value_Data_List;
-      Leaf_Cursors : Leaf_Cursor_Array (1 .. Positive (X.Length));
+      Init_Record  : Value_Record (Record_Kind);
+      Sample       : Value_Data_List;
+      Output       : Value_Data_List :=
+                         Value_Data_Package.To_Vector (Init_Record,
+                         Count_Type (Num_Samples));
+      Leaf_Cursors : Leaf_Cursor_Array (1 .. Num_Samples);
    begin
       Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
            "Tree.Apply_Dense Self.Nodes tree is empty");
 
+      --  for each sample of features
       for index in X.First_Index .. X.Last_Index loop
-         Samples := X.Element (index);
+         Sample := X.Element (index);
          Node_Cursor := First_Child (Self.Nodes.Root);
          while Has_Element (Node_Cursor) and then
            not Element (Node_Cursor).Is_Leaf loop
             Node := Element (Node_Cursor);
             Feature := Node.Feature_Index;
-            if Node.Is_Leaf and then Samples.Element (Feature).Float_Value <= Node.Threshold then
+            if Node.Is_Leaf and then
+                  Sample.Element (Feature).Float_Value <= Node.Threshold then
                Node_Cursor := First_Child (Node_Cursor);
             else
                Node_Cursor := Last_Child (Node_Cursor);
