@@ -29,17 +29,16 @@ package body Tree is
       use Ada.Containers;
       use ML_Types;
       use Nodes_Package;
-      Num_Samples  : constant Positive := Positive (X.Length);
-      Node_Cursor  : Tree_Cursor;
-      Node         : Tree_Node;
-      Feature      : Positive;
-      Sample       : Value_Data_List;
-      Output       : List_Of_Value_Data_Lists :=
-                       Classifier_Utilities.Init_Samples_Copy (X);
-      Leaf_Cursors : Leaf_Cursor_Array (1 .. Num_Samples);
+      Num_Samples    : constant Positive := Positive (X.Length);
+      Node_Cursor    : Tree_Cursor;
+      Node           : Tree_Node;
+      Sample         : Value_Data_List;
+      Feature        : Value_Record;
+      Split          : Boolean;
+      Output_Cursors : Leaf_Cursor_Array (1 .. Num_Samples);
    begin
       Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
-           "Tree.Apply_Dense Self.Nodes tree is empty");
+              "Tree.Apply_Dense Self.Nodes tree is empty");
 
       --  for each sample of features
       for index in X.First_Index .. X.Last_Index loop
@@ -48,18 +47,30 @@ package body Tree is
          while Has_Element (Node_Cursor) and then
            not Element (Node_Cursor).Is_Leaf loop
             Node := Element (Node_Cursor);
-            Feature := Node.Feature_Index;
-            if Node.Is_Leaf and then
-                  Sample.Element (Feature).Float_Value <= Node.Threshold then
-               Node_Cursor := First_Child (Node_Cursor);
-            else
-               Node_Cursor := Last_Child (Node_Cursor);
+            Feature := Sample.Element (Node.Feature_Index);
+            if Node.Is_Leaf then
+               Assert (Feature.Value_Kind = Float_Type or
+                         Feature.Value_Kind = Integer_Type,
+                       "Tree.Apply_Dense Self.Nodes invalid feature data type");
+               case Feature.Value_Kind is
+               when Float_Type =>
+                  Split := Feature.Float_Value <= Node.Threshold;
+               when Integer_Type =>
+                  Split := Float (Feature.Integer_Value) <= Node.Threshold;
+               when others => null;
+               end case;
+               if Split then
+                  Node_Cursor := First_Child (Node_Cursor);
+               else
+                  Node_Cursor := Last_Child (Node_Cursor);
+               end if;
             end if;
          end loop;
-         Leaf_Cursors (index) := Node_Cursor;
+
+         Output_Cursors (index) := Node_Cursor;
       end loop;
 
-      return Leaf_Cursors;
+      return Output_Cursors;
 
    end Apply_Dense;
 
