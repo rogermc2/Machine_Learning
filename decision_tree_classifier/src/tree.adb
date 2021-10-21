@@ -121,9 +121,9 @@ package body Tree is
         ("Tree.Predict Self.Nodes X", X);
 
       Leaf_Cursors := Apply (Self, X);
-      Put_Line ("Tree.Predict Self.Nodes Leaf_Cursors length" &
-                  Integer'Image (Integer (Leaf_Cursors'Length)));
-
+      Classifier_Utilities.Print_Node_Cursor_Array
+          ("Tree.Predict Self.Nodes Leaf_Cursors", Leaf_Cursors);
+      --  L801
       for index in 1 .. N_Samples loop
          Put_Line ("Tree.Predict Self.Nodes index" & Integer'Image (index));
          Leaf := Element (Leaf_Cursors (index));
