@@ -126,6 +126,12 @@ package body Tree is
       Feature_Index   : Positive;
       Features_List   : Value_Data_List;
       Output          : Value_Data_List;
+      --  L1086 _get_value_ndarray
+      --  Output should be a 3D array (node count, num outputs, max classes)
+      --  self.value
+      --  Leaf_Cursors should provide node-count nodes but
+      --  provides num-samples nodes
+      --  (Self.Nodes.Node_Count, Self.Num_Outputs, Self.Classes.Length)
    begin
       Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
               "Tree.Predict Self.Nodes tree is empty");
@@ -134,6 +140,8 @@ package body Tree is
         ("Tree.Predict Self.Nodes X", X);
 
       Leaf_Cursors := Apply (Self, X);
+      Put_Line ("Tree.Predict Leaf_Cursors length: " &
+               Integer'Image (Leaf_Cursors'Length));
 --        Classifier_Utilities.Print_Node_Cursor_Array
 --          ("Tree.Predict Self.Nodes Leaf_Cursors", Leaf_Cursors);
       --  L801

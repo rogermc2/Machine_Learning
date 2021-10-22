@@ -43,6 +43,7 @@ package Tree is
       Depth                     : Positive := 1;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
+      --  Values is num_outputs x num_classes
       Values                    : List_Of_Values_Lists;
       case Leaf_Node is
          when False =>
@@ -65,14 +66,12 @@ package Tree is
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
 
-   type Tree_Attributes is private;
    type Tree_Class is record
       Num_Features    : Natural := 0;
       Classes         : ML_Types.List_Of_Value_Data_Lists;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Integer := -1;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
-      Attributes      : Tree_Attributes;
    end record;
 
    Value_Error : Exception;
@@ -92,11 +91,6 @@ package Tree is
                      return ML_Types.Value_Data_List;
 
 private
-
-   type Tree_Attributes is record
-      Node_Count : Natural := 0;
-      Max_Depth  : Natural := 0;
-   end record;
 
    type Value_Array is array
      (Natural range <>) of Float;
