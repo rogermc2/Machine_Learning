@@ -132,6 +132,6 @@ package Base_Decision_Tree is
                      Random_State             : Integer := 0);
    function Predict (Self : in out Classifier;
                      X    : ML_Types.List_Of_Value_Data_Lists)
-                     return ML_Types.Value_Data_List;
+                     return Tree.Values_Array_3D;
 
 end Base_Decision_Tree;

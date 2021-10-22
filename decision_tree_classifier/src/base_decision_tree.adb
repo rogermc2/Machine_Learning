@@ -315,7 +315,7 @@ package body Base_Decision_Tree is
     --  Based on class.py fit L431 Predict
     function Predict (Self : in out Classifier;
                       X    : ML_Types.List_Of_Value_Data_Lists)
-                     return ML_Types.Value_Data_List is
+                     return Tree.Values_Array_3D is
     begin
         return Tree.Predict (Self.Attributes.Decision_Tree, X);
     end Predict;

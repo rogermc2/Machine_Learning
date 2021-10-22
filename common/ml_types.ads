@@ -88,6 +88,9 @@ package ML_Types is
    type Value_Data_Array is array (Positive range <>) of Value_Record;
    type Value_Data_Array_2D is array (Positive range <>, Positive range <>)
      of Value_Record;
+   type Value_Data_Array_3D is array
+     (Positive range <>, Positive range <>, Positive range <>)
+     of Value_Record;
 
    package Count_Package is new Ada.Containers.Ordered_Maps
      (Data_Type, Natural);

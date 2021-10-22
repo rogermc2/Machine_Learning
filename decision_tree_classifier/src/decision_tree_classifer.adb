@@ -5,7 +5,7 @@
 
 with Base_Decision_Tree;
 with Classifier_Types;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with Criterion;
 with Node_Splitter;
 with Weights;
@@ -67,46 +67,34 @@ package body Decision_Tree_Classifer is
    --  class in a leaf.
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                  X    : ML_Types.List_Of_Value_Data_Lists)
-                                  return ML_Types.List_Of_Value_Data_Lists is
+                                 return ML_Types.List_Of_Value_Data_Lists is
       use ML_Types;
-      Proba      : Value_Data_List;
-      All_Proba  : List_Of_Value_Data_Lists;
-      Data       : Value_Record;
-      Normalizer : Float := 0.0;
+      Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
+      Num_Nodes       : constant Positive
+        := Positive (Self.Attributes.Decision_Tree.Nodes.Node_Count);
+      Num_Classes     : constant Positive
+        := Positive (Self.Attributes.Decision_Tree.Classes.Length);
+      Proba           : Tree.Values_Array_3D
+        (1 .. Num_Nodes, 1 .. Num_Outputs,1 .. Num_Classes);
+      Prob_K          : Tree.Values_Array_2D (1 .. Num_Nodes, 1 .. Num_Classes);
+      All_Proba       : List_Of_Value_Data_Lists;
+      Normalizer      : Float := 0.0;
    begin
       --  L954
       Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
-      Classifier_Utilities.Print_Value_Data_List ("Decision_Tree_Classifer.Predict_Probability, Proba",
-                                                 Proba);
-      for OP_Index in 1 .. Self.Attributes.Num_Outputs loop
-         for index in Proba.First_Index .. Proba.Last_Index loop
-            Data := Proba.Element (index);
-            case Data.Value_Kind is
-               when Float_Type =>
-                  Normalizer := Normalizer + Data.Float_Value;
-               when Integer_Type =>
-                  Normalizer := Normalizer + Float (Data.Integer_Value);
-               when others => null;
-            end case;
+      --        Classifier_Utilities.Print_Value_Data_List ("Decision_Tree_Classifer.Predict_Probability, Proba",
+      --                                                    Proba);
+      --  L969
+      for k in 1 .. Num_Outputs loop
+         for node_index in 1 .. Num_Nodes loop
+            for class_index in Proba'First (1)  .. Proba'Last (1) loop
+               Prob_K (node_index, class_index) :=
+                 Proba (node_index, k, class_index);
+               if Normalizer <= 0.0 then
+                  Normalizer := 1.0;
+               end if;
+            end loop;
          end loop;
-         if Normalizer <= 0.0 then
-            Normalizer := 1.0;
-         end if;
-
-         for index in Proba.First_Index .. Proba.Last_Index loop
-            Data := Proba.Element (index);
-            case Data.Value_Kind is
-               when Float_Type =>
-                  Data.Float_Value := Data.Float_Value / Normalizer;
-               when Integer_Type =>
-                  Data.Integer_Value :=
-                    Integer (Float (Data.Integer_Value) / Normalizer);
-               when others => null;
-            end case;
-            Proba.Replace_Element (index, Data);
-         end loop;
-         All_Proba.Append (Proba);
-
       end loop;
 
       return All_Proba;
