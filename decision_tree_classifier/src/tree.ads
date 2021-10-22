@@ -80,9 +80,6 @@ package Tree is
 
    Value_Error : Exception;
 
-   function Apply (Self : Tree_Class;
-                   X    : ML_Types.List_Of_Value_Data_Lists)
-                   return Leaf_Cursor_Array;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;

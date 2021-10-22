@@ -40,7 +40,7 @@ package body Classifier_Tests is
                           To_Multi_Value_List (X_Array);
       Y               : List_Of_Value_Data_Lists;
       Num_Samples     : constant Natural := Natural (X.Length);
-      Probabilities   : List_Of_Value_Data_Lists;
+      Probabilities   : Tree.List_Of_Values_Lists;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,
@@ -56,7 +56,7 @@ package body Classifier_Tests is
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
       Print_Tree ("The Tree", theTree);
       Probabilities := Predict_Probability (theTree, X);
-      Classifier_Utilities.Print_List_Of_Value_Data_Lists
+      Classifier_Utilities.Print_List_Of_Value_Lists
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);
       --          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
