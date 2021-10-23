@@ -116,31 +116,23 @@ package body Tree is
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
       Num_Nodes       : constant Positive := Positive (Self.Nodes.Node_Count - 1);
       Node_Index      : Natural := 0;
-      Node_Values     : Values_List_3D;
+      Node_Values     : ML_Types.Value_Data_Lists_3D;
       --  L1086 _get_value_ndarray
       --  Output should be a 3D array (node count, num outputs, max classes)
       --  self.value
       procedure Build_Output (Curs : Cursor) is
-         Node        : constant Tree_Node := Element (Curs);
-         Num_Classes : Positive;
+         Node         : constant Tree_Node := Element (Curs);
          --  Values is num_outputs x num_classes
-         Values      : constant Values_List_2D := Node.Values;
-         Outputs     : Values_List;
-         Class_Values    : Values_List;
-         Out_Values      : Values_List_2D;
+         Values       : constant Values_List_2D := Node.Values;
+         Outputs      : Values_List;
+         Classes_Out  : ML_Types.Value_Data_Lists_2D;
+         Class_Values : ML_Types.Value_Data_List;
       begin
-         Put_Line ("Tree.Predict.Build_Output Num_Classes" &
-                     Integer'Image (Num_Classes));
-         Node_Index := Node_Index + 1;
          for output_index in 1 .. Num_Outputs loop
-            Num_Classes := Positive (Self.Classes (output_index).Length);
-            Outputs := Values.Element (output_index);
-            for class_index in 1 .. Num_Classes loop
-               Class_Values.Append (Outputs.Element (class_index));
-            end loop;
-            Out_Values.Append (Class_Values);
+            Class_Values := Values.Element (output_index);
+            Classes_Out.Append (Class_Values);
          end loop;
-         Node_Values.Append (Out_Values);
+         Node_Values.Append (Classes_Out);
       end Build_Output;
 
    begin
@@ -151,6 +143,9 @@ package body Tree is
         ("Tree.Predict Self.Nodes X", X);
      Put_Line ("Tree.Predict Num_Nodes" & Integer'Image (Num_Nodes));
      Put_Line ("Tree.Predict Num_Outputs" & Integer'Image (Num_Outputs));
+         Put_Line ("Tree.Predict.Build_Output Num_Classes" &
+                     Integer'Image (Integer (Self.Classes.Length)) &
+                  " x " & Integer'Image (Integer (Self.Classes.Element (1).Length)));
 
       --  L767
       Iterate_Subtree (Self.Nodes.Root, Build_Output'access);

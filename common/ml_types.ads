@@ -85,6 +85,11 @@ package ML_Types is
      Ada.Containers.Vectors (Positive, Value_Data_List);
    subtype Value_Data_Lists_2D is Value_Lists_Data_Package.Vector;
 
+   use Value_Lists_Data_Package;
+   package Value_Lists_3D_Package is new
+     Ada.Containers.Vectors (Positive, Value_Data_Lists_2D);
+   subtype Value_Data_Lists_3D is Value_Lists_3D_Package.Vector;
+
    type Value_Data_Array is array (Positive range <>) of Value_Record;
    type Value_Data_Array_2D is array (Positive range <>, Positive range <>)
      of Value_Record;
