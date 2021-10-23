@@ -67,21 +67,19 @@ package body Decision_Tree_Classifer is
    --  class in a leaf.
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                  X    : ML_Types.Value_Data_Lists_2D)
-                                  return Tree.Values_List_2D is
+                                  return Tree.Values_List_3D is
       use ML_Types;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
       Num_Nodes       : constant Positive
         := Positive (Self.Attributes.Decision_Tree.Nodes.Node_Count);
-      Classes         : constant Value_Data_Lists_2D :=
-                          Self.Attributes.Decision_Tree.Classes;
-      Num_Classes     : constant Positive := Positive (Classes.Length);
-      Proba           : Tree.Values_List_3D;
-      Classes_K       : Value_Data_List;
-      Num_Classes_K   : Positive;
-      Prob_K          : Tree.Values_List_2D;
-      Prob_K_List     : Tree.Values_List;
-      All_Proba       : Tree.Values_List_2D;
-      Normalizer      : Float;
+      Classes       : constant Value_Data_Lists_2D :=
+                        Self.Attributes.Decision_Tree.Classes;
+      Num_Classes   : constant Positive := Positive (Classes.Length);
+      Proba         : Tree.Values_List_3D;
+      Prob_K        : Tree.Values_List_2D;
+      Prob_Class    : Tree.Values_List;
+      All_Proba     : Tree.Values_List_3D;
+      Normalizer    : Float;
    begin
       --  L954
       Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
@@ -89,32 +87,29 @@ package body Decision_Tree_Classifer is
       --                                                    Proba);
       --  L969
       for k in 1 .. Num_Outputs loop
-         Prob_K_List.Clear;
+         Prob_K.Clear;
          for node_index in 1 .. Num_Nodes loop
+            Prob_K := Proba.Element (node_index);
+            Prob_Class.Clear;
             for class_index in 1  .. Num_Classes loop
-               Classes_K := Classes.Element (k);
-               Num_Classes_K := Positive (Classes_K.Length);
-               Prob_K := Proba.Element (node_index);
-               --                      Prob_K (node_index, class_index) := Proba (node_index, k,
-               --                                                                 Num_Classes_K);
+               Prob_Class := Prob_K.Element (class_index);
+
                Normalizer := 0.0;
                for index in 1 .. Num_Nodes loop
-                  Normalizer := Normalizer + Prob_K (index, class_index);
+                  Normalizer := Normalizer + Prob_Class.Element (class_index);
                end loop;
 
-               Prob_K_List.Append (Prob_K (node_index, class_index));
-
                if Normalizer > 0.0 then
-                  for index in Prob_K_List.First_Index ..
-                    Prob_K_List.Last_Index loop
-                     Prob_K_List.Replace_Element
-                       (index, Prob_K_List.Element (index) / Normalizer);
+                  for index in Prob_Class.First_Index ..
+                    Prob_Class.Last_Index loop
+                     Prob_Class.Replace_Element
+                       (index, Prob_Class.Element (index) / Normalizer);
                   end loop;
                end if;
+               Prob_K.Append (Prob_Class);
             end loop;
+            All_Proba.Append (Prob_K);
          end loop;
-
-         All_Proba.Append (Prob_K_List);
       end loop;
 
       return All_Proba;

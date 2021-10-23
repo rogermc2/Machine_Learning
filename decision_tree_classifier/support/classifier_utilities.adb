@@ -729,6 +729,16 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Value_Lists_3D
+     (Name : String; Multi_List : Tree.Values_List_3D) is
+   begin
+      for index in Multi_List.First_Index .. Multi_List.Last_Index loop
+         Print_List_Of_Value_Lists (Name, Multi_List.Element (index));
+      end loop;
+   end Print_Value_Lists_3D;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
       aWeight : Float;
       Count   : Integer := 1;

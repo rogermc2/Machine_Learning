@@ -13,7 +13,7 @@ package body Criterion is
     --  L214 __cinit__
     procedure C_Init (Criteria : in out Criterion_Class;
                       Num_Outputs : Tree.Index_Range;
-                      Classes  : ML_Types.List_Of_Value_Data_Lists) is
+                      Classes  : ML_Types.Value_Data_Lists_2D) is
     begin
         --  L252
         Criteria.Num_Outputs := Num_Outputs;
@@ -212,7 +212,7 @@ package body Criterion is
     --  ------------------------------------------------------------------------
 
     procedure Node_Value (Self  : Criterion_Class;
-                          Value : out Classifier_Types.List_Of_Float_Lists) is
+                          Value : out Classifier_Types.Float_List_2D) is
         Sum_Total_K : Classifier_Types.Float_List;
         Total_K     : Classifier_Types.Float_List;
     begin

@@ -44,13 +44,13 @@ package Tree_Build is
     procedure Build_Best_First_Tree
       (Best_Builder  : in out Tree_Builder;
        theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.Value_Data_Lists_2D;
        Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
        Sample_Weight : Weights.Weight_List);
     procedure Build_Depth_First_Tree
       (Depth_Builder : in out Tree_Builder;
        theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.List_Of_Value_Data_Lists;
+       X             : ML_Types.Value_Data_Lists_2D;
        Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
        Sample_Weight : Weights.Weight_List);
     procedure Change_To_Leaf_Node (aTree : in out Tree.Tree_Class;

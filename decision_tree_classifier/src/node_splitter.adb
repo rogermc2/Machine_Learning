@@ -30,7 +30,7 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure Init (Self             : in out Splitter_Class;
-                   Input_X          : ML_Types.List_Of_Value_Data_Lists;
+                   Input_X          : ML_Types.Value_Data_Lists_2D;
                    Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
                    Sample_Weight    : Weights.Weight_List;
                    Min_Leaf_Samples : Positive := 1) is
@@ -104,7 +104,7 @@ package body Node_Splitter is
 
    procedure Node_Value
      (Self   : Splitter_Class;
-      Values : out Classifier_Types.List_Of_Float_Lists) is
+      Values : out Classifier_Types.Float_List_2D) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;

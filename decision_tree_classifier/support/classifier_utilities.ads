@@ -19,7 +19,7 @@ package Classifier_Utilities is
    function Compare_Float_Lists (L, R : Float_List) return Boolean;
    function Dot (L : Weights.Weight_List; R : Natural_List) return Float;
    function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
-                                return ML_Types.Value_Data_Lists_2D;
+                               return ML_Types.Value_Data_Lists_2D;
    procedure Print_Boolean_Matrix (Name    : String;
                                    aMatrix : Estimator.Boolean_Matrix);
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
@@ -48,26 +48,28 @@ package Classifier_Utilities is
    procedure Print_Value_List (Name : String; theList : Tree.Values_List);
    procedure Print_Value_Data_List (Name    : String;
                                     theList : ML_Types.Value_Data_List);
+   procedure Print_Value_Lists_3D
+     (Name : String; Multi_List : Tree.Values_List_3D);
    procedure Print_Weights (Name : String; Data : Weights.Weight_List);
    procedure Print_Weights_Lists (Name : String;
                                   Data : Weights.Weight_Lists_List);
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                       return Integer_List;
+                                      return Integer_List;
    function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
    function To_Array (L : Integer_List) return Integer_Array;
    function To_Float_List (A : Float_Array) return Float_List;
    function To_Integer_List (A : Integer_Array) return Integer_List;
    function To_Natural_List (A : Natural_Array) return Natural_List;
    function To_Integer_Value_List (A : Integer_Array)
-                                    return ML_Types.Value_Data_Lists_2D;
+                                   return ML_Types.Value_Data_Lists_2D;
    function To_Multi_Value_List (A : Multi_Value_Array)
-                                  return ML_Types.Value_Data_Lists_2D;
+                                 return ML_Types.Value_Data_Lists_2D;
    function To_Natural_Value_List (A : Natural_Array)
-                                    return ML_Types.Value_Data_Lists_2D;
+                                   return ML_Types.Value_Data_Lists_2D;
    function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
                            return Tree.Tree_Cursor;
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                   return Integer_Array;
+                                  return Integer_Array;
    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
    --  As Integer_List, indices are part of the returned list
    function Unique (Nums : Integer_List) return Integer_List;
