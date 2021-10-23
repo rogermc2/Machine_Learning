@@ -129,6 +129,8 @@ package body Tree is
          Class_Values : ML_Types.Value_Data_List;
       begin
          Node_ID := Node_ID + 1;
+         Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Node ID" &
+                  Integer'Image (Node_ID) & " Values list is empty");
          Put_Line ("Tree.Predict.Build_Output Node ID" &
                   Integer'Image (Node_ID));
 --           Classifier_Utilities.Print_Node
