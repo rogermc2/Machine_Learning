@@ -83,7 +83,7 @@ package ML_Types is
    use Value_Data_Package;
    package Value_Lists_Data_Package is new
      Ada.Containers.Vectors (Positive, Value_Data_List);
-   subtype List_Of_Value_Data_Lists is Value_Lists_Data_Package.Vector;
+   subtype Value_Data_Lists_2D is Value_Lists_Data_Package.Vector;
 
    type Value_Data_Array is array (Positive range <>) of Value_Record;
    type Value_Data_Array_2D is array (Positive range <>, Positive range <>)
@@ -137,7 +137,7 @@ package ML_Types is
    type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
       Feature_Names  : String_List;
       Label_Name     : Unbounded_String := To_Unbounded_String ("");
-      Feature_Values : List_Of_Value_Data_Lists;
+      Feature_Values : Value_Data_Lists_2D;
       Label_Values   : Value_Data_List;
    end record;
 

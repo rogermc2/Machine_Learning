@@ -10,7 +10,7 @@ package Criterion is
         Y                         : Classifier_Types.List_Of_Natural_Lists;
         --  Sample_Weight contains the weight of each sample
         Sample_Weight             : Weights.Weight_List;
-        Samples                   : ML_Types.List_Of_Value_Data_Lists;
+        Samples                   : ML_Types.Value_Data_Lists_2D;
         Num_Outputs               : Tree.Index_Range := 1;
         Start_Row                 : Natural := 0;
         End_Row                   : Natural := 0;
@@ -31,7 +31,7 @@ package Criterion is
         Sum_Right                 : Weights.Weight_Lists_List;
         Sq_Sum_Total              : Float := 0.0;
         --  Classification Criterion_Class
-        Classes                   : ML_Types.List_Of_Value_Data_Lists;
+        Classes                   : ML_Types.Value_Data_Lists_2D;
         Sample_Indices            : Classifier_Types.Natural_List;
         Proxy_Improvement         : Float := -Float'Last;
     end record;
@@ -40,7 +40,7 @@ package Criterion is
 
     procedure C_Init (Criteria  : in out Criterion_Class;
                       Num_Outputs : Tree.Index_Range;
-                      Classes     : ML_Types.List_Of_Value_Data_Lists);
+                      Classes     : ML_Types.Value_Data_Lists_2D);
     procedure Classification_Init
       (Criteria            : in out Criterion_Class;
        Y                   : Classifier_Types.List_Of_Natural_Lists;
@@ -60,7 +60,7 @@ package Criterion is
        Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
     function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
     procedure Node_Value (Self  : Criterion_Class;
-                          Value : out Classifier_Types.List_Of_Float_Lists);
+                          Value : out Classifier_Types.Float_List_2D);
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;
     procedure Reset (Criteria : in out Criterion_Class);

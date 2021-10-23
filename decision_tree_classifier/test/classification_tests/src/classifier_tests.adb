@@ -36,11 +36,11 @@ package body Classifier_Tests is
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
 --        Max_Depth       : constant Positive := 5;
-      X               : constant List_Of_Value_Data_Lists :=
+      X               : constant Value_Data_Lists_2D :=
                           To_Multi_Value_List (X_Array);
-      Y               : List_Of_Value_Data_Lists;
+      Y               : Value_Data_Lists_2D;
       Num_Samples     : constant Natural := Natural (X.Length);
-      Probabilities   : Tree.List_Of_Values_Lists;
+      Probabilities   : Tree.Values_List_2D;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,

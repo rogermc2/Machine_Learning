@@ -136,8 +136,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Init_Samples_Copy (Samples : ML_Types.List_Of_Value_Data_Lists)
-                               return ML_Types.List_Of_Value_Data_Lists is
+   function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
+                               return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Num_Samples    : constant Positive := Positive (Samples.Length);
       Sample_1       : constant Value_Data_List := Samples.Element (1);
@@ -147,7 +147,7 @@ package body Classifier_Utilities is
       Integer_Init   : Value_Record (Integer_Type);
       UB_String_Init : Value_Record (UB_String_Type);
       Init_Features  : Value_Data_List;
-      theCopy        : List_Of_Value_Data_Lists;
+      theCopy        : Value_Data_Lists_2D;
    begin
       for index in 1 .. Num_Features loop
          case Sample_1.Element (index).Value_Kind is
@@ -236,11 +236,11 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : Integer_Array)
-                                   return ML_Types.List_Of_Value_Data_Lists is
+                                   return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
-      Multi_List : List_Of_Value_Data_Lists;
+      Multi_List : Value_Data_Lists_2D;
    begin
       for index in A'Range loop
          B_List.Clear;
@@ -255,10 +255,10 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Multi_Value_List (A : Multi_Value_Array)
-                                 return ML_Types.List_Of_Value_Data_Lists is
+                                 return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Value    : Value_Record (Integer_Type);
-      Row_List : List_Of_Value_Data_Lists;
+      Row_List : Value_Data_Lists_2D;
       Col_List : Value_Data_List;
    begin
       for row in A'Range loop
@@ -288,7 +288,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_Value_List (A : Natural_Array)
-                                   return ML_Types.List_Of_Value_Data_Lists is
+                                   return ML_Types.Value_Data_Lists_2D is
       Int_Array : Integer_Array (1 .. A'Length);
    begin
       for index in A'Range loop
@@ -448,7 +448,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_List_Of_Float_Lists (Name : String;
-                                        Data : List_Of_Float_Lists) is
+                                        Data : Float_List_2D) is
    begin
       Put_Line (Name & ": ");
       for index in Data.First_Index .. Data.Last_Index loop
@@ -475,7 +475,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_List_Of_Value_Lists
-     (Name : String; Multi_List : Tree.List_Of_Values_Lists) is
+     (Name : String; Multi_List : Tree.Values_List_2D) is
    begin
       Print_List_Of_Float_Lists (Name, Multi_List);
    end Print_List_Of_Value_Lists;
@@ -483,7 +483,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_List_Of_Value_Data_Lists
-     (Name : String; Multi_List : ML_Types.List_Of_Value_Data_Lists) is
+     (Name : String; Multi_List : ML_Types.Value_Data_Lists_2D) is
    begin
       Put_Line (Name & ": ");
       for index in Multi_List.First_Index .. Multi_List.Last_Index loop
@@ -621,7 +621,7 @@ package body Classifier_Utilities is
                                  Indent : Natural := 0) is
          use Ada.Containers;
          Node   : constant Tree_Node := Element (Curs);
-         Values : constant List_Of_Float_Lists := Node.Values;
+         Values : constant Float_List_2D := Node.Values;
       begin
          This_Indent := Indent + 1;
          if This_Indent > 10 then

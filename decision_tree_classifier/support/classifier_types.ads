@@ -27,7 +27,7 @@ package Classifier_Types is
    use Float_Package;
    package Float_List_Package is new
       Ada.Containers.Vectors (Positive, Float_List);
-   subtype List_Of_Float_Lists is Float_List_Package.Vector;
+   subtype Float_List_2D is Float_List_Package.Vector;
 
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;

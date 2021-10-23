@@ -83,11 +83,11 @@ package Decision_Tree_Classifer is
                      Random_State             : Integer := 0);
    procedure Classification_Fit
      (aClassifier    : in out Base_Decision_Tree.Classifier;
-      X              : ML_Types.List_Of_Value_Data_Lists;
-      Y              : ML_Types.List_Of_Value_Data_Lists;
+      X              : ML_Types.Value_Data_Lists_2D;
+      Y              : ML_Types.Value_Data_Lists_2D;
       Max_Depth      : Integer := -1);
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                 X    : ML_Types.List_Of_Value_Data_Lists)
-                                  return Tree.List_Of_Values_Lists;
+                                 X    : ML_Types.Value_Data_Lists_2D)
+                                  return Tree.Values_List_2D;
 
 end Decision_Tree_Classifer;

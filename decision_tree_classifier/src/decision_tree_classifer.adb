@@ -16,8 +16,8 @@ package body Decision_Tree_Classifer is
     --  L884
     procedure Classification_Fit
       (aClassifier    : in out Base_Decision_Tree.Classifier;
-       X              : ML_Types.List_Of_Value_Data_Lists;
-       Y              : ML_Types.List_Of_Value_Data_Lists;
+       X              : ML_Types.Value_Data_Lists_2D;
+       Y              : ML_Types.Value_Data_Lists_2D;
        Max_Depth      : Integer := -1) is
         Sample_Weights : Classifier_Types.Float_List;
     begin
@@ -66,13 +66,13 @@ package body Decision_Tree_Classifer is
     --  The predicted class probability is the fraction of samples of the same
     --  class in a leaf.
     function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                  X    : ML_Types.List_Of_Value_Data_Lists)
-                                  return Tree.List_Of_Values_Lists is
+                                  X    : ML_Types.Value_Data_Lists_2D)
+                                  return Tree.Values_List_2D is
         use ML_Types;
         Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
         Num_Nodes       : constant Positive
           := Positive (Self.Attributes.Decision_Tree.Nodes.Node_Count);
-        Classes         : constant List_Of_Value_Data_Lists :=
+        Classes         : constant Value_Data_Lists_2D :=
                             Self.Attributes.Decision_Tree.Classes;
         Num_Classes     : constant Positive := Positive (Classes.Length);
         Proba           : Tree.Values_Array_3D
@@ -82,7 +82,7 @@ package body Decision_Tree_Classifer is
         Prob_K          : Tree.Values_Array_2D (1 .. Num_Nodes,
                                                 1 .. Num_Classes);
         Prob_K_List     : Tree.Values_List;
-        All_Proba       : Tree.List_Of_Values_Lists;
+        All_Proba       : Tree.Values_List_2D;
         Normalizer      : Float;
     begin
         --  L954

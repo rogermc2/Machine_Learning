@@ -32,7 +32,7 @@ package Weights is
                                    Y             : ML_Types.Value_Data_List)
                                    return Weight_List;
    function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
-                                   Y             : ML_Types.List_Of_Value_Data_Lists;
+                                   Y             : ML_Types.Value_Data_Lists_2D;
                                    Class_Weights : Weight_List :=
                                      Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=

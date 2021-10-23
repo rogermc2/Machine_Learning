@@ -85,7 +85,7 @@ package Base_Decision_Tree is
    type Attribute_Data is record
       --  The classes labels (single output problem)
       --  or a list of arrays of class labels (multi-output problem).
-      Classes             : ML_Types.List_Of_Value_Data_Lists;
+      Classes             : ML_Types.Value_Data_Lists_2D;
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
@@ -111,8 +111,8 @@ package Base_Decision_Tree is
 
    procedure Base_Fit
      (aClassifier    : in out Classifier;
-      X              : ML_Types.List_Of_Value_Data_Lists;
-      Y              : ML_Types.List_Of_Value_Data_Lists;
+      X              : ML_Types.Value_Data_Lists_2D;
+      Y              : ML_Types.Value_Data_Lists_2D;
       Sample_Weights : out Classifier_Types.Float_List;
       Max_Depth      : Integer := -1);
    procedure C_Init (aClassifier              : in out Classifier;
@@ -131,7 +131,7 @@ package Base_Decision_Tree is
                      CCP_Alpha                : Float := 0.0;
                      Random_State             : Integer := 0);
    function Predict (Self : in out Classifier;
-                     X    : ML_Types.List_Of_Value_Data_Lists)
+                     X    : ML_Types.Value_Data_Lists_2D)
                      return Tree.Values_Array_3D;
 
 end Base_Decision_Tree;

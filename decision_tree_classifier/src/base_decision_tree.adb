@@ -15,14 +15,14 @@ package body Base_Decision_Tree is
 
     procedure Base_Fit_Checks
       (aClassifier    : in out Classifier;
-       X              : ML_Types.List_Of_Value_Data_Lists;
-       Y              : ML_Types.List_Of_Value_Data_Lists;
+       X              : ML_Types.Value_Data_Lists_2D;
+       Y              : ML_Types.Value_Data_Lists_2D;
        Sample_Weights : in out Classifier_Types.Float_List);
     procedure Classification_Part
       (aClassifier            : in out Classifier;
-       Y                      : ML_Types.List_Of_Value_Data_Lists;
+       Y                      : ML_Types.Value_Data_Lists_2D;
        Y_Encoded              : out Classifier_Types.List_Of_Natural_Lists;
-       Classes                : out ML_Types.List_Of_Value_Data_Lists;
+       Classes                : out ML_Types.Value_Data_Lists_2D;
        Expanded_Class_Weights : in out Classifier_Types.Float_List);
     procedure Prune_Tree (aClassifier : in out Classifier);
 
@@ -31,14 +31,14 @@ package body Base_Decision_Tree is
     --  L150
     procedure Base_Fit
       (aClassifier    : in out Classifier;
-       X              : ML_Types.List_Of_Value_Data_Lists;
-       Y              : ML_Types.List_Of_Value_Data_Lists;
+       X              : ML_Types.Value_Data_Lists_2D;
+       Y              : ML_Types.Value_Data_Lists_2D;
        Sample_Weights : out Classifier_Types.Float_List;
        Max_Depth      : Integer := -1) is
         Criteria              : Criterion.Criterion_Class;
         Splitter              : Node_Splitter.Splitter_Class;
         Y_Encoded             : Classifier_Types.List_Of_Natural_Lists;
-        Classes               : ML_Types.List_Of_Value_Data_Lists;
+        Classes               : ML_Types.Value_Data_Lists_2D;
         --  L205
         Expanded_Class_Weight : Weights.Weight_List;
         Sum_Sample_Weight     : Float := 0.0;
@@ -110,8 +110,8 @@ package body Base_Decision_Tree is
 
     procedure Base_Fit_Checks
       (aClassifier    : in out Classifier;
-       X              : ML_Types.List_Of_Value_Data_Lists;
-       Y              : ML_Types.List_Of_Value_Data_Lists;
+       X              : ML_Types.Value_Data_Lists_2D;
+       Y              : ML_Types.Value_Data_Lists_2D;
        Sample_Weights : in out Classifier_Types.Float_List) is
         use Maths.Float_Math_Functions;
         use Tree;
@@ -249,9 +249,9 @@ package body Base_Decision_Tree is
     --  based on L200 of _classes.py BasesDecisionTree.Fit
     procedure Classification_Part
       (aClassifier            : in out Classifier;
-       Y                      : ML_Types.List_Of_Value_Data_Lists;
+       Y                      : ML_Types.Value_Data_Lists_2D;
        Y_Encoded              : out Classifier_Types.List_Of_Natural_Lists;
-       Classes                : out ML_Types.List_Of_Value_Data_Lists;
+       Classes                : out ML_Types.Value_Data_Lists_2D;
        Expanded_Class_Weights : in out Classifier_Types.Float_List) is
         use Ada.Containers;
         use Weights;
@@ -314,7 +314,7 @@ package body Base_Decision_Tree is
     --  -------------------------------------------------------------------------
     --  Based on class.py fit L431 Predict
     function Predict (Self : in out Classifier;
-                      X    : ML_Types.List_Of_Value_Data_Lists)
+                      X    : ML_Types.Value_Data_Lists_2D)
                      return Tree.Values_Array_3D is
     begin
         return Tree.Predict (Self.Attributes.Decision_Tree, X);
