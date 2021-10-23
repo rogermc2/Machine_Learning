@@ -50,7 +50,7 @@ package body Tree_Build is
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241 stores values in tree.values indexed by node id
-      Node_Splitter.Node_Value (Splitter, New_Node.Value);
+      Node_Splitter.Node_Value (Splitter, theTree.Value);
 
       New_Node.Samples_Start := Start;
       New_Node.Num_Node_Samples := 1 + Stop - Start;
@@ -131,9 +131,10 @@ package body Tree_Build is
          aSplit.Feature, aSplit.Improvement, aSplit.Threshold, Start_Row,
          End_Row, Float (Parent_Node.Weighted_Num_Node_Samples));
       New_Node := Element (Node_Cursor);
-      Node_Splitter.Node_Value (Splitter, Values);
-      New_Node.Value := Values;
       Replace_Element (theTree.Nodes, Node_Cursor, New_Node);
+
+      --  L463
+      Node_Splitter.Node_Value (Splitter, Values);
 
       Res.Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,

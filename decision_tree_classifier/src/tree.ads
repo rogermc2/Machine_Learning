@@ -48,8 +48,6 @@ package Tree is
       Depth                     : Positive := 1;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
-      --  From?
-      Value                     : Weights.Weight_Lists_List;
       --  From _Tree class Tree Value is num_outputs x num_classes per node
       Values                    : ML_Types.Value_Data_Lists_2D;
       case Leaf_Node is
@@ -79,6 +77,7 @@ package Tree is
       Classes         : ML_Types.Value_Data_Lists_2D;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Integer := -1;
+      Value           : Weights.Weight_Lists_List;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
    end record;
 
