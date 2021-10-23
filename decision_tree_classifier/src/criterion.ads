@@ -60,7 +60,7 @@ package Criterion is
        Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
     function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
     procedure Node_Value (Self  : Criterion_Class;
-                          Value : out Classifier_Types.Float_List_2D);
+                          Value : out Weights.Weight_Lists_List);
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float;
     procedure Reset (Criteria : in out Criterion_Class);

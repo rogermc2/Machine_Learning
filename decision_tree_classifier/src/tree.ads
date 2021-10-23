@@ -11,6 +11,7 @@ with Ada.Containers.Vectors;
 
 with Classifier_Types;
 with ML_Types;
+with Weights;
 
 package Tree is
 
@@ -42,13 +43,15 @@ package Tree is
       Impurity                  : Float := Float'Large;
       Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
-      --  From Tree Utils StackRecord struct
+      --  From Tree/Utils StackRecord struct
       Samples_Start             : Positive := 1;
       Depth                     : Positive := 1;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
-      --  Values is num_outputs x num_classes
-      Values                    : Values_List_2D;
+      --  From?
+      Value                     : Weights.Weight_Lists_List;
+      --  From _Tree class Tree Value is num_outputs x num_classes per node
+      Values                    : ML_Types.Value_Data_Lists_2D;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct
@@ -90,6 +93,6 @@ package Tree is
 --     function Get_Value_Array (Self : Tree_Class) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Tree.Values_List_3D;
+                     return ML_Types.Value_Data_Lists_3D;
 
 end Tree;

@@ -109,30 +109,30 @@ package body Tree is
    --  _tree L763
    function Predict (Self : Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Tree.Values_List_3D is
+                     return ML_Types.Value_Data_Lists_3D is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       use Ada.Containers;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
-      Num_Nodes       : constant Positive := Positive (Self.Nodes.Node_Count - 1);
-      Node_Index      : Natural := 0;
-      Node_Values     : ML_Types.Value_Data_Lists_3D;
+      Num_Nodes       : constant Positive :=
+                            Positive (Self.Nodes.Node_Count - 1);
+      Output_Values   : ML_Types.Value_Data_Lists_3D;
       --  L1086 _get_value_ndarray
       --  Output should be a 3D array (node count, num outputs, max classes)
       --  self.value
+
       procedure Build_Output (Curs : Cursor) is
          Node         : constant Tree_Node := Element (Curs);
          --  Values is num_outputs x num_classes
-         Values       : constant Values_List_2D := Node.Values;
-         Outputs      : Values_List;
+         Values       : constant ML_Types.Value_Data_Lists_2D := Node.Values;
          Classes_Out  : ML_Types.Value_Data_Lists_2D;
          Class_Values : ML_Types.Value_Data_List;
       begin
-         for output_index in 1 .. Num_Outputs loop
+         for output_index in Values.First_Index .. Values.Last_Index loop
             Class_Values := Values.Element (output_index);
             Classes_Out.Append (Class_Values);
          end loop;
-         Node_Values.Append (Classes_Out);
+         Output_Values.Append (Classes_Out);
       end Build_Output;
 
    begin
@@ -151,7 +151,7 @@ package body Tree is
       Iterate_Subtree (Self.Nodes.Root, Build_Output'access);
 
 --        Classifier_Utilities.Print_Value_Data_List ("Tree.Predict Output", Output);
-      return Node_Values;
+      return Output_Values;
 
    end Predict;
 

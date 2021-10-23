@@ -104,7 +104,7 @@ package body Node_Splitter is
 
    procedure Node_Value
      (Self   : Splitter_Class;
-      Values : out Classifier_Types.Float_List_2D) is
+      Values : out Weights.Weight_Lists_List) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;

@@ -212,24 +212,12 @@ package body Criterion is
     --  ------------------------------------------------------------------------
 
     procedure Node_Value (Self  : Criterion_Class;
-                          Value : out Classifier_Types.Float_List_2D) is
-        Sum_Total_K : Classifier_Types.Float_List;
-        Total_K     : Classifier_Types.Float_List;
+                          Value : out Weights.Weight_Lists_List) is
     begin
-        if Self.Sum_Total.Is_Empty then
-            raise Criterion_Error with "Criterion.Node_Value Sum_Total is empty";
-        end if;
+        Assert (not Self.Sum_Total.Is_Empty,
+            "Criterion.Node_Value Self.Sum_Total is empty");
 
-        Value.Clear;
-        for index in Self.Sum_Total.First_Index .. Self.Sum_Total.Last_Index loop
-            Sum_Total_K := Self.Sum_Total.Element (index);
-            Total_K.Clear;
-            for c in Self.Classes.First_Index .. Self.Classes.Last_Index loop
-                Total_K.Append (Sum_Total_K.Element (c) /
-                                  Self.Num_Weighted_Node_Samples);
-            end loop;
-            Value.Append (Total_K);
-        end loop;
+        Value := Self.Sum_Total;
 
     end Node_Value;
 

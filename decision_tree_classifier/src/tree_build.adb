@@ -50,7 +50,7 @@ package body Tree_Build is
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241 stores values in tree.values indexed by node id
-      Node_Splitter.Node_Value (Splitter, New_Node.Values);
+      Node_Splitter.Node_Value (Splitter, New_Node.Value);
 
       New_Node.Samples_Start := Start;
       New_Node.Num_Node_Samples := 1 + Stop - Start;
@@ -99,7 +99,7 @@ package body Tree_Build is
                                 Start_Row + Parent_Node.Num_Node_Samples - 1;
       Node_Cursor           : Tree.Tree_Cursor;
       New_Node              : Tree.Tree_Node;
-      Values                : Tree.Values_List_2D;
+      Values                : Weights.Weight_Lists_List;
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
@@ -132,7 +132,7 @@ package body Tree_Build is
          End_Row, Float (Parent_Node.Weighted_Num_Node_Samples));
       New_Node := Element (Node_Cursor);
       Node_Splitter.Node_Value (Splitter, Values);
-      New_Node.Values := Values;
+      New_Node.Value := Values;
       Replace_Element (theTree.Nodes, Node_Cursor, New_Node);
 
       Res.Node_Cursor := Add_Node
