@@ -109,25 +109,25 @@ package body Tree is
    --  _tree L763
    function Predict (Self : Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Tree.Values_Array_3D is
+                     return Tree.Values_List_3D is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       use Ada.Containers;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
       Num_Nodes       : constant Positive := Positive (Self.Nodes.Node_Count - 1);
       Node_Index      : Natural := 0;
---        Out_Values      : Values_Array_3D (1 .. Num_Nodes, 1 .. Num_Outputs,
---                                           1 .. Num_Classes);
-      Out_Values      : Values_List_2D;
+      Node_Values     : Values_List_3D;
       --  L1086 _get_value_ndarray
       --  Output should be a 3D array (node count, num outputs, max classes)
       --  self.value
       procedure Build_Output (Curs : Cursor) is
-         --  Tree_Node.Values is num_outputs x num_classes
          Node        : constant Tree_Node := Element (Curs);
          Num_Classes : Positive;
+         --  Values is num_outputs x num_classes
          Values      : constant Values_List_2D := Node.Values;
          Outputs     : Values_List;
+         Class_Values    : Values_List;
+         Out_Values      : Values_List_2D;
       begin
          Put_Line ("Tree.Predict.Build_Output Num_Classes" &
                      Integer'Image (Num_Classes));
@@ -136,11 +136,11 @@ package body Tree is
             Num_Classes := Positive (Self.Classes (output_index).Length);
             Outputs := Values.Element (output_index);
             for class_index in 1 .. Num_Classes loop
-               null;
---                 Out_Values (Node_Index, output_index, class_index) :=
---                   Outputs.Element (class_index);
+               Class_Values.Append (Outputs.Element (class_index));
             end loop;
+            Out_Values.Append (Class_Values);
          end loop;
+         Node_Values.Append (Out_Values);
       end Build_Output;
 
    begin
@@ -156,7 +156,7 @@ package body Tree is
       Iterate_Subtree (Self.Nodes.Root, Build_Output'access);
 
 --        Classifier_Utilities.Print_Value_Data_List ("Tree.Predict Output", Output);
-      return Out_Values;
+      return Node_Values;
 
    end Predict;
 

@@ -29,6 +29,11 @@ package Classifier_Types is
       Ada.Containers.Vectors (Positive, Float_List);
    subtype Float_List_2D is Float_List_Package.Vector;
 
+   use Float_List_Package;
+   package List_Of_Float_Lists_Package is new
+      Ada.Containers.Vectors (Positive, Float_List_2D);
+   subtype Float_List_3D is List_Of_Float_Lists_Package.Vector;
+
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
    package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");

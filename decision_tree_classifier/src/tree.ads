@@ -31,6 +31,7 @@ package Tree is
 
    subtype Values_List is Classifier_Types.Float_List;
    subtype Values_List_2D is Classifier_Types.Float_List_2D;
+   subtype Values_List_3D is Classifier_Types.Float_List_3D;
    type Values_Array_2D is array
      (Positive range <>, Positive range <>) of Float;
    type Values_Array_3D is array
@@ -89,6 +90,6 @@ package Tree is
 --     function Get_Value_Array (Self : Tree_Class) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Tree.Values_Array_3D;
+                     return Tree.Values_List_3D;
 
 end Tree;
