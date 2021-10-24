@@ -39,21 +39,21 @@ package body Tree is
       Not_Leaf       : Boolean := True;
       Split          : Boolean;
       Output_Cursors : Tree_Cursor_List;
---        Node_ID        : Natural := 0;
+      Node_ID        : Natural := 0;
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0,
               "Tree.Apply_Dense Self.Nodes tree is empty");
 
-      --  for each sample of features
+      --  L804 for each sample of features
       for index in X.First_Index .. X.Last_Index loop
---           Put_Line ("Tree.Apply_Dense, index: " & Integer'Image (index));
+         Put_Line ("Tree.Apply_Dense, index: " & Integer'Image (index));
          Sample := X.Element (index);
          Node_Cursor := Top_Cursor;
          Not_Leaf := True;
 
          while Not_Leaf loop
---              Node_ID := Node_ID + 1;
---              Put_Line ("Tree.Apply_Dense, Node_ID: " & Integer'Image (Node_ID));
+            Node_ID := Node_ID + 1;
+            Put_Line ("Tree.Apply_Dense, Node_ID: " & Integer'Image (Node_ID));
             Node := Element (Node_Cursor);
             Left_Cursor := First_Child (Node_Cursor);
 
@@ -130,6 +130,7 @@ package body Tree is
       end Build_Output;
 
    begin
+      Put_Line ("Tree.Predict");
       Leaf_Cursors := Apply (Self, X);
       Put_Line ("Tree.Predict Leaf_Cursors set");
       --  L767
