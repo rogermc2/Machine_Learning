@@ -9,6 +9,7 @@ with Decision_Tree_Classifer;
 with ML_Types;
 with Printing;
 with Tree;
+with Weights;
 
 package body Classifier_Tests is
    use Classifier_Types;
@@ -42,7 +43,8 @@ package body Classifier_Tests is
                           To_Multi_Value_List (X_Array);
       Y               : Value_Data_Lists_2D;
       Num_Samples     : constant Natural := Natural (X.Length);
-      Probabilities   : ML_Types.Value_Data_Lists_3D;
+      Probabilities   : Weights.Weight_Lists_3D;
+--        Probabilities   : ML_Types.Value_Data_Lists_3D;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,
@@ -58,7 +60,8 @@ package body Classifier_Tests is
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
       Print_Tree ("The Tree", theTree);
       Probabilities := Predict_Probability (theTree, X);
-      Print_Value_Data_List_3D
+--        Print_Value_Data_List_3D
+      Print_Weight_Lists_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);
       --          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",

@@ -49,12 +49,13 @@ package Tree is
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
       --  From _Tree class Tree Value is num_outputs x num_classes per node
-      Values                    : ML_Types.Value_Data_Lists_2D;
+--        Values                    : ML_Types.Value_Data_Lists_2D;
+      Values                    : Weights.Weight_Lists_2D;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct
             --  Feature used for splitting the node
-            Feature_Index : Positive := 1;
+            Feature_Index : Natural := 0;
             Threshold     : Float := 0.0;
          when True => null;
       end case;
@@ -77,11 +78,12 @@ package Tree is
       Classes         : ML_Types.Value_Data_Lists_2D;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Integer := -1;
-      Value           : Weights.Weight_Lists_List;
+      Value           : Weights.Weight_Lists_2D;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
       --  From _Treenp.ndarray _get_value_ndarray, Data_Values is
       --  num_nodes x num_outputs x num_classes per node
-      Data_Values     : ML_Types.Value_Data_Lists_3D;
+      Data_Values     : Weights.Weight_Lists_3D;
+--        Data_Values     : ML_Types.Value_Data_Lists_3D;
    end record;
 
    Value_Error : Exception;
@@ -94,6 +96,6 @@ package Tree is
    --                    X_Idx_Sorted  : State := None);
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return ML_Types.Value_Data_Lists_3D;
+                     return Weights.Weight_Lists_3D;
 
 end Tree;

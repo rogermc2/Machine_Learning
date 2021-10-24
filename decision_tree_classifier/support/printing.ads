@@ -51,6 +51,8 @@ package Printing is
       (Name : String; Multi_List : Tree.Values_List_3D);
     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
     procedure Print_Weights_Lists (Name : String;
-                                   Data : Weights.Weight_Lists_List);
+                                   Data : Weights.Weight_Lists_2D);
+   procedure Print_Weight_Lists_3D (Name : String;
+                                    Data : Weights.Weight_Lists_3D);
 
 end Printing;

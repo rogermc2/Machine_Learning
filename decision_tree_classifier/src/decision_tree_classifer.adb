@@ -74,19 +74,26 @@ package body Decision_Tree_Classifer is
     --  class in a leaf.
     function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                   X    : ML_Types.Value_Data_Lists_2D)
-                                  return ML_Types.Value_Data_Lists_3D is
-        use ML_Types;
+                                  return Weights.Weight_Lists_3D is
+--                                    return ML_Types.Value_Data_Lists_3D is
+      use ML_Types;
+      use Weights;
         Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
         Num_Nodes       : constant Positive
           := Positive (Self.Attributes.Decision_Tree.Nodes.Node_Count);
         Classes       : constant Value_Data_Lists_2D :=
                           Self.Attributes.Decision_Tree.Classes;
         Num_Classes   : constant Positive := Positive (Classes.Length);
-        Proba         : Value_Data_Lists_3D;
-        Prob_K        : Value_Data_Lists_2D;
-        Prob_Class    : Value_Data_List;
-        All_Proba     : Value_Data_Lists_3D;
-        Class         : Value_Record;
+--          Proba         : Value_Data_Lists_3D;
+--          Prob_K        : Value_Data_Lists_2D;
+--          Prob_Class    : Value_Data_List;
+--          All_Proba     : Value_Data_Lists_3D;
+        Proba         : Weight_Lists_3D;
+        Prob_K        : Weight_Lists_2D;
+        Prob_Class    : Weight_List;
+        All_Proba     : Weight_Lists_3D;
+--          Class         : Value_Record;
+        Class         : Float;
         Normalizer    : Float;
     begin
         --  L954
@@ -105,33 +112,35 @@ package body Decision_Tree_Classifer is
                     Normalizer := 0.0;
                     for index in 1 .. Num_Nodes loop
                         Class := Prob_Class.Element (class_index);
-                        case Class.Value_Kind is
-                        when Float_Type =>
-                            Normalizer := Normalizer + Class.Float_Value;
-                        when Integer_Type =>
-                            Normalizer := Normalizer +
-                              Float (Class.Integer_Value);
-                        when Boolean_Type | UB_String_Type => null;
-                        end case;
+                        Normalizer := Normalizer + Class;
+--                          case Class.Value_Kind is
+--                          when Float_Type =>
+--                              Normalizer := Normalizer + Class.Float_Value;
+--                          when Integer_Type =>
+--                              Normalizer := Normalizer +
+--                                Float (Class.Integer_Value);
+--                          when Boolean_Type | UB_String_Type => null;
+--                          end case;
                     end loop;
 
                     if Normalizer > 0.0 then
                         for index in Prob_Class.First_Index ..
                           Prob_Class.Last_Index loop
                             Class := Prob_Class.Element (class_index);
-                            case Class.Value_Kind is
-                            when Float_Type =>
-                                Class.Float_Value := Class.Float_Value / Normalizer;
-                            when Integer_Type =>
-                                Class.Integer_Value :=
-                                  Integer (Float (Class.Integer_Value) / Normalizer);
-                            when Boolean_Type | UB_String_Type => null;
-                            end case;
+                            Class := Class / Normalizer;
+--                              case Class.Value_Kind is
+--                              when Float_Type =>
+--                                  Class.Float_Value := Class.Float_Value / Normalizer;
+--                              when Integer_Type =>
+--                                  Class.Integer_Value :=
+--                                    Integer (Float (Class.Integer_Value) / Normalizer);
+--                              when Boolean_Type | UB_String_Type => null;
+--                              end case;
 
-                            if Class.Value_Kind = Float_Type or
-                              Class.Value_Kind = Integer_Type then
+--                              if Class.Value_Kind = Float_Type or
+--                                Class.Value_Kind = Integer_Type then
                                 Prob_Class.Replace_Element  (index, Class);
-                            end if;
+--                              end if;
                         end loop;
                     end if;
 

@@ -3,6 +3,8 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Utilities;
+
 with Printing;
 
 package body Tree is
@@ -65,9 +67,10 @@ package body Tree is
                   Assert (Feature_Value.Value_Kind = Float_Type or
                             Feature_Value.Value_Kind = Integer_Type,
                           "Tree.Apply_Dense Self.Nodes invalid feature data type");
---                    Put_Line ("Tree.Apply_Dense Feature_Index: " &
---                                Integer'Image (Node.Feature_Index));
+                  Put_Line ("Tree.Apply_Dense Feature_Index: " &
+                              Integer'Image (Node.Feature_Index));
                   Feature_Value := Sample.Element (Node.Feature_Index);
+                  Utilities.Print_Value_Record ("Feature_Value", Feature_Value);
                   case Feature_Value.Value_Kind is
                      when Float_Type =>
                         Split := Feature_Value.Float_Value <= Node.Threshold;
@@ -97,22 +100,29 @@ package body Tree is
    --  -------------------------------------------------------------------------
    --  _tree L763
    function Predict (Self : in out Tree_Class;
-                     X    : ML_Types.Value_Data_Lists_2D) return ML_Types.Value_Data_Lists_3D is
+                     X    : ML_Types.Value_Data_Lists_2D)
+                     return Weights.Weight_Lists_3D is
+--                       return ML_Types.Value_Data_Lists_3D is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       --  Leaf_Cursors is a list of node cursors
       Leaf_Cursors  : Tree_Cursor_List;
       Node_ID       : Natural := 0;
-      Output_Values : ML_Types.Value_Data_Lists_3D;
+--        Output_Values : ML_Types.Value_Data_Lists_3D;
+      Output_Values : Weights.Weight_Lists_3D;
 
+      --  L1087 node dimension of _get_value_ndarray?
       procedure Build_Output (Curs : Tree_Cursor_Package.Cursor) is
          use Tree_Cursor_Package;
          use Nodes_Package;
          Node         : constant Tree_Node := Element (Element (Curs));
          --  Values is num_outputs x num_classes
-         Values       : constant ML_Types.Value_Data_Lists_2D := Node.Values;
-         Classes_Out  : ML_Types.Value_Data_Lists_2D;
-         Class_Values : ML_Types.Value_Data_List;
+--           Values       : constant ML_Types.Value_Data_Lists_2D := Node.Values;
+         Values       : constant Weights.Weight_Lists_2D := Node.Values;
+         Classes_Out  : Weights.Weight_Lists_2D;
+--           Classes_Out  : ML_Types.Value_Data_Lists_2D;
+--           Class_Values : ML_Types.Value_Data_List;
+         Class_Values : Weights.Weight_List;
       begin
          Node_ID := Node_ID + 1;
          Put_Line ("Tree.Predict.Build_Output Node ID" &
@@ -122,7 +132,7 @@ package body Tree is
                    Integer'Image (Node_ID) & " Values list is empty");
          --           Printing.Print_Node
          --             ("Tree.Predict.Build_Output Node", Node);
-         Printing.Print_Value_Data_List_2D
+         Printing.Print_Weights_Lists
            ("Tree.Predict.Build_Output Values", Values);
          for output_index in Values.First_Index .. Values.Last_Index loop
             Class_Values := Values.Element (output_index);
@@ -134,12 +144,13 @@ package body Tree is
    begin
       Leaf_Cursors := Apply (Self, X);
       New_Line;
-      Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
-                                               Leaf_Cursors);
+--        Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
+--                                                 Leaf_Cursors);
       --  L767
       Leaf_Cursors.Iterate (Build_Output'access);
       Self.Data_Values := Output_Values;
-      Printing.Print_Value_Data_List_3D
+--        Printing.Print_Value_Data_List_3D
+      Printing.Print_Weight_Lists_3D
         ("Tree.Predict Output Values...", Output_Values);
 
       return Output_Values;

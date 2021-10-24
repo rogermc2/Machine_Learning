@@ -9,9 +9,7 @@ with Printing;
 
 package body Weights is
 
-   --     function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-   --                          Data     : out Float) return  Float_Array;
-   function Reduce_Weight_Lists (Lists : Weight_Lists_List)
+   function Reduce_Weight_Lists (Lists : Weight_Lists_2D)
                                  return Weight_List;
 
    --  -------------------------------------------------------------------------
@@ -106,7 +104,7 @@ package body Weights is
       Weight_K              : Weight_List;
       aWeight               : Float;
       Weights               : Weight_List;
-      Expanded_Class_Weight : Weight_Lists_List;
+      Expanded_Class_Weight : Weight_Lists_2D;
    begin
       for index_k in 1 .. Num_Lists loop
          Weights.Clear;
@@ -166,7 +164,7 @@ package body Weights is
       K_Indices             : Integer_List;
       Inverse               : Natural_List;
       Class_K_Weights       : Weight_List;
-      Expanded_Class_Weight : Weight_Lists_List;
+      Expanded_Class_Weight : Weight_Lists_2D;
       Result                : Weight_List;
    begin
       case Weight_Kind is
@@ -328,7 +326,7 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   function Reduce_Weight_Lists (Lists : Weight_Lists_List)
+   function Reduce_Weight_Lists (Lists : Weight_Lists_2D)
                                  return Weight_List is
       use Ada.Containers;
       List_Length  : constant Count_Type := Lists.Element (1).Length;

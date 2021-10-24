@@ -39,6 +39,7 @@ package body Node_Splitter is
       Weighted_Samples : Float := 0.0;
    begin
       Self.Min_Leaf_Samples := Min_Leaf_Samples;
+      --  X dimensions: num samples x num features
       Self.Max_Features := Tree.Index_Range (Input_X.Element (1).Length);
       --  Min_Leaf_Samples is the minimum number of samples that each leaf can
       --  have, where splits which would result in having less samples in a
@@ -104,7 +105,7 @@ package body Node_Splitter is
 
    procedure Node_Value
      (Self   : Splitter_Class;
-      Values : out Weights.Weight_Lists_List) is
+      Values : out Weights.Weight_Lists_2D) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;

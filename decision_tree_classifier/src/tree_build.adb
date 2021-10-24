@@ -97,7 +97,7 @@ package body Tree_Build is
                                 Start_Row + Parent_Node.Num_Node_Samples - 1;
       Node_Cursor           : Tree.Tree_Cursor;
       New_Node              : Tree.Tree_Node;
-      Values                : Weights.Weight_Lists_List;
+      Values                : Weights.Weight_Lists_2D;
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,

@@ -88,6 +88,6 @@ package Decision_Tree_Classifer is
       Max_Depth      : Integer := -1);
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                  X    : ML_Types.Value_Data_Lists_2D)
-                                  return ML_Types.Value_Data_Lists_3D;
+                                 return Weights.Weight_Lists_3D;
 
 end Decision_Tree_Classifer;

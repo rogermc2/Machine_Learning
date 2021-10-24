@@ -212,7 +212,7 @@ package body Criterion is
     --  ------------------------------------------------------------------------
 
     procedure Node_Value (Self  : Criterion_Class;
-                          Value : out Weights.Weight_Lists_List) is
+                          Value : out Weights.Weight_Lists_2D) is
     begin
         Assert (not Self.Sum_Total.Is_Empty,
             "Criterion.Node_Value Self.Sum_Total is empty");
