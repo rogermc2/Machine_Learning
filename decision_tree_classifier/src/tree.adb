@@ -3,7 +3,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Utilities;
+with Print_Utilities;
 
 package body Tree is
 
@@ -133,9 +133,9 @@ package body Tree is
                   Integer'Image (Node_ID) & " Values list is empty");
          Put_Line ("Tree.Predict.Build_Output Node ID" &
                   Integer'Image (Node_ID));
---           Classifier_Utilities.Print_Node
+--           Print_Utilities.Print_Node
 --             ("Tree.Predict.Build_Output Node", Node);
-         Classifier_Utilities.Print_Value_Data_List_2D
+         Print_Utilities.Print_Value_Data_List_2D
            ("Tree.Predict.Build_Output Values", Values);
          for output_index in Values.First_Index .. Values.Last_Index loop
             Class_Values := Values.Element (output_index);
@@ -148,7 +148,7 @@ package body Tree is
       Assert (Integer (Child_Count (Self.Nodes.Root)) > 0,
               "Tree.Predict Self.Nodes tree is empty");
 
-      Classifier_Utilities.Print_List_Of_Value_Data_Lists
+      Print_Utilities.Print_List_Of_Value_Data_Lists
         ("Tree.Predict Self.Nodes X", X);
       Put_Line ("Tree.Predict Num_Nodes" & Integer'Image (Num_Nodes));
       Put_Line ("Tree.Predict Num_Outputs" & Integer'Image (Num_Outputs));
@@ -156,7 +156,7 @@ package body Tree is
       --  L767
       Iterate_Subtree (Self.Nodes.Root, Build_Output'access);
 
-      Classifier_Utilities.Print_Value_Data_List_3D
+      Print_Utilities.Print_Value_Data_List_3D
         ("Tree.Predict Output Values...", Output_Values);
       Put_Line ("Tree.Predict done");
 

@@ -7,6 +7,7 @@ with Classifier_Types;
 with Classifier_Utilities;
 with Decision_Tree_Classifer;
 with ML_Types;
+with Print_Utilities;
 with Tree;
 
 package body Classifier_Tests is
@@ -31,6 +32,7 @@ package body Classifier_Tests is
    procedure Test_Classification_Toy  is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
+      use Print_Utilities;
 
       --        Expected        : List_Of_Value_Data_Lists;
       theTree         : Base_Decision_Tree.Classifier
@@ -56,7 +58,7 @@ package body Classifier_Tests is
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
       Print_Tree ("The Tree", theTree);
       Probabilities := Predict_Probability (theTree, X);
-      Classifier_Utilities.Print_Value_Data_List_3D
+      Print_Value_Data_List_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);
       --          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
