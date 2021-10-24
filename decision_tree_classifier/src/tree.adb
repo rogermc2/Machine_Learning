@@ -22,6 +22,7 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
    --  L777
+   --  Apply_Dense finds the terminal region (=leaf node) for each sample in X.
    function Apply_Dense (Self : Tree_Class;
                          X    : ML_Types.Value_Data_Lists_2D)
                          return Tree_Cursor_List is
@@ -95,7 +96,7 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
    --  _tree L763
-   function Predict (Self : Tree_Class;
+   function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D) return ML_Types.Value_Data_Lists_3D is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
@@ -114,10 +115,11 @@ package body Tree is
          Class_Values : ML_Types.Value_Data_List;
       begin
          Node_ID := Node_ID + 1;
-         Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Node ID" &
-                   Integer'Image (Node_ID) & " Values list is empty");
          Put_Line ("Tree.Predict.Build_Output Node ID" &
                      Integer'Image (Node_ID));
+--           Print_Utilities.Print_Node  ("Tree.Predict.Build_Output Node", Node);
+         Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Node ID" &
+                   Integer'Image (Node_ID) & " Values list is empty");
          --           Print_Utilities.Print_Node
          --             ("Tree.Predict.Build_Output Node", Node);
          Print_Utilities.Print_Value_Data_List_2D
@@ -130,12 +132,13 @@ package body Tree is
       end Build_Output;
 
    begin
-      Put_Line ("Tree.Predict");
       Leaf_Cursors := Apply (Self, X);
-      Put_Line ("Tree.Predict Leaf_Cursors set");
+      New_Line;
+      Print_Utilities.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
+                                               Leaf_Cursors);
       --  L767
       Leaf_Cursors.Iterate (Build_Output'access);
-      Output_Values := Self.Data_Values;
+      Self.Data_Values := Output_Values;
       Print_Utilities.Print_Value_Data_List_3D
         ("Tree.Predict Output Values...", Output_Values);
 

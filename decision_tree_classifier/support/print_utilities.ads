@@ -34,6 +34,8 @@ package Print_Utilities is
     procedure Print_Node (Message : String; Node : Tree.Tree_Node);
     procedure Print_Node_Cursor_Array (Name    : String;
                                        Cursors : Tree.Leaf_Cursor_Array);
+    procedure Print_Node_Cursor_List (Name    : String;
+                                      Cursors : Tree.Tree_Cursor_List);
     procedure Print_Split_Record (Name : String;
                                   Data : Node_Splitter.Split_Record);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);

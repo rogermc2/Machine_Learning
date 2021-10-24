@@ -92,7 +92,7 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
-   function Predict (Self : Tree_Class;
+   function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_3D;
 
