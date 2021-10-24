@@ -79,6 +79,9 @@ package Tree is
       Max_Depth       : Integer := -1;
       Value           : Weights.Weight_Lists_List;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
+      --  From _Treenp.ndarray _get_value_ndarray, Data_Values is
+      --  num_nodes x num_outputs x num_classes per node
+      Data_Values     : ML_Types.Value_Data_Lists_3D;
    end record;
 
    Value_Error : Exception;
@@ -89,7 +92,6 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
---     function Get_Value_Array (Self : Tree_Class) return Value_Array;
    function Predict (Self : Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_3D;
