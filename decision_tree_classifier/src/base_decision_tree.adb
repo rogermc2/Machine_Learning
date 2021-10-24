@@ -35,6 +35,7 @@ package body Base_Decision_Tree is
       Y              : ML_Types.Value_Data_Lists_2D;
       Sample_Weights : out Classifier_Types.Float_List;
       Max_Depth      : Integer := -1) is
+      use Estimator;
       Criteria              : Criterion.Criterion_Class;
       Splitter              : Node_Splitter.Splitter_Class;
       Y_Encoded             : Classifier_Types.List_Of_Natural_Lists;
@@ -54,8 +55,10 @@ package body Base_Decision_Tree is
       end if;
 
       --  L207  Generates Y_Encoded and Classes
-      Classification_Part (aClassifier, Y, Y_Encoded,
-                           Classes, Expanded_Class_Weight);
+      if aClassifier.Estimator_Kind = Classifier_Estimator then
+            Classification_Part (aClassifier, Y, Y_Encoded,
+                                 Classes, Expanded_Class_Weight);
+      end if;
 
       Criterion.C_Init (Criteria, Tree.Index_Range (Y_Encoded.Length), Classes);
       --  L163

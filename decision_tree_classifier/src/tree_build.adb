@@ -3,10 +3,8 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Classifier_Utilities;
 with ML_Types;
 with Build_Utils;
---  with Utilities;
 with Tree;
 
 package body Tree_Build is

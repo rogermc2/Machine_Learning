@@ -1,12 +1,14 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
 with Classifier_Types;
 --  with Classifier_Utilities;
 with Criterion;
+with Estimator;
 with Node_Splitter;
 with Weights;
 
@@ -19,8 +21,13 @@ package body Decision_Tree_Classifer is
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
        Max_Depth      : Integer := -1) is
+        use Estimator;
         Sample_Weights : Classifier_Types.Float_List;
     begin
+        Assert (aClassifier.Estimator_Kind = Classifier_Estimator,
+                "Decision_Tree_Classifer.Classification_Fit, invalid estimator "
+                & Estimator_Type'Image (aClassifier.Estimator_Kind));
+
         --  L920
         Base_Decision_Tree.Base_Fit (aClassifier, X, Y, Sample_Weights, Max_Depth);
 
