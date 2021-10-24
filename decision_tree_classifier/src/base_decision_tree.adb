@@ -9,7 +9,7 @@ with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
 with Encode_Utils;
-with Print_Utilities;
+with Printing;
 
 package body Base_Decision_Tree is
 
@@ -97,7 +97,7 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
-      Print_Utilities.Print_List_Of_Value_Data_Lists
+      Printing.Print_List_Of_Value_Data_Lists
         ("Base_Decision_Tree.Base_Fit, Classes",
         aClassifier.Attributes.Decision_Tree.Classes);
 
@@ -310,8 +310,8 @@ package body Base_Decision_Tree is
       end if;
 
       Classes := aClassifier.Attributes.Classes;
-      Print_Utilities.Print_List_Of_Natural_Lists ("Y_Encoded", Y_Encoded);
-      Print_Utilities.Print_List_Of_Value_Data_Lists ("Classes", Classes);
+      Printing.Print_List_Of_Natural_Lists ("Y_Encoded", Y_Encoded);
+      Printing.Print_List_Of_Value_Data_Lists ("Classes", Classes);
 
    exception
       when others => raise Classifier_Error with

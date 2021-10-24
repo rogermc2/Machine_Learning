@@ -7,7 +7,7 @@ with Classifier_Types;
 with Classifier_Utilities;
 with Decision_Tree_Classifer;
 with ML_Types;
-with Print_Utilities;
+with Printing;
 with Tree;
 
 package body Classifier_Tests is
@@ -32,7 +32,7 @@ package body Classifier_Tests is
    procedure Test_Classification_Toy  is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
-      use Print_Utilities;
+      use Printing;
 
       --        Expected        : List_Of_Value_Data_Lists;
       theTree         : Base_Decision_Tree.Classifier

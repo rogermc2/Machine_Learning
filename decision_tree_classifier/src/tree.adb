@@ -3,7 +3,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Print_Utilities;
+with Printing;
 
 package body Tree is
 
@@ -117,12 +117,12 @@ package body Tree is
          Node_ID := Node_ID + 1;
          Put_Line ("Tree.Predict.Build_Output Node ID" &
                      Integer'Image (Node_ID));
---           Print_Utilities.Print_Node  ("Tree.Predict.Build_Output Node", Node);
+--           Printing.Print_Node  ("Tree.Predict.Build_Output Node", Node);
          Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Node ID" &
                    Integer'Image (Node_ID) & " Values list is empty");
-         --           Print_Utilities.Print_Node
+         --           Printing.Print_Node
          --             ("Tree.Predict.Build_Output Node", Node);
-         Print_Utilities.Print_Value_Data_List_2D
+         Printing.Print_Value_Data_List_2D
            ("Tree.Predict.Build_Output Values", Values);
          for output_index in Values.First_Index .. Values.Last_Index loop
             Class_Values := Values.Element (output_index);
@@ -134,12 +134,12 @@ package body Tree is
    begin
       Leaf_Cursors := Apply (Self, X);
       New_Line;
-      Print_Utilities.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
+      Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
                                                Leaf_Cursors);
       --  L767
       Leaf_Cursors.Iterate (Build_Output'access);
       Self.Data_Values := Output_Values;
-      Print_Utilities.Print_Value_Data_List_3D
+      Printing.Print_Value_Data_List_3D
         ("Tree.Predict Output Values...", Output_Values);
 
       return Output_Values;

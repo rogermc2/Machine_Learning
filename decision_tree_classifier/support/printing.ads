@@ -9,7 +9,7 @@ with Node_Splitter;
 with Tree;
 with Weights;
 
-package Print_Utilities is
+package Printing is
 
     Print_Error : Exception;
 
@@ -53,4 +53,4 @@ package Print_Utilities is
     procedure Print_Weights_Lists (Name : String;
                                    Data : Weights.Weight_Lists_List);
 
-end Print_Utilities;
+end Printing;

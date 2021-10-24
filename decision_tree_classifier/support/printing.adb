@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
 
-package body Print_Utilities is
+package body Printing is
 
     --  -------------------------------------------------------------------------
 
@@ -558,4 +558,4 @@ package body Print_Utilities is
 
     --  ------------------------------------------------------------------------
 
-end Print_Utilities;
+end Printing;
