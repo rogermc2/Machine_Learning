@@ -148,7 +148,7 @@ package body Tree is
 --                                                 Leaf_Cursors);
       --  L767
       Leaf_Cursors.Iterate (Build_Output'access);
-      Self.Data_Values := Output_Values;
+--        Self.Data_Values := Output_Values;
 --        Printing.Print_Value_Data_List_3D
       Printing.Print_Weight_Lists_3D
         ("Tree.Predict Output Values...", Output_Values);

@@ -78,11 +78,11 @@ package Tree is
       Classes         : ML_Types.Value_Data_Lists_2D;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Integer := -1;
-      Value           : Weights.Weight_Lists_2D;
+--        Value           : Weights.Weight_Lists_2D;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
       --  From _Treenp.ndarray _get_value_ndarray, Data_Values is
       --  num_nodes x num_outputs x num_classes per node
-      Data_Values     : Weights.Weight_Lists_3D;
+--        Data_Values     : Weights.Weight_Lists_3D;
 --        Data_Values     : ML_Types.Value_Data_Lists_3D;
    end record;
 
