@@ -59,7 +59,8 @@ package body Classifier_Tests is
                   Integer'Image (Integer
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
       Print_Tree ("The Tree", theTree);
-      Put_Line ("===========================================");
+      Put_Line ("----------------------------------------------");
+      New_Line;
       Probabilities := Predict_Probability (theTree, X);
       Print_Weight_Lists_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
