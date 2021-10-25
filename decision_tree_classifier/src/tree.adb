@@ -3,7 +3,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
+--  with Utilities;
 
 with Printing;
 
@@ -34,13 +34,10 @@ package body Tree is
         use Nodes_Package;
         Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
         Node_Cursor    : Tree_Cursor;
---          Left_Cursor    : Tree_Cursor;
         Node           : Tree_Node;
---          Left_Node      : Tree_Node;
         Sample         : Value_Data_List;
         Feature_Value  : Value_Record;
---          Not_Leaf       : Boolean := True;
-        Split          : Boolean;
+        Use_Left       : Boolean;
         Output_Cursors : Tree_Cursor_List;
         Node_ID        : Natural := 0;
     begin
@@ -50,43 +47,35 @@ package body Tree is
         --  L804 for each sample of features
         for index in X.First_Index .. X.Last_Index loop
             Put_Line ("Tree.Apply_Dense, index: " & Integer'Image (index));
-            Sample := X.Element (index);
+            Node_ID := 0;
             Node_Cursor := Top_Cursor;
+            Sample := X.Element (index);
 
             while not Element (First_Child (Node_Cursor)).Leaf_Node loop
                 Node_ID := Node_ID + 1;
                 Put_Line ("Tree.Apply_Dense, Node_ID: " & Integer'Image (Node_ID));
                 Node := Element (Node_Cursor);
-                --              Left_Cursor := First_Child (Node_Cursor);
-                --
-                --              Not_Leaf := not Element (Left_Cursor).Leaf_Node;
-                --              if Not_Leaf then
-                --                 Left_Node := Element (Left_Cursor);
-                --                 if not Left_Node.Leaf_Node then
                 Assert (Feature_Value.Value_Kind = Float_Type or
                           Feature_Value.Value_Kind = Integer_Type,
                         "Tree.Apply_Dense Self.Nodes invalid feature data type");
-                Put_Line ("Tree.Apply_Dense Feature_Index: " &
-                            Integer'Image (Node.Feature_Index));
+--                  Put_Line ("Tree.Apply_Dense Feature_Index: " &
+--                              Integer'Image (Node.Feature_Index));
                 Feature_Value := Sample.Element (Node.Feature_Index);
-                Utilities.Print_Value_Record ("Feature_Value", Feature_Value);
+--                  Utilities.Print_Value_Record ("Feature_Value", Feature_Value);
                 case Feature_Value.Value_Kind is
                     when Float_Type =>
-                        Split := Feature_Value.Float_Value <= Node.Threshold;
+                        Use_Left := Feature_Value.Float_Value <= Node.Threshold;
                     when Integer_Type =>
-                        Split := Float (Feature_Value.Integer_Value) <=
+                        Use_Left := Float (Feature_Value.Integer_Value) <=
                           Node.Threshold;
                     when others => null;
                 end case;
 
-                if Split then
+                if Use_Left then
                     Node_Cursor := First_Child (Node_Cursor);
                 else
                     Node_Cursor := Last_Child (Node_Cursor);
                 end if;
-                --                 end if;
-
-                --              end if;  --  Not_Leaf
             end loop;  --  Not_Leaf
 
             Output_Cursors.Append (Node_Cursor);
@@ -106,7 +95,7 @@ package body Tree is
     --  Each sample is a list of feature values, one value per feature
     --  Leaf_Cursors is a list of node cursors
         Leaf_Cursors  : Tree_Cursor_List;
-        Node_ID       : Natural := 0;
+        Cursor_ID     : Natural := 0;
         Output_Values : Weights.Weight_Lists_3D;
 
         --  L1087 node dimension of _get_value_ndarray?
@@ -120,11 +109,11 @@ package body Tree is
             Classes_Out  : Weights.Weight_Lists_2D;
             Class_Values : Weights.Weight_List;
         begin
-            Node_ID := Node_ID + 1;
-            Put_Line ("Tree.Predict.Build_Output Node ID" &
-                        Integer'Image (Node_ID));
-            Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Node ID" &
-                      Integer'Image (Node_ID) & " Values list is empty");
+            Cursor_ID := Cursor_ID + 1;
+            Put_Line ("Tree.Predict.Build_Output Cursor ID" &
+                        Integer'Image (Cursor_ID));
+            Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Cursor ID" &
+                      Integer'Image (Cursor_ID) & " Values list is empty");
             Printing.Print_Weights_Lists
               ("Tree.Predict.Build_Output Values", Values);
             for output_index in Values.First_Index .. Values.Last_Index loop
