@@ -97,7 +97,7 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
-      Printing.Print_List_Of_Value_Data_Lists
+      Printing.Print_Value_Data_Lists_2D
         ("Base_Decision_Tree.Base_Fit, Classes",
         aClassifier.Attributes.Decision_Tree.Classes);
 
@@ -310,8 +310,8 @@ package body Base_Decision_Tree is
       end if;
 
       Classes := aClassifier.Attributes.Classes;
-      Printing.Print_List_Of_Natural_Lists ("Y_Encoded", Y_Encoded);
-      Printing.Print_List_Of_Value_Data_Lists ("Classes", Classes);
+      Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
+      Printing.Print_Value_Data_Lists_2D ("Classes", Classes);
 
    exception
       when others => raise Classifier_Error with

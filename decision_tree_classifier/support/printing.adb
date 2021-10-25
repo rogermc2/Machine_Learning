@@ -156,7 +156,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_List_Of_Float_Lists (Name : String;
+   procedure Print_Float_Lists_2D (Name : String;
                                         Data : Float_List_2D) is
    begin
       Put_Line (Name & ": ");
@@ -166,12 +166,12 @@ package body Printing is
       end loop;
       New_Line;
 
-   end Print_List_Of_Float_Lists;
+   end Print_Float_Lists_2D;
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_List_Of_Natural_Lists (Name : String;
-                                          Data : List_Of_Natural_Lists) is
+   procedure Print_Natural_Lists_2D (Name : String;
+                                     Data : List_Of_Natural_Lists) is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
@@ -179,28 +179,28 @@ package body Printing is
       end loop;
       New_Line;
 
-   end Print_List_Of_Natural_Lists;
+   end Print_Natural_Lists_2D;
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_List_Of_Value_Lists
+   procedure Print_Value_Lists_2D
      (Name : String; Multi_List : Tree.Values_List_2D) is
    begin
-      Print_List_Of_Float_Lists (Name, Multi_List);
-   end Print_List_Of_Value_Lists;
+      Print_Float_Lists_2D (Name, Multi_List);
+   end Print_Value_Lists_2D;
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_List_Of_Value_Data_Lists
-     (Name : String; Multi_List : ML_Types.Value_Data_Lists_2D) is
+   procedure Print_Value_Lists_3D (Name   : String;
+                                   theList :Tree.Values_List_3D) is
    begin
       Put_Line (Name & ": ");
-      for index in Multi_List.First_Index .. Multi_List.Last_Index loop
-         Print_Value_Data_List ("List" & Integer'Image (index),
-                                Multi_List.Element (index));
+      for index in theList.First_Index .. theList.Last_Index loop
+         Print_Value_Lists_2D ("List" & Integer'Image (index),
+                                   theList.Element (index));
       end loop;
       New_Line;
-   end Print_List_Of_Value_Data_Lists;
+   end Print_Value_Lists_3D;
 
    --  ------------------------------------------------------------------------
 
@@ -339,9 +339,7 @@ package body Printing is
       use Tree;
       use Nodes_Package;
       Nodes       : constant Tree_Nodes := aTree.Nodes;
---        Node_Values : Value_Data_List;
       Node_Values : Weights.Weight_List;
---        Data        : Value_Record;
       Data        : Float;
       Data_String : Unbounded_String;
       This_Indent : Natural := 0;
@@ -351,8 +349,7 @@ package body Printing is
                                  Indent : Natural := 0) is
          use Ada.Containers;
          Node   : constant Tree_Node := Element (Curs);
---           Values : constant ML_Types.Value_Data_Lists_2D  := Node.Values;
-         Values : constant Weights.Weight_Lists_2D  := Node.Values;
+         Values : constant Weights.Weight_Lists_2D := Node.Values;
       begin
          This_Indent := Indent + 1;
          if This_Indent > 10 then
@@ -386,18 +383,6 @@ package body Printing is
                     Node_Values.Last_Index loop
                      Data := Node_Values.Element (v_index);
                      Data_String := Data_String & Float'Image (Data);
---                       case Data.Value_Kind is
---                          when Boolean_Type =>
---                             Data_String := Data_String &
---                               Boolean'Image (Data.Boolean_Value);
---                          when Float_Type =>
---                             Data_String := Data_String & Float'Image (Data.Float_Value);
---                          when Integer_Type =>
---                             Data_String := Data_String &
---                               Integer'Image (Data.Integer_Value);
---                          when UB_String_Type =>
---                             Data_String := Data_String & Data.UB_String_Value;
---                       end case;
 
                      if not (index = Node_Values.Last_Index) then
                         Data_String := Data_String & ", ";
@@ -417,6 +402,7 @@ package body Printing is
                end if;
             end if;
          end; --  declare block
+
       end Print_Tree_Node;
 
    begin
@@ -477,7 +463,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Value_Data_List_2D
+   procedure Print_Value_Data_Lists_2D
      (Name : String; theList : ML_Types.Value_Data_Lists_2D) is
    begin
       if Name'Length > 0 then
@@ -494,11 +480,11 @@ package body Printing is
          end loop;
       end if;
 
-   end Print_Value_Data_List_2D;
+   end Print_Value_Data_Lists_2D;
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Value_Data_List_3D
+   procedure Print_Value_Data_Lists_3D
      (Name : String; theList : ML_Types.Value_Data_Lists_3D) is
    begin
       if Name'Length > 0 then
@@ -511,24 +497,13 @@ package body Printing is
          Put_Line ("Print_Value_Data_List_3D, first 2D list is empty");
       else
          for index in theList.First_Index .. theList.Last_Index loop
-            Print_Value_Data_List_2D ("", theList.Element (index));
+            Print_Value_Data_Lists_2D ("", theList.Element (index));
          end loop;
       end if;
 
-   end Print_Value_Data_List_3D;
+   end Print_Value_Data_Lists_3D;
 
    --  -------------------------------------------------------------
-
-   procedure Print_Value_Lists_3D
-     (Name : String; Multi_List : Tree.Values_List_3D) is
-   begin
-      Put_Line (Name & ":");
-      for index in Multi_List.First_Index .. Multi_List.Last_Index loop
-         Print_List_Of_Value_Lists ("", Multi_List.Element (index));
-      end loop;
-   end Print_Value_Lists_3D;
-
-   --  ------------------------------------------------------------------------
 
    procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
       aWeight : Float;

@@ -20,16 +20,16 @@ package Printing is
                                  Start, Finish : Integer);
     procedure Print_Float_List (Name  : String; theList : Float_List);
     procedure Print_Integer_List (Name : String; theList : Integer_List);
-    procedure Print_List_Of_Natural_Lists (Name : String;
+    procedure Print_Natural_Lists_2D (Name : String;
                                            Data : List_Of_Natural_Lists);
-    procedure Print_List_Of_Float_Lists (Name : String;
+    procedure Print_Float_Lists_2D (Name : String;
                                          Data : Float_List_2D);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
-    procedure Print_List_Of_Value_Lists
+    procedure Print_Value_Lists_2D
       (Name : String; Multi_List : Tree.Values_List_2D);
-    procedure Print_List_Of_Value_Data_Lists
-      (Name : String; Multi_List : ML_Types.Value_Data_Lists_2D);
+    procedure Print_Value_Lists_3D
+      (Name : String; theList : Tree.Values_List_3D);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
     procedure Print_Node (Message : String; Node : Tree.Tree_Node);
     procedure Print_Node_Cursor_Array (Name    : String;
@@ -43,12 +43,10 @@ package Printing is
     procedure Print_Value_List (Name : String; theList : Tree.Values_List);
     procedure Print_Value_Data_List (Name    : String;
                                      theList : ML_Types.Value_Data_List);
-    procedure Print_Value_Data_List_2D (Name    : String;
+    procedure Print_Value_Data_Lists_2D (Name    : String;
                                         theList : ML_Types.Value_Data_Lists_2D);
-    procedure Print_Value_Data_List_3D (Name    : String;
-                                        theList : ML_Types.Value_Data_Lists_3D);
-    procedure Print_Value_Lists_3D
-      (Name : String; Multi_List : Tree.Values_List_3D);
+    procedure Print_Value_Data_Lists_3D (Name    : String;
+                                         theList : ML_Types.Value_Data_Lists_3D);
     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
     procedure Print_Weights_Lists (Name : String;
                                    Data : Weights.Weight_Lists_2D);
