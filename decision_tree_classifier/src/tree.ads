@@ -33,10 +33,6 @@ package Tree is
    subtype Values_List is Classifier_Types.Float_List;
    subtype Values_List_2D is Classifier_Types.Float_List_2D;
    subtype Values_List_3D is Classifier_Types.Float_List_3D;
-   type Values_Array_2D is array
-     (Positive range <>, Positive range <>) of Float;
-   type Values_Array_3D is array
-     (Positive range <>, Positive range <>, Positive range <>) of Float;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
       --  from _Tree Node struct
@@ -49,7 +45,7 @@ package Tree is
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
       --  From _Tree class Tree Value is num_outputs x num_classes per node
---        Values                    : ML_Types.Value_Data_Lists_2D;
+      --        Values                    : ML_Types.Value_Data_Lists_2D;
       Values                    : Weights.Weight_Lists_2D;
       case Leaf_Node is
          when False =>
@@ -78,12 +74,10 @@ package Tree is
       Classes         : ML_Types.Value_Data_Lists_2D;
       Num_Outputs     : Index_Range := 1;
       Max_Depth       : Integer := -1;
---        Value           : Weights.Weight_Lists_2D;
       Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
       --  From _Treenp.ndarray _get_value_ndarray, Data_Values is
       --  num_nodes x num_outputs x num_classes per node
---        Data_Values     : Weights.Weight_Lists_3D;
---        Data_Values     : ML_Types.Value_Data_Lists_3D;
+      --  Data_Values  stored in individual nodes;
    end record;
 
    Value_Error : Exception;

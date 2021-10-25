@@ -48,14 +48,10 @@ package body Tree_Build is
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
       --  _Tree L241 stores values in tree.values indexed by node id
---        Node_Splitter.Node_Value (Splitter, theTree.Value);
       Node_Splitter.Node_Value (Splitter, New_Node.Values);
 
       New_Node.Samples_Start := Start;
       New_Node.Num_Node_Samples := 1 + Stop - Start;
---        Put_Line ("Tree_Build.Add_Node, Start, Stop, Num_Node_Samples:" &
---                    Integer'Image (Start) & ", " & Integer'Image (Stop) &
---                    ", " & Integer'Image (New_Node.Num_Node_Samples));
 
       if not Is_Leaf then
          New_Node.Feature_Index := Feature_Index;
@@ -98,7 +94,6 @@ package body Tree_Build is
                                 Start_Row + Parent_Node.Num_Node_Samples - 1;
       Node_Cursor           : Tree.Tree_Cursor;
       New_Node              : Tree.Tree_Node;
-      Values                : Weights.Weight_Lists_2D;
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
@@ -132,8 +127,7 @@ package body Tree_Build is
       New_Node := Element (Node_Cursor);
       Replace_Element (theTree.Nodes, Node_Cursor, New_Node);
 
-      --  L463
-      Node_Splitter.Node_Value (Splitter, Values);
+      --  L463 Node_Value set by Add_Node
 
       Res.Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,

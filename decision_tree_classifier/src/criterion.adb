@@ -4,7 +4,6 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
---  with Classifier_Utilities;
 with ML_Types;
 
 package body Criterion is

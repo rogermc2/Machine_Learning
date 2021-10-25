@@ -3,7 +3,6 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Classifier_Utilities;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -92,9 +91,6 @@ package body Ada_Tree_Builder is
                           " is not in the row index range " &
                           Integer'Image (Start_Row + 1) & " .. " &
                           Integer'Image (End_Row));
-
---                  Classifier_Utilities.Print_Split_Record
---                    ("Ada_Tree_Builder.Add_Branch, Split", Split);
 
                 Is_Leaf_Node := Split_Row = Parent_Node.Samples_Start or
                   Split_Row >= End_Row or

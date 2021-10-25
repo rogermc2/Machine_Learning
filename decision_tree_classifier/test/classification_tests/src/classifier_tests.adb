@@ -60,7 +60,6 @@ package body Classifier_Tests is
                   (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
       Print_Tree ("The Tree", theTree);
       Probabilities := Predict_Probability (theTree, X);
---        Print_Value_Data_List_3D
       Print_Weight_Lists_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);

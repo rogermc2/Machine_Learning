@@ -264,9 +264,8 @@ package body Printing is
          Put_Line (To_String (UB_Offset) &
                      "Prediction: Values list is empty!");
       else
-         --              Print_List_Of_Value_Data_Lists
          Print_Weights_Lists
-           (To_String (UB_Offset & "Prediction"), Node.Values);
+           (To_String (UB_Offset & "Class predictions"), Node.Values);
       end if;
 
    end Print_Node;
