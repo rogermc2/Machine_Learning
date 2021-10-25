@@ -49,7 +49,7 @@ package body Tree is
 
       --  L804 for each sample of features
       for index in X.First_Index .. X.Last_Index loop
-         Put_Line ("Tree.Apply_Dense, index: " & Integer'Image (index));
+         Put_Line ("Tree.Apply_Dense, sample index: " & Integer'Image (index));
          Sample := X.Element (index);
          Node_Cursor := Top_Cursor;
          Not_Leaf := True;
@@ -67,8 +67,8 @@ package body Tree is
                   Assert (Feature_Value.Value_Kind = Float_Type or
                             Feature_Value.Value_Kind = Integer_Type,
                           "Tree.Apply_Dense Self.Nodes invalid feature data type");
-                  Put_Line ("Tree.Apply_Dense Feature_Index: " &
-                              Integer'Image (Node.Feature_Index));
+                  --                    Put_Line ("Tree.Apply_Dense Feature_Index: " &
+                  --                                Integer'Image (Node.Feature_Index));
                   Feature_Value := Sample.Element (Node.Feature_Index);
                   Utilities.Print_Value_Record ("Feature_Value", Feature_Value);
                   case Feature_Value.Value_Kind is
@@ -86,9 +86,17 @@ package body Tree is
                      Node_Cursor := Last_Child (Node_Cursor);
                   end if;
                end if;
-
+            else
+               Put_Line ("Tree.Apply_Dense, Node: " & Integer'Image (Node_ID + 1)
+                        & " is leaf.");
             end if;  --  Not_Leaf
          end loop;  --  Not_Leaf
+         --  Leaf detected
+--           Put_Line ("Tree.Apply_Dense, leaf Node_ID: " &
+--                       Integer'Image (Node_ID + 1));
+         Printing.Print_Node ("Tree.Apply_Dense leaf Node_ID: " &
+                                Integer'Image (Node_ID + 1),
+                              Element (Node_Cursor));
 
          Output_Cursors.Append (Node_Cursor);
       end loop;
