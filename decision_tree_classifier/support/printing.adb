@@ -543,7 +543,7 @@ package body Printing is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
-         Print_Weights_Lists ("Output" & Integer'Image (index),
+         Print_Weights_Lists ("Output list" & Integer'Image (index),
                               Data.Element (Index));
       end loop;
       New_Line;
