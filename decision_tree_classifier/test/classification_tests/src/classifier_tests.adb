@@ -24,9 +24,9 @@ package body Classifier_Tests is
    X_Array     : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
                    ((-2, -1), (-1, -1), (-1, -2), (1, 1), (1, 2), (2, 1));
    Y_Array     : constant Integer_Array (1 .. 6) := (-1, -1, -1, 1, 1, 1);
-   --     T_Array     : constant Multi_Value_Array (1 .. 3, 1 .. 2) :=
-   --                     ((-1, -1), (2, 2), (3, 2));
-   --     True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
+   T_Array     : constant Multi_Value_Array (1 .. 3, 1 .. 2) :=
+                      ((-1, -1), (2, 2), (3, 2));
+   True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
 
    --  -------------------------------------------------------------------------
 
@@ -34,17 +34,20 @@ package body Classifier_Tests is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
       use Printing;
+      use Weights;
 
-      --        Expected        : List_Of_Value_Data_Lists;
+      Expected        : Value_Data_Lists_2D;
+      Prediction      : Value_Data_Lists_2D;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
 --        Max_Depth       : constant Positive := 5;
       X               : constant Value_Data_Lists_2D :=
                           To_Multi_Value_List (X_Array);
       Y               : Value_Data_Lists_2D;
+      T               : constant Value_Data_Lists_2D :=
+                          To_Multi_Value_List (T_Array);
       Num_Samples     : constant Natural := Natural (X.Length);
       Probabilities   : Weights.Weight_Lists_3D;
---        Probabilities   : ML_Types.Value_Data_Lists_3D;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,
@@ -52,7 +55,7 @@ package body Classifier_Tests is
 
       Y := To_Integer_Value_List (Y_Array);
       --  L229
-      --        Expected := To_Integer_Value_List (True_Result);
+      Expected := To_Integer_Value_List (True_Result);
       --  L230
       Classification_Fit (theTree, X, Y);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
@@ -61,7 +64,11 @@ package body Classifier_Tests is
       Print_Tree ("The Tree", theTree);
       Put_Line ("----------------------------------------------");
       New_Line;
-      Probabilities := Predict_Probability (theTree, X);
+      Prediction := Tree.Predict (theTree.Attributes.Decision_Tree, T);
+--        Probabilities := Predict_Probability (theTree, X);
+--        if Probabilities = Expected then
+--           null;
+--        end if;
       Put_Line ("Classification_Tests.Test_Classification_Toy Print_Weight_Lists_3D");
       Print_Weight_Lists_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
