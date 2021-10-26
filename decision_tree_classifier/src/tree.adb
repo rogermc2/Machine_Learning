@@ -124,11 +124,12 @@ package body Tree is
         end Build_Output;
 
     begin
+        --  L767
         Leaf_Cursors := Apply (Self, X);
         New_Line;
         Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
                                          Leaf_Cursors);
-        --  L767
+        Self.Data_Values := Leaf_Cursors;
         Leaf_Cursors.Iterate (Build_Output'access);
         --        Printing.Print_Weight_Lists_3D
         --          ("Tree.Predict Output Values...", Output_Values);
