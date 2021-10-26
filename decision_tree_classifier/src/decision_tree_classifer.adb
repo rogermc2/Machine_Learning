@@ -78,6 +78,7 @@ package body Decision_Tree_Classifer is
       use ML_Types;
       use Weights;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
+      Node_Values     : Tree.Nodes_List;
       Num_Nodes       : Positive;
       Classes         : constant Value_Data_Lists_2D :=
                           Self.Attributes.Decision_Tree.Classes;
@@ -90,8 +91,9 @@ package body Decision_Tree_Classifer is
       Normalizer      : Float;
    begin
       --  L954
-      Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
-      Num_Nodes := Positive (Proba.Length);
+      Node_Values :=  Self.Attributes.Decision_Tree.Values;
+      Num_Nodes := Positive (Positive (Node_Values.Length));
+--        Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
       --  L969
       for k in 1 .. Num_Outputs loop
          Prob_K.Clear;

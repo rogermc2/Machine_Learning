@@ -34,10 +34,9 @@ package body Classifier_Tests is
       use Classifier_Utilities;
       use Decision_Tree_Classifer;
       use Printing;
-      use Weights;
 
       Expected        : Value_Data_Lists_2D;
-      Prediction      : Value_Data_Lists_2D;
+      Prediction      : Value_Data_List;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
 --        Max_Depth       : constant Positive := 5;
