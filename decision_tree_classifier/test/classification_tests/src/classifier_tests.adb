@@ -26,7 +26,7 @@ package body Classifier_Tests is
    Y_Array     : constant Integer_Array (1 .. 6) := (-1, -1, -1, 1, 1, 1);
    T_Array     : constant Multi_Value_Array (1 .. 3, 1 .. 2) :=
                       ((-1, -1), (2, 2), (3, 2));
-   True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
+--     True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
 
    --  -------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ package body Classifier_Tests is
       use Decision_Tree_Classifer;
       use Printing;
 
-      Expected        : Value_Data_Lists_2D;
+--        Expected        : Value_Data_Lists_2D;
       Prediction      : Value_Data_List;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
@@ -54,7 +54,7 @@ package body Classifier_Tests is
 
       Y := To_Integer_Value_List (Y_Array);
       --  L229
-      Expected := To_Integer_Value_List (True_Result);
+--        Expected := To_Integer_Value_List (True_Result);
       --  L230
       Classification_Fit (theTree, X, Y);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
