@@ -41,27 +41,21 @@ package body Tree is
         Feature_Value  : Value_Record;
         Use_Left       : Boolean;
         Output_Cursors : Tree_Cursor_List;
-        Node_ID        : Natural := 0;
     begin
         Assert (Integer (Child_Count (Top_Cursor)) > 0,
                 "Tree.Apply_Dense Self.Nodes tree is empty");
 
         --  L804 for each sample of features
         for index in X.First_Index .. X.Last_Index loop
-            Put_Line ("Tree.Apply_Dense, index: " & Integer'Image (index));
-            Node_ID := 0;
+--              Put_Line ("Tree.Apply_Dense, index: " & Integer'Image (index));
             Node_Cursor := Top_Cursor;
             Sample := X.Element (index);
 
             while not Element (First_Child (Node_Cursor)).Leaf_Node loop
-                Node_ID := Node_ID + 1;
-                Put_Line ("Tree.Apply_Dense, Node_ID: " & Integer'Image (Node_ID));
                 Node := Element (Node_Cursor);
                 Assert (Feature_Value.Value_Kind = Float_Type or
                           Feature_Value.Value_Kind = Integer_Type,
                         "Tree.Apply_Dense Self.Nodes invalid feature data type");
---                  Put_Line ("Tree.Apply_Dense Feature_Index: " &
---                              Integer'Image (Node.Feature_Index));
                 Feature_Value := Sample.Element (Node.Feature_Index);
 --                  Utilities.Print_Value_Record ("Feature_Value", Feature_Value);
                 case Feature_Value.Value_Kind is
@@ -128,7 +122,6 @@ package body Tree is
     begin
         --  L767
         Leaf_Cursors := Apply (Self, X);
-        New_Line;
         Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
                                          Leaf_Cursors);
         Save_Nodes (Self, Leaf_Cursors);
@@ -146,9 +139,9 @@ package body Tree is
                           Cursors : Tree_Cursor_List) is
         use Nodes_List_Package;
     begin
-        aTree.Data_Values.Clear;
+        aTree.Values.Clear;
         for index in Cursors.First_Index .. Cursors.Last_Index loop
-            aTree.Data_Values.Append (Element (Cursors (index)));
+            aTree.Values.Append (Element (Cursors (index)));
         end loop;
 
     end Save_Nodes;

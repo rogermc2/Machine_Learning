@@ -228,7 +228,17 @@ package body Printing is
       UB_Offset   : constant Unbounded_String :=
                       To_Unbounded_String (Offset);
    begin
+      Put (To_String (UB_Offset & "Start:" &
+                  Integer'Image (Node.Samples_Start)));
+      Put ("," & Integer'Image (Node.Num_Node_Samples) & " sample");
+      if Node.Num_Node_Samples > 1 then
+         Put_Line ("s");
+      else
+         New_Line;
+      end if;
+
       Put (To_String (UB_Offset & "Type of node: "));
+
       if Node.Leaf_Node then
          Put_Line ("Leaf");
       else
@@ -237,10 +247,6 @@ package body Printing is
 
       Put_Line (To_String (UB_Offset & "Number of weighted samples:" &
                   Integer'Image (Node.Weighted_Num_Node_Samples)));
-      Put_Line (To_String (UB_Offset & "Start:" &
-                  Integer'Image (Node.Samples_Start)));
-      Put_Line (To_String (UB_Offset & "Number of samples:" &
-                  Integer'Image (Node.Num_Node_Samples)));
       if Node.Is_Left then
          Put_Line (To_String (UB_Offset & "True branch"));
       else
@@ -274,9 +280,12 @@ package body Printing is
 
    procedure Print_Node (Message : String; Node : Tree.Tree_Node) is
    begin
-      Put_Line (Message);
+      if Message'Length > 0 then
+         Put_Line (Message);
+      end if;
       Print_Node (node);
       New_Line;
+
    end Print_Node;
 
    --  ------------------------------------------------------------------------

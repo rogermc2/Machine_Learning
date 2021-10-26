@@ -74,16 +74,16 @@ package Tree is
    subtype Nodes_List is Nodes_List_Package.Vector;
 
    type Tree_Class is record
-      Num_Features    : Natural := 0;
+      Num_Features : Natural := 0;
       --  Classes:  outputs x classes
-      Classes         : ML_Types.Value_Data_Lists_2D;
-      Num_Outputs     : Index_Range := 1;
-      Max_Depth       : Integer := -1;
-      Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
-      --  From _Treenp.ndarray _get_value_ndarray, Data_Values is
-      --  num_nodes x num_outputs x num_classes per node
-      --  Data_Values  stored in individual nodes;
-      Data_Values     : Nodes_List;
+      Classes      : ML_Types.Value_Data_Lists_2D;
+      Num_Outputs  : Index_Range := 1;
+      Max_Depth    : Integer := -1;
+      Nodes        : Nodes_Package.Tree;  -- Ada Multiway Tree
+      --  From _Treenp.ndarray _get_value_ndarray generates a Values
+      --  3D array, num_nodes x num_outputs x num_classes per node.
+      --  Values corresponds to the first dimension of ndarray
+      Values       : Nodes_List;
    end record;
 
    Value_Error : Exception;

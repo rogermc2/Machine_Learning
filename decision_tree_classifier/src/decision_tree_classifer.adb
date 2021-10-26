@@ -93,9 +93,10 @@ package body Decision_Tree_Classifer is
       Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
       --  L969
       Put_Line ("Predict_Probability L969");
-      Put_Line ("Predict_Probability Num_Outputs, Num_Nodes: " &
+      Put_Line ("Predict_Probability Num_Outputs, Num_Nodes, Num_Classes: " &
                   Integer'Image (Num_Outputs) & ", " &
-                  Integer'Image (Num_Nodes));
+                  Integer'Image (Num_Nodes) & ", " &
+                  Integer'Image (Num_Classes));
       for k in 1 .. Num_Outputs loop
          Prob_K.Clear;
          for node_index in 1 .. Num_Nodes loop
