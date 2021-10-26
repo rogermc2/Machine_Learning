@@ -13,8 +13,8 @@ package body Tree is
                          X           : ML_Types.Value_Data_Lists_2D;
                          Out_Cursors : out Tree_Cursor_List)
                           return ML_Types.Value_Data_List;
-   procedure Save_Nodes (aTree   : in out Tree_Class;
-                         Cursors : Tree_Cursor_List);
+--     procedure Save_Nodes (aTree   : in out Tree_Class;
+--                           Cursors : Tree_Cursor_List);
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
@@ -135,7 +135,7 @@ package body Tree is
       Out_Data := Apply (Self, X, Leaf_Cursors);
       --        Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
       --                                         Leaf_Cursors);
-      Save_Nodes (Self, Leaf_Cursors);
+--        Save_Nodes (Self, Leaf_Cursors);
       Leaf_Cursors.Iterate (Build_Output'access);
       --        Printing.Print_Weight_Lists_3D
       --          ("Tree.Predict Output Values...", Output_Values);
@@ -147,16 +147,16 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
-   procedure Save_Nodes (aTree   : in out Tree_Class;
-                         Cursors : Tree_Cursor_List) is
-      use Nodes_List_Package;
-   begin
-      aTree.Prediction_Values.Clear;
-      for index in Cursors.First_Index .. Cursors.Last_Index loop
-         aTree.Prediction_Values.Append (Element (Cursors (index)));
-      end loop;
-
-   end Save_Nodes;
+--     procedure Save_Nodes (aTree   : in out Tree_Class;
+--                           Cursors : Tree_Cursor_List) is
+--        use Nodes_List_Package;
+--     begin
+--        aTree.Prediction_Values.Clear;
+--        for index in Cursors.First_Index .. Cursors.Last_Index loop
+--           aTree.Prediction_Values.Append (Element (Cursors (index)));
+--        end loop;
+--
+--     end Save_Nodes;
 
    --  -------------------------------------------------------------------------
 
