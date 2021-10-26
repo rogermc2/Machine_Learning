@@ -2,13 +2,14 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
 with Classifier_Types;
 with Criterion;
 with Estimator;
 with Node_Splitter;
+--  with Printing;
 with Weights;
 
 package body Decision_Tree_Classifer is
@@ -73,12 +74,11 @@ package body Decision_Tree_Classifer is
    --  class in a leaf.
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                  X    : ML_Types.Value_Data_Lists_2D)
-                                  return Weights.Weight_Lists_3D is
+                                 return Weights.Weight_Lists_3D is
       use ML_Types;
       use Weights;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
-      Num_Nodes       : constant Positive
-        := Positive (Self.Attributes.Decision_Tree.Nodes.Node_Count) - 1;
+      Num_Nodes       : Positive;
       Classes         : constant Value_Data_Lists_2D :=
                           Self.Attributes.Decision_Tree.Classes;
       Num_Classes     : constant Positive := Positive (Classes.Length);
@@ -91,17 +91,11 @@ package body Decision_Tree_Classifer is
    begin
       --  L954
       Proba :=  Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Num_Nodes := Positive (Proba.Length);
       --  L969
-      Put_Line ("Predict_Probability L969");
-      Put_Line ("Predict_Probability Num_Outputs, Num_Nodes, Num_Classes: " &
-                  Integer'Image (Num_Outputs) & ", " &
-                  Integer'Image (Num_Nodes) & ", " &
-                  Integer'Image (Num_Classes));
       for k in 1 .. Num_Outputs loop
          Prob_K.Clear;
          for node_index in 1 .. Num_Nodes loop
-            Put_Line ("Predict_Probability k, node_index: " &
-                     Integer'Image (k) & ", " &  Integer'Image (node_index));
             Prob_K := Proba.Element (node_index);
             Prob_Class.Clear;
             for class_index in 1  .. Num_Classes loop
@@ -127,7 +121,7 @@ package body Decision_Tree_Classifer is
             All_Proba.Append (Prob_K);
          end loop;
       end loop;
-      Put_Line ("Predict_Probability returning");
+
       return All_Proba;
 
    end Predict_Probability;

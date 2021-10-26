@@ -51,8 +51,8 @@ package Tree is
          when False =>
             --  from _Tree Node struct
             --  Feature used for splitting the node
-            Feature_Index : Natural := 0;
-            Threshold     : Float := 0.0;
+            Best_Fit_Feature_Index : Natural := 0;
+            Threshold              : Float := 0.0;
          when True => null;
       end case;
    end record;

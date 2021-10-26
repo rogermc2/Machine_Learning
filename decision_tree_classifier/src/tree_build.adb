@@ -54,7 +54,7 @@ package body Tree_Build is
       New_Node.Num_Node_Samples := 1 + Stop - Start;
 
       if not Is_Leaf then
-         New_Node.Feature_Index := Feature_Index;
+         New_Node.Best_Fit_Feature_Index := Feature_Index;
          New_Node.Threshold := Threshold;
       end if;
 

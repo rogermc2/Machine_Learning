@@ -62,6 +62,7 @@ package body Classifier_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Probabilities := Predict_Probability (theTree, X);
+      Put_Line ("Classification_Tests.Test_Classification_Toy Print_Weight_Lists_3D");
       Print_Weight_Lists_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);

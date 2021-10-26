@@ -261,7 +261,7 @@ package body Printing is
 
       if not Node.Leaf_Node then
          Put_Line (To_String (UB_Offset & "Feature index: " &
-                     Integer'Image (Node.Feature_Index)));
+                     Integer'Image (Node.Best_Fit_Feature_Index)));
          Put_Line (To_String (UB_Offset & "Threshold: " &
                      Float'Image (Node.Threshold)));
       end if;

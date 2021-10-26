@@ -5,7 +5,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 --  with Utilities;
 
-with Printing;
+--  with Printing;
 
 package body Tree is
 
@@ -60,7 +60,7 @@ package body Tree is
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
-            Feature_Value := Sample.Element (Node.Feature_Index);
+            Feature_Value := Sample.Element (Node.Best_Fit_Feature_Index);
             --  Make tree traversal decision
             case Feature_Value.Value_Kind is
                when Float_Type =>
@@ -112,9 +112,9 @@ package body Tree is
          Cursor_ID := Cursor_ID + 1;
          Assert (not Values.Is_Empty, "Tree.Predict.Build_Output Cursor ID" &
                    Integer'Image (Cursor_ID) & " Values list is empty");
-         Printing.Print_Weights_Lists
-           ("Tree.Predict Build_Output Values for Cursor ID" &
-            Integer'Image (Cursor_ID), Values);
+--           Printing.Print_Weights_Lists
+--             ("Tree.Predict Build_Output Values for Cursor ID" &
+--              Integer'Image (Cursor_ID), Values);
          for output_index in Values.First_Index .. Values.Last_Index loop
             Class_Values := Values.Element (output_index);
             Classes_Out.Append (Class_Values);
@@ -125,8 +125,8 @@ package body Tree is
    begin
       --  L767
       Leaf_Cursors := Apply (Self, X);
-      Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
-                                       Leaf_Cursors);
+--        Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
+--                                         Leaf_Cursors);
       Save_Nodes (Self, Leaf_Cursors);
       Leaf_Cursors.Iterate (Build_Output'access);
       --        Printing.Print_Weight_Lists_3D
