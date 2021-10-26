@@ -131,6 +131,7 @@ package body Tree is
 
    begin
       --  L767
+      --        Leaf_Cursors := Apply (Self, X);
       Out_Data := Apply (Self, X, Leaf_Cursors);
       --        Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
       --                                         Leaf_Cursors);
@@ -149,12 +150,10 @@ package body Tree is
    procedure Save_Nodes (aTree   : in out Tree_Class;
                          Cursors : Tree_Cursor_List) is
       use Nodes_List_Package;
-      aNode : Tree_Node;
    begin
       aTree.Prediction_Values.Clear;
       for index in Cursors.First_Index .. Cursors.Last_Index loop
-         aNode := Element (Cursors (index));
---           aTree.Prediction_Values.Append ();
+         aTree.Prediction_Values.Append (Element (Cursors (index)));
       end loop;
 
    end Save_Nodes;

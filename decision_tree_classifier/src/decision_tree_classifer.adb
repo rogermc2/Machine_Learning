@@ -78,7 +78,7 @@ package body Decision_Tree_Classifer is
       use ML_Types;
       use Weights;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
-      Node_Values     : ML_Types.Value_Data_Lists_3D;
+      Node_Values     : Tree.Nodes_List;
       Num_Nodes       : Positive;
       Classes         : constant Value_Data_Lists_2D :=
                           Self.Attributes.Decision_Tree.Classes;
