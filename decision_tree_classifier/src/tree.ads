@@ -68,6 +68,11 @@ package Tree is
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
 
+   use Nodes_Package;
+   package Nodes_List_Package is new Ada.Containers.Vectors
+     (Positive, Tree_Node);
+   subtype Nodes_List is Nodes_List_Package.Vector;
+
    type Tree_Class is record
       Num_Features    : Natural := 0;
       --  Classes:  outputs x classes
@@ -78,7 +83,7 @@ package Tree is
       --  From _Treenp.ndarray _get_value_ndarray, Data_Values is
       --  num_nodes x num_outputs x num_classes per node
       --  Data_Values  stored in individual nodes;
-      Data_Values     : Tree_Cursor_List;
+      Data_Values     : Nodes_List;
    end record;
 
    Value_Error : Exception;

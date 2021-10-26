@@ -12,6 +12,8 @@ package body Tree is
     function Apply_Dense (Self : Tree_Class;
                           X    : ML_Types.Value_Data_Lists_2D)
                          return Tree_Cursor_List;
+    procedure Save_Nodes (aTree : in out Tree_Class;
+                          Cursors : Tree_Cursor_List);
 
     --  -------------------------------------------------------------------------
     --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
@@ -129,7 +131,7 @@ package body Tree is
         New_Line;
         Printing.Print_Node_Cursor_List ("Tree.Predict Leaf_Cursors",
                                          Leaf_Cursors);
-        Self.Data_Values := Leaf_Cursors;
+        Save_Nodes (Self, Leaf_Cursors);
         Leaf_Cursors.Iterate (Build_Output'access);
         --        Printing.Print_Weight_Lists_3D
         --          ("Tree.Predict Output Values...", Output_Values);
@@ -137,6 +139,19 @@ package body Tree is
         return Output_Values;
 
     end Predict;
+
+    --  -------------------------------------------------------------------------
+
+    procedure Save_Nodes (aTree : in out Tree_Class;
+                          Cursors : Tree_Cursor_List) is
+        use Nodes_List_Package;
+    begin
+        aTree.Data_Values.Clear;
+        for index in Cursors.First_Index .. Cursors.Last_Index loop
+            aTree.Data_Values.Append (Element (Cursors (index)));
+        end loop;
+
+    end Save_Nodes;
 
     --  -------------------------------------------------------------------------
 
