@@ -84,7 +84,7 @@ package Tree is
       --  3D array, num_nodes x num_outputs x num_classes per node.
       --  Values corresponds to the first dimension of ndarray
 --        Prediction_Values : Nodes_List;
-      Values       : Weights.Weight_Lists_2D;
+      Values       : Weights.Weight_Lists_3D;
    end record;
 
    Value_Error : Exception;

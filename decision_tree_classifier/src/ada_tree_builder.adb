@@ -6,6 +6,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
+with Weights;
 
 package body Ada_Tree_Builder is
 
@@ -46,6 +47,7 @@ package body Ada_Tree_Builder is
       Is_Leaf_Node                : Boolean := False;
       Impurity                    : Float := Float'Last;
       Weighted_Node_Samples       : Float := 0.0;
+      Values                      : Weights.Weight_Lists_2D;
       Left_Child_Cursor           : Tree.Tree_Cursor;
       Right_Child_Cursor          : Tree.Tree_Cursor;
       Left_Child                  : Tree.Tree_Node;
@@ -108,7 +110,9 @@ package body Ada_Tree_Builder is
                Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Start_Row,
                Split_Row - 1, Weighted_Node_Samples);
             --  L241 Node.Values already added by Tree_Build.Add_Node
-            Node_Splitter.Node_Value (Builder.Splitter, theTree.Values);
+            Node_Splitter.Node_Value (Builder.Splitter, Values);
+            theTree.Values.Append (Values);
+
             Left_Child := Element (Left_Child_Cursor);
 
             --  L254
