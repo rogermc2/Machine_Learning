@@ -1,18 +1,18 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Utilities;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Tree is
 
    function Apply_Dense (Self           : Tree_Class;
                          X              : ML_Types.Value_Data_Lists_2D)
-                          return Classifier_Types.Natural_List;
+                         return Classifier_Types.Natural_List;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
@@ -20,7 +20,7 @@ package body Tree is
    --       for each sample?
    function Apply (Self           : Tree_Class;
                    X              : ML_Types.Value_Data_Lists_2D)
-                    return Classifier_Types.Natural_List is
+                   return Classifier_Types.Natural_List is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -34,7 +34,7 @@ package body Tree is
    --  intermediate subsets are called internal nodes or split nodes.
    function Apply_Dense (Self           : Tree_Class;
                          X              : ML_Types.Value_Data_Lists_2D)
-                          return Classifier_Types.Natural_List is
+                         return Classifier_Types.Natural_List is
       --  X is a list of samples of features
       use Ada.Containers;
       use ML_Types;
@@ -92,7 +92,7 @@ package body Tree is
    --  _tree L763
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                      return Classifier_Types.Value_List is
+                     return Classifier_Types.Value_List is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       --  Leaf_Cursors is a list of leaf node cursors, one for each sample
@@ -106,9 +106,18 @@ package body Tree is
    begin
       --  L767;
       Selected_Nodes := Apply (Self, X);
+      Printing.Print_Natural_List ("Tree.Predict Selected_Nodes", Selected_Nodes);
+      Put_Line ("Tree.Predict Self.Values length" &
+                  Integer'Image (Integer (Self.Values.Length)));
+      Printing.Print_Weight_Lists_3D ("Tree.Predict Self.Values", Self.Values);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
+         Put_Line ("Tree.Predict index" & Integer'Image (index));
          Node_ID := Selected_Nodes.Element (index);
-         Data_2D := self.Values.Element (Node_ID);
+         Put_Line ("Tree.Predict Node_ID" & Integer'Image (Node_ID));
+         Assert (not Self.Values.Element (Node_ID).Is_Empty,
+                 "Tree.Predict Self.Values item" & Integer'Image (Node_ID) &
+                   " is empty");
+         Data_2D := Self.Values.Element (Node_ID);
          Out_Data.Append (Data_2D.Element (Output_Index));
       end loop;
 

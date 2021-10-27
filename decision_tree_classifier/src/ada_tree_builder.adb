@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Node_Splitter;
@@ -32,6 +33,7 @@ package body Ada_Tree_Builder is
       Parent_Cursor         : in out Tree.Tree_Cursor) is
       --  Parent_Cursor is a cursor to an existing node which is the head
       --  of this branch
+      use Ada.Containers;
       use Node_Splitter;
       use Tree;
       use Nodes_Package;
@@ -53,6 +55,7 @@ package body Ada_Tree_Builder is
       Left_Child                  : Tree.Tree_Node;
       Right_Child                 : Tree.Tree_Node;
       Split_Row                   : Positive := End_Row;
+      Node_ID                     : Positive;
    begin
       if not Parent_Node.Leaf_Node then
          --           Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
@@ -110,8 +113,13 @@ package body Ada_Tree_Builder is
                Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Start_Row,
                Split_Row - 1, Weighted_Node_Samples);
             --  L241 Node.Values already added by Tree_Build.Add_Node
+            Node_ID := Element (Left_Child_Cursor).Node_ID;
             Node_Splitter.Node_Value (Builder.Splitter, Values);
-            theTree.Values.Append (Values);
+
+            if Integer (theTree.Values.Length) < Node_ID then
+               theTree.Values.Set_Length (Count_Type (Node_ID));
+            end if;
+            theTree.Values.Replace_Element (Node_ID, Values);
 
             Left_Child := Element (Left_Child_Cursor);
 
