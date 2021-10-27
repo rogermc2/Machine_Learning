@@ -1,3 +1,5 @@
+--  Based on scikit-learn/sklearn/tree _criterion.pyx
+--  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
@@ -209,7 +211,7 @@ package body Criterion is
     end Impurity_Improvement;
 
     --  ------------------------------------------------------------------------
-
+    --  L490
     procedure Node_Value (Self  : Criterion_Class;
                           Value : out Weights.Weight_Lists_2D) is
     begin
