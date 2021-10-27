@@ -100,17 +100,17 @@ package body Tree is
       use Weight_Lists_3D_Package;
       Output_Index    : constant Positive := 1;
       Selected_Nodes  : Classifier_Types.Natural_List;
+      Node_ID         : Positive;
       Data_2D         : Weight_Lists_2D;
       Out_Data        : Classifier_Types.Value_List;
    begin
       --  L767;
       Selected_Nodes := Apply (Self, X);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
-         Data_2D := Self.Values.Element (index);
+         Node_ID := Selected_Nodes.Element (index);
+         Data_2D := self.Values.Element (Node_ID);
          Out_Data.Append (Data_2D.Element (Output_Index));
       end loop;
-      --        Printing.Print_Node_Cursor_List ("Tree.Predict Selected_Nodes",
-      --                                         Selected_Nodes);
 
       return Out_Data;
 
