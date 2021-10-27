@@ -97,11 +97,10 @@ package body Tree is
       --  Each sample is a list of feature values, one value per feature
       --  Leaf_Cursors is a list of leaf node cursors, one for each sample
       use Weights;
-      use Weight_Lists_3D_Package;
       Output_Index    : constant Positive := 1;
       Selected_Nodes  : Classifier_Types.Natural_List;
       Node_ID         : Positive;
-      Data_2D         : Weight_Lists_2D;
+      Data            : Weight_List;
       Out_Data        : Classifier_Types.Value_List;
    begin
       --  L767;
@@ -113,8 +112,8 @@ package body Tree is
          Assert (not Self.Values.Element (Node_ID).Is_Empty,
                  "Tree.Predict Self.Values item" & Integer'Image (Node_ID) &
                    " is empty");
-         Data_2D := Self.Values.Element (Node_ID);
-         Out_Data.Append (Data_2D.Element (Output_Index));
+         Data := Self.Values.Element (Node_ID);
+         Out_Data.Append (Data.Element (Output_Index));
       end loop;
 
       return Out_Data;

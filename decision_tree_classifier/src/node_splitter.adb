@@ -105,7 +105,7 @@ package body Node_Splitter is
 
    procedure Node_Value
      (Self   : Splitter_Class;
-      Values : out Weights.Weight_Lists_2D) is
+      Values : out Weights.Weight_List) is
    begin
       Criterion.Node_Value (Self.Criteria, Values);
    end Node_Value;

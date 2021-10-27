@@ -270,7 +270,7 @@ package body Printing is
          Put_Line (To_String (UB_Offset) &
                      "Prediction: Values list is empty!");
       else
-         Print_Weights_Lists
+         Print_Weights
            (To_String (UB_Offset & "Class predictions"), Node.Values);
       end if;
 
@@ -349,7 +349,6 @@ package body Printing is
       use Nodes_Package;
       Nodes       : constant Tree_Nodes := aTree.Nodes;
       Node_Values : Weights.Weight_List;
-      Data        : Float;
       Data_String : Unbounded_String;
       This_Indent : Natural := 0;
       Node_Count  : Natural := 0;
@@ -358,7 +357,7 @@ package body Printing is
                                  Indent : Natural := 0) is
          use Ada.Containers;
          Node   : constant Tree_Node := Element (Curs);
-         Values : constant Weights.Weight_Lists_2D := Node.Values;
+         Values : constant Weights.Weight_List := Node.Values;
       begin
          This_Indent := Indent + 1;
          if This_Indent > 10 then
@@ -387,16 +386,12 @@ package body Printing is
             else
                Data_String := To_Unbounded_String ("Values : {");
                for index in Values.First_Index .. Values.Last_Index loop
-                  Node_Values := Values.Element (index);
-                  for v_index in Node_Values.First_Index ..
-                    Node_Values.Last_Index loop
-                     Data := Node_Values.Element (v_index);
-                     Data_String := Data_String & Float'Image (Data);
+                     Data_String :=
+                          Data_String & Float'Image (Values.Element (index));
 
                      if not (index = Node_Values.Last_Index) then
                         Data_String := Data_String & ", ";
                      end if;
-                  end loop;
 
                   Data_String := Data_String & " }";
                   Put_Line (Offset & To_String (Data_String));

@@ -47,7 +47,7 @@ package Tree is
       Num_Constant_Features     : Integer := 0;
       --  From _Tree class Tree Value is num_outputs x num_classes per node
       --        Values                    : ML_Types.Value_Data_Lists_2D;
-      Values                    : Weights.Weight_Lists_2D;
+      Values                    : Weights.Weight_List;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct
@@ -84,8 +84,7 @@ package Tree is
       --  From _Treenp.ndarray _get_value_ndarray generates a Values
       --  3D array, num_nodes x num_outputs x num_classes per node.
       --  Values corresponds to the first dimension of ndarray
---        Prediction_Values : Nodes_List;
-      Values       : Weights.Weight_Lists_3D;
+      Values       : Weights.Weight_Lists_2D;
    end record;
 
    Value_Error : Exception;
