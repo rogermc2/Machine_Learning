@@ -74,20 +74,21 @@ package body Decision_Tree_Classifer is
    --  class in a leaf.
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                  X    : ML_Types.Value_Data_Lists_2D)
-                                 return Weights.Weight_Lists_2D is
+                                 return Weights.Weight_Lists_3D is
       use ML_Types;
       use Weights;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
       --  L954
-      Proba           : constant Weights.Weight_Lists_2D :=
+      Proba           : constant Weights.Weight_Lists_3D :=
                           Self.Attributes.Decision_Tree.Values;
       Num_Nodes       : constant Positive := Positive (Proba.Length);
       Classes         : constant Value_Data_Lists_2D :=
                           Self.Attributes.Decision_Tree.Classes;
       Num_Classes     : constant Positive := Positive (Classes.Length);
-      Prob_K          : Weight_List;
-      Prob_Class      : Float;
-      All_Proba       : Weight_Lists_2D;
+      Prob_K          : Weight_Lists_2D;
+      Prob_Class      : Weight_List;
+      All_Proba       : Weight_Lists_3D;
+      Class           : Float;
       Normalizer      : Float;
    begin
       --  L969
@@ -95,16 +96,23 @@ package body Decision_Tree_Classifer is
          Prob_K.Clear;
          for node_index in 1 .. Num_Nodes loop
             Prob_K := Proba.Element (node_index);
+            Prob_Class.Clear;
             for class_index in 1  .. Num_Classes loop
                Prob_Class := Prob_K.Element (class_index);
 
                Normalizer := 0.0;
                for index in 1 .. Num_Nodes loop
-                  Normalizer := Normalizer + Prob_Class;
+                  Class := Prob_Class.Element (class_index);
+                  Normalizer := Normalizer + Class;
                end loop;
 
                if Normalizer > 0.0 then
-                     Prob_Class := Prob_Class / Normalizer;
+                  for index in Prob_Class.First_Index ..
+                    Prob_Class.Last_Index loop
+                     Class := Prob_Class.Element (class_index);
+                     Class := Class / Normalizer;
+                     Prob_Class.Replace_Element  (index, Class);
+                  end loop;
                end if;
 
                Prob_K.Append (Prob_Class);

@@ -49,7 +49,7 @@ package body Ada_Tree_Builder is
       Is_Leaf_Node                : Boolean := False;
       Impurity                    : Float := Float'Last;
       Weighted_Node_Samples       : Float := 0.0;
-      Values                      : Weights.Weight_List;
+      Values                      : Weights.Weight_Lists_2D;
       Left_Child_Cursor           : Tree.Tree_Cursor;
       Right_Child_Cursor          : Tree.Tree_Cursor;
       Left_Child                  : Tree.Tree_Node;

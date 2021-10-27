@@ -30,8 +30,8 @@ package body Criterion is
        Sample_Indices     : Classifier_Types.Natural_List;
        --  Sample_Weight contains the weight of each sample
        Sample_Weight      : Weights.Weight_List;
-       Weighted_Samples   : Float := 0.0;
-       Start_Row, End_Row : Natural := 0) is
+       Weighted_Samples   : Float;
+       Start_Row, End_Row : Natural) is
         Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
         Sum_Total_K     : Classifier_Types.Float_List;
         Y_I_Index       : Positive;
@@ -52,7 +52,7 @@ package body Criterion is
 
         Assert (not Criteria.Classes.Is_Empty,
                 "Criterion.Classification_Init Criteria.Classes is empty");
-        --  L325  Set Sum_Total values to 0.0
+        --  L325
         for row in 1 .. Num_Outputs loop
             Sum_Total_K.Clear;
             for c in Criteria.Classes.Element (row).First_Index ..
@@ -213,14 +213,12 @@ package body Criterion is
     --  ------------------------------------------------------------------------
     --  L490  ClassificationCriterion(Criterion).node_value
     procedure Node_Value (Self  : Criterion_Class;
-                          Value : out Weights.Weight_List) is
+                          Value : out Weights.Weight_Lists_2D) is
     begin
         Assert (not Self.Sum_Total.Is_Empty,
             "Criterion.Node_Value Self.Sum_Total is empty");
 
-        for k in 1 .. Integer (Self.Num_Outputs) loop
-            Value.Append (Self.Sum_Total.Element (k));
-        end loop;
+        Value := Self.Sum_Total;
 
     end Node_Value;
 
