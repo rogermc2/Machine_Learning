@@ -134,6 +134,14 @@ package body Ada_Tree_Builder is
               (theTree, Builder.Splitter, Depth, Parent_Cursor, False,
                Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Split_Row,
                End_Row, Weighted_Node_Samples);
+            Node_ID := Element (Right_Child_Cursor).Node_ID;
+            Node_Splitter.Node_Value (Builder.Splitter, Values);
+
+            if Integer (theTree.Values.Length) < Node_ID then
+               theTree.Values.Set_Length (Count_Type (Node_ID));
+            end if;
+            theTree.Values.Replace_Element (Node_ID, Values);
+
             Right_Child := Element (Right_Child_Cursor);
 
             if Depth > Max_Depth_Seen then

@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Utilities;
 
@@ -107,13 +107,9 @@ package body Tree is
       --  L767;
       Selected_Nodes := Apply (Self, X);
       Printing.Print_Natural_List ("Tree.Predict Selected_Nodes", Selected_Nodes);
-      Put_Line ("Tree.Predict Self.Values length" &
-                  Integer'Image (Integer (Self.Values.Length)));
-      Printing.Print_Weight_Lists_3D ("Tree.Predict Self.Values", Self.Values);
+--        Printing.Print_Weight_Lists_3D ("Tree.Predict Self.Values", Self.Values);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
-         Put_Line ("Tree.Predict index" & Integer'Image (index));
          Node_ID := Selected_Nodes.Element (index);
-         Put_Line ("Tree.Predict Node_ID" & Integer'Image (Node_ID));
          Assert (not Self.Values.Element (Node_ID).Is_Empty,
                  "Tree.Predict Self.Values item" & Integer'Image (Node_ID) &
                    " is empty");

@@ -211,7 +211,7 @@ package body Criterion is
     end Impurity_Improvement;
 
     --  ------------------------------------------------------------------------
-    --  L490
+    --  L490  ClassificationCriterion(Criterion).node_value
     procedure Node_Value (Self  : Criterion_Class;
                           Value : out Weights.Weight_Lists_2D) is
     begin
@@ -285,7 +285,7 @@ package body Criterion is
     end Reverse_Reset;
 
     --  ------------------------------------------------------------------------
-    --  Update statistics by moving samples[pos:new_pos] to the left child.
+    --  L402 Update statistics by moving samples[pos:new_pos] to the left child.
     procedure Update (Criteria : in out Criterion_Class;
                       New_Pos  : Positive) is
         Num_Outputs : constant Positive :=
