@@ -36,7 +36,7 @@ package body Classifier_Tests is
       use Printing;
 
 --        Expected        : Value_Data_Lists_2D;
-      Prediction      : Value_Data_List;
+      Prediction      : Classifier_Types.Value_List;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
 --        Max_Depth       : constant Positive := 5;
@@ -64,7 +64,7 @@ package body Classifier_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Prediction := Tree.Predict (theTree.Attributes.Decision_Tree, T);
-      Print_Value_Data_List ("Classification_Tests.Test_Classification_Toy Predictions",
+      Print_Value_List ("Classification_Tests.Test_Classification_Toy Predictions",
                              Prediction);
 --        Probabilities := Predict_Probability (theTree, X);
 --        if Probabilities = Expected then

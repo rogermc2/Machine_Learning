@@ -5,25 +5,24 @@ with Ada.Assertions; use Ada.Assertions;
 
 --  with Utilities;
 
+with Classifier_Types;
 --  with Printing;
 
 package body Tree is
 
    function Apply_Dense (Self           : Tree_Class;
-                         X              : ML_Types.Value_Data_Lists_2D;
-                         Selected_Nodes : out Tree_Cursor_List)
-                          return ML_Types.Value_Data_List;
+                         X              : ML_Types.Value_Data_Lists_2D)
+                          return Classifier_Types.Natural_List;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    --       That is, the set of relevant nodes containing the prediction values
    --       for each sample?
    function Apply (Self           : Tree_Class;
-                   X              : ML_Types.Value_Data_Lists_2D;
-                   Selected_Nodes : Out Tree_Cursor_List)
-                    return ML_Types.Value_Data_List is
+                   X              : ML_Types.Value_Data_Lists_2D)
+                    return Classifier_Types.Natural_List is
    begin
-      return Apply_Dense (Self, X, Selected_Nodes);
+      return Apply_Dense (Self, X);
    end Apply;
 
    --  -------------------------------------------------------------------------
@@ -34,9 +33,8 @@ package body Tree is
    --  The final subsets are called terminal or leaf nodes and the
    --  intermediate subsets are called internal nodes or split nodes.
    function Apply_Dense (Self           : Tree_Class;
-                         X              : ML_Types.Value_Data_Lists_2D;
-                         Selected_Nodes : out Tree_Cursor_List)
-                          return ML_Types.Value_Data_List is
+                         X              : ML_Types.Value_Data_Lists_2D)
+                          return Classifier_Types.Natural_List is
       --  X is a list of samples of features
       use Ada.Containers;
       use ML_Types;
@@ -45,7 +43,7 @@ package body Tree is
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
-      Out_Data       : Value_Data_List;
+      Selected_Nodes : Classifier_Types.Natural_List;
       Sample         : Value_Data_List;
       Feature_Value  : Value_Record;
       Use_Left       : Boolean;
@@ -83,13 +81,10 @@ package body Tree is
             end if;
          end loop;  --  Not_Leaf
 
-         Feature_Value :=
-           Sample.Element (Element (Node_Cursor).Best_Fit_Feature_Index);
-         Out_Data.Append (Feature_Value);
-         Selected_Nodes.Append (Node_Cursor);
+         Selected_Nodes.Append (Element (Node_Cursor).Node_ID);
       end loop;
 
-      return Out_Data;
+      return Selected_Nodes;
 
    end Apply_Dense;
 
@@ -97,16 +92,23 @@ package body Tree is
    --  _tree L763
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_List is
+                      return Classifier_Types.Value_List is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       --  Leaf_Cursors is a list of leaf node cursors, one for each sample
-      Selected_Nodes  : Tree_Cursor_List;
-      Out_Data        : ML_Types.Value_Data_List;
-
+      use Weights;
+      use Weight_Lists_3D_Package;
+      Output_Index    : constant Positive := 1;
+      Selected_Nodes  : Classifier_Types.Natural_List;
+      Data_2D         : Weight_Lists_2D;
+      Out_Data        : Classifier_Types.Value_List;
    begin
       --  L767;
-      Out_Data := Apply (Self, X, Selected_Nodes);
+      Selected_Nodes := Apply (Self, X);
+      for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
+         Data_2D := Self.Values.Element (index);
+         Out_Data.Append (Data_2D.Element (Output_Index));
+      end loop;
       --        Printing.Print_Node_Cursor_List ("Tree.Predict Selected_Nodes",
       --                                         Selected_Nodes);
 

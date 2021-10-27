@@ -9,7 +9,8 @@ with Tree;
 
 package body Tree_Build is
 
-   Epsilon : constant Float := 10.0 ** (-10);
+   Epsilon   : constant Float := 10.0 ** (-10);
+   Last_Node : Natural := 0;
 
    --  ----------------------------------------------------------------------
    --  Based on scikit-learn/sklearn/tree _tree.pyx _add_node
@@ -42,6 +43,8 @@ package body Tree_Build is
               "Tree_Build.Add_Node stop index:" & Integer'Image (Stop) &
                 " is less than start index" & Integer'Image (Start));
 
+      Last_Node := Last_Node + 1;
+      New_Node.Node_ID := Last_Node;
       --  _Tree L738
       New_Node.Is_Left := Is_Left;
       New_Node.Depth := Depth;

@@ -28,6 +28,7 @@ package Weights is
    package Weight_Lists_3D_Package is new Ada.Containers.Vectors
      (Positive, Weight_Lists_2D);
    subtype Weight_Lists_3D is Weight_Lists_3D_Package.Vector;
+   subtype Weight_Lists_3D_Cursor is Weight_Lists_3D_Package.Cursor;
 
    Weights_Error : exception;
 

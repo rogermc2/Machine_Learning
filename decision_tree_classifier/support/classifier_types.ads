@@ -23,6 +23,7 @@ package Classifier_Types is
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
+   subtype Value_List is Float_Package.Vector;
 
    use Float_Package;
    package Float_List_Package is new
@@ -36,6 +37,7 @@ package Classifier_Types is
 
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
+   subtype Natural_Cursor is Natural_Package.Cursor;
    package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");
 
    use Natural_Package;

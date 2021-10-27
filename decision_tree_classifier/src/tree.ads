@@ -35,6 +35,7 @@ package Tree is
    subtype Values_List_3D is Classifier_Types.Float_List_3D;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
+      Node_ID                   : Positive;
       --  from _Tree Node struct
       Impurity                  : Float := Float'Large;
       Num_Node_Samples          : Positive := 1;
@@ -97,6 +98,6 @@ package Tree is
    --                    X_Idx_Sorted  : State := None);
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return ML_Types.Value_Data_List;
+                     return Classifier_Types.Value_List;
 
 end Tree;
