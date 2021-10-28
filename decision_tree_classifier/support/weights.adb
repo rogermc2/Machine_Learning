@@ -309,17 +309,20 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive;
-                        Data     : out Float) return Float_Array is
+   function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive)
+                        return Weight_List is
       aList  : Weight_List;
-      Column : Float_Array (1 .. integer (Weights.Length));
+      Column : Weight_List;
+      Data   : Float;
    begin
       for index in 1 .. integer (Weights.Length) loop
          aList := Weights.Element (index);
          Data := aList.Element (Data_Index);
          Column (index) := Data;
       end loop;
+
       return Column;
+
    end Get_Column;
 
    --  -------------------------------------------------------------------------

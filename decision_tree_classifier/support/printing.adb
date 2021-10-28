@@ -270,7 +270,7 @@ package body Printing is
          Put_Line (To_String (UB_Offset) &
                      "Prediction: Values list is empty!");
       else
-         Print_Weights_Lists
+         Print_Weights_Lists_2D
            (To_String (UB_Offset & "Class predictions"), Node.Values);
       end if;
 
@@ -533,8 +533,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Weights_Lists (Name : String;
-                                  Data : Weights.Weight_Lists_2D) is
+   procedure Print_Weights_Lists_2D (Name : String;
+                                     Data : Weights.Weight_Lists_2D) is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
@@ -543,7 +543,7 @@ package body Printing is
       end loop;
       New_Line;
 
-   end Print_Weights_Lists;
+   end Print_Weights_Lists_2D;
 
    --  ------------------------------------------------------------------------
 
@@ -552,8 +552,8 @@ package body Printing is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
-         Print_Weights_Lists ("Output list" & Integer'Image (index),
-                              Data.Element (Index));
+         Print_Weights_Lists_2D ("Output list" & Integer'Image (index),
+                                 Data.Element (Index));
       end loop;
       New_Line;
 

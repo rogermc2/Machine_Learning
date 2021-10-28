@@ -44,7 +44,7 @@ package Weights is
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List;
-   function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive;
-                        Data     : out Float) return Float_Array;
+   function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive)
+                        return Weight_List;
 
 end Weights;

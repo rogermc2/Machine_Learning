@@ -5,8 +5,6 @@
 
 with Maths;
 
-with Utilities;
-
 with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
@@ -326,10 +324,9 @@ package body Base_Decision_Tree is
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
                       return Float_List_2D is
-      use Utilities;
-      Prob_A      : Classifier_Types.Value_List :=
-                 Tree.Predict (Self.Attributes.Decision_Tree, X);
-      Prob_Col_K   : ML_Types.Value_Data_List;
+      Prob_A      : Weights.Weight_Lists_2D :=
+                        Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Prob_Col_K   : Weights.Weight_List;
       Class_K      : ML_Types.Value_Data_List;
       Max         : Float := -Float'Last;
       Predictions : Float_List_2D;
@@ -337,7 +334,7 @@ package body Base_Decision_Tree is
       Predictions.Set_Length (X.Length);
       for k in 1 .. Positive (Self.Attributes.Num_Outputs) loop
          Class_K := Self.Attributes.Classes.Element (k);
-         Prob_Col_K := Get_Column (Prob_A, k);
+         Prob_Col_K := Weights.Get_Column (Prob_A, k);
       end loop;
 
          for prob in Prob_A.First_Index .. Prob_A.Last_Index loop
