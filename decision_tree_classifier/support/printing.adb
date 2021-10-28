@@ -426,11 +426,11 @@ package body Printing is
                                theList : Tree.Values_List) is
       Count : Integer := 1;
    begin
-      Put (Name & ": ");
+      Put_Line (Name & ": ");
       for Index in theList.First_Index .. theList.Last_Index loop
          Put ("   " & Float'Image (theList.Element (Index)));
          Count := Count + 1;
-         if Count > 10 then
+         if Count > 5 then
             New_Line;
             Count := 1;
          end if;
