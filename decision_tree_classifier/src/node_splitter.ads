@@ -57,7 +57,7 @@ package Node_Splitter is
                    Min_Leaf_Samples : Positive := 1);
    function Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self   : Splitter_Class;
-                         Values : out Weights.Weight_Lists_2D);
+                         Values : out Weights.Weight_List);
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
       Start_Row, End_Row    : Positive;
