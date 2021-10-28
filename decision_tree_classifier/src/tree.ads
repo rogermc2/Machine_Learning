@@ -46,7 +46,6 @@ package Tree is
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
       --  From _Tree class Tree Value is num_outputs x num_classes per node
-      --        Values                    : ML_Types.Value_Data_Lists_2D;
       Values                    : Weights.Weight_Lists_2D;
       case Leaf_Node is
          when False =>
@@ -98,6 +97,6 @@ package Tree is
    --                    X_Idx_Sorted  : State := None);
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Classifier_Types.Value_List;
+                     return Weights.Weight_Lists_2D;
 
 end Tree;

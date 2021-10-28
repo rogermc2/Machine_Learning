@@ -9,10 +9,10 @@ with ML_Types;
 package Weights is
 
    type Weight_Type is (No_Weight, Balanced_Weight, Weight_Dict, Weights_List);
---     type Weight_Data is record
---        Label  : Classifier_Types.Class_Label := To_Unbounded_String ("None");
---        Weight : Float := 1.0;
---     end record;
+   --     type Weight_Data is record
+   --        Label  : Classifier_Types.Class_Label := To_Unbounded_String ("None");
+   --        Weight : Float := 1.0;
+   --     end record;
 
    package Weight_Dictionary is new Ada.Containers.Ordered_Maps
      (Classifier_Types.Class_Label, Float);
@@ -37,12 +37,14 @@ package Weights is
                                    Classes       : ML_Types.Value_Data_List;
                                    Y             : ML_Types.Value_Data_List)
                                    return Weight_List;
-   function Compute_Sample_Weight (Weight_Kind   : Weight_Type;
-                                   Y             : ML_Types.Value_Data_Lists_2D;
-                                   Class_Weights : Weight_List :=
+   function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
+                                   Y              : ML_Types.Value_Data_Lists_2D;
+                                   Class_Weights  : Weight_List :=
                                      Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List;
+   function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive;
+                        Data     : out Float) return Float_Array;
 
 end Weights;

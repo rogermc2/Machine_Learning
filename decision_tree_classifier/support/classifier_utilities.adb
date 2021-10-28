@@ -135,6 +135,24 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Column (List_2D      : Float_List_2D;
+                        Column_Index : Positive) return Float_List is
+      aList  : Float_List;
+      Column : Float_List;
+      Data   : Float;
+   begin
+      for index in List_2D.First_Index .. List_2D.Last_Index loop
+         aList := List_2D.Element (index);
+         Data := aList.Element (Column_Index);
+         Column.Append (Data);
+      end loop;
+
+      return Column;
+
+   end Get_Column;
+
+   --  -------------------------------------------------------------------------
+
    function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D is
       use ML_Types;

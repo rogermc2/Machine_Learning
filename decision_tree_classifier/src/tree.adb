@@ -6,21 +6,22 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Utilities;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Tree is
 
-   function Apply_Dense (Self           : Tree_Class;
-                         X              : ML_Types.Value_Data_Lists_2D)
-                         return Classifier_Types.Natural_List;
+   function Apply_Dense (Self : Tree_Class;
+                         X    : ML_Types.Value_Data_Lists_2D)
+                         return Tree_Cursor_List;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    --       That is, the set of relevant nodes containing the prediction values
    --       for each sample?
-   function Apply (Self           : Tree_Class;
-                   X              : ML_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List is
+   function Apply (Self : Tree_Class;
+                   X    : ML_Types.Value_Data_Lists_2D)
+                   return Tree_Cursor_List is
+--                     return Classifier_Types.Natural_List is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -34,7 +35,8 @@ package body Tree is
    --  intermediate subsets are called internal nodes or split nodes.
    function Apply_Dense (Self           : Tree_Class;
                          X              : ML_Types.Value_Data_Lists_2D)
-                         return Classifier_Types.Natural_List is
+                         return Tree_Cursor_List is
+--                           return Classifier_Types.Natural_List is
       --  X is a list of samples of features
       use Ada.Containers;
       use ML_Types;
@@ -43,7 +45,8 @@ package body Tree is
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
-      Selected_Nodes : Classifier_Types.Natural_List;
+      Selected_Nodes : Tree_Cursor_List;
+--        Selected_Nodes : Classifier_Types.Natural_List;
       Sample         : Value_Data_List;
       Feature_Value  : Value_Record;
       Use_Left       : Boolean;
@@ -81,7 +84,8 @@ package body Tree is
             end if;
          end loop;  --  Not_Leaf
 
-         Selected_Nodes.Append (Element (Node_Cursor).Node_ID);
+         Selected_Nodes.Append (Node_Cursor);
+--           Selected_Nodes.Append (Element (Node_Cursor).Node_ID);
       end loop;
 
       return Selected_Nodes;
@@ -92,29 +96,19 @@ package body Tree is
    --  _tree L763
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Classifier_Types.Value_List is
+                     return Weights.Weight_Lists_2D is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
-      --  Leaf_Cursors is a list of leaf node cursors, one for each sample
       use Weights;
-      use Weight_Lists_3D_Package;
-      Output_Index    : constant Positive := 1;
-      Selected_Nodes  : Classifier_Types.Natural_List;
-      Node_ID         : Positive;
-      Data_2D         : Weight_Lists_2D;
-      Out_Data        : Classifier_Types.Value_List;
+      Selected_Nodes  : Tree_Cursor_List;
+      Node_Cursor     : Tree_Cursor;
+      Out_Data        : Weight_Lists_2D;
    begin
       --  L767;
       Selected_Nodes := Apply (Self, X);
-      Printing.Print_Natural_List ("Tree.Predict Selected_Nodes", Selected_Nodes);
---        Printing.Print_Weight_Lists_3D ("Tree.Predict Self.Values", Self.Values);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
-         Node_ID := Selected_Nodes.Element (index);
-         Assert (not Self.Values.Element (Node_ID).Is_Empty,
-                 "Tree.Predict Self.Values item" & Integer'Image (Node_ID) &
-                   " is empty");
-         Data_2D := Self.Values.Element (Node_ID);
-         Out_Data.Append (Data_2D.Element (Output_Index));
+         Node_Cursor := Selected_Nodes.Element (index);
+         Out_Data := Element (Node_Cursor).Values;
       end loop;
 
       return Out_Data;

@@ -5,6 +5,8 @@
 
 with Maths;
 
+with Utilities;
+
 with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
@@ -320,12 +322,32 @@ package body Base_Decision_Tree is
    end Classification_Part;
 
    --  -------------------------------------------------------------------------
-   --  Based on class.py fit L431 Predict
+   --  Based on class.py predict L431 Predict
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
-                      return Classifier_Types.Value_List is
+                      return Float_List_2D is
+      use Utilities;
+      Prob_A      : Classifier_Types.Value_List :=
+                 Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Prob_Col_K   : ML_Types.Value_Data_List;
+      Class_K      : ML_Types.Value_Data_List;
+      Max         : Float := -Float'Last;
+      Predictions : Float_List_2D;
    begin
-      return Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Predictions.Set_Length (X.Length);
+      for k in 1 .. Positive (Self.Attributes.Num_Outputs) loop
+         Class_K := Self.Attributes.Classes.Element (k);
+         Prob_Col_K := Get_Column (Prob_A, k);
+      end loop;
+
+         for prob in Prob_A.First_Index .. Prob_A.Last_Index loop
+            null;
+         end loop;
+
+         for sample in Predictions.First_Index .. Predictions.Last_Index loop
+            null;
+         end loop;
+      return Predictions;
    end Predict;
 
    --  -------------------------------------------------------------------------

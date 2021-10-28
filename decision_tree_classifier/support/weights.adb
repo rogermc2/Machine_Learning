@@ -114,14 +114,14 @@ package body Weights is
          --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
          K_Indices := Classifier_Utilities.Search_Sorted_Value_List
            (Classes_Full, Y_Full);
---           Classifier_Utilities.Print_Integer_List
---             ("Weights.Compute_Balanced_Sample_Weight, K_Indices", K_Indices);
+         --           Classifier_Utilities.Print_Integer_List
+         --             ("Weights.Compute_Balanced_Sample_Weight, K_Indices", K_Indices);
          for y_index in Y_Full.First_Index .. Y_Full.Last_Index loop
             aWeight := Weight_K.Element (K_Indices.Element (y_index));
             Weights.Append (aWeight);
          end loop;
---           Classifier_Utilities.Print_Weights
---             ("Weights.Compute_Balanced_Sample_Weight, Weights", Weights);
+         --           Classifier_Utilities.Print_Weights
+         --             ("Weights.Compute_Balanced_Sample_Weight, Weights", Weights);
 
          Expanded_Class_Weight.Append (Weights);
       end loop;
@@ -309,20 +309,18 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   --     function Get_Column (Weights  : Weight_Lists_List; Data_Index : Positive;
-   --                          Data     : out Float)
-   --       --                          Data     : out Weight_Data)
-   --                          return  Float_Array is
-   --        aList  : Weight_List;
-   --        Column : Float_Array (1 .. integer (Weights.Length));
-   --     begin
-   --        for index in 1 .. integer (Weights.Length) loop
-   --           aList := Weights.Element (index);
-   --           Data := aList.Element (Data_Index);
-   --           Column (index) := Data;
-   --        end loop;
-   --        return Column;
-   --     end Get_Column;
+   function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive;
+                        Data     : out Float) return Float_Array is
+      aList  : Weight_List;
+      Column : Float_Array (1 .. integer (Weights.Length));
+   begin
+      for index in 1 .. integer (Weights.Length) loop
+         aList := Weights.Element (index);
+         Data := aList.Element (Data_Index);
+         Column (index) := Data;
+      end loop;
+      return Column;
+   end Get_Column;
 
    --  -------------------------------------------------------------------------
 
@@ -334,8 +332,8 @@ package body Weights is
       Value        : Float;
       Reduced_List : Weight_List;
    begin
---        Classifier_Utilities.Print_Weights_Lists
---   ("Reduce_Weight_Lists Lists", Lists);
+      --        Classifier_Utilities.Print_Weights_Lists
+      --   ("Reduce_Weight_Lists Lists", Lists);
       for index in 1 .. List_Length loop
          Reduced_List.Append (1.0) ;
       end loop;
