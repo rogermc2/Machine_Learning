@@ -97,6 +97,6 @@ package Tree is
    --                    X_Idx_Sorted  : State := None);
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Weights.Weight_Lists_2D;
+                     return Weights.Weight_Lists_3D;
 
 end Tree;

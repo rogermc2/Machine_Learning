@@ -324,17 +324,19 @@ package body Base_Decision_Tree is
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
                       return Float_List_2D is
-      Prob_A      : Weights.Weight_Lists_2D :=
+      Prob_A      : constant Weights.Weight_Lists_3D :=
                         Tree.Predict (Self.Attributes.Decision_Tree, X);
-      Prob_Col_K   : Weights.Weight_List;
-      Class_K      : ML_Types.Value_Data_List;
+      Output_K    : Weights.Weight_Lists_2D;
+      Prob_Col_K  : Weights.Weight_List;
+      Class_K     : ML_Types.Value_Data_List;
       Max         : Float := -Float'Last;
       Predictions : Float_List_2D;
    begin
       Predictions.Set_Length (X.Length);
       for k in 1 .. Positive (Self.Attributes.Num_Outputs) loop
          Class_K := Self.Attributes.Classes.Element (k);
-         Prob_Col_K := Weights.Get_Column (Prob_A, k);
+         Output_K := Prob_A.Element (k);
+         Prob_Col_K := Weights.Get_Column (Output_K, k);
       end loop;
 
          for prob in Prob_A.First_Index .. Prob_A.Last_Index loop
@@ -345,6 +347,7 @@ package body Base_Decision_Tree is
             null;
          end loop;
       return Predictions;
+
    end Predict;
 
    --  -------------------------------------------------------------------------

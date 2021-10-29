@@ -36,7 +36,7 @@ package body Classifier_Tests is
       use Printing;
 
 --        Expected        : Value_Data_Lists_2D;
-      Prediction      : Weights.Weight_Lists_2D;
+      Prediction      : Weights.Weight_Lists_3D;
 --        Prediction      : Classifier_Types.Value_List;
       theTree         : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
@@ -66,7 +66,7 @@ package body Classifier_Tests is
       New_Line;
       Prediction := Tree.Predict (theTree.Attributes.Decision_Tree, T);
       Print_Weights_Lists_2D ("Classification_Tests.Test_Classification_Toy Predictions",
-                              Prediction);
+                              Prediction.Element (1));
 --        Probabilities := Predict_Probability (theTree, X);
 --        if Probabilities = Expected then
 --           null;

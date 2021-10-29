@@ -96,19 +96,19 @@ package body Tree is
    --  _tree L763
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return Weights.Weight_Lists_2D is
+                     return Weights.Weight_Lists_3D is
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       use Weights;
       Selected_Nodes  : Tree_Cursor_List;
       Node_Cursor     : Tree_Cursor;
-      Out_Data        : Weight_Lists_2D;
+      Out_Data        : Weight_Lists_3D;
    begin
       --  L767;
       Selected_Nodes := Apply (Self, X);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
-         Out_Data := Element (Node_Cursor).Values;
+         Out_Data.Append (Element (Node_Cursor).Values);
       end loop;
 
       return Out_Data;
