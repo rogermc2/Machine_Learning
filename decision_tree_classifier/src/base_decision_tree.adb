@@ -320,23 +320,26 @@ package body Base_Decision_Tree is
    end Classification_Part;
 
    --  -------------------------------------------------------------------------
-   --  Based on class.py predict L431 Predict
+   --  Based on class.py predict L443 Predict
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
-                      return Float_List_2D is
+                     return Weights.Weight_Lists_2D is
+      use Ada.Containers;
+      Num_Samples : constant Count_Type := X.Length;
       Prob_A      : constant Weights.Weight_Lists_3D :=
                         Tree.Predict (Self.Attributes.Decision_Tree, X);
       Output_K    : Weights.Weight_Lists_2D;
-      Prob_Col_K  : Weights.Weight_List;
+      Prob_A_K  : Weights.Weight_List;
       Class_K     : ML_Types.Value_Data_List;
       Max         : Float := -Float'Last;
-      Predictions : Float_List_2D;
+      --  Predictions, num samples x num outputs
+      Predictions : Weights.Weight_Lists_2D;
    begin
-      Predictions.Set_Length (X.Length);
+      Predictions.Set_Length (Num_Samples);
       for k in 1 .. Positive (Self.Attributes.Num_Outputs) loop
          Class_K := Self.Attributes.Classes.Element (k);
          Output_K := Prob_A.Element (k);
-         Prob_Col_K := Weights.Get_Column (Output_K, k);
+         Prob_A_K := Weights.Get_Column (Output_K, k);
       end loop;
 
          for prob in Prob_A.First_Index .. Prob_A.Last_Index loop

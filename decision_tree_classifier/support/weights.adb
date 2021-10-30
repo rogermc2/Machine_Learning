@@ -326,6 +326,60 @@ package body Weights is
    end Get_Column;
 
    --  -------------------------------------------------------------------------
+   --  Max returns the indices of the max element of Weights in axis 1
+   type Index_Range_2D is new Integer range 1 .. 2;
+   function Max (Weights    : Weight_Lists_2D;
+                 Data_Index : Index_Range_2D)
+                 return Natural_List is
+      Columns     : Weight_Lists_2D;
+      Column      : Weight_List;
+      Row         : Weight_List;
+      Value       : Float;
+      Max_Value   : Float;
+      Max_Index   : Positive;
+      Max_Indices : Natural_List;
+
+      --  vector<vector> transpose(vector<vector>, data)
+      --  vector<vector> result (data[0].size(), vector(data.size()));
+      --  for (vector i = 0; i < data[0].size(); i++)
+      --   for (vector j = 0; j < data.size(); j++) {
+      --   result[i][j] = data[j][i];
+
+      function Transpose (Weights : Weight_Lists_2D) return Weight_Lists_2D is
+         Result : Weight_Lists_2D;
+      begin
+         return Result;
+      end Transpose;
+   begin
+      if Data_Index = 2 then
+         for index_1 in Weights.First_Index .. Weights.Last_Index loop
+            Row := Weights.Element (index_1);
+            Max_Value := -Float'Last;
+            Max_Index := 1;
+            for index_2 in Row.First_Index .. Row.Last_Index loop
+               Value := Row.Element (index_2);
+               if Value > Max_Value then
+                  Max_Value := Value;
+                  Max_Index := index_2;
+               end if;
+            end loop;
+            Max_Indices.Append (Max_Index);
+         end loop;
+      else
+         for index_1 in Weights.First_Index .. Weights.Last_Index loop
+            Row := Weights.Element (index_1);
+            for index_2 in Row.First_Index .. Row.Last_Index loop
+               null;
+
+            end loop;
+         end loop;
+      end if;
+
+      return Max_Indices;
+
+   end Max;
+
+   --  -------------------------------------------------------------------------
 
    function Reduce_Weight_Lists (Lists : Weight_Lists_2D)
                                  return Weight_List is

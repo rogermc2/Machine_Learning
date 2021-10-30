@@ -38,7 +38,7 @@ package body Classifier_Tests is
 --        Expected        : Value_Data_Lists_2D;
       Prediction      : Weights.Weight_Lists_3D;
 --        Prediction      : Classifier_Types.Value_List;
-      theTree         : Base_Decision_Tree.Classifier
+      theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
 --        Max_Depth       : constant Positive := 5;
       X               : constant Value_Data_Lists_2D :=
@@ -57,14 +57,14 @@ package body Classifier_Tests is
       --  L229
 --        Expected := To_Integer_Value_List (True_Result);
       --  L230
-      Classification_Fit (theTree, X, Y);
+      Classification_Fit (theClassifier, X, Y);
       Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
                   Integer'Image (Integer
-                  (theTree.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
-      Print_Tree ("The Tree", theTree);
+                  (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
+      Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
-      Prediction := Tree.Predict (theTree.Attributes.Decision_Tree, T);
+      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
       Print_Weights_Lists_2D ("Classification_Tests.Test_Classification_Toy Predictions",
                               Prediction.Element (1));
 --        Probabilities := Predict_Probability (theTree, X);
