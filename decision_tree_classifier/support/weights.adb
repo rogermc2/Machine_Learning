@@ -325,6 +325,24 @@ package body Weights is
 
     end Get_Column;
 
+    --  ------------------------------------------------------------------------
+
+    function Get_Column (Weights  : Weight_Lists_3D; Data_Index : Positive)
+                         return Weight_Lists_2D is
+        aList_2D  : Weight_Lists_2D;
+        Column_2D : Weight_Lists_2D;
+        Data_2D   : Weight_List;
+    begin
+        for index in 1 .. Integer (Weights.Length) loop
+            aList_2D := Weights.Element (index);
+            Data_2D := aList_2D.Element (Data_Index);
+            Column_2D (index) := Data_2D;
+        end loop;
+
+        return Column_2D;
+
+    end Get_Column;
+
     --  -------------------------------------------------------------------------
     --  Max returns the indices of the max element of Weights in axis 1
     function Max (Weights    : Weight_Lists_2D; Data_Index : Index_Range_2D)
@@ -392,25 +410,16 @@ package body Weights is
     --  -------------------------------------------------------------------------
 
     function Transpose (Weights : Weight_Lists_2D) return Weight_Lists_2D is
-        Column     : Weight_List := Get_Column (Weights, 1);
         New_Row    : Weight_List;
         Result     : Weight_Lists_2D;
     begin
-        for col in Column.First_Index .. Column.Last_Index loop
-            New_Row.Clear;
-            New_Row.Append (Column.Element (col));
+        for col in 1 .. Positive (Weights.Element (1).Length) loop
+            New_Row := Get_Column (Weights, col);
             Result.Append (New_Row);
         end loop;
 
-        for row in 2 .. Positive (Weights.Length) loop
-            Column := Get_Column (Weights, row);
-            for col in Column.First_Index .. Column.Last_Index loop
-                New_Row := Result.Element (row);
-                New_Row.Append (Column.Element (col));
-                Result.Replace_Element (row, New_Row);
-            end loop;
-        end loop;
         return Result;
+
     end Transpose;
 
     --  -------------------------------------------------------------------------
