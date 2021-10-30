@@ -7,6 +7,7 @@ package Classifier_Types is
 
    subtype Class_Label is Unbounded_String;
 
+   type Index_Range_2D is new Integer range 1 .. 2;
    type Integer_Array is array (Integer range <>) of Integer;
    type Float_Array is array (Integer range <>) of Float;
    type Natural_Array is array (Integer range <>) of Natural;
