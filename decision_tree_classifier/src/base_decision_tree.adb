@@ -324,49 +324,100 @@ package body Base_Decision_Tree is
    --  Predict returns the predicted class for each sample in X
    --  (num_samples x num_outputs)
    --  proba: nodes x samples x outputs
-   --  for each output k
-   --     set proba_k to nodes x samples for that output
-   --     from proba_k get the indices of the max sample value for each node
+   --      function Predict (Self : in out Classifier;
+   --                       X    : ML_Types.Value_Data_Lists_2D)
+   --                       return ML_Types.Value_Data_Lists_2D is
+   --        use Ada.Containers;
+   --        use ML_Types.Value_Data_Package;
+   --        use Weights;
+   --        Num_Samples       : constant Count_Type := X.Length;
+   --        Prob_A            : constant Weight_Lists_3D :=
+   --                              Tree.Predict (Self.Attributes.Decision_Tree, X);
+   --        --        Output_K          : Weight_Lists_2D;
+   --        Prob_A_K          : Weight_Lists_2D;
+   --        Class_K           : ML_Types.Value_Data_List;
+   --        Selected_Classes  : ML_Types.Value_Data_Lists_2D;
+   --        Selected_Class    : ML_Types.Value_Record;
+   --        Max_Indices       : Natural_List;
+   --        --  Prediction 1 x num samples
+   --        Pred              : ML_Types.Value_Data_List;
+   --        --  Predictions, num samples x num outputs
+   --        Predictions       : ML_Types.Value_Data_Lists_2D;
+   --     begin
+   --        Predictions.Set_Length (Num_Samples);
+   --        --  479
+   --        for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
+   --           Class_K := Self.Attributes.Classes.Element (op);
+   --           --  Prob_A_K: nodes x samples
+   --           Prob_A_K := Weights.Get_Column (Prob_A, op);
+   --           --  Max_Indices: 1 x samples
+   --           Max_Indices := Max (Prob_A_K, 2);
+   --           Selected_Classes.Clear;
+   --           for args_index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
+   --              Selected_Class :=
+   --                Class_K.Element (Max_Indices.Element (args_index));
+   --              Selected_Classes.Append (Class_K);
+   --           end loop;
+   --           --  Now add the Selected_Classes to Predictions output column op
+   --           --  Predictions, num samples x num outputs
+   --           for sample_index in Predictions.First_Index .. Predictions.Last_Index loop
+   --              Pred := Predictions.Element (sample_index);
+   --              Class_K := Selected_Classes.Element (op);
+   --              --              Pred.Replace_Element (op, Class_K);
+   --              Predictions.Replace_Element  (sample_index, Pred);
+   --           end loop;
+   --        end loop;
+   --
+   --        return Predictions;
+
+   --  end Predict;
+
+   --  -------------------------------------------------------------------------
+
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_2D is
+                  return ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
-      use ML_Types.Value_Data_Package;
       use Weights;
       Num_Samples       : constant Count_Type := X.Length;
       Prob_A            : constant Weight_Lists_3D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
---        Output_K          : Weight_Lists_2D;
-      Prob_A_K          : Weight_Lists_2D;
+      Samples_K         : Weight_Lists_2D;
+      Outputs_K         : Weight_List;
+      Samples_2K        : Weight_List;
+      Nodes_2K          : Weight_Lists_2D;
       Class_K           : ML_Types.Value_Data_List;
       Selected_Classes  : ML_Types.Value_Data_Lists_2D;
       Selected_Class    : ML_Types.Value_Record;
       Max_Indices       : Natural_List;
-      --  Predictions, num samples x num outputs
+      --  Prediction 1 x num samples
       Pred              : ML_Types.Value_Data_List;
+      --  Predictions, num samples x num outputs
       Predictions       : ML_Types.Value_Data_Lists_2D;
    begin
       Predictions.Set_Length (Num_Samples);
       --  479
       for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
          Class_K := Self.Attributes.Classes.Element (op);
-         --  Prob_A_K: nodes x samples
-         Prob_A_K := Weights.Get_Column (Prob_A, op);
-         --  Max_Indices: 1 x samples
-         Max_Indices := Max (Prob_A_K, 2);
-         Selected_Classes.Clear;
-         for args_index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
-            Selected_Class :=
-              Class_K.Element (Max_Indices.Element (args_index));
-            Selected_Classes.Append (Class_K);
+         Nodes_2K.Clear;
+         for node_index in Prob_A.First_Index .. Prob_A.Last_Index loop
+            Samples_K := Prob_A.Element (node_index);
+            Samples_2K.Clear;
+            for s_index in Samples_K.First_Index .. Samples_K.Last_Index loop
+               Outputs_K := Samples_K.Element (s_index);
+               Samples_2K.Append (Outputs_K.Element (op));
+            end loop;
+            Nodes_2K.Append (Samples_2K);
          end loop;
 
-         for sample_index in Predictions.First_Index .. Predictions.Last_Index loop
-            Pred := Predictions.Element (sample_index);
-            Class_K := Selected_Classes.Element (op);
-            Pred.Replace_Element (op, Class_K);
-            Predictions.Replace_Element  (sample_index, Pred);
+         --  for each node get the index of the sample with the highest value
+         Max_Indices.Clear;
+         for index in Nodes_2K.First_Index .. Nodes_2K.Last_Index loop
+            --  Max_Indices: 1 x samples
+            Samples_2K := Nodes_2K.Element (index);
+            Max_Indices.Append (Max (Nodes_2K.Element (index)));
          end loop;
+
       end loop;
 
       return Predictions;

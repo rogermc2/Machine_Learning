@@ -48,8 +48,7 @@ package Weights is
                         return Weight_List;
     function Get_Column (Weights  : Weight_Lists_3D; Data_Index : Positive)
                          return Weight_Lists_2D;
-    function Max (Weights : Weight_Lists_2D; Data_Index : Index_Range_2D)
-                  return Natural_List;
+    function Max (Weights : Weight_List) return Positive;
     function Transpose (Weights : Weight_Lists_2D) return Weight_Lists_2D;
 
 end Weights;
