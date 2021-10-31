@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -378,6 +378,7 @@ package body Base_Decision_Tree is
                      X    : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
+      use ML_Types;
       use Weights;
       Num_Samples       : constant Count_Type := X.Length;
       Prob_A            : constant Weight_Lists_3D :=
@@ -398,7 +399,6 @@ package body Base_Decision_Tree is
       Predictions.Set_Length (Num_Samples);
       --  479
       for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
-         Classes_K := Self.Attributes.Classes.Element (op);
          Nodes_2K.Clear;
          for node_index in Prob_A.First_Index .. Prob_A.Last_Index loop
             Samples_K := Prob_A.Element (node_index);
@@ -418,22 +418,18 @@ package body Base_Decision_Tree is
             Max_Indices.Append (Max (Nodes_2K.Element (index)));
          end loop;
 
+         Classes_K := Self.Attributes.Classes.Element (op);
          Selected_Classes.Clear;
          for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
             Selected_Class := Classes_K.Element (Max_Indices (index));
             Selected_Classes.Append (Selected_Class);
          end loop;
-         Put_Line ("Base_Decision_Tree.Predict, Selected_Classes set");
-         for index in Predictions.First_Index .. Predictions.Last_Index loop
-            Put_Line ("Base_Decision_Tree.Predict, index" &
-                        Integer'Image (index));
-            Pred := Predictions.Element (index);
-            if not Pred.Is_Empty then
-               Printing.Print_Value_Data_List ("Base_Decision_Tree.Predict, Pred", Pred);
-               Pred.Replace_Element (op, Selected_Classes.Element (index));
-               Predictions.Replace_Element (index, Pred);
-            end if;
+
+         for index in Selected_Classes.First_Index ..
+           Selected_Classes.Last_Index loop
+            Pred.Append (Selected_Classes.Element (index));
          end loop;
+         Predictions.Replace_Element (op, Pred);
       end loop;
 
       return Predictions;
