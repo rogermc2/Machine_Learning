@@ -55,9 +55,9 @@ package body Classifier_Tests is
         Expected := To_Integer_Value_List (True_Result);
         --  L230
         Classification_Fit (theClassifier, X, Y);
-        Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
-                    Integer'Image (Integer
-                    (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
+--          Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
+--                      Integer'Image (Integer
+--                      (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
         Print_Tree ("The Tree", theClassifier);
         Put_Line ("----------------------------------------------");
         New_Line;

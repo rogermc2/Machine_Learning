@@ -6,22 +6,19 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Utilities;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Tree is
 
-   function Apply_Dense (Self : Tree_Class;
-                         X    : ML_Types.Value_Data_Lists_2D)
+   function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                          return Tree_Cursor_List;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    --       That is, the set of relevant nodes containing the prediction values
    --       for each sample?
-   function Apply (Self : Tree_Class;
-                   X    : ML_Types.Value_Data_Lists_2D)
+   function Apply (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                    return Tree_Cursor_List is
---                     return Classifier_Types.Natural_List is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -33,11 +30,10 @@ package body Tree is
    --  instance belonging to one subset.
    --  The final subsets are called terminal or leaf nodes and the
    --  intermediate subsets are called internal nodes or split nodes.
-   function Apply_Dense (Self           : Tree_Class;
-                         X              : ML_Types.Value_Data_Lists_2D)
+   function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                          return Tree_Cursor_List is
 --                           return Classifier_Types.Natural_List is
-      --  X is a list of samples of features
+      --  X is a list of samples of features (num samples x num features)
       use Ada.Containers;
       use ML_Types;
       use Value_Data_Package;
@@ -46,17 +42,16 @@ package body Tree is
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
       Selected_Nodes : Tree_Cursor_List;
---        Selected_Nodes : Classifier_Types.Natural_List;
       Sample         : Value_Data_List;
       Feature_Value  : Value_Record;
       Use_Left       : Boolean;
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0,
               "Tree.Apply_Dense Self.Nodes tree is empty");
-      Selected_Nodes.Clear;
-      --  L804 for each sample of features
+      --  L800 for each sample
       for index in X.First_Index .. X.Last_Index loop
          Node_Cursor := Top_Cursor;
+         --  Sample is alist of feature values
          Sample := X.Element (index);
 
          --  Find a node with a leaf child.
@@ -85,7 +80,6 @@ package body Tree is
          end loop;  --  Not_Leaf
 
          Selected_Nodes.Append (Node_Cursor);
---           Selected_Nodes.Append (Element (Node_Cursor).Node_ID);
       end loop;
 
       return Selected_Nodes;
@@ -106,6 +100,8 @@ package body Tree is
    begin
       --  L760;
       Selected_Nodes := Apply (Self, X);
+      Printing.Print_Node_Cursor_List ("Tree.Predict, Selected_Nodes",
+                                        Selected_Nodes);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
          Out_Data.Append (Element (Node_Cursor).Values);

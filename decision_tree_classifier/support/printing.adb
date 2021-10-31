@@ -228,6 +228,7 @@ package body Printing is
       UB_Offset   : constant Unbounded_String :=
                       To_Unbounded_String (Offset);
    begin
+      Put_Line ("Node" & Integer'Image (Node.Node_ID));
       Put (To_String (UB_Offset & "Start:" &
                   Integer'Image (Node.Samples_Start)));
       Put ("," & Integer'Image (Node.Num_Node_Samples) & " sample");
@@ -344,7 +345,6 @@ package body Printing is
 
    procedure Print_Tree (Name  : String;
                          aTree : Tree.Tree_Class) is
---        use ML_Types;
       use Tree;
       use Nodes_Package;
       Nodes       : constant Tree_Nodes := aTree.Nodes;
@@ -352,7 +352,7 @@ package body Printing is
       Data        : Float;
       Data_String : Unbounded_String;
       This_Indent : Natural := 0;
-      Node_Count  : Natural := 0;
+--        Node_Count  : Natural := 0;
       --  Print_Tree_Node is recursive
       procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
                                  Indent : Natural := 0) is
@@ -378,8 +378,8 @@ package body Printing is
                Offset (Indent) := ' ';
             end if;
 
-            Node_Count := Node_Count + 1;
-            Put_Line (Offset & "Node " & Integer'Image (Node_Count));
+--              Node_Count := Node_Count + 1;
+--              Put_Line (Offset & "Node " & Integer'Image (Node_Count));
             Print_Node (Node, Offset);
 
             if Values.Is_Empty then

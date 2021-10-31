@@ -5,6 +5,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 with ML_Types;
 with Build_Utils;
+--  with Printing;
 with Tree;
 
 package body Tree_Build is
@@ -70,6 +71,7 @@ package body Tree_Build is
                                      New_Item => New_Node);
          Node_Cursor := Last_Child (Parent_Cursor);
       end if;
+--        Printing.Print_Node ("Tree_Build.Add_Node, New_Node", New_Node);
 
       return Node_Cursor;
 
@@ -96,7 +98,6 @@ package body Tree_Build is
       End_Row               : Positive :=
                                 Start_Row + Parent_Node.Num_Node_Samples - 1;
       Node_Cursor           : Tree.Tree_Cursor;
-      New_Node              : Tree.Tree_Node;
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
@@ -127,8 +128,6 @@ package body Tree_Build is
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, aSplit.Improvement, aSplit.Threshold, Start_Row,
          End_Row, Float (Parent_Node.Weighted_Num_Node_Samples));
-      New_Node := Element (Node_Cursor);
-      Replace_Element (theTree.Nodes, Node_Cursor, New_Node);
 
       --  L463 Node_Value set by Add_Node
 
@@ -343,6 +342,7 @@ package body Tree_Build is
       Old_Node  : constant Tree.Tree_Node := Element (Node_Cursor);
       Leaf_Node : Tree.Tree_Node (True);
    begin
+      Leaf_Node.Node_ID := Old_Node.Node_ID;
       Leaf_Node.Impurity := Old_Node.Impurity;
       Leaf_Node.Num_Node_Samples := Old_Node.Num_Node_Samples;
       Leaf_Node. Weighted_Num_Node_Samples := Old_Node.Weighted_Num_Node_Samples;
