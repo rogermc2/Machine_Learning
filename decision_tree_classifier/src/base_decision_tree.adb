@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -376,7 +376,7 @@ package body Base_Decision_Tree is
 
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
-                  return ML_Types.Value_Data_Lists_2D is
+                     return ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
       use Weights;
       Num_Samples       : constant Count_Type := X.Length;
@@ -386,8 +386,8 @@ package body Base_Decision_Tree is
       Outputs_K         : Weight_List;
       Samples_2K        : Weight_List;
       Nodes_2K          : Weight_Lists_2D;
-      Class_K           : ML_Types.Value_Data_List;
-      Selected_Classes  : ML_Types.Value_Data_Lists_2D;
+      Classes_K         : ML_Types.Value_Data_List;
+      Selected_Classes  : ML_Types.Value_Data_List;
       Selected_Class    : ML_Types.Value_Record;
       Max_Indices       : Natural_List;
       --  Prediction 1 x num samples
@@ -398,7 +398,7 @@ package body Base_Decision_Tree is
       Predictions.Set_Length (Num_Samples);
       --  479
       for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
-         Class_K := Self.Attributes.Classes.Element (op);
+         Classes_K := Self.Attributes.Classes.Element (op);
          Nodes_2K.Clear;
          for node_index in Prob_A.First_Index .. Prob_A.Last_Index loop
             Samples_K := Prob_A.Element (node_index);
@@ -418,6 +418,22 @@ package body Base_Decision_Tree is
             Max_Indices.Append (Max (Nodes_2K.Element (index)));
          end loop;
 
+         Selected_Classes.Clear;
+         for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
+            Selected_Class := Classes_K.Element (Max_Indices (index));
+            Selected_Classes.Append (Selected_Class);
+         end loop;
+         Put_Line ("Base_Decision_Tree.Predict, Selected_Classes set");
+         for index in Predictions.First_Index .. Predictions.Last_Index loop
+            Put_Line ("Base_Decision_Tree.Predict, index" &
+                        Integer'Image (index));
+            Pred := Predictions.Element (index);
+            if not Pred.Is_Empty then
+               Printing.Print_Value_Data_List ("Base_Decision_Tree.Predict, Pred", Pred);
+               Pred.Replace_Element (op, Selected_Classes.Element (index));
+               Predictions.Replace_Element (index, Pred);
+            end if;
+         end loop;
       end loop;
 
       return Predictions;

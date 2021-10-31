@@ -9,7 +9,6 @@ with Decision_Tree_Classifer;
 with ML_Types;
 with Printing;
 with Tree;
-with Weights;
 
 package body Classifier_Tests is
    use Classifier_Types;
@@ -36,8 +35,7 @@ package body Classifier_Tests is
       use Printing;
 
 --        Expected        : Value_Data_Lists_2D;
-      Prediction      : Weights.Weight_Lists_3D;
---        Prediction      : Classifier_Types.Value_List;
+      Prediction      : ML_Types.Value_Data_Lists_2D;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
 --        Max_Depth       : constant Positive := 5;
@@ -65,7 +63,7 @@ package body Classifier_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Weights_Lists_2D ("Classification_Tests.Test_Classification_Toy Predictions",
+      Print_Value_Data_List ("Classification_Tests.Test_Classification_Toy Predictions",
                               Prediction.Element (1));
 --        Probabilities := Predict_Probability (theTree, X);
 --        if Probabilities = Expected then

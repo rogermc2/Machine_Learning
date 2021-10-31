@@ -446,7 +446,6 @@ package body Printing is
       Value : Value_Record;
       Count : Integer := 1;
    begin
-      Put_Line ("Print_Value_Data_List");
       if Name'Length > 0 then
          Put (Name & ": ");
       end if;
