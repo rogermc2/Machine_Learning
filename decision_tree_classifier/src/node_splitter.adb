@@ -290,6 +290,10 @@ package body Node_Splitter is
       Swap                 : Natural;
       Best_Split           : Split_Record;
    begin
+      Assert (End_Row > Start_Row, "Node_Splitter.Find_Best_Split End_Row " &
+                Integer'Image (End_Row) & " should be greater than Start_Row "
+              & Integer'Image (Start_Row));
+
       while F_I > Num_Total_Constants and
         (Num_Visited_Features < Natural (Max_Features) or
            --   At least one drawn feature must be non constant.
@@ -538,8 +542,6 @@ package body Node_Splitter is
                            return Split_Record is
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
-      Start_Row            : constant Positive := Self.Start_Row;
-      End_Row              : constant Positive := Self.End_Row;
       Current_Split        : Split_Record;
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Num_Total_Constants  : Natural := Num_Known_Constants;
@@ -550,14 +552,10 @@ package body Node_Splitter is
       --  L281 features is a pointer to self.features
       --  L282 constant_features is a pointer to self.constant_features
       --  L285 Xf is a pointer to self.feature_values
-      Assert (End_Row > Start_Row, "Node_Splitter.Split_Node End_Row " &
-                Integer'Image (End_Row) & " should be greater than Start_Row "
-              & Integer'Image (Start_Row));
-
-      Assert ( not Self.Sample_Indices.Is_Empty,
+      Assert (not Self.Sample_Indices.Is_Empty,
                "Node_Splitter.Split_Node called with empty Sample_Indices");
 
-      Init_Split (Current_Split, Start_Row);
+      Init_Split (Current_Split, Self.Start_Row);
       --          Classifier_Utilities.Print_Split_Record
       --            ("Node_Splitter.Split_Node Current_Split", Current_Split);
       Find_Best_Split (Self, Num_Features, Num_Constant_Features,
@@ -566,12 +564,6 @@ package body Node_Splitter is
       --  L421  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-      Assert (Best_Split.Split_Row >= Start_Row,
-              "Node_Splitter.Split_Node, invalid position" &
-                Integer'Image (Best_Split.Split_Row) &
-                " should be greater than Start_Row" &
-                Integer'Image (Self.Start_Row));
-
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
       --  L454
