@@ -506,13 +506,13 @@ package body Node_Splitter is
          --  Draw a feature at random;
          F_J := Num_Drawn_Constants + 1 +
            Maths.Random_Integer mod (F_I - Num_Found_Constants);
-
-         if F_J < Num_Known_Constants then
-            Swap := Num_Drawn_Constants;
+         --  L346
+         if F_J <= Num_Known_Constants then
+            Num_Drawn_Constants := Num_Drawn_Constants + 1;
+            Swap := Self.Feature_Indices.Element (Num_Drawn_Constants);
             Self.Feature_Indices.Replace_Element
               (Num_Drawn_Constants, Self.Feature_Indices.Element (F_J));
-            Self.Feature_Indices.Replace_Element (F_J, Self.Feature_Indices.Element (Swap));
-            Num_Drawn_Constants := Num_Drawn_Constants + 1;
+            Self.Feature_Indices.Replace_Element (F_J, Swap);
          else  --  L356
             F_J := F_J + Num_Found_Constants;
             if F_J = 0 then
