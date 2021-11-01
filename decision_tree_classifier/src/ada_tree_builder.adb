@@ -1,4 +1,4 @@
---  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
+--  Based on scikit-learn/sklearn/tree _tree.pyx L119 class DepthFirstTreeBuilder
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
@@ -61,7 +61,7 @@ package body Ada_Tree_Builder is
          --           Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
          --                     & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
          --                       ", " & Integer'Image (Parent_Node.Num_Node_Samples));
-         --  L208
+         --  L205
          --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
          --              New_Line;
          Reset_Node (Builder.Splitter, Start_Row, End_Row, Weighted_Node_Samples);
@@ -71,9 +71,11 @@ package body Ada_Tree_Builder is
          if First then
             Impurity := Node_Impurity (Builder.Splitter);
             First := False;
+         else
+            Impurity := Parent_Node.Impurity;
          end if;
 
-         --  L210
+         --  L207
          Is_Leaf_Node := Depth >= Builder.Max_Depth or
            Builder.Splitter.Num_Samples = 1 or
            Parent_Node.Num_Node_Samples < Builder.Min_Samples_Split or
@@ -101,7 +103,7 @@ package body Ada_Tree_Builder is
               Split_Row >= End_Row or
               Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
 
-            --  L229  _tree.add_node just generates a new initialized node
+            --  L228  _tree.add_node just generates a new initialized node
             --        right and left children are added to the tree (stack) at
             --        L245 and L251 respectively
             --                  Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
@@ -180,7 +182,7 @@ package body Ada_Tree_Builder is
    begin
       Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
-      --  L208
+      --  L205
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Splitter, 1, Positive (Y_Encoded.Length),
                   Splitter.Weighted_Samples);
