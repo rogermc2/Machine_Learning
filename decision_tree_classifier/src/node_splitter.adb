@@ -44,12 +44,12 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Evaluate (Self                  : in out Splitter_Class;
-                       Num_Total_Constants   : in out Natural;
-                       Num_Found_Constants   : in out Natural;
-                       F_I                   : in out Natural; F_J : Natural;
-                       Current_Split         : in out Split_Record;
-                       Best_Split            : in out Split_Record) is
+   procedure Check_For_Split (Self                  : in out Splitter_Class;
+                              Num_Total_Constants   : in out Natural;
+                              Num_Found_Constants   : in out Natural;
+                              F_I                   : in out Natural; F_J : Natural;
+                              Current_Split         : in out Split_Record;
+                              Best_Split            : in out Split_Record) is
       use ML_Types;
       X_F_Start : Value_Record;
       X_F_End   : Value_Record;
@@ -71,7 +71,7 @@ package body Node_Splitter is
 
          when others =>
             raise Node_Splitter_Error with
-              "Node_Splitter.Reset_Node, invalid X_Features" &
+              "Node_Splitter.Check_For_Split, invalid X_Features" &
               ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
       end case;
 
@@ -92,9 +92,9 @@ package body Node_Splitter is
          Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
                               Current_Split, Best_Split);
          --  L428
-         --                      Put_Line ("Node_Splitter.Split_Node found");
+         --                      Put_Line ("Node_Splitter.Check_For_Split found");
       end if;
-   end Evaluate;
+   end Check_For_Split;
 
    --  -------------------------------------------------------------------------
 
@@ -273,11 +273,11 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Find_Best_Split (Self       : in out Splitter_Class;
-                              Num_Features : Natural;
+   procedure Find_Best_Split (Self                  : in out Splitter_Class;
+                              Num_Features          : Natural;
                               Num_Constant_Features : Natural;
                               Num_Found_Constants   : in out Natural;
-                              Num_Total_Constants  : in out Natural) is
+                              Num_Total_Constants   : in out Natural) is
 
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Max_Features         : constant Tree.Index_Range := Self.Max_Features;
@@ -435,8 +435,8 @@ package body Node_Splitter is
       --  L367
       Sort (Self.Feature_Values);
       --  L369  Self.Feature_Values is a value_data_list
-      Evaluate (Self, Num_Total_Constants, Num_Found_Constants, F_I, F_J,
-                Current_Split, Best_Split );
+      Check_For_Split (Self, Num_Total_Constants, Num_Found_Constants, F_I, F_J,
+                       Current_Split, Best_Split );
    end Process;
 
    --  -------------------------------------------------------------------------
@@ -539,7 +539,7 @@ package body Node_Splitter is
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
-                           return Split_Record is
+                        return Split_Record is
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Current_Split        : Split_Record;
@@ -553,7 +553,7 @@ package body Node_Splitter is
       --  L282 constant_features is a pointer to self.constant_features
       --  L285 Xf is a pointer to self.feature_values
       Assert (not Self.Sample_Indices.Is_Empty,
-               "Node_Splitter.Split_Node called with empty Sample_Indices");
+              "Node_Splitter.Split_Node called with empty Sample_Indices");
 
       Init_Split (Current_Split, Self.Start_Row);
       --          Classifier_Utilities.Print_Split_Record
