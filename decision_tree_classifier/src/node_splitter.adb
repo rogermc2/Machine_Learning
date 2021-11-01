@@ -47,8 +47,7 @@ package body Node_Splitter is
    function Can_Split (Self                  : in out Splitter_Class;
                        Num_Total_Constants   : in out Natural;
                        Num_Found_Constants   : in out Natural;
-                       F_I                   : in out Natural;
-                       F_J                   : Natural)
+                       F_I, F_J              : Natural)
                        return Boolean is
       use ML_Types;
       X_F_Start : Value_Record;
@@ -88,7 +87,6 @@ package body Node_Splitter is
          Num_Total_Constants := Num_Total_Constants + 1;
 
       elsif F_I > 1 then  --  L378
-         F_I := F_I - 1;
          OK := True;
       end if;
 
@@ -437,6 +435,7 @@ package body Node_Splitter is
       --  L369  Self.Feature_Values is a value_data_list
       if Can_Split (Self, Num_Total_Constants, Num_Found_Constants,
                     F_I, F_J) then
+         F_I := F_I - 1;
          Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
                               Current_Split, Best_Split);
          --  L428
