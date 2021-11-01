@@ -537,7 +537,10 @@ package body Node_Splitter is
          end loop;
       end if;
 
+      --  L454
       Num_Constant_Features := Num_Total_Constants;
+
+      --  L453
       return Best_Split;
 
    end Split_Node;
