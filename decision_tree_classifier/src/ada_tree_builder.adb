@@ -179,6 +179,7 @@ package body Ada_Tree_Builder is
       Depth            : constant Positive := 1;
       Builder          : Tree_Builder;
       Top_Node_Cursor  : Cursor;
+      Impurity         : Float := Float'Last;
    begin
       Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
@@ -189,7 +190,7 @@ package body Ada_Tree_Builder is
 
       Top_Node_Cursor := Tree_Build.Add_Node
         (theTree, Splitter, Depth, theTree.Nodes.Root, True, False, 1,
-         Float'Last, 0.0, 1, Positive (Y_Encoded.Length),
+         Impurity, 0.0, 1, Positive (Y_Encoded.Length),
          Splitter.Weighted_Samples);
       Add_Branch (theTree, Builder, Top_Node_Cursor);
 
