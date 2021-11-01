@@ -44,17 +44,18 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Check_For_Split (Self                  : in out Splitter_Class;
-                              Num_Total_Constants   : in out Natural;
-                              Num_Found_Constants   : in out Natural;
-                              F_I                   : in out Natural; F_J : Natural;
-                              Current_Split         : in out Split_Record;
-                              Best_Split            : in out Split_Record) is
+   function Can_Split (Self                  : in out Splitter_Class;
+                       Num_Total_Constants   : in out Natural;
+                       Num_Found_Constants   : in out Natural;
+                       F_I                   : in out Natural;
+                       F_J                   : Natural)
+                       return Boolean is
       use ML_Types;
       X_F_Start : Value_Record;
       X_F_End   : Value_Record;
       Swap      : Natural;
       LE        : Boolean;
+      OK        : Boolean := False;
    begin
       X_F_Start :=
         Self.Feature_Values.Element (Self.Feature_Values.First_Index);
@@ -83,18 +84,17 @@ package body Node_Splitter is
               (Num_Total_Constants + 1));
          Self.Feature_Indices.Replace_Element
            (Num_Total_Constants + 1, Swap);
-
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
 
       elsif F_I > 1 then  --  L378
          F_I := F_I - 1;
-         Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
-                              Current_Split, Best_Split);
-         --  L428
-         --                      Put_Line ("Node_Splitter.Check_For_Split found");
+         OK := True;
       end if;
-   end Check_For_Split;
+
+      return OK;
+
+   end Can_Split;
 
    --  -------------------------------------------------------------------------
 
@@ -435,8 +435,13 @@ package body Node_Splitter is
       --  L367
       Sort (Self.Feature_Values);
       --  L369  Self.Feature_Values is a value_data_list
-      Check_For_Split (Self, Num_Total_Constants, Num_Found_Constants, F_I, F_J,
-                       Current_Split, Best_Split );
+      if Can_Split (Self, Num_Total_Constants, Num_Found_Constants,
+                    F_I, F_J) then
+         Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
+                              Current_Split, Best_Split);
+         --  L428
+      end if;
+
    end Process;
 
    --  -------------------------------------------------------------------------
