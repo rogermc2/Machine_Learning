@@ -13,6 +13,10 @@ package body Node_Splitter is
 
    Feature_Threshold : constant Float := 10.0 ** (-7);
 
+   procedure Update_Constants (Self                  : in out Splitter_Class;
+                               Num_Known_Constants   : Natural;
+                               Num_Found_Constants   : Natural);
+
    --  -------------------------------------------------------------------------
 
    procedure C_Init (Self             : in out Splitter_Class;
@@ -533,6 +537,21 @@ package body Node_Splitter is
                 " should be greater than Start_Row" &
                 Integer'Image (Self.Start_Row));
 
+      Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
+
+      --  L454
+      Num_Constant_Features := Num_Total_Constants;
+      --  L453
+      return Best_Split;
+
+   end Split_Node;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Update_Constants (Self                  : in out Splitter_Class;
+                               Num_Known_Constants   : Natural;
+                               Num_Found_Constants   : Natural) is
+   begin
       --  L442
       --  Respect invariant for constant features: the original order of
       --  element in features[:n_known_constants] must be preserved for
@@ -550,13 +569,7 @@ package body Node_Splitter is
          end loop;
       end if;
 
-      --  L454
-      Num_Constant_Features := Num_Total_Constants;
-
-      --  L453
-      return Best_Split;
-
-   end Split_Node;
+   end Update_Constants;
 
    --  ------------------------------------------------------------------------
 
