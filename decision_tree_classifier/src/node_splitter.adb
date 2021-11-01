@@ -270,7 +270,10 @@ package body Node_Splitter is
    end Evaluate_All_Splits;
 
    --  -------------------------------------------------------------------------
-
+  ---  BestSplitter.Find_Best_Split samples up to max_features without
+   --  replacement using a Fisher-Yates-based algorithm.
+   --  Variables F_I and F_J are used to compute a permutation of the Features
+   --  being classified.
    procedure Find_Best_Split (Self                  : in out Splitter_Class;
                               Num_Features          : Natural;
                               Num_Constant_Features : Natural;
@@ -537,9 +540,8 @@ package body Node_Splitter is
    end Reset_Node;
 
    --  -------------------------------------------------------------------------
-   --  BestSplitter.Split_Node samples up to max_features without replacement
-   --  using a Fisher-Yates-based algorithm (using the local variables `f_i`
-   --  and `f_j` to compute a permutation of the `features` array).
+   --  BestSplitter.Split_Node implements a Fisher-Yates-based algorithm
+   --  in the Find_Best_Split procedure.
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
