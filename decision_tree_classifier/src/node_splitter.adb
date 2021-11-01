@@ -511,38 +511,6 @@ package body Node_Splitter is
       --          Classifier_Utilities.Print_Split_Record
       --            ("Node_Splitter.Split_Node L421, Best_Split", Best_Split);
 
-      --  L432  Reorganize into samples
-      --        (start .. best.pos) + samples (best.pos .. end)
-      Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-      Assert (Best_Split.Split_Row >= Start_Row,
-              "Node_Splitter.Split_Node, invalid position" &
-                Integer'Image (Best_Split.Split_Row) &
-                " should be greater than Start_Row" &
-                Integer'Image (Self.Start_Row));
-
-      --  L456
-      --  Respect invariant for constant features: the original order of
-      --  element in features[:n_known_constants] must be preserved for
-      --  sibling and child nodes.
-      if Num_Known_Constants > 0 then
-         for index in 1 .. Num_Known_Constants loop
-            Self.Feature_Indices.Replace_Element
-              (index, Self.Constant_Features_I.Element (index));
-         end loop;
-
-         --   Copy newly found constant features
-         for index in Num_Known_Constants + 1 .. Num_Found_Constants loop
-            Self.Constant_Features_I.Replace_Element
-              (index, Self.Feature_Indices.Element (index));
-         end loop;
-
-      end if;
-
-      --          Classifier_Utilities.Print_Split_Record
-      --            ("Node_Splitter.Split_Node L421, ", Current_Split);
-      --          Classifier_Utilities.Print_Split_Record
-      --            ("Node_Splitter.Split_Node L421, Best_Split", Best_Split);
-
       --  L421  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
@@ -552,7 +520,7 @@ package body Node_Splitter is
                 " should be greater than Start_Row" &
                 Integer'Image (Self.Start_Row));
 
-      --  L448
+      --  L442
       --  Respect invariant for constant features: the original order of
       --  element in features[:n_known_constants] must be preserved for
       --  sibling and child nodes.
@@ -562,7 +530,7 @@ package body Node_Splitter is
               (index, Self.Constant_Features_I.Element (index));
          end loop;
 
-         --   Copy newly found constant features
+         --  L447 Copy newly found constant features
          for index in Num_Known_Constants + 1 .. Num_Found_Constants loop
             Self.Constant_Features_I.Replace_Element
               (index, Self.Feature_Indices.Element (index));

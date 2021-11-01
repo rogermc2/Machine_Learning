@@ -2,7 +2,7 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -177,6 +177,7 @@ package body Criterion is
               "Criterion.Entropy_Node_Impurity Criterion Classes is empty";
         end if;
 
+        Put_Line ("Criterion.Entropy_Node_Impurity");
         --  L535 Y structure samples (rows) x outputs (columns)
         for index in Self.Y.Element (1).First_Index .. Self.Y.Element (1).Last_Index loop
             Class_List := Self.Classes.Element (index);
@@ -189,6 +190,8 @@ package body Criterion is
                 end if;
             end loop;
         end loop;
+        Put_Line ("Criterion.Entropy_Node_Impurity, Entropy" &
+                 Float'Image (Entropy / Float (Self.Sum_Total.Length)));
 
         return Entropy / Float (Self.Sum_Total.Length);
 

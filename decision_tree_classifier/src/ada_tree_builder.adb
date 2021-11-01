@@ -177,9 +177,9 @@ package body Ada_Tree_Builder is
       use Tree.Nodes_Package;
       use Node_Splitter;
       Depth            : constant Positive := 1;
+      Impurity         : constant Float := Float'Last;
       Builder          : Tree_Builder;
       Top_Node_Cursor  : Cursor;
-      Impurity         : Float := Float'Last;
    begin
       Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
 
