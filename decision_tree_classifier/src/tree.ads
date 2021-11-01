@@ -45,8 +45,6 @@ package Tree is
       Depth                     : Positive := 1;
       Is_Left                   : Boolean := True;
       Num_Constant_Features     : Integer := 0;
-      --  From _Tree class Tree Value is num_outputs x num_classes per node
-      Values                    : Weights.Weight_Lists_2D;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct

@@ -96,6 +96,7 @@ package body Tree is
       use Weights;
       Selected_Nodes  : Tree_Cursor_List;
       Node_Cursor     : Tree_Cursor;
+      Node            : Tree_Node;
       Out_Data        : Weight_Lists_3D;
    begin
       --  L760;
@@ -104,7 +105,8 @@ package body Tree is
                                         Selected_Nodes);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
-         Out_Data.Append (Element (Node_Cursor).Values);
+         Node := Element (Node_Cursor);
+         Out_Data.Append (Self.Values.Element (Node.Node_ID));
       end loop;
 
       return Out_Data;

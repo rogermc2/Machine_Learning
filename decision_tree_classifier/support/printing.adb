@@ -253,6 +253,7 @@ package body Printing is
       else
          Put_Line (To_String (UB_Offset & "False branch"));
       end if;
+
       Put_Line (To_String (UB_Offset & "Number of constant features:" &
                   Integer'Image (Node.Num_Constant_Features)));
       Put_Line (To_String (UB_Offset & "Depth:" &
@@ -265,14 +266,6 @@ package body Printing is
                      Integer'Image (Node.Best_Fit_Feature_Index)));
          Put_Line (To_String (UB_Offset & "Threshold: " &
                      Float'Image (Node.Threshold)));
-      end if;
-
-      if Node.Values.Is_Empty then
-         Put_Line (To_String (UB_Offset) &
-                     "Prediction: Values list is empty!");
-      else
-         Print_Weights_Lists_2D
-           (To_String (UB_Offset & "Class predictions"), Node.Values);
       end if;
 
    end Print_Node;
@@ -348,17 +341,12 @@ package body Printing is
       use Tree;
       use Nodes_Package;
       Nodes       : constant Tree_Nodes := aTree.Nodes;
-      Node_Values : Weights.Weight_List;
-      Data        : Float;
-      Data_String : Unbounded_String;
       This_Indent : Natural := 0;
---        Node_Count  : Natural := 0;
       --  Print_Tree_Node is recursive
       procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
                                  Indent : Natural := 0) is
          use Ada.Containers;
          Node   : constant Tree_Node := Element (Curs);
-         Values : constant Weights.Weight_Lists_2D := Node.Values;
       begin
          This_Indent := Indent + 1;
          if This_Indent > 10 then
@@ -378,31 +366,7 @@ package body Printing is
                Offset (Indent) := ' ';
             end if;
 
---              Node_Count := Node_Count + 1;
---              Put_Line (Offset & "Node " & Integer'Image (Node_Count));
             Print_Node (Node, Offset);
-
-            if Values.Is_Empty then
-               Put_Line ("Values: none.");
-            else
-               Data_String := To_Unbounded_String ("Values : {");
-               for index in Values.First_Index .. Values.Last_Index loop
-                  Node_Values := Values.Element (index);
-                  for v_index in Node_Values.First_Index ..
-                    Node_Values.Last_Index loop
-                     Data := Node_Values.Element (v_index);
-                     Data_String := Data_String & Float'Image (Data);
-
-                     if not (index = Node_Values.Last_Index) then
-                        Data_String := Data_String & ", ";
-                     end if;
-                  end loop;
-
-                  Data_String := Data_String & " }";
-                  Put_Line (Offset & To_String (Data_String));
-               end loop;
-            end if;
-            New_Line;
 
             if not Is_Leaf (Curs) then
                Print_Tree_Node (First_Child (Curs));

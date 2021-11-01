@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class DepthFirstTreeBuilder
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
@@ -33,10 +34,12 @@ package body Tree_Build is
                       Impurity, Threshold   : Float;
                       Start, Stop           : Positive;
                       Weighted_Node_Samples : Float) return Tree.Tree_Cursor is
+      use Ada.Containers;
       use Tree;
       use Nodes_Package;
       New_Node    : Tree_Node (Is_Leaf);
       Node_Cursor : Tree.Tree_Cursor;
+      Values      : Weights.Weight_Lists_2D;
    begin
       Assert (Parent_Cursor /= No_Element,
               "Tree_Build.Add_Node, parent cursor is null.");
@@ -51,8 +54,13 @@ package body Tree_Build is
       New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
+
       --  _Tree L241 store values in tree.values indexed by node id
-      Node_Splitter.Node_Value (Splitter, New_Node.Values);
+      Node_Splitter.Node_Value (Splitter, Values);
+      if New_Node.Node_ID > Integer (theTree.Values.Length) then
+         theTree.Values.Set_Length (Count_Type (New_Node.Node_ID));
+      end if;
+      theTree.Values.Replace_Element (New_Node.Node_ID, Values);
 
       New_Node.Samples_Start := Start;
       New_Node.Num_Node_Samples := 1 + Stop - Start;
@@ -88,6 +96,7 @@ package body Tree_Build is
       Parent_Cursor         : Tree.Tree_Cursor;
       Depth                 : Positive;
       Res                   : in out Build_Utils.Priority_Record) is
+      use Ada.Containers;
       use Tree.Nodes_Package;
       Parent_Node           : constant Tree.Tree_Node :=
                                 Element (Parent_Cursor);
@@ -98,6 +107,8 @@ package body Tree_Build is
       End_Row               : Positive :=
                                 Start_Row + Parent_Node.Num_Node_Samples - 1;
       Node_Cursor           : Tree.Tree_Cursor;
+      Node                  : Tree.Tree_Node;
+      Values                : Weights.Weight_Lists_2D;
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
@@ -128,8 +139,14 @@ package body Tree_Build is
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, aSplit.Improvement, aSplit.Threshold, Start_Row,
          End_Row, Float (Parent_Node.Weighted_Num_Node_Samples));
+      Node := Element (Node_Cursor);
 
-      --  L463 Node_Value set by Add_Node
+      --  L461
+      Node_Splitter.Node_Value (Splitter, Values);
+      if Node.Node_ID > Integer (theTree.Values.Length) then
+         theTree.Values.Set_Length (Count_Type (Node.Node_ID));
+      end if;
+      theTree.Values.Replace_Element (Node.Node_ID, Values);
 
       Res.Node_Cursor := Add_Node
         (theTree, Splitter, Depth, Parent_Cursor, Is_Left, Is_Leaf,
@@ -349,7 +366,7 @@ package body Tree_Build is
       Leaf_Node.Samples_Start := Old_Node.Samples_Start;
       Leaf_Node.Depth := Old_Node.Depth;
       Leaf_Node.Num_Constant_Features := Old_Node.Num_Constant_Features;
-      Leaf_Node.Values := Old_Node.Values;
+--        Leaf_Node.Values := Old_Node.Values;
       aTree.Nodes.Replace_Element (Node_Cursor, Leaf_Node);
 
    end Change_To_Leaf_Node;
