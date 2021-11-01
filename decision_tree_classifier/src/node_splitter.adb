@@ -112,10 +112,10 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Find_Best_Split (Self       : in out Splitter_Class;
-                              Features_X : ML_Types.Value_Data_List;
-                              Current    : in out Split_Record;
-                              Best       : in out Split_Record) is
+   procedure Evauate_All_Splits (Self       : in out Splitter_Class;
+                                 Features_X : ML_Types.Value_Data_List;
+                                 Current    : in out Split_Record;
+                                 Best       : in out Split_Record) is
       use ML_Types;
       P_Index                   : Positive;
       Current_Proxy_Improvement : Float := -Float'Last;
@@ -194,19 +194,19 @@ package body Node_Splitter is
             --  L398 Accept if min_samples_leaf is guaranteed
             if Current.Split_Row - Self.Start_Row >= Self.Min_Leaf_Samples and
               Self.End_Row - Current.Split_Row >= Self.Min_Leaf_Samples then
-               --  L401
+               --  L400
                Criterion.Update (Self.Criteria, Best.Split_Row);
 
-               --  L405 Accept if min_weight_leaf is satisfied
+               --  L402 Accept if min_weight_leaf is satisfied
                if Self.Criteria.Num_Weighted_Left >= Self.Min_Leaf_Weight and
                  Self.Criteria.Num_Weighted_Right >= Self.Min_Leaf_Weight then
                   Current_Proxy_Improvement :=
                     Criterion.Proxy_Impurity_Improvement (Self.Criteria);
-                  --  L412  Note: Improvements are negative values.
+                  --  L409  Note: Improvements are negative values.
                   --                          Put_Line ("Node_Splitter.Find_Best_Split L412");
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
-                     --  L415
+                     --  L41
                      --                              Put_Line ("Node_Splitter.Find_Best_Split L415");
                      case Features_X.Element (P_Index).Value_Kind is
                         when Float_Type =>
@@ -254,8 +254,8 @@ package body Node_Splitter is
                         when Boolean_Type | UB_String_Type => null;
                      end case;
 
-                     --  L422
-                     Best.Threshold := Current.Threshold;
+                     --  L419
+                     Best := Current;
                   end if;
                end if;
             end if;
@@ -264,13 +264,96 @@ package body Node_Splitter is
 
       if Best.Split_Row <= Self.Start_Row then
          raise Node_Splitter_Error with
-           "Node_Splitter.Find_Best_Split, final position" &
+           "Node_Splitter.Evauate_All_Splits, final position" &
            Integer'Image (Best.Split_Row) &
            " should be greater than Start_Index" &
            Integer'Image (Self.Start_Row);
       end if;
 
-   end Find_Best_Split;
+   end Evauate_All_Splits;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Process (Self                  : in out Splitter_Class;
+                      Num_Total_Constants   : in out Natural;
+                      Num_Found_Constants   : in out Natural;
+                      Start_Row, End_Row    : Positive;
+                      F_I                   : in out Natural; F_J : Natural;
+                      Best_Split            : in out Split_Record) is
+      use ML_Types;
+      use Value_Data_Sorting;
+      Current_Split        : Split_Record;
+      X_Samples_Row        : Natural;
+      X_Samples            : Value_Data_List;
+      X_F_Start            : Value_Record;
+      X_F_End              : Value_Record;
+      Swap                 : Natural;
+      LE                   : Boolean;
+   begin
+      --  L358 Sort samples along Current.Feature index;
+      Current_Split.Feature := Self.Feature_Indices.Element (F_J);
+      --  L364
+      for index in Start_Row .. End_Row loop
+         X_Samples_Row := Self.Sample_Indices.Element (index);
+         X_Samples := Self.X.Element (X_Samples_Row);
+         --  Self.Feature_Values is a Value_Data_List
+         Self.Feature_Values.Replace_Element
+           (index, X_Samples (Current_Split.Feature));
+      end loop;
+
+      --  L367
+      Sort (Self.Feature_Values);
+      --  L369  Self.Feature_Values is a value_data_list
+      X_F_Start :=
+        Self.Feature_Values.Element (Self.Feature_Values.First_Index);
+      X_F_End :=
+        Self.Feature_Values.Element (Self.Feature_Values.Last_Index);
+
+      case X_F_Start.Value_Kind is
+         when Float_Type =>
+            LE := X_F_End.Float_Value  <= X_F_Start.Float_Value +
+              Feature_Threshold;
+
+         when Integer_Type =>
+            LE := X_F_End.Integer_Value <= X_F_Start.Integer_Value;
+
+         when others =>
+            raise Node_Splitter_Error with
+              "Node_Splitter.Reset_Node, invalid X_Features" &
+              ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
+      end case;
+
+      --  Still L369
+      if LE then
+         Swap := Self.Feature_Indices.Element (F_J);
+         Self.Feature_Indices.Replace_Element
+           (F_J, Self.Feature_Indices.Element
+              (Num_Total_Constants + 1));
+         Self.Feature_Indices.Replace_Element
+           (Num_Total_Constants + 1, Swap);
+
+         Num_Found_Constants := Num_Found_Constants + 1;
+         Num_Total_Constants := Num_Total_Constants + 1;
+
+      elsif F_I > 1 then  --  L378
+         F_I := F_I - 1;
+         Swap := Self.Feature_Indices.Element (F_I);
+         Self.Feature_Indices.Replace_Element
+           (F_I, Self.Feature_Indices.Element (F_J));
+         Self.Feature_Indices.Replace_Element (F_J, Swap);
+
+         --  L377 Evaluate all splits
+         --                      Put_Line ("Node_Splitter.Split_Node L382 Start_Row, End_Row " &
+         --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
+         --                      Classifier_Utilities.Print_Value_Data_List
+         --                        ("Node_Splitter.Split_Node L382, Self.Feature_Values",
+         --                         Self.Feature_Values);
+         Evauate_All_Splits (Self, Self.Feature_Values,
+                             Current_Split, Best_Split);
+         --  L428
+         --                      Put_Line ("Node_Splitter.Split_Node found");
+      end if;
+   end Process;
 
    --  -------------------------------------------------------------------------
 
@@ -372,21 +455,14 @@ package body Node_Splitter is
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
-                         return Split_Record is
-      use ML_Types;
+                        return Split_Record is
       use Tree;
-      use Value_Data_Package;
-      use Value_Data_Sorting;
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Max_Features         : constant Index_Range := Self.Max_Features;
       Start_Row            : constant Positive := Self.Start_Row;
       End_Row              : constant Positive := Self.End_Row;
-      X_F_Start            : Value_Record;
-      X_F_End              : Value_Record;
       Current_Split        : Split_Record;
-      X_Samples_Row        : Natural;
-      X_Samples            : Value_Data_List;
       F_I                  : Natural := Num_Features;
       F_J                  : Natural;
       Swap                 : Natural;
@@ -395,7 +471,6 @@ package body Node_Splitter is
       Num_Visited_Features : Natural := 0;
       Num_Found_Constants  : Natural := 0;
       Num_Drawn_Constants  : Natural := 0;
-      LE                   : Boolean;
       Best_Split           : Split_Record;
    begin
       --  L277 samples is a pointer to self.samples
@@ -439,70 +514,8 @@ package body Node_Splitter is
             if F_J = 0 then
                F_J := 1;
             end if;
-
-            --  L358 Sort samples along Current.Feature index;
-            Current_Split.Feature := Self.Feature_Indices.Element (F_J);
-            --  L364
-            for index in Start_Row .. End_Row loop
-               X_Samples_Row := Self.Sample_Indices.Element (index);
-               X_Samples := Self.X.Element (X_Samples_Row);
-               --  Self.Feature_Values is a Value_Data_List
-               Self.Feature_Values.Replace_Element
-                 (index, X_Samples (Current_Split.Feature));
-            end loop;
-
-            --  L367
-            Sort (Self.Feature_Values);
-            --  L369  Self.Feature_Values is a value_data_list
-            X_F_Start :=
-              Self.Feature_Values.Element (Self.Feature_Values.First_Index);
-            X_F_End :=
-              Self.Feature_Values.Element (Self.Feature_Values.Last_Index);
-
-            case X_F_Start.Value_Kind is
-               when Float_Type =>
-                  LE := X_F_End.Float_Value  <= X_F_Start.Float_Value +
-                    Feature_Threshold;
-
-               when Integer_Type =>
-                  LE := X_F_End.Integer_Value <= X_F_Start.Integer_Value;
-
-               when others =>
-                  raise Node_Splitter_Error with
-                    "Node_Splitter.Reset_Node, invalid X_Features" &
-                    ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
-            end case;
-
-            --  Still L369
-            if LE then
-               Swap := Self.Feature_Indices.Element (F_J);
-               Self.Feature_Indices.Replace_Element
-                 (F_J, Self.Feature_Indices.Element
-                    (Num_Total_Constants + 1));
-               Self.Feature_Indices.Replace_Element
-                 (Num_Total_Constants + 1, Swap);
-
-               Num_Found_Constants := Num_Found_Constants + 1;
-               Num_Total_Constants := Num_Total_Constants + 1;
-
-            elsif F_I > 1 then  --  L378
-               F_I := F_I - 1;
-               Swap := Self.Feature_Indices.Element (F_I);
-               Self.Feature_Indices.Replace_Element
-                 (F_I, Self.Feature_Indices.Element (F_J));
-               Self.Feature_Indices.Replace_Element (F_J, Swap);
-
-               --  L382 Evaluate all splits
-               --                      Put_Line ("Node_Splitter.Split_Node L382 Start_Row, End_Row " &
-               --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
-               --                      Classifier_Utilities.Print_Value_Data_List
-               --                        ("Node_Splitter.Split_Node L382, Self.Feature_Values",
-               --                         Self.Feature_Values);
-               Find_Best_Split (Self, Self.Feature_Values, Current_Split,
-                                Best_Split);
-               --  L428
-               --                      Put_Line ("Node_Splitter.Split_Node found");
-            end if;
+            Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
+                     End_Row, F_I, F_J, Best_Split);
          end if;
       end loop;  --  L430
 
