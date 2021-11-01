@@ -274,6 +274,10 @@ package body Node_Splitter is
    --  replacement using a Fisher-Yates-based algorithm.
    --  Variables F_I and F_J are used to compute a permutation of the Features
    --  being classified.
+   --  Pseudo code to shuffle an array a of n elements (indices 0..n-1):
+   --    for i from n - 1 downto 1 do
+   --         j = random integer with 0 <= j <= i
+   --         exchange a[j] and a[i]
    procedure Find_Best_Split (Self                  : in out Splitter_Class;
                               Num_Features          : Natural;
                               Num_Constant_Features : Natural;
