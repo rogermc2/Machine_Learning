@@ -86,8 +86,8 @@ package body Node_Splitter is
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
 
-      elsif F_I > 1 then  --  L378
-         OK := True;
+      else  --  L378
+         OK := F_I > 1;
       end if;
 
       return OK;
