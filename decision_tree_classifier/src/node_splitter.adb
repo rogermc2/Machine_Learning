@@ -7,7 +7,7 @@ with Ada.Containers;
 with Maths;
 
 with Classifier_Types;
---  with Classifier_Utilities;
+with Printing;
 
 package body Node_Splitter is
 
@@ -113,9 +113,9 @@ package body Node_Splitter is
       --  L377 Evaluate all splits
       --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L382 Start_Row, End_Row " &
       --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
-      --                      Classifier_Utilities.Print_Value_Data_List
-      --                        ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
-      --                         Self.Feature_Values);
+      Printing.Print_Value_Data_List
+        ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
+         Self.Feature_Values);
       --  L384 Reset the criterion to pos = start
       Criterion.Reset (Self.Criteria);
       P_Index := Self.Start_Row;
@@ -278,7 +278,8 @@ package body Node_Splitter is
    procedure Find_Best_Split (Self                  : in out Splitter_Class;
                               Num_Constant_Features : Natural;
                               Num_Found_Constants   : in out Natural;
-                              Num_Total_Constants   : in out Natural) is
+                              Num_Total_Constants   : in out Natural;
+                              Best_Split            : in out Split_Record) is
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -290,7 +291,6 @@ package body Node_Splitter is
       F_I                  : Natural := Num_Features;
       F_J                  : Natural;
       Swap                 : Natural;
-      Best_Split           : Split_Record;
    begin
       Assert (End_Row > Start_Row, "Node_Splitter.Find_Best_Split End_Row " &
                 Integer'Image (End_Row) & " should be greater than Start_Row "
@@ -302,7 +302,7 @@ package body Node_Splitter is
       --  L323
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features < Positive (Max_Features) or
-           --   At least one drawn feature must be non constant.
+           --   At least one drawn feature must be a non-constant.
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
@@ -312,24 +312,25 @@ package body Node_Splitter is
          --  F_J = random integer with 2 <= F_J <= F_I
          F_J := 2 +
            Maths.Random_Integer * (F_I - 2 - Num_Found_Constants);
---           F_J := Num_Drawn_Constants + 1 +
---             Maths.Random_Integer mod (F_I - Num_Found_Constants);
-         --  L346
-         if F_J <= Num_Known_Constants then
-            --  F_J is in the interval
-            --  Num_Drawn_Constants ..  Num_Found_Constants
-            Swap := Self.Feature_Indices.Element (Num_Drawn_Constants);
-            Self.Feature_Indices.Replace_Element
-              (Num_Drawn_Constants, Self.Feature_Indices.Element (F_J));
-            Self.Feature_Indices.Replace_Element (F_J, Swap);
-            Num_Drawn_Constants := Num_Drawn_Constants + 1;
-         else  --  L356 F_J > Num_Known_Constants
+         --           F_J := Num_Drawn_Constants + 1 +
+         --             Maths.Random_Integer mod (F_I - Num_Found_Constants);
+
+         if F_J > Num_Known_Constants then
+            --  L356 F_J > Num_Known_Constants
             --  F_J is in the interval
             --  Num_Known_Constants .. F_I - Num_Found_Constants
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
             Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                      End_Row, F_I, F_J, Best_Split);
+         else --  L346
+            --  F_J is a constant in the interval
+            --  Num_Drawn_Constants ..  Num_Found_Constants
+            Swap := Self.Feature_Indices.Element (Num_Drawn_Constants + 1);
+            Self.Feature_Indices.Replace_Element
+              (Num_Drawn_Constants + 1, Self.Feature_Indices.Element (F_J));
+            Self.Feature_Indices.Replace_Element (F_J, Swap);
+            Num_Drawn_Constants := Num_Drawn_Constants + 1;
          end if;
       end loop;  --  L430
 
@@ -575,8 +576,8 @@ package body Node_Splitter is
       Init_Split (Current_Split, Self.Start_Row);
       --          Classifier_Utilities.Print_Split_Record
       --            ("Node_Splitter.Split_Node Current_Split", Current_Split);
-      Find_Best_Split (Self, Num_Constant_Features,
-                       Num_Found_Constants, Num_Total_Constants);
+      Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
+                       Num_Total_Constants, Best_Split);
 
       --  L421  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
