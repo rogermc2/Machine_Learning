@@ -15,7 +15,6 @@ package body Node_Splitter is
 
    procedure Evaluate_All_Splits (Self       : in out Splitter_Class;
                                   Features_X : ML_Types.Value_Data_List;
-                                  F_I, F_J   : Natural;
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record);
    procedure Process (Self                  : in out Splitter_Class;
@@ -95,21 +94,14 @@ package body Node_Splitter is
 
    procedure Evaluate_All_Splits (Self       : in out Splitter_Class;
                                   Features_X : ML_Types.Value_Data_List;
-                                  F_I, F_J   : Natural;
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record) is
       use ML_Types;
       P_Index                   : Positive;
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
-      Swap                      : Natural;
       LE                        : Boolean;
    begin
-      Swap := Self.Feature_Indices.Element (F_I);
-      Self.Feature_Indices.Replace_Element
-        (F_I, Self.Feature_Indices.Element (F_J));
-      Self.Feature_Indices.Replace_Element (F_J, Swap);
-
       --  L377 Evaluate all splits
       --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L382 Start_Row, End_Row " &
       --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
@@ -432,6 +424,7 @@ package body Node_Splitter is
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
+      Swap                 : Natural;
    begin
       --  L358 Sort samples along Current.Feature index;
       Current_Split.Feature := Self.Feature_Indices.Element (F_J);
@@ -450,8 +443,13 @@ package body Node_Splitter is
       if Can_Split (Self, Num_Total_Constants, F_I, F_J) then
          --  L374
          F_I := F_I - 1;
-         Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
-                              Current_Split, Best_Split);
+         Swap := Self.Feature_Indices.Element (F_I);
+         Self.Feature_Indices.Replace_Element
+           (F_I, Self.Feature_Indices.Element (F_J));
+         Self.Feature_Indices.Replace_Element (F_J, Swap);
+
+         Evaluate_All_Splits (Self, Self.Feature_Values, Current_Split,
+                              Best_Split);
          --  L428
       else -- L370
          Num_Found_Constants := Num_Found_Constants + 1;
