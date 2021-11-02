@@ -319,16 +319,15 @@ package body Node_Splitter is
 --             Maths.Random_Integer mod (F_I - Num_Found_Constants);
          --  L346
          if F_J <= Num_Known_Constants then
-            Num_Drawn_Constants := Num_Drawn_Constants + 1;
+            --  F_J is in the interval
+            --  Num_Drawn_Constants ..  Num_Found_Constants
             Swap := Self.Feature_Indices.Element (Num_Drawn_Constants);
             Self.Feature_Indices.Replace_Element
               (Num_Drawn_Constants, Self.Feature_Indices.Element (F_J));
             Self.Feature_Indices.Replace_Element (F_J, Swap);
-         else  --  L356
+            Num_Drawn_Constants := Num_Drawn_Constants + 1;
+         else  --  L356 F_J > Num_Known_Constants
             F_J := F_J + Num_Found_Constants;
-            if F_J = 0 then
-               F_J := 1;
-            end if;
             Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                      End_Row, F_I, F_J, Best_Split);
          end if;
@@ -449,9 +448,9 @@ package body Node_Splitter is
       --  L369  Self.Feature_Values is a value_data_list
       if Can_Split (Self, Num_Total_Constants, Num_Found_Constants,
                     F_I, F_J) then
-         F_I := F_I - 1;
          Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
                               Current_Split, Best_Split);
+         F_I := F_I - 1;
          --  L428
       end if;
 
@@ -467,19 +466,19 @@ package body Node_Splitter is
       use Classifier_Types.Natural_Package;
       Partition_End : Natural;
       P_Index       : Positive;
-      Sample_P      : Natural;
+      Sample_PI     : Positive;
       X_1           : ML_Types.Value_Data_List;
       X             : ML_Types.Value_Record;
       Swap          : Positive;
       Crit          : Criterion.Criterion_Class;
    begin
-      --  L425 Reorganize into samples[start:best.pos] + samples[best.pos:end]
+      --  L421 Reorganize into samples[start:best.pos] + samples[best.pos:end]
       if Best_Split.Split_Row < Self.End_Row then
          Partition_End := Self.End_Row;
          P_Index := Self.Start_Row;
          while P_Index < Partition_End loop
-            Sample_P := Self.Sample_Indices.Element (P_Index);
-            X_1 := Self.X.Element (Sample_P);
+            Sample_PI := Self.Sample_Indices.Element (P_Index);
+            X_1 := Self.X.Element (Sample_PI);
             X := X_1.Element (Best_Split.Feature);
 
             case X.Value_Kind is
