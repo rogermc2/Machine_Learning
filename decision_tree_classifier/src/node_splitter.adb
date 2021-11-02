@@ -270,20 +270,20 @@ package body Node_Splitter is
    end Evaluate_All_Splits;
 
    --  -------------------------------------------------------------------------
-  ---  BestSplitter.Find_Best_Split samples up to max_features without
+   ---  BestSplitter.Find_Best_Split samples up to max_features without
    --  replacement using a Fisher-Yates-based algorithm.
    --  Variables F_I and F_J are used to compute a permutation of the Features
    --  being classified.
    --  Pseudo code to shuffle an array a of n elements (indices 0..n-1):
-   --    for i from 0 to n - 1 do
-   --         j = random integer with 1 <= j <= i + 1
+   --    for i from n - 1 down to 0 do
+   --         j = random integer with 0 <= j <= i
    --         exchange a[j] and a[i]
    procedure Find_Best_Split (Self                  : in out Splitter_Class;
-                              Num_Features          : Natural;
                               Num_Constant_Features : Natural;
                               Num_Found_Constants   : in out Natural;
                               Num_Total_Constants   : in out Natural) is
-
+      Num_Features         : constant Natural :=
+                               Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Max_Features         : constant Tree.Index_Range := Self.Max_Features;
       Start_Row            : constant Positive := Self.Start_Row;
@@ -298,7 +298,11 @@ package body Node_Splitter is
       Assert (End_Row > Start_Row, "Node_Splitter.Find_Best_Split End_Row " &
                 Integer'Image (End_Row) & " should be greater than Start_Row "
               & Integer'Image (Start_Row));
-
+      --  Pseudo code to shuffle an array a of n elements (indices 1..n):
+      --    for i from n down to 1 do
+      --         j = random integer with i <= j <= i + 1
+      --         exchange a[j] and a[i]
+      --  L323
       while F_I > Num_Total_Constants and
         (Num_Visited_Features < Natural (Max_Features) or
            --   At least one drawn feature must be non constant.
@@ -307,9 +311,12 @@ package body Node_Splitter is
          --  L329
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L342
-         --  Draw a feature at random;
-         F_J := Num_Drawn_Constants + 1 +
-           Maths.Random_Integer mod (F_I - Num_Found_Constants);
+         --  Draw a feature at random
+         --  F_J = random integer with 2 <= F_J <= F_I + 2
+         F_J := 2 +
+           Maths.Random_Integer * (F_I - Num_Found_Constants);
+--           F_J := Num_Drawn_Constants + 1 +
+--             Maths.Random_Integer mod (F_I - Num_Found_Constants);
          --  L346
          if F_J <= Num_Known_Constants then
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
@@ -550,8 +557,6 @@ package body Node_Splitter is
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
                         return Split_Record is
-      Num_Features         : constant Natural :=
-                               Natural (Self.Feature_Indices.Length);
       Current_Split        : Split_Record;
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Num_Total_Constants  : Natural := Num_Known_Constants;
@@ -568,7 +573,7 @@ package body Node_Splitter is
       Init_Split (Current_Split, Self.Start_Row);
       --          Classifier_Utilities.Print_Split_Record
       --            ("Node_Splitter.Split_Node Current_Split", Current_Split);
-      Find_Best_Split (Self, Num_Features, Num_Constant_Features,
+      Find_Best_Split (Self, Num_Constant_Features,
                        Num_Found_Constants, Num_Total_Constants);
 
       --  L421  Reorganize into samples
