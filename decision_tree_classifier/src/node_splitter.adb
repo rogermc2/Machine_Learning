@@ -45,8 +45,7 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    function Can_Split (Self                  : in out Splitter_Class;
-                       Num_Total_Constants   : in out Natural;
-                       Num_Found_Constants   : in out Natural;
+                       Num_Total_Constants   : Natural;
                        F_I, F_J              : Natural)
                        return Boolean is
       use ML_Types;
@@ -83,8 +82,6 @@ package body Node_Splitter is
               (Num_Total_Constants + 1));
          Self.Feature_Indices.Replace_Element
            (Num_Total_Constants + 1, Swap);
-         Num_Found_Constants := Num_Found_Constants + 1;
-         Num_Total_Constants := Num_Total_Constants + 1;
 
       else  --  L378
          OK := F_I > 1;
@@ -299,12 +296,12 @@ package body Node_Splitter is
                 Integer'Image (End_Row) & " should be greater than Start_Row "
               & Integer'Image (Start_Row));
       --  Pseudo code to shuffle an array a of n elements (indices 1..n):
-      --    for i from n down to 1 do
-      --         j = random integer with i <= j <= i + 1
+      --    for i from n down to 2 do
+      --         j = random integer with i <= j <= i
       --         exchange a[j] and a[i]
       --  L323
-      while F_I > Num_Total_Constants and
-        (Num_Visited_Features < Natural (Max_Features) or
+      while F_I > Num_Total_Constants + 1 and
+        (Num_Visited_Features < Positive (Max_Features) or
            --   At least one drawn feature must be non constant.
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
@@ -312,9 +309,9 @@ package body Node_Splitter is
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L342
          --  Draw a feature at random
-         --  F_J = random integer with 2 <= F_J <= F_I + 2
+         --  F_J = random integer with 2 <= F_J <= F_I
          F_J := 2 +
-           Maths.Random_Integer * (F_I - Num_Found_Constants);
+           Maths.Random_Integer * (F_I - 2 - Num_Found_Constants);
 --           F_J := Num_Drawn_Constants + 1 +
 --             Maths.Random_Integer mod (F_I - Num_Found_Constants);
          --  L346
@@ -327,7 +324,10 @@ package body Node_Splitter is
             Self.Feature_Indices.Replace_Element (F_J, Swap);
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
          else  --  L356 F_J > Num_Known_Constants
+            --  F_J is in the interval
+            --  Num_Known_Constants .. F_I - Num_Found_Constants
             F_J := F_J + Num_Found_Constants;
+            --  F_J is in the interval Num_ Total_Constants .. F_I
             Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                      End_Row, F_I, F_J, Best_Split);
          end if;
@@ -446,12 +446,15 @@ package body Node_Splitter is
       --  L367
       Sort (Self.Feature_Values);
       --  L369  Self.Feature_Values is a value_data_list
-      if Can_Split (Self, Num_Total_Constants, Num_Found_Constants,
-                    F_I, F_J) then
+      if Can_Split (Self, Num_Total_Constants, F_I, F_J) then
+         --  L374
+         F_I := F_I - 1;
          Evaluate_All_Splits (Self, Self.Feature_Values, F_I, F_J,
                               Current_Split, Best_Split);
-         F_I := F_I - 1;
          --  L428
+      else -- L370
+         Num_Found_Constants := Num_Found_Constants + 1;
+         Num_Total_Constants := Num_Total_Constants + 1;
       end if;
 
    end Process;
