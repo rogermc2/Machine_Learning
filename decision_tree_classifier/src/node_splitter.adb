@@ -7,7 +7,7 @@ with Ada.Containers;
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -105,9 +105,9 @@ package body Node_Splitter is
       --  L377 Evaluate all splits
       --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L382 Start_Row, End_Row " &
       --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
-      Printing.Print_Value_Data_List
-        ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
-         Self.Feature_Values);
+--        Printing.Print_Value_Data_List
+--          ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
+--           Self.Feature_Values);
       --  L384 Reset the criterion to pos = start
       Criterion.Reset (Self.Criteria);
       P_Index := Self.Start_Row;
@@ -123,12 +123,8 @@ package body Node_Splitter is
       --  Set of features to be split :
       --  P_Index: Self.Start_Index through Self.End_Index
       while P_Index < Self.End_Row loop
-         --              Put_Line ("Node_Splitter.Evaluate_All_Splits P_Index " &
-         --                          Integer'Image (P_Index));
          LE := True;
          while P_Index + 1 < Self.End_Row and LE loop
-            --                  Put_Line ("Node_Splitter.Evaluate_All_Splits P_Index + 1:" &
-            --                              Integer'Image (P_Index + 1));
             case Features_X.Element (P_Index + 1).Value_Kind is
                when Boolean_Type =>
                   --  if current X value is false and next X value is true
@@ -166,15 +162,12 @@ package body Node_Splitter is
                   if LE then
                      P_Index := P_Index + 1;
                   end if;
-                  --                      Put_Line ("Node_Splitter.Evaluate_All_Splits P_Index after case " &
-                  --                                  Integer'Image (P_Index));
             end case;
          end loop; --  P1_Index
 
          P_Index := P_Index + 1;
          --  L393
-         --              Put_Line ("Node_Splitter.Find_BeEvaluate_All_Splitsst_Split L393");
-         if P_Index < Self.End_Row then
+         if P_Index <= Self.End_Row then
             Best.Split_Row := P_Index;
             --  Best.Pos_I is the start index of the right node's data
             --  L398 Accept if min_samples_leaf is guaranteed
@@ -192,8 +185,7 @@ package body Node_Splitter is
                   --                          Put_Line ("Node_Splitter.Find_Best_Split L412");
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
-                     --  L41
-                     --                              Put_Line ("Node_Splitter.Evaluate_All_Splits L415");
+                     --  L414
                      case Features_X.Element (P_Index).Value_Kind is
                         when Float_Type =>
                            Current.Threshold := 0.5 *
