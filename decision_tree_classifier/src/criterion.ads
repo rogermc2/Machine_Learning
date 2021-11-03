@@ -7,6 +7,7 @@ with Weights;
 package Criterion is
 
    type Criterion_Kind is (Criterion_Classification, Criterion_Regression);
+   type Criterion_CLF is (Criterion_Gini, Criterion_Entropy);
 
    type Criterion_Class (Criterion_Type : Criterion_Kind :=
                            Criterion_Classification) is record

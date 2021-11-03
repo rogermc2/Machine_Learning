@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
-with Decision_Tree_Classifer;
+with Decision_Tree_Classification;
 with ML_Types;
 with Printing;
 with Tree;
@@ -31,7 +31,7 @@ package body Classifier_Tests is
 
     procedure Test_Classification_Toy  is
         use Classifier_Utilities;
-        use Decision_Tree_Classifer;
+        use Decision_Tree_Classification;
         use Printing;
         Expected        : Value_Data_Lists_2D;
         Prediction      : ML_Types.Value_Data_Lists_2D;

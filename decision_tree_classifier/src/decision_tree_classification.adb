@@ -12,7 +12,7 @@ with Node_Splitter;
 --  with Printing;
 with Weights;
 
-package body Decision_Tree_Classifer is
+package body Decision_Tree_Classification is
 
    --  -------------------------------------------------------------------------
    --  L884
@@ -127,4 +127,4 @@ package body Decision_Tree_Classifer is
 
    --  -------------------------------------------------------------------------
 
-end Decision_Tree_Classifer;
+end Decision_Tree_Classification;
