@@ -100,6 +100,7 @@ package body Printing is
             Count := 1;
          end if;
       end loop;
+      New_Line;
    end Print_Float_List;
 
    --  ------------------------------------------------------------------------

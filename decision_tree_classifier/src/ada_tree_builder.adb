@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Node_Splitter;
 with Tree;
@@ -58,22 +58,25 @@ package body Ada_Tree_Builder is
       Node_ID                     : Positive;
    begin
       Assert (not Parent_Node.Leaf_Node,
-             "Ada_Tree_Builder.Add_Branch called on a leaf node");
+              "Ada_Tree_Builder.Add_Branch called on a leaf node");
       --           Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
       --                     & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
       --                       ", " & Integer'Image (Parent_Node.Num_Node_Samples));
-      --  L205
+      --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       --              New_Line;
-        Reset_Node (Builder.Splitter, Start_Row, End_Row, Weighted_Node_Samples);
+      Reset_Node (Builder.Splitter, Start_Row, End_Row, Weighted_Node_Samples);
       --              Put_Line ("Ada_Tree_Builder.Add_Branch Reset_Node Start_Row, End_Row: "
       --                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
-
+      --  L216 Calculate Node Impurity
       if First then
          Impurity := Node_Impurity (Builder.Splitter);
          First := False;
+         Put_Line ("Ada_Tree_Builder.Add_Branch First Impurity: " &
+                     Float'Image (Impurity));
       else
          Impurity := Parent_Node.Impurity;
+         Put_Line ("Ada_Tree_Builder.Add_Branch Impurity: " & Float'Image (Impurity));
       end if;
 
       --  L207

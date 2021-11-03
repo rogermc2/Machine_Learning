@@ -32,7 +32,7 @@ package body Tree is
    --  intermediate subsets are called internal nodes or split nodes.
    function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                          return Tree_Cursor_List is
---                           return Classifier_Types.Natural_List is
+      --                           return Classifier_Types.Natural_List is
       --  X is a list of samples of features (num samples x num features)
       use Ada.Containers;
       use ML_Types;
@@ -48,16 +48,26 @@ package body Tree is
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0,
               "Tree.Apply_Dense Self.Nodes tree is empty");
+
       --  L800 for each sample
       for index in X.First_Index .. X.Last_Index loop
+--           Put_Line ("Tree.Apply_Dense index" & Integer'Image (index));
          Node_Cursor := Top_Cursor;
+--           Put_Line ("Tree.Apply_Dense Top Node_ID " &
+--                       Integer'Image (Element (Node_Cursor).Node_ID));
          --  Sample is alist of feature values
          Sample := X.Element (index);
 
+--           Put_Line ("Tree.Apply_Dense Node_ID, Leaf_Node " &
+--                       Integer'Image (Element (First_Child (Node_Cursor)).Node_ID)
+--                       & " " &
+--                    Boolean'Image (Element (First_Child (Node_Cursor)).Leaf_Node));
          --  Find a node with a leaf child.
          --  This node has the prediction value.
          while not Element (First_Child (Node_Cursor)).Leaf_Node loop
             Node := Element (Node_Cursor);
+--              Put_Line ("Tree.Apply_Dense Node.Node_ID" &
+--                          Integer'Image (Node.Node_ID));
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -101,8 +111,9 @@ package body Tree is
    begin
       --  L760;
       Selected_Nodes := Apply (Self, X);
-      Printing.Print_Node_Cursor_List ("Tree.Predict, Selected_Nodes",
-                                        Selected_Nodes);
+      Printing.Print_Weight_Lists_3D ("Tree.Predict, Self.Values", Self.Values);
+      Printing.Print_Node_Cursor_List ("Tree.Predict, Apply: Selected_Nodes",
+                                       Selected_Nodes);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
          Node := Element (Node_Cursor);

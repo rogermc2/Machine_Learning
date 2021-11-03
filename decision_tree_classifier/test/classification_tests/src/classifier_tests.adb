@@ -58,7 +58,7 @@ package body Classifier_Tests is
 --          Put_Line ("Classification_Tests.Test_Classification_Toy Tree size: " &
 --                      Integer'Image (Integer
 --                      (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count) - 1));
---          Print_Tree ("The Tree", theClassifier);
+        Print_Tree ("The Tree", theClassifier);
         Put_Line ("----------------------------------------------");
         New_Line;
         Prediction := Base_Decision_Tree.Predict (theClassifier, T);

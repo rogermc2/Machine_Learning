@@ -61,7 +61,7 @@ package body Node_Splitter is
 
       case X_F_Start.Value_Kind is
          when Float_Type =>
-            LE := X_F_End.Float_Value  <= X_F_Start.Float_Value +
+            LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
               Feature_Threshold;
 
          when Integer_Type =>
@@ -256,9 +256,6 @@ package body Node_Splitter is
    --  Variables F_I and F_J are used to compute a permutation of the Features
    --  being classified.
    --  Pseudo code to shuffle an array a of n elements (indices 0..n-1):
-   --    for i from n - 1 down to 0 do
-   --         j = random integer with 0 <= j <= i
-   --         exchange a[j] and a[i]
    procedure Find_Best_Split (Self                  : in out Splitter_Class;
                               Num_Constant_Features : Natural;
                               Num_Found_Constants   : in out Natural;
@@ -279,10 +276,6 @@ package body Node_Splitter is
       Assert (End_Row > Start_Row, "Node_Splitter.Find_Best_Split End_Row " &
                 Integer'Image (End_Row) & " should be greater than Start_Row "
               & Integer'Image (Start_Row));
-      --  Pseudo code to shuffle an array a of n elements (indices 1..n):
-      --    for i from n down to 2 do
-      --         j = random integer with i <= j <= i
-      --         exchange a[j] and a[i]
       --  L323
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features < Positive (Max_Features) or

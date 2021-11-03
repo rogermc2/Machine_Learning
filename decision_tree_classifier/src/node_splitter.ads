@@ -35,7 +35,7 @@ package Node_Splitter is
       --  encoded version of sample Y
       Y                    : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight        : Weights.Weight_List;
-      Node_Impurity        : Float;
+      Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
       End_Row              : Positive := 1;
       --  BaseDenseSplitter elements
