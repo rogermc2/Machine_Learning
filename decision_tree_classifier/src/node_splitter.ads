@@ -35,7 +35,7 @@ package Node_Splitter is
       --  encoded version of sample Y
       Y                    : Classifier_Types.List_Of_Natural_Lists;
       Sample_Weight        : Weights.Weight_List;
-      Node_Impurity        : Float;
+      Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
       End_Row              : Positive := 1;
       --  BaseDenseSplitter elements
@@ -55,7 +55,8 @@ package Node_Splitter is
                    Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
                    Sample_Weight    : Weights.Weight_List;
                    Min_Leaf_Samples : Positive := 1);
-   function Node_Impurity (Self : Splitter_Class) return Float;
+   function Entropy_Node_Impurity (Self : Splitter_Class) return Float;
+   function Gini_Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self   : Splitter_Class;
                          Values : out Weights.Weight_Lists_2D);
    procedure Reset_Node

@@ -1,12 +1,17 @@
 
 with Ada.Numerics;
+with Ada.Numerics.Discrete_Random;
 with Ada.Numerics.Float_Random;
 
 package body Maths is
+   package Random_Integer_Package is new 
+     Ada.Numerics.Discrete_Random (Random_Integer_Range);
+   
    Radians_Per_Degree : constant Radian := Ada.Numerics.Pi / 180.0;
    Degrees_Per_Radian : constant Degree := 180.0 / Ada.Numerics.Pi;
 
-   Gen     : Ada.Numerics.Float_Random.Generator;
+   Float_Gen           : Ada.Numerics.Float_Random.Generator;
+   Integer_Gen         : Random_Integer_Package.Generator;
 
    --  ------------------------------------------------------------------------
 
@@ -34,14 +39,15 @@ package body Maths is
    function Random_Float return Float is
       use Ada.Numerics.Float_Random;
    begin
-      return 2.0 * Float (Random (Gen)) - 1.0;
+      return 2.0 * Float (Random (Float_Gen)) - 1.0;
    end Random_Float;
 
    --  ------------------------------------------------------------------------
 
    function Random_Integer return Integer is
+      use Random_Integer_Package;
    begin
-      return Integer (Random_Float);
+      return Integer (Random (Integer_Gen));
    end Random_Integer;
 
    --  ------------------------------------------------------------------------

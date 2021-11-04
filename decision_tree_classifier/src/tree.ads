@@ -44,7 +44,7 @@ package Tree is
       Samples_Start             : Positive := 1;
       Depth                     : Positive := 1;
       Is_Left                   : Boolean := True;
-      Num_Constant_Features     : Integer := 0;
+      Num_Constant_Features     : Natural := 0;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct

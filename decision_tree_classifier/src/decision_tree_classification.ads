@@ -1,5 +1,5 @@
 
---  Based on scikit-learn/sklearn/tree tree _classes.py
+--  Based on scikit-learn/sklearn/tree _classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 --  Decision Trees (DTs) are a non-parametric supervised learning method used
 --  for classification and regression.
@@ -27,7 +27,7 @@ with Criterion;
 with Node_Splitter;
 with Weights;
 
-package Decision_Tree_Classifer is
+package Decision_Tree_Classification is
    --  Gini Impurity is a measurement of the likelihood of an incorrect
    --  classification of a new instance of a random variable.
    --     type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
@@ -39,6 +39,8 @@ package Decision_Tree_Classifer is
    package UB_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
    subtype Unbounded_List is UB_Package.Vector;
+
+   --  type Decision_Tree_Classifer see Base_Decision_Tree
 
    type Split_Record (Split_Type : Tree.Data_Type) is record
       --  The minimum number of samples required to split an internal node.
@@ -90,4 +92,4 @@ package Decision_Tree_Classifer is
                                  X    : ML_Types.Value_Data_Lists_2D)
                                  return Weights.Weight_Lists_3D;
 
-end Decision_Tree_Classifer;
+end Decision_Tree_Classification;
