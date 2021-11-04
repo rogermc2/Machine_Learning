@@ -65,7 +65,7 @@ package body Base_Decision_Tree is
           Num_Classes.Append (Positive (Classes.Element (index).Length));
       end loop;
 
-      Criterion.C_Init (Criteria, Tree.Index_Range (Y_Encoded.Length),
+      Criterion.C_Init (Criteria, Tree.Index_Range (Y.Element (1).Length),
                         Num_Classes);
       --  L163
       Node_Splitter.C_Init (Splitter, Criteria);

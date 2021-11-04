@@ -66,8 +66,8 @@ package body Criterion is
          Criteria.Sum_Total.Append (Sum_Total_K);
       end loop;
 
-      Put_Line ("Criterion.Classification_Init Start_Row, End_Row " &
-                  Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
+--        Put_Line ("Criterion.Classification_Init Start_Row, End_Row " &
+--                    Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       --  L329
       for p in Start_Row .. End_Row loop
          Y_I_Index := Sample_Indices.Element (p);
@@ -103,8 +103,6 @@ package body Criterion is
          Criteria.Sum_Total);
 
       Reset (Criteria);
-
-      Put_Line ("Criterion.Classification_Init done");
 
    end Classification_Init;
 
@@ -165,42 +163,26 @@ package body Criterion is
       Sq_Count      : Float := 0.0;
    begin
       --  L620
-      Put_Line ("Criterion.Gini_Node_Impurity L620");
       Printing.Print_Weights_Lists_2D
         ("Criterion.Gini_Node_Impurity Sum_Total", Criteria.Sum_Total);
       for index_k in 1 .. Criteria.Num_Outputs loop
-         Put_Line ("Criterion.Gini_Node_Impurity index_k" &
-                     Integer'Image (Integer (index_k)));
          Sq_Count := 0.0;
-         Put_Line ("Criterion.Gini_Node_Impurity, Num_Classes length" &
-                     Integer'Image (Integer (Num_Classes.Length)));
          Classes_K := Num_Classes.Element (Integer (index_k));
-         Put_Line ("Criterion.Gini_Node_Impurity, Classes_K" &
-                     Integer'Image (Classes_K));
          Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
-         Printing.Print_Weights
-           ("Criterion.Gini_Node_Impurity Sum_Total_K", Sum_Total_K);
+--           Printing.Print_Weights
+--             ("Criterion.Gini_Node_Impurity Sum_Total_K", Sum_Total_K);
          for class_index in 1 .. Classes_K loop
-            Put_Line ("Criterion.Gini_Node_Impurity, Class_Index" &
-                        Integer'Image (class_index));
             Count_K := Float (Sum_Total_K.Element (class_index));
-            Put_Line ("Criterion.Gini_Node_Impurity Count_K" &
-                        Float'Image (Count_K));
          end loop;
-         Put_Line ("Criterion.Gini_Node_Impurity inner loop done");
          Sq_Count := Sq_Count + Count_K ** 2;
-         Put_Line ("Criterion.Gini_Node_Impurity Sq_Count, Num_Weighted_Node_Samples" &
-                     Float'Image (Sq_Count) & ", " &
-                     Float'Image (Criteria.Num_Weighted_Node_Samples));
+--           Put_Line ("Criterion.Gini_Node_Impurity Sq_Count, Num_Weighted_Node_Samples" &
+--                       Float'Image (Sq_Count) & ", " &
+--                       Float'Image (Criteria.Num_Weighted_Node_Samples));
 
          Gini := Gini +
            1.0 - Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
-         Put_Line ("Criterion.Gini_Node_Impurity Gini" &
-                     Float'Image (Gini));
       end loop;
-      Put_Line ("Criterion.Gini_Node_Impurity loop done");
-      Put_Line ("Criterion.Gini_Node_Impurity Gini, Num_Outputs" &
-                  Float'Image (Gini) & ", " & Integer'Image (Num_Outputs));
+--        Put_Line ("Criterion.Gini_Node_Impurity Gini" & Float'Image (Gini));
 
       return Gini / Float (Num_Outputs);
 
