@@ -40,10 +40,7 @@ package Decision_Tree_Classification is
      (Positive, Unbounded_String);
    subtype Unbounded_List is UB_Package.Vector;
 
-   type Decision_Tree_Classifer is record
-      Criteria   : Criterion.Criterion_CLF := Criterion.Criterion_Gini;
-
-   end record;
+   --  type Decision_Tree_Classifer see Base_Decision_Tree
 
    type Split_Record (Split_Type : Tree.Data_Type) is record
       --  The minimum number of samples required to split an internal node.

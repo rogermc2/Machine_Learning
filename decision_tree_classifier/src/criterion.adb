@@ -149,8 +149,7 @@ package body Criterion is
    --  ------------------------------------------------------------------------
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
    --   of the current node
-   function Gini_Node_Impurity (Criteria : in out Criterion_Class)
-                                return Float is
+   function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
       Num_Outputs   : constant Positive := Positive (Criteria.Y.Length);
       Sum_Total_K   : Weights.Weight_List;
       Count_K       : Float;

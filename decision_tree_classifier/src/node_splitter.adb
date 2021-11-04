@@ -105,9 +105,9 @@ package body Node_Splitter is
       --  L377 Evaluate all splits
       --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L382 Start_Row, End_Row " &
       --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
---        Printing.Print_Value_Data_List
---          ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
---           Self.Feature_Values);
+      --        Printing.Print_Value_Data_List
+      --          ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
+      --           Self.Feature_Values);
       --  L384 Reset the criterion to pos = start
       Criterion.Reset (Self.Criteria);
       P_Index := Self.Start_Row;
@@ -382,10 +382,17 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   function Node_Impurity (Self : Splitter_Class) return Float is
+   function Entropy_Node_Impurity (Self : Splitter_Class) return Float is
    begin
       return Criterion.Entropy_Node_Impurity (Self.Criteria);
-   end Node_Impurity;
+   end Entropy_Node_Impurity;
+
+   --  -------------------------------------------------------------------------
+
+   function Gini_Node_Impurity (Self : Splitter_Class) return Float is
+   begin
+      return Criterion.Gini_Node_Impurity (Self.Criteria);
+   end Gini_Node_Impurity;
 
    --  -------------------------------------------------------------------------
 

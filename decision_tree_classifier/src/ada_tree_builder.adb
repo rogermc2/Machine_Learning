@@ -70,7 +70,7 @@ package body Ada_Tree_Builder is
       --                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       --  L216 Calculate Node Impurity
       if First then
-         Impurity := Node_Impurity (Builder.Splitter);
+         Impurity := Gini_Node_Impurity (Builder.Splitter);
          First := False;
          Put_Line ("Ada_Tree_Builder.Add_Branch First Impurity: " &
                      Float'Image (Impurity));
