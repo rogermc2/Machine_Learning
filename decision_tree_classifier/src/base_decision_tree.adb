@@ -40,6 +40,7 @@ package body Base_Decision_Tree is
       Splitter              : Node_Splitter.Splitter_Class;
       Y_Encoded             : Classifier_Types.List_Of_Natural_Lists;
       Classes               : ML_Types.Value_Data_Lists_2D;
+      Num_Classes           : Classifier_Types.Natural_List;
       --  L205
       Expanded_Class_Weight : Weights.Weight_List;
       Sum_Sample_Weight     : Float := 0.0;
@@ -60,7 +61,12 @@ package body Base_Decision_Tree is
                               Classes, Expanded_Class_Weight);
       end if;
 
-      Criterion.C_Init (Criteria, Tree.Index_Range (Y_Encoded.Length), Classes);
+      for index in Classes.First_Index .. Classes.Last_Index loop
+          Num_Classes.Append (Positive (Classes.Element (index).Length));
+      end loop;
+
+      Criterion.C_Init (Criteria, Tree.Index_Range (Y_Encoded.Length),
+                        Num_Classes);
       --  L163
       Node_Splitter.C_Init (Splitter, Criteria);
       C_Init (aClassifier, Criteria, Splitter, Max_Depth => Max_Depth);

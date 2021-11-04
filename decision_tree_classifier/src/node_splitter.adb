@@ -2,7 +2,7 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -540,6 +540,7 @@ package body Node_Splitter is
          Start_Row, End_Row);
 
       Weighted_Node_Samples := Splitter.Criteria.Num_Weighted_Node_Samples;
+      Put_Line ("Node_Splitter.Reset_Node done");
 
    end Reset_Node;
 

@@ -69,6 +69,7 @@ package body Ada_Tree_Builder is
       --              Put_Line ("Ada_Tree_Builder.Add_Branch Reset_Node Start_Row, End_Row: "
       --                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       --  L216 Calculate Node Impurity
+      Put_Line ("Ada_Tree_Builder.Add_Branch L216");
       if First then
          Impurity := Gini_Node_Impurity (Builder.Splitter);
          First := False;
