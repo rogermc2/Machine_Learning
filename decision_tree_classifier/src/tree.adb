@@ -64,7 +64,8 @@ package body Tree is
 --                    Boolean'Image (Element (First_Child (Node_Cursor)).Leaf_Node));
          --  Find a node with a leaf child.
          --  This node has the prediction value.
-         while not Element (First_Child (Node_Cursor)).Leaf_Node loop
+--           while not Element (First_Child (Node_Cursor)).Leaf_Node loop
+         while not Element (Node_Cursor).Leaf_Node loop
             Node := Element (Node_Cursor);
 --              Put_Line ("Tree.Apply_Dense Node.Node_ID" &
 --                          Integer'Image (Node.Node_ID));
@@ -97,7 +98,7 @@ package body Tree is
    end Apply_Dense;
 
    --  ------------------------------------------------------------------------
-   --  _tree L758
+   --  _tree L774
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return Weights.Weight_Lists_3D is
@@ -109,6 +110,7 @@ package body Tree is
       Node            : Tree_Node;
       Out_Data        : Weight_Lists_3D;
    begin
+      Printing.Print_Value_Data_Lists_2D ("Tree.Predict, X ", X);
       --  L760;
       Selected_Nodes := Apply (Self, X);
       Printing.Print_Weight_Lists_3D ("Tree.Predict, Self.Values", Self.Values);
@@ -120,6 +122,7 @@ package body Tree is
          Out_Data.Append (Self.Values.Element (Node.Node_ID));
       end loop;
 
+      Printing.Print_Weight_Lists_3D ("Tree.Predict, Out_Data", Out_Data);
       return Out_Data;
 
    end Predict;
