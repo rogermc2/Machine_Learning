@@ -37,7 +37,7 @@ package Tree is
    type Tree_Node (Leaf_Node : Boolean := False) is record
       Node_ID                   : Positive;
       --  from _Tree Node struct
-      Impurity                  : Float := Float'Large;
+      Impurity                  : Float := Float'Last;
       Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
       --  From Tree/Utils StackRecord struct

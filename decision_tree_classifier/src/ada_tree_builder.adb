@@ -59,15 +59,10 @@ package body Ada_Tree_Builder is
    begin
       Assert (not Parent_Node.Leaf_Node,
               "Ada_Tree_Builder.Add_Branch called on a leaf node");
-      --           Put_Line ("Ada_Tree_Builder.Add_Branch entry, Start_Row, End_Row, Num_Node_Samples: "
-      --                     & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row)  &
-      --                       ", " & Integer'Image (Parent_Node.Num_Node_Samples));
+
       --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-      --              New_Line;
       Reset_Node (Builder.Splitter, Start_Row, End_Row, Weighted_Node_Samples);
-      --              Put_Line ("Ada_Tree_Builder.Add_Branch Reset_Node Start_Row, End_Row: "
-      --                        & Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       --  L216 Calculate Node Impurity
       if First then
          Impurity := Gini_Node_Impurity (Builder.Splitter);
@@ -104,9 +99,11 @@ package body Ada_Tree_Builder is
                    Integer'Image (End_Row));
 
          Is_Leaf_Node :=  Split_Row >= End_Row or
-           Split.Improvement + Epsilon <= Builder.Min_Impurity_Decrease;
-         Put_Line ("Ada_Tree_Builder.Add_Branch L228 Is_Leaf_Node: " &
-                     Boolean'Image (Is_Leaf_Node));
+           Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
+         Put_Line ("Ada_Tree_Builder.Add_Branch L228 Split_Row >= End_Row: " &
+                     Boolean'Image (Split_Row >= End_Row));
+         Put_Line ("Ada_Tree_Builder.Add_Branch L228 Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease: " &
+                     Boolean'Image (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
 
          --  L228  _tree.add_node just generates a new initialized node
          --        right and left children are added to the tree (stack) at

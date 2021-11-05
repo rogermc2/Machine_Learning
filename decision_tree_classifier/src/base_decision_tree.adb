@@ -364,8 +364,6 @@ package body Base_Decision_Tree is
             end loop;
             Nodes_2K.Append (Samples_2K);
          end loop;
-         Printing.Print_Weights_Lists_2D ("Base_Decision_Tree.Predict, Nodes_2K",
-                                          Nodes_2K);
 
          --  for each node get the index of the sample with the highest value
          Max_Indices.Clear;
