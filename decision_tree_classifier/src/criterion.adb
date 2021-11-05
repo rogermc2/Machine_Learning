@@ -2,12 +2,12 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with ML_Types;
-with Printing;
+--  with Printing;
 
 package body Criterion is
 
@@ -58,16 +58,12 @@ package body Criterion is
       --  L325
       for row in 1 .. Num_Outputs loop
          Sum_Total_K.Clear;
-         --              for c in Criteria.Classes.Element (row).First_Index ..
-         --                Criteria.Classes.Element (row).Last_Index loop
          for c in 1 .. Criteria.Num_Classes.Element (row) loop
             Sum_Total_K.Append (0.0);
          end loop;
          Criteria.Sum_Total.Append (Sum_Total_K);
       end loop;
 
---        Put_Line ("Criterion.Classification_Init Start_Row, End_Row " &
---                    Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       --  L329
       for p in Start_Row .. End_Row loop
          Y_I_Index := Sample_Indices.Element (p);
@@ -84,8 +80,6 @@ package body Criterion is
             Sum_Total_K := Criteria.Sum_Total.Element (k);
             --  Y_Ik is an index into Y (output k) classes
             Y_Ik := Y_I.Element (k);
-            --              Put_Line ("Criterion.Classification_Init p, Y_Ik " &
-            --                          Integer'Image (p) & ", " & Integer'Image (Y_Ik));
             --  L339 c = Y_Ik
             --  sum_total[k * self.sum_stride + c] += w
             --  Add Weight to Y (output k, class Y_Ik)
@@ -97,10 +91,6 @@ package body Criterion is
          Criteria.Num_Weighted_Node_Samples :=
            Criteria.Num_Weighted_Node_Samples + Weight;
       end loop;
-
-      Printing.Print_Weights_Lists_2D
-        ("Criterion.Classification_Init Sum_Total of each class",
-         Criteria.Sum_Total);
 
       Reset (Criteria);
 
@@ -171,8 +161,6 @@ package body Criterion is
       Sq_Count      : Float := 0.0;
    begin
       --  L620
-      Printing.Print_Weights_Lists_2D
-        ("Criterion.Gini_Node_Impurity Sum_Total", Criteria.Sum_Total);
       for index_k in 1 .. Criteria.Num_Outputs loop
          Sq_Count := 0.0;
          Num_Classes_K := Num_Classes.Element (Integer (index_k));
@@ -183,15 +171,9 @@ package body Criterion is
             Sq_Count := Sq_Count + Count_K ** 2;
          end loop;
 
---           Put_Line ("Criterion.Gini_Node_Impurity Sq_Count, Num_Weighted_Node_Samples" &
---                       Float'Image (Sq_Count) & ", " &
---                       Float'Image (Criteria.Num_Weighted_Node_Samples));
-
          Gini := Gini + 1.0 -
            Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
       end loop;
-      Put_Line ("Criterion.Gini_Node_Impurity Gini" &
-                  Float'Image (Gini / Float (Num_Outputs)));
 
       return Gini / Float (Num_Outputs);
 
@@ -215,24 +197,15 @@ package body Criterion is
       --  k in range(self.n_outputs)
       for index_k in Self.Y.Element (1).First_Index
         .. Self.Y.Element (1).Last_Index loop
-         Put_Line ("Criterion.Entropy_Node_Impurity, index_k" &
-                     Integer'Image (index_k));
-         --              Class_List := Self.Classes.Element (index_k);
          Sum_Total_K := Self.Sum_Total.Element (index_k);
          for c in Class_List.First_Index .. Class_List.Last_Index loop
             Count_K := Sum_Total_K.Element (c);
             if Count_K > 0.0 then
-               Put_Line ("Criterion.Entropy_Node_Impurity, Num_Weighted_Node_Samples" &
-                           Float'Image (Self.Num_Weighted_Node_Samples));
                Count_K := Count_K / Self.Num_Weighted_Node_Samples;
-               Put_Line ("Criterion.Entropy_Node_Impurity, Count_K" &
-                           Float'Image (Count_K));
                Entropy := Entropy - Count_K * Log (Count_K);
             end if;
          end loop;
       end loop;
-      Put_Line ("Criterion.Entropy_Node_Impurity, Entropy" &
-                  Float'Image (Entropy / Float (Self.Sum_Total.Length)));
 
       return Entropy / Float (Self.Sum_Total.Length);
 

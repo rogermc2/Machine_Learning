@@ -40,7 +40,7 @@ package body Ada_Tree_Builder is
       Split                       : Split_Record;
       --  Parent_Node corresponds to popped stack_record?
       --  L199
-      Parent_Node                 : Tree.Tree_Node := Element (Parent_Cursor);
+      Parent_Node                 : constant Tree.Tree_Node := Element (Parent_Cursor);
       Start_Row                   : constant Positive := Parent_Node.Samples_Start;
       End_Row                     : constant Positive :=
                                       Start_Row + Parent_Node.Num_Node_Samples - 1;
@@ -72,12 +72,13 @@ package body Ada_Tree_Builder is
       if First then
          Impurity := Gini_Node_Impurity (Builder.Splitter);
          First := False;
-         Put_Line ("Ada_Tree_Builder.Add_Branch First Impurity: " &
-                     Float'Image (Impurity));
       else
          Impurity := Parent_Node.Impurity;
-         Put_Line ("Ada_Tree_Builder.Add_Branch Impurity: " & Float'Image (Impurity));
       end if;
+      Put_Line ("Ada_Tree_Builder.Add_Branch Impurity: " &
+                  Float'Image (Impurity));
+      Put_Line ("Ada_Tree_Builder.Add_Branch Parent_Node Node_ID: " &
+                     Integer'Image (Parent_Node.Node_ID));
 
       --  L207
       Is_Leaf_Node := Depth >= Builder.Max_Depth or
@@ -88,11 +89,10 @@ package body Ada_Tree_Builder is
         --  if Impurity == 0.0 with tolerance for rounding errors
       abs (Impurity) <= Epsilon;
 
+      Put_Line ("Ada_Tree_Builder.Add_Branch Is_Leaf_Node: " &
+                  Boolean'Image (Is_Leaf_Node));
       --  L222
-      if Is_Leaf_Node then
-         Tree_Build.Change_To_Leaf_Node (theTree, Parent_Cursor);
-         Parent_Node := Element (Parent_Cursor);
-      else  --  L222 not leaf
+      if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
          Split_Row := Split.Split_Row;
@@ -120,6 +120,8 @@ package body Ada_Tree_Builder is
             Split_Row - 1, Weighted_Node_Samples);
          --  L241 Node.Values already added by Tree_Build.Add_Node
          Node_ID := Element (Left_Child_Cursor).Node_ID;
+         Put_Line ("Ada_Tree_Builder.Add_Branch left Node_ID: " &
+                     Integer'Image (Node_ID));
          Node_Splitter.Node_Value (Builder.Splitter, Values);
 
          if Integer (theTree.Values.Length) < Node_ID then
@@ -141,6 +143,8 @@ package body Ada_Tree_Builder is
             Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Split_Row,
             End_Row, Weighted_Node_Samples);
          Node_ID := Element (Right_Child_Cursor).Node_ID;
+         Put_Line ("Ada_Tree_Builder.Add_Branch right Node_ID: " &
+                     Integer'Image (Node_ID));
          Node_Splitter.Node_Value (Builder.Splitter, Values);
 
          if Integer (theTree.Values.Length) < Node_ID then
@@ -196,6 +200,8 @@ package body Ada_Tree_Builder is
          Impurity, 0.0, 1, Positive (Y_Encoded.Length),
          Splitter.Weighted_Samples);
       Add_Branch (theTree, Builder, Top_Node_Cursor);
+      Put_Line ("Ada_Tree_Builder.Build_Tree tree built");
+      New_Line;
 
    end Build_Tree;
 
