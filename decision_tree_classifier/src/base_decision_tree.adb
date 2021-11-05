@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/_classes.py
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -45,15 +46,10 @@ package body Base_Decision_Tree is
       Expanded_Class_Weight : Weights.Weight_List;
       Sum_Sample_Weight     : Float := 0.0;
    begin
-      if Integer (X.Length) < 1 then
-         raise Value_Error with
-           "Base_Decision_Tree.Base_Fit, X is empty";
-      end if;
-
-      if Integer (Y.Length) < 1 then
-         raise Value_Error with
-           "Base_Decision_Tree.Base_Fit, Y is empty";
-      end if;
+      Assert (not X.Is_Empty,
+           "Base_Decision_Tree.Base_Fit, X is empty");
+      Assert (not Y.Is_Empty,
+           "Base_Decision_Tree.Base_Fit, Y is empty");
 
       --  L207  Generates Y_Encoded and Classes
       if aClassifier.Estimator_Kind = Classifier_Estimator then
@@ -103,9 +99,9 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
-      Printing.Print_Value_Data_Lists_2D
-        ("Base_Decision_Tree.Base_Fit, Classes",
-         aClassifier.Attributes.Decision_Tree.Classes);
+--        Printing.Print_Value_Data_Lists_2D
+--          ("Base_Decision_Tree.Base_Fit, Classes",
+--           aClassifier.Attributes.Decision_Tree.Classes);
 
       --  L410
       Ada_Tree_Builder.Build_Tree

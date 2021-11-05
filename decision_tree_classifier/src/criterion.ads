@@ -35,7 +35,6 @@ package Criterion is
        Proxy_Improvement         : Float := -Float'Last;
        case Criterion_Type is
            when Criterion_Classification =>
---                 Classes           : ML_Types.Value_Data_Lists_2D;
                Num_Classes       : Classifier_Types.Natural_List;
            when Criterion_Regression =>
                Sq_Sum_Total      : Float := 0.0;

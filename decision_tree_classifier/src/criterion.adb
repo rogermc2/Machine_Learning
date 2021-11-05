@@ -151,13 +151,21 @@ package body Criterion is
 
    --  ------------------------------------------------------------------------
    --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
-   --   of the current node
+   --  of the current node.
+   --  Gini_Node_Impurity handles cases where the target is a classification
+   --  taking values 0, 1, ... K-2, K-1.
+   --  If node m represents a region Rm with Nm observations then:
+   --  Let count_k = 1/ Nm \ sum_{x_i in Rm} I(yi = k)
+   --  be the proportion of class k observations in node m.
+   --  The Gini Index is then defined as:
+   --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
+   --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
    function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
       Num_Outputs   : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes   : constant Classifier_Types.Natural_List :=
                         Criteria.Num_Classes;
       Sum_Total_K   : Weights.Weight_List;
-      Classes_K     : Positive;
+      Num_Classes_K  : Positive;
       Count_K       : Float;
       Gini          : Float := 0.0;
       Sq_Count      : Float := 0.0;
@@ -167,22 +175,23 @@ package body Criterion is
         ("Criterion.Gini_Node_Impurity Sum_Total", Criteria.Sum_Total);
       for index_k in 1 .. Criteria.Num_Outputs loop
          Sq_Count := 0.0;
-         Classes_K := Num_Classes.Element (Integer (index_k));
+         Num_Classes_K := Num_Classes.Element (Integer (index_k));
          Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
---           Printing.Print_Weights
---             ("Criterion.Gini_Node_Impurity Sum_Total_K", Sum_Total_K);
-         for class_index in 1 .. Classes_K loop
+
+         for class_index in 1 .. Num_Classes_K loop
             Count_K := Float (Sum_Total_K.Element (class_index));
+            Sq_Count := Sq_Count + Count_K ** 2;
          end loop;
-         Sq_Count := Sq_Count + Count_K ** 2;
+
 --           Put_Line ("Criterion.Gini_Node_Impurity Sq_Count, Num_Weighted_Node_Samples" &
 --                       Float'Image (Sq_Count) & ", " &
 --                       Float'Image (Criteria.Num_Weighted_Node_Samples));
 
-         Gini := Gini +
-           1.0 - Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
+         Gini := Gini + 1.0 -
+           Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
       end loop;
---        Put_Line ("Criterion.Gini_Node_Impurity Gini" & Float'Image (Gini));
+      Put_Line ("Criterion.Gini_Node_Impurity Gini" &
+                  Float'Image (Gini / Float (Num_Outputs)));
 
       return Gini / Float (Num_Outputs);
 
