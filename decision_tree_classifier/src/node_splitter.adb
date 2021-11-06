@@ -32,7 +32,7 @@ package body Node_Splitter is
     procedure C_Init (Self             : in out Splitter_Class;
                       Criteria         : Criterion.Criterion_Class;
                       Max_Features     : Tree.Index_Range := 1;
-                      Min_Leaf_Samples : Positive := 1;
+                      Min_Leaf_Samples : Integer := 0;
                       Min_Leaf_Weight  : Float := 0.0) is
     begin
         Self.Criteria := Criteria;
@@ -103,9 +103,6 @@ package body Node_Splitter is
         LE                        : Boolean;
         Best_Updated              : Boolean := False;
     begin
-        Best := Current;
-        Printing.Print_Split_Record
-          ("Node_Splitter.Evaluate_All_Splits initialized Best", Best);
         Put_Line ("Node_Splitter.Evaluate_All_Splits Start, Stop" &
                     Integer'Image (Self.Start_Row) & ", " &
                     Integer'Image (Self.End_Row));
@@ -121,9 +118,8 @@ package body Node_Splitter is
         --  P_Index: Self.Start_Index through Self.End_Index
         --  L381
         while P_Index < Self.End_Row loop
-
-            Put_Line ("Node_Splitter.Evaluate_All_Splits L382 P_Index: "
-                      & Integer'Image (P_Index));
+--              Put_Line ("Node_Splitter.Evaluate_All_Splits L382 P_Index: "
+--                        & Integer'Image (P_Index));
             --  L382
             LE := True;
             while P_Index + 1 < Self.End_Row and LE loop
@@ -167,29 +163,29 @@ package body Node_Splitter is
                     end if;
                 end case;
                 P_Index := P_Index + 1;
-                Put_Line ("Node_Splitter.Evaluate_All_Splits L384 P_Index: " &
-                            Integer'Image (P_Index));
+--                  Put_Line ("Node_Splitter.Evaluate_All_Splits L384 P_Index: " &
+--                              Integer'Image (P_Index));
             end loop; --  P1_Index
 
             --  L388
             P_Index := P_Index + 1;
-            Put_Line ("Node_Splitter.Evaluate_All_Splits L388 P_Index: " &
-                        Integer'Image (P_Index));
+--              Put_Line ("Node_Splitter.Evaluate_All_Splits L388 P_Index: " &
+--                          Integer'Image (P_Index));
             --  L395
             if P_Index <= Self.End_Row then
                 Current.Split_Row := P_Index;
-                Put_Line ("Node_Splitter.Evaluate_All_Splits L395 Split_Row: " &
-                            Integer'Image (Current.Split_Row));
+                Put_Line ("Node_Splitter.Evaluate_All_Splits L395 Start_Row, Split_Row, End_Row: " &
+                            Integer'Image (Self.Start_Row) & ", " &
+                            Integer'Image (Current.Split_Row) & ", " &
+                            Integer'Image (Self.End_Row));
                 --  Best.Pos_I is the start index of the right node's data
                 --  L398 Accept if min_samples_leaf is guaranteed
-                Put_Line ("Node_Splitter.Evaluate_All_Splits L398 Min_Leaf_Samples: " &
-                            Integer'Image (Self.Min_Leaf_Samples));
                 if Current.Split_Row - Self.Start_Row >= Self.Min_Leaf_Samples and
-                  Self.End_Row - Current.Split_Row >= Self.Min_Leaf_Samples then
+                  Self.End_Row - Current.Split_Row + 1 >= Self.Min_Leaf_Samples then
                     --  L400
                     Criterion.Update (Self.Criteria, Current.Split_Row);
-                    Put_Line ("Node_Splitter.Evaluate_All_Splits L400 Split_Row: "
-                                 & Integer'Image (Current.Split_Row));
+--                      Put_Line ("Node_Splitter.Evaluate_All_Splits L400 Split_Row: "
+--                                   & Integer'Image (Current.Split_Row));
 
                     --  L402 Accept if min_weight_leaf is satisfied
                     if Self.Criteria.Num_Weighted_Left >= Self.Min_Leaf_Weight and
@@ -249,20 +245,17 @@ package body Node_Splitter is
                             end case;
 
                             --  L419
-                            Put_Line
-                              ("Node_Splitter.Evaluate_All_Splits L419 Split_Row: "
-                                   & Integer'Image (Current.Split_Row));
                             Best := Current;
                             Best_Updated := True;
                         end if;
                     end if;
                 end if;
-                Put_Line ("Node_Splitter.Evaluate_All_Splits L420 Split_Row: " &
-                            Integer'Image (Current.Split_Row));
+--                  Put_Line ("Node_Splitter.Evaluate_All_Splits L420 Split_Row: " &
+--                              Integer'Image (Current.Split_Row));
             end if;
         end loop;
         Printing.Print_Split_Record
-          ("Node_Splitter.Evaluate_All_Splits after 2nd loop Best", Best);
+          ("Node_Splitter.Evaluate_All_Splits final Best", Best);
         if not Best_Updated then
             Put_Line
               ("Node_Splitter.Evaluate_All_Splits, " &

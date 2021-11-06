@@ -48,7 +48,7 @@ package Node_Splitter is
     procedure C_Init (Self          : in out Splitter_Class;
                       Criteria      : Criterion.Criterion_Class;
                       Max_Features  : Tree.Index_Range := 1;
-                      Min_Leaf_Samples : Positive := 1;
+                      Min_Leaf_Samples : Integer := 0;
                       Min_Leaf_Weight : Float := 0.0);
    procedure Init (Self             : in out Splitter_Class;
                    Input_X          : ML_Types.Value_Data_Lists_2D;
