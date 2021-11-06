@@ -106,9 +106,10 @@ package body Node_Splitter is
         Best := Current;
         Printing.Print_Split_Record
           ("Node_Splitter.Evaluate_All_Splits initialized Best", Best);
+        Put_Line ("Node_Splitter.Evaluate_All_Splits Start, Stop" &
+                    Integer'Image (Self.Start_Row) & ", " &
+                    Integer'Image (Self.End_Row));
         --  L380 Evaluate all splits
-        --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L382 Start_Row, End_Row " &
-        --                                  Integer'Image (Start_Row) & Integer'Image (End_Row));
         Printing.Print_Value_Data_List
           ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
            Self.Feature_Values);
@@ -120,10 +121,14 @@ package body Node_Splitter is
         --  P_Index: Self.Start_Index through Self.End_Index
         --  L381
         while P_Index < Self.End_Row loop
-            Put_Line ("Node_Splitter.Evaluate_All_Splits P_Index: " &
-                        Integer'Image (P_Index));
+
+            Put_Line ("Node_Splitter.Evaluate_All_Splits L382 P_Index: "
+                      & Integer'Image (P_Index));
+            --  L382
             LE := True;
-            case Features_X.Element (P_Index + 1).Value_Kind is
+            while P_Index + 1 < Self.End_Row and LE loop
+                --  L383
+                case Features_X.Element (P_Index + 1).Value_Kind is
                 when Boolean_Type =>
                     --  if current X value is false and next X value is true
                     --  increment X index
@@ -150,9 +155,6 @@ package body Node_Splitter is
                       Features_X.Element (P_Index).Integer_Value;
                     if LE then
                         P_Index := P_Index + 1;
-                        Put_Line
-                          ("Node_Splitter.Evaluate_All_Splits integer P_Index: "
-                           & Integer'Image (P_Index));
                     end if;
 
                 when UB_String_Type =>
@@ -163,35 +165,40 @@ package body Node_Splitter is
                     if LE then
                         P_Index := P_Index + 1;
                     end if;
-            end case;
-
-            --  L382
-            while P_Index + 1 <= Self.End_Row and LE loop
-                --  L384
+                end case;
                 P_Index := P_Index + 1;
+                Put_Line ("Node_Splitter.Evaluate_All_Splits L384 P_Index: " &
+                            Integer'Image (P_Index));
             end loop; --  P1_Index
 
             --  L388
             P_Index := P_Index + 1;
-            Put_Line ("Node_Splitter.Evaluate_All_Splits L393 P_Index: " &
+            Put_Line ("Node_Splitter.Evaluate_All_Splits L388 P_Index: " &
                         Integer'Image (P_Index));
             --  L395
             if P_Index <= Self.End_Row then
                 Current.Split_Row := P_Index;
+                Put_Line ("Node_Splitter.Evaluate_All_Splits L395 Split_Row: " &
+                            Integer'Image (Current.Split_Row));
                 --  Best.Pos_I is the start index of the right node's data
                 --  L398 Accept if min_samples_leaf is guaranteed
+                Put_Line ("Node_Splitter.Evaluate_All_Splits L398 Min_Leaf_Samples: " &
+                            Integer'Image (Self.Min_Leaf_Samples));
                 if Current.Split_Row - Self.Start_Row >= Self.Min_Leaf_Samples and
                   Self.End_Row - Current.Split_Row >= Self.Min_Leaf_Samples then
                     --  L400
                     Criterion.Update (Self.Criteria, Current.Split_Row);
+                    Put_Line ("Node_Splitter.Evaluate_All_Splits L400 Split_Row: "
+                                 & Integer'Image (Current.Split_Row));
 
                     --  L402 Accept if min_weight_leaf is satisfied
                     if Self.Criteria.Num_Weighted_Left >= Self.Min_Leaf_Weight and
                       Self.Criteria.Num_Weighted_Right >= Self.Min_Leaf_Weight then
+                        --  L409  Note: Improvements are negative values.
                         Current_Proxy_Improvement :=
                           Criterion.Proxy_Impurity_Improvement (Self.Criteria);
-                        --  L409  Note: Improvements are negative values.
-                        --                          Put_Line ("Node_Splitter.Find_Best_Split L412");
+                        Put_Line ("Node_Splitter.Evaluate_All_Splits L409 Current_Proxy_Improvement: "
+                             & Float'Image (Current_Proxy_Improvement));
                         if Current_Proxy_Improvement > Best_Proxy_Improvement then
                             Best_Proxy_Improvement := Current_Proxy_Improvement;
                             --  L414
@@ -242,11 +249,16 @@ package body Node_Splitter is
                             end case;
 
                             --  L419
+                            Put_Line
+                              ("Node_Splitter.Evaluate_All_Splits L419 Split_Row: "
+                                   & Integer'Image (Current.Split_Row));
                             Best := Current;
                             Best_Updated := True;
                         end if;
                     end if;
                 end if;
+                Put_Line ("Node_Splitter.Evaluate_All_Splits L420 Split_Row: " &
+                            Integer'Image (Current.Split_Row));
             end if;
         end loop;
         Printing.Print_Split_Record
@@ -259,7 +271,7 @@ package body Node_Splitter is
 
         if Best.Split_Row <= Self.Start_Row then
             raise Node_Splitter_Error with
-              "Node_Splitter.Evaluate_All_Splits, final position" &
+              "Node_Splitter.Evaluate_All_Splits, split position" &
               Integer'Image (Best.Split_Row) &
               " should be greater than Start_Index" &
               Integer'Image (Self.Start_Row);
