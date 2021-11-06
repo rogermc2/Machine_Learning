@@ -103,13 +103,13 @@ package body Node_Splitter is
         LE                        : Boolean;
         Best_Updated              : Boolean := False;
     begin
-        Put_Line ("Node_Splitter.Evaluate_All_Splits Start, Stop" &
+        Put_Line ("Node_Splitter.Evaluate_All_Splits Start, Stop: " &
                     Integer'Image (Self.Start_Row) & ", " &
                     Integer'Image (Self.End_Row));
         --  L380 Evaluate all splits
-        Printing.Print_Value_Data_List
-          ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
-           Self.Feature_Values);
+--          Printing.Print_Value_Data_List
+--            ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
+--             Self.Feature_Values);
         --  L384 Reset the criterion to pos = start
         Criterion.Reset (Self.Criteria);
         P_Index := Self.Start_Row;
@@ -174,10 +174,10 @@ package body Node_Splitter is
             --  L395
             if P_Index <= Self.End_Row then
                 Current.Split_Row := P_Index;
-                Put_Line ("Node_Splitter.Evaluate_All_Splits L395 Start_Row, Split_Row, End_Row: " &
-                            Integer'Image (Self.Start_Row) & ", " &
-                            Integer'Image (Current.Split_Row) & ", " &
-                            Integer'Image (Self.End_Row));
+--                  Put_Line ("Node_Splitter.Evaluate_All_Splits L395 Start_Row, Split_Row, End_Row: " &
+--                              Integer'Image (Self.Start_Row) & ", " &
+--                              Integer'Image (Current.Split_Row) & ", " &
+--                              Integer'Image (Self.End_Row));
                 --  Best.Pos_I is the start index of the right node's data
                 --  L398 Accept if min_samples_leaf is guaranteed
                 if Current.Split_Row - Self.Start_Row >= Self.Min_Leaf_Samples and
@@ -193,8 +193,8 @@ package body Node_Splitter is
                         --  L409  Note: Improvements are negative values.
                         Current_Proxy_Improvement :=
                           Criterion.Proxy_Impurity_Improvement (Self.Criteria);
-                        Put_Line ("Node_Splitter.Evaluate_All_Splits L409 Current_Proxy_Improvement: "
-                             & Float'Image (Current_Proxy_Improvement));
+--                          Put_Line ("Node_Splitter.Evaluate_All_Splits L409 Current_Proxy_Improvement: "
+--                               & Float'Image (Current_Proxy_Improvement));
                         if Current_Proxy_Improvement > Best_Proxy_Improvement then
                             Best_Proxy_Improvement := Current_Proxy_Improvement;
                             --  L414
@@ -254,8 +254,7 @@ package body Node_Splitter is
 --                              Integer'Image (Current.Split_Row));
             end if;
         end loop;
-        Printing.Print_Split_Record
-          ("Node_Splitter.Evaluate_All_Splits final Best", Best);
+
         if not Best_Updated then
             Put_Line
               ("Node_Splitter.Evaluate_All_Splits, " &
@@ -319,10 +318,8 @@ package body Node_Splitter is
                 --  F_J is in the interval Num_ Total_Constants .. F_I
                 Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                          End_Row, F_I, F_J, Best_Split);
-                Put_Line ("Node_Splitter.Split_Node F_I, F_J: " &
-                            Integer'Image (F_I) & ", " & Integer'Image (F_J));
-                Printing.Print_Split_Record
-                  ("Node_Splitter.Split_Node Find_Best_Split from Process", Best_Split);
+--                  Put_Line ("Node_Splitter.Split_Node F_I, F_J: " &
+--                              Integer'Image (F_I) & ", " & Integer'Image (F_J));
             else --  L346
                 --  F_J is a constant in the interval
                 --  Num_Drawn_Constants ..  Num_Found_Constants
@@ -332,8 +329,6 @@ package body Node_Splitter is
                 Self.Feature_Indices.Replace_Element (F_J, Swap);
                 Num_Drawn_Constants := Num_Drawn_Constants + 1;
             end if;
-            Printing.Print_Split_Record
-              ("Node_Splitter.Split_Node Find_Best_Split end loop", Best_Split);
         end loop;  --  L430
 
     end Find_Best_Split;
@@ -459,8 +454,8 @@ package body Node_Splitter is
         --  L369  Self.Feature_Values is a value_data_list
         if Can_Split (Self, Num_Total_Constants, F_I, F_J) then
             --  L374
-            Put_Line ("Node_Splitter.Process splitting L374 F_I, F_J: " &
-                        Integer'Image (F_I) & ", " & Integer'Image (F_J));
+--              Put_Line ("Node_Splitter.Process splitting L374 F_I, F_J: " &
+--                          Integer'Image (F_I) & ", " & Integer'Image (F_J));
             F_I := F_I - 1;
             Swap := Self.Feature_Indices.Element (F_I);
             Self.Feature_Indices.Replace_Element
@@ -469,8 +464,8 @@ package body Node_Splitter is
 
             Evaluate_All_Splits (Self, Self.Feature_Values, Current_Split,
                                  Best_Split);
-            Printing.Print_Split_Record
-              ("Node_Splitter.Process L428 Best_Split", Best_Split);
+--              Printing.Print_Split_Record
+--                ("Node_Splitter.Process L428 Best_Split", Best_Split);
             --  L428
         else -- L370
             Num_Found_Constants := Num_Found_Constants + 1;
@@ -593,8 +588,6 @@ package body Node_Splitter is
                 "Node_Splitter.Split_Node called with empty Sample_Indices");
 
         Init_Split (Current_Split, Self.Start_Row);
-        Printing.Print_Split_Record
-          ("Node_Splitter.Split_Node Current_Split", Current_Split);
         Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                          Num_Total_Constants, Best_Split);
 
