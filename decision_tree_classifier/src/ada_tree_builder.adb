@@ -52,8 +52,6 @@ package body Ada_Tree_Builder is
       Values                      : Weights.Weight_Lists_2D;
       Left_Child_Cursor           : Tree.Tree_Cursor;
       Right_Child_Cursor          : Tree.Tree_Cursor;
-      --        Left_Child                  : Tree.Tree_Node;
-      --        Right_Child                 : Tree.Tree_Node;
       Split_Row                   : Positive := End_Row;
       Node_ID                     : Positive;
    begin
