@@ -4,6 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Build_Utils;
 with Node_Splitter;
 with Printing;
 with Tree;
@@ -164,16 +165,19 @@ package body Ada_Tree_Builder is
       Splitter      : in out Node_Splitter.Splitter_Class;
       Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
       Max_Depth     : Integer) is
+      use Build_Utils;
       use Tree.Nodes_Package;
       use Node_Splitter;
-      Depth            : constant Positive := 1;
+      Depth            : constant Natural := 0;
       Impurity         : constant Float := Float'Last;
+      Stack            : Stack_List;
       Builder          : Tree_Builder;
       Split            : Node_Splitter.Split_Record;
       Top_Node_Cursor  : Cursor;
    begin
       Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
-
+      Push (Stack, 1, Positive (Y_Encoded.Length), Depth, Top_Node_Cursor,
+            True, Float'Last, 0);
       --  L205
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Splitter, 1, Positive (Y_Encoded.Length),

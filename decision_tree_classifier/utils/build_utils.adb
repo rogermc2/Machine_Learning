@@ -11,7 +11,7 @@ package body Build_Utils is
 
    procedure Push (aStack                : in out Stack_List;
                    Start, Stop           : Positive;
-                   Depth                 : Positive;
+                   Depth                 : Natural;
                    Parent                : Tree.Tree_Cursor;
                    Is_Left               : Boolean;
                    Impurity              : Float;

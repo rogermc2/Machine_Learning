@@ -26,7 +26,7 @@ package body Tree_Build is
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    --  L720
    function Add_Node (theTree               : in out Tree.Tree_Class;
-                      Depth                 : Positive;
+                      Depth                 : Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
@@ -260,8 +260,9 @@ package body Tree_Build is
       Is_Leaf           : Boolean := False;
       Splitter          : Node_Splitter.Splitter_Class;
       Split             : Node_Splitter.Split_Record;
-      Node              : Stack_Record;
+      Node              : Tree.Tree_Node;
       Stack             : Stack_List;
+      Data              : Stack_Record;
       Stack_Curs        : Build_Utils.Stack_Cursor;
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
@@ -269,20 +270,20 @@ package body Tree_Build is
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
 
-      Node.Parent := Node_Cursor;
-      Node.Start := 1;
-      Node.Stop := Num_Node_Samples;
-      Stack.Append (Node);
-      Stack_Curs := Stack.First;
+      Data.Parent := Node_Cursor;
+      Data.Start := 1;
+      Data.Stop := Num_Node_Samples;
+      Push (Stack, 1, Num_Node_Samples, Depth, Node_Cursor, Is_Left, Impurity,
+            0);
 
-      while Has_Element (Stack_Curs) loop
-         Node := Element (Stack_Curs);
-         Start := Node.Start;
-         Stop := Node.Stop;
-         Depth := Node.Depth;
-         Parent := Node.Parent;
-         Is_Left := Node.Is_Left;
-         Constant_Features := Node.Num_Constant_Features;
+      while not Stack.Is_Empty loop
+         Data := Pop (Stack);
+         Start := Data.Start;
+         Stop := Data.Stop;
+         Depth := Data.Depth;
+         Parent := Data.Parent;
+         Is_Left := Data.Is_Left;
+         Constant_Features := Data.Num_Constant_Features;
 
          Node_Splitter.Reset_Node (Splitter, Start, Stop, Weighted_Samples);
          if First then
@@ -312,23 +313,12 @@ package body Tree_Build is
 
          if not Is_Leaf then
             --  Right child
-            Node.Parent := Parent;
-            Node.Node_Cursor := Node_Cursor;
-            Node.Start := Split.Split_Row;
-            Node.Stop := Stop;
-            Node.Depth := Depth + 1;
-            Node.Is_Left := False;
-            Node.Impurity := Split.Impurity_Right;
-            Node.Num_Constant_Features := Constant_Features;
-            Stack.Append (Node);
+            Push (Stack, Split.Split_Row, Stop, Depth + 1, Parent,
+                 False, Split.Impurity_Right, Constant_Features);
 
             --  Left child
-            Node.Start := Start;
-            Node.Stop := Split.Split_Row;
-            Node.Depth := Depth + 1;
-            Node.Is_Left := True;
-            Node.Impurity := Split.Impurity_Left;
-            Stack.Append (Node);
+            Push (Stack, Start, Split.Split_Row - 1, Depth + 1, Parent,
+                 True, Split.Impurity_Left, Constant_Features);
          end if;
 
          if Depth > Max_Depth_Seen then
