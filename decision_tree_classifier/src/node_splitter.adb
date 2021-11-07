@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -493,7 +493,6 @@ package body Node_Splitter is
       --  L424 Reorganize into samples[start:best.pos] + samples[best.pos:end]
       if Best_Split.Split_Row < Self.End_Row then
          --  L426
-         Put_Line ("Node_Splitter.Reorder_Rows L426");
          Partition_End := Self.End_Row;
          P_Index := Self.Start_Row;
          while P_Index < Partition_End loop
@@ -541,8 +540,8 @@ package body Node_Splitter is
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
-         Put_Line ("Node_Splitter.Reorder_Rows L442 Best_Split.Improvement: " &
-                  Float'Image (Best_Split.Improvement));
+--           Put_Line ("Node_Splitter.Reorder_Rows L442 Best_Split.Improvement: " &
+--                    Float'Image (Best_Split.Improvement));
       end if;
 
    end Reorder_Rows;
@@ -596,22 +595,22 @@ package body Node_Splitter is
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
 
-      Printing.Print_Split_Record
-        ("Node_Splitter.Split_Node Best_Split L424", Best_Split);
+--        Printing.Print_Split_Record
+--          ("Node_Splitter.Split_Node Best_Split L424", Best_Split);
 
       --  L424  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
 
-      Printing.Print_Split_Record
-        ("Node_Splitter.Split_Node Best_Split L444", Best_Split);
+--        Printing.Print_Split_Record
+--          ("Node_Splitter.Split_Node Best_Split L444", Best_Split);
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
       --  L454
       Num_Constant_Features := Num_Total_Constants;
       --  L453
-      Printing.Print_Split_Record
-        ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
+--        Printing.Print_Split_Record
+--          ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
       return Best_Split;
 
    end Split_Node;
