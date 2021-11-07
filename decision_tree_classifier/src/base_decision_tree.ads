@@ -37,16 +37,6 @@ package Base_Decision_Tree is
       (Positive, Unbounded_String);
     subtype Unbounded_List is UB_Package.Vector;
 
-    type Split_Record (Split_Type : Tree.Data_Type) is record
-    --  The minimum number of samples required to split an internal node.
-        case Split_Type is
-            when Tree.Integer_Type =>  Min_Split         : Integer := 2;
-            when Tree.Float_Type   => Min_Fraction_Split : Float := 2.0;
-            when Tree.Enum_Type    => null;
-            when others    => null;
-        end case;
-    end record;
-
     type Leaf_Record (Leaf_Type : Tree.Data_Type) is record
         case Leaf_Type is
             when Tree.Integer_Type =>  Min_Leaf       : Integer := 1;
