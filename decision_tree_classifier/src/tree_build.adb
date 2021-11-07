@@ -270,7 +270,7 @@ package body Tree_Build is
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
 
-      Data.Parent := Node_Cursor;
+      Data.Parent_Cursor := Node_Cursor;
       Data.Start := 1;
       Data.Stop := Num_Node_Samples;
       Push (Stack, 1, Num_Node_Samples, Depth, Node_Cursor, Is_Left, Impurity,
@@ -281,7 +281,7 @@ package body Tree_Build is
          Start := Data.Start;
          Stop := Data.Stop;
          Depth := Data.Depth;
-         Parent := Data.Parent;
+         Parent := Data.Parent_Cursor;
          Is_Left := Data.Is_Left;
          Constant_Features := Data.Num_Constant_Features;
 

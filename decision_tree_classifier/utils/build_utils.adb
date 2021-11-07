@@ -18,7 +18,7 @@ package body Build_Utils is
                    Num_Constant_Features : Natural) is
       Data : Stack_Record;
    begin
-      Data.Parent := Parent;
+      Data.Parent_Cursor := Parent;
       Data.Start := Start;
       Data.Stop  := Stop;
       Data.Depth := Depth;

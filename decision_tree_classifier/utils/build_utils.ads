@@ -20,7 +20,7 @@ package Build_Utils is
    end record;
 
    type Stack_Record is record
-      Parent                : Tree.Tree_Cursor;
+      Parent_Cursor         : Tree.Tree_Cursor;
       --        Node_Cursor           : Tree.Tree_Cursor;
       --        Node_Params           : Tree.Tree_Node;
       Start                 : Positive := 1;
