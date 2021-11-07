@@ -68,8 +68,8 @@ package body Ada_Tree_Builder is
       else
          Impurity := Parent_Node.Impurity;
       end if;
---        Put_Line ("Ada_Tree_Builder.Add_Branch Impurity: " &
---                    Float'Image (Impurity));
+      --        Put_Line ("Ada_Tree_Builder.Add_Branch Impurity: " &
+      --                    Float'Image (Impurity));
       Put_Line ("Ada_Tree_Builder.Add_Branch Parent_Node Node_ID: " &
                   Integer'Image (Parent_Node.Node_ID));
 
@@ -82,8 +82,8 @@ package body Ada_Tree_Builder is
         --  if Impurity == 0.0 with tolerance for rounding errors
       abs (Impurity) <= Epsilon;
 
---        Put_Line ("Ada_Tree_Builder.Add_Branch L222 Is_Leaf_Node: " &
---                    Boolean'Image (Is_Leaf_Node));
+      --        Put_Line ("Ada_Tree_Builder.Add_Branch L222 Is_Leaf_Node: " &
+      --                    Boolean'Image (Is_Leaf_Node));
       --  L222
       if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
@@ -95,28 +95,24 @@ package body Ada_Tree_Builder is
                    " is not in the row index range " &
                    Integer'Image (Start_Row + 1) & " .. " &
                    Integer'Image (End_Row));
-
-         Is_Leaf_Node :=  Split_Row >= End_Row or
+         --  L233
+         Is_Leaf_Node := Split_Row >= End_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
---           Put_Line ("Ada_Tree_Builder.Add_Branch L228 Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease: " &
---                       Boolean'Image (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
+           Put_Line ("Ada_Tree_Builder.Add_Branch L228 Split.Improvement: " &
+                      Float'Image (Split.Improvement));
 
-         --  L228  _tree.add_node just generates a new initialized node
-         --        right and left children are added to the tree (stack) at
-         --        L245 and L251 respectively
-         --                  Put_Line ("Ada_Tree_Builder.Add_Branch L229 adding node, Start_Row, Split_Row, Num_Node_Samples:"
-         --                            & Integer'Image (Start_Row) & ", " & Integer'Image (Split_Row) &
-         --                              ", " & Integer'Image (Parent_Node.Num_Node_Samples));
-
+         --  tree.add_node just generates a new initialized node
+         --  right and left children are added to the tree (stack) at
+         --  L245 and L251 respectively
+         --  L228
          Left_Child_Cursor := Tree_Build.Add_Node
            (theTree, Builder.Splitter, Depth, Parent_Cursor, True,
             Is_Leaf_Node, Split.Feature, Impurity, Split.Threshold, Start_Row,
             Split_Row - 1, Weighted_Node_Samples);
-         --  L241 Node.Values already added by Tree_Build.Add_Node
          Node_ID := Element (Left_Child_Cursor).Node_ID;
          Put_Line ("Ada_Tree_Builder.Add_Branch left Node_ID: " &
                      Integer'Image (Node_ID));
-         --  239
+         --  238
          Node_Splitter.Node_Value (Builder.Splitter, Values);
 
          if Integer (theTree.Values.Length) < Node_ID then
@@ -139,17 +135,18 @@ package body Ada_Tree_Builder is
          end if;
          theTree.Values.Replace_Element (Node_ID, Values);
 
+         --  L240
+         if not Is_Leaf_Node then
+            --  Add left branch
+            Add_Branch (theTree, Builder, Left_Child_Cursor);
+            --  Add right branch
+            Add_Branch (theTree, Builder, Right_Child_Cursor);
+         end if;
+
          --  L254
          if Depth > Max_Depth_Seen then
             Max_Depth_Seen := Depth;
          end if;
-      end if;
-
-      if not Is_Leaf_Node then
-         --  Add left branch
-         Add_Branch (theTree, Builder, Left_Child_Cursor);
-         --  Add right branch
-         Add_Branch (theTree, Builder, Right_Child_Cursor);
       end if;
       New_Line;
 

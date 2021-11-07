@@ -217,7 +217,6 @@ package body Criterion is
                                   Impurity_Parent, Impurity_Left,
                                   Impurity_Right : Float) return float is
    begin
-
       return (Criteria.Num_Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
         (Impurity_Parent -
            (Criteria.Num_Weighted_Right / Criteria.Num_Weighted_Node_Samples *
