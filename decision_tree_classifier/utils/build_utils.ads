@@ -21,8 +21,6 @@ package Build_Utils is
 
    type Stack_Record is record
       Parent_Cursor         : Tree.Tree_Cursor;
-      --        Node_Cursor           : Tree.Tree_Cursor;
-      --        Node_Params           : Tree.Tree_Node;
       Start                 : Positive := 1;
       Stop                  : Positive := 1;
       Depth                 : Natural := 0;

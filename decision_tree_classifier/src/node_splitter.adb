@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Node_Splitter is
 
@@ -609,8 +609,10 @@ package body Node_Splitter is
       --  L454
       Num_Constant_Features := Num_Total_Constants;
       --  L453
---        Printing.Print_Split_Record
---          ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
+      Put_Line ("Node_Splitter.Split_Node L453 Start" &
+               Integer'Image (Self.Start_Row));
+      Printing.Print_Split_Record
+        ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
       return Best_Split;
 
    end Split_Node;
