@@ -102,7 +102,7 @@ package body Ada_Tree_Builder is
       else
          Child_Cursor := Tree_Build.Add_Node
            (theTree, Data.Depth, Data.Parent_Cursor, Data.Is_Left, Is_Leaf_Node,
-            Split.Feature, Impurity, Split.Threshold, Start_Row, End_Row,
+            Split.Feature, Split.Threshold, Impurity, Num_Node_Samples,
             Weighted_Node_Samples);
       end if;
       Node_ID := Element (Child_Cursor).Node_ID;
@@ -160,8 +160,8 @@ package body Ada_Tree_Builder is
       Impurity := Gini_Node_Impurity (Builder.Splitter);
 
       Top_Node_Cursor := Tree_Build.Add_Node
-        (theTree, Depth, theTree.Nodes.Root, True, False, 1, Impurity, 0.0,
-         Start_Row, End_Row, Splitter.Weighted_Samples);
+        (theTree, Depth, theTree.Nodes.Root, True, False, 1, 0.0, Impurity,
+         Splitter.Num_Samples, Splitter.Weighted_Samples);
       Push (Stack, Start_Row, End_Row, Depth, Top_Node_Cursor, True,
             Impurity, 0);
       New_Line;

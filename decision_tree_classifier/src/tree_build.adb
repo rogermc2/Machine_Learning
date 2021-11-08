@@ -30,8 +30,8 @@ package body Tree_Build is
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
-                      Impurity, Threshold   : Float;
-                      Start, Stop           : Positive;
+                      Threshold, Impurity   : Float;
+                      Num_Samples           : Positive;
                       Weighted_Node_Samples : Float) return Tree.Tree_Cursor is
       use Ada.Containers;
       use Tree;
@@ -41,9 +41,6 @@ package body Tree_Build is
    begin
       Assert (Parent_Cursor /= No_Element,
               "Tree_Build.Add_Node, parent cursor is null.");
-      Assert (Stop >= Start,
-              "Tree_Build.Add_Node stop index:" & Integer'Image (Stop) &
-                " is less than start index" & Integer'Image (Start));
 
       Last_Node := Last_Node + 1;
       New_Node.Node_ID := Last_Node;
@@ -51,10 +48,8 @@ package body Tree_Build is
       New_Node.Is_Left := Is_Left;
       New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
+      New_Node.Num_Node_Samples := Num_Samples;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
-
-      New_Node.Samples_Start := Start;
-      New_Node.Num_Node_Samples := 1 + Stop - Start;
 
       if not Is_Leaf then
          New_Node.Best_Fit_Feature_Index := Feature_Index;
@@ -128,8 +123,8 @@ package body Tree_Build is
 
       Node_Cursor := Add_Node
         (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf,
-         aSplit.Feature, aSplit.Improvement, aSplit.Threshold, Start_Row,
-         End_Row, Float (Parent_Node.Weighted_Num_Node_Samples));
+         aSplit.Feature, aSplit.Threshold, aSplit.Improvement,
+          Splitter.Num_Samples, Float (Parent_Node.Weighted_Num_Node_Samples));
       Node := Element (Node_Cursor);
 
       --  L461
@@ -141,7 +136,7 @@ package body Tree_Build is
 
       Res.Node_Cursor := Add_Node
         (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf,
-         aSplit.Feature, Impurity, aSplit.Threshold, Start_Row, End_Row,
+         aSplit.Feature, aSplit.Threshold, Impurity, Splitter.Num_Samples,
          Splitter.Weighted_Samples);
       Res.Node_Params := Element (Res.Node_Cursor);
       Res.Depth := Depth + 1;
@@ -308,7 +303,7 @@ package body Tree_Build is
 
          Node_Cursor := Add_Node
            (theTree, Depth, Parent, Is_Left, Is_Leaf,
-            Split.Feature, Impurity, Split.Threshold, Start,
+            Split.Feature, Split.Threshold, Impurity,
             Splitter.Num_Samples, Weighted_Samples);
 
          if not Is_Leaf then
