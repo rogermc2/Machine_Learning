@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
-with Printing;
+--  with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -75,8 +75,8 @@ package body Ada_Tree_Builder is
       else
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         Printing.Print_Split_Record ("Ada_Tree_Builder.Add_Branch L220 Split",
-                                      Split);
+--           Printing.Print_Split_Record ("Ada_Tree_Builder.Add_Branch L220 Split",
+--                                        Split);
          --  L233
          Is_Leaf_Node := Split.Split_Row >= End_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
@@ -124,7 +124,6 @@ package body Ada_Tree_Builder is
       if Data.Depth + 1 > Max_Depth_Seen then
          Max_Depth_Seen := Data.Depth + 1;
       end if;
-      New_Line;
 
    end Add_Branch;
 
@@ -161,7 +160,7 @@ package body Ada_Tree_Builder is
       while not Stack.Is_Empty loop
          Add_Branch (theTree, Builder, Stack, Split);
       end loop;
-      Put_Line ("Ada_Tree_Builder.Build_Tree tree built");
+      Put_Line ("Ada_Tree_Builder.Build_Tree tree built.");
       New_Line;
 
    end Build_Tree;
