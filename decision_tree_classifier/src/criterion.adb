@@ -2,12 +2,12 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with ML_Types;
---  with Printing;
+with Printing;
 
 package body Criterion is
 
@@ -49,13 +49,12 @@ package body Criterion is
       Criteria.End_Row := End_Row;
       Criteria.Num_Weighted_Samples := Weighted_Samples;
       Criteria.Num_Weighted_Node_Samples := 0.0;
-
-      --        Criteria.Sq_Sum_Total := 0.0;
       Criteria.Sum_Total.Clear;
 
       Assert (not Criteria.Num_Classes.Is_Empty,
               "Criterion.Classification_Init Criteria.Num_Classes is empty");
-      --  L325
+      --  L325 Initialize Sum_Total
+      --  Sum_Total dimensions: num outputs x num classes
       for row in 1 .. Num_Outputs loop
          Sum_Total_K.Clear;
          for c in 1 .. Criteria.Num_Classes.Element (row) loop
@@ -65,6 +64,8 @@ package body Criterion is
       end loop;
 
       --  L329
+      Put_Line ("Criterion.Classification_Init, Start_Row, End_Row: " &
+               Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
       for p in Start_Row .. End_Row loop
          Y_I_Index := Sample_Indices.Element (p);
 
@@ -93,6 +94,8 @@ package body Criterion is
       end loop;
 
       Reset (Criteria);
+      Printing.Print_Weights_Lists_2D ("Criterion.Classification_Init, Sum_Total",
+                                      Criteria.Sum_Total);
 
    end Classification_Init;
 
@@ -233,7 +236,7 @@ package body Criterion is
    begin
       Assert (not Self.Sum_Total.Is_Empty,
               "Criterion.Node_Value Self.Sum_Total is empty");
-
+      --  Value dimensions: num outputs x num classes
       Value := Self.Sum_Total;
 
    end Node_Value;
