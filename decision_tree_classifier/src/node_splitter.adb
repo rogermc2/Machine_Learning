@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -103,9 +103,9 @@ package body Node_Splitter is
       LE                        : Boolean;
       Best_Updated              : Boolean := False;
    begin
-      Put_Line ("Node_Splitter.Evaluate_All_Splits Start, Stop: " &
-                  Integer'Image (Self.Start_Row) & ", " &
-                  Integer'Image (Self.End_Row));
+--        Put_Line ("Node_Splitter.Evaluate_All_Splits Start, Stop: " &
+--                    Integer'Image (Self.Start_Row) & ", " &
+--                    Integer'Image (Self.End_Row));
       --  L380 Evaluate all splits
       --          Printing.Print_Value_Data_List
       --            ("Node_Splitter.Evaluate_All_Splits L382, Self.Feature_Values",
@@ -261,13 +261,11 @@ package body Node_Splitter is
               "WARNING : Best Fit was not updated");
       end if;
 
-      if Best.Split_Row <= Self.Start_Row then
-         raise Node_Splitter_Error with
+      Assert (Best.Split_Row > Self.Start_Row,
            "Node_Splitter.Evaluate_All_Splits, split position" &
            Integer'Image (Best.Split_Row) &
            " should be greater than Start_Index" &
-           Integer'Image (Self.Start_Row);
-      end if;
+           Integer'Image (Self.Start_Row));
 
    end Evaluate_All_Splits;
 
@@ -609,10 +607,10 @@ package body Node_Splitter is
       --  L454
       Num_Constant_Features := Num_Total_Constants;
       --  L453
-      Put_Line ("Node_Splitter.Split_Node L453 Start" &
-               Integer'Image (Self.Start_Row));
-      Printing.Print_Split_Record
-        ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
+--        Put_Line ("Node_Splitter.Split_Node L453 Start" &
+--                 Integer'Image (Self.Start_Row));
+--        Printing.Print_Split_Record
+--          ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
       return Best_Split;
 
    end Split_Node;
