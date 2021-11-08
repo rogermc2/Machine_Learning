@@ -19,10 +19,12 @@ package body Classifier_Tests is
     --                             Friedman_Mse, Poisson);
     --     type Clf_Trees is (Decision_Tree_Classifier, Extra_Tree_Classifier);
     --     type Reg_Trees is (Decision_Tree_Regressor, Extra_Tree_Regressor);
-    --  X_Array 6 rows (samples) x 2 columns (features)
+    --  X_Array 6 rows (samples) x 1 column (outpuss)
     X_Array     : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
                     ((-2, -1), (-1, -1), (-1, -2), (1, 1), (1, 2), (2, 1));
+    --  Y_Array 6 rows (samples) x 2 columns (features)
     Y_Array     : constant Integer_Array (1 .. 6) := (-1, -1, -1, 1, 1, 1);
+    --  T_Array 3 rows (samples) x 2 columns (features)
     T_Array     : constant Multi_Value_Array (1 .. 3, 1 .. 2) :=
                     ((-1, -1), (2, 2), (3, 2));
     True_Result : constant Integer_Array (1 .. 3) := (-1, 1, 1);
