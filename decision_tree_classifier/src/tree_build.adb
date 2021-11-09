@@ -119,7 +119,7 @@ package body Tree_Build is
 
       Node_Cursor := Add_Node
         (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf,
-         aSplit.Feature, aSplit.Threshold, aSplit.Improvement,
+         aSplit.Feature, aSplit.Threshold, Impurity,
           Splitter.Num_Samples, Float (Parent_Node.Weighted_Num_Node_Samples));
       Node := Element (Node_Cursor);
 
@@ -272,6 +272,7 @@ package body Tree_Build is
       Push (Stack, 1, Num_Node_Samples, Depth, Node_Cursor, Is_Left, Impurity,
             0);
 
+      --  L190
       while not Stack.Is_Empty loop
          Data := Pop (Stack);
          Start := Data.Start;
@@ -281,6 +282,7 @@ package body Tree_Build is
          Is_Left := Data.Is_Left;
          Constant_Features := Data.Num_Constant_Features;
 
+         Num_Node_Samples := Stop - Start + 1;
          Node_Splitter.Reset_Node (Splitter, Start, Stop, Weighted_Samples);
          if First then
             Impurity := Splitter.Node_Impurity;
@@ -289,6 +291,7 @@ package body Tree_Build is
             Impurity := Node.Impurity;
          end if;
 
+         --  L204
          Is_Leaf := Depth >= Depth_Builder.Max_Depth or
            Num_Node_Samples < Depth_Builder.Min_Samples_Split or
            Num_Node_Samples < 2 * Depth_Builder.Min_Samples_Leaf or

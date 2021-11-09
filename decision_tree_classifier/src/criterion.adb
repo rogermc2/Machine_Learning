@@ -42,11 +42,13 @@ package body Criterion is
       Y_Ik            : Natural;
       Weight          : Float := 1.0;
    begin
+      --  L302
       Criteria.Y := Y;
       Criteria.Sample_Weight := Sample_Weight;
       Criteria.Sample_Indices := Sample_Indices;
       Criteria.Start_Row := Start_Row;
       Criteria.End_Row := End_Row;
+      Criteria.Num_Node_Samples := End_Row - Start_Row + 1;
       Criteria.Num_Weighted_Samples := Weighted_Samples;
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;

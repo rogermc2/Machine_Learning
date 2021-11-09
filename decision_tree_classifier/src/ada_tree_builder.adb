@@ -55,7 +55,7 @@ package body Ada_Tree_Builder is
       --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       if not First then
-         Put_Line ("Ada_Tree_Builder.Add_Branch L209, Start_Row, End_Row: " &
+         Put_Line ("Ada_Tree_Builder.Add_Branch L209 not first, Start_Row, End_Row: " &
                      Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
          Reset_Node (Builder.Splitter, Start_Row, End_Row, Weighted_Node_Samples);
       end if;
@@ -117,8 +117,17 @@ package body Ada_Tree_Builder is
       end if;
       theTree.Values.Replace_Element (Node_ID, Values);
 
+      Put_Line
+        ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Start, Num_Node_Samples: " &
+                  Integer'Image (Node_ID) & ", " &
+                  Integer'Image (Element (Child_Cursor).Samples_Start) & ", " &
+                  Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
+         Put_Line ("Ada_Tree_Builder.Add_Branch L240 Start, Pos, End: " &
+                  Integer'Image (Start_Row) & ", " &
+                  Integer'Image (Split.Split_Row) & ", " &
+                  Integer'Image (End_Row));
          --  Add right branch
          Push (theStack, Split.Split_Row, End_Row, Data.Depth + 1,
                Child_Cursor, False, Split.Impurity_Right,
