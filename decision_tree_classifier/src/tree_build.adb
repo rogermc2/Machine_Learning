@@ -77,21 +77,21 @@ package body Tree_Build is
      (theBuilder            : in out Tree_Builder;
       Splitter              : in out Node_Splitter.Splitter_Class;
       theTree               : in out Tree.Tree_Class;
+      Start_Row, End_Row    : Positive;
       Impurity              : in out Float;
       Is_First, Is_Left     : Boolean;
       Parent_Cursor         : Tree.Tree_Cursor;
-      Depth                 : Positive;
+      Depth                 : Natural;
       Res                   : in out Build_Utils.Priority_Record) is
       use Ada.Containers;
       use Tree.Nodes_Package;
       Parent_Node           : constant Tree.Tree_Node :=
                                 Element (Parent_Cursor);
+      Num_Samples           : constant Positive :=
+                                End_Row - Start_Row + 1;
       Is_Leaf               : Boolean;
       aSplit                : Node_Splitter.Split_Record;
       Num_Constant_Features : Natural := 0;
-      Start_Row             : Positive := Parent_Node.Samples_Start;
-      End_Row               : Positive :=
-                                Start_Row + Parent_Node.Num_Node_Samples - 1;
       Node_Cursor           : Tree.Tree_Cursor;
       Node                  : Tree.Tree_Node;
       Values                : Weights.Weight_Lists_2D;
@@ -103,22 +103,18 @@ package body Tree_Build is
          Impurity := Splitter.Node_Impurity;
       end if;
 
+      --  L440
       Is_Leaf := (Depth >= theBuilder.Max_Depth) or
-        (Splitter.Num_Samples = 1 or Splitter.Num_Samples < theBuilder.Min_Samples_Split) or
-        (Splitter.Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
+        (Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split) or
+        (Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
         (Impurity <= Epsilon);
 
       if not Is_Leaf then
          aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
                                              Num_Constant_Features);
          Is_Leaf :=
+           aSplit.Split_Row > End_Row or
            aSplit.Improvement + Epsilon < theBuilder.Min_Impurity_Decrease;
-      end if;
-
-      if Is_Left then
-         End_Row := aSplit.Split_Row - 1;
-      else
-         Start_Row := aSplit.Split_Row;
       end if;
 
       Node_Cursor := Add_Node
@@ -187,11 +183,11 @@ package body Tree_Build is
       Impurity         : Float := 0.0;
       Frontier         : Build_Utils.Frontier_List;
       Current_Node     : Tree.Tree_Node;
-      Depth            : Positive := 1;
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
+      Is_Leaf          : Boolean := False;
    begin
-      --  L332
+      --  L324
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       if Best_Builder.Max_Leaf_Nodes <= 0 then
          raise Tree_Build_Error with
@@ -199,30 +195,35 @@ package body Tree_Build is
       end if;
 
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
-      Add_Split_Node (Best_Builder, Splitter, theTree, Impurity,
-                      True, True, theTree.Nodes.Root, Depth, Split_Node_Left);
+      --  L344 add root to frontier
+      Add_Split_Node
+        (Best_Builder, Splitter, theTree, 1, Splitter.Num_Samples, Impurity,
+         True, True, theTree.Nodes.Root, 0, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
 
+      --  L354
       Curs := Frontier.First;
       while Has_Element (Curs) loop
          Heap_Record := Element (Curs);
          Current_Node := Heap_Record.Node_Params;
          Node_Cursor := Heap_Record.Node_Cursor;
-         if not Current_Node.Leaf_Node then
+         Is_Leaf := Heap_Record.Is_Leaf or Max_Split_Nodes < 0;
+         if not Is_Leaf then
+            --  L371
             Max_Split_Nodes := Max_Split_Nodes - 1;
-            Depth := Current_Node.Depth + 1;
             Add_Split_Node
-              (Best_Builder, Splitter, theTree, Current_Node.Impurity, False,
-               Current_Node.Is_Left, Node_Cursor, Depth, Split_Node_Left);
-            --  tree.nodes may have changed
+              (Best_Builder, Splitter, theTree, Heap_Record.Start,
+               Heap_Record.Position, Heap_Record.Impurity, False,
+               Current_Node.Is_Left, Node_Cursor, Heap_Record.Depth + 1, Split_Node_Left);
+            --  L383 tree.nodes may have changed
             Heap_Record := Element (Curs);
             Current_Node := Heap_Record.Node_Params;
             Node_Cursor := Heap_Record.Node_Cursor;
-            Depth := Current_Node.Depth + 1;
+            --  Compute right split node
             Add_Split_Node
-              (Best_Builder, Splitter, theTree,
-               Heap_Record.Impurity_Right, False, False, Node_Cursor, Depth,
-               Split_Node_Right);
+              (Best_Builder, Splitter, theTree, Heap_Record.Position,
+               Heap_Record.Stop, Heap_Record.Impurity_Right, False, False,
+               Node_Cursor, Heap_Record.Depth + 1, Split_Node_Right);
             Add_To_Frontier (Split_Node_Right, Frontier);
          end if;
 
