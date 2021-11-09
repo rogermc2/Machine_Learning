@@ -66,8 +66,8 @@ package body Criterion is
 
       --  L329
       Put_Line ("Criterion.Classification_Init, Start_Row, End_Mark: " &
-               Integer'Image (Start_Row) & ", " & Integer'Image (End_Mark));
-      for p in Sample_Indices.First_Index .. Sample_Indices.Last_Index loop
+                  Integer'Image (Start_Row) & ", " & Integer'Image (End_Mark));
+      for p in Start_Row .. End_Mark - 1 loop
          Y_I_Index := Sample_Indices.Element (p);
 
          --  Weight is originally set to be 1.0, meaning that if no
