@@ -341,7 +341,6 @@ package body Node_Splitter is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Weighted_Samples : Float := 0.0;
-      J_Index          : Natural := 0;
    begin
       Self.Min_Leaf_Samples := Min_Leaf_Samples;
       --  X dimensions: num samples x num features
@@ -353,17 +352,12 @@ package body Node_Splitter is
       --  L146 Create a new list which will store nonzero samples from the
       --  feature of interest
       Self.Sample_Indices.Clear;
-      for index in 1 .. Num_Samples loop
-           Self.Sample_Indices.Append (0);
-      end loop;
-
       --  L152 For each sample (row)
       for index_i in Input_X.First_Index .. Input_X.Last_Index loop
          --  Only work with positively weighted samples.
          if Sample_Weight.Is_Empty or else
            Sample_Weight.Element (index_i) > 0.0 then
-            J_Index := J_Index + 1;
-            Self.Sample_Indices.Replace_Element (J_Index, index_i);
+            Self.Sample_Indices.Append (index_i);
          end if;
 
          if Sample_Weight.Is_Empty then
@@ -375,7 +369,7 @@ package body Node_Splitter is
       end loop;
 
       --  Number of samples is the number of positively weighted samples.
-      Self.Num_Samples := J_Index;
+      Self.Num_Samples := Positive (Self.Sample_Indices.Length);
       Self.Weighted_Samples := Weighted_Samples;
 
       Self.Feature_Indices.Clear;
