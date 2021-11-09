@@ -47,9 +47,9 @@ package body Base_Decision_Tree is
       Sum_Sample_Weight     : Float := 0.0;
    begin
       Assert (not X.Is_Empty,
-           "Base_Decision_Tree.Base_Fit, X is empty");
+              "Base_Decision_Tree.Base_Fit, X is empty");
       Assert (not Y.Is_Empty,
-           "Base_Decision_Tree.Base_Fit, Y is empty");
+              "Base_Decision_Tree.Base_Fit, Y is empty");
 
       --  X is 2D list num samples x num features
       --  Y is 2D list num classes x num outputs
@@ -60,7 +60,7 @@ package body Base_Decision_Tree is
       end if;
 
       for index in Classes.First_Index .. Classes.Last_Index loop
-          Num_Classes.Append (Positive (Classes.Element (index).Length));
+         Num_Classes.Append (Positive (Classes.Element (index).Length));
       end loop;
 
       Criterion.C_Init (Criteria, Tree.Index_Range (Y.Element (1).Length),
@@ -101,9 +101,9 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
---        Printing.Print_Value_Data_Lists_2D
---          ("Base_Decision_Tree.Base_Fit, Classes",
---           aClassifier.Attributes.Decision_Tree.Classes);
+      --        Printing.Print_Value_Data_Lists_2D
+      --          ("Base_Decision_Tree.Base_Fit, Classes",
+      --           aClassifier.Attributes.Decision_Tree.Classes);
 
       --  L410
       Ada_Tree_Builder.Build_Tree
@@ -276,16 +276,16 @@ package body Base_Decision_Tree is
       Inverse     : Natural_List;
    begin
       Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
-                Count_Type'Image (Y.Length));
+                  Count_Type'Image (Y.Length));
       Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
-                Count_Type'Image (Num_Outputs));
+                  Count_Type'Image (Num_Outputs));
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
       Classes.Clear;
       Y_Encoded.Set_Length (Y.Length);
 
-      --  Y is 2D list num classes x num outputs
-      --  Y_Encoded is 2D list num classes x num outputs
+      --  Y is 2D list num samples x num outputs
+      --  Y_Encoded is 2D list num samples x num outputs
       --  L208  Initialize Y_Encoded
       for class in Y.First_Index .. Y.Last_Index loop
          Column.Clear;
@@ -295,6 +295,7 @@ package body Base_Decision_Tree is
          Y_Encoded.Replace_Element (class, Column);
       end loop;
 
+      --  Classes is 2D list num outputs x num classes
       OP_Row.Set_Length (Num_Outputs);
       for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
          Yk_Row.Clear;
@@ -309,6 +310,10 @@ package body Base_Decision_Tree is
             YE_Row.Replace_Element (op, Inverse.Element (class));
             Y_Encoded.Replace_Element (class, YE_Row);
          end loop;
+         Put_Line ("Base_Decision_Tree.Classification_Part Num Y_Encoded: " &
+                     Count_Type'Image (Y_Encoded.Length));
+         Put_Line ("Base_Decision_Tree.Classification_Part Num Classes: " &
+                     Count_Type'Image (Classes.Element (1).Length));
 
       end loop;
       aClassifier.Attributes.Classes := Classes;
@@ -335,7 +340,6 @@ package body Base_Decision_Tree is
                      X    : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
-      use ML_Types;
       use Weights;
       Num_Samples       : constant Count_Type := X.Length;
       Prob_A            : constant Weight_Lists_3D :=
@@ -398,6 +402,8 @@ package body Base_Decision_Tree is
          end loop;
          Predictions.Replace_Element (op, Pred);
       end loop;
+      Put_Line ("Base_Decision_Tree.Predict, Predictions size: " &
+                  Integer'Image (Integer (Predictions.Length)));
 
       return Predictions;
 

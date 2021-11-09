@@ -82,9 +82,9 @@ package body Criterion is
          for k in 1 .. Num_Outputs loop
             Sum_Total_K := Criteria.Sum_Total.Element (k);
             --  L339 c = Y_Ik is an index into Y (output k) class i
-            Y_Ik := Y_I.Element (k);   --  class.output
+            Y_Ik := Y_I.Element (k);   --  output.class
             --  sum_total[k * self.sum_stride + c] += w
-            --  Add Weight to Y (class Y_I, output k)
+            --  Add Weight to Y (output k, class Y_I)
             Sum_Total_K.Replace_Element
               (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
             Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
