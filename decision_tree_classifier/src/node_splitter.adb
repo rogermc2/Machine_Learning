@@ -117,12 +117,12 @@ package body Node_Splitter is
       --  Set of features to be split :
       --  P_Index: Self.Start_Index through Self.End_Index
       --  L381
-      while P_Index < Self.End_Mark loop
+      while P_Index < Self.End_Mark - 1 loop
          --              Put_Line ("Node_Splitter.Evaluate_All_Splits L382 P_Index: "
          --                        & Integer'Image (P_Index));
          --  L382
          LE := True;
-         while P_Index + 1 < Self.End_Mark and LE loop
+         while P_Index + 1 < Self.End_Mark - 1 and LE loop
             --  L383
             case Features_X.Element (P_Index + 1).Value_Kind is
                when Boolean_Type =>
@@ -452,11 +452,11 @@ package body Node_Splitter is
 
       --  L367
       Sort (Self.Feature_Values);
-      --  L369  Self.Feature_Values is a value_data_list
+      --  Self.Feature_Values is a value_data_list
       if Can_Split (Self, Num_Total_Constants, F_I, F_J) then
          --  L374
-         --              Put_Line ("Node_Splitter.Process splitting L374 F_I, F_J: " &
-         --                          Integer'Image (F_I) & ", " & Integer'Image (F_J));
+--           Put_Line ("Node_Splitter.Process splitting L374 F_I, F_J: " &
+--                      Integer'Image (F_I) & ", " & Integer'Image (F_J));
          F_I := F_I - 1;
          Swap := Self.Feature_Indices.Element (F_I);
          Self.Feature_Indices.Replace_Element

@@ -71,7 +71,7 @@ package body Ada_Tree_Builder is
         --  if Impurity == 0.0 with tolerance for rounding errors
       abs (Impurity) <= Epsilon;
 
-      Put_Line ("Ada_Tree_Builder.Add_Branch L222 Is_Leaf_Node: " &
+      Put_Line ("Ada_Tree_Builder.Add_Branch L220 Is_Leaf_Node: " &
                  Boolean'Image (Is_Leaf_Node));
       --  L220
       if Is_Leaf_Node then
@@ -79,8 +79,8 @@ package body Ada_Tree_Builder is
       else
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
---            Printing.Print_Split_Record ("Ada_Tree_Builder.Add_Branch L220 Split",
---                                          Split);
+          Printing.Print_Split_Record ("Ada_Tree_Builder.Add_Branch L220 Split",
+                                        Split);
          --  L233
          Is_Leaf_Node := Split.Split_Row >= End_Mark or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;

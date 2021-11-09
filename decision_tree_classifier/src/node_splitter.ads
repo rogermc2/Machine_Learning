@@ -13,6 +13,8 @@ package Node_Splitter is
 
    type Split_Record is record
       Feature        : Natural := 0;
+      --  Split_Row is the count of samples below threshold for Feature
+      --  >= end if the node is a leaf.
       Split_Row      : Positive := 2;  --  Right start?
       Threshold      : Float;
       Improvement    : Float := -Float'Last;

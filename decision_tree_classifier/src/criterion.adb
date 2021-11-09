@@ -34,6 +34,7 @@ package body Criterion is
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;
       Start_Row, End_Mark : Natural) is
+      --  In Python a[start:stop] means items start through stop - 1
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
@@ -64,9 +65,10 @@ package body Criterion is
          Criteria.Sum_Total.Append (Sum_Total_K);
       end loop;
 
-      --  L329
+      --  L325
       Put_Line ("Criterion.Classification_Init, Start_Row, End_Mark: " &
                   Integer'Image (Start_Row) & ", " & Integer'Image (End_Mark));
+      --  Python would be p in Start_Row .. End_Mark!
       for p in Start_Row .. End_Mark - 1 loop
          Y_I_Index := Sample_Indices.Element (p);
 
@@ -320,9 +322,10 @@ package body Criterion is
       Sum_K       : Classifier_Types.Float_List;
       Weight      : Float := 1.0;
    begin
-      --  L439
+      --  L435
       if (New_Pos - Criteria.Split_Row) <= (Criteria.End_Mark - New_Pos) then
-         for p in Criteria.Split_Row .. New_Pos loop
+         --  Python: for p in Criteria.Split_Row .. New_Pos!
+         for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
                Weight := Criteria.Sample_Weight.Element (i);
@@ -341,7 +344,7 @@ package body Criterion is
 
       else  --  L449
          Reverse_Reset (Criteria);
-         for p in reverse Criteria.End_Mark - 1 .. New_Pos -1 loop
+         for p in reverse Criteria.End_Mark - 1 .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
                Weight := Criteria.Sample_Weight.Element (i);
