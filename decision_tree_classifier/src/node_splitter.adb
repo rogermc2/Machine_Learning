@@ -20,7 +20,7 @@ package body Node_Splitter is
    procedure Process (Self                  : in out Splitter_Class;
                       Num_Total_Constants   : in out Natural;
                       Num_Found_Constants   : in out Natural;
-                      Start_Row, End_Mark   : Positive;
+                      Start_Row, Stop_Row   : Positive;
                       F_I                   : in out Natural; F_J : Natural;
                       Best_Split            : in out Split_Record);
    procedure Update_Constants (Self                  : in out Splitter_Class;
@@ -117,12 +117,12 @@ package body Node_Splitter is
       --  Set of features to be split :
       --  P_Index: Self.Start_Index through Self.End_Index
       --  L381
-      while P_Index < Self.End_Mark - 1 loop
+      while P_Index < Self.Stop_Row loop
          --              Put_Line ("Node_Splitter.Evaluate_All_Splits L382 P_Index: "
          --                        & Integer'Image (P_Index));
          --  L382
          LE := True;
-         while P_Index + 1 < Self.End_Mark - 1 and LE loop
+         while P_Index + 1 < Self.Stop_Row and LE loop
             --  L383
             case Features_X.Element (P_Index + 1).Value_Kind is
                when Boolean_Type =>
@@ -172,7 +172,7 @@ package body Node_Splitter is
          --              Put_Line ("Node_Splitter.Evaluate_All_Splits L388 P_Index: " &
          --                          Integer'Image (P_Index));
          --  L395
-         if P_Index <= Self.End_Mark then
+         if P_Index <= Self.Stop_Row then
             Current.Split_Row := P_Index;
             --                  Put_Line ("Node_Splitter.Evaluate_All_Splits L395 Start_Row, Split_Row, End_Row: " &
             --                              Integer'Image (Self.Start_Row) & ", " &
@@ -181,7 +181,7 @@ package body Node_Splitter is
             --  Best.Pos_I is the start index of the right node's data
             --  L398 Accept if min_samples_leaf is guaranteed
             if Current.Split_Row - Self.Start_Row >= Self.Min_Leaf_Samples and
-              Self.End_Mark - Current.Split_Row + 1 >= Self.Min_Leaf_Samples then
+              Self.Stop_Row - Current.Split_Row >= Self.Min_Leaf_Samples then
                --  L400
                Criterion.Update (Self.Criteria, Current.Split_Row);
                --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L400 Split_Row: "
@@ -284,15 +284,15 @@ package body Node_Splitter is
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Max_Features         : constant Tree.Index_Range := Self.Max_Features;
       Start_Row            : constant Positive := Self.Start_Row;
-      End_Mark             : constant Positive := Self.End_Mark;
+      Stop_Row             : constant Positive := Self.Stop_Row;
       Num_Drawn_Constants  : Natural := 0;
       Num_Visited_Features : Natural := 0;
       F_I                  : Natural := Num_Features;
       F_J                  : Natural;
       Swap                 : Natural;
    begin
-      Assert (End_Mark > Start_Row, "Node_Splitter.Find_Best_Split End_Row " &
-                Integer'Image (End_Mark) & " should be greater than Start_Row "
+      Assert (Stop_Row >= Start_Row, "Node_Splitter.Find_Best_Split Stop_Row " &
+                Integer'Image (Stop_Row) & " should be greater than Start_Row "
               & Integer'Image (Start_Row));
       --  L323
       while F_I > Num_Total_Constants + 1 and
@@ -315,7 +315,7 @@ package body Node_Splitter is
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
             Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
-                     End_Mark, F_I, F_J, Best_Split);
+                     Stop_Row, F_I, F_J, Best_Split);
 --              Put_Line ("Node_Splitter.Find_Best_Split F_I, F_J: " &
 --                          Integer'Image (F_I) & ", " & Integer'Image (F_J));
          else --  L346
@@ -429,7 +429,7 @@ package body Node_Splitter is
    procedure Process (Self                  : in out Splitter_Class;
                       Num_Total_Constants   : in out Natural;
                       Num_Found_Constants   : in out Natural;
-                      Start_Row, End_Mark   : Positive;
+                      Start_Row, Stop_Row   : Positive;
                       F_I                   : in out Natural; F_J : Natural;
                       Best_Split            : in out Split_Record) is
       use ML_Types;
@@ -442,7 +442,7 @@ package body Node_Splitter is
       --  L358 Sort samples along Current.Feature index;
       Current_Split.Feature := Self.Feature_Indices.Element (F_J);
       --  L364
-      for index in Start_Row .. End_Mark - 1 loop
+      for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Self.Sample_Indices.Element (index);
          X_Samples := Self.X.Element (X_Samples_Row);
          --  Self.Feature_Values is a Value_Data_List
@@ -492,9 +492,9 @@ package body Node_Splitter is
       Crit          : Criterion.Criterion_Class;
    begin
       --  L424 Reorganize into samples[start:best.pos] + samples[best.pos:end]
-      if Best_Split.Split_Row < Self.End_Mark then
+      if Best_Split.Split_Row <= Self.Stop_Row then
          --  L426
-         Partition_End := Self.End_Mark;
+         Partition_End := Self.Stop_Row;
          P_Index := Self.Start_Row;
          while P_Index < Partition_End loop
             Sample_PI := Self.Sample_Indices.Element (P_Index);
@@ -551,21 +551,21 @@ package body Node_Splitter is
    --  Reset_Node resets the splitter Split based on node Split.Samples[start:end].
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
-      Start_Row, End_Mark   : Positive;
+      Start_Row, Stop_Row   : Positive;
       Weighted_Node_Samples : in out Float) is
    begin
-      Assert (End_Mark > Start_Row,
+      Assert (Stop_Row >= Start_Row,
               "Node_Splitter.Reset_Node, stop index" &
-                Integer'Image (End_Mark) &
+                Integer'Image (Stop_Row) &
                 " should not be less than start index" &
                 Integer'Image (Start_Row));
 
       Splitter.Start_Row := Start_Row;
-      Splitter.End_Mark := End_Mark;
+      Splitter.Stop_Row := Stop_Row;
       Criterion.Classification_Init
         (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
          Splitter.Sample_Weight, Splitter.Weighted_Samples,
-         Start_Row, End_Mark);
+         Start_Row, Stop_Row);
 
       Weighted_Node_Samples := Splitter.Criteria.Num_Weighted_Node_Samples;
 

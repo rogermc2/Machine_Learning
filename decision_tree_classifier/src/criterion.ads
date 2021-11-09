@@ -15,7 +15,7 @@ package Criterion is
        Samples                   : ML_Types.Value_Data_Lists_2D;
        Num_Outputs               : Tree.Index_Range := 1;
        Start_Row                 : Natural := 0;
-       End_Mark                  : Natural := 0;
+       Stop_Row                  : Natural := 0;
        Split_Row                 : Natural := 0;
        Num_Node_Samples          : Natural := 0;
        Num_Weighted_Samples      : Float := 0.0;
@@ -54,7 +54,7 @@ package Criterion is
        --  Sample_Weight contains the weight of each sample
        Sample_Weight        : Weights.Weight_List;
        Weighted_Samples     : Float;
-       Start_Row, End_Mark  : Natural);
+       Start_Row, Stop_Row  : Natural);
     procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
                                       Impurity_Left,
                                       Impurity_Right : out Float);

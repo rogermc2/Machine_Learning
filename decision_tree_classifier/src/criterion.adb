@@ -33,7 +33,7 @@ package body Criterion is
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;
-      Start_Row, End_Mark : Natural) is
+      Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
@@ -47,8 +47,8 @@ package body Criterion is
       Criteria.Sample_Weight := Sample_Weight;
       Criteria.Sample_Indices := Sample_Indices;
       Criteria.Start_Row := Start_Row;
-      Criteria.End_Mark := End_Mark;
-      Criteria.Num_Node_Samples := End_Mark - Start_Row;
+      Criteria.Stop_Row := Stop_Row;
+      Criteria.Num_Node_Samples := Stop_Row - Start_Row + 1;
       Criteria.Num_Weighted_Samples := Weighted_Samples;
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
@@ -66,10 +66,10 @@ package body Criterion is
       end loop;
 
       --  L325
-      Put_Line ("Criterion.Classification_Init, Start_Row, End_Mark: " &
-                  Integer'Image (Start_Row) & ", " & Integer'Image (End_Mark));
-      --  Python would be p in Start_Row .. End_Mark!
-      for p in Start_Row .. End_Mark - 1 loop
+      Put_Line ("Criterion.Classification_Init, Start_Row, Stop_Row: " &
+                  Integer'Image (Start_Row) & ", " & Integer'Image (Stop_Row));
+
+      for p in Start_Row .. Stop_Row loop
          Y_I_Index := Sample_Indices.Element (p);
 
          --  Weight is originally set to be 1.0, meaning that if no
@@ -290,7 +290,7 @@ package body Criterion is
                       Positive (Criteria.Y.Element (1).Length);
       Sum_Right_K : Classifier_Types.Float_List;
    begin
-      Criteria.Split_Row := Criteria.End_Mark;
+      Criteria.Split_Row := Criteria.Stop_Row + 1;
       Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Node_Samples;
       Criteria.Num_Weighted_Right := 0.0;
 
@@ -323,8 +323,7 @@ package body Criterion is
       Weight      : Float := 1.0;
    begin
       --  L435
-      if (New_Pos - Criteria.Split_Row) <= (Criteria.End_Mark - New_Pos) then
-         --  Python: for p in Criteria.Split_Row .. New_Pos!
+      if (New_Pos - Criteria.Split_Row) < (Criteria.Stop_Row - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
@@ -344,7 +343,7 @@ package body Criterion is
 
       else  --  L449
          Reverse_Reset (Criteria);
-         for p in reverse Criteria.End_Mark - 1 .. New_Pos loop
+         for p in reverse Criteria.Stop_Row .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
                Weight := Criteria.Sample_Weight.Element (i);
