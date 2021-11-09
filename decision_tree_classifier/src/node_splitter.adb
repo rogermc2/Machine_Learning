@@ -332,7 +332,7 @@ package body Node_Splitter is
    end Find_Best_Split;
 
    --  -------------------------------------------------------------------------
-
+   --  L116
    procedure Init (Self             : in out Splitter_Class;
                    Input_X          : ML_Types.Value_Data_Lists_2D;
                    Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
@@ -341,6 +341,7 @@ package body Node_Splitter is
       use Ada.Containers;
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Weighted_Samples : Float := 0.0;
+      J_Index          : Natural := 0;
    begin
       Self.Min_Leaf_Samples := Min_Leaf_Samples;
       --  X dimensions: num samples x num features
@@ -348,20 +349,28 @@ package body Node_Splitter is
       --  Min_Leaf_Samples is the minimum number of samples that each leaf can
       --  have, where splits which would result in having less samples in a
       --  leaf are not considered.
+
+      --  L146 Create a new list which will store nonzero samples from the
+      --  feature of interest
       Self.Sample_Indices.Clear;
-      --  For each sample (row)
-      for index in Input_X.First_Index .. Input_X.Last_Index loop
+      for index in 1 .. Num_Samples loop
+           Self.Sample_Indices.Append (0);
+      end loop;
+
+      --  L152 For each sample (row)
+      for index_i in Input_X.First_Index .. Input_X.Last_Index loop
          --  Only work with positively weighted samples.
          if Sample_Weight.Is_Empty or else
-           Sample_Weight.Element (index) > 0.0 then
-            Self.Sample_Indices.Append (index);
+           Sample_Weight.Element (index_i) > 0.0 then
+            J_Index := J_Index + 1;
+            Self.Sample_Indices.Replace_Element (J_Index, index_i);
          end if;
 
          if Sample_Weight.Is_Empty then
             Weighted_Samples := Weighted_Samples + 1.0;
          else
             Weighted_Samples :=
-              Weighted_Samples + Sample_Weight.Element (index);
+              Weighted_Samples + Sample_Weight.Element (index_i);
          end if;
       end loop;
 

@@ -21,7 +21,6 @@ package body Criterion is
       --  L252
       Criteria.Num_Outputs := Num_Outputs;
       Criteria.Num_Classes := Num_Classes;
-      --          Criteria.Classes := Classes;
 
    end C_Init;
 
@@ -81,10 +80,10 @@ package body Criterion is
          Y_I := Y.Element (Y_I_Index);
          for k in 1 .. Num_Outputs loop
             Sum_Total_K := Criteria.Sum_Total.Element (k);
-            --  Y_Ik is an index into Y (output k) classes
+            --  L339 c = Y_Ik is an index into Y (output k) classes
             Y_Ik := Y_I.Element (k);
-            --  L339 c = Y_Ik
             --  sum_total[k * self.sum_stride + c] += w
+            --
             --  Add Weight to Y (output k, class Y_Ik)
             Sum_Total_K.Replace_Element
               (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
