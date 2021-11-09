@@ -28,7 +28,8 @@ package body Decision_Tree_Classification is
               "Decision_Tree_Classifer.Classification_Fit, invalid estimator "
               & Estimator_Type'Image (aClassifier.Estimator_Kind));
 
-      --  L920
+      --  L920 X is 2D list num samples x num features
+      --       Y is 2D list num classes x num outputs
       Base_Decision_Tree.Base_Fit (aClassifier, X, Y, Sample_Weights, Max_Depth);
 
    end Classification_Fit;

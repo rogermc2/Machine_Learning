@@ -9,7 +9,7 @@ package Criterion is
     type Criterion_Kind is (Criterion_Classification, Criterion_Regression);
     type Criterion_Class
       (Criterion_Type : Criterion_Kind := Criterion_Classification) is record
-       Y                         : Classifier_Types.List_Of_Natural_Lists;
+       Y                         : Classifier_Types.Natural_Lists_2D;
        --  Sample_Weight contains the weight of each sample
        Sample_Weight             : Weights.Weight_List;
        Samples                   : ML_Types.Value_Data_Lists_2D;
@@ -48,7 +48,7 @@ package Criterion is
                       Num_Classes : Classifier_Types.Natural_List);
     procedure Classification_Init
       (Criteria             : in out Criterion_Class;
-       Y                    : Classifier_Types.List_Of_Natural_Lists;
+       Y                    : Classifier_Types.Natural_Lists_2D;
        --  Samples:
        Sample_Indices       : Classifier_Types.Natural_List;
        --  Sample_Weight contains the weight of each sample

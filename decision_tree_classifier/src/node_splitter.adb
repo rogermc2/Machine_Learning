@@ -335,7 +335,7 @@ package body Node_Splitter is
    --  L116
    procedure Init (Self             : in out Splitter_Class;
                    Input_X          : ML_Types.Value_Data_Lists_2D;
-                   Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
+                   Y_Encoded        : Classifier_Types.Natural_Lists_2D;
                    Sample_Weight    : Weights.Weight_List;
                    Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;

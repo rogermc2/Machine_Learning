@@ -171,8 +171,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Natural_Lists_2D (Name : String;
-                                     Data : List_Of_Natural_Lists) is
+   procedure Print_Natural_Lists_2D (Name : String; Data : Natural_Lists_2D) is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop

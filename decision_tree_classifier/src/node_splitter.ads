@@ -33,7 +33,7 @@ package Node_Splitter is
       Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
       --  encoded version of sample Y
-      Y                    : Classifier_Types.List_Of_Natural_Lists;
+      Y                    : Classifier_Types.Natural_Lists_2D;
       Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
@@ -52,7 +52,7 @@ package Node_Splitter is
                       Min_Leaf_Weight : Float := 0.0);
    procedure Init (Self             : in out Splitter_Class;
                    Input_X          : ML_Types.Value_Data_Lists_2D;
-                   Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
+                   Y_Encoded        : Classifier_Types.Natural_Lists_2D;
                    Sample_Weight    : Weights.Weight_List;
                    Min_Leaf_Samples : Positive := 1);
    function Entropy_Node_Impurity (Self : Splitter_Class) return Float;

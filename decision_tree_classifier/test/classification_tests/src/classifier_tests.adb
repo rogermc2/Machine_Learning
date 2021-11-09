@@ -52,6 +52,7 @@ package body Classifier_Tests is
         Assert (Num_Samples > 0,
                 "Classification_Tests.Test_Classification_Toy called with empty X vector.");
 
+        --  Y is 2D list num outputs x num classes
         Y := To_Integer_Value_List (Y_Array);
         --  L229
         Expected := To_Integer_Value_List (True_Result);

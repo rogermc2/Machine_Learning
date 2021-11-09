@@ -22,7 +22,7 @@ package body Base_Decision_Tree is
    procedure Classification_Part
      (aClassifier            : in out Classifier;
       Y                      : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded              : out Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out ML_Types.Value_Data_Lists_2D;
       Expanded_Class_Weights : in out Classifier_Types.Float_List);
    procedure Prune_Tree (aClassifier : in out Classifier);
@@ -39,7 +39,7 @@ package body Base_Decision_Tree is
       use Estimator;
       Criteria              : Criterion.Criterion_Class;
       Splitter              : Node_Splitter.Splitter_Class;
-      Y_Encoded             : Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded             : Classifier_Types.Natural_Lists_2D;
       Classes               : ML_Types.Value_Data_Lists_2D;
       Num_Classes           : Classifier_Types.Natural_List;
       --  L205
@@ -51,6 +51,8 @@ package body Base_Decision_Tree is
       Assert (not Y.Is_Empty,
            "Base_Decision_Tree.Base_Fit, Y is empty");
 
+      --  X is 2D list num samples x num features
+      --  Y is 2D list num classes x num outputs
       --  L207  Generates Y_Encoded and Classes
       if aClassifier.Estimator_Kind = Classifier_Estimator then
          Classification_Part (aClassifier, Y, Y_Encoded,
@@ -260,7 +262,7 @@ package body Base_Decision_Tree is
    procedure Classification_Part
      (aClassifier            : in out Classifier;
       Y                      : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded              : out Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out ML_Types.Value_Data_Lists_2D;
       Expanded_Class_Weights : in out Classifier_Types.Float_List) is
       use Ada.Containers;
@@ -273,33 +275,39 @@ package body Base_Decision_Tree is
       Column      : Natural_List;
       Inverse     : Natural_List;
    begin
+      Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
+                Count_Type'Image (Y.Length));
+      Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
+                Count_Type'Image (Num_Outputs));
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
       Classes.Clear;
       Y_Encoded.Set_Length (Y.Length);
 
+      --  Y is 2D list num classes x num outputs
+      --  Y_Encoded is 2D list num classes x num outputs
       --  L208  Initialize Y_Encoded
-      for row in Y.First_Index .. Y.Last_Index loop
+      for class in Y.First_Index .. Y.Last_Index loop
          Column.Clear;
-         for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
-            Column.Append (col);
+         for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+            Column.Append (op);
          end loop;
-         Y_Encoded.Replace_Element (row, Column);
+         Y_Encoded.Replace_Element (class, Column);
       end loop;
 
       OP_Row.Set_Length (Num_Outputs);
-      for col in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+      for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
          Yk_Row.Clear;
-         for row in Y.First_Index .. Y.Last_Index loop
-            Y_Row := Y.Element (row);
-            Yk_Row.Append (Y_Row.Element (col));
+         for class in Y.First_Index .. Y.Last_Index loop
+            Y_Row := Y.Element (class);
+            Yk_Row.Append (Y_Row.Element (op));
          end loop;
          Classes.Append (Encode_Utils.Unique (Yk_Row, Inverse));
 
-         for row in Y.First_Index .. Y.Last_Index loop
-            YE_Row := Y_Encoded.Element (row);
-            YE_Row.Replace_Element (col, Inverse.Element (row));
-            Y_Encoded.Replace_Element (row, YE_Row);
+         for class in Y.First_Index .. Y.Last_Index loop
+            YE_Row := Y_Encoded.Element (class);
+            YE_Row.Replace_Element (op, Inverse.Element (class));
+            Y_Encoded.Replace_Element (class, YE_Row);
          end loop;
 
       end loop;

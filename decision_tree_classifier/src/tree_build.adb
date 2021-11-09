@@ -171,7 +171,7 @@ package body Tree_Build is
      (Best_Builder  : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X             : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded     : Classifier_Types.Natural_Lists_2D;
       Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Frontier_Package;
@@ -238,7 +238,7 @@ package body Tree_Build is
      (Depth_Builder : in out Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X             : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+      Y_Encoded     : Classifier_Types.Natural_Lists_2D;
       Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Build_Utils.Stack_Package;

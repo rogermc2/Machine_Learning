@@ -44,7 +44,7 @@ package Classifier_Types is
    use Natural_Package;
    package Natural_List_Package is new
       Ada.Containers.Vectors (Positive, Natural_List);
-   subtype List_Of_Natural_Lists is Natural_List_Package.Vector;
+   subtype Natural_Lists_2D is Natural_List_Package.Vector;
 
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;

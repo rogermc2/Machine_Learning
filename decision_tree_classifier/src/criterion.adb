@@ -28,7 +28,7 @@ package body Criterion is
    --  L59, L214, 280
    procedure Classification_Init
      (Criteria            : in out Criterion_Class;
-      Y                   : Classifier_Types.List_Of_Natural_Lists;
+      Y                   : Classifier_Types.Natural_Lists_2D;
       Sample_Indices      : Classifier_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
@@ -36,9 +36,9 @@ package body Criterion is
       Start_Row, End_Mark : Natural) is
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
-      Y_I_Index       : Positive;
-      Y_I             : Classifier_Types.Natural_List;
-      Y_Ik            : Natural;
+      Y_I_Index       : Positive;  --  Class index
+      Y_I             : Classifier_Types.Natural_List;  --  Class
+      Y_Ik            : Natural; --  Class.output
       Weight          : Float := 1.0;
    begin
       --  L302
@@ -67,7 +67,7 @@ package body Criterion is
       --  L329
       Put_Line ("Criterion.Classification_Init, Start_Row, End_Mark: " &
                Integer'Image (Start_Row) & ", " & Integer'Image (End_Mark));
-      for p in Start_Row .. End_Mark - 1 loop
+      for p in Sample_Indices.First_Index .. Sample_Indices.Last_Index loop
          Y_I_Index := Sample_Indices.Element (p);
 
          --  Weight is originally set to be 1.0, meaning that if no
@@ -77,14 +77,14 @@ package body Criterion is
          end if;
 
          --  L338 Count weighted class frequency for each target
+         --  Y_I is Class
          Y_I := Y.Element (Y_I_Index);
          for k in 1 .. Num_Outputs loop
             Sum_Total_K := Criteria.Sum_Total.Element (k);
-            --  L339 c = Y_Ik is an index into Y (output k) classes
-            Y_Ik := Y_I.Element (k);
+            --  L339 c = Y_Ik is an index into Y (output k) class i
+            Y_Ik := Y_I.Element (k);   --  class.output
             --  sum_total[k * self.sum_stride + c] += w
-            --
-            --  Add Weight to Y (output k, class Y_Ik)
+            --  Add Weight to Y (class Y_I, output k)
             Sum_Total_K.Replace_Element
               (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
             Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
@@ -95,7 +95,7 @@ package body Criterion is
       end loop;
 
       Reset (Criteria);
-      Printing.Print_Weights_Lists_2D ("Criterion.Classification_Init, Sum_Total",
+      Printing.Print_Weights_Lists_2D ("Criterion.Classification_Init, class Sum_Totals",
                                       Criteria.Sum_Total);
 
    end Classification_Init;
