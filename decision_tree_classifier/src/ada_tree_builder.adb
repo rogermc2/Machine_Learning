@@ -52,6 +52,8 @@ package body Ada_Tree_Builder is
       Child_Cursor          : Tree.Tree_Cursor;
       Node_ID               : Positive;
    begin
+      Printing.Print_Stack_Record ("Ada_Tree_Builder.Add_Branch stack data",
+                                  Data);
       --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       if not First then
@@ -131,7 +133,7 @@ package body Ada_Tree_Builder is
                Child_Cursor, False, Split.Impurity_Right,
                Num_Constant_Features);
          --  Add left branch
-         Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
+         Push (theStack, Start_Row, Split.Split_Row - 1, Data.Depth + 1,
                Child_Cursor, True, Split.Impurity_Left,
                Num_Constant_Features);
       end if;
