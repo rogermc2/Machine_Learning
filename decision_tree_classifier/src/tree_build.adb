@@ -140,7 +140,7 @@ package body Tree_Build is
       Res.Is_Leaf := Is_Leaf;
 
       if Is_Leaf then
-         Res.Position := Res.Stop;
+         Res.Position := Res.End_Mark;
          Res.Improvement := 0.0;
          Res.Impurity_Left := Impurity;
          Res.Impurity_Right := Impurity;
@@ -222,7 +222,7 @@ package body Tree_Build is
             --  Compute right split node
             Add_Split_Node
               (Best_Builder, Splitter, theTree, Heap_Record.Position,
-               Heap_Record.Stop, Heap_Record.Impurity_Right, False, False,
+               Heap_Record.End_Mark, Heap_Record.Impurity_Right, False, False,
                Node_Cursor, Heap_Record.Depth + 1, Split_Node_Right);
             Add_To_Frontier (Split_Node_Right, Frontier);
          end if;

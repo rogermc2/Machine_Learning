@@ -37,7 +37,7 @@ package Node_Splitter is
       Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
-      End_Row              : Positive := 1;
+      End_Mark             : Positive := 1;
       --  BaseDenseSplitter elements
       X                    : ML_Types.Value_Data_Lists_2D;
       Total_Samples        : Natural := 0;
@@ -61,7 +61,7 @@ package Node_Splitter is
                          Values : out Weights.Weight_Lists_2D);
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
-      Start_Row, End_Row    : Positive;
+      Start_Row, End_Mark   : Positive;
       Weighted_Node_Samples : in out Float);
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;

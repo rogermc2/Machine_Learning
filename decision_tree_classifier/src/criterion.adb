@@ -28,13 +28,13 @@ package body Criterion is
    --  ------------------------------------------------------------------------
    --  L59, L214, 280
    procedure Classification_Init
-     (Criteria           : in out Criterion_Class;
-      Y                  : Classifier_Types.List_Of_Natural_Lists;
-      Sample_Indices     : Classifier_Types.Natural_List;
+     (Criteria            : in out Criterion_Class;
+      Y                   : Classifier_Types.List_Of_Natural_Lists;
+      Sample_Indices      : Classifier_Types.Natural_List;
       --  Sample_Weight contains the weight of each sample
-      Sample_Weight      : Weights.Weight_List;
-      Weighted_Samples   : Float;
-      Start_Row, End_Row : Natural) is
+      Sample_Weight       : Weights.Weight_List;
+      Weighted_Samples    : Float;
+      Start_Row, End_Mark : Natural) is
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
       Y_I_Index       : Positive;
@@ -47,8 +47,8 @@ package body Criterion is
       Criteria.Sample_Weight := Sample_Weight;
       Criteria.Sample_Indices := Sample_Indices;
       Criteria.Start_Row := Start_Row;
-      Criteria.End_Row := End_Row;
-      Criteria.Num_Node_Samples := End_Row - Start_Row + 1;
+      Criteria.End_Mark := End_Mark;
+      Criteria.Num_Node_Samples := End_Mark - Start_Row;
       Criteria.Num_Weighted_Samples := Weighted_Samples;
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
@@ -66,9 +66,9 @@ package body Criterion is
       end loop;
 
       --  L329
-      Put_Line ("Criterion.Classification_Init, Start_Row, End_Row: " &
-               Integer'Image (Start_Row) & ", " & Integer'Image (End_Row));
-      for p in Start_Row .. End_Row loop
+      Put_Line ("Criterion.Classification_Init, Start_Row, End_Mark: " &
+               Integer'Image (Start_Row) & ", " & Integer'Image (End_Mark));
+      for p in Start_Row .. End_Mark - 1 loop
          Y_I_Index := Sample_Indices.Element (p);
 
          --  Weight is originally set to be 1.0, meaning that if no
@@ -289,7 +289,7 @@ package body Criterion is
                       Positive (Criteria.Y.Element (1).Length);
       Sum_Right_K : Classifier_Types.Float_List;
    begin
-      Criteria.Split_Row := Criteria.End_Row;
+      Criteria.Split_Row := Criteria.End_Mark;
       Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Node_Samples;
       Criteria.Num_Weighted_Right := 0.0;
 
@@ -308,7 +308,7 @@ package body Criterion is
    end Reverse_Reset;
 
    --  ------------------------------------------------------------------------
-   --  L402 Update statistics by moving samples[pos:new_pos] to the left child.
+   --  L398 Update statistics by moving samples[pos:new_pos] to the left child.
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
       Num_Outputs : constant Positive :=
@@ -322,7 +322,7 @@ package body Criterion is
       Weight      : Float := 1.0;
    begin
       --  L439
-      if (New_Pos - Criteria.Split_Row) <= (Criteria.End_Row - New_Pos) then
+      if (New_Pos - Criteria.Split_Row) <= (Criteria.End_Mark - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
@@ -340,9 +340,9 @@ package body Criterion is
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
          end loop;
 
-      else  --  L452
+      else  --  L449
          Reverse_Reset (Criteria);
-         for p in reverse Criteria.End_Row .. New_Pos loop
+         for p in reverse Criteria.End_Mark - 1 .. New_Pos -1 loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
                Weight := Criteria.Sample_Weight.Element (i);

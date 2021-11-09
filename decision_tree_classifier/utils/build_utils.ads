@@ -15,7 +15,7 @@ package Build_Utils is
       Impurity_Right : Float;
       Improvement    : Float;
       Start          : Positive := 1;
-      Stop           : Positive := 1;
+      End_Mark       : Positive := 1;
       Position       : Positive := 1;
    end record;
 

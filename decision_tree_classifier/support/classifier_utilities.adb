@@ -400,7 +400,7 @@ package body Classifier_Utilities is
             Next (Set_Curs);
          end loop;
          return Unique_Array;
-      end;
+      end; --  declare block
    end Unique_Integer_Array;
 
    --  -------------------------------------------------------------------------

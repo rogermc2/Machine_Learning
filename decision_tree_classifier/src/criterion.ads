@@ -15,7 +15,7 @@ package Criterion is
        Samples                   : ML_Types.Value_Data_Lists_2D;
        Num_Outputs               : Tree.Index_Range := 1;
        Start_Row                 : Natural := 0;
-       End_Row                   : Natural := 0;
+       End_Mark                  : Natural := 0;
        Split_Row                 : Natural := 0;
        Num_Node_Samples          : Natural := 0;
        Num_Weighted_Samples      : Float := 0.0;
@@ -47,14 +47,14 @@ package Criterion is
                       Num_Outputs : Tree.Index_Range;
                       Num_Classes : Classifier_Types.Natural_List);
     procedure Classification_Init
-      (Criteria            : in out Criterion_Class;
-       Y                   : Classifier_Types.List_Of_Natural_Lists;
+      (Criteria             : in out Criterion_Class;
+       Y                    : Classifier_Types.List_Of_Natural_Lists;
        --  Samples:
-       Sample_Indices      : Classifier_Types.Natural_List;
+       Sample_Indices       : Classifier_Types.Natural_List;
        --  Sample_Weight contains the weight of each sample
-       Sample_Weight       : Weights.Weight_List;
-       Weighted_Samples    : Float;
-       Start_Row, End_Row  : Natural);
+       Sample_Weight        : Weights.Weight_List;
+       Weighted_Samples     : Float;
+       Start_Row, End_Mark  : Natural);
     procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
                                       Impurity_Left,
                                       Impurity_Right : out Float);
