@@ -375,7 +375,7 @@ package body Node_Splitter is
       end loop;
 
       --  Number of samples is the number of positively weighted samples.
-      Self.Num_Samples := Natural (Self.Sample_Indices.Length);
+      Self.Num_Samples := J_Index;
       Self.Weighted_Samples := Weighted_Samples;
 
       Self.Feature_Indices.Clear;
