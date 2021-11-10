@@ -26,7 +26,7 @@ package body Tree_Build is
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    --  L720
    function Add_Node (theTree               : in out Tree.Tree_Class;
-                      Depth                 : Natural;
+--                        Depth                 : Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
@@ -45,8 +45,8 @@ package body Tree_Build is
       Last_Node := Last_Node + 1;
       New_Node.Node_ID := Last_Node;
       --  _Tree L738
-      New_Node.Is_Left := Is_Left;
-      New_Node.Depth := Depth;
+--        New_Node.Is_Left := Is_Left;
+--        New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
       New_Node.Num_Node_Samples := Num_Samples;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
@@ -118,7 +118,7 @@ package body Tree_Build is
       end if;
 
       Node_Cursor := Add_Node
-        (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf,
+        (theTree, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, aSplit.Threshold, Impurity,
           Splitter.Num_Samples, Float (Parent_Node.Weighted_Num_Node_Samples));
       Node := Element (Node_Cursor);
@@ -131,7 +131,7 @@ package body Tree_Build is
       theTree.Values.Replace_Element (Node.Node_ID, Values);
 
       Res.Node_Cursor := Add_Node
-        (theTree, Depth, Parent_Cursor, Is_Left, Is_Leaf,
+        (theTree, Parent_Cursor, Is_Left, Is_Leaf,
          aSplit.Feature, aSplit.Threshold, Impurity, Splitter.Num_Samples,
          Splitter.Weighted_Samples);
       Res.Node_Params := Element (Res.Node_Cursor);
@@ -182,7 +182,7 @@ package body Tree_Build is
       Max_Split_Nodes  : Natural;
       Impurity         : Float := 0.0;
       Frontier         : Build_Utils.Frontier_List;
-      Current_Node     : Tree.Tree_Node;
+--        Current_Node     : Tree.Tree_Node;
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
       Is_Leaf          : Boolean := False;
@@ -205,7 +205,7 @@ package body Tree_Build is
       Curs := Frontier.First;
       while Has_Element (Curs) loop
          Heap_Record := Element (Curs);
-         Current_Node := Heap_Record.Node_Params;
+--           Current_Node := Heap_Record.Node_Params;
          Node_Cursor := Heap_Record.Node_Cursor;
          Is_Leaf := Heap_Record.Is_Leaf or Max_Split_Nodes < 0;
          if not Is_Leaf then
@@ -214,10 +214,10 @@ package body Tree_Build is
             Add_Split_Node
               (Best_Builder, Splitter, theTree, Heap_Record.Start,
                Heap_Record.Position, Heap_Record.Impurity, False,
-               Current_Node.Is_Left, Node_Cursor, Heap_Record.Depth + 1, Split_Node_Left);
+               True, Node_Cursor, Heap_Record.Depth + 1, Split_Node_Left);
             --  L383 tree.nodes may have changed
             Heap_Record := Element (Curs);
-            Current_Node := Heap_Record.Node_Params;
+--              Current_Node := Heap_Record.Node_Params;
             Node_Cursor := Heap_Record.Node_Cursor;
             --  Compute right split node
             Add_Split_Node
@@ -306,9 +306,8 @@ package body Tree_Build is
          end if;
 
          Node_Cursor := Add_Node
-           (theTree, Depth, Parent, Is_Left, Is_Leaf,
-            Split.Feature, Split.Threshold, Impurity,
-            Splitter.Num_Samples, Weighted_Samples);
+           (theTree, Parent, Is_Left, Is_Leaf, Split.Feature, Split.Threshold,
+            Impurity, Splitter.Num_Samples, Weighted_Samples);
 
          if not Is_Leaf then
             --  Right child
@@ -343,10 +342,9 @@ package body Tree_Build is
       Leaf_Node.Impurity := Old_Node.Impurity;
       Leaf_Node.Num_Node_Samples := Old_Node.Num_Node_Samples;
       Leaf_Node. Weighted_Num_Node_Samples := Old_Node.Weighted_Num_Node_Samples;
-      Leaf_Node.Samples_Start := Old_Node.Samples_Start;
-      Leaf_Node.Depth := Old_Node.Depth;
-      Leaf_Node.Num_Constant_Features := Old_Node.Num_Constant_Features;
---        Leaf_Node.Values := Old_Node.Values;
+--        Leaf_Node.Samples_Start := Old_Node.Samples_Start;
+--        Leaf_Node.Depth := Old_Node.Depth;
+--        Leaf_Node.Num_Constant_Features := Old_Node.Num_Constant_Features;
       aTree.Nodes.Replace_Element (Node_Cursor, Leaf_Node);
 
    end Change_To_Leaf_Node;

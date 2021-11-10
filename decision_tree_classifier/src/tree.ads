@@ -41,10 +41,10 @@ package Tree is
       Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
       --  From Tree/Utils StackRecord struct
-      Samples_Start             : Positive := 1;
-      Depth                     : Positive := 1;
-      Is_Left                   : Boolean := True;
-      Num_Constant_Features     : Natural := 0;
+--        Samples_Start             : Positive := 1;
+--        Depth                     : Positive := 1;
+--        Is_Left                   : Boolean := True;
+--        Num_Constant_Features     : Natural := 0;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct

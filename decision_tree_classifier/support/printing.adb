@@ -229,9 +229,7 @@ package body Printing is
                         To_Unbounded_String (Offset);
     begin
         Put_Line ("Node" & Integer'Image (Node.Node_ID));
-        Put (To_String (UB_Offset & "Start:" &
-               Integer'Image (Node.Samples_Start)));
-        Put ("," & Integer'Image (Node.Num_Node_Samples) & " sample");
+        Put (To_String (UB_Offset) & Integer'Image (Node.Num_Node_Samples) & " sample");
         if Node.Num_Node_Samples > 1 then
             Put_Line ("s");
         else
@@ -248,16 +246,6 @@ package body Printing is
 
         Put_Line (To_String (UB_Offset & "Number of weighted samples:" &
                     Integer'Image (Node.Weighted_Num_Node_Samples)));
-        if Node.Is_Left then
-            Put_Line (To_String (UB_Offset & "True branch"));
-        else
-            Put_Line (To_String (UB_Offset & "False branch"));
-        end if;
-
-        Put_Line (To_String (UB_Offset & "Number of constant features:" &
-                    Integer'Image (Node.Num_Constant_Features)));
-        Put_Line (To_String (UB_Offset & "Depth:" &
-                    Integer'Image (Node.Depth)));
         Put_Line (To_String (UB_Offset & "Impurity: " &
                     Float'Image (Node.Impurity)));
 
