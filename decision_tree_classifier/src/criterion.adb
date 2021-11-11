@@ -2,12 +2,12 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with ML_Types;
-with Printing;
+--  with Printing;
 
 package body Criterion is
 
@@ -66,9 +66,6 @@ package body Criterion is
       end loop;
 
       --  L325
-      Put_Line ("Criterion.Classification_Init, Start_Row, Stop_Row: " &
-                  Integer'Image (Start_Row) & ", " & Integer'Image (Stop_Row));
-
       for p in Start_Row .. Stop_Row loop
          Y_I_Index := Sample_Indices.Element (p);
 
@@ -97,8 +94,8 @@ package body Criterion is
       end loop;
 
       Reset (Criteria);
-      Printing.Print_Weights_Lists_2D ("Criterion.Classification_Init, class Sum_Totals",
-                                      Criteria.Sum_Total);
+      --        Printing.Print_Weights_Lists_2D ("Criterion.Classification_Init, class Sum_Totals",
+      --                                        Criteria.Sum_Total);
 
    end Classification_Init;
 
@@ -157,14 +154,14 @@ package body Criterion is
    --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
    --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
    function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
-      Num_Outputs   : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes   : constant Classifier_Types.Natural_List :=
-                        Criteria.Num_Classes;
-      Sum_Total_K   : Weights.Weight_List;
+      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
+      Num_Classes    : constant Classifier_Types.Natural_List :=
+                         Criteria.Num_Classes;
+      Sum_Total_K    : Weights.Weight_List;
       Num_Classes_K  : Positive;
-      Count_K       : Float;
-      Gini          : Float := 0.0;
-      Sq_Count      : Float := 0.0;
+      Count_K        : Float;
+      Gini           : Float := 0.0;
+      Sq_Count       : Float := 0.0;
    begin
       --  L620
       for index_k in 1 .. Criteria.Num_Outputs loop
@@ -247,7 +244,7 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                         return Float is
+                                        return Float is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin

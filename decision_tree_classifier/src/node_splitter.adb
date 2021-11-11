@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -118,8 +118,6 @@ package body Node_Splitter is
       --  P_Index: Self.Start_Index through Self.End_Index
       --  L381
       while P_Index < Self.Stop_Row loop
-         --              Put_Line ("Node_Splitter.Evaluate_All_Splits L382 P_Index: "
-         --                        & Integer'Image (P_Index));
          --  L382
          LE := True;
          while P_Index + 1 < Self.Stop_Row and LE loop
@@ -169,8 +167,6 @@ package body Node_Splitter is
 
          --  L388
          P_Index := P_Index + 1;
-         --              Put_Line ("Node_Splitter.Evaluate_All_Splits L388 P_Index: " &
-         --                          Integer'Image (P_Index));
          --  L395
          if P_Index <= Self.Stop_Row then
             Current.Split_Row := P_Index;
@@ -184,8 +180,6 @@ package body Node_Splitter is
               Self.Stop_Row - Current.Split_Row >= Self.Min_Leaf_Samples then
                --  L400
                Criterion.Update (Self.Criteria, Current.Split_Row);
-               --                      Put_Line ("Node_Splitter.Evaluate_All_Splits L400 Split_Row: "
-               --                                   & Integer'Image (Current.Split_Row));
 
                --  L402 Accept if min_weight_leaf is satisfied
                if Self.Criteria.Num_Weighted_Left >= Self.Min_Leaf_Weight and
@@ -193,8 +187,6 @@ package body Node_Splitter is
                   --  L409  Note: Improvements are negative values.
                   Current_Proxy_Improvement :=
                     Criterion.Proxy_Impurity_Improvement (Self.Criteria);
-                  --                          Put_Line ("Node_Splitter.Evaluate_All_Splits L409 Current_Proxy_Improvement: "
-                  --                               & Float'Image (Current_Proxy_Improvement));
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
@@ -250,8 +242,6 @@ package body Node_Splitter is
                   end if;
                end if;
             end if;
-            --                  Put_Line ("Node_Splitter.Evaluate_All_Splits L420 Split_Row: " &
-            --                              Integer'Image (Current.Split_Row));
          end if;
       end loop;
 
@@ -596,24 +586,13 @@ package body Node_Splitter is
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
 
-      Printing.Print_Split_Record
-        ("Node_Splitter.Split_Node Best_Split L424", Best_Split);
-
       --  L424  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-
---        Printing.Print_Split_Record
---          ("Node_Splitter.Split_Node Best_Split L444", Best_Split);
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
       --  L454
       Num_Constant_Features := Num_Total_Constants;
-      --  L453
---        Put_Line ("Node_Splitter.Split_Node L453 Start" &
---                 Integer'Image (Self.Start_Row));
---        Printing.Print_Split_Record
---          ("Node_Splitter.Split_Node Best_Split L453", Best_Split);
       return Best_Split;
 
    end Split_Node;
