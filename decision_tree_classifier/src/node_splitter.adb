@@ -392,7 +392,7 @@ package body Node_Splitter is
 
    procedure Init_Split (theSplit : in out Split_Record; Start : Positive) is
    begin
-      theSplit.Split_Row := Start + 1;
+      theSplit.Split_Row := Start;
       theSplit.Impurity_Left := Float'Last;
       theSplit.Impurity_Right := Float'Last;
       theSplit.Improvement := -Float'Last;
