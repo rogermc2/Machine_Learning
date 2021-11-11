@@ -131,7 +131,7 @@ package body Ada_Tree_Builder is
                Child_Cursor, False, Split.Impurity_Right,
                Num_Constant_Features);
          --  Add left branch
-         Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
+         Push (theStack, Start_Row, Split.Split_Row - 1, Data.Depth + 1,
                Child_Cursor, True, Split.Impurity_Left,
                Num_Constant_Features);
       end if;

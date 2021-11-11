@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Node_Splitter is
 
@@ -254,7 +254,7 @@ package body Node_Splitter is
             --                              Integer'Image (Current.Split_Row));
          end if;
       end loop;
-
+      Best.Split_Row := Best.Split_Row + 1;
       if not Best_Updated then
          Put_Line
            ("Node_Splitter.Evaluate_All_Splits, " &
@@ -596,8 +596,8 @@ package body Node_Splitter is
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
 
---        Printing.Print_Split_Record
---          ("Node_Splitter.Split_Node Best_Split L424", Best_Split);
+      Printing.Print_Split_Record
+        ("Node_Splitter.Split_Node Best_Split L424", Best_Split);
 
       --  L424  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
