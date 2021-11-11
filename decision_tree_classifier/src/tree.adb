@@ -3,10 +3,8 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Utilities;
-
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Tree is
 
@@ -52,7 +50,6 @@ package body Tree is
       --  L798 for each sample
       for index in X.First_Index .. X.Last_Index loop
          Node_Cursor := Top_Cursor;
-         Printing.Print_Node ("Tree.Apply_Dense, top Node", Node_Cursor);
          --  Sample is alist of feature values
          Sample := X.Element (index);
 
@@ -60,7 +57,6 @@ package body Tree is
          --  This node has the prediction value.
          while not Element (Node_Cursor).Leaf_Node loop
             Node := Element (Node_Cursor);
-            Printing.Print_Node ("Tree.Apply_Dense, Node", Node);
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -80,11 +76,9 @@ package body Tree is
             else
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
-            Printing.Print_Node ("Tree.Apply_Dense, Selected child Node",
-                                 Node_Cursor);
          end loop;  --  Not_Leaf
-
-         Printing.Print_Node ("Tree.Apply_Dense, Selected_Node", Node_Cursor);
+--           Put_Line ("Tree.Apply_Dense, sample" & Integer'Image (index));
+--           Printing.Print_Node ("Tree.Apply_Dense, Selected_Node", Node_Cursor);
          Selected_Nodes.Append (Node_Cursor);
       end loop;
 
@@ -105,20 +99,14 @@ package body Tree is
       Node            : Tree_Node;
       Out_Data        : Weight_Lists_3D;
    begin
-      Printing.Print_Value_Data_Lists_2D ("Tree.Predict, X ", X);
       --  L760;
       Selected_Nodes := Apply (Self, X);
-      Printing.Print_Weight_Lists_3D ("Tree.Predict, Self.Values", Self.Values);
-      Printing.Print_Node_Cursor_List ("Tree.Predict, Apply: Selected_Nodes",
-                                       Selected_Nodes);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
-         Printing.Print_Node ("Tree.Predict, Selected_Node", Node_Cursor);
          Node := Element (Node_Cursor);
          Out_Data.Append (Self.Values.Element (Node.Node_ID));
       end loop;
 
-      Printing.Print_Weight_Lists_3D ("Tree.Predict, Out_Data", Out_Data);
       return Out_Data;
 
    end Predict;
