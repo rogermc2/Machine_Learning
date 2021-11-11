@@ -254,7 +254,7 @@ package body Node_Splitter is
             --                              Integer'Image (Current.Split_Row));
          end if;
       end loop;
-      Best.Split_Row := Best.Split_Row + 1;
+
       if not Best_Updated then
          Put_Line
            ("Node_Splitter.Evaluate_All_Splits, " &

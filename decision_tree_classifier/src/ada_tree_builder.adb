@@ -127,11 +127,11 @@ package body Ada_Tree_Builder is
                   Integer'Image (Split.Split_Row) & ", " &
                   Integer'Image (Stop_Row));
          --  Add right branch
-         Push (theStack, Split.Split_Row, Stop_Row, Data.Depth + 1,
+         Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
                Child_Cursor, False, Split.Impurity_Right,
                Num_Constant_Features);
          --  Add left branch
-         Push (theStack, Start_Row, Split.Split_Row - 1, Data.Depth + 1,
+         Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
                Child_Cursor, True, Split.Impurity_Left,
                Num_Constant_Features);
       end if;

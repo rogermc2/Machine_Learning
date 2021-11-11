@@ -158,7 +158,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Lists_2D (Name : String;
-                                        Data : Float_List_2D) is
+                                   Data : Float_List_2D) is
    begin
       Put_Line (Name & ": ");
       for index in Data.First_Index .. Data.Last_Index loop
@@ -191,13 +191,13 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Value_Lists_3D (Name   : String;
+   procedure Print_Value_Lists_3D (Name    : String;
                                    theList :Tree.Values_List_3D) is
    begin
       Put_Line (Name & ": ");
       for index in theList.First_Index .. theList.Last_Index loop
          Print_Value_Lists_2D ("List" & Integer'Image (index),
-                                   theList.Element (index));
+                               theList.Element (index));
       end loop;
       New_Line;
    end Print_Value_Lists_3D;
@@ -225,19 +225,12 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Node (Node : Tree.Tree_Node; Offset : String := "") is
-      UB_Offset   : constant Unbounded_String :=
-                      To_Unbounded_String (Offset);
+      UB_Offset : constant Unbounded_String :=
+                    To_Unbounded_String (Offset);
    begin
       Put_Line ("Node" & Integer'Image (Node.Node_ID));
-      Put (To_String (UB_Offset & "Start:" &
-                  Integer'Image (Node.Samples_Start)));
-      Put ("," & Integer'Image (Node.Num_Node_Samples) & " sample");
-      if Node.Num_Node_Samples > 1 then
-         Put_Line ("s");
-      else
-         New_Line;
-      end if;
-
+      Put_Line (To_String (UB_Offset) & "Number of samples:" &
+                  Integer'Image (Node.Num_Node_Samples));
       Put (To_String (UB_Offset & "Type of node: "));
 
       if Node.Leaf_Node then
