@@ -40,7 +40,7 @@ package body Ada_Tree_Builder is
       use Tree;
       use Nodes_Package;
       --  L199
-      Data                  : Stack_Record := Pop (theStack);
+      Data                  : constant Stack_Record := Pop (theStack);
       Start_Row             : constant Positive := Data.Start;
       Stop_Row              : constant Positive := Data.Stop;
       Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
@@ -72,9 +72,7 @@ package body Ada_Tree_Builder is
       abs (Impurity) <= Epsilon;
 
       --  L220
-      if Is_Leaf_Node then
-         Tree_Build.Change_To_Leaf_Node (theTree, Data.Parent_Cursor);
-      else
+      if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
          --  L233

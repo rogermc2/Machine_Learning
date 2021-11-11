@@ -49,17 +49,18 @@ package body Tree is
       Assert (Integer (Child_Count (Top_Cursor)) > 0,
               "Tree.Apply_Dense Self.Nodes tree is empty");
 
-      --  L800 for each sample
+      --  L798 for each sample
       for index in X.First_Index .. X.Last_Index loop
          Node_Cursor := Top_Cursor;
+         Printing.Print_Node ("Tree.Apply_Dense, top Node", Node_Cursor);
          --  Sample is alist of feature values
          Sample := X.Element (index);
 
          --  Find a node with a leaf child.
          --  This node has the prediction value.
---           while not Element (Node_Cursor).Leaf_Node loop
          while not Element (Node_Cursor).Leaf_Node loop
             Node := Element (Node_Cursor);
+            Printing.Print_Node ("Tree.Apply_Dense, Node", Node);
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -79,7 +80,8 @@ package body Tree is
             else
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
-            Printing.Print_Node ("Tree.Apply_Dense, Selected child Node", Node_Cursor);
+            Printing.Print_Node ("Tree.Apply_Dense, Selected child Node",
+                                 Node_Cursor);
          end loop;  --  Not_Leaf
 
          Printing.Print_Node ("Tree.Apply_Dense, Selected_Node", Node_Cursor);
@@ -91,7 +93,7 @@ package body Tree is
    end Apply_Dense;
 
    --  ------------------------------------------------------------------------
-   --  _tree L774
+   --  _tree L758
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return Weights.Weight_Lists_3D is
