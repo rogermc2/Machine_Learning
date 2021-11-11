@@ -260,7 +260,20 @@ package body Printing is
       if Message'Length > 0 then
          Put_Line (Message);
       end if;
-      Print_Node (node);
+      Print_Node (Node);
+      New_Line;
+
+   end Print_Node;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Node (Message : String; Node : Tree.Tree_Cursor) is
+      use Tree.Nodes_Package;
+   begin
+      if Message'Length > 0 then
+         Put_Line (Message);
+      end if;
+      Print_Node (Element (Node));
       New_Line;
 
    end Print_Node;

@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
-with Printing;
+--  with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -103,18 +103,18 @@ package body Ada_Tree_Builder is
       --  238
       --  Values dimensions: num outputs x num classes
       Node_Splitter.Node_Value (Builder.Splitter, Values);
-      Printing.Print_Weights_Lists_2D
-        ("Ada_Tree_Builder.Add_Branch L238 Node" & Integer'Image (Node_ID) &
-           " Values", Values);
+--        Printing.Print_Weights_Lists_2D
+--          ("Ada_Tree_Builder.Add_Branch L238 Node" & Integer'Image (Node_ID) &
+--             " Values", Values);
       if Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node_ID));
       end if;
       theTree.Values.Replace_Element (Node_ID, Values);
 
-      Put_Line
-        ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Num_Node_Samples: " &
-                  Integer'Image (Node_ID) & ", " &
-                  Integer'Image (Element (Child_Cursor).Num_Node_Samples));
+--        Put_Line
+--          ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Num_Node_Samples: " &
+--                    Integer'Image (Node_ID) & ", " &
+--                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
 --           Put_Line ("Ada_Tree_Builder.Add_Branch L240 Start, Pos, End: " &

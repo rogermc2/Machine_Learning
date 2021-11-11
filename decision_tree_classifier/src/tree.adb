@@ -57,6 +57,7 @@ package body Tree is
 
          --  Find a node with a leaf child.
          --  This node has the prediction value.
+--           while not Element (Node_Cursor).Leaf_Node loop
          while not Element (Node_Cursor).Leaf_Node loop
             Node := Element (Node_Cursor);
             Assert (Feature_Value.Value_Kind = Float_Type or
@@ -78,8 +79,10 @@ package body Tree is
             else
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
+            Printing.Print_Node ("Tree.Apply_Dense, Selected child Node", Node_Cursor);
          end loop;  --  Not_Leaf
 
+         Printing.Print_Node ("Tree.Apply_Dense, Selected_Node", Node_Cursor);
          Selected_Nodes.Append (Node_Cursor);
       end loop;
 
@@ -108,6 +111,7 @@ package body Tree is
                                        Selected_Nodes);
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
+         Printing.Print_Node ("Tree.Predict, Selected_Node", Node_Cursor);
          Node := Element (Node_Cursor);
          Out_Data.Append (Self.Values.Element (Node.Node_ID));
       end loop;

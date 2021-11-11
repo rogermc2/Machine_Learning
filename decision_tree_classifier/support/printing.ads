@@ -32,6 +32,7 @@ package Printing is
       (Name : String; theList : Tree.Values_List_3D);
     procedure Print_Natural_List (Name : String; theList : Natural_List);
     procedure Print_Node (Message : String; Node : Tree.Tree_Node);
+   procedure Print_Node (Message : String; Node : Tree.Tree_Cursor);
     procedure Print_Node_Cursor_Array (Name    : String;
                                        Cursors : Tree.Leaf_Cursor_Array);
     procedure Print_Node_Cursor_List (Name    : String;
