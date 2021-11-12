@@ -33,25 +33,24 @@ package Tree_Build is
     Tree_Build_Error : Exception;
 
     function Add_Node (theTree                 : in out Tree.Tree_Class;
-                       Splitter                : Node_Splitter.Splitter_Class;
-                       Depth                   : Positive;
+--                         Depth                   : Natural;
                        Parent_Cursor           : Tree.Tree_Cursor;
                        Is_Left, Is_Leaf        : Boolean;
                        Feature_Index           : Positive;
-                       Impurity, Threshold     : Float;
-                       Start, Stop             : Positive;
+                       Threshold, Impurity     : Float;
+                       Num_Samples             : Positive;
                        Weighted_Node_Samples   : Float) return Tree.Tree_Cursor;
     procedure Build_Best_First_Tree
       (Best_Builder  : in out Tree_Builder;
        theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.List_Of_Value_Data_Lists;
-       Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+       X             : ML_Types.Value_Data_Lists_2D;
+       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
        Sample_Weight : Weights.Weight_List);
     procedure Build_Depth_First_Tree
       (Depth_Builder : in out Tree_Builder;
        theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.List_Of_Value_Data_Lists;
-       Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+       X             : ML_Types.Value_Data_Lists_2D;
+       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
        Sample_Weight : Weights.Weight_List);
     procedure Change_To_Leaf_Node (aTree : in out Tree.Tree_Class;
                                    Node_Cursor : in out Tree.Tree_Cursor);

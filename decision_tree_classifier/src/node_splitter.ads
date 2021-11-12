@@ -12,7 +12,9 @@ package Node_Splitter is
    use Ada.Strings.Unbounded;
 
    type Split_Record is record
-      Feature        : Positive := 1;
+      Feature        : Natural := 0;
+      --  Split_Row is the count of samples below threshold for Feature
+      --  >= end if the node is a leaf.
       Split_Row      : Positive := 2;  --  Right start?
       Threshold      : Float;
       Improvement    : Float := -Float'Last;
@@ -33,13 +35,13 @@ package Node_Splitter is
       Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
       --  encoded version of sample Y
-      Y                    : Classifier_Types.List_Of_Natural_Lists;
+      Y                    : Classifier_Types.Natural_Lists_2D;
       Sample_Weight        : Weights.Weight_List;
-      Node_Impurity        : Float;
+      Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
-      End_Row              : Positive := 1;
+      Stop_Row             : Positive := 1;
       --  BaseDenseSplitter elements
-      X                    : ML_Types.List_Of_Value_Data_Lists;
+      X                    : ML_Types.Value_Data_Lists_2D;
       Total_Samples        : Natural := 0;
    end record;
 
@@ -48,19 +50,20 @@ package Node_Splitter is
     procedure C_Init (Self          : in out Splitter_Class;
                       Criteria      : Criterion.Criterion_Class;
                       Max_Features  : Tree.Index_Range := 1;
-                      Min_Leaf_Samples : Positive := 1;
+                      Min_Leaf_Samples : Integer := 0;
                       Min_Leaf_Weight : Float := 0.0);
    procedure Init (Self             : in out Splitter_Class;
-                   Input_X          : ML_Types.List_Of_Value_Data_Lists;
-                   Y_Encoded        : Classifier_Types.List_Of_Natural_Lists;
+                   Input_X          : ML_Types.Value_Data_Lists_2D;
+                   Y_Encoded        : Classifier_Types.Natural_Lists_2D;
                    Sample_Weight    : Weights.Weight_List;
                    Min_Leaf_Samples : Positive := 1);
-   function Node_Impurity (Self : Splitter_Class) return Float;
+   function Entropy_Node_Impurity (Self : Splitter_Class) return Float;
+   function Gini_Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self   : Splitter_Class;
-                         Values : out Classifier_Types.List_Of_Float_Lists);
+                         Values : out Weights.Weight_Lists_2D);
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
-      Start_Row, End_Row    : Positive;
+      Start_Row, Stop_Row   : Positive;
       Weighted_Node_Samples : in out Float);
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;

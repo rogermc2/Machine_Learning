@@ -11,13 +11,13 @@ with Ada.Containers.Vectors;
 
 with Classifier_Types;
 with ML_Types;
+with Weights;
 
 package Tree is
 
    type State is (None);
    type Data_Type is (Integer_Type, Float_Type, Enum_Type);
    type Feature_Type is (No_Feature, Auto_Feature, Sqrt_Feature, Log2_Feature);
-   type Value_Array (<>) is private;
 
    Max_Array_Size : constant Integer := 4000;
    type Index_Range is range 1 .. Max_Array_Size;
@@ -31,25 +31,26 @@ package Tree is
    end record;
 
    subtype Values_List is Classifier_Types.Float_List;
-   subtype List_Of_Values_Lists is Classifier_Types.List_Of_Float_Lists;
+   subtype Values_List_2D is Classifier_Types.Float_List_2D;
+   subtype Values_List_3D is Classifier_Types.Float_List_3D;
 
-   type Tree_Node (Is_Leaf : Boolean := False) is record
+   type Tree_Node (Leaf_Node : Boolean := False) is record
+      Node_ID                   : Positive;
       --  from _Tree Node struct
-      Impurity                  : Float := Float'Large;
+      Impurity                  : Float := Float'Last;
       Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
-      --  From Tree Utils StackRecord struct
-      Samples_Start             : Positive := 1;
-      Depth                     : Positive := 1;
-      Is_Left                   : Boolean := True;
-      Num_Constant_Features     : Integer := 0;
-      Values                    : List_Of_Values_Lists;
-      case Is_Leaf is
+      --  From Tree/Utils StackRecord struct
+--        Samples_Start             : Positive := 1;
+--        Depth                     : Positive := 1;
+--        Is_Left                   : Boolean := True;
+--        Num_Constant_Features     : Natural := 0;
+      case Leaf_Node is
          when False =>
             --  from _Tree Node struct
             --  Feature used for splitting the node
-            Feature_Index : Positive := 1;
-            Threshold     : Float := 0.0;
+            Best_Fit_Feature_Index : Natural := 0;
+            Threshold              : Float := 0.0;
          when True => null;
       end case;
    end record;
@@ -65,40 +66,34 @@ package Tree is
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
 
-   type Tree_Attributes is private;
+   use Nodes_Package;
+   package Nodes_List_Package is new Ada.Containers.Vectors
+     (Positive, Tree_Node);
+   subtype Nodes_List is Nodes_List_Package.Vector;
+
    type Tree_Class is record
-      Num_Features    : Natural := 0;
-      Classes         : ML_Types.List_Of_Value_Data_Lists;
-      Num_Outputs     : Index_Range := 1;
-      Max_Depth       : Integer := -1;
-      Nodes           : Nodes_Package.Tree;  -- Ada Multiway Tree
-      Attributes      : Tree_Attributes;
+      Num_Features : Natural := 0;
+      --  Classes:  outputs x classes
+      Classes      : ML_Types.Value_Data_Lists_2D;
+      Num_Outputs  : Index_Range := 1;
+      Max_Depth    : Integer := -1;
+      Nodes        : Nodes_Package.Tree;  -- Ada Multiway Tree
+      --  From _Treenp.ndarray _get_value_ndarray generates a Values
+      --  3D array, num_nodes x num_outputs x num_classes per node.
+      --  Values corresponds to the first dimension of ndarray
+      Values       : Weights.Weight_Lists_3D;
    end record;
 
    Value_Error : Exception;
 
-   function Apply (Self : Tree_Class;
-                   X    : ML_Types.List_Of_Value_Data_Lists)
-                   return Leaf_Cursor_Array;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
---     function Get_Value_Array (Self : Tree_Class) return Value_Array;
-   function Predict (Self : Tree_Class;
-                     X    : ML_Types.List_Of_Value_Data_Lists)
-                     return ML_Types.Value_Data_List;
-
-private
-
-   type Tree_Attributes is record
-      Node_Count : Natural := 0;
-      Max_Depth  : Natural := 0;
-   end record;
-
-   type Value_Array is array
-     (Natural range <>) of Float;
+   function Predict (Self : in out Tree_Class;
+                     X    : ML_Types.Value_Data_Lists_2D)
+                     return Weights.Weight_Lists_3D;
 
 end Tree;

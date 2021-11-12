@@ -20,7 +20,7 @@ package Ada_Tree_Builder is
     procedure Build_Tree
       (theTree       : in out Tree.Tree_Class;
        Splitter      : in out Node_Splitter.Splitter_Class;
-       Y_Encoded     : Classifier_Types.List_Of_Natural_Lists;
+       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
        Max_Depth     : Integer);
 
 end Ada_Tree_Builder;

@@ -5,7 +5,7 @@ with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Utilities;
+with Printing;
 with Utilities;
 
 package body Encode_Utils is
@@ -53,7 +53,7 @@ package body Encode_Utils is
 
       ML_Types.Value_Data_Sorting.Sort (Sorted_Values);
 
-      Classifier_Utilities.Print_Value_Data_List
+      Printing.Print_Value_Data_List
         ("Encode_Utils.Encode Uniques", Uniques);
       Uniques := Unique (Values);
       return Uniques;
@@ -79,8 +79,8 @@ package body Encode_Utils is
             New_Line;
             Put ("Encode_Error: Encode_Utils.Encode Values contains ");
             Put_Line ("previously unseen labels.");
-            Classifier_Utilities.Print_Value_Data_List ("Unique list", Uniques);
-            Classifier_Utilities.Print_Value_Data_List ("Unseen labels", Diff);
+            Printing.Print_Value_Data_List ("Unique list", Uniques);
+            Printing.Print_Value_Data_List ("Unseen labels", Diff);
             raise Encode_Error;
          end if;
       end if;

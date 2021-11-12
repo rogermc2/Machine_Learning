@@ -13,22 +13,25 @@ package Utilities is
    function Feature_Array (Data    : ML_Types.Rows_Vector;
                            Col_Num : ML_Types.Class_Range)
                            return ML_Types.Value_Data_Array;
+   function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
+                        Column_Index : Positive)
+                        return ML_Types.Value_Data_List;
    function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type;
    function Is_Boolean (Item : in Unbounded_String) return Boolean;
    function Is_Float (Item : in Unbounded_String) return Boolean;
    function Is_Integer (Item : in Unbounded_String) return Boolean;
    function Label_Array (Data : ML_Types.Rows_Vector)
-                          return  ML_Types.Value_Data_Array;
+                         return  ML_Types.Value_Data_Array;
    procedure Load_CSV_Data (Data_File : File_Type;
                             Data      : out ML_Types.Rows_Vector);
    function Number_Of_Features (Rows : ML_Types.Rows_Vector)
-                                 return ML_Types.Class_Range;
+                                return ML_Types.Class_Range;
    function Number_Of_Features (Rows : ML_Types.Value_Data_List)
-                                 return ML_Types.Class_Range;
+                                return ML_Types.Class_Range;
    function Predictions (Node : ML_Types.Tree_Node_Type)
-                          return ML_Types.Predictions_List;
+                         return ML_Types.Predictions_List;
    function Prediction_String (Label_Counts : ML_Types.Predictions_List)
-                                return String;
+                               return String;
    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data);
    procedure Print_Classification (Classification : ML_Types.Predictions_List);
    procedure Print_Feature_Values (Message : String; Rows : ML_Types.Rows_Vector;
@@ -48,10 +51,10 @@ package Utilities is
    procedure Print_Value_Record (Message : String;
                                  Value   : ML_Types.Value_Record);
    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector)
-                             return ML_Types.Data_Record;
+                            return ML_Types.Data_Record;
    function Split_String (aString, Pattern : String)
                           return ML_Types.String_List;
-   function XY_To_Rows (X, Y : ML_Types.List_Of_Value_Data_Lists)
+   function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
                         return ML_Types.Rows_Vector;
 
 end Utilities;

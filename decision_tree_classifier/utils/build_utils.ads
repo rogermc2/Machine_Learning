@@ -15,14 +15,12 @@ package Build_Utils is
       Impurity_Right : Float;
       Improvement    : Float;
       Start          : Positive := 1;
-      Stop           : Positive := 1;
+      Stop_Row       : Positive := 1;
       Position       : Positive := 1;
    end record;
 
    type Stack_Record is record
-      Parent                : Tree.Tree_Cursor;
-      Node_Cursor           : Tree.Tree_Cursor;
-      Node_Params           : Tree.Tree_Node;
+      Parent_Cursor         : Tree.Tree_Cursor;
       Start                 : Positive := 1;
       Stop                  : Positive := 1;
       Depth                 : Natural := 0;
@@ -40,5 +38,14 @@ package Build_Utils is
      Ada.Containers.Doubly_Linked_Lists (Stack_Record);
    subtype Stack_List is Stack_Package.List;
    subtype Stack_Cursor is Stack_Package.Cursor;
+
+   function Pop (aStack : in out Stack_List) return Stack_Record;
+   procedure Push (aStack                : in out Stack_List;
+                   Start, Stop           : Positive;
+                   Depth                 : Natural;
+                   Parent                : Tree.Tree_Cursor;
+                   Is_Left               : Boolean;
+                   Impurity              : Float;
+                   Num_Constant_Features : Natural);
 
 end Build_Utils;

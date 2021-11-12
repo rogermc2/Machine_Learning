@@ -7,6 +7,7 @@ package Classifier_Types is
 
    subtype Class_Label is Unbounded_String;
 
+   type Index_Range_2D is new Integer range 1 .. 2;
    type Integer_Array is array (Integer range <>) of Integer;
    type Float_Array is array (Integer range <>) of Float;
    type Natural_Array is array (Integer range <>) of Natural;
@@ -23,20 +24,27 @@ package Classifier_Types is
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
+   subtype Value_List is Float_Package.Vector;
 
    use Float_Package;
    package Float_List_Package is new
       Ada.Containers.Vectors (Positive, Float_List);
-   subtype List_Of_Float_Lists is Float_List_Package.Vector;
+   subtype Float_List_2D is Float_List_Package.Vector;
+
+   use Float_List_Package;
+   package List_Of_Float_Lists_Package is new
+      Ada.Containers.Vectors (Positive, Float_List_2D);
+   subtype Float_List_3D is List_Of_Float_Lists_Package.Vector;
 
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
+   subtype Natural_Cursor is Natural_Package.Cursor;
    package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");
 
    use Natural_Package;
    package Natural_List_Package is new
       Ada.Containers.Vectors (Positive, Natural_List);
-   subtype List_Of_Natural_Lists is Natural_List_Package.Vector;
+   subtype Natural_Lists_2D is Natural_List_Package.Vector;
 
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;

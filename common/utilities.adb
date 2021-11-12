@@ -65,6 +65,26 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
+   function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
+                        Column_Index : Positive)
+                        return ML_Types.Value_Data_List is
+      use ML_Types;
+      aList  : Value_Data_List;
+      Column : Value_Data_List;
+      Data   : Value_Record;
+   begin
+      for index in List_2D.First_Index .. List_2D.Last_Index loop
+         aList := List_2D.Element (index);
+         Data := aList.Element (Column_Index);
+         Column.Append (Data);
+      end loop;
+
+      return Column;
+
+   end Get_Column;
+
+   --  -------------------------------------------------------------------------
+
    function Feature_Array (Data    : ML_Types.Rows_Vector;
                            Col_Num : Class_Range) return Value_Data_Array is
       Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
@@ -710,7 +730,7 @@ package body Utilities is
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;
       Feature_Values : Value_Data_List;
-      Features_List  : List_Of_Value_Data_Lists;
+      Features_List  : Value_Data_Lists_2D;
       Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
       Label_Type     : Data_Type;
       Label_Values   : Value_Data_List;
@@ -900,7 +920,7 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   function XY_To_Rows (X, Y : ML_Types.List_Of_Value_Data_Lists)
+   function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
                         return Rows_Vector is
 
       Feature_Values   : Value_Data_List;
