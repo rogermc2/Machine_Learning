@@ -347,7 +347,8 @@ package body Base_Decision_Tree is
       Samples_K         : Weight_Lists_2D;
       Outputs_K         : Weight_List;
       Samples_2K        : Weight_List;
-      Nodes_2K          : Weight_Lists_2D;
+      Node_Values_2K    : Weight_Lists_2D;
+      Node_Values       : Weight_List;
       Classes_K         : ML_Types.Value_Data_List;
       Selected_Classes  : ML_Types.Value_Data_List;
       Selected_Class    : ML_Types.Value_Record;
@@ -366,7 +367,7 @@ package body Base_Decision_Tree is
       Predictions.Set_Length (Num_Samples);
       --  479
       for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
-         Nodes_2K.Clear;
+         Node_Values_2K.Clear;
          for node_index in Prob_A.First_Index .. Prob_A.Last_Index loop
             Samples_K := Prob_A.Element (node_index);
             Samples_2K.Clear;
@@ -374,18 +375,21 @@ package body Base_Decision_Tree is
                Outputs_K := Samples_K.Element (s_index);
                Samples_2K.Append (Outputs_K.Element (op));
             end loop;
-            Nodes_2K.Append (Samples_2K);
+            Node_Values_2K.Append (Samples_2K);
          end loop;
+         Printing.Print_Weights_Lists_2D ("Base_Decision_Tree.Predict, Node_Values_2K",
+                                 Node_Values_2K);
 
          --  for each node get the index of the sample with the highest value
          Max_Indices.Clear;
-         for index in Nodes_2K.First_Index .. Nodes_2K.Last_Index loop
+         for index in Node_Values_2K.First_Index ..
+           Node_Values_2K.Last_Index loop
             --  Max_Indices: 1 x samples
-            Samples_2K := Nodes_2K.Element (index);
-            Max_Indices.Append (Max (Nodes_2K.Element (index)));
+            Node_Values := Node_Values_2K.Element (index);
+            Max_Indices.Append (Max (Node_Values));
          end loop;
-         Printing.Print_Weights ("Base_Decision_Tree.Predict, Samples_2K",
-                                 Samples_2K);
+         Printing.Print_Natural_List ("Base_Decision_Tree.Predict, Max_Indices",
+                                      Max_Indices);
 
          Classes_K := Self.Attributes.Classes.Element (op);
          Selected_Classes.Clear;
@@ -393,8 +397,8 @@ package body Base_Decision_Tree is
             Selected_Class := Classes_K.Element (Max_Indices (index));
             Selected_Classes.Append (Selected_Class);
          end loop;
-         Printing.Print_Value_Data_List ("Base_Decision_Tree.Predict, Selected_Classes",
-                                         Selected_Classes);
+         Printing.Print_Value_Data_List
+           ("Base_Decision_Tree.Predict, Selected_Classes", Selected_Classes);
          Pred.Clear;
          for index in Selected_Classes.First_Index ..
            Selected_Classes.Last_Index loop
