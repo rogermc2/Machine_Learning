@@ -69,7 +69,7 @@ package body Decision_Tree_Classification is
    end C_Init;
 
    --  -------------------------------------------------------------------------
-   --  _classes.py L930 Predict_Probability predicts class probabilities
+   --  _classes.py L952 Predict_Probability predicts class probabilities
    --   of the input samples X.
    --  The predicted class probability is the fraction of samples of the same
    --  class in a leaf.
