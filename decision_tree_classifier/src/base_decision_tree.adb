@@ -357,9 +357,9 @@ package body Base_Decision_Tree is
       --  Predictions, num samples x num outputs
       Predictions       : ML_Types.Value_Data_Lists_2D;
    begin
-      Put_Line ("Base_Decision_Tree.Predict, Prob_A size: " &
-                  Integer'Image (Integer (Prob_A.Length)) & " x " &
-                  Integer'Image (Integer (Prob_A.Element (1).Length)));
+--        Put_Line ("Base_Decision_Tree.Predict, Prob_A size: " &
+--                    Integer'Image (Integer (Prob_A.Length)) & " x " &
+--                    Integer'Image (Integer (Prob_A.Element (1).Length)));
       Printing.Print_Weight_Lists_3D ("Base_Decision_Tree.Predict, Prob_A",
                                       Prob_A);
 
