@@ -253,7 +253,23 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : Integer_Array)
-                                   return ML_Types.Value_Data_Lists_2D is
+                                   return ML_Types.Value_Data_List is
+      use ML_Types;
+      Data       : Value_Record (Integer_Type);
+      A_List     : Value_Data_List;
+   begin
+      for index in A'Range loop
+         Data.Integer_Value := A (index);
+         A_List.Append (Data);
+      end loop;
+
+      return A_List;
+   end To_Integer_Value_List;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Integer_Value_List_2D (A : Integer_Array)
+                                      return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
@@ -267,7 +283,7 @@ package body Classifier_Utilities is
       end loop;
 
       return Multi_List;
-   end To_Integer_Value_List;
+   end To_Integer_Value_List_2D;
 
    --  -------------------------------------------------------------------------
 
@@ -311,7 +327,7 @@ package body Classifier_Utilities is
       for index in A'Range loop
          Int_Array (index) := A (index);
       end loop;
-      return To_Integer_Value_List (Int_Array);
+      return To_Integer_Value_List_2D (Int_Array);
    end To_Natural_Value_List;
 
    --  ------------------------------------------------------------------------

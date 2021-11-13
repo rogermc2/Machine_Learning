@@ -13,6 +13,6 @@ begin
    Test_Label_Encoder
       (Classifier_Utilities.To_Integer_Value_List ((2, 1, 3, 1, 3)),
        Classifier_Utilities.To_Integer_Value_List ((1, 2, 3)),
-       Classifier_Utilities.To_Natural_List ((1, 0, 2, 0, 2)));
+       Classifier_Utilities.To_Natural_List ((2, 1, 3, 1, 3)));
 
 end Test_Labels;
