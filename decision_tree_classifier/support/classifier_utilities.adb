@@ -220,6 +220,68 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Sum_Cols (aList : Classifier_Types.Float_List_2D)
+                      return Classifier_Types.Float_List is
+      theSum : Classifier_Types.Float_List;
+      Value  : Float;
+   begin
+      for index in aList.First_Index .. aList.Last_Index loop
+         Value := 0.0;
+         for index_2 in aList.Element (1).First_Index ..
+           aList.Element (1).Last_Index loop
+            Value := Value + aList.Element (1).Element (index_2);
+         end loop;
+         theSum.Append (Value);
+      end loop;
+
+      return theSum;
+
+   end Sum_Cols;
+
+   --  -------------------------------------------------------------------------
+
+   function Sum_Cols (aList : ML_Types.Value_Data_Lists_2D)
+                      return ML_Types.Value_Data_List is
+      use ML_Types;
+      theSum     : Value_Data_List;
+      Value_Type : constant Data_Type :=
+                     aList.Element (1).Element (1).Value_Kind;
+      F_Value    : Float;
+      I_Value    : Integer;
+      Value_Rec  : Value_Record;
+   begin
+      for index in aList.First_Index .. aList.Last_Index loop
+         F_Value := 0.0;
+         I_Value := 0;
+         Value_Rec := aList.Element (1).Element (1);
+         case Value_Type is
+            when Float_Type =>
+               for index_2 in aList.Element (1).First_Index ..
+                 aList.Element (1).Last_Index loop
+                  F_Value := F_Value +
+                    aList.Element (1).Element (index_2).Float_Value;
+               end loop;
+               Value_Rec.Float_Value := F_Value;
+
+            when Integer_Type =>
+               for index_2 in aList.Element (1).First_Index ..
+                 aList.Element (1).Last_Index loop
+                  I_Value := I_Value +
+                    aList.Element (1).Element (index_2).Integer_Value;
+               end loop;
+               Value_Rec.Integer_Value := I_Value;
+
+            when others => null;
+         end case;
+         theSum.Append (Value_Rec);
+      end loop;
+
+      return theSum;
+
+   end Sum_Cols;
+
+   --  -------------------------------------------------------------------------
+
    function To_Array (L : Integer_List) return Integer_Array is
       New_Array : Integer_Array (1 .. Integer (L.Length));
       A_Index   : Integer := 0;

@@ -75,21 +75,21 @@ package body Decision_Tree_Classification is
    --  class in a leaf.
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                  X    : ML_Types.Value_Data_Lists_2D)
-                                 return Weights.Weight_Lists_3D is
+                                 return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
-      use Weights;
       Num_Outputs     : constant Positive := Positive (X.Element (1).Length);
-      --  L954
-      Proba           : constant Weights.Weight_Lists_3D :=
-                          Self.Attributes.Decision_Tree.Values;
+      --  L978
+      Proba           : constant Value_Data_Lists_2D :=
+                          Base_Decision_Tree.Predict (Self, X);
       Num_Nodes       : constant Positive := Positive (Proba.Length);
       Classes         : constant Value_Data_Lists_2D :=
                           Self.Attributes.Decision_Tree.Classes;
       Num_Classes     : constant Positive := Positive (Classes.Length);
-      Prob_K          : Weight_Lists_2D;
-      Prob_Class      : Weight_List;
-      All_Proba       : Weight_Lists_3D;
-      Class           : Float;
+      Prob_K          : Value_Data_List;
+      Prob_Class      : Value_Record;
+      All_Proba       : Value_Data_Lists_2D;
+      F_Class         : Float;
+      I_Class         : Integer;
       Normalizer      : Float;
    begin
       --  L969
@@ -97,29 +97,35 @@ package body Decision_Tree_Classification is
          Prob_K.Clear;
          for node_index in 1 .. Num_Nodes loop
             Prob_K := Proba.Element (node_index);
-            Prob_Class.Clear;
             for class_index in 1  .. Num_Classes loop
                Prob_Class := Prob_K.Element (class_index);
-
                Normalizer := 0.0;
-               for index in 1 .. Num_Nodes loop
-                  Class := Prob_Class.Element (class_index);
-                  Normalizer := Normalizer + Class;
-               end loop;
-
-               if Normalizer > 0.0 then
-                  for index in Prob_Class.First_Index ..
-                    Prob_Class.Last_Index loop
-                     Class := Prob_Class.Element (class_index);
-                     Class := Class / Normalizer;
-                     Prob_Class.Replace_Element  (index, Class);
-                  end loop;
-               end if;
-
-               Prob_K.Append (Prob_Class);
+               case Prob_Class.Value_Kind is
+                  when Float_Type =>
+                     F_Class := Prob_Class.Float_Value;
+                     Normalizer := Normalizer + F_Class;
+                  when Integer_Type =>
+                     I_Class := Prob_Class.Integer_Value;
+                     Normalizer := Normalizer + Float (I_Class);
+                  when others => null;
+               end case;
             end loop;
-            All_Proba.Append (Prob_K);
+
+            if Normalizer > 0.0 then
+               case Prob_Class.Value_Kind is
+                  when Float_Type =>
+                     Prob_Class.Float_Value :=
+                       Prob_Class.Float_Value / Normalizer;
+                  when Integer_Type =>
+                     Prob_Class.Integer_Value :=
+                       Integer (Float (Prob_Class.Integer_Value) / Normalizer);
+                  when others => null;
+               end case;
+            end if;
+
+            Prob_K.Append (Prob_Class);
          end loop;
+         All_Proba.Append (Prob_K);
       end loop;
 
       return All_Proba;

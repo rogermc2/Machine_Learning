@@ -9,7 +9,6 @@ with Decision_Tree_Classification;
 with ML_Types;
 with Printing;
 with Tree;
-with Weights;
 
 package body Classifier_Tests is
    use Classifier_Types;
@@ -20,7 +19,7 @@ package body Classifier_Tests is
    --                             Friedman_Mse, Poisson);
    --     type Clf_Trees is (Decision_Tree_Classifier, Extra_Tree_Classifier);
    --     type Reg_Trees is (Decision_Tree_Regressor, Extra_Tree_Regressor);
-   --  X_Array 6 rows (samples) x 1 column (outpuss)
+   --  X_Array 6 rows (samples) x 1 column (outputs)
    X_Array     : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
                    ((-2, -1), (-1, -1), (-1, -2), (1, 1), (1, 2), (2, 1));
    --  Y_Array 6 rows (samples) x 2 columns (features)
@@ -47,7 +46,8 @@ package body Classifier_Tests is
       T               : constant Value_Data_Lists_2D :=
                           To_Multi_Value_List (T_Array);
       Num_Samples     : constant Natural := Natural (X.Length);
-      Probabilities   : Weights.Weight_Lists_3D;
+      Probabilities   : Value_Data_Lists_2D;
+--        Column_Sums     : Value_Data_List;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,
@@ -70,10 +70,11 @@ package body Classifier_Tests is
         ("Classification_Tests.Test_Classification_Toy Expected", Expected);
       --  L353 test_probability
       Probabilities := Predict_Probability (theClassifier, X);
+--        Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
       --        if Probabilities = Expected then
       --           null;
       --        end if;
-      Print_Weight_Lists_3D
+      Print_Value_Data_Lists_2D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);
 
