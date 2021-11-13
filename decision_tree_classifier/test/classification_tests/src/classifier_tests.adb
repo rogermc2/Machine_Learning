@@ -9,7 +9,7 @@ with Decision_Tree_Classification;
 with ML_Types;
 with Printing;
 with Tree;
---  with Weights;
+with Weights;
 
 package body Classifier_Tests is
    use Classifier_Types;
@@ -47,16 +47,16 @@ package body Classifier_Tests is
       T               : constant Value_Data_Lists_2D :=
                           To_Multi_Value_List (T_Array);
       Num_Samples     : constant Natural := Natural (X.Length);
---        Probabilities   : Weights.Weight_Lists_3D;
+      Probabilities   : Weights.Weight_Lists_3D;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,
               "Classification_Tests.Test_Classification_Toy called with empty X vector.");
 
       --  Y is 2D list num outputs x num classes
-      Y := To_Integer_Value_List (Y_Array);
+      Y := To_Integer_Value_List_2D (Y_Array);
       --  L229
-      Expected := To_Integer_Value_List (True_Result);
+      Expected := To_Integer_Value_List_2D (True_Result);
       --  L230
       Classification_Fit (theClassifier, X, Y);
       Print_Tree ("The Tree", theClassifier);
@@ -69,15 +69,13 @@ package body Classifier_Tests is
       Print_Value_Data_Lists_2D
         ("Classification_Tests.Test_Classification_Toy Expected", Expected);
       --  L353 test_probability
---        Probabilities := Predict_Probability (theClassifier, X);
+      Probabilities := Predict_Probability (theClassifier, X);
       --        if Probabilities = Expected then
       --           null;
       --        end if;
---        Print_Weight_Lists_3D
---          ("Classification_Tests.Test_Classification_Toy Probabilities",
---           Probabilities);
-      --          Print_Value_List ("Classification_Tests.Test_Classification_Toy Classes",
-      --                            Classes);
+      Print_Weight_Lists_3D
+        ("Classification_Tests.Test_Classification_Toy Probabilities",
+         Probabilities);
 
    end Test_Classification_Toy;
 
