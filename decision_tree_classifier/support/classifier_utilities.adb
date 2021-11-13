@@ -105,14 +105,18 @@ package body Classifier_Utilities is
          end loop;
 
          if not OK then
+            New_Line;
             Put ("Classifier_Utilities.Compare_Float_Lists test ");
             Put_Line ("failed with error: " & Float'Image (Max_Diff));
+            New_Line;
          end if;
       else
+         New_Line;
          Put ("Classifier_Utilities.Compare_Float_Lists ");
          Put_Line ("test failed with different length lists, Left: "
                    & Count_Type'Image (L.Length) & ", Right: " &
                      Count_Type'Image (R.Length));
+         New_Line;
       end if;
 
       return OK;
@@ -232,7 +236,7 @@ package body Classifier_Utilities is
    function To_Float_List (A : Float_Array) return Float_List is
       A_List : Float_List;
    begin
-      for index in A'Range loop
+      for index in A'First .. A'Last loop
          A_List.Append (A (index));
       end loop;
       return A_List;
@@ -243,7 +247,7 @@ package body Classifier_Utilities is
    function To_Integer_List (A : Integer_Array) return Integer_List is
       A_List : Integer_List;
    begin
-      for index in A'Range loop
+      for index in A'First .. A'Last loop
          A_List.Append (A (index));
       end loop;
       return A_List;
@@ -258,7 +262,7 @@ package body Classifier_Utilities is
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
    begin
-      for index in A'Range loop
+      for index in A'First .. A'Last loop
          Data.Integer_Value := A (index);
          A_List.Append (Data);
       end loop;
@@ -275,7 +279,7 @@ package body Classifier_Utilities is
       B_List     : Value_Data_List;
       Multi_List : Value_Data_Lists_2D;
    begin
-      for index in A'Range loop
+      for index in A'First .. A'Last loop
          B_List.Clear;
          Data.Integer_Value := A (index);
          B_List.Append (Data);
@@ -294,7 +298,7 @@ package body Classifier_Utilities is
       Row_List : Value_Data_Lists_2D;
       Col_List : Value_Data_List;
    begin
-      for row in A'Range loop
+      for row in A'First .. A'Last loop
          Col_List.Clear;
          for col in A'Range (2) loop
             Value.Integer_Value := A (row, col);
@@ -311,7 +315,7 @@ package body Classifier_Utilities is
    function To_Natural_List (A : Natural_Array) return Natural_List is
       A_List : Natural_List;
    begin
-      for index in A'Range loop
+      for index in A'First .. A'Last loop
          A_List.Append (A (index));
       end loop;
       return A_List;
@@ -324,7 +328,7 @@ package body Classifier_Utilities is
                                    return ML_Types.Value_Data_Lists_2D is
       Int_Array : Integer_Array (1 .. A'Length);
    begin
-      for index in A'Range loop
+      for index in A'First .. A'Last loop
          Int_Array (index) := A (index);
       end loop;
       return To_Integer_Value_List_2D (Int_Array);

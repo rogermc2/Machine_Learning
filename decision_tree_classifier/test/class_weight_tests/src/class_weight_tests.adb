@@ -15,7 +15,8 @@ package body Class_Weight_Tests is
       use Classifier_Types;
       use Float_Package;
       use Natural_Package;
-      No_Weights    : constant Weights.Weight_List := Float_Package.Empty_Vector;
+      No_Weights    : constant Weights.Weight_List :=
+                          Float_Package.Empty_Vector;
       Values        : Value_Data_List;
       Class_Weights : Weights.Weight_List;
       Classes       : Value_Data_List;
@@ -24,7 +25,6 @@ package body Class_Weight_Tests is
       Dot_Product   : Float;
       OK            : Boolean;
    begin
-      New_Line;
       Assert (not Y.Is_Empty,
            "Class_Weight_Tests.Test_Compute_Class_Weight called with " &
            "empty data vector.");
@@ -64,16 +64,15 @@ package body Class_Weight_Tests is
       Expected_Weights : Weights.Weight_List) is
       use Classifier_Types.Float_Package;
       use Weights;
-      Sample_Weights   : Weight_List;
+      Sample_Weights : Weight_List;
    begin
       Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y);
-      New_Line;
-      Put ("Test_Compute_Class_Weight, Weights test ");
+
+      Put ("Test_Compute_Sample_Weights test ");
       if Classifier_Utilities.Compare_Float_Lists
         (Sample_Weights, Expected_Weights) then
          Put_Line ("passed.");
       else
-         Put_Line ("failed.");
          Printing.Print_Weights ("Expected", Expected_Weights);
          Printing.Print_Weights ("Weights", Sample_Weights);
       end if;
