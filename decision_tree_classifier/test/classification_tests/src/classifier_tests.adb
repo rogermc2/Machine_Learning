@@ -54,9 +54,9 @@ package body Classifier_Tests is
               "Classification_Tests.Test_Classification_Toy called with empty X vector.");
 
       --  Y is 2D list num outputs x num classes
-      Y := To_Integer_Value_List (Y_Array);
+      Y := To_Integer_Value_List_2D (Y_Array);
       --  L229
-      Expected := To_Integer_Value_List (True_Result);
+      Expected := To_Integer_Value_List_2D (True_Result);
       --  L230
       Classification_Fit (theClassifier, X, Y);
       Print_Tree ("The Tree", theClassifier);
