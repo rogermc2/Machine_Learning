@@ -8,13 +8,14 @@ with Class_Weight_Tests;
 with Weights;
 
 procedure Test_Weight_Functions is
+    use Classifier_Types;
     use Classifier_Utilities;
     WUB3                    : constant Float := 7.0 / 9.0;
     WUB1                    : constant Float := 7.0 / 3.0;
     WUB3_Sq                 : constant Float := WUB3 ** 2;
     WUB1_Sq                 : constant Float := WUB1 ** 2;
-    Multi_Values            : Classifier_Types.Multi_Value_Array (1 .. 6, 1 .. 2);
-    Multi_Values_UB         : Classifier_Types.Multi_Value_Array (1 .. 7, 1 .. 2);
+    Multi_Values            : Multi_Value_Array (1 .. 6, 1 .. 2);
+    Multi_Values_UB         : Multi_Value_Array (1 .. 7, 1 .. 2);
     Expected_Sample_Weights : Weights.Weight_List;
 begin
     New_Line;

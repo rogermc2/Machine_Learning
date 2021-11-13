@@ -62,11 +62,9 @@ package body Class_Weight_Tests is
    procedure Test_Compute_Sample_Weight
      (Weight_Kind      : Weights.Weight_Type; Y : Value_Data_Lists_2D;
       Expected_Weights : Weights.Weight_List) is
-      use Classifier_Types.Float_Package;
-      use Weights;
-      Sample_Weights : Weight_List;
+      Sample_Weights : Weights.Weight_List;
    begin
-      Sample_Weights := Compute_Sample_Weight (Weight_Kind, Y);
+      Sample_Weights := Weights.Compute_Sample_Weight (Weight_Kind, Y);
 
       Put ("Test_Compute_Sample_Weights test ");
       if Classifier_Utilities.Compare_Float_Lists

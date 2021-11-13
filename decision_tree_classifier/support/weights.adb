@@ -10,13 +10,13 @@ with Printing;
 package body Weights is
 
     function Reduce_Weight_Lists (Lists : Weight_Lists_2D)
-                                 return Weight_List;
+                                  return Weight_List;
 
     --  -------------------------------------------------------------------------
 
     function Compute_Balanced_Class_Weights
       (Classes : ML_Types.Value_Data_List;  Y : ML_Types.Value_Data_List)
-      return Weight_List is
+       return Weight_List is
         use Label;
         use Natural_Package;
         Weights             : Weight_List;
@@ -60,7 +60,7 @@ package body Weights is
                                     Class_Weights : Weight_List;
                                     Classes       : ML_Types.Value_Data_List;
                                     Y             : ML_Types.Value_Data_List)
-                                   return Weight_List is
+                                    return Weight_List is
         Weights : Weight_List;
     begin
         case Weight_Kind is
@@ -96,6 +96,7 @@ package body Weights is
       (Y : ML_Types.Value_Data_Lists_2D) return Weight_List is
         use ML_Types;
         use Float_Package;
+        Y_1                   : Value_Data_List;
         Y_Full                : Value_Data_List;
         Classes_Full          : Value_Data_List;
         Inverse               : Natural_List := Natural_Package.Empty_Vector;
@@ -105,21 +106,26 @@ package body Weights is
         Weights               : Weight_List;
         Expanded_Class_Weight : Weight_Lists_2D;
     begin
-        for index in 1 .. Integer (Y.Length) loop
-            Y_Full.Append (Y.Element (index));
-        end loop;
+        for index_2 in Y.Element (1).First_Index ..
+          Y.Element (1).Last_Index loop
+            Y_Full.Clear;
+            Weights.Clear;
+            for index in Y.First_Index .. Y.Last_Index loop
+                Y_1 := Y.Element (index);
+                Y_Full.Append (Y_1.Element (index_2));
+            end loop;
 
-        Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
-        Weight_K := Compute_Balanced_Class_Weights (Classes_Full, Y_Full);
-        --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
-        K_Indices := Classifier_Utilities.Search_Sorted_Value_List
-          (Classes_Full, Y_Full);
-        for y_index in Y_Full.First_Index .. Y_Full.Last_Index loop
-            aWeight := Weight_K.Element (K_Indices.Element (y_index));
-            Weights.Append (aWeight);
+            Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
+            Weight_K := Compute_Balanced_Class_Weights (Classes_Full, Y_Full);
+            --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
+            K_Indices := Classifier_Utilities.Search_Sorted_Value_List
+              (Classes_Full, Y_Full);
+            for y_index in Y_Full.First_Index .. Y_Full.Last_Index loop
+                aWeight := Weight_K.Element (K_Indices.Element (y_index));
+                Weights.Append (aWeight);
+            end loop;
+            Expanded_Class_Weight.Append (Weights);
         end loop;
-
-        Expanded_Class_Weight.Append (Weights);
 
         return Reduce_Weight_Lists (Expanded_Class_Weight);
 
@@ -139,7 +145,7 @@ package body Weights is
                                       Float_Package.Empty_Vector;
                                     Indices        : Integer_List :=
                                       Integer_Package.Empty_Vector)
-                                   return Weight_List is
+                                    return Weight_List is
         use ML_Types;
         use Value_Data_Package;
         use Float_Package;
@@ -163,7 +169,7 @@ package body Weights is
     begin
         case Weight_Kind is
             when Balanced_Weight =>
-                --              Put_Line ("Compute_Sample_Weight Balanced_Weight");
+                --                  Put_Line ("Compute_Sample_Weight Balanced_Weight");
                 Result := Compute_Balanced_Sample_Weight (Y);
 
             when No_Weight =>
@@ -304,7 +310,7 @@ package body Weights is
     --  -------------------------------------------------------------------------
 
     function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive)
-                        return Weight_List is
+                         return Weight_List is
         aList  : Weight_List;
         Column : Weight_List;
         Data   : Float;
@@ -322,7 +328,7 @@ package body Weights is
     --  ------------------------------------------------------------------------
 
     function Get_Column (Weights  : Weight_Lists_3D; Data_Index : Positive)
-                        return Weight_Lists_2D is
+                         return Weight_Lists_2D is
         aList_2D  : Weight_Lists_2D;
         Column_2D : Weight_Lists_2D;
         Data_2D   : Weight_List;
@@ -394,15 +400,13 @@ package body Weights is
     --  -------------------------------------------------------------------------
 
     function Reduce_Weight_Lists (Lists : Weight_Lists_2D)
-                                 return Weight_List is
+                                  return Weight_List is
         use Ada.Containers;
         List_Length  : constant Count_Type := Lists.Element (1).Length;
         aList        : Weight_List;
         Value        : Float;
         Reduced_List : Weight_List;
     begin
-        --        Classifier_Utilities.Print_Weights_Lists
-        --   ("Reduce_Weight_Lists Lists", Lists);
         for index in 1 .. List_Length loop
             Reduced_List.Append (1.0) ;
         end loop;
@@ -410,10 +414,10 @@ package body Weights is
         for index in Lists.First_Index .. Lists.Last_Index loop
             aList := Lists.Element (index);
             for index_2 in 1 .. Integer (List_Length) loop
-                Value := Reduced_List.Element (index_2) * aList.Element (index_2);
+                Value := Reduced_List.Element (index_2) *
+                  aList.Element (index_2);
                 Reduced_List.Replace_Element (index_2, Value);
             end loop;
-
         end loop;
 
         return Reduced_List;
