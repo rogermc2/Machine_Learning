@@ -157,6 +157,26 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Column
+      (List_2D : ML_Types.Value_Data_Lists_2D;
+       Column_Index : Positive) return  ML_Types.Value_Data_List is
+      use  ML_Types;
+      aList  : Value_Data_List;
+      Column : Value_Data_List;
+      Data   : Value_Record;
+   begin
+      for index in List_2D.First_Index .. List_2D.Last_Index loop
+         aList := List_2D.Element (index);
+         Data := aList.Element (Column_Index);
+         Column.Append (aList);
+      end loop;
+
+      return Column;
+
+   end Get_Column;
+
+   --  -------------------------------------------------------------------------
+
    function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
@@ -415,6 +435,23 @@ package body Classifier_Utilities is
    end Set_Diff;
 
    --  -------------------------------------------------------------------------
+
+    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
+                        return  ML_Types.Value_Data_Lists_2D is
+        use  ML_Types;
+        New_Row : Value_Data_List;
+        Result  : Value_Data_Lists_2D;
+    begin
+        for col in 1 .. Positive (Values.Element (1).Length) loop
+            New_Row := Get_Column (Values, col);
+            Result.Append (New_Row);
+        end loop;
+
+        return Result;
+
+    end Transpose;
+
+    --  -------------------------------------------------------------------------
 
    function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
                            return Tree.Tree_Cursor is

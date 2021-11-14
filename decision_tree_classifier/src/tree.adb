@@ -88,6 +88,7 @@ package body Tree is
 
    --  ------------------------------------------------------------------------
    --  _tree L758
+   --  Predict returns a 3D list, num_nodes x num_outputs x num_classes
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return Weights.Weight_Lists_3D is
@@ -104,6 +105,7 @@ package body Tree is
       for index in Selected_Nodes.First_Index .. Selected_Nodes.Last_Index loop
          Node_Cursor := Selected_Nodes.Element (index);
          Node := Element (Node_Cursor);
+         --  Values: num_nodes x num_outputs x num_classes
          Out_Data.Append (Self.Values.Element (Node.Node_ID));
       end loop;
 
