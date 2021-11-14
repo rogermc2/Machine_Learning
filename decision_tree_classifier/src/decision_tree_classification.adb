@@ -75,8 +75,7 @@ package body Decision_Tree_Classification is
     --  class in a leaf.
     function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                   X    : ML_Types.Value_Data_Lists_2D)
-                                 return ML_Types.Value_Data_Lists_2D is
-        use ML_Types;
+                                 return Weights.Weight_Lists_3D is
         use Weights;
         Num_Outputs     : constant Positive :=
                             Positive (Self.Attributes.Num_Outputs);
@@ -87,15 +86,9 @@ package body Decision_Tree_Classification is
         Prob_Node       : Weight_Lists_2D;
         Prob_Classes    : Weight_List;
         Prob_Node_Class : Weight_Lists_2D;
-        Prob_Outputs    : Weight_Lists_3D;
---          Num_Nodes       : constant Positive := Positive (Proba.Length);
-        --  Classes: num outputs x num classes
---          Classes         : constant Value_Data_Lists_2D :=
---                              Self.Attributes.Decision_Tree.Classes;
---          Num_Classes     : constant Positive := Positive (Classes.Length);
-        Output_K        : Weight_Lists_2D; -- List of nodes
+        Output_K        : Weight_Lists_2D;
         Node_K          : Weight_List;     -- List of classes
-        All_Proba       : Value_Data_Lists_2D;
+        All_Proba       : Weight_Lists_3D;
         F_Class         : Float;
         Normalizer      : Float;
     begin
@@ -116,20 +109,12 @@ package body Decision_Tree_Classification is
                 end loop;
                  Prob_Node_Class.Append (Prob_Classes);
             end loop;
-            Prob_Outputs.Append (Prob_Node_Class);
+            All_Proba.Append (Prob_Node_Class);
         end loop;
-        Put_Line ("Decision_Tree_Classification.Predict_Probability Prob_Outputs length: "
-                 & Integer'Image (Integer (Prob_Outputs.Length)));
-        Printing.Print_Weight_Lists_3D
-          ("Decision_Tree_Classification.Predict_Probability Prob_Outputs",
-          Prob_Outputs);
 
         --  L969
-        for k in Prob_Outputs.First_Index .. Prob_Outputs.Last_Index loop
-            Output_K := Prob_Outputs.Element (k);
-            Printing.Print_Weights_Lists_2D
-              ("Decision_Tree_Classification.Predict_Probability Output_K",
-               Output_K);
+        for k in All_Proba.First_Index .. All_Proba.Last_Index loop
+            Output_K := All_Proba.Element (k);
             for node_index in Output_K.First_Index .. Output_K.Last_Index loop
                 Prob_Classes := Output_K.Element (node_index);
                 Normalizer := 0.0;
@@ -153,8 +138,11 @@ package body Decision_Tree_Classification is
 
                 Output_K.Replace_Element (node_index, Prob_Classes);
             end loop;
-            Prob_Outputs.Replace_Element (k, Output_K);
+            All_Proba.Replace_Element (k, Output_K);
         end loop;
+        Printing.Print_Weight_Lists_3D
+          ("Decision_Tree_Classification.Predict_Probability All_Proba",
+          All_Proba);
 
         return All_Proba;
 
