@@ -478,17 +478,17 @@ package body Classifier_Utilities is
                                return ML_Types.Value_Data_Lists_2D is
         use ML_Types;
         use Value_Data_Package;
-        Row_List    : Value_Data_List;
-        A_Data      : Value_Record;
-        A2_list     : Value_Data_Lists_2D;
+        Output_List : Value_Data_List;
+        A2_List     : Value_Data_Lists_2D;
     begin
+        A2_List.Clear;
         for index in A.First_Index .. A.Last_Index loop
-            A_Data := A.Element (index);
-            Row_List.Append (A_Data);
-            A2_list.Append (Row_List);
+            Output_List.Clear;
+            Output_List.Append (A.Element (index));
+            A2_List.Append (Output_List);
         end loop;
 
-        return A2_list;
+        return A2_List;
 
     end To_Value_2D_List;
 
