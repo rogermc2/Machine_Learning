@@ -51,8 +51,9 @@ package body Classifier_Tests is
       T                : constant Value_Data_Lists_2D :=
                            To_Multi_Value_List (T_Array);
       Num_Samples      : constant Natural := Natural (X.Length);
-      Sample_Weights   : Weights.Weight_List := Ones (Num_Samples);
       No_Weights       : Weights.Weight_List := Empty_Vector;
+      Sample_Weights_1 : Weights.Weight_List := Ones (Num_Samples);
+      Sample_Weights_2 : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
       Probabilities    : Weights.Weight_Lists_3D;
       Column_Sums      : Weights.Weight_List;
    begin
@@ -85,8 +86,15 @@ package body Classifier_Tests is
            (Routine_Name & " Column_Sums", Column_Sums);
       end if;
 
-      Put_Line ("Test Weighted Classification Toy");
-      Classification_Fit (theClassifier, X, Y, Sample_Weights);
+      Put_Line ("Test Weighted Classification Toy 1");
+      Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
+      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
+      Print_Value_Data_Lists_2D
+        (Routine_Name & " Predictions", Prediction);
+      Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
+
+      Put_Line ("Test Weighted Classification Toy 0.5");
+      Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
       Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Prediction);

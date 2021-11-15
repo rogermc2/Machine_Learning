@@ -285,6 +285,38 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
+    function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
+        use Natural_Package;
+        Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+        aVal        : Natural;
+        Diff        : Natural_List;
+    begin
+        for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+            aVal := Unique_Vals.Element (index);
+            if not Uniques.Contains (aVal) then
+                Diff.Append (aVal);
+            end if;
+        end loop;
+
+        return Diff;
+    end Set_Diff;
+
+    --  -------------------------------------------------------------------------
+
+    function Set_Value (List_Length : Positive; Value : Float)
+                        return Weights.Weight_List is
+        List_Of_Ones : Weights.Weight_List;
+    begin
+        for index in 1 .. List_Length loop
+            List_Of_Ones.Append (Value);
+        end loop;
+
+        return List_Of_Ones;
+
+    end Set_Value;
+
+    --  -------------------------------------------------------------------------
+
     function Sum_Cols (aList : Classifier_Types.Float_List_2D)
                        return Classifier_Types.Float_List is
         theSum : Classifier_Types.Float_List;
@@ -517,24 +549,6 @@ package body Classifier_Utilities is
     end To_Natural_Value_List;
 
     --  ------------------------------------------------------------------------
-
-    function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
-        use Natural_Package;
-        Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
-        aVal        : Natural;
-        Diff        : Natural_List;
-    begin
-        for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
-            aVal := Unique_Vals.Element (index);
-            if not Uniques.Contains (aVal) then
-                Diff.Append (aVal);
-            end if;
-        end loop;
-
-        return Diff;
-    end Set_Diff;
-
-    --  -------------------------------------------------------------------------
 
     function Transpose (Values : ML_Types.Value_Data_Lists_2D)
                         return  ML_Types.Value_Data_Lists_2D is
