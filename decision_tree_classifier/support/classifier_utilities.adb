@@ -3,6 +3,7 @@ with Ada.Containers.Ordered_Sets;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
+--  with Printing;
 
 package body Classifier_Utilities is
 
@@ -245,7 +246,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                           return Integer_List is
+                                       return Integer_List is
         use ML_Types;
         use Integer_Package;
         use Value_Data_Package;
@@ -272,7 +273,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Sum_Cols (aList : Classifier_Types.Float_List_2D)
-                           return Classifier_Types.Float_List is
+                       return Classifier_Types.Float_List is
         theSum : Classifier_Types.Float_List;
         Value  : Float;
     begin
@@ -292,7 +293,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Sum_Cols (aList : ML_Types.Value_Data_Lists_2D)
-                           return ML_Types.Value_Data_List is
+                       return ML_Types.Value_Data_List is
         use ML_Types;
         theSum     : Value_Data_List;
         Value_Type : constant Data_Type :=
@@ -328,6 +329,38 @@ package body Classifier_Utilities is
         end loop;
 
         return theSum;
+
+    end Sum_Cols;
+
+    --  -------------------------------------------------------------------------
+    --  aList: num outputs x num samples x num classes
+    --  Sum_Cols sums each class
+    function Sum_Cols (aList : Weights.Weight_Lists_3D)
+                       return Weights.Weight_List is
+        Samples : Weights.Weight_Lists_2D;
+        Classes : Weights.Weight_List;
+        Sums    : Weights.Weight_List;
+        Value   : Float := 0.0;
+    begin
+        Sums.Set_Length (aList.Element (1).Length);
+        for output_index in aList.First_Index .. aList.Last_Index loop
+            Samples := aList.Element (output_index);
+            for sample_index in Samples.First_Index .. Samples.Last_Index loop
+                Value := 0.0;
+                Classes := Samples.Element (sample_index);
+                for class_index in Classes.First_Index ..
+                  Classes.Last_Index loop
+                    Value := Value + Classes.Element (class_index);
+                    if abs (Value) < 10.0 ** (-6) then
+                        Value := 0.0;
+                    end if;
+                end loop;
+                Sums.Replace_Element
+                  (sample_index, Sums.Element (sample_index) + Value);
+            end loop;
+        end loop;
+
+        return Sums;
 
     end Sum_Cols;
 
@@ -370,7 +403,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Integer_Value_List (A : Integer_Array)
-                                        return ML_Types.Value_Data_List is
+                                    return ML_Types.Value_Data_List is
         use ML_Types;
         Data       : Value_Record (Integer_Type);
         A_List     : Value_Data_List;
@@ -386,7 +419,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Integer_Value_List_2D (A : Integer_Array)
-                                           return ML_Types.Value_Data_Lists_2D is
+                                       return ML_Types.Value_Data_Lists_2D is
         use ML_Types;
         Data       : Value_Record (Integer_Type);
         B_List     : Value_Data_List;
@@ -405,7 +438,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Multi_Value_List (A : Multi_Value_Array)
-                                      return ML_Types.Value_Data_Lists_2D is
+                                  return ML_Types.Value_Data_Lists_2D is
         use ML_Types;
         Value    : Value_Record (Integer_Type);
         Row_List : Value_Data_Lists_2D;
@@ -438,7 +471,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Natural_Value_List (A : Natural_Array)
-                                        return ML_Types.Value_Data_Lists_2D is
+                                    return ML_Types.Value_Data_Lists_2D is
         Int_Array : Integer_Array (1 .. A'Length);
     begin
         for index in A'First .. A'Last loop
@@ -468,7 +501,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Transpose (Values : ML_Types.Value_Data_Lists_2D)
-                            return  ML_Types.Value_Data_Lists_2D is
+                        return  ML_Types.Value_Data_Lists_2D is
         use  ML_Types;
         New_Row : Value_Data_List;
         Result  : Value_Data_Lists_2D;
@@ -485,7 +518,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
-                                return Tree.Tree_Cursor is
+                            return Tree.Tree_Cursor is
         use Ada.Containers;
         use Tree;
         use Nodes_Package;
@@ -530,7 +563,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                       return Integer_Array is
+                                   return Integer_Array is
         use Int_Sets;
         Unique_Set : Int_Sets.Set;
         Set_Curs   : Int_Sets.Cursor;

@@ -48,7 +48,7 @@ package body Classifier_Tests is
                           To_Multi_Value_List (T_Array);
       Num_Samples     : constant Natural := Natural (X.Length);
       Probabilities   : Weights.Weight_Lists_3D;
---        Column_Sums     : Value_Data_List;
+      Column_Sums     : Weights.Weight_List;
    begin
       Put_Line ("Classification_Tests.Test_Classification_Toy:");
       Assert (Num_Samples > 0,
@@ -71,13 +71,15 @@ package body Classifier_Tests is
         ("Classification_Tests.Test_Classification_Toy Expected", Expected);
       --  L353 test_probability
       Probabilities := Predict_Probability (theClassifier, X);
---        Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
-      --        if Probabilities = Expected then
-      --           null;
-      --        end if;
       Print_Weight_Lists_3D
         ("Classification_Tests.Test_Classification_Toy Probabilities",
          Probabilities);
+      Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
+      --        if Probabilities = Expected then
+      --           null;
+      --        end if;
+      Print_Weights ("Classification_Tests.Test_Classification_Toy Column_Sums",
+                     Column_Sums);
 
    end Test_Classification_Toy;
 

@@ -27,6 +27,8 @@ package Classifier_Utilities is
                       return Classifier_Types.Float_List;
     function Sum_Cols (aList : ML_Types.Value_Data_Lists_2D)
                       return ML_Types.Value_Data_List;
+    function Sum_Cols (aList : Weights.Weight_Lists_3D)
+                      return Weights.Weight_List;
     function To_Array (L : Integer_List) return Integer_Array;
     function To_Float_List (A : Float_Array) return Float_List;
     function To_Integer_List (A : Integer_Array) return Integer_List;
