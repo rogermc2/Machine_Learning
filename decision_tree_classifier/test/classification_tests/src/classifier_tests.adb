@@ -80,9 +80,9 @@ package body Classifier_Tests is
         Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
 
         if Column_Sums = Ones (Integer (X.Length)) then
-            Put_Line ("Probabilities test passed");
+            Put_Line ("Classification_Tests Probabilities test passed");
         else
-            Put_Line ("Probabilities test failed");
+            Put_Line ("Classification_Tests Probabilities test failed");
             Print_Weights
               ("Classification_Tests.Test_Classification_Toy Column_Sums",
                Column_Sums);
@@ -102,11 +102,10 @@ package body Classifier_Tests is
         Iris_Data       : Data_Record;
         theClassifier   : Base_Decision_Tree.Classifier
           (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-        X               : constant Value_Data_Lists_2D :=
-                            Iris_Data.Feature_Values;
+        X               :  Value_Data_Lists_2D;
         --  Y: num outputs x num classes
         Y               : Value_Data_Lists_2D;
-        Num_Samples     : constant Natural := Natural (X.Length);
+        Num_Samples     : Natural;
         Probabilities   : Weights.Weight_Lists_3D;
         Column_Sums     : Weights.Weight_List;
     begin
@@ -114,13 +113,18 @@ package body Classifier_Tests is
         Utilities.Load_CSV_Data (Data_File, Iris_CSV_Data);
         Close (Data_File);
         Iris_Data := Utilities.Split_Row_Data (Iris_CSV_Data);
+        X := Iris_Data.Feature_Values;
+        Num_Samples := Natural (X.Length);
 
-        Put_Line ("Classification_Tests.Test_Probability:");
+        Put_Line ("Classification_Tests.Test_Probability");
         Assert (Num_Samples > 0,
                 "Classification_Tests.Test_Probability called with empty X vector.");
 
         --  Y is 2D list num outputs x num classes
         Y := To_Value_2D_List (Iris_Data.Label_Values);
+        Print_Value_Data_Lists_2D ("Classification_Tests.Test_Probability Y", Y);
+        Assert (Integer (Y.Element (1).Length) = Num_Samples,
+                "Classification_Tests.Test_Probability invalid Y vector");
         --  L356
         Classification_Fit (theClassifier, X, Y);
         Print_Tree ("The Tree", theClassifier);
@@ -129,7 +133,7 @@ package body Classifier_Tests is
         --  L358 test_probability
         Probabilities := Predict_Probability (theClassifier, X);
 --          Print_Weight_Lists_3D
---            ("Classification_Tests.Test_Classification_Toy Probabilities",
+--            ("Classification_Tests.Test_Probability Probabilities",
 --             Probabilities);
         Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
 
