@@ -126,9 +126,6 @@ package body Classifier_Tests is
       New_Line;
       --  L358 test_probability
       Probabilities := Predict_Probability (theClassifier, X);
-      --          Print_Weight_Lists_3D
-      --            ("Classification_Tests.Test_Probability Probabilities",
-      --             Probabilities);
       Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
 
       if Column_Sums = Ones (Integer (X.Length)) then
