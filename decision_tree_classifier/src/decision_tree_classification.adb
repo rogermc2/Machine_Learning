@@ -5,7 +5,6 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
-with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
 with Estimator;
@@ -16,14 +15,14 @@ with Weights;
 package body Decision_Tree_Classification is
 
     --  -------------------------------------------------------------------------
-    --  L884
+    --  L904
     procedure Classification_Fit
       (aClassifier    : in out Base_Decision_Tree.Classifier;
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
+       Sample_Weights : in out Weights.Weight_List;
        Max_Depth      : Integer := -1) is
         use Estimator;
-        Sample_Weights : Classifier_Types.Float_List;
     begin
         Assert (aClassifier.Estimator_Kind = Classifier_Estimator,
                 "Decision_Tree_Classifer.Classification_Fit, invalid estimator "

@@ -34,7 +34,7 @@ package body Base_Decision_Tree is
       (aClassifier    : in out Classifier;
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
-       Sample_Weights : out Classifier_Types.Float_List;
+       Sample_Weights : out Weights.Weight_List;
        Max_Depth      : Integer := -1) is
         use Estimator;
         Criteria              : Criterion.Criterion_Class;
@@ -244,8 +244,9 @@ package body Base_Decision_Tree is
        Y                      : ML_Types.Value_Data_Lists_2D;
        Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
        Classes                : out ML_Types.Value_Data_Lists_2D;
-       Expanded_Class_Weights : in out Classifier_Types.Float_List) is
+       Expanded_Class_Weights : in out Weights.Weight_List) is
         use Ada.Containers;
+        use Classifier_Types;
         use Weights;
         Num_Outputs : constant Count_Type := Y.Element (1).Length;
         Y_Row       : ML_Types.Value_Data_List;
@@ -328,7 +329,7 @@ package body Base_Decision_Tree is
         Classes_K         : ML_Types.Value_Data_List;
         Selected_Classes  : ML_Types.Value_Data_List;
         Selected_Class    : ML_Types.Value_Record;
-        Max_Indices       : Natural_List;  --  argmax
+        Max_Indices       : Classifier_Types.Natural_List;  --  argmax
         --  Prediction 1 x num samples
         Pred              : ML_Types.Value_Data_List;
         --  Predictions, num samples x num outputs
