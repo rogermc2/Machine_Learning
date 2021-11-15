@@ -245,6 +245,19 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
+    function Ones (List_Length : Positive) return Weights.Weight_List is
+        List_Of_Ones : Weights.Weight_List;
+    begin
+        for index in 1 .. List_Length loop
+            List_Of_Ones.Append (1.0);
+        end loop;
+
+        return List_Of_Ones;
+
+    end Ones;
+
+    --  -------------------------------------------------------------------------
+
     function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
                                        return Integer_List is
         use ML_Types;
@@ -342,7 +355,10 @@ package body Classifier_Utilities is
         Sums    : Weights.Weight_List;
         Value   : Float := 0.0;
     begin
-        Sums.Set_Length (aList.Element (1).Length);
+        for index in 1 .. aList.Element (1).Length loop
+            Sums.Append (0.0);
+        end loop;
+
         for output_index in aList.First_Index .. aList.Last_Index loop
             Samples := aList.Element (output_index);
             for sample_index in Samples.First_Index .. Samples.Last_Index loop
@@ -455,6 +471,19 @@ package body Classifier_Utilities is
         return Row_List;
 
     end To_Multi_Value_List;
+
+    --  -------------------------------------------------------------------------
+
+    function To_Value_2D_List (A : ML_Types.Value_Data_List)
+                               return ML_Types.Value_Data_Lists_2D is
+        use ML_Types;
+        Row_List : Value_Data_Lists_2D;
+    begin
+        Row_List.Append (A);
+
+        return Row_List;
+
+    end To_Value_2D_List;
 
     --  -------------------------------------------------------------------------
 

@@ -20,6 +20,7 @@ package Classifier_Utilities is
     function Nodes_3D_To_Outputs_3D (Nodes : Weights.Weight_Lists_3D;
                                      Num_Outputs : Positive)
                                      return Weights.Weight_Lists_3D;
+    function Ones (List_Length : Positive) return Weights.Weight_List;
     function Search_Sorted_Value_List
       (List_A, List_B : ML_Types.Value_Data_List) return Integer_List;
     function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
@@ -39,6 +40,8 @@ package Classifier_Utilities is
                                       return ML_Types.Value_Data_Lists_2D;
     function To_Multi_Value_List (A : Multi_Value_Array)
                                  return ML_Types.Value_Data_Lists_2D;
+    function To_Value_2D_List (A : ML_Types.Value_Data_List)
+                               return ML_Types.Value_Data_Lists_2D;
     function To_Natural_Value_List (A : Natural_Array)
                                    return ML_Types.Value_Data_Lists_2D;
     function Transpose (Values : ML_Types.Value_Data_Lists_2D)

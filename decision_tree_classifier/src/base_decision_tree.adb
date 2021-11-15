@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -275,10 +275,10 @@ package body Base_Decision_Tree is
       Column      : Natural_List;
       Inverse     : Natural_List;
    begin
-      Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
-                  Count_Type'Image (Y.Length));
-      Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
-                  Count_Type'Image (Num_Outputs));
+--        Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
+--                    Count_Type'Image (Y.Length));
+--        Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
+--                    Count_Type'Image (Num_Outputs));
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
       Classes.Clear;
@@ -310,11 +310,8 @@ package body Base_Decision_Tree is
             YE_Row.Replace_Element (op, Inverse.Element (class));
             Y_Encoded.Replace_Element (class, YE_Row);
          end loop;
-         Put_Line ("Base_Decision_Tree.Classification_Part Num Y_Encoded: " &
-                     Count_Type'Image (Y_Encoded.Length));
-         Put_Line ("Base_Decision_Tree.Classification_Part Num Classes: " &
-                     Count_Type'Image (Classes.Element (1).Length));
-
+--           Put_Line ("Base_Decision_Tree.Classification_Part Num Classes: " &
+--                       Count_Type'Image (Classes.Element (1).Length));
       end loop;
       aClassifier.Attributes.Classes := Classes;
 
