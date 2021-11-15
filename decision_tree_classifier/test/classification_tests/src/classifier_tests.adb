@@ -112,7 +112,6 @@ package body Classifier_Tests is
       Iris_Data := Utilities.Split_Row_Data (Iris_CSV_Data);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
-
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 

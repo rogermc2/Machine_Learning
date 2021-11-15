@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Node_Splitter is
 
@@ -473,6 +473,7 @@ package body Node_Splitter is
                              Classifier_Types.Natural_List;
                            Impurity    : Float) is
       use Classifier_Types.Natural_Package;
+      Routine_Name  : constant String := "Node_Splitter.Reorder_Rows";
       Partition_End : Natural;
       P_Index       : Positive;
       Sample_PI     : Positive;
@@ -489,6 +490,11 @@ package body Node_Splitter is
          while P_Index < Partition_End loop
             Sample_PI := Self.Sample_Indices.Element (P_Index);
             X_1 := Self.X.Element (Sample_PI);
+            Put_Line (Routine_Name & " X_1 length " &
+                        Integer'Image (Integer (X_1.Length)));
+            Printing.Print_Value_Data_List (Routine_Name & " X_1", X_1);
+            Put_Line (Routine_Name & " Best_Split.Feature " &
+                        Integer'Image (Best_Split.Feature));
             X := X_1.Element (Best_Split.Feature);
 
             case X.Value_Kind is
