@@ -568,18 +568,19 @@ package body Node_Splitter is
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
                          return Split_Record is
-      Current_Split        : Split_Record;
+      Routine_Name         : constant String := "Node_Splitter.Split_Node";
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Num_Total_Constants  : Natural := Num_Known_Constants;
       Num_Found_Constants  : Natural := 0;
+      Current_Split        : Split_Record;
       Best_Split           : Split_Record;
    begin
       --  L277 samples is a pointer to self.samples
       --  L281 features is a pointer to self.features
       --  L282 constant_features is a pointer to self.constant_features
       --  L285 Xf is a pointer to self.feature_values
-      Assert (not Self.Sample_Indices.Is_Empty,
-              "Node_Splitter.Split_Node called with empty Sample_Indices");
+      Assert (not Self.Sample_Indices.Is_Empty, Routine_Name &
+              " called with empty Sample_Indices");
       --  L315
       Init_Split (Current_Split, Self.Start_Row);
       --  L326
