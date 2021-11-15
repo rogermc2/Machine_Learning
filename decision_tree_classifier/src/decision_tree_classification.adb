@@ -10,7 +10,7 @@ with Classifier_Utilities;
 with Criterion;
 with Estimator;
 with Node_Splitter;
-with Printing;
+--  with Printing;
 with Weights;
 
 package body Decision_Tree_Classification is
@@ -84,7 +84,6 @@ package body Decision_Tree_Classification is
         --  Proba: num nodes x num outputs x num classes
         Proba           : constant Weight_Lists_3D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
---          Prob_Classes    : Weight_List;
         Output_K        : Weight_Lists_2D;
         Node_K          : Weight_List;
         --  All_Proba: num nodes x num outputs x num classes
@@ -95,7 +94,6 @@ package body Decision_Tree_Classification is
         --  All_Proba: num_outputs x num nodes x num classes
         All_Proba := Classifier_Utilities.Nodes_3D_To_Outputs_3D
           (Proba, Num_Outputs);
-
         --  L969
         for output_index in All_Proba.First_Index .. All_Proba.Last_Index loop
             Output_K := All_Proba.Element (output_index);
@@ -103,32 +101,30 @@ package body Decision_Tree_Classification is
             for node_index in Output_K.First_Index .. Output_K.Last_Index loop
                 Node_K := Output_K.Element (node_index);
                 --  Node_K List of classes
-                Normalizer := 0.0;
                 for class_index in Node_K.First_Index  .. Node_K.Last_Index loop
+                    Normalizer := 0.0;
                     F_Class := Node_K.Element (class_index);
                     for class_index in Node_K.First_Index ..
                       Node_K.Last_Index loop
                         F_Class := Node_K.Element (class_index);
                         Normalizer := Normalizer + F_Class;
                     end loop;
-                end loop;
 
-                if Normalizer > 0.0 then
-                    for class_index in Node_K.First_Index ..
-                      Node_K.Last_Index loop
-                        F_Class := Node_K.Element (class_index);
-                        Node_K.Replace_Element
-                          (class_index, F_Class / Normalizer);
-                    end loop;
-                end if;
+                    if Normalizer > 0.0 then
+                        for class_index in Node_K.First_Index ..
+                          Node_K.Last_Index loop
+                            F_Class := Node_K.Element (class_index);
+                            Node_K.Replace_Element
+                              (class_index, F_Class / Normalizer);
+                        end loop;
+                    end if;
+                end loop;
 
                 Output_K.Replace_Element (node_index, Node_K);
             end loop;
+
             All_Proba.Replace_Element (output_index, Output_K);
         end loop;
-        Printing.Print_Weight_Lists_3D
-          ("Decision_Tree_Classification.Predict_Probability All_Proba",
-           All_Proba);
 
         return All_Proba;
 
