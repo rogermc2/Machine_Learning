@@ -2,10 +2,11 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
 with Classifier_Types;
+with Classifier_Utilities;
 with Criterion;
 with Estimator;
 with Node_Splitter;
@@ -83,34 +84,14 @@ package body Decision_Tree_Classification is
         --  Proba: num nodes x num outputs x num classes
         Proba           : constant Weight_Lists_3D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
-        Prob_Node       : Weight_Lists_2D;
         Prob_Classes    : Weight_List;
-        Prob_Node_Class : Weight_Lists_2D;
         Output_K        : Weight_Lists_2D;
         Node_K          : Weight_List;     -- List of classes
         All_Proba       : Weight_Lists_3D;
         F_Class         : Float;
         Normalizer      : Float;
     begin
-        Put_Line ("Decision_Tree_Classification.Predict_Probability Num_Outputs length: "
-                 & Integer'Image (Num_Outputs));
-        Put_Line ("Decision_Tree_Classification.Predict_Probability Proba length: "
-                 & Integer'Image (Integer (Proba.Length)));
-        Printing.Print_Weight_Lists_3D
-          ("Decision_Tree_Classification.Predict_Probability Proba", Proba);
-        for index in 1 .. Num_Outputs loop
-            Prob_Node_Class.Clear;
-            for index_2 in Proba.First_Index .. Proba.Last_Index loop
-                --  Prob_Node: num outputs x num classes
-                Prob_Node := Proba.Element (index_2);
-                for index_3 in Prob_Node.First_Index .. Prob_Node.Last_Index loop
-                    --  Prob_Classes: num classes
-                    Prob_Classes := Prob_Node.Element (index_3);
-                end loop;
-                 Prob_Node_Class.Append (Prob_Classes);
-            end loop;
-            All_Proba.Append (Prob_Node_Class);
-        end loop;
+        All_Proba := Classifier_Utilities.Nodes_3D_To_Outputs_3D (Proba, Num_Outputs);
 
         --  L969
         for k in All_Proba.First_Index .. All_Proba.Last_Index loop

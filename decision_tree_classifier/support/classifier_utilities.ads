@@ -17,9 +17,11 @@ package Classifier_Utilities is
                          Column_Index : Positive) return Float_List;
     function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D;
-
-    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                      return Integer_List;
+    function Nodes_3D_To_Outputs_3D (Nodes : Weights.Weight_Lists_3D;
+                                     Num_Outputs : Positive)
+                                     return Weights.Weight_Lists_3D;
+    function Search_Sorted_Value_List
+      (List_A, List_B : ML_Types.Value_Data_List) return Integer_List;
     function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
     function Sum_Cols (aList : Classifier_Types.Float_List_2D)
                       return Classifier_Types.Float_List;
