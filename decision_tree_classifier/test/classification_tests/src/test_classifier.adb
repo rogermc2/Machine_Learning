@@ -8,6 +8,6 @@ procedure Test_Classifier is
 begin
    Put_Line ("Test Classifier started");
    Test_Classification_Toy;
-   Test_Probability;
+--     Test_Probability;
 
 end Test_Classifier;

@@ -87,6 +87,10 @@ package body Classifier_Tests is
 
       Put_Line ("Test Weighted Classification Toy");
       Classification_Fit (theClassifier, X, Y, Sample_Weights);
+      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
+      Print_Value_Data_Lists_2D
+        (Routine_Name & " Predictions", Prediction);
+      Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
 
    end Test_Classification_Toy;
 

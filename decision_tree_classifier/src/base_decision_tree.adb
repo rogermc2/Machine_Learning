@@ -36,7 +36,10 @@ package body Base_Decision_Tree is
        Y              : ML_Types.Value_Data_Lists_2D;
        Sample_Weights : out Weights.Weight_List;
        Max_Depth      : Integer := -1) is
+        use Ada.Containers;
         use Estimator;
+        Routine_Name          : constant String :=
+                                  "Base_Decision_Tree.Base_Fit";
         Criteria              : Criterion.Criterion_Class;
         Splitter              : Node_Splitter.Splitter_Class;
         Y_Encoded             : Classifier_Types.Natural_Lists_2D;
@@ -46,10 +49,12 @@ package body Base_Decision_Tree is
         Expanded_Class_Weight : Weights.Weight_List;
         Sum_Sample_Weight     : Float := 0.0;
     begin
-        Assert (not X.Is_Empty,
-                "Base_Decision_Tree.Base_Fit, X is empty");
-        Assert (not Y.Is_Empty,
-                "Base_Decision_Tree.Base_Fit, Y is empty");
+        Assert (not X.Is_Empty, Routine_Name & ", X is empty");
+        Assert (not Y.Is_Empty, Routine_Name & ", Y is empty");
+        if not Sample_Weights.Is_Empty then
+            Assert (Sample_Weights.Length = X.Length, Routine_Name &
+                      ",Sample_Weights must be the same size as X.");
+        end if;
 
         --  X is 2D list num samples x num features
         --  Y is 2D list num classes x num outputs
@@ -75,7 +80,8 @@ package body Base_Decision_Tree is
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
-        if Expanded_Class_Weight.Is_Empty then
+        --  L326
+        if not Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
                 Sample_Weights := Expanded_Class_Weight;
             else
