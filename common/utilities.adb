@@ -729,30 +729,29 @@ package body Utilities is
       use Rows_Package;
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;
-      Feature_Values : Value_Data_List;
       Features_List  : Value_Data_Lists_2D;
       Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
       Label_Type     : Data_Type;
       Label_Values   : Value_Data_List;
       Data           : Data_Record;
    begin
-      for index in aRow.Features'First .. aRow.Features'Last loop
-         Data.Feature_Names.Append (aRow.Features (index));
-      end loop;
       Data.Label_Name := aRow.Label;
 
-      for row_index in Row_Data.First_Index + 1 .. Row_Data.Last_Index loop
+      for row_index in Row_Data.First_Index .. Row_Data.Last_Index loop
          aRow := Row_Data.Element (row_index);
          declare
             Features                : constant Feature_Data_Array
               (1 .. aRow.Class_Count) := aRow.Features;
+            Feature_Values          : Value_Data_List :=
+                                        Value_Data_Package.Empty_Vector;
             Label                   : constant Unbounded_String := aRow.Label;
          begin
-            if row_index = Row_Data.First_Index + 1 then
+            if row_index = Row_Data.First_Index then
                Label_Type := Get_Data_Type (aRow.Label);
             end if;
-            for f_index in Features'Range loop
-               if row_index = Row_Data.First_Index + 1 then
+
+            for f_index in Features'First .. Features'Last loop
+               if row_index = Row_Data.First_Index then
                   Feature_Types (f_index) :=
                     Get_Data_Type (aRow.Features (f_index));
                end if;

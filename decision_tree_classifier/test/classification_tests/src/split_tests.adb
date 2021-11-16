@@ -34,7 +34,7 @@ package body Split_Tests is
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X             :  Value_Data_Lists_2D;
-      X_Short       :  Value_Data_Lists_2D;
+--        X_Short       :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y             : Value_Data_Lists_2D;
       No_Weights    : Weights.Weight_List := Empty_Vector;
@@ -50,13 +50,11 @@ package body Split_Tests is
       --  L1689
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
-      for index in 1 .. 10 loop
-         X_Short.Append (X.Element (index));
-      end loop;
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", X_Short);
+--        for index in 1 .. 10 loop
+--           X_Short.Append (X.Element (index));
+--        end loop;
+--        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", X_Short);
       Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
-      Put_Line (Routine_Name & ", X.Element (1).Length" &
-                  Integer'Image (Integer (X.Element (1).Length)));
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 

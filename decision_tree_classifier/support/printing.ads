@@ -47,7 +47,8 @@ package Printing is
     procedure Print_Value_Data_List (Name    : String;
                                      theList : ML_Types.Value_Data_List);
     procedure Print_Value_Data_Lists_2D (Name    : String;
-                                        theList : ML_Types.Value_Data_Lists_2D);
+                                        theList : ML_Types.Value_Data_Lists_2D;
+                                         Num_Items : Positive := 1000);
     procedure Print_Value_Data_Lists_3D (Name    : String;
                                          theList : ML_Types.Value_Data_Lists_3D);
    procedure Print_Value_Data_Record (Name  : String;

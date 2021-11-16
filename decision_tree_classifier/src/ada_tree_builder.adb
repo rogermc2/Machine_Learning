@@ -39,7 +39,7 @@ package body Ada_Tree_Builder is
       use Node_Splitter;
       use Tree;
       use Nodes_Package;
-      Routine_Name          : constant String := "Ada_Tree_Builder.Add_Branch";
+--        Routine_Name          : constant String := "Ada_Tree_Builder.Add_Branch";
       --  L199
       Data                  : constant Stack_Record := Pop (theStack);
       Start_Row             : constant Positive := Data.Start;
@@ -71,23 +71,23 @@ package body Ada_Tree_Builder is
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
         --  if Impurity == 0.0 with tolerance for rounding errors
       abs (Impurity) <= Epsilon;
-      Put_Line (Routine_Name & ", L207 Is_Leaf_Node: " &
-                  Boolean'Image (Is_Leaf_Node));
+--        Put_Line (Routine_Name & ", L207 Is_Leaf_Node: " &
+--                    Boolean'Image (Is_Leaf_Node));
       --  L220
       if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         Put_Line (Routine_Name & ", L220 Split.Split_Row >= Stop_Row: " &
-                     Boolean'Image (Split.Split_Row >= Stop_Row));
-         Put_Line (Routine_Name &
-                     ", L220 Improvement + Epsilon < Min_Impurity_Decrease: " &
-                     Boolean'Image (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
+--           Put_Line (Routine_Name & ", L220 Split.Split_Row >= Stop_Row: " &
+--                       Boolean'Image (Split.Split_Row >= Stop_Row));
+--           Put_Line (Routine_Name &
+--                       ", L220 Improvement + Epsilon < Min_Impurity_Decrease: " &
+--                       Boolean'Image (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
          --  L233
          Is_Leaf_Node := Split.Split_Row >= Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
       end if;
-      Put_Line (Routine_Name & ", L233 Is_Leaf_Node: " &
-                  Boolean'Image (Is_Leaf_Node));
+--        Put_Line (Routine_Name & ", L233 Is_Leaf_Node: " &
+--                    Boolean'Image (Is_Leaf_Node));
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at

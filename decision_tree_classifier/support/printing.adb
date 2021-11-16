@@ -428,8 +428,6 @@ package body Printing is
    begin
       if Name'Length > 0 then
          Put (Name & ": ");
-      else
-         New_Line;
       end if;
 
       for Index in theList.First_Index .. theList.Last_Index loop
@@ -449,8 +447,13 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_2D
-     (Name : String; theList : ML_Types.Value_Data_Lists_2D) is
+     (Name      : String; theList : ML_Types.Value_Data_Lists_2D;
+      Num_Items : Positive := 1000) is
+      Items : Positive := Positive (theList.Last_Index);
    begin
+      if Items > Num_Items then
+         Items := Num_Items;
+      end if;
       if Name'Length > 0 then
          Put_Line (Name & ":");
       end if;
@@ -460,9 +463,8 @@ package body Printing is
       elsif Integer (theList.Element (1).Length) = 0 then
          Put_Line ("Print_Value_Data_List_2D, first data list is empty");
       else
-         for index in theList.First_Index .. theList.Last_Index loop
+         for index in theList.First_Index .. Items loop
             Print_Value_Data_List ("", theList.Element (index));
-            New_Line;
          end loop;
       end if;
 
