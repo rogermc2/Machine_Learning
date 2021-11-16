@@ -424,7 +424,7 @@ package body Node_Splitter is
                       Best_Split            : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
---        Routine_Name         : constant String := "Node_Splitter.Process ";
+      --        Routine_Name         : constant String := "Node_Splitter.Process ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -433,8 +433,8 @@ package body Node_Splitter is
       Current_Split := Best_Split;
       --  L354 Sort samples along Current.Feature index;
       Current_Split.Feature := Self.Feature_Indices.Element (F_J);
---        Printing.Print_Split_Record
---          (Routine_Name & "L358 initial Current_Split", Current_Split);
+      --        Printing.Print_Split_Record
+      --          (Routine_Name & "L358 initial Current_Split", Current_Split);
       --  L358
       for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Self.Sample_Indices.Element (index);
@@ -463,8 +463,8 @@ package body Node_Splitter is
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
       end if;
---        Printing.Print_Split_Record
---          (Routine_Name & "final Best_Split", Best_Split);
+      --        Printing.Print_Split_Record
+      --          (Routine_Name & "final Best_Split", Best_Split);
 
    end Process;
 
@@ -476,7 +476,7 @@ package body Node_Splitter is
                              Classifier_Types.Natural_List;
                            Impurity    : Float) is
       use Classifier_Types.Natural_Package;
---        Routine_Name  : constant String := "Node_Splitter.Reorder_Rows";
+      --        Routine_Name  : constant String := "Node_Splitter.Reorder_Rows";
       Partition_End : Natural;
       P_Index       : Positive;
       Sample_PI     : Positive;

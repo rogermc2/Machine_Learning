@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -125,6 +125,8 @@ package body Base_Decision_Tree is
        Sample_Weights : in out Classifier_Types.Float_List) is
         use Maths.Float_Math_Functions;
         use Tree;
+        Routine_Name          : constant String :=
+                                "Base_Decision_Tree.Base_Fit_Checks";
         Num_Samples           : constant Positive := Positive (X.Length);
         --  L229
         Max_Depth             : Natural;
@@ -144,13 +146,10 @@ package body Base_Decision_Tree is
 
         --  L235
         Assert (aClassifier.Parameters.Min_Samples_Leaf > 0,
-                "Base_Decision_Tree.Base_Fit_Checks, Min_Samples_Leaf " &
-                  "must be at least 1");
-
+                Routine_Name & ", Min_Samples_Leaf must be at least 1");
         --  L250
-        Assert (aClassifier.Parameters.Min_Samples_Split > 1,
-                "Base_Decision_Tree.Base_Fit_Checks, Min_Samples_Split " &
-                  "must be at least 2");
+        Assert (aClassifier.Parameters.Min_Samples_Split > 1, Routine_Name &
+                ", Min_Samples_Split must be at least 2");
         Min_Sample_Split := aClassifier.Parameters.Min_Samples_Split;
 
         --  L263
@@ -169,43 +168,39 @@ package body Base_Decision_Tree is
         --  L291
         aClassifier.Parameters.Max_Features := Max_Features;
 
-        Assert (Positive (Y.Length) = Num_Samples,
-                "Base_Decision_Tree.Base_Fit_Checks, number of labels " &
-                  Integer'Image (Integer (Y.Length)) &
+        Assert (Positive (Y.Length) = Num_Samples, Routine_Name &
+                ", number of labels " & Integer'Image (Integer (Y.Length)) &
                   " does not match number of samples " &
                   Integer'Image (Num_Samples));
 
         --  L298
         Assert (aClassifier.Parameters.Min_Weight_Fraction_Leaf >= 0.0 and
                   aClassifier.Parameters.Min_Weight_Fraction_Leaf < 5.0,
-                "Base_Decision_Tree.Base_Fit_Checks, " &
-                  "Min_Weight_Fraction_Leaf is "
-                & Float'Image (aClassifier.Parameters.Min_Weight_Fraction_Leaf)
+                Routine_Name & ", Min_Weight_Fraction_Leaf is " &
+                Float'Image (aClassifier.Parameters.Min_Weight_Fraction_Leaf)
                 &  " but should be in (0.0, 5.0]");
 
         if Max_Features <= 0 or
           Max_Features > aClassifier.Attributes.Num_Features then
-            raise Value_Error with
-              "Base_Decision_Tree.Base_Fit_Checks, Max_Features is not in (0, Num_Features)";
+            raise Value_Error with Routine_Name &
+              ", Max_Features is not in (0, Num_Features)";
         end if;
 
         --  L301
-        Assert (Max_Depth > 0,
-                "Base_Decision_Tree.Base_Fit_Checks, must be greater than 0.");
+        Assert (Max_Depth > 0, Routine_Name & ", must be greater than 0.");
 
         --  L305
-        Assert (Max_Leaf_Nodes = -1 or Max_Leaf_Nodes > 1,
-                "Base_Decision_Tree.Base_Fit_Checks, Max_Leaf_Nodes must be > 1");
+        Assert (Max_Leaf_Nodes = -1 or Max_Leaf_Nodes > 1, Routine_Name &
+                ", Max_Leaf_Nodes must be > 1");
         --  L315
         if not Sample_Weights.Is_Empty then
             Assert (Integer (Sample_Weights.Length) = Num_Samples,
-                    "Base_Decision_Tree.Base_Fit_Checks, Sample_Weight length "
-                    & "should be the same as the number of X samples");
+                    Routine_Name & ", Sample_Weight length " &
+                    "should be the same as the number of X samples");
         end if;
         --  L350
         Assert (aClassifier.Parameters.Min_Impurity_Decrease >= 0.0,
-                "Base_Decision_Tree.Base_Fit_Checks, " &
-                  "Min_Impurity_Decrease should be >= 0");
+                Routine_Name & ", Min_Impurity_Decrease should be >= 0");
 
     end Base_Fit_Checks;
 
@@ -325,6 +320,7 @@ package body Base_Decision_Tree is
                       return ML_Types.Value_Data_Lists_2D is
         use Ada.Containers;
         use Weights;
+        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
         Num_Samples       : constant Count_Type := X.Length;
         Prob_A            : constant Weight_Lists_3D :=
                               Tree.Predict (Self.Attributes.Decision_Tree, X);
@@ -341,6 +337,8 @@ package body Base_Decision_Tree is
         --  Predictions, num samples x num outputs
         Predictions       : ML_Types.Value_Data_Lists_2D;
     begin
+      Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
+                (Self.Attributes.Decision_Tree.Nodes.Node_Count - 1));
         Predictions.Set_Length (Num_Samples);
         --  479
         for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop

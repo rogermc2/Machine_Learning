@@ -90,14 +90,14 @@ package body Classifier_Tests is
       Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
       Print_Value_Data_Lists_2D
-        (Routine_Name & " Predictions", Prediction);
+        (Routine_Name & " 1.0 weightedpPredictions", Prediction);
       Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
 
       Put_Line ("Test Weighted Classification Toy 0.5");
       Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
       Print_Value_Data_Lists_2D
-        (Routine_Name & " Predictions", Prediction);
+        (Routine_Name & " 0.5 weighted predictions", Prediction);
       Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
 
    end Test_Classification_Toy;
