@@ -34,8 +34,7 @@ package body Base_Decision_Tree is
       (aClassifier    : in out Classifier;
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
-       Sample_Weights : out Weights.Weight_List;
-       Max_Depth      : Integer := -1) is
+       Sample_Weights : out Weights.Weight_List) is
         use Ada.Containers;
         use Estimator;
         Routine_Name          : constant String :=
@@ -72,7 +71,6 @@ package body Base_Decision_Tree is
                           Num_Classes);
         --  L163
         Node_Splitter.C_Init (Splitter, Criteria);
-        C_Init (aClassifier, Criteria, Splitter, Max_Depth => Max_Depth);
 
         --  L184
         aClassifier.Attributes.Num_Features :=

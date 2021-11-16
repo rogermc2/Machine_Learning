@@ -87,8 +87,7 @@ package Decision_Tree_Classification is
       (aClassifier    : in out Base_Decision_Tree.Classifier;
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
-       Sample_Weights : in out Weights.Weight_List;
-       Max_Depth      : Integer := -1);
+       Sample_Weights : in out Weights.Weight_List);
     function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                   X    : ML_Types.Value_Data_Lists_2D)
                                  return Weights.Weight_Lists_3D;

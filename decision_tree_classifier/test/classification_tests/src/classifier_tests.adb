@@ -7,8 +7,10 @@ with Utilities;
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
+with Criterion;
 with Decision_Tree_Classification;
 with ML_Types;
+with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -41,6 +43,8 @@ package body Classifier_Tests is
       use Float_Package;
       Routine_Name     : constant String :=
                            "Classification_Tests.Test_Classification_Toy";
+      Criteria         : Criterion.Criterion_Class;
+      Splitter         : Node_Splitter.Splitter_Class;
       Expected         : Value_Data_Lists_2D;
       Prediction       : ML_Types.Value_Data_Lists_2D;
       theClassifier    : Base_Decision_Tree.Classifier
@@ -57,6 +61,7 @@ package body Classifier_Tests is
       Probabilities    : Weights.Weight_Lists_3D;
       Column_Sums      : Weights.Weight_List;
    begin
+      C_Init (theClassifier, Criteria, Splitter);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");

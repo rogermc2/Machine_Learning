@@ -20,8 +20,7 @@ package body Decision_Tree_Classification is
       (aClassifier    : in out Base_Decision_Tree.Classifier;
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
-       Sample_Weights : in out Weights.Weight_List;
-       Max_Depth      : Integer := -1) is
+       Sample_Weights : in out Weights.Weight_List) is
         use Estimator;
     begin
         Assert (aClassifier.Estimator_Kind = Classifier_Estimator,
@@ -30,7 +29,7 @@ package body Decision_Tree_Classification is
 
         --  L920 X is 2D list num samples x num features
         --       Y is 2D list num classes x num outputs
-        Base_Decision_Tree.Base_Fit (aClassifier, X, Y, Sample_Weights, Max_Depth);
+        Base_Decision_Tree.Base_Fit (aClassifier, X, Y, Sample_Weights);
 
     end Classification_Fit;
 
