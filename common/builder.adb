@@ -598,7 +598,6 @@ package body Builder is
 
    procedure Set_Header_Data (Header_Line : String) is
    begin
-      Put_Line ("Builder.Set_Header_Data Header: " & Header_Line);
       Header_Data := Parse_Header (Header_Line);
    end Set_Header_Data;
 

@@ -736,7 +736,7 @@ package body Utilities is
       Label_Values   : Value_Data_List;
       Data           : Data_Record;
    begin
-      for index in aRow.Features'Range loop
+      for index in aRow.Features'First .. aRow.Features'Last loop
          Data.Feature_Names.Append (aRow.Features (index));
       end loop;
       Data.Label_Name := aRow.Label;

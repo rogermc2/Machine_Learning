@@ -50,6 +50,8 @@ package Printing is
                                         theList : ML_Types.Value_Data_Lists_2D);
     procedure Print_Value_Data_Lists_3D (Name    : String;
                                          theList : ML_Types.Value_Data_Lists_3D);
+   procedure Print_Value_Data_Record (Name  : String;
+                                      Value : ML_Types.Value_Record);
     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
     procedure Print_Weights_Lists_2D (Name : String;
                                       Data : Weights.Weight_Lists_2D);

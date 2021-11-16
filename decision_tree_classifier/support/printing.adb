@@ -428,16 +428,13 @@ package body Printing is
    begin
       if Name'Length > 0 then
          Put (Name & ": ");
+      else
+         New_Line;
       end if;
 
       for Index in theList.First_Index .. theList.Last_Index loop
          Value := theList.Element (Index);
-         case Value.Value_Kind is
-            when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
-            when Float_Type => Put (Float'Image (Value.Float_Value));
-            when Integer_Type => Put (Integer'Image (Value.Integer_Value));
-            when UB_String_Type => Put (To_String (Value.UB_String_Value));
-         end case;
+         Print_Value_Data_Record ("", Value);
          Put ("   ");
          Count := Count + 1;
          if Count > 10 then
@@ -465,6 +462,7 @@ package body Printing is
       else
          for index in theList.First_Index .. theList.Last_Index loop
             Print_Value_Data_List ("", theList.Element (index));
+            New_Line;
          end loop;
       end if;
 
@@ -492,6 +490,25 @@ package body Printing is
    end Print_Value_Data_Lists_3D;
 
    --  -------------------------------------------------------------
+
+   procedure Print_Value_Data_Record
+     (Name : String; Value : ML_Types.Value_Record) is
+      use ML_Types;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name & ":");
+      end if;
+
+      case Value.Value_Kind is
+         when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
+         when Float_Type => Put (Float'Image (Value.Float_Value));
+         when Integer_Type => Put (Integer'Image (Value.Integer_Value));
+         when UB_String_Type => Put (To_String (Value.UB_String_Value));
+      end case;
+
+   end Print_Value_Data_Record;
+
+   --  ------------------------------------------------------------------------
 
    procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
       aWeight : Float;
