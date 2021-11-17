@@ -61,6 +61,8 @@ package body Split_Tests is
       Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+      Put_Line (Routine_Name & ", Number of samples:" &
+                  Integer'Image (Count_Samples (theClassifier)));
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Put_Line (Routine_Name & ", Prediction size" &
                   Count_Type'Image (Prediction.Length));

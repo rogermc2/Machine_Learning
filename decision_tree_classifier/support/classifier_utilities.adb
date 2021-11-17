@@ -126,6 +126,28 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
+                           return Natural is
+      use Tree;
+      use Nodes_Package;
+      Nodes     : constant Nodes_Package.Tree :=
+                    aClassifier.Attributes.Decision_Tree.Nodes;
+      Num_Nodes : Natural := 0;
+      procedure Add (Curs : Cursor) is
+         Node : constant Tree_Node := Element (Curs);
+      begin
+         if Curs /= Nodes.Root then
+            Num_Nodes := Num_Nodes + Node.Num_Node_Samples;
+         end if;
+      end Add;
+   begin
+      Iterate (Nodes, Add'Access);
+      return Num_Nodes;
+
+   end Count_Samples;
+
+   --  -------------------------------------------------------------------------
+
    function Dot (L : Weights.Weight_List;
                  R : Natural_List) return Float is
       use Float_Package;
@@ -216,8 +238,8 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Data (File_Name : String) return ML_Types.Data_Record is
-      Data_File     : File_Type;
-      CSV_Data      : ML_Types.Rows_Vector;
+      Data_File : File_Type;
+      CSV_Data  : ML_Types.Rows_Vector;
    begin
       Open (Data_File, In_File, File_Name);
       Utilities.Load_CSV_Data (Data_File, CSV_Data);
