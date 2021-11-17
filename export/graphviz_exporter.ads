@@ -6,7 +6,7 @@ with Tree;
 
 package Graphviz_Exporter is
 
-   procedure Export (Input_File_Name : String);
+   procedure Dot_To_Dot (Input_File_Name : String);
    procedure Export_Graphviz (theTree            : Tree.Tree_Nodes;
                               Output_File_Name   : Unbounded_String:=
                                 To_Unbounded_String ("tree.dot");
@@ -15,6 +15,8 @@ package Graphviz_Exporter is
                                 Unbounded_Package.Empty_Vector;
                               Class_Names        : Class_Names_List
                               := Unbounded_Package.Empty_Vector;
+                              Label              : Unbounded_String :=
+                                To_Unbounded_String ("all");
                               Filled             : Boolean := False;
                               Leaves_Parallel    : Boolean := False;
                               Impurity           : Boolean := True;
