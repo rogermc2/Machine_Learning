@@ -132,17 +132,17 @@ package body Classifier_Utilities is
       use Nodes_Package;
       Nodes     : constant Nodes_Package.Tree :=
                     aClassifier.Attributes.Decision_Tree.Nodes;
-      Num_Nodes : Natural := 0;
+      Num_Samples : Natural := 0;
       procedure Add (Curs : Cursor) is
          Node : constant Tree_Node := Element (Curs);
       begin
          if Curs /= Nodes.Root then
-            Num_Nodes := Num_Nodes + Node.Num_Node_Samples;
+            Num_Samples := Num_Samples + Node.Num_Node_Samples;
          end if;
       end Add;
    begin
       Iterate (Nodes, Add'Access);
-      return Num_Nodes;
+      return Num_Samples;
 
    end Count_Samples;
 
