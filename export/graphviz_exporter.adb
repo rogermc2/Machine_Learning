@@ -9,9 +9,28 @@ with State_Machine;
 with Export_Types; use Export_Types;
 with Export_Utilities;
 
-with Tree;
-
 package body Graphviz_Exporter is
+
+   type DOT_Tree_Exporter is record
+      theTree            : Tree.Tree_Nodes;
+      Output_File_Name   : Unbounded_String := To_Unbounded_String ("tree.dot");
+      Max_Depth          : Positive := Integer'Last;
+      Feature_Names      : Feature_Names_List :=
+                             Unbounded_Package.Empty_Vector;
+      Class_Names        : Class_Names_List :=
+                             Unbounded_Package.Empty_Vector;
+      Filled             : Boolean := False;
+      Leaves_Parallel    : Boolean := False;
+      Impurity           : Boolean := True;
+      Node_Ids           : Boolean := False;
+      Proportion         : Boolean := False;
+      Rotate             : Boolean := False;
+      Rounded            : Boolean := False;
+      Special_Characters : Boolean := False;
+      Precision          : Positive := 3;
+      Font_Name          : Unbounded_String :=
+                             To_Unbounded_String ("helvetica");
+   end record;
 
    procedure Export (Input_File_Name : String) is
       Table            : Dot_Tables.Table_Data;
@@ -55,7 +74,25 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Export_Graphviz (theTree : Tree.Tree_Nodes) is
+   procedure Export_Graphviz (theTree            : Tree.Tree_Nodes;
+                              Output_File_Name   : Unbounded_String :=
+                                To_Unbounded_String ("tree.dot");
+                              Max_Depth          : Positive := Integer'Last;
+                              Feature_Names      : Feature_Names_List :=
+                                Unbounded_Package.Empty_Vector;
+                              Class_Names        : Class_Names_List :=
+                                Unbounded_Package.Empty_Vector;
+                              Filled             : Boolean := False;
+                              Leaves_Parallel    : Boolean := False;
+                              Impurity           : Boolean := True;
+                              Node_Ids           : Boolean := False;
+                              Proportion         : Boolean := False;
+                              Rotate             : Boolean := False;
+                              Rounded            : Boolean := False;
+                              Special_Characters : Boolean := False;
+                              Precision          : Positive := 3;
+                              Font_Name          : Unbounded_String :=
+                                To_Unbounded_String ("helvetica")) is
 
    begin
       null;
