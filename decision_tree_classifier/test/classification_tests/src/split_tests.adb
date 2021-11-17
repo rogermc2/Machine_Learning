@@ -31,6 +31,8 @@ package body Split_Tests is
          Node : constant Tree_Node := Element (Curs);
       begin
          if Curs /= Nodes.Root and then not Node.Leaf_Node  then
+            Put_Line ("Check_Min_Split.Check Node.Num_Node_Samples" &
+                        Integer'Image (Node.Num_Node_Samples));
             OK := OK and Node.Num_Node_Samples >= Min_Split_Rule;
             if Node.Num_Node_Samples < Min_Split then
                Min_Split := Node.Num_Node_Samples;
@@ -60,7 +62,7 @@ package body Split_Tests is
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X             :  Value_Data_Lists_2D;
-      --        X_Short       :  Value_Data_Lists_2D;
+--        Short         :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y             : Value_Data_Lists_2D;
       No_Weights    : Weights.Weight_List := Empty_Vector;
@@ -74,9 +76,10 @@ package body Split_Tests is
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
       --        for index in 1 .. 10 loop
-      --           X_Short.Append (X.Element (index));
+      --           Short.Append (X.Element (index));
       --        end loop;
-      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", X_Short);
+      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", Short);
+
       Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
@@ -85,6 +88,11 @@ package body Split_Tests is
       Y := To_Value_2D_List (Iris_Data.Label_Values);
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
+
+--        for index in 1 .. 100 loop
+--           Short.Append (Y.Element (index));
+--        end loop;
+--        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", Y_Short", Short);
       --  L1695
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
