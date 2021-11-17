@@ -28,11 +28,9 @@ package body Decision_Path_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name    : constant String :=
                           "Decision_Path_Tests.Test_Decision_Path";
+      Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
       Criteria        : Criterion.Criterion_Class;
       Splitter        : Node_Splitter.Splitter_Class;
-      Data_File       : File_Type;
-      Iris_CSV_Data   : ML_Types.Rows_Vector;
-      Iris_Data       : Data_Record;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X               :  Value_Data_Lists_2D;
@@ -44,10 +42,6 @@ package body Decision_Path_Tests is
       Column_Sums     : Weights.Weight_List;
    begin
       C_Init (theClassifier, Criteria, Splitter);
-      Open (Data_File, In_File, "src/iris.csv");
-      Utilities.Load_CSV_Data (Data_File, Iris_CSV_Data);
-      Close (Data_File);
-      Iris_Data := Utilities.Split_Row_Data (Iris_CSV_Data);
       --  L1689
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);

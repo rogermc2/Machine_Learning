@@ -2,8 +2,6 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
-
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
@@ -116,9 +114,7 @@ package body Classifier_Tests is
       use Float_Package;
       Routine_Name    : constant String :=
                           "Classification_Tests.Test_Probability";
-      Data_File       : File_Type;
-      Iris_CSV_Data   : ML_Types.Rows_Vector;
-      Iris_Data       : Data_Record;
+      Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       X               :  Value_Data_Lists_2D;
@@ -129,10 +125,6 @@ package body Classifier_Tests is
       Probabilities   : Weights.Weight_Lists_3D;
       Column_Sums     : Weights.Weight_List;
    begin
-      Open (Data_File, In_File, "src/iris.csv");
-      Utilities.Load_CSV_Data (Data_File, Iris_CSV_Data);
-      Close (Data_File);
-      Iris_Data := Utilities.Split_Row_Data (Iris_CSV_Data);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name);

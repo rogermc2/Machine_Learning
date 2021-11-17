@@ -3,8 +3,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Utilities;
-
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
@@ -25,10 +23,8 @@ package body Split_Tests is
       use Decision_Tree_Classification;
       use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name  : constant String := "Split_Tests.Test_Iris";
-      Data_File     : File_Type;
-      Iris_CSV_Data : ML_Types.Rows_Vector;
-      Iris_Data     : Data_Record;
+      Routine_Name  : constant String := "Split_Tests.Test_Min_Samples_Split";
+      Iris_Data     : constant Data_Record := Load_Data ("src/iris.csv");
       Criteria      : Criterion.Criterion_Class;
       Splitter      : Node_Splitter.Splitter_Class;
       theClassifier : Base_Decision_Tree.Classifier
@@ -43,10 +39,6 @@ package body Split_Tests is
    begin
       C_Init (theClassifier, Criteria, Splitter, Min_Split_Samples => 10,
               Max_Leaf_Nodes => 100);
-      Open (Data_File, In_File, "src/iris.csv");
-      Utilities.Load_CSV_Data (Data_File, Iris_CSV_Data);
-      Close (Data_File);
-      Iris_Data := Utilities.Split_Row_Data (Iris_CSV_Data);
       --  L1689
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
