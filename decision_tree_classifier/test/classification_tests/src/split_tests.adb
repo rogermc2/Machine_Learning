@@ -17,6 +17,36 @@ with Weights;
 package body Split_Tests is
    use ML_Types;
 
+   function Check_Min_Split (aClassifier : Base_Decision_Tree.Classifier;
+                             Min_Split   : out Natural) return Boolean is
+      use Tree;
+      use Nodes_Package;
+      Nodes          : constant Nodes_Package.Tree :=
+                         aClassifier.Attributes.Decision_Tree.Nodes;
+      Min_Split_Rule : constant Positive :=
+                         aClassifier.Parameters.Min_Samples_Split;
+      OK             : Boolean := True;
+
+      procedure Check (Curs : Cursor) is
+         Node : constant Tree_Node := Element (Curs);
+      begin
+         if Curs /= Nodes.Root and then not Node.Leaf_Node  then
+            OK := OK and Node.Num_Node_Samples >= Min_Split_Rule;
+            if Node.Num_Node_Samples < Min_Split then
+               Min_Split := Node.Num_Node_Samples;
+            end if;
+         end if;
+      end Check;
+
+   begin
+      Min_Split := Integer'Last;
+      Iterate (Nodes, Check'Access);
+      return OK;
+
+   end Check_Min_Split;
+
+   --  -------------------------------------------------------------------------
+
    procedure Test_Min_Samples_Split is
       use Ada.Containers;
       use Classifier_Utilities;
@@ -30,11 +60,12 @@ package body Split_Tests is
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X             :  Value_Data_Lists_2D;
---        X_Short       :  Value_Data_Lists_2D;
+      --        X_Short       :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y             : Value_Data_Lists_2D;
       No_Weights    : Weights.Weight_List := Empty_Vector;
       Num_Samples   : Natural;
+      Min_Split     : Natural;
       Prediction    : ML_Types.Value_Data_Lists_2D;
    begin
       C_Init (theClassifier, Criteria, Splitter, Min_Split_Samples => 10,
@@ -42,10 +73,10 @@ package body Split_Tests is
       --  L1689
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
---        for index in 1 .. 10 loop
---           X_Short.Append (X.Element (index));
---        end loop;
---        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", X_Short);
+      --        for index in 1 .. 10 loop
+      --           X_Short.Append (X.Element (index));
+      --        end loop;
+      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", X_Short);
       Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
@@ -61,13 +92,14 @@ package body Split_Tests is
       Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
-      Put_Line (Routine_Name & ", Number of samples:" &
-                  Integer'Image (Count_Samples (theClassifier)));
+      Put_Line (Routine_Name & ", Min_Split status: " &
+                  Boolean'Image (Check_Min_Split (theClassifier, Min_Split)) &
+                  Integer'Image (Min_Split));
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Put_Line (Routine_Name & ", Prediction size" &
                   Count_Type'Image (Prediction.Length));
---        Print_Value_Data_Lists_2D
---          (Routine_Name & " Predictions", Prediction);
+      --        Print_Value_Data_Lists_2D
+      --          (Routine_Name & " Predictions", Prediction);
 
    end Test_Min_Samples_Split;
 

@@ -128,11 +128,13 @@ package body Classifier_Utilities is
 
    function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
                            return Natural is
+      use Ada.Containers;
       use Tree;
       use Nodes_Package;
       Nodes     : constant Nodes_Package.Tree :=
                     aClassifier.Attributes.Decision_Tree.Nodes;
       Num_Samples : Natural := 0;
+
       procedure Add (Curs : Cursor) is
          Node : constant Tree_Node := Element (Curs);
       begin
@@ -140,9 +142,10 @@ package body Classifier_Utilities is
             Num_Samples := Num_Samples + Node.Num_Node_Samples;
          end if;
       end Add;
+
    begin
       Iterate (Nodes, Add'Access);
-      return Num_Samples;
+      return Num_Samples / Integer (Nodes.Node_Count - 2);
 
    end Count_Samples;
 
