@@ -169,11 +169,14 @@ package body Graphviz_Exporter is
       use Tree.Nodes_Package;
 
       procedure Do_Node (Curs : Cursor) is
+         Left_Child : Cursor;
+         Right_Child : Cursor;
       begin
          if Curs /= Exporter.theTree.Root and then
            not Element (Curs).Leaf_Node and then
            Depth <= Exporter.Max_Depth then
-            null;
+            Left_Child := First_Child (Curs);
+            Right_Child := Last_Child (Curs);
          end if;
       end Do_Node;
 
