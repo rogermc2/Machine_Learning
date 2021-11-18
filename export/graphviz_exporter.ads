@@ -9,7 +9,7 @@ package Graphviz_Exporter is
    type DOT_Tree_Exporter is private;
 
    procedure Dot_To_Dot (Input_File_Name : String);
-   procedure Export_Graphviz (Exporter : DOT_Tree_Exporter);
+   procedure Export_Graphviz (Exporter : in out DOT_Tree_Exporter);
    procedure Init (Exporter           : in out DOT_Tree_Exporter;
                    theTree            : Tree.Tree_Nodes;
                    Output_File_Name   : Unbounded_String :=
@@ -56,6 +56,8 @@ private
       Precision          : Positive := 3;
       Font_Name          : Unbounded_String :=
                              To_Unbounded_String ("helvetica");
+      Ranks              : Unbounded_String := To_Unbounded_String ("");
+      Colours            : Unbounded_String := To_Unbounded_String ("");
       Initialized        : Boolean := False;
    end record;
 

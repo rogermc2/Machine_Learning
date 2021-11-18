@@ -11,9 +11,13 @@ with Export_Utilities;
 
 package body Graphviz_Exporter is
 
+   type Rank is (Leaves_Rank, Colours_Rank);
+   type Colour is (Bounds_Colour, RGB_Colour);
+
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
-   procedure Recurse (Exporter : DOT_Tree_Exporter;
+   procedure Recurse (Exporter : in out DOT_Tree_Exporter;
+                      Output_File : File_Type;
                       Depth    : Natural := 0);
 
    --  -------------------------------------------------------------------------
@@ -60,16 +64,16 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Export (Exporter    : DOT_Tree_Exporter;
+   procedure Export (Exporter    : in out DOT_Tree_Exporter;
                      Output_File : File_Type) is
    begin
       Head (Exporter, Output_File);
-      Recurse (Exporter);
+      Recurse (Exporter, Output_File);
    end Export;
 
    --  -------------------------------------------------------------
 
-   procedure Export_Graphviz (Exporter : DOT_Tree_Exporter) is
+   procedure Export_Graphviz (Exporter : in out DOT_Tree_Exporter) is
       Output_File : File_Type;
    begin
       Create (Output_File, Out_File, To_String (Exporter.Output_File_Name));
@@ -95,10 +99,10 @@ package body Graphviz_Exporter is
          Rounded_Filled := Rounded_Filled & "rounded";
       end if;
       if Exporter.Filled or Exporter.Rounded then
-         Put (Output_File, ", style=""%s"", color=""black""");
-         Put (Output_File, ", " & To_String (Rounded_Filled));
+         Put (Output_File, ", style=" & To_String (Rounded_Filled));
+         Put (Output_File, ", color=""black""");
       end if;
-      Put (Output_File, ", fontname=""%s""" & To_String (Exporter.Font_Name));
+      Put (Output_File, ", fontname=" & To_String (Exporter.Font_Name));
       Put_Line (Output_File, "] ;\n");
       --  Specify graph & edge aesthetics
       if Exporter.Leaves_Parallel then
@@ -164,19 +168,33 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Recurse (Exporter : DOT_Tree_Exporter;
+   procedure Recurse (Exporter : in out DOT_Tree_Exporter;
+                      Output_File : File_Type;
                       Depth    : Natural := 0) is
       use Tree.Nodes_Package;
 
       procedure Do_Node (Curs : Cursor) is
-         Left_Child : Cursor;
+         Left_Child  : Cursor;
          Right_Child : Cursor;
+         Node_ID     : Positive;
+         Pos         : Natural;
       begin
          if Curs /= Exporter.theTree.Root and then
            not Element (Curs).Leaf_Node and then
            Depth <= Exporter.Max_Depth then
+            Node_ID := Element (Curs).Node_ID;
             Left_Child := First_Child (Curs);
             Right_Child := Last_Child (Curs);
+            if Element (Left_Child).Leaf_Node then
+               Exporter.Ranks := To_Unbounded_String
+                 ("leaves" & Integer'Image (Node_ID));
+            elsif Index (Exporter.Ranks, Integer'Image (Depth)) > 0 then
+               null;
+            else Exporter.Ranks := To_Unbounded_String
+                 (Integer'Image (Depth) & Integer'Image (Node_ID));
+            end if;
+
+            Put_Line (Output_File, Integer'Image (Node_ID) & " [label=");
          end if;
       end Do_Node;
 

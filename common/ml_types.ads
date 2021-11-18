@@ -23,6 +23,7 @@ package ML_Types is
 
    package Unbounded_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
+   subtype Unbounded_List is Unbounded_Package.Vector;
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
 
