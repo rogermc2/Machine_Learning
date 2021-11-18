@@ -12,7 +12,7 @@ package Graphviz_Exporter is
    procedure Dot_To_Dot (Input_File_Name : String);
    procedure Export_Graphviz (Exporter : in out DOT_Tree_Exporter);
    procedure Init (Exporter           : in out DOT_Tree_Exporter;
-                   theTree            : Tree.Tree_Nodes;
+                   theTree            : Tree.Tree_Class;
                    Output_File_Name   : Unbounded_String :=
                      To_Unbounded_String ("tree.dot");
                    Max_Depth          : Positive := Integer'Last;
@@ -37,7 +37,7 @@ package Graphviz_Exporter is
 private
 
    type DOT_Tree_Exporter is record
-      theTree            : Tree.Tree_Nodes;
+      theTree            : Tree.Tree_Class;
       Output_File_Name   : Unbounded_String := To_Unbounded_String ("tree.dot");
       Max_Depth          : Positive := Integer'Last;
       Feature_Names      : Feature_Names_List :=
