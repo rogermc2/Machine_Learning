@@ -5,7 +5,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Config;
-with Criterion;
 with Dot_Tables;
 with State_Machine;
 with Export_Types; use Export_Types;
@@ -17,9 +16,7 @@ package body Graphviz_Exporter is
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
-                      Output_File : File_Type;
-                      Criteria    : Criterion.Criterion_Class;
-                      Depth       : Natural := 0);
+                      Output_File : File_Type; Depth : Natural := 0);
 
    --  -------------------------------------------------------------------------
 
@@ -67,10 +64,9 @@ package body Graphviz_Exporter is
 
    procedure Export (Exporter    : in out DOT_Tree_Exporter;
                      Output_File : File_Type) is
-      Criteria    : Criterion.Criterion_Class;
    begin
       Head (Exporter, Output_File);
-      Recurse (Exporter, Output_File, Criteria);
+      Recurse (Exporter, Output_File);
    end Export;
 
    --  -------------------------------------------------------------
@@ -182,8 +178,8 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
    --  Node_To_String generates the node content string
    function Node_To_String
-     (Exporter  : DOT_Tree_Exporter;  Node_Curs : Tree.Tree_Cursor;
-      Criteria  : Criterion.Criterion_Class) return String is
+     (Exporter  : DOT_Tree_Exporter;  Node_Curs : Tree.Tree_Cursor)
+      return String is
       use Tree.Nodes_Package;
       Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
       Show_Labels    : constant Boolean
@@ -195,7 +191,6 @@ package body Graphviz_Exporter is
       Value          : constant Weights.Weight_Lists_2D :=
                          Exporter.theTree.Values.Element (Node_ID);
       Feature        : Unbounded_String;
-      Threshold      : constant Float := Element (Node_Curs).Threshold;
       Node_String    : Unbounded_String := Characters;
    begin
       if Exporter.Node_Ids then
@@ -218,12 +213,23 @@ package body Graphviz_Exporter is
          end if;
          Node_String := Node_String & Feature &  " " &
            Slice (Characters, 4, 4) &  " " &
-           Classifier_Utilities.Float_Precision (Threshold, Exporter.Precision)
+           Classifier_Utilities.Float_Precision
+           (Element (Node_Curs).Threshold, Exporter.Precision)
            & Slice (Characters, 5, 5);
       end if;
 
       if Exporter.Impurity then
-         null;
+         if Show_Labels then
+            Node_String := Node_String & "impurity = ";
+         end if;
+
+         Node_String := Node_String & Classifier_Utilities.Float_Precision
+           (Element (Node_Curs).Impurity, Exporter.Precision) &
+           Slice (Characters, 5, 5);
+      end if;
+
+      if Show_Labels then
+         Node_String := Node_String & "samples = ";
       end if;
 
       return To_String (Node_String);
@@ -233,9 +239,7 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
 
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
-                      Output_File : File_Type;
-                      Criteria    : Criterion.Criterion_Class;
-                      Depth       : Natural := 0) is
+                      Output_File : File_Type; Depth : Natural := 0) is
 
       procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
          use Tree.Nodes_Package;
@@ -267,7 +271,7 @@ package body Graphviz_Exporter is
                end if;
 
                Put (Output_File, Node_ID_S & " [label=" &
-                      Node_To_String (Exporter, Node_Curs, Criteria));
+                      Node_To_String (Exporter, Node_Curs));
 
                if Exporter.Filled then
                   Put (Output_File, ", fillcolor=");
