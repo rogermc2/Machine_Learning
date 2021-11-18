@@ -81,14 +81,14 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
 
---     function Get_Fill_Colour (Exporter : DOT_Tree_Exporter;
---                               Node_ID : Positive) return String is
---     begin
---        if not Exporter.Ranks.Contains (To_Unbounded_String ("rgb")) then
---           null;
---        end if;
---        return "";
---     end Get_Fill_Colour;
+   --     function Get_Fill_Colour (Exporter : DOT_Tree_Exporter;
+   --                               Node_ID : Positive) return String is
+   --     begin
+   --        if not Exporter.Ranks.Contains (To_Unbounded_String ("rgb")) then
+   --           null;
+   --        end if;
+   --        return "";
+   --     end Get_Fill_Colour;
 
    --  -------------------------------------------------------------------------
 
@@ -111,16 +111,16 @@ package body Graphviz_Exporter is
          Put (Output_File, ", color=""black""");
       end if;
       Put (Output_File, ", fontname=" & To_String (Exporter.Font_Name));
-      Put_Line (Output_File, "] ;\n");
+      Put_Line (Output_File, "] ;");
       --  Specify graph & edge aesthetics
       if Exporter.Leaves_Parallel then
-         Put_Line (Output_File, "graph [ranksep=equally, splines=polyline] ");
+         Put (Output_File, "graph [ranksep=equally, splines=polyline] ");
       end if;
-      Edge_Line := To_Unbounded_String ("edge [fontname=""%s""] ;\n" &
-                                          To_String (Exporter.Font_Name));
-      if Exporter.Rotate then
+      Edge_Line := To_Unbounded_String
+        ("edge [fontname=" & To_String (Exporter.Font_Name) & "] ;");
+      if Exporter.Rotate /= 0.0 then
          Put (Output_File, To_String (Edge_Line));
-         Put_Line (Output_File, "rankdir=LR ;\n");
+         Put_Line (Output_File, "rankdir=LR ;");
       else
          Put_Line (Output_File, To_String (Edge_Line));
       end if;
@@ -145,7 +145,7 @@ package body Graphviz_Exporter is
                    Impurity           : Boolean := True;
                    Node_Ids           : Boolean := False;
                    Proportion         : Boolean := False;
-                   Rotate             : Boolean := False;
+                   Rotate             : Float := 0.0;
                    Rounded            : Boolean := False;
                    Special_Characters : Boolean := False;
                    Precision          : Positive := 3;
@@ -183,32 +183,71 @@ package body Graphviz_Exporter is
       procedure Do_Node (Curs : Tree.Tree_Cursor) is
          use Tree.Nodes_Package;
          use Export_Types.Export_Maps;
-         Left_Child   : Tree.Tree_Cursor;
-         Right_Child  : Tree.Tree_Cursor;
-         Node_ID      : constant Unbounded_String
-           := To_Unbounded_String (Integer'Image (Element (Curs).Node_ID));
+         Node_Parent  : constant Tree.Tree_Cursor := Parent (Curs);
+         Node_ID      : constant Positive := Element (Curs).Node_ID;
+         Node_ID_S    : constant String := Integer'Image (Node_ID);
+         Node_ID_UB   : constant Unbounded_String :=
+                          To_Unbounded_String (Node_ID_S);
          Depth_S      : constant Unbounded_String
            := To_Unbounded_String (Integer'Image (Depth));
+         Left_Child   : Tree.Tree_Cursor;
+         --           Right_Child  : Tree.Tree_Cursor;
+         Angles       : array (1 .. 2) of Float := (45.0, -45.0);
       begin
-         if Curs /= Exporter.theTree.Root and then
-           not Element (Curs).Leaf_Node and then
-           Depth <= Exporter.Max_Depth then
-            Left_Child := First_Child (Curs);
-            Right_Child := Last_Child (Curs);
-            if Element (Left_Child).Leaf_Node then
-               Include (Exporter.Ranks, To_Unbounded_String ("leaves"), Node_ID);
-            elsif not Exporter.Ranks.Contains (Depth_S) then
-               Include (Exporter.Ranks, Depth_S, Node_ID);
+         if Curs /= Exporter.theTree.Root then
+            if not Element (Curs).Leaf_Node and then
+              Depth <= Exporter.Max_Depth then
+               Left_Child := First_Child (Curs);
+               --                 Right_Child := Last_Child (Curs);
+               if Element (Left_Child).Leaf_Node then
+                  Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
+                           Node_ID_UB);
+                  --              elsif not Exporter.Ranks.Contains (Depth_S) then
+                  --                 Include (Exporter.Ranks, Depth_S, Node_ID);
+               else
+                  Include (Exporter.Ranks, Depth_S, Node_ID_UB);
+               end if;
+
+               Put (Output_File, Node_ID_S & " [label=");
+
+               if Exporter.Filled then
+                  Put (Output_File, ", fillcolor=");
+               end if;
+               Put_Line (Output_File, "] ;");
+
+               if Node_Parent /= Exporter.theTree.Root then
+                  Put (Output_File,
+                       Integer'Image (Element (Node_Parent).Node_ID) &
+                         " -> " & Node_ID_S);
+               else
+                  for index in Angles'First .. Angles'Last loop
+                     Angles (index) := (1.0 - 2.0 * Exporter.Rotate) * Angles (index);
+                  end loop;
+                  Put (Output_File, " [labeldistance=2.5, labelangle=");
+                  if Node_ID = 1 then
+                     Put_Line (Output_File, Float'Image (Angles (1)) &
+                                 ", headlabel=""True"" ;");
+                  else
+                     Put_Line (Output_File,  Float'Image (Angles (2)) &
+                                 ", headlabel=""False"" ;");
+                  end if;
+               end if;
+
+               if not Element (Left_Child).Leaf_Node then
+                  null;
+               end if;
             else
-               Include (Exporter.Ranks, Depth_S, Node_ID);
+               Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
+                        Node_ID_UB);
+               Put (Output_File,  Node_ID_S & " [label=""(...)""");
+               if Exporter.Filled then
+                  Put (Output_File, ", fillcolor=""#C0C0C0""");
+               end if;
+               Put_Line ("] ;");
             end if;
 
---              Put_Line (Output_File, Node_ID & " [label=");
          end if;
 
-         if Exporter.Filled then
-            Put_Line (Output_File, ", fillcolor=");
-         end if;
       end Do_Node;
 
    begin

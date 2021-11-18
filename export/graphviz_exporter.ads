@@ -27,7 +27,7 @@ package Graphviz_Exporter is
                    Impurity           : Boolean := True;
                    Node_Ids           : Boolean := False;
                    Proportion         : Boolean := False;
-                   Rotate             : Boolean := False;
+                   Rotate             : Float := 0.0;
                    Rounded            : Boolean := False;
                    Special_Characters : Boolean := False;
                    Precision          : Positive := 3;
@@ -51,7 +51,7 @@ private
       Impurity           : Boolean := True;
       Node_Ids           : Boolean := False;
       Proportion         : Boolean := False;
-      Rotate             : Boolean := False;
+      Rotate             : Float := 0.0;
       Rounded            : Boolean := False;
       Special_Characters : Boolean := False;
       Precision          : Positive := 3;
