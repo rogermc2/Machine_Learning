@@ -1,5 +1,6 @@
 
 with Ada.Strings.Bounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Bounded_IO;
 with Ada.Containers.Ordered_Maps;
@@ -9,9 +10,9 @@ with Config;
 
 package Export_Types is
 
-   -- A statement is a list of attributes or an element (node or edge)
+   --  A statement is a list of attributes or an element (node or edge)
    type Statement is (Attributes, Nodes, Edges);
-   -- States for recognizer
+   --  States for recognizer
    type State is
      (Digraph, Name, Open_Brace, Statements, Open_Bracket, Equals, Semicolon,
       Attributes, Values, Pointer, Targets);
@@ -25,6 +26,10 @@ package Export_Types is
 
    package Attribute_Maps is new
      Ada.Containers.Ordered_Maps (Config.Name, Config.Name);
+
+   package Export_Maps is new
+     Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
+   subtype Export_Map is Export_Maps.Map;
 
    package Elements is
       Blanks : constant Config.Name := (others => ' ');
@@ -41,7 +46,7 @@ package Export_Types is
 
    use Elements;
    package Element_Vectors is new
-     Ada.Containers.Vectors (Natural, Element);
+     Ada.Containers.Vectors (Natural, Elements.Element);
 
    package Tables is
       type Attribute is (Graphs, Nodes, Edges);

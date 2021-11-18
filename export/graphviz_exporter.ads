@@ -2,6 +2,7 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types; use ML_Types;
+with Export_Types;
 with Tree;
 
 package Graphviz_Exporter is
@@ -56,8 +57,8 @@ private
       Precision          : Positive := 3;
       Font_Name          : Unbounded_String :=
                              To_Unbounded_String ("helvetica");
-      Ranks              : Unbounded_String := To_Unbounded_String ("");
-      Colours            : Unbounded_String := To_Unbounded_String ("");
+      Ranks              : Export_Types.Export_Map;
+      Colours            : Export_Types.Export_Map;
       Initialized        : Boolean := False;
    end record;
 
