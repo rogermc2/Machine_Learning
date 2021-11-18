@@ -18,6 +18,7 @@ package Classifier_Utilities is
    function Dot (L : Weights.Weight_List; R : Natural_List) return Float;
    function Get_Column (List_2D      : Float_List_2D;
                         Column_Index : Positive) return Float_List;
+   function Float_Precision (Number : Float; Precision : Natural) return String;
    function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D;
    function Load_Data (File_Name : String) return ML_Types.Data_Record;

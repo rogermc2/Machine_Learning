@@ -1,9 +1,9 @@
 
 with Ada.Exceptions;
-with Ada.Numerics.Elementary_Functions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Utilities;
 with Config;
 with Criterion;
 with Dot_Tables;
@@ -13,8 +13,6 @@ with Export_Utilities;
 with Weights;
 
 package body Graphviz_Exporter is
-
-   package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
@@ -186,7 +184,6 @@ package body Graphviz_Exporter is
    function Node_To_String
      (Exporter  : DOT_Tree_Exporter;  Node_Curs : Tree.Tree_Cursor;
       Criteria  : Criterion.Criterion_Class) return String is
-      use Ada.Numerics.Elementary_Functions;
       use Tree.Nodes_Package;
       Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
       Show_Labels    : constant Boolean
@@ -199,7 +196,6 @@ package body Graphviz_Exporter is
                          Exporter.theTree.Values.Element (Node_ID);
       Feature        : Unbounded_String;
       Threshold      : constant Float := Element (Node_Curs).Threshold;
-      Integer_Length : Positive;
       Node_String    : Unbounded_String := Characters;
    begin
       if Exporter.Node_Ids then
@@ -211,33 +207,20 @@ package body Graphviz_Exporter is
            Integer'Image (Node_ID) & Slice (Characters, 5, 5) ;
       end if;
 
-      if abs Threshold < 1.0 then
-         Integer_Length := 1;
-      else
-         Integer_Length := 1 + Integer (Float'Floor (Log (Float'Floor (abs Threshold), 10.0)));
-      end if;
-
-      declare
-         Threshold_S : String (1 .. Integer_Length + Exporter.Precision);
-      begin
-         Float_IO.Put (To   => Threshold_S,
-                       Item => Threshold,
-                       Aft  => Exporter.Precision,
-                       Exp  => 0);
-         if not Element (Left_Child).Leaf_Node then
-            --  Write decision criteria
-            if not Exporter.Feature_Names.Is_Empty then
-               Feature := Feature_Names.Element (Node_ID);
-            else
-               Feature :=
-                 To_Unbounded_String ("X") & Slice (Characters, 2, 2) &
-                 Feature_Names.Element (Node_ID) & Slice (Characters, 3, 3);
-            end if;
-            Node_String := Node_String & Feature &  " " &
-              Slice (Characters, 4, 4) &  " " &  Threshold_S
-              & Slice (Characters, 5, 5);
+      if not Element (Left_Child).Leaf_Node then
+         --  Write decision criteria
+         if not Exporter.Feature_Names.Is_Empty then
+            Feature := Feature_Names.Element (Node_ID);
+         else
+            Feature :=
+              To_Unbounded_String ("X") & Slice (Characters, 2, 2) &
+              Feature_Names.Element (Node_ID) & Slice (Characters, 3, 3);
          end if;
-      end; --  declare block
+         Node_String := Node_String & Feature &  " " &
+           Slice (Characters, 4, 4) &  " " &
+           Classifier_Utilities.Float_Precision (Threshold, Exporter.Precision)
+           & Slice (Characters, 5, 5);
+      end if;
 
       if Exporter.Impurity then
          null;
