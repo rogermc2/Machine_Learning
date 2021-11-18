@@ -178,10 +178,12 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
    --  Node_To_String generates the node content string
    function Node_To_String
-     (Exporter  : DOT_Tree_Exporter;  Node_Curs : Tree.Tree_Cursor)
+     (Exporter  : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor)
       return String is
       use Tree.Nodes_Package;
       Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
+      Top_Node       : Tree.Tree_Cursor :=
+                         First_Child (Exporter.theTree.Nodes.Root);
       Show_Labels    : constant Boolean
         := Exporter.Label = To_Unbounded_String ("all") or
         (Exporter.Label = To_Unbounded_String ("root") and Node_ID = 1);
@@ -191,6 +193,7 @@ package body Graphviz_Exporter is
       Value          : constant Weights.Weight_Lists_2D :=
                          Exporter.theTree.Values.Element (Node_ID);
       Feature        : Unbounded_String;
+      Percent        : Float;
       Node_String    : Unbounded_String := Characters;
    begin
       if Exporter.Node_Ids then
@@ -228,9 +231,21 @@ package body Graphviz_Exporter is
            Slice (Characters, 5, 5);
       end if;
 
+      --  Write node samples count
       if Show_Labels then
          Node_String := Node_String & "samples = ";
       end if;
+
+      if Exporter.Proportion then
+         Percent := 100.0 * Float (Element (Node_Curs).Num_Node_Samples) /
+           Float (Element (Top_Node).Num_Node_Samples);
+         Node_String := Node_String &
+           Classifier_Utilities.Float_Precision (Percent, 1) & "%";
+      else
+         Node_String := Node_String &
+           Integer'Image (Element (Node_Curs).Num_Node_Samples);
+      end if;
+      Node_String := Node_String & Slice (Characters, 5, 5);
 
       return To_String (Node_String);
 
