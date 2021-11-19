@@ -4,13 +4,14 @@ with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Types;
 with Classifier_Utilities;
 with Config;
 with Dot_Tables;
 with State_Machine;
 with Export_Types; use Export_Types;
 with Export_Utilities;
---  with Weights;
+with Weights;
 
 package body Graphviz_Exporter is
 
@@ -180,7 +181,7 @@ package body Graphviz_Exporter is
     --  Node_To_String generates the node content string
     function Node_To_String
       (Exporter  : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor)
-      return String is
+       return String is
         use Ada.Containers;
         use Tree.Nodes_Package;
         Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
@@ -195,8 +196,11 @@ package body Graphviz_Exporter is
         Characters     : constant Unbounded_String := Exporter.Characters;
         Left_Child     : constant Tree.Tree_Cursor := First_Child (Node_Curs);
         Feature_Names  : constant Feature_Names_List := Exporter.Feature_Names;
---          Value          : Weights.Weight_Lists_2D :=
---                             Exporter.theTree.Values.Element (Node_ID);
+        --          Value          : Weights.Weight_Lists_2D :=
+        --                             Exporter.theTree.Values.Element (Node_ID);
+        Max_Indices    : Classifier_Types.Natural_List;  --  argmax
+        Class_Values   : Weights.Weight_Lists_2D;
+        Class_Name     : Unbounded_String;
         Feature        : Unbounded_String;
         Percent        : Float;
         Node_String    : Unbounded_String := Characters;
@@ -256,19 +260,39 @@ package body Graphviz_Exporter is
             null;
         end if;
         if Show_Labels then
---              Node_String := Node_String & "value = ";
+            --              Node_String := Node_String & "value = ";
             null;
         end if;
         if Exporter.Proportion then
---              Node_String := Node_String & "";
+            --              Node_String := Node_String & "";
             null;
         end if;
         --  Value text not implemented
 
         --  Write node majority class
         if not Exporter.Class_Names.Is_Empty and then
+          Integer (Exporter.theTree.Num_Outputs) = 1 and then
           Classes.Element (1).Element (1).Integer_Value /= 1 then
-          null;
+            if Show_Labels then
+                Node_String := Node_String & "class = ";
+            end if;
+            Max_Indices.Clear;
+            for node_index in Exporter.Class_Names.First_Index ..
+              Exporter.Class_Names.Last_Index loop
+                Class_Name := Exporter.Class_Names.Element (node_index);
+--                  Max_Indices.Append (Max (Class_Values.Element (1)));
+--                  Samples_2K.Clear;
+--                  for s_index in Class_Values.First_Index .. Class_Values.Last_Index loop
+--                      Outputs_K := Class_Values.Element (s_index);
+--                      Samples_2K.Append (Outputs_K.Element (op));
+--                  end loop;
+--                  Node_Values_2K.Append (Samples_2K);
+            end loop;
+            if Exporter.Class_Names.Is_Empty then
+                null;
+            else
+                null;
+            end if;
         end if;
 
         return To_String (Node_String);
