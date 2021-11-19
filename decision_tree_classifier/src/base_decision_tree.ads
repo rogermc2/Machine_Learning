@@ -26,8 +26,6 @@ with Weights;
 package Base_Decision_Tree is
 --  Gini Impurity is a measurement of the likelihood of an incorrect
 --  classification of a new instance of a random variable.
-    type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
-    type Regressor_Criteria_Type is (MSE_Criteria, Friedman_MSE_Criteria, MAE_Criteria);
     type Splitter_Type is (Best_Splitter, Random_Splitter);
     Type State is (None);
     Type Weight_Type is (None);
@@ -52,7 +50,8 @@ package Base_Decision_Tree is
     --  class BaseDecisionTree
     type Base_Parameter_Data
       (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
-        Criterion_Kind           : Classifier_Criteria_Type := Gini_Criteria;
+        Criterion_Kind           : Criterion.Classifier_Criteria_Type :=
+                                     Criterion.Gini_Criteria;
         Critera                  : Criterion.Criterion_Class;
         Splitter_Kind            : Splitter_Type := Best_Splitter;
         Splitter                 : Node_Splitter.Splitter_Class;
