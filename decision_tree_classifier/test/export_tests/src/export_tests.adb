@@ -11,7 +11,7 @@ with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
 with Node_Splitter;
---  with Printing;
+with Printing;
 with Tree;
 with Weights;
 
@@ -65,6 +65,9 @@ package body Export_Tests is
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
       Classification_Fit (theClassifier, X, Y, No_Weights);
+      Printing.Print_Tree ("The Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
       Graphviz_Exporter.Export_Graphviz (Exporter);
 
    end Test_Graphviz_Toy;
