@@ -1,7 +1,7 @@
 
 with Ada.Strings.Bounded;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO;
 with Ada.Text_IO.Bounded_IO;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
@@ -40,7 +40,6 @@ package Export_Types is
       end record;
 
       function "=" (Left, Right : Element) return Boolean;
-      function "<" (Left, Right : Element) return Boolean;
 
    end Elements;
 

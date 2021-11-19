@@ -5,7 +5,7 @@ with Ada.Strings.Fixed;
 package body Dot_Tables is
 
    package Element_Sort is new
-     Element_Vectors.Generic_Sorting (Elements."<");
+     Element_Vectors.Generic_Sorting (Elements."=");
 
    function Trim (Source : String;
                   Side   : Ada.Strings.Trim_End :=  Ada.Strings.Right)

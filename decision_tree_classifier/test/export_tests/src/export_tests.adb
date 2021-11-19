@@ -66,10 +66,9 @@ package body Export_Tests is
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
-      Graphviz_Exporter.Init
-        (Exporter, theClassifier.Attributes.Decision_Tree,
-         Class_Names => Class_Names);
-      Graphviz_Exporter.Export_Graphviz (Exporter);
+      Graphviz_Exporter.Export_Graphviz
+          (Exporter, theClassifier.Attributes.Decision_Tree,
+           Class_Names => Class_Names);
 
    end Test_Graphviz_Toy;
 
