@@ -4,7 +4,6 @@ with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Types;
 with Classifier_Utilities;
 with Config;
 with Dot_Tables;
@@ -193,7 +192,7 @@ package body Graphviz_Exporter is
       Show_Labels    : constant Boolean
         := Exporter.Label = To_Unbounded_String ("all") or
         (Exporter.Label = To_Unbounded_String ("root") and Node_ID = 1);
-      Characters     : constant Unbounded_String := Exporter.Characters;
+      Characters     : constant Character_List := Exporter.Characters;
       Left_Child     : constant Tree.Tree_Cursor := First_Child (Node_Curs);
       Feature_Names  : constant Feature_Names_List := Exporter.Feature_Names;
       --  Value: num_outputs x num_classes
@@ -201,22 +200,22 @@ package body Graphviz_Exporter is
                          Exporter.theTree.Values.Element (Node_ID);
       Output_Data    : Weights.Weight_List;
       Class_Value    : Float;
-      Max_Indices    : Classifier_Types.Natural_List;  --  argmax
+      Arg_Max        : Positive;
       Class_Name     : Unbounded_String;
       Feature        : Unbounded_String;
-      Value_Text     : Unbounded_String := To_Unbounded_String ("");
       Value_First    : Boolean := True;
+      Value_Text     : Unbounded_String := To_Unbounded_String ("");
       Pos            : Natural;
       Percent        : Float;
-      Node_String    : Unbounded_String := Characters;
+      Node_String    : Unbounded_String := To_Unbounded_String ("");
    begin
       if Exporter.Node_Ids then
          --  Write node ID
          if Show_Labels then
             Node_String := Node_String & "node ";
          end if;
-         Node_String := Node_String & Slice (Characters, 1, 1) &
-           Integer'Image (Node_ID) & Slice (Characters, 5, 5) ;
+         Node_String := Node_String & Characters.Element (1) &
+           Integer'Image (Node_ID) & Characters.Element (5) ;
       end if;
 
       if not Element (Left_Child).Leaf_Node then
@@ -225,14 +224,13 @@ package body Graphviz_Exporter is
             Feature := Feature_Names.Element (Node_ID);
          else
             Feature :=
-              To_Unbounded_String ("X") & Slice (Characters, 2, 2) &
-              Feature_Names.Element (Node_ID) & Slice (Characters, 3, 3);
+              To_Unbounded_String ("X") & Characters.Element (2) &
+              Feature_Names.Element (Node_ID) & Characters.Element (3);
          end if;
          Node_String := Node_String & Feature &  " " &
-           Slice (Characters, 4, 4) &  " " &
-           Classifier_Utilities.Float_Precision (Node_Data.Threshold,
-                                                 Exporter.Precision) &
-           Slice (Characters, 5, 5);
+           Characters.Element (4) &  " " &
+           Classifier_Utilities.Float_Precision
+           (Node_Data.Threshold, Exporter.Precision) & Characters.Element (5);
       end if;
 
       if Exporter.Impurity then
@@ -241,7 +239,7 @@ package body Graphviz_Exporter is
          end if;
 
          Node_String := Node_String & Classifier_Utilities.Float_Precision
-           (Node_Data.Impurity, Exporter.Precision) & Slice (Characters, 5, 5);
+           (Node_Data.Impurity, Exporter.Precision) & Characters.Element (5);
       end if;
 
       --  Write node samples count
@@ -257,7 +255,7 @@ package body Graphviz_Exporter is
          Node_String := Node_String &
            Integer'Image (Node_Data.Num_Node_Samples);
       end if;
-      Node_String := Node_String & Slice (Characters, 5, 5);
+      Node_String := Node_String & Characters.Element (5);
 
       --  Write node class distribution / regression value
       if Exporter.Proportion and Classes.Element (1).Length /= 1 then
@@ -289,8 +287,8 @@ package body Graphviz_Exporter is
                   Value_Text := Value_Text & ", ";
                end if;
                Value_Text := Value_Text &
-                 (To_Unbounded_String (Classifier_Utilities.Float_Precision
-                  (Output_Data.Element (class_index), Exporter.Precision)));
+               (To_Unbounded_String (Classifier_Utilities.Float_Precision
+                (Output_Data.Element (class_index), Exporter.Precision)));
             end loop;
          end loop;
       end if;
@@ -298,19 +296,19 @@ package body Graphviz_Exporter is
       if Integer (Exporter.theTree.Num_Outputs) = 1 and then
         Exporter.theTree.Classes.Element (1).Element (1).Value_Kind =
         Integer_Type then
-         Pos := 0;
-         while Pos /= Length (Value_Text) loop
+         Pos := Index (Value_Text, "[");
+         while Pos /= 0 loop
+            Delete (Value_Text, Pos, Pos);
             Pos := Index (Value_Text, "[");
-            Delete (Value_Text, Pos, Pos);
          end loop;
-         Pos := 0;
+         Pos := Index (Value_Text, "]");
          while Pos /= Length (Value_Text) loop
-            Pos := Index (Value_Text, "]");
             Delete (Value_Text, Pos, Pos);
+            Pos := Index (Value_Text, "]");
          end loop;
          Value_Text := Value_Text & "";
       end if;
-      Node_String := Node_String & Value_Text & Slice (Characters, 5, 5);
+      Node_String := Node_String & Value_Text & Characters.Element (5);
 
       --  Write node majority class
       if not Exporter.Class_Names.Is_Empty and then
@@ -319,24 +317,21 @@ package body Graphviz_Exporter is
          if Show_Labels then
             Node_String := Node_String & "class = ";
          end if;
-         Max_Indices.Clear;
-         for node_index in Exporter.Class_Names.First_Index ..
-           Exporter.Class_Names.Last_Index loop
-            Class_Name := Exporter.Class_Names.Element (node_index);
-            --                  Max_Indices.Append (Max (Class_Values.Element (1)));
-            --                  Samples_2K.Clear;
-            --                  for s_index in Class_Values.First_Index .. Class_Values.Last_Index loop
-            --                      Outputs_K := Class_Values.Element (s_index);
-            --                      Samples_2K.Append (Outputs_K.Element (op));
-            --                  end loop;
-            --                  Node_Values_2K.Append (Samples_2K);
-         end loop;
+
+         Output_Data := Value.Element (Node_ID);
+         Arg_Max := Weights.Max (Output_Data);
+
          if Exporter.Class_Names.Is_Empty then
-            null;
+            Class_Name := Exporter.Class_Names.Element (Arg_Max);
          else
-            null;
+            Class_Name := "y" & Characters.Element (2) &
+              To_Unbounded_String (Integer'Image (Arg_Max)) &
+              Characters.Element (3);
          end if;
+         Node_String := Node_String & Class_Name;
       end if;
+
+      Node_String := Node_String & Characters.Element (6);
 
       return To_String (Node_String);
 

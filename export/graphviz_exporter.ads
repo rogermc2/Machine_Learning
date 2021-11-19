@@ -59,7 +59,7 @@ private
                              To_Unbounded_String ("helvetica");
       Ranks              : Export_Types.Export_Map;
       Colours            : Export_Types.Export_Map;
-      Characters         : Unbounded_String := To_Unbounded_String ("");
+      Characters         : ML_Types.Character_List;
       Initialized        : Boolean := False;
    end record;
 
