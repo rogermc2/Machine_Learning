@@ -18,6 +18,7 @@ package body Graphviz_Exporter is
                    Output_File : File_Type);
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                       Output_File : File_Type; Depth : Natural := 0);
+   procedure Tail (Exporter    : DOT_Tree_Exporter; Output_File : File_Type);
 
    --  -------------------------------------------------------------------------
 
@@ -68,6 +69,8 @@ package body Graphviz_Exporter is
    begin
       Head (Exporter, Output_File);
       Recurse (Exporter, Output_File);
+      Tail (Exporter, Output_File);
+
    end Export;
 
    --  -------------------------------------------------------------
@@ -428,5 +431,25 @@ package body Graphviz_Exporter is
    end Recurse;
 
    --  -------------------------------------------------------------------------
+
+   procedure Tail (Exporter    : DOT_Tree_Exporter; Output_File : File_Type) is
+       use Export_Maps;
+        procedure Write_Rank (Curs : Cursor) is
+        begin
+            Put (Output_File, "{Rank=same ; " & To_String (Element (Curs)) & "; ");
+
+            Put_Line (Output_File, "} ;");
+        end Write_Rank;
+
+   begin
+      if Exporter.Leaves_Parallel then
+            Exporter.Ranks.Iterate (Write_Rank'Access);
+      end if;
+
+      Put_Line (Output_File, "}");
+
+   end Tail;
+
+   --  -------------------------------------------------------------
 
 end Graphviz_Exporter;

@@ -7,6 +7,7 @@ with Weights;
 package Criterion is
 
     type Criterion_Kind is (Criterion_Classification, Criterion_Regression);
+    type Criterion_Method is (Criterion_Gini);
     type Criterion_Class
       (Criterion_Type : Criterion_Kind := Criterion_Classification) is record
        Y                         : Classifier_Types.Natural_Lists_2D;

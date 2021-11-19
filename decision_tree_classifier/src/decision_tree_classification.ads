@@ -68,9 +68,13 @@ package Decision_Tree_Classification is
     Classifier_Error : Exception;
     Value_Error      : Exception;
 
-    procedure C_Init (aClassifier              : in out Base_Decision_Tree.Classifier;
+    procedure C_Init (aClassifier              : in out
+                        Base_Decision_Tree.Classifier;
                       Criteria                 : Criterion.Criterion_Class;
                       Splitter                 : Node_Splitter.Splitter_Class;
+                      theCriterion             : Base_Decision_Tree.
+                        Classifier_Criteria_Type :=
+                          Base_Decision_Tree.Gini_Criteria;
                       Max_Depth                : Integer := -1;
                       Min_Split_Samples        : Positive := 2;
                       Min_Leaf_Samples         : Positive := 1;
@@ -90,6 +94,6 @@ package Decision_Tree_Classification is
        Sample_Weights : in out Weights.Weight_List);
     function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
                                   X    : ML_Types.Value_Data_Lists_2D)
-                                 return Weights.Weight_Lists_3D;
+                                  return Weights.Weight_Lists_3D;
 
 end Decision_Tree_Classification;
