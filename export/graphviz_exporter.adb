@@ -192,7 +192,7 @@ package body Graphviz_Exporter is
       Show_Labels    : constant Boolean
         := Exporter.Label = To_Unbounded_String ("all") or
         (Exporter.Label = To_Unbounded_String ("root") and Node_ID = 1);
-      Characters     : constant Character_List := Exporter.Characters;
+      Characters     : constant Character_Array := Exporter.Characters;
       Left_Child     : constant Tree.Tree_Cursor := First_Child (Node_Curs);
       Feature_Names  : constant Feature_Names_List := Exporter.Feature_Names;
       --  Value: num_outputs x num_classes
@@ -214,8 +214,8 @@ package body Graphviz_Exporter is
          if Show_Labels then
             Node_String := Node_String & "node ";
          end if;
-         Node_String := Node_String & Characters.Element (1) &
-           Integer'Image (Node_ID) & Characters.Element (5) ;
+         Node_String := Node_String & Characters (1) &
+           Integer'Image (Node_ID) & Characters (5) ;
       end if;
 
       if not Element (Left_Child).Leaf_Node then
@@ -224,13 +224,13 @@ package body Graphviz_Exporter is
             Feature := Feature_Names.Element (Node_ID);
          else
             Feature :=
-              To_Unbounded_String ("X") & Characters.Element (2) &
-              Feature_Names.Element (Node_ID) & Characters.Element (3);
+              To_Unbounded_String ("X") & Characters (2) &
+              Feature_Names.Element (Node_ID) & Characters (3);
          end if;
          Node_String := Node_String & Feature &  " " &
-           Characters.Element (4) &  " " &
+           Characters (4) &  " " &
            Classifier_Utilities.Float_Precision
-           (Node_Data.Threshold, Exporter.Precision) & Characters.Element (5);
+           (Node_Data.Threshold, Exporter.Precision) & Characters (5);
       end if;
 
       if Exporter.Impurity then
@@ -239,7 +239,7 @@ package body Graphviz_Exporter is
          end if;
 
          Node_String := Node_String & Classifier_Utilities.Float_Precision
-           (Node_Data.Impurity, Exporter.Precision) & Characters.Element (5);
+           (Node_Data.Impurity, Exporter.Precision) & Characters (5);
       end if;
 
       --  Write node samples count
@@ -255,7 +255,7 @@ package body Graphviz_Exporter is
          Node_String := Node_String &
            Integer'Image (Node_Data.Num_Node_Samples);
       end if;
-      Node_String := Node_String & Characters.Element (5);
+      Node_String := Node_String & Characters (5);
 
       --  Write node class distribution / regression value
       if Exporter.Proportion and Classes.Element (1).Length /= 1 then
@@ -308,7 +308,7 @@ package body Graphviz_Exporter is
          end loop;
          Value_Text := Value_Text & "";
       end if;
-      Node_String := Node_String & Value_Text & Characters.Element (5);
+      Node_String := Node_String & Value_Text & Characters (5);
 
       --  Write node majority class
       if not Exporter.Class_Names.Is_Empty and then
@@ -324,14 +324,14 @@ package body Graphviz_Exporter is
          if Exporter.Class_Names.Is_Empty then
             Class_Name := Exporter.Class_Names.Element (Arg_Max);
          else
-            Class_Name := "y" & Characters.Element (2) &
+            Class_Name := "y" & Characters (2) &
               To_Unbounded_String (Integer'Image (Arg_Max)) &
-              Characters.Element (3);
+              Characters (3);
          end if;
          Node_String := Node_String & Class_Name;
       end if;
 
-      Node_String := Node_String & Characters.Element (6);
+      Node_String := Node_String & Characters (6);
 
       return To_String (Node_String);
 

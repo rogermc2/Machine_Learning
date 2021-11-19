@@ -36,6 +36,8 @@ package Graphviz_Exporter is
 
 private
 
+   type Character_Array is array (1 .. 7) of Unbounded_String;
+
    type DOT_Tree_Exporter is record
       theTree            : Tree.Tree_Class;
       Output_File_Name   : Unbounded_String := To_Unbounded_String ("tree.dot");
@@ -59,7 +61,11 @@ private
                              To_Unbounded_String ("helvetica");
       Ranks              : Export_Types.Export_Map;
       Colours            : Export_Types.Export_Map;
-      Characters         : ML_Types.Character_List;
+      Characters         : Character_Array
+        := (To_Unbounded_String ("#"), To_Unbounded_String ("["),
+            To_Unbounded_String ("]"), To_Unbounded_String ("=>"),
+            To_Unbounded_String ("\\n"), To_Unbounded_String (""""),
+            To_Unbounded_String (""""));
       Initialized        : Boolean := False;
    end record;
 
