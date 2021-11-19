@@ -59,8 +59,6 @@ package body Export_Tests is
    begin
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
               Min_Split_Samples => 2);
-      Graphviz_Exporter.Init (Exporter, theClassifier.Attributes.Decision_Tree,
-                              Class_Names => Class_Names);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
@@ -68,6 +66,9 @@ package body Export_Tests is
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+      Graphviz_Exporter.Init
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Class_Names => Class_Names);
       Graphviz_Exporter.Export_Graphviz (Exporter);
 
    end Test_Graphviz_Toy;

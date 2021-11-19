@@ -188,6 +188,7 @@ package body Graphviz_Exporter is
       return String is
       use Ada.Containers;
       use Tree.Nodes_Package;
+      Routine_Name   : constant String := "Graphviz_Exporter.Node_To_String";
       Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
       Top_Node       : constant Tree.Tree_Cursor :=
                          First_Child (Exporter.theTree.Nodes.Root);
@@ -243,14 +244,18 @@ package body Graphviz_Exporter is
             Node_String := Node_String & "impurity = ";
          end if;
 
+         Put_Line (Routine_Name & " set Impurity");
          Node_String := Node_String & Classifier_Utilities.Float_Precision
            (Node_Data.Impurity, Exporter.Precision) & Characters (5);
+         Put_Line (Routine_Name & " Impurity set");
       end if;
 
+      Put_Line (Routine_Name & " Write node samples count");
       --  Write node samples count
       if Show_Labels then
          Node_String := Node_String & "samples = ";
       end if;
+      Put_Line (Routine_Name & " Exporter.Proportion");
       if Exporter.Proportion then
          Percent := 100.0 * Float (Node_Data.Num_Node_Samples) /
            Float (Element (Top_Node).Num_Node_Samples);
@@ -262,6 +267,7 @@ package body Graphviz_Exporter is
       end if;
       Node_String := Node_String & Characters (5);
 
+     Put_Line (Routine_Name & " Write node class");
       --  Write node class distribution / regression value
       if Exporter.Proportion and Classes.Element (1).Length /= 1 then
          for output_index in Value.First_Index .. Value.Last_Index loop
@@ -350,7 +356,7 @@ package body Graphviz_Exporter is
       procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
          use Tree.Nodes_Package;
          use Export_Types.Export_Maps;
-         Routine_Name : constant String := "Graphviz_Exporter.Recurse.Do_Node";
+--           Routine_Name : constant String := "Graphviz_Exporter.Recurse.Do_Node";
          Node_Parent  : constant Tree.Tree_Cursor := Parent (Node_Curs);
          Node_ID      : constant Positive := Element (Node_Curs).Node_ID;
          Node_ID_S    : constant String := Integer'Image (Node_ID);
@@ -359,10 +365,8 @@ package body Graphviz_Exporter is
          Depth_S      : constant Unbounded_String
            := To_Unbounded_String (Integer'Image (Depth));
          Left_Child   : Tree.Tree_Cursor;
-         --           Right_Child  : Tree.Tree_Cursor;
          Angles       : array (1 .. 2) of Float := (45.0, -45.0);
       begin
-         Put_Line (Routine_Name);
          if Node_Curs /= Exporter.theTree.Nodes.Root then
             if not Element (Node_Curs).Leaf_Node and then
               Depth <= Exporter.Max_Depth then
@@ -430,8 +434,6 @@ package body Graphviz_Exporter is
       end Do_Node;
 
    begin
-      Put_Line ("Graphviz_Exporter.Recurse Node_Count: " &
-      Ada.Containers.Count_Type'Image (Exporter.theTree.Nodes.Node_Count));
       Exporter.theTree.Nodes.Iterate (Do_Node'Access);
 
    end Recurse;
