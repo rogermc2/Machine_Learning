@@ -3,8 +3,8 @@ with Ada.Exceptions;
 with Ada.Text_IO;
 
 with Dot_Tables;
-with Types; use Types;
-with Utilities;
+with Export_Types; use Export_Types;
+with Export_Utilities;
 
 package body State_Machine is
 
@@ -15,13 +15,13 @@ package body State_Machine is
 
    procedure Parse_Line (Table : in out Dot_Tables.Table_Data;
                          N     : Config.Name) is
-      use Utilities;
-      anElement : Types.Elements.Element;
+      use Export_Utilities;
+      anElement : Export_Types.Elements.Element;
    begin
       case Current_State is
          --  First line should be "digraph name {"
          when Digraph =>
-            if N = Utilities.Pad ("digraph") then
+            if N = Pad ("digraph") then
                Current_State := Name;
             else
                raise Syntax_Error with "digraph";
