@@ -199,7 +199,7 @@ package body Classifier_Utilities is
       end if;
 
       declare
-         theString : String (1 .. Integer_Length + Precision);
+         theString : String (1 .. Integer_Length + Precision + 1);
       begin
          Float_IO.Put (To   => theString,
                        Item => Number,

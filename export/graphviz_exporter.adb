@@ -144,7 +144,7 @@ package body Graphviz_Exporter is
         Rounded_Filled : Unbounded_String := To_Unbounded_String ("");
         Edge_Line      : Unbounded_String := To_Unbounded_String ("");
     begin
-        Put_Line (Output_File, "digraph Tree");
+        Put_Line (Output_File, "digraph Tree {");
         --  Specify node aesthetics
         Put (Output_File, "node [shape=box");
         if Exporter.Filled then
@@ -181,7 +181,7 @@ package body Graphviz_Exporter is
       return String is
         use Ada.Containers;
         use Tree.Nodes_Package;
-        Routine_Name   : constant String := "Graphviz_Exporter.Node_To_String";
+--          Routine_Name   : constant String := "Graphviz_Exporter.Node_To_String";
         Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
         Top_Node       : constant Tree.Tree_Cursor :=
                            First_Child (Exporter.theTree.Nodes.Root);
@@ -237,18 +237,15 @@ package body Graphviz_Exporter is
                 Node_String := Node_String & "impurity = ";
             end if;
 
-            Put_Line (Routine_Name & " set Impurity");
             Node_String := Node_String & Classifier_Utilities.Float_Precision
               (Node_Data.Impurity, Exporter.Precision) & Characters (5);
-            Put_Line (Routine_Name & " Impurity set");
         end if;
 
-        Put_Line (Routine_Name & " Write node samples count");
         --  Write node samples count
         if Show_Labels then
             Node_String := Node_String & "samples = ";
         end if;
-        Put_Line (Routine_Name & " Exporter.Proportion");
+
         if Exporter.Proportion then
             Percent := 100.0 * Float (Node_Data.Num_Node_Samples) /
               Float (Element (Top_Node).Num_Node_Samples);
@@ -260,7 +257,6 @@ package body Graphviz_Exporter is
         end if;
         Node_String := Node_String & Characters (5);
 
-        Put_Line (Routine_Name & " Write node class");
         --  Write node class distribution / regression value
         if Exporter.Proportion and Classes.Element (1).Length /= 1 then
             for output_index in Value.First_Index .. Value.Last_Index loop
@@ -413,7 +409,7 @@ package body Graphviz_Exporter is
                         --  Colour cropped nodes grey
                         Put (Output_File, ", fillcolor=""#C0C0C0""");
                     end if;
-                    Put_Line ("] ;");
+                    Put_Line (Output_File, "] ;");
 
                     if Element (Node_Parent).Node_ID > 1 then
                         --  Add edge to parent
@@ -433,7 +429,7 @@ package body Graphviz_Exporter is
 
     --  -------------------------------------------------------------------------
 
-    procedure Tail (Exporter    : DOT_Tree_Exporter; Output_File : File_Type) is
+    procedure Tail (Exporter : DOT_Tree_Exporter; Output_File : File_Type) is
         use Export_Maps;
         procedure Write_Rank (Curs : Cursor) is
         begin
