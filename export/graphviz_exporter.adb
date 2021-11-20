@@ -234,8 +234,6 @@ package body Graphviz_Exporter is
         end Write_String;
 
     begin
-        --  L520
-        Node_String := Node_ID_S & To_Unbounded_String (" [label = ");
         --  L283
         if Exporter.Node_Ids then
             --  Write node ID
@@ -420,15 +418,17 @@ package body Graphviz_Exporter is
                 end if;
 
                 --  L520
+                Put (Output_File, Node_ID_S & " [label = """);
                 Node_To_String (Exporter, Node_Curs, Criteria, Output_File);
 
                 if Exporter.Filled then
                     Put (Output_File, ", fillcolor = ");
                 end if;
-                Put_Line (Output_File, "];");
+                --  L528
+                Put_Line (Output_File, """];");
 
                 if Node_Parent /= Exporter.theTree.Nodes.Root then
-                    --  Add edge to parent
+                    --  L531  Add edge to parent
                     Put (Output_File,
                          Integer'Image (Element (Node_Parent).Node_ID) &
                            " -> " & Node_ID_S);
@@ -441,12 +441,10 @@ package body Graphviz_Exporter is
                     if Node_ID = 1 then
                         Put_Line (Output_File,
                                   Float_Precision (Angles (1), 3) &
-                                    ", headlabel = ""True"";");
-                        --                              Put_Line (Output_File, Float'Image (Angles (1)) &
-                        --                                          ", headlabel=""True"";");
+                                    ", headlabel = ""True""];");
                     else
                         Put_Line (Output_File,  Float'Image (Angles (2)) &
-                                    ", headlabel = ""False"";");
+                                    ", headlabel = ""False""];");
                     end if;
                 end if;
 
