@@ -8,6 +8,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Config;
+with Criterion;
 with Dot_Tables;
 with State_Machine;
 with Export_Types; use Export_Types;
@@ -19,6 +20,7 @@ package body Graphviz_Exporter is
     procedure Head (Exporter    : DOT_Tree_Exporter;
                     Output_File : File_Type);
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
+                       Criteria    : Criterion.Classifier_Criteria_Type;
                        Output_File : File_Type; Depth : Natural := 0);
     procedure Tail (Exporter    : DOT_Tree_Exporter; Output_File : File_Type);
 
@@ -68,14 +70,18 @@ package body Graphviz_Exporter is
 
     procedure Export (Exporter    : in out DOT_Tree_Exporter;
                       Output_File : File_Type) is
+        use Ada.Containers;
+        Criteria : constant Criterion.Classifier_Criteria_Type :=
+                     Criterion.Gini_Criteria;
     begin
         if not Exporter.Feature_Names.Is_Empty then
-            Assert (Integer (Exporter.Feature_Names.Length) =
-                      Exporter.theTree.Num_Features, "Exporter.Feature_Names"
+            Assert (Exporter.Feature_Names.Length =
+                      Exporter.theTree.Features.Length, "Exporter.Feature_Names"
                       & " length does not match the number of features.");
         end if;
+
         Head (Exporter, Output_File);
-        Recurse (Exporter, Output_File);
+        Recurse (Exporter, Criteria, Output_File);
         Tail (Exporter, Output_File);
 
     end Export;
@@ -153,7 +159,7 @@ package body Graphviz_Exporter is
     begin
         Put_Line (Output_File, "digraph Tree {");
         --  Specify node aesthetics
-        Put (Output_File, "node [shape=box");
+        Put (Output_File, "node [shape = box");
         if Exporter.Filled then
             Rounded_Filled := Rounded_Filled & "filled";
         end if;
@@ -163,22 +169,22 @@ package body Graphviz_Exporter is
         end if;
 
         if Exporter.Filled or Exporter.Rounded then
-            Put (Output_File, ", style=" & To_String (Rounded_Filled));
-            Put (Output_File, ", color=""black""");
+            Put (Output_File, ", style = " & To_String (Rounded_Filled));
+            Put (Output_File, ", color = ""black""");
         end if;
 
-        Put (Output_File, ", fontname=" & To_String (Exporter.Font_Name));
+        Put (Output_File, ", fontname = " & To_String (Exporter.Font_Name));
         Put_Line (Output_File, "];");
         --  Specify graph & edge aesthetics
         if Exporter.Leaves_Parallel then
-            Put (Output_File, "graph [ranksep=equally, splines=polyline] ");
+            Put (Output_File, "graph [ranksep = equally, splines = polyline] ");
         end if;
 
         Edge_Line := To_Unbounded_String
-          ("edge [fontname=" & To_String (Exporter.Font_Name) & "];");
+          ("edge [fontname = " & To_String (Exporter.Font_Name) & "];");
         if Exporter.Rotate /= 0.0 then
             Put (Output_File, To_String (Edge_Line));
-            Put_Line (Output_File, "rankdir=LR;");
+            Put_Line (Output_File, "rankdir = LR;");
         else
             Put_Line (Output_File, To_String (Edge_Line));
         end if;
@@ -188,35 +194,38 @@ package body Graphviz_Exporter is
     --  -------------------------------------------------------------------------
     --  L269 Node_To_String generates the node content string
     procedure Node_To_String
-      (Exporter  : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor;
+      (Exporter : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor;
+       Criteria : Criterion.Classifier_Criteria_Type;
        Output_File : File_Type) is
         use Ada.Containers;
+        use Criterion;
         use Tree.Nodes_Package;
-        Routine_Name   : constant String := "Graphviz_Exporter.Node_To_String ";
-        Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
-        Node_ID_S      : constant String := Integer'Image (Node_ID);
-        Top_Node       : constant Tree.Tree_Cursor :=
+        Routine_Name    : constant String := "Graphviz_Exporter.Node_To_String ";
+        Node_ID         : constant Positive := Element (Node_Curs).Node_ID;
+        Node_ID_S       : constant String := Integer'Image (Node_ID);
+        Top_Node        : constant Tree.Tree_Cursor :=
                            First_Child (Exporter.theTree.Nodes.Root);
-        Node_Data      : constant Tree.Tree_Node := Element (Node_Curs);
-        Classes        : constant ML_Types.Value_Data_Lists_2D :=
+        Node_Data       : constant Tree.Tree_Node := Element (Node_Curs);
+        Classes         : constant ML_Types.Value_Data_Lists_2D :=
                            Exporter.theTree.Classes;
-        Show_Labels    : constant Boolean
+        Show_Labels     : constant Boolean
           := Exporter.Label = To_Unbounded_String ("all") or
           (Exporter.Label = To_Unbounded_String ("root") and Node_ID = 1);
-        Feature_Names  : constant Feature_Names_List := Exporter.Feature_Names;
+        Feature_Names   : constant Feature_Names_List := Exporter.Feature_Names;
         --  Value: num_outputs x num_classes
-        Value          : Weights.Weight_Lists_2D :=
+        Value           : Weights.Weight_Lists_2D :=
                            Exporter.theTree.Values.Element (Node_ID);
-        Output_Data    : Weights.Weight_List;
-        Class_Value    : Float;
-        Arg_Max        : Positive;
-        Class_Name     : Unbounded_String;
-        Feature        : Unbounded_String;
-        Value_First    : Boolean := True;
-        Value_Text     : Unbounded_String := To_Unbounded_String ("");
-        Pos            : Natural;
-        Percent        : Float;
-        Node_String    : Unbounded_String := To_Unbounded_String ("");
+        Output_Data     : Weights.Weight_List;
+        Class_Value     : Float;
+        Arg_Max         : Positive;
+        Class_Name      : Unbounded_String;
+        Feature         : Unbounded_String;
+        Value_First     : Boolean := True;
+        Value_Text      : Unbounded_String := To_Unbounded_String ("");
+        Pos             : Natural;
+        Percent         : Float;
+        Node_String     : Unbounded_String := To_Unbounded_String ("");
+        Criteria_String : Unbounded_String := To_Unbounded_String ("");
 
         procedure Write_String is
         begin
@@ -226,7 +235,7 @@ package body Graphviz_Exporter is
 
     begin
         --  L520
-        Node_String := Node_ID_S & To_Unbounded_String (" [label=");
+        Node_String := Node_ID_S & To_Unbounded_String (" [label = ");
         --  L283
         if Exporter.Node_Ids then
             --  Write node ID
@@ -237,19 +246,18 @@ package body Graphviz_Exporter is
             Write_String;
         end if;
 
+        --  L289
         if not Element (First_Child (Node_Curs)).Leaf_Node then
 --          if not Node_Data.Leaf_Node then
             --  Write decision criteria
             if Exporter.Feature_Names.Is_Empty then
+                Feature := To_Unbounded_String ("X[") &
+                  Feature_Names.Element (Node_ID) & "]";
                 Put_Line (Routine_Name & "Feature_Names is empty");
+            else
                 if not Exporter.theTree.Features.Is_Empty then
                     Feature := Exporter.theTree.Features.Element (Node_ID);
                 end if;
-            else
-                Put_Line (Routine_Name & "Feature_Names: " &
-                         Integer'Image (Integer (Feature_Names.Length)));
-                Feature := To_Unbounded_String ("X[") &
-                  Feature_Names.Element (Node_ID) & "]";
             end if;
 
             Node_String := Node_String & Feature &  " => " &
@@ -258,9 +266,20 @@ package body Graphviz_Exporter is
             Write_String;
         end if;
 
+        --  306  Write impurity
         if Exporter.Impurity then
             if Show_Labels then
                 Node_String := Node_String & "impurity = ";
+            end if;
+
+            if Show_Labels then
+                case Criteria is
+                    when Gini_Criteria =>
+                        Criteria_String := To_Unbounded_String ("Gini");
+                    when Entropy_Criteria =>
+                        Criteria_String := To_Unbounded_String ("Entropy");
+                end case;
+                Node_String := Node_String & Criteria_String & " = ";
             end if;
 
             Node_String := Node_String & Classifier_Utilities.Float_Precision
@@ -329,13 +348,14 @@ package body Graphviz_Exporter is
                 Pos := Index (Value_Text, "[");
             end loop;
             Pos := Index (Value_Text, "]");
-            while Pos /= Length (Value_Text) loop
-                Delete (Value_Text, Pos, Pos);
-                Pos := Index (Value_Text, "]");
-            end loop;
-            Value_Text := Value_Text & "";
+            if Pos > 0 then
+                while Pos <= Length (Value_Text) loop
+                    Delete (Value_Text, Pos, Pos);
+                    Pos := Index (Value_Text, "]");
+                end loop;
+            end if;
         end if;
-        Node_String := Node_String & Value_Text;
+        Node_String := Node_String & "[" & Value_Text & "]";
         Write_String;
 
         --  Write node majority class
@@ -364,6 +384,7 @@ package body Graphviz_Exporter is
     --  -------------------------------------------------------------------------
 
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
+                       Criteria    : Criterion.Classifier_Criteria_Type;
                        Output_File : File_Type; Depth : Natural := 0) is
 
         procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
@@ -399,10 +420,10 @@ package body Graphviz_Exporter is
                 end if;
 
                 --  L520
-                Node_To_String (Exporter, Node_Curs, Output_File);
+                Node_To_String (Exporter, Node_Curs, Criteria, Output_File);
 
                 if Exporter.Filled then
-                    Put (Output_File, ", fillcolor=");
+                    Put (Output_File, ", fillcolor = ");
                 end if;
                 Put_Line (Output_File, "];");
 
@@ -416,16 +437,16 @@ package body Graphviz_Exporter is
                         Angles (index) := (1.0 - 2.0 * Exporter.Rotate) *
                           Angles (index);
                     end loop;
-                    Put (Output_File, " [labeldistance=2.5, labelangle=");
+                    Put (Output_File, " [labeldistance = 2.5, labelangle = ");
                     if Node_ID = 1 then
                         Put_Line (Output_File,
                                   Float_Precision (Angles (1), 3) &
-                                    ", headlabel=""True"";");
+                                    ", headlabel = ""True"";");
                         --                              Put_Line (Output_File, Float'Image (Angles (1)) &
                         --                                          ", headlabel=""True"";");
                     else
                         Put_Line (Output_File,  Float'Image (Angles (2)) &
-                                    ", headlabel=""False"";");
+                                    ", headlabel = ""False"";");
                     end if;
                 end if;
 
@@ -435,10 +456,10 @@ package body Graphviz_Exporter is
             else  --   Leaf_Node or Depth > Exporter.Max_Depth
                 Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
                          Node_ID_UB);
-                Put (Output_File,  Node_ID_S & " [label=""(...)""");
+                Put (Output_File,  Node_ID_S & " [label = ""(...)""");
                 if Exporter.Filled then
                     --  Colour cropped nodes grey
-                    Put (Output_File, ", fillcolor=""#C0C0C0""");
+                    Put (Output_File, ", fillcolor = ""#C0C0C0""");
                 end if;
                 Put_Line (Output_File, "];");
 

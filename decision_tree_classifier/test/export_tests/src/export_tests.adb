@@ -67,7 +67,7 @@ package body Export_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Graphviz_Exporter.Export_Graphviz
-          (Exporter, theClassifier.Attributes.Decision_Tree,
+          (Exporter, theClassifier.Attributes.Decision_Tree, Proportion => True,
            Class_Names => Class_Names);
 
    end Test_Graphviz_Toy;

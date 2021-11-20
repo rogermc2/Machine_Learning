@@ -67,7 +67,7 @@ package Tree is
    subtype Nodes_List is Nodes_List_Package.Vector;
 
    type Tree_Class is record
-      Num_Features : Natural := 0;
+--        Num_Features : Natural := 0;
       Features     : ML_Types.Unbounded_List;
       --  Classes:  outputs x classes
       Classes      : ML_Types.Value_Data_Lists_2D;
