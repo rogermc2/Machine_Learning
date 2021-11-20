@@ -68,6 +68,7 @@ package Tree is
 
    type Tree_Class is record
       Num_Features : Natural := 0;
+      Features     : ML_Types.Unbounded_List;
       --  Classes:  outputs x classes
       Classes      : ML_Types.Value_Data_Lists_2D;
       Num_Outputs  : Index_Range := 1;
