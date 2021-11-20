@@ -164,10 +164,10 @@ package body Graphviz_Exporter is
             Put (Output_File, "graph [ranksep=equally, splines=polyline] ");
         end if;
         Edge_Line := To_Unbounded_String
-          ("edge [fontname=" & To_String (Exporter.Font_Name) & "] ;");
+          ("edge [fontname=" & To_String (Exporter.Font_Name) & "];");
         if Exporter.Rotate /= 0.0 then
             Put (Output_File, To_String (Edge_Line));
-            Put_Line (Output_File, "rankdir=LR ;");
+            Put_Line (Output_File, "rankdir=LR;");
         else
             Put_Line (Output_File, To_String (Edge_Line));
         end if;
@@ -176,13 +176,14 @@ package body Graphviz_Exporter is
 
     --  -------------------------------------------------------------------------
     --  Node_To_String generates the node content string
-    function Node_To_String
-      (Exporter  : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor)
-      return String is
+    procedure Node_To_String
+      (Exporter  : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor;
+       Output_File : File_Type) is
         use Ada.Containers;
         use Tree.Nodes_Package;
 --          Routine_Name   : constant String := "Graphviz_Exporter.Node_To_String";
         Node_ID        : constant Positive := Element (Node_Curs).Node_ID;
+        Node_ID_S    : constant String := Integer'Image (Node_ID);
         Top_Node       : constant Tree.Tree_Cursor :=
                            First_Child (Exporter.theTree.Nodes.Root);
         Node_Data      : constant Tree.Tree_Node := Element (Node_Curs);
@@ -191,7 +192,6 @@ package body Graphviz_Exporter is
         Show_Labels    : constant Boolean
           := Exporter.Label = To_Unbounded_String ("all") or
           (Exporter.Label = To_Unbounded_String ("root") and Node_ID = 1);
-        Characters     : constant Character_Array := Exporter.Characters;
         Left_Child     : constant Tree.Tree_Cursor := First_Child (Node_Curs);
         Feature_Names  : constant Feature_Names_List := Exporter.Feature_Names;
         --  Value: num_outputs x num_classes
@@ -208,13 +208,15 @@ package body Graphviz_Exporter is
         Percent        : Float;
         Node_String    : Unbounded_String := To_Unbounded_String ("");
     begin
+        Node_String := Node_ID_S & To_Unbounded_String (" [label=");
         if Exporter.Node_Ids then
             --  Write node ID
             if Show_Labels then
                 Node_String := Node_String & "node ";
             end if;
-            Node_String := Node_String & Characters (1) &
-              Integer'Image (Node_ID) & Characters (5) ;
+            Node_String := Node_String & "#" & Node_ID_S;
+            Put_Line (Output_File, To_String (Node_String));
+            Node_String := To_Unbounded_String ("");
         end if;
 
         if not Element (Left_Child).Leaf_Node then
@@ -222,14 +224,15 @@ package body Graphviz_Exporter is
             if not Exporter.Feature_Names.Is_Empty then
                 Feature := Feature_Names.Element (Node_ID);
             else
-                Feature :=
-                  To_Unbounded_String ("X") & Characters (2) &
-                  Feature_Names.Element (Node_ID) & Characters (3);
+                Feature := To_Unbounded_String ("X[") &
+                  Feature_Names.Element (Node_ID) & "]";
             end if;
-            Node_String := Node_String & Feature &  " " &
-              Characters (4) &  " " &
+
+            Node_String := Node_String & Feature &  " => " &
               Classifier_Utilities.Float_Precision
-              (Node_Data.Threshold, Exporter.Precision) & Characters (5);
+              (Node_Data.Threshold, Exporter.Precision);
+            Put_Line (Output_File, To_String (Node_String));
+            Node_String := To_Unbounded_String ("");
         end if;
 
         if Exporter.Impurity then
@@ -238,7 +241,9 @@ package body Graphviz_Exporter is
             end if;
 
             Node_String := Node_String & Classifier_Utilities.Float_Precision
-              (Node_Data.Impurity, Exporter.Precision) & Characters (5);
+              (Node_Data.Impurity, Exporter.Precision);
+            Put_Line (Output_File, To_String (Node_String));
+            Node_String := To_Unbounded_String ("");
         end if;
 
         --  Write node samples count
@@ -255,7 +260,8 @@ package body Graphviz_Exporter is
             Node_String := Node_String &
               Integer'Image (Node_Data.Num_Node_Samples);
         end if;
-        Node_String := Node_String & Characters (5);
+        Put_Line (Output_File, To_String (Node_String));
+        Node_String := To_Unbounded_String ("");
 
         --  Write node class distribution / regression value
         if Exporter.Proportion and Classes.Element (1).Length /= 1 then
@@ -308,7 +314,8 @@ package body Graphviz_Exporter is
             end loop;
             Value_Text := Value_Text & "";
         end if;
-        Node_String := Node_String & Value_Text & Characters (5);
+        Put_Line (Output_File, To_String (Node_String & Value_Text));
+        Node_String := To_Unbounded_String ("");
 
         --  Write node majority class
         if not Exporter.Class_Names.Is_Empty and then
@@ -324,16 +331,11 @@ package body Graphviz_Exporter is
             if Exporter.Class_Names.Is_Empty then
                 Class_Name := Exporter.Class_Names.Element (Arg_Max);
             else
-                Class_Name := "y" & Characters (2) &
-                  To_Unbounded_String (Integer'Image (Arg_Max)) &
-                  Characters (3);
+                Class_Name := "y[" &
+                  To_Unbounded_String (Integer'Image (Arg_Max)) & "]";
             end if;
-            Node_String := Node_String & Class_Name;
+            Put_Line (Output_File, To_String (Node_String & Class_Name));
         end if;
-
-        Node_String := Node_String & Characters (6);
-
-        return To_String (Node_String);
 
     end Node_To_String;
 
@@ -371,13 +373,12 @@ package body Graphviz_Exporter is
                         Include (Exporter.Ranks, Depth_S, Node_ID_UB);
                     end if;
 
-                    Put (Output_File, Node_ID_S & " [label=" &
-                           Node_To_String (Exporter, Node_Curs));
+                    Node_To_String (Exporter, Node_Curs, Output_File);
 
                     if Exporter.Filled then
                         Put (Output_File, ", fillcolor=");
                     end if;
-                    Put_Line (Output_File, "] ;");
+                    Put_Line (Output_File, "];");
 
                     if Node_Parent /= Exporter.theTree.Nodes.Root then
                         --  Add edge to parent
@@ -391,10 +392,10 @@ package body Graphviz_Exporter is
                         Put (Output_File, " [labeldistance=2.5, labelangle=");
                         if Node_ID = 1 then
                             Put_Line (Output_File, Float'Image (Angles (1)) &
-                                        ", headlabel=""True"" ;");
+                                        ", headlabel=""True"";");
                         else
                             Put_Line (Output_File,  Float'Image (Angles (2)) &
-                                        ", headlabel=""False"" ;");
+                                        ", headlabel=""False"";");
                         end if;
                     end if;
 
@@ -409,7 +410,7 @@ package body Graphviz_Exporter is
                         --  Colour cropped nodes grey
                         Put (Output_File, ", fillcolor=""#C0C0C0""");
                     end if;
-                    Put_Line (Output_File, "] ;");
+                    Put_Line (Output_File, "];");
 
                     if Element (Node_Parent).Node_ID > 1 then
                         --  Add edge to parent
@@ -435,7 +436,7 @@ package body Graphviz_Exporter is
         begin
             Put (Output_File, "{Rank=same ; " & To_String (Element (Curs)) & "; ");
 
-            Put_Line (Output_File, "} ;");
+            Put_Line (Output_File, "};");
         end Write_Rank;
 
     begin

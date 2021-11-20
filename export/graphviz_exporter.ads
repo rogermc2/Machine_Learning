@@ -58,11 +58,6 @@ private
                                To_Unbounded_String ("helvetica");
         Ranks              : Export_Types.Export_Map;
         Colours            : Export_Types.Export_Map;
-        Characters         : Character_Array
-          := (To_Unbounded_String ("#"), To_Unbounded_String ("["),
-              To_Unbounded_String ("]"), To_Unbounded_String ("=>"),
-              To_Unbounded_String ("\\n"), To_Unbounded_String (""""),
-              To_Unbounded_String (""""));
         Initialized        : Boolean := False;
     end record;
 
