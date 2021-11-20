@@ -193,10 +193,10 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
    --  L269 Node_To_String generates the node content string
-   procedure Node_To_String
+   function Node_To_String
      (Exporter    : DOT_Tree_Exporter; Node_Curs : Tree.Tree_Cursor;
-      Criteria    : Criterion.Classifier_Criteria_Type;
-      Output_File : File_Type) is
+      Criteria    : Criterion.Classifier_Criteria_Type)
+      return String is
       use Ada.Containers;
       use Criterion;
       use Tree.Nodes_Package;
@@ -227,13 +227,6 @@ package body Graphviz_Exporter is
       Percent         : Float;
       Node_String     : Unbounded_String := To_Unbounded_String ("");
       Criteria_String : Unbounded_String := To_Unbounded_String ("");
-
-      procedure Write_String is
-      begin
-         Put_Line (Output_File, To_String (Node_String));
-         Node_String := To_Unbounded_String ("");
-      end Write_String;
-
    begin
       --  L283
       if Exporter.Node_Ids then
@@ -241,8 +234,7 @@ package body Graphviz_Exporter is
          if Show_Labels then
             Node_String := Node_String & "node ";
          end if;
-         Node_String := Node_String & "#" & Node_ID_S;
-         Write_String;
+         Node_String := Node_String & "#" & Node_ID_S & "\n";
       end if;
 
       --  L289
@@ -261,17 +253,16 @@ package body Graphviz_Exporter is
          end if;
 
          --  L299
-         Node_String := Node_String & Feature &  " <= " &
+         Node_String := Node_String & Feature & " <= " &
            Classifier_Utilities.Float_Precision
-           (Node_Data.Threshold, Exporter.Precision);
-         Write_String;
+           (Node_Data.Threshold, Exporter.Precision) & "\n";
       end if;
 
       if Exporter.Impurity then
          --  308  Write impurity
---           if Show_Labels then
---              Node_String := Node_String & "impurity = ";
---           end if;
+         --           if Show_Labels then
+         --              Node_String := Node_String & "impurity = ";
+         --           end if;
 
          if Show_Labels then
             case Criteria is
@@ -284,8 +275,7 @@ package body Graphviz_Exporter is
          end if;
 
          Node_String := Node_String & Classifier_Utilities.Float_Precision
-           (Node_Data.Impurity, Exporter.Precision);
-         Write_String;
+           (Node_Data.Impurity, Exporter.Precision) & "\n";
       end if;
 
       --  L320 Write node samples count
@@ -297,12 +287,11 @@ package body Graphviz_Exporter is
          Percent := 100.0 * Float (Node_Data.Num_Node_Samples) /
            Float (Element (Top_Node).Num_Node_Samples);
          Node_String := Node_String &
-           Classifier_Utilities.Float_Precision (Percent, 1) & "%";
+           Classifier_Utilities.Float_Precision (Percent, 1) & "%" & "\n";
       else
          Node_String := Node_String &
-           Integer'Image (Node_Data.Num_Node_Samples);
+           Integer'Image (Node_Data.Num_Node_Samples) & "\n";
       end if;
-      Write_String;
 
       --  L331 Write node class distribution / regression value
       if Exporter.Proportion and Classes.Element (1).Length /= 1 then
@@ -360,8 +349,7 @@ package body Graphviz_Exporter is
             end loop;
          end if;
       end if;
-      Node_String := Node_String & "[" & Value_Text & "]";
-      Write_String;
+      Node_String := Node_String & "[" & Value_Text & "]" & "\n";
 
       --  L357 Write node majority class
       if not Exporter.Class_Names.Is_Empty and then
@@ -382,8 +370,9 @@ package body Graphviz_Exporter is
               To_Unbounded_String (Integer'Image (Arg_Max)) & "]";
          end if;
          Node_String := Node_String & Class_Name;
-         Write_String;
       end if;
+
+      return To_String (Node_String);
 
    end Node_To_String;
 
@@ -426,8 +415,8 @@ package body Graphviz_Exporter is
             end if;
 
             --  L520
-            Put (Output_File, Node_ID_S & " [label = """);
-            Node_To_String (Exporter, Node_Curs, Criteria, Output_File);
+            Put (Output_File, Node_ID_S & " [label = """ &
+             Node_To_String (Exporter, Node_Curs, Criteria));
 
             --  L524
             if Exporter.Filled then
