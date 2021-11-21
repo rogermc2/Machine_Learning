@@ -12,11 +12,13 @@ package body Classifier_Utilities is
    use ML_Types;
 
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
+   use ML_Types.Value_Data_Package;
    package Value_Sets is new
-      Ada.Containers.Ordered_Sets (ML_Types.Value_Record,
-                                   ML_Types."<", ML_Types."<=");
-   package Weights_Sets is new
-      Ada.Containers.Ordered_Sets (Weights.Weight_Lists_3D);
+     Ada.Containers.Ordered_Sets (ML_Types.Value_Record);
+   use Weights.Weight_Lists_3D_Package;
+   package Weight_Sets is new
+     Ada.Containers.Ordered_Sets (Float);
+
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
    --  -------------------------------------------------------------------------
@@ -144,7 +146,7 @@ package body Classifier_Utilities is
                       aClassifier.Attributes.Decision_Tree.Nodes;
       Num_Samples : Natural := 0;
 
-      procedure Add (Curs : Cursor) is
+      procedure Add (Curs : Nodes_Package.Cursor) is
          Node : constant Tree_Node := Element (Curs);
       begin
          if Curs /= Nodes.Root then
@@ -764,25 +766,42 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Weights (Values : Weights.Weight_Lists_3D)
-                           return Weights.Weight_Lists_3D is
-      use Value_Sets;
-      use Value_Data_Package;
-      Unique_Set  : Value_Sets.Set;
-      Int_Curs    : Value_Data_Package.Cursor := Values.First;
-      Set_Curs    : Value_Sets.Cursor;
-      Values_List : Value_Data_List;
+                            return Weights.Weight_List is
+      use Weight_Sets;
+      use Weights;
+      use Float_Package;
+      use Weight_Lists_2D_Package;
+      use Weight_Lists_3D_Package;
+      Unique_Set     : Weight_Sets.Set;
+      Weight_3D_Curs : Weight_Lists_3D_Package.Cursor := Values.First;
+      Weight_2D_Curs : Weight_Lists_2D_Package.Cursor;
+      Weights_Curs   : Float_Package.Cursor;
+      Set_Curs       : Weight_Sets.Cursor;
+      Weight_2D_List : Weight_Lists_2D;
+      Weights        : Weight_List;
+      Unique_List    : Weight_List;
    begin
-      while Has_Element (Int_Curs) loop
-         Unique_Set.Include (Element (Int_Curs));
-         Next (Int_Curs);
+      while Has_Element (Weight_3D_Curs) loop
+         Weight_2D_List := Element (Weight_3D_Curs);
+         Weight_2D_Curs := Weight_2D_List.First;
+         while Has_Element (Weight_2D_Curs) loop
+            Weights := Element (Weight_2D_Curs);
+            Weights_Curs := Weights.First;
+            while Has_Element (Weights_Curs) loop
+               Unique_Set.Include (Element (Weights_Curs));
+               Next (Weights_Curs);
+            end loop;
+            Next (Weight_2D_Curs);
+         end loop;
+         Next (Weight_3D_Curs);
       end loop;
 
       Set_Curs := Unique_Set.First;
       while Has_Element (Set_Curs) loop
-         Values_List.Append (Element (Set_Curs));
+         Unique_List.Append (Element (Set_Curs));
          Next (Set_Curs);
       end loop;
-      return Values_List;
+      return Unique_List;
 
    end Unique_Weights;
 

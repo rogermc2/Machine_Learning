@@ -206,7 +206,7 @@ package body Graphviz_Exporter is
          if Integer (Exporter.theTree.Num_Outputs) /= 1 then
                 null;
          elsif Exporter.theTree.Num_Classes.Element (1) = 1 and
-              Integer (Classifier_Utilities.Unique_Values
+              Integer (Classifier_Utilities.Unique_Weights
                        (Exporter.theTree.Values).Length) > 1 then
               null;
 --                 Node_Value := Exporter.theTree.Values
