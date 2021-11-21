@@ -22,11 +22,11 @@ package body Export_Tests is
                    ((-2, -1), (-1, -1), (-1, -2), (1, 1), (1, 2), (2, 1));
    --  Y_Array 6 rows (samples) x 2 columns (features)
    Y_Array     : constant Integer_Array (1 .. 6) := (-1, -1, -1, 1, 1, 1);
-   Y2_Array    : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
-                    ((-1, 1), (-1, 1), (-1, 1), (1, 2), (1, 2), (1, 3));
-   W_Array     : constant Float_Array (1 .. 6) :=
-                    (1.0, 1.0, 1.0, 0.5, 0.5, 0.5);
-   Y_Deg_Array : constant Integer_Array (1 .. 6) := (1, 1, 1, 1, 1, 1);
+--     Y2_Array    : constant Multi_Value_Array (1 .. 6, 1 .. 2) :=
+--                      ((-1, 1), (-1, 1), (-1, 1), (1, 2), (1, 2), (1, 3));
+--     W_Array     : constant Float_Array (1 .. 6) :=
+--                      (1.0, 1.0, 1.0, 0.5, 0.5, 0.5);
+--     Y_Deg_Array : constant Integer_Array (1 .. 6) := (1, 1, 1, 1, 1, 1);
 
    --  -------------------------------------------------------------------------
 
@@ -49,11 +49,11 @@ package body Export_Tests is
       Y                : constant Value_Data_Lists_2D :=
                              To_Integer_Value_List_2D (Y_Array);
       --  Y2 is 2D list num outputs x num classes
-      Y2               : constant Value_Data_Lists_2D :=
-                           To_Multi_Value_List (Y2_Array);
-      W                : Weights.Weight_List := To_Float_List (W_Array);
-      Y_Degraded       : constant Value_Data_Lists_2D :=
-                              To_Integer_Value_List_2D  (Y_Deg_Array);
+--        Y2               : constant Value_Data_Lists_2D :=
+--                             To_Multi_Value_List (Y2_Array);
+--        W                : Weights.Weight_List := To_Float_List (W_Array);
+--        Y_Degraded       : constant Value_Data_Lists_2D :=
+--                                To_Integer_Value_List_2D  (Y_Deg_Array);
       Num_Samples      : constant Natural := Natural (X.Length);
       No_Weights       : Weights.Weight_List := Empty_Vector;
    begin
@@ -67,7 +67,7 @@ package body Export_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Graphviz_Exporter.Export_Graphviz
-          (Exporter, theClassifier.Attributes.Decision_Tree, Proportion => True,
+          (Exporter, theClassifier.Attributes.Decision_Tree,
            Class_Names => Class_Names);
 
    end Test_Graphviz_Toy;

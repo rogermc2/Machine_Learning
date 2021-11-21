@@ -10,6 +10,7 @@ with Classifier_Utilities;
 with Config;
 with Criterion;
 with Dot_Tables;
+with Export_Types;
 with Node_Strings;
 with State_Machine;
 with Export_Types; use Export_Types;
@@ -17,12 +18,58 @@ with Export_Utilities;
 
 package body Graphviz_Exporter is
 
+   type RGB_Array is array (1 .. 7) of Graph_Colours;
+
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                       Criteria    : Criterion.Classifier_Criteria_Type;
                       Output_File : File_Type; Depth : Natural := 0);
    procedure Tail (Exporter    : DOT_Tree_Exporter; Output_File : File_Type);
+
+   --  -------------------------------------------------------------------------
+
+   function Colour_Brew (Num_Colours : Positive) return Colours_List is
+      Saturation  : Float := 0.75;
+      Value       : Float := 0.9;
+      Chroma      : Float := Saturation * Value;
+      Value_Shift : Float := Value - Chroma;
+      H_Index     : Float := 25.0;
+      H_Bar       : Float;
+      X           : Float;
+      RGB_Init    : constant RGB_Array :=
+                      ((Chroma, X, 0.0),
+                       (X, Chroma, 0.0),
+                       (0.0, Chroma, X),
+                       (0.0, X, Chroma),
+                       (X, 0.0, Chroma),
+                       (Chroma, 0.0, X),
+                       (Chroma, X, 0.0));
+      R           : Float;
+      G           : Float;
+      B           : Float;
+      RGB         : RGB_Array;
+      theColours  : Colours_List;
+   begin
+      while H_Index < 385.0 loop
+         H_Bar := H_Index / 60.0;
+         X := Chroma * (1.0 - abs (Float'Remainder (H_Bar, 2.0)) - 1.0);
+         R := RGB_Init (Integer (H_Bar)).R;
+         G := RGB_Init (Integer (H_Bar)).G;
+         B := RGB_Init (Integer (H_Bar)).B;
+         for index in RGB'First .. RGB'Last loop
+            RGB (index) := (255.0 * (R + Value_Shift),
+                            255.0 * (G + Value_Shift),
+                            255.0 * (B + Value_Shift));
+            theColours.Append (RGB (index));
+         end loop;
+
+         H_Index := H_Index + 360.0 / Float (Num_Colours);
+      end loop;
+
+      return theColours;
+
+   end Colour_Brew;
 
    --  -------------------------------------------------------------------------
 
@@ -141,14 +188,16 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
 
-   --     function Get_Fill_Colour (Exporter : DOT_Tree_Exporter;
-   --                               Node_ID : Positive) return String is
-   --     begin
-   --        if not Exporter.Ranks.Contains (To_Unbounded_String ("rgb")) then
-   --           null;
-   --        end if;
-   --        return "";
-   --     end Get_Fill_Colour;
+   function Get_Fill_Colour (Exporter : DOT_Tree_Exporter;
+                             Node_ID  : Positive) return String is
+      use Export_Types;
+   begin
+      if not Exporter.Ranks.Contains (To_Unbounded_String ("rgb")) then
+         Exporter.Ranks.Include (To_Unbounded_String ("rgb"),
+                                 Colour_Brew (Exporter.theTree.Classes.Element (1)));
+      end if;
+      return "";
+   end Get_Fill_Colour;
 
    --  -------------------------------------------------------------------------
 
@@ -231,11 +280,12 @@ package body Graphviz_Exporter is
 
             --  L520
             Put (Output_File, Node_ID_S & " [label = """ &
-            Node_Strings.Node_To_String (Exporter, Node_Curs, Criteria));
+                   Node_Strings.Node_To_String (Exporter, Node_Curs, Criteria));
 
             --  L524
             if Exporter.Filled then
-               Put (Output_File, ", fillcolor = ");
+               Put (Output_File, ", fillcolor = " &
+                      Get_Fill_Colour(Exporter, Node_ID));
             end if;
             --  L528
             Put_Line (Output_File, """];");

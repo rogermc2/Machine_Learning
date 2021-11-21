@@ -24,8 +24,23 @@ package Export_Types is
 
    package Lines_IO is new Ada.Text_IO.Bounded_IO (Lines);
 
+   type Graph_Colours is record
+      R : Float := 0.0;
+      G : Float := 0.0;
+      B : Float := 0.0;
+   end record;
+
+   package Colours_Package is new Ada.Containers.Vectors
+     (Positive, Graph_Colours);
+   subtype Colours_List is Colours_Package.Vector;
+
    package Attribute_Maps is new
      Ada.Containers.Ordered_Maps (Config.Name, Config.Name);
+
+   use Colours_Package;
+   package Export_Colour_Maps is new
+     Ada.Containers.Ordered_Maps (Unbounded_String, Colours_List);
+   subtype Colour_Map is Export_Colour_Maps.Map;
 
    package Export_Maps is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
