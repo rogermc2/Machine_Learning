@@ -30,9 +30,28 @@ package Export_Types is
       B : Float := 0.0;
    end record;
 
+   type Integer_Graph_Colours is record
+      R : Natural := 0;
+      G : Natural := 0;
+      B : Natural := 0;
+   end record;
+
+   type Graph_Bounds is record
+      H : Float := 0.0;
+      V : Float := 0.0;
+   end record;
+
    package Colours_Package is new Ada.Containers.Vectors
      (Positive, Graph_Colours);
    subtype Colours_List is Colours_Package.Vector;
+
+   package Integer_Colours_Package is new Ada.Containers.Vectors
+     (Positive, Integer_Graph_Colours);
+   subtype Integer_Colours_List is Integer_Colours_Package.Vector;
+
+   package Bounds_Package is new Ada.Containers.Vectors
+     (Positive, Graph_Bounds);
+   subtype Bounds_List is Bounds_Package.Vector;
 
    package Attribute_Maps is new
      Ada.Containers.Ordered_Maps (Config.Name, Config.Name);

@@ -196,12 +196,16 @@ package body Graphviz_Exporter is
       use Classifier_Types;
       Values_List : Weights.Weight_Lists_3D;
       Node_Value  : Float;
+      Colours     : Colours_List;
    begin
       --        Assert (Exporter.theTree.Values.
-      if not Exporter.Colours.Contains (To_Unbounded_String ("rgb")) then
-         Exporter.Colours.Include
-           (To_Unbounded_String ("rgb"),
-            Colour_Brew (Integer (Exporter.theTree.Classes.Length)));
+      if Exporter.Colours.Is_Empty then
+         Colours := Colour_Brew (Integer (Exporter.theTree.Classes.Length));
+         for index in Colours.First_Index .. Colours.Last_Index loop
+            Exporter.Colours.Append ((Integer (Colours.Element (index).R),
+                                     Integer (Colours.Element (index).G),
+                                     Integer (Colours.Element (index).B)));
+         end loop;
 
          Values_List := Exporter.theTree.Values;
          if Integer (Exporter.theTree.Num_Outputs) /= 1 then
@@ -213,6 +217,11 @@ package body Graphviz_Exporter is
             --                 Node_Value := Exporter.theTree.Values
          end if;
       end if;
+
+      if Integer (Exporter.theTree.Num_Outputs) = 1  then
+            null;
+      end if;
+
       return "";
    end Get_Fill_Colour;
 

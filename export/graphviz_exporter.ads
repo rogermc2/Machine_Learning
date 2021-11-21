@@ -30,7 +30,8 @@ package Graphviz_Exporter is
         Font_Name          : Unbounded_String :=
                                To_Unbounded_String ("helvetica");
         Ranks              : Export_Types.Export_Map;
-        Colours            : Export_Types.Colour_Map;
+        Colours            : Export_Types.Integer_Colours_List;
+        Bounds             : Export_Types.Bounds_List;
         Initialized        : Boolean := False;
     end record;
 
