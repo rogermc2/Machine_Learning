@@ -59,5 +59,7 @@ package Classifier_Utilities is
                                   return Integer_Array;
    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
    function Unique (Nums : Integer_List) return Integer_List;
+   function Unique_Values (Values : ML_Types.Value_Data_List)
+                           return ML_Types.Value_Data_List;
 
 end Classifier_Utilities;

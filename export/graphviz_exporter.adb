@@ -6,6 +6,7 @@ with Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Types;
 with Classifier_Utilities;
 with Config;
 with Criterion;
@@ -15,6 +16,7 @@ with Node_Strings;
 with State_Machine;
 with Export_Types; use Export_Types;
 with Export_Utilities;
+with Weights;
 
 package body Graphviz_Exporter is
 
@@ -187,14 +189,28 @@ package body Graphviz_Exporter is
    end Export_Graphviz;
 
    --  -------------------------------------------------------------------------
-
-   function Get_Fill_Colour (Exporter : DOT_Tree_Exporter;
+   --  L248 Get_Fill_Colour fetches the appropriate color for a node
+   function Get_Fill_Colour (Exporter : in out DOT_Tree_Exporter;
                              Node_ID  : Positive) return String is
-      use Export_Types;
+        use Classifier_Types;
+        Values_List : Weights.Weight_Lists_3D;
+        Node_Value  : Float;
    begin
-      if not Exporter.Ranks.Contains (To_Unbounded_String ("rgb")) then
-         Exporter.Ranks.Include (To_Unbounded_String ("rgb"),
-                                 Colour_Brew (Exporter.theTree.Classes.Element (1)));
+--        Assert (Exporter.theTree.Values.
+      if not Exporter.Colours.Contains (To_Unbounded_String ("rgb")) then
+         Exporter.Colours.Include
+              (To_Unbounded_String ("rgb"),
+               Colour_Brew (Integer (Exporter.theTree.Classes.Length)));
+
+         Values_List := Exporter.theTree.Values;
+         if Integer (Exporter.theTree.Num_Outputs) /= 1 then
+                null;
+         elsif Exporter.theTree.Num_Classes.Element (1) = 1 and
+              Integer (Classifier_Utilities.Unique_Values
+                       (Exporter.theTree.Values).Length) > 1 then
+              null;
+--                 Node_Value := Exporter.theTree.Values
+         end if;
       end if;
       return "";
    end Get_Fill_Colour;

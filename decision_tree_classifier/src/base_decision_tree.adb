@@ -124,7 +124,7 @@ package body Base_Decision_Tree is
         use Maths.Float_Math_Functions;
         use Tree;
         Routine_Name          : constant String :=
-                                "Base_Decision_Tree.Base_Fit_Checks";
+                                  "Base_Decision_Tree.Base_Fit_Checks";
         Num_Samples           : constant Positive := Positive (X.Length);
         --  L229
         Max_Depth             : Natural;
@@ -147,7 +147,7 @@ package body Base_Decision_Tree is
                 Routine_Name & ", Min_Samples_Leaf must be at least 1");
         --  L250
         Assert (aClassifier.Parameters.Min_Samples_Split > 1, Routine_Name &
-                ", Min_Samples_Split must be at least 2");
+                  ", Min_Samples_Split must be at least 2");
         Min_Sample_Split := aClassifier.Parameters.Min_Samples_Split;
 
         --  L263
@@ -167,7 +167,7 @@ package body Base_Decision_Tree is
         aClassifier.Parameters.Max_Features := Max_Features;
 
         Assert (Positive (Y.Length) = Num_Samples, Routine_Name &
-                ", number of labels " & Integer'Image (Integer (Y.Length)) &
+                  ", number of labels " & Integer'Image (Integer (Y.Length)) &
                   " does not match number of samples " &
                   Integer'Image (Num_Samples));
 
@@ -175,7 +175,7 @@ package body Base_Decision_Tree is
         Assert (aClassifier.Parameters.Min_Weight_Fraction_Leaf >= 0.0 and
                   aClassifier.Parameters.Min_Weight_Fraction_Leaf < 5.0,
                 Routine_Name & ", Min_Weight_Fraction_Leaf is " &
-                Float'Image (aClassifier.Parameters.Min_Weight_Fraction_Leaf)
+                  Float'Image (aClassifier.Parameters.Min_Weight_Fraction_Leaf)
                 &  " but should be in (0.0, 5.0]");
 
         if Max_Features <= 0 or
@@ -189,12 +189,12 @@ package body Base_Decision_Tree is
 
         --  L305
         Assert (Max_Leaf_Nodes = -1 or Max_Leaf_Nodes > 1, Routine_Name &
-                ", Max_Leaf_Nodes must be > 1");
+                  ", Max_Leaf_Nodes must be > 1");
         --  L315
         if not Sample_Weights.Is_Empty then
             Assert (Integer (Sample_Weights.Length) = Num_Samples,
                     Routine_Name & ", Sample_Weight length " &
-                    "should be the same as the number of X samples");
+                      "should be the same as the number of X samples");
         end if;
         --  L350
         Assert (aClassifier.Parameters.Min_Impurity_Decrease >= 0.0,
@@ -260,6 +260,7 @@ package body Base_Decision_Tree is
         --        Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
         --                    Count_Type'Image (Num_Outputs));
         aClassifier.Attributes.Classes.Clear;
+        aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
         Y_Encoded.Clear;
         Classes.Clear;
         Y_Encoded.Set_Length (Y.Length);
@@ -283,6 +284,8 @@ package body Base_Decision_Tree is
                 Y_Row := Y.Element (class);
                 Yk_Row.Append (Y_Row.Element (op));
             end loop;
+            aClassifier.Attributes.Decision_Tree.Num_Classes.Append
+              (Integer (Yk_Row.Length));
             Classes.Append (Encode_Utils.Unique (Yk_Row, Inverse));
 
             for class in Y.First_Index .. Y.Last_Index loop
@@ -290,20 +293,18 @@ package body Base_Decision_Tree is
                 YE_Row.Replace_Element (op, Inverse.Element (class));
                 Y_Encoded.Replace_Element (class, YE_Row);
             end loop;
-            --           Put_Line ("Base_Decision_Tree.Classification_Part Num Classes: " &
-            --                       Count_Type'Image (Classes.Element (1).Length));
         end loop;
         aClassifier.Attributes.Classes := Classes;
 
-        --  L218
+        --  L222
         if aClassifier.Parameters.Class_Weight /= No_Weight then
             Expanded_Class_Weights :=
               Weights.Compute_Sample_Weight (No_Weight, Y);
         end if;
 
         Classes := aClassifier.Attributes.Classes;
---          Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
---          Printing.Print_Value_Data_Lists_2D ("Classes", Classes);
+        --          Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
+        --          Printing.Print_Value_Data_Lists_2D ("Classes", Classes);
 
     exception
         when others => raise Classifier_Error with
@@ -335,8 +336,8 @@ package body Base_Decision_Tree is
         --  Predictions, num samples x num outputs
         Predictions       : ML_Types.Value_Data_Lists_2D;
     begin
-      Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
-                (Self.Attributes.Decision_Tree.Nodes.Node_Count - 1));
+        Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
+                  (Self.Attributes.Decision_Tree.Nodes.Node_Count - 1));
         Predictions.Set_Length (Num_Samples);
         --  479
         for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop

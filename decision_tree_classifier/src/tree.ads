@@ -70,6 +70,7 @@ package Tree is
 --        Num_Features : Natural := 0;
       Features     : ML_Types.Unbounded_List;
       --  Classes:  outputs x classes
+      Num_Classes  : Classifier_Types.Natural_List;
       Classes      : ML_Types.Value_Data_Lists_2D;
       Num_Outputs  : Index_Range := 1;
       Max_Depth    : Integer := -1;

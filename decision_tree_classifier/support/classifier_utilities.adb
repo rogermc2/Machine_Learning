@@ -9,7 +9,14 @@ with Utilities;
 
 package body Classifier_Utilities is
 
+   use ML_Types;
+
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
+   package Value_Sets is new
+      Ada.Containers.Ordered_Sets (ML_Types.Value_Record,
+                                   ML_Types."<", ML_Types."<=");
+   package Weights_Sets is new
+      Ada.Containers.Ordered_Sets (Weights.Weight_Lists_3D);
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
    --  -------------------------------------------------------------------------
@@ -639,10 +646,9 @@ package body Classifier_Utilities is
    function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
                            return Tree.Tree_Cursor is
       use Ada.Containers;
-      use Tree;
-      use Nodes_Package;
-      Parent_Node : constant Tree_Cursor := Parent (Current_Node);
-      Next_Node   : Tree_Cursor;
+      use Tree.Nodes_Package;
+      Parent_Node : constant Tree.Tree_Cursor := Parent (Current_Node);
+      Next_Node   : Tree.Tree_Cursor;
    begin
       if not Is_Leaf (Current_Node) then
          if Current_Node = First_Child (Parent_Node) then
@@ -729,6 +735,56 @@ package body Classifier_Utilities is
          return Unique_Array;
       end;
    end Unique_Integer_Array;
+
+   --  -------------------------------------------------------------------------
+
+   function Unique_Values (Values : ML_Types.Value_Data_List)
+                           return ML_Types.Value_Data_List is
+      use Value_Sets;
+      use Value_Data_Package;
+      Unique_Set  : Value_Sets.Set;
+      Int_Curs    : Value_Data_Package.Cursor := Values.First;
+      Set_Curs    : Value_Sets.Cursor;
+      Values_List : Value_Data_List;
+   begin
+      while Has_Element (Int_Curs) loop
+         Unique_Set.Include (Element (Int_Curs));
+         Next (Int_Curs);
+      end loop;
+
+      Set_Curs := Unique_Set.First;
+      while Has_Element (Set_Curs) loop
+         Values_List.Append (Element (Set_Curs));
+         Next (Set_Curs);
+      end loop;
+      return Values_List;
+
+   end Unique_Values;
+
+   --  -------------------------------------------------------------------------
+
+   function Unique_Weights (Values : Weights.Weight_Lists_3D)
+                           return Weights.Weight_Lists_3D is
+      use Value_Sets;
+      use Value_Data_Package;
+      Unique_Set  : Value_Sets.Set;
+      Int_Curs    : Value_Data_Package.Cursor := Values.First;
+      Set_Curs    : Value_Sets.Cursor;
+      Values_List : Value_Data_List;
+   begin
+      while Has_Element (Int_Curs) loop
+         Unique_Set.Include (Element (Int_Curs));
+         Next (Int_Curs);
+      end loop;
+
+      Set_Curs := Unique_Set.First;
+      while Has_Element (Set_Curs) loop
+         Values_List.Append (Element (Set_Curs));
+         Next (Set_Curs);
+      end loop;
+      return Values_List;
+
+   end Unique_Weights;
 
    --  -------------------------------------------------------------------------
 
