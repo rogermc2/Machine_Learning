@@ -67,6 +67,8 @@ package body Node_Strings is
            (Node_Data.Threshold, Exporter.Precision) & "\n";
       end Write_Decision_Criteria;
 
+      --  ----------------------------------------------------------------------
+
       procedure Write_Impurity is
       begin
          --  308  Write impurity
@@ -88,6 +90,8 @@ package body Node_Strings is
            (Node_Data.Impurity, Exporter.Precision) & "\n";
       end Write_Impurity;
 
+      --  ----------------------------------------------------------------------
+
       procedure Write_Node_Samples_Count is
       begin
          --  L320
@@ -105,6 +109,8 @@ package body Node_Strings is
               Integer'Image (Node_Data.Num_Node_Samples) & "\n";
          end if;
       end Write_Node_Samples_Count;
+
+      --  ----------------------------------------------------------------------
 
    begin
       --  L283
@@ -129,7 +135,7 @@ package body Node_Strings is
       Write_Node_Samples_Count;
       Write_Node_Class_Value (Exporter, Node_Curs, Node_ID, Show_Labels);
 
-      --  L357 Write node majority class
+      --  L357
       if not Exporter.Class_Names.Is_Empty and then
         Integer (Exporter.theTree.Num_Outputs) = 1 and then
         Classes.Element (1).Element (1).Integer_Value /= 1 then
