@@ -10,7 +10,7 @@ with Classifier_Utilities;
 with Config;
 with Criterion;
 with Dot_Tables;
-with Node_To_String;
+with Node_Strings;
 with State_Machine;
 with Export_Types; use Export_Types;
 with Export_Utilities;
@@ -231,7 +231,7 @@ package body Graphviz_Exporter is
 
             --  L520
             Put (Output_File, Node_ID_S & " [label = """ &
-             Node_To_String (Exporter, Node_Curs, Criteria));
+            Node_Strings.Node_To_String (Exporter, Node_Curs, Criteria));
 
             --  L524
             if Exporter.Filled then
