@@ -32,21 +32,14 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
 
    function Colour_Brew (Num_Colours : Positive) return Colours_List is
-      Saturation  : Float := 0.75;
-      Value       : Float := 0.9;
-      Chroma      : Float := Saturation * Value;
-      Value_Shift : Float := Value - Chroma;
+      Saturation  : constant Float := 0.75;
+      Value       : constant Float := 0.9;
+      Chroma      : constant Float := Saturation * Value;
+      Value_Shift : constant Float := Value - Chroma;
       H_Index     : Float := 25.0;
       H_Bar       : Float;
       X           : Float;
-      RGB_Init    : constant RGB_Array :=
-                      ((Chroma, X, 0.0),
-                       (X, Chroma, 0.0),
-                       (0.0, Chroma, X),
-                       (0.0, X, Chroma),
-                       (X, 0.0, Chroma),
-                       (Chroma, 0.0, X),
-                       (Chroma, X, 0.0));
+      RGB_Init    : RGB_Array;
       R           : Float;
       G           : Float;
       B           : Float;
@@ -56,9 +49,17 @@ package body Graphviz_Exporter is
       while H_Index < 385.0 loop
          H_Bar := H_Index / 60.0;
          X := Chroma * (1.0 - abs (Float'Remainder (H_Bar, 2.0)) - 1.0);
+         RGB_Init := ((Chroma, X, 0.0),
+                      (X, Chroma, 0.0),
+                      (0.0, Chroma, X),
+                      (0.0, X, Chroma),
+                      (X, 0.0, Chroma),
+                      (Chroma, 0.0, X),
+                      (Chroma, X, 0.0));
          R := RGB_Init (Integer (H_Bar)).R;
          G := RGB_Init (Integer (H_Bar)).G;
          B := RGB_Init (Integer (H_Bar)).B;
+
          for index in RGB'First .. RGB'Last loop
             RGB (index) := (255.0 * (R + Value_Shift),
                             255.0 * (G + Value_Shift),
@@ -192,24 +193,24 @@ package body Graphviz_Exporter is
    --  L248 Get_Fill_Colour fetches the appropriate color for a node
    function Get_Fill_Colour (Exporter : in out DOT_Tree_Exporter;
                              Node_ID  : Positive) return String is
-        use Classifier_Types;
-        Values_List : Weights.Weight_Lists_3D;
-        Node_Value  : Float;
+      use Classifier_Types;
+      Values_List : Weights.Weight_Lists_3D;
+      Node_Value  : Float;
    begin
---        Assert (Exporter.theTree.Values.
+      --        Assert (Exporter.theTree.Values.
       if not Exporter.Colours.Contains (To_Unbounded_String ("rgb")) then
          Exporter.Colours.Include
-              (To_Unbounded_String ("rgb"),
-               Colour_Brew (Integer (Exporter.theTree.Classes.Length)));
+           (To_Unbounded_String ("rgb"),
+            Colour_Brew (Integer (Exporter.theTree.Classes.Length)));
 
          Values_List := Exporter.theTree.Values;
          if Integer (Exporter.theTree.Num_Outputs) /= 1 then
-                null;
+            null;
          elsif Exporter.theTree.Num_Classes.Element (1) = 1 and
-              Integer (Classifier_Utilities.Unique_Weights
-                       (Exporter.theTree.Values).Length) > 1 then
-              null;
---                 Node_Value := Exporter.theTree.Values
+           Integer (Classifier_Utilities.Unique_Weights
+                    (Exporter.theTree.Values).Length) > 1 then
+            null;
+            --                 Node_Value := Exporter.theTree.Values
          end if;
       end if;
       return "";
