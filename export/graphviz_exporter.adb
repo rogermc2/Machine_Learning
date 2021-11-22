@@ -282,7 +282,7 @@ package body Graphviz_Exporter is
         Edge_Line      : Unbounded_String := To_Unbounded_String ("");
     begin
         Put_Line (Output_File, "digraph Tree {");
-        --  Specify node aesthetics
+        --  L479 Specify node aesthetics
         Put (Output_File, "node [shape = box");
         if Exporter.Filled then
             Rounded_Filled := Rounded_Filled & "filled";
@@ -292,6 +292,7 @@ package body Graphviz_Exporter is
             Rounded_Filled := Rounded_Filled & "rounded";
         end if;
 
+        --  L485
         if Exporter.Filled or Exporter.Rounded then
             Put (Output_File, ", style = " & To_String (Rounded_Filled));
             Put (Output_File, ", color = ""black""");
@@ -299,7 +300,8 @@ package body Graphviz_Exporter is
 
         Put (Output_File, ", fontname = " & To_String (Exporter.Font_Name));
         Put_Line (Output_File, "];");
-        --  Specify graph & edge aesthetics
+
+        --  L494 Specify graph & edge aesthetics
         if Exporter.Leaves_Parallel then
             Put (Output_File, "graph [ranksep = equally, splines = polyline] ");
         end if;
@@ -354,15 +356,16 @@ package body Graphviz_Exporter is
                         --  Add to Ranks map
                         Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
                                  Node_ID_UB);
-                        --              elsif not Exporter.Ranks.Contains (Depth_S) then
-                        --                 Include (Exporter.Ranks, Depth_S, Node_ID);
+                    elsif not Exporter.Ranks.Contains (Depth_S) then
+                        Replace (Exporter.Ranks, Depth_S, Node_ID_UB);
                     else
                         Include (Exporter.Ranks, Depth_S, Node_ID_UB);
                     end if;
 
                     --  L520
                     Put (Output_File, Node_ID_S & " [label = """ &
-                           Node_Strings.Node_To_String (Exporter, Node_Curs, Criteria));
+                           Node_Strings.Node_To_String
+                           (Exporter, Node_Curs, Criteria));
 
                     --  L524
                     if Exporter.Filled then
