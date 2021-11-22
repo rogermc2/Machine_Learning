@@ -35,6 +35,8 @@ package Graphviz_Exporter is
         Initialized        : Boolean := False;
     end record;
 
+    Graphviz_Error : Exception;
+
     procedure Dot_To_Dot (Input_File_Name : String);
     procedure Export_Graphviz (Exporter : in out DOT_Tree_Exporter;
                                theTree            : Tree.Tree_Class;

@@ -200,15 +200,16 @@ package body Graphviz_Exporter is
         Colour        : Integer_Graph_Colours;
         Sorted_Values : Float_List := Value;
         Alpha         : Float;
-        Red_Hex       : String (1 .. 2);
-        Green_Hex     : String (1 .. 2);
-        Blue_Hex      : String (1 .. 2);
 
-        procedure Set_Colour (Colour : in out Integer) is
+        function Set_Colour (Colour : in out Integer) return String is
+            Hex_Colour       : String (1 .. 2);
         begin
             Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
                                  255.0 * (1.0 - Alpha)));
+            Put (Hex_Colour, Colour, Base => 16);
+            return Hex_Colour;
         end Set_Colour;
+
     begin
         if Exporter.Bounds.Is_Empty then
             --  Classification Tree
@@ -226,14 +227,8 @@ package body Graphviz_Exporter is
             null;
         end if;
 
-        Set_Colour (Colour.R);
-        Set_Colour (Colour.G);
-        Set_Colour (Colour.B);
-        Put (Red_Hex, Colour.R, Base => 16);
-        Put (Green_Hex, Colour.G, Base => 16);
-        Put (Blue_Hex, Colour.B, Base => 16);
-
-        return "#" & Red_Hex & Green_Hex & Blue_Hex;
+        return "#" & Set_Colour (Colour.R) & Set_Colour (Colour.G) &
+          Set_Colour (Colour.B);
 
     end Get_Colour;
 
@@ -325,24 +320,31 @@ package body Graphviz_Exporter is
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                        Criteria    : Criterion.Classifier_Criteria_Type;
                        Output_File : File_Type; Depth : Natural := 0) is
+        use Ada.Containers;
         use Tree.Nodes_Package;
 
         procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
-            use Classifier_Utilities;
             use Export_Types.Export_Maps;
             Routine_Name : constant String :=
                              "Graphviz_Exporter.Recurse.Do_Node ";
-            Node_Parent  : constant Tree.Tree_Cursor := Parent (Node_Curs);
             Node_ID      : constant Positive := Element (Node_Curs).Node_ID;
             Node_ID_S    : constant String := Integer'Image (Node_ID);
             Node_ID_UB   : constant Unbounded_String :=
                              To_Unbounded_String (Node_ID_S);
             Depth_S      : constant Unbounded_String
               := To_Unbounded_String (Integer'Image (Depth));
+            Base_Angles  : constant array (1 .. 2) of Float := (45.0, -45.0);
+            Node_Parent  : Tree.Tree_Cursor;
+            Parent_ID    : Positive;
             Left_Child   : Tree.Tree_Cursor;
-            Angles       : array (1 .. 2) of Float := (45.0, -45.0);
+            Angles       : array (1 .. 2) of Float;
         begin
             Put_Line (Routine_Name & "Node ID" & Node_ID_S);
+            if Node_ID > 1 then
+                Node_Parent := Parent (Node_Curs);
+                Parent_ID := Element (Node_Parent).Node_ID;
+            end if;
+
             if not Element (Node_Curs).Leaf_Node and then
             --  L510
               Depth <= Exporter.Max_Depth then
@@ -367,34 +369,39 @@ package body Graphviz_Exporter is
                     Put (Output_File, ", fillcolor = " &
                            Get_Fill_Colour (Exporter, Node_ID));
                 end if;
-                --  L528
                 Put_Line (Output_File, """];");
 
-                if Node_Parent /= Exporter.theTree.Nodes.Root then
-                    --  L531  Add edge to parent
+                --  L530
+                if Node_ID > 1 then
+                    --  Add edge to parent
                     Put (Output_File,
                          Integer'Image (Element (Node_Parent).Node_ID) &
                            " -> " & Node_ID_S);
-                else
-                    for index in Angles'First .. Angles'Last loop
-                        Angles (index) := (1.0 - 2.0 * Exporter.Rotate) *
-                          Angles (index);
-                    end loop;
-                    Put (Output_File, " [labeldistance = 2.5, labelangle = ");
-                    if Node_ID = 1 then
-                        Put_Line (Output_File,
-                                  Float_Precision (Angles (1), 3) &
-                                    ", headlabel = ""True""];");
-                    else
-                        Put_Line (Output_File,  Float'Image (Angles (2)) &
-                                    ", headlabel = ""False""];");
-                    end if;
-                end if;
+                    if Parent_ID = 1 then
+                        --  L534 Draw True/False labels if parent is
+                        --  "root" (top) node
+                        for index in Angles'First .. Angles'Last loop
+                            Angles (index) := -(2.0 * Exporter.Rotate - 1.0) *
+                              Base_Angles (index);
+                        end loop;
+                        Put (Output_File,
+                             " [labeldistance = 2.5, labelangle = ");
 
-                if not Element (Left_Child).Leaf_Node then
-                    null;
+                        --  L537
+                        if Node_ID = 2 then
+                            Put (Output_File, Float'Image (Angles (1)) &
+                                   ", headlabel = ""True""");
+                        else
+                            Put (Output_File, Float'Image (Angles (2)) &
+                                   ", headlabel = ""False""");
+                        end if;
+                    end if;
+                    --  L541
+                    Put_Line (Output_File, ";");
                 end if;
-            else  --   Leaf_Node or Depth > Exporter.Max_Depth
+                --  L543 recurse
+
+            else  --  L560 Leaf_Node or Depth > Exporter.Max_Depth
                 Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
                          Node_ID_UB);
                 Put (Output_File,  Node_ID_S & " [label = ""(...)""");
@@ -404,7 +411,8 @@ package body Graphviz_Exporter is
                 end if;
                 Put_Line (Output_File, "];");
 
-                if Element (Node_Parent).Node_ID > 1 then
+                --  L568
+                if Node_ID > 1 then
                     --  Add edge to parent
                     Put_Line (Output_File,
                               Integer'Image (Element (Node_Parent).Node_ID)
@@ -415,7 +423,7 @@ package body Graphviz_Exporter is
         end Do_Node;
 
     begin
-        Assert (Integer (Exporter.theTree.Nodes.Node_Count) > 1,
+        Assert (Exporter.theTree.Nodes.Node_Count > 1,
                 "Graphviz_Exporter.Recurse, empty tree.");
         Exporter.theTree.Nodes.Iterate (Do_Node'Access);
 
