@@ -345,78 +345,81 @@ package body Graphviz_Exporter is
                 Parent_ID := Element (Node_Parent).Node_ID;
             end if;
 
-            if not Element (Node_Curs).Leaf_Node and then
-            --  L510
-              Depth <= Exporter.Max_Depth then
-                Left_Child := First_Child (Node_Curs);
-                --  L512 Collect ranks for for 'leaf' option in plot_options
-                if Element (Left_Child).Leaf_Node then
-                    --  Add to Ranks map
+            if not Element (Node_Curs).Leaf_Node then
+                --  L510
+                if Depth <= Exporter.Max_Depth then
+                    Left_Child := First_Child (Node_Curs);
+                    --  L512 Collect ranks for for 'leaf' option in plot_options
+                    if Element (Left_Child).Leaf_Node then
+                        --  Add to Ranks map
+                        Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
+                                 Node_ID_UB);
+                        --              elsif not Exporter.Ranks.Contains (Depth_S) then
+                        --                 Include (Exporter.Ranks, Depth_S, Node_ID);
+                    else
+                        Include (Exporter.Ranks, Depth_S, Node_ID_UB);
+                    end if;
+
+                    --  L520
+                    Put (Output_File, Node_ID_S & " [label = """ &
+                           Node_Strings.Node_To_String (Exporter, Node_Curs, Criteria));
+
+                    --  L524
+                    if Exporter.Filled then
+                        Put (Output_File, ", fillcolor = " &
+                               Get_Fill_Colour (Exporter, Node_ID));
+                    end if;
+                    Put_Line (Output_File, """];");
+
+                    --  L530
+                    Put_Line (Routine_Name & " L530 Node_ID" & Integer'Image (Node_ID));
+                    if Node_ID > 1 then
+                        --  Add edge to parent
+                        Put (Output_File,
+                             Integer'Image (Parent_ID) & " -> " & Node_ID_S);
+                        Put_Line (Routine_Name & " L533 Parent_ID" &
+                                    Integer'Image (Parent_ID));
+                        if Parent_ID = 1 then
+                            --  L534 Draw True/False labels if parent is
+                            --  "root" (top) node
+                            for index in Angles'First .. Angles'Last loop
+                                Angles (index) := -(2.0 * Exporter.Rotate - 1.0) *
+                                  Base_Angles (index);
+                            end loop;
+                            Put (Output_File,
+                                 " [labeldistance = 2.5, labelangle = ");
+
+                            --  L537
+                            if Node_ID = 2 then
+                                Put (Output_File, Float'Image (Angles (1)) &
+                                       ", headlabel = ""True""");
+                            else
+                                Put (Output_File, Float'Image (Angles (2)) &
+                                       ", headlabel = ""False""");
+                            end if;
+                        end if;
+                        --  L541
+                        Put_Line (Output_File, ";");
+                    end if;
+                    --  L543 recurse
+
+                else  --  L560 Depth > Exporter.Max_Depth
                     Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
                              Node_ID_UB);
-                    --              elsif not Exporter.Ranks.Contains (Depth_S) then
-                    --                 Include (Exporter.Ranks, Depth_S, Node_ID);
-                else
-                    Include (Exporter.Ranks, Depth_S, Node_ID_UB);
-                end if;
-
-                --  L520
-                Put (Output_File, Node_ID_S & " [label = """ &
-                       Node_Strings.Node_To_String (Exporter, Node_Curs, Criteria));
-
-                --  L524
-                if Exporter.Filled then
-                    Put (Output_File, ", fillcolor = " &
-                           Get_Fill_Colour (Exporter, Node_ID));
-                end if;
-                Put_Line (Output_File, """];");
-
-                --  L530
-                if Node_ID > 1 then
-                    --  Add edge to parent
-                    Put (Output_File,
-                         Integer'Image (Element (Node_Parent).Node_ID) &
-                           " -> " & Node_ID_S);
-                    if Parent_ID = 1 then
-                        --  L534 Draw True/False labels if parent is
-                        --  "root" (top) node
-                        for index in Angles'First .. Angles'Last loop
-                            Angles (index) := -(2.0 * Exporter.Rotate - 1.0) *
-                              Base_Angles (index);
-                        end loop;
-                        Put (Output_File,
-                             " [labeldistance = 2.5, labelangle = ");
-
-                        --  L537
-                        if Node_ID = 2 then
-                            Put (Output_File, Float'Image (Angles (1)) &
-                                   ", headlabel = ""True""");
-                        else
-                            Put (Output_File, Float'Image (Angles (2)) &
-                                   ", headlabel = ""False""");
-                        end if;
+                    Put (Output_File,  Node_ID_S & " [label = ""(...)""");
+                    if Exporter.Filled then
+                        --  Colour cropped nodes grey
+                        Put (Output_File, ", fillcolor = ""#C0C0C0""");
                     end if;
-                    --  L541
-                    Put_Line (Output_File, ";");
-                end if;
-                --  L543 recurse
+                    Put_Line (Output_File, "];");
 
-            else  --  L560 Leaf_Node or Depth > Exporter.Max_Depth
-                Include (Exporter.Ranks, To_Unbounded_String ("leaves"),
-                         Node_ID_UB);
-                Put (Output_File,  Node_ID_S & " [label = ""(...)""");
-                if Exporter.Filled then
-                    --  Colour cropped nodes grey
-                    Put (Output_File, ", fillcolor = ""#C0C0C0""");
-                end if;
-                Put_Line (Output_File, "];");
-
-                --  L568
-                if Node_ID > 1 then
-                    --  Add edge to parent
-                    Put_Line (Output_File,
-                              Integer'Image (Element (Node_Parent).Node_ID)
-                              & " -> " & Node_ID_S);
+                    --  L568
+                    if Node_ID > 1 then
+                        --  Add edge to parent
+                        Put_Line (Output_File,
+                                  Integer'Image (Element (Node_Parent).Node_ID)
+                                  & " -> " & Node_ID_S);
+                    end if;
                 end if;
             end if; --  not leaf node
 
