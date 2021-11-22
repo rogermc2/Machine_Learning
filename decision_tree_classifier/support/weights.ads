@@ -16,6 +16,7 @@ package Weights is
 
     use Float_Package;
     subtype Weight_List is Float_Package.Vector;
+
     package Weight_Lists_2D_Package is new Ada.Containers.Vectors
       (Positive, Weight_List);
     subtype Weight_Lists_2D is Weight_Lists_2D_Package.Vector;

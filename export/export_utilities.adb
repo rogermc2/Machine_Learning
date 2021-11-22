@@ -6,6 +6,35 @@ with Ada.Strings.Maps.Constants;
 
 package body Export_Utilities is
 
+    --  -------------------------------------------------------------------------
+
+    function Arg_Max (Values : Colours_List) return Positive is
+        Max_Value  : Float := Float'Safe_First;
+        Max_Index  : Positive := 1;
+        Colour     : Graph_Colours;
+    begin
+        for index in Values.First_Index .. Values.Last_Index loop
+            Colour := Values.Element (index);
+            if Colour.R > Max_Value then
+                Max_Index := index;
+                Max_Value := Colour.R;
+            end if;
+            if Colour.G > Max_Value then
+                Max_Index := index;
+                Max_Value := Colour.G;
+            end if;
+            if Colour.B > Max_Value then
+                Max_Index := index;
+                Max_Value := Colour.B;
+            end if;
+        end loop;
+
+        return Max_Index;
+
+    end Arg_Max;
+
+    --  -------------------------------------------------------------------------
+
    procedure Get_Name (aLine  : in out Lines.Bounded_String;
                        Finish : in out Natural;  -- End of previous name,
                        --   return end of this name

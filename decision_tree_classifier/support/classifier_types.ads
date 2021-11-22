@@ -25,6 +25,7 @@ package Classifier_Types is
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
    subtype Value_List is Float_Package.Vector;
+   package Float_Sorting is new Float_Package.Generic_Sorting ("<");
 
    use Float_Package;
    package Float_List_Package is new

@@ -38,9 +38,9 @@ package Criterion is
        Proxy_Improvement         : Float := -Float'Last;
        case Criterion_Type is
            when Criterion_Classification =>
-               Num_Classes       : Classifier_Types.Natural_List;
+               Num_Classes  : Classifier_Types.Natural_List;
            when Criterion_Regression =>
-               Sq_Sum_Total      : Float := 0.0;
+               Sq_Sum_Total : Float := 0.0;
        end case;
     end record;
 

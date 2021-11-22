@@ -4,6 +4,7 @@ with Export_Types; use Export_Types;
 
 package Export_Utilities is
 
+   function Arg_Max (Values : Colours_List) return Positive;
    procedure Get_Name (aLine   : in out Lines.Bounded_String;
                        Finish  : in out Natural;
                        N       : out Config.Name);
