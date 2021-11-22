@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with ML_Types;
+--  with Printing;
 with Weights;
 
 package body Node_Strings is
@@ -29,7 +30,7 @@ package body Node_Strings is
       use Tree;
       use Tree.Nodes_Package;
       Routine_Name    : constant String :=
-                          "Graphviz_Exporter.Node_To_String ";
+                          "Node_Strings.Node_To_String ";
       Node_ID         : constant Positive := Element (Node_Curs).Node_ID;
       Node_ID_S       : constant String := Integer'Image (Node_ID);
       Top_Node        : constant Tree.Tree_Cursor :=
@@ -123,8 +124,8 @@ package body Node_Strings is
       end if;
 
       --  L289
-      if not Element (First_Child (Node_Curs)).Leaf_Node then
-         --          if not Node_Data.Leaf_Node then
+      if not Element (Node_Curs).Leaf_Node and then
+        not Element (First_Child (Node_Curs)).Leaf_Node then
          Write_Decision_Criteria;
       end if;
 
@@ -236,6 +237,8 @@ package body Node_Strings is
      (Exporter    : Graphviz_Exporter.DOT_Tree_Exporter;
       Node_ID     : Positive; Show_Labels : Boolean;
       Node_String : in out Unbounded_String) is
+      Routine_Name : constant String :=
+                       "Node_Strings.Write_Node_Majority_Class ";
       --  Value: num_outputs x num_classes
       Value           : constant Weights.Weight_Lists_2D :=
                           Exporter.theTree.Values.Element (Node_ID);
@@ -247,7 +250,11 @@ package body Node_Strings is
          Node_String := Node_String & "class = ";
       end if;
 
-      Output_Data := Value.Element (Node_ID);
+      if Integer (Exporter.theTree.Num_Outputs) = 1 then
+         Output_Data := Value.Element (1);
+      else
+         Put_Line (Routine_Name & "Num_Outputs > 1 not implemented");
+      end if;
       Arg_Max := Weights.Max (Output_Data);
 
       --  L366

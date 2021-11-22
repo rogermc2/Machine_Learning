@@ -42,15 +42,15 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
     --  Arg_Max returns the indices of the maximum values along an axis.
-    function Arg_Max (Values_3D : Weights.Weight_Lists_3D)
-                      return Classifier_Types.Natural_List is
-        Values_2K    : Weights.Weight_Lists_2D;
-        Values       : Weights.Weight_List;
-        Max_Indices  : Classifier_Types.Natural_List;
-    begin
-        Values_2K.Clear;
-        Max_Indices.Clear;
-        Put_line ("Classifier_Utilities.Arg_Max not implemented");
+--      function Arg_Max (Values_3D : Weights.Weight_Lists_3D)
+--                        return Classifier_Types.Natural_List is
+--          Values_2K    : Weights.Weight_Lists_2D;
+--          Values       : Weights.Weight_List;
+--          Max_Indices  : Classifier_Types.Natural_List;
+--      begin
+--          Values_2K.Clear;
+--          Max_Indices.Clear;
+--          Put_line ("Classifier_Utilities.Arg_Max not implemented");
 
 --          for index_1 in Values_3D.First_Index .. Values_3D.Last_Index loop
 --              Values_2K := Values_3D (index_1);
@@ -64,10 +64,10 @@ package body Classifier_Utilities is
 --                  end loop;
 --                  Node_Values_2K.Append (Samples_2K);
 --          end loop;
-
-        return Max_Indices;
-
-    end Arg_Max;
+--
+--          return Max_Indices;
+--
+--      end Arg_Max;
 
     --  -------------------------------------------------------------------------
     --  Bin_Count counts the number of occurrences of each value in Numbers.

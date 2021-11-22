@@ -10,8 +10,6 @@ package Classifier_Utilities is
     Value_Error : Exception;
 
     function Arg_Max (Values : Weights.Weight_List) return Positive;
-    function Arg_Max (Values_3D : Weights.Weight_Lists_3D)
-                      return Classifier_Types.Natural_List;
     function Bin_Count (Numbers : Natural_List) return Natural_List;
     function Bin_Count (Numbers : ML_Types.Value_Data_List) return Natural_List;
     procedure Clear (anArray : in out ML_Types.Value_Data_Array);
