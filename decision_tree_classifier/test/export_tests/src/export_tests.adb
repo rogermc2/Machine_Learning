@@ -42,6 +42,7 @@ package body Export_Tests is
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter         : Graphviz_Exporter.DOT_Tree_Exporter;
       Class_Names      : Class_Names_List;
+      Feature_Names    : Feature_Names_List;
       X                : constant Value_Data_Lists_2D :=
                            To_Multi_Value_List (X_Array);
       Y                : constant Value_Data_Lists_2D :=
@@ -57,6 +58,8 @@ package body Export_Tests is
    begin
       Class_Names.Append (To_Unbounded_String ("Yes"));
       Class_Names.Append (To_Unbounded_String ("No"));
+      Feature_Names.Append (To_Unbounded_String ("feature_1"));
+      Feature_Names.Append (To_Unbounded_String ("feature_2"));
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
               Min_Split_Samples => 2);
       Put_Line (Routine_Name);
@@ -68,6 +71,10 @@ package body Export_Tests is
       New_Line;
       Graphviz_Exporter.Export_Graphviz
           (Exporter, theClassifier.Attributes.Decision_Tree);
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Feature_Names => Feature_Names,
+         Output_File_Name => To_Unbounded_String ("features.dot"));
 
    end Test_Graphviz_Toy;
 
