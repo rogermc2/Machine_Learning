@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with ML_Types;
---  with Printing;
+with Printing;
 with Weights;
 
 package body Node_Strings is
@@ -22,7 +22,8 @@ package body Node_Strings is
    procedure Write_Node_Class_Value
      (Exporter  : Graphviz_Exporter.DOT_Tree_Exporter;
       Node_Curs : Tree.Tree_Cursor;
-      Node_ID   : Positive; Show_Labels : Boolean);
+      Node_ID   : Positive; Show_Labels : Boolean;
+      Node_String : in out Unbounded_String);
    procedure Write_Node_Majority_Class
      (Exporter    : Graphviz_Exporter.DOT_Tree_Exporter;
       Node_ID     : Positive; Show_Labels : Boolean;
@@ -64,7 +65,7 @@ package body Node_Strings is
          if Show_Labels then
             Node_String := Node_String & "node ";
          end if;
-         Node_String := Node_String & "#" & Node_ID_S & "\n";
+         Node_String := Node_String & "#" & Node_ID_S & "\n ";
       end if;
 
       --  L289
@@ -80,7 +81,8 @@ package body Node_Strings is
 
       Write_Node_Samples_Count (Exporter, Node_Curs, Top_Node, Show_Labels,
                                 Node_String);
-      Write_Node_Class_Value (Exporter, Node_Curs, Node_ID, Show_Labels);
+      Write_Node_Class_Value (Exporter, Node_Curs, Node_ID, Show_Labels,
+                              Node_String);
 
       --  L357
       if not Exporter.Class_Names.Is_Empty and then
@@ -121,7 +123,7 @@ package body Node_Strings is
       --  L299
       Node_String := Node_String & Feature & " <= " &
         Classifier_Utilities.Float_Precision
-        (Node_Data.Threshold, Exporter.Precision) & "\n";
+        (Node_Data.Threshold, Exporter.Precision) & "\n ";
    end Write_Decision_Criteria;
 
    --  ----------------------------------------------------------------------
@@ -150,19 +152,22 @@ package body Node_Strings is
       end if;
 
       Node_String := Node_String & Classifier_Utilities.Float_Precision
-        (Node_Data.Impurity, Exporter.Precision) & "\n";
+        (Node_Data.Impurity, Exporter.Precision) & "\n ";
    end Write_Impurity;
 
    --  ----------------------------------------------------------------------
 
    procedure Write_Node_Class_Value
-     (Exporter  : Graphviz_Exporter.DOT_Tree_Exporter;
-      Node_Curs : Tree.Tree_Cursor;
-      Node_ID   : Positive; Show_Labels : Boolean) is
+     (Exporter    : Graphviz_Exporter.DOT_Tree_Exporter;
+      Node_Curs   : Tree.Tree_Cursor;
+      Node_ID     : Positive; Show_Labels : Boolean;
+      Node_String : in out Unbounded_String) is
       use Ada.Containers;
       use ML_Types;
       use Tree;
       use Tree.Nodes_Package;
+      Routine_Name    : constant String :=
+                          "Node_Strings.Write_Node_Class_Value ";
       Node_Data       : constant Tree.Tree_Node := Element (Node_Curs);
       Classes         : constant ML_Types.Value_Data_Lists_2D :=
                           Exporter.theTree.Classes;
@@ -173,8 +178,8 @@ package body Node_Strings is
       --  Value: num_outputs x num_classes
       Value           : Weights.Weight_Lists_2D :=
                           Exporter.theTree.Values.Element (Node_ID);
+      Class           : Weights.Weight_List;
       Output_Data     : Weights.Weight_List;
-      Node_String     : Unbounded_String := To_Unbounded_String ("");
    begin
       --  L331 Write distribution / regression value
       if Exporter.Proportion and Classes.Element (1).Length /= 1 then
@@ -191,6 +196,12 @@ package body Node_Strings is
          end loop;
       end if;
 
+      if Exporter.theTree.Num_Outputs = 1 then
+         Class := Value.Element (1);
+         Value_Text := To_Unbounded_String (Classifier_Utilities.Float_Precision
+           (Class.Element (1), Exporter.Precision));
+      end if;
+
       --  L335
       if Show_Labels then
          Node_String := Node_String & "value = ";
@@ -200,6 +211,7 @@ package body Node_Strings is
       if Exporter.Proportion then
          for output_index in Value.First_Index .. Value.Last_Index loop
             Output_Data := Value.Element (output_index);
+            Printing.Print_Weights (Routine_Name & "L340 Output_Data ", Output_Data);
             for class_index in Output_Data.First_Index ..
               Output_Data.Last_Index loop
                if Value_First then
@@ -208,6 +220,7 @@ package body Node_Strings is
                   Value_Text := Value_Text & ", ";
                end if;
                --  L342
+               Put_Line (Routine_Name & "L342 Value_Text " & To_String (Value_Text));
                Value_Text := Value_Text &
                (To_Unbounded_String (Classifier_Utilities.Float_Precision
                 (Output_Data.Element (class_index), Exporter.Precision)));
@@ -219,11 +232,13 @@ package body Node_Strings is
       if Integer (Exporter.theTree.Num_Outputs) = 1 and then
         Exporter.theTree.Classes.Element (1).Element (1).Value_Kind =
         Integer_Type then
+         Put_Line (Routine_Name & "L352+ ");
          Pos := Index (Value_Text, "[");
          while Pos /= 0 loop
             Delete (Value_Text, Pos, Pos);
             Pos := Index (Value_Text, "[");
          end loop;
+
          Pos := Index (Value_Text, "]");
          if Pos > 0 then
             while Pos <= Length (Value_Text) loop
@@ -232,7 +247,8 @@ package body Node_Strings is
             end loop;
          end if;
       end if;
-      Node_String := Node_String & "[" & Value_Text & "]" & "\n";
+      Node_String := Node_String & "[" & Value_Text & "]" & "\n ";
+      Put_Line (Routine_Name & "L352 Value_Text " & To_String (Value_Text));
 
    end Write_Node_Class_Value;
 
@@ -251,10 +267,12 @@ package body Node_Strings is
       Arg_Max         : Positive;
       Class_Name      : Unbounded_String;
    begin
+      --  L368
       if Show_Labels then
          Node_String := Node_String & "class = ";
       end if;
 
+      --  Calculate Arg_Max
       if Integer (Exporter.theTree.Num_Outputs) = 1 then
          Output_Data := Value.Element (1);
       else
@@ -293,10 +311,10 @@ package body Node_Strings is
          Percent := 100.0 * Float (Node_Data.Num_Node_Samples) /
            Float (Element (Top_Node).Num_Node_Samples);
          Node_String := Node_String &
-           Classifier_Utilities.Float_Precision (Percent, 1) & "%" & "\n";
+           Classifier_Utilities.Float_Precision (Percent, 1) & "%" & "\n ";
       else
          Node_String := Node_String &
-           Integer'Image (Node_Data.Num_Node_Samples) & "\n";
+           Integer'Image (Node_Data.Num_Node_Samples) & "\n ";
       end if;
    end Write_Node_Samples_Count;
 
