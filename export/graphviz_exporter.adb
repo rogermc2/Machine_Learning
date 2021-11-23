@@ -339,7 +339,7 @@ package body Graphviz_Exporter is
          Node_Parent  : Tree.Tree_Cursor;
          Parent_ID    : Positive;
          Left_Child   : Tree.Tree_Cursor;
-         Angles       : array (1 .. 2) of Float;
+         Angles       : array (1 .. 2) of Integer;
       begin
          Put_Line (Routine_Name & "Node ID" & Node_ID_S);
          if Node_ID > 1 then
@@ -384,19 +384,19 @@ package body Graphviz_Exporter is
                   --  L534 Draw True/False labels if parent is
                   --  "root" (top) node
                   for index in Angles'First .. Angles'Last loop
-                     Angles (index) := -(2.0 * Exporter.Rotate - 1.0) *
-                       Base_Angles (index);
+                     Angles (index) := - Integer ((2.0 * Exporter.Rotate - 1.0) *
+                       Base_Angles (index));
                   end loop;
                   Put (Output_File,
                        " [labeldistance = 2.5, labelangle = ");
 
                   --  L537
                   if Node_ID = 2 then
-                     Put (Output_File, Float'Image (Angles (1)) &
-                            ", headlabel = ""True""");
+                     Put (Output_File, Integer'Image (Angles (1)) &
+                            ", headlabel = ""True""]");
                   else
-                     Put (Output_File, Float'Image (Angles (2)) &
-                            ", headlabel = ""False""");
+                     Put (Output_File, Integer'Image (Angles (2)) &
+                            ", headlabel = ""False""]");
                   end if;
                end if;
                --  L541
