@@ -37,7 +37,6 @@ package Graphviz_Exporter is
 
     Graphviz_Error : Exception;
 
-    procedure Dot_To_Dot (Input_File_Name : String);
     procedure Export_Graphviz (Exporter : in out DOT_Tree_Exporter;
                                theTree            : Tree.Tree_Class;
                                Output_File_Name   : Unbounded_String :=
