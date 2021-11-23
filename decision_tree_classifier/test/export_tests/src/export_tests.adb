@@ -41,9 +41,7 @@ package body Export_Tests is
       theClassifier    : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter         : Graphviz_Exporter.DOT_Tree_Exporter;
-      Class_Names      : constant Class_Names_Array (1 .. 2) :=
-                           (To_Unbounded_String ("Yes"),
-                            To_Unbounded_String ("No"));
+      Class_Names      : Class_Names_List;
       X                : constant Value_Data_Lists_2D :=
                            To_Multi_Value_List (X_Array);
       Y                : constant Value_Data_Lists_2D :=
@@ -57,6 +55,8 @@ package body Export_Tests is
       Num_Samples      : constant Natural := Natural (X.Length);
       No_Weights       : Weights.Weight_List := Empty_Vector;
    begin
+      Class_Names.Append (To_Unbounded_String ("Yes"));
+      Class_Names.Append (To_Unbounded_String ("No"));
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
               Min_Split_Samples => 2);
       Put_Line (Routine_Name);
@@ -67,8 +67,7 @@ package body Export_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Graphviz_Exporter.Export_Graphviz
-          (Exporter, theClassifier.Attributes.Decision_Tree,
-           Class_Names => Class_Names);
+          (Exporter, theClassifier.Attributes.Decision_Tree);
 
    end Test_Graphviz_Toy;
 

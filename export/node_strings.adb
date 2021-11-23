@@ -40,7 +40,6 @@ package body Node_Strings is
       (Exporter  : Graphviz_Exporter.DOT_Tree_Exporter;
        Node_Curs : Tree.Tree_Cursor;
        Criteria  : Criterion.Classifier_Criteria_Type) return String is
-        use ML_Types;
         use Tree;
         use Tree.Nodes_Package;
         --        Routine_Name    : constant String :=
@@ -50,8 +49,6 @@ package body Node_Strings is
         Top_Node        : constant Tree.Tree_Cursor :=
                             First_Child (Exporter.theTree.Nodes.Root);
         Node_Data       : constant Tree.Tree_Node := Element (Node_Curs);
-        Classes         : constant ML_Types.Value_Data_Lists_2D :=
-                            Exporter.theTree.Classes;
         --  L277
         Show_Labels     : constant Boolean
           := Exporter.Label = To_Unbounded_String ("all") or
@@ -87,7 +84,7 @@ package body Node_Strings is
         --  L357
         if not Exporter.Class_Names.Is_Empty and then
           Integer (Exporter.theTree.Num_Outputs) = 1 and then
-          Classes.Element (1).Element (1).Integer_Value /= 1 then
+          Exporter.theTree.Num_Classes.Element (1) /= 1 then
             Write_Node_Majority_Class (Exporter, Node_ID, Show_Labels,
                                        Node_String);
         end if;

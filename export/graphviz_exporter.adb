@@ -145,7 +145,8 @@ package body Graphviz_Exporter is
                               Max_Depth          : Positive := Integer'Last;
                               Feature_Names      : Feature_Names_List :=
                                 Unbounded_Package.Empty_Vector;
-                              Class_Names        : Class_Names_Array;
+                               Class_Names        : Class_Names_List :=
+                                 Unbounded_Package.Empty_Vector;
                               Label              : Unbounded_String :=
                                 To_Unbounded_String ("all");
                               Filled             : Boolean := False;
@@ -165,10 +166,7 @@ package body Graphviz_Exporter is
       Exporter.Output_File_Name := Output_File_Name;
       Exporter.Max_Depth := Max_Depth;
       Exporter.Feature_Names := Feature_Names;
-      Exporter.Class_Names.Clear;
-      for index in Class_Names'First .. Class_Names'Last loop
-         Exporter.Class_Names.Append (Class_Names (index));
-      end loop;
+      Exporter.Class_Names := Class_Names;
       Exporter.Label := Label;
       Exporter.Filled := Filled;
       Exporter.Leaves_Parallel := Leaves_Parallel;

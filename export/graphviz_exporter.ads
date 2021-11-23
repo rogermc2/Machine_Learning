@@ -45,7 +45,8 @@ package Graphviz_Exporter is
                                Max_Depth          : Positive := Integer'Last;
                                Feature_Names      : Feature_Names_List :=
                                  Unbounded_Package.Empty_Vector;
-                               Class_Names        : Class_Names_Array;
+                               Class_Names        : Class_Names_List :=
+                                 Unbounded_Package.Empty_Vector;
                                Label              : Unbounded_String :=
                                  To_Unbounded_String ("all");
                                Filled             : Boolean := False;
