@@ -402,6 +402,28 @@ package body Printing is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Unbounded_List (Name    : String;
+                                   theList : ML_Types.Unbounded_List) is
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Put (To_String (theList.Element (Index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Unbounded_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Value_List (Name    : String;
                                theList : Tree.Values_List) is
       Count : Integer := 1;

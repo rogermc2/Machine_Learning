@@ -68,8 +68,8 @@ package body Node_Strings is
       end if;
 
       --  L289
-      if not Element (Node_Curs).Leaf_Node and then
-        not Element (First_Child (Node_Curs)).Leaf_Node then
+      if not Element (Node_Curs).Leaf_Node then
+         --          not Element (First_Child (Node_Curs)).Leaf_Node then
          Write_Decision_Criteria (Exporter, Node_ID, Node_Data, Node_String);
       end if;
 
@@ -101,21 +101,21 @@ package body Node_Strings is
       Node_ID     : Positive;
       Node_Data   : Tree.Tree_Node;
       Node_String : in out Unbounded_String) is
-      Routine_Name  : constant String :=
-                        "Node_Strings.Write_Decision_Criteria ";
-      Feature       : Unbounded_String;
-      Feature_Names : constant ML_Types.Feature_Names_List :=
-                        Exporter.Feature_Names;
+--        Routine_Name     : constant String :=
+--                             "Node_Strings.Write_Decision_Criteria ";
+      Feature_ID       : Positive;
+      Feature          : Unbounded_String;
+      Feature_Names    : constant ML_Types.Feature_Names_List :=
+                           Exporter.Feature_Names;
    begin
-      if Exporter.Feature_Names.Is_Empty then
+      if not Exporter.Feature_Names.Is_Empty then
          --  L294
          Feature := To_Unbounded_String ("X[") &
            Feature_Names.Element (Node_ID) & "]";
-         Put_Line (Routine_Name & "Feature_Names is empty");
       else
-         if not Exporter.theTree.Features.Is_Empty then
-            Feature := Exporter.theTree.Features.Element (Node_ID);
-         end if;
+         Feature_ID := Node_Data.Best_Fit_Feature_Index;
+         Feature := To_Unbounded_String ("X[") &
+           Integer'Image (Feature_ID) & "]";
       end if;
 
       --  L299

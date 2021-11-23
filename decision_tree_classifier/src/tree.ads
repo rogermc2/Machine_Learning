@@ -43,6 +43,7 @@ package Tree is
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct
+            Features               : ML_Types.Unbounded_List;
             --  Feature used for splitting the node
             Best_Fit_Feature_Index : Natural := 0;
             Threshold              : Float := 0.0;
@@ -67,8 +68,7 @@ package Tree is
    subtype Nodes_List is Nodes_List_Package.Vector;
 
    type Tree_Class is record
---        Num_Features : Natural := 0;
-      Features     : ML_Types.Unbounded_List;
+      Num_Features : Natural := 0;
       --  Classes:  outputs x classes
       Num_Classes  : Classifier_Types.Natural_List;
       Classes      : ML_Types.Value_Data_Lists_2D;

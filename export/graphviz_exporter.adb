@@ -121,13 +121,12 @@ package body Graphviz_Exporter is
 
    procedure Export (Exporter    : in out DOT_Tree_Exporter;
                      Output_File : File_Type) is
-      use Ada.Containers;
       Criteria : constant Criterion.Classifier_Criteria_Type :=
                    Criterion.Gini_Criteria;
    begin
       if not Exporter.Feature_Names.Is_Empty then
-         Assert (Exporter.Feature_Names.Length =
-                   Exporter.theTree.Features.Length, "Exporter.Feature_Names"
+         Assert (Integer (Exporter.Feature_Names.Length) =
+                   Exporter.theTree.Num_Features, "Exporter.Feature_Names"
                  & " length does not match the number of features.");
       end if;
 
