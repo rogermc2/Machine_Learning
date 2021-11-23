@@ -62,6 +62,7 @@ package body Export_Tests is
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
               Min_Split_Samples => 2);
+      Graphviz_Exporter.C_Init (Exporter);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");

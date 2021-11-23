@@ -83,6 +83,10 @@ package Tree is
 
    Value_Error : Exception;
 
+    procedure C_Init (aTree : in out Tree_Class; Num_Features : Natural := 0;
+                      Num_Classes  : Classifier_Types.Natural_List :=
+                        Classifier_Types.Natural_Package.Empty_Vector;
+                      Num_Outputs  : Index_Range := 1);
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
