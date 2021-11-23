@@ -42,7 +42,7 @@ package body Export_Tests is
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter         : Graphviz_Exporter.DOT_Tree_Exporter;
       Class_Names      : Class_Names_List;
-      Feature_Names    : Feature_Names_List;
+      Feature_Names    : Feature_Names_List := Unbounded_Package.Empty_Vector;
       X                : constant Value_Data_Lists_2D :=
                            To_Multi_Value_List (X_Array);
       Y                : constant Value_Data_Lists_2D :=

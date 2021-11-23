@@ -121,13 +121,17 @@ package body Graphviz_Exporter is
 
    procedure Export (Exporter    : in out DOT_Tree_Exporter;
                      Output_File : File_Type) is
+      use Ada.Containers;
       Criteria : constant Criterion.Classifier_Criteria_Type :=
                    Criterion.Gini_Criteria;
    begin
       if not Exporter.Feature_Names.Is_Empty then
          Assert (Integer (Exporter.Feature_Names.Length) =
-                   Exporter.theTree.Num_Features, "Exporter.Feature_Names"
-                 & " length does not match the number of features.");
+                   Exporter.theTree.Num_Features, "Graphviz_Exporter.Export" &
+                   " Exporter.Feature_Names length" &
+                   Count_Type'Image (Exporter.Feature_Names.Length) &
+                   " does not match the number of features" &
+                   Integer'Image (Exporter.theTree.Num_Features));
       end if;
 
       Head (Exporter, Output_File);
@@ -145,8 +149,8 @@ package body Graphviz_Exporter is
                               Max_Depth          : Positive := Integer'Last;
                               Feature_Names      : Feature_Names_List :=
                                 Unbounded_Package.Empty_Vector;
-                               Class_Names        : Class_Names_List :=
-                                 Unbounded_Package.Empty_Vector;
+                              Class_Names        : Class_Names_List :=
+                                Unbounded_Package.Empty_Vector;
                               Label              : Unbounded_String :=
                                 To_Unbounded_String ("all");
                               Filled             : Boolean := False;
@@ -382,7 +386,7 @@ package body Graphviz_Exporter is
                   --  "root" (top) node
                   for index in Angles'First .. Angles'Last loop
                      Angles (index) := - Integer ((2.0 * Exporter.Rotate - 1.0) *
-                       Base_Angles (index));
+                                                    Base_Angles (index));
                   end loop;
                   Put (Output_File,
                        " [labeldistance = 2.5, labelangle = ");
