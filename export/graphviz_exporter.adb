@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _export.py
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Integer_Text_IO;
 with Ada.Strings.Fixed;
@@ -195,6 +196,7 @@ package body Graphviz_Exporter is
     --  L225 Get_Colour finds the appropriate color & intensity for a node
     function Get_Colour (Exporter : in out DOT_Tree_Exporter;
                          Value    : Weights.Weight_List) return String is
+        use Ada.Characters.Handling;
         use Ada.Integer_Text_IO;
         use Classifier_Types;
         Routine_Name : constant String :=
@@ -205,6 +207,7 @@ package body Graphviz_Exporter is
         Sorted_Values : Float_List := Value;
         Alpha         : Float;
         Alpha_1       : Float;
+        Pos           : Integer;
 
         function Set_Colour (Colour : in out Natural) return String is
             use Ada.Strings.Fixed;
@@ -215,11 +218,11 @@ package body Graphviz_Exporter is
                                  Alpha_1));
             Put (Hex_Colour, Colour, Base => 16);
 
-            Put_Line (Routine_Name & "Hex_Colour: " & Hex_Colour);
-            Put_Line (Routine_Name & "trimmed Hex_Colour: " &
-                        Trim (Hex_Colour, Ada.Strings.Right));
---              return Hex_Colour;
-            return Trim (Hex_Colour, Ada.Strings.Right);
+            Pos := Index (Hex_Colour,"#");
+            Delete (Hex_Colour, 1, Pos); -- remove 16#
+            Pos := Index (Hex_Colour,"#");
+            Delete (Hex_Colour, Pos, Pos);
+            return To_Lower (Trim (Hex_Colour, Ada.Strings.Right));
 
         end Set_Colour;
 
@@ -237,14 +240,8 @@ package body Graphviz_Exporter is
                     (1.0 - Sorted_Values.Element (2));
 
             end if;
-            Put_Line (Routine_Name & "Alpha: " & Float'Image (Alpha));
 
             Alpha_1 := 255.0 * (1.0 - Alpha);
-            Put_Line (Routine_Name & "Sorted_Values.Element (1): " &
-                        Float'Image (Sorted_Values.Element (1)));
-            Put_Line (Routine_Name & "Sorted_Values.Element (2): " &
-                        Float'Image (Sorted_Values.Element (2)));
-            Put_Line (Routine_Name & "Alpha_1: " & Float'Image (Alpha_1));
             if Alpha_1 < 0.0 then
                 Alpha_1 := 0.0;
             end if;
@@ -253,6 +250,10 @@ package body Graphviz_Exporter is
             null;
         end if;
 
+        Put_Line (Routine_Name & Set_Colour (Colour.R) & ", " &
+                    Set_Colour (Colour.G) & ", " & Set_Colour (Colour.B));
+        Put_Line (Routine_Name & Set_Colour (Colour.R) &
+                    Set_Colour (Colour.G) & Set_Colour (Colour.B));
         return "#" & Set_Colour (Colour.R) & Set_Colour (Colour.G) &
           Set_Colour (Colour.B);
 
