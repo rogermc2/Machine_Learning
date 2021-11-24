@@ -66,16 +66,25 @@ package body Export_Tests is
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
+
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+
       Graphviz_Exporter.Export_Graphviz
           (Exporter, theClassifier.Attributes.Decision_Tree);
+      --  Test with feature_names
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
          Feature_Names => Feature_Names,
          Output_File_Name => To_Unbounded_String ("features.dot"));
+
+      --  Test with class names
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Class_Names => Class_Names,
+         Output_File_Name => To_Unbounded_String ("classes.dot"));
 
    end Test_Graphviz_Toy;
 

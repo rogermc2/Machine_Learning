@@ -273,7 +273,7 @@ package body Node_Strings is
         Arg_Max         : Positive;
         Class_Name      : Unbounded_String;
     begin
-        --  L368
+        --  L364
         if Show_Labels then
             Node_String := Node_String & "class = ";
         end if;
@@ -288,10 +288,10 @@ package body Node_Strings is
 
         --  L366
         if Exporter.Class_Names.Is_Empty then
-            Class_Name := Exporter.Class_Names.Element (Arg_Max);
-        else
             Class_Name := "y[" &
               To_Unbounded_String (Integer'Image (Arg_Max)) & "]";
+        else
+            Class_Name := Exporter.Class_Names.Element (Arg_Max);
         end if;
         Node_String := Node_String & Class_Name;
 
