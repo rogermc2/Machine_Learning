@@ -209,20 +209,32 @@ package body Graphviz_Exporter is
         Alpha_1       : Float;
         Pos           : Integer;
 
-        function Set_Colour (Colour : in out Natural) return String is
+        function Set_Colour (Colour : Natural) return String is
             use Ada.Strings.Fixed;
-            Hex_Colour : String (1 .. 8);
+            Hex_Colour    : String (1 .. 8);
+            Dec_Colour    : Natural;
+            Hex_Colour_UB : Unbounded_String;
         begin
+            Dec_Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
+                                     Alpha_1));
+            Put_Line (Routine_Name & ".Set_Colour Colour: " &
+                        Integer'Image (Dec_Colour));
+            Put (Hex_Colour, Dec_Colour, Base => 16);
 
-            Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
-                                 Alpha_1));
-            Put (Hex_Colour, Colour, Base => 16);
-
-            Pos := Index (Hex_Colour,"#");
+            Pos := Index (Hex_Colour, "#");
             Delete (Hex_Colour, 1, Pos); -- remove 16#
-            Pos := Index (Hex_Colour,"#");
+            Pos := Index (Hex_Colour, "#");
             Delete (Hex_Colour, Pos, Pos);
-            return To_Lower (Trim (Hex_Colour, Ada.Strings.Right));
+            Hex_Colour_UB := To_Unbounded_String
+              (To_Lower (Trim (Hex_Colour, Ada.Strings.Right)));
+
+            if Length (Hex_Colour_UB) = 0 then
+                Hex_Colour_UB := To_Unbounded_String ("00");
+            elsif Length (Hex_Colour_UB) = 1 then
+                Hex_Colour_UB := To_Unbounded_String ("0") & Hex_Colour_UB;
+            end if;
+
+            return To_String (Hex_Colour_UB);
 
         end Set_Colour;
 
@@ -242,16 +254,14 @@ package body Graphviz_Exporter is
             end if;
 
             Alpha_1 := 255.0 * (1.0 - Alpha);
-            if Alpha_1 < 0.0 then
-                Alpha_1 := 0.0;
-            end if;
+            --              if Alpha_1 < 0.0 then
+            --                  Alpha_1 := 0.0;
+            --              end if;
         else
             --  Regression or multi-output
             null;
         end if;
 
-        Put_Line (Routine_Name & Set_Colour (Colour.R) & ", " &
-                    Set_Colour (Colour.G) & ", " & Set_Colour (Colour.B));
         Put_Line (Routine_Name & Set_Colour (Colour.R) &
                     Set_Colour (Colour.G) & Set_Colour (Colour.B));
         return "#" & Set_Colour (Colour.R) & Set_Colour (Colour.G) &
