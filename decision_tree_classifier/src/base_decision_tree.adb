@@ -92,7 +92,7 @@ package body Base_Decision_Tree is
             end if;
         end if;
 
-        --  L325
+        --  L333
         if not Sample_Weights.Is_Empty then
             Sum_Sample_Weight := 0.0;
             for index in Sample_Weights.First_Index ..
@@ -101,6 +101,11 @@ package body Base_Decision_Tree is
                   Sum_Sample_Weight + Sample_Weights.Element (index);
             end loop;
         end if;
+
+        --  L392
+        Tree.C_Init (aClassifier.Attributes.Decision_Tree,
+                     Positive (aClassifier.Attributes.Num_Features),
+                     Num_Classes, aClassifier.Attributes.Num_Outputs);
 
         aClassifier.Attributes.Decision_Tree.Classes :=
           aClassifier.Attributes.Classes;

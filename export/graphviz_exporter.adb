@@ -181,6 +181,9 @@ package body Graphviz_Exporter is
         Exporter.Precision  := Precision;
         Exporter.Font_Name := Font_Name;
 
+        Put_Line ("C_init theTree.Num_Features: " &
+                   Integer'Image (theTree.Num_Features));
+
         Exporter.Initialized := True;
 
         Create (Output_File, Out_File, To_String (Exporter.Output_File_Name));

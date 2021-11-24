@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -42,8 +43,8 @@ package body Node_Strings is
        Criteria  : Criterion.Classifier_Criteria_Type) return String is
         use Tree;
         use Tree.Nodes_Package;
-        --        Routine_Name    : constant String :=
-        --                            "Node_Strings.Node_To_String ";
+--          Routine_Name    : constant String :=
+--                                    "Node_Strings.Node_To_String ";
         Node_ID         : constant Positive := Element (Node_Curs).Node_ID;
         Node_ID_S       : constant String := Integer'Image (Node_ID);
         Top_Node        : constant Tree.Tree_Cursor :=
@@ -163,8 +164,8 @@ package body Node_Strings is
         use ML_Types;
         use Tree;
         use Tree.Nodes_Package;
---          Routine_Name    : constant String :=
---                              "Node_Strings.Write_Node_Class_Value ";
+        Routine_Name    : constant String :=
+                            "Node_Strings.Write_Node_Class_Value ";
         Node_Data       : constant Tree.Tree_Node := Element (Node_Curs);
         Classes         : constant ML_Types.Value_Data_Lists_2D :=
                             Exporter.theTree.Classes;
@@ -177,6 +178,9 @@ package body Node_Strings is
                             Exporter.theTree.Values.Element (Node_ID);
         Output_Data     : Weights.Weight_List;
     begin
+        Assert (not Classes.Is_Empty, Routine_Name &
+                  "Exporter.theTree.Classes is empty");
+
         --  L331 Write distribution / regression value
         if Exporter.Proportion and Classes.Element (1).Length /= 1 then
             for output_index in Value.First_Index .. Value.Last_Index loop
