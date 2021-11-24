@@ -197,8 +197,8 @@ package body Graphviz_Exporter is
                          Value    : Weights.Weight_List) return String is
         use Ada.Integer_Text_IO;
         use Classifier_Types;
---          Routine_Name : constant String :=
---                           "Graphviz_Exporter.Get_Colour ";
+        Routine_Name : constant String :=
+                         "Graphviz_Exporter.Get_Colour ";
         Colour_Index  : constant Positive :=
                           Classifier_Utilities.Arg_Max (Value);
         Colour        : Integer_Graph_Colours;
@@ -208,22 +208,27 @@ package body Graphviz_Exporter is
 
         function Set_Colour (Colour : in out Natural) return String is
             use Ada.Strings.Fixed;
-            Hex_Colour : String (1 .. 20);
+            Hex_Colour : String (1 .. 8);
         begin
 
             Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
                                  Alpha_1));
             Put (Hex_Colour, Colour, Base => 16);
 
+            Put_Line (Routine_Name & "Hex_Colour: " & Hex_Colour);
+            Put_Line (Routine_Name & "trimmed Hex_Colour: " &
+                        Trim (Hex_Colour, Ada.Strings.Right));
+--              return Hex_Colour;
             return Trim (Hex_Colour, Ada.Strings.Right);
 
         end Set_Colour;
 
     begin
         if Exporter.Bounds.Is_Empty then
-            --  Classification Tree
+            --  L228 Classification Tree
             Colour := Exporter.Colours.Element (Colour_Index);
             Float_Sorting.Sort (Sorted_Values);
+            Float_Package.Reverse_Elements  (Sorted_Values);
             if Integer (Sorted_Values.Length) = 1 then
                 Alpha := 0.0;
             else
@@ -232,8 +237,14 @@ package body Graphviz_Exporter is
                     (1.0 - Sorted_Values.Element (2));
 
             end if;
+            Put_Line (Routine_Name & "Alpha: " & Float'Image (Alpha));
 
             Alpha_1 := 255.0 * (1.0 - Alpha);
+            Put_Line (Routine_Name & "Sorted_Values.Element (1): " &
+                        Float'Image (Sorted_Values.Element (1)));
+            Put_Line (Routine_Name & "Sorted_Values.Element (2): " &
+                        Float'Image (Sorted_Values.Element (2)));
+            Put_Line (Routine_Name & "Alpha_1: " & Float'Image (Alpha_1));
             if Alpha_1 < 0.0 then
                 Alpha_1 := 0.0;
             end if;
@@ -250,10 +261,15 @@ package body Graphviz_Exporter is
     --  -------------------------------------------------------------------------
     --  L248 Get_Fill_Colour fetches the appropriate color for a node
     function Get_Fill_Colour (Exporter : in out DOT_Tree_Exporter;
+                              Node_Curs : Tree.Tree_Cursor;
                               Node_ID  : Positive) return String is
         use Weights;
-        Node_Values_List : Weight_Lists_2D;
-        Node_Value       : Weight_List;
+        use Tree.Nodes_Package;
+        Weighted_Samples : constant Float
+          := Float (Element (Node_Curs).Weighted_Num_Node_Samples);
+        Output_Values    : Weight_Lists_2D;
+        Class_Values     : Weight_List;
+        Class            : Float;
         Colours          : Colours_List;
         Colour           : Graph_Colours;
         Integer_Colour   : Integer_Graph_Colours;
@@ -282,14 +298,22 @@ package body Graphviz_Exporter is
 
         --  L259
         if Integer (Exporter.theTree.Num_Outputs) = 1  then
-            Node_Values_List := Exporter.theTree.Values.Element (Node_ID);
-            for index in Node_Values_List.First_Index ..
-              Node_Values_List.Last_Index loop
-                Node_Value.Append (Node_Values_List.Element (index));
+            Output_Values := Exporter.theTree.Values.Element (Node_ID);
+            for index in Output_Values.First_Index ..
+              Output_Values.Last_Index loop
+                Class_Values.Append (Output_Values.Element (index));
+
+                for class_index in Class_Values.First_Index ..
+                  Class_Values.Last_Index loop
+                    Class := Class_Values.Element (class_index);
+                    Class_Values.Replace_Element
+                      (class_index, Class / Weighted_Samples);
+
+                end loop;
             end loop;
         end if;
 
-        return Get_Colour (Exporter, Node_Value);
+        return Get_Colour (Exporter, Class_Values);
 
     end Get_Fill_Colour;
 
@@ -303,22 +327,23 @@ package body Graphviz_Exporter is
         Put_Line (Output_File, "digraph Tree {");
         --  L479 Specify node aesthetics
         Put (Output_File, "node [shape = box");
-        if Exporter.Filled then
+        if Exporter.Filled and Exporter.Rounded then
+            Rounded_Filled := Rounded_Filled & "filled, rounded";
+        elsif Exporter.Filled then
             Rounded_Filled := Rounded_Filled & "filled";
-        end if;
-
-        if Exporter.Rounded then
+        elsif Exporter.Rounded then
             Rounded_Filled := Rounded_Filled & "rounded";
         end if;
 
         --  L485
         if Exporter.Filled or Exporter.Rounded then
-            Put (Output_File, ", style = " & To_String (Rounded_Filled));
+            Put (Output_File, ", style = """ & To_String (Rounded_Filled)
+                 & """");
             Put (Output_File, ", color = ""black""");
         end if;
 
-        Put (Output_File, ", fontname = " & To_String (Exporter.Font_Name));
-        Put_Line (Output_File, "];");
+        Put (Output_File, ", fontname = """ & To_String (Exporter.Font_Name));
+        Put_Line (Output_File, """];");
 
         --  L494 Specify graph & edge aesthetics
         if Exporter.Leaves_Parallel then
@@ -326,7 +351,7 @@ package body Graphviz_Exporter is
         end if;
 
         Edge_Line := To_Unbounded_String
-          ("edge [fontname = " & To_String (Exporter.Font_Name) & "];");
+          ("edge [fontname = """ & To_String (Exporter.Font_Name) & """];");
         if Exporter.Rotate /= 0.0 then
             Put (Output_File, To_String (Edge_Line));
             Put_Line (Output_File, "rankdir = LR;");
@@ -390,7 +415,7 @@ package body Graphviz_Exporter is
                 --  L524
                 if Exporter.Filled then
                     Put (Output_File, ", fillcolor = " &
-                           Get_Fill_Colour (Exporter, Node_ID));
+                           Get_Fill_Colour (Exporter, Node_Curs, Node_ID));
                 end if;
                 Put_Line (Output_File, """];");
 
