@@ -3,14 +3,15 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Integer_Text_IO;
+with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
-with Export_Types;
-with Node_Strings;
 with Export_Types; use Export_Types;
+with Node_Strings;
+--  with Printing;
 with Weights;
 
 package body Graphviz_Exporter is
@@ -81,6 +82,7 @@ package body Graphviz_Exporter is
         H_Bar       : Float;
         X           : Float;
         RGB_Init    : RGB_Array;
+        RGB_Index   : Positive;
         R           : Float;
         G           : Float;
         B           : Float;
@@ -89,6 +91,7 @@ package body Graphviz_Exporter is
     begin
         while H_Index < 385.0 loop
             H_Bar := H_Index / 60.0;
+            RGB_Index := 1 + Integer (H_Bar);
             X := Chroma * (1.0 - abs (Float'Remainder (H_Bar, 2.0)) - 1.0);
             RGB_Init := ((Chroma, X, 0.0),
                          (X, Chroma, 0.0),
@@ -97,9 +100,9 @@ package body Graphviz_Exporter is
                          (X, 0.0, Chroma),
                          (Chroma, 0.0, X),
                          (Chroma, X, 0.0));
-            R := RGB_Init (Integer (H_Bar)).R;
-            G := RGB_Init (Integer (H_Bar)).G;
-            B := RGB_Init (Integer (H_Bar)).B;
+            R := RGB_Init (RGB_Index).R;
+            G := RGB_Init (RGB_Index).G;
+            B := RGB_Init (RGB_Index).B;
 
             for index in RGB'First .. RGB'Last loop
                 RGB (index) := (255.0 * (R + Value_Shift),
@@ -194,18 +197,26 @@ package body Graphviz_Exporter is
                          Value    : Weights.Weight_List) return String is
         use Ada.Integer_Text_IO;
         use Classifier_Types;
-        Colour_Index  : constant Positive := Classifier_Utilities.Arg_Max (Value);
+--          Routine_Name : constant String :=
+--                           "Graphviz_Exporter.Get_Colour ";
+        Colour_Index  : constant Positive :=
+                          Classifier_Utilities.Arg_Max (Value);
         Colour        : Integer_Graph_Colours;
         Sorted_Values : Float_List := Value;
         Alpha         : Float;
+        Alpha_1       : Float;
 
-        function Set_Colour (Colour : in out Integer) return String is
-            Hex_Colour       : String (1 .. 2);
+        function Set_Colour (Colour : in out Natural) return String is
+            use Ada.Strings.Fixed;
+            Hex_Colour : String (1 .. 20);
         begin
+
             Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
-                                 255.0 * (1.0 - Alpha)));
+                                 Alpha_1));
             Put (Hex_Colour, Colour, Base => 16);
-            return Hex_Colour;
+
+            return Trim (Hex_Colour, Ada.Strings.Right);
+
         end Set_Colour;
 
     begin
@@ -219,6 +230,12 @@ package body Graphviz_Exporter is
                 Alpha :=
                   (Sorted_Values.Element (1) - Sorted_Values.Element (2)) /
                     (1.0 - Sorted_Values.Element (2));
+
+            end if;
+
+            Alpha_1 := 255.0 * (1.0 - Alpha);
+            if Alpha_1 < 0.0 then
+                Alpha_1 := 0.0;
             end if;
         else
             --  Regression or multi-output
@@ -238,14 +255,18 @@ package body Graphviz_Exporter is
         Node_Values_List : Weight_Lists_2D;
         Node_Value       : Weight_List;
         Colours          : Colours_List;
+        Colour           : Graph_Colours;
+        Integer_Colour   : Integer_Graph_Colours;
     begin
         if Exporter.Colours.Is_Empty then
             --  L251
             Colours := Colour_Brew (Integer (Exporter.theTree.Classes.Length));
             for index in Colours.First_Index .. Colours.Last_Index loop
-                Exporter.Colours.Append ((Integer (Colours.Element (index).R),
-                                         Integer (Colours.Element (index).G),
-                                         Integer (Colours.Element (index).B)));
+                Colour := Colours.Element (index);
+                Integer_Colour := (Natural (abs (Colour.R)),
+                                   Natural (abs (Colour.G)),
+                                   Natural (abs (Colour.B)));
+                Exporter.Colours.Append (Integer_Colour);
             end loop;
 
             --  L253

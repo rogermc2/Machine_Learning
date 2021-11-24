@@ -19,7 +19,42 @@ package body Printing is
             New_Line;
         end loop;
         New_Line;
+
     end Print_Boolean_Matrix;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Colours_List (Name    : String;
+                                  Colours : Export_Types.Colours_List) is
+        use Export_Types.Colours_Package;
+        Item : Export_Types.Graph_Colours;
+    begin
+        Put_Line (Name & " RGB: ");
+        for row in Colours.First_Index .. Colours.Last_Index loop
+            Item := Colours.Element (row);
+            Put_Line (Float'Image (Item.R) & ", " & Float'Image (Item.G) &
+            ", " & Float'Image (Item.B));
+        end loop;
+        New_Line;
+
+    end Print_Colours_List;
+
+    --  ------------------------------------------------------------------------
+
+    procedure Print_Integer_Colours_List
+      (Name : String; Colours : Export_Types.Integer_Colours_List) is
+        use Export_Types.Integer_Colours_Package;
+        Item : Export_Types.Integer_Graph_Colours;
+    begin
+        Put_Line (Name & " RGB: ");
+        for row in Colours.First_Index .. Colours.Last_Index loop
+            Item := Colours.Element (row);
+            Put_Line (Natural'Image (Item.R) & ", " & Natural'Image (Item.G) &
+            ", " & Natural'Image (Item.B));
+        end loop;
+        New_Line;
+
+    end Print_Integer_Colours_List;
 
     --  ------------------------------------------------------------------------
 
