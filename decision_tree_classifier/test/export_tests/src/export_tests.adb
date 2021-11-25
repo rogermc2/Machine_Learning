@@ -99,6 +99,12 @@ package body Export_Tests is
            Class_Names => Class_Names,
            Output_File_Name => To_Unbounded_String ("max_depth.dot"));
 
+        --  Test max depth with plot options
+        Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree, Max_Depth => 0,
+         Filled => True, Node_Ids => True,
+           Output_File_Name => To_Unbounded_String ("max_depth_plot.dot"));
+
     end Test_Graphviz_Toy;
 
     --  -------------------------------------------------------------------------
