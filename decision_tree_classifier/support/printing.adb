@@ -32,8 +32,9 @@ package body Printing is
         Put_Line (Name & " RGB: ");
         for row in Colours.First_Index .. Colours.Last_Index loop
             Item := Colours.Element (row);
-            Put_Line (Float'Image (Item.R) & ", " & Float'Image (Item.G) &
-            ", " & Float'Image (Item.B));
+            Put_Line (Integer'Image (row)  & ", " & Float'Image (Item.R) &
+                        ", " & Float'Image (Item.G) & ", " &
+                        Float'Image (Item.B));
         end loop;
         New_Line;
 
@@ -49,7 +50,7 @@ package body Printing is
         Put_Line (Name & " RGB: ");
         for row in Colours.First_Index .. Colours.Last_Index loop
             Item := Colours.Element (row);
-            Put_Line (Natural'Image (Item.R) & ", " & Natural'Image (Item.G) &
+            Put_Line (Natural'Image (Item.R) & ". " & Natural'Image (Item.G) &
             ", " & Natural'Image (Item.B));
         end loop;
         New_Line;
