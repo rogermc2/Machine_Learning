@@ -78,7 +78,7 @@ package body Base_Decision_Tree is
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
-        --  L326
+      --  L326
         if not Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
                 Sample_Weights := Expanded_Class_Weight;

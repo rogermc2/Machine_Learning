@@ -73,7 +73,7 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
 
    function Colour_Brew (Num_Colours : Positive)
-                          return Integer_Colours_List is
+                         return Integer_Colours_List is
 
       function Modulo (Dividend, Divisor : in Float) return Float is
          N : constant Integer := Integer (Float'Floor (Dividend / Divisor));
@@ -374,8 +374,8 @@ package body Graphviz_Exporter is
 
       procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
          use Export_Types.Export_Maps;
-         --              Routine_Name : constant String :=
-         --                               "Graphviz_Exporter.Recurse.Do_Node ";
+         Routine_Name : constant String :=
+                          "Graphviz_Exporter.Recurse.Do_Node ";
          Node_ID      : constant Positive := Element (Node_Curs).Node_ID;
          Node_ID_S    : constant String := Integer'Image (Node_ID);
          Node_ID_UB   : constant Unbounded_String :=
@@ -388,7 +388,7 @@ package body Graphviz_Exporter is
          Left_Child   : Tree.Tree_Cursor;
          Angles       : array (1 .. 2) of Integer;
       begin
-         --              Put_Line (Routine_Name & "Node ID" & Node_ID_S);
+         Put_Line (Routine_Name & "Node ID" & Node_ID_S);
          if Node_ID > 1 then
             Node_Parent := Parent (Node_Curs);
             Parent_ID := Element (Node_Parent).Node_ID;

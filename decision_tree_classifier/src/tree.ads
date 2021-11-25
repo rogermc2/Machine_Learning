@@ -35,7 +35,7 @@ package Tree is
    subtype Values_List_3D is Classifier_Types.Float_List_3D;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
-      Node_ID                   : Positive;
+      Node_ID                   : Positive := 1;
       --  from _Tree Node struct
       Impurity                  : Float := Float'Last;
       Num_Node_Samples          : Positive := 1;

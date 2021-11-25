@@ -26,7 +26,6 @@ package body Tree_Build is
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
    --  L720
    function Add_Node (theTree               : in out Tree.Tree_Class;
---                        Depth                 : Natural;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
                       Feature_Index         : Positive;
@@ -45,8 +44,6 @@ package body Tree_Build is
       Last_Node := Last_Node + 1;
       New_Node.Node_ID := Last_Node;
       --  _Tree L738
---        New_Node.Is_Left := Is_Left;
---        New_Node.Depth := Depth;
       New_Node.Impurity := Impurity;
       New_Node.Num_Node_Samples := Num_Samples;
       New_Node.Weighted_Num_Node_Samples := Integer (Weighted_Node_Samples);
@@ -389,6 +386,13 @@ package body Tree_Build is
       Depth_Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
 
    end Init_Depth_First_Tree;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Reset_Last_Node is
+   begin
+      Last_Node := 0;
+   end Reset_Last_Node;
 
    --  ------------------------------------------------------------------------
 
