@@ -101,13 +101,20 @@ package body Printing is
 
     --  -------------------------------------------------------------------
 
-    procedure Print_Float_Array (Name          : String; anArray : Float_Array;
-                                 Start, Finish : Integer) is
+    procedure Print_Float_Array (Name  : String; anArray : Float_Array;
+                                 Start : Integer := 1; Finish : Integer := 0) is
+        Last  : Integer;
         Count : Integer := 1;
     begin
+        if Finish > 0 then
+            Last := Finish;
+        else
+            Last := Integer (anArray'Length);
+        end if;
+
         Put_Line (Name & ": ");
         if Start >= anArray'First and then Finish <= anArray'Last then
-            for Index in Start .. Finish loop
+            for Index in Start .. Last loop
                 Put (Float'Image (anArray (Index)) & "  ");
                 Count := Count + 1;
                 if Count > 4 then
@@ -119,6 +126,7 @@ package body Printing is
             Put_Line ("Print_Float_Array called with invalid start or finish index.");
         end if;
         New_Line;
+
     end Print_Float_Array;
 
     --  ------------------------------------------------------------------------

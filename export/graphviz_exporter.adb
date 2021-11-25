@@ -21,6 +21,7 @@ package body Graphviz_Exporter is
 
     procedure Head (Exporter    : DOT_Tree_Exporter;
                     Output_File : File_Type);
+    procedure Print_RGB_Array (Name : String; anArray : RGB_Array);
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                        Criteria    : Criterion.Classifier_Criteria_Type;
                        Output_File : File_Type; Depth : Natural := 0);
@@ -74,7 +75,10 @@ package body Graphviz_Exporter is
 
     --  -------------------------------------------------------------------------
 
-    function Colour_Brew (Num_Colours : Positive) return Integer_Colours_List is
+    function Colour_Brew (Num_Colours : Positive)
+                          return Integer_Colours_List is
+        Routine_Name  : constant String :=
+                          "Graphviz_Exporter.Colour_Brew ";
         Saturation  : constant Float := 0.75;
         Value       : constant Float := 0.9;
         Chroma      : constant Float := Saturation * Value;
@@ -91,6 +95,7 @@ package body Graphviz_Exporter is
         RGB_Item    : Integer_Graph_Colours;
         theColours  : Integer_Colours_List;
     begin
+        Put_Line (Routine_Name & "Num_Colours" & Integer'Image (Num_Colours));
         while H_Index < 385.0 loop
             H_Bar := H_Index / 60.0;
             RGB_Index := 1 + Integer (H_Bar);
@@ -102,9 +107,12 @@ package body Graphviz_Exporter is
                          (X, 0.0, Chroma),
                          (Chroma, 0.0, X),
                          (Chroma, X, 0.0));
+            Print_RGB_Array (Routine_Name & "RGB_Init", RGB_Init);
             R := RGB_Init (RGB_Index).R;
             G := RGB_Init (RGB_Index).G;
             B := RGB_Init (RGB_Index).B;
+
+            Put_Line (Routine_Name & "G" & Float'Image (G));
 
             RGB_Item := (Integer (255.0 * (R + Value_Shift)),
                          Integer (255.0 * (G + Value_Shift)),
@@ -294,8 +302,13 @@ package body Graphviz_Exporter is
     begin
         if Exporter.Colours.Is_Empty then
             --  L251
-            Exporter.Colours :=
-              Colour_Brew (Integer (Exporter.theTree.Classes.Length));
+            Printing.Print_Value_Data_List
+              (Routine_Name & "classes (1)", Exporter.theTree.Classes.Element (1));
+            Printing.Print_Value_Data_Lists_2D
+              (Routine_Name & "classes", Exporter.theTree.Classes);
+
+            Exporter.Colours := Colour_Brew
+              (Integer (Exporter.theTree.Classes.Element (1).Length));
             Printing.Print_Integer_Colours_List
               (Routine_Name & "Colour_Brew Colours", Exporter.Colours);
 
@@ -376,6 +389,21 @@ package body Graphviz_Exporter is
     end Head;
 
     --  -------------------------------------------------------------------------
+
+    procedure Print_RGB_Array (Name : String; anArray : RGB_Array) is
+        Colours : Graph_Colours;
+    begin
+        Put_Line (Name & ": ");
+        for index in anArray'First .. anArray'Last loop
+            Colours := anArray (index);
+            Put (Float'Image (Colours.R) & ", ");
+            Put (Float'Image (Colours.G) & ", ");
+            Put_Line (Float'Image (Colours.B));
+        end loop;
+
+    end Print_RGB_Array;
+
+    --  ------------------------------------------------------------------------
 
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                        Criteria    : Criterion.Classifier_Criteria_Type;
