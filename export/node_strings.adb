@@ -90,7 +90,7 @@ package body Node_Strings is
                                        Node_String);
         end if;
 
-        return To_String (Node_String) & """";
+        return To_String (Node_String);
 
     end Node_To_String;
 
