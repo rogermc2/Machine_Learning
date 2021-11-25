@@ -20,6 +20,8 @@ package Export_Types is
       B : Float := 0.0;
    end record;
 
+   type RGB_Array is array (1 .. 7) of Graph_Colours;
+
    type Integer_Graph_Colours is record
       R : Natural := 0;
       G : Natural := 0;

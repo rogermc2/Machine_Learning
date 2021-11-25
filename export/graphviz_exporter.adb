@@ -12,16 +12,13 @@ with Classifier_Utilities;
 with Criterion;
 with Export_Types; use Export_Types;
 with Node_Strings;
-with Printing;
+--  with Printing;
 with Weights;
 
 package body Graphviz_Exporter is
 
-    type RGB_Array is array (1 .. 7) of Graph_Colours;
-
     procedure Head (Exporter    : DOT_Tree_Exporter;
                     Output_File : File_Type);
-    --      procedure Print_RGB_Array (Name : String; anArray : RGB_Array);
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                        Criteria    : Criterion.Classifier_Criteria_Type;
                        Output_File : File_Type; Depth : Natural := 0);
@@ -210,8 +207,8 @@ package body Graphviz_Exporter is
         use Ada.Characters.Handling;
         use Ada.Integer_Text_IO;
         use Classifier_Types;
-        Routine_Name  : constant String :=
-                          "Graphviz_Exporter.Get_Colour ";
+--          Routine_Name  : constant String :=
+--                            "Graphviz_Exporter.Get_Colour ";
         Colour_Index  : constant Positive :=
                           Classifier_Utilities.Arg_Max (Value);
         Colour        : Integer_Graph_Colours;
@@ -228,8 +225,6 @@ package body Graphviz_Exporter is
         begin
             Dec_Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
                                      Alpha_1));
-            Put_Line (Routine_Name & ".Set_Colour Colour: " &
-                        Integer'Image (Dec_Colour));
             Put (Hex_Colour, Dec_Colour, Base => 16);
 
             Pos := Index (Hex_Colour, "#");
@@ -250,17 +245,9 @@ package body Graphviz_Exporter is
         end Set_Colour;
 
     begin
-        Printing.Print_Weights (Routine_Name & "Value", Value);
         if Exporter.Bounds.Is_Empty then
-            Printing.Print_Integer_Colours_List
-              (Routine_Name & "Exporter.Colours", Exporter.Colours);
-            Put_Line (Routine_Name & "Colour_Index: " &
-                        Integer'Image (Colour_Index));
             --  L228 Classification Tree
             Colour := Exporter.Colours.Element (Colour_Index);
-            Put_Line (Routine_Name & "Red: " & Integer'Image (Colour.R));
-            Put_Line (Routine_Name & "Green: " & Integer'Image (Colour.G));
-            Put_Line (Routine_Name & "Blue: " & Integer'Image (Colour.B));
             Float_Sorting.Sort (Sorted_Values);
             Float_Package.Reverse_Elements  (Sorted_Values);
             if Integer (Sorted_Values.Length) = 1 then
@@ -270,19 +257,13 @@ package body Graphviz_Exporter is
                   (Sorted_Values.Element (1) - Sorted_Values.Element (2)) /
                     (1.0 - Sorted_Values.Element (2));
             end if;
-            Put_Line (Routine_Name & "Alpha: " & Float'Image (Alpha));
 
             Alpha_1 := 255.0 * (1.0 - Alpha);
-            --              if Alpha_1 < 0.0 then
-            --                  Alpha_1 := 0.0;
-            --              end if;
         else
             --  Regression or multi-output
             null;
         end if;
 
-        Put_Line (Routine_Name & Set_Colour (Colour.R) &
-                    Set_Colour (Colour.G) & Set_Colour (Colour.B));
         return "#" & Set_Colour (Colour.R) & Set_Colour (Colour.G) &
           Set_Colour (Colour.B);
 
@@ -295,8 +276,8 @@ package body Graphviz_Exporter is
                               Node_ID   : Positive) return String is
         use Weights;
         use Tree.Nodes_Package;
-        Routine_Name  : constant String :=
-                          "Graphviz_Exporter.Get_Fill_Colour ";
+--          Routine_Name  : constant String :=
+--                            "Graphviz_Exporter.Get_Fill_Colour ";
         Weighted_Samples : constant Float
           := Float (Element (Node_Curs).Weighted_Num_Node_Samples);
         Output_Values    : Weight_Lists_2D;
@@ -305,15 +286,8 @@ package body Graphviz_Exporter is
     begin
         if Exporter.Colours.Is_Empty then
             --  L251
-            Printing.Print_Value_Data_List
-              (Routine_Name & "classes (1)", Exporter.theTree.Classes.Element (1));
-            Printing.Print_Value_Data_Lists_2D
-              (Routine_Name & "classes", Exporter.theTree.Classes);
-
             Exporter.Colours := Colour_Brew
               (Integer (Exporter.theTree.Classes.Element (1).Length));
-            Printing.Print_Integer_Colours_List
-              (Routine_Name & "Colour_Brew Colours", Exporter.Colours);
 
             --  L253
             if Integer (Exporter.theTree.Num_Outputs) /= 1 then
@@ -338,7 +312,6 @@ package body Graphviz_Exporter is
                     Class := Class_Values.Element (class_index);
                     Class_Values.Replace_Element
                       (class_index, Class / Weighted_Samples);
-
                 end loop;
             end loop;
         end if;
@@ -393,21 +366,6 @@ package body Graphviz_Exporter is
 
     --  -------------------------------------------------------------------------
 
-    --      procedure Print_RGB_Array (Name : String; anArray : RGB_Array) is
-    --          Colours : Graph_Colours;
-    --      begin
-    --          Put_Line (Name & ": ");
-    --          for index in anArray'First .. anArray'Last loop
-    --              Colours := anArray (index);
-    --              Put (Float'Image (Colours.R) & ", ");
-    --              Put (Float'Image (Colours.G) & ", ");
-    --              Put_Line (Float'Image (Colours.B));
-    --          end loop;
-    --
-    --      end Print_RGB_Array;
-
-    --  ------------------------------------------------------------------------
-
     procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
                        Criteria    : Criterion.Classifier_Criteria_Type;
                        Output_File : File_Type; Depth : Natural := 0) is
@@ -416,8 +374,8 @@ package body Graphviz_Exporter is
 
         procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
             use Export_Types.Export_Maps;
-            Routine_Name : constant String :=
-                             "Graphviz_Exporter.Recurse.Do_Node ";
+--              Routine_Name : constant String :=
+--                               "Graphviz_Exporter.Recurse.Do_Node ";
             Node_ID      : constant Positive := Element (Node_Curs).Node_ID;
             Node_ID_S    : constant String := Integer'Image (Node_ID);
             Node_ID_UB   : constant Unbounded_String :=
@@ -430,7 +388,7 @@ package body Graphviz_Exporter is
             Left_Child   : Tree.Tree_Cursor;
             Angles       : array (1 .. 2) of Integer;
         begin
-            Put_Line (Routine_Name & "Node ID" & Node_ID_S);
+--              Put_Line (Routine_Name & "Node ID" & Node_ID_S);
             if Node_ID > 1 then
                 Node_Parent := Parent (Node_Curs);
                 Parent_ID := Element (Node_Parent).Node_ID;
@@ -459,7 +417,7 @@ package body Graphviz_Exporter is
 
                 --  L524
                 if Exporter.Filled then
-                    Put (Output_File, ", fillcolor = " &
+                    Put (Output_File, ", fillcolor = """ &
                            Get_Fill_Colour (Exporter, Node_Curs, Node_ID));
                 end if;
                 Put_Line (Output_File, """];");
