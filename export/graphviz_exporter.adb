@@ -156,7 +156,7 @@ package body Graphviz_Exporter is
                                theTree            : Tree.Tree_Class;
                                Output_File_Name   : Unbounded_String :=
                                  To_Unbounded_String ("tree.dot");
-                               Max_Depth          : Positive := Integer'Last;
+                               Max_Depth          : Natural := Integer'Last;
                                Feature_Names      : Feature_Names_List :=
                                  Unbounded_Package.Empty_Vector;
                                Class_Names        : Class_Names_List :=

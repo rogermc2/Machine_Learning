@@ -93,6 +93,12 @@ package body Export_Tests is
            Rounded => True, Font_Name => To_Unbounded_String ("sans"),
            Output_File_Name => To_Unbounded_String ("plot.dot"));
 
+        --  Test max depth
+        Graphviz_Exporter.Export_Graphviz
+          (Exporter, theClassifier.Attributes.Decision_Tree, Max_Depth => 0,
+           Class_Names => Class_Names,
+           Output_File_Name => To_Unbounded_String ("max_depth.dot"));
+
     end Test_Graphviz_Toy;
 
     --  -------------------------------------------------------------------------
