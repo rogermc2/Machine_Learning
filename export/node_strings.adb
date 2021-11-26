@@ -44,7 +44,7 @@ package body Node_Strings is
         use Tree;
         use Tree.Nodes_Package;
 --          Routine_Name    : constant String :=
---                                    "Node_Strings.Node_To_String ";
+--                              "Node_Strings.Node_To_String ";
         Node_ID         : constant Positive := Element (Node_Curs).Node_ID;
         Node_ID_S       : constant String := Integer'Image (Node_ID);
         Top_Node        : constant Tree.Tree_Cursor :=
@@ -101,8 +101,8 @@ package body Node_Strings is
        Node_ID     : Positive;
        Node_Data   : Tree.Tree_Node;
        Node_String : in out Unbounded_String) is
-    --        Routine_Name     : constant String :=
-    --                             "Node_Strings.Write_Decision_Criteria ";
+--            Routine_Name     : constant String :=
+--                                 "Node_Strings.Write_Decision_Criteria ";
         Feature_ID       : Positive;
         Feature          : Unbounded_String;
         Feature_Names    : constant ML_Types.Feature_Names_List :=

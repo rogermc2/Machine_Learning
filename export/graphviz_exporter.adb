@@ -294,14 +294,16 @@ package body Graphviz_Exporter is
 
             --  L253
             if Integer (Exporter.theTree.Num_Outputs) /= 1 then
+                --  Find max and min impurities for multi-output
                 Put_Line (Routine_Name & " L253 Num_Outputs /= 1");
                 null;
             elsif Exporter.theTree.Num_Classes.Element (1) = 1 and
               Integer (Classifier_Utilities.Unique_Weights
                        (Exporter.theTree.Values).Length) > 1 then
+                --  L258 Find max and min values in leaf nodes for regression
                 Put_Line (Routine_Name & " L253 elsif");
-                null;
-                --                  Node_Value := Exporter.theTree.Values;
+                Exporter.Bounds.Append ((Weights.Min (Exporter.theTree.Values),
+                                        Weights.Max (Exporter.theTree.Values)));
             end if;
         end if;
 

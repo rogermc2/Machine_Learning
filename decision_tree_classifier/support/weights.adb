@@ -381,9 +381,9 @@ package body Weights is
     --  -------------------------------------------------------------------------
 
     function Max (Weights : Weight_List) return Positive is
-        Value       : Float;
-        Max_Value   : Float := -Float'Last;
-        Max_Index   : Positive := 1;
+        Value     : Float;
+        Max_Value : Float := -Float'Last;
+        Max_Index : Positive := 1;
     begin
         for index in Weights.First_Index .. Weights.Last_Index loop
             Value := Weights.Element (index);
@@ -396,6 +396,109 @@ package body Weights is
         return Max_Index;
 
     end Max;
+
+    --  -------------------------------------------------------------------------
+
+    function Max (Weights : Weight_List) return Float is
+        Value     : Float;
+        Max_Value : Float := -Float'Last;
+    begin
+        for index in Weights.First_Index .. Weights.Last_Index loop
+            Value := Weights.Element (index);
+            if Value > Max_Value then
+                Max_Value := Value;
+            end if;
+        end loop;
+
+        return Max_Value;
+
+    end Max;
+
+    --  -------------------------------------------------------------------------
+
+    function Max (Weights_3D : Weight_Lists_3D) return Float is
+        List_2D   : Weight_Lists_2D;
+        Weights   : Weight_List;
+        Value     : Float;
+        Max_Value : Float := -Float'Last;
+    begin
+        for index_1 in Weights_3D.First_Index .. Weights_3D.Last_Index loop
+            List_2D := Weights_3D.Element (index_1);
+            for index_2 in List_2D.First_Index .. List_2D.Last_Index loop
+                Weights := List_2D.Element (index_2);
+                for index_3 in Weights.First_Index .. Weights.Last_Index loop
+                    Value := Weights.Element (index_3);
+                    if Value > Max_Value then
+                        Max_Value := Value;
+                    end if;
+                end loop;
+            end loop;
+        end loop;
+
+        return Max_Value;
+
+    end Max;
+
+    --  -------------------------------------------------------------------------
+
+    function Min (Weights : Weight_List) return Positive is
+        Value     : Float;
+        Min_Value : Float := Float'Last;
+        Min_Index : Positive := 1;
+    begin
+        for index in Weights.First_Index .. Weights.Last_Index loop
+            Value := Weights.Element (index);
+            if Value < Min_Value then
+                Min_Value := Value;
+                Min_Index := index;
+            end if;
+        end loop;
+
+        return Min_Index;
+
+    end Min;
+
+    --  -------------------------------------------------------------------------
+
+    function Min (Weights : Weight_List) return Float is
+        Value     : Float;
+        Min_Value : Float := Float'Last;
+    begin
+        for index in Weights.First_Index .. Weights.Last_Index loop
+            Value := Weights.Element (index);
+            if Value < Min_Value then
+                Min_Value := Value;
+            end if;
+        end loop;
+
+        return Min_Value;
+
+    end Min;
+
+    --  -------------------------------------------------------------------------
+
+    function Min (Weights_3D : Weight_Lists_3D) return Float is
+        List_2D   : Weight_Lists_2D;
+        Weights   : Weight_List;
+        Value     : Float;
+        Min_Value : Float := Float'Last;
+    begin
+        for index_1 in Weights_3D.First_Index .. Weights_3D.Last_Index loop
+            List_2D := Weights_3D.Element (index_1);
+            for index_2 in List_2D.First_Index .. List_2D.Last_Index loop
+                Weights := List_2D.Element (index_2);
+                for index_3 in Weights.First_Index .. Weights.Last_Index loop
+                    Value := Weights.Element (index_3);
+                    if Value < Min_Value then
+                        Min_Value := Value;
+                    end if;
+                end loop;
+            end loop;
+        end loop;
+
+        return Min_Value;
+
+    end Min;
 
     --  -------------------------------------------------------------------------
 
