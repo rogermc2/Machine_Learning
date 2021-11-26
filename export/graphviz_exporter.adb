@@ -432,7 +432,6 @@ package body Graphviz_Exporter is
                     Put_Line (Output_File, """");
                 end if;
                 Put_Line (Output_File, "];");
-                Put_Line (Routine_Name & "L530");
                 --  L530
                 if Node_ID > 1 then
                     --  Add edge to parent

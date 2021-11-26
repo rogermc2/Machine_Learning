@@ -247,6 +247,7 @@ package body Classifier_Utilities is
                               return String is
         use Ada.Numerics.Elementary_Functions;
         Integer_Length : Positive;
+        String_Length  : Positive;
     begin
         if abs Number < 1.0 then
             Integer_Length := 1;
@@ -254,15 +255,18 @@ package body Classifier_Utilities is
             Integer_Length :=
               1 + Integer (Float'Floor (Log (Float'Floor (abs Number), 10.0)));
         end if;
+        String_Length := Integer_Length + Precision + 1;
+        if Number < 0.0 then
+            String_Length := String_Length + 1;
+        end if;
 
         declare
-            theString : String (1 .. Integer_Length + Precision + 1);
+            theString : String (1 .. String_Length);
         begin
             Float_IO.Put (To   => theString,
                           Item => Number,
                           Aft  => Precision,
                           Exp  => 0);
-
             return theString;
         end;
 
