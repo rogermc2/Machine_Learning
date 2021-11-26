@@ -62,7 +62,6 @@ package body Export_Tests is
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
               Min_Split_Samples => 2);
-      Graphviz_Exporter.C_Init (Exporter);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
@@ -71,6 +70,9 @@ package body Export_Tests is
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+
+      Graphviz_Exporter.C_Init
+          (Exporter, theClassifier.Attributes.Decision_Tree);
 
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree);
@@ -111,6 +113,10 @@ package body Export_Tests is
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+
+      Graphviz_Exporter.C_Init
+          (Exporter, theClassifier.Attributes.Decision_Tree);
+
       --  Test multi-output with weighted samples
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree, Filled => True,

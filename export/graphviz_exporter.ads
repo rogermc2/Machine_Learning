@@ -20,7 +20,7 @@ package Graphviz_Exporter is
                                To_Unbounded_String ("all");
         Filled             : Boolean := False;
         Leaves_Parallel    : Boolean := False;
-        Impurity           : Boolean := True;
+        Impurity           : Boolean := False;
         Node_Ids           : Boolean := False;
         Proportion         : Boolean := False;
         Rotate             : Float := 0.0;
@@ -38,6 +38,7 @@ package Graphviz_Exporter is
     Graphviz_Error : Exception;
 
     procedure C_Init (Exporter    : in out DOT_Tree_Exporter;
+                      theTree            : Tree.Tree_Class;
                       Output_File_Name   : Unbounded_String :=
                         To_Unbounded_String ("tree.dot");
                       Max_Depth          : Positive := Integer'Last;

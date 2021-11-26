@@ -10,7 +10,7 @@ with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
 with Encode_Utils;
---  with Printing;
+with Printing;
 
 package body Base_Decision_Tree is
 
@@ -39,6 +39,8 @@ package body Base_Decision_Tree is
         use Estimator;
         Routine_Name          : constant String :=
                                   "Base_Decision_Tree.Base_Fit";
+        Num_Outputs           : constant Positive :=
+                                  Positive (Y.Element (1).Length);
         Criteria              : Criterion.Criterion_Class;
         Splitter              : Node_Splitter.Splitter_Class;
         Y_Encoded             : Classifier_Types.Natural_Lists_2D;
@@ -52,7 +54,7 @@ package body Base_Decision_Tree is
         Assert (not Y.Is_Empty, Routine_Name & ", Y is empty");
         if not Sample_Weights.Is_Empty then
             Assert (Sample_Weights.Length = X.Length, Routine_Name &
-                      ",Sample_Weights must be the same size as X.");
+                      " Sample_Weights must be the same size as X.");
         end if;
 
         --  X is 2D list num samples x num features
@@ -67,7 +69,7 @@ package body Base_Decision_Tree is
             Num_Classes.Append (Positive (Classes.Element (index).Length));
         end loop;
 
-        Criterion.C_Init (Criteria, Tree.Index_Range (Y.Element (1).Length),
+        Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
                           Num_Classes);
         --  L163
         Node_Splitter.C_Init (Splitter, Criteria);
@@ -78,7 +80,7 @@ package body Base_Decision_Tree is
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
-      --  L326
+        --  L326
         if not Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
                 Sample_Weights := Expanded_Class_Weight;
@@ -133,7 +135,8 @@ package body Base_Decision_Tree is
         Num_Samples           : constant Positive := Positive (X.Length);
         --  L229
         Max_Depth             : Natural;
-        Max_Leaf_Nodes        : constant Integer := aClassifier.Parameters.Max_Leaf_Nodes;
+        Max_Leaf_Nodes        : constant Integer :=
+                                  aClassifier.Parameters.Max_Leaf_Nodes;
         Min_Sample_Leaf       : constant Positive := 1;
         Min_Sample_Split      : Positive := 1;
         Max_Features          : Index_Range := Tree.Index_Range'Last;
@@ -260,15 +263,16 @@ package body Base_Decision_Tree is
         Column      : Natural_List;
         Inverse     : Natural_List;
     begin
-        --        Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
-        --                    Count_Type'Image (Y.Length));
-        --        Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
-        --                    Count_Type'Image (Num_Outputs));
+        Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
+                    Count_Type'Image (Y.Length));
+        Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
+                    Count_Type'Image (Num_Outputs));
         aClassifier.Attributes.Classes.Clear;
         aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
         Y_Encoded.Clear;
         Classes.Clear;
         Y_Encoded.Set_Length (Y.Length);
+        aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
 
         --  Y is 2D list num samples x num outputs
         --  Y_Encoded is 2D list num samples x num outputs
@@ -308,8 +312,8 @@ package body Base_Decision_Tree is
         end if;
 
         Classes := aClassifier.Attributes.Classes;
-        --          Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
-        --          Printing.Print_Value_Data_Lists_2D ("Classes", Classes);
+        Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
+        Printing.Print_Value_Data_Lists_2D ("Classes", Classes);
 
     exception
         when others => raise Classifier_Error with

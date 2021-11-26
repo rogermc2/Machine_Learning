@@ -161,6 +161,24 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Export_Map
+      (Name : String; aMap : Export_Types.Export_Map) is
+        use Export_Types;
+        use Export_Types.Export_Maps;
+        Curs : Cursor := aMap.First;
+        aKey : Unbounded_String;
+   begin
+      Put_Line (Name & ": ");
+      while Has_Element (Curs) loop
+         aKey := Key (Curs);
+         Put_Line (To_String (aKey) & ":  " & To_String (Element (Curs)));
+         Next (Curs);
+      end loop;
+      New_Line;
+   end Print_Export_Map;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Multi_Value_Array (Name    : String;
                                       anArray : Multi_Value_Array) is
    begin

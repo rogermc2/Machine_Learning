@@ -22,6 +22,7 @@ package Printing is
    procedure Print_Integer_Colours_List
      (Name : String; Colours : Export_Types.Integer_Colours_List);
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
+   procedure Print_Export_Map (Name : String; aMap : Export_Types.Export_Map);
    procedure Print_Float_Array (Name   : String; anArray : Float_Array;
                                 Start  : Integer := 1;
                                 Finish : Integer := 0);
