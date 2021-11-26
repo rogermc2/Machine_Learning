@@ -74,8 +74,6 @@ package body Export_Tests is
       Graphviz_Exporter.C_Init
           (Exporter, theClassifier.Attributes.Decision_Tree);
 
-      Graphviz_Exporter.Export_Graphviz
-        (Exporter, theClassifier.Attributes.Decision_Tree);
       --  Test with feature_names
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
@@ -121,7 +119,7 @@ package body Export_Tests is
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree, Filled => True,
          Impurity => False,
-         Output_File_Name => To_Unbounded_String ("multi-output.dot"));
+         Output_File_Name => To_Unbounded_String ("multi_output.dot"));
 
    end Test_Graphviz_Toy;
 
