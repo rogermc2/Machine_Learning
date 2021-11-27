@@ -93,8 +93,6 @@ package body Criterion is
       end loop;
 
       Reset (Criteria);
-      --        Printing.Print_Weights_Lists_2D ("Criterion.Classification_Init, class Sum_Totals",
-      --                                        Criteria.Sum_Total);
 
    end Classification_Init;
 
@@ -118,7 +116,6 @@ package body Criterion is
         Criteria.Num_Classes.Last_Index loop
          Sq_Count_Left := 0.0;
          Sq_Count_Right := 0.0;
-         --              Class_List := Criteria.Classes.Element (k);
          Sum_Left_K := Criteria.Sum_Left.Element (k);
          Sum_Right_K := Criteria.Sum_Right.Element (k);
          for c in Class_List.First_Index .. Class_List.Last_Index loop

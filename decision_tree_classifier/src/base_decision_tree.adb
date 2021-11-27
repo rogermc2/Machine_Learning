@@ -73,14 +73,14 @@ package body Base_Decision_Tree is
                           Num_Classes);
         Node_Splitter.C_Init (Splitter, Criteria);
 
-        --  L184
+        --  L189
         aClassifier.Attributes.Num_Features :=
           Tree.Index_Range (X.Element (1).Length);
-        Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
+      --  L229
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
         --  Base_Fit_Checks ends at L350
-        --  L326
+        --  L323
         if not Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
                 Sample_Weights := Expanded_Class_Weight;
@@ -108,16 +108,14 @@ package body Base_Decision_Tree is
         Tree.C_Init (aClassifier.Attributes.Decision_Tree,
                      Positive (aClassifier.Attributes.Num_Features),
                      Num_Classes, aClassifier.Attributes.Num_Outputs);
-        Put_Line (Routine_Name & "Num_Outputs: " &
-                    Integer'Image (Integer (aClassifier.Attributes.Num_Outputs)));
 
         aClassifier.Attributes.Decision_Tree.Classes :=
           aClassifier.Attributes.Classes;
 
         --  L410
         Ada_Tree_Builder.Build_Tree
-          (aClassifier.Attributes.Decision_Tree, Splitter, Y_Encoded,
-           aClassifier.Parameters.Max_Depth);
+          (aClassifier.Attributes.Decision_Tree, Splitter, X, Y_Encoded,
+           Sample_Weights, aClassifier.Parameters.Max_Depth);
 
         Prune_Tree (aClassifier);
 
