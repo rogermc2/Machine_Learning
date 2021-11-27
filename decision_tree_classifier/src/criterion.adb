@@ -16,7 +16,6 @@ package body Criterion is
    procedure C_Init (Criteria    : in out Criterion_Class;
                      Num_Outputs : Tree.Index_Range;
                      Num_Classes : Classifier_Types.Natural_List) is
-      --                        Classes     : ML_Types.Value_Data_Lists_2D) is
    begin
       --  L252
       Criteria.Num_Outputs := Num_Outputs;
@@ -154,6 +153,7 @@ package body Criterion is
    --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
    --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
    function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
+--        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    : constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
@@ -238,6 +238,7 @@ package body Criterion is
               "Criterion.Node_Value Self.Sum_Total is empty");
       --  Value dimensions: num outputs x num classes
       Value := Self.Sum_Total;
+--        Printing.Print_Weights_Lists_2D ("Criterion.Node_Value Value", Value);
 
    end Node_Value;
 

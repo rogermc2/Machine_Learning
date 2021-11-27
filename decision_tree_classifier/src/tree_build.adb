@@ -62,7 +62,6 @@ package body Tree_Build is
                                      New_Item => New_Node);
          Node_Cursor := Last_Child (Parent_Cursor);
       end if;
---        Printing.Print_Node ("Tree_Build.Add_Node, New_Node", New_Node);
 
       return Node_Cursor;
 
