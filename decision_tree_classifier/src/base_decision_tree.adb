@@ -71,7 +71,6 @@ package body Base_Decision_Tree is
 
         Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
                           Num_Classes);
-        --  L163
         Node_Splitter.C_Init (Splitter, Criteria);
 
         --  L184

@@ -185,9 +185,11 @@ package body Ada_Tree_Builder is
         Top_Node_Cursor := Tree_Build.Add_Node
           (theTree, theTree.Nodes.Root, True, False, 1, 0.0, Impurity,
            Splitter.Num_Samples, Splitter.Weighted_Samples);
+
         Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor, True,
               Impurity, Constant_Features);
 
+        --  L194
         while not Stack.Is_Empty loop
             Add_Branch (theTree, Builder, Stack, Split);
         end loop;
