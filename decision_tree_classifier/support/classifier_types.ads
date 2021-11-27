@@ -8,11 +8,13 @@ package Classifier_Types is
    subtype Class_Label is Unbounded_String;
 
    type Index_Range_2D is new Integer range 1 .. 2;
+   type Index_Array_2D is array (Index_Range_2D range <>) of Positive;
+
    type Integer_Array is array (Integer range <>) of Integer;
    type Float_Array is array (Integer range <>) of Float;
    type Natural_Array is array (Integer range <>) of Natural;
    type Multi_Value_Array is array (Integer range <>, Integer range <>)
-      of Integer;
+     of Integer;
 
    package Integer_Array_Package is new Ada.Containers.Indefinite_Vectors
      (Positive, Integer_Array);
@@ -25,6 +27,7 @@ package Classifier_Types is
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
    subtype Value_List is Float_Package.Vector;
+   package Float_Sorting is new Float_Package.Generic_Sorting ("<");
 
    use Float_Package;
    package Float_List_Package is new

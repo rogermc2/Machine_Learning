@@ -1,7 +1,8 @@
-
+--  Based on scikit-learn/sklearn/preprocessing/tests test_label.py
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
+with Printing;
 with Label;
 
 package body Label_Tests is
@@ -13,17 +14,16 @@ package body Label_Tests is
                                  Expected_Labels : Classifier_Types.Natural_List) is
       use ML_Types.Value_Data_Package;
       use Classifier_Types;
-      use Classifier_Utilities;
+      use Printing;
       use Classifier_Types.Natural_Package;
       use Label;
       LE_U              : Label_Encoder (Class_Unique);
---        LE_L              : Label_Encoder (Label.Class_Label);
       Labels            : Classifier_Types.Natural_List;
       Recovered_Values  : ML_Types.Value_Data_List;
       OK                : Boolean := True;
    begin
       Put_Line ("Label_Tests.Test_Label_Encoder:");
-      Print_Value_List ("Values", Values);
+      Print_Value_Data_List ("Values", Values);
       Fit (LE_U, Values);
       for index in Classes.First_Index .. Classes.Last_Index loop
          OK := OK and LE_U.Uniques.Contains (Classes.Element (index));
@@ -33,7 +33,7 @@ package body Label_Tests is
          Put_Line ("Class match test passed");
       else
          Put_Line ("Class match test failed");
-         Print_Value_List ("Fit Uniques", LE_U.Uniques);
+         Print_Value_Data_List ("Fit Uniques", LE_U.Uniques);
       end if;
 
       Labels := Transform (LE_U, Values);
@@ -53,8 +53,8 @@ package body Label_Tests is
       else
          Put_Line ("Label Inverse test failed");
          Print_Natural_List ("Labels", Labels);
-         Print_Value_List ("Recovered values", Recovered_Values);
-         Print_Value_List ("Original values", Values);
+         Print_Value_Data_List ("Recovered values", Recovered_Values);
+         Print_Value_Data_List ("Original values", Values);
       end if;
 
       LE_U.Uniques := ML_Types.Value_Data_Package.Empty_Vector;
@@ -108,16 +108,17 @@ package body Label_Tests is
    end Test_Label_Encoder_Empty_Array;
 
    --  -------------------------------------------------------------------------
-
+   --  L224
    procedure Test_Label_Encoder_Negative_Integers is
       use ML_Types;
-      use Label;
       use Classifier_Utilities;
+      use Label;
+      use Printing;
       use Value_Data_Package;
       use Classifier_Types.Natural_Package;
       Expected_Uniques   : Value_Data_List;
       Expected_Labels    : constant Classifier_Types.Natural_List :=
-                             To_Natural_List ((1, 2, 3, 3, 4, 0, 0));
+                             To_Natural_List ((2, 3, 4, 4, 5, 1, 1));
       Values             : constant Value_Data_List :=
                              To_Integer_Value_List ((1, 4, 5, -1, 0));
       LE_U               : Label_Encoder (Class_Unique);
@@ -132,8 +133,8 @@ package body Label_Tests is
          Put_Line ("passed");
       else
          Put_Line ("failed");
-         Print_Value_List ("Transformed data", LE_U.Uniques);
-         Print_Value_List ("Expected", Expected_Uniques);
+         Print_Value_Data_List ("Transformed data", LE_U.Uniques);
+         Print_Value_Data_List ("Expected", Expected_Uniques);
       end if;
 
       Transformed := Transform

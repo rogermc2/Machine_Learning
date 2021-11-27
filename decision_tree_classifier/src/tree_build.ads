@@ -70,5 +70,6 @@ package Tree_Build is
        Min_Weight_Leaf                     : Float := 0.0;
        Max_Depth                           : Integer := -1;
        Min_Impurity_Decrease               : Float := 0.0);
+   procedure Reset_Last_Node;
 
 end Tree_Build;

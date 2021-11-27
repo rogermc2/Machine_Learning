@@ -1,0 +1,116 @@
+
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
+
+with Base_Decision_Tree;
+with Classifier_Types;
+with Classifier_Utilities;
+with Criterion;
+with Decision_Tree_Classification;
+with ML_Types;
+with Node_Splitter;
+with Printing;
+with Tree;
+with Weights;
+
+package body Split_Tests is
+   use ML_Types;
+
+   function Check_Min_Split (aClassifier : Base_Decision_Tree.Classifier;
+                             Min_Split   : out Natural) return Boolean is
+      use Tree;
+      use Nodes_Package;
+      Nodes          : constant Nodes_Package.Tree :=
+                         aClassifier.Attributes.Decision_Tree.Nodes;
+      Min_Split_Rule : constant Positive :=
+                         aClassifier.Parameters.Min_Samples_Split;
+      OK             : Boolean := True;
+
+      procedure Check (Curs : Cursor) is
+         Node : constant Tree_Node := Element (Curs);
+      begin
+         if Curs /= Nodes.Root and then not Node.Leaf_Node  then
+            Put_Line ("Check_Min_Split.Check Node.Num_Node_Samples" &
+                        Integer'Image (Node.Num_Node_Samples));
+            OK := OK and Node.Num_Node_Samples >= Min_Split_Rule;
+            if Node.Num_Node_Samples < Min_Split then
+               Min_Split := Node.Num_Node_Samples;
+            end if;
+         end if;
+      end Check;
+
+   begin
+      Min_Split := Integer'Last;
+      Iterate (Nodes, Check'Access);
+      return OK;
+
+   end Check_Min_Split;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Test_Min_Samples_Split is
+      use Ada.Containers;
+      use Classifier_Utilities;
+      use Decision_Tree_Classification;
+      use Printing;
+      use Classifier_Types.Float_Package;
+      Routine_Name  : constant String := "Split_Tests.Test_Min_Samples_Split";
+      Iris_Data     : constant Data_Record := Load_Data ("src/iris.csv");
+      Criteria      : Criterion.Criterion_Class;
+      Splitter      : Node_Splitter.Splitter_Class;
+      theClassifier : Base_Decision_Tree.Classifier
+        (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
+      X             :  Value_Data_Lists_2D;
+--        Short         :  Value_Data_Lists_2D;
+      --  Y: num outputs x num classes
+      Y             : Value_Data_Lists_2D;
+      No_Weights    : Weights.Weight_List := Empty_Vector;
+      Num_Samples   : Natural;
+      Min_Split     : Natural;
+      Prediction    : ML_Types.Value_Data_Lists_2D;
+   begin
+      C_Init (theClassifier, Criteria, Splitter, Min_Split_Samples => 10,
+              Max_Leaf_Nodes => 100);
+      --  L1689
+      X := Iris_Data.Feature_Values;
+      Num_Samples := Natural (X.Length);
+      --        for index in 1 .. 10 loop
+      --           Short.Append (X.Element (index));
+      --        end loop;
+      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", X_Short", Short);
+
+      Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
+      Put_Line (Routine_Name);
+      Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
+
+      --  Y is 2D list num outputs x num classes
+      Y := To_Value_2D_List (Iris_Data.Label_Values);
+      Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
+                " invalid Y vector");
+
+--        for index in 1 .. 100 loop
+--           Short.Append (Y.Element (index));
+--        end loop;
+--        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", Y_Short", Short);
+      --  L1695
+      Classification_Fit (theClassifier, X, Y, No_Weights);
+      Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
+                (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
+      Print_Tree ("The Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+      Put_Line (Routine_Name & ", Min_Split status: " &
+                  Boolean'Image (Check_Min_Split (theClassifier, Min_Split)) &
+                  Integer'Image (Min_Split));
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Put_Line (Routine_Name & ", Prediction size" &
+                  Count_Type'Image (Prediction.Length));
+      --        Print_Value_Data_Lists_2D
+      --          (Routine_Name & " Predictions", Prediction);
+
+   end Test_Min_Samples_Split;
+
+   --  -------------------------------------------------------------------------
+
+end Split_Tests;

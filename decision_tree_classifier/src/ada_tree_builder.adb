@@ -1,4 +1,5 @@
---  Based on scikit-learn/sklearn/tree _tree.pyx L119 class DepthFirstTreeBuilder
+--  Based on scikit-learn/sklearn/tree _tree.pyx L119
+--  class DepthFirstTreeBuilder
 
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
@@ -6,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
---  with Printing;
+with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -28,7 +29,8 @@ package body Ada_Tree_Builder is
       Min_Impurity_Decrease : Float := 0.0);
 
    --  ------------------------------------------------------------------
-   --  Based on scikit-learn/sklearn/tree _tree.pyx DepthFirstTreeBuilder.build
+   --  Based on scikit-learn/sklearn/tree _tree.pyx
+   --  DepthFirstTreeBuilder.build
    procedure Add_Branch
      (theTree  : in out Tree.Tree_Class;
       Builder  : in out Tree_Builder;
@@ -39,6 +41,7 @@ package body Ada_Tree_Builder is
       use Node_Splitter;
       use Tree;
       use Nodes_Package;
+      --        Routine_Name          : constant String := "Ada_Tree_Builder.Add_Branch";
       --  L199
       Data                  : constant Stack_Record := Pop (theStack);
       Start_Row             : constant Positive := Data.Start;
@@ -50,10 +53,10 @@ package body Ada_Tree_Builder is
       Weighted_Node_Samples : Float := 0.0;
       Values                : Weights.Weight_Lists_2D;
       Child_Cursor          : Tree.Tree_Cursor;
-      Node_ID               : Positive;
+      Node_ID               : Positive := 1;
    begin
---        Printing.Print_Stack_Record ("Ada_Tree_Builder.Add_Branch stack data",
---                                    Data);
+      Printing.Print_Stack_Record ("Ada_Tree_Builder.Add_Branch stack data",
+                                   Data);
       --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       if not First then
@@ -70,24 +73,32 @@ package body Ada_Tree_Builder is
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
         --  if Impurity == 0.0 with tolerance for rounding errors
       abs (Impurity) <= Epsilon;
-
+      --        Put_Line (Routine_Name & ", L207 Is_Leaf_Node: " &
+      --                    Boolean'Image (Is_Leaf_Node));
       --  L220
       if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
+         --           Put_Line (Routine_Name & ", L220 Split.Split_Row >= Stop_Row: " &
+         --                       Boolean'Image (Split.Split_Row >= Stop_Row));
+         --           Put_Line (Routine_Name &
+         --                       ", L220 Improvement + Epsilon < Min_Impurity_Decrease: " &
+         --                       Boolean'Image (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
          --  L233
          Is_Leaf_Node := Split.Split_Row >= Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
       end if;
+      --        Put_Line (Routine_Name & ", L233 Is_Leaf_Node: " &
+      --                    Boolean'Image (Is_Leaf_Node));
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at
       --  L245 and L251 respectively
       --  L228
---        Put_Line ("Ada_Tree_Builder.Add_Branch L228 Builder Start, Pos, End: " &
---                    Integer'Image (Builder.Splitter.Start_Row) & ", " &
---                    Integer'Image (Split.Split_Row) & ", " &
---                    Integer'Image (Builder.Splitter.Stop_Row));
+      --        Put_Line ("Ada_Tree_Builder.Add_Branch L228 Builder Start, Pos, End: " &
+      --                    Integer'Image (Builder.Splitter.Start_Row) & ", " &
+      --                    Integer'Image (Split.Split_Row) & ", " &
+      --                    Integer'Image (Builder.Splitter.Stop_Row));
       if First then
          Child_Cursor := Data.Parent_Cursor;
          First := False;
@@ -101,24 +112,24 @@ package body Ada_Tree_Builder is
       --  238
       --  Values dimensions: num outputs x num classes
       Node_Splitter.Node_Value (Builder.Splitter, Values);
---        Printing.Print_Weights_Lists_2D
---          ("Ada_Tree_Builder.Add_Branch L238 Node" & Integer'Image (Node_ID) &
---             " Values", Values);
+      --          Printing.Print_Weights_Lists_2D
+      --            ("Ada_Tree_Builder.Add_Branch L238 Node" & Integer'Image (Node_ID) &
+      --               " Values", Values);
       if Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node_ID));
       end if;
       theTree.Values.Replace_Element (Node_ID, Values);
 
---        Put_Line
---          ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Num_Node_Samples: " &
---                    Integer'Image (Node_ID) & ", " &
---                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
+      --        Put_Line
+      --          ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Num_Node_Samples: " &
+      --                    Integer'Image (Node_ID) & ", " &
+      --                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
---           Put_Line ("Ada_Tree_Builder.Add_Branch L240 Start, Pos, End: " &
---                    Integer'Image (Start_Row) & ", " &
---                    Integer'Image (Split.Split_Row) & ", " &
---                    Integer'Image (Stop_Row));
+         --           Put_Line ("Ada_Tree_Builder.Add_Branch L240 Start, Pos, End: " &
+         --                    Integer'Image (Start_Row) & ", " &
+         --                    Integer'Image (Split.Split_Row) & ", " &
+         --                    Integer'Image (Stop_Row));
          --  Add right branch
          Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
                Child_Cursor, False, Split.Impurity_Right,
@@ -191,6 +202,7 @@ package body Ada_Tree_Builder is
       Builder.Min_Weight_Leaf := Min_Weight_Leaf;
       Builder.Max_Depth := Max_Depth;
       Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
+      Tree_Build.Reset_Last_Node;
 
    end Init_Tree_Builder;
 

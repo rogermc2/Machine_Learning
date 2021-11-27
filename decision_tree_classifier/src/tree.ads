@@ -35,19 +35,15 @@ package Tree is
    subtype Values_List_3D is Classifier_Types.Float_List_3D;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
-      Node_ID                   : Positive;
+      Node_ID                   : Positive := 1;
       --  from _Tree Node struct
       Impurity                  : Float := Float'Last;
       Num_Node_Samples          : Positive := 1;
       Weighted_Num_Node_Samples : Natural := 0;
-      --  From Tree/Utils StackRecord struct
---        Samples_Start             : Positive := 1;
---        Depth                     : Positive := 1;
---        Is_Left                   : Boolean := True;
---        Num_Constant_Features     : Natural := 0;
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct
+            Features               : ML_Types.Unbounded_List;
             --  Feature used for splitting the node
             Best_Fit_Feature_Index : Natural := 0;
             Threshold              : Float := 0.0;
@@ -72,8 +68,10 @@ package Tree is
    subtype Nodes_List is Nodes_List_Package.Vector;
 
    type Tree_Class is record
+      --  _tree.pxd L43
       Num_Features : Natural := 0;
       --  Classes:  outputs x classes
+      Num_Classes  : Classifier_Types.Natural_List;
       Classes      : ML_Types.Value_Data_Lists_2D;
       Num_Outputs  : Index_Range := 1;
       Max_Depth    : Integer := -1;
@@ -86,6 +84,10 @@ package Tree is
 
    Value_Error : Exception;
 
+    procedure C_Init (aTree : in out Tree_Class; Num_Features : Natural := 0;
+                      Num_Classes  : Classifier_Types.Natural_List :=
+                        Classifier_Types.Natural_Package.Empty_Vector;
+                      Num_Outputs  : Index_Range := 1);
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
