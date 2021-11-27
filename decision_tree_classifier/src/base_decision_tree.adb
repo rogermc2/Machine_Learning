@@ -38,7 +38,7 @@ package body Base_Decision_Tree is
         use Ada.Containers;
         use Estimator;
         Routine_Name          : constant String :=
-                                  "Base_Decision_Tree.Base_Fit";
+                                  "Base_Decision_Tree.Base_Fit ";
         Num_Outputs           : constant Positive :=
                                   Positive (Y.Element (1).Length);
         Criteria              : Criterion.Criterion_Class;
@@ -80,6 +80,7 @@ package body Base_Decision_Tree is
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
+        --  Base_Fit_Checks ends at L350
         --  L326
         if not Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
@@ -108,6 +109,8 @@ package body Base_Decision_Tree is
         Tree.C_Init (aClassifier.Attributes.Decision_Tree,
                      Positive (aClassifier.Attributes.Num_Features),
                      Num_Classes, aClassifier.Attributes.Num_Outputs);
+        Put_Line (Routine_Name & "Num_Outputs: " &
+                    Integer'Image (Integer (aClassifier.Attributes.Num_Outputs)));
 
         aClassifier.Attributes.Decision_Tree.Classes :=
           aClassifier.Attributes.Classes;
@@ -263,10 +266,6 @@ package body Base_Decision_Tree is
         Column      : Natural_List;
         Inverse     : Natural_List;
     begin
-        Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
-                    Count_Type'Image (Y.Length));
-        Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
-                    Count_Type'Image (Num_Outputs));
         aClassifier.Attributes.Classes.Clear;
         aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
         Y_Encoded.Clear;
@@ -311,6 +310,7 @@ package body Base_Decision_Tree is
               Weights.Compute_Sample_Weight (No_Weight, Y);
         end if;
 
+        --  L227
         Classes := aClassifier.Attributes.Classes;
         Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
         Printing.Print_Value_Data_Lists_2D ("Classes", Classes);
