@@ -12,11 +12,11 @@ package Node_Splitter is
    use Ada.Strings.Unbounded;
 
    type Split_Record is record
-      Feature        : Natural := 0;
+      Feature        : Positive := 1;
       --  Split_Row is the count of samples below threshold for Feature
       --  >= end if the node is a leaf.
       Split_Row      : Positive := 2;  --  Right start?
-      Threshold      : Float;
+      Threshold      : Float := 0.0;
       Improvement    : Float := -Float'Last;
       Impurity_Left  : Float := -Float'Last;
       Impurity_Right : Float := -Float'Last;

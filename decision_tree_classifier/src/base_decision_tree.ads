@@ -18,7 +18,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Types;
 with Tree;
 
-with Classifier_Types; use Classifier_Types;
 with Criterion;
 with Estimator;
 with Node_Splitter;
@@ -27,8 +26,6 @@ with Weights;
 package Base_Decision_Tree is
 --  Gini Impurity is a measurement of the likelihood of an incorrect
 --  classification of a new instance of a random variable.
-    type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
-    type Regressor_Criteria_Type is (MSE_Criteria, Friedman_MSE_Criteria, MAE_Criteria);
     type Splitter_Type is (Best_Splitter, Random_Splitter);
     Type State is (None);
     Type Weight_Type is (None);
@@ -53,13 +50,14 @@ package Base_Decision_Tree is
     --  class BaseDecisionTree
     type Base_Parameter_Data
       (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
-        Criterion_Kind           : Classifier_Criteria_Type := Gini_Criteria;
+        Criterion_Kind           : Criterion.Classifier_Criteria_Type :=
+                                     Criterion.Gini_Criteria;
         Critera                  : Criterion.Criterion_Class;
         Splitter_Kind            : Splitter_Type := Best_Splitter;
         Splitter                 : Node_Splitter.Splitter_Class;
         Max_Depth                : Integer := -1;  --  < 0 means unspecified
-        Min_Samples_Split        : Integer := 0;
-        Min_Samples_Leaf         : Integer := 0;
+        Min_Samples_Split        : Integer := 2;
+        Min_Samples_Leaf         : Integer := 1;
         Min_Weight_Fraction_Leaf : Float := 0.0;
         Max_Features             : Tree.Index_Range := 1;
         Random_State             : Integer := 0;
@@ -107,8 +105,7 @@ package Base_Decision_Tree is
       (aClassifier    : in out Classifier;
        X              : ML_Types.Value_Data_Lists_2D;
        Y              : ML_Types.Value_Data_Lists_2D;
-       Sample_Weights : out Classifier_Types.Float_List;
-       Max_Depth      : Integer := -1);
+       Sample_Weights : out Weights.Weight_List);
     procedure C_Init (aClassifier              : in out Classifier;
                       Criteria                 : Criterion.Criterion_Class;
                       Splitter                 : Node_Splitter.Splitter_Class;

@@ -7,6 +7,9 @@ with Weights;
 package Criterion is
 
     type Criterion_Kind is (Criterion_Classification, Criterion_Regression);
+    type Classifier_Criteria_Type is (Gini_Criteria, Entropy_Criteria);
+    type Regressor_Criteria_Type is (MSE_Criteria, Friedman_MSE_Criteria,
+                                     MAE_Criteria);
     type Criterion_Class
       (Criterion_Type : Criterion_Kind := Criterion_Classification) is record
        Y                         : Classifier_Types.Natural_Lists_2D;
@@ -35,9 +38,9 @@ package Criterion is
        Proxy_Improvement         : Float := -Float'Last;
        case Criterion_Type is
            when Criterion_Classification =>
-               Num_Classes       : Classifier_Types.Natural_List;
+               Num_Classes  : Classifier_Types.Natural_List;
            when Criterion_Regression =>
-               Sq_Sum_Total      : Float := 0.0;
+               Sq_Sum_Total : Float := 0.0;
        end case;
     end record;
 

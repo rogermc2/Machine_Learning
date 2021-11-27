@@ -16,9 +16,20 @@ package ML_Types is
    type Feature_Names_Array is array (Class_Range range <>) of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
+   type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
    subtype Feature_Class is Class_Range;
    subtype Question_Type is Class_Range;
+
+   package Character_Package is new Ada.Containers.Vectors
+     (Positive, Character);
+   subtype Character_List is Character_Package.Vector;
+
+   package Unbounded_Package is new Ada.Containers.Vectors
+     (Positive, Unbounded_String);
+   subtype Unbounded_List is Unbounded_Package.Vector;
+   subtype Class_Names_List is Unbounded_Package.Vector;
+   subtype Feature_Names_List is Unbounded_Package.Vector;
 
    type Node_Kind is (Undefined_Node, Decision_Node, Prediction_Node);
 

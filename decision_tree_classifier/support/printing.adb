@@ -3,6 +3,7 @@ with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
+with Export_Types;
 
 package body Printing is
 
@@ -19,7 +20,64 @@ package body Printing is
          New_Line;
       end loop;
       New_Line;
+
    end Print_Boolean_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List) is
+      use Export_Types;
+      Bound : Graph_Bounds;
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      for Index in Data.First_Index .. Data.Last_Index loop
+         Bound := Data.Element (Index);
+         Put ("(" & Float'Image (Bound.H) & ", " & Float'Image (Bound.V) & ")");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Bounds;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Colours_List (Name    : String;
+                                 Colours : Export_Types.Colours_List) is
+      use Export_Types.Colours_Package;
+      Item : Export_Types.Graph_Colours;
+   begin
+      Put_Line (Name & " RGB: ");
+      for row in Colours.First_Index .. Colours.Last_Index loop
+         Item := Colours.Element (row);
+         Put_Line (Integer'Image (row)  & ", " & Float'Image (Item.R) &
+                     ", " & Float'Image (Item.G) & ", " &
+                     Float'Image (Item.B));
+      end loop;
+      New_Line;
+
+   end Print_Colours_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_Colours_List
+     (Name : String; Colours : Export_Types.Integer_Colours_List) is
+      use Export_Types.Integer_Colours_Package;
+      Item : Export_Types.Integer_Graph_Colours;
+   begin
+      Put_Line (Name & " RGB: ");
+      for row in Colours.First_Index .. Colours.Last_Index loop
+         Item := Colours.Element (row);
+         Put_Line (Natural'Image (Item.R) & ". " & Natural'Image (Item.G) &
+                     ", " & Natural'Image (Item.B));
+      end loop;
+      New_Line;
+
+   end Print_Integer_Colours_List;
 
    --  ------------------------------------------------------------------------
 
@@ -65,13 +123,20 @@ package body Printing is
 
    --  -------------------------------------------------------------------
 
-   procedure Print_Float_Array (Name          : String; anArray : Float_Array;
-                                Start, Finish : Integer) is
+   procedure Print_Float_Array (Name  : String; anArray : Float_Array;
+                                Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
       Count : Integer := 1;
    begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
+
       Put_Line (Name & ": ");
       if Start >= anArray'First and then Finish <= anArray'Last then
-         for Index in Start .. Finish loop
+         for Index in Start .. Last loop
             Put (Float'Image (anArray (Index)) & "  ");
             Count := Count + 1;
             if Count > 4 then
@@ -83,6 +148,7 @@ package body Printing is
          Put_Line ("Print_Float_Array called with invalid start or finish index.");
       end if;
       New_Line;
+
    end Print_Float_Array;
 
    --  ------------------------------------------------------------------------
@@ -114,6 +180,24 @@ package body Printing is
       end loop;
       New_Line;
    end Print_Integer_Array;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Export_Map
+      (Name : String; aMap : Export_Types.Export_Map) is
+        use Export_Types;
+        use Export_Types.Export_Maps;
+        Curs : Cursor := aMap.First;
+        aKey : Unbounded_String;
+   begin
+      Put_Line (Name & ": ");
+      while Has_Element (Curs) loop
+         aKey := Key (Curs);
+         Put_Line (To_String (aKey) & ":  " & To_String (Element (Curs)));
+         Next (Curs);
+      end loop;
+      New_Line;
+   end Print_Export_Map;
 
    --  ------------------------------------------------------------------------
 
@@ -306,6 +390,23 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_RGB_Array (Name    : String;
+                              anArray : Export_Types.RGB_Array) is
+      use Export_Types;
+      Colours : Graph_Colours;
+   begin
+      Put_Line (Name & ": ");
+      for index in anArray'First .. anArray'Last loop
+         Colours := anArray (index);
+         Put (Float'Image (Colours.R) & ", ");
+         Put (Float'Image (Colours.G) & ", ");
+         Put_Line (Float'Image (Colours.B));
+      end loop;
+
+   end Print_RGB_Array;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Split_Record (Name : String;
                                  Data : Node_Splitter.Split_Record) is
    begin
@@ -402,6 +503,28 @@ package body Printing is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Unbounded_List (Name    : String;
+                                   theList : ML_Types.Unbounded_List) is
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Put (To_String (theList.Element (Index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Unbounded_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Value_List (Name    : String;
                                theList : Tree.Values_List) is
       Count : Integer := 1;
@@ -432,12 +555,7 @@ package body Printing is
 
       for Index in theList.First_Index .. theList.Last_Index loop
          Value := theList.Element (Index);
-         case Value.Value_Kind is
-            when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
-            when Float_Type => Put (Float'Image (Value.Float_Value));
-            when Integer_Type => Put (Integer'Image (Value.Integer_Value));
-            when UB_String_Type => Put (To_String (Value.UB_String_Value));
-         end case;
+         Print_Value_Data_Record ("", Value);
          Put ("   ");
          Count := Count + 1;
          if Count > 10 then
@@ -452,18 +570,26 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_2D
-     (Name : String; theList : ML_Types.Value_Data_Lists_2D) is
+     (Name      : String; theList : ML_Types.Value_Data_Lists_2D;
+      Num_Items : Positive := 1000) is
+      Items : Positive;
    begin
-      if Name'Length > 0 then
-         Put_Line (Name & ":");
-      end if;
-
       if Integer (theList.Length) = 0 then
          Put_Line ("Print_Value_Data_List_2D list is empty");
+
       elsif Integer (theList.Element (1).Length) = 0 then
          Put_Line ("Print_Value_Data_List_2D, first data list is empty");
+
       else
-         for index in theList.First_Index .. theList.Last_Index loop
+         Items := Positive (theList.Last_Index);
+         if Items > Num_Items then
+            Items := Num_Items;
+         end if;
+         if Name'Length > 0 then
+            Put_Line (Name & ":");
+         end if;
+
+         for index in theList.First_Index .. Items loop
             Print_Value_Data_List ("", theList.Element (index));
          end loop;
       end if;
@@ -492,6 +618,25 @@ package body Printing is
    end Print_Value_Data_Lists_3D;
 
    --  -------------------------------------------------------------
+
+   procedure Print_Value_Data_Record
+     (Name : String; Value : ML_Types.Value_Record) is
+      use ML_Types;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name & ":");
+      end if;
+
+      case Value.Value_Kind is
+         when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
+         when Float_Type => Put (Float'Image (Value.Float_Value));
+         when Integer_Type => Put (Integer'Image (Value.Integer_Value));
+         when UB_String_Type => Put (To_String (Value.UB_String_Value));
+      end case;
+
+   end Print_Value_Data_Record;
+
+   --  ------------------------------------------------------------------------
 
    procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
       aWeight : Float;
