@@ -180,6 +180,7 @@ package body Ada_Tree_Builder is
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
       Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
+      --  L210
       Impurity := Gini_Node_Impurity (Builder.Splitter);
 
       Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
