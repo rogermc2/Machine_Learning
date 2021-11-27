@@ -17,6 +17,7 @@ package Printing is
 
    procedure Print_Boolean_Matrix (Name    : String;
                                    aMatrix : Estimator.Boolean_Matrix);
+   procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);
    procedure Print_Colours_List (Name    : String;
                                  Colours : Export_Types.Colours_List);
    procedure Print_Integer_Colours_List

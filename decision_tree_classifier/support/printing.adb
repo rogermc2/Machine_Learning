@@ -3,6 +3,7 @@ with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
+with Export_Types;
 
 package body Printing is
 
@@ -21,6 +22,27 @@ package body Printing is
       New_Line;
 
    end Print_Boolean_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List) is
+      use Export_Types;
+      Bound : Graph_Bounds;
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      for Index in Data.First_Index .. Data.Last_Index loop
+         Bound := Data.Element (Index);
+         Put ("(" & Float'Image (Bound.H) & ", " & Float'Image (Bound.V) & ")");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Bounds;
 
    --  ------------------------------------------------------------------------
 
