@@ -56,13 +56,13 @@ package body Tree_Build is
 
       case Branch is
          when Left_Node =>
-         theTree.Nodes.Prepend_Child (Parent   => Parent_Cursor,
-                                      New_Item => New_Node);
-         Node_Cursor := First_Child (Parent_Cursor);
-      when Top_Node | Right_Node =>
-         theTree.Nodes.Append_Child (Parent   => Parent_Cursor,
-                                     New_Item => New_Node);
-         Node_Cursor := Last_Child (Parent_Cursor);
+            theTree.Nodes.Prepend_Child
+              (Parent   => Parent_Cursor, New_Item => New_Node);
+            Node_Cursor := First_Child (Parent_Cursor);
+         when Top_Node | Right_Node =>
+            theTree.Nodes.Append_Child
+              (Parent => Parent_Cursor, New_Item => New_Node);
+            Node_Cursor := Last_Child (Parent_Cursor);
       end case;
 
       return Node_Cursor;
@@ -181,7 +181,7 @@ package body Tree_Build is
       Max_Split_Nodes  : Natural;
       Impurity         : Float := 0.0;
       Frontier         : Build_Utils.Frontier_List;
---        Current_Node     : Tree.Tree_Node;
+      --        Current_Node     : Tree.Tree_Node;
       Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
       Curs             : Frontier_Cursor;
       Is_Leaf          : Boolean := False;
@@ -310,11 +310,11 @@ package body Tree_Build is
          if not Is_Leaf then
             --  Right child
             Push (Stack, Split.Split_Row, Stop, Depth + 1, Parent,
-                 Tree.Right_Node, Split.Impurity_Right, Constant_Features);
+                  Tree.Right_Node, Split.Impurity_Right, Constant_Features);
 
             --  Left child
             Push (Stack, Start, Split.Split_Row - 1, Depth + 1, Parent,
-                 Tree.Left_Node, Split.Impurity_Left, Constant_Features);
+                  Tree.Left_Node, Split.Impurity_Left, Constant_Features);
          end if;
 
          if Depth > Max_Depth_Seen then
@@ -340,9 +340,9 @@ package body Tree_Build is
       Leaf_Node.Impurity := Old_Node.Impurity;
       Leaf_Node.Num_Node_Samples := Old_Node.Num_Node_Samples;
       Leaf_Node. Weighted_Num_Node_Samples := Old_Node.Weighted_Num_Node_Samples;
---        Leaf_Node.Samples_Start := Old_Node.Samples_Start;
---        Leaf_Node.Depth := Old_Node.Depth;
---        Leaf_Node.Num_Constant_Features := Old_Node.Num_Constant_Features;
+      --        Leaf_Node.Samples_Start := Old_Node.Samples_Start;
+      --        Leaf_Node.Depth := Old_Node.Depth;
+      --        Leaf_Node.Num_Constant_Features := Old_Node.Num_Constant_Features;
       aTree.Nodes.Replace_Element (Node_Cursor, Leaf_Node);
 
    end Change_To_Leaf_Node;
