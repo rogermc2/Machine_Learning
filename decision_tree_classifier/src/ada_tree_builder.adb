@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
+with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -59,14 +60,11 @@ package body Ada_Tree_Builder is
         --                                     Data);
         --  L209
         --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-        if First then
-            null;
-        else
-            Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
-                        Weighted_Node_Samples);
-        end if;
+        Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
+                    Weighted_Node_Samples);
         --  L216
         Impurity := Data.Impurity;
+        Put_Line (Routine_Name & "L214 Impurity: " & Float'Image (Impurity));
 
         --  L207
         Is_Leaf_Node := Data.Depth >= Builder.Max_Depth or
@@ -74,14 +72,14 @@ package body Ada_Tree_Builder is
           Num_Node_Samples < Builder.Min_Samples_Split or
           Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
           Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
-          --  if Impurity == 0.0 with tolerance for rounding errors
-        abs (Impurity) <= Epsilon;
-        --        Put_Line (Routine_Name & ", L207 Is_Leaf_Node: " &
-        --                    Boolean'Image (Is_Leaf_Node));
+          abs (Impurity) <= Epsilon;  --  0.0 withtolerance for rounding errors
+
         --  L220
         if not Is_Leaf_Node then
             Split := Split_Node (Builder.Splitter, Impurity,
                                  Num_Constant_Features);
+            Printing.Print_Split_Record (Routine_Name & "L221 Split record",
+                                         Split);
             --           Put_Line (Routine_Name & ", L220 Split.Split_Row >= Stop_Row: " &
             --                       Boolean'Image (Split.Split_Row >= Stop_Row));
             --           Put_Line (Routine_Name &
@@ -131,7 +129,7 @@ package body Ada_Tree_Builder is
         --                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
         --  L240
         if not Is_Leaf_Node then
-            Put_Line ("Ada_Tree_Builder.Add_Branch L240 Start, Pos, End: " &
+            Put_Line (Routine_Name & "L240 Start, Pos, End: " &
                         Integer'Image (Start_Row) & ", " &
                         Integer'Image (Split.Split_Row) & ", " &
                         Integer'Image (Stop_Row));
@@ -179,19 +177,24 @@ package body Ada_Tree_Builder is
         --  L159
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
         Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
+        --  L206
         Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
-        --  206
+        --  L214
         Impurity := Gini_Node_Impurity (Builder.Splitter);
-        Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
-
+        Put_Line (Routine_Name & "L214 Impurity first: " &
+                    Float'Image (Impurity));
+        --  L221 first
         Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
-        Node_Splitter.Node_Value (Builder.Splitter, Values);
-        theTree.Values.Clear;
-        theTree.Values.Append (Values);
-
+        Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
+                                     Split);
+        --  L229 first
         Top_Node_Cursor := Tree_Build.Add_Node
           (theTree, theTree.Nodes.Root, True, False, 1, 0.0, Impurity,
            Splitter.Num_Samples, Splitter.Weighted_Samples);
+        --  L239 first
+        Node_Splitter.Node_Value (Builder.Splitter, Values);
+        theTree.Values.Clear;
+        theTree.Values.Append (Values);
 
         --  L184
         Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor, True,
@@ -201,6 +204,7 @@ package body Ada_Tree_Builder is
         while not Stack.Is_Empty loop
             Add_Branch (theTree, Builder, Stack, Split);
         end loop;
+
         Put_Line (Routine_Name & "tree built.");
         New_Line;
 
