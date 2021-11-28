@@ -102,7 +102,6 @@ package body Ada_Tree_Builder is
          --  A node (the top node) has already been added to theTree
          Child_Cursor := Data.Parent_Cursor;
          First := False;
-         Put_Line (Routine_Name & ", L228 first child cursor set");
       else
          --  Add a node to theTree
          Child_Cursor := Tree_Build.Add_Node
@@ -132,10 +131,10 @@ package body Ada_Tree_Builder is
       --                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
-         Put_Line (Routine_Name & "L240 Start, Pos, End: " &
-                     Integer'Image (Start_Row) & ", " &
-                     Integer'Image (Split.Split_Row) & ", " &
-                     Integer'Image (Stop_Row));
+--           Put_Line (Routine_Name & "L240 Start, Pos, End: " &
+--                       Integer'Image (Start_Row) & ", " &
+--                       Integer'Image (Split.Split_Row) & ", " &
+--                       Integer'Image (Stop_Row));
          --  Add right branch
          Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
                Child_Cursor, Tree.Right_Node, Split.Impurity_Right,

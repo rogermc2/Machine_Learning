@@ -497,11 +497,10 @@ package body Node_Splitter is
       X_1           : ML_Types.Value_Data_List;
       X             : ML_Types.Value_Record;
       Swap          : Positive;
-      Crit          : Criterion.Criterion_Class;
    begin
-      --  L424 Reorganize into samples[start:best.pos] + samples[best.pos:end]
+      --  L417 Reorganize into samples[start:best.pos] + samples[best.pos:end]
       if Best_Split.Split_Row <= Self.Stop_Row then
-         --  L426
+         --  L419
          Partition_End := Self.Stop_Row;
          P_Index := Self.Start_Row;
          while P_Index < Partition_End loop
@@ -541,9 +540,7 @@ package body Node_Splitter is
 
          --  L436
          Criterion.Reset (Self.Criteria);
-         Crit := Self.Criteria;
-         Crit.Split_Row := Best_Split.Split_Row;
-         Criterion.Update (Self.Criteria, Crit.Split_Row);
+         Criterion.Update (Self.Criteria, Best_Split.Split_Row);
          Criterion.Gini_Children_Impurity
            (Self.Criteria, Best_Split.Impurity_Left, Best_Split.Impurity_Right);
          Best_Split.Improvement := Criterion.Impurity_Improvement
@@ -608,7 +605,7 @@ package body Node_Splitter is
                        Num_Total_Constants, Best_Split);
 --        Printing.Print_Split_Record (Routine_Name & " Best_Split", Best_Split);
 
-      --  L424  Reorganize into samples
+      --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
