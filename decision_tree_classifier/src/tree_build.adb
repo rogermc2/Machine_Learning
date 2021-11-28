@@ -24,7 +24,7 @@ package body Tree_Build is
    --  Parent_Cursor is a cursor to an existing node which is the head
    --  of this node's branch Tree.
    --  Tree_Class.Nodes is an Ada Indefinite Multiway Tree.
-   --  L720
+   --  L716
    function Add_Node (theTree               : in out Tree.Tree_Class;
                       Parent_Cursor         : Tree.Tree_Cursor;
                       Is_Left, Is_Leaf      : Boolean;
