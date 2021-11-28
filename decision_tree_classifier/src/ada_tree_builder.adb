@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
-with Printing;
+--  with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -184,12 +184,10 @@ package body Ada_Tree_Builder is
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
       --  L214
       Impurity := Gini_Node_Impurity (Builder.Splitter);
-      Put_Line (Routine_Name & "L214 Impurity first: " &
-                  Float'Image (Impurity));
       --  L221 first
       Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
-      Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
-                                   Split);
+--        Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
+--                                     Split);
       --  L229 first  Add_Node adds a node to theTree
       Top_Node_Cursor := Tree_Build.Add_Node
         (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,

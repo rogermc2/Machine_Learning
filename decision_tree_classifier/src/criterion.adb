@@ -103,9 +103,11 @@ package body Criterion is
                                      Impurity_Left,
                                      Impurity_Right : out Float) is
       use Maths.Float_Math_Functions;
+--        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
       Num_Outputs    : constant Positive :=
                          Positive (Criteria.Y.Element (1).Length);
-      Class_List     : ML_Types.Value_Data_List;
+      Class_List     :  constant Classifier_Types.Natural_List :=
+                           Criteria.Classes;
       Sum_Left_K     : Classifier_Types.Float_List;
       Sum_Right_K    : Classifier_Types.Float_List;
       Count_K        : Float;
@@ -113,7 +115,7 @@ package body Criterion is
       Sq_Count_Right : Float;
    begin
       --  L662
-      for k in Criteria.Classes.First_Index .. Criteria.Classes.Last_Index loop
+      for k in Class_List.First_Index .. Class_List.Last_Index loop
          Sq_Count_Left := 0.0;
          Sq_Count_Right := 0.0;
          Sum_Left_K := Criteria.Sum_Left.Element (k);
@@ -128,6 +130,7 @@ package body Criterion is
             Count_K := Sum_Right_K.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Num_Weighted_Right;
+--                  Put_Line (Routine_Name & " right Count_K: " & Float'Image (Count_K));
                Sq_Count_Right := Sq_Count_Right - Count_K * Log (Count_K);
             end if;
          end loop;
