@@ -580,7 +580,7 @@ package body Node_Splitter is
    end Reset_Node;
 
    --  -------------------------------------------------------------------------
-   --  BestSplitter.Split_Node implements a Fisher-Yates-based algorithm
+   --  L268 BestSplitter.Split_Node implements a Fisher-Yates-based algorithm
    --  in the Find_Best_Split procedure.
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;

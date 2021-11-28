@@ -15,11 +15,11 @@ package body Criterion is
    --  L214 __cinit__
    procedure C_Init (Criteria    : in out Criterion_Class;
                      Num_Outputs : Tree.Index_Range;
-                     Num_Classes : Classifier_Types.Natural_List) is
+                     Classes     : Classifier_Types.Natural_List) is
    begin
-      --  L252
+      --  L220
       Criteria.Num_Outputs := Num_Outputs;
-      Criteria.Num_Classes := Num_Classes;
+      Criteria.Classes := Classes;
 
    end C_Init;
 
@@ -34,6 +34,7 @@ package body Criterion is
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
+--        Routine_Name    : constant String := "Criterion.Classification_Init ";
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
@@ -52,13 +53,13 @@ package body Criterion is
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
 
-      Assert (not Criteria.Num_Classes.Is_Empty,
-              "Criterion.Classification_Init Criteria.Num_Classes is empty");
+      Assert (not Criteria.Classes.Is_Empty,
+              "Criterion.Classification_Init Criteria.Classes is empty");
       --  L325 Initialize Sum_Total
       --  Sum_Total dimensions: num outputs x num classes
       for row in 1 .. Num_Outputs loop
          Sum_Total_K.Clear;
-         for c in 1 .. Criteria.Num_Classes.Element (row) loop
+         for c in 1 .. Criteria.Classes.Element (row) loop
             Sum_Total_K.Append (0.0);
          end loop;
          Criteria.Sum_Total.Append (Sum_Total_K);
@@ -112,8 +113,7 @@ package body Criterion is
       Sq_Count_Right : Float;
    begin
       --  L662
-      for k in Criteria.Num_Classes.First_Index ..
-        Criteria.Num_Classes.Last_Index loop
+      for k in Criteria.Classes.First_Index .. Criteria.Classes.Last_Index loop
          Sq_Count_Left := 0.0;
          Sq_Count_Right := 0.0;
          Sum_Left_K := Criteria.Sum_Left.Element (k);
@@ -153,7 +153,7 @@ package body Criterion is
 --        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    : constant Classifier_Types.Natural_List :=
-                         Criteria.Num_Classes;
+                         Criteria.Classes;
       Sum_Total_K    : Weights.Weight_List;
       Num_Classes_K  : Positive;
       Count_K        : Float;
@@ -190,7 +190,7 @@ package body Criterion is
       Count_K     : Float := 0.0;
       Entropy     : Float := 0.0;
    begin
-      Assert (not Self.Num_Classes.Is_Empty,
+      Assert (not Self.Classes.Is_Empty,
               "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
 
       --  L535 Y structure samples (rows) x outputs (columns)
@@ -267,9 +267,7 @@ package body Criterion is
       Criteria.Sum_Right.Clear;
       for k in 1 .. Num_Outputs loop
          Sum_Left_K.Clear;
-         --              for c in Criteria.Classes.Element (k).First_Index ..
-         --                Criteria.Classes.Element (k).Last_Index loop
-         for c in 1 .. Criteria.Num_Classes.Element (k) loop
+         for c in 1 .. Criteria.Classes.Element (k) loop
             Sum_Left_K.Append (0.0);
          end loop;
          Criteria.Sum_Left.Append (Sum_Left_K);
@@ -292,9 +290,7 @@ package body Criterion is
       Criteria.Sum_Right.Clear;
       for index in 1 .. Num_Outputs loop
          Sum_Right_K.Clear;
-         --              for c in Criteria.Classes.Element (index).First_Index ..
-         --                Criteria.Classes.Element (index).Last_Index loop
-         for c in 1 .. Criteria.Num_Classes.Element (index) loop
+         for c in 1 .. Criteria.Classes.Element (index) loop
             Sum_Right_K.Append (0.0);
          end loop;
          Criteria.Sum_Right.Append (Sum_Right_K);
@@ -364,9 +360,7 @@ package body Criterion is
          Sum_Left_K := Criteria.Sum_Left.Element (k);
          Sum_Right_K := Criteria.Sum_Right.Element (k);
          Sum_K := Criteria.Sum_Total.Element (k);
-         --              for class_index in Criteria.Classes.Element (k).First_Index ..
-         --                Criteria.Classes.Element (k).Last_Index loop
-         for class_index in 1 .. Criteria.Num_Classes.Element (k) loop
+         for class_index in 1 .. Criteria.Classes.Element (k) loop
             Sum_Right_K.Replace_Element (class_index, Sum_K.Element (class_index) -
                                            Sum_Left_K.Element (class_index));
          end loop;
