@@ -13,7 +13,7 @@ package body Build_Utils is
                    Start, Stop           : Positive;
                    Depth                 : Natural;
                    Parent                : Tree.Tree_Cursor;
-                   Is_Left               : Boolean;
+                   Branch                : Tree.Node_Type;
                    Impurity              : Float;
                    Num_Constant_Features : Natural) is
       Data : Stack_Record;
@@ -22,7 +22,7 @@ package body Build_Utils is
       Data.Start := Start;
       Data.Stop  := Stop;
       Data.Depth := Depth;
-      Data.Is_Left := Is_Left;
+      Data.Branch := Branch;
       Data.Impurity := Impurity;
       Data.Num_Constant_Features := Num_Constant_Features;
       aStack.Prepend (Data);

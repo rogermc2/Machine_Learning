@@ -32,13 +32,14 @@ package Tree_Build is
 
     Tree_Build_Error : Exception;
 
-    function Add_Node (theTree                 : in out Tree.Tree_Class;
-                       Parent_Cursor           : Tree.Tree_Cursor;
-                       Is_Left, Is_Leaf        : Boolean;
-                       Feature_Index           : Positive;
-                       Threshold, Impurity     : Float;
-                       Num_Samples             : Positive;
-                       Weighted_Node_Samples   : Float) return Tree.Tree_Cursor;
+    function Add_Node (theTree               : in out Tree.Tree_Class;
+                       Parent_Cursor         : Tree.Tree_Cursor;
+                       Branch                : Tree.Node_Type;
+                       Is_Leaf               : Boolean;
+                       Feature_Index         : Positive;
+                       Threshold, Impurity   : Float;
+                       Num_Samples           : Positive;
+                       Weighted_Node_Samples : Float) return Tree.Tree_Cursor;
     procedure Build_Best_First_Tree
       (Best_Builder  : in out Tree_Builder;
        theTree       : in out Tree.Tree_Class;

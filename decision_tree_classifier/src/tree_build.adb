@@ -27,7 +27,8 @@ package body Tree_Build is
    --  L716
    function Add_Node (theTree               : in out Tree.Tree_Class;
                       Parent_Cursor         : Tree.Tree_Cursor;
-                      Is_Left, Is_Leaf      : Boolean;
+                      Branch                : Tree.Node_Type;
+                      Is_Leaf               : Boolean;
                       Feature_Index         : Positive;
                       Threshold, Impurity   : Float;
                       Num_Samples           : Positive;
@@ -53,15 +54,16 @@ package body Tree_Build is
          New_Node.Threshold := Threshold;
       end if;
 
-      if Is_Left then
+      case Branch is
+         when Left_Node =>
          theTree.Nodes.Prepend_Child (Parent   => Parent_Cursor,
                                       New_Item => New_Node);
          Node_Cursor := First_Child (Parent_Cursor);
-      else
+      when Top_Node | Right_Node =>
          theTree.Nodes.Append_Child (Parent   => Parent_Cursor,
                                      New_Item => New_Node);
          Node_Cursor := Last_Child (Parent_Cursor);
-      end if;
+      end case;
 
       return Node_Cursor;
 
@@ -70,15 +72,16 @@ package body Tree_Build is
    --  ------------------------------------------------------------------------
 
    procedure Add_Split_Node
-     (theBuilder            : in out Tree_Builder;
-      Splitter              : in out Node_Splitter.Splitter_Class;
-      theTree               : in out Tree.Tree_Class;
-      Start_Row, End_Row    : Positive;
-      Impurity              : in out Float;
-      Is_First, Is_Left     : Boolean;
-      Parent_Cursor         : Tree.Tree_Cursor;
-      Depth                 : Natural;
-      Res                   : in out Build_Utils.Priority_Record) is
+     (theBuilder         : in out Tree_Builder;
+      Splitter           : in out Node_Splitter.Splitter_Class;
+      theTree            : in out Tree.Tree_Class;
+      Start_Row, End_Row : Positive;
+      Impurity           : in out Float;
+      Is_First           : Boolean;
+      Branch             : Tree.Node_Type;
+      Parent_Cursor      : Tree.Tree_Cursor;
+      Depth              : Natural;
+      Res                : in out Build_Utils.Priority_Record) is
       use Ada.Containers;
       use Tree.Nodes_Package;
       Parent_Node           : constant Tree.Tree_Node :=
@@ -114,9 +117,9 @@ package body Tree_Build is
       end if;
 
       Node_Cursor := Add_Node
-        (theTree, Parent_Cursor, Is_Left, Is_Leaf,
-         aSplit.Feature, aSplit.Threshold, Impurity,
-          Splitter.Num_Samples, Float (Parent_Node.Weighted_Num_Node_Samples));
+        (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
+         aSplit.Threshold, Impurity, Splitter.Num_Samples,
+         Float (Parent_Node.Weighted_Num_Node_Samples));
       Node := Element (Node_Cursor);
 
       --  L461
@@ -127,8 +130,8 @@ package body Tree_Build is
       theTree.Values.Replace_Element (Node.Node_ID, Values);
 
       Res.Node_Cursor := Add_Node
-        (theTree, Parent_Cursor, Is_Left, Is_Leaf,
-         aSplit.Feature, aSplit.Threshold, Impurity, Splitter.Num_Samples,
+        (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
+         aSplit.Threshold, Impurity, Splitter.Num_Samples,
          Splitter.Weighted_Samples);
       Res.Node_Params := Element (Res.Node_Cursor);
       Res.Depth := Depth + 1;
@@ -194,14 +197,13 @@ package body Tree_Build is
       --  L344 add root to frontier
       Add_Split_Node
         (Best_Builder, Splitter, theTree, 1, Splitter.Num_Samples, Impurity,
-         True, True, theTree.Nodes.Root, 0, Split_Node_Left);
+         True, Tree.Left_Node, theTree.Nodes.Root, 0, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
 
       --  L354
       Curs := Frontier.First;
       while Has_Element (Curs) loop
          Heap_Record := Element (Curs);
---           Current_Node := Heap_Record.Node_Params;
          Node_Cursor := Heap_Record.Node_Cursor;
          Is_Leaf := Heap_Record.Is_Leaf or Max_Split_Nodes < 0;
          if not Is_Leaf then
@@ -210,16 +212,16 @@ package body Tree_Build is
             Add_Split_Node
               (Best_Builder, Splitter, theTree, Heap_Record.Start,
                Heap_Record.Position, Heap_Record.Impurity, False,
-               True, Node_Cursor, Heap_Record.Depth + 1, Split_Node_Left);
+               Tree.Left_Node, Node_Cursor, Heap_Record.Depth + 1, Split_Node_Left);
             --  L383 tree.nodes may have changed
             Heap_Record := Element (Curs);
---              Current_Node := Heap_Record.Node_Params;
             Node_Cursor := Heap_Record.Node_Cursor;
             --  Compute right split node
             Add_Split_Node
               (Best_Builder, Splitter, theTree, Heap_Record.Position,
-               Heap_Record.Stop_Row, Heap_Record.Impurity_Right, False, False,
-               Node_Cursor, Heap_Record.Depth + 1, Split_Node_Right);
+               Heap_Record.Stop_Row, Heap_Record.Impurity_Right, False,
+               Tree.Right_Node, Node_Cursor, Heap_Record.Depth + 1,
+               Split_Node_Right);
             Add_To_Frontier (Split_Node_Right, Frontier);
          end if;
 
@@ -239,7 +241,7 @@ package body Tree_Build is
       use Build_Utils;
       use Build_Utils.Stack_Package;
       First             : Boolean := True;
-      Is_Left           : Boolean := True;
+      Branch            : Tree.Node_Type;
       Parent            : Tree.Tree_Cursor;
       Impurity          : Float := Float'Last;
       Num_Node_Samples  : Natural := 0;
@@ -258,15 +260,15 @@ package body Tree_Build is
       Stack_Curs        : Build_Utils.Stack_Cursor;
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
-      --  L163
+      --  L159
       Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
 
       Data.Parent_Cursor := Node_Cursor;
       Data.Start := 1;
       Data.Stop := Num_Node_Samples;
-      Push (Stack, 1, Num_Node_Samples, Depth, Node_Cursor, Is_Left, Impurity,
-            0);
+      Push (Stack, 1, Num_Node_Samples, Depth, Node_Cursor, Tree.Left_Node,
+            Impurity, 0);
 
       --  L190
       while not Stack.Is_Empty loop
@@ -275,7 +277,7 @@ package body Tree_Build is
          Stop := Data.Stop;
          Depth := Data.Depth;
          Parent := Data.Parent_Cursor;
-         Is_Left := Data.Is_Left;
+         Branch := Data.Branch;
          Constant_Features := Data.Num_Constant_Features;
 
          Num_Node_Samples := Stop - Start + 1;
@@ -302,17 +304,17 @@ package body Tree_Build is
          end if;
 
          Node_Cursor := Add_Node
-           (theTree, Parent, Is_Left, Is_Leaf, Split.Feature, Split.Threshold,
+           (theTree, Parent, Branch, Is_Leaf, Split.Feature, Split.Threshold,
             Impurity, Splitter.Num_Samples, Weighted_Samples);
 
          if not Is_Leaf then
             --  Right child
             Push (Stack, Split.Split_Row, Stop, Depth + 1, Parent,
-                 False, Split.Impurity_Right, Constant_Features);
+                 Tree.Right_Node, Split.Impurity_Right, Constant_Features);
 
             --  Left child
             Push (Stack, Start, Split.Split_Row - 1, Depth + 1, Parent,
-                 True, Split.Impurity_Left, Constant_Features);
+                 Tree.Left_Node, Split.Impurity_Left, Constant_Features);
          end if;
 
          if Depth > Max_Depth_Seen then

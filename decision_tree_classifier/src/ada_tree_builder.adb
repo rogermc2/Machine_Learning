@@ -103,7 +103,7 @@ package body Ada_Tree_Builder is
             First := False;
         else
             Child_Cursor := Tree_Build.Add_Node
-              (theTree, Data.Parent_Cursor, Data.Is_Left, Is_Leaf_Node,
+              (theTree, Data.Parent_Cursor, Data.Branch, Is_Leaf_Node,
                Split.Feature, Split.Threshold, Impurity, Num_Node_Samples,
                Weighted_Node_Samples);
         end if;
@@ -135,11 +135,11 @@ package body Ada_Tree_Builder is
                         Integer'Image (Stop_Row));
             --  Add right branch
             Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
-                  Child_Cursor, False, Split.Impurity_Right,
+                  Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
                   Num_Constant_Features);
             --  Add left branch
             Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
-                  Child_Cursor, True, Split.Impurity_Left,
+                  Child_Cursor, Tree.Left_Node, Split.Impurity_Left,
                   Num_Constant_Features);
         end if;
         --  L254
@@ -189,7 +189,7 @@ package body Ada_Tree_Builder is
                                      Split);
         --  L229 first
         Top_Node_Cursor := Tree_Build.Add_Node
-          (theTree, theTree.Nodes.Root, True, False, 1, 0.0, Impurity,
+          (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,
            Splitter.Num_Samples, Splitter.Weighted_Samples);
         --  L239 first
         Node_Splitter.Node_Value (Builder.Splitter, Values);
@@ -197,8 +197,8 @@ package body Ada_Tree_Builder is
         theTree.Values.Append (Values);
 
         --  L184
-        Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor, True,
-              Impurity, Constant_Features);
+      Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor,
+            Tree.Left_Node, Impurity, Constant_Features);
 
         --  L190
         while not Stack.Is_Empty loop

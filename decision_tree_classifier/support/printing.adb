@@ -433,7 +433,7 @@ package body Printing is
       Put_Line ("Start Row:      " & Integer'Image (Data.Start));
       Put_Line ("Stop Row:       " & Integer'Image (Data.Stop));
       Put_Line ("Depth:          " & Integer'Image (Data.Depth));
-      Put_Line ("Is Left:        " & Boolean'Image (Data.Is_Left));
+      Put_Line ("Branch:         " & Tree.Node_Type'Image (Data.Branch));
       Put_Line ("Impurity:       " & Float'Image (Data.Impurity));
       Put_Line ("Num Constant Features: " &
                   Integer'Image (Data.Num_Constant_Features));
