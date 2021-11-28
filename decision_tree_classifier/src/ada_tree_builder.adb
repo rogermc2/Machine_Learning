@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
+with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -15,7 +16,6 @@ package body Ada_Tree_Builder is
 
    Epsilon : constant Float := 10.0 ** (-10);
 
-   First          : Boolean := True;
    Max_Depth_Seen : Positive := 1;
 
    procedure Init_Tree_Builder
@@ -34,14 +34,15 @@ package body Ada_Tree_Builder is
      (theTree  : in out Tree.Tree_Class;
       Builder  : in out Tree_Builder;
       theStack : in out Build_Utils.Stack_List;
-      Split    : in out Node_Splitter.Split_Record) is
+      Split    : in out Node_Splitter.Split_Record;
+      First    : in out Boolean) is
       use Ada.Containers;
       use Build_Utils;
       use Node_Splitter;
       use Tree;
       use Nodes_Package;
-      --          Routine_Name          : constant String :=
-      --                                    "Ada_Tree_Builder.Add_Branch ";
+      Routine_Name          : constant String :=
+                               "Ada_Tree_Builder.Add_Branch ";
       --  L199
       Data                  : constant Stack_Record := Pop (theStack);
       Start_Row             : constant Positive := Data.Start;
@@ -60,6 +61,7 @@ package body Ada_Tree_Builder is
       --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       if First then
+         Printing.Print_Stack_Record (Routine_Name & "Data", Data);
          null;
       else
          Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
@@ -91,8 +93,6 @@ package body Ada_Tree_Builder is
          Is_Leaf_Node := Split.Split_Row >= Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
       end if;
-      --        Put_Line (Routine_Name & ", L233 Is_Leaf_Node: " &
-      --                    Boolean'Image (Is_Leaf_Node));
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at
@@ -117,24 +117,24 @@ package body Ada_Tree_Builder is
       --  Values dimensions: num outputs x num classes
       Node_Splitter.Node_Value (Builder.Splitter, Values);
 
-      --          Put_Line (Routine_Name & " L238 Node" & Integer'Image (Node_ID));
-      --          Printing.Print_Weights_Lists_2D (Routine_Name & " Values", Values);
+      Put_Line (Routine_Name & " L238 Node" & Integer'Image (Node_ID));
+      Printing.Print_Weights_Lists_2D (Routine_Name & " Values", Values);
 
       if Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node_ID));
       end if;
       theTree.Values.Replace_Element (Node_ID, Values);
 
-      --        Put_Line
-      --          ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Num_Node_Samples: " &
-      --                    Integer'Image (Node_ID) & ", " &
-      --                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
+      Put_Line
+        (Routine_Name & "Pre L240 Node_ID, Num_Node_Samples: " &
+           Integer'Image (Node_ID) & ", " &
+           Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
-         --           Put_Line ("Ada_Tree_Builder.Add_Branch L240 Start, Pos, End: " &
-         --                    Integer'Image (Start_Row) & ", " &
-         --                    Integer'Image (Split.Split_Row) & ", " &
-         --                    Integer'Image (Stop_Row));
+         Put_Line (Routine_Name & " L240 Start, Pos, End: " &
+                     Integer'Image (Start_Row) & ", " &
+                     Integer'Image (Split.Split_Row) & ", " &
+                     Integer'Image (Stop_Row));
          --  Add right branch
          Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
                Child_Cursor, False, Split.Impurity_Right,
@@ -164,6 +164,7 @@ package body Ada_Tree_Builder is
       use Tree.Nodes_Package;
       use Node_Splitter;
       Routine_Name      : constant String := "Ada_Tree_Builder.Build_Tree ";
+      First             : Boolean := True;
       Depth             : constant Natural := 1;
       Builder           : Tree_Builder;
       Start_Row         : constant Positive := 1;
@@ -198,7 +199,7 @@ package body Ada_Tree_Builder is
 
       --  L190
       while not Stack.Is_Empty loop
-         Add_Branch (theTree, Builder, Stack, Split);
+         Add_Branch (theTree, Builder, Stack, Split, First);
       end loop;
       Put_Line (Routine_Name & "tree built.");
       New_Line;
