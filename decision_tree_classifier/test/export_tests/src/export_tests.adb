@@ -60,6 +60,7 @@ package body Export_Tests is
       Class_Names.Append (To_Unbounded_String ("No"));
       Feature_Names.Append (To_Unbounded_String ("feature_1"));
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
+
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
               Min_Split_Samples => 2);
       Put_Line (Routine_Name);
@@ -116,10 +117,10 @@ package body Export_Tests is
           (Exporter, theClassifier.Attributes.Decision_Tree);
 
       --  Test multi-output with weighted samples
-      Graphviz_Exporter.Export_Graphviz
-        (Exporter, theClassifier.Attributes.Decision_Tree, Filled => True,
-         Impurity => False, Max_Depth => 5,
-         Output_File_Name => To_Unbounded_String ("multi_output.dot"));
+--        Graphviz_Exporter.Export_Graphviz
+--          (Exporter, theClassifier.Attributes.Decision_Tree, Filled => True,
+--           Impurity => False, Max_Depth => 5,
+--           Output_File_Name => To_Unbounded_String ("multi_output.dot"));
 
    end Test_Graphviz_Toy;
 

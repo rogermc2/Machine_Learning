@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with ML_Types;
---  with Printing;
+with Printing;
 with Weights;
 
 package body Node_Strings is
@@ -68,7 +68,7 @@ package body Node_Strings is
 
       --  L289
       if not Element (Node_Curs).Leaf_Node then
-         --          not Element (First_Child (Node_Curs)).Leaf_Node then
+--           not Element (First_Child (Node_Curs)).Leaf_Node then
          Write_Decision_Criteria (Exporter, Node_ID, Node_Data, Node_String);
       end if;
 
@@ -101,8 +101,8 @@ package body Node_Strings is
       Node_ID     : Positive;
       Node_Data   : Tree.Tree_Node;
       Node_String : in out Unbounded_String) is
-      --            Routine_Name     : constant String :=
-      --                                 "Node_Strings.Write_Decision_Criteria ";
+      Routine_Name     : constant String :=
+                           "Node_Strings.Write_Decision_Criteria ";
       Feature_ID       : Positive;
       Feature          : Unbounded_String;
       Feature_Names    : constant ML_Types.Feature_Names_List :=
@@ -110,6 +110,8 @@ package body Node_Strings is
    begin
       if not Exporter.Feature_Names.Is_Empty then
          --  L294
+         Printing.Print_Unbounded_List (Routine_Name & "Feature_Names",
+                                        Exporter.Feature_Names);
          Feature := To_Unbounded_String ("X[") &
            Feature_Names.Element (Node_ID) & "]";
       else
