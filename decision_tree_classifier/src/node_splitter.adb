@@ -48,16 +48,14 @@ package body Node_Splitter is
                        return Boolean is
       use ML_Types;
       Routine_Name : constant String := "Node_Splitter.Can_Split";
-      X_F_Start    : Value_Record;
-      X_F_End      : Value_Record;
+      X_F_Start    : constant Value_Record :=
+                       Self.Feature_Values.Element (Self.Feature_Values.First_Index);
+      X_F_End      : constant Value_Record :=
+                       Self.Feature_Values.Element (Self.Feature_Values.Last_Index);
       Swap         : Natural;
       LE           : Boolean;
       OK           : Boolean := False;
    begin
-      X_F_Start :=
-        Self.Feature_Values.Element (Self.Feature_Values.First_Index);
-      X_F_End :=
-        Self.Feature_Values.Element (Self.Feature_Values.Last_Index);
       --        Printing.Print_Value_Data_Record (Routine_Name & " X_F_Start", X_F_Start);
       --        Printing.Print_Value_Data_Record (Routine_Name & " X_F_End", X_F_End);
       case X_F_Start.Value_Kind is
