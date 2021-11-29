@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Build_Utils;
 with Node_Splitter;
---  with Printing;
+with Printing;
 with Tree;
 with Tree_Build;
 with Weights;
@@ -73,21 +73,38 @@ package body Ada_Tree_Builder is
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
       abs (Impurity) <= Epsilon;  --  0.0 withtolerance for rounding errors
+      --        Put_Line (Routine_Name & " L207 Data.Depth >= Builder.Max_Depth: " &
+      --                    Boolean'Image (Data.Depth >= Builder.Max_Depth));
+      --        Put_Line (Routine_Name & " L220 Builder.Splitter.Num_Samples = 1: " &
+      --                    Boolean'Image (Builder.Splitter.Num_Samples = 1));
+      --        Put_Line (Routine_Name & " L220 Num_Node_Samples < Builder.Min_Samples_Split: " &
+      --                    Boolean'Image (Num_Node_Samples < Builder.Min_Samples_Split));
+      --        Put_Line (Routine_Name & " L220 Num_Node_Samples < 2 * Builder.Min_Samples_Leaf: " &
+      --                    Boolean'Image (Num_Node_Samples < 2 * Builder.Min_Samples_Leaf));
+      --        Put_Line (Routine_Name & " L220 Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf: " &
+      --                    Boolean'Image (Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf));
+      --        Put_Line (Routine_Name & " L220 abs (Impurity) <= Epsilon: " &
+      --                    Boolean'Image (abs (Impurity) <= Epsilon));
+      Put_Line (Routine_Name &
+                  " L207 Is_Leaf_Node: " & Boolean'Image (Is_Leaf_Node));
 
       --  L220
       if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         --           Printing.Print_Split_Record (Routine_Name & "L221 Split record",
-         --                                        Split);
-         --           Put_Line (Routine_Name & ", L220 Split.Split_Row >= Stop_Row: " &
-         --                       Boolean'Image (Split.Split_Row >= Stop_Row));
-         --           Put_Line (Routine_Name &
-         --                       ", L220 Improvement + Epsilon < Min_Impurity_Decrease: " &
-         --                       Boolean'Image (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
          --  L233
          Is_Leaf_Node := Split.Split_Row >= Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
+         Put_Line (Routine_Name & " L233 Is_Leaf_Node: " &
+                     Boolean'Image (Is_Leaf_Node));
+         if Is_Leaf_Node then
+            Put_Line (Routine_Name & " L233 Split.Split_Row >= Stop_Row: " &
+                        Boolean'Image (Split.Split_Row >= Stop_Row));
+            Put_Line (Routine_Name &
+                        " L233 Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease: " &
+                        Boolean'Image
+                        (Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease));
+         end if;
       end if;
 
       --  tree.add_node adds one node to the tree
@@ -131,10 +148,10 @@ package body Ada_Tree_Builder is
       --                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
---           Put_Line (Routine_Name & "L240 Start, Pos, End: " &
---                       Integer'Image (Start_Row) & ", " &
---                       Integer'Image (Split.Split_Row) & ", " &
---                       Integer'Image (Stop_Row));
+         --           Put_Line (Routine_Name & "L240 Start, Pos, End: " &
+         --                       Integer'Image (Start_Row) & ", " &
+         --                       Integer'Image (Split.Split_Row) & ", " &
+         --                       Integer'Image (Stop_Row));
          --  Add right branch
          Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
                Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
@@ -143,11 +160,17 @@ package body Ada_Tree_Builder is
          Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
                Child_Cursor, Tree.Left_Node, Split.Impurity_Left,
                Num_Constant_Features);
+      else
+         Put_Line (Routine_Name & ", L254 leaf node.");
+         Printing.Print_Split_Record (Routine_Name & "Split", Split);
       end if;
+
       --  L254
       if Data.Depth + 1 > Max_Depth_Seen then
          Max_Depth_Seen := Data.Depth + 1;
       end if;
+      Put_Line (Routine_Name & "end");
+      New_Line;
 
    end Add_Branch;
 
@@ -186,8 +209,8 @@ package body Ada_Tree_Builder is
       Impurity := Gini_Node_Impurity (Builder.Splitter);
       --  L221 first
       Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
---        Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
---                                     Split);
+      --        Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
+      --                                     Split);
       --  L229 first  Add_Node adds a node to theTree
       Top_Node_Cursor := Tree_Build.Add_Node
         (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,
