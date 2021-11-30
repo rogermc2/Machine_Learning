@@ -168,6 +168,7 @@ package body Base_Decision_Tree is
         --  L235
         Assert (aClassifier.Parameters.Min_Samples_Leaf > 0,
                 Routine_Name & ", Min_Samples_Leaf must be at least 1");
+
         --  L250
         case aClassifier.Parameters.Min_Samples_Split.Value_Kind is
         when Split_Float =>

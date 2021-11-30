@@ -132,12 +132,12 @@ package body Node_Splitter is
         end Compare;
 
     begin
-        --          Put_Line (Routine_Name & " Start, Stop: " &
-        --                      Integer'Image (Splitter.Start_Row) & ", " &
-        --                      Integer'Image (Splitter.Stop_Row));
-        --          Printing.Print_Value_Data_List
-        --            (Routine_Name & " L380, Self.Feature_Values",
-        --             Splitter.Feature_Values);
+        Put_Line (Routine_Name & " Start, Stop: " &
+                    Integer'Image (Splitter.Start_Row) & ", " &
+                    Integer'Image (Splitter.Stop_Row));
+        Printing.Print_Value_Data_List
+          (Routine_Name & " L380, Self.Feature_Values",
+           Splitter.Feature_Values);
 
         --  Set of features to be split:
         --  Splitter.Start_Index through Splitter.End_Index
@@ -153,16 +153,16 @@ package body Node_Splitter is
 
             --  L389
             P_Index := P_Index + 1;
-            --              Put_Line (Routine_Name & " L389 P_Index: " &
-            --                          Integer'Image (P_Index));
+            Put_Line (Routine_Name & " L389 P_Index: " &
+                        Integer'Image (P_Index));
             --  L393
             if P_Index <= Splitter.Stop_Row then
                 Current.Split_Row := P_Index;
-                --                  Put_Line (Routine_Name &
-                --                              " L395 Start_Row, Split_Row, End_Row: " &
-                --                              Integer'Image (Splitter.Start_Row) & ", " &
-                --                              Integer'Image (Current.Split_Row) & ", " &
-                --                              Integer'Image (Splitter.Stop_Row));
+                Put_Line (Routine_Name &
+                            " L395 Start_Row, Split_Row, End_Row: " &
+                            Integer'Image (Splitter.Start_Row) & ", " &
+                            Integer'Image (Current.Split_Row) & ", " &
+                            Integer'Image (Splitter.Stop_Row));
                 --  Best.Pos_I is the start index of the right node's data
                 --  L397 Accept if min_samples_leaf is guaranteed
                 if Current.Split_Row - Splitter.Start_Row >=
@@ -243,10 +243,9 @@ package body Node_Splitter is
         end loop;
 
         if not Best_Updated then
-            Put_Line
-              (Routine_Name & "WARNING : Best Fit was not updated");
-            Printing.Print_Split_Record ("", Best);
+            Printing.Print_Split_Record (Routine_Name & "Best Fit", Best);
         end if;
+        Assert (Best_Updated, Routine_Name & "Best Fit was not updated");
 
         Assert (Best.Split_Row > Splitter.Start_Row,
                 "Node_Splitter.Evaluate_All_Splits, split position" &
