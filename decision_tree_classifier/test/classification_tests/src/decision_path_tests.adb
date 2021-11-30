@@ -1,6 +1,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
@@ -10,6 +11,7 @@ with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
 with Decision_Tree_Classification;
+with Graphviz_Exporter;
 with ML_Types;
 with Node_Splitter;
 with Printing;
@@ -26,20 +28,20 @@ package body Decision_Path_Tests is
       use Decision_Tree_Classification;
       use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name    : constant String :=
-                          "Decision_Path_Tests.Test_Decision_Path";
-      Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
-      Criteria        : Criterion.Criterion_Class;
-      Splitter        : Node_Splitter.Splitter_Class;
-      theClassifier   : Base_Decision_Tree.Classifier
+      Routine_Name      : constant String :=
+                            "Decision_Path_Tests.Test_Decision_Path";
+      Iris_Data         : constant Data_Record := Load_Data ("src/iris.csv");
+      Criteria          : Criterion.Criterion_Class;
+      Splitter          : Node_Splitter.Splitter_Class;
+      theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
-      X               :  Value_Data_Lists_2D;
+      X                 :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
-      Y               : Value_Data_Lists_2D;
-      No_Weights      : Weights.Weight_List := Empty_Vector;
-      Num_Samples     : Natural;
-      Probabilities   : Weights.Weight_Lists_3D;
-      Column_Sums     : Weights.Weight_List;
+      Y                 : Value_Data_Lists_2D;
+      No_Weights        : Weights.Weight_List := Empty_Vector;
+      Num_Samples       : Natural;
+      Probabilities     : Weights.Weight_Lists_3D;
+      Column_Sums       : Weights.Weight_List;
    begin
       C_Init (theClassifier, Criteria, Splitter);
       --  L1689
@@ -86,12 +88,13 @@ package body Decision_Path_Tests is
       Iris_Data     : Data_Record;
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
-      X             :  Value_Data_Lists_2D;
+      Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
+      X              :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
-      Y             : Value_Data_Lists_2D;
-      No_Weights    : Weights.Weight_List := Empty_Vector;
-      Num_Samples   : Natural;
-      Prediction    : ML_Types.Value_Data_Lists_2D;
+      Y              : Value_Data_Lists_2D;
+      No_Weights     : Weights.Weight_List := Empty_Vector;
+      Num_Samples    : Natural;
+      Prediction     : ML_Types.Value_Data_Lists_2D;
    begin
       C_Init (theClassifier, Criteria, Splitter);
       Open (Data_File, In_File, "src/iris.csv");
@@ -119,6 +122,12 @@ package body Decision_Path_Tests is
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Prediction);
+
+      Graphviz_Exporter.C_Init
+        (Exporter, theClassifier.Attributes.Decision_Tree);
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Output_File_Name => To_Unbounded_String ("iris.dot"));
 
    end Test_Iris;
 

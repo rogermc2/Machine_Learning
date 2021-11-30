@@ -47,6 +47,18 @@ package Base_Decision_Tree is
                                Max_Features_Auto, Max_Features_Sqrt,
                                Max_Features_Log_Sq, Max_Features_None);
 
+   type Split_Data_Type is (Split_Integer, Split_Float);
+
+   type Split_Value_Record (Value_Kind : Split_Data_Type
+                            := Split_Integer) is record
+      case Value_Kind is
+         when Split_Float => Float_Value : Float := 0.0;
+         when Split_Integer => Integer_Value : Integer := 2;
+      end case;
+   end record;
+
+   Default_Min_Split : Split_Value_Record;
+
     --  class BaseDecisionTree
     type Base_Parameter_Data
       (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
@@ -55,8 +67,8 @@ package Base_Decision_Tree is
         Critera                  : Criterion.Criterion_Class;
         Splitter_Kind            : Splitter_Type := Best_Splitter;
         Splitter                 : Node_Splitter.Splitter_Class;
+        Min_Samples_Split        : Split_Value_Record := Default_Min_Split;
         Max_Depth                : Integer := -1;  --  < 0 means unspecified
-        Min_Samples_Split        : Integer := 2;
         Min_Samples_Leaf         : Integer := 1;
         Min_Weight_Fraction_Leaf : Float := 0.0;
         Max_Features             : Tree.Index_Range := 1;
@@ -109,7 +121,7 @@ package Base_Decision_Tree is
     procedure C_Init (aClassifier              : in out Classifier;
                       Criteria                 : Criterion.Criterion_Class;
                       Splitter                 : Node_Splitter.Splitter_Class;
-                      Min_Samples_Split        : Integer := 2;
+                      Min_Samples_Split        : Split_Value_Record;
                       Min_Leaf_Samples         : Integer := 1;
                       Max_Features             : Tree.Index_Range :=
                         Tree.Index_Range'Last;
