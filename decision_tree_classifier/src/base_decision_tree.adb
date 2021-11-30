@@ -112,8 +112,6 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
-      Put_Line (Routine_Name & "L410 Max_Leaf_Nodes" &
-                  Integer'Image (aClassifier.Parameters.Max_Leaf_Nodes));
       --  L410
       Ada_Tree_Builder.Build_Tree
         (aClassifier.Attributes.Decision_Tree, Splitter, X, Y_Encoded,
