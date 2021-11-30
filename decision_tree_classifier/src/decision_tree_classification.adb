@@ -40,10 +40,10 @@ package body Decision_Tree_Classification is
                         Base_Decision_Tree.Classifier;
                       Criteria                 : Criterion.Criterion_Class;
                       Splitter                 : Node_Splitter.Splitter_Class;
+                      Min_Split_Samples        : ML_Types.Value_Record;
                       theCriterion             : Criterion.
                         Classifier_Criteria_Type := Criterion.Gini_Criteria;
                       Max_Depth                : Integer := -1;
-                      Min_Split_Samples        : Positive := 2;
                       Min_Leaf_Samples         : Positive := 1;
                       Min_Leaf_Weight_Fraction : Float := 0.0;
                       Max_Features             : Tree.Index_Range :=

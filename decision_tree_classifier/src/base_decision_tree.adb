@@ -112,6 +112,8 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
+      Put_Line (Routine_Name & "L410 Max_Leaf_Nodes" &
+                  Integer'Image (aClassifier.Parameters.Max_Leaf_Nodes));
       --  L410
       Ada_Tree_Builder.Build_Tree
         (aClassifier.Attributes.Decision_Tree, Splitter, X, Y_Encoded,
@@ -137,8 +139,8 @@ package body Base_Decision_Tree is
       Max_Depth             : Natural;
       Max_Leaf_Nodes        : constant Integer :=
                                 aClassifier.Parameters.Max_Leaf_Nodes;
-      Min_Sample_Leaf       : constant Positive := 1;
-      Min_Sample_Split      : Positive := 1;
+--        Min_Sample_Leaf       : constant Positive := 1;
+      Min_Samples_Split     : ML_Types.Value_Record;
       Max_Features          : Index_Range := Tree.Index_Range'Last;
       Sqrt_Num_Features     : Index_Range := 1;
    begin
@@ -154,14 +156,24 @@ package body Base_Decision_Tree is
       Assert (aClassifier.Parameters.Min_Samples_Leaf > 0,
               Routine_Name & ", Min_Samples_Leaf must be at least 1");
       --  L250
-      Assert (aClassifier.Parameters.Min_Samples_Split > 1, Routine_Name &
-                ", Min_Samples_Split must be at least 2");
-      Min_Sample_Split := aClassifier.Parameters.Min_Samples_Split;
+      case aClassifier.Parameters.Min_Samples_Split.Value_Kind is
+      when ML_Types.Float_Type =>
+         Assert (aClassifier.Parameters.Min_Samples_Split.Float_Value > 0.0
+                 and
+                   aClassifier.Parameters.Min_Samples_Split.Float_Value <= 1.0,
+                 Routine_Name &
+                   " Min_Samples_Split must be in the range (0.0, 1.0]");
+      when ML_Types.Integer_Type =>
+         Assert (aClassifier.Parameters.Min_Samples_Split.Integer_Value > 1,
+                 Routine_Name & " Min_Samples_Split must be at least 2");
+         Min_Samples_Split := aClassifier.Parameters.Min_Samples_Split;
+      when others => null;
+      end case;
 
-      --  L263
-      if Min_Sample_Split < 2 * Min_Sample_Leaf then
-         Min_Sample_Split := 2 * Min_Sample_Leaf;
-      end if;
+      --  L265
+--        if Min_Sample_Split < 2 * Min_Sample_Leaf then
+--           Min_Sample_Split := 2 * Min_Sample_Leaf;
+--        end if;
 
       Sqrt_Num_Features :=
         Tree.Index_Range (Sqrt (Float (aClassifier.Attributes.Num_Features)));
@@ -215,7 +227,7 @@ package body Base_Decision_Tree is
    procedure C_Init (aClassifier              : in out Classifier;
                      Criteria                 : Criterion.Criterion_Class;
                      Splitter                 : Node_Splitter.Splitter_Class;
-                     Min_Samples_Split        : Integer := 2;
+                     Min_Samples_Split        : ML_Types.Value_Record;
                      Min_Leaf_Samples         : Integer := 1;
                      Max_Features             : Tree.Index_Range :=
                        Tree.Index_Range'Last;
@@ -311,7 +323,7 @@ package body Base_Decision_Tree is
 
       --  L227
       Classes := aClassifier.Attributes.Classes;
---        Printing.Print_Natural_Lists_2D (Routine_Name & "Y_Encoded", Y_Encoded);
+      --        Printing.Print_Natural_Lists_2D (Routine_Name & "Y_Encoded", Y_Encoded);
       Printing.Print_Value_Data_Lists_2D (Routine_Name & "Classes", Classes);
 
    exception
@@ -323,7 +335,7 @@ package body Base_Decision_Tree is
 
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
-                     return ML_Types.Value_Data_Lists_2D is
+                  return ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
       use Weights;
       Routine_Name      : constant String := "Base_Decision_Tree.Predict";
