@@ -55,7 +55,8 @@ package Base_Decision_Tree is
         Critera                  : Criterion.Criterion_Class;
         Splitter_Kind            : Splitter_Type := Best_Splitter;
         Splitter                 : Node_Splitter.Splitter_Class;
-        Min_Samples_Split        : ML_Types.Value_Record;
+        Min_Samples_Split        : ML_Types.Value_Record
+          (ML_Types.Integer_Type);
         Max_Depth                : Integer := -1;  --  < 0 means unspecified
         Min_Samples_Leaf         : Integer := 1;
         Min_Weight_Fraction_Leaf : Float := 0.0;
