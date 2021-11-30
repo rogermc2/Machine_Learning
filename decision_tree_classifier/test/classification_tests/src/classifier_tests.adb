@@ -58,10 +58,8 @@ package body Classifier_Tests is
       Sample_Weights_2 : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
       Probabilities    : Weights.Weight_Lists_3D;
       Column_Sums      : Weights.Weight_List;
-      Min_Samples_Split : ML_Types.Value_Record (Integer_Type);
    begin
-      Min_Samples_Split.Integer_Value := 2;
-      C_Init (theClassifier, Criteria, Splitter, Min_Samples_Split);
+      C_Init (theClassifier, Criteria, Splitter);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");

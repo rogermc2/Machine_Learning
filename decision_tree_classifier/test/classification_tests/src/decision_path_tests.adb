@@ -40,10 +40,8 @@ package body Decision_Path_Tests is
         Num_Samples       : Natural;
         Probabilities     : Weights.Weight_Lists_3D;
         Column_Sums       : Weights.Weight_List;
-        Min_Samples_Split : ML_Types.Value_Record (Integer_Type);
     begin
-        Min_Samples_Split.Integer_Value := 2;
-        C_Init (theClassifier, Criteria, Splitter, Min_Samples_Split);
+        C_Init (theClassifier, Criteria, Splitter);
         --  L1689
         X := Iris_Data.Feature_Values;
         Num_Samples := Natural (X.Length);
@@ -94,10 +92,8 @@ package body Decision_Path_Tests is
         No_Weights    : Weights.Weight_List := Empty_Vector;
         Num_Samples   : Natural;
         Prediction    : ML_Types.Value_Data_Lists_2D;
-        Min_Samples_Split : ML_Types.Value_Record (Integer_Type);
     begin
-        Min_Samples_Split.Integer_Value := 2;
-        C_Init (theClassifier, Criteria, Splitter, Min_Samples_Split);
+        C_Init (theClassifier, Criteria, Splitter);
         Open (Data_File, In_File, "src/iris.csv");
         Utilities.Load_CSV_Data (Data_File, Iris_CSV_Data);
         Close (Data_File);
