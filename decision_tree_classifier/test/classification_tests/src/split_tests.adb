@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Strings.Unbounded; use  Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
@@ -123,8 +123,14 @@ package body Split_Tests is
       Assert (Check_Min_Split (theClassifier, Min_Split),
               Routine_Name & "failed with Min_Split " &
                 Integer'Image (Min_Split) & " less than 10");
-      Put_Line (Routine_Name & " Min_Split integer test status: " &
+      Put_Line (Routine_Name & " Min_Split integer test Min_Split: " &
                   Integer'Image (Min_Split));
+
+      Graphviz_Exporter.C_Init
+        (Exporter, theClassifier.Attributes.Decision_Tree);
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Output_File_Name => To_Unbounded_String ("integer_test.dot"));
 
       --  L684 test for float parameter
       Min_Split_Float_Samples.Float_Value := 0.2;
@@ -141,7 +147,7 @@ package body Split_Tests is
       Assert (Check_Min_Split (theClassifier, Min_Split),
               Routine_Name & "failed with Min_Split " &
                 Integer'Image (Min_Split) & " less than 10");
-      Put_Line (Routine_Name & " Min_Split float test status: " &
+      Put_Line (Routine_Name & " Min_Split float test Min_Split: " &
                   Integer'Image (Min_Split));
 
       Graphviz_Exporter.C_Init
