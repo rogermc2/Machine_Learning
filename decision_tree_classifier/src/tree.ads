@@ -18,6 +18,7 @@ package Tree is
    type State is (None);
    type Data_Type is (Integer_Type, Float_Type, Enum_Type);
    type Feature_Type is (No_Feature, Auto_Feature, Sqrt_Feature, Log2_Feature);
+   type Node_Type is (Top_Node, Left_Node, Right_Node);
 
    Max_Array_Size : constant Integer := 4000;
    type Index_Range is range 1 .. Max_Array_Size;

@@ -38,7 +38,7 @@ package Criterion is
        Proxy_Improvement         : Float := -Float'Last;
        case Criterion_Type is
            when Criterion_Classification =>
-               Num_Classes  : Classifier_Types.Natural_List;
+               Classes  : Classifier_Types.Natural_List;
            when Criterion_Regression =>
                Sq_Sum_Total : Float := 0.0;
        end case;
@@ -48,7 +48,7 @@ package Criterion is
 
     procedure C_Init (Criteria    : in out Criterion_Class;
                       Num_Outputs : Tree.Index_Range;
-                      Num_Classes : Classifier_Types.Natural_List);
+                      Classes     : Classifier_Types.Natural_List);
     procedure Classification_Init
       (Criteria             : in out Criterion_Class;
        Y                    : Classifier_Types.Natural_Lists_2D;

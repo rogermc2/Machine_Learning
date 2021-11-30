@@ -1,7 +1,9 @@
 
 with Classifier_Types;
+with ML_Types;
 with Node_Splitter;
 with Tree;
+with Weights;
 
 package Ada_Tree_Builder is
 
@@ -18,9 +20,11 @@ package Ada_Tree_Builder is
     Ada_Tree_Build_Error : Exception;
 
     procedure Build_Tree
-      (theTree       : in out Tree.Tree_Class;
-       Splitter      : in out Node_Splitter.Splitter_Class;
-       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
-       Max_Depth     : Integer);
+      (theTree        : in out Tree.Tree_Class;
+       Splitter       : in out Node_Splitter.Splitter_Class;
+       X              : ML_Types.Value_Data_Lists_2D;
+       Y_Encoded      : Classifier_Types.Natural_Lists_2D;
+       Sample_Weights : Weights.Weight_List;
+       Max_Depth      : Integer);
 
 end Ada_Tree_Builder;

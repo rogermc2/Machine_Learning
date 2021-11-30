@@ -38,7 +38,7 @@ package body Base_Decision_Tree is
         use Ada.Containers;
         use Estimator;
         Routine_Name          : constant String :=
-                                  "Base_Decision_Tree.Base_Fit";
+                                  "Base_Decision_Tree.Base_Fit ";
         Num_Outputs           : constant Positive :=
                                   Positive (Y.Element (1).Length);
         Criteria              : Criterion.Criterion_Class;
@@ -71,16 +71,16 @@ package body Base_Decision_Tree is
 
         Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
                           Num_Classes);
-        --  L163
         Node_Splitter.C_Init (Splitter, Criteria);
 
-        --  L184
+        --  L189
         aClassifier.Attributes.Num_Features :=
           Tree.Index_Range (X.Element (1).Length);
-        Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
 
+      --  L229
         Base_Fit_Checks (aClassifier, X, Y, Sample_Weights);
-        --  L326
+        --  Base_Fit_Checks ends at L350
+        --  L323
         if not Expanded_Class_Weight.Is_Empty then
             if Sample_Weights.Is_Empty then
                 Sample_Weights := Expanded_Class_Weight;
@@ -114,8 +114,8 @@ package body Base_Decision_Tree is
 
         --  L410
         Ada_Tree_Builder.Build_Tree
-          (aClassifier.Attributes.Decision_Tree, Splitter, Y_Encoded,
-           aClassifier.Parameters.Max_Depth);
+          (aClassifier.Attributes.Decision_Tree, Splitter, X, Y_Encoded,
+           Sample_Weights, aClassifier.Parameters.Max_Depth);
 
         Prune_Tree (aClassifier);
 
@@ -263,10 +263,6 @@ package body Base_Decision_Tree is
         Column      : Natural_List;
         Inverse     : Natural_List;
     begin
-        Put_Line ("Base_Decision_Tree.Classification_Part Num samples: " &
-                    Count_Type'Image (Y.Length));
-        Put_Line ("Base_Decision_Tree.Classification_Part Num_Outputs: " &
-                    Count_Type'Image (Num_Outputs));
         aClassifier.Attributes.Classes.Clear;
         aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
         Y_Encoded.Clear;
@@ -311,6 +307,7 @@ package body Base_Decision_Tree is
               Weights.Compute_Sample_Weight (No_Weight, Y);
         end if;
 
+        --  L227
         Classes := aClassifier.Attributes.Classes;
         Printing.Print_Natural_Lists_2D ("Y_Encoded", Y_Encoded);
         Printing.Print_Value_Data_Lists_2D ("Classes", Classes);

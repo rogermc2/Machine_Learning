@@ -24,7 +24,7 @@ package Build_Utils is
       Start                 : Positive := 1;
       Stop                  : Positive := 1;
       Depth                 : Natural := 0;
-      Is_Left               : Boolean := True;
+      Branch                : Tree.Node_Type;
       Impurity              : Float := Float'Last;
       Num_Constant_Features : Natural := 0;
    end record;
@@ -44,7 +44,7 @@ package Build_Utils is
                    Start, Stop           : Positive;
                    Depth                 : Natural;
                    Parent                : Tree.Tree_Cursor;
-                   Is_Left               : Boolean;
+                   Branch                : Tree.Node_Type;
                    Impurity              : Float;
                    Num_Constant_Features : Natural);
 
