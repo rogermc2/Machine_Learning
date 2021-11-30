@@ -41,8 +41,8 @@ package body Ada_Tree_Builder is
         use Node_Splitter;
         use Tree;
         use Nodes_Package;
---          Routine_Name          : constant String :=
---                                    "Ada_Tree_Builder.Add_Branch ";
+        --          Routine_Name          : constant String :=
+        --                                    "Ada_Tree_Builder.Add_Branch ";
         --  L199
         Data                  : constant Stack_Record := Pop (theStack);
         Start_Row             : constant Positive := Data.Start;
@@ -178,12 +178,16 @@ package body Ada_Tree_Builder is
     --  ------------------------------------------------------------------
     --  L129 DepthFirstTreeBuilder.build
     procedure Build_Tree
-      (theTree        : in out Tree.Tree_Class;
-       Splitter       : in out Node_Splitter.Splitter_Class;
-       X              : ML_Types.Value_Data_Lists_2D;
-       Y_Encoded      : Classifier_Types.Natural_Lists_2D;
-       Sample_Weights : Weights.Weight_List;
-       Max_Depth      : Integer) is
+      (theTree               : in out Tree.Tree_Class;
+       Splitter              : in out Node_Splitter.Splitter_Class;
+       X                     : ML_Types.Value_Data_Lists_2D;
+       Y_Encoded             : Classifier_Types.Natural_Lists_2D;
+       Sample_Weights        : Weights.Weight_List;
+       Min_Samples_Split     : Positive;
+       Min_Samples_Leaf      : Positive;
+       Min_Weight_Leaf       : Float;
+       Max_Depth             : Integer;
+       Min_Impurity_Decrease : Float) is
         use Build_Utils;
         use Tree.Nodes_Package;
         use Node_Splitter;
@@ -203,7 +207,12 @@ package body Ada_Tree_Builder is
     begin
         --  L159
         Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
-        Init_Tree_Builder (Builder, Splitter, Max_Depth => Max_Depth);
+        Init_Tree_Builder (Builder, Splitter,
+                           Min_Samples_Split     => Min_Samples_Split,
+                           Min_Samples_Leaf      => Min_Samples_Leaf,
+                           Min_Weight_Leaf       => Min_Weight_Leaf,
+                           Max_Depth             => Max_Depth,
+                           Min_Impurity_Decrease => Min_Impurity_Decrease);
         --  L206
         Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
         --  L214
