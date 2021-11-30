@@ -33,8 +33,6 @@ package body Split_Tests is
          Node : constant Tree_Node := Element (Curs);
       begin
          if Curs /= Nodes.Root and then not Node.Leaf_Node  then
-            Put_Line ("Check_Min_Split.Check Node.Num_Node_Samples" &
-                        Integer'Image (Node.Num_Node_Samples));
             OK := OK and Node.Num_Node_Samples >= Min_Split_Rule;
             if Node.Num_Node_Samples < Num_Split then
                Num_Split := Node.Num_Node_Samples;
