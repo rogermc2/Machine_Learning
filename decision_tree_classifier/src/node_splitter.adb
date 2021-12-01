@@ -58,6 +58,7 @@ package body Node_Splitter is
    begin
       --        Printing.Print_Value_Data_Record (Routine_Name & " X_F_Start", X_F_Start);
       --        Printing.Print_Value_Data_Record (Routine_Name & " X_F_End", X_F_End);
+      --  L363
       case X_F_Start.Value_Kind is
          when Float_Type =>
             LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
@@ -71,7 +72,7 @@ package body Node_Splitter is
               & ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
       end case;
 
-      --  Still L369
+      --  Still L363
       if LE then
          Swap := Self.Feature_Indices.Element (F_J);
          Self.Feature_Indices.Replace_Element
@@ -81,7 +82,7 @@ package body Node_Splitter is
            (Num_Total_Constants + 1, Swap);
 
       else  --  L378
-         OK := F_I > 1;
+         OK := not LE and F_I > 1;
       end if;
 
       return OK;
@@ -132,6 +133,7 @@ package body Node_Splitter is
       end Compare;
 
    begin
+      Put_Line (Routine_Name);
       Put_Line (Routine_Name & " Start, Stop: " &
                   Integer'Image (Splitter.Start_Row) & ", " &
                   Integer'Image (Splitter.Stop_Row));
@@ -430,7 +432,7 @@ package body Node_Splitter is
                       Best_Split            : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
-      --          Routine_Name         : constant String := "Node_Splitter.Process ";
+      Routine_Name         : constant String := "Node_Splitter.Process ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -457,6 +459,7 @@ package body Node_Splitter is
       Sort (Splitter.Feature_Values);
       --  Splitter.Feature_Values is a value_data_list
       if Can_Split (Splitter, Num_Total_Constants, F_I, F_J) then
+         Put_Line (Routine_Name & "can split");
          --  L375
          F_I := F_I - 1;
          Swap := Splitter.Feature_Indices.Element (F_I);
@@ -472,6 +475,7 @@ package body Node_Splitter is
          Evaluate_All_Splits (Splitter, Current_Split, Best_Split);
          --  L428
       else -- L370
+         Put_Line (Routine_Name & "L370 can't split");
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
       end if;
