@@ -184,11 +184,11 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Export_Map
-      (Name : String; aMap : Export_Types.Export_Map) is
-        use Export_Types;
-        use Export_Types.Export_Maps;
-        Curs : Cursor := aMap.First;
-        aKey : Unbounded_String;
+     (Name : String; aMap : Export_Types.Export_Map) is
+      use Export_Types;
+      use Export_Types.Export_Maps;
+      Curs : Cursor := aMap.First;
+      aKey : Unbounded_String;
    begin
       Put_Line (Name & ": ");
       while Has_Element (Curs) loop
@@ -550,13 +550,13 @@ package body Printing is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
-         Put (Name & ": ");
+         Put_Line (Name & ": ");
       end if;
 
       for Index in theList.First_Index .. theList.Last_Index loop
          Value := theList.Element (Index);
-         Print_Value_Data_Record ("", Value);
          Put ("   ");
+         Print_Value_Data_Record ("", Value);
          Count := Count + 1;
          if Count > 10 then
             New_Line;
@@ -633,6 +633,10 @@ package body Printing is
          when Integer_Type => Put (Integer'Image (Value.Integer_Value));
          when UB_String_Type => Put (To_String (Value.UB_String_Value));
       end case;
+
+      if Name'Length > 0 then
+         New_Line;
+      end if;
 
    end Print_Value_Data_Record;
 
