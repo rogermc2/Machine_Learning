@@ -432,7 +432,7 @@ package body Graphviz_Exporter is
          Left_Child   : Tree.Tree_Cursor;
          Angles       : array (1 .. 2) of Integer;
       begin
-         Put_Line (Routine_Name & "Node ID" & Node_ID_S);
+--           Put_Line (Routine_Name & "Node ID" & Node_ID_S);
          if Node_ID > 1 then
             Node_Parent := Parent (Node_Curs);
             Parent_ID := Element (Node_Parent).Node_ID;

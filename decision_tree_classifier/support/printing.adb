@@ -574,19 +574,20 @@ package body Printing is
       Num_Items : Positive := 1000) is
       Items : Positive;
    begin
+      if Name'Length > 0 then
+         Put_Line (Name & ": ");
+      end if;
+
       if Integer (theList.Length) = 0 then
-         Put_Line ("Print_Value_Data_List_2D list is empty");
+         Put_Line ("List is empty");
 
       elsif Integer (theList.Element (1).Length) = 0 then
-         Put_Line ("Print_Value_Data_List_2D, first data list is empty");
+         Put_Line ("First data list is empty");
 
       else
          Items := Positive (theList.Last_Index);
          if Items > Num_Items then
             Items := Num_Items;
-         end if;
-         if Name'Length > 0 then
-            Put_Line (Name & ":");
          end if;
 
          for index in theList.First_Index .. Items loop
