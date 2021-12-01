@@ -34,35 +34,34 @@ package body Export_Tests is
       use Classifier_Utilities;
       use Decision_Tree_Classification;
       use Float_Package;
-      Routine_Name     : constant String :=
+      Routine_Name      : constant String :=
                            "Export_Tests.Test_Graphviz_Toy";
-      Criteria         : Criterion.Criterion_Class;
-      Splitter         : Node_Splitter.Splitter_Class;
-      theClassifier    : Base_Decision_Tree.Classifier
+      Criteria          : Criterion.Criterion_Class;
+      Splitter          : Node_Splitter.Splitter_Class;
+      theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-      Exporter         : Graphviz_Exporter.DOT_Tree_Exporter;
-      Class_Names      : Class_Names_List;
-      Feature_Names    : Feature_Names_List := Unbounded_Package.Empty_Vector;
-      X                : constant Value_Data_Lists_2D :=
+      Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
+      Class_Names       : Class_Names_List;
+      Feature_Names     : Feature_Names_List := Unbounded_Package.Empty_Vector;
+      X                 : constant Value_Data_Lists_2D :=
                            To_Multi_Value_List (X_Array);
-      Y                : constant Value_Data_Lists_2D :=
+      Y                 : constant Value_Data_Lists_2D :=
                            To_Integer_Value_List_2D (Y_Array);
       --  Y2 is 2D list num outputs x num classes
-      Y2               : constant Value_Data_Lists_2D :=
+      Y2                : constant Value_Data_Lists_2D :=
                            To_Multi_Value_List (Y2_Array);
-      W                : Weights.Weight_List := To_Float_List (W_Array);
+      W                 : Weights.Weight_List := To_Float_List (W_Array);
       --        Y_Degraded       : constant Value_Data_Lists_2D :=
       --                                To_Integer_Value_List_2D  (Y_Deg_Array);
-      Num_Samples      : constant Natural := Natural (X.Length);
-      No_Weights       : Weights.Weight_List := Empty_Vector;
+      Num_Samples       : constant Natural := Natural (X.Length);
+      No_Weights        : Weights.Weight_List := Empty_Vector;
    begin
       Class_Names.Append (To_Unbounded_String ("Yes"));
       Class_Names.Append (To_Unbounded_String ("No"));
       Feature_Names.Append (To_Unbounded_String ("feature_1"));
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
 
-      C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
-              Min_Split_Samples => 2);
+      C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
@@ -107,7 +106,7 @@ package body Export_Tests is
          Output_File_Name => To_Unbounded_String ("max_depth_plot.dot"));
 
       C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
-              Min_Split_Samples => 2, theCriterion => Criterion.Gini_Criteria);
+              theCriterion => Criterion.Gini_Criteria);
       Classification_Fit (theClassifier, X, Y2, W);
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
