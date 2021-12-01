@@ -217,10 +217,14 @@ package body Ada_Tree_Builder is
         Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
         --  L214
         Impurity := Gini_Node_Impurity (Builder.Splitter);
+        Put_Line (Routine_Name & "L221 Constant_Features: " &
+                    Integer'Image (Constant_Features));
         --  L221 first
         Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
         --        Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
         --                                     Split);
+        Put_Line (Routine_Name & "L229 Constant_Features: " &
+                    Integer'Image (Constant_Features));
         --  L229 first  Add_Node adds a node to theTree
         Top_Node_Cursor := Tree_Build.Add_Node
           (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,
@@ -230,6 +234,8 @@ package body Ada_Tree_Builder is
         theTree.Values.Clear;
         theTree.Values.Append (Values);
 
+        Put_Line (Routine_Name & "L184 Constant_Features: " &
+                    Integer'Image (Constant_Features));
         --  L184
         Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor,
               Tree.Left_Node, Impurity, Constant_Features);

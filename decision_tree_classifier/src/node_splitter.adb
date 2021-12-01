@@ -256,8 +256,8 @@ package body Node_Splitter is
     end Evaluate_All_Splits;
 
     --  -------------------------------------------------------------------------
-    ---  BestSplitter.Find_Best_Split samples up to max_features without
-    --  replacement using a Fisher-Yates-based algorithm.
+    --  Find_Best_Split samples up to max_features without replacement using a
+    --  Fisher-Yates-based algorithm.
     --  Variables F_I and F_J are used to compute a permutation of the Features
     --  being classified.
     procedure Find_Best_Split (Self                  : in out Splitter_Class;
@@ -266,7 +266,7 @@ package body Node_Splitter is
                                Num_Total_Constants   : in out Natural;
                                Best_Split            : in out Split_Record) is
         Routine_Name         : constant String :=
-                                 "Node_Splitter.Find_Best_Split";
+                                 "Node_Splitter.Find_Best_Split ";
         Num_Features         : constant Natural :=
                                  Natural (Self.Feature_Indices.Length);
         Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -288,7 +288,7 @@ package body Node_Splitter is
         --        Put_Line (Routine_Name & " Num_Features: " &
         --                    Integer'Image (Num_Features));
         --  L323
-        while F_I > Num_Total_Constants + 1 and
+        while F_I > Num_Total_Constants and
           (Num_Visited_Features < Positive (Max_Features) or
              --   At least one drawn feature must be a non-constant.
              Num_Visited_Features <=
@@ -306,22 +306,30 @@ package body Node_Splitter is
             --           Put_Line (Routine_Name & " Num_Known_Constants: " &
             --                    Integer'Image (Num_Known_Constants));
             --           Put_Line (Routine_Name & " F_J: " & Integer'Image (F_J));
-            if F_J > Num_Known_Constants then
-                --  L349 F_J > Num_Known_Constants
-                --  F_J is in the interval
-                --  Num_Known_Constants .. F_I - Num_Found_Constants
-                F_J := F_J + Num_Found_Constants;
-                --  F_J is in the interval Num_ Total_Constants .. F_I
-                Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
-                         Stop_Row, F_I, F_J, Best_Split);
-            else --  L346
-                --  F_J is a constant in the interval
-                --  Num_Drawn_Constants ..  Num_Found_Constants
+            if F_J < Num_Known_Constants then
+                --  L348 F_J is a constant in the interval
+                --  Num_Drawn_Constants .. Num_Found_Constants
                 Swap := Self.Feature_Indices.Element (Num_Drawn_Constants + 1);
                 Self.Feature_Indices.Replace_Element
                   (Num_Drawn_Constants + 1, Self.Feature_Indices.Element (F_J));
                 Self.Feature_Indices.Replace_Element (F_J, Swap);
                 Num_Drawn_Constants := Num_Drawn_Constants + 1;
+
+            else --  L353 F_J >= Num_Known_Constants
+                --  F_J is in the interval
+                --  Num_Known_Constants .. F_I - Num_Found_Constants
+                F_J := F_J + Num_Found_Constants;
+                --  F_J is in the interval Num_ Total_Constants .. F_I
+                --                  Put_Line (Routine_Name & "L353 Num_Known_Constants: " &
+                --                             Integer'Image (Num_Known_Constants));
+                --                  Put_Line (Routine_Name & "L353 Num_Found_Constants: " &
+                --                             Integer'Image (Num_Found_Constants));
+                Put_Line (Routine_Name & "353+ Num_Total_Constants: " &
+                            Integer'Image (Num_Total_Constants));
+                Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
+                         Stop_Row, F_I, F_J, Best_Split);
+                Put_Line (Routine_Name & "post process Num_Total_Constants: " &
+                            Integer'Image (Num_Total_Constants));
             end if;
         end loop;  --  L430
 
@@ -429,7 +437,7 @@ package body Node_Splitter is
                        Best_Split            : in out Split_Record) is
         use ML_Types;
         use Value_Data_Sorting;
-        --          Routine_Name         : constant String := "Node_Splitter.Process ";
+        Routine_Name         : constant String := "Node_Splitter.Process ";
         Current_Split        : Split_Record;
         X_Samples_Row        : Natural;
         X_Samples            : Value_Data_List;
@@ -473,6 +481,8 @@ package body Node_Splitter is
         else -- L370
             Num_Found_Constants := Num_Found_Constants + 1;
             Num_Total_Constants := Num_Total_Constants + 1;
+            Put_Line (Routine_Name & "L370 Num_Total_Constants: " &
+                        Integer'Image (Num_Total_Constants));
         end if;
         --        Printing.Print_Split_Record
         --          (Routine_Name & "final Best_Split", Best_Split);
@@ -585,7 +595,7 @@ package body Node_Splitter is
                          Impurity              : Float;
                          Num_Constant_Features : in out Natural)
                          return Split_Record is
-        Routine_Name         : constant String := "Node_Splitter.Split_Node";
+        Routine_Name         : constant String := "Node_Splitter.Split_Node ";
         Num_Known_Constants  : constant Natural := Num_Constant_Features;
         Num_Total_Constants  : Natural := Num_Known_Constants;
         Num_Found_Constants  : Natural := 0;
@@ -602,19 +612,27 @@ package body Node_Splitter is
         --          Put_Line (Routine_Name & " Stop_Row: " & Integer'Image (Self.Stop_Row));
         --          Printing.Print_Split_Record (Routine_Name & " initialized Best_Split",
         --                                       Best_Split);
-        --  L319
+        --  L324
+        Put_Line (Routine_Name & "L324 Num_Total_Constants: " &
+                    Integer'Image (Num_Total_Constants));
         Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                          Num_Total_Constants, Best_Split);
         --          Printing.Print_Split_Record (Routine_Name & " L417 Best_Split", Best_Split);
 
+        Put_Line (Routine_Name & "417 Num_Total_Constants: " &
+                    Integer'Image (Num_Total_Constants));
         --  L417  Reorganize into samples
         --        (start .. best.pos) + samples (best.pos .. end)
         Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
         --          Printing.Print_Split_Record (Routine_Name & " reordered Best_Split", Best_Split);
         Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
+        Put_Line (Routine_Name & "constants updated Num_Constant_Features: " &
+                    Integer'Image (Num_Constant_Features));
 
         --  L454
         Num_Constant_Features := Num_Total_Constants;
+        Put_Line (Routine_Name & "L454 Num_Constant_Features: " &
+                    Integer'Image (Num_Constant_Features));
         return Best_Split;
 
     end Split_Node;
