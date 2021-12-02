@@ -27,7 +27,6 @@ package body Builder is
    Num_Leaves  : Natural := 0;
 
    function Parse (aString : String) return Row_Data;
-   function Parse_Header (Header : String) return Header_Data_Type;
    procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                     Question : in out Question_Data;
                     Best     : out Best_Data);
@@ -575,6 +574,7 @@ package body Builder is
       end loop;
       Header_Row.Label := To_Unbounded_String (Header (Pos_1 + 1 .. Last));
       return Header_Row;
+
    end Parse_Header;
 
    --  ---------------------------------------------------------------------------
