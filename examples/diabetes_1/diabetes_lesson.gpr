@@ -1,4 +1,4 @@
-with "../decision_tree_classifier/classifier";
+with "../../decision_tree_classifier/classifier";
 
 project Diabetes_Lesson is
 
