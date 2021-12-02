@@ -443,6 +443,30 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Strings (Name : String; theList : ML_Types.String_List) is
+      use ML_Types.String_Package;
+      Curs  : Cursor := theList.First;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      while Has_Element (Curs) loop
+         Put (To_String (Element (Curs)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Tree (Name  : String;
                          aTree : Base_Decision_Tree.Classifier) is
       Tree_Nodes  : constant Tree.Tree_Class :=

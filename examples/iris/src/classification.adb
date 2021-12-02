@@ -45,10 +45,12 @@ package body Classification is
       Class_Names.Append (To_Unbounded_String ("Versicolour"));
       Class_Names.Append (To_Unbounded_String ("Virginica"));
       Feature_Names := Iris_Data.Feature_Names;
+      Printing.Print_Strings (Routine_Name & "Feature_Names", Feature_Names);
       while Has_Element (Names_Cursor) loop
          Features.Append (Element (Names_Cursor));
          Next (Names_Cursor);
       end loop;
+      Printing.Print_Unbounded_List (Routine_Name & "Features", Features);
 
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
