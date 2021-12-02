@@ -25,17 +25,17 @@ package body Classification is
       use ML_Types.String_Package;
       use Classifier_Types.Float_Package;
       Routine_Name    : constant String :=
-                          "Classification.Classify_Iris";
+                          "Classification.Classify_Iris ";
       Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
+      Feature_Names   : constant String_List := Iris_Data.Feature_Names;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
       Class_Names     : Class_Names_List;
-      Feature_Names   : String_List;
       Names_Cursor    : String_Package.Cursor :=
                           Feature_Names.First;
       Features        : Feature_Names_List;
-      X               :  Value_Data_Lists_2D;
+      X               : Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
       No_Weights      : Weights.Weight_List := Empty_Vector;
@@ -44,8 +44,7 @@ package body Classification is
       Class_Names.Append (To_Unbounded_String ("Setosa"));
       Class_Names.Append (To_Unbounded_String ("Versicolour"));
       Class_Names.Append (To_Unbounded_String ("Virginica"));
-      Feature_Names := Iris_Data.Feature_Names;
-      Printing.Print_Strings (Routine_Name & "Feature_Names", Feature_Names);
+
       while Has_Element (Names_Cursor) loop
          Features.Append (Element (Names_Cursor));
          Next (Names_Cursor);
