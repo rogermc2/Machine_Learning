@@ -238,7 +238,6 @@ package body Criterion is
               "Criterion.Node_Value Self.Sum_Total is empty");
       --  Value dimensions: num outputs x num classes
       Value := Self.Sum_Total;
---        Printing.Print_Weights_Lists_2D ("Criterion.Node_Value Value", Value);
 
    end Node_Value;
 

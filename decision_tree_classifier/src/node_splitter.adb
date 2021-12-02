@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -45,7 +45,7 @@ package body Node_Splitter is
     function Can_Split (Self                  : in out Splitter_Class;
                         Num_Total_Constants   : Natural;
                         F_I, F_J              : Natural)
-                        return Boolean is
+                       return Boolean is
         use ML_Types;
         Routine_Name : constant String := "Node_Splitter.Can_Split";
         X_F_Start    : constant Value_Record :=
@@ -56,8 +56,7 @@ package body Node_Splitter is
         LE           : Boolean;
         OK           : Boolean := False;
     begin
-        --        Printing.Print_Value_Data_Record (Routine_Name & " X_F_Start", X_F_Start);
-        --        Printing.Print_Value_Data_Record (Routine_Name & " X_F_End", X_F_End);
+        --  L363
         case X_F_Start.Value_Kind is
             when Float_Type =>
                 LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
@@ -71,7 +70,7 @@ package body Node_Splitter is
                   & ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
         end case;
 
-        --  Still L369
+        --  Still L363
         if LE then
             Swap := Self.Feature_Indices.Element (F_J);
             Self.Feature_Indices.Replace_Element
@@ -81,7 +80,7 @@ package body Node_Splitter is
               (Num_Total_Constants + 1, Swap);
 
         else  --  L378
-            OK := F_I > 1;
+            OK := not LE and F_I > 1;
         end if;
 
         return OK;
@@ -132,13 +131,6 @@ package body Node_Splitter is
         end Compare;
 
     begin
-        --          Put_Line (Routine_Name & " Start, Stop: " &
-        --                      Integer'Image (Splitter.Start_Row) & ", " &
-        --                      Integer'Image (Splitter.Stop_Row));
-        --          Printing.Print_Value_Data_List
-        --            (Routine_Name & " L380, Self.Feature_Values",
-        --             Splitter.Feature_Values);
-
         --  Set of features to be split:
         --  Splitter.Start_Index through Splitter.End_Index
         --  L380 Evaluate all splits
@@ -153,16 +145,9 @@ package body Node_Splitter is
 
             --  L389
             P_Index := P_Index + 1;
-            --              Put_Line (Routine_Name & " L389 P_Index: " &
-            --                          Integer'Image (P_Index));
             --  L393
             if P_Index <= Splitter.Stop_Row then
                 Current.Split_Row := P_Index;
-                --                  Put_Line (Routine_Name &
-                --                              " L395 Start_Row, Split_Row, End_Row: " &
-                --                              Integer'Image (Splitter.Start_Row) & ", " &
-                --                              Integer'Image (Current.Split_Row) & ", " &
-                --                              Integer'Image (Splitter.Stop_Row));
                 --  Best.Pos_I is the start index of the right node's data
                 --  L397 Accept if min_samples_leaf is guaranteed
                 if Current.Split_Row - Splitter.Start_Row >=
@@ -171,7 +156,6 @@ package body Node_Splitter is
                     Splitter.Min_Leaf_Samples then
                     --  L400
                     Criterion.Update (Splitter.Criteria, Current.Split_Row);
-                    --                 Put_Line (Routine_Name & " L400 Criterion Updated");
 
                     --  L402 Accept if min_weight_leaf is satisfied
                     if Splitter.Criteria.Num_Weighted_Left >=
@@ -236,17 +220,13 @@ package body Node_Splitter is
                         end if;
                     end if;
                 end if;
-                --              else
-                --                  Put_Line
-                --                    (Routine_Name & "P1 > Stop_Row");
             end if;
         end loop;
 
         if not Best_Updated then
-            Put_Line
-              (Routine_Name & "WARNING : Best Fit was not updated");
-            Printing.Print_Split_Record ("", Best);
+            Put_Line (Routine_Name & " WARNING: Best Fit not updated");
         end if;
+        --        Assert (Best_Updated, Routine_Name & "Best Fit was not updated");
 
         Assert (Best.Split_Row > Splitter.Start_Row,
                 "Node_Splitter.Evaluate_All_Splits, split position" &
@@ -284,10 +264,6 @@ package body Node_Splitter is
                   Integer'Image (Stop_Row) &
                   " should be greater than Start_Row "
                 & Integer'Image (Start_Row));
-        --        Put_Line (Routine_Name & " Start, Stop: " & Integer'Image (Start_Row) &
-        --                    Integer'Image (Self.Stop_Row));
-        --        Put_Line (Routine_Name & " Num_Features: " &
-        --                    Integer'Image (Num_Features));
         --  L323
         while F_I > Num_Total_Constants + 1 and
           (Num_Visited_Features < Positive (Max_Features) or
@@ -296,17 +272,12 @@ package body Node_Splitter is
                Num_Found_Constants + Num_Drawn_Constants) loop
             --  L329
             Num_Visited_Features := Num_Visited_Features + 1;
-            --           Put_Line (Routine_Name & " Num_Visited_Features: " &
-            --                    Integer'Image (Num_Visited_Features));
             --  L342
             --  Draw a feature at random
             --  F_J = random integer with 2 <= F_J <= F_I
             F_J := 2 +
               Maths.Random_Integer * (F_I - 2 - Num_Found_Constants);
 
-            --           Put_Line (Routine_Name & " Num_Known_Constants: " &
-            --                    Integer'Image (Num_Known_Constants));
-            --           Put_Line (Routine_Name & " F_J: " & Integer'Image (F_J));
             if F_J > Num_Known_Constants then
                 --  L349 F_J > Num_Known_Constants
                 --  F_J is in the interval
@@ -430,7 +401,7 @@ package body Node_Splitter is
                        Best_Split            : in out Split_Record) is
         use ML_Types;
         use Value_Data_Sorting;
-        --          Routine_Name         : constant String := "Node_Splitter.Process ";
+        --        Routine_Name         : constant String := "Node_Splitter.Process ";
         Current_Split        : Split_Record;
         X_Samples_Row        : Natural;
         X_Samples            : Value_Data_List;
@@ -439,8 +410,6 @@ package body Node_Splitter is
         Current_Split := Best_Split;
         --  L354 Sort samples along Current.Feature index;
         Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
-        --          Printing.Print_Split_Record
-        --            (Routine_Name & "L358 initial Current_Split", Current_Split);
         --  L358
         for index in Start_Row .. Stop_Row loop
             X_Samples_Row := Splitter.Sample_Indices.Element (index);
@@ -449,10 +418,7 @@ package body Node_Splitter is
             Splitter.Feature_Values.Replace_Element
               (index, X_Samples (Current_Split.Feature));
         end loop;
-        --        Put_Line (Routine_Name & ", Feature_Values size: " &
-        --                 Integer'Image (Integer (Splitter.Feature_Values.Length)));
-        --        Printing.Print_Value_Data_List (Routine_Name &
-        --                                        " Feature_Values", Self.Feature_Values);
+
         --  L361
         Sort (Splitter.Feature_Values);
         --  Splitter.Feature_Values is a value_data_list
@@ -466,17 +432,14 @@ package body Node_Splitter is
 
             --  L379 Reset the criterion to pos = start
             Criterion.Reset (Splitter.Criteria);
-            --              Put_Line (Routine_Name & " L380 splitting F_I, F_J: " &
-            --                          Integer'Image (F_I) & ", " & Integer'Image (F_J));
 
             Evaluate_All_Splits (Splitter, Current_Split, Best_Split);
             --  L428
         else -- L370
+            --           Put_Line (Routine_Name & "L370 can't split");
             Num_Found_Constants := Num_Found_Constants + 1;
             Num_Total_Constants := Num_Total_Constants + 1;
         end if;
-        --        Printing.Print_Split_Record
-        --          (Routine_Name & "final Best_Split", Best_Split);
 
     end Process;
 
@@ -496,7 +459,6 @@ package body Node_Splitter is
         X             : ML_Types.Value_Record;
         Swap          : Positive;
     begin
-        --          Put_Line (Routine_Name & " Stop_Row: " & Integer'Image (Self.Stop_Row));
         --  L417 Reorganize into samples[start:best.pos] + samples[best.pos:end]
         if Best_Split.Split_Row <= Self.Stop_Row then
             --  L419
@@ -543,14 +505,9 @@ package body Node_Splitter is
             Criterion.Gini_Children_Impurity
               (Self.Criteria, Best_Split.Impurity_Left,
                Best_Split.Impurity_Right);
-            --              Printing.Print_Split_Record (Routine_Name & " Best_Split children",
-            --                                           Best_Split);
             Best_Split.Improvement := Criterion.Impurity_Improvement
               (Self.Criteria, Impurity, Best_Split.Impurity_Left,
                Best_Split.Impurity_Right);
-
-            --              Put_Line (Routine_Name & " Best_Split.Improvement: " &
-            --                          Float'Image (Best_Split.Improvement));
         end if;
 
     end Reorder_Rows;
@@ -585,7 +542,7 @@ package body Node_Splitter is
     function Split_Node (Self                  : in out Splitter_Class;
                          Impurity              : Float;
                          Num_Constant_Features : in out Natural)
-                         return Split_Record is
+                        return Split_Record is
         Routine_Name         : constant String := "Node_Splitter.Split_Node";
         Num_Known_Constants  : constant Natural := Num_Constant_Features;
         Num_Total_Constants  : Natural := Num_Known_Constants;
@@ -600,22 +557,18 @@ package body Node_Splitter is
                   " called with empty Sample_Indices");
         --  L308
         Init_Split (Best_Split, Self.Stop_Row);
-        --          Put_Line (Routine_Name & " Stop_Row: " & Integer'Image (Self.Stop_Row));
-        --          Printing.Print_Split_Record (Routine_Name & " initialized Best_Split",
-        --                                       Best_Split);
         --  L319
         Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                          Num_Total_Constants, Best_Split);
-        --          Printing.Print_Split_Record (Routine_Name & " L417 Best_Split", Best_Split);
 
         --  L417  Reorganize into samples
         --        (start .. best.pos) + samples (best.pos .. end)
         Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-        --          Printing.Print_Split_Record (Routine_Name & " reordered Best_Split", Best_Split);
         Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
         --  L454
         Num_Constant_Features := Num_Total_Constants;
+
         return Best_Split;
 
     end Split_Node;
