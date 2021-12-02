@@ -137,24 +137,13 @@ package body Ada_Tree_Builder is
       --  Values dimensions: num outputs x num classes
       Node_Splitter.Node_Value (Builder.Splitter, Values);
 
-      --          Put_Line (Routine_Name & " L238 Node" & Integer'Image (Node_ID));
-      --          Printing.Print_Weights_Lists_2D (Routine_Name & " Values", Values);
-
       if Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node_ID));
       end if;
       theTree.Values.Replace_Element (Node_ID, Values);
 
-      --        Put_Line
-      --          ("Ada_Tree_Builder.Add_Branch L238 Node_ID, Num_Node_Samples: " &
-      --                    Integer'Image (Node_ID) & ", " &
-      --                    Integer'Image (Element (Child_Cursor).Num_Node_Samples));
       --  L240
       if not Is_Leaf_Node then
-         --           Put_Line (Routine_Name & "L240 Start, Pos, End: " &
-         --                       Integer'Image (Start_Row) & ", " &
-         --                       Integer'Image (Split.Split_Row) & ", " &
-         --                       Integer'Image (Stop_Row));
          --  Add right branch
          Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
                Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
@@ -163,17 +152,12 @@ package body Ada_Tree_Builder is
          Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
                Child_Cursor, Tree.Left_Node, Split.Impurity_Left,
                Num_Constant_Features);
-         --        else
-         --           Put_Line (Routine_Name & ", L254 leaf node.");
-         --           Printing.Print_Split_Record (Routine_Name & "Split", Split);
       end if;
 
       --  L254
       if Data.Depth + 1 > Max_Depth_Seen then
          Max_Depth_Seen := Data.Depth + 1;
       end if;
-      --        Put_Line (Routine_Name & "end");
-      --        New_Line;
 
    end Add_Branch;
 
@@ -219,14 +203,9 @@ package body Ada_Tree_Builder is
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
       --  L214
       Impurity := Gini_Node_Impurity (Builder.Splitter);
---        Put_Line (Routine_Name & "L221 Constant_Features: " &
---                    Integer'Image (Constant_Features));
       --  L221 first
       Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
-      --        Printing.Print_Split_Record (Routine_Name & "L221 first Split record",
-      --                                     Split);
---        Put_Line (Routine_Name & "L229 Constant_Features: " &
---                    Integer'Image (Constant_Features));
+
       --  L229 first  Add_Node adds a node to theTree
       Top_Node_Cursor := Tree_Build.Add_Node
         (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,
@@ -236,8 +215,6 @@ package body Ada_Tree_Builder is
       theTree.Values.Clear;
       theTree.Values.Append (Values);
 
---        Put_Line (Routine_Name & "L184 Constant_Features: " &
---                    Integer'Image (Constant_Features));
       --  L184
       Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor,
             Tree.Left_Node, Impurity, Constant_Features);
