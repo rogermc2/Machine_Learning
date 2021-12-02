@@ -29,12 +29,19 @@ package body Classification is
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
+      Class_Names       : Class_Names_List;
+--        Feature_Names     : Feature_Names_List;
       X               :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
       No_Weights      : Weights.Weight_List := Empty_Vector;
       Num_Samples     : Natural;
    begin
+      Class_Names.Append (To_Unbounded_String ("Setosa"));
+      Class_Names.Append (To_Unbounded_String ("Versicolour"));
+      Class_Names.Append (To_Unbounded_String ("Virginica"));
+--        Feature_Names.Append (To_Unbounded_String ("feature_1"));
+--        Feature_Names.Append (To_Unbounded_String ("feature_2"));
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name);
@@ -55,7 +62,8 @@ package body Classification is
 
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
-         Output_File_Name => To_Unbounded_String ("diabetes.dot"));
+         Class_Names => Class_Names,
+         Output_File_Name => To_Unbounded_String ("iris.dot"));
 
    end Classify_Iris;
 
