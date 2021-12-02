@@ -628,6 +628,7 @@ package body Printing is
          Put_Line (Name & ":");
       end if;
 
+      Put ("Value_Kind " & Data_Type'Image (Value.Value_Kind) & ": ");
       case Value.Value_Kind is
          when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
          when Float_Type => Put (Float'Image (Value.Float_Value));

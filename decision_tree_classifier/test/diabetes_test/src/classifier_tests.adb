@@ -1,13 +1,13 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
 with Decision_Tree_Classification;
---  with Graphviz_Exporter;
+with Graphviz_Exporter;
 with ML_Types;
 with Printing;
 with Tree;
@@ -28,6 +28,7 @@ package body Classifier_Tests is
       Diabetes_Data   : constant Data_Record := Load_Data ("src/diabetes.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
+      Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
       X               :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
@@ -60,6 +61,13 @@ package body Classifier_Tests is
          Put_Line ("Probabilities test failed");
          Print_Weights (Routine_Name & " Column_Sums", Column_Sums);
       end if;
+
+      Graphviz_Exporter.C_Init
+          (Exporter, theClassifier.Attributes.Decision_Tree);
+
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Output_File_Name => To_Unbounded_String ("diabetes.dot"));
 
    end Test_Diabetes;
 
