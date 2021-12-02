@@ -24,8 +24,7 @@ package Utilities is
                          return  ML_Types.Value_Data_Array;
    procedure Load_CSV_Data (Data_File : File_Type;
                             Data      : out ML_Types.Rows_Vector);
-   function Load_CSV_Data (Data_File : File_Type)
-                           return ML_Types.Raw_Data_Vector;
+   function Load_CSV_Data (File_Name : String) return ML_Types.Raw_Data_Vector;
    function Number_Of_Features (Rows : ML_Types.Rows_Vector)
                                 return ML_Types.Class_Range;
    function Number_Of_Features (Rows : ML_Types.Value_Data_List)

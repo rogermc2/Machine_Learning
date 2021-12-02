@@ -1,6 +1,8 @@
 
 with Ada.Characters.Handling;
 with Ada.Containers;
+with Ada.Exceptions;
+with Ada.IO_Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
@@ -251,16 +253,31 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Load_CSV_Data (Data_File : File_Type)
+   function Load_CSV_Data (File_Name : String)
                            return ML_Types.Raw_Data_Vector is
+      use Ada.Exceptions;
       use Ada.Strings.Unbounded;
       use ML_Types.Raw_Data_Package;
-      Data : Raw_Data_Vector;
+      Data_File : File_Type;
+      Data      : Raw_Data_Vector;
    begin
-         while not End_Of_File (Data_File) loop
-               Data.Append (To_Unbounded_String (Get_Line (Data_File)));
-         end loop;
+      Open (Data_File, In_File, File_Name);
+      while not End_Of_File (Data_File) loop
+         Data.Append (To_Unbounded_String (Get_Line (Data_File)));
+      end loop;
+      Close (Data_File);
 
+      return Data;
+
+   exception
+      when anError : Ada.IO_Exceptions.Name_Error  =>
+         Put_Line ("Utilities.Load_CSV_Data Name_Error.");
+         Put_Line (Exception_Information (anError));
+      return Data;
+
+      when anError : others =>
+         Put_Line ("An exception occurred in Utilities.Load_CSV_Data!");
+         Put_Line (Exception_Information (anError));
       return Data;
 
    end Load_CSV_Data;
