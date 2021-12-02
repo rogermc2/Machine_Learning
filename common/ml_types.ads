@@ -48,6 +48,10 @@ package ML_Types is
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
+   package Raw_Data_Package is new Ada.Containers.Vectors
+     (Positive, Unbounded_String);
+   subtype Raw_Data_Vector is Raw_Data_Package.Vector;
+
    type Data_Rows is array (Integer range <>) of Unbounded_String;
 
    type Features_Data (Class_Count : Class_Range := 2) is record

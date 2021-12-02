@@ -251,6 +251,22 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Load_CSV_Data (Data_File : File_Type)
+                           return ML_Types.Raw_Data_Vector is
+      use Ada.Strings.Unbounded;
+      use ML_Types.Raw_Data_Package;
+      Data : Raw_Data_Vector;
+   begin
+         while not End_Of_File (Data_File) loop
+               Data.Append (To_Unbounded_String (Get_Line (Data_File)));
+         end loop;
+
+      return Data;
+
+   end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
    function Number_Of_Features (Rows : Rows_Vector) return Class_Range is
       Data  : constant Row_Data := Rows.First_Element;
    begin
