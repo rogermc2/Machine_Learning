@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -10,7 +10,7 @@ with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Base_Decision_Tree is
 
@@ -80,13 +80,10 @@ package body Base_Decision_Tree is
         Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
                           Num_Classes);
         Node_Splitter.C_Init (Splitter, Criteria);
-        Printing.Print_Natural_List (Routine_Name & "Num_Classes", Num_Classes);
 
         --  L189
         aClassifier.Attributes.Num_Features :=
           Tree.Index_Range (X.Element (1).Length);
-        Put_Line (Routine_Name & "Num_Features" &
-                  Tree.Index_Range'Image (aClassifier.Attributes.Num_Features));
 
         --  L229
         Base_Fit_Checks (aClassifier, X, Y, Min_Samples_Split, Sample_Weights);

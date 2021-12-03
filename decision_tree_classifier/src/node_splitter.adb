@@ -109,11 +109,6 @@ package body Node_Splitter is
          XP_1   : constant Value_Record := Features.Element (P_Index + 1);
          Result : Boolean;
       begin
-         --           Assert (XP_1.Value_Kind = XP.Value_Kind,
-         --                   Routine_Name & ".Compare XP_1.Value_Kind " &
-         --                     Data_Type'Image (XP_1.Value_Kind) &
-         --                     " is different to XP.Value_Kind " &
-         --                     Data_Type'Image (XP.Value_Kind) & ".");
          --  Check for next feature value equal to or less than
          --  current feature value
          Result := XP_1.Value_Kind = XP.Value_Kind;
