@@ -67,6 +67,7 @@ package body Classification is
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
 
+      C_Init (theClassifier, Criteria, Splitter);
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));

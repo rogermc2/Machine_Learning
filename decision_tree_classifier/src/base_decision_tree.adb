@@ -43,15 +43,13 @@ package body Base_Decision_Tree is
         Num_Samples           : constant Positive := Positive (X.Length);
         Num_Outputs           : constant Positive :=
                                   Positive (Y.Element (1).Length);
-        Criteria              : Criterion.Criterion_Class;
-        Splitter              : Node_Splitter.Splitter_Class;
         Y_Encoded             : Classifier_Types.Natural_Lists_2D
           := Classifier_Types.Natural_List_Package.Empty_Vector;
         Classes               : ML_Types.Value_Data_Lists_2D
           := ML_Types.Value_Lists_Data_Package.Empty_Vector;
         Num_Classes           : Classifier_Types.Natural_List
           := Classifier_Types.Natural_Package.Empty_Vector;
-        Min_Samples_Split     : Positive;
+        Min_Samples_Split     : Positive := 1;
         --  L205
         Expanded_Class_Weight : Weights.Weight_List :=
                                   Classifier_Types.Float_Package.Empty_Vector;
@@ -77,9 +75,10 @@ package body Base_Decision_Tree is
             Num_Classes.Append (Positive (Classes.Element (index).Length));
         end loop;
 
-        Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
+        Criterion.C_Init (aClassifier.Parameters.Criteria, Tree.Index_Range (Num_Outputs),
                           Num_Classes);
-        Node_Splitter.C_Init (Splitter, Criteria);
+        Node_Splitter.C_Init (aClassifier.Parameters.Splitter,
+                              aClassifier.Parameters.Criteria);
 
         --  L189
         aClassifier.Attributes.Num_Features :=
@@ -118,7 +117,7 @@ package body Base_Decision_Tree is
               * Sum_Sample_Weight;
         end if;
 
-        Splitter.Min_Leaf_Weight := Min_Weight_Leaf;
+        aClassifier.Parameters.Splitter.Min_Leaf_Weight := Min_Weight_Leaf;
 
         --  L392
         Tree.C_Init (aClassifier.Attributes.Decision_Tree,
@@ -130,7 +129,8 @@ package body Base_Decision_Tree is
 
         --  L410
         Ada_Tree_Builder.Build_Tree
-          (aClassifier.Attributes.Decision_Tree, Splitter, X, Y_Encoded,
+          (aClassifier.Attributes.Decision_Tree,
+           aClassifier.Parameters.Splitter, X, Y_Encoded,
            Sample_Weights, Min_Samples_Split,
            aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf,
            aClassifier.Parameters.Max_Depth,
@@ -267,7 +267,7 @@ package body Base_Decision_Tree is
                       CCP_Alpha                : Float := 0.0;
                       Random_State             : Integer := 0) is
     begin
-        aClassifier.Parameters.Critera := Criteria;
+        aClassifier.Parameters.Criteria := Criteria;
         aClassifier.Parameters.Splitter := Splitter;
         aClassifier.Parameters.Max_Depth := Max_Depth;
         aClassifier.Parameters.Min_Samples_Split := Min_Samples_Split;
@@ -364,7 +364,7 @@ package body Base_Decision_Tree is
                       return ML_Types.Value_Data_Lists_2D is
         use Ada.Containers;
         use Weights;
---          Routine_Name      : constant String := "Base_Decision_Tree.Predict";
+        --          Routine_Name      : constant String := "Base_Decision_Tree.Predict";
         Num_Samples       : constant Count_Type := X.Length;
         Prob_A            : constant Weight_Lists_3D :=
                               Tree.Predict (Self.Attributes.Decision_Tree, X);

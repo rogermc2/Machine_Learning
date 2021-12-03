@@ -64,7 +64,7 @@ package Base_Decision_Tree is
       (Split_Type, Leaf_Type, Feature_Type : Tree.Data_Type) is record
         Criterion_Kind           : Criterion.Classifier_Criteria_Type :=
                                      Criterion.Gini_Criteria;
-        Critera                  : Criterion.Criterion_Class;
+        Criteria                 : Criterion.Criterion_Class;
         Splitter_Kind            : Splitter_Type := Best_Splitter;
         Splitter                 : Node_Splitter.Splitter_Class;
         Min_Samples_Split        : Split_Value_Record := Default_Min_Split;
