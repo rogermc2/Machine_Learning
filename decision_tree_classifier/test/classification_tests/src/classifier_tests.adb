@@ -59,8 +59,9 @@ package body Classifier_Tests is
       No_Weights        : Weights.Weight_List := Empty_Vector;
       Sample_Weights_1  : Weights.Weight_List := Ones (Num_Samples);
       Sample_Weights_2  : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
-      Probabilities     : Weights.Weight_Lists_3D;
-      Column_Sums       : Weights.Weight_List;
+      Probabilities     : Weights.Weight_Lists_3D :=
+                              Weights.Weight_Lists_3D_Package.Empty_Vector;
+      Column_Sums       : Weights.Weight_List := Empty_Vector;
    begin
       C_Init (theClassifier, Criteria, Splitter);
       Put_Line (Routine_Name);
@@ -131,8 +132,10 @@ package body Classifier_Tests is
       Routine_Name    : constant String :=
                           "Classification_Tests.Test_Probability";
       Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
+      Criteria        : Criterion.Criterion_Class;
+      Splitter        : Node_Splitter.Splitter_Class;
       theClassifier   : Base_Decision_Tree.Classifier
-        (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
+        (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X               :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
@@ -141,6 +144,7 @@ package body Classifier_Tests is
       Probabilities   : Weights.Weight_Lists_3D;
       Column_Sums     : Weights.Weight_List;
    begin
+      C_Init (theClassifier, Criteria, Splitter);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name);

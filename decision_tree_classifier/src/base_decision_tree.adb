@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -10,7 +10,7 @@ with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
 with Encode_Utils;
---  with Printing;
+with Printing;
 
 package body Base_Decision_Tree is
 
@@ -45,12 +45,16 @@ package body Base_Decision_Tree is
                                   Positive (Y.Element (1).Length);
         Criteria              : Criterion.Criterion_Class;
         Splitter              : Node_Splitter.Splitter_Class;
-        Y_Encoded             : Classifier_Types.Natural_Lists_2D;
-        Classes               : ML_Types.Value_Data_Lists_2D;
-        Num_Classes           : Classifier_Types.Natural_List;
+        Y_Encoded             : Classifier_Types.Natural_Lists_2D
+          := Classifier_Types.Natural_List_Package.Empty_Vector;
+        Classes               : ML_Types.Value_Data_Lists_2D
+          := ML_Types.Value_Lists_Data_Package.Empty_Vector;
+        Num_Classes           : Classifier_Types.Natural_List
+          := Classifier_Types.Natural_Package.Empty_Vector;
         Min_Samples_Split     : Positive;
         --  L205
-        Expanded_Class_Weight : Weights.Weight_List;
+        Expanded_Class_Weight : Weights.Weight_List :=
+                                  Classifier_Types.Float_Package.Empty_Vector;
         Min_Weight_Leaf       : Float := 0.0;
         Sum_Sample_Weight     : Float := 0.0;
     begin
@@ -76,10 +80,13 @@ package body Base_Decision_Tree is
         Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
                           Num_Classes);
         Node_Splitter.C_Init (Splitter, Criteria);
+        Printing.Print_Natural_List (Routine_Name & "Num_Classes", Num_Classes);
 
         --  L189
         aClassifier.Attributes.Num_Features :=
           Tree.Index_Range (X.Element (1).Length);
+        Put_Line (Routine_Name & "Num_Features" &
+                  Tree.Index_Range'Image (aClassifier.Attributes.Num_Features));
 
         --  L229
         Base_Fit_Checks (aClassifier, X, Y, Min_Samples_Split, Sample_Weights);
@@ -289,16 +296,17 @@ package body Base_Decision_Tree is
        Expanded_Class_Weights : in out Weights.Weight_List) is
         use Ada.Containers;
         use Classifier_Types;
+        use ML_Types;
         use Weights;
         Routine_Name : constant String :=
                          "Base_Decision_Tree.Classification_Part ";
         Num_Outputs  : constant Count_Type := Y.Element (1).Length;
-        Y_Row        : ML_Types.Value_Data_List;
-        Yk_Row       : ML_Types.Value_Data_List;
-        YE_Row       : Natural_List;
-        OP_Row       : ML_Types.Value_Data_List;
-        Column       : Natural_List;
-        Inverse      : Natural_List;
+        Y_Row        : Value_Data_List := Value_Data_Package.Empty_Vector;
+        Yk_Row       : Value_Data_List := Value_Data_Package.Empty_Vector;
+        YE_Row       : Natural_List := Natural_Package.Empty_Vector;
+        OP_Row       : Value_Data_List := Value_Data_Package.Empty_Vector;
+        Column       : Natural_List := Natural_Package.Empty_Vector;
+        Inverse      : Natural_List := Natural_Package.Empty_Vector;
     begin
         aClassifier.Attributes.Classes.Clear;
         aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
