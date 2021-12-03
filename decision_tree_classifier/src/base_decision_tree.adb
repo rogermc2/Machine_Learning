@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -10,7 +10,7 @@ with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Base_Decision_Tree is
 
@@ -346,8 +346,6 @@ package body Base_Decision_Tree is
 
         --  L227
         Classes := aClassifier.Attributes.Classes;
-        --        Printing.Print_Natural_Lists_2D (Routine_Name & "Y_Encoded", Y_Encoded);
-        Printing.Print_Value_Data_Lists_2D (Routine_Name & "Classes", Classes);
 
     exception
         when others => raise Classifier_Error with Routine_Name & "error";
@@ -361,7 +359,7 @@ package body Base_Decision_Tree is
                       return ML_Types.Value_Data_Lists_2D is
         use Ada.Containers;
         use Weights;
-        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
+--          Routine_Name      : constant String := "Base_Decision_Tree.Predict";
         Num_Samples       : constant Count_Type := X.Length;
         Prob_A            : constant Weight_Lists_3D :=
                               Tree.Predict (Self.Attributes.Decision_Tree, X);
@@ -378,8 +376,6 @@ package body Base_Decision_Tree is
         --  Predictions, num samples x num outputs
         Predictions       : ML_Types.Value_Data_Lists_2D;
     begin
-        Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
-                  (Self.Attributes.Decision_Tree.Nodes.Node_Count - 1));
         Predictions.Set_Length (Num_Samples);
         --  479
         for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop

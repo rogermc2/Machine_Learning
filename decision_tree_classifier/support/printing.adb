@@ -652,17 +652,13 @@ package body Printing is
          Put_Line (Name & ":");
       end if;
 
-      Put ("Value_Kind " & Data_Type'Image (Value.Value_Kind) & ": ");
+--        Put ("Value_Kind " & Data_Type'Image (Value.Value_Kind) & ": ");
       case Value.Value_Kind is
          when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
          when Float_Type => Put (Float'Image (Value.Float_Value));
          when Integer_Type => Put (Integer'Image (Value.Integer_Value));
          when UB_String_Type => Put (To_String (Value.UB_String_Value));
       end case;
-
-      if Name'Length > 0 then
-         New_Line;
-      end if;
 
    end Print_Value_Data_Record;
 

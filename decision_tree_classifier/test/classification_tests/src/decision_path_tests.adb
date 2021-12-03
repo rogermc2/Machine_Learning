@@ -85,17 +85,15 @@ package body Decision_Path_Tests is
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
-      X              :  Value_Data_Lists_2D;
+      X              : constant Value_Data_Lists_2D := Iris_Data.Feature_Values;
+      Num_Samples    : constant Natural := Natural (X.Length);
       --  Y: num outputs x num classes
       Y              : Value_Data_Lists_2D;
       No_Weights     : Weights.Weight_List := Empty_Vector;
-      Num_Samples    : Natural;
       Prediction     : ML_Types.Value_Data_Lists_2D;
    begin
       C_Init (theClassifier, Criteria, Splitter);
       --  L1689
-      X := Iris_Data.Feature_Values;
-      Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
