@@ -7,11 +7,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
-with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -33,8 +31,6 @@ package body Classification is
                           "Classification.Classify_Iris ";
       Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
 --        Feature_Names   : constant String_List := Iris_Data.Feature_Names;
-      Criteria        : Criterion.Criterion_Class;
-      Splitter        : Node_Splitter.Splitter_Class;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -46,9 +42,10 @@ package body Classification is
       Num_Samples     : constant Natural := Natural (X.Length);
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
+      Num_Outputs     : Positive;
       No_Weights      : Weights.Weight_List := Empty_Vector;
    begin
-      C_Init (theClassifier, Criteria, Splitter);
+      Put_Line (Routine_Name);
 --        Class_Names.Append (To_Unbounded_String ("Setosa"));
 --        Class_Names.Append (To_Unbounded_String ("Versicolour"));
 --        Class_Names.Append (To_Unbounded_String ("Virginica"));
@@ -59,15 +56,14 @@ package body Classification is
 --        end loop;
 --        Printing.Print_Unbounded_List (Routine_Name & "Features", Features);
 
-      Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
       --  Y is 2D list num outputs x num classes
       Y := To_Value_2D_List (Iris_Data.Label_Values);
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
+      Num_Outputs := Positive (Y.Element (1).Length);
 
-      C_Init (theClassifier, Criteria, Splitter);
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
@@ -75,7 +71,7 @@ package body Classification is
       Put_Line ("----------------------------------------------");
       New_Line;
 
-      C_Init (theClassifier, Criteria, Splitter);
+      C_Init (theClassifier, Num_Outputs);
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));

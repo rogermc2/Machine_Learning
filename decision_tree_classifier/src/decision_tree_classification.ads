@@ -23,8 +23,7 @@ with ML_Types;
 with Tree;
 
 with Base_Decision_Tree;
-with Criterion;
-with Node_Splitter;
+with Classifier_Types;
 with Weights;
 
 package Decision_Tree_Classification is
@@ -68,26 +67,22 @@ package Decision_Tree_Classification is
    Classifier_Error : Exception;
    Value_Error      : Exception;
 
-   procedure C_Init (aClassifier                           : in out
-                       Base_Decision_Tree.Classifier;
-                     Criteria                              : Criterion.Criterion_Class;
-                     Splitter                              : Node_Splitter.Splitter_Class;
-                     Min_Split_Samples                     :
-                     Base_Decision_Tree.Split_Value_Record :=
-                       Base_Decision_Tree.Default_Min_Split;
-                     theCriterion                          : Criterion.
-                       Classifier_Criteria_Type := Criterion.Gini_Criteria;
-                     Max_Depth                             : Integer := -1;
-                     Min_Leaf_Samples                      : Positive := 1;
-                     Min_Leaf_Weight_Fraction              : Float := 0.0;
-                     Max_Features                          : Tree.Index_Range :=
-                       Tree.Index_Range'Last;
-                     Max_Leaf_Nodes                        : Integer := -1;
-                     Class_Weight                          : Weights.Weight_Type :=
-                       Weights.No_Weight;
-                     Min_Impurity_Decrease                 : Float := 0.0;
-                     CCP_Alpha                             : Float := 0.0;
-                     Random_State                          : Integer := 0);
+   procedure C_Init
+     (aClassifier              : in out Base_Decision_Tree.Classifier;
+      Num_Outputs              : Positive := 1;
+      Num_Classes              : Classifier_Types.Natural_List :=
+        Classifier_Types.Natural_Package.Empty_Vector;
+      Min_Split_Samples        : Base_Decision_Tree.Split_Value_Record :=
+        Base_Decision_Tree.Default_Min_Split;
+      Max_Depth                : Integer := -1;
+      Min_Leaf_Samples         : Positive := 1;
+      Min_Leaf_Weight_Fraction : Float := 0.0;
+      Max_Features             : Tree.Index_Range := Tree.Index_Range'Last;
+      Max_Leaf_Nodes           : Integer := -1;
+      Class_Weight             : Weights.Weight_Type := Weights.No_Weight;
+      Min_Impurity_Decrease    : Float := 0.0;
+      CCP_Alpha                : Float := 0.0;
+      Random_State             : Integer := 0);
    procedure Classification_Fit
      (aClassifier    : in out Base_Decision_Tree.Classifier;
       X              : ML_Types.Value_Data_Lists_2D;
