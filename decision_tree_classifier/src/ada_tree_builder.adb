@@ -113,7 +113,8 @@ package body Ada_Tree_Builder is
               Builder.Min_Impurity_Decrease then
                 Put_Line (Routine_Name & " L233 Split.Improvement + Epsilon " &
                             Float'Image (Split.Improvement + Epsilon) &
-                            " < Builder.Min_Impurity_Decrease");
+                            " < Builder.Min_Impurity_Decrease " &
+                            Float'Image (Builder.Min_Impurity_Decrease));
             end if;
         end if;
 

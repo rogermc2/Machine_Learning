@@ -29,12 +29,10 @@ package body Node_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure C_Init (Self             : in out Splitter_Class;
-                     Criteria         : Criterion.Criterion_Class;
                      Max_Features     : Tree.Index_Range := 1;
                      Min_Leaf_Samples : Integer := 0;
                      Min_Leaf_Weight  : Float := 0.0) is
    begin
-      Self.Criteria := Criteria;
       Self.Max_Features := Max_Features;
       Self.Min_Leaf_Samples := Min_Leaf_Samples;
       Self.Min_Leaf_Weight := Min_Leaf_Weight;

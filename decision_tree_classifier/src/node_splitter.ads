@@ -54,7 +54,6 @@ package Node_Splitter is
     Node_Splitter_Error : Exception;
 
     procedure C_Init (Self          : in out Splitter_Class;
-                      Criteria      : Criterion.Criterion_Class;
                       Max_Features  : Tree.Index_Range := 1;
                       Min_Leaf_Samples : Integer := 0;
                       Min_Leaf_Weight : Float := 0.0);

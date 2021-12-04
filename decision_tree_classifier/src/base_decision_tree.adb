@@ -64,12 +64,12 @@ package body Base_Decision_Tree is
                                  Classes, Expanded_Class_Weight);
         end if;
 
-        Criterion.C_Init (aClassifier.Parameters.Criteria,
+        Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
                           aClassifier.Attributes.Num_Outputs,
                           aClassifier.Attributes.Decision_Tree.Num_Classes);
 
         Node_Splitter.C_Init
-          (aClassifier.Parameters.Splitter, aClassifier.Parameters.Criteria,
+          (aClassifier.Parameters.Splitter,
            Tree.Index_Range (aClassifier.Attributes.Max_Features),
            aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf);
 
@@ -273,8 +273,7 @@ package body Base_Decision_Tree is
         aClassifier.Parameters.Class_Weight := Class_Weight;
         aClassifier.Parameters.CCP_Alpha := CCP_Alpha;
         aClassifier.Parameters.Random_State := Random_State;
-        Node_Splitter.C_Init (aClassifier.Parameters.Splitter,
-                              aClassifier.Parameters.Criteria);
+        Node_Splitter.C_Init (aClassifier.Parameters.Splitter);
 
     end C_Init;
 
@@ -348,7 +347,7 @@ package body Base_Decision_Tree is
         end if;
         --  L227
         Classes := aClassifier.Attributes.Classes;
-        aClassifier.Parameters.Criteria.Num_Classes :=
+        aClassifier.Parameters.Splitter.Criteria.Num_Classes :=
           aClassifier.Attributes.Decision_Tree.Num_Classes;
 
     exception

@@ -65,8 +65,7 @@ package body Decision_Tree_Classification is
         aClassifier.Parameters.Random_State := Random_State;
 
         aClassifier.Parameters.Criterion_Kind := Criterion_Type;
-        Node_Splitter.C_Init (aClassifier.Parameters.Splitter,
-                              aClassifier.Parameters.Criteria);
+        Node_Splitter.C_Init (aClassifier.Parameters.Splitter);
 
     end C_Init;
 
