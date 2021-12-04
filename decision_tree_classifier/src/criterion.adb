@@ -35,7 +35,7 @@ package body Criterion is
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
---        Routine_Name    : constant String := "Criterion.Classification_Init ";
+      --        Routine_Name    : constant String := "Criterion.Classification_Init ";
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
@@ -104,11 +104,11 @@ package body Criterion is
                                      Impurity_Left,
                                      Impurity_Right : out Float) is
       use Maths.Float_Math_Functions;
---        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
+      --        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
       Num_Outputs    : constant Positive :=
                          Positive (Criteria.Y.Element (1).Length);
       Class_List     :  constant Classifier_Types.Natural_List :=
-                           Criteria.Num_Classes;
+                         Criteria.Num_Classes;
       Sum_Left_K     : Classifier_Types.Float_List;
       Sum_Right_K    : Classifier_Types.Float_List;
       Count_K        : Float;
@@ -131,7 +131,7 @@ package body Criterion is
             Count_K := Sum_Right_K.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Num_Weighted_Right;
---                  Put_Line (Routine_Name & " right Count_K: " & Float'Image (Count_K));
+               --                  Put_Line (Routine_Name & " right Count_K: " & Float'Image (Count_K));
                Sq_Count_Right := Sq_Count_Right - Count_K * Log (Count_K);
             end if;
          end loop;
@@ -154,7 +154,7 @@ package body Criterion is
    --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
    --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
    function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
---        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
+      --        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    : constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
@@ -216,17 +216,19 @@ package body Criterion is
    end Entropy_Node_Impurity;
 
    --  ------------------------------------------------------------------------
-
+   --  L200
    function Impurity_Improvement (Criteria       : Criterion_Class;
                                   Impurity_Parent, Impurity_Left,
                                   Impurity_Right : Float) return float is
+      Weighted_Node_Samples : constant Float :=
+                                Criteria.Num_Weighted_Node_Samples;
+      Right_Component       : constant Float
+        := Criteria.Num_Weighted_Right / Weighted_Node_Samples * Impurity_Right;
+      Left_Component        : constant Float
+        := Criteria.Num_Weighted_Left / Weighted_Node_Samples * Impurity_Left;
    begin
-      return (Criteria.Num_Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
-        (Impurity_Parent -
-           (Criteria.Num_Weighted_Right / Criteria.Num_Weighted_Node_Samples *
-                Impurity_Right) -
-           (Criteria.Num_Weighted_Left / Criteria.Num_Weighted_Node_Samples *
-                Impurity_Left));
+      return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
+        (Impurity_Parent - Right_Component - Left_Component);
 
    end Impurity_Improvement;
 
