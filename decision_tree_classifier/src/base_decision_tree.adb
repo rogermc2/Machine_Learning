@@ -42,6 +42,7 @@ package body Base_Decision_Tree is
       Routine_Name          : constant String :=
                                 "Base_Decision_Tree.Base_Fit ";
       Criteria              : Criterion.Criterion_Class;
+      Splitter              : Node_Splitter.Splitter_Class;
       Num_Samples           : constant Positive := Positive (X.Length);
       --        Num_Outputs           : constant Tree.Index_Range :=
       --                                  Tree.Index_Range (Y.Element (1).Length);
@@ -68,6 +69,11 @@ package body Base_Decision_Tree is
          Classification_Part (aClassifier, Criteria , Y, Y_Encoded,
                               Classes, Expanded_Class_Weight);
       end if;
+
+      Node_Splitter.C_Init
+        (Splitter, Criteria,
+         Tree.Index_Range (aClassifier.Attributes.Max_Features),
+         aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf);
 
       for index in Classes.First_Index .. Classes.Last_Index loop
          Num_Classes.Append (Positive (Classes.Element (index).Length));
@@ -150,7 +156,6 @@ package body Base_Decision_Tree is
       Max_Depth         : Natural;
       Max_Leaf_Nodes    : constant Integer :=
                             aClassifier.Parameters.Max_Leaf_Nodes;
-      Min_Sample_Leaf   : constant Positive := 1;
       Max_Features      : Index_Range := Tree.Index_Range'Last;
       Sqrt_Num_Features : Index_Range := 1;
    begin
@@ -188,8 +193,8 @@ package body Base_Decision_Tree is
       end case;
 
       --  L268
-      Min_Samples_Split :=
-        Integer'Max (Min_Samples_Split, 2  * Min_Sample_Leaf);
+      Min_Samples_Split := Integer'Max
+         (Min_Samples_Split, 2  * aClassifier.Parameters.Min_Samples_Leaf);
 
       Sqrt_Num_Features :=
         Tree.Index_Range (Sqrt (Float (aClassifier.Attributes.Num_Features)));
