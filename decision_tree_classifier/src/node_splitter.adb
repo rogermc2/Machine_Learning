@@ -521,10 +521,10 @@ package body Node_Splitter is
      (Splitter              : in out Splitter_Class;
       Start_Row, Stop_Row   : Positive;
       Weighted_Node_Samples : in out Float) is
+      Routine_Name : constant String := "Node_Splitter.Reset_Node";
    begin
       Assert (Stop_Row >= Start_Row,
-              "Node_Splitter.Reset_Node, stop index" &
-                Integer'Image (Stop_Row) &
+              Routine_Name & " stop index" & Integer'Image (Stop_Row) &
                 " should not be less than start index" &
                 Integer'Image (Start_Row));
 
