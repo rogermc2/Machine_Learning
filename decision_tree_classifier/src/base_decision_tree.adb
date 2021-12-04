@@ -312,7 +312,7 @@ package body Base_Decision_Tree is
 
       --  Y is 2D list num samples x num outputs
       --  Y_Encoded is 2D list num samples x num outputs
-      --  L208  Initialize Y_Encoded
+      --  L215  Initialize Y_Encoded
       for class in Y.First_Index .. Y.Last_Index loop
          Column.Clear;
          for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
@@ -321,7 +321,6 @@ package body Base_Decision_Tree is
          Y_Encoded.Replace_Element (class, Column);
       end loop;
 
-      Put_Line (Routine_Name & "Y_Encoded generated");
       --  Classes is 2D list num outputs x num classes
       OP_Row.Set_Length (Num_Outputs);
       for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
@@ -334,23 +333,13 @@ package body Base_Decision_Tree is
            (Integer (Yk_Row.Length));
          Classes.Append (Encode_Utils.Unique (Yk_Row, Inverse));
 
-         Put_Line (Routine_Name & "Encode_Utils.Unique done");
          for class in Y.First_Index .. Y.Last_Index loop
             YE_Row := Y_Encoded.Element (class);
             YE_Row.Replace_Element (op, Inverse.Element (class));
             Y_Encoded.Replace_Element (class, YE_Row);
          end loop;
       end loop;
-      aClassifier.Attributes.Classes := Classes;
-      Put_Line (Routine_Name & "Attributes.Classes set");
 
-      aClassifier.Parameters.Criteria.Num_Classes.Clear;
-      for class in Y.First_Index .. Y.Last_Index loop
-         aClassifier.Parameters.Criteria.Num_Classes.Append
-           (Natural (Classes (class).Length));
-      end loop;
-
-      Put_Line (Routine_Name & "L222");
       --  L222
       if aClassifier.Parameters.Class_Weight /= No_Weight then
          Expanded_Class_Weights :=
@@ -358,7 +347,7 @@ package body Base_Decision_Tree is
       end if;
 
       --  L227
---        Classes := aClassifier.Attributes.Classes;
+      Classes := aClassifier.Attributes.Classes;
 
    exception
       when others => raise Classifier_Error with Routine_Name & "error";

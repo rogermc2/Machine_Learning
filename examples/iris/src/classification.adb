@@ -42,7 +42,6 @@ package body Classification is
       Num_Samples     : constant Natural := Natural (X.Length);
       --  Y: num outputs x num classes
       Y               : Value_Data_Lists_2D;
-      Num_Outputs     : Positive;
       No_Weights      : Weights.Weight_List := Empty_Vector;
    begin
       Put_Line (Routine_Name);
@@ -62,7 +61,6 @@ package body Classification is
       Y := To_Value_2D_List (Iris_Data.Label_Values);
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
-      Num_Outputs := Positive (Y.Element (1).Length);
 
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
@@ -71,7 +69,7 @@ package body Classification is
       Put_Line ("----------------------------------------------");
       New_Line;
 
-      C_Init (theClassifier, Num_Outputs);
+      C_Init (theClassifier);
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
