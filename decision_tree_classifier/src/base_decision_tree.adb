@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -10,7 +10,7 @@ with Ada_Tree_Builder;
 with Classifier_Types;
 with Criterion;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Base_Decision_Tree is
 
@@ -22,6 +22,7 @@ package body Base_Decision_Tree is
       Sample_Weights    : in out Classifier_Types.Float_List);
    procedure Classification_Part
      (aClassifier            : in out Classifier;
+      Criteria               : in out Criterion.Criterion_Class;
       Y                      : ML_Types.Value_Data_Lists_2D;
       Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out ML_Types.Value_Data_Lists_2D;
@@ -40,21 +41,19 @@ package body Base_Decision_Tree is
       use Estimator;
       Routine_Name          : constant String :=
                                 "Base_Decision_Tree.Base_Fit ";
+      Criteria              : Criterion.Criterion_Class;
       Num_Samples           : constant Positive := Positive (X.Length);
-      Y_Encoded             : Classifier_Types.Natural_Lists_2D
-        := Classifier_Types.Natural_List_Package.Empty_Vector;
-      Classes               : ML_Types.Value_Data_Lists_2D
-        := ML_Types.Value_Lists_Data_Package.Empty_Vector;
-      Num_Classes           : Classifier_Types.Natural_List
-        := Classifier_Types.Natural_Package.Empty_Vector;
+      --        Num_Outputs           : constant Tree.Index_Range :=
+      --                                  Tree.Index_Range (Y.Element (1).Length);
+      Y_Encoded             : Classifier_Types.Natural_Lists_2D;
+      Classes               : ML_Types.Value_Data_Lists_2D;
+      Num_Classes           : Classifier_Types.Natural_List;
       Min_Samples_Split     : Positive := 1;
       --  L205
-      Expanded_Class_Weight : Weights.Weight_List :=
-                                Classifier_Types.Float_Package.Empty_Vector;
+      Expanded_Class_Weight : Weights.Weight_List;
       Min_Weight_Leaf       : Float := 0.0;
       Sum_Sample_Weight     : Float := 0.0;
    begin
-      Put_Line (Routine_Name);
       Assert (not X.Is_Empty, Routine_Name & ", X is empty");
       Assert (not Y.Is_Empty, Routine_Name & ", Y is empty");
       if not Sample_Weights.Is_Empty then
@@ -66,11 +65,10 @@ package body Base_Decision_Tree is
       --  Y is 2D list num classes x num outputs
       --  L207  Generates Y_Encoded and Classes
       if aClassifier.Estimator_Kind = Classifier_Estimator then
-         Classification_Part (aClassifier, Y, Y_Encoded,
+         Classification_Part (aClassifier, Criteria , Y, Y_Encoded,
                               Classes, Expanded_Class_Weight);
       end if;
 
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Classes", Classes);
       for index in Classes.First_Index .. Classes.Last_Index loop
          Num_Classes.Append (Positive (Classes.Element (index).Length));
       end loop;
@@ -247,7 +245,8 @@ package body Base_Decision_Tree is
    --  -------------------------------------------------------------------------
 
    procedure C_Init (aClassifier              : in out Classifier;
-                     Num_Outputs              : Positive := 1;
+                     Criterion_Type           : Criterion.Classifier_Criteria_Type :=
+                       Criterion.Gini_Criteria;
                      Min_Samples_Split        : Split_Value_Record :=
                        Default_Min_Split;
                      Min_Leaf_Samples         : Integer := 1;
@@ -262,6 +261,7 @@ package body Base_Decision_Tree is
                      CCP_Alpha                : Float := 0.0;
                      Random_State             : Integer := 0) is
    begin
+      aClassifier.Parameters.Criterion_Kind := Criterion_Type;
       aClassifier.Parameters.Max_Depth := Max_Depth;
       aClassifier.Parameters.Min_Samples_Split := Min_Samples_Split;
       aClassifier.Parameters.Min_Samples_Leaf := Min_Leaf_Samples;
@@ -273,8 +273,6 @@ package body Base_Decision_Tree is
       aClassifier.Parameters.Class_Weight := Class_Weight;
       aClassifier.Parameters.CCP_Alpha := CCP_Alpha;
       aClassifier.Parameters.Random_State := Random_State;
-      Criterion.C_Init (aClassifier.Parameters.Criteria,
-                        Tree.Index_Range (Num_Outputs));
       Node_Splitter.C_Init (aClassifier.Parameters.Splitter,
                             aClassifier.Parameters.Criteria);
 
@@ -284,6 +282,7 @@ package body Base_Decision_Tree is
    --  based on L200 of _classes.py BasesDecisionTree.Fit
    procedure Classification_Part
      (aClassifier            : in out Classifier;
+      Criteria               : in out Criterion.Criterion_Class;
       Y                      : ML_Types.Value_Data_Lists_2D;
       Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out ML_Types.Value_Data_Lists_2D;
@@ -302,7 +301,6 @@ package body Base_Decision_Tree is
       Column       : Natural_List := Natural_Package.Empty_Vector;
       Inverse      : Natural_List := Natural_Package.Empty_Vector;
    begin
-      Put_Line (Routine_Name);
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
       Y_Encoded.Clear;
@@ -339,6 +337,9 @@ package body Base_Decision_Tree is
             Y_Encoded.Replace_Element (class, YE_Row);
          end loop;
       end loop;
+      Criterion.C_Init (Criteria, Tree.Index_Range (Num_Outputs),
+                        aClassifier.Attributes.Decision_Tree.Num_Classes);
+      aClassifier.Attributes.Classes := Classes;
 
       --  L222
       if aClassifier.Parameters.Class_Weight /= No_Weight then

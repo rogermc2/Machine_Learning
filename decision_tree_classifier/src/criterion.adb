@@ -15,7 +15,7 @@ package body Criterion is
    --  L214 __cinit__
    procedure C_Init (Criteria    : in out Criterion_Class;
                      Num_Outputs : Tree.Index_Range := 1;
-                     Num_Classes     : Classifier_Types.Natural_List :=
+                     Num_Classes : Classifier_Types.Natural_List :=
                        Classifier_Types.Natural_Package.Empty_Vector) is
    begin
       --  L220

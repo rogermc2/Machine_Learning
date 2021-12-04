@@ -2,7 +2,7 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Decision_Tree;
 with Classifier_Utilities;
@@ -24,7 +24,6 @@ package body Decision_Tree_Classification is
         use Estimator;
         Routine_Name : constant String := "Decision_Tree_Classifer.Classification_Fit ";
     begin
-        Put_Line (Routine_Name);
         Assert (aClassifier.Estimator_Kind = Classifier_Estimator,
                 Routine_Name & " invalid estimator "
                 & Estimator_Type'Image (aClassifier.Estimator_Kind));

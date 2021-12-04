@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
+with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
@@ -69,7 +70,7 @@ package body Classification is
       Put_Line ("----------------------------------------------");
       New_Line;
 
-      C_Init (theClassifier);
+      C_Init (theClassifier, Criterion.Gini_Criteria);
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
