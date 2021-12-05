@@ -67,7 +67,6 @@ package body Base_Decision_Tree is
         Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
                           aClassifier.Attributes.Num_Outputs,
                           aClassifier.Attributes.Decision_Tree.Num_Classes);
-
         Node_Splitter.C_Init
           (aClassifier.Parameters.Splitter,
            Tree.Index_Range (aClassifier.Attributes.Max_Features),

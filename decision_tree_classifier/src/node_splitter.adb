@@ -402,7 +402,7 @@ package body Node_Splitter is
                       Best_Split            : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
-      --        Routine_Name         : constant String := "Node_Splitter.Process ";
+--        Routine_Name         : constant String := "Node_Splitter.Process ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -544,7 +544,7 @@ package body Node_Splitter is
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
                         return Split_Record is
-      Routine_Name         : constant String := "Node_Splitter.Split_Node";
+      Routine_Name         : constant String := "Node_Splitter.Split_Node ";
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Num_Total_Constants  : Natural := Num_Known_Constants;
       Num_Found_Constants  : Natural := 0;

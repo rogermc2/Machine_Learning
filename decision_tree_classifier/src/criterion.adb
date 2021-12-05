@@ -2,12 +2,12 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with ML_Types;
---  with Printing;
+with Printing;
 
 package body Criterion is
 
@@ -99,14 +99,12 @@ package body Criterion is
    end Classification_Init;
 
    --  ------------------------------------------------------------------------
-   --  L637
+   --  L630
    procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float) is
-      use Maths.Float_Math_Functions;
-      --        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
-      Num_Outputs    : constant Positive :=
-                         Positive (Criteria.Y.Element (1).Length);
+      Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
+      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    :  constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
       Sum_Left_K     : Classifier_Types.Float_List;
@@ -114,31 +112,32 @@ package body Criterion is
       Count_K        : Float;
       Sq_Count_Left  : Float;
       Sq_Count_Right : Float;
+      Gini_Left      : Float := 0.0;
+      Gini_Right     : Float := 0.0;
    begin
       --  L662
-      for k in 1 .. Positive (Criteria.Num_Outputs) loop
+      for k in 1 .. Num_Outputs loop
          Sq_Count_Left := 0.0;
          Sq_Count_Right := 0.0;
          Sum_Left_K := Criteria.Sum_Left.Element (k);
          Sum_Right_K := Criteria.Sum_Right.Element (k);
+
          for c in 1 .. Num_Classes.Element (k) loop
             Count_K := Sum_Left_K.Element (c);
-            if Count_K > 0.0 then
-               Count_K := Count_K / Criteria.Num_Weighted_Left;
-               Sq_Count_Left := Sq_Count_Left - Count_K * Log (Count_K);
-            end if;
+            Sq_Count_Left := Sq_Count_Left + Count_K ** 2;
 
             Count_K := Sum_Right_K.Element (c);
-            if Count_K > 0.0 then
-               Count_K := Count_K / Criteria.Num_Weighted_Right;
-               --                  Put_Line (Routine_Name & " right Count_K: " & Float'Image (Count_K));
-               Sq_Count_Right := Sq_Count_Right - Count_K * Log (Count_K);
-            end if;
+            Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
          end loop;
       end loop;
 
-      Impurity_Left := Sq_Count_Left / Float (Num_Outputs);
-      Impurity_Right := Sq_Count_Right / Float (Num_Outputs);
+      Gini_Left := Gini_Left + 1.0 -
+        Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
+      Gini_Right := Gini_Right + 1.0 -
+        Sq_Count_Left / Criteria.Num_Weighted_Right ** 2;
+
+      Impurity_Left := Gini_Left / Float (Num_Outputs);
+      Impurity_Right := Gini_Right / Float (Num_Outputs);
 
    end Gini_Children_Impurity;
 
