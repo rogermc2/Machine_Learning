@@ -2,7 +2,7 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -65,10 +65,6 @@ package body Criterion is
          end loop;
       end loop;
 
-      Put_Line (Routine_Name & " Criteria.Num_Weighted_Left" &
-                  Float'Image (Criteria.Num_Weighted_Left));
-      Put_Line (Routine_Name & " Criteria.Num_Weighted_Right" &
-                  Float'Image (Criteria.Num_Weighted_Right));
       Gini_Left := Gini_Left + 1.0 -
         Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
       Gini_Right := Gini_Right + 1.0 -
@@ -325,22 +321,23 @@ package body Criterion is
    --  L398 Update statistics by moving samples[pos:new_pos] to the left child.
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
-      Num_Outputs : constant Positive :=
-                      Positive (Criteria.Y.Element (1).Length);
-      i           : Positive;
-      Y_I         : Classifier_Types.Natural_List;
-      Label_Index : Positive;  --  Class index?
-      Sum_Left_K  : Classifier_Types.Float_List;
-      Sum_Right_K : Classifier_Types.Float_List;
-      Sum_K       : Classifier_Types.Float_List;
-      Weight      : Float := 1.0;
+--        Routine_Name : constant String := "Criterion.Update ";
+      Num_Outputs  : constant Positive :=
+                       Positive (Criteria.Y.Element (1).Length);
+      i            : Positive;
+      Y_I          : Classifier_Types.Natural_List;
+      Label_Index  : Positive;  --  Class index?
+      Sum_Left_K   : Classifier_Types.Float_List;
+      Sum_Right_K  : Classifier_Types.Float_List;
+      Sum_K        : Classifier_Types.Float_List;
+      Weight       : Float := 1.0;
    begin
       --  L435  Update statistics up to new_pos given that
       --  sum_left[x] +  sum_right[x] = sum_total[x] and that sum_total
       --  is known, update sum_left from the direction that requires
       --  the least amount of computations
 
-      if (New_Pos - Criteria.Split_Row) < (Criteria.Stop_Row - New_Pos) then
+      if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
@@ -360,12 +357,14 @@ package body Criterion is
 
       else  --  L449
          Reverse_Reset (Criteria);
-         for p in reverse Criteria.Stop_Row .. New_Pos loop
+         --  Num_Weighted_Left set to Num_Weighted_Node_Samples by Reverse_Reset
+         for p in reverse New_Pos .. Criteria.Stop_Row loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
                Weight := Criteria.Sample_Weight.Element (i);
             end if;
 
+            --  L446
             Y_I := Criteria.Y.Element (i);
             for k in 1 .. Num_Outputs loop
                Label_Index := Y_I.Element (k);
