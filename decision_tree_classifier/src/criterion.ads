@@ -51,6 +51,9 @@ package Criterion is
                      Num_Outputs : Tree.Index_Range := 1;
                      Num_Classes : Classifier_Types.Natural_List :=
                        Classifier_Types.Natural_Package.Empty_Vector);
+   procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
+                                     Impurity_Left,
+                                     Impurity_Right : out Float);
    procedure Classification_Init
      (Criteria             : in out Criterion_Class;
       Y                    : Classifier_Types.Natural_Lists_2D;
@@ -60,9 +63,6 @@ package Criterion is
       Sample_Weight        : Weights.Weight_List;
       Weighted_Samples     : Float;
       Start_Row, Stop_Row  : Natural);
-   procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
-                                     Impurity_Left,
-                                     Impurity_Right : out Float);
    function Impurity_Improvement
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;

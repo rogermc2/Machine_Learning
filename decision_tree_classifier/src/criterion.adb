@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with ML_Types;
-with Printing;
+--  with Printing;
 
 package body Criterion is
 
@@ -25,7 +25,62 @@ package body Criterion is
    end C_Init;
 
    --  ------------------------------------------------------------------------
-   --  L59, L214, 280
+   --  L630
+   procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
+                                     Impurity_Left,
+                                     Impurity_Right : out Float) is
+      Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
+      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
+      Num_Classes    :  constant Classifier_Types.Natural_List :=
+                         Criteria.Num_Classes;
+      Sum_Left_K     : Classifier_Types.Float_List;
+      Sum_Right_K    : Classifier_Types.Float_List;
+      Count_K        : Float;
+      Sq_Count_Left  : Float;
+      Sq_Count_Right : Float;
+      Gini_Left      : Float := 0.0;
+      Gini_Right     : Float := 0.0;
+   begin
+      Assert (Criteria.Num_Weighted_Left > 0.0,
+              Routine_Name & "Criteria.Num_Weighted_Left " &
+                Float'Image (Criteria.Num_Weighted_Left) &
+                " should be > 0.0.");
+      Assert (Criteria.Num_Weighted_Right > 0.0,
+              Routine_Name & "Criteria.Num_Weighted_Right " &
+                Float'Image (Criteria.Num_Weighted_Right) &
+                " should be > 0.0.");
+      --  L662
+      for k in 1 .. Num_Outputs loop
+         Sq_Count_Left := 0.0;
+         Sq_Count_Right := 0.0;
+         Sum_Left_K := Criteria.Sum_Left.Element (k);
+         Sum_Right_K := Criteria.Sum_Right.Element (k);
+
+         for c in 1 .. Num_Classes.Element (k) loop
+            Count_K := Sum_Left_K.Element (c);
+            Sq_Count_Left := Sq_Count_Left + Count_K ** 2;
+
+            Count_K := Sum_Right_K.Element (c);
+            Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
+         end loop;
+      end loop;
+
+      Put_Line (Routine_Name & " Criteria.Num_Weighted_Left" &
+                  Float'Image (Criteria.Num_Weighted_Left));
+      Put_Line (Routine_Name & " Criteria.Num_Weighted_Right" &
+                  Float'Image (Criteria.Num_Weighted_Right));
+      Gini_Left := Gini_Left + 1.0 -
+        Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
+      Gini_Right := Gini_Right + 1.0 -
+        Sq_Count_Left / Criteria.Num_Weighted_Right ** 2;
+
+      Impurity_Left := Gini_Left / Float (Num_Outputs);
+      Impurity_Right := Gini_Right / Float (Num_Outputs);
+
+   end Children_Impurity_Gini;
+
+   --  ------------------------------------------------------------------------
+   --  L59, L214, 276
    procedure Classification_Init
      (Criteria            : in out Criterion_Class;
       Y                   : Classifier_Types.Natural_Lists_2D;
@@ -99,60 +154,25 @@ package body Criterion is
    end Classification_Init;
 
    --  ------------------------------------------------------------------------
-   --  L630
-   procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
-                                     Impurity_Left,
-                                     Impurity_Right : out Float) is
-      Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
-      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes    :  constant Classifier_Types.Natural_List :=
-                         Criteria.Num_Classes;
-      Sum_Left_K     : Classifier_Types.Float_List;
-      Sum_Right_K    : Classifier_Types.Float_List;
-      Count_K        : Float;
-      Sq_Count_Left  : Float;
-      Sq_Count_Right : Float;
-      Gini_Left      : Float := 0.0;
-      Gini_Right     : Float := 0.0;
-   begin
-      --  L662
-      for k in 1 .. Num_Outputs loop
-         Sq_Count_Left := 0.0;
-         Sq_Count_Right := 0.0;
-         Sum_Left_K := Criteria.Sum_Left.Element (k);
-         Sum_Right_K := Criteria.Sum_Right.Element (k);
-
-         for c in 1 .. Num_Classes.Element (k) loop
-            Count_K := Sum_Left_K.Element (c);
-            Sq_Count_Left := Sq_Count_Left + Count_K ** 2;
-
-            Count_K := Sum_Right_K.Element (c);
-            Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
-         end loop;
-      end loop;
-
-      Gini_Left := Gini_Left + 1.0 -
-        Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
-      Gini_Right := Gini_Right + 1.0 -
-        Sq_Count_Left / Criteria.Num_Weighted_Right ** 2;
-
-      Impurity_Left := Gini_Left / Float (Num_Outputs);
-      Impurity_Right := Gini_Right / Float (Num_Outputs);
-
-   end Gini_Children_Impurity;
-
-   --  ------------------------------------------------------------------------
 
    function Impurity_Improvement (Criteria       : Criterion_Class;
                                   Impurity_Parent, Impurity_Left,
                                   Impurity_Right : Float) return float is
+      Routine_Name          : constant String := "Criterion.Impurity_Improvement";
       Weighted_Node_Samples : constant Float :=
                                 Criteria.Num_Weighted_Node_Samples;
       Right_Component       : constant Float
-        := Criteria.Num_Weighted_Right / Weighted_Node_Samples * Impurity_Right;
+        := (Criteria.Num_Weighted_Right / Weighted_Node_Samples) * Impurity_Right;
       Left_Component        : constant Float
-        := Criteria.Num_Weighted_Left / Weighted_Node_Samples * Impurity_Left;
+        := (Criteria.Num_Weighted_Left / Weighted_Node_Samples) * Impurity_Left;
    begin
+      Assert (Weighted_Node_Samples > 0.0,
+              Routine_Name & "Criteria.Weighted_Node_Samples " &
+                Float'Image (Weighted_Node_Samples) & " should be > 0.0");
+      Assert (Criteria.Num_Weighted_Samples > 0.0,
+              Routine_Name & "Criteria.Num_Weighted_Samples " &
+                Float'Image (Criteria.Num_Weighted_Samples) &
+                " should be > 0.0");
       return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
         (Impurity_Parent - Right_Component - Left_Component);
 
@@ -248,7 +268,7 @@ package body Criterion is
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
-      Gini_Children_Impurity (Criteria, Impurity_Left, Impurity_Right);
+      Children_Impurity_Gini (Criteria, Impurity_Left, Impurity_Right);
       return -Criteria.Num_Weighted_Right * Impurity_Right -
         Criteria.Num_Weighted_Left * Impurity_Left;
 
@@ -309,13 +329,17 @@ package body Criterion is
                       Positive (Criteria.Y.Element (1).Length);
       i           : Positive;
       Y_I         : Classifier_Types.Natural_List;
-      Y_Ik        : Natural;  --  Class index
+      Label_Index : Positive;  --  Class index?
       Sum_Left_K  : Classifier_Types.Float_List;
       Sum_Right_K : Classifier_Types.Float_List;
       Sum_K       : Classifier_Types.Float_List;
       Weight      : Float := 1.0;
    begin
-      --  L435
+      --  L435  Update statistics up to new_pos given that
+      --  sum_left[x] +  sum_right[x] = sum_total[x] and that sum_total
+      --  is known, update sum_left from the direction that requires
+      --  the least amount of computations
+
       if (New_Pos - Criteria.Split_Row) < (Criteria.Stop_Row - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);
@@ -326,9 +350,9 @@ package body Criterion is
             Y_I := Criteria.Y.Element (i);
             for k in 1 .. Num_Outputs loop
                Sum_Left_K := Criteria.Sum_Left.Element (k);
-               Y_Ik := Y_I.Element (k);  --  Class index
+               Label_Index := Y_I.Element (k);  --  Class index
                Sum_Left_K.Replace_Element
-                 (Y_Ik, Sum_Left_K.Element (Y_Ik) + Weight);
+                 (Label_Index, Sum_Left_K.Element (Label_Index) + Weight);
                Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
             end loop;
             Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
@@ -344,10 +368,10 @@ package body Criterion is
 
             Y_I := Criteria.Y.Element (i);
             for k in 1 .. Num_Outputs loop
-               Y_Ik := Y_I.Element (k);
+               Label_Index := Y_I.Element (k);
                Sum_Left_K := Criteria.Sum_Left.Element (k);
                Sum_Left_K.Replace_Element
-                 (Y_Ik, Sum_Left_K.Element (Y_Ik) - Weight);
+                 (Label_Index, Sum_Left_K.Element (Label_Index) - Weight);
                Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
             end loop;
 

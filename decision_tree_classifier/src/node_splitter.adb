@@ -402,7 +402,7 @@ package body Node_Splitter is
                       Best_Split            : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
---        Routine_Name         : constant String := "Node_Splitter.Process ";
+      --        Routine_Name         : constant String := "Node_Splitter.Process ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -503,12 +503,23 @@ package body Node_Splitter is
          --  L436
          Criterion.Reset (Self.Criteria);
          Criterion.Update (Self.Criteria, Best_Split.Split_Row);
-         Criterion.Gini_Children_Impurity
+         Criterion.Children_Impurity_Gini
            (Self.Criteria, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
+         Put_Line (Routine_Name &
+                     " Children_Impurity_Gini Best_Split.Improvement " &
+                     Float'Image (Best_Split.Improvement));
+         Put_Line (Routine_Name &
+                     " Children_Impurity_Gini Best_Split.Impurity_Left " &
+                     Float'Image (Best_Split.Impurity_Left));
+         Put_Line (Routine_Name &
+                     " Gini_Children_Impurity Best_Split.Impurity_Right " &
+                     Float'Image (Best_Split.Impurity_Right));
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
+         Put_Line (Routine_Name & " L319 Best_Split.Improvement " &
+                     Float'Image (Best_Split.Improvement));
       end if;
 
    end Reorder_Rows;
@@ -561,10 +572,13 @@ package body Node_Splitter is
       --  L319
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
-
+      Put_Line (Routine_Name & " L319 Best_Split.Improvement " &
+                  Float'Image (Best_Split.Improvement));
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
+      Put_Line (Routine_Name & " reordered Best_Split.Improvement " &
+                  Float'Image (Best_Split.Improvement));
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
       --  L454

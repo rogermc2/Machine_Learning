@@ -99,9 +99,11 @@ package body Ada_Tree_Builder is
 
       --  L220
       if not Is_Leaf_Node then
+         Put_Line (Routine_Name & " L220 Node_ID " &
+                     Integer'Image (Node_ID));
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         Put_Line (Routine_Name & " L233 Split.Improvement" &
+         Put_Line (Routine_Name & " L233 Split.Improvement " &
                      Float'Image (Split.Improvement));
          --  L233
          Is_Leaf_Node := Split.Split_Row >= Stop_Row or
