@@ -35,36 +35,38 @@ package body Classification is
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
---        Class_Names     : Class_Names_List;
+      Class_Names     : Class_Names_List;
 --        Names_Cursor    : String_Package.Cursor := Feature_Names.First;
---        Features        : Feature_Names_List;
-      X               : constant Value_Data_Lists_2D :=
+      Features        : Feature_Names_List;
+      Iris_Features   : constant Value_Data_Lists_2D :=
                           Iris_Data.Feature_Values;
-      Num_Samples     : constant Natural := Natural (X.Length);
-      --  Y: num outputs x num classes
-      Y               : Value_Data_Lists_2D;
+      Num_Samples     : constant Natural := Natural (Iris_Features.Length);
+      --  Iris_Target: num outputs x num classes
+      Iris_Target     : Value_Data_Lists_2D;
       No_Weights      : Weights.Weight_List := Empty_Vector;
    begin
       Put_Line (Routine_Name);
---        Class_Names.Append (To_Unbounded_String ("Setosa"));
---        Class_Names.Append (To_Unbounded_String ("Versicolour"));
---        Class_Names.Append (To_Unbounded_String ("Virginica"));
---
+      Class_Names.Append (To_Unbounded_String ("Setosa"));
+      Class_Names.Append (To_Unbounded_String ("Versicolour"));
+      Class_Names.Append (To_Unbounded_String ("Virginica"));
+
 --        while Has_Element (Names_Cursor) loop
 --           Features.Append (Element (Names_Cursor));
 --           Next (Names_Cursor);
 --        end loop;
 --        Printing.Print_Unbounded_List (Routine_Name & "Features", Features);
 
-      Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
+      Assert (Num_Samples > 0, Routine_Name &
+                " called with empty Features vector.");
 
-      --  Y is 2D list num outputs x num classes
-      Y := To_Value_2D_List (Iris_Data.Label_Values);
-      Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
-                " invalid Y vector");
+      --  Iris_Target is 2D list num outputs x num classes
+      Iris_Target := To_Value_2D_List (Iris_Data.Label_Values);
+      Assert (Integer (Iris_Target.Length) = Num_Samples, Routine_Name &
+                " invalid Iris_Target vector");
 
-      C_Init (theClassifier, Criterion.Gini_Criteria);
-      Classification_Fit (theClassifier, X, Y, No_Weights);
+      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Features => 2);
+      Classification_Fit (theClassifier, Iris_Features, Iris_Target,
+                          No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
       Print_Tree ("The Tree", theClassifier);
@@ -72,7 +74,8 @@ package body Classification is
       New_Line;
 
       C_Init (theClassifier, Criterion.Gini_Criteria);
-      Classification_Fit (theClassifier, X, Y, No_Weights);
+      Classification_Fit (theClassifier, Iris_Features, Iris_Target,
+                          No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
       Print_Tree ("The Tree", theClassifier);
@@ -84,8 +87,8 @@ package body Classification is
 
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
---           Class_Names => Class_Names,
---           Feature_Names => Features,
+         Class_Names => Class_Names,
+         Feature_Names => Features,
          Output_File_Name => To_Unbounded_String ("iris.dot"));
 
    end Classify_Iris;
