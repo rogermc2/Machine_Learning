@@ -107,7 +107,7 @@ package body Criterion is
       --        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
       Num_Outputs    : constant Positive :=
                          Positive (Criteria.Y.Element (1).Length);
-      Class_List     :  constant Classifier_Types.Natural_List :=
+      Num_Classes    :  constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
       Sum_Left_K     : Classifier_Types.Float_List;
       Sum_Right_K    : Classifier_Types.Float_List;
@@ -116,12 +116,12 @@ package body Criterion is
       Sq_Count_Right : Float;
    begin
       --  L662
-      for k in Class_List.First_Index .. Class_List.Last_Index loop
+      for k in 1 .. Positive (Criteria.Num_Outputs) loop
          Sq_Count_Left := 0.0;
          Sq_Count_Right := 0.0;
          Sum_Left_K := Criteria.Sum_Left.Element (k);
          Sum_Right_K := Criteria.Sum_Right.Element (k);
-         for c in Class_List.First_Index .. Class_List.Last_Index loop
+         for c in 1 .. Num_Classes.Element (k) loop
             Count_K := Sum_Left_K.Element (c);
             if Count_K > 0.0 then
                Count_K := Count_K / Criteria.Num_Weighted_Left;
@@ -143,80 +143,7 @@ package body Criterion is
    end Gini_Children_Impurity;
 
    --  ------------------------------------------------------------------------
-   --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
-   --  of the current node.
-   --  Gini_Node_Impurity handles cases where the target is a classification
-   --  taking values 0, 1, ... K-2, K-1.
-   --  If node m represents a region Rm with Nm observations then:
-   --  Let count_k = 1/ Nm \ sum_{x_i in Rm} I(yi = k)
-   --  be the proportion of class k observations in node m.
-   --  The Gini Index is then defined as:
-   --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
-   --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
-   function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
-      --        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
-      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes    : constant Classifier_Types.Natural_List :=
-                         Criteria.Num_Classes;
-      Sum_Total_K    : Weights.Weight_List;
-      Num_Classes_K  : Positive;
-      Count_K        : Float;
-      Gini           : Float := 0.0;
-      Sq_Count       : Float := 0.0;
-   begin
-      --  L620
-      for index_k in 1 .. Criteria.Num_Outputs loop
-         Sq_Count := 0.0;
-         Num_Classes_K := Num_Classes.Element (Integer (index_k));
-         Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
 
-         for class_index in 1 .. Num_Classes_K loop
-            Count_K := Float (Sum_Total_K.Element (class_index));
-            Sq_Count := Sq_Count + Count_K ** 2;
-         end loop;
-
-         Gini := Gini + 1.0 -
-           Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
-      end loop;
-
-      return Gini / Float (Num_Outputs);
-
-   end Gini_Node_Impurity;
-
-   --  ------------------------------------------------------------------------
-   --  L524 Entropy_Node_Impurity evaluates the cross-entropy criterion as
-   --  impurity of the current node.  i.e. the impurity of samples[start:end].
-   --  The smaller the impurity the better.
-   function Entropy_Node_Impurity (Self : Criterion_Class) return Float is
-      use Maths.Float_Math_Functions;
-      Class_List  : ML_Types.Value_Data_List;
-      Sum_Total_K : Classifier_Types.Float_List;
-      Count_K     : Float := 0.0;
-      Entropy     : Float := 0.0;
-   begin
-      Assert (not Self.Num_Classes.Is_Empty,
-              "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
-
-      --  L535 Y structure samples (rows) x outputs (columns)
-      --  k in range(self.n_outputs)
-      for index_k in Self.Y.Element (1).First_Index
-        .. Self.Y.Element (1).Last_Index loop
-         Sum_Total_K := Self.Sum_Total.Element (index_k);
-         for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Count_K := Sum_Total_K.Element (c);
-            if Count_K > 0.0 then
-               Count_K := Count_K / Self.Num_Weighted_Node_Samples;
-               Entropy := Entropy - Count_K * Log (Count_K);
-            end if;
-         end loop;
-      end loop;
-
-      return Entropy / Float (Self.Sum_Total.Length);
-
-   end Entropy_Node_Impurity;
-
-   --  ------------------------------------------------------------------------
-   --  L200
    function Impurity_Improvement (Criteria       : Criterion_Class;
                                   Impurity_Parent, Impurity_Left,
                                   Impurity_Right : Float) return float is
@@ -233,6 +160,77 @@ package body Criterion is
    end Impurity_Improvement;
 
    --  ------------------------------------------------------------------------
+   --  L 605 Node_Impurity_Gini evaluates the Gini criterion as the impurity
+   --  of the current node.
+   --  Node_Impurity_Gini handles cases where the target is a classification
+   --  taking values 0, 1, ... K-2, K-1.
+   --  If node m represents a region Rm with Nm observations then:
+   --  Let count_k = 1/ Nm \ sum_{x_i in Rm} I(yi = k)
+   --  be the proportion of class k observations in node m.
+   --  The Gini Index is then defined as:
+   --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
+   --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
+   function Node_Impurity_Gini (Criteria : Criterion_Class) return Float is
+      --        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
+      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
+      Num_Classes    : constant Classifier_Types.Natural_List :=
+                         Criteria.Num_Classes;
+      Sum_Total_K    : Weights.Weight_List;      Count_K        : Float;
+      Gini           : Float := 0.0;
+      Sq_Count       : Float := 0.0;
+   begin
+      --  L620
+      for index_k in 1 .. Criteria.Num_Outputs loop
+         Sq_Count := 0.0;
+         Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
+
+         for class_index in 1 .. Num_Classes.Element (Integer (index_k)) loop
+            Count_K := Float (Sum_Total_K.Element (class_index));
+            Sq_Count := Sq_Count + Count_K ** 2;
+         end loop;
+
+         Gini := Gini + 1.0 -
+           Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
+      end loop;
+
+      return Gini / Float (Num_Outputs);
+
+   end Node_Impurity_Gini;
+
+   --  ------------------------------------------------------------------------
+   --  L521 Node_Impurity_Entropy evaluates the cross-entropy criterion as
+   --  impurity of the current node.  i.e. the impurity of samples[start:end].
+   --  The smaller the impurity the better.
+   function Node_Impurity_Entropy (Self : Criterion_Class) return Float is
+      use Maths.Float_Math_Functions;
+      Num_Classes : constant Classifier_Types.Natural_List := Self.Num_Classes;
+      Sum_Total_K : Classifier_Types.Float_List;
+      Count_K     : Float := 0.0;
+      Entropy     : Float := 0.0;
+   begin
+      Assert (not Self.Num_Classes.Is_Empty,
+              "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
+
+      --  L535 Y structure samples (rows) x outputs (columns)
+      --  k in range(self.n_outputs)
+      for index_k in Self.Y.Element (1).First_Index
+        .. Self.Y.Element (1).Last_Index loop
+         Sum_Total_K := Self.Sum_Total.Element (index_k);
+         for c in 1 .. Num_Classes.Element (index_k) loop
+            Count_K := Sum_Total_K.Element (c);
+            if Count_K > 0.0 then
+               Count_K := Count_K / Self.Num_Weighted_Node_Samples;
+               Entropy := Entropy - Count_K * Log (Count_K);
+            end if;
+         end loop;
+      end loop;
+
+      return Entropy / Float (Self.Sum_Total.Length);
+
+   end Node_Impurity_Entropy;
+
+   --  ------------------------------------------------------------------------
+   --  L200
    --  L490  ClassificationCriterion(Criterion).node_value
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Weights.Weight_Lists_2D) is

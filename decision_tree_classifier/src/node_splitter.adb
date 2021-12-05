@@ -374,14 +374,14 @@ package body Node_Splitter is
 
    function Entropy_Node_Impurity (Self : Splitter_Class) return Float is
    begin
-      return Criterion.Entropy_Node_Impurity (Self.Criteria);
+      return Criterion.Node_Impurity_Entropy (Self.Criteria);
    end Entropy_Node_Impurity;
 
    --  -------------------------------------------------------------------------
 
    function Gini_Node_Impurity (Self : Splitter_Class) return Float is
    begin
-      return Criterion.Gini_Node_Impurity (Self.Criteria);
+      return Criterion.Node_Impurity_Gini (Self.Criteria);
    end Gini_Node_Impurity;
 
    --  -------------------------------------------------------------------------

@@ -25,8 +25,8 @@ package Criterion is
       Num_Weighted_Node_Samples : Float := 0.0;
       Num_Weighted_Left         : Float := 0.0;
       Num_Weighted_Right        : Float := 0.0;
-      --  For classification criteria, Sum_Total is the sum of the weighted
-      --  count of each class.
+      --  For classification criteria, Sum_Total is the sum of the
+      --   weighted count of each class.
       --  For regression, Sum_Total is the sum of w*y.
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
@@ -38,6 +38,7 @@ package Criterion is
       Proxy_Improvement         : Float := -Float'Last;
       case Criterion_Type is
          when Criterion_Classification =>
+            --  each output's number of classes for
             Num_Classes  : Classifier_Types.Natural_List;
          when Criterion_Regression =>
             Sq_Sum_Total : Float := 0.0;
@@ -62,11 +63,11 @@ package Criterion is
    procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float);
-   function Gini_Node_Impurity (Criteria : Criterion_Class) return Float;
    function Impurity_Improvement
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
-   function Entropy_Node_Impurity (Self : Criterion_Class) return Float;
+   function Node_Impurity_Entropy (Self : Criterion_Class) return Float;
+   function Node_Impurity_Gini (Criteria : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Weights.Weight_Lists_2D);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
