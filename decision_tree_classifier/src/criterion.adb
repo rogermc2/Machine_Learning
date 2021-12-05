@@ -337,7 +337,7 @@ package body Criterion is
       --  is known, update sum_left from the direction that requires
       --  the least amount of computations
 
-      if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row - New_Pos) then
+      if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row + 1 - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then

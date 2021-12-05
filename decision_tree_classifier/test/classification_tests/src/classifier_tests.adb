@@ -139,7 +139,8 @@ package body Classifier_Tests is
       Probabilities   : Weights.Weight_Lists_3D;
       Column_Sums     : Weights.Weight_List;
    begin
-      C_Init (theClassifier, Criterion.Gini_Criteria);
+      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Depth => 2,
+              Max_Features => 1);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name);
