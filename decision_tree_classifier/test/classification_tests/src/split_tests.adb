@@ -12,7 +12,6 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -70,8 +69,6 @@ package body Split_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name              : constant String := "Split_Tests.Test_Min_Samples_Split ";
       Iris_Data                 : constant Data_Record := Load_Data ("src/iris.csv");
-      Criteria                  : Criterion.Criterion_Class;
-      Splitter                  : Node_Splitter.Splitter_Class;
       theClassifier             : Classifier (Tree.Float_Type, Tree.Float_Type,
                                               Tree.Float_Type);
       Exporter                  : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -110,7 +107,7 @@ package body Split_Tests is
       --  L675 test for integer parameter
       --  Max_Leaf_Nodes is only used for Best First tree building
       Min_Split_Integer_Samples.Integer_Value := 10;
-      Base_Decision_Tree.C_Init (theClassifier, Criteria, Splitter,
+      Base_Decision_Tree.C_Init (theClassifier, Criterion.Gini_Criteria,
                                  Min_Split_Integer_Samples);
 
       Classification_Fit (theClassifier, X, Y, No_Weights);
@@ -134,7 +131,7 @@ package body Split_Tests is
 
       --  L684 test for float parameter
       Min_Split_Float_Samples.Float_Value := 0.2;
-      Base_Decision_Tree.C_Init (theClassifier, Criteria, Splitter,
+      Base_Decision_Tree.C_Init (theClassifier, Criterion.Gini_Criteria,
                                  Min_Split_Float_Samples);
       Classification_Fit (theClassifier, X, Y, No_Weights);
 

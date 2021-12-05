@@ -10,7 +10,6 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -43,8 +42,6 @@ package body Classifier_Tests is
       use Float_Package;
       Routine_Name      : constant String :=
                             "Classification_Tests.Test_Classification_Toy";
-      Criteria          : Criterion.Criterion_Class;
-      Splitter          : Node_Splitter.Splitter_Class;
       Expected          : Value_Data_Lists_2D;
       Prediction        : ML_Types.Value_Data_Lists_2D;
       theClassifier     : Base_Decision_Tree.Classifier
@@ -63,7 +60,7 @@ package body Classifier_Tests is
                               Weights.Weight_Lists_3D_Package.Empty_Vector;
       Column_Sums       : Weights.Weight_List := Empty_Vector;
    begin
-      C_Init (theClassifier, Criteria, Splitter);
+      C_Init (theClassifier, Criterion.Gini_Criteria);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
@@ -132,8 +129,6 @@ package body Classifier_Tests is
       Routine_Name    : constant String :=
                           "Classification_Tests.Test_Probability";
       Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
-      Criteria        : Criterion.Criterion_Class;
-      Splitter        : Node_Splitter.Splitter_Class;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X               :  Value_Data_Lists_2D;
@@ -144,7 +139,7 @@ package body Classifier_Tests is
       Probabilities   : Weights.Weight_Lists_3D;
       Column_Sums     : Weights.Weight_List;
    begin
-      C_Init (theClassifier, Criteria, Splitter);
+      C_Init (theClassifier, Criterion.Gini_Criteria);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name);

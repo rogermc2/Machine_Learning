@@ -10,7 +10,6 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -36,8 +35,6 @@ package body Export_Tests is
       use Float_Package;
       Routine_Name      : constant String :=
                            "Export_Tests.Test_Graphviz_Toy";
-      Criteria          : Criterion.Criterion_Class;
-      Splitter          : Node_Splitter.Splitter_Class;
       theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -61,7 +58,7 @@ package body Export_Tests is
       Feature_Names.Append (To_Unbounded_String ("feature_1"));
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
 
-      C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3);
+      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Depth => 3);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
@@ -105,8 +102,7 @@ package body Export_Tests is
          Filled => True, Node_Ids => True,
          Output_File_Name => To_Unbounded_String ("max_depth_plot.dot"));
 
-      C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
-              theCriterion => Criterion.Gini_Criteria);
+      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Depth => 3);
       Classification_Fit (theClassifier, X, Y2, W);
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");

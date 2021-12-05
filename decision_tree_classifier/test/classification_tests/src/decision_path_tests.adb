@@ -11,7 +11,6 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -29,8 +28,6 @@ package body Decision_Path_Tests is
       Routine_Name      : constant String :=
                             "Decision_Path_Tests.Test_Decision_Path";
       Iris_Data         : constant Data_Record := Load_Data ("src/iris.csv");
-      Criteria          : Criterion.Criterion_Class;
-      Splitter          : Node_Splitter.Splitter_Class;
       theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       X                 :  Value_Data_Lists_2D;
@@ -41,7 +38,7 @@ package body Decision_Path_Tests is
       Probabilities     : Weights.Weight_Lists_3D;
       Column_Sums       : Weights.Weight_List;
    begin
-      C_Init (theClassifier, Criteria, Splitter);
+      C_Init (theClassifier, Criterion.Gini_Criteria);
       --  L1689
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
@@ -80,8 +77,6 @@ package body Decision_Path_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name  : constant String := "Decision_Path_Tests.Test_Iris";
       Iris_Data     : constant Data_Record := Load_Data ("src/iris.csv");
-      Criteria      : Criterion.Criterion_Class;
-      Splitter      : Node_Splitter.Splitter_Class;
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -92,7 +87,7 @@ package body Decision_Path_Tests is
       No_Weights     : Weights.Weight_List := Empty_Vector;
       Prediction     : ML_Types.Value_Data_Lists_2D;
    begin
-      C_Init (theClassifier, Criteria, Splitter);
+      C_Init (theClassifier, Criterion.Gini_Criteria);
       --  L1689
       Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
       Put_Line (Routine_Name);
