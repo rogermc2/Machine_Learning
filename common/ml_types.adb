@@ -43,6 +43,25 @@ package body ML_Types is
 
    --  ------------------------------------------------------------------------
 
+   function "=" (L, R : Value_Record) return Value_Record is
+      Result : Value_Record (Boolean_Type);
+   begin
+      case L.Value_Kind is
+         when Boolean_Type =>
+            Result.Boolean_Value := L.Boolean_Value = R.Boolean_Value;
+         when Integer_Type =>
+            Result.Boolean_Value := L.Integer_Value = R.Integer_Value;
+         when Float_Type =>
+            Result.Boolean_Value := L.Float_Value = R.Float_Value;
+         when UB_String_Type =>
+            Result.Boolean_Value := L.UB_String_Value = R.UB_String_Value;
+      end case;
+
+      return Result;
+   end "=";
+
+   --  ------------------------------------------------------------------------
+
    function "-" (L, R : Value_Record) return Value_Record is
       Result : Value_Record (L.Value_Kind);
    begin
@@ -109,6 +128,19 @@ package body ML_Types is
 
    --  ------------------------------------------------------------------------
 
+   function "=" (L, R : Value_Data_List) return Value_Data_List is
+      Result : Value_Data_List;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result.Append (L.Element (index) = R.Element (index));
+      end loop;
+
+      return Result;
+
+   end "=";
+
+   --  ----------------------------------------------------------------------------
+
    function "-" (L, R : Value_Data_List) return Value_Data_List is
       Result : Value_Data_List;
    begin
@@ -145,6 +177,19 @@ package body ML_Types is
       return Result;
 
    end Dot;
+
+   --  ----------------------------------------------------------------------------
+
+   function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
+      Result : Value_Data_Lists_2D;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result.Append (L.Element (index) = R.Element (index));
+      end loop;
+
+      return Result;
+
+   end "=";
 
    --  ----------------------------------------------------------------------------
 
