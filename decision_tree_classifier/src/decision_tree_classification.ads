@@ -69,10 +69,9 @@ package Decision_Tree_Classification is
 
     procedure C_Init
       (aClassifier              : in out Base_Decision_Tree.Classifier;
+       Min_Split_Samples        : String;
        Criterion_Type           : Criterion.Classifier_Criteria_Type :=
          Criterion.Gini_Criteria;
-       Min_Split_Samples        : Base_Decision_Tree.Split_Value_Record :=
-         Base_Decision_Tree.Default_Min_Split;
        Max_Depth                : Integer := -1;
        Min_Leaf_Samples         : Positive := 1;
        Min_Leaf_Weight_Fraction : Float := 0.0;

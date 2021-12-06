@@ -64,7 +64,7 @@ package body Classification is
       Assert (Integer (Iris_Target.Length) = Num_Samples, Routine_Name &
                 " invalid Iris_Target vector");
 
-      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Features => 2);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Features => 2);
       Classification_Fit (theClassifier, Iris_Features, Iris_Target,
                           No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
@@ -73,7 +73,7 @@ package body Classification is
       Put_Line ("----------------------------------------------");
       New_Line;
 
-      C_Init (theClassifier, Criterion.Gini_Criteria);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria);
       Classification_Fit (theClassifier, Iris_Features, Iris_Target,
                           No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image

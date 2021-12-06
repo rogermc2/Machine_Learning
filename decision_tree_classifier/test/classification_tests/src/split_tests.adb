@@ -78,8 +78,6 @@ package body Split_Tests is
       Y                         : Value_Data_Lists_2D;
       No_Weights                : Weights.Weight_List := Empty_Vector;
       Num_Samples               : Natural;
-      Min_Split_Float_Samples   : Split_Value_Record (Split_Float);
-      Min_Split_Integer_Samples : Split_Value_Record (Split_Integer);
       Min_Split                 : Natural;
    begin
       --  L666
@@ -106,9 +104,7 @@ package body Split_Tests is
 
       --  L675 test for integer parameter
       --  Max_Leaf_Nodes is only used for Best First tree building
-      Min_Split_Integer_Samples.Integer_Value := 10;
-      Base_Decision_Tree.C_Init (theClassifier, Criterion.Gini_Criteria,
-                                 Min_Split_Integer_Samples);
+      Base_Decision_Tree.C_Init (theClassifier, "10", Criterion.Gini_Criteria);
 
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & " Node_Count" & Count_Type'Image
@@ -130,9 +126,7 @@ package body Split_Tests is
          Output_File_Name => To_Unbounded_String ("integer_test.dot"));
 
       --  L684 test for float parameter
-      Min_Split_Float_Samples.Float_Value := 0.2;
-      Base_Decision_Tree.C_Init (theClassifier, Criterion.Gini_Criteria,
-                                 Min_Split_Float_Samples);
+      Base_Decision_Tree.C_Init (theClassifier, "0.2", Criterion.Gini_Criteria);
       Classification_Fit (theClassifier, X, Y, No_Weights);
 
       Put_Line (Routine_Name & " Node_Count" & Count_Type'Image

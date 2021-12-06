@@ -57,7 +57,7 @@ package Base_Decision_Tree is
       end case;
    end record;
 
-   Default_Min_Split : Split_Value_Record;
+   Default_Min_Split : Split_Value_Record (Split_Integer);
 
    --  class BaseDecisionTree
    type Base_Parameter_Data
@@ -119,9 +119,9 @@ package Base_Decision_Tree is
       Sample_Weights : out Weights.Weight_List);
    procedure C_Init
      (aClassifier              : in out Classifier;
+      Min_Samples_Split        : String;
       Criterion_Type           : Criterion.Classifier_Criteria_Type :=
         Criterion.Gini_Criteria;
-      Min_Samples_Split        : Split_Value_Record := Default_Min_Split;
       Min_Leaf_Samples         : Integer := 1;
       Max_Features             : Tree.Index_Range :=
         Tree.Index_Range'Last;

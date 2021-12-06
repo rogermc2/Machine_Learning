@@ -58,7 +58,8 @@ package body Export_Tests is
       Feature_Names.Append (To_Unbounded_String ("feature_1"));
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
 
-      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Depth => 3);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria,
+               Max_Depth => 3);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
@@ -102,7 +103,7 @@ package body Export_Tests is
          Filled => True, Node_Ids => True,
          Output_File_Name => To_Unbounded_String ("max_depth_plot.dot"));
 
-      C_Init (theClassifier, Criterion.Gini_Criteria, Max_Depth => 3);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 3);
       Classification_Fit (theClassifier, X, Y2, W);
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");

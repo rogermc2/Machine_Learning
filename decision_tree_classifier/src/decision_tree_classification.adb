@@ -10,6 +10,7 @@ with Criterion;
 with Estimator;
 with Node_Splitter;
 --  with Printing;
+with Utilities;
 with Weights;
 
 package body Decision_Tree_Classification is
@@ -39,10 +40,9 @@ package body Decision_Tree_Classification is
     --  L852 DecisionTreeClassifier.__init__
     procedure C_Init
       (aClassifier              : in out Base_Decision_Tree.Classifier;
+       Min_Split_Samples        : String;
        Criterion_Type           : Criterion.Classifier_Criteria_Type :=
          Criterion.Gini_Criteria;
-       Min_Split_Samples        : Base_Decision_Tree.Split_Value_Record :=
-         Base_Decision_Tree.Default_Min_Split;
        Max_Depth                : Integer := -1;
        Min_Leaf_Samples         : Positive := 1;
        Min_Leaf_Weight_Fraction : Float := 0.0;
@@ -52,9 +52,27 @@ package body Decision_Tree_Classification is
        Min_Impurity_Decrease    : Float := 0.0;
        CCP_Alpha                : Float := 0.0;
        Random_State             : Integer := 0) is
+       use Base_Decision_Tree;
     begin
+        if Utilities.Is_Float (To_Unbounded_String (Min_Split_Samples)) then
+            declare
+                Min_Split : Split_Value_Record (Split_Float);
+            begin
+                Min_Split.Float_Value := Float'Value (Min_Split_Samples);
+                aClassifier.Parameters.Min_Samples_Split := Min_Split;
+            end;
+        elsif Utilities.Is_Integer
+          (To_Unbounded_String (Min_Split_Samples)) then
+            declare
+                Min_Split : Base_Decision_Tree.Split_Value_Record
+                  (Split_Integer);
+            begin
+                Min_Split.Integer_Value := Integer'Value (Min_Split_Samples);
+                aClassifier.Parameters.Min_Samples_Split := Min_Split;
+            end;
+
+        end if;
         aClassifier.Parameters.Max_Depth := Max_Depth;
-        aClassifier.Parameters.Min_Samples_Split := Min_Split_Samples;
         aClassifier.Parameters.Min_Samples_Leaf := Min_Leaf_Samples;
         aClassifier.Parameters.Min_Weight_Fraction_Leaf := Min_Leaf_Weight_Fraction;
         aClassifier.Parameters.Max_Features := Max_Features;

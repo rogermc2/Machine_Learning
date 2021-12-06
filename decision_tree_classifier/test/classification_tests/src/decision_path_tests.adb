@@ -38,7 +38,7 @@ package body Decision_Path_Tests is
       Probabilities     : Weights.Weight_Lists_3D;
       Column_Sums       : Weights.Weight_List;
    begin
-      C_Init (theClassifier, Criterion.Gini_Criteria);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria);
       --  L1689
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
@@ -87,7 +87,7 @@ package body Decision_Path_Tests is
       No_Weights     : Weights.Weight_List := Empty_Vector;
       Prediction     : ML_Types.Value_Data_Lists_2D;
    begin
-      C_Init (theClassifier, Criterion.Gini_Criteria);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria);
       --  L1689
       Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
       Put_Line (Routine_Name);
