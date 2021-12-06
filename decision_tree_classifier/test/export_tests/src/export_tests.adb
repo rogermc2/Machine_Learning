@@ -120,9 +120,15 @@ package body Export_Tests is
           (Exporter, theClassifier.Attributes.Decision_Tree);
 
       --  Test multi-output with weighted samples
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 3);
+      Classification_Fit (theClassifier, X, Y2, W);
+      Printing.Print_Tree ("The Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree, Filled => True,
-         Impurity => False, Max_Depth => 5,
+         Impurity => False,
          Output_File_Name => To_Unbounded_String ("multi_output.dot"));
 
    end Test_Graphviz_Toy;
