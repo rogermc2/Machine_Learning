@@ -2,7 +2,7 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -91,14 +91,13 @@ package body Node_Splitter is
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record) is
       use ML_Types;
-      Routine_Name              : constant String :=
-                                    "Node_Splitter.Evaluate_All_Splits ";
+--        Routine_Name              : constant String :=
+--                                      "Node_Splitter.Evaluate_All_Splits ";
       Features_X                : constant ML_Types.Value_Data_List :=
                                     Splitter.Feature_Values;
       P_Index                   : Positive;
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
-      Best_Updated              : Boolean := False;
 
       function Compare (Features   : ML_Types.Value_Data_List;
                         P_Index    : Positive) return Boolean is
@@ -215,19 +214,14 @@ package body Node_Splitter is
                         when Boolean_Type | UB_String_Type => null;
                      end case;
 
-                     --  L419
+                     --  L419 Only update if
+                     --       Current_Proxy_Improvement > Best_Proxy_Improvement
                      Best := Current;
-                     Best_Updated := True;
                   end if;
                end if;
             end if;
          end if;
       end loop;
-
-      if not Best_Updated then
-         Put_Line (Routine_Name & " WARNING: Best Fit not updated");
-      end if;
-      --        Assert (Best_Updated, Routine_Name & "Best Fit was not updated");
 
       Assert (Best.Split_Row > Splitter.Start_Row,
               "Node_Splitter.Evaluate_All_Splits, split position" &
