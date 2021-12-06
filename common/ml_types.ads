@@ -97,11 +97,9 @@ package ML_Types is
    function "-" (L, R : Value_Record) return Value_Record;
    function "abs" (Value : Value_Record) return Value_Record;
 
-   function "-" (L, R : Value_Data_Package.Vector)
-                 return Value_Data_Package.Vector;
-   function "abs" (aVector : Value_Data_Package.Vector)
-                   return Value_Data_Package.Vector;
-   function Dot (L, R : Value_Data_Package.Vector) return Value_Record;
+   function "-" (L, R : Value_Data_List) return Value_Data_List;
+   function "abs" (aVector : Value_Data_List) return Value_Data_List;
+   function Dot (L, R : Value_Data_List) return Value_Record;
 
    package Value_Data_Sorting is new
      Value_Data_Package.Generic_Sorting ("<");
@@ -111,11 +109,9 @@ package ML_Types is
      Ada.Containers.Vectors (Positive, Value_Data_List);
    subtype Value_Data_Lists_2D is Value_Lists_Data_Package.Vector;
 
-   function "-" (L, R : Value_Lists_Data_Package.Vector)
-                 return Value_Lists_Data_Package.Vector;
-   function "abs" (aVector : Value_Lists_Data_Package.Vector)
-                   return Value_Lists_Data_Package.Vector;
-   function Dot (L, R : Value_Lists_Data_Package.Vector) return Value_Record;
+   function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
 
    use Value_Lists_Data_Package;
    package Value_Lists_3D_Package is new

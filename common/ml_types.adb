@@ -109,9 +109,8 @@ package body ML_Types is
 
    --  ------------------------------------------------------------------------
 
-   function "-" (L, R : Value_Data_Package.Vector)
-                 return Value_Data_Package.Vector is
-      Result : Value_Data_Package.Vector;
+   function "-" (L, R : Value_Data_List) return Value_Data_List is
+      Result : Value_Data_List;
    begin
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) - R.Element (index));
@@ -123,9 +122,8 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
-   function "abs" (aVector : Value_Data_Package.Vector)
-                   return Value_Data_Package.Vector is
-      Result : Value_Data_Package.Vector;
+   function "abs" (aVector : Value_Data_List) return Value_Data_List is
+      Result : Value_Data_List;
    begin
       for index in aVector.First_Index .. aVector.Last_Index loop
          Result.Append (abs (aVector.Element (index)));
@@ -137,7 +135,7 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
-   function Dot (L, R : Value_Data_Package.Vector) return Value_Record is
+   function Dot (L, R : Value_Data_List) return Value_Record is
       Result : Value_Record (L.First_Element.Value_Kind);
    begin
       for index in L.First_Index .. L.Last_Index loop
@@ -150,9 +148,8 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
-   function "-" (L, R : Value_Lists_Data_Package.Vector)
-                 return Value_Lists_Data_Package.Vector is
-      Result : Value_Lists_Data_Package.Vector;
+   function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
+      Result : Value_Data_Lists_2D;
    begin
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) - R.Element (index));
@@ -164,9 +161,8 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
-   function "abs" (aVector : Value_Lists_Data_Package.Vector)
-                   return Value_Lists_Data_Package.Vector is
-      Result : Value_Lists_Data_Package.Vector;
+   function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D is
+      Result : Value_Data_Lists_2D;
    begin
       for index in aVector.First_Index .. aVector.Last_Index loop
          Result.Append (abs (aVector.Element (index)));
@@ -178,9 +174,9 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
-   function Dot (L, R : Value_Lists_Data_Package.Vector) return Value_Record is
-      L_Data_List : Value_Data_Package.Vector := L.First_Element;
-      R_Data_List : Value_Data_Package.Vector;
+   function Dot (L, R : Value_Data_Lists_2D) return Value_Record is
+      L_Data_List : Value_Data_List := L.First_Element;
+      R_Data_List : Value_Data_List;
       Result      : Value_Record (L_Data_List.First_Element.Value_Kind);
    begin
       for index in L.First_Index .. L.Last_Index loop
