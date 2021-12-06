@@ -38,25 +38,25 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
---     function Average (L, R : ML_Types.Value_Data_Lists_2D)
---                       return ML_Types.Value_Record is
---        use ML_Types;
---        L_Data_List : Value_Data_List := L.First_Element;
---        R_Data_List : Value_Data_List;
---        Result      : Value_Record (L_Data_List.First_Element.Value_Kind);
---     begin
---        for index in L.First_Index .. L.Last_Index loop
---           L_Data_List := L.Element (index);
---           R_Data_List := R.Element (index);
---           for index in L_Data_List.First_Index .. L_Data_List.Last_Index loop
---              Result := Result +
---                L_Data_List.Element (index) * R_Data_List.Element (index);
---           end loop;
---        end loop;
---
---        return Result;
---
---     end Average;
+   --     function Average (L, R : ML_Types.Value_Data_Lists_2D)
+   --                       return ML_Types.Value_Record is
+   --        use ML_Types;
+   --        L_Data_List : Value_Data_List := L.First_Element;
+   --        R_Data_List : Value_Data_List;
+   --        Result      : Value_Record (L_Data_List.First_Element.Value_Kind);
+   --     begin
+   --        for index in L.First_Index .. L.Last_Index loop
+   --           L_Data_List := L.Element (index);
+   --           R_Data_List := R.Element (index);
+   --           for index in L_Data_List.First_Index .. L_Data_List.Last_Index loop
+   --              Result := Result +
+   --                L_Data_List.Element (index) * R_Data_List.Element (index);
+   --           end loop;
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end Average;
 
    --  ----------------------------------------------------------------------------
 
@@ -83,6 +83,36 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
+   function Sum (Sample_Score : ML_Types.Value_Data_Lists_2D) return float is
+      use ML_Types;
+      Values : Value_Data_List;
+      Value  : Value_Record;
+      Result : Float := 0.0;
+   begin
+      for index in Sample_Score.First_Index .. Sample_Score.Last_Index loop
+         Values := Sample_Score.Element (index);
+         for index_2 in Values.First_Index .. Values.Last_Index loop
+            Value := Values (index_2);
+            case Value.Value_Kind is
+               when Boolean_Type =>
+                  if Value.Boolean_Value then
+                     Result := Result + 1.0;
+                  end if;
+               when Float_Type =>
+                  Result := Result + Value.Float_Value;
+               when Integer_Type =>
+                  Result := Result + Float (Value.Integer_Value);
+               when UB_String_Type => null;
+            end case;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Sum;
+
+   --  ------------------------------------------------------------------------
+
    function Weighted_Sum
      (Sample_Score  : ML_Types.Value_Data_Lists_2D;
       Sample_Weight : Weights.Weight_List :=
@@ -94,8 +124,10 @@ package body Classification_Metrics is
       if Normalize then
          null;
          --           Result := Average (Sample_Score, Sample_Weight);
-      else
+      elsif not Sample_Weight.Is_Empty then
          Result := Average (Sample_Weight, Sample_Score);
+      else
+         Result := Sum (Sample_Score);
       end if;
 
       return Result;
