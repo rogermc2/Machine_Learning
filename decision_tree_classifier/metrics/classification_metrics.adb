@@ -19,16 +19,15 @@ package body Classification_Metrics is
         Classifier_Types.Float_Package.Empty_Vector)
       return float is
       use Ada.Containers;
-      use ML_Types.Value_Data_Package;
-      use ML_Types.Value_Lists_Data_Package;
+      use ML_Types;
       Routine_Name : constant String := "Classification_Metrics.Accuracy_Score";
-      Score : ML_Types.Value_Data_Lists_2D;
+      Score : Value_Data_Lists_2D;
    begin
       Assert (Y_True.Length = Y_Prediction.Length, Routine_Name &
                 "");
       Assert (Y_True.Length = Sample_Weight.Length, Routine_Name &
                 "");
-      Score := Y_Prediction - Y_True;
+      Score := abs (Y_Prediction - Y_True);
 
       return 0.0;
 
