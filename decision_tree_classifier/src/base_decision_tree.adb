@@ -395,7 +395,7 @@ package body Base_Decision_Tree is
         --  Predictions, num samples x num outputs
         Predictions       : ML_Types.Value_Data_Lists_2D;
     begin
-        Predictions.Set_Length (Num_Samples);
+--          Predictions.Set_Length (Num_Samples);
         --  479
         for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
             Node_Values_2K.Clear;
@@ -423,7 +423,8 @@ package body Base_Decision_Tree is
               Selected_Classes.Last_Index loop
                 Pred.Append (Selected_Classes.Element (index));
             end loop;
-            Predictions.Replace_Element (op, Pred);
+            Predictions.Append (Pred);
+--              Predictions.Replace_Element (op, Pred);
         end loop;
 
         return Predictions;

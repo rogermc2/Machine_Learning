@@ -56,8 +56,6 @@ package body Ada_Tree_Builder is
       Child_Cursor          : Tree.Tree_Cursor;
       Node_ID               : Positive := 1;
    begin
-      --        Printing.Print_Stack_Record ("Ada_Tree_Builder.Add_Branch stack data",
-      --                                     Data);
       --  L209
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
@@ -66,7 +64,6 @@ package body Ada_Tree_Builder is
       --        Put_Line (Routine_Name & " L216 Num_Constant_Features: " &
       --                    Integer'Image (Integer (Num_Constant_Features)));
       Impurity := Data.Impurity;
-      --        Put_Line (Routine_Name & "L216 Impurity: " & Float'Image (Impurity));
 
       --  L207
       Is_Leaf_Node := Data.Depth >= Builder.Max_Depth or
@@ -81,12 +78,12 @@ package body Ada_Tree_Builder is
       elsif Builder.Splitter.Num_Samples = 1 then
          Put_Line (Routine_Name &
                      " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
-      elsif Num_Node_Samples < Builder.Min_Samples_Split then
-         Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
-                     " Builder.Min_Samples_Split");
-      elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
-         Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
-                     "2 * Builder.Min_Samples_Leaf");
+--        elsif Num_Node_Samples < Builder.Min_Samples_Split then
+--           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
+--                       " Builder.Min_Samples_Split");
+--        elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
+--           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
+--                       "2 * Builder.Min_Samples_Leaf");
       elsif Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf then
          Put_Line
            (Routine_Name & " L207 Leaf_Node Weighted_Node_Samples < " &
@@ -103,34 +100,25 @@ package body Ada_Tree_Builder is
 --                       Integer'Image (Node_ID));
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
---           Put_Line (Routine_Name & " L233 Split.Improvement " &
---                       Float'Image (Split.Improvement));
          --  L233
          Is_Leaf_Node := Split.Split_Row >= Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
-         --           Put_Line (Routine_Name & " L233 Is_Leaf_Node: " &
-         --                       Boolean'Image (Is_Leaf_Node));
-         if Split.Split_Row >= Stop_Row then
-            null;
---              Put_Line (Routine_Name &
---                          " L233 Is_Leaf_Node Split.Split_Row >= Stop_Row");
-         elsif Split.Improvement + Epsilon <
-           Builder.Min_Impurity_Decrease then
-            Put_Line (Routine_Name & " L233 Split.Improvement + Epsilon " &
-                        Float'Image (Split.Improvement + Epsilon) &
-                        " < Builder.Min_Impurity_Decrease " &
-                        Float'Image (Builder.Min_Impurity_Decrease));
-         end if;
+
+--           if Split.Split_Row >= Stop_Row then
+--              null;
+--           elsif Split.Improvement + Epsilon <
+--             Builder.Min_Impurity_Decrease then
+--              Put_Line (Routine_Name & " L233 Split.Improvement + Epsilon " &
+--                          Float'Image (Split.Improvement + Epsilon) &
+--                          " < Builder.Min_Impurity_Decrease " &
+--                          Float'Image (Builder.Min_Impurity_Decrease));
+--           end if;
       end if;
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at
       --  L245 and L251 respectively
       --  L228
-      --        Put_Line (Routine_Name & "L228 Builder Start, Pos, End: " &
-      --                    Integer'Image (Builder.Splitter.Start_Row) & ", " &
-      --                    Integer'Image (Split.Split_Row) & ", " &
-      --                    Integer'Image (Builder.Splitter.Stop_Row));
       if First then
          --  A node (the top node) has already been added to theTree
          Child_Cursor := Data.Parent_Cursor;
@@ -143,8 +131,6 @@ package body Ada_Tree_Builder is
             Weighted_Node_Samples);
       end if;
       Node_ID := Element (Child_Cursor).Node_ID;
-      --        Put_Line (Routine_Name & ", L238 child Node_ID: " &
-      --                    Integer'Image (Node_ID));
 
       --  238
       --  Values dimensions: num outputs x num classes

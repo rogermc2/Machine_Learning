@@ -128,7 +128,7 @@ package body Classifier_Tests is
       use Decision_Tree_Classification;
       use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name  : constant String := "Decision_Path_Tests.Test_Iris";
+      Routine_Name  : constant String := "Classifier_Tests.Test_Iris";
       Iris_Data     : constant Data_Record := Load_Data ("src/iris.csv");
       theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
@@ -154,10 +154,14 @@ package body Classifier_Tests is
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-      Print_Tree ("The Tree", theClassifier);
+--        Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+
+      --  L306
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Put_Line (Routine_Name & " Num Predictions" &
+                  Integer'Image (Integer (Prediction.Element (1).Length)));
       Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Prediction);
 
@@ -202,7 +206,7 @@ package body Classifier_Tests is
                 " invalid Y vector");
       --  L356
       Classification_Fit (theClassifier, X, Y, No_Weights);
-      Print_Tree ("The Tree", theClassifier);
+--        Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
       --  L358 test_probability

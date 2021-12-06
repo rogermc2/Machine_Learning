@@ -12,7 +12,7 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Printing;
+--  with Printing;
 with Tree;
 with Weights;
 
@@ -65,24 +65,25 @@ package body Split_Tests is
       use Base_Decision_Tree;
       use Classifier_Utilities;
       use Decision_Tree_Classification;
-      use Printing;
+--        use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name              : constant String := "Split_Tests.Test_Min_Samples_Split ";
-      Iris_Data                 : constant Data_Record := Load_Data ("src/iris.csv");
+      Routine_Name              : constant String :=
+                                    "Split_Tests.Test_Min_Samples_Split ";
+      Iris_Data                 : constant Data_Record :=
+                                    Load_Data ("src/iris.csv");
+      --  L666
+      X                         : constant Value_Data_Lists_2D :=
+                                    Iris_Data.Feature_Values;
+      Num_Samples               : constant Natural := Natural (X.Length);
       theClassifier             : Classifier (Tree.Float_Type, Tree.Float_Type,
                                               Tree.Float_Type);
       Exporter                  : Graphviz_Exporter.DOT_Tree_Exporter;
-      X                         : Value_Data_Lists_2D;
       --        Short         :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y                         : Value_Data_Lists_2D;
       No_Weights                : Weights.Weight_List := Empty_Vector;
-      Num_Samples               : Natural;
       Min_Split                 : Natural;
    begin
-      --  L666
-      X := Iris_Data.Feature_Values;
-      Num_Samples := Natural (X.Length);
       --        for index in 1 .. 10 loop
       --           Short.Append (X.Element (index));
       --        end loop;
@@ -109,7 +110,7 @@ package body Split_Tests is
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & " Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-      Print_Tree ("The Tree", theClassifier);
+--        Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
@@ -131,7 +132,7 @@ package body Split_Tests is
 
       Put_Line (Routine_Name & " Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-      Print_Tree ("The Tree", theClassifier);
+--        Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
