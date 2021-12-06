@@ -28,6 +28,9 @@ package Classifier_Types is
    subtype Float_List is Float_Package.Vector;
    subtype Value_List is Float_Package.Vector;
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
+   function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
+   function Dot (L, R : Float_Package.Vector) return Float;
 
    use Float_Package;
    package Float_List_Package is new

@@ -1,44 +1,201 @@
 
 package body ML_Types is
 
-    function "<" (L, R : Value_Record) return Boolean is
-        Result : Boolean := L.Value_Kind = R.Value_Kind;
-    begin
-        if Result then
-          case L.Value_Kind is
+   function "<" (L, R : Value_Record) return Boolean is
+      Result : Boolean := L.Value_Kind = R.Value_Kind;
+   begin
+      if Result then
+         case L.Value_Kind is
             when Boolean_Type =>
-                Result := L.Boolean_Value /= R.Boolean_Value;
+               Result := L.Boolean_Value /= R.Boolean_Value;
             when Integer_Type =>
-                Result := L.Integer_Value < R.Integer_Value;
+               Result := L.Integer_Value < R.Integer_Value;
             when Float_Type =>
-                Result := L.Float_Value < R.Float_Value;
+               Result := L.Float_Value < R.Float_Value;
             when UB_String_Type =>
-                Result := L.UB_String_Value < R.UB_String_Value;
-          end case;
-        end if;
+               Result := L.UB_String_Value < R.UB_String_Value;
+         end case;
+      end if;
 
-        return Result;
-    end "<";
+      return Result;
+   end "<";
 
-    --  ------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------
 
-    function "<=" (L, R : Value_Record) return Boolean is
-        Result : Boolean := L.Value_Kind = R.Value_Kind;
-    begin
-        if Result then
-          case L.Value_Kind is
+   function "<=" (L, R : Value_Record) return Boolean is
+      Result : Boolean := L.Value_Kind = R.Value_Kind;
+   begin
+      if Result then
+         case L.Value_Kind is
             when Boolean_Type =>
-                Result := L.Boolean_Value = R.Boolean_Value;
+               Result := L.Boolean_Value = R.Boolean_Value;
             when Integer_Type =>
-                Result := L.Integer_Value <= R.Integer_Value;
+               Result := L.Integer_Value <= R.Integer_Value;
             when Float_Type =>
-                Result := L.Float_Value <= R.Float_Value;
+               Result := L.Float_Value <= R.Float_Value;
             when UB_String_Type =>
-                Result := L.UB_String_Value <= R.UB_String_Value;
-          end case;
-        end if;
+               Result := L.UB_String_Value <= R.UB_String_Value;
+         end case;
+      end if;
 
-        return Result;
-    end "<=";
+      return Result;
+   end "<=";
+
+   --  ------------------------------------------------------------------------
+
+   function "-" (L, R : Value_Record) return Value_Record is
+      Result : Value_Record (L.Value_Kind);
+   begin
+      case L.Value_Kind is
+         when Integer_Type =>
+            Result.Integer_Value := L.Integer_Value - R.Integer_Value;
+         when Float_Type =>
+            Result.Float_Value := L.Float_Value - R.Float_Value;
+         when Boolean_Type | UB_String_Type => null;
+      end case;
+
+      return Result;
+   end "-";
+
+   --  ------------------------------------------------------------------------
+
+   function "*" (L, R : Value_Record) return Value_Record is
+      Result : Value_Record (L.Value_Kind);
+   begin
+      case L.Value_Kind is
+         when Integer_Type =>
+            Result.Integer_Value := L.Integer_Value * R.Integer_Value;
+         when Float_Type =>
+            Result.Float_Value := L.Float_Value * R.Float_Value;
+         when Boolean_Type | UB_String_Type => null;
+      end case;
+
+      return Result;
+
+   end "*";
+
+   --  ------------------------------------------------------------------------
+
+   function "abs" (Value : Value_Record) return Value_Record is
+      Result : Value_Record (Value.Value_Kind);
+   begin
+      case Value.Value_Kind is
+         when Integer_Type =>
+            Result.Integer_Value := abs (Value.Integer_Value);
+         when Float_Type =>
+            Result.Float_Value := abs (Value.Float_Value);
+         when Boolean_Type | UB_String_Type => null;
+      end case;
+
+      return Result;
+
+   end "abs";
+
+   --  ------------------------------------------------------------------------
+
+   function "+" (L, R : Value_Record) return Value_Record is
+      Result : Value_Record (L.Value_Kind);
+   begin
+      case L.Value_Kind is
+         when Integer_Type =>
+            Result.Integer_Value := L.Integer_Value + R.Integer_Value;
+         when Float_Type =>
+            Result.Float_Value := L.Float_Value + R.Float_Value;
+         when Boolean_Type | UB_String_Type => null;
+      end case;
+
+      return Result;
+   end "+";
+
+   --  ------------------------------------------------------------------------
+
+   function "-" (L, R : Value_Data_Package.Vector)
+                 return Value_Data_Package.Vector is
+      Result : Value_Data_Package.Vector;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result.Append (L.Element (index) - R.Element (index));
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ----------------------------------------------------------------------------
+
+   function "abs" (aVector : Value_Data_Package.Vector)
+                   return Value_Data_Package.Vector is
+      Result : Value_Data_Package.Vector;
+   begin
+      for index in aVector.First_Index .. aVector.Last_Index loop
+         Result.Append (abs (aVector.Element (index)));
+      end loop;
+
+      return Result;
+
+   end "abs";
+
+   --  ----------------------------------------------------------------------------
+
+   function Dot (L, R : Value_Data_Package.Vector) return Value_Record is
+      Result : Value_Record (L.First_Element.Value_Kind);
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result := Result + L.Element (index) * R.Element (index);
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
+   function "-" (L, R : Value_Lists_Data_Package.Vector)
+                 return Value_Lists_Data_Package.Vector is
+      Result : Value_Lists_Data_Package.Vector;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result.Append (L.Element (index) - R.Element (index));
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ----------------------------------------------------------------------------
+
+   function "abs" (aVector : Value_Lists_Data_Package.Vector)
+                   return Value_Lists_Data_Package.Vector is
+      Result : Value_Lists_Data_Package.Vector;
+   begin
+      for index in aVector.First_Index .. aVector.Last_Index loop
+         Result.Append (abs (aVector.Element (index)));
+      end loop;
+
+      return Result;
+
+   end "abs";
+
+   --  ----------------------------------------------------------------------------
+
+   function Dot (L, R : Value_Lists_Data_Package.Vector) return Value_Record is
+      L_Data_List : Value_Data_Package.Vector := L.First_Element;
+      R_Data_List : Value_Data_Package.Vector;
+      Result      : Value_Record (L_Data_List.First_Element.Value_Kind);
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         L_Data_List := L.Element (index);
+         R_Data_List := R.Element (index);
+         for index in L_Data_List.First_Index .. L_Data_List.Last_Index loop
+            Result := Result +
+              L_Data_List.Element (index) * R_Data_List.Element (index);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
 
 end ML_Types;
