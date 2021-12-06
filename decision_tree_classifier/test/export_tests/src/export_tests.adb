@@ -53,6 +53,7 @@ package body Export_Tests is
       Num_Samples       : constant Natural := Natural (X.Length);
       No_Weights        : Weights.Weight_List := Empty_Vector;
    begin
+      Put_Line (Routine_Name);
       Class_Names.Append (To_Unbounded_String ("Yes"));
       Class_Names.Append (To_Unbounded_String ("No"));
       Feature_Names.Append (To_Unbounded_String ("feature_1"));
@@ -60,7 +61,6 @@ package body Export_Tests is
 
       C_Init (theClassifier, "2", Criterion.Gini_Criteria,
                Max_Depth => 3);
-      Put_Line (Routine_Name);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
 
@@ -70,7 +70,12 @@ package body Export_Tests is
       New_Line;
 
       Graphviz_Exporter.C_Init
-          (Exporter, theClassifier.Attributes.Decision_Tree);
+        (Exporter, theClassifier.Attributes.Decision_Tree);
+
+      --  Test export code
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Output_File_Name => To_Unbounded_String ("export.dot"));
 
       --  Test with feature_names
       Graphviz_Exporter.Export_Graphviz
@@ -92,6 +97,8 @@ package body Export_Tests is
          Output_File_Name => To_Unbounded_String ("plot.dot"));
 
       --  Test max depth
+      Class_Names.Clear;
+      Class_Names.Append (To_Unbounded_String ("True"));
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree, Max_Depth => 0,
          Class_Names => Class_Names,

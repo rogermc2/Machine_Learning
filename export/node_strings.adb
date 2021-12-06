@@ -1,6 +1,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Characters.Handling;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -248,6 +249,7 @@ package body Node_Strings is
      (Exporter    : Graphviz_Exporter.DOT_Tree_Exporter;
       Node_ID     : Positive; Show_Labels : Boolean;
       Node_String : in out Unbounded_String) is
+      use Ada.Characters.Handling;
       Routine_Name    : constant String :=
                           "Node_Strings.Write_Node_Majority_Class ";
       --  Value: num_outputs x num_classes
@@ -271,7 +273,8 @@ package body Node_Strings is
       Arg_Max := Weights.Max (Output_Data);
 
       --  L366
-      if Exporter.Class_Names.Is_Empty then
+      if Integer (Exporter.Class_Names.Length) = 1 and then
+      To_Upper (To_String (Exporter.Class_Names.Element (1))) = "TRUE" then
          Class_Name := "y[" &
            To_Unbounded_String (Integer'Image (Arg_Max)) & "]";
       else
