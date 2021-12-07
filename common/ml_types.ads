@@ -116,6 +116,8 @@ package ML_Types is
    function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
    function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D;
    procedure Check_Length (Routine_Name : String; L, R : Value_Data_Lists_2D);
+   procedure Check_Length (Routine_Name : String; L : Value_Data_Lists_2D;
+                           R : Value_Data_List);
    function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
 
    use Value_Lists_Data_Package;

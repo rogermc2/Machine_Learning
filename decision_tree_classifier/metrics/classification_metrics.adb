@@ -26,7 +26,8 @@ package body Classification_Metrics is
                        "Classification_Metrics.Accuracy_Score, ";
       Score        : Value_Data_Lists_2D;
    begin
-      Check_Length (Routine_Name & " True, Prediction: ", Y_True, Y_Prediction);
+      Check_Length (Routine_Name & " True, Prediction: ",
+                    Y_True, Y_Prediction.Element (1));
       if not Sample_Weight.Is_Empty then
          Classifier_Types.Check_Length (Routine_Name & " True, Sample_Weight: ",
                                         Sample_Weight, Y_True);

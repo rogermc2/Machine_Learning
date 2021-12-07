@@ -256,6 +256,18 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
+   procedure Check_Length (Routine_Name : String; L : Value_Data_Lists_2D;
+                           R : Value_Data_List) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, "ML_Types." & Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Length;
+
+   --  ----------------------------------------------------------------------------
+
    function Dot (L, R : Value_Data_Lists_2D) return Value_Record is
       L_Data_List : Value_Data_List := L.First_Element;
       R_Data_List : Value_Data_List;
