@@ -574,7 +574,7 @@ package body Printing is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
-         Put_Line (Name & ": ");
+         Put_Line (Name);
       end if;
 
       for Index in theList.First_Index .. theList.Last_Index loop
@@ -599,7 +599,7 @@ package body Printing is
       Items : Positive;
    begin
       if Name'Length > 0 then
-         Put_Line (Name & ": ");
+         Put_Line (Name);
       end if;
 
       if Integer (theList.Length) = 0 then
@@ -615,7 +615,8 @@ package body Printing is
          end if;
 
          for index in theList.First_Index .. Items loop
-            Print_Value_Data_List ("", theList.Element (index));
+            Print_Value_Data_List (Integer'Image (index) & ":",
+                                   theList.Element (index));
          end loop;
       end if;
 
