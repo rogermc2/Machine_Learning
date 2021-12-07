@@ -1,6 +1,8 @@
 
 package body ML_Types is
 
+    Precision : constant Float := 10.0 ** (-6);
+
    function "<" (L, R : Value_Record) return Boolean is
       Result : Boolean := L.Value_Kind = R.Value_Kind;
    begin
@@ -52,7 +54,9 @@ package body ML_Types is
          when Integer_Type =>
             Result.Boolean_Value := L.Integer_Value = R.Integer_Value;
          when Float_Type =>
-            Result.Boolean_Value := L.Float_Value = R.Float_Value;
+            Result.Boolean_Value :=
+                  L.Float_Value >= R.Float_Value - Precision and
+                  L.Float_Value <= R.Float_Value + Precision;
          when UB_String_Type =>
             Result.Boolean_Value := L.UB_String_Value = R.UB_String_Value;
       end case;
