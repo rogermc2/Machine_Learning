@@ -61,33 +61,6 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   function Dot (L : Weights.Weight_List; R : ML_Types.Value_Data_Lists_2D)
-                 return Float is
-      use ML_Types;
-      R_List : Value_Data_List;
-      Result : Float := 0.0;
-   begin
-      for index in R.First_Index .. R.Last_Index loop
-            R_List := R.Element (index);
-            for index_2 in R.First_Index .. R.Last_Index loop
-                case R_List.Element (1).Value_Kind is
-                    when Float_Type =>
-                    Result := Result + L.Element (index_2) *
-                          R_List.Element (index_2).Float_Value;
-                    when Integer_Type =>
-                    Result := Result + L.Element (index_2) *
-                          Float (R_List.Element (index_2).Integer_Value);
-                    when Boolean_Type | UB_String_Type => null;
-                end case;
-            end loop;
-      end loop;
-
-      return Result;
-
-   end Dot;
-
-   --  ----------------------------------------------------------------------------
-
    function Sum (Sample_Score : ML_Types.Value_Data_Lists_2D) return float is
       use ML_Types;
       Values : Value_Data_List;
@@ -122,14 +95,14 @@ package body Classification_Metrics is
      (Sample_Score  : ML_Types.Value_Data_Lists_2D;
       Sample_Weight : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
-      Normalize     : Boolean := False) return float is
+      Normalize : Boolean := False) return float is
       --        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum";
-      Result       : Float := 0.0;
+      Result    : Float := 0.0;
    begin
       if Normalize then
          Result := Average (Sample_Weight, Sample_Score);
       elsif not Sample_Weight.Is_Empty then
-         Result := Dot (Sample_Weight, Sample_Score);
+         Result := Classifier_Types.Dot (Sample_Weight, Sample_Score);
       else
          Result := Sum (Sample_Score);
       end if;

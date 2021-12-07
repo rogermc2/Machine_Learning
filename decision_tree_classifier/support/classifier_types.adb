@@ -40,4 +40,31 @@ package body Classifier_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function Dot (L : Classifier_Types.Float_List; R : ML_Types.Value_Data_Lists_2D)
+                 return Float is
+      use ML_Types;
+      R_List : Value_Data_List;
+      Result : Float := 0.0;
+   begin
+      for index in R.First_Index .. R.Last_Index loop
+            R_List := R.Element (index);
+            for index_2 in R.First_Index .. R.Last_Index loop
+                case R_List.Element (1).Value_Kind is
+                    when Float_Type =>
+                    Result := Result + L.Element (index_2) *
+                          R_List.Element (index_2).Float_Value;
+                    when Integer_Type =>
+                    Result := Result + L.Element (index_2) *
+                          Float (R_List.Element (index_2).Integer_Value);
+                    when Boolean_Type | UB_String_Type => null;
+                end case;
+            end loop;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
 end Classifier_Types;

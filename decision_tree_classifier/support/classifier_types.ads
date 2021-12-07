@@ -3,6 +3,8 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with ML_Types;
+
 package Classifier_Types is
 
    subtype Class_Label is Unbounded_String;
@@ -31,6 +33,8 @@ package Classifier_Types is
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
    function Dot (L, R : Float_Package.Vector) return Float;
+   function Dot (L : Classifier_Types.Float_List;
+                 R : ML_Types.Value_Data_Lists_2D) return Float;
 
    use Float_Package;
    package Float_List_Package is new
