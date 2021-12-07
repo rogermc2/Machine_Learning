@@ -164,8 +164,8 @@ package body Classifier_Tests is
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Put_Line (Routine_Name & " Num Predictions" &
                   Integer'Image (Integer (Prediction.Element (1).Length)));
---        Print_Value_Data_Lists_2D
---          (Routine_Name & " Predictions", Prediction);
+      Printing.Print_Value_Data_Lists_2D
+        (Routine_Name & " Predictions", Prediction);
       Score := Classification_Metrics.Accuracy_Score (Prediction, Iris_Target);
       Put_Line (Routine_Name & " Score" &  Float'Image (Score));
 
@@ -185,7 +185,7 @@ package body Classifier_Tests is
       use Printing;
       use Float_Package;
       Routine_Name    : constant String :=
-                          "Classification_Tests.Test_Probability";
+                          "Classification_Tests.Test_Probability ";
       Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
@@ -194,8 +194,9 @@ package body Classifier_Tests is
       Y               : Value_Data_Lists_2D;
       No_Weights      : Weights.Weight_List := Empty_Vector;
       Num_Samples     : Natural;
-      Probabilities   : Weights.Weight_Lists_3D;
+      Prob_Predict    : Weights.Weight_Lists_3D;
       Column_Sums     : Weights.Weight_List;
+      Prob_Arg_Max    : Positive;
    begin
       C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 2,
               Max_Features => 1);
@@ -214,8 +215,11 @@ package body Classifier_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       --  L358 test_probability
-      Probabilities := Predict_Probability (theClassifier, X);
-      Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
+      Prob_Predict := Predict_Probability (theClassifier, X);
+      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Predict);
+
+      Prob_Arg_Max := Arg_Max (Prob_Predict.Element (1).Element (1));
+      Put_Line (Routine_Name & "Prob_Arg_Max: " & Integer'Image (Prob_Arg_Max));
 
       if Column_Sums = Ones (Integer (X.Length)) then
          Put_Line ("Probabilities test passed");
