@@ -101,6 +101,7 @@ package ML_Types is
    function "=" (L, R : Value_Data_List) return Value_Data_List;
    function "-" (L, R : Value_Data_List) return Value_Data_List;
    function "abs" (aVector : Value_Data_List) return Value_Data_List;
+   procedure Check_Length (Routine_Name : String; L, R : Value_Data_List);
    function Dot (L, R : Value_Data_List) return Value_Record;
 
    package Value_Data_Sorting is new
@@ -114,6 +115,7 @@ package ML_Types is
    function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
    function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
    function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   procedure Check_Length (Routine_Name : String; L, R : Value_Data_Lists_2D);
    function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
 
    use Value_Lists_Data_Package;

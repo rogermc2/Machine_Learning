@@ -1,6 +1,8 @@
 
-with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
+
+with Printing;
 
 package body Classification_Metrics is
 
@@ -20,14 +22,20 @@ package body Classification_Metrics is
       return float is
       use Ada.Containers;
       use ML_Types;
-      Routine_Name : constant String := "Classification_Metrics.Accuracy_Score";
+      Routine_Name : constant String :=
+                       "Classification_Metrics.Accuracy_Score, ";
       Score        : Value_Data_Lists_2D;
    begin
-      Assert (Y_True.Length = Y_Prediction.Length, Routine_Name &
-                "");
-      Assert (Y_True.Length = Sample_Weight.Length, Routine_Name &
-                "");
+      Check_Length (Routine_Name & " True, Prediction: ", Y_True, Y_Prediction);
+      if not Sample_Weight.Is_Empty then
+         Classifier_Types.Check_Length (Routine_Name & " True, Sample_Weight: ",
+                                        Sample_Weight, Y_True);
+      end if;
+
+      Put_Line (Routine_Name & "Prediction length " &
+                  Count_Type'Image (Y_Prediction.Length));
       Score := Y_Prediction = Y_True;
+      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Score ", Score);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
@@ -95,7 +103,7 @@ package body Classification_Metrics is
      (Sample_Score  : ML_Types.Value_Data_Lists_2D;
       Sample_Weight : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
-      Normalize : Boolean := False) return float is
+      Normalize     : Boolean := False) return float is
       --        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum";
       Result    : Float := 0.0;
    begin

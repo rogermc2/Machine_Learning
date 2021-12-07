@@ -1,7 +1,12 @@
 
+--  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Assertions; use Ada.Assertions;
+
 package body ML_Types is
 
-    Precision : constant Float := 10.0 ** (-6);
+   Precision : constant Float := 10.0 ** (-6);
+
+   --  ------------------------------------------------------------------------
 
    function "<" (L, R : Value_Record) return Boolean is
       Result : Boolean := L.Value_Kind = R.Value_Kind;
@@ -55,8 +60,8 @@ package body ML_Types is
             Result.Boolean_Value := L.Integer_Value = R.Integer_Value;
          when Float_Type =>
             Result.Boolean_Value :=
-                  L.Float_Value >= R.Float_Value - Precision and
-                  L.Float_Value <= R.Float_Value + Precision;
+              L.Float_Value >= R.Float_Value - Precision and
+              L.Float_Value <= R.Float_Value + Precision;
          when UB_String_Type =>
             Result.Boolean_Value := L.UB_String_Value = R.UB_String_Value;
       end case;
@@ -135,6 +140,7 @@ package body ML_Types is
    function "=" (L, R : Value_Data_List) return Value_Data_List is
       Result : Value_Data_List;
    begin
+      Check_Length ("=", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) = R.Element (index));
       end loop;
@@ -148,6 +154,7 @@ package body ML_Types is
    function "-" (L, R : Value_Data_List) return Value_Data_List is
       Result : Value_Data_List;
    begin
+      Check_Length ("-", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) - R.Element (index));
       end loop;
@@ -174,6 +181,7 @@ package body ML_Types is
    function Dot (L, R : Value_Data_List) return Value_Record is
       Result : Value_Record (L.First_Element.Value_Kind);
    begin
+      Check_Length ("Dot", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result := Result + L.Element (index) * R.Element (index);
       end loop;
@@ -187,6 +195,7 @@ package body ML_Types is
    function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
       Result : Value_Data_Lists_2D;
    begin
+      Check_Length ("=", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) = R.Element (index));
       end loop;
@@ -200,6 +209,7 @@ package body ML_Types is
    function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
       Result : Value_Data_Lists_2D;
    begin
+      Check_Length ("-", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) - R.Element (index));
       end loop;
@@ -223,11 +233,35 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
+   procedure Check_Length (Routine_Name : String;
+                           L, R         : Value_Data_Lists_2D) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, "ML_Types." & Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Length;
+
+   --  ----------------------------------------------------------------------------
+
+   procedure Check_Length (Routine_Name : String; L, R : Value_Data_List) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, "ML_Types." & Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Length;
+
+   --  ----------------------------------------------------------------------------
+
    function Dot (L, R : Value_Data_Lists_2D) return Value_Record is
       L_Data_List : Value_Data_List := L.First_Element;
       R_Data_List : Value_Data_List;
       Result      : Value_Record (L_Data_List.First_Element.Value_Kind);
    begin
+      Check_Length ("Dot", L, R);
       for index in L.First_Index .. L.Last_Index loop
          L_Data_List := L.Element (index);
          R_Data_List := R.Element (index);

@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
+with Classification_Metrics;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
@@ -126,7 +127,7 @@ package body Classifier_Tests is
       use Ada.Containers;
       use Classifier_Utilities;
       use Decision_Tree_Classification;
-      use Printing;
+--        use Printing;
       use Classifier_Types.Float_Package;
       Routine_Name  : constant String := "Classifier_Tests.Test_Iris";
       Iris_Data     : constant Data_Record := Load_Data ("src/iris.csv");
@@ -135,10 +136,11 @@ package body Classifier_Tests is
       Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
       X              : constant Value_Data_Lists_2D := Iris_Data.Feature_Values;
       Num_Samples    : constant Natural := Natural (X.Length);
-      --  Y: num outputs x num classes
-      Y              : Value_Data_Lists_2D;
+      --  Iris_Target (Y) : num outputs x num classes
+      Iris_Target    : Value_Data_Lists_2D;
       No_Weights     : Weights.Weight_List := Empty_Vector;
       Prediction     : ML_Types.Value_Data_Lists_2D;
+      Score          : Float;
    begin
       C_Init (theClassifier, "2", Criterion.Gini_Criteria);
       --  L1689
@@ -146,12 +148,12 @@ package body Classifier_Tests is
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
-      --  Y is 2D list num outputs x num classes
-      Y := To_Value_2D_List (Iris_Data.Label_Values);
-      Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
-                " invalid Y vector");
+      --  Iris_Target is 2D list num outputs x num classes
+      Iris_Target := To_Value_2D_List (Iris_Data.Label_Values);
+      Assert (Integer (Iris_Target.Length) = Num_Samples, Routine_Name &
+                " invalid Iris_Target vector");
       --  L1695
-      Classification_Fit (theClassifier, X, Y, No_Weights);
+      Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
       Put_Line (Routine_Name & ", Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
 --        Print_Tree ("The Tree", theClassifier);
@@ -162,8 +164,10 @@ package body Classifier_Tests is
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Put_Line (Routine_Name & " Num Predictions" &
                   Integer'Image (Integer (Prediction.Element (1).Length)));
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Predictions", Prediction);
+--        Print_Value_Data_Lists_2D
+--          (Routine_Name & " Predictions", Prediction);
+      Score := Classification_Metrics.Accuracy_Score (Prediction, Iris_Target);
+      Put_Line (Routine_Name & " Score" &  Float'Image (Score));
 
       Graphviz_Exporter.C_Init
         (Exporter, theClassifier.Attributes.Decision_Tree);

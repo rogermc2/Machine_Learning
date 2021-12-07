@@ -32,6 +32,10 @@ package Classifier_Types is
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
+   procedure Check_Length (Routine_Name : String; L : Float_List;
+                           R            : ML_Types.Value_Data_List);
+   procedure Check_Length (Routine_Name : String; L : Float_List;
+                           R            : ML_Types.Value_Data_Lists_2D);
    function Dot (L, R : Float_Package.Vector) return Float;
    function Dot (L : Classifier_Types.Float_List;
                  R : ML_Types.Value_Data_Lists_2D) return Float;

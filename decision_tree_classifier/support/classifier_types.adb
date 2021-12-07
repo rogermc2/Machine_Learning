@@ -1,4 +1,6 @@
 
+with Ada.Assertions; use Ada.Assertions;
+
 package body Classifier_Types is
 
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector is
@@ -24,6 +26,30 @@ package body Classifier_Types is
       return Result;
 
    end "abs";
+
+   --  ----------------------------------------------------------------------------
+
+   procedure Check_Length (Routine_Name : String; L : Float_List;
+                           R            : ML_Types.Value_Data_List) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Length;
+
+   --  ----------------------------------------------------------------------------
+
+   procedure Check_Length (Routine_Name : String; L : Float_List;
+                           R            : ML_Types.Value_Data_Lists_2D) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Length;
 
    --  ----------------------------------------------------------------------------
 
