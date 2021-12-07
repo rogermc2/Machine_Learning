@@ -26,6 +26,18 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
+   --  Numpy argmax(input_array, axis=None, out=None)
+   --  axis : int, optional  By default the index is into the flattened array,
+   --  otherwise along the specified axis.
+   --  Returns an array of indices into the input_array.
+   --  It has the same shape as `input_array.shape` with the dimension along
+   --  `axis` removed.
+   --  Example a = array([[10, 11, 12],   indices: [[00, 01, 02],
+   --                     [13, 14, 15]])           [[10, 11, 12],
+   --  2 rows (axis 0) x 3 columns  (axis 1)
+   --  np.argmax(a) returns 5
+   --  np.argmax(a, axis=0) returns array([1, 1, 1]) -> [13, 14, 15]
+   --  np.argmax(a, axis=1) returns array([2, 2]) -> [12, 15]
    function Arg_Max (Values : Weights.Weight_List) return Positive is
       Max_Value  : Float := Float'Safe_First;
       Max_Index  : Positive := 1;

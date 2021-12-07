@@ -198,7 +198,7 @@ package body Classifier_Tests is
       Column_Sums     : Weights.Weight_List;
       Prob_Arg_Max    : Positive;
    begin
-      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 2,
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 1,
               Max_Features => 1);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
@@ -211,10 +211,11 @@ package body Classifier_Tests is
                 " invalid Y vector");
       --  L356
       Classification_Fit (theClassifier, X, Y, No_Weights);
---        Print_Tree ("The Tree", theClassifier);
+      Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
       --  L358 test_probability
+      --  Prob_Predict: num outputs x num samples x num classes
       Prob_Predict := Predict_Probability (theClassifier, X);
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Predict);
 
