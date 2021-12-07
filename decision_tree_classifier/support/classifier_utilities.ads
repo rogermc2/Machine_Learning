@@ -23,8 +23,8 @@ package Classifier_Utilities is
     function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D;
     function Load_Data (File_Name : String) return ML_Types.Data_Record;
-    function Nodes_3D_To_Outputs_3D (Nodes       : Weights.Weight_Lists_3D;
-                                     Num_Outputs : Positive)
+    function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
+                                       Num_Outputs : Positive)
                                     return Weights.Weight_Lists_3D;
     function Ones (List_Length : Positive) return Weights.Weight_List;
     function Search_Sorted_Value_List

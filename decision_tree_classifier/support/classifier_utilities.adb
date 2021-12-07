@@ -361,35 +361,36 @@ package body Classifier_Utilities is
    end Load_Data;
 
    --  -------------------------------------------------------------------------
-   --  Nodes_3D_To_Outputs_3D num nodes x num outputs x num classes to
-   --                         num outputs x num nodes x num classes
-   function Nodes_3D_To_Outputs_3D (Nodes       : Weights.Weight_Lists_3D;
+   --  Samples_3D_To_Outputs_3D num samples x num outputs x num classes to
+   --                           num outputs x num samples x num classes
+   function Samples_3D_To_Outputs_3D (Samples   : Weights.Weight_Lists_3D;
                                     Num_Outputs : Positive)
                                     return Weights.Weight_Lists_3D is
       use Weights;
-      Node         : Weight_Lists_2D;
-      Classes      : Weight_List;
-      Node_Classes : Weight_Lists_2D;  --  num nodes x num classes
-      --             Outputs: num_outputs x num nodes x num classes
-      Outputs      : Weight_Lists_3D;
+      Sample_List    : Weight_Lists_2D;
+      Classes        : Weight_List;
+      Sample_Classes : Weight_Lists_2D;  --  num samples x num classes
+      --  Outputs: num_outputs x num samples x num classes
+      Outputs        : Weight_Lists_3D;
    begin
       for index in 1 .. Num_Outputs loop
-         Node_Classes.Clear;
-         for index_2 in Nodes.First_Index .. Nodes.Last_Index loop
-            --  Node: num outputs x num classes
-            Node := Nodes.Element (index_2);
-            for index_3 in Node.First_Index .. Node.Last_Index loop
+         Sample_Classes.Clear;
+         for index_2 in Samples.First_Index .. Samples.Last_Index loop
+            --  Sample_List: num outputs x num classes
+            Sample_List := Samples.Element (index_2);
+            for index_3 in Sample_List.First_Index
+              .. Sample_List.Last_Index loop
                --  Classes: num classes
-               Classes := Node.Element (index_3);
+               Classes := Sample_List.Element (index_3);
             end loop;
-            Node_Classes.Append (Classes);
+            Sample_Classes.Append (Classes);
          end loop;
-         Outputs.Append (Node_Classes);
+         Outputs.Append (Sample_Classes);
       end loop;
 
       return Outputs;
 
-   end Nodes_3D_To_Outputs_3D;
+   end Samples_3D_To_Outputs_3D;
 
    --  -------------------------------------------------------------------------
 

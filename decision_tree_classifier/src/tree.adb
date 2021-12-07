@@ -15,6 +15,7 @@ package body Tree is
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    --       That is, the set of relevant nodes containing the prediction values
    --       for each sample?
+   --  Apply returns a list containing the Node ID associated with each sample.
    function Apply (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                    return Classifier_Types.Natural_List is
    begin
@@ -28,6 +29,8 @@ package body Tree is
    --  instance belonging to one subset.
    --  The final subsets are called terminal or leaf nodes and the
    --  intermediate subsets are called internal nodes or split nodes.
+   --  Apply_Dense returns a list containing the Node ID associated with each
+   --  sample
    function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                          return Classifier_Types.Natural_List is
       --                           return Tree_Cursor_List is
@@ -91,6 +94,7 @@ package body Tree is
       return Out_Data;
 
    end Apply_Dense;
+
    --  ------------------------------------------------------------------------
 
    procedure C_Init (aTree        : in out Tree_Class; Num_Features : Natural := 0;
@@ -110,23 +114,26 @@ package body Tree is
 
    --  ------------------------------------------------------------------------
    --  _tree L758
-   --  Predict returns a 3D list, num_nodes x num_outputs x num_classes
+   --  Predict returns a 3D list, num_samples x num_outputs x num_classes
    function Predict (Self : in out Tree_Class;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return Weights.Weight_Lists_3D is
       use Ada.Containers;
-      Routine_Name    : constant String := "Tree.Predict";
+      Routine_Name : constant String := "Tree.Predict ";
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
       --  Values: num_nodes x num_outputs x num_classes
-      Values          : constant Weights.Weight_Lists_3D := Self.Values;
-      Samples         : Classifier_Types.Natural_List;
-      Out_Data        : Weights.Weight_Lists_3D;
+      Values       : constant Weights.Weight_Lists_3D := Self.Values;
+      Samples      : Classifier_Types.Natural_List;
+      --  Out_Data: num_samples x num_outputs x num_classes
+      Out_Data     : Weights.Weight_Lists_3D;
    begin
-      Assert (Self.Nodes.Node_Count > 1, Routine_Name & ", Tree is empty.");
+      --  Check for top node, child of root node
+      Assert (Self.Nodes.Node_Count > 1, Routine_Name & " Tree is empty.");
       Put_Line (Routine_Name & ", Node_Count" &
                   Count_Type'Image (Self.Nodes.Node_Count - 1));
-      --  L760
+      --  L760  Apply returns a list containing the Node ID associated with
+      --        each sample.
       Samples := Apply (Self, X);
       for index in Samples.First_Index .. Samples.Last_Index loop
          if Samples.Element (index) > 0 then

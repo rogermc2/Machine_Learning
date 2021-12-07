@@ -99,18 +99,18 @@ package body Decision_Tree_Classification is
         Num_Outputs : constant Positive :=
                         Positive (Self.Attributes.Num_Outputs);
         --  L978
-        --  Proba: num nodes x num outputs x num classes
+        --  Proba: num samples x num outputs x num classes
         Proba       : constant Weight_Lists_3D :=
                         Tree.Predict (Self.Attributes.Decision_Tree, X);
         Output_K    : Weight_Lists_2D;
         Node_K      : Weight_List;
-        --  All_Proba: num nodes x num outputs x num classes
+        --  All_Proba: num samples x num outputs x num classes
         All_Proba   : Weight_Lists_3D;
         F_Class     : Float;
         Normalizer  : Float;
     begin
-        --  All_Proba: num_outputs x num nodes x num classes
-        All_Proba := Classifier_Utilities.Nodes_3D_To_Outputs_3D
+        --  All_Proba: num_outputs x num samples x num classes
+        All_Proba := Classifier_Utilities.Samples_3D_To_Outputs_3D
           (Proba, Num_Outputs);
         --  L969
         for output_index in All_Proba.First_Index .. All_Proba.Last_Index loop
