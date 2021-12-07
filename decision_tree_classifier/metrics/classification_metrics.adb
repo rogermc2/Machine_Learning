@@ -1,14 +1,16 @@
 
-with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Containers;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
+with Classifier_Utilities;
 with Printing;
 
 package body Classification_Metrics is
 
    function Weighted_Sum
-     (Sample_Score  : ML_Types.Value_Data_Lists_2D;
-      Sample_Weight : Weights.Weight_List :=
+     (Sample_Score   : ML_Types.Value_Data_Lists_2D;
+      Sample_Weights : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
       Normalize     : Boolean := False) return float;
 
@@ -20,7 +22,7 @@ package body Classification_Metrics is
       Sample_Weight        : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector)
       return float is
-      use Ada.Containers;
+--        use Ada.Containers;
       use ML_Types;
       Routine_Name : constant String :=
                        "Classification_Metrics.Accuracy_Score, ";
@@ -33,9 +35,7 @@ package body Classification_Metrics is
                                         Sample_Weight, Y_True);
       end if;
 
-      Put_Line (Routine_Name & "Prediction length " &
-                  Count_Type'Image (Y_Prediction.Length));
-      Score := Y_Prediction = Y_True;
+      Score := Classifier_Utilities.Transpose (Y_Prediction) = Y_True;
       Printing.Print_Value_Data_Lists_2D (Routine_Name & "Score ", Score);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
@@ -52,6 +52,8 @@ package body Classification_Metrics is
       Value  : Value_Record;
       Result : Float := 0.0;
    begin
+      Classifier_Types.Check_Length ("Classification_Metrics.Average",
+                                     Boolean_2D, Weight);
       for index in Boolean_2D.First_Index .. Boolean_2D.Last_Index loop
          Values := Boolean_2D.Element (index);
          for index_2 in Values.First_Index .. Values.Last_Index loop
@@ -101,17 +103,21 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Weighted_Sum
-     (Sample_Score  : ML_Types.Value_Data_Lists_2D;
-      Sample_Weight : Weights.Weight_List :=
+     (Sample_Score   : ML_Types.Value_Data_Lists_2D;
+      Sample_Weights : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
-      Normalize     : Boolean := False) return float is
-      --        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum";
-      Result    : Float := 0.0;
+      Normalize      : Boolean := False) return float is
+      Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
+      Result       : Float := 0.0;
    begin
-      if Normalize then
-         Result := Average (Sample_Weight, Sample_Score);
-      elsif not Sample_Weight.Is_Empty then
-         Result := Classifier_Types.Dot (Sample_Weight, Sample_Score);
+      Assert (not Sample_Score.Is_Empty, Routine_Name &
+                "Sample_Score is empty");
+      if Normalize and not Sample_Weights.Is_Empty then
+         Classifier_Types.Check_Length
+           (Routine_Name, Sample_Weights, Sample_Score);
+         Result := Average (Sample_Weights, Sample_Score);
+      elsif not Sample_Weights.Is_Empty then
+         Result := Classifier_Types.Dot (Sample_Weights, Sample_Score);
       else
          Result := Sum (Sample_Score);
       end if;

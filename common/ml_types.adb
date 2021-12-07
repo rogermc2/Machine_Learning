@@ -140,7 +140,7 @@ package body ML_Types is
    function "=" (L, R : Value_Data_List) return Value_Data_List is
       Result : Value_Data_List;
    begin
-      Check_Length ("=", L, R);
+      Check_Length ("1D =", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) = R.Element (index));
       end loop;
@@ -195,7 +195,7 @@ package body ML_Types is
    function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
       Result : Value_Data_Lists_2D;
    begin
-      Check_Length ("=", L, R);
+      Check_Length ("2D =", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) = R.Element (index));
       end loop;

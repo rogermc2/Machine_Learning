@@ -36,6 +36,8 @@ package Classifier_Types is
                            R            : ML_Types.Value_Data_List);
    procedure Check_Length (Routine_Name : String; L : Float_List;
                            R            : ML_Types.Value_Data_Lists_2D);
+   procedure Check_Length
+     (Routine_Name : String; L : ML_Types.Value_Data_Lists_2D; R : Float_List);
    function Dot (L, R : Float_Package.Vector) return Float;
    function Dot (L : Classifier_Types.Float_List;
                  R : ML_Types.Value_Data_Lists_2D) return Float;
