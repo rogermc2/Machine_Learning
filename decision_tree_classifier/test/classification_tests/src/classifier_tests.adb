@@ -198,7 +198,7 @@ package body Classifier_Tests is
       Column_Sums     : Weights.Weight_List;
       Prob_Arg_Max    : Positive;
    begin
-      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 2,
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 1,
               Max_Features => 1);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
