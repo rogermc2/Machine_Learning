@@ -73,14 +73,16 @@ package body Ada_Tree_Builder is
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
       abs (Impurity) <= Epsilon;  --  0.0 withtolerance for rounding errors
       if Data.Depth >= Builder.Max_Depth then
-         Put_Line (Routine_Name &
-                     " L207 Leaf_Node Data.Depth >= Builder.Max_Depth");
+         null;
+--           Put_Line (Routine_Name &
+--                       " L207 Leaf_Node Data.Depth >= Builder.Max_Depth");
       elsif Builder.Splitter.Num_Samples = 1 then
          Put_Line (Routine_Name &
                      " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
 --        elsif Num_Node_Samples < Builder.Min_Samples_Split then
 --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
---                       " Builder.Min_Samples_Split");
+--                       " Builder.Min_Samples_Split: "  &
+--                       Integer'Image (Builder.Min_Samples_Split));
 --        elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
 --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
 --                       "2 * Builder.Min_Samples_Leaf");
@@ -88,31 +90,29 @@ package body Ada_Tree_Builder is
          Put_Line
            (Routine_Name & " L207 Leaf_Node Weighted_Node_Samples < " &
               "2.0 * Builder.Min_Weight_Leaf");
-         --          elsif abs (Impurity) <= Epsilon then
-         --              Put_Line (Routine_Name &
-         --                          " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
-         --                          ") <= Epsilon");
+--        elsif abs (Impurity) <= Epsilon then
+--           Put_Line (Routine_Name &
+--                       " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
+--                       ") <= Epsilon");
       end if;
 
       --  L220
       if not Is_Leaf_Node then
---           Put_Line (Routine_Name & " L220 Node_ID " &
---                       Integer'Image (Node_ID));
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
          --  L233
-         Is_Leaf_Node := Split.Split_Row >= Stop_Row or
+         Is_Leaf_Node := Split.Split_Row > Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
 
---           if Split.Split_Row >= Stop_Row then
---              null;
---           elsif Split.Improvement + Epsilon <
---             Builder.Min_Impurity_Decrease then
---              Put_Line (Routine_Name & " L233 Split.Improvement + Epsilon " &
---                          Float'Image (Split.Improvement + Epsilon) &
---                          " < Builder.Min_Impurity_Decrease " &
---                          Float'Image (Builder.Min_Impurity_Decrease));
---           end if;
+         --           if Split.Split_Row >= Stop_Row then
+         --              null;
+         --           elsif Split.Improvement + Epsilon <
+         --             Builder.Min_Impurity_Decrease then
+         --              Put_Line (Routine_Name & " L233 Split.Improvement + Epsilon " &
+         --                          Float'Image (Split.Improvement + Epsilon) &
+         --                          " < Builder.Min_Impurity_Decrease " &
+         --                          Float'Image (Builder.Min_Impurity_Decrease));
+         --           end if;
       end if;
 
       --  tree.add_node adds one node to the tree
@@ -144,11 +144,11 @@ package body Ada_Tree_Builder is
       --  L240
       if not Is_Leaf_Node then
          --  Add right branch
-         Push (theStack, Split.Split_Row + 1, Stop_Row, Data.Depth + 1,
+         Push (theStack, Split.Split_Row, Stop_Row, Data.Depth + 1,
                Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
                Num_Constant_Features);
          --  Add left branch
-         Push (theStack, Start_Row, Split.Split_Row, Data.Depth + 1,
+         Push (theStack, Start_Row, Split.Split_Row - 1, Data.Depth + 1,
                Child_Cursor, Tree.Left_Node, Split.Impurity_Left,
                Num_Constant_Features);
       end if;

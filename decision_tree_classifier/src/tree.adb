@@ -39,7 +39,7 @@ package body Tree is
       use ML_Types;
       use Value_Data_Package;
       use Nodes_Package;
-      Routine_Name : constant String := "Tree.Apply_Dense ";
+--        Routine_Name : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
@@ -80,8 +80,6 @@ package body Tree is
                end case;
 
                if Use_Left then
-                 Put_Line (Routine_Name & "Feature_Value.Float_Value" &
-                                 Float'Image (Feature_Value.Float_Value));
                   Node_Cursor := First_Child (Node_Cursor);
                else
                   Node_Cursor := Last_Child (Node_Cursor);
