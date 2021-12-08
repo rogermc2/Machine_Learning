@@ -217,8 +217,6 @@ package body Node_Splitter is
                      --  L419 Only update if
                      --       Current_Proxy_Improvement > Best_Proxy_Improvement
                      Best := Current;
---                       Put_Line (Routine_Name & "L419 Best.Split_Row" &
---                                   Integer'Image (Best.Split_Row));
                   end if;
                end if;
             end if;
@@ -261,8 +259,6 @@ package body Node_Splitter is
                 Integer'Image (Stop_Row) &
                 " should be greater than Start_Row "
               & Integer'Image (Start_Row));
-      --        Printing.Print_Split_Record (Routine_Name & "L323 Best_Split",
-      --                                     Best_Split);
       --  L323
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features < Positive (Max_Features) or
@@ -295,8 +291,6 @@ package body Node_Splitter is
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
          end if;
       end loop;  --  L430
-      --        Printing.Print_Split_Record (Routine_Name & "end Best_Split",
-      --                                     Best_Split);
 
    end Find_Best_Split;
 
@@ -570,8 +564,6 @@ package body Node_Splitter is
       --  L319
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
-      --        Put_Line (Routine_Name & " L319 Best_Split.Improvement " &
-      --                    Float'Image (Best_Split.Improvement));
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
