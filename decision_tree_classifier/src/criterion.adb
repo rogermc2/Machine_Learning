@@ -2,7 +2,7 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -321,7 +321,7 @@ package body Criterion is
    --  L398 Update statistics by moving samples[pos:new_pos] to the left child.
    procedure Update (Criteria : in out Criterion_Class;
                      New_Pos  : Positive) is
---        Routine_Name : constant String := "Criterion.Update ";
+      Routine_Name : constant String := "Criterion.Update ";
       Num_Outputs  : constant Positive :=
                        Positive (Criteria.Y.Element (1).Length);
       i            : Positive;
@@ -336,7 +336,7 @@ package body Criterion is
       --  sum_left[x] +  sum_right[x] = sum_total[x] and that sum_total
       --  is known, update sum_left from the direction that requires
       --  the least amount of computations
-
+      Put_Line (Routine_Name & "Split_Row: " & Integer'Image (Criteria.Split_Row));
       if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row + 1 - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);

@@ -2,12 +2,12 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Node_Splitter is
 
@@ -91,8 +91,8 @@ package body Node_Splitter is
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record) is
       use ML_Types;
---        Routine_Name              : constant String :=
---                                      "Node_Splitter.Evaluate_All_Splits ";
+      Routine_Name              : constant String :=
+                                    "Node_Splitter.Evaluate_All_Splits ";
       Features_X                : constant ML_Types.Value_Data_List :=
                                     Splitter.Feature_Values;
       P_Index                   : Positive;
@@ -396,7 +396,7 @@ package body Node_Splitter is
                       Best_Split            : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
-      --        Routine_Name         : constant String := "Node_Splitter.Process ";
+      Routine_Name         : constant String := "Node_Splitter.Process ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -416,9 +416,12 @@ package body Node_Splitter is
 
       --  L361
       Sort (Splitter.Feature_Values);
+--        Printing.Print_Value_Data_List
+--            (Routine_Name & "L375 Feature_Values", Splitter.Feature_Values);
       --  Splitter.Feature_Values is a value_data_list
       if Can_Split (Splitter, Num_Total_Constants, F_I, F_J) then
          --  L375
+         Put_Line (Routine_Name & "L375 can split");
          F_I := F_I - 1;
          Swap := Splitter.Feature_Indices.Element (F_I);
          Splitter.Feature_Indices.Replace_Element
@@ -563,8 +566,6 @@ package body Node_Splitter is
       --  L319
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
---        Put_Line (Routine_Name & " L319 Best_Split.Improvement " &
---                    Float'Image (Best_Split.Improvement));
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
