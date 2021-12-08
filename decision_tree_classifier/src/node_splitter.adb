@@ -143,21 +143,21 @@ package body Node_Splitter is
             P_Index := P_Index + 1;
          end loop;
 
-         --  L389
+         --  L384
          P_Index := P_Index + 1;
-         --  L393
+         --  L388
          if P_Index <= Splitter.Stop_Row then
             Current.Split_Row := P_Index;
             --  Best.Pos_I is the start index of the right node's data
-            --  L397 Accept if min_samples_leaf is guaranteed
+            --  L391 Accept if min_samples_leaf is guaranteed
             if Current.Split_Row - Splitter.Start_Row >=
               Splitter.Min_Leaf_Samples and
-              Splitter.Stop_Row - Current.Split_Row >=
+              Splitter.Stop_Row - Current.Split_Row + 1 >=
                 Splitter.Min_Leaf_Samples then
-               --  L400
+               --  L396
                Criterion.Update (Splitter.Criteria, Current.Split_Row);
 
-               --  L402 Accept if min_weight_leaf is satisfied
+               --  L399 Accept if min_weight_leaf is satisfied
                if Splitter.Criteria.Num_Weighted_Left >=
                  Splitter.Min_Leaf_Weight and
                  Splitter.Criteria.Num_Weighted_Right >=
@@ -217,6 +217,8 @@ package body Node_Splitter is
                      --  L419 Only update if
                      --       Current_Proxy_Improvement > Best_Proxy_Improvement
                      Best := Current;
+--                       Put_Line (Routine_Name & "L419 Best.Split_Row" &
+--                                   Integer'Image (Best.Split_Row));
                   end if;
                end if;
             end if;
@@ -259,6 +261,8 @@ package body Node_Splitter is
                 Integer'Image (Stop_Row) &
                 " should be greater than Start_Row "
               & Integer'Image (Start_Row));
+      --        Printing.Print_Split_Record (Routine_Name & "L323 Best_Split",
+      --                                     Best_Split);
       --  L323
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features < Positive (Max_Features) or
@@ -291,6 +295,8 @@ package body Node_Splitter is
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
          end if;
       end loop;  --  L430
+      --        Printing.Print_Split_Record (Routine_Name & "end Best_Split",
+      --                                     Best_Split);
 
    end Find_Best_Split;
 
@@ -396,7 +402,7 @@ package body Node_Splitter is
                       Best_Split            : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
-      --        Routine_Name         : constant String := "Node_Splitter.Process ";
+      Routine_Name         : constant String := "Node_Splitter.Process ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -430,6 +436,7 @@ package body Node_Splitter is
 
          Evaluate_All_Splits (Splitter, Current_Split, Best_Split);
          --  L428
+
       else -- L370
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
@@ -499,15 +506,15 @@ package body Node_Splitter is
          Criterion.Children_Impurity_Gini
            (Self.Criteria, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
---           Put_Line (Routine_Name &
---                       " Children_Impurity_Gini Best_Split.Improvement " &
---                       Float'Image (Best_Split.Improvement));
---           Put_Line (Routine_Name &
---                       " Children_Impurity_Gini Best_Split.Impurity_Left " &
---                       Float'Image (Best_Split.Impurity_Left));
---           Put_Line (Routine_Name &
---                       " Gini_Children_Impurity Best_Split.Impurity_Right " &
---                       Float'Image (Best_Split.Impurity_Right));
+         --           Put_Line (Routine_Name &
+         --                       " Children_Impurity_Gini Best_Split.Improvement " &
+         --                       Float'Image (Best_Split.Improvement));
+         --           Put_Line (Routine_Name &
+         --                       " Children_Impurity_Gini Best_Split.Impurity_Left " &
+         --                       Float'Image (Best_Split.Impurity_Left));
+         --           Put_Line (Routine_Name &
+         --                       " Gini_Children_Impurity Best_Split.Impurity_Right " &
+         --                       Float'Image (Best_Split.Impurity_Right));
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
@@ -563,13 +570,13 @@ package body Node_Splitter is
       --  L319
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
---        Put_Line (Routine_Name & " L319 Best_Split.Improvement " &
---                    Float'Image (Best_Split.Improvement));
+      --        Put_Line (Routine_Name & " L319 Best_Split.Improvement " &
+      --                    Float'Image (Best_Split.Improvement));
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
---        Put_Line (Routine_Name & " reordered Best_Split.Improvement " &
---                    Float'Image (Best_Split.Improvement));
+      --        Put_Line (Routine_Name & " reordered Best_Split.Improvement " &
+      --                    Float'Image (Best_Split.Improvement));
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
       --  L454

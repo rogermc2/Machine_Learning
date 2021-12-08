@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Tree is
 
@@ -39,6 +39,7 @@ package body Tree is
       use ML_Types;
       use Value_Data_Package;
       use Nodes_Package;
+      Routine_Name : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
@@ -79,6 +80,8 @@ package body Tree is
                end case;
 
                if Use_Left then
+                 Put_Line (Routine_Name & "Feature_Value.Float_Value" &
+                                 Float'Image (Feature_Value.Float_Value));
                   Node_Cursor := First_Child (Node_Cursor);
                else
                   Node_Cursor := Last_Child (Node_Cursor);
@@ -130,6 +133,7 @@ package body Tree is
    begin
       --  Check for top node, child of root node
       Assert (Self.Nodes.Node_Count > 1, Routine_Name & " Tree is empty.");
+
       Put_Line (Routine_Name & ", Node_Count" &
                   Count_Type'Image (Self.Nodes.Node_Count - 1));
       --  L760  Apply returns a list containing the Node ID associated with
@@ -140,7 +144,9 @@ package body Tree is
             Out_Data.Append (Values.Element (Samples.Element (index)));
          end if;
       end loop;
-
+      Put_Line (Routine_Name & ", samples size" &
+                  Count_Type'Image (Samples.Length));
+      Printing.Print_Natural_List (Routine_Name & " samples", Samples);
       return Out_Data;
 
    end Predict;

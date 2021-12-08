@@ -335,9 +335,14 @@ package body Criterion is
       --  L435  Update statistics up to new_pos given that
       --  sum_left[x] +  sum_right[x] = sum_total[x] and that sum_total
       --  is known, update sum_left from the direction that requires
-      --  the least amount of computations
+      --  the least amount of computations.
+      --  Criteria.Split_Row is the start position of the current right side.
+      --  New_Pos is the start position of the updated right side.
+      --  New_Pos - 1 is the new ending position for which to move samples from
+      --  the right child to the left child.
+      --  Move Criteria.Split_Row .. New_Pos - 1 to left side
 
-      if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row + 1 - New_Pos) then
+      if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row - New_Pos) then
          for p in Criteria.Split_Row .. New_Pos - 1 loop
             i := Criteria.Sample_Indices.Element (p);
             if not Criteria.Sample_Weight.Is_Empty then
