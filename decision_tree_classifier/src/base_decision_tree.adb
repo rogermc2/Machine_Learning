@@ -4,7 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
+--  with Maths;
 
 with Ada_Tree_Builder;
 with Classifier_Types;
@@ -65,14 +65,6 @@ package body Base_Decision_Tree is
                               Classes, Expanded_Class_Weight);
       end if;
 
-      Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
-                        aClassifier.Attributes.Num_Outputs,
-                        aClassifier.Attributes.Decision_Tree.Num_Classes);
-      Node_Splitter.C_Init
-        (aClassifier.Parameters.Splitter,
-         Tree.Index_Range (aClassifier.Attributes.Max_Features),
-         aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf);
-
       --  L189
       aClassifier.Attributes.Num_Features :=
         Tree.Index_Range (X.Element (1).Length);
@@ -80,6 +72,14 @@ package body Base_Decision_Tree is
       --  L229
       Base_Fit_Checks (aClassifier, X, Y, Min_Samples_Split, Sample_Weights);
       --  Base_Fit_Checks ends at L350
+
+      Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
+                        aClassifier.Attributes.Num_Outputs,
+                        aClassifier.Attributes.Decision_Tree.Num_Classes);
+      Node_Splitter.C_Init
+        (aClassifier.Parameters.Splitter,
+         Tree.Index_Range (aClassifier.Attributes.Max_Features),
+         aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf);
 
       --  L323
       if not Expanded_Class_Weight.Is_Empty then
@@ -142,7 +142,7 @@ package body Base_Decision_Tree is
       Y                 : ML_Types.Value_Data_Lists_2D;
       Min_Samples_Split : out Positive;
       Sample_Weights    : in out Classifier_Types.Float_List) is
-      use Maths.Float_Math_Functions;
+--        use Maths.Float_Math_Functions;
       use Tree;
       Routine_Name      : constant String :=
                             "Base_Decision_Tree.Base_Fit_Checks";
@@ -152,7 +152,7 @@ package body Base_Decision_Tree is
       Max_Leaf_Nodes    : constant Integer :=
                             aClassifier.Parameters.Max_Leaf_Nodes;
       Max_Features      : Index_Range := Tree.Index_Range'Last;
-      Sqrt_Num_Features : Index_Range := 1;
+--        Sqrt_Num_Features : Index_Range := 1;
    begin
       --  L229
       if aClassifier.Parameters.Max_Depth < 0 then
@@ -191,16 +191,18 @@ package body Base_Decision_Tree is
       Min_Samples_Split := Integer'Max
         (Min_Samples_Split, 2  * aClassifier.Parameters.Min_Samples_Leaf);
 
-      Sqrt_Num_Features :=
-        Tree.Index_Range (Sqrt (Float (aClassifier.Attributes.Num_Features)));
-      if Sqrt_Num_Features > 1 then
-         Max_Features := Sqrt_Num_Features;
-      else
-         Max_Features := 1;
-      end if;
+--        Sqrt_Num_Features :=
+--          Tree.Index_Range (Sqrt (Float (aClassifier.Attributes.Num_Features)));
+--        if Sqrt_Num_Features > 1 then
+--           Max_Features := Sqrt_Num_Features;
+--        else
+--           Max_Features := 1;
+--        end if;
 
+      --  L288 Integral Max_Features
+      Max_Features := aClassifier.Parameters.Max_Features;
       --  L291
-      aClassifier.Parameters.Max_Features := Max_Features;
+       aClassifier.Parameters.Max_Features := Max_Features;
 
       --  L301
       Assert (Positive (Y.Length) = Num_Samples, Routine_Name &
@@ -219,10 +221,16 @@ package body Base_Decision_Tree is
       Assert (Max_Depth > 0, Routine_Name & ", must be greater than 0.");
 
       --  L310
-      if Max_Features <= 0 or
-        Max_Features > aClassifier.Attributes.Num_Features then
+      if Max_Features <= 0 then
+--          Max_Features > aClassifier.Attributes.Num_Features then
          raise Value_Error with Routine_Name &
-           ", Max_Features is not in (0, Num_Features)";
+           ", Max_Features " & Index_Range'Image (Max_Features) &
+           " is not in (0, Num_Features)";
+      end if;
+
+      if Max_Features > aClassifier.Attributes.Num_Features then
+            aClassifier.Parameters.Max_Features :=
+              aClassifier.Attributes.Num_Features;
       end if;
 
       --  L316
