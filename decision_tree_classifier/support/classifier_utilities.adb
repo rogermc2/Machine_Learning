@@ -26,18 +26,6 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
-   --  Numpy argmax(input_array, axis=None, out=None)
-   --  axis : int, optional  By default the index is into the flattened array,
-   --  otherwise along the specified axis.
-   --  Returns an array of indices into the input_array.
-   --  It has the same shape as `input_array.shape` with the dimension along
-   --  `axis` removed.
-   --  Example a = array([[10, 11, 12],   indices: [[00, 01, 02],
-   --                     [13, 14, 15]])           [[10, 11, 12],
-   --  2 rows (axis 0) x 3 columns  (axis 1)
-   --  np.argmax(a) returns 5
-   --  np.argmax(a, axis=0) returns array([1, 1, 1]) -> [13, 14, 15]
-   --  np.argmax(a, axis=1) returns array([2, 2]) -> [12, 15]
    function Arg_Max (Values : Weights.Weight_List) return Positive is
       Max_Value  : Float := Float'Safe_First;
       Max_Index  : Positive := 1;
@@ -57,26 +45,57 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
---     function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural)
---                       return Classifier_Types.Natural_List is
---        Values_2K    : Weights.Weight_Lists_2D;
---        Values       : Weights.Weight_List;
---        Max_Indices  : Classifier_Types.Natural_List;
---     begin
---        Values_2K.Clear;
---        Max_Indices.Clear;
---
---        for index_1 in Values_3D.First_Index .. Values_3D.Last_Index loop
---           Values_2K := Values_3D (index_1);
---           for index_2 in Values_2K.First_Index .. Values_2K.Last_Index loop
---              Values := Values_2K.Element (index_2);
---              Max_Indices.Append (Weights.Max (Values));
---           end loop;
---        end loop;
---
---        return Max_Indices;
---
---     end Arg_Max;
+   --  Numpy argmax(input_array, axis=None, out=None)
+   --  axis : int, optional  By default the index is into the flattened array,
+   --  otherwise along the specified axis.
+   --  Returns an array of indices into the input_array.
+   --  It has the same shape as `input_array.shape` with the dimension along
+   --  `axis` removed.
+   --  Example a = array([[10, 11, 12],   indices: [[00, 01, 02],
+   --                     [13, 14, 15]])           [[10, 11, 12],
+   --  2 rows (axis 0) x 3 columns  (axis 1)
+   --  np.argmax(a, axis=1)
+   --  returns array([2, 2]) -> [12, 15]
+   function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
+                     return Classifier_Types.Natural_List is
+      Values       : Weights.Weight_List;
+      Max_Indices  : Classifier_Types.Natural_List;
+   begin
+      Max_Indices.Clear;
+      if Axis = 0 then
+         for index in Values_2D.First_Index .. Values_2D.Last_Index loop
+            Values := Values_2D.Element (index);
+            Max_Indices.Append (Weights.Max (Values));
+         end loop;
+      end if;
+
+      return Max_Indices;
+
+   end Arg_Max;
+
+   --  -------------------------------------------------------------------------
+
+   function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural := 0)
+                     return Classifier_Types.Natural_List is
+      Values_2K    : Weights.Weight_Lists_2D;
+      Values       : Weights.Weight_List;
+      Max_Indices  : Classifier_Types.Natural_List;
+   begin
+      Values_2K.Clear;
+      Max_Indices.Clear;
+      if Axis = 0 then
+         for index_1 in Values_3D.First_Index .. Values_3D.Last_Index loop
+            Values_2K := Values_3D (index_1);
+            for index_2 in Values_2K.First_Index .. Values_2K.Last_Index loop
+               Values := Values_2K.Element (index_2);
+               Max_Indices.Append (Weights.Max (Values));
+            end loop;
+         end loop;
+      end if;
+
+      return Max_Indices;
+
+   end Arg_Max;
 
    --  -------------------------------------------------------------------------
    --  Bin_Count counts the number of occurrences of each value in Numbers.
@@ -363,9 +382,9 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
    --  Samples_3D_To_Outputs_3D num samples x num outputs x num classes to
    --                           num outputs x num samples x num classes
-   function Samples_3D_To_Outputs_3D (Samples   : Weights.Weight_Lists_3D;
-                                    Num_Outputs : Positive)
-                                    return Weights.Weight_Lists_3D is
+   function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
+                                      Num_Outputs : Positive)
+                                      return Weights.Weight_Lists_3D is
       use Weights;
       Sample_List    : Weight_Lists_2D;
       Classes        : Weight_List;

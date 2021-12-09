@@ -43,7 +43,7 @@ package body Classifier_Tests is
       use Printing;
       use Float_Package;
       Routine_Name      : constant String :=
-                            "Classification_Tests.Test_Classification_Toy";
+                            "Classification_Tests.Test_Classification_Toy ";
       Expected          : Value_Data_Lists_2D;
       Prediction        : ML_Types.Value_Data_Lists_2D;
       theClassifier     : Base_Decision_Tree.Classifier
@@ -56,11 +56,11 @@ package body Classifier_Tests is
                             To_Multi_Value_List (T_Array);
       Num_Samples       : constant Natural := Natural (X.Length);
       No_Weights        : Weights.Weight_List := Empty_Vector;
-      Sample_Weights_1  : Weights.Weight_List := Ones (Num_Samples);
-      Sample_Weights_2  : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
-      Probabilities     : Weights.Weight_Lists_3D :=
-                              Weights.Weight_Lists_3D_Package.Empty_Vector;
+--        Sample_Weights_1  : Weights.Weight_List := Ones (Num_Samples);
+--        Sample_Weights_2  : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
+      Prob_Prediction   : Weights.Weight_Lists_3D;
       Column_Sums       : Weights.Weight_List := Empty_Vector;
+      Max_Arg           : Classifier_Types.Natural_List;
    begin
       C_Init (theClassifier, "2", Criterion.Gini_Criteria);
       Put_Line (Routine_Name);
@@ -80,44 +80,62 @@ package body Classifier_Tests is
       Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Prediction);
       Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
-      --  L353 test_probability
-      Probabilities := Predict_Probability (theClassifier, X);
-      Column_Sums := Classifier_Utilities.Sum_Cols (Probabilities);
+      New_Line;
 
+      --  L353 test_probability
+      --  Python proba : ndarray of shape (n_samples, n_classes) or
+      --  list of n_outputs \ such arrays if n_outputs > 1
+      Put_Line ("Classification_Tests Probabilities test");
+      Prob_Prediction := Predict_Probability (theClassifier, X);
+      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
+
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Max_Arg := Arg_Max (Prob_Prediction.Element (1));
+      Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
+                          Max_Arg);
+      Print_Value_Data_Lists_2D
+        ("Classification_Tests Probabilities Prediction: ", Prediction);
       if Column_Sums = Ones (Integer (X.Length)) then
-         Put_Line ("Classification_Tests Probabilities test passed");
+         Put_Line
+           ("Classification_Tests Probabilities Column_Sums test passed");
       else
-         Put_Line ("Classification_Tests Probabilities test failed");
+         Put_Line ("Classification_Tests Probabilities Column_Sumstest failed");
          Print_Weights
            (Routine_Name & " Column_Sums", Column_Sums);
       end if;
-
-      Put_Line ("Test Weighted Classification Toy 1");
-      Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
-
-      Printing.Print_Tree ("Weighted Classification Tree", theClassifier);
-      Put_Line ("----------------------------------------------");
-      New_Line;
 
       Graphviz_Exporter.C_Init
         (Exporter, theClassifier.Attributes.Decision_Tree);
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
-         Output_File_Name => To_Unbounded_String ("weighted_1.dot"));
+         Output_File_Name => To_Unbounded_String ("Probability.dot"));
 
-      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " 1.0 weighted Predictions", Prediction);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Expected 1.0 weighted Predictions", Expected);
-
-      Put_Line ("Test Weighted Classification Toy 0.5");
-      Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
-      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " 0.5 weighted predictions", Prediction);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Expected 0.5 weighted predictions", Expected);
+--        Put_Line ("Test Weighted Classification Toy 1");
+--        Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
+--
+--        Printing.Print_Tree ("Weighted Classification Tree", theClassifier);
+--        Put_Line ("----------------------------------------------");
+--        New_Line;
+--
+--        Graphviz_Exporter.C_Init
+--          (Exporter, theClassifier.Attributes.Decision_Tree);
+--        Graphviz_Exporter.Export_Graphviz
+--          (Exporter, theClassifier.Attributes.Decision_Tree,
+--           Output_File_Name => To_Unbounded_String ("weighted_1.dot"));
+--
+--        Prediction := Base_Decision_Tree.Predict (theClassifier, T);
+--        Print_Value_Data_Lists_2D
+--          (Routine_Name & " 1.0 weighted Predictions", Prediction);
+--        Print_Value_Data_Lists_2D
+--          (Routine_Name & " Expected 1.0 weighted Predictions", Expected);
+--
+--        Put_Line ("Test Weighted Classification Toy 0.5");
+--        Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
+--        Prediction := Base_Decision_Tree.Predict (theClassifier, T);
+--        Print_Value_Data_Lists_2D
+--          (Routine_Name & " 0.5 weighted predictions", Prediction);
+--        Print_Value_Data_Lists_2D
+--          (Routine_Name & " Expected 0.5 weighted predictions", Expected);
 
    end Test_Classification_Toy;
 
