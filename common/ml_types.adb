@@ -195,7 +195,7 @@ package body ML_Types is
    function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
       Result : Value_Data_Lists_2D;
    begin
-      Check_Length ("2D =", L, R);
+      Check_Lengths ("2D =", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) = R.Element (index));
       end loop;
@@ -209,7 +209,7 @@ package body ML_Types is
    function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D is
       Result : Value_Data_Lists_2D;
    begin
-      Check_Length ("-", L, R);
+      Check_Lengths ("-", L, R);
       for index in L.First_Index .. L.Last_Index loop
          Result.Append (L.Element (index) - R.Element (index));
       end loop;
@@ -233,38 +233,30 @@ package body ML_Types is
 
    --  ----------------------------------------------------------------------------
 
-   procedure Check_Length (Routine_Name : String;
-                           L, R         : Value_Data_Lists_2D) is
-      use Ada.Containers;
-   begin
-      Assert (R.Length = L.Length, "ML_Types." & Routine_Name &
-                " R length" & Count_Type'Image (R.Length) &
-                " should be the same as L length" &
-                Count_Type'Image (L.Length));
-   end Check_Length;
-
-   --  ----------------------------------------------------------------------------
-
    procedure Check_Length (Routine_Name : String; L, R : Value_Data_List) is
       use Ada.Containers;
    begin
       Assert (R.Length = L.Length, "ML_Types." & Routine_Name &
-                " R length" & Count_Type'Image (R.Length) &
-                " should be the same as L length" &
+                " right length" & Count_Type'Image (R.Length) &
+                " should be the same as left length" &
                 Count_Type'Image (L.Length));
    end Check_Length;
 
    --  ----------------------------------------------------------------------------
 
-   procedure Check_Length (Routine_Name : String; L : Value_Data_Lists_2D;
-                           R : Value_Data_List) is
+   procedure Check_Lengths (Routine_Name : String;
+                           L, R         : Value_Data_Lists_2D) is
       use Ada.Containers;
    begin
-      Assert (R.Length = L.Length, "ML_Types." & Routine_Name &
-                " R length" & Count_Type'Image (R.Length) &
-                " should be the same as L length" &
-                Count_Type'Image (L.Length));
-   end Check_Length;
+      Assert (R.Length = L.Length and
+                R.Element (1).Length = L.Element (1).Length, "ML_Types."
+                & Routine_Name &
+                " right lengths (" & Count_Type'Image (R.Length) & ", " &
+                Count_Type'Image (R.Element (1).Length) &
+                ") should be the same as left lengths (" &
+                Count_Type'Image (L.Length) & ", " &
+                Count_Type'Image (L.Element (1).Length) & ").");
+   end Check_Lengths;
 
    --  ----------------------------------------------------------------------------
 
@@ -273,7 +265,7 @@ package body ML_Types is
       R_Data_List : Value_Data_List;
       Result      : Value_Record (L_Data_List.First_Element.Value_Kind);
    begin
-      Check_Length ("Dot", L, R);
+      Check_Lengths ("Dot", L, R);
       for index in L.First_Index .. L.Last_Index loop
          L_Data_List := L.Element (index);
          R_Data_List := R.Element (index);
