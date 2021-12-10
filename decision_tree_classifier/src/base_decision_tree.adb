@@ -73,14 +73,13 @@ package body Base_Decision_Tree is
       Base_Fit_Checks (aClassifier, X, Y, Min_Samples_Split, Sample_Weights);
       --  Base_Fit_Checks ends at L350
 
-      Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
-                        aClassifier.Attributes.Num_Outputs,
-                        aClassifier.Attributes.Decision_Tree.Num_Classes);
       Node_Splitter.C_Init
         (aClassifier.Parameters.Splitter,
          Tree.Index_Range (aClassifier.Attributes.Max_Features),
          aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf);
-
+      Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
+                        aClassifier.Attributes.Num_Outputs,
+                        aClassifier.Attributes.Decision_Tree.Num_Classes);
       --  L323
       if not Expanded_Class_Weight.Is_Empty then
          if Sample_Weights.Is_Empty then

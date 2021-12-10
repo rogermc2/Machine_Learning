@@ -122,7 +122,7 @@ package body Criterion is
          Y_I_Index := Sample_Indices.Element (p);
 
          --  Weight is originally set to be 1.0, meaning that if no
-         --  sample weights are given, the default weight of each sample is 1.0
+         --  sample weights are given the default weight of each sample is 1.0
          if not Sample_Weight.Is_Empty then
             Weight := Sample_Weight.Element (Y_I_Index);
          end if;
@@ -177,20 +177,15 @@ package body Criterion is
    --  ------------------------------------------------------------------------
    --  L 605 Node_Impurity_Gini evaluates the Gini criterion as the impurity
    --  of the current node.
-   --  Node_Impurity_Gini handles cases where the target is a classification
-   --  taking values 0, 1, ... K-2, K-1.
-   --  If node m represents a region Rm with Nm observations then:
-   --  Let count_k = 1/ Nm \ sum_{x_i in Rm} I(yi = k)
-   --  be the proportion of class k observations in node m.
-   --  The Gini Index is then defined as:
-   --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
-   --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
+   --  Gini impurity is calculated by subtracting the sum of the squared
+   --  probabilities of each class from one
    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float is
-      --        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
+      --        Routine_Name   : constant String := "Criterion.Node_Impurity_Gini ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    : constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
-      Sum_Total_K    : Weights.Weight_List;      Count_K        : Float;
+      Sum_Total_K    : Weights.Weight_List;
+      Count_K        : Float;
       Gini           : Float := 0.0;
       Sq_Count       : Float := 0.0;
    begin

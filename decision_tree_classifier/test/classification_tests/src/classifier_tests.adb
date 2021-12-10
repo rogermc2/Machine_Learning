@@ -151,16 +151,16 @@ package body Classifier_Tests is
         Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
         X              : constant Value_Data_Lists_2D := Iris_Data.Feature_Values;
         Num_Samples    : constant Natural := Natural (X.Length);
-        --  Iris_Target (Y) : num outputs x num classes
+        --  Iris_Target (Y) : num outputs x num samples
         Iris_Target    : Value_Data_Lists_2D;
         No_Weights     : Weights.Weight_List := Empty_Vector;
         Prediction     : ML_Types.Value_Data_Lists_2D;
         Score          : Float;
     begin
+        Put_Line (Routine_Name);
         C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria);
         --  L1689
         Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
-        Put_Line (Routine_Name);
         Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
         Put_Line (Routine_Name & ", X size: " & Count_Type'Image (X.Length) &
@@ -170,7 +170,7 @@ package body Classifier_Tests is
 --          Put_Line (Routine_Name & ", Iris_Target size: " &
 --                      Count_Type'Image (Iris_Target.Length) & " x " &
 --                      Count_Type'Image (Iris_Target.Element (1).Length));
-        Assert (Integer (Iris_Target.Length) = Num_Samples, Routine_Name &
+        Assert (Positive (Iris_Target.Length) = Num_Samples, Routine_Name &
                   " invalid Iris_Target vector");
         --  L1695
         Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
