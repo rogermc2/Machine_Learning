@@ -72,7 +72,7 @@ package body Classifier_Tests is
         Expected := Transpose (To_Integer_Value_List_2D (True_Result));
         --  L230
         Classification_Fit (theClassifier, X, Y, No_Weights);
-        Print_Tree ("The Tree", theClassifier);
+        Printing.Print_Tree ("The Tree", theClassifier);
         Put_Line ("----------------------------------------------");
         New_Line;
         Prediction := Base_Decision_Tree.Predict (theClassifier, T);
@@ -167,17 +167,17 @@ package body Classifier_Tests is
                     " x " & Count_Type'Image (X.Element (1).Length));
         --  Iris_Target is 2D list num outputs x num samples
         Iris_Target := Iris_Data.Label_Values;
-        Put_Line (Routine_Name & ", Iris_Target size: " &
-                    Count_Type'Image (Iris_Target.Length) & " x " &
-                    Count_Type'Image (Iris_Target.Element (1).Length));
+--          Put_Line (Routine_Name & ", Iris_Target size: " &
+--                      Count_Type'Image (Iris_Target.Length) & " x " &
+--                      Count_Type'Image (Iris_Target.Element (1).Length));
         Assert (Integer (Iris_Target.Length) = Num_Samples, Routine_Name &
                   " invalid Iris_Target vector");
         --  L1695
+        Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
         Put_Line
           (Routine_Name & " Node_Count: " & Count_Type'Image
              (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-        Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
-        --        Print_Tree ("The Tree", theClassifier);
+        Printing.Print_Tree ("The Tree", theClassifier);
         Put_Line ("----------------------------------------------");
         New_Line;
 
