@@ -35,11 +35,11 @@ package body Classification_Metrics is
               (Routine_Name & " True, Sample_Weight: ", Sample_Weight, Y_True);
         end if;
 
-        Printing.Print_Value_Data_Lists_2D (Routine_Name & "Y_True ",
-                                            Y_True);
-        Printing.Print_Value_Data_Lists_2D
-          (Routine_Name & "Y_Prediction ",
-           Classifier_Utilities.Transpose (Y_Prediction));
+--          Printing.Print_Value_Data_Lists_2D (Routine_Name & "Y_True ",
+--                                              Y_True);
+--          Printing.Print_Value_Data_Lists_2D
+--            (Routine_Name & "Y_Prediction ",
+--             Classifier_Utilities.Transpose (Y_Prediction));
         Score := Classifier_Utilities.Transpose (Y_Prediction) = Y_True;
         Printing.Print_Value_Data_Lists_2D (Routine_Name & "Score ", Score);
 

@@ -90,10 +90,10 @@ package body Ada_Tree_Builder is
          Put_Line
            (Routine_Name & " L207 Leaf_Node Weighted_Node_Samples < " &
               "2.0 * Builder.Min_Weight_Leaf");
-      elsif abs (Impurity) <= Epsilon then
-         Put_Line (Routine_Name &
-                     " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
-                     ") <= Epsilon");
+--        elsif abs (Impurity) <= Epsilon then
+--           Put_Line (Routine_Name &
+--                       " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
+--                       ") <= Epsilon");
       end if;
 
       --  L220
@@ -202,12 +202,8 @@ package body Ada_Tree_Builder is
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
       --  L214
       Impurity := Gini_Node_Impurity (Builder.Splitter);
-      Put_Line (Routine_Name & "L214 Impurity: " &
-               Float'Image (Impurity));
       --  L221 first
       Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
-      Put_Line (Routine_Name & "L221 first Impurity: " &
-               Float'Image (Impurity));
 
       --  L229 first  Add_Node adds a node to theTree
       Top_Node_Cursor := Tree_Build.Add_Node

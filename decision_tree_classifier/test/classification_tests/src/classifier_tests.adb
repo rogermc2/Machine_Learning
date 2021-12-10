@@ -166,7 +166,8 @@ package body Classifier_Tests is
         Put_Line (Routine_Name & ", X size: " & Count_Type'Image (X.Length) &
                     " x " & Count_Type'Image (X.Element (1).Length));
         --  Iris_Target is 2D list num outputs x num samples
-        Iris_Target := Iris_Data.Label_Values;
+      Iris_Target := Iris_Data.Label_Values;
+--        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", Iris_Target", Iris_Target);
 --          Put_Line (Routine_Name & ", Iris_Target size: " &
 --                      Count_Type'Image (Iris_Target.Length) & " x " &
 --                      Count_Type'Image (Iris_Target.Element (1).Length));
