@@ -785,6 +785,7 @@ package body Utilities is
         Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
         Label_Type     : Data_Type;
         Label_Values   : Value_Data_List;
+        Labels_List    : Value_Data_Lists_2D;
         Data           : Data_Record;
     begin
         Data.Label_Name := aRow.Label;
@@ -796,7 +797,8 @@ package body Utilities is
                   (1 .. aRow.Class_Count) := aRow.Features;
                 Feature_Values          : Value_Data_List :=
                                             Value_Data_Package.Empty_Vector;
-                Label                   : constant Unbounded_String := aRow.Label;
+                Label                   : constant Unbounded_String :=
+                                            aRow.Label;
             begin
                 if row_index = Row_Data.First_Index then
                     Label_Type := Get_Data_Type (aRow.Label);
@@ -831,7 +833,7 @@ package body Utilities is
                 Features_List.Append (Feature_Values);
 
                 declare
-                    Label_Value    : Value_Record (Label_Type);
+                    Label_Value : Value_Record (Label_Type);
                 begin
                     case Label_Type is
                     when Boolean_Type =>
@@ -848,11 +850,12 @@ package body Utilities is
                     end case;
                     Label_Values.Append (Label_Value);
                 end;  --  declare block;
+                Labels_List.Append (Label_Values);
             end;
         end loop;
 
         Data.Feature_Values := Features_List;
-        Data.Label_Values := Label_Values;
+        Data.Label_Values := Labels_List;
         return Data;
 
     end Split_Row_Data;

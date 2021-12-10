@@ -176,7 +176,7 @@ package ML_Types is
       Feature_Names  : String_List;
       Label_Name     : Unbounded_String := To_Unbounded_String ("");
       Feature_Values : Value_Data_Lists_2D;
-      Label_Values   : Value_Data_List;
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
    end record;
 
    type Raw_Question is record
