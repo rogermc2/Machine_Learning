@@ -2,7 +2,7 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Numerics.Elementary_Functions;
 --  with Ada.Strings.Fixed;
---  with Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Builder;
@@ -24,8 +24,9 @@ package body Classifier_Utilities is
 
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
-   function Split_Raw_Data (Raw_Data : ML_Types.Raw_Data_Vector;
-                            Num_Outputs : Positive := 1) return Data_Record;
+   function Split_Raw_Data (Raw_Data    : ML_Types.Raw_Data_Vector;
+                            Num_Outputs : Positive := 1)
+                            return Multi_Output_Data_Record;
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
@@ -343,35 +344,52 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
-                       return ML_Types.Data_Record is
+                       return ML_Types.Multi_Output_Data_Record is
       Data_File    : File_Type;
-      Header_Line  : Header_Data_Type;
-      CSV_Data     : ML_Types.Rows_Vector;
+--        Header_Line  : Header_Data_Type;
+--        CSV_Data     : ML_Types.Rows_Vector;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
-      Data         : ML_Types.Data_Record;
+--        Data         : ML_Types.Data_Record;
+      Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
-      if Num_Outputs = 1 then
-         CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
-      else
+--        if Num_Outputs = 1 then
+--           CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
+--        else
          Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
-      end if;
+--        end if;
       Close (Data_File);
 
-      if Num_Outputs = 1 then
-         Data := Utilities.Split_Row_Data (CSV_Data);
-         Data.Label_Name := Header_Line.Label;
-         for index in Header_Line.Features'First ..
-           Header_Line.Features'Last loop
-            Data.Feature_Names.Append (Header_Line.Features (index));
-         end loop;
-      else
-         Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
-      end if;
+--        if Num_Outputs = 1 then
+--           Data := Utilities.Split_Row_Data (CSV_Data);
+--           Data.Label_Name := Header_Line.Label;
+--           for index in Header_Line.Features'First ..
+--             Header_Line.Features'Last loop
+--              Data.Feature_Names.Append (Header_Line.Features (index));
+--           end loop;
+--        else
+         Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
+--        end if;
 
-      return Data;
+      return Output_Data;
 
    end Load_Data;
+
+   --  ---------------------------------------------------------------------------
+
+   procedure Parse_Header
+     (Header       : ML_Types.Unbounded_List; Num_Features : Positive;
+      Data_Record  : in out Multi_Output_Data_Record) is
+   begin
+      for index in 1 .. Positive (Header.Length) loop
+         if index <= Num_Features then
+            Data_Record.Feature_Names.Append (Header.Element (index));
+         else
+            Data_Record.Label_Names.Append (Header.Element (index));
+         end if;
+      end loop;
+
+   end Parse_Header;
 
    --  -------------------------------------------------------------------------
    --  Samples_3D_To_Outputs_3D num samples x num outputs x num classes to
@@ -479,46 +497,53 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_Raw_Data (Raw_Data : ML_Types.Raw_Data_Vector;
-                            Num_Outputs : Positive := 1) return Data_Record is
-      use Rows_Package;
+   function Split_Raw_Data (Raw_Data    : ML_Types.Raw_Data_Vector;
+                            Num_Outputs : Positive := 1)
+                            return Multi_Output_Data_Record is
+      use Ada.Strings.Unbounded;
       use Value_Data_Package;
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
+      Num_Items      : constant Positive := Positive (aRow.Length);
+      Num_Features   : constant Positive := Num_Items - Num_Outputs;
+      Feature_Types  : array  (1 .. Num_Features) of Data_Type;
       Features_List  : Value_Data_Lists_2D;
-      Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
-      Label_Type     : Data_Type;
+      Label_Types    : array  (1 .. Num_Outputs) of Data_Type;
       Label_Values   : Value_Data_List;
       Labels_List    : Value_Data_Lists_2D;
-      Label_Names    : Unbounded_List;
       Data           : Multi_Output_Data_Record;
    begin
+      Parse_Header (aRow, Num_Features, Data);
 
-      for row_index in Row_Data.First_Index .. Row_Data.Last_Index loop
-         aRow := Row_Data.Element (row_index);
+      aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
+      for f_index in 1 .. Num_Features loop
+         Feature_Types (Positive (f_index)) :=
+           Utilities.Get_Data_Type (aRow (Positive (f_index)));
+      end loop;
+
+      for f_index in 1 .. Num_Outputs loop
+         Label_Types (Positive (f_index)) :=
+           Utilities.Get_Data_Type (aRow (Positive (Num_Features + f_index)));
+      end loop;
+
+      for row_index in Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index loop
+         aRow := Raw_Data.Element (row_index);  --  Unbound list
          Label_Values.Clear;
          declare
-            Features                : constant Feature_Data_Array
-              (1 .. aRow.Class_Count) := aRow.Features;
-            Feature_Values          : Value_Data_List :=
-                                        Value_Data_Package.Empty_Vector;
-            Label                   : constant Unbounded_String :=
-                                        aRow.Label;
+            Features       : Feature_Data_Array
+              (1 .. Class_Range (Num_Features));
+            Feature_Values : Value_Data_List :=
+                               Value_Data_Package.Empty_Vector;
+            Labels         : Feature_Data_Array
+              (1 .. Class_Range (Num_Outputs));
+            Label_Values   : Value_Data_List :=
+                               Value_Data_Package.Empty_Vector;
          begin
-            if row_index = Row_Data.First_Index then
-               Label_Type := Get_Data_Type (aRow.Label);
-            end if;
-
             for f_index in Features'First .. Features'Last loop
-               if row_index = Row_Data.First_Index then
-                  Feature_Types (f_index) :=
-                    Get_Data_Type (aRow.Features (f_index));
-               end if;
-
                declare
                   Feat_String : constant Unbounded_String := Features (f_index);
-                  Value       : Value_Record (Feature_Types (f_index));
+                  Value       : Value_Record (Feature_Types (Positive (f_index)));
                begin
-                  case Feature_Types (f_index) is
+                  case Feature_Types (Positive (f_index)) is
                      when Boolean_Type =>
                         Value.Boolean_Value :=
                           Boolean'Value (To_String (Feat_String));
@@ -536,25 +561,25 @@ package body Classifier_Utilities is
             end loop;
             Features_List.Append (Feature_Values);
 
-            declare
-               Label_Value : Value_Record (Label_Type);
-            begin
-               case Label_Type is
+            for f_index in Labels'First .. Labels'Last loop
+               declare
+                  Label       : constant String := To_String (Labels (f_index));
+                  Label_Value : Value_Record;
+               begin
+                  case Label_Types (Positive (f_index)) is
                   when Boolean_Type =>
-                     Label_Value.Boolean_Value :=
-                       Boolean'Value (To_String (Label));
+                     Label_Value.Boolean_Value := Boolean'Value (Label);
                   when Integer_Type =>
-                     Label_Value.Integer_Value :=
-                       Integer'Value (To_String (Label));
+                     Label_Value.Integer_Value := Integer'Value (Label);
                   when Float_Type =>
-                     Label_Value.Float_Value :=
-                       Float'Value (To_String (Label));
+                     Label_Value.Float_Value := Float'Value (Label);
                   when UB_String_Type =>
-                     Label_Value.UB_String_Value := Label;
-               end case;
-               Label_Values.Append (Label_Value);
-            end;  --  declare block;
-            Labels_List.Append (Label_Values);
+                     Label_Value.UB_String_Value := Labels (f_index);
+                  end case;
+                  Label_Values.Append (Label_Value);
+               end;  --  declare block;
+               Labels_List.Append (Label_Values);
+            end loop;
          end;
       end loop;
 

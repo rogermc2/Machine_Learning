@@ -145,7 +145,8 @@ package body Classifier_Tests is
         --        use Printing;
         use Classifier_Types.Float_Package;
         Routine_Name   : constant String := "Classifier_Tests.Test_Iris";
-        Iris_Data      : constant Data_Record := Load_Data ("src/iris.csv");
+      Iris_Data      : constant Multi_Output_Data_Record :=
+                         Load_Data ("src/iris.csv");
         theClassifier  : Base_Decision_Tree.Classifier
           (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
         Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -217,7 +218,8 @@ package body Classifier_Tests is
         use Float_Package;
         Routine_Name    : constant String :=
                             "Classification_Tests.Test_Probability ";
-        Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
+      Iris_Data         : constant Multi_Output_Data_Record :=
+                          Load_Data ("src/iris.csv");
         theClassifier   : Base_Decision_Tree.Classifier
           (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
         Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
