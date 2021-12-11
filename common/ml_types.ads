@@ -182,6 +182,13 @@ package ML_Types is
       Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
    end record;
 
+   type Multi_Output_Data_Record (Label_Kind : Data_Type := Integer_Type) is record
+      Feature_Names  : String_List;
+      Label_Names     : Unbounded_List;
+      Feature_Values : Value_Data_Lists_2D;
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
+   end record;
+
    type Raw_Question is record
       Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
       Feature_Value : Unbounded_String;  --  e.g. "Green"

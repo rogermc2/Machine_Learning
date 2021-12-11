@@ -24,6 +24,9 @@ package body Classifier_Utilities is
 
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
+   function Split_Raw_Data (Raw_Data : ML_Types.Raw_Data_Vector;
+                            Num_Outputs : Positive := 1) return Data_Record;
+
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
    function Arg_Max (Values : Weights.Weight_List) return Positive is
@@ -57,7 +60,7 @@ package body Classifier_Utilities is
    --  np.argmax(a, axis=1)
    --  returns array([2, 2]) -> [12, 15]
    function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
-                      return Classifier_Types.Natural_List is
+                     return Classifier_Types.Natural_List is
       Values       : Weights.Weight_List;
       Max_Indices  : Classifier_Types.Natural_List;
    begin
@@ -76,7 +79,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural := 0)
-                      return Classifier_Types.Natural_List is
+                     return Classifier_Types.Natural_List is
       Values_2K    : Weights.Weight_Lists_2D;
       Values       : Weights.Weight_List;
       Max_Indices  : Classifier_Types.Natural_List;
@@ -131,7 +134,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Bin_Count (Numbers : ML_Types.Value_Data_List)
-                        return Natural_List is
+                       return Natural_List is
       use Ada.Containers;
       use ML_Types;
       use Natural_Package;
@@ -214,7 +217,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
-                            return Natural is
+                           return Natural is
       use Ada.Containers;
       use Tree;
       use Nodes_Package;
@@ -254,7 +257,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Float_Precision (Number : Float; Precision : Natural)
-                              return String is
+                             return String is
       use Ada.Numerics.Elementary_Functions;
       Integer_Length : Positive;
       String_Length  : Positive;
@@ -304,7 +307,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
-                                return ML_Types.Value_Data_Lists_2D is
+                               return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Num_Samples    : constant Positive := Positive (Samples.Length);
       Sample_1       : constant Value_Data_List := Samples.Element (1);
@@ -340,26 +343,32 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
-                        return ML_Types.Data_Record is
-      Data_File   : File_Type;
-      Header_Line : Header_Data_Type;
-      CSV_Data    : ML_Types.Rows_Vector;
-      Data        : ML_Types.Data_Record;
+                       return ML_Types.Data_Record is
+      Data_File    : File_Type;
+      Header_Line  : Header_Data_Type;
+      CSV_Data     : ML_Types.Rows_Vector;
+      Raw_CSV_Data : ML_Types.Raw_Data_Vector;
+      Data         : ML_Types.Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
       if Num_Outputs = 1 then
          CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
       else
-         Utilities.Load_CSV_Data (Data_File, CSV_Data);
+         Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
       end if;
       Close (Data_File);
 
-      Data := Utilities.Split_Row_Data (CSV_Data, Num_Outputs);
-      Data.Label_Name := Header_Line.Label;
-      for index in Header_Line.Features'First ..
-        Header_Line.Features'Last loop
-         Data.Feature_Names.Append (Header_Line.Features (index));
-      end loop;
+      if Num_Outputs = 1 then
+         Data := Utilities.Split_Row_Data (CSV_Data);
+         Data.Label_Name := Header_Line.Label;
+         for index in Header_Line.Features'First ..
+           Header_Line.Features'Last loop
+            Data.Feature_Names.Append (Header_Line.Features (index));
+         end loop;
+      else
+         Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
+      end if;
+
       return Data;
 
    end Load_Data;
@@ -369,7 +378,7 @@ package body Classifier_Utilities is
    --                           num outputs x num samples x num classes
    function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
                                       Num_Outputs : Positive)
-                                       return Weights.Weight_Lists_3D is
+                                      return Weights.Weight_Lists_3D is
       use Weights;
       Sample_List    : Weight_Lists_2D;
       Classes        : Weight_List;
@@ -412,7 +421,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                       return Integer_List is
+                                      return Integer_List is
       use ML_Types;
       use Integer_Package;
       use Value_Data_Package;
@@ -457,7 +466,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Set_Value (List_Length : Positive; Value : Float)
-                        return Weights.Weight_List is
+                       return Weights.Weight_List is
       List_Of_Ones : Weights.Weight_List;
    begin
       for index in 1 .. List_Length loop
@@ -470,8 +479,95 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Split_Raw_Data (Raw_Data : ML_Types.Raw_Data_Vector;
+                            Num_Outputs : Positive := 1) return Data_Record is
+      use Rows_Package;
+      use Value_Data_Package;
+      aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
+      Features_List  : Value_Data_Lists_2D;
+      Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
+      Label_Type     : Data_Type;
+      Label_Values   : Value_Data_List;
+      Labels_List    : Value_Data_Lists_2D;
+      Label_Names    : Unbounded_List;
+      Data           : Multi_Output_Data_Record;
+   begin
+
+      for row_index in Row_Data.First_Index .. Row_Data.Last_Index loop
+         aRow := Row_Data.Element (row_index);
+         Label_Values.Clear;
+         declare
+            Features                : constant Feature_Data_Array
+              (1 .. aRow.Class_Count) := aRow.Features;
+            Feature_Values          : Value_Data_List :=
+                                        Value_Data_Package.Empty_Vector;
+            Label                   : constant Unbounded_String :=
+                                        aRow.Label;
+         begin
+            if row_index = Row_Data.First_Index then
+               Label_Type := Get_Data_Type (aRow.Label);
+            end if;
+
+            for f_index in Features'First .. Features'Last loop
+               if row_index = Row_Data.First_Index then
+                  Feature_Types (f_index) :=
+                    Get_Data_Type (aRow.Features (f_index));
+               end if;
+
+               declare
+                  Feat_String : constant Unbounded_String := Features (f_index);
+                  Value       : Value_Record (Feature_Types (f_index));
+               begin
+                  case Feature_Types (f_index) is
+                     when Boolean_Type =>
+                        Value.Boolean_Value :=
+                          Boolean'Value (To_String (Feat_String));
+                     when Integer_Type =>
+                        Value.Integer_Value :=
+                          Integer'Value (To_String (Feat_String));
+                     when Float_Type =>
+                        Value.Float_Value :=
+                          Float'Value (To_String (Feat_String));
+                     when UB_String_Type =>
+                        Value.UB_String_Value := Feat_String;
+                  end case;
+                  Feature_Values.Append (Value);
+               end;  --  declare block
+            end loop;
+            Features_List.Append (Feature_Values);
+
+            declare
+               Label_Value : Value_Record (Label_Type);
+            begin
+               case Label_Type is
+                  when Boolean_Type =>
+                     Label_Value.Boolean_Value :=
+                       Boolean'Value (To_String (Label));
+                  when Integer_Type =>
+                     Label_Value.Integer_Value :=
+                       Integer'Value (To_String (Label));
+                  when Float_Type =>
+                     Label_Value.Float_Value :=
+                       Float'Value (To_String (Label));
+                  when UB_String_Type =>
+                     Label_Value.UB_String_Value := Label;
+               end case;
+               Label_Values.Append (Label_Value);
+            end;  --  declare block;
+            Labels_List.Append (Label_Values);
+         end;
+      end loop;
+
+      Data.Feature_Values := Features_List;
+      Data.Label_Values := Labels_List;
+      return Data;
+
+   end Split_Raw_Data;
+
+   --  -----------------------------------------------------------------------
+
    function Sum_Cols (aList : Classifier_Types.Float_List_2D)
-                       return Classifier_Types.Float_List is
+                      return Classifier_Types.Float_List is
       theSum : Classifier_Types.Float_List;
       Value  : Float;
    begin
@@ -491,7 +587,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Sum_Cols (aList : ML_Types.Value_Data_Lists_2D)
-                       return ML_Types.Value_Data_List is
+                      return ML_Types.Value_Data_List is
       use ML_Types;
       theSum     : Value_Data_List;
       Value_Type : constant Data_Type :=
@@ -534,7 +630,7 @@ package body Classifier_Utilities is
    --  aList: num outputs x num samples x num classes
    --  Sum_Cols sums each class
    function Sum_Cols (aList : Weights.Weight_Lists_3D)
-                       return Weights.Weight_List is
+                      return Weights.Weight_List is
       Samples : Weights.Weight_Lists_2D;
       Classes : Weights.Weight_List;
       Sums    : Weights.Weight_List;
@@ -604,7 +700,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : Integer_Array)
-                                    return ML_Types.Value_Data_List is
+                                   return ML_Types.Value_Data_List is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
@@ -620,7 +716,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List_2D (A : Integer_Array)
-                                       return ML_Types.Value_Data_Lists_2D is
+                                      return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
@@ -639,7 +735,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Multi_Value_List (A : Multi_Value_Array)
-                                  return ML_Types.Value_Data_Lists_2D is
+                                 return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       Value    : Value_Record (Integer_Type);
       Row_List : Value_Data_Lists_2D;
@@ -660,7 +756,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Value_2D_List (A : ML_Types.Value_Data_List)
-                               return ML_Types.Value_Data_Lists_2D is
+                              return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       use Value_Data_Package;
       Output_List : Value_Data_List;
@@ -692,7 +788,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_Value_List (A : Natural_Array)
-                                    return ML_Types.Value_Data_Lists_2D is
+                                   return ML_Types.Value_Data_Lists_2D is
       Int_Array : Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
@@ -704,7 +800,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
-                        return  ML_Types.Value_Data_Lists_2D is
+                       return  ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
       use  ML_Types;
       Num_Rows : constant Positive := Positive (Values.Length);
@@ -736,7 +832,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
-                            return Tree.Tree_Cursor is
+                           return Tree.Tree_Cursor is
       use Ada.Containers;
       use Tree.Nodes_Package;
       Parent_Node : constant Tree.Tree_Cursor := Parent (Current_Node);
@@ -780,7 +876,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Integer_Array (Nums : ML_Types.Value_Data_Array)
-                                   return Integer_Array is
+                                  return Integer_Array is
       use Int_Sets;
       Unique_Set : Int_Sets.Set;
       Set_Curs   : Int_Sets.Cursor;
@@ -831,7 +927,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Values (Values : ML_Types.Value_Data_List)
-                            return ML_Types.Value_Data_List is
+                           return ML_Types.Value_Data_List is
       use Value_Sets;
       use Value_Data_Package;
       Unique_Set  : Value_Sets.Set;
@@ -856,7 +952,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique_Weights (Values : Weights.Weight_Lists_3D)
-                             return Weights.Weight_List is
+                            return Weights.Weight_List is
       use Weight_Sets;
       use Weights;
       use Float_Package;
