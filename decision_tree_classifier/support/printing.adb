@@ -580,7 +580,7 @@ package body Printing is
       for Index in theList.First_Index .. theList.Last_Index loop
          Value := theList.Element (Index);
          Put ("   ");
-         Print_Value_Data_Record ("", Value);
+         Print_Value_Record ("", Value);
          Count := Count + 1;
          if Count > 10 then
             New_Line;
@@ -645,7 +645,7 @@ package body Printing is
 
    --  -------------------------------------------------------------
 
-   procedure Print_Value_Data_Record
+   procedure Print_Value_Record
      (Name : String; Value : ML_Types.Value_Record) is
       use ML_Types;
    begin
@@ -653,7 +653,6 @@ package body Printing is
          Put_Line (Name & ":");
       end if;
 
---        Put ("Value_Kind " & Data_Type'Image (Value.Value_Kind) & ": ");
       case Value.Value_Kind is
          when Boolean_Type => Put (Boolean'Image (Value.Boolean_Value));
          when Float_Type => Put (Float'Image (Value.Float_Value));
@@ -661,7 +660,11 @@ package body Printing is
          when UB_String_Type => Put (To_String (Value.UB_String_Value));
       end case;
 
-   end Print_Value_Data_Record;
+      if Name'Length > 0 then
+         New_Line;
+      end if;
+
+   end Print_Value_Record;
 
    --  ------------------------------------------------------------------------
 

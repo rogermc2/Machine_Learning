@@ -346,30 +346,30 @@ package body Classifier_Utilities is
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
       Data_File    : File_Type;
---        Header_Line  : Header_Data_Type;
---        CSV_Data     : ML_Types.Rows_Vector;
+      --        Header_Line  : Header_Data_Type;
+      --        CSV_Data     : ML_Types.Rows_Vector;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
---        Data         : ML_Types.Data_Record;
+      --        Data         : ML_Types.Data_Record;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
---        if Num_Outputs = 1 then
---           CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
---        else
-         Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
---        end if;
+      --        if Num_Outputs = 1 then
+      --           CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
+      --        else
+      Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
+      --        end if;
       Close (Data_File);
 
---        if Num_Outputs = 1 then
---           Data := Utilities.Split_Row_Data (CSV_Data);
---           Data.Label_Name := Header_Line.Label;
---           for index in Header_Line.Features'First ..
---             Header_Line.Features'Last loop
---              Data.Feature_Names.Append (Header_Line.Features (index));
---           end loop;
---        else
-         Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
---        end if;
+      --        if Num_Outputs = 1 then
+      --           Data := Utilities.Split_Row_Data (CSV_Data);
+      --           Data.Label_Name := Header_Line.Label;
+      --           for index in Header_Line.Features'First ..
+      --             Header_Line.Features'Last loop
+      --              Data.Feature_Names.Append (Header_Line.Features (index));
+      --           end loop;
+      --        else
+      Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
+      --        end if;
 
       return Output_Data;
 
@@ -500,8 +500,10 @@ package body Classifier_Utilities is
    function Split_Raw_Data (Raw_Data    : ML_Types.Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
                             return Multi_Output_Data_Record is
+      use Ada.Strings;
       use Ada.Strings.Unbounded;
       use Value_Data_Package;
+      Routine_Name   : constant String := "Classifier_Utilities.Split_Raw_Data ";
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
@@ -513,7 +515,6 @@ package body Classifier_Utilities is
       Data           : Multi_Output_Data_Record;
    begin
       Parse_Header (aRow, Num_Features, Data);
-
       aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
       for f_index in 1 .. Num_Features loop
          Feature_Types (Positive (f_index)) :=
@@ -540,21 +541,22 @@ package body Classifier_Utilities is
          begin
             for f_index in Features'First .. Features'Last loop
                declare
-                  Feat_String : constant Unbounded_String := Features (f_index);
+                  Feat_String : constant String := To_String (Features (f_index));
                   Value       : Value_Record (Feature_Types (Positive (f_index)));
                begin
+                  Put_Line (Routine_Name & "parse Feature_Type " &
+                              Data_Type'Image (Feature_Types (Positive (f_index))));
                   case Feature_Types (Positive (f_index)) is
                      when Boolean_Type =>
-                        Value.Boolean_Value :=
-                          Boolean'Value (To_String (Feat_String));
+                        Value.Boolean_Value := Boolean'Value (Feat_String);
                      when Integer_Type =>
-                        Value.Integer_Value :=
-                          Integer'Value (To_String (Feat_String));
+                        Value.Integer_Value := Integer'Value (Feat_String);
                      when Float_Type =>
-                        Value.Float_Value :=
-                          Float'Value (To_String (Feat_String));
+                        Put_Line (Routine_Name & "parse Float_Type '" &
+                                    Feat_String & "'");
+                        Value.Float_Value := Float'Value (Feat_String);
                      when UB_String_Type =>
-                        Value.UB_String_Value := Feat_String;
+                        Value.UB_String_Value := Features (f_index);
                   end case;
                   Feature_Values.Append (Value);
                end;  --  declare block
