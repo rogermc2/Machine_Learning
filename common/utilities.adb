@@ -777,7 +777,8 @@ package body Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Split_Row_Data (Row_Data : ML_Types.Rows_Vector) return Data_Record is
+   function Split_Row_Data (Row_Data : ML_Types.Rows_Vector;
+                            Num_Outputs : Positive := 1) return Data_Record is
       use Rows_Package;
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;

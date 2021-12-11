@@ -53,7 +53,8 @@ package Utilities is
                                    Feature : ML_Types.Feature_Name_Type);
     procedure Print_Value_Record (Message : String;
                                   Value   : ML_Types.Value_Record);
-    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector)
+    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector;
+                             Num_Outputs : Positive := 1)
                             return ML_Types.Data_Record;
     function Split_String (aString, Pattern : String)
                           return ML_Types.String_List;

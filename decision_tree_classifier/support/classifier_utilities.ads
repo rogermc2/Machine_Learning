@@ -26,7 +26,8 @@ package Classifier_Utilities is
     function Float_Precision (Number : Float; Precision : Natural) return String;
     function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D;
-    function Load_Data (File_Name : String) return ML_Types.Data_Record;
+    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
+                        return ML_Types.Data_Record;
     function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
                                        Num_Outputs : Positive)
                                     return Weights.Weight_Lists_3D;

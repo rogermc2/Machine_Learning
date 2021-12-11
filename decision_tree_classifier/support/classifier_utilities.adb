@@ -339,7 +339,8 @@ package body Classifier_Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Load_Data (File_Name : String) return ML_Types.Data_Record is
+    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
+                        return ML_Types.Data_Record is
         Data_File   : File_Type;
         Header_Line : Header_Data_Type;
         CSV_Data    : ML_Types.Rows_Vector;
@@ -349,7 +350,7 @@ package body Classifier_Utilities is
         CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
         Close (Data_File);
 
-        Data := Utilities.Split_Row_Data (CSV_Data);
+        Data := Utilities.Split_Row_Data (CSV_Data, Num_Outputs);
         Data.Label_Name := Header_Line.Label;
         for index in Header_Line.Features'First ..
           Header_Line.Features'Last loop
