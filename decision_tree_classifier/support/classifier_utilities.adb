@@ -540,20 +540,20 @@ package body Classifier_Utilities is
                                Value_Data_Package.Empty_Vector;
          begin
             for f_index in Features'First .. Features'Last loop
+               Features (f_index) := aRow (Positive (f_index));
+            end loop;
+
+            for f_index in Features'First .. Features'Last loop
                declare
                   Feat_String : constant String := To_String (Features (f_index));
                   Value       : Value_Record (Feature_Types (Positive (f_index)));
                begin
-                  Put_Line (Routine_Name & "parse Feature_Type " &
-                              Data_Type'Image (Feature_Types (Positive (f_index))));
                   case Feature_Types (Positive (f_index)) is
                      when Boolean_Type =>
                         Value.Boolean_Value := Boolean'Value (Feat_String);
                      when Integer_Type =>
                         Value.Integer_Value := Integer'Value (Feat_String);
                      when Float_Type =>
-                        Put_Line (Routine_Name & "parse Float_Type '" &
-                                    Feat_String & "'");
                         Value.Float_Value := Float'Value (Feat_String);
                      when UB_String_Type =>
                         Value.UB_String_Value := Features (f_index);
