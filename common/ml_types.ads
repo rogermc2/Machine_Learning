@@ -13,8 +13,10 @@ package ML_Types is
 
    type Class_Range is new Positive range 1 .. Max_Features;
    type Feature_Name_Type is new Unbounded_String;
-   type Feature_Names_Array is array (Class_Range range <>) of Feature_Name_Type;
+   type Feature_Names_Array is array (Class_Range range <>)
+     of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
+   type Data_Array is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
    type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
@@ -48,8 +50,9 @@ package ML_Types is
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
+   use Unbounded_Package;
    package Raw_Data_Package is new Ada.Containers.Vectors
-     (Positive, Unbounded_String);
+     (Positive, Unbounded_List);
    subtype Raw_Data_Vector is Raw_Data_Package.Vector;
 
    type Data_Rows is array (Integer range <>) of Unbounded_String;

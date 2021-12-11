@@ -69,7 +69,7 @@ package body Utilities is
 
    function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
                         Column_Index : Positive)
-                         return ML_Types.Value_Data_List is
+                        return ML_Types.Value_Data_List is
       use ML_Types;
       aList  : Value_Data_List;
       Column : Value_Data_List;
@@ -220,7 +220,7 @@ package body Utilities is
       Builder.Set_Header_Data (To_String (Data_Line));
 
       declare
-         Values       : Feature_Data_Array (1 .. Num_Features);
+         Values : Feature_Data_Array (1 .. Num_Features);
       begin
          while not End_Of_File (Data_File) loop
             declare
@@ -245,9 +245,6 @@ package body Utilities is
             end;  --  declare block
          end loop;
       end;  --  declare block
-      --        Put_Line ("Data length: " & Count_Type'Image (Data.Data.Length));
-      --        Print_Data_Item (Data.Data, Num_Features, 15);
-      --        Print_Data (Data.Data, Num_Features);
 
    end Load_CSV_Data;
 
@@ -255,7 +252,7 @@ package body Utilities is
 
    function Load_CSV_Data
      (Data_File : File_Type; Header_Line : out Header_Data_Type)
-       return ML_Types.Rows_Vector is
+      return ML_Types.Rows_Vector is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
@@ -271,7 +268,7 @@ package body Utilities is
       Header_Line := Builder.Parse_Header (To_String (Data_Line));
 
       declare
-         Values       : Feature_Data_Array (1 .. Num_Features);
+         Values : Feature_Data_Array (1 .. Num_Features);
       begin
          while not End_Of_File (Data_File) loop
             declare
@@ -300,6 +297,37 @@ package body Utilities is
       return Data;
 
    end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Raw_CSV_Data (Data_File : File_Type)
+                               return ML_Types.Raw_Data_Vector is
+      use Ada.Strings.Unbounded;
+      use ML_Types;
+      use ML_Types.String_Package;
+      Data_Line : Unbounded_String :=
+                    To_Unbounded_String (Get_Line (Data_File));
+      CSV_Line  : String_List;
+      Curs      : ML_Types.String_Package.Cursor;
+      Values    : Unbounded_List;
+      Data      : ML_Types.Raw_Data_Vector;
+   begin
+      while not End_Of_File (Data_File) loop
+         Data_Line := To_Unbounded_String (Get_Line (Data_File));
+         CSV_Line := Utilities.Split_String
+           (To_String (Data_Line), ",");
+         Curs := CSV_Line.First;
+         Values.Clear;
+         while Has_Element (Curs) loop
+            Values.Append (Element (Curs));
+            Next (Curs);
+         end loop;
+         Data.Append (Values);
+      end loop;
+
+      return Data;
+
+   end Load_Raw_CSV_Data;
 
    --  -------------------------------------------------------------------------
 
@@ -450,7 +478,7 @@ package body Utilities is
    --  ------------------------------------------------------------------------
 
    function Prediction_String (Label_Counts : Predictions_List)
-                                return String is
+                               return String is
       use Prediction_Data_Package;
       Count_Cursor : Cursor := Label_Counts.First;
       Prediction   : Prediction_Data;
@@ -777,7 +805,7 @@ package body Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Split_Row_Data (Row_Data : ML_Types.Rows_Vector;
+   function Split_Row_Data (Row_Data    : ML_Types.Rows_Vector;
                             Num_Outputs : Positive := 1) return Data_Record is
       use Rows_Package;
       use Value_Data_Package;
@@ -977,7 +1005,7 @@ package body Utilities is
    --  --------------------------------------------------------------------------
 
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
-                         return Rows_Vector is
+                        return Rows_Vector is
 
       Feature_Values   : Value_Data_List;
       Label_Values     : Value_Data_List;
