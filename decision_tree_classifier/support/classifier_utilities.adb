@@ -503,7 +503,7 @@ package body Classifier_Utilities is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
       use Value_Data_Package;
-      Routine_Name   : constant String := "Classifier_Utilities.Split_Raw_Data ";
+      --        Routine_Name   : constant String := "Classifier_Utilities.Split_Raw_Data ";
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
@@ -512,6 +512,7 @@ package body Classifier_Utilities is
       Label_Types    : array  (1 .. Num_Outputs) of Data_Type;
       Label_Values   : Value_Data_List;
       Labels_List    : Value_Data_Lists_2D;
+      Feature_Values : Value_Data_List;
       Data           : Multi_Output_Data_Record;
    begin
       Parse_Header (aRow, Num_Features, Data);
@@ -529,46 +530,34 @@ package body Classifier_Utilities is
       for row_index in Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index loop
          aRow := Raw_Data.Element (row_index);  --  Unbound list
          Label_Values.Clear;
-         declare
-            Features       : Feature_Data_Array
-              (1 .. Class_Range (Num_Features));
-            Feature_Values : Value_Data_List :=
-                               Value_Data_Package.Empty_Vector;
-            Labels         : Feature_Data_Array
-              (1 .. Class_Range (Num_Outputs));
-            Label_Values   : Value_Data_List :=
-                               Value_Data_Package.Empty_Vector;
-         begin
-            for f_index in Features'First .. Features'Last loop
-               Features (f_index) := aRow (Positive (f_index));
-            end loop;
+         Feature_Values.Clear;
+         for f_index in 1 .. Num_Features loop
+            declare
+               Feat_String : constant String := To_String (aRow (f_index));
+               Value       : Value_Record (Feature_Types (Positive (f_index)));
+            begin
+               case Feature_Types (Positive (f_index)) is
+                  when Boolean_Type =>
+                     Value.Boolean_Value := Boolean'Value (Feat_String);
+                  when Integer_Type =>
+                     Value.Integer_Value := Integer'Value (Feat_String);
+                  when Float_Type =>
+                     Value.Float_Value := Float'Value (Feat_String);
+                  when UB_String_Type =>
+                     Value.UB_String_Value := aRow (f_index);
+               end case;
+               Feature_Values.Append (Value);
+            end;  --  declare block
+         end loop;
+         Features_List.Append (Feature_Values);
 
-            for f_index in Features'First .. Features'Last loop
-               declare
-                  Feat_String : constant String := To_String (Features (f_index));
-                  Value       : Value_Record (Feature_Types (Positive (f_index)));
-               begin
-                  case Feature_Types (Positive (f_index)) is
-                     when Boolean_Type =>
-                        Value.Boolean_Value := Boolean'Value (Feat_String);
-                     when Integer_Type =>
-                        Value.Integer_Value := Integer'Value (Feat_String);
-                     when Float_Type =>
-                        Value.Float_Value := Float'Value (Feat_String);
-                     when UB_String_Type =>
-                        Value.UB_String_Value := Features (f_index);
-                  end case;
-                  Feature_Values.Append (Value);
-               end;  --  declare block
-            end loop;
-            Features_List.Append (Feature_Values);
-
-            for f_index in Labels'First .. Labels'Last loop
-               declare
-                  Label       : constant String := To_String (Labels (f_index));
-                  Label_Value : Value_Record;
-               begin
-                  case Label_Types (Positive (f_index)) is
+         for o_index in 1 .. Num_Outputs loop
+            declare
+               Label       : constant String :=
+                               To_String (aRow (Num_Features + o_index));
+               Label_Value : Value_Record (Label_Types (o_index));
+            begin
+               case Label_Types (Positive (o_index)) is
                   when Boolean_Type =>
                      Label_Value.Boolean_Value := Boolean'Value (Label);
                   when Integer_Type =>
@@ -576,13 +565,13 @@ package body Classifier_Utilities is
                   when Float_Type =>
                      Label_Value.Float_Value := Float'Value (Label);
                   when UB_String_Type =>
-                     Label_Value.UB_String_Value := Labels (f_index);
-                  end case;
-                  Label_Values.Append (Label_Value);
-               end;  --  declare block;
-               Labels_List.Append (Label_Values);
-            end loop;
-         end;
+                     Label_Value.UB_String_Value :=
+                       aRow (Num_Features + o_index);
+               end case;
+               Label_Values.Append (Label_Value);
+            end;  --  declare block;
+            Labels_List.Append (Label_Values);
+         end loop;
       end loop;
 
       Data.Feature_Values := Features_List;
