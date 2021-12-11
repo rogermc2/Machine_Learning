@@ -346,31 +346,14 @@ package body Classifier_Utilities is
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return ML_Types.Multi_Output_Data_Record is
       Data_File    : File_Type;
-      --        Header_Line  : Header_Data_Type;
-      --        CSV_Data     : ML_Types.Rows_Vector;
       Raw_CSV_Data : ML_Types.Raw_Data_Vector;
-      --        Data         : ML_Types.Data_Record;
       Output_Data  : ML_Types.Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
-      --        if Num_Outputs = 1 then
-      --           CSV_Data := Utilities.Load_CSV_Data (Data_File, Header_Line);
-      --        else
       Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
-      --        end if;
       Close (Data_File);
 
-      --        if Num_Outputs = 1 then
-      --           Data := Utilities.Split_Row_Data (CSV_Data);
-      --           Data.Label_Name := Header_Line.Label;
-      --           for index in Header_Line.Features'First ..
-      --             Header_Line.Features'Last loop
-      --              Data.Feature_Names.Append (Header_Line.Features (index));
-      --           end loop;
-      --        else
       Output_Data := Split_Raw_Data (Raw_CSV_Data, Num_Outputs);
-      --        end if;
-
       return Output_Data;
 
    end Load_Data;
