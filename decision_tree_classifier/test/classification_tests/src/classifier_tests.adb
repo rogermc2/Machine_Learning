@@ -179,7 +179,7 @@ package body Classifier_Tests is
       Put_Line
         (Routine_Name & " Node_Count: " & Count_Type'Image
            (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-      Printing.Print_Tree ("The Tree", theClassifier);
+--        Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
