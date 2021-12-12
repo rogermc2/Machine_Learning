@@ -63,7 +63,7 @@ package body Tree is
          if Integer (Child_Count (Top_Cursor)) > 0 then
             --  Find a node with a leaf child.
             --  This node has the prediction value.
-            while not Element (Node_Cursor).Leaf_Node loop
+            while not Element (First_Child (Node_Cursor)).Leaf_Node loop
                Node := Element (Node_Cursor);
                Assert (Feature_Value.Value_Kind = Float_Type or
                          Feature_Value.Value_Kind = Integer_Type,
