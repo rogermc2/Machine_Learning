@@ -66,13 +66,13 @@ package body Ada_Tree_Builder is
       Impurity := Data.Impurity;
 
       --  L207
-      Is_Leaf_Node := Data.Depth >= Builder.Max_Depth or
+      Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
         Builder.Splitter.Num_Samples = 1 or
         Num_Node_Samples < Builder.Min_Samples_Split or
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
       abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
-      if Data.Depth >= Builder.Max_Depth then
+      if Data.Depth > Builder.Max_Depth then
          null;
 --           Put_Line (Routine_Name &
 --                       " L207 Leaf_Node Data.Depth >= Builder.Max_Depth");

@@ -70,11 +70,13 @@ package body Tree is
                Node := Element (Node_Cursor);
                Put_Line (Routine_Name & "Node_ID" &
                            Integer'Image (Node.Node_ID));
+               Feature_Value :=
+                 Current_Sample.Element (Node.Best_Fit_Feature_Index);
+               Printing.Print_Value_Record (Routine_Name & "Feature_Value",
+                                            Feature_Value);
                Assert (Feature_Value.Value_Kind = Float_Type or
                          Feature_Value.Value_Kind = Integer_Type,
                        "Tree.Apply_Dense Self.Nodes invalid feature data type");
-               Feature_Value :=
-                 Current_Sample.Element (Node.Best_Fit_Feature_Index);
                --  Make tree traversal decision
                case Feature_Value.Value_Kind is
                   when Float_Type =>

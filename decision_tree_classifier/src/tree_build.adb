@@ -103,7 +103,7 @@ package body Tree_Build is
       end if;
 
       --  L440
-      Is_Leaf := (Depth >= theBuilder.Max_Depth) or
+      Is_Leaf := (Depth > theBuilder.Max_Depth) or
         (Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split) or
         (Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
         (Impurity <= Epsilon);
@@ -290,7 +290,7 @@ package body Tree_Build is
          end if;
 
          --  L204
-         Is_Leaf := Depth >= Depth_Builder.Max_Depth or
+         Is_Leaf := Depth > Depth_Builder.Max_Depth or
            Num_Node_Samples < Depth_Builder.Min_Samples_Split or
            Num_Node_Samples < 2 * Depth_Builder.Min_Samples_Leaf or
            Weighted_Samples < 2.0 * Depth_Builder.Min_Weight_Leaf or
