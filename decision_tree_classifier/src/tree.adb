@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
 with Printing;
@@ -39,12 +39,12 @@ package body Tree is
       use ML_Types;
       use Value_Data_Package;
       use Nodes_Package;
---        Routine_Name : constant String := "Tree.Apply_Dense ";
+      Routine_Name : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
-      Sample         : Value_Data_List;
+      Current_Sample : Value_Data_List;
       Feature_Value  : Value_Record;
       Out_Data       : Classifier_Types.Natural_List;
       Use_Left       : Boolean;
@@ -57,18 +57,21 @@ package body Tree is
       --  L798 for each sample
       for index in X.First_Index .. X.Last_Index loop
          Node_Cursor := Top_Cursor;
-         --  Sample is a list of feature values
-         Sample := X.Element (index);
+         --  Current_Sample is a list of feature values
+         Current_Sample := X.Element (index);
 
          if Integer (Child_Count (Top_Cursor)) > 0 then
             --  Find a node with a leaf child.
             --  This node has the prediction value.
             while not Element (First_Child (Node_Cursor)).Leaf_Node loop
                Node := Element (Node_Cursor);
+               Put_Line (Routine_Name & "Node_ID" &
+                           Integer'Image (Node.Node_ID));
                Assert (Feature_Value.Value_Kind = Float_Type or
                          Feature_Value.Value_Kind = Integer_Type,
                        "Tree.Apply_Dense Self.Nodes invalid feature data type");
-               Feature_Value := Sample.Element (Node.Best_Fit_Feature_Index);
+               Feature_Value :=
+                 Current_Sample.Element (Node.Best_Fit_Feature_Index);
                --  Make tree traversal decision
                case Feature_Value.Value_Kind is
                   when Float_Type =>
@@ -80,18 +83,22 @@ package body Tree is
                end case;
 
                if Use_Left then
+                  Put_Line (Routine_Name & "left child Node_ID" &
+                              Integer'Image
+                              (Element (First_Child (Node_Cursor)).Node_ID));
                   Node_Cursor := First_Child (Node_Cursor);
                else
+                  Put_Line (Routine_Name & "right child Node_ID" &
+                              Integer'Image
+                              (Element (Last_Child (Node_Cursor)).Node_ID));
                   Node_Cursor := Last_Child (Node_Cursor);
                end if;
 
-               Out_Data.Replace_Element (index, Element (Node_Cursor).Node_ID);
             end loop;  --  Not_Leaf
-         else
-            Out_Data.Replace_Element (index, Element (Node_Cursor).Node_ID);
          end if;
+         Out_Data.Replace_Element (index, Element (Node_Cursor).Node_ID);
       end loop;
-
+      Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
       return Out_Data;
 
    end Apply_Dense;
