@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
@@ -36,6 +37,7 @@ package body Tree is
       --                           return Tree_Cursor_List is
       --  X is a list of samples of features (num samples x num features)
       use Ada.Containers;
+      use Ada.Strings.Unbounded;
       use ML_Types;
       use Value_Data_Package;
       use Nodes_Package;
@@ -79,12 +81,29 @@ package body Tree is
                        "Tree.Apply_Dense Self.Nodes invalid feature data type");
                --  Make tree traversal decision
                case Feature_Value.Value_Kind is
+                  when Boolean_Type =>
+                     if True then
+                        Use_Left := 1.0 <= Node.Threshold;
+                     else
+                        Use_Left := 0.0 <= Node.Threshold;
+                     end if;
                   when Float_Type =>
                      Use_Left := Feature_Value.Float_Value <= Node.Threshold;
                   when Integer_Type =>
                      Use_Left := Float (Feature_Value.Integer_Value) <=
                        Node.Threshold;
-                  when others => null;
+                  when UB_String_Type =>
+                     declare
+                        Comp : Float := 0.0;
+                        Text : constant String :=
+                                 To_String (Feature_Value.UB_String_Value);
+                     begin
+                        for pos in 1 .. Text'Length loop
+                           Comp := Comp +
+                             Float (Integer'Value (Text (pos .. pos)));
+                        end loop;
+                        Use_Left := Comp <= Node.Threshold;
+                     end;
                end case;
 
                if Use_Left then
