@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Tree is
 
@@ -132,11 +132,10 @@ package body Tree is
       --  Check for top node, child of root node
       Assert (Self.Nodes.Node_Count > 1, Routine_Name & " Tree is empty.");
 
---        Put_Line (Routine_Name & ", Node_Count" &
---                    Count_Type'Image (Self.Nodes.Node_Count - 1));
       --  L760  Apply returns a list containing the Node ID associated with
       --        each sample.
       Samples := Apply (Self, X);
+      Printing.Print_Natural_List (Routine_Name & " samples", Samples);
       for index in Samples.First_Index .. Samples.Last_Index loop
          if Samples.Element (index) > 0 then
             Out_Data.Append (Values.Element (Samples.Element (index)));
@@ -144,7 +143,6 @@ package body Tree is
       end loop;
 --        Put_Line (Routine_Name & ", samples size" &
 --                    Count_Type'Image (Samples.Length));
---        Printing.Print_Natural_List (Routine_Name & " samples", Samples);
       return Out_Data;
 
    end Predict;

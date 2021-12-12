@@ -1,11 +1,10 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Sets;
 with Ada.Numerics.Elementary_Functions;
---  with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Builder;
 with Encode_Utils;
 --  with Printing;
 with Utilities;
@@ -686,6 +685,26 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function To_Float_List (F : ML_Types.Value_Data_List)
+                           return Float_List is
+      Item   : Value_Record;
+      Floats : Float_List;
+   begin
+      for index in F.First_Index .. F.Last_Index loop
+         Item := F.Element (index);
+         Assert (Item.Value_Kind = Float_Type,
+                 "Classifier_Utilities.To_Float_List invalid item "
+                 & Integer'Image (index) & " data type is " &
+                   Data_Type'Image (Item.Value_Kind));
+         Floats.Append (Item.Float_Value);
+      end loop;
+
+      return Floats;
+
+   end To_Float_List;
+
+   --  -------------------------------------------------------------------------
+
    function To_Integer_List (A : Integer_Array) return Integer_List is
       A_List : Integer_List;
    begin
@@ -693,6 +712,26 @@ package body Classifier_Utilities is
          A_List.Append (A (index));
       end loop;
       return A_List;
+
+   end To_Integer_List;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Integer_List (Ints : ML_Types.Value_Data_List)
+                             return Integer_List is
+      Item   : Value_Record;
+      Values : Integer_List;
+   begin
+      for index in Ints.First_Index .. Ints.Last_Index loop
+         Item := Ints.Element (index);
+         Assert (Item.Value_Kind = Integer_Type,
+                 "Classifier_Utilities.To_Float_List invalid item "
+                 & Integer'Image (index) & " data type is " &
+                   Data_Type'Image (Item.Value_Kind));
+         Values.Append (Item.Integer_Value);
+      end loop;
+
+      return Values;
 
    end To_Integer_List;
 
@@ -754,26 +793,6 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Value_2D_List (A : ML_Types.Value_Data_List)
-                              return ML_Types.Value_Data_Lists_2D is
-      use ML_Types;
-      use Value_Data_Package;
-      Output_List : Value_Data_List;
-      A2_List     : Value_Data_Lists_2D;
-   begin
-      A2_List.Clear;
-      for index in A.First_Index .. A.Last_Index loop
-         Output_List.Clear;
-         Output_List.Append (A.Element (index));
-         A2_List.Append (Output_List);
-      end loop;
-
-      return A2_List;
-
-   end To_Value_2D_List;
-
-   --  -------------------------------------------------------------------------
-
    function To_Natural_List (A : Natural_Array) return Natural_List is
       A_List : Natural_List;
    begin
@@ -797,6 +816,26 @@ package body Classifier_Utilities is
    end To_Natural_Value_List;
 
    --  ------------------------------------------------------------------------
+
+   function To_Value_2D_List (A : ML_Types.Value_Data_List)
+                              return ML_Types.Value_Data_Lists_2D is
+      use ML_Types;
+      use Value_Data_Package;
+      Output_List : Value_Data_List;
+      A2_List     : Value_Data_Lists_2D;
+   begin
+      A2_List.Clear;
+      for index in A.First_Index .. A.Last_Index loop
+         Output_List.Clear;
+         Output_List.Append (A.Element (index));
+         A2_List.Append (Output_List);
+      end loop;
+
+      return A2_List;
+
+   end To_Value_2D_List;
+
+   --  -------------------------------------------------------------------------
 
    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
                        return  ML_Types.Value_Data_Lists_2D is

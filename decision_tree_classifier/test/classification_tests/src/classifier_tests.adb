@@ -196,14 +196,15 @@ package body Classifier_Tests is
       X                 :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y                 : Value_Data_Lists_2D;
-      No_Weights        : Weights.Weight_List := Empty_Vector;
+      No_Weights        : Weights.Weight_List :=
+                            Float_Package.Empty_Vector;
       Num_Samples       : Natural;
       Prediction        : ML_Types.Value_Data_Lists_2D;
       Column_Sums       : Weights.Weight_List;
       Prob_Prediction   : Weights.Weight_Lists_3D;
       Max_Arg           : Classifier_Types.Natural_List;
    begin
-      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 2,
+      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 1,
               Max_Features => 1);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
@@ -228,9 +229,6 @@ package body Classifier_Tests is
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
 
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
-      Max_Arg := Arg_Max (Prob_Prediction.Element (1));
-      Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
-                          Max_Arg);
       Print_Value_Data_Lists_2D
         ("Classification_Tests Probabilities Prediction: ", Prediction);
       if Column_Sums = Ones (Integer (X.Length)) then
@@ -242,6 +240,17 @@ package body Classifier_Tests is
          Print_Weights
            (Routine_Name & " Column_Sums", Column_Sums);
       end if;
+
+      Max_Arg := Arg_Max (Prob_Prediction.Element (1));
+--        if Max_Arg = To_Integer_List (Prediction.Element (1)) then
+--           Put_Line
+--             ("Classification_Tests Probabilities Max_Arg test passed");
+--        else
+--           Put_Line
+--             ("Classification_Tests Probabilities Max_Arg test failed");
+         Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
+                             Max_Arg);
+--        end if;
 
       Graphviz_Exporter.C_Init
         (Exporter, theClassifier.Attributes.Decision_Tree);
