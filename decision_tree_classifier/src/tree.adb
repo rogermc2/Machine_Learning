@@ -39,7 +39,7 @@ package body Tree is
       use ML_Types;
       use Value_Data_Package;
       use Nodes_Package;
-      Routine_Name : constant String := "Tree.Apply_Dense ";
+      Routine_Name   : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
@@ -47,6 +47,7 @@ package body Tree is
       Current_Sample : Value_Data_List;
       Feature_Value  : Value_Record;
       Out_Data       : Classifier_Types.Natural_List;
+      Continue       : Boolean;
       Use_Left       : Boolean;
    begin
       --  L790
@@ -63,7 +64,9 @@ package body Tree is
          if Integer (Child_Count (Top_Cursor)) > 0 then
             --  Find a node with a leaf child.
             --  This node has the prediction value.
-            while not Element (First_Child (Node_Cursor)).Leaf_Node loop
+            Continue := True;
+            while Continue and then
+              not Element (First_Child (Node_Cursor)).Leaf_Node loop
                Node := Element (Node_Cursor);
                Put_Line (Routine_Name & "Node_ID" &
                            Integer'Image (Node.Node_ID));
@@ -93,6 +96,7 @@ package body Tree is
                               (Element (Last_Child (Node_Cursor)).Node_ID));
                   Node_Cursor := Last_Child (Node_Cursor);
                end if;
+               Continue := Child_Count (Node_Cursor) > 0;
 
             end loop;  --  Not_Leaf
          end if;
@@ -148,8 +152,8 @@ package body Tree is
             Out_Data.Append (Values.Element (Samples.Element (index)));
          end if;
       end loop;
---        Put_Line (Routine_Name & ", samples size" &
---                    Count_Type'Image (Samples.Length));
+      --        Put_Line (Routine_Name & ", samples size" &
+      --                    Count_Type'Image (Samples.Length));
       return Out_Data;
 
    end Predict;

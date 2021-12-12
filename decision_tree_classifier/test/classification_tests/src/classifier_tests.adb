@@ -204,7 +204,7 @@ package body Classifier_Tests is
       Prob_Prediction   : Weights.Weight_Lists_3D;
       Max_Arg           : Classifier_Types.Natural_List;
    begin
-      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 6,
+      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 2,
               Max_Features => 1);
       X := Iris_Data.Feature_Values;
       Num_Samples := Natural (X.Length);
