@@ -57,8 +57,6 @@ package body Classifier_Tests is
                             To_Multi_Value_List (T_Array);
       Num_Samples       : constant Natural := Natural (X.Length);
       No_Weights        : Weights.Weight_List := Float_Package.Empty_Vector;
-      --        Sample_Weights_1  : Weights.Weight_List := Ones (Num_Samples);
-      --        Sample_Weights_2  : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
       Success           : Boolean;
    begin
       C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria);
@@ -89,7 +87,8 @@ package body Classifier_Tests is
            ("Classification_Tests Toy prediction test failed");
       end if;
 
-      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Features => 1);
+      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria,
+              Max_Features => 1);
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Print_Tree ("Max_Features = 1 Tree", theClassifier);
       Put_Line ("----------------------------------------------");
@@ -102,37 +101,11 @@ package body Classifier_Tests is
       Success := Prediction = Expected;
       if Success then
          Put_Line
-           ("Classification_Tests Max_Features = 1 prediction test passed");
+           ("Classification Toy Tests Max Features = 1 prediction test passed");
       else
          Put_Line
-           ("Classification_Tests Max_Features = 1 prediction test failed");
+           ("Classification Toy Tests Max Features = 1 prediction test failed");
       end if;
-      --        Put_Line ("Test Weighted Classification Toy 1");
-      --        Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
-      --
-      --        Printing.Print_Tree ("Weighted Classification Tree", theClassifier);
-      --        Put_Line ("----------------------------------------------");
-      --        New_Line;
-      --
-      --        Graphviz_Exporter.C_Init
-      --          (Exporter, theClassifier.Attributes.Decision_Tree);
-      --        Graphviz_Exporter.Export_Graphviz
-      --          (Exporter, theClassifier.Attributes.Decision_Tree,
-      --           Output_File_Name => To_Unbounded_String ("weighted_1.dot"));
-      --
-      --        Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      --        Print_Value_Data_Lists_2D
-      --          (Routine_Name & " 1.0 weighted Predictions", Prediction);
-      --        Print_Value_Data_Lists_2D
-      --          (Routine_Name & " Expected 1.0 weighted Predictions", Expected);
-      --
-      --        Put_Line ("Test Weighted Classification Toy 0.5");
-      --        Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
-      --        Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      --        Print_Value_Data_Lists_2D
-      --          (Routine_Name & " 0.5 weighted predictions", Prediction);
-      --        Print_Value_Data_Lists_2D
-      --          (Routine_Name & " Expected 0.5 weighted predictions", Expected);
 
    end Test_Classification_Toy;
 
@@ -169,9 +142,6 @@ package body Classifier_Tests is
       --  Iris_Target is 2D list num outputs x num samples
       Iris_Target := Iris_Data.Label_Values;
       --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", Iris_Target", Iris_Target);
-      --          Put_Line (Routine_Name & ", Iris_Target size: " &
-      --                      Count_Type'Image (Iris_Target.Length) & " x " &
-      --                      Count_Type'Image (Iris_Target.Element (1).Length));
       Assert (Positive (Iris_Target.Length) = Num_Samples, Routine_Name &
                 " invalid Iris_Target vector");
       --  L1695
@@ -179,7 +149,7 @@ package body Classifier_Tests is
       Put_Line
         (Routine_Name & " Node_Count: " & Count_Type'Image
            (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
---        Printing.Print_Tree ("The Tree", theClassifier);
+      --        Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
@@ -189,8 +159,8 @@ package body Classifier_Tests is
         (Routine_Name & " Num_Samples, Num Predictions: " & Integer'Image
            (Num_Samples) &
            ", " & Integer'Image (Integer (Prediction.Element (1).Length)));
-      --          Printing.Print_Value_Data_Lists_2D
-      --            (Routine_Name & " Predictions", Prediction);
+      Printing.Print_Value_Data_Lists_2D
+        (Routine_Name & " Predictions", Prediction);
       Put_Line (Routine_Name & ", Iris_Target size: " &
                   Count_Type'Image (Iris_Target.Length) & " x " &
                   Count_Type'Image (Iris_Target.Element (1).Length));
@@ -280,6 +250,81 @@ package body Classifier_Tests is
          Output_File_Name => To_Unbounded_String ("Probability.dot"));
 
    end Test_Probability;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Test_Weighted_Classification_Toy  is
+      use Classifier_Utilities;
+      use Decision_Tree_Classification;
+      use Printing;
+      use Float_Package;
+      use Value_Lists_Data_Package;
+      Routine_Name      : constant String
+        := "Classification_Tests.Test_Weighted_Classification_Toy ";
+      Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
+      Expected          : Value_Data_Lists_2D;
+      Prediction        : ML_Types.Value_Data_Lists_2D;
+      theClassifier     : Base_Decision_Tree.Classifier
+        (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
+      X                 : constant Value_Data_Lists_2D :=
+                            To_Multi_Value_List (X_Array);
+      Y                 : Value_Data_Lists_2D;
+      T                 : constant Value_Data_Lists_2D :=
+                            To_Multi_Value_List (T_Array);
+      Num_Samples       : constant Natural := Natural (X.Length);
+      Sample_Weights_1  : Weights.Weight_List := Ones (Num_Samples);
+      Sample_Weights_2  : Weights.Weight_List := Set_Value (Num_Samples, 0.5);
+      Success           : Boolean;
+   begin
+      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria);
+      Put_Line (Routine_Name);
+      Assert (Num_Samples > 0,
+              Routine_Name & " called with empty X vector.");
+
+      --  Y is 2D list num outputs x num classes
+      Y := To_Integer_Value_List_2D (Y_Array);
+      Expected := Transpose (To_Integer_Value_List_2D (True_Result));
+
+      Put_Line ("Test Weighted Classification Toy 1");
+      Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
+
+      Printing.Print_Tree ("Weighted Classification Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+
+      Graphviz_Exporter.C_Init
+        (Exporter, theClassifier.Attributes.Decision_Tree);
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Output_File_Name => To_Unbounded_String ("weighted_1.dot"));
+
+      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
+      Print_Value_Data_Lists_2D
+        (Routine_Name & " 1.0 weighted Predictions", Prediction);
+      Print_Value_Data_Lists_2D
+        (Routine_Name & " Expected 1.0 weighted Predictions", Expected);
+
+      Success := Prediction = Expected;
+
+      New_Line;
+      Put_Line ("Test Weighted Classification Toy 0.5");
+      Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
+      Prediction := Base_Decision_Tree.Predict (theClassifier, T);
+      Print_Value_Data_Lists_2D
+        (Routine_Name & " 0.5 weighted predictions", Prediction);
+      Print_Value_Data_Lists_2D
+        (Routine_Name & " Expected 0.5 weighted predictions", Expected);
+
+      Success := Success and Prediction = Expected;
+      if Success then
+         Put_Line
+           ("Weighted Classification Tests Toy prediction test passed");
+      else
+         Put_Line
+           ("Weighted Classification Tests Toy prediction test failed");
+      end if;
+
+   end Test_Weighted_Classification_Toy;
 
    --  -------------------------------------------------------------------------
 
