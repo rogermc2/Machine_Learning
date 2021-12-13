@@ -2,10 +2,10 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Tree is
 
@@ -24,7 +24,7 @@ package body Tree is
    end Apply;
 
    --  -------------------------------------------------------------------------
-   --  L777
+   --  L780
    --  Apply_Dense finds the terminal region (=leaf node) for each sample in X.
    --  Through splitting, different subsets of a dataset are created with each
    --  instance belonging to one subset.
@@ -52,30 +52,29 @@ package body Tree is
       Continue       : Boolean;
       Use_Left       : Boolean;
    begin
-      --  L790
+      Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
+             "Top node has no children");
+      --  L796
       for index in 1 .. Num_Samples loop
          Out_Data.Append (0);
       end loop;
 
-      --  L798 for each sample
+      --  L804 for each sample
       for index in X.First_Index .. X.Last_Index loop
          Node_Cursor := Top_Cursor;
          --  Current_Sample is a list of feature values
          Current_Sample := X.Element (index);
 
-         if Integer (Child_Count (Top_Cursor)) > 0 then
             --  Find a node with a leaf child.
             --  This node has the prediction value.
             Continue := True;
             while Continue and then
-              not Element (First_Child (Node_Cursor)).Leaf_Node loop
+              Child_Count (Node_Cursor) > 0 loop
                Node := Element (Node_Cursor);
-               Put_Line (Routine_Name & "Node_ID" &
-                           Integer'Image (Node.Node_ID));
                Feature_Value :=
                  Current_Sample.Element (Node.Best_Fit_Feature_Index);
-               Printing.Print_Value_Record (Routine_Name & "Feature_Value",
-                                            Feature_Value);
+--                 Printing.Print_Value_Record (Routine_Name & "Feature_Value",
+--                                              Feature_Value);
                Assert (Feature_Value.Value_Kind = Float_Type or
                          Feature_Value.Value_Kind = Integer_Type,
                        "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -107,23 +106,22 @@ package body Tree is
                end case;
 
                if Use_Left then
-                  Put_Line (Routine_Name & "left child Node_ID" &
-                              Integer'Image
-                              (Element (First_Child (Node_Cursor)).Node_ID));
+--                    Put_Line (Routine_Name & "use left child Node_ID" &
+--                                Integer'Image
+--                                (Element (First_Child (Node_Cursor)).Node_ID));
                   Node_Cursor := First_Child (Node_Cursor);
                else
-                  Put_Line (Routine_Name & "right child Node_ID" &
-                              Integer'Image
-                              (Element (Last_Child (Node_Cursor)).Node_ID));
+--                    Put_Line (Routine_Name & "use right child Node_ID" &
+--                                Integer'Image
+--                                (Element (Last_Child (Node_Cursor)).Node_ID));
                   Node_Cursor := Last_Child (Node_Cursor);
                end if;
                Continue := Child_Count (Node_Cursor) > 0;
 
             end loop;  --  Not_Leaf
-         end if;
          Out_Data.Replace_Element (index, Element (Node_Cursor).Node_ID);
       end loop;
-      Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
+--        Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
       return Out_Data;
 
    end Apply_Dense;
@@ -166,8 +164,9 @@ package body Tree is
 
       --  L760  Apply returns a list containing the Node ID associated with
       --        each sample.
+--        Printing.Print_Value_Data_Lists_2D (Routine_Name & " X", X);
       Samples := Apply (Self, X);
-      Printing.Print_Natural_List (Routine_Name & " samples", Samples);
+--        Printing.Print_Natural_List (Routine_Name & " samples", Samples);
       for index in Samples.First_Index .. Samples.Last_Index loop
          if Samples.Element (index) > 0 then
             Out_Data.Append (Values.Element (Samples.Element (index)));

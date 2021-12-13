@@ -193,9 +193,13 @@ package body Classifier_Tests is
       theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
-      X                 :  Value_Data_Lists_2D;
+      X                 : constant Value_Data_Lists_2D :=
+                            To_Multi_Value_List (X_Array);
+      Y                 : constant Value_Data_Lists_2D :=
+                            To_Integer_Value_List_2D (Y_Array);
+      X_Iris            : Value_Data_Lists_2D;
       --  Y: num outputs x num classes
-      Y                 : Value_Data_Lists_2D;
+      Y_Iris            : Value_Data_Lists_2D;
       No_Weights        : Weights.Weight_List :=
                             Float_Package.Empty_Vector;
       Num_Samples       : Natural;
@@ -204,19 +208,18 @@ package body Classifier_Tests is
       Prob_Prediction   : Weights.Weight_Lists_3D;
       Max_Arg           : Classifier_Types.Natural_List;
    begin
+      --  L357
       C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 1,
               Max_Features => 1);
-      X := Iris_Data.Feature_Values;
+
       Num_Samples := Natural (X.Length);
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
-      --  Y is 2D list num outputs x num classes
-      Y := Iris_Data.Label_Values;
-      --          Y := To_Value_2D_List (Iris_Data.Label_Values);
+      --  Y_Iris is 2D list num outputs x num classes
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
-      --  L356
+      --  L359
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
@@ -224,21 +227,43 @@ package body Classifier_Tests is
 
       --  Python proba : ndarray of shape (n_samples, n_classes) or
       --  list of n_outputs \ such arrays if n_outputs > 1
-      Put_Line ("Classification_Tests Probabilities test");
+      Put_Line ("Classification_Tests Iris Probabilities test");
       Prob_Prediction := Predict_Probability (theClassifier, X);
+
+      --  Iris probabilty test
+      X_Iris := Iris_Data.Feature_Values;
+      Num_Samples := Natural (X_Iris.Length);
+      Put_Line (Routine_Name);
+      Assert (Num_Samples > 0, Routine_Name &
+                " called with empty X_Iris vector.");
+
+      --  Y_Iris is 2D list num outputs x num classes
+      Y_Iris := Iris_Data.Label_Values;
+      Assert (Integer (Y_Iris.Length) = Num_Samples, Routine_Name &
+                " invalid Y_Iris vector");
+      --  L362
+      Classification_Fit (theClassifier, X_Iris, Y_Iris, No_Weights);
+      Print_Tree ("The Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+
+      --  Python proba : ndarray of shape (n_samples, n_classes) or
+      --  list of n_outputs \ such arrays if n_outputs > 1
+      Put_Line ("Classification_Tests Probabilities test");
+      Prob_Prediction := Predict_Probability (theClassifier, X_Iris);
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
 
-      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X_Iris);
       Print_Value_Data_Lists_2D
         ("Classification_Tests Probabilities Prediction: ", Prediction);
-      if Column_Sums = Ones (Integer (X.Length)) then
+      if Column_Sums = Ones (Integer (X_Iris.Length)) then
          Put_Line
-           ("Classification_Tests Probabilities Column_Sums test passed");
+           ("Classification_Tests Probabilities Iris Column_Sums test passed");
       else
          Put_Line
-           ("Classification_Tests Probabilities Column_Sums test failed");
+           ("Classification_Tests Probabilities Iris Column_Sums test failed");
          Print_Weights
-           (Routine_Name & " Column_Sums", Column_Sums);
+           (Routine_Name & " Iris Column_Sums", Column_Sums);
       end if;
 
       Max_Arg := Arg_Max (Prob_Prediction.Element (1));
@@ -256,7 +281,7 @@ package body Classifier_Tests is
         (Exporter, theClassifier.Attributes.Decision_Tree);
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
-         Output_File_Name => To_Unbounded_String ("Probability.dot"));
+         Output_File_Name => To_Unbounded_String ("prob_iris.dot"));
 
    end Test_Probability;
 

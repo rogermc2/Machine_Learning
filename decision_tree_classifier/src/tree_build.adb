@@ -36,11 +36,12 @@ package body Tree_Build is
       use Ada.Containers;
       use Tree;
       use Nodes_Package;
+      Routine_Name : constant String := "Tree_Build.Add_Node ";
       New_Node    : Tree_Node (Is_Leaf);
       Node_Cursor : Tree.Tree_Cursor;
    begin
       Assert (Parent_Cursor /= No_Element,
-              "Tree_Build.Add_Node, parent cursor is null.");
+             Routine_Name & "parent cursor is null.");
 
       Last_Node := Last_Node + 1;
       New_Node.Node_ID := Last_Node;
