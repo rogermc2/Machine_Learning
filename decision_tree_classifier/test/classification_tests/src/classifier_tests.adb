@@ -216,7 +216,7 @@ package body Classifier_Tests is
       Put_Line (Routine_Name);
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
-      --  Y_Iris is 2D list num outputs x num classes
+      --  Y is 2D list num outputs x num classes
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
       --  L359
@@ -227,8 +227,24 @@ package body Classifier_Tests is
 
       --  Python proba : ndarray of shape (n_samples, n_classes) or
       --  list of n_outputs \ such arrays if n_outputs > 1
-      Put_Line ("Classification_Tests Iris Probabilities test");
+      Put_Line ("Classification_Tests Probabilities test");
       Prob_Prediction := Predict_Probability (theClassifier, X);
+
+      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
+
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Print_Value_Data_Lists_2D
+        ("Classification_Tests Probabilities Prediction: ", Prediction);
+      if Column_Sums = Ones (Integer (X.Length)) then
+         Put_Line
+           ("Classification_Tests Probabilities Column_Sums test passed");
+      else
+         Put_Line
+           ("Classification_Tests Probabilities Column_Sums test failed");
+         Print_Weights
+           (Routine_Name & " Column_Sums", Column_Sums);
+      end if;
+      New_Line;
 
       --  Iris probabilty test
       X_Iris := Iris_Data.Feature_Values;
@@ -249,7 +265,6 @@ package body Classifier_Tests is
 
       --  Python proba : ndarray of shape (n_samples, n_classes) or
       --  list of n_outputs \ such arrays if n_outputs > 1
-      Put_Line ("Classification_Tests Probabilities test");
       Prob_Prediction := Predict_Probability (theClassifier, X_Iris);
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
 
