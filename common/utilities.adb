@@ -305,8 +305,7 @@ package body Utilities is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
-      Data_Line : Unbounded_String :=
-                    To_Unbounded_String (Get_Line (Data_File));
+      Data_Line : Unbounded_String;
       CSV_Line  : String_List;
       Curs      : ML_Types.String_Package.Cursor;
       Values    : Unbounded_List;

@@ -485,7 +485,8 @@ package body Classifier_Utilities is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
       use Value_Data_Package;
-      --        Routine_Name   : constant String := "Classifier_Utilities.Split_Raw_Data ";
+--        Routine_Name   : constant String :=
+--                             "Classifier_Utilities.Split_Raw_Data ";
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
@@ -508,8 +509,8 @@ package body Classifier_Utilities is
          Label_Types (Positive (f_index)) :=
            Utilities.Get_Data_Type (aRow (Positive (Num_Features + f_index)));
       end loop;
-
-      for row_index in Positive'Succ (Raw_Data.First_Index) .. Raw_Data.Last_Index loop
+      for row_index in Positive'Succ (Raw_Data.First_Index) ..
+          Raw_Data.Last_Index loop
          aRow := Raw_Data.Element (row_index);  --  Unbound list
          Label_Values.Clear;
          Feature_Values.Clear;
