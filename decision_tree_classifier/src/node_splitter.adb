@@ -7,7 +7,7 @@ with Ada.Containers;
 with Maths;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Node_Splitter is
 
@@ -259,7 +259,7 @@ package body Node_Splitter is
                 Integer'Image (Stop_Row) &
                 " should be greater than Start_Row "
               & Integer'Image (Start_Row));
-      --  L323
+      --  L319
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features < Positive (Max_Features) or
            --   At least one drawn feature must be a non-constant.
@@ -353,9 +353,9 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
    --  L42
-   procedure Init_Split (theSplit : in out Split_Record; Stop : Positive) is
+   procedure Init_Split (theSplit : in out Split_Record; Start : Positive) is
    begin
-      theSplit.Split_Row := Stop;
+      theSplit.Split_Row := Start;
       theSplit.Impurity_Left := Float'Last;
       theSplit.Impurity_Right := Float'Last;
       theSplit.Improvement := -Float'Last;
@@ -402,7 +402,6 @@ package body Node_Splitter is
       X_Samples            : Value_Data_List;
       Swap                 : Natural;
    begin
-      Current_Split := Best_Split;
       --  L354 Sort samples along Current.Feature index;
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
       --  L358
@@ -425,13 +424,12 @@ package body Node_Splitter is
            (F_I, Splitter.Feature_Indices.Element (F_J));
          Splitter.Feature_Indices.Replace_Element (F_J, Swap);
 
-         --  L379 Reset the criterion to pos = start
+         --  L374 Reset the criterion to pos = start
          Criterion.Reset (Splitter.Criteria);
-
          Evaluate_All_Splits (Splitter, Current_Split, Best_Split);
          --  L428
 
-      else -- L370
+      else -- L366
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
       end if;
@@ -541,7 +539,7 @@ package body Node_Splitter is
    end Reset_Node;
 
    --  -------------------------------------------------------------------------
-   --  L268 BestSplitter.Split_Node implements a Fisher-Yates-based algorithm
+   --  L263 BestSplitter.Split_Node implements a Fisher-Yates-based algorithm
    --  in the Find_Best_Split procedure.
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
@@ -562,8 +560,12 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
+      Printing.Print_Split_Record
+        (Routine_Name & "L319 Best_Split record", Best_Split);
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
+      Printing.Print_Split_Record
+        (Routine_Name & "L417 Best_Split record", Best_Split);
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);

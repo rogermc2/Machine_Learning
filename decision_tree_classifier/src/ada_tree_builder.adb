@@ -202,7 +202,8 @@ package body Ada_Tree_Builder is
       Impurity := Gini_Node_Impurity (Builder.Splitter);
       --  L221 first
       Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
-
+--        Printing.Print_Split_Record
+--          (Routine_Name & "L229 first Split record", Split);
       --  L229 first  Add_Node adds a node to theTree
       Top_Node_Cursor := Tree_Build.Add_Node
         (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,
