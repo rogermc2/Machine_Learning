@@ -186,6 +186,7 @@ package body Classifier_Tests is
       use Decision_Tree_Classification;
       use Printing;
       use Float_Package;
+      use Natural_Package;
       Routine_Name      : constant String :=
                             "Classification_Tests.Test_Probability ";
       Iris_Data         : constant Multi_Output_Data_Record :=
@@ -208,6 +209,7 @@ package body Classifier_Tests is
       Prob_Prediction   : Weights.Weight_Lists_3D;
       Max_Arg           : Classifier_Types.Natural_List;
    begin
+      Put_Line ("Classification_Tests Toy Probabilities test");
       --  L357
       C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 1,
               Max_Features => 1);
@@ -221,20 +223,15 @@ package body Classifier_Tests is
                 " invalid Y vector");
       --  L359
       Classification_Fit (theClassifier, X, Y, No_Weights);
-      Print_Tree ("The Tree", theClassifier);
+      Print_Tree ("Toy Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
       --  Python proba : ndarray of shape (n_samples, n_classes) or
       --  list of n_outputs \ such arrays if n_outputs > 1
-      Put_Line ("Classification_Tests Probabilities test");
       Prob_Prediction := Predict_Probability (theClassifier, X);
-
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
 
-      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
-      Print_Value_Data_Lists_2D
-        ("Classification_Tests Probabilities Prediction: ", Prediction);
       if Column_Sums = Ones (Integer (X.Length)) then
          Put_Line
            ("Classification_Tests Probabilities Column_Sums test passed");
@@ -244,6 +241,10 @@ package body Classifier_Tests is
          Print_Weights
            (Routine_Name & " Column_Sums", Column_Sums);
       end if;
+
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Print_Value_Data_Lists_2D
+        ("Classification_Tests Probabilities Prediction: ", Prediction);
       New_Line;
 
       --  Iris probabilty test
@@ -269,27 +270,29 @@ package body Classifier_Tests is
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
 
       Prediction := Base_Decision_Tree.Predict (theClassifier, X_Iris);
-      Print_Value_Data_Lists_2D
-        ("Classification_Tests Probabilities Prediction: ", Prediction);
-      if Column_Sums = Ones (Integer (X_Iris.Length)) then
-         Put_Line
-           ("Classification_Tests Probabilities Iris Column_Sums test passed");
-      else
-         Put_Line
-           ("Classification_Tests Probabilities Iris Column_Sums test failed");
-         Print_Weights
-           (Routine_Name & " Iris Column_Sums", Column_Sums);
-      end if;
+--        Print_Value_Data_Lists_2D
+--          ("Classification_Tests Probabilities Prediction: ", Prediction);
+--        if Column_Sums = Ones (Integer (X_Iris.Length)) then
+--           Put_Line
+--             ("Classification_Tests Probabilities Iris Column_Sums test passed");
+--        else
+--           Put_Line
+--             ("Classification_Tests Probabilities Iris Column_Sums test failed");
+--           Print_Weights
+--             (Routine_Name & " Iris Column_Sums", Column_Sums);
+--        end if;
 
       Max_Arg := Arg_Max (Prob_Prediction.Element (1));
---        if Max_Arg = To_Integer_List (Prediction.Element (1)) then
+      Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
+                             Max_Arg);
+--        if Max_Arg = To_Natural_List (Prediction.Element (1)) then
 --           Put_Line
 --             ("Classification_Tests Probabilities Max_Arg test passed");
 --        else
 --           Put_Line
 --             ("Classification_Tests Probabilities Max_Arg test failed");
-         Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
-                             Max_Arg);
+--           Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
+--                               Max_Arg);
 --        end if;
 
       Graphviz_Exporter.C_Init

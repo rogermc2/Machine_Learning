@@ -50,6 +50,8 @@ package Classifier_Utilities is
    function To_Integer_List (Ints : ML_Types.Value_Data_List)
                              return Integer_List;
    function To_Natural_List (A : Natural_Array) return Natural_List;
+   function To_Natural_List (Numbers : ML_Types.Value_Data_List)
+                             return Natural_List;
    function To_Integer_Value_List (A : Integer_Array)
                                    return ML_Types.Value_Data_List;
    function To_Integer_Value_List_2D (A : Integer_Array)

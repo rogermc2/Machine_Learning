@@ -805,6 +805,29 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function To_Natural_List (Numbers : ML_Types.Value_Data_List)
+                             return Natural_List is
+      Item   : Value_Record;
+      Values : Natural_List;
+   begin
+      for index in Numbers.First_Index .. Numbers.Last_Index loop
+         Item := Numbers.Element (index);
+         Assert (Item.Value_Kind = Integer_Type,
+                 "Classifier_Utilities.To_Natural_List invalid item "
+                 & Integer'Image (index) & " data type is " &
+                   Data_Type'Image (Item.Value_Kind));
+         Assert (Item.Integer_Value >= 0,
+                 "Classifier_Utilities.To_Natural_List invalid value "
+                 & Integer'Image (Item.Integer_Value) & " should be >= 0.");
+         Values.Append (Natural (Item.Integer_Value));
+      end loop;
+
+      return Values;
+
+   end To_Natural_List;
+
+   --  -------------------------------------------------------------------------
+
    function To_Natural_Value_List (A : Natural_Array)
                                    return ML_Types.Value_Data_Lists_2D is
       Int_Array : Integer_Array (1 .. A'Length);
