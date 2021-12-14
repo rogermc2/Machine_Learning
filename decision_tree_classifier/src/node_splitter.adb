@@ -2,7 +2,7 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -242,7 +242,7 @@ package body Node_Splitter is
                               Num_Total_Constants   : in out Natural;
                               Best_Split            : in out Split_Record) is
       Routine_Name         : constant String :=
-                               "Node_Splitter.Find_Best_Split";
+                               "Node_Splitter.Find_Best_Split ";
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -267,28 +267,32 @@ package body Node_Splitter is
              Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
          Num_Visited_Features := Num_Visited_Features + 1;
-         --  L342
+         --  L339
          --  Draw a feature at random
-         --  F_J = random integer with 2 <= F_J <= F_I
-         F_J := 2 +
-           Maths.Random_Integer * (F_I - 2 - Num_Found_Constants);
+         --  F_J = random integer in the range
+         --        Num_Drawn_Constants + 1 .. F_I - Num_Found_Constants
+         --  Random_Integer has range 0 .. 1
+         F_J := Num_Drawn_Constants + 1 +
+           Maths.Random_Integer * (F_I - Num_Found_Constants - 1);
 
-         if F_J > Num_Known_Constants then
-            --  L349 F_J > Num_Known_Constants
-            --  F_J is in the interval
-            --  Num_Known_Constants .. F_I - Num_Found_Constants
-            F_J := F_J + Num_Found_Constants;
-            --  F_J is in the interval Num_ Total_Constants .. F_I
-            Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
-                     Stop_Row, F_I, F_J, Best_Split);
-         else --  L346
-            --  F_J is a constant in the interval
+         if F_J < Num_Known_Constants then
+            --  L343 F_J is a constant in the interval
             --  Num_Drawn_Constants ..  Num_Found_Constants
             Swap := Self.Feature_Indices.Element (Num_Drawn_Constants + 1);
             Self.Feature_Indices.Replace_Element
               (Num_Drawn_Constants + 1, Self.Feature_Indices.Element (F_J));
             Self.Feature_Indices.Replace_Element (F_J, Swap);
             Num_Drawn_Constants := Num_Drawn_Constants + 1;
+         else
+            --  L349 F_J >= Num_Known_Constants
+            --  F_J is in the interval
+            --  Num_Known_Constants .. F_I - Num_Found_Constants
+            F_J := F_J + Num_Found_Constants;
+            --  F_J is in the interval Num_ Total_Constants .. F_I
+            Put_Line (Routine_Name & "F_I, F_J: " & Integer'Image (F_I) &
+                     ", "  & Integer'Image (F_J));
+            Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
+                     Stop_Row, F_I, F_J, Best_Split);
          end if;
       end loop;  --  L430
 

@@ -47,6 +47,7 @@ package body Maths is
    function Random_Integer return Integer is
       use Random_Integer_Package;
    begin
+      --  Random_Integer_Range is range 0 .. 1
       return Integer (Random (Integer_Gen));
    end Random_Integer;
 
