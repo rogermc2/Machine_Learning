@@ -186,7 +186,7 @@ package body Classifier_Tests is
       use Decision_Tree_Classification;
       use Printing;
       use Float_Package;
---        use Natural_Package;
+      use Natural_Package;
       Routine_Name      : constant String :=
                             "Classification_Tests.Test_Probability ";
       Iris_Data         : constant Multi_Output_Data_Record :=
@@ -204,10 +204,10 @@ package body Classifier_Tests is
       No_Weights        : Weights.Weight_List :=
                             Float_Package.Empty_Vector;
       Num_Samples       : Natural;
---        Prediction        : ML_Types.Value_Data_Lists_2D;
+      Prediction        : ML_Types.Value_Data_Lists_2D;
       Column_Sums       : Weights.Weight_List;
       Prob_Prediction   : Weights.Weight_Lists_3D;
---        Max_Arg           : Classifier_Types.Natural_List;
+      Max_Arg           : Classifier_Types.Natural_List;
    begin
       Put_Line ("Classification_Tests Toy Probabilities test");
       --  L357
@@ -242,10 +242,10 @@ package body Classifier_Tests is
            (Routine_Name & " Column_Sums", Column_Sums);
       end if;
 
---        Prediction := Base_Decision_Tree.Predict (theClassifier, X);
---        Print_Value_Data_Lists_2D
---          ("Classification_Tests Probabilities Prediction: ", Prediction);
---        New_Line;
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Print_Value_Data_Lists_2D
+        ("Classification_Tests Probabilities Prediction: ", Prediction);
+      New_Line;
 
       --  Iris probabilty test
       X_Iris := Iris_Data.Feature_Values;
@@ -269,31 +269,31 @@ package body Classifier_Tests is
       Prob_Prediction := Predict_Probability (theClassifier, X_Iris);
       Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
 
---        Prediction := Base_Decision_Tree.Predict (theClassifier, X_Iris);
---        Print_Value_Data_Lists_2D
---          ("Classification_Tests Probabilities Prediction: ", Prediction);
---        if Column_Sums = Ones (Integer (X_Iris.Length)) then
---           Put_Line
---             ("Classification_Tests Probabilities Iris Column_Sums test passed");
---        else
---           Put_Line
---             ("Classification_Tests Probabilities Iris Column_Sums test failed");
---           Print_Weights
---             (Routine_Name & " Iris Column_Sums", Column_Sums);
---        end if;
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X_Iris);
+      Print_Value_Data_Lists_2D
+        ("Classification_Tests Probabilities Prediction: ", Prediction);
+      if Column_Sums = Ones (Integer (X_Iris.Length)) then
+         Put_Line
+           ("Classification_Tests Probabilities Iris Column_Sums test passed");
+      else
+         Put_Line
+           ("Classification_Tests Probabilities Iris Column_Sums test failed");
+         Print_Weights
+           (Routine_Name & " Iris Column_Sums", Column_Sums);
+      end if;
 
---        Max_Arg := Arg_Max (Prob_Prediction.Element (1));
---        Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
---                               Max_Arg);
---        if Max_Arg = To_Natural_List (Prediction.Element (1)) then
---           Put_Line
---             ("Classification_Tests Probabilities Max_Arg test passed");
---        else
---           Put_Line
---             ("Classification_Tests Probabilities Max_Arg test failed");
---           Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
---                               Max_Arg);
---        end if;
+      Max_Arg := Arg_Max (Prob_Prediction.Element (1));
+      Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
+                             Max_Arg);
+      if Max_Arg = To_Natural_List (Prediction.Element (1)) then
+         Put_Line
+           ("Classification_Tests Probabilities Max_Arg test passed");
+      else
+         Put_Line
+           ("Classification_Tests Probabilities Max_Arg test failed");
+         Print_Natural_List ("Classification_Tests Probabilities Max_Arg: ",
+                             Max_Arg);
+      end if;
 
       Graphviz_Exporter.C_Init
         (Exporter, theClassifier.Attributes.Decision_Tree);

@@ -21,6 +21,10 @@ package body Criterion is
       --  L220
       Criteria.Num_Outputs := Num_Outputs;
       Criteria.Num_Classes := Num_Classes;
+      Criteria.Sum_Total.Clear;
+      Criteria.Sum_Left.Clear;
+      Criteria.Sum_Right.Clear;
+      Criteria.Sample_Indices.Clear;
 
    end C_Init;
 
@@ -49,7 +53,7 @@ package body Criterion is
               Routine_Name & "Criteria.Num_Weighted_Right " &
                 Float'Image (Criteria.Num_Weighted_Right) &
                 " should be > 0.0.");
-      --  L662
+      --  L656
       for k in 1 .. Num_Outputs loop
          Sq_Count_Left := 0.0;
          Sq_Count_Right := 0.0;
@@ -63,12 +67,12 @@ package body Criterion is
             Count_K := Sum_Right_K.Element (c);
             Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
          end loop;
-      end loop;
 
-      Gini_Left := Gini_Left + 1.0 -
-        Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
-      Gini_Right := Gini_Right + 1.0 -
-        Sq_Count_Left / Criteria.Num_Weighted_Right ** 2;
+         Gini_Left := Gini_Left + 1.0 -
+           Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
+         Gini_Right := Gini_Right + 1.0 -
+           Sq_Count_Right / Criteria.Num_Weighted_Right ** 2;
+      end loop;
 
       Impurity_Left := Gini_Left / Float (Num_Outputs);
       Impurity_Right := Gini_Right / Float (Num_Outputs);
@@ -256,10 +260,20 @@ package body Criterion is
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float is
+--        Routine_Name   : constant String :=
+--                           "Criterion.Proxy_Impurity_Improvement ";
       Impurity_Left  : Float;
       Impurity_Right : Float;
    begin
       Children_Impurity_Gini (Criteria, Impurity_Left, Impurity_Right);
+--        Put_Line (Routine_Name & "Num_Weighted_Left " &
+--                    Float'Image (Criteria.Num_Weighted_Left));
+--        Put_Line (Routine_Name & "Num_Weighted_Right " &
+--                    Float'Image (Criteria.Num_Weighted_Right));
+--        Put_Line (Routine_Name & "Impurity_Left " &
+--                    Float'Image (Impurity_Left));
+--        Put_Line (Routine_Name & "Impurity_Right " &
+--                    Float'Image (Impurity_Right));
       return -Criteria.Num_Weighted_Right * Impurity_Right -
         Criteria.Num_Weighted_Left * Impurity_Left;
 

@@ -2,12 +2,12 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -16,12 +16,13 @@ package body Node_Splitter is
    procedure Evaluate_All_Splits (Splitter   : in out Splitter_Class;
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record);
-   procedure Process (Splitter              : in out Splitter_Class;
-                      Num_Total_Constants   : in out Natural;
-                      Num_Found_Constants   : in out Natural;
-                      Start_Row, Stop_Row   : Positive;
-                      F_I                   : in out Natural; F_J : Natural;
-                      Best_Split            : in out Split_Record);
+   procedure Process_Non_Constants
+     (Splitter              : in out Splitter_Class;
+      Num_Total_Constants   : in out Natural;
+      Num_Found_Constants   : in out Natural;
+      Start_Row, Stop_Row   : Positive;
+      F_I                   : in out Natural; F_J : Natural;
+      Best_Split            : in out Split_Record);
    procedure Update_Constants (Self                  : in out Splitter_Class;
                                Num_Known_Constants   : Natural;
                                Num_Found_Constants   : Natural);
@@ -92,7 +93,7 @@ package body Node_Splitter is
                                   Best       : in out Split_Record) is
       use ML_Types;
 --        Routine_Name              : constant String :=
---                                      "Node_Splitter.Evaluate_All_Splits ";
+--                                       "Node_Splitter.Evaluate_All_Splits ";
       Features_X                : constant ML_Types.Value_Data_List :=
                                     Splitter.Feature_Values;
       P_Index                   : Positive;
@@ -133,10 +134,10 @@ package body Node_Splitter is
    begin
       --  Set of features to be split:
       --  Splitter.Start_Index through Splitter.End_Index
-      --  L380 Evaluate all splits
+      --  L375 Evaluate all splits
       P_Index := Splitter.Start_Row;
       while P_Index < Splitter.Stop_Row loop
-         --  L383
+         --  L378
          while P_Index + 1 < Splitter.Stop_Row and
            Compare (Features_X, P_Index) loop
             --  L380
@@ -145,6 +146,7 @@ package body Node_Splitter is
 
          --  L384
          P_Index := P_Index + 1;
+--           Put_Line (Routine_Name & "L384 P_Index " & Integer'Image (P_Index));
          --  L388
          if P_Index <= Splitter.Stop_Row then
             Current.Split_Row := P_Index;
@@ -163,6 +165,9 @@ package body Node_Splitter is
                  Splitter.Criteria.Num_Weighted_Right >=
                    Splitter.Min_Leaf_Weight then
                   --  L409  Note: Improvements are negative values.
+                  --  Current_Proxy_Improvement is a proxy quantity such that
+                  --  the split that maximizes this value also maximizes the
+                  --  impurity improvement.
                   Current_Proxy_Improvement :=
                     Criterion.Proxy_Impurity_Improvement (Splitter.Criteria);
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
@@ -251,7 +256,9 @@ package body Node_Splitter is
       Stop_Row             : constant Positive := Self.Stop_Row;
       Num_Drawn_Constants  : Natural := 0;
       Num_Visited_Features : Natural := 0;
+      --  F_I is the Fisher-Yates shuffling index
       F_I                  : Natural := Num_Features;
+      --  F_J is the Fisher-Yates replacement index
       F_J                  : Natural;
       Swap                 : Natural;
    begin
@@ -275,9 +282,12 @@ package body Node_Splitter is
          F_J := Num_Drawn_Constants + 1 +
            Maths.Random_Integer * (F_I - Num_Found_Constants - 1);
 
+         --  Fisher-Yates shuffles by swapping values indexed by F_I and F_J
          if F_J < Num_Known_Constants then
-            --  L343 F_J is a constant in the interval
-            --  Num_Drawn_Constants ..  Num_Found_Constants
+            --  L343 F_J indexes a constant in the interval
+            --  Num_Drawn_Constants .. Num_Found_Constants
+            --  Implement Fisher-Yates shuffle by swapping value indexed by
+            --  swapping the value indexed by F_J with the last Drawn_Constant
             Swap := Self.Feature_Indices.Element (Num_Drawn_Constants + 1);
             Self.Feature_Indices.Replace_Element
               (Num_Drawn_Constants + 1, Self.Feature_Indices.Element (F_J));
@@ -286,15 +296,20 @@ package body Node_Splitter is
          else
             --  L349 F_J >= Num_Known_Constants
             --  F_J is in the interval
-            --  Num_Known_Constants .. F_I - Num_Found_Constants
+            --  Num_Known_Constants + 1 .. F_I - Num_Found_Constants
+            Assert (F_J > Num_Known_Constants and
+                      F_J <= F_I - Num_Found_Constants,
+                    Routine_Name & "F_J: " & Integer'Image (F_J) &
+                      "should be in the range " &
+                      Integer'Image (Num_Known_Constants + 1) &  ".. " &
+                      Integer'Image (F_I - Num_Found_Constants));
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
-            Put_Line (Routine_Name & "F_I, F_J: " & Integer'Image (F_I) &
-                     ", "  & Integer'Image (F_J));
-            Process (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
-                     Stop_Row, F_I, F_J, Best_Split);
+            Process_Non_Constants
+              (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
+               Stop_Row, F_I, F_J, Best_Split);
          end if;
-      end loop;  --  L430
+      end loop;  --  L415
 
    end Find_Best_Split;
 
@@ -392,53 +407,60 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Process (Splitter              : in out Splitter_Class;
-                      Num_Total_Constants   : in out Natural;
-                      Num_Found_Constants   : in out Natural;
-                      Start_Row, Stop_Row   : Positive;
-                      F_I                   : in out Natural; F_J : Natural;
-                      Best_Split            : in out Split_Record) is
+   procedure Process_Non_Constants (Splitter            : in out Splitter_Class;
+                                    Num_Total_Constants : in out Natural;
+                                    Num_Found_Constants : in out Natural;
+                                    Start_Row, Stop_Row : Positive;
+                                    F_I                 : in out Natural;
+                                    F_J                 : Natural;
+                                    Best_Split          : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
---        Routine_Name         : constant String := "Node_Splitter.Process ";
+--        Routine_Name         : constant String :=
+--                                 "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
       Swap                 : Natural;
    begin
-      --  L354 Sort samples along Current.Feature index;
+      --  L352
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
-      --  L358
+      --  L358 Sort samples along Current.Feature index
+      Splitter.Feature_Values.Clear;
       for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Splitter.Sample_Indices.Element (index);
          X_Samples := Splitter.X.Element (X_Samples_Row);
          --  Splitter.Feature_Values is a Value_Data_List
-         Splitter.Feature_Values.Replace_Element
-           (index, X_Samples (Current_Split.Feature));
+         Splitter.Feature_Values.Append (X_Samples (Current_Split.Feature));
       end loop;
 
       --  L361
       Sort (Splitter.Feature_Values);
       --  Splitter.Feature_Values is a value_data_list
       if Can_Split (Splitter, Num_Total_Constants, F_I, F_J) then
-         --  L375
+         --  L375 Implement Fisher-Yates permutation by swapping F_J feature
+         --  with preceding F_I feature
          F_I := F_I - 1;
-         Swap := Splitter.Feature_Indices.Element (F_I);
-         Splitter.Feature_Indices.Replace_Element
-           (F_I, Splitter.Feature_Indices.Element (F_J));
-         Splitter.Feature_Indices.Replace_Element (F_J, Swap);
+--           Put_Line (Routine_Name & "swapping features " & Integer'Image (F_I) &
+--                       " and " & Integer'Image (F_J));
+         if F_J /= F_I then
+            Swap := Splitter.Feature_Indices.Element (F_I);
+            Splitter.Feature_Indices.Replace_Element
+              (F_I, Splitter.Feature_Indices.Element (F_J));
+            Splitter.Feature_Indices.Replace_Element (F_J, Swap);
+         end if;
 
          --  L374 Reset the criterion to pos = start
          Criterion.Reset (Splitter.Criteria);
          Evaluate_All_Splits (Splitter, Current_Split, Best_Split);
-         --  L428
+         --  L415
 
-      else -- L366
+      else -- L366 can't split
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
       end if;
 
-   end Process;
+   end Process_Non_Constants;
 
    --  -------------------------------------------------------------------------
 
@@ -564,17 +586,11 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
-      Printing.Print_Split_Record
-        (Routine_Name & "L319 Best_Split record", Best_Split);
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
-      Printing.Print_Split_Record
-        (Routine_Name & "L417 Best_Split record", Best_Split);
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
-      --        Put_Line (Routine_Name & " reordered Best_Split.Improvement " &
-      --                    Float'Image (Best_Split.Improvement));
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
 
       --  L454
