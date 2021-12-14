@@ -18,12 +18,12 @@ package body Base_Decision_Tree is
    procedure Base_Fit_Checks
      (aClassifier       : in out Classifier;
       X                 : ML_Types.Value_Data_Lists_2D;
-      Y                 : ML_Types.Value_Data_Lists_2D;
+      Y                 : Classifier_Types.Natural_Lists_2D;
       Min_Samples_Split : out Positive;
       Sample_Weights    : in out Classifier_Types.Float_List);
    procedure Classification_Part
      (aClassifier            : in out Classifier;
-      Y                      : ML_Types.Value_Data_Lists_2D;
+      Y_Orig                 : ML_Types.Value_Data_Lists_2D;
       Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out ML_Types.Value_Data_Lists_2D;
       Expanded_Class_Weights : in out Classifier_Types.Float_List);
@@ -35,7 +35,7 @@ package body Base_Decision_Tree is
    procedure Base_Fit
      (aClassifier    : in out Classifier;
       X              : ML_Types.Value_Data_Lists_2D;
-      Y              : ML_Types.Value_Data_Lists_2D;
+      Y_Orig         : ML_Types.Value_Data_Lists_2D;
       Sample_Weights : out Weights.Weight_List) is
       use Ada.Containers;
       use Estimator;
@@ -51,17 +51,17 @@ package body Base_Decision_Tree is
       Sum_Sample_Weight     : Float := 0.0;
    begin
       Assert (not X.Is_Empty, Routine_Name & ", X is empty");
-      Assert (not Y.Is_Empty, Routine_Name & ", Y is empty");
+      Assert (not Y_Orig.Is_Empty, Routine_Name & ", Y is empty");
       if not Sample_Weights.Is_Empty then
          Assert (Sample_Weights.Length = X.Length, Routine_Name &
                    " Sample_Weights must be the same size as X.");
       end if;
 
       --  X is 2D list num samples x num features
-      --  Y is 2D list num classes x num outputs
+      --  Y_Orig is 2D list num classes x num outputs
       --  L207  Generates Y_Encoded and Classes
       if aClassifier.Estimator_Kind = Classifier_Estimator then
-         Classification_Part (aClassifier, Y, Y_Encoded,
+         Classification_Part (aClassifier, Y_Orig, Y_Encoded,
                               Classes, Expanded_Class_Weight);
       end if;
 
@@ -70,7 +70,7 @@ package body Base_Decision_Tree is
         Tree.Index_Range (X.Element (1).Length);
 
       --  L229
-      Base_Fit_Checks (aClassifier, X, Y, Min_Samples_Split, Sample_Weights);
+      Base_Fit_Checks (aClassifier, X, Y_Encoded, Min_Samples_Split, Sample_Weights);
       --  Base_Fit_Checks ends at L350
 
       Node_Splitter.C_Init
@@ -138,7 +138,7 @@ package body Base_Decision_Tree is
    procedure Base_Fit_Checks
      (aClassifier       : in out Classifier;
       X                 : ML_Types.Value_Data_Lists_2D;
-      Y                 : ML_Types.Value_Data_Lists_2D;
+      Y                 : Classifier_Types.Natural_Lists_2D;
       Min_Samples_Split : out Positive;
       Sample_Weights    : in out Classifier_Types.Float_List) is
 --        use Maths.Float_Math_Functions;
@@ -304,7 +304,7 @@ package body Base_Decision_Tree is
    --  based on L200 of _classes.py BasesDecisionTree.Fit
    procedure Classification_Part
      (aClassifier            : in out Classifier;
-      Y                      : ML_Types.Value_Data_Lists_2D;
+      Y_Orig                  : ML_Types.Value_Data_Lists_2D;
       Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out ML_Types.Value_Data_Lists_2D;
       Expanded_Class_Weights : in out Weights.Weight_List) is
@@ -314,7 +314,7 @@ package body Base_Decision_Tree is
       use Weights;
       Routine_Name : constant String :=
                        "Base_Decision_Tree.Classification_Part ";
-      Num_Outputs  : constant Count_Type := Y.Element (1).Length;
+      Num_Outputs  : constant Count_Type := Y_Orig.Element (1).Length;
       Y_Row        : Value_Data_List := Value_Data_Package.Empty_Vector;
       Yk_Row       : Value_Data_List := Value_Data_Package.Empty_Vector;
       YE_Row       : Natural_List := Natural_Package.Empty_Vector;
@@ -327,15 +327,16 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
       Y_Encoded.Clear;
       Classes.Clear;
-      Y_Encoded.Set_Length (Y.Length);
+      Y_Encoded.Set_Length (Y_Orig.Length);
       aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
 
       --  Y is 2D list num samples x num outputs
       --  Y_Encoded is 2D list num samples x num outputs
       --  L215  Initialize Y_Encoded
-      for class in Y.First_Index .. Y.Last_Index loop
+      for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
          Column.Clear;
-         for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+         for op in Y_Orig.Element (1).First_Index
+           .. Y_Orig.Element (1).Last_Index loop
             Column.Append (op);
          end loop;
          Y_Encoded.Replace_Element (class, Column);
@@ -343,17 +344,18 @@ package body Base_Decision_Tree is
 
       --  Classes is 2D list num outputs x num classes
       OP_Row.Set_Length (Num_Outputs);
-      for op in Y.Element (1).First_Index .. Y.Element (1).Last_Index loop
+      for op in Y_Orig.Element (1).First_Index
+        .. Y_Orig.Element (1).Last_Index loop
          Yk_Row.Clear;
-         for class in Y.First_Index .. Y.Last_Index loop
-            Y_Row := Y.Element (class);
+         for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
+            Y_Row := Y_Orig.Element (class);
             Yk_Row.Append (Y_Row.Element (op));
          end loop;
          Class_List := (Encode_Utils.Unique (Yk_Row, Inverse));
          aClassifier.Attributes.Decision_Tree.Num_Classes.Append
            (Positive (Class_List.Length));
 
-         for class in Y.First_Index .. Y.Last_Index loop
+         for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
             YE_Row := Y_Encoded.Element (class);
             YE_Row.Replace_Element (op, Inverse.Element (class));
             Y_Encoded.Replace_Element (class, YE_Row);
@@ -366,7 +368,7 @@ package body Base_Decision_Tree is
       --  L222
       if aClassifier.Parameters.Class_Weight /= No_Weight then
          Expanded_Class_Weights :=
-           Weights.Compute_Sample_Weight (No_Weight, Y);
+           Weights.Compute_Sample_Weight (No_Weight, Y_Orig);
       end if;
       --  L227
       Classes := aClassifier.Attributes.Classes;

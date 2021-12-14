@@ -115,7 +115,7 @@ package Base_Decision_Tree is
    procedure Base_Fit
      (aClassifier    : in out Classifier;
       X              : ML_Types.Value_Data_Lists_2D;
-      Y              : ML_Types.Value_Data_Lists_2D;
+      Y_Orig         : ML_Types.Value_Data_Lists_2D;
       Sample_Weights : out Weights.Weight_List);
    procedure C_Init
      (aClassifier              : in out Classifier;
