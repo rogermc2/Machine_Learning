@@ -164,16 +164,13 @@ package body Tree is
 
       --  L760  Apply returns a list containing the Node ID associated with
       --        each sample.
---        Printing.Print_Value_Data_Lists_2D (Routine_Name & " X", X);
       Samples := Apply (Self, X);
---        Printing.Print_Natural_List (Routine_Name & " samples", Samples);
       for index in Samples.First_Index .. Samples.Last_Index loop
          if Samples.Element (index) > 0 then
             Out_Data.Append (Values.Element (Samples.Element (index)));
          end if;
       end loop;
-      --        Put_Line (Routine_Name & ", samples size" &
-      --                    Count_Type'Image (Samples.Length));
+
       return Out_Data;
 
    end Predict;
