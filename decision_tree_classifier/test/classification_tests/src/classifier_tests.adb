@@ -265,16 +265,17 @@ package body Classifier_Tests is
       Y_Iris := Iris_Data.Label_Values;
       Assert (Integer (Y_Iris.Length) = Num_Samples, Routine_Name &
                 " invalid Y_Iris vector");
-      Print_Value_Data_List (Routine_Name & "Y_Iris",
-                             Transpose (Y_Iris).Element (1));
+--        Print_Value_Data_List (Routine_Name & "Y_Iris",
+--                               Transpose (Y_Iris).Element (1));
       Labels := Fit_Transform (LE_U, Transpose (Y_Iris).Element (1));
-      Print_Natural_List (Routine_Name & "Labels", Labels);
       for index in Labels.First_Index .. Labels.Last_Index loop
          Labels_1D.Clear;
          Label.Integer_Value := Labels (index);
          Labels_1D.Append (Label);
          Labels_2D.Append (Labels_1D);
       end loop;
+      Print_Value_Data_Lists_2D (Routine_Name & "Labels_2D",
+                                 Transpose (Labels_2D));
       --  L362
       Classification_Fit (theClassifier, X_Iris, Labels_2D, No_Weights);
       Print_Tree ("The Tree", theClassifier);
