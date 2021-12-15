@@ -387,20 +387,20 @@ package body Base_Decision_Tree is
                      X    : ML_Types.Value_Data_Lists_2D)
                       return ML_Types.Value_Data_Lists_2D is
       use Weights;
-      --          Routine_Name      : constant String := "Base_Decision_Tree.Predict";
+--        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
       --  Prob_A: num_samples x num_outputs x num_classes
       Prob_A            : constant Weight_Lists_3D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
       --  Prob_A: num_samples x num_classes
       Prob_Ak           : Weight_Lists_2D;
---        Class_Values      : ML_Types.Value_Data_List;
+      Class_Values      : ML_Types.Value_Data_List;
       Samples_2K        : Weight_Lists_2D;
       Samples           : Weight_Lists_2D;
       Classes           : Weight_List;
-      Selected_Classes  : Weight_List;
-      Selected_Class    : Positive;
+      Selected_Classes  : Classifier_Types.Integer_List;
+      Selected_Class    : Integer;
       Max_Indices       : Classifier_Types.Natural_List;  --  argmax
-      Class_Indices     : Classifier_Types.Natural_List;
+--        Class_Indices     : Classifier_Types.Natural_List;
       --  Prediction 1 x num samples
       Pred              : ML_Types.Value_Data_List;
       --  Predictions, num samples x num outputs
@@ -420,11 +420,14 @@ package body Base_Decision_Tree is
          Max_Indices := Classifier_Utilities.Arg_Max (Samples);
 --           Class_Indices := Self.Attributes.Classes;
          Selected_Classes.Clear;
-         --              Class_Values := Self.Attributes.Classes.Element (op);
+         Class_Values := Self.Attributes.Classes.Element (op);
          for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
             Classes := Samples.Element (index);
---              Selected_Class := Classes.Element (Max_Indices (index));
---              Selected_Classes.Append (Selected_Class);
+--              Put_Line (Routine_Name & "Selected_Class value: " &
+--                       Integer'Image (Class_Values.Element (Max_Indices (index)).Integer_Value));
+            Selected_Class :=
+                  Class_Values.Element (Max_Indices (index)).Integer_Value;
+            Selected_Classes.Append (Selected_Class);
          end loop;
          --
          --           Pred.Clear;
