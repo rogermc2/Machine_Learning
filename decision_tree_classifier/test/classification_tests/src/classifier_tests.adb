@@ -11,6 +11,7 @@ with Classification_Metrics;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
+with Label;
 with ML_Types;
 with Printing;
 with Tree;
@@ -184,6 +185,7 @@ package body Classifier_Tests is
    procedure Test_Probability  is
       use Classifier_Utilities;
       use Decision_Tree_Classification;
+      use Label;
       use Printing;
       use Float_Package;
       use Natural_Package;
@@ -198,6 +200,11 @@ package body Classifier_Tests is
                             To_Multi_Value_List (X_Array);
       Y                 : constant Value_Data_Lists_2D :=
                             To_Integer_Value_List_2D (Y_Array);
+      LE_U              : Label_Encoder (Class_Unique);
+      Labels            : Classifier_Types.Natural_List;
+      Label             : Value_Record (Integer_Type);
+      Labels_1D         : Value_Data_List;
+      Labels_2D         : Value_Data_Lists_2D;
       X_Iris            : Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y_Iris            : Value_Data_Lists_2D;
@@ -258,8 +265,18 @@ package body Classifier_Tests is
       Y_Iris := Iris_Data.Label_Values;
       Assert (Integer (Y_Iris.Length) = Num_Samples, Routine_Name &
                 " invalid Y_Iris vector");
+      Print_Value_Data_List (Routine_Name & "Y_Iris",
+                             Transpose (Y_Iris).Element (1));
+      Labels := Fit_Transform (LE_U, Transpose (Y_Iris).Element (1));
+      Print_Natural_List (Routine_Name & "Labels", Labels);
+      for index in Labels.First_Index .. Labels.Last_Index loop
+         Labels_1D.Clear;
+         Label.Integer_Value := Labels (index);
+         Labels_1D.Append (Label);
+         Labels_2D.Append (Labels_1D);
+      end loop;
       --  L362
-      Classification_Fit (theClassifier, X_Iris, Y_Iris, No_Weights);
+      Classification_Fit (theClassifier, X_Iris, Labels_2D, No_Weights);
       Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
