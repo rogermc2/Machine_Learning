@@ -188,7 +188,7 @@ package body Tree_Build is
       Is_Leaf          : Boolean := False;
    begin
       --  L324
-      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
+      Node_Splitter.Initialize (Splitter, X, Y_Encoded, Sample_Weight);
       if Best_Builder.Max_Leaf_Nodes <= 0 then
          raise Tree_Build_Error with
            "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
@@ -262,7 +262,7 @@ package body Tree_Build is
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
       --  L159
-      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
+      Node_Splitter.Initialize (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
 
       Data.Parent_Cursor := Node_Cursor;

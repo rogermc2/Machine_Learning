@@ -189,7 +189,7 @@ package body Ada_Tree_Builder is
       Top_Node_Cursor   : Cursor;
    begin
       --  L159
-      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weights);
+      Node_Splitter.Initialize (Splitter, X, Y_Encoded, Sample_Weights);
       Init_Tree_Builder (Builder, Splitter,
                          Min_Samples_Split     => Min_Samples_Split,
                          Min_Samples_Leaf      => Min_Samples_Leaf,
