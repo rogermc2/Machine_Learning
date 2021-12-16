@@ -48,7 +48,7 @@ package body Ada_Tree_Builder is
       Start_Row             : constant Positive := Data.Start;
       Stop_Row              : constant Positive := Data.Stop;
       Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
-      Impurity              : constant Float := Data.Impurity;
+      Impurity              : Float;
       Num_Constant_Features : Natural := Data.Num_Constant_Features;
       Is_Leaf_Node          : Boolean := False;
       Weighted_Node_Samples : Float := 0.0;
@@ -56,20 +56,17 @@ package body Ada_Tree_Builder is
       Child_Cursor          : Tree.Tree_Cursor;
       Node_ID               : Positive := 1;
    begin
-      if not First then
-         --  L202
-         --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-         Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
-                     Weighted_Node_Samples);
-      end if;
+      --  L202
+      --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
+      Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
+                  Weighted_Node_Samples);
 
-      --  L207
+      --  L204
       Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
         Builder.Splitter.Num_Samples = 1 or
         Num_Node_Samples < Builder.Min_Samples_Split or
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
-        Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
-      abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
+        Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf;
 
       if Data.Depth > Builder.Max_Depth then
          null;
@@ -95,40 +92,34 @@ package body Ada_Tree_Builder is
          --                       ") <= Epsilon");
       end if;
 
-      --  L220
-      if not First and not Is_Leaf_Node then
+      --  L209
+      if First then
+         Impurity := Gini_Node_Impurity (Builder.Splitter);
+         First := False;
+      else
+         Impurity := Data.Impurity;
+      end if;
+
+      Is_Leaf_Node := Is_Leaf_Node or
+      abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
+
+      --  L216
+      if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         --  L233
+         --  L221
          Is_Leaf_Node := Split.Split_Row > Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
-
-         --           if Split.Split_Row >= Stop_Row then
-         --              null;
-         --           elsif Split.Improvement + Epsilon <
-         --             Builder.Min_Impurity_Decrease then
-         --              Put_Line (Routine_Name & " L233 Split.Improvement + Epsilon " &
-         --                          Float'Image (Split.Improvement + Epsilon) &
-         --                          " < Builder.Min_Impurity_Decrease " &
-         --                          Float'Image (Builder.Min_Impurity_Decrease));
-         --           end if;
       end if;
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at
-      --  L245 and L251 respectively
-      --  L228
-      if First then
-         --  A node (the top node) has already been added to theTree
-         Child_Cursor := Data.Parent_Cursor;
-         First := False;
-      else
-         --  Add a node to theTree
-         Child_Cursor := Tree_Build.Add_Node
-           (theTree, Data.Parent_Cursor, Data.Branch, Is_Leaf_Node,
-            Split.Feature, Split.Threshold, Impurity, Num_Node_Samples,
-            Weighted_Node_Samples);
-      end if;
+      --  L238 and L245 respectively
+      --  L225 Add a node to theTree
+      Child_Cursor := Tree_Build.Add_Node
+        (theTree, Data.Parent_Cursor, Data.Branch, Is_Leaf_Node,
+         Split.Feature, Split.Threshold, Impurity, Num_Node_Samples,
+         Weighted_Node_Samples);
       Node_ID := Element (Child_Cursor).Node_ID;
 
       --  238
@@ -174,20 +165,16 @@ package body Ada_Tree_Builder is
       Min_Impurity_Decrease : Float) is
       use Build_Utils;
       use Tree.Nodes_Package;
-      use Node_Splitter;
       Routine_Name      : constant String := "Ada_Tree_Builder.Build_Tree ";
       Depth             : constant Natural := 1;
       Start_Row         : constant Positive := 1;
       Stop_Row          : constant Positive := Positive (Y_Encoded.Length);
       Builder           : Tree_Builder;
       First             : Boolean := True;
-      Impurity          : Float;
-      Constant_Features : Natural := 0;
-      Weighted_Samples  : Float := 0.0;
+      Impurity          : constant Float := Float'Last;
+      Constant_Features : constant Natural := 0;
       Stack             : Stack_List;
       Split             : Node_Splitter.Split_Record;
-      Values            : Weights.Weight_Lists_2D;
-      Top_Node_Cursor   : Cursor;
    begin
       --  L159
       Node_Splitter.Initialize (Splitter, X, Y_Encoded, Sample_Weights);
@@ -197,25 +184,8 @@ package body Ada_Tree_Builder is
                          Min_Weight_Leaf       => Min_Weight_Leaf,
                          Max_Depth             => Max_Depth,
                          Min_Impurity_Decrease => Min_Impurity_Decrease);
-      --  L206
-      Reset_Node (Builder.Splitter, Start_Row, Stop_Row, Weighted_Samples);
-      --  L214
-      Impurity := Gini_Node_Impurity (Builder.Splitter);
-      --  L221 first
-      Split := Split_Node (Builder.Splitter, Impurity, Constant_Features);
---        Printing.Print_Split_Record
---          (Routine_Name & "L229 first Split record", Split);
-      --  L229 first  Add_Node adds a node to theTree
-      Top_Node_Cursor := Tree_Build.Add_Node
-        (theTree, theTree.Nodes.Root, Tree.Top_Node, False, 1, 0.0, Impurity,
-         Splitter.Num_Samples, Splitter.Weighted_Samples);
-      --  L239 first
-      Node_Splitter.Node_Value (Builder.Splitter, Values);
-      theTree.Values.Clear;
-      theTree.Values.Append (Values);
-
       --  L184
-      Push (Stack, Start_Row, Stop_Row, Depth, Top_Node_Cursor,
+      Push (Stack, Start_Row, Stop_Row, Depth, theTree.Nodes.Root,
             Tree.Left_Node, Impurity, Constant_Features);
 
       --  L190
