@@ -48,20 +48,20 @@ package body Ada_Tree_Builder is
       Start_Row             : constant Positive := Data.Start;
       Stop_Row              : constant Positive := Data.Stop;
       Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
+      Impurity              : constant Float := Data.Impurity;
       Num_Constant_Features : Natural := Data.Num_Constant_Features;
       Is_Leaf_Node          : Boolean := False;
-      Impurity              : Float := Float'Last;
       Weighted_Node_Samples : Float := 0.0;
       Values                : Weights.Weight_Lists_2D;
       Child_Cursor          : Tree.Tree_Cursor;
       Node_ID               : Positive := 1;
    begin
-      --  L209
-      --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-      Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
-                  Weighted_Node_Samples);
-      --  L216
-      Impurity := Data.Impurity;
+      if not First then
+         --  L202
+         --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
+         Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
+                     Weighted_Node_Samples);
+      end if;
 
       --  L207
       Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
@@ -70,6 +70,7 @@ package body Ada_Tree_Builder is
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
       abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
+
       if Data.Depth > Builder.Max_Depth then
          null;
          --           Put_Line (Routine_Name &
@@ -95,7 +96,7 @@ package body Ada_Tree_Builder is
       end if;
 
       --  L220
-      if not Is_Leaf_Node then
+      if not First and not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
          --  L233

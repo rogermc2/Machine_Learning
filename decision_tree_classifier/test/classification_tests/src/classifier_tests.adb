@@ -275,8 +275,8 @@ package body Classifier_Tests is
             Labels_1D.Append (Label);
             Labels_2D.Append (Labels_1D);
         end loop;
-        Print_Value_Data_Lists_2D (Routine_Name & "Labels_2D",
-                                   Transpose (Labels_2D));
+--          Print_Value_Data_Lists_2D (Routine_Name & "Labels_2D",
+--                                     Transpose (Labels_2D));
         --  L362
         Classification_Fit (theClassifier, X_Iris, Labels_2D, No_Weights);
         Print_Tree ("The Tree", theClassifier);

@@ -672,7 +672,10 @@ package body Printing is
       aWeight : Float;
       Count   : Integer := 1;
    begin
-      Put_Line (Name & ": ");
+      if Name'Length > 0 then
+         Put_Line (Name & ": ");
+      end if;
+
       for Index in Data.First_Index .. Data.Last_Index loop
          aWeight := Data.Element (Index);
          Put (Float'Image (aWeight) & "   ");
@@ -692,8 +695,7 @@ package body Printing is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
-         Print_Weights ("Output" & Integer'Image (index),
-                        Data.Element (Index));
+         Print_Weights ("", Data.Element (Index));
       end loop;
       New_Line;
 

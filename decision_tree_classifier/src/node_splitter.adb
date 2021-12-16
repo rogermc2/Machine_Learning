@@ -543,7 +543,7 @@ package body Node_Splitter is
     end Reorder_Rows;
 
     --  -------------------------------------------------------------------------
-    --  Reset_Node resets the splitter Split based on node Split.Samples[start:end].
+    --  L179 Reset_Node resets the splitter Split based on node Split.Samples[start:end].
     procedure Reset_Node
       (Splitter              : in out Splitter_Class;
        Start_Row, Stop_Row   : Positive;
@@ -554,7 +554,7 @@ package body Node_Splitter is
                 Routine_Name & " stop index" & Integer'Image (Stop_Row) &
                   " should not be less than start index" &
                   Integer'Image (Start_Row));
-
+      --  L196
         Splitter.Start_Row := Start_Row;
         Splitter.Stop_Row := Stop_Row;
         Criterion.Classification_Init
