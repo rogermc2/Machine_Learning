@@ -420,7 +420,6 @@ package body Base_Decision_Tree is
 
             --  Samples: num_samples x num_classes
             Max_Indices := Classifier_Utilities.Arg_Max (Samples);
-            --           Class_Indices := Self.Attributes.Classes;
             Selected_Classes.Clear;
             Class_Values := Self.Attributes.Classes.Element (op);
             for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop

@@ -57,11 +57,11 @@ package Node_Splitter is
                       Max_Features  : Tree.Index_Range := 1;
                       Min_Leaf_Samples : Integer := 0;
                       Min_Leaf_Weight : Float := 0.0);
-    procedure Init (Self             : in out Splitter_Class;
-                    Input_X          : ML_Types.Value_Data_Lists_2D;
-                    Y_Encoded        : Classifier_Types.Natural_Lists_2D;
-                    Sample_Weight    : Weights.Weight_List;
-                    Min_Leaf_Samples : Positive := 1);
+    procedure Initialize (Self             : in out Splitter_Class;
+                          Input_X          : ML_Types.Value_Data_Lists_2D;
+                          Y_Encoded        : Classifier_Types.Natural_Lists_2D;
+                          Sample_Weight    : Weights.Weight_List;
+                          Min_Leaf_Samples : Positive := 1);
     function Entropy_Node_Impurity (Self : Splitter_Class) return Float;
     function Gini_Node_Impurity (Self : Splitter_Class) return Float;
     procedure Node_Value (Self   : Splitter_Class;
