@@ -687,7 +687,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Weights_Lists_2D (Name : String;
+   procedure Print_Weight_Lists_2D (Name : String;
                                      Data : Weights.Weight_Lists_2D) is
    begin
       Put_Line (Name & ": ");
@@ -697,7 +697,7 @@ package body Printing is
       end loop;
       New_Line;
 
-   end Print_Weights_Lists_2D;
+   end Print_Weight_Lists_2D;
 
    --  ------------------------------------------------------------------------
 
@@ -706,7 +706,7 @@ package body Printing is
    begin
       Put_Line (Name & ": ");
       for Index in Data.First_Index .. Data.Last_Index loop
-         Print_Weights_Lists_2D ("Output list" & Integer'Image (index),
+         Print_Weight_Lists_2D ("Output list" & Integer'Image (index),
                                  Data.Element (Index));
       end loop;
       New_Line;
