@@ -54,18 +54,18 @@ package Criterion is
    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float);
-   procedure Classification_Init
-     (Criteria             : in out Criterion_Class;
-      Y                    : Classifier_Types.Natural_Lists_2D;
-      --  Samples:
-      Sample_Indices       : Classifier_Types.Natural_List;
-      --  Sample_Weight contains the weight of each sample
-      Sample_Weight        : Weights.Weight_List;
-      Weighted_Samples     : Float;
-      Start_Row, Stop_Row  : Natural);
    function Impurity_Improvement
      (Criteria                                       : Criterion_Class;
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
+   procedure Initialize_Node_Criterion
+      (Criteria           : in out Criterion_Class;
+      Y                   : Classifier_Types.Natural_Lists_2D;
+      --  Samples:
+      Sample_Indices      : Classifier_Types.Natural_List;
+      --  Sample_Weight contains the weight of each sample
+      Sample_Weight       : Weights.Weight_List;
+      Weighted_Samples    : Float;
+      Start_Row, Stop_Row : Natural);
    function Node_Impurity_Entropy (Self : Criterion_Class) return Float;
    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;

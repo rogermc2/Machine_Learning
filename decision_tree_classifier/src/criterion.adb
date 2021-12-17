@@ -80,8 +80,33 @@ package body Criterion is
    end Children_Impurity_Gini;
 
    --  ------------------------------------------------------------------------
-   --  L59, L214, 276
-   procedure Classification_Init
+
+   function Impurity_Improvement (Criteria       : Criterion_Class;
+                                  Impurity_Parent, Impurity_Left,
+                                  Impurity_Right : Float) return float is
+      Routine_Name          : constant String := "Criterion.Impurity_Improvement";
+      Weighted_Node_Samples : constant Float :=
+                                Criteria.Num_Weighted_Node_Samples;
+      Right_Component       : constant Float
+        := (Criteria.Num_Weighted_Right / Weighted_Node_Samples) * Impurity_Right;
+      Left_Component        : constant Float
+        := (Criteria.Num_Weighted_Left / Weighted_Node_Samples) * Impurity_Left;
+   begin
+      Assert (Weighted_Node_Samples > 0.0,
+              Routine_Name & "Criteria.Weighted_Node_Samples " &
+                Float'Image (Weighted_Node_Samples) & " should be > 0.0");
+      Assert (Criteria.Num_Weighted_Samples > 0.0,
+              Routine_Name & "Criteria.Num_Weighted_Samples " &
+                Float'Image (Criteria.Num_Weighted_Samples) &
+                " should be > 0.0");
+      return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
+        (Impurity_Parent - Right_Component - Left_Component);
+
+   end Impurity_Improvement;
+
+   --  ------------------------------------------------------------------------
+   --  L59, L214, 280
+   procedure Initialize_Node_Criterion
      (Criteria            : in out Criterion_Class;
       Y                   : Classifier_Types.Natural_Lists_2D;
       Sample_Indices      : Classifier_Types.Natural_List;
@@ -110,7 +135,7 @@ package body Criterion is
       Criteria.Sum_Total.Clear;
 
       Assert (not Criteria.Num_Classes.Is_Empty,
-              "Criterion.Classification_Init Criteria.Num_Classes is empty");
+              "Criterion.Initialize_Node_Criterion Criteria.Num_Classes is empty");
       --  L321 Initialize Sum_Total
       --  Sum_Total dimensions: num outputs x num classes
       for row in 1 .. Num_Outputs loop
@@ -154,32 +179,7 @@ package body Criterion is
       Printing.Print_Weight_Lists_2D (Routine_Name & "Criteria.Sum_Total",
                                       Criteria.Sum_Total);
 
-   end Classification_Init;
-
-   --  ------------------------------------------------------------------------
-
-   function Impurity_Improvement (Criteria       : Criterion_Class;
-                                  Impurity_Parent, Impurity_Left,
-                                  Impurity_Right : Float) return float is
-      Routine_Name          : constant String := "Criterion.Impurity_Improvement";
-      Weighted_Node_Samples : constant Float :=
-                                Criteria.Num_Weighted_Node_Samples;
-      Right_Component       : constant Float
-        := (Criteria.Num_Weighted_Right / Weighted_Node_Samples) * Impurity_Right;
-      Left_Component        : constant Float
-        := (Criteria.Num_Weighted_Left / Weighted_Node_Samples) * Impurity_Left;
-   begin
-      Assert (Weighted_Node_Samples > 0.0,
-              Routine_Name & "Criteria.Weighted_Node_Samples " &
-                Float'Image (Weighted_Node_Samples) & " should be > 0.0");
-      Assert (Criteria.Num_Weighted_Samples > 0.0,
-              Routine_Name & "Criteria.Num_Weighted_Samples " &
-                Float'Image (Criteria.Num_Weighted_Samples) &
-                " should be > 0.0");
-      return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
-        (Impurity_Parent - Right_Component - Left_Component);
-
-   end Impurity_Improvement;
+   end Initialize_Node_Criterion;
 
    --  ------------------------------------------------------------------------
    --  L 605 Node_Impurity_Gini evaluates the Gini criterion as the impurity

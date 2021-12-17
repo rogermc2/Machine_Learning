@@ -557,7 +557,7 @@ package body Node_Splitter is
       --  L196
         Splitter.Start_Row := Start_Row;
         Splitter.Stop_Row := Stop_Row;
-        Criterion.Classification_Init
+        Criterion.Initialize_Node_Criterion
           (Splitter.Criteria, Splitter.Y, Splitter.Sample_Indices,
            Splitter.Sample_Weight, Splitter.Weighted_Samples,
            Start_Row, Stop_Row);
