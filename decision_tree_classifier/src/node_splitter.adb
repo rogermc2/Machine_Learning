@@ -610,16 +610,19 @@ package body Node_Splitter is
       Num_Found_Constants  : Natural := 0;
       Best_Split           : Split_Record;
    begin
-      --  L277 samples is a pointer to self.samples
-      --  L281 features is a pointer to self.features
-      --  L282 constant_features is a pointer to self.constant_features
-      --  L285 Xf is a pointer to self.feature_values
+      --  L271 samples is a pointer to self.samples
+      --  L275 features is a pointer to self.features
+      --  L276 constant_features is a pointer to self.constant_features
+      --  L279 Xf is a pointer to self.feature_values
       Assert (not Self.Sample_Indices.Is_Empty, Routine_Name &
                 " called with empty Sample_Indices");
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
-      Put_Line (Routine_Name & "L319");
+      Put_Line (Routine_Name & "L319 Feature_Values Length" &
+                  Integer'Image (Integer (Self.Feature_Values.Length)));
+      Put_Line (Routine_Name & "L319 Feature_Indices Length" &
+                  Integer'Image (Integer (Self.Feature_Indices.Length)));
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
       Put_Line (Routine_Name & "L417");
