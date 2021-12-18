@@ -369,7 +369,7 @@ package body Node_Splitter is
          end if;
       end loop;
 
-      --  L160 Number of samples is the number of positively weighted samples.
+      --  L160 Self.Number of samples is the number of positively weighted samples.
       Self.Num_Samples := Positive (Self.Sample_Indices.Length);
       Self.Weighted_Samples := Weighted_Samples;
 
@@ -379,11 +379,12 @@ package body Node_Splitter is
          Self.Feature_Indices.Append (index);
       end loop;
 
-      --  L171
-      Self.Feature_Values.Clear;
+      --  L171 realloc deallocates the old object pointed to by ptr and returns
+      --  a pointer to a new object that has the size specified by size.
+      --  The contents of the new object is identical to that of the old object
+      --  prior to deallocation, up to the lesser of the new and old sizes.
       --  Self.Feature_Values is set by Process_Non_Constants
       Self.Feature_Values.Set_Length (Count_Type (Num_Samples));
-      Self.Constant_Features_I.Clear;
       Self.Constant_Features_I.Set_Length (Count_Type (Num_Features));
 
       --  L250
