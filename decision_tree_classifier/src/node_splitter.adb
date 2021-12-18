@@ -2,7 +2,7 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -94,14 +94,14 @@ package body Node_Splitter is
       use ML_Types;
       Routine_Name              : constant String :=
                                     "Node_Splitter.Evaluate_All_Splits ";
-      Features_X                : constant ML_Types.Value_Data_List :=
+      Feature_Values            : constant ML_Types.Value_Data_List :=
                                     Splitter.Feature_Values;
       P_Index                   : Positive;
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
 
-      function Compare (Features   : ML_Types.Value_Data_List;
-                        P_Index    : Positive) return Boolean is
+      function Compare (Features : ML_Types.Value_Data_List;
+                        P_Index  : Positive) return Boolean is
          use ML_Types;
          Feature_Index : constant Positive := P_Index - Splitter.Start_Row + 1;
          XP            : constant Value_Record :=
@@ -139,10 +139,10 @@ package body Node_Splitter is
       --  Set of features to be split:
       --  Splitter.Start_Index through Splitter.End_Index
       --  L375 Evaluate all splits
-      Assert (Integer (Features_X.Length) >=
+      Assert (Integer (Feature_Values.Length) >=
                 Splitter.Stop_Row - Splitter.Start_Row + 1, Routine_Name &
-                "Invalid Features_X.Length " &
-                Integer'Image (Integer (Features_X.Length)));
+                "Invalid Feature_Values Length " &
+                Integer'Image (Integer (Feature_Values.Length)));
       P_Index := Splitter.Start_Row;
       while P_Index < Splitter.Stop_Row loop
          --  L378
@@ -152,7 +152,7 @@ package body Node_Splitter is
          --           Put_Line (Routine_Name & "L378 Features_X length " &
          --                       Integer'Image (Integer (Features_X.Length)));
          while P_Index + 1 < Splitter.Stop_Row and
-           Compare (Features_X, P_Index) loop
+           Compare (Feature_Values, P_Index) loop
             --             Put_Line (Routine_Name & "L380 P_Index " & Integer'Image (P_Index));
             --  L380
             P_Index := P_Index + 1;
@@ -189,26 +189,26 @@ package body Node_Splitter is
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
-                     case Features_X.Element (P_Index).Value_Kind is
+                     case Feature_Values.Element (P_Index).Value_Kind is
                         when Float_Type =>
                            Current.Threshold := 0.5 *
-                             (Features_X.Element (P_Index - 1).Float_Value
-                              + Features_X.Element (P_Index).Float_Value);
+                             (Feature_Values.Element (P_Index - 1).Float_Value
+                              + Feature_Values.Element (P_Index).Float_Value);
                            if Current.Threshold =
-                             Features_X.Element (P_Index).Float_Value or
+                             Feature_Values.Element (P_Index).Float_Value or
                              Current.Threshold = Float'Last or
                              Current.Threshold = (-Float'Last) then
-                              case Features_X.Element
+                              case Feature_Values.Element
                                 (P_Index - 1).Value_Kind is
                                  when Float_Type =>
-                                    Current.Threshold := Features_X.Element
+                                    Current.Threshold := Feature_Values.Element
                                       (P_Index - 1).Float_Value;
                                  when Integer_Type =>
                                     Current.Threshold :=
-                                      Float (Features_X.Element
+                                      Float (Feature_Values.Element
                                              (P_Index - 1).Integer_Value);
                                  when Boolean_Type =>
-                                    if Features_X.Element
+                                    if Feature_Values.Element
                                       (P_Index - 1).Boolean_Value then
                                        Current.Threshold := 1.0;
                                     else
@@ -220,15 +220,15 @@ package body Node_Splitter is
 
                         when Integer_Type =>
                            Current.Threshold := 0.5 * Float
-                             (Features_X.Element (P_Index - 1).Integer_Value
-                              + Features_X.Element (P_Index).Integer_Value);
+                             (Feature_Values.Element (P_Index - 1).Integer_Value
+                              + Feature_Values.Element (P_Index).Integer_Value);
                            if Current.Threshold =
-                             Float (Features_X.Element (P_Index).
+                             Float (Feature_Values.Element (P_Index).
                                         Integer_Value) or
                                Current.Threshold = Float'Last or
                                Current.Threshold = (-Float'Last) then
                               Current.Threshold :=
-                                Float (Features_X.Element (P_Index - 1).
+                                Float (Feature_Values.Element (P_Index - 1).
                                            Integer_Value);
                            end if;
 
@@ -441,8 +441,8 @@ package body Node_Splitter is
                                     Best_Split          : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
---        Routine_Name         : constant String :=
---                                 "Node_Splitter.Process_Non_Constants ";
+      --        Routine_Name         : constant String :=
+      --                                 "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -612,10 +612,10 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
---        Put_Line (Routine_Name & "L319 Feature_Values Length" &
---                    Integer'Image (Integer (Self.Feature_Values.Length)));
---        Put_Line (Routine_Name & "L319 Feature_Indices Length" &
---                    Integer'Image (Integer (Self.Feature_Indices.Length)));
+      Put_Line (Routine_Name & "L319 Feature_Values Length" &
+                  Integer'Image (Integer (Self.Feature_Values.Length)));
+      Put_Line (Routine_Name & "L319 Feature_Indices Length" &
+                  Integer'Image (Integer (Self.Feature_Indices.Length)));
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
       --  L417  Reorganize into samples
