@@ -115,7 +115,7 @@ package body Criterion is
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
-      Routine_Name    : constant String := "Criterion.Classification_Init ";
+      Routine_Name    : constant String := "Criterion.Initialize_Node_Criterion ";
       Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
       Sum_Total_K     : Classifier_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
@@ -134,8 +134,8 @@ package body Criterion is
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
 
-      Assert (not Criteria.Num_Classes.Is_Empty,
-              "Criterion.Initialize_Node_Criterion Criteria.Num_Classes is empty");
+      Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
+              " Criteria.Num_Classes is empty");
       --  L321 Initialize Sum_Total
       --  Sum_Total dimensions: num outputs x num classes
       for row in 1 .. Num_Outputs loop
