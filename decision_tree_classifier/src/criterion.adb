@@ -268,7 +268,7 @@ package body Criterion is
         Impurity_Left  : Float;
         Impurity_Right : Float;
     begin
-        Printing.Print_Criterion (Routine_Name & "Criteria", Criteria);
+--          Printing.Print_Criterion (Routine_Name & "Criteria", Criteria);
         Children_Impurity_Gini (Criteria, Impurity_Left, Impurity_Right);
         --        Put_Line (Routine_Name & "Num_Weighted_Left " &
         --                    Float'Image (Criteria.Num_Weighted_Left));

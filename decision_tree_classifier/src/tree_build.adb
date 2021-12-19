@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 with Build_Utils;
@@ -85,6 +85,7 @@ package body Tree_Build is
       Res                : in out Build_Utils.Priority_Record) is
       use Ada.Containers;
       use Tree.Nodes_Package;
+      Routine_Name          : constant String := "Tree_Build.Add_Split_Node";
       Parent_Node           : constant Tree.Tree_Node :=
                                 Element (Parent_Cursor);
       Num_Samples           : constant Positive :=
@@ -97,6 +98,7 @@ package body Tree_Build is
       Values                : Weights.Weight_Lists_2D;
    begin
       --  L429
+      Put_Line (Routine_Name & "L429 Reset_Node");
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
                                 Splitter.Weighted_Samples);
       if Is_First then
