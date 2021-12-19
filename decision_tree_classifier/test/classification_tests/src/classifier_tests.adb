@@ -15,6 +15,7 @@ with Label;
 with ML_Types;
 with Printing;
 with Tree;
+with Utilities;
 with Weights;
 
 package body Classifier_Tests is
@@ -208,6 +209,7 @@ package body Classifier_Tests is
         X_Iris            : Value_Data_Lists_2D;
         --  Y: num outputs x num classes
         Y_Iris            : Value_Data_Lists_2D;
+        Iris_Perm         : Value_Data_List;
         No_Weights        : Weights.Weight_List :=
                               Float_Package.Empty_Vector;
         Num_Samples       : Natural;
@@ -268,6 +270,8 @@ package body Classifier_Tests is
                   " invalid Y_Iris vector");
         --        Print_Value_Data_List (Routine_Name & "Y_Iris",
         --                               Transpose (Y_Iris).Element (1));
+      Iris_Perm := Utilities.Permute (Transpose (Y_Iris).Element (1));
+      Printing.Print_Value_Data_List (Routine_Name & "Iris_Perm", Iris_Perm);
         Labels := Fit_Transform (LE_U, Transpose (Y_Iris).Element (1));
         for index in Labels.First_Index .. Labels.Last_Index loop
             Labels_1D.Clear;

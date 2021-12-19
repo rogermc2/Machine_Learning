@@ -345,6 +345,41 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Permute (aList : ML_Types.Value_Data_List)
+                     return ML_Types.Value_Data_List is
+      use ML_Types;
+      Permutation : Value_Data_List := aList;
+      List_Length : constant Positive := Positive (Permutation.Length);
+      procedure Recurse (K : Positive) is
+         Swap : Value_Record;
+      begin
+         if K > 1 then
+            for index in 1 .. K loop
+               if K mod 2 = 0 then
+                  Swap := Permutation.Element (index);
+                  Permutation.Replace_Element
+                    (index, Permutation.Element (K - 1));
+                  Permutation.Replace_Element (K - 1, Swap);
+               else
+                  Swap := Permutation.First_Element;
+                  Permutation.Replace_Element
+                    (1, Permutation.Element (K + 1));
+                  Permutation.Replace_Element (K + 1, Swap);
+               end if;
+            end loop;
+            Recurse (K - 1);
+         end if;
+      end Recurse;
+   begin
+      if List_Length > 1 then
+         Recurse (List_Length - 1);
+      end if;
+
+      return Permutation;
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    function Predictions (Node : Tree_Node_Type) return Predictions_List is
       use ML_Types;
       use Prediction_Data_Package;
@@ -390,13 +425,13 @@ package body Utilities is
       Put_Line (Message & " best question:");
       Put (Feature & " = ");
       case Feature_Kind is
-         when Integer_Type =>
-            Put_Line (Integer'Image (Question.Integer_Value));
-         when Float_Type =>
-            Put_Line (Float'Image (Question.Float_Value));
-         when Boolean_Type =>
-            Put_Line (Boolean'Image (Question.Boolean_Value));
-         when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
+      when Integer_Type =>
+         Put_Line (Integer'Image (Question.Integer_Value));
+      when Float_Type =>
+         Put_Line (Float'Image (Question.Float_Value));
+      when Boolean_Type =>
+         Put_Line (Boolean'Image (Question.Boolean_Value));
+      when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
       end case;
       Put_Line ("Gain = " & Float'Image (Builder.Gain (Best_Split)));
 
@@ -463,13 +498,13 @@ package body Utilities is
                   " value record:");
       Put ("  Value: ");
       case Value_Kind is
-         when Integer_Type =>
-            Put_Line (Integer'Image (Value.Integer_Value));
-         when Float_Type =>
-            Put_Line (Float'Image (Value.Float_Value));
-         when Boolean_Type =>
-            Put_Line (Boolean'Image (Value.Boolean_Value));
-         when UB_String_Type => Put_Line (To_String (Value.UB_String_Value));
+      when Integer_Type =>
+         Put_Line (Integer'Image (Value.Integer_Value));
+      when Float_Type =>
+         Put_Line (Float'Image (Value.Float_Value));
+      when Boolean_Type =>
+         Put_Line (Boolean'Image (Value.Boolean_Value));
+      when UB_String_Type => Put_Line (To_String (Value.UB_String_Value));
       end case;
 
    end Print_Value_Record;
@@ -532,14 +567,14 @@ package body Utilities is
       Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
       Print_Question ("    Question", Node.Question);
       case Node.Node_Type is
-         when Prediction_Node =>
-            Print_Rows ("        Rows:", Node.Rows);
-            Print_Row ("    Prediction:", Node.Prediction);
-         when Decision_Node =>
-            Print_Rows ("    True Rows:", Node.True_Branch);
-            Print_Rows ("    False Rows:", Node.False_Branch);
-         when Undefined_Node =>
-            Put_Line (" is not defined.");
+      when Prediction_Node =>
+         Print_Rows ("        Rows:", Node.Rows);
+         Print_Row ("    Prediction:", Node.Prediction);
+      when Decision_Node =>
+         Print_Rows ("    True Rows:", Node.True_Branch);
+         Print_Rows ("    False Rows:", Node.False_Branch);
+      when Undefined_Node =>
+         Put_Line (" is not defined.");
       end case;
 
    end Print_Node;
@@ -551,18 +586,18 @@ package body Utilities is
    begin
       Put_Line (Offset & "    gini = " & Float'Image (Node.Gini));
       case Node.Node_Type is
-         when Prediction_Node =>
-            Print_Row ("    Prediction:", Node.Prediction);
-         when Decision_Node =>
-            Put_Line (Offset & "    samples = " &
-                        Integer'Image (Integer (Node.True_Branch.Length) +
-                          Integer (Node.False_Branch.Length)));
-            Put_Line (Offset & "    value = [" &
-                        Integer'Image (Integer (Node.True_Branch.Length)) & ","
-                      & Integer'Image (Integer (Node.False_Branch.Length))
-                      & "]");
-         when Undefined_Node =>
-            Put_Line (" is not defined.");
+      when Prediction_Node =>
+         Print_Row ("    Prediction:", Node.Prediction);
+      when Decision_Node =>
+         Put_Line (Offset & "    samples = " &
+                     Integer'Image (Integer (Node.True_Branch.Length) +
+                       Integer (Node.False_Branch.Length)));
+         Put_Line (Offset & "    value = [" &
+                     Integer'Image (Integer (Node.True_Branch.Length)) & ","
+                   & Integer'Image (Integer (Node.False_Branch.Length))
+                   & "]");
+      when Undefined_Node =>
+         Put_Line (" is not defined.");
       end case;
 
    end Print_Node_Data;
@@ -603,13 +638,13 @@ package body Utilities is
       Put_Line (Message & " question:");
       Put ("  Feature " & "'" & Col & "'" & " = ");
       case Feature_Kind is
-         when Integer_Type =>
-            Put_Line (Integer'Image (Question.Integer_Value));
-         when Float_Type =>
-            Put_Line (Float'Image (Question.Float_Value));
-         when Boolean_Type =>
-            Put_Line (Boolean'Image (Question.Boolean_Value));
-         when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
+      when Integer_Type =>
+         Put_Line (Integer'Image (Question.Integer_Value));
+      when Float_Type =>
+         Put_Line (Float'Image (Question.Float_Value));
+      when Boolean_Type =>
+         Put_Line (Boolean'Image (Question.Boolean_Value));
+      when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
       end case;
       Put_Line ("  Gain " & Float'Image (Question.Gain));
 
@@ -626,8 +661,8 @@ package body Utilities is
       Put (Message);
       Put (" raw question: Is " & Col);
       case Data_Kind is
-         when Integer_Type | Float_Type => Put (" >= ");
-         when others => Put (" = ");
+      when Integer_Type | Float_Type => Put (" >= ");
+      when others => Put (" = ");
       end case;
       Put_Line (" " & Value);
    end Print_Raw_Question;
@@ -639,23 +674,23 @@ package body Utilities is
    begin
       Put ("Is " & To_String (Question.Feature_Name));
       case Question.Feature_Kind is
-         when Integer_Type =>
-            Put (" >= " & Integer'Image
-                 (Question.Integer_Value));
-         when Float_Type =>
-            Put (" >= " & Float'Image
-                 (Question.Float_Value));
-         when Boolean_Type =>
-            Put (" = " & Boolean'Image
-                 (Question.Boolean_Value));
-         when UB_String_Type =>
-            UB_String := Question.UB_String_Value;
-            if Is_Integer (UB_String) or else
-              Is_Float (UB_String) then
-               Put (" >= " & To_String (UB_String));
-            else
-               Put (" = " & To_String (UB_String));
-            end if;
+      when Integer_Type =>
+         Put (" >= " & Integer'Image
+              (Question.Integer_Value));
+      when Float_Type =>
+         Put (" >= " & Float'Image
+              (Question.Float_Value));
+      when Boolean_Type =>
+         Put (" = " & Boolean'Image
+              (Question.Boolean_Value));
+      when UB_String_Type =>
+         UB_String := Question.UB_String_Value;
+         if Is_Integer (UB_String) or else
+           Is_Float (UB_String) then
+            Put (" >= " & To_String (UB_String));
+         else
+            Put (" = " & To_String (UB_String));
+         end if;
       end case;
       Put_Line ("?");
 
@@ -788,14 +823,14 @@ package body Utilities is
       while Has_Element (Curs) loop
          Data := Element (Curs);
          case Data.Feature_Kind is
-            when Boolean_Type =>
-               Put (" " & Boolean'Image (Data.Boolean_Value));
-            when Float_Type =>
-               Put (" " & Float'Image (Data.Float_Value));
-            when Integer_Type =>
-               Put (" " & Integer'Image (Data.Integer_Value));
-            when UB_String_Type =>
-               Put (" " & To_String (Data.UB_String_Value));
+         when Boolean_Type =>
+            Put (" " & Boolean'Image (Data.Boolean_Value));
+         when Float_Type =>
+            Put (" " & Float'Image (Data.Float_Value));
+         when Integer_Type =>
+            Put (" " & Integer'Image (Data.Integer_Value));
+         when UB_String_Type =>
+            Put (" " & To_String (Data.UB_String_Value));
          end case;
          Next (Curs);
       end loop;
@@ -844,17 +879,17 @@ package body Utilities is
                   Value       : Value_Record (Feature_Types (f_index));
                begin
                   case Feature_Types (f_index) is
-                     when Boolean_Type =>
-                        Value.Boolean_Value :=
-                          Boolean'Value (To_String (Feat_String));
-                     when Integer_Type =>
-                        Value.Integer_Value :=
-                          Integer'Value (To_String (Feat_String));
-                     when Float_Type =>
-                        Value.Float_Value :=
-                          Float'Value (To_String (Feat_String));
-                     when UB_String_Type =>
-                        Value.UB_String_Value := Feat_String;
+                  when Boolean_Type =>
+                     Value.Boolean_Value :=
+                       Boolean'Value (To_String (Feat_String));
+                  when Integer_Type =>
+                     Value.Integer_Value :=
+                       Integer'Value (To_String (Feat_String));
+                  when Float_Type =>
+                     Value.Float_Value :=
+                       Float'Value (To_String (Feat_String));
+                  when UB_String_Type =>
+                     Value.UB_String_Value := Feat_String;
                   end case;
                   Feature_Values.Append (Value);
                end;  --  declare block
@@ -865,17 +900,17 @@ package body Utilities is
                Label_Value : Value_Record (Label_Type);
             begin
                case Label_Type is
-                  when Boolean_Type =>
-                     Label_Value.Boolean_Value :=
-                       Boolean'Value (To_String (Label));
-                  when Integer_Type =>
-                     Label_Value.Integer_Value :=
-                       Integer'Value (To_String (Label));
-                  when Float_Type =>
-                     Label_Value.Float_Value :=
-                       Float'Value (To_String (Label));
-                  when UB_String_Type =>
-                     Label_Value.UB_String_Value := Label;
+               when Boolean_Type =>
+                  Label_Value.Boolean_Value :=
+                    Boolean'Value (To_String (Label));
+               when Integer_Type =>
+                  Label_Value.Integer_Value :=
+                    Integer'Value (To_String (Label));
+               when Float_Type =>
+                  Label_Value.Float_Value :=
+                    Float'Value (To_String (Label));
+               when UB_String_Type =>
+                  Label_Value.UB_String_Value := Label;
                end case;
                Label_Values.Append (Label_Value);
             end;  --  declare block;
@@ -954,44 +989,44 @@ package body Utilities is
                     Get_Data_Type (Row2_Features (col));
                   Value_String := Data.Features (col);
                   case Feature_Data_Type is
-                     when Boolean_Type =>
-                        declare
-                           Feature_Value : Value_Data (Boolean_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.Boolean_Value :=
-                             Boolean'Value (To_String (Value_String));
-                           Add_To_Set (Feature_Value);
-                        end;
+                  when Boolean_Type =>
+                     declare
+                        Feature_Value : Value_Data (Boolean_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.Boolean_Value :=
+                          Boolean'Value (To_String (Value_String));
+                        Add_To_Set (Feature_Value);
+                     end;
 
-                     when Float_Type =>
-                        declare
-                           Feature_Value : Value_Data (Float_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.Float_Value :=
-                             Float'Value (To_String (Value_String));
-                           Add_To_Set (Feature_Value);
-                        end;
+                  when Float_Type =>
+                     declare
+                        Feature_Value : Value_Data (Float_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.Float_Value :=
+                          Float'Value (To_String (Value_String));
+                        Add_To_Set (Feature_Value);
+                     end;
 
-                     when Integer_Type =>
-                        declare
-                           Feature_Value : Value_Data (Integer_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.Integer_Value :=
-                             Integer'Value (To_String (Value_String));
-                           Add_To_Set (Feature_Value);
-                        end;
+                  when Integer_Type =>
+                     declare
+                        Feature_Value : Value_Data (Integer_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.Integer_Value :=
+                          Integer'Value (To_String (Value_String));
+                        Add_To_Set (Feature_Value);
+                     end;
 
-                     when UB_String_Type =>
-                        declare
-                           Feature_Value : Value_Data (UB_String_Type);
-                        begin
-                           Feature_Value.Feature_Name := Feature;
-                           Feature_Value.UB_String_Value := Value_String;
-                           Add_To_Set (Feature_Value);
-                        end;
+                  when UB_String_Type =>
+                     declare
+                        Feature_Value : Value_Data (UB_String_Type);
+                     begin
+                        Feature_Value.Feature_Name := Feature;
+                        Feature_Value.UB_String_Value := Value_String;
+                        Add_To_Set (Feature_Value);
+                     end;
                   end case;
                end if;
             end loop;
