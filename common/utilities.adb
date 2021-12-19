@@ -354,17 +354,17 @@ package body Utilities is
          Swap : Value_Record;
       begin
          if K > 1 then
-            for index in 1 .. K loop
+            for index in 1 .. K - 1 loop
                if K mod 2 = 0 then
                   Swap := Permutation.Element (index);
                   Permutation.Replace_Element
-                    (index, Permutation.Element (K - 1));
-                  Permutation.Replace_Element (K - 1, Swap);
+                    (index, Permutation.Element (K));
+                  Permutation.Replace_Element (K, Swap);
                else
                   Swap := Permutation.First_Element;
                   Permutation.Replace_Element
-                    (1, Permutation.Element (K + 1));
-                  Permutation.Replace_Element (K + 1, Swap);
+                    (1, Permutation.Element (K));
+                  Permutation.Replace_Element (K, Swap);
                end if;
             end loop;
             Recurse (K - 1);

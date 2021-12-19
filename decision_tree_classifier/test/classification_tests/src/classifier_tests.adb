@@ -207,9 +207,10 @@ package body Classifier_Tests is
         Labels_1D         : Value_Data_List;
         Labels_2D         : Value_Data_Lists_2D;
         X_Iris            : Value_Data_Lists_2D;
+        X_Perm            : Value_Data_List;
         --  Y: num outputs x num classes
         Y_Iris            : Value_Data_Lists_2D;
-        Iris_Perm         : Value_Data_List;
+        Y_Perm            : Value_Data_List;
         No_Weights        : Weights.Weight_List :=
                               Float_Package.Empty_Vector;
         Num_Samples       : Natural;
@@ -220,8 +221,8 @@ package body Classifier_Tests is
     begin
         Put_Line ("Classification_Tests Toy Probabilities test");
         --  L357
-        C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria, Max_Depth => 1,
-                Max_Features => 1);
+        C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria,
+                Max_Depth => 1, Max_Features => 1);
 
         Num_Samples := Natural (X.Length);
         Put_Line (Routine_Name);
@@ -270,8 +271,15 @@ package body Classifier_Tests is
                   " invalid Y_Iris vector");
         --        Print_Value_Data_List (Routine_Name & "Y_Iris",
         --                               Transpose (Y_Iris).Element (1));
-      Iris_Perm := Utilities.Permute (Transpose (Y_Iris).Element (1));
-      Printing.Print_Value_Data_List (Routine_Name & "Iris_Perm", Iris_Perm);
+      X_Perm := Utilities.Permute (Transpose (X_Iris).Element (1));
+      Y_Perm := Utilities.Permute (Transpose (Y_Iris).Element (1));
+      X_Iris.Clear;
+      X_Iris.Append (X_Perm);
+      X_Iris := Transpose (X_Iris);
+      Y_Iris.Clear;
+      Y_Iris.Append (Y_Perm);
+      Y_Iris := Transpose (Y_Iris);
+      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Y_Iris", Transpose (Y_Iris));
         Labels := Fit_Transform (LE_U, Transpose (Y_Iris).Element (1));
         for index in Labels.First_Index .. Labels.Last_Index loop
             Labels_1D.Clear;
