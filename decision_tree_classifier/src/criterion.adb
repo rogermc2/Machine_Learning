@@ -263,8 +263,8 @@ package body Criterion is
 
     function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float is
-        Routine_Name   : constant String :=
-                           "Criterion.Proxy_Impurity_Improvement ";
+--          Routine_Name   : constant String :=
+--                             "Criterion.Proxy_Impurity_Improvement ";
         Impurity_Left  : Float;
         Impurity_Right : Float;
     begin

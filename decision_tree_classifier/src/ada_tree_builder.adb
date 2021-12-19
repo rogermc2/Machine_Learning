@@ -106,15 +106,15 @@ package body Ada_Tree_Builder is
 
       --  L216
       if not Is_Leaf_Node then
-         Put_Line (Routine_Name & "L216");
+         Put_Line (Routine_Name & "L216 Split_Node");
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         Put_Line (Routine_Name & "node split");
+         Put_Line (Routine_Name & "L221 node split");
          --  L221
          Is_Leaf_Node := Split.Split_Row > Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
       end if;
-      Put_Line (Routine_Name & "L225");
+      Put_Line (Routine_Name & "L225 Add_Node");
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at
