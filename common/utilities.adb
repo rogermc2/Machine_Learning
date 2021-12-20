@@ -440,7 +440,7 @@ package body Utilities is
                     Next_Perm.Append (Item);
                     Put_Line ("Utilities.Permute.Recurse Remaining length: " &
                          Integer'Image (Integer (Remaining.Length)));
-                    Remaining.Delete (index, 1);
+                    Remaining.Delete_Last;
                     Recurse (Next_Perm, Generated, Remaining);
                 end loop;
             else
