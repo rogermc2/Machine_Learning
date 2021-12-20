@@ -385,29 +385,29 @@ package body Utilities is
         use ML_Types;
         Permutation : Value_Data_Lists_2D := aList;
         List_Length : constant Positive := Positive (Permutation.Length);
-        procedure Recurse (K : Positive) is
+
+        procedure Recurse (K : Positive; aPerm : in out Value_Data_Lists_2D) is
             Swap : Value_Data_List;
         begin
             if K > 1 then
+--                  Recurse (K - 1, aPerm);
                 for index in 1 .. K - 1 loop
                     if K mod 2 = 0 then
-                        Swap := Permutation.Element (index);
-                        Permutation.Replace_Element
-                          (index, Permutation.Element (K));
-                        Permutation.Replace_Element (K, Swap);
+                        Swap := aPerm.Element (index);
+                        aPerm.Replace_Element (index, aPerm.Element (K));
+                        aPerm.Replace_Element (K, Swap);
                     else
-                        Swap := Permutation.First_Element;
-                        Permutation.Replace_Element
-                          (1, Permutation.Element (K));
-                        Permutation.Replace_Element (K, Swap);
+                        Swap := aPerm.First_Element;
+                        aPerm.Replace_Element (1, aPerm.Element (K));
+                        aPerm.Replace_Element (K, Swap);
                     end if;
                 end loop;
-                Recurse (K - 1);
+                Recurse (K - 1, aPerm);
             end if;
         end Recurse;
     begin
         if List_Length > 1 then
-            Recurse (List_Length - 1);
+            Recurse (List_Length - 1, Permutation);
         end if;
 
         return Permutation;
