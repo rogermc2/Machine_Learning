@@ -380,6 +380,41 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Permute (aList : ML_Types.Value_Data_Lists_2D)
+                     return ML_Types.Value_Data_Lists_2D is
+      use ML_Types;
+      Permutation : Value_Data_Lists_2D := aList;
+      List_Length : constant Positive := Positive (Permutation.Length);
+      procedure Recurse (K : Positive) is
+         Swap : Value_Data_List;
+      begin
+         if K > 1 then
+            for index in 1 .. K - 1 loop
+               if K mod 2 = 0 then
+                  Swap := Permutation.Element (index);
+                  Permutation.Replace_Element
+                    (index, Permutation.Element (K));
+                  Permutation.Replace_Element (K, Swap);
+               else
+                  Swap := Permutation.First_Element;
+                  Permutation.Replace_Element
+                    (1, Permutation.Element (K));
+                  Permutation.Replace_Element (K, Swap);
+               end if;
+            end loop;
+            Recurse (K - 1);
+         end if;
+      end Recurse;
+   begin
+      if List_Length > 1 then
+         Recurse (List_Length - 1);
+      end if;
+
+      return Permutation;
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    function Predictions (Node : Tree_Node_Type) return Predictions_List is
       use ML_Types;
       use Prediction_Data_Package;
