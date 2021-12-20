@@ -1,10 +1,11 @@
 
 with Ada.Characters.Handling;
 with Ada.Containers;
---  with Ada.Exceptions;
---  with Ada.IO_Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
+
+--  with Classifier_Utilities;
+--  with Printing;
 
 package body Utilities is
 
@@ -402,6 +403,10 @@ package body Utilities is
                   aPerm.Replace_Element (1, aPerm.Element (K));
                   aPerm.Replace_Element (K, Swap);
                end if;
+               Permutations.Append (aPerm);
+--                 Printing.Print_Value_Data_Lists_2D
+--                        ("Utilities.Permute aPerm",
+--                        Classifier_Utilities.Transpose (aPerm));
             end loop;
             Recurse (K - 1, aPerm);
          end if;
@@ -411,9 +416,7 @@ package body Utilities is
    begin
       Permutations.Append (Permutation);
       if List_Length > 1 then
-         Recurse (List_Length - 1, Permutation);
-         Permutations.Append (Permutation);
-         Recurse (List_Length - 1, Permutation);
+         Recurse (List_Length, Permutation);
          Permutations.Append (Permutation);
       end if;
 
