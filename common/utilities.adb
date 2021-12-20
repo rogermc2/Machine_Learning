@@ -380,83 +380,83 @@ package body Utilities is
 
     --  -------------------------------------------------------------------------
 
---      function Permute_H (aList : ML_Types.Value_Data_Lists_2D)
---                          return ML_Types.Value_Data_Lists_2D is
---          use ML_Types;
---          Permutation : Value_Data_Lists_2D := aList;
---          List_Length : constant Positive := Positive (Permutation.Length);
---          procedure Recurse (K : Positive) is
---              Swap : Value_Data_List;
---          begin
---              if K > 1 then
---                  for index in 1 .. K - 1 loop
---                      if K mod 2 = 0 then
---                          Swap := Permutation.Element (index);
---                          Permutation.Replace_Element
---                            (index, Permutation.Element (K));
---                          Permutation.Replace_Element (K, Swap);
---                      else
---                          Swap := Permutation.First_Element;
---                          Permutation.Replace_Element
---                            (1, Permutation.Element (K));
---                          Permutation.Replace_Element (K, Swap);
---                      end if;
---                  end loop;
---                  Recurse (K - 1);
---              end if;
---          end Recurse;
---      begin
---          if List_Length > 1 then
---              Recurse (List_Length - 1);
---          end if;
---
---          return Permutation;
---      end Permute_H;
+    function Permute (aList : ML_Types.Value_Data_Lists_2D)
+                        return ML_Types.Value_Data_Lists_2D is
+        use ML_Types;
+        Permutation : Value_Data_Lists_2D := aList;
+        List_Length : constant Positive := Positive (Permutation.Length);
+        procedure Recurse (K : Positive) is
+            Swap : Value_Data_List;
+        begin
+            if K > 1 then
+                for index in 1 .. K - 1 loop
+                    if K mod 2 = 0 then
+                        Swap := Permutation.Element (index);
+                        Permutation.Replace_Element
+                          (index, Permutation.Element (K));
+                        Permutation.Replace_Element (K, Swap);
+                    else
+                        Swap := Permutation.First_Element;
+                        Permutation.Replace_Element
+                          (1, Permutation.Element (K));
+                        Permutation.Replace_Element (K, Swap);
+                    end if;
+                end loop;
+                Recurse (K - 1);
+            end if;
+        end Recurse;
+    begin
+        if List_Length > 1 then
+            Recurse (List_Length - 1);
+        end if;
+
+        return Permutation;
+    end Permute;
 
     --  -------------------------------------------------------------------------
     --  Based on https://www.baeldung.com/cs/array-generate-all-permutations
-    function Permute (aList : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_2D is
-        use ML_Types;
-        Data_In      : Value_Data_Lists_2D := aList;
-        Permutations : Value_Data_Lists_2D;
-        Current      : Value_Data_Lists_2D;
-
-        procedure Recurse (Current : Value_Data_Lists_2D;
-                           Generated, To_Permute : in out Value_Data_Lists_2D) is
-            Remaining : Value_Data_Lists_2D;
-            Next_Perm : Value_Data_Lists_2D;
-            Item      : Value_Data_List;
-            use Value_Lists_Data_Package;
-        begin
-            Put_Line ("Utilities.Permute.Recurse");
-            if not To_Permute.Is_Empty then
-                Put_Line ("Utilities.Permute.Recurse To_Permute length: " &
-                         Integer'Image (Integer (To_Permute.Length)));
-                Remaining := To_Permute;
-                for index in To_Permute.First_Index .. To_Permute.Last_Index loop
-                    Item := To_Permute.Element (index);
-                    Next_Perm := Current;
-                    Next_Perm.Append (Item);
-                    Put_Line ("Utilities.Permute.Recurse Remaining length: " &
-                         Integer'Image (Integer (Remaining.Length)));
-                    Remaining.Delete_Last;
-                    Recurse (Next_Perm, Generated, Remaining);
-                end loop;
-            else
-                Put_Line ("Utilities.Permute.Recurse appending Current");
-                Generated.Append (Current);
-                Put_Line ("Utilities.Permute.Recurse Current appended");
-            end if;
-
-        end Recurse;
-
-    begin
-        Recurse (Current, Permutations, Data_In);
-
-        return Permutations;
-
-    end Permute;
+--      function Permute (aList : ML_Types.Value_Data_Lists_2D)
+--                        return ML_Types.Value_Data_Lists_2D is
+--          use ML_Types;
+--          Data_In      : Value_Data_Lists_2D := aList;
+--          Permutations : Value_Data_Lists_2D;
+--          Current      : Value_Data_Lists_2D;
+--
+--          procedure Recurse (Current : Value_Data_Lists_2D;
+--                             Generated, To_Permute : in out Value_Data_Lists_2D) is
+--              Remaining : Value_Data_Lists_2D;
+--              Next_Perm : Value_Data_Lists_2D;
+--              Item      : Value_Data_List;
+--              use Value_Lists_Data_Package;
+--          begin
+--              Put_Line ("Utilities.Permute.Recurse");
+--              if not To_Permute.Is_Empty then
+--                  Put_Line ("Utilities.Permute.Recurse To_Permute length: " &
+--                           Integer'Image (Integer (To_Permute.Length)));
+--                  Remaining := To_Permute;
+--                  for index in To_Permute.First_Index .. To_Permute.Last_Index loop
+--                      Item := To_Permute.Element (index);
+--                      Next_Perm := Current;
+--                      Next_Perm.Append (Item);
+--                      Put_Line ("Utilities.Permute.Recurse Remaining length: " &
+--                           Integer'Image (Integer (Remaining.Length)));
+--                      Remaining.Delete_Last;
+--                      Recurse (Next_Perm, Generated, Remaining);
+--                  end loop;
+--              else
+--                  Put_Line ("Utilities.Permute.Recurse appending Current");
+--                  Generated.Append (Current);
+--                  Put_Line ("Utilities.Permute.Recurse Current appended");
+--              end if;
+--
+--          end Recurse;
+--
+--      begin
+--          Recurse (Current, Permutations, Data_In);
+--
+--          return Permutations;
+--
+--      end Permute;
 
     --  -------------------------------------------------------------------------
 

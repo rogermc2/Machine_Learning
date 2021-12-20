@@ -271,8 +271,8 @@ package body Classifier_Tests is
         --                               Transpose (Y_Iris).Element (1));
       X_Iris := Utilities.Permute (X_Iris);
       Y_Iris := Utilities.Permute (Y_Iris);
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Y_Iris",
-                                          Transpose (Y_Iris));
+      Printing.Print_Value_Data_Lists_2D (Routine_Name & "X_Iris",
+                                          Transpose (X_Iris));
 
       Labels := Fit_Transform (LE_U, Transpose (Y_Iris).Element (1));
       Printing.Print_Natural_List (Routine_Name & "Labels", Labels);
