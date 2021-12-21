@@ -15,6 +15,7 @@ procedure Test_Permute is
     Count  : Natural := 0;
     --  Expected: (1, 2, 3), (2, 1, 3), (3, 1, 2),
     --            (1, 3, 2),(2, 3, 1), (3, 2, 1),
+    Permutations : Value_Data_Lists_3D;
 begin
     P_List := Permute (A_List);
     for index in P_List.First_Index .. P_List.Last_Index loop
@@ -24,9 +25,10 @@ begin
     end loop;
 
     New_Line;
-    for count in  1 .. 3 loop
-        aPerm := Permute (A_List);
-        Print_Value_Data_Lists_2D ("A permutation ", Transpose (aPerm));
+    for count in  1 .. 10 loop
+      aPerm := Permute (A_List);
+      Permutations.Append (Transpose (aPerm));
     end loop;
+    Print_Value_Data_Lists_3D ("Permutations", Permutations);
 
 end Test_Permute;

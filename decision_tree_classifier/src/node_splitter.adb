@@ -21,7 +21,8 @@ package body Node_Splitter is
       Num_Total_Constants   : in out Natural;
       Num_Found_Constants   : in out Natural;
       Start_Row, Stop_Row   : Positive;
-      F_I                   : in out Natural; F_J : Natural;
+      F_I                   : in out Natural;
+      F_J                   : Natural;
       Best_Split            : in out Split_Record);
    procedure Update_Constants (Self                  : in out Splitter_Class;
                                Num_Known_Constants   : Natural;
@@ -310,7 +311,8 @@ package body Node_Splitter is
          --  Random_Integer has range 0 .. 1
 
          F_J := Num_Drawn_Constants + 1 +
-           Maths.Random_Integer * (F_I - Num_Found_Constants - 1);
+           Natural (abs (Maths.Random_Float) *
+                      Float (F_I - Num_Found_Constants - 1));
          Put_Line (Routine_Name & "F_J: " & Integer'Image (F_J));
          --              Printing.Print_Natural_List
          --                (Routine_Name & "Feature_Indices pre swap", Self.Feature_Indices);

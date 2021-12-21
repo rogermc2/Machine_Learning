@@ -269,8 +269,8 @@ package body Classifier_Tests is
                   " invalid Y_Iris vector");
         --        Print_Value_Data_List (Routine_Name & "Y_Iris",
         --                               Transpose (Y_Iris).Element (1));
-      X_Iris := Utilities.Permute (X_Iris).First_Element;
-      Y_Iris := Utilities.Permute (Y_Iris).First_Element;
+      X_Iris := Utilities.Permute (X_Iris);
+      Y_Iris := Utilities.Permute (Y_Iris);
       Printing.Print_Value_Data_Lists_2D (Routine_Name & "X_Iris",
                                           Transpose (X_Iris));
 
