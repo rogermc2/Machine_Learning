@@ -63,6 +63,7 @@ package Utilities is
                              return ML_Types.Data_Record;
    function Split_String (aString, Pattern : String)
                            return ML_Types.String_List;
+   procedure Swap (Data : in out ML_Types.Value_Data_Lists_2D; L, R : Positive);
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
                          return ML_Types.Rows_Vector;
 

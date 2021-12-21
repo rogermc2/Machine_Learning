@@ -13,7 +13,6 @@ package body Utilities is
    use ML_Types;
 
    procedure Print_Results_Question (Question : ML_Types.Question_Data);
-   procedure Swap (Data : in out ML_Types.Value_Data_Lists_2D; L, R : Positive);
    function Unique_Values (Rows    : Rows_Vector;
                            Feature : Feature_Name_Type) return Value_List;
 
@@ -408,50 +407,6 @@ package body Utilities is
 
       return Permutations;
    end Permute;
-
-   --  -------------------------------------------------------------------------
-   --  Based on https://www.baeldung.com/cs/array-generate-all-permutations
-   --         function Permute (aList : ML_Types.Value_Data_Lists_2D)
-   --                           return ML_Types.Value_Data_Lists_3D is
-   --             use ML_Types;
-   --             Data_In      : Value_Data_Lists_2D := aList;
-   --             Permutations : Value_Data_Lists_3D;
-   --             Current      : Value_Data_Lists_2D;
-   --
-   --             procedure Recurse (Current : Value_Data_Lists_2D;
-   --                                Generated : in out Value_Data_Lists_3D;
-   --                                To_Permute : in out Value_Data_Lists_2D) is
-   --                 Remaining : Value_Data_Lists_2D;
-   --                 Next_Perm : Value_Data_Lists_2D;
-   --                 Item      : Value_Data_List;
-   --                 use Value_Lists_Data_Package;
-   --             begin
-   --                 if not To_Permute.Is_Empty then
-   --  --                     Put_Line ("Utilities.Permute.Recurse To_Permute length: " &
-   --  --                              Integer'Image (Integer (To_Permute.Length)));
-   --                     Remaining := To_Permute;
-   --                     for index in To_Permute.First_Index .. To_Permute.Last_Index loop
-   --                         Item := To_Permute.Element (index);
-   --                         Next_Perm := Current;
-   --                         Next_Perm.Append (Item);
-   --  --                         Put_Line ("Utilities.Permute.Recurse Remaining length: " &
-   --  --                              Integer'Image (Integer (Remaining.Length)));
-   --                         Remaining.Delete_Last;
-   --                         Recurse (Next_Perm, Generated, Remaining);
-   --                     end loop;
-   --                 else
-   --  --                     Put_Line ("Utilities.Permute.Recurse appending Current");
-   --                     Generated.Append (Current);
-   --                 end if;
-   --
-   --             end Recurse;
-   --
-   --         begin
-   --             Recurse (Current, Permutations, Data_In);
-   --
-   --             return Permutations;
-   --
-   --         end Permute;
 
    --  -------------------------------------------------------------------------
 

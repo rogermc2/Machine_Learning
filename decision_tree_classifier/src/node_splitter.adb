@@ -194,9 +194,6 @@ package body Node_Splitter is
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
                      Put_Line (Routine_Name &
-                                 "L414 Current_Proxy_Improvement > " &
-                                 "Best_Proxy_Improvement");
-                     Put_Line (Routine_Name &
                                  "L409 Current_Proxy_Improvement " &
                                  Float'Image (Current_Proxy_Improvement));
                      case Feature_Values.Element (P_Index).Value_Kind is
@@ -244,14 +241,12 @@ package body Node_Splitter is
 
                         when Boolean_Type | UB_String_Type => null;
                      end case;
-                     Put_Line (Routine_Name & "L419 Current.Threshold "
-                               & Float'Image (Current.Threshold));
 
                      --  L419 Only update if Current_Proxy_Improvement
                      --       > Best_Proxy_Improvement
                      Best := Current;
-                     Printing.Print_Split_Record
-                       (Routine_Name & "L419 Best", Best);
+                     Printing.Print_Split_Record (Routine_Name & "L419 Best",
+                                                  Best);
                   end if;
                end if;
             end if;
@@ -610,7 +605,6 @@ package body Node_Splitter is
                 " should not be less than start index" &
                 Integer'Image (Start_Row));
       --  L196
-      Put_Line (Routine_Name & "L196");
       Splitter.Start_Row := Start_Row;
       Splitter.Stop_Row := Stop_Row;
       Criterion.Initialize_Node_Criterion
@@ -644,10 +638,6 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
-      Put_Line (Routine_Name & "L319 Feature_Values Length" &
-                  Integer'Image (Integer (Self.Feature_Values.Length)));
-      Put_Line (Routine_Name & "L319 Feature_Indices Length" &
-                  Integer'Image (Integer (Self.Feature_Indices.Length)));
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
       --  L417  Reorganize into samples
