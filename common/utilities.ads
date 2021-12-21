@@ -34,6 +34,8 @@ package Utilities is
    function Number_Of_Features (Rows : ML_Types.Value_Data_List)
                                  return ML_Types.Class_Range;
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
+                     return ML_Types.Value_Data_Lists_2D;
+   function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_3D;
    function Predictions (Node : ML_Types.Tree_Node_Type)
                           return ML_Types.Predictions_List;
