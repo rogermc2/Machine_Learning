@@ -168,11 +168,10 @@ package body Classifier_Tests is
       Put_Line (Routine_Name & ", Iris_Target size: " &
                   Count_Type'Image (Iris_Target.Length) & " x " &
                   Count_Type'Image (Iris_Target.Element (1).Length));
-      Put_Line (Routine_Name & ", Transpose (Prediction) size: " &
-                  Count_Type'Image (Transpose (Prediction).Length) & " x " &
-                  Count_Type'Image (Transpose (Prediction).Element (1).Length));
-      Score := Classification_Metrics.Accuracy_Score
-        (Iris_Target, Transpose (Prediction));
+      Put_Line (Routine_Name & ", Prediction size: " &
+                  Count_Type'Image (Prediction.Length) & " x " &
+                  Count_Type'Image (Prediction.Element (1).Length));
+      Score := Classification_Metrics.Accuracy_Score (Iris_Target, Prediction);
       Put_Line (Routine_Name & " Score" &  Float'Image (Score));
 
       Graphviz_Exporter.C_Init
