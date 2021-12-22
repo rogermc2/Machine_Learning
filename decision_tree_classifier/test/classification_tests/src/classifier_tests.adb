@@ -164,7 +164,7 @@ package body Classifier_Tests is
            (Num_Samples) &
            ", " & Integer'Image (Integer (Prediction.Element (1).Length)));
       Printing.Print_Value_Data_Lists_2D
-        (Routine_Name & " Predictions", Prediction);
+        (Routine_Name & " Predictions", Transpose (Prediction));
       Put_Line (Routine_Name & ", Iris_Target size: " &
                   Count_Type'Image (Iris_Target.Length) & " x " &
                   Count_Type'Image (Iris_Target.Element (1).Length));

@@ -17,9 +17,9 @@ begin
    Put_Line ("Test Probability started");
    Test_Probability;
    New_Line;
---     Put_Line ("Test Iris started");
---     Test_Iris;
---     New_Line;
+   Put_Line ("Test Iris started");
+   Test_Iris;
+   New_Line;
 --     Put_Line ("Test Decision Path started");
 --     Test_Decision_Path;
 --     New_Line;
