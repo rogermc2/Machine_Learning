@@ -341,7 +341,7 @@ package body Printing is
         Count : Integer := 1;
     begin
         if Name'Length > 0 then
-            Put (Name & ": ");
+            Put_Line (Name & ": ");
         end if;
 
         for Index in theList.First_Index .. theList.Last_Index loop

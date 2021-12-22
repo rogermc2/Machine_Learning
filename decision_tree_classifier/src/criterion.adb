@@ -7,7 +7,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Maths;
 
 with ML_Types;
-with Printing;
+--  with Printing;
 
 package body Criterion is
 
@@ -176,8 +176,8 @@ package body Criterion is
 
         Reset (Criteria);
 
-        Printing.Print_Weight_Lists_2D (Routine_Name & "Criteria.Sum_Total",
-                                        Criteria.Sum_Total);
+--          Printing.Print_Weight_Lists_2D (Routine_Name & "Criteria.Sum_Total",
+--                                          Criteria.Sum_Total);
 
     end Initialize_Node_Criterion;
 

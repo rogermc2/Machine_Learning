@@ -2,12 +2,12 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -193,9 +193,9 @@ package body Node_Splitter is
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
-                     Put_Line (Routine_Name &
-                                 "L409 Current_Proxy_Improvement " &
-                                 Float'Image (Current_Proxy_Improvement));
+--                       Put_Line (Routine_Name &
+--                                   "L409 Current_Proxy_Improvement " &
+--                                   Float'Image (Current_Proxy_Improvement));
                      case Feature_Values.Element (P_Index).Value_Kind is
                         when Float_Type =>
                            Current.Threshold := 0.5 *
@@ -245,8 +245,8 @@ package body Node_Splitter is
                      --  L419 Only update if Current_Proxy_Improvement
                      --       > Best_Proxy_Improvement
                      Best := Current;
-                     Printing.Print_Split_Record (Routine_Name & "L419 Best",
-                                                  Best);
+--                       Printing.Print_Split_Record (Routine_Name & "L419 Best",
+--                                                    Best);
                   end if;
                end if;
             end if;
@@ -308,7 +308,7 @@ package body Node_Splitter is
          F_J := Num_Drawn_Constants + 1 +
            Natural (abs (Maths.Random_Float) *
                       Float (F_I - Num_Found_Constants - 1));
-         Put_Line (Routine_Name & "F_J: " & Integer'Image (F_J));
+--           Put_Line (Routine_Name & "F_J: " & Integer'Image (F_J));
          --              Printing.Print_Natural_List
          --                (Routine_Name & "Feature_Indices pre swap", Self.Feature_Indices);
          if F_J < Num_Known_Constants then
@@ -577,18 +577,18 @@ package body Node_Splitter is
          Criterion.Children_Impurity_Gini
            (Self.Criteria, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
-         Put_Line (Routine_Name &
-                     " Children_Impurity_Gini Best_Split.Impurity_Left " &
-                     Float'Image (Best_Split.Impurity_Left));
-         Put_Line (Routine_Name &
-                     " Gini_Children_Impurity Best_Split.Impurity_Right " &
-                     Float'Image (Best_Split.Impurity_Right));
+--           Put_Line (Routine_Name &
+--                       " Children_Impurity_Gini Best_Split.Impurity_Left " &
+--                       Float'Image (Best_Split.Impurity_Left));
+--           Put_Line (Routine_Name &
+--                       " Gini_Children_Impurity Best_Split.Impurity_Right " &
+--                       Float'Image (Best_Split.Impurity_Right));
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
       end if;
-      Printing.Print_Split_Record
-        (Routine_Name & "L436 Best_Split", Best_Split);
+--        Printing.Print_Split_Record
+--          (Routine_Name & "L436 Best_Split", Best_Split);
 
    end Reorder_Rows;
 
