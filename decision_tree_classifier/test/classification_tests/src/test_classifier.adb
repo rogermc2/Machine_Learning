@@ -11,12 +11,12 @@ begin
    Put_Line ("Test Classifier started");
    Test_Classification_Toy;
    New_Line;
---     Put_Line ("Test Weighted Classifier started");
---     Test_Weighted_Classification_Toy;
---     New_Line;
---     Put_Line ("Test Probability started");
---     Test_Probability;
---     New_Line;
+   Put_Line ("Test Weighted Classifier started");
+   Test_Weighted_Classification_Toy;
+   New_Line;
+   Put_Line ("Test Probability started");
+   Test_Probability;
+   New_Line;
 --     Put_Line ("Test Iris started");
 --     Test_Iris;
 --     New_Line;

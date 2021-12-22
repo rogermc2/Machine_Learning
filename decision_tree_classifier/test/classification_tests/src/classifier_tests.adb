@@ -69,17 +69,13 @@ package body Classifier_Tests is
       --  Y is 2D list num outputs x num classes
       Y := To_Integer_Value_List_2D (Y_Array);
       --  L229
-      Expected := Transpose (To_Integer_Value_List_2D (True_Result));
+      Expected := To_Integer_Value_List_2D (True_Result);
       --  L230
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Predictions", Prediction);
-      Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
-      New_Line;
       Success := Prediction = Expected;
       if Success then
          Put_Line
@@ -87,6 +83,11 @@ package body Classifier_Tests is
       else
          Put_Line
            ("Classification_Tests Toy prediction test failed");
+         Print_Value_Data_Lists_2D (Routine_Name & " Predictions",
+                                    Transpose (Prediction));
+         Print_Value_Data_Lists_2D (Routine_Name & " Expected",
+                                    Transpose (Expected));
+         New_Line;
       end if;
 
       C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria,
@@ -96,10 +97,6 @@ package body Classifier_Tests is
       Put_Line ("----------------------------------------------");
       New_Line;
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Predictions", Prediction);
-      Print_Value_Data_Lists_2D (Routine_Name & " Expected", Expected);
-      New_Line;
       Success := Prediction = Expected;
       if Success then
          Put_Line
@@ -107,6 +104,11 @@ package body Classifier_Tests is
       else
          Put_Line
            ("Classification Toy Tests Max Features = 1 prediction test failed");
+         Print_Value_Data_Lists_2D (Routine_Name & " Predictions",
+                                    Transpose (Prediction));
+         Print_Value_Data_Lists_2D (Routine_Name & " Expected",
+                                    Transpose (Expected));
+         New_Line;
       end if;
 
    end Test_Classification_Toy;
@@ -367,7 +369,7 @@ package body Classifier_Tests is
 
       --  Y is 2D list num outputs x num classes
       Y := To_Integer_Value_List_2D (Y_Array);
-      Expected := Transpose (To_Integer_Value_List_2D (True_Result));
+      Expected := To_Integer_Value_List_2D (True_Result);
 
       Put_Line ("Test Weighted Classification Toy 1");
       Classification_Fit (theClassifier, X, Y, Sample_Weights_1);
@@ -383,29 +385,38 @@ package body Classifier_Tests is
          Output_File_Name => To_Unbounded_String ("weighted_1.dot"));
 
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " 1.0 weighted Predictions", Prediction);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Expected 1.0 weighted Predictions", Expected);
 
       Success := Prediction = Expected;
+      if Success then
+         Put_Line
+           ("1.0 Weighted Classification Tests Toy prediction test passed");
+      else
+         Put_Line
+           ("1.0 Weighted Classification Tests Toy prediction test failed");
+         Print_Value_Data_Lists_2D (Routine_Name & " 1.0 weighted Predictions",
+                                    Transpose (Prediction));
+         Print_Value_Data_Lists_2D
+           (Routine_Name & " Expected 1.0 weighted Predictions",
+            Transpose (Expected));
+      end if;
 
       New_Line;
       Put_Line ("Test Weighted Classification Toy 0.5");
       Classification_Fit (theClassifier, X, Y, Sample_Weights_2);
       Prediction := Base_Decision_Tree.Predict (theClassifier, T);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " 0.5 weighted predictions", Prediction);
-      Print_Value_Data_Lists_2D
-        (Routine_Name & " Expected 0.5 weighted predictions", Expected);
 
       Success := Success and Prediction = Expected;
       if Success then
          Put_Line
-           ("Weighted Classification Tests Toy prediction test passed");
+           ("0.5 Weighted Classification Tests Toy prediction test passed");
       else
          Put_Line
-           ("Weighted Classification Tests Toy prediction test failed");
+           ("0.5 Weighted Classification Tests Toy prediction test failed");
+         Print_Value_Data_Lists_2D
+           (Routine_Name & " 0.5 weighted predictions", Transpose (Prediction));
+         Print_Value_Data_Lists_2D
+           (Routine_Name & " Expected 0.5 weighted predictions",
+            Transpose (Expected));
       end if;
 
    end Test_Weighted_Classification_Toy;
