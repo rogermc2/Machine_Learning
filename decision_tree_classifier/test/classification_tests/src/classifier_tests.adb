@@ -190,32 +190,32 @@ package body Classifier_Tests is
       use Printing;
       use Float_Package;
       use Natural_Package;
-      Routine_Name      : constant String :=
-                            "Classification_Tests.Test_Probability ";
-      Iris_Data         : constant Multi_Output_Data_Record :=
-                            Load_Data ("src/iris.csv");
-      theClassifier     : Base_Decision_Tree.Classifier
+      Routine_Name  : constant String :=
+                        "Classification_Tests.Test_Probability ";
+      Iris_Data     : constant Multi_Output_Data_Record :=
+                        Load_Data ("src/iris.csv");
+      theClassifier : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
-      Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
-      X                 : constant Value_Data_Lists_2D :=
-                            To_Multi_Value_List (X_Array);
-      Y                 : constant Value_Data_Lists_2D :=
-                            To_Integer_Value_List_2D (Y_Array);
-      LE_U              : Label_Encoder (Class_Unique);
-      Labels            : Classifier_Types.Natural_List;
-      Label             : Value_Record (Integer_Type);
-      Labels_1D         : Value_Data_List;
-      Labels_2D         : Value_Data_Lists_2D;
-      X_Iris            : Value_Data_Lists_2D;
+      Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
+      X             : constant Value_Data_Lists_2D :=
+                        To_Multi_Value_List (X_Array);
+      Y             : constant Value_Data_Lists_2D :=
+                        To_Integer_Value_List_2D (Y_Array);
+      LE_U          : Label_Encoder (Class_Unique);
+      Labels        : Classifier_Types.Natural_List;
+      Label         : Value_Record (Integer_Type);
+      Labels_1D     : Value_Data_List;
+      Labels_2D     : Value_Data_Lists_2D;
+      X_Iris        : Value_Data_Lists_2D;
       --  Y: num outputs x num classes
-      Y_Iris            : Value_Data_Lists_2D;
-      No_Weights        : Weights.Weight_List :=
-                            Float_Package.Empty_Vector;
-      Num_Samples       : Natural;
-      Prediction        : ML_Types.Value_Data_Lists_2D;
-      Column_Sums       : Weights.Weight_List;
-      Prob_Prediction   : Weights.Weight_Lists_3D;
-      Max_Arg           : Classifier_Types.Natural_List;
+      Y_Iris        : Value_Data_Lists_2D;
+      No_Weights    : Weights.Weight_List :=
+                        Float_Package.Empty_Vector;
+      Num_Samples   : Natural;
+      Prediction    : ML_Types.Value_Data_Lists_2D;
+      Column_Sums   : Weights.Weight_List;
+      Prob_Predict  : Weights.Weight_Lists_3D;
+      Max_Arg       : Classifier_Types.Natural_List;
    begin
       Put_Line ("Classification_Tests Toy Probabilities test");
       --  L357
@@ -237,8 +237,8 @@ package body Classifier_Tests is
 
       --  Python proba : ndarray of shape (n_samples, n_classes) or
       --  list of n_outputs \ such arrays if n_outputs > 1
-      Prob_Prediction := Predict_Probability (theClassifier, X);
-      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
+      Prob_Predict := Predict_Probability (theClassifier, X);
+      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Predict);
 
       if Column_Sums = Ones (Integer (X.Length)) then
          Put_Line
@@ -251,9 +251,9 @@ package body Classifier_Tests is
       end if;
 
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
---        Print_Value_Data_Lists_2D
---          ("Classification_Tests Probabilities Prediction: ",
---           Transpose (Prediction));
+      --        Print_Value_Data_Lists_2D
+      --          ("Classification_Tests Probabilities Prediction: ",
+      --           Transpose (Prediction));
       New_Line;
 
       --  Iris probabilty test
@@ -292,13 +292,16 @@ package body Classifier_Tests is
 
       --  Python proba : ndarray of shape (n_samples, n_classes) or
       --  list of n_outputs \ such arrays if n_outputs > 1
-      Prob_Prediction := Predict_Probability (theClassifier, X_Iris);
-      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Prediction);
+      --  L368
+      Prob_Predict := Predict_Probability (theClassifier, X_Iris);
+      Column_Sums := Classifier_Utilities.Sum_Cols (Prob_Predict);
 
+      --  L376
       Prediction := Base_Decision_Tree.Predict (theClassifier, X_Iris);
---        Print_Value_Data_Lists_2D
---          ("Classification_Tests Iris Probabilities Prediction: ",
---           Transpose (Prediction));
+      --        Print_Value_Data_Lists_2D
+      --          ("Classification_Tests Iris Probabilities Prediction: ",
+      --           Transpose (Prediction));
+      --  L369
       if Column_Sums = Ones (Integer (X_Iris.Length)) then
          Put_Line
            ("Classification_Tests Probabilities Iris Column_Sums test passed");
@@ -309,7 +312,8 @@ package body Classifier_Tests is
            (Routine_Name & " Iris Column_Sums", Column_Sums);
       end if;
 
-      Max_Arg := Arg_Max (Prob_Prediction.Element (1));
+      --  L375
+      Max_Arg := Arg_Max (Prob_Predict.Element (1));
       if Max_Arg = To_Natural_List (Transpose (Prediction).Element (1)) then
          Put_Line
            ("Classification_Tests Iris Probabilities Max_Arg test passed");
