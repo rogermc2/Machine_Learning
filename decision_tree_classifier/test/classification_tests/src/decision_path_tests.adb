@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree/tests check_decision_path L1692
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -11,7 +12,7 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
---  with Printing;
+with Printing;
 with Tree;
 with Weights;
 
@@ -21,12 +22,13 @@ package body Decision_Path_Tests is
    --  -------------------------------------------------------------------------
    --  Based on test_decision_path L1692 which calls check_decision_path L1688
    procedure Test_Decision_Path  is
+      use Ada.Containers;
       use Classifier_Utilities;
       use Decision_Tree_Classification;
       --        use Printing;
       use Classifier_Types.Float_Package;
       Routine_Name      : constant String :=
-                            "Decision_Path_Tests.Test_Decision_Path";
+                            "Decision_Path_Tests.Test_Decision_Path ";
       Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
       Iris_Data         : constant Multi_Output_Data_Record :=
                             Load_Data ("src/iris.csv");
@@ -38,6 +40,8 @@ package body Decision_Path_Tests is
       --  Iris_Target (Y) : num outputs x num samples
       Iris_Target       : Value_Data_Lists_2D;
       No_Weights        : Weights.Weight_List := Empty_Vector;
+      Node_Indicator    : Classifier_Types.Natural_Lists_2D;
+      Success           : Boolean;
    begin
       --  L1698
       C_Init (theClassifier, "2", Criterion.Gini_Criteria);
@@ -50,9 +54,23 @@ package body Decision_Path_Tests is
                 " invalid Iris_Target vector");
       --  L1695
       Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
-      --        Print_Tree ("The Tree", theClassifier);
+      Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+
+      Node_Indicator := Base_Decision_Tree.Decision_Path (theClassifier, X);
+      Success := Positive (Node_Indicator.Length) = Num_Samples and
+        Node_Indicator.Element (1).Length =
+        theClassifier.Attributes.Decision_Tree.Nodes.Node_Count;
+      if Success then
+         Put_Line (Routine_Name & "test passed.");
+      else
+         Put_Line (Routine_Name & "test failed.");
+         Put_Line (Routine_Name & "Node_Indicator size: " &
+                     Count_Type'Image (Node_Indicator.Length) & " x" &
+                     Count_Type'Image (Node_Indicator.Element (1).Length));
+         New_Line;
+      end if;
 
       Graphviz_Exporter.C_Init
         (Exporter, theClassifier.Attributes.Decision_Tree);
