@@ -1,6 +1,5 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -116,7 +115,6 @@ package body Classifier_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Iris is
-      use Ada.Containers;
       use Classifier_Utilities;
       use Decision_Tree_Classification;
       --        use Printing;
@@ -134,45 +132,40 @@ package body Classifier_Tests is
       No_Weights     : Weights.Weight_List := Empty_Vector;
       Prediction     : ML_Types.Value_Data_Lists_2D;
       Score          : Float;
+      Success        : Boolean := False;
    begin
       Put_Line (Routine_Name);
       C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria);
       --  L1689
-      Put_Line (Routine_Name & ", Num_Samples" & Integer'Image (Num_Samples));
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
-      Put_Line (Routine_Name & ", X size: " & Count_Type'Image (X.Length) &
-                  " x " & Count_Type'Image (X.Element (1).Length));
       --  Iris_Target is 2D list num outputs x num samples
       Iris_Target := Iris_Data.Label_Values;
-      --        Printing.Print_Value_Data_Lists_2D (Routine_Name & ", Iris_Target", Iris_Target);
       Assert (Positive (Iris_Target.Length) = Num_Samples, Routine_Name &
                 " invalid Iris_Target vector");
       --  L1695
       Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
-      Put_Line
-        (Routine_Name & " Node_Count: " & Count_Type'Image
-           (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
       --        Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
       --  L306
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
-      Put_Line
-        (Routine_Name & " Num_Samples, Num Predictions: " & Integer'Image
-           (Num_Samples) &
-           ", " & Integer'Image (Integer (Prediction.Element (1).Length)));
       Printing.Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Transpose (Prediction));
-      Put_Line (Routine_Name & ", Iris_Target size: " &
-                  Count_Type'Image (Iris_Target.Length) & " x " &
-                  Count_Type'Image (Iris_Target.Element (1).Length));
-      Put_Line (Routine_Name & ", Prediction size: " &
-                  Count_Type'Image (Prediction.Length) & " x " &
-                  Count_Type'Image (Prediction.Element (1).Length));
       Score := Classification_Metrics.Accuracy_Score (Iris_Target, Prediction);
       Put_Line (Routine_Name & " Score" &  Float'Image (Score));
+
+      Success := Score > 0.5;
+      if Success then
+         Put_Line
+           ("Classification_Tests Iris prediction test passed");
+      else
+         Put_Line
+           ("Classification_Tests Iris prediction test failed");
+         Put_Line (Routine_Name & " Score" &  Float'Image (Score));
+         New_Line;
+      end if;
 
       Graphviz_Exporter.C_Init
         (Exporter, theClassifier.Attributes.Decision_Tree);

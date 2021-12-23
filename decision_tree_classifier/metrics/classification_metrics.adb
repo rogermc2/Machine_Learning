@@ -1,10 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Containers;
 --  with Ada.Text_IO; use Ada.Text_IO;
-
-with Classifier_Utilities;
-with Printing;
 
 package body Classification_Metrics is
 
@@ -22,7 +18,6 @@ package body Classification_Metrics is
       Sample_Weight        : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector)
        return float is
-      --        use Ada.Containers;
       use ML_Types;
       Routine_Name : constant String :=
                        "Classification_Metrics.Accuracy_Score, ";
@@ -35,14 +30,7 @@ package body Classification_Metrics is
            (Routine_Name & " True, Sample_Weight: ", Sample_Weight, Y_True);
       end if;
 
-      --          Printing.Print_Value_Data_Lists_2D (Routine_Name & "Y_True ",
-      --                                              Y_True);
-      --          Printing.Print_Value_Data_Lists_2D
-      --            (Routine_Name & "Y_Prediction ",
-      --             Classifier_Utilities.Transpose (Y_Prediction));
       Score := Y_Prediction = Y_True;
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Score ",
-                                          Classifier_Utilities.Transpose (Score));
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
@@ -54,25 +42,34 @@ package body Classification_Metrics is
                      Boolean_2D : ML_Types.Value_Data_Lists_2D)
                       return Float is
       use ML_Types;
-      Values : Value_Data_List;
-      Value  : Value_Record;
-      Result : Float := 0.0;
+      Weights     : Classifier_Types.Float_List := Weight;
+      Values      : Value_Data_List;
+      Value       : Value_Record;
+      Sum_Weights : Float := 0.0;
+      Result      : Float := 0.0;
    begin
+      if Weights.Is_Empty then
+         for index in Boolean_2D.First_Index .. Boolean_2D.Last_Index loop
+            Weights.Append (1.0);
+         end loop;
+      end if;
+
       Classifier_Types.Check_Length ("Classification_Metrics.Average",
-                                     Boolean_2D, Weight);
+                                     Boolean_2D, Weights);
       for index in Boolean_2D.First_Index .. Boolean_2D.Last_Index loop
          Values := Boolean_2D.Element (index);
          for index_2 in Values.First_Index .. Values.Last_Index loop
             Value := Values (index_2);
+            Sum_Weights := Sum_Weights + Weights.Element (index_2);
             if Value.Value_Kind = Boolean_Type then
                if Value.Boolean_Value then
-                  Result := Result + Weight.Element (index_2);
+                  Result := Result + Weights.Element (index_2);
                end if;
             end if;
          end loop;
       end loop;
 
-      return Result;
+      return Result / Sum_Weights;
 
    end Average;
 
@@ -118,11 +115,11 @@ package body Classification_Metrics is
    begin
       Assert (not Sample_Score.Is_Empty, Routine_Name &
                 "Sample_Score is empty");
-      if Normalize and not Sample_Weights.Is_Empty then
-         Classifier_Types.Check_Length
-           (Routine_Name, Sample_Weights, Sample_Score);
+      if Normalize then
          Result := Average (Sample_Weights, Sample_Score);
       elsif not Sample_Weights.Is_Empty then
+         Classifier_Types.Check_Length
+           (Routine_Name, Sample_Weights, Sample_Score);
          Result := Classifier_Types.Dot (Sample_Weights, Sample_Score);
       else
          Result := Sum (Sample_Score);

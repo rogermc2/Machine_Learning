@@ -85,6 +85,7 @@ package body Classifier_Types is
       R_List : Value_Data_List;
       Result : Float := 0.0;
    begin
+      Check_Length ("Classifier_Types.Dot", L, R);
       for index in R.First_Index .. R.Last_Index loop
          R_List := R.Element (index);
          for index_2 in R.First_Index .. R.Last_Index loop
