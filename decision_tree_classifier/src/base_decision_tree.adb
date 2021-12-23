@@ -4,10 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Maths;
-
 with Ada_Tree_Builder;
-with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
 with Encode_Utils;
@@ -380,6 +377,16 @@ package body Base_Decision_Tree is
       when others => raise Classifier_Error with Routine_Name & "error";
 
    end Classification_Part;
+
+   --  -------------------------------------------------------------------------
+
+   function Decision_Path (aClassifier : Classifier;
+                           X           : ML_Types.Value_Data_Lists_2D)
+                           return Classifier_Types.Natural_Lists_2D is
+   begin
+      return Tree.Decision_Path (aClassifier.Attributes.Decision_Tree, X);
+
+   end Decision_Path;
 
    --  -------------------------------------------------------------------------
 

@@ -12,7 +12,7 @@ package ML_Types is
    pragma Ordered (Data_Type);
 
    type Class_Range is new Positive range 1 .. Max_Features;
-   type Feature_Name_Type is new Unbounded_String;
+   subtype Feature_Name_Type is Unbounded_String;
    type Feature_Names_Array is array (Class_Range range <>)
      of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;

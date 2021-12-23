@@ -18,6 +18,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with ML_Types;
 with Tree;
 
+with Classifier_Types;
 with Criterion;
 with Estimator;
 with Node_Splitter;
@@ -135,5 +136,8 @@ package Base_Decision_Tree is
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D;
+   function Decision_Path (aClassifier : Classifier;
+                           X           : ML_Types.Value_Data_Lists_2D)
+                           return Classifier_Types.Natural_Lists_2D;
 
 end Base_Decision_Tree;

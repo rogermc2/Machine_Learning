@@ -11,6 +11,9 @@ package body Tree is
 
    function Apply_Dense (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
                          return Classifier_Types.Natural_List;
+   function Decision_Path_Dense (aTree : Tree_Class;
+                                 X     : ML_Types.Value_Data_Lists_2D)
+                                 return Classifier_Types.Natural_Lists_2D;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
@@ -53,7 +56,7 @@ package body Tree is
       Use_Left       : Boolean;
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
-             "Top node has no children");
+                "Top node has no children");
       --  L796
       for index in 1 .. Num_Samples loop
          Out_Data.Append (0);
@@ -65,63 +68,63 @@ package body Tree is
          --  Current_Sample is a list of feature values
          Current_Sample := X.Element (index);
 
-            --  Find a node with a leaf child.
-            --  This node has the prediction value.
-            Continue := True;
-            while Continue and then
-              Child_Count (Node_Cursor) > 0 loop
-               Node := Element (Node_Cursor);
-               Feature_Value :=
-                 Current_Sample.Element (Node.Best_Fit_Feature_Index);
---                 Printing.Print_Value_Record (Routine_Name & "Feature_Value",
---                                              Feature_Value);
-               Assert (Feature_Value.Value_Kind = Float_Type or
-                         Feature_Value.Value_Kind = Integer_Type,
-                       "Tree.Apply_Dense Self.Nodes invalid feature data type");
-               --  Make tree traversal decision
-               case Feature_Value.Value_Kind is
-                  when Boolean_Type =>
-                     if True then
-                        Use_Left := 1.0 <= Node.Threshold;
-                     else
-                        Use_Left := 0.0 <= Node.Threshold;
-                     end if;
-                  when Float_Type =>
-                     Use_Left := Feature_Value.Float_Value <= Node.Threshold;
-                  when Integer_Type =>
-                     Use_Left := Float (Feature_Value.Integer_Value) <=
-                       Node.Threshold;
-                  when UB_String_Type =>
-                     declare
-                        Comp : Float := 0.0;
-                        Text : constant String :=
-                                 To_String (Feature_Value.UB_String_Value);
-                     begin
-                        for pos in 1 .. Text'Length loop
-                           Comp := Comp +
-                             Float (Integer'Value (Text (pos .. pos)));
-                        end loop;
-                        Use_Left := Comp <= Node.Threshold;
-                     end;
-               end case;
+         --  Find a node with a leaf child.
+         --  This node has the prediction value.
+         Continue := True;
+         while Continue and then
+           Child_Count (Node_Cursor) > 0 loop
+            Node := Element (Node_Cursor);
+            Feature_Value :=
+              Current_Sample.Element (Node.Best_Fit_Feature_Index);
+            --                 Printing.Print_Value_Record (Routine_Name & "Feature_Value",
+            --                                              Feature_Value);
+            Assert (Feature_Value.Value_Kind = Float_Type or
+                      Feature_Value.Value_Kind = Integer_Type,
+                    "Tree.Apply_Dense Self.Nodes invalid feature data type");
+            --  Make tree traversal decision
+            case Feature_Value.Value_Kind is
+               when Boolean_Type =>
+                  if True then
+                     Use_Left := 1.0 <= Node.Threshold;
+                  else
+                     Use_Left := 0.0 <= Node.Threshold;
+                  end if;
+               when Float_Type =>
+                  Use_Left := Feature_Value.Float_Value <= Node.Threshold;
+               when Integer_Type =>
+                  Use_Left := Float (Feature_Value.Integer_Value) <=
+                    Node.Threshold;
+               when UB_String_Type =>
+                  declare
+                     Comp : Float := 0.0;
+                     Text : constant String :=
+                              To_String (Feature_Value.UB_String_Value);
+                  begin
+                     for pos in 1 .. Text'Length loop
+                        Comp := Comp +
+                          Float (Integer'Value (Text (pos .. pos)));
+                     end loop;
+                     Use_Left := Comp <= Node.Threshold;
+                  end;
+            end case;
 
-               if Use_Left then
---                    Put_Line (Routine_Name & "use left child Node_ID" &
---                                Integer'Image
---                                (Element (First_Child (Node_Cursor)).Node_ID));
-                  Node_Cursor := First_Child (Node_Cursor);
-               else
---                    Put_Line (Routine_Name & "use right child Node_ID" &
---                                Integer'Image
---                                (Element (Last_Child (Node_Cursor)).Node_ID));
-                  Node_Cursor := Last_Child (Node_Cursor);
-               end if;
-               Continue := Child_Count (Node_Cursor) > 0;
+            if Use_Left then
+               --                    Put_Line (Routine_Name & "use left child Node_ID" &
+               --                                Integer'Image
+               --                                (Element (First_Child (Node_Cursor)).Node_ID));
+               Node_Cursor := First_Child (Node_Cursor);
+            else
+               --                    Put_Line (Routine_Name & "use right child Node_ID" &
+               --                                Integer'Image
+               --                                (Element (Last_Child (Node_Cursor)).Node_ID));
+               Node_Cursor := Last_Child (Node_Cursor);
+            end if;
+            Continue := Child_Count (Node_Cursor) > 0;
 
-            end loop;  --  Not_Leaf
+         end loop;  --  Not_Leaf
          Out_Data.Replace_Element (index, Element (Node_Cursor).Node_ID);
       end loop;
---        Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
+      --        Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
       return Out_Data;
 
    end Apply_Dense;
@@ -144,6 +147,123 @@ package body Tree is
    end C_Init;
 
    --  ------------------------------------------------------------------------
+
+   function Decision_Path
+     (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
+      return Classifier_Types.Natural_Lists_2D is
+   begin
+      return Decision_Path_Dense (aTree, X);
+
+   end Decision_Path;
+
+   --  -------------------------------------------------------------------------
+
+   function Decision_Path_Dense
+     (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
+      return Classifier_Types.Natural_Lists_2D is
+      use Ada.Containers;
+      use Ada.Strings.Unbounded;
+      use ML_Types;
+      use Value_Data_Package;
+      use Nodes_Package;
+      Routine_Name   : constant String := "Tree.Decision_Path_Dense ";
+      Top_Cursor     : constant Tree_Cursor := First_Child (aTree.Nodes.Root);
+      Num_Samples    : constant Positive := Positive (X.Length);
+      Node_Cursor    : Tree_Cursor;
+      Node           : Tree_Node;
+      Indices        : Classifier_Types.Natural_List;
+      Current_Sample : Value_Data_List;
+      Feature_Value  : Value_Record;
+      Use_Left       : Boolean;
+      Continue       : Boolean := True;
+      Out_Row        : Classifier_Types.Natural_List;
+      Out_Data       : Classifier_Types.Natural_Lists_2D;
+   begin
+      Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
+                "Top node has no children");
+      --  L914
+      for index in 1 .. Num_Samples loop
+         Indices.Append (0);
+      end loop;
+
+      --  L924 for each sample
+      for index in X.First_Index .. X.Last_Index loop
+         Node_Cursor := Top_Cursor;
+         --  Current_Sample is a list of feature values
+         Current_Sample := X.Element (index);
+
+         --  Find a node with a leaf child.
+         --  This node has the prediction value.
+         Continue := True;
+         while Continue and then
+           Child_Count (Node_Cursor) > 0 loop
+            Node := Element (Node_Cursor);
+            Feature_Value :=
+              Current_Sample.Element (Node.Best_Fit_Feature_Index);
+            --                 Printing.Print_Value_Record (Routine_Name & "Feature_Value",
+            --                                              Feature_Value);
+            Assert (Feature_Value.Value_Kind = Float_Type or
+                      Feature_Value.Value_Kind = Integer_Type,
+                    "Tree.Apply_Dense Self.Nodes invalid feature data type");
+            --  Make tree traversal decision
+            case Feature_Value.Value_Kind is
+               when Boolean_Type =>
+                  if True then
+                     Use_Left := 1.0 <= Node.Threshold;
+                  else
+                     Use_Left := 0.0 <= Node.Threshold;
+                  end if;
+               when Float_Type =>
+                  Use_Left := Feature_Value.Float_Value <= Node.Threshold;
+               when Integer_Type =>
+                  Use_Left := Float (Feature_Value.Integer_Value) <=
+                    Node.Threshold;
+               when UB_String_Type =>
+                  declare
+                     Comp : Float := 0.0;
+                     Text : constant String :=
+                              To_String (Feature_Value.UB_String_Value);
+                  begin
+                     for pos in 1 .. Text'Length loop
+                        Comp := Comp +
+                          Float (Integer'Value (Text (pos .. pos)));
+                     end loop;
+                     Use_Left := Comp <= Node.Threshold;
+                  end;
+            end case;
+
+            if Use_Left then
+               --                    Put_Line (Routine_Name & "use left child Node_ID" &
+               --                                Integer'Image
+               --                                (Element (First_Child (Node_Cursor)).Node_ID));
+               Node_Cursor := First_Child (Node_Cursor);
+            else
+               --                    Put_Line (Routine_Name & "use right child Node_ID" &
+               --                                Integer'Image
+               --                                (Element (Last_Child (Node_Cursor)).Node_ID));
+               Node_Cursor := Last_Child (Node_Cursor);
+            end if;
+            Continue := Child_Count (Node_Cursor) > 0;
+
+         end loop;  --  Not_Leaf
+         Indices.Replace_Element (index, Element (Node_Cursor).Node_ID);
+      end loop;
+
+      for index in 1 .. Num_Samples loop
+         Out_Row.Clear;
+         for index_2 in 1 .. Integer (Node_Count (aTree.Nodes)) loop
+            Out_Row.Append (Indices.Element (index_2));
+         end loop;
+         Out_Data.Append (Out_Row);
+      end loop;
+
+      --        Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
+      return Out_Data;
+
+   end Decision_Path_Dense;
+
+   --  -------------------------------------------------------------------------
+
    --  _tree L758
    --  Predict returns a 3D list, num_samples x num_outputs x num_classes
    function Predict (Self : in out Tree_Class;
