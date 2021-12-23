@@ -20,6 +20,48 @@ package body Decision_Path_Tests is
    use ML_Types;
 
    --  -------------------------------------------------------------------------
+
+   procedure Assert_Correct_Leaf_Indices
+     (aClassifier    : Base_Decision_Tree.Classifier;
+      X              : Value_Data_Lists_2D;
+      Node_Indicator : Classifier_Types.Natural_Lists_2D) is
+      Routine_Name   : constant String :=
+                         "Decision_Path_Tests.Assert_Correct_Leaf_Indices ";
+      Leaves         : constant Classifier_Types.Natural_List :=
+                         Base_Decision_Tree.Apply (aClassifier, X);
+      Ones           : constant Weights.Weight_List :=
+                         Classifier_Utilities.Ones (Positive (X.Length));
+      Node_List      : Classifier_Types.Natural_List;
+      Enum_Leaves    : array (1 .. Integer (Leaves.Length), 1 .. 2) of Integer;
+      Leaf_Indicator : array (1 .. Integer (Leaves.Length)) of Integer;
+      Count          : Natural := 0;
+   begin
+      for index in 1 .. Integer (Leaves.Length) loop
+         Enum_Leaves (index, 1) := index;
+         Enum_Leaves (index, 2) := Leaves.Element (index);
+      end loop;
+
+      for index in 1 .. Integer (Enum_Leaves'Length) loop
+         for index_2 in 1 .. Integer (Enum_Leaves'Length (2)) loop
+            Node_List := Node_Indicator.Element (Enum_Leaves (index, index_2));
+            Leaf_Indicator (index) := Node_List.Element (index_2);
+         end loop;
+      end loop;
+      Printing.Print_Natural_List (Routine_Name & "Leaves", Leaves);
+
+      Put_Line (Routine_Name & "Leaf_Indicator");
+      for index in 1 .. Integer (Leaf_Indicator'Length) loop
+         Put (Integer'Image (Leaf_Indicator(index)));
+         Count := Count + 1;
+         if Count > 10 then
+            Count := 0;
+            New_Line;
+         end if;
+      end loop;
+
+   end Assert_Correct_Leaf_Indices;
+
+   --  -------------------------------------------------------------------------
    --  Based on test_decision_path L1692 which calls check_decision_path L1688
    procedure Test_Decision_Path  is
       use Ada.Containers;
@@ -77,6 +119,8 @@ package body Decision_Path_Tests is
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
          Output_File_Name => To_Unbounded_String ("decision_path.dot"));
+
+      Assert_Correct_Leaf_Indices (theClassifier, X, Node_Indicator);
 
    end Test_Decision_Path;
 

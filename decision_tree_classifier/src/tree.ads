@@ -85,6 +85,8 @@ package Tree is
 
    Value_Error : Exception;
 
+   function Apply (Self : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
+                   return Classifier_Types.Natural_List;
    procedure C_Init (aTree        : in out Tree_Class; Num_Features : Natural := 0;
                      Num_Classes  : Classifier_Types.Natural_List :=
                        Classifier_Types.Natural_Package.Empty_Vector;

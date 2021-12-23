@@ -108,11 +108,12 @@ package Base_Decision_Tree is
    Classifier_Error : Exception;
    Value_Error      : Exception;
 
+   function Apply (aClassifier : Classifier; X : ML_Types.Value_Data_Lists_2D)
+                   return Classifier_Types.Natural_List;
    --  BaseDecisionTree.Fit (super of class DecisionTreeClassifier)
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
-
    procedure Base_Fit
      (aClassifier    : in out Classifier;
       X              : ML_Types.Value_Data_Lists_2D;

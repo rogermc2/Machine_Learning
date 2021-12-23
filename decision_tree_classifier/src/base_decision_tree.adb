@@ -28,6 +28,16 @@ package body Base_Decision_Tree is
    procedure Prune_Tree (aClassifier : in out Classifier);
 
    --  -------------------------------------------------------------------------
+
+   function Apply (aClassifier : Classifier; X : ML_Types.Value_Data_Lists_2D)
+                   return Classifier_Types.Natural_List is
+   begin
+
+      return Tree.Apply (aClassifier.Attributes.Decision_Tree, X);
+
+   end Apply;
+
+   --  -------------------------------------------------------------------------
    --  if is_classification: part of _classes.py BasesDecisionTree.Fit
    --  L150
    procedure Base_Fit
@@ -392,10 +402,10 @@ package body Base_Decision_Tree is
 
    function Predict (Self : in out Classifier;
                      X    : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_2D is
+                     return ML_Types.Value_Data_Lists_2D is
       --  returns num samples x num outputs
       use Weights;
---        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
+      --        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
       --  L468 Prob_A: num_samples x num_outputs x num_classes
       Prob_A            : constant Weight_Lists_3D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
