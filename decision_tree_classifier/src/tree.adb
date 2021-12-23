@@ -150,7 +150,7 @@ package body Tree is
 
    function Decision_Path
      (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D is
+    return Classifier_Types.Natural_Lists_2D is
    begin
       return Decision_Path_Dense (aTree, X);
 
@@ -160,7 +160,7 @@ package body Tree is
 
    function Decision_Path_Dense
      (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D is
+    return Classifier_Types.Natural_Lists_2D is
       use Ada.Containers;
       use Ada.Strings.Unbounded;
       use ML_Types;
@@ -233,18 +233,11 @@ package body Tree is
             end case;
 
             if Use_Left then
-               --                    Put_Line (Routine_Name & "use left child Node_ID" &
-               --                                Integer'Image
-               --                                (Element (First_Child (Node_Cursor)).Node_ID));
                Node_Cursor := First_Child (Node_Cursor);
             else
-               --                    Put_Line (Routine_Name & "use right child Node_ID" &
-               --                                Integer'Image
-               --                                (Element (Last_Child (Node_Cursor)).Node_ID));
                Node_Cursor := Last_Child (Node_Cursor);
             end if;
             Continue := Child_Count (Node_Cursor) > 0;
-
          end loop;  --  Not_Leaf
          Indices.Replace_Element (index, Element (Node_Cursor).Node_ID);
       end loop;
@@ -257,13 +250,11 @@ package body Tree is
          Out_Data.Append (Out_Row);
       end loop;
 
-      --        Printing.Print_Natural_List (Routine_Name & "Out_Data", Out_Data);
       return Out_Data;
 
    end Decision_Path_Dense;
 
    --  -------------------------------------------------------------------------
-
    --  _tree L758
    --  Predict returns a 3D list, num_samples x num_outputs x num_classes
    function Predict (Self : in out Tree_Class;

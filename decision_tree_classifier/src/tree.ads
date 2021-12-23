@@ -91,9 +91,9 @@ package Tree is
                      Num_Classes  : Classifier_Types.Natural_List :=
                        Classifier_Types.Natural_Package.Empty_Vector;
                      Num_Outputs  : Index_Range := 1);
-   function Decision_Path (aTree : Tree_Class;
-                           X     : ML_Types.Value_Data_Lists_2D)
-                           return Classifier_Types.Natural_Lists_2D;
+   function Decision_Path
+     (aTree : Tree_Class; X : ML_Types.Value_Data_Lists_2D)
+      return Classifier_Types.Natural_Lists_2D;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;

@@ -101,6 +101,8 @@ package body Decision_Path_Tests is
       New_Line;
 
       Node_Indicator := Base_Decision_Tree.Decision_Path (theClassifier, X);
+      Printing.Print_Natural_Lists_2D (Routine_Name & "Node_Indicator",
+                                       Node_Indicator);
       Success := Positive (Node_Indicator.Length) = Num_Samples and
         Node_Indicator.Element (1).Length =
         theClassifier.Attributes.Decision_Tree.Nodes.Node_Count;
