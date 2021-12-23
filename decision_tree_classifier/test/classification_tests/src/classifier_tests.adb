@@ -143,26 +143,26 @@ package body Classifier_Tests is
       Iris_Target := Iris_Data.Label_Values;
       Assert (Positive (Iris_Target.Length) = Num_Samples, Routine_Name &
                 " invalid Iris_Target vector");
-      --  L1695
+      --  L309
       Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
       --        Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
-      --  L306
+      --  L310
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Printing.Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Transpose (Prediction));
       Score := Classification_Metrics.Accuracy_Score (Iris_Target, Prediction);
       Put_Line (Routine_Name & " Score" &  Float'Image (Score));
 
-      Success := Score > 0.5;
+      Success := Score > 0.9;
       if Success then
          Put_Line
-           ("Classification_Tests Iris prediction test passed");
+           ("Classification_Tests Iris prediction test passed.");
       else
          Put_Line
-           ("Classification_Tests Iris prediction test failed");
+           ("Classification_Tests Iris prediction test failed.");
          Put_Line (Routine_Name & " Score" &  Float'Image (Score));
          New_Line;
       end if;
@@ -172,6 +172,35 @@ package body Classifier_Tests is
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree,
          Output_File_Name => To_Unbounded_String ("iris.dot"));
+
+      --  L315
+      C_Init (theClassifier, Min_Split, Criterion.Gini_Criteria,
+              Max_Features => 2);
+      Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
+      --        Printing.Print_Tree ("The Tree, Max_Features = 2", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+
+      --  L317
+      Prediction := Base_Decision_Tree.Predict (theClassifier, X);
+      Printing.Print_Value_Data_Lists_2D
+        (Routine_Name & " Predictions Max_Features = 2",
+         Transpose (Prediction));
+      Score := Classification_Metrics.Accuracy_Score (Iris_Target, Prediction);
+      Put_Line (Routine_Name & " Score for Max_Features = 2:" &
+                  Float'Image (Score));
+
+      Success := Success and Score > 0.5;
+      if Success then
+         Put_Line
+           ("Classification_Tests Iris prediction test passed.");
+      else
+         Put_Line
+           ("Classification_Tests Iris prediction test failed.");
+         Put_Line (Routine_Name & " Score for Max_Features = 2:" &
+                     Float'Image (Score));
+         New_Line;
+      end if;
 
    end Test_Iris;
 
