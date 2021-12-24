@@ -147,6 +147,7 @@ package body Ada_Tree_Builder is
       if Data.Depth + 1 > Max_Depth_Seen then
          Max_Depth_Seen := Data.Depth + 1;
       end if;
+      theTree.Max_Depth := Max_Depth_Seen;
 
    end Add_Branch;
 
