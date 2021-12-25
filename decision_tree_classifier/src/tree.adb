@@ -5,7 +5,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Tree is
 
@@ -203,6 +203,8 @@ package body Tree is
          Node_Cursor := Top_Cursor;
          --  Current_Sample is a list of feature values
          Current_Sample := X.Element (index);
+         Printing.Print_Value_Data_List (Routine_Name & "Current_Sample",
+                                         Current_Sample);
 
          --  L928 Add all external nodes
          Continue := True;
@@ -216,7 +218,7 @@ package body Tree is
          while Continue and then
            Child_Count (Node_Cursor) > 0 loop
             Node := Element (Node_Cursor);
---              I_Index := I_Index + 1;
+            I_Index := I_Index + 1;
 --              Put_Line (Routine_Name & "I_Index" & Integer'Image (I_Index));
 --              Ind_Ptr (I_Index) := Node.Node_ID;
             Node_ID_List.Replace_Element (I_Index, Node.Node_ID);

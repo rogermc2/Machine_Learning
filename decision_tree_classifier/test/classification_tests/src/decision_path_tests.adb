@@ -1,4 +1,3 @@
---  Based on scikit-learn/sklearn/tree/tests check_decision_path L1692
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
@@ -29,8 +28,6 @@ package body Decision_Path_Tests is
                          "Decision_Path_Tests.Assert_Correct_Leaf_Indices ";
       Leaves         : constant Classifier_Types.Natural_List :=
                          Base_Decision_Tree.Apply (aClassifier, X);
-      Ones           : constant Weights.Weight_List :=
-                         Classifier_Utilities.Ones (Positive (X.Length));
       Node_List      : Classifier_Types.Natural_List;
       Enum_Leaves    : array (1 .. Integer (Leaves.Length), 1 .. 2) of Integer;
       Leaf_Indicator : array (1 .. Integer (Leaves.Length)) of Integer;
@@ -62,7 +59,70 @@ package body Decision_Path_Tests is
    end Assert_Correct_Leaf_Indices;
 
    --  -------------------------------------------------------------------------
-   --  Based on test_decision_path L1692 which calls check_decision_path L1688
+   --  Based on test_decision_path_hardcoded L1684
+   procedure Test_Decision_Path_Hardcoded  is
+      use Ada.Containers;
+      use Classifier_Utilities;
+      use Decision_Tree_Classification;
+      --        use Printing;
+      use Classifier_Types.Float_Package;
+      Routine_Name      : constant String :=
+                            "Decision_Path_Tests.Test_Decision_Path_Hardcoded ";
+      Iris_Data         : constant Multi_Output_Data_Record :=
+                            Load_Data ("src/iris.csv");
+      X                 :  constant Value_Data_Lists_2D :=
+                            Iris_Data.Feature_Values;
+      Num_Samples       : constant Natural := Natural (X.Length);
+      T                 : constant Classifier_Types.Multi_Value_Array
+        (1 .. 2, 1 .. 3) := ((1, 1, 0), (1, 0, 1));
+      Expected          : constant Value_Data_Lists_2D :=
+                            To_Multi_Value_List (T);
+      X2                : Value_Data_Lists_2D;
+      theClassifier     : Base_Decision_Tree.Classifier
+        (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
+      --  Iris_Target (Y) : num outputs x num samples
+      Iris_Target       : Value_Data_Lists_2D;
+      No_Weights        : Weights.Weight_List := Empty_Vector;
+      Node_Indicator    : Classifier_Types.Natural_Lists_2D;
+      Success           : Boolean;
+   begin
+      --  L1698
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 1);
+      Put_Line (Routine_Name);
+      Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
+
+      --  Iris_Target is 2D list num outputs x num samples
+      Iris_Target := Iris_Data.Label_Values;
+      Assert (Positive (Iris_Target.Length) = Num_Samples, Routine_Name &
+                " invalid Iris_Target vector");
+      --  L1687
+      Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
+      Printing.Print_Tree ("The Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+      X2.Append (X.First_Element);
+      X2.Append (X.Element (2));
+      Node_Indicator := Base_Decision_Tree.Decision_Path (theClassifier, X2);
+      Printing.Print_Natural_Lists_2D (Routine_Name & "Node_Indicator",
+                                       Node_Indicator);
+      Success := Positive (Node_Indicator.Length) = Num_Samples and
+        Node_Indicator.Element (1).Length =
+        theClassifier.Attributes.Decision_Tree.Nodes.Node_Count;
+      if Success then
+         Put_Line (Routine_Name & "test passed.");
+      else
+         Put_Line (Routine_Name & "test failed.");
+         Put_Line (Routine_Name & "Node_Indicator size: " &
+                     Count_Type'Image (Node_Indicator.Length) & " x" &
+                     Count_Type'Image (Node_Indicator.Element (1).Length));
+         New_Line;
+      end if;
+
+   end Test_Decision_Path_Hardcoded;
+
+   --  -------------------------------------------------------------------------
+
+   --  Based on test_decision_path L1692
    procedure Test_Decision_Path  is
       use Ada.Containers;
       use Classifier_Utilities;
