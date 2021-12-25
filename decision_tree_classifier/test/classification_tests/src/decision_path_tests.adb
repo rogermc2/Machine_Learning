@@ -97,11 +97,13 @@ package body Decision_Path_Tests is
                 " invalid Iris_Target vector");
       --  L1687
       Classification_Fit (theClassifier, X, Iris_Target, No_Weights);
-      Printing.Print_Tree ("The Tree", theClassifier);
+      Printing.Print_Tree (Routine_Name & "Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
+
       X2.Append (X.First_Element);
       X2.Append (X.Element (2));
+
       Node_Indicator := Base_Decision_Tree.Decision_Path (theClassifier, X2);
       Printing.Print_Natural_Lists_2D (Routine_Name & "Node_Indicator",
                                        Node_Indicator);

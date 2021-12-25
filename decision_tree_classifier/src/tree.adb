@@ -210,7 +210,7 @@ package body Tree is
          Continue := True;
          I_Index := 0;
          Node_ID_List.Clear;
-         for index in 1 .. aTree.Max_Depth + 1 loop
+         for index in 1 .. aTree.Max_Depth loop
             Node_ID_List.Append (0);
          end loop;
 
@@ -219,7 +219,8 @@ package body Tree is
            Child_Count (Node_Cursor) > 0 loop
             Node := Element (Node_Cursor);
             I_Index := I_Index + 1;
---              Put_Line (Routine_Name & "I_Index" & Integer'Image (I_Index));
+            Put_Line (Routine_Name & "index, I_Index:" &
+                        Integer'Image (index) & ", " & Integer'Image (I_Index));
 --              Ind_Ptr (I_Index) := Node.Node_ID;
             Node_ID_List.Replace_Element (I_Index, Node.Node_ID);
             Feature_Value :=
