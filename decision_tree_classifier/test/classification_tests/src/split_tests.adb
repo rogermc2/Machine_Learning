@@ -69,7 +69,7 @@ package body Split_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name              : constant String :=
                                     "Split_Tests.Test_Min_Samples_Split ";
-      Iris_Data                 : constant Data_Record :=
+      Iris_Data                 : constant Multi_Output_Data_Record :=
                                     Load_Data ("src/iris.csv");
       --  L666
       X                         : constant Value_Data_Lists_2D :=
@@ -94,7 +94,7 @@ package body Split_Tests is
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
       --  L667 Y is 2D list num outputs x num classes
-      Y := To_Value_2D_List (Iris_Data.Label_Values);
+      Y := Iris_Data.Label_Values;
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
 
