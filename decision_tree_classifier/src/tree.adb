@@ -201,12 +201,13 @@ package body Tree is
          while Continue and then
            Child_Count (Node_Cursor) > 0 loop
             Node := Element (Node_Cursor);
+            Node_ID_List.Append (Node.Node_ID);
+
             Feature_Value :=
               Current_Sample.Element (Node.Best_Fit_Feature_Index);
             Put_Line (Routine_Name & "Node_ID " & Integer'Image (Node.Node_ID));
             Printing.Print_Value_Record (Routine_Name & "Feature_Value",
                                          Feature_Value);
-            Node_ID_List.Append (Node.Node_ID);
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -249,6 +250,8 @@ package body Tree is
          --  L939 Add leaf node
          Node := Element (Node_Cursor);
          Node_ID_List.Append (Node.Node_ID);
+         Printing.Print_Natural_List (Routine_Name & "Node_ID_List",
+                                         Node_ID_List);
          Out_Data.Append (Node_ID_List);
       end loop;
 
