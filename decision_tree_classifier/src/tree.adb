@@ -168,13 +168,7 @@ package body Tree is
       use Nodes_Package;
       Routine_Name   : constant String := "Tree.Decision_Path_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (aTree.Nodes.Root);
---        Num_Samples    : constant Positive := Positive (X.Length);
-      --  L910 Initialize output
---        Ind_Ptr        : array (1 .. Num_Samples + 1) of Natural :=
---                           (others => 0);
---        Indices        : array (1 .. Num_Samples, 1 .. aTree.Max_Depth + 1)
---          of Natural :=  (others => (others => 0));
-      I_Index        : Natural := 0;
+      Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
       Node_ID_List   : Classifier_Types.Natural_List;
@@ -185,21 +179,15 @@ package body Tree is
       --  Out_Data: num samples x num nodes
       Out_Data       : Classifier_Types.Natural_Lists_2D;
    begin
-      --  csr_matrix() is used to create a sparse matrix of
-      --  compressed sparse row format.
-      --  csr_matrix((data, indices, indptr), [shape=(M, N)])
-      --  is the standard CSR representation where the column indices for
-      --  row i are stored in indices[indptr[i]:indptr[i+1]] and their
-      --  corresponding values are stored in data[indptr[i]:indptr[i+1]].
-      Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
+     Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
                 "Top node has no children");
-      --  L914
---        for index in 1 .. Num_Samples loop
---           Indices_List.Append (0);
---        end loop;
+         Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
+         Put_Line (Routine_Name & "Max_Depth" & Integer'Image (aTree.Max_Depth));
 
       --  L924 for each sample
       for index in X.First_Index .. X.Last_Index loop
+         New_Line;
+         Put_Line (Routine_Name & "Sample " & Integer'Image (index));
          Node_Cursor := Top_Cursor;
          --  Current_Sample is a list of feature values
          Current_Sample := X.Element (index);
@@ -208,23 +196,17 @@ package body Tree is
 
          --  L928 Add all external nodes
          Continue := True;
-         I_Index := 0;
          Node_ID_List.Clear;
-         for index in 1 .. aTree.Max_Depth loop
-            Node_ID_List.Append (0);
-         end loop;
 
-         Put_Line (Routine_Name & "Max_Depth" & Integer'Image (aTree.Max_Depth));
          while Continue and then
            Child_Count (Node_Cursor) > 0 loop
             Node := Element (Node_Cursor);
-            I_Index := I_Index + 1;
-            Put_Line (Routine_Name & "index, I_Index:" &
-                        Integer'Image (index) & ", " & Integer'Image (I_Index));
---              Ind_Ptr (I_Index) := Node.Node_ID;
-            Node_ID_List.Replace_Element (I_Index, Node.Node_ID);
             Feature_Value :=
               Current_Sample.Element (Node.Best_Fit_Feature_Index);
+            Put_Line (Routine_Name & "Node_ID " & Integer'Image (Node.Node_ID));
+            Printing.Print_Value_Record (Routine_Name & "Feature_Value",
+                                         Feature_Value);
+            Node_ID_List.Append (Node.Node_ID);
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -266,18 +248,9 @@ package body Tree is
 
          --  L939 Add leaf node
          Node := Element (Node_Cursor);
-         Node_ID_List.Replace_Element (I_Index + 1, Node.Node_ID);
-         --           Ind_Ptr (I_Index) := Node.Node_ID;
+         Node_ID_List.Append (Node.Node_ID);
          Out_Data.Append (Node_ID_List);
       end loop;
-
---        for index in 1 .. Num_Samples loop
---           Out_Row.Clear;
---           for index_2 in 1 .. Integer (Node_Count (aTree.Nodes)) loop
---              Out_Row.Append (Indices_List.Element (index_2));
---           end loop;
---           Out_Data.Append (Out_Row);
---        end loop;
 
       return Out_Data;
 
