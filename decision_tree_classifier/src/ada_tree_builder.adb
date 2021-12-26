@@ -60,6 +60,9 @@ package body Ada_Tree_Builder is
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                   Weighted_Node_Samples);
+      Put_Line (Routine_Name & " Start_Row, Stop_Row" &
+                     Integer'Image (Start_Row) & ", " &
+                     Integer'Image (Stop_Row));
 
       --  L204
       Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
