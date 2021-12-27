@@ -83,6 +83,10 @@ package body Node_Splitter is
          else  --  L378
             OK := not LE and F_I > 1;
          end if;
+      else
+         Put_Line (Routine_Name & "X_F_End.Value_Kind /= X_F_Start.Value_Kind");
+         Printing.Print_Value_Record (Routine_Name & "X_F_Start", X_F_Start);
+         Printing.Print_Value_Record (Routine_Name & "X_F_End", X_F_End);
       end if;
 
       return OK;
@@ -297,11 +301,11 @@ package body Node_Splitter is
            --   At least one drawn feature must be a non-constant.
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
-         Put_Line (Routine_Name & "Start_Row, Stop_Row: " &
-                     Integer'Image (Start_Row) & ", " &
-                     Integer'Image (Stop_Row));
-         Printing.Print_Value_Data_List
-           (Routine_Name & "Feature_Values", Self.Feature_Values);
+--           Put_Line (Routine_Name & "Start_Row, Stop_Row: " &
+--                       Integer'Image (Start_Row) & ", " &
+--                       Integer'Image (Stop_Row));
+--           Printing.Print_Value_Data_List
+--             (Routine_Name & "Feature_Values", Self.Feature_Values);
          --  L329
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L339
@@ -330,17 +334,23 @@ package body Node_Splitter is
             --  L349 F_J >= Num_Known_Constants
             --  F_J is in the interval
             --  Num_Known_Constants + 1 .. F_I - Num_Found_Constants
+--              Put_Line (Routine_Name & "L349 Num_Total_Constants: " &
+--                           Integer'Image (Num_Known_Constants));
             Assert (F_J > Num_Known_Constants and
                       F_J <= F_I - Num_Found_Constants,
                     Routine_Name & "F_J: " & Integer'Image (F_J) &
-                      "should be in the range " &
-                      Integer'Image (Num_Known_Constants + 1) &  ".. " &
+                      " should be in the range " &
+                      Integer'Image (Num_Known_Constants + 1) &  " .. " &
                       Integer'Image (F_I - Num_Found_Constants));
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
+--              Put_Line (Routine_Name & "Process_Non_Constants Num_Total_Constants: " &
+--                           Integer'Image (Num_Total_Constants));
             Process_Non_Constants
               (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                Stop_Row, F_I, F_J, Best_Split);
+--              Put_Line (Routine_Name & "after Process_Non_Constants Num_Total_Constants: " &
+--                           Integer'Image (Num_Total_Constants));
          end if;
       end loop;  --  L415
 
@@ -466,34 +476,34 @@ package body Node_Splitter is
       X_Samples            : Value_Data_List;
       Swap                 : Natural;
    begin
-      Printing.Print_Value_Data_List (Routine_Name & " Feature_Values",
-                                      Splitter.Feature_Values);
+--        Printing.Print_Value_Data_List (Routine_Name & " Feature_Values",
+--                                        Splitter.Feature_Values);
       --  L359 Xf is a pointer to self.feature_values
       --  L352
-      Put_Line (Routine_Name & " Start_Row, Stop_Row" &
-                     Integer'Image (Start_Row) & ", " &
-                     Integer'Image (Stop_Row));
+--        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
+--                       Integer'Image (Start_Row) & ", " &
+--                       Integer'Image (Stop_Row));
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
-      Put_Line (Routine_Name & " Current_Split.Feature" &
-         Integer'Image (Current_Split.Feature));
+--        Put_Line (Routine_Name & " Current_Split.Feature" &
+--           Integer'Image (Current_Split.Feature));
       --  L358 Sort samples along Current.Feature index
       for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Splitter.Sample_Indices.Element (index);
-         Put_Line (Routine_Name & " index, X_Samples_Row" &
-                     Integer'Image (index) & ", " &
-                     Integer'Image (X_Samples_Row));
+--           Put_Line (Routine_Name & " index, X_Samples_Row" &
+--                       Integer'Image (index) & ", " &
+--                       Integer'Image (X_Samples_Row));
          X_Samples := Splitter.X.Element (X_Samples_Row);
-         Printing.Print_Value_Data_List (Routine_Name & " X_Samples",
-                                         X_Samples);
+--           Printing.Print_Value_Data_List (Routine_Name & " X_Samples",
+--                                           X_Samples);
          --  Splitter.Feature_Values is a Value_Data_List
          Splitter.Feature_Values.Replace_Element
            (index, X_Samples (Current_Split.Feature));
       end loop;
 
       --  L361
-      Printing.Print_Value_Data_List
-                (Routine_Name & "L361 Splitter.Feature_Values",
-                 Splitter.Feature_Values);
+--        Printing.Print_Value_Data_List
+--                  (Routine_Name & "L361 Splitter.Feature_Values",
+--                   Splitter.Feature_Values);
       Sort (Splitter.Feature_Values);
       --          Printing.Print_Value_Data_List
       --            (Routine_Name & "sorted Splitter.Feature_Values",
@@ -501,6 +511,8 @@ package body Node_Splitter is
       --  Splitter.Feature_Values is a value_data_list
       --  If can't split, Can_Split swaps Feature_Indices (F_J) with
       --  Feature_Indices (Num_Total_Constants)
+      Put_Line (Routine_Name & "after sort Num_Total_Constants: " &
+                         Integer'Image (Num_Total_Constants));
       if Can_Split (Splitter, Num_Total_Constants, F_I, F_J) then
          --  L375 Implement Fisher-Yates permutation by swapping F_J feature
          --  with preceding F_I feature
@@ -525,6 +537,9 @@ package body Node_Splitter is
       else -- L366 can't split
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
+         Put_Line (Routine_Name & "L366 can't split Num_Total_Constants: " &
+                         Integer'Image (Num_Total_Constants));
+                         New_Line;
       end if;
 
    end Process_Non_Constants;
@@ -646,6 +661,8 @@ package body Node_Splitter is
       Num_Found_Constants  : Natural := 0;
       Best_Split           : Split_Record;
    begin
+      Put_Line ( Routine_Name & "Num_Known_Constants: " &
+                      Integer'Image (Num_Known_Constants));
       --  L271 samples is a pointer to self.samples
       --  L275 features is a pointer to self.features
       --  L276 constant_features is a pointer to self.constant_features
@@ -655,12 +672,19 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
+      Put_Line ( Routine_Name & "319 Num_Total_Constants: " &
+                      Integer'Image (Num_Total_Constants));
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
+      Put_Line ( Routine_Name & "417 Num_Total_Constants: " &
+                      Integer'Image (Num_Total_Constants));
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
+
+      Put_Line ( Routine_Name & "454 Num_Total_Constants: " &
+                      Integer'Image (Num_Total_Constants));
 
       --  L454
       Num_Constant_Features := Num_Total_Constants;
