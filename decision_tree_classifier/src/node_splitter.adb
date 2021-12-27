@@ -172,7 +172,7 @@ package body Node_Splitter is
 
          --  L386
          P_Index := P_Index + 1;
-         --              Put_Line (Routine_Name & "L388 P_Index " & Integer'Image (P_Index));
+--           Put_Line (Routine_Name & "L388 P_Index " & Integer'Image (P_Index));
          --  L388
          if P_Index <= Splitter.Stop_Row then
             Current.Split_Row := P_Index;
@@ -183,10 +183,8 @@ package body Node_Splitter is
               Splitter.Stop_Row - Current.Split_Row + 1 >=
                 Splitter.Min_Leaf_Samples then
                --  L396
-               --                      Put_Line (Routine_Name & "L396 update criterion");
                Criterion.Update (Splitter.Criteria, Current.Split_Row);
 
-               --                 Put_Line (Routine_Name & "L399");
                --  L399 Accept if min_weight_leaf is satisfied
                if Splitter.Criteria.Num_Weighted_Left >=
                  Splitter.Min_Leaf_Weight and
@@ -201,6 +199,13 @@ package body Node_Splitter is
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
+                     Put_Line (Routine_Name & " L414 P_Index, Stop_Row: " &
+                              Integer'Image (P_Index) & ", " &
+                              Integer'Image (Splitter.Stop_Row));
+                     Put_Line (Routine_Name & " L414 Feature_Values.Length: " &
+                              Integer'Image (Integer (Feature_Values.Length)));
+                     Put_Line (Routine_Name & " Value_Kind: " & Data_Type'Image
+                               (Feature_Values.Element (P_Index).Value_Kind));
                      case Feature_Values.Element (P_Index).Value_Kind is
                         when Float_Type =>
                            Current.Threshold := 0.5 *
@@ -246,6 +251,7 @@ package body Node_Splitter is
 
                         when Boolean_Type | UB_String_Type => null;
                      end case;
+                     Put_Line (Routine_Name & " L419");
 
                      --  L419 Only update if Current_Proxy_Improvement
                      --       > Best_Proxy_Improvement
@@ -482,6 +488,10 @@ package body Node_Splitter is
       Put_Line (Routine_Name & " L352 Start_Row, Stop_Row" &
                   Integer'Image (Start_Row) & ", " &
                   Integer'Image (Stop_Row));
+      Printing.Print_Value_Data_List
+        (Routine_Name & "L352 Splitter.Feature_Values",
+         Splitter.Feature_Values);
+      Splitter.Feature_Values.Clear;
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
 --        Put_Line (Routine_Name & " L352 Current_Split.Feature" &
 --                    Integer'Image (Current_Split.Feature));
@@ -498,21 +508,19 @@ package body Node_Splitter is
          --  Splitter.Feature_Values is a Value_Data_List
 --           Printing.Print_Value_Record (Routine_Name & " Current_Split.Feature",
 --                                           X_Features (Current_Split.Feature));
---           Put_Line (Routine_Name & "Replace_Element");
-         Splitter.Feature_Values.Replace_Element
-           (index, X_Features (Current_Split.Feature));
---           Put_Line (Routine_Name & "Element replaced");
+         Splitter.Feature_Values.Append (X_Features (Current_Split.Feature));
+--           Splitter.Feature_Values.Replace_Element
+--             (index, X_Features (Current_Split.Feature));
       end loop;
 
-      Put_Line (Routine_Name & "L361");
       --  L361
       Printing.Print_Value_Data_List
         (Routine_Name & "L361 Splitter.Feature_Values",
          Splitter.Feature_Values);
       Sort (Splitter.Feature_Values);
---        Printing.Print_Value_Data_List
---          (Routine_Name & "sorted Splitter.Feature_Values",
---           Splitter.Feature_Values);
+      Printing.Print_Value_Data_List
+        (Routine_Name & "sorted Splitter.Feature_Values",
+         Splitter.Feature_Values);
       --  Splitter.Feature_Values is a value_data_list
       --  If can't split, Can_Split swaps Feature_Indices (F_J) with
       --  Feature_Indices (Num_Total_Constants)
@@ -520,24 +528,29 @@ package body Node_Splitter is
          --  L375 Implement Fisher-Yates permutation by swapping F_J feature
          --  with preceding F_I feature
          F_I := F_I - 1;
-         --              Put_Line (Routine_Name & "swapping features " & Integer'Image (F_I) &
-         --                          " and " & Integer'Image (F_J));
+         Put_Line (Routine_Name & " L375 swapping features " &
+                     Integer'Image (F_I) & " and " & Integer'Image (F_J));
+--           Printing.Print_Natural_List
+--                (Routine_Name & "Feature_Indices", Splitter.Feature_Indices);
          if F_J /= F_I then
             Swap := Splitter.Feature_Indices.Element (F_I);
             Splitter.Feature_Indices.Replace_Element
               (F_I, Splitter.Feature_Indices.Element (F_J));
             Splitter.Feature_Indices.Replace_Element (F_J, Swap);
          end if;
-         --              Printing.Print_Natural_List
-         --                (Routine_Name & "Feature_Indices post swap",
-         --                 Splitter.Feature_Indices);
+         Printing.Print_Natural_List
+              (Routine_Name & "Feature_Indices post swap",
+                Splitter.Feature_Indices);
 
          --  L374 Reset the criterion to pos = start
          Criterion.Reset (Splitter.Criteria);
+         Put_Line (Routine_Name & " L374 reset");
          Evaluate_All_Splits (Splitter, Current_Split, Best_Split);
+         Put_Line (Routine_Name & " L415");
          --  L415
 
       else -- L366 can't split
+         Put_Line (Routine_Name & " L366 can't split");
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
       end if;

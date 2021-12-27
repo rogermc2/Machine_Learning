@@ -26,8 +26,7 @@ package body Diabetes_Tests is
       use Decision_Tree_Classification;
       --        use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name    : constant String :=
-                            "Diabetes_Tests.Test_Diabetes_Overfit";
+      Routine_Name    : constant String := "Diabetes_Tests.Test_Diabetes_Overfit";
       Diabetes_Data   : constant Multi_Output_Data_Record :=
                          Load_Data ("src/diabetes3.csv");
       theClassifier   : Base_Decision_Tree.Classifier
@@ -54,7 +53,7 @@ package body Diabetes_Tests is
                 " invalid Diabetes_Target vector");
       --  L309
       Classification_Fit (theClassifier, X, Diabetes_Target, No_Weights);
-      Printing.Print_Tree ("The Tree", theClassifier);
+--        Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
