@@ -2,12 +2,12 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
---  with Printing;
+with Printing;
 
 package body Node_Splitter is
 
@@ -347,11 +347,11 @@ package body Node_Splitter is
             --  F_J is in the interval Num_ Total_Constants .. F_I
             --              Put_Line (Routine_Name & "Process_Non_Constants Num_Total_Constants: " &
             --                           Integer'Image (Num_Total_Constants));
+            Put_Line (Routine_Name & "Process_Non_Constants");
             Process_Non_Constants
               (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                Stop_Row, F_I, F_J, Best_Split);
-            --              Put_Line (Routine_Name & "after Process_Non_Constants Num_Total_Constants: " &
-            --                           Integer'Image (Num_Total_Constants));
+            Put_Line (Routine_Name & "Process_Non_Constants done");
          end if;
       end loop;  --  L415
 
@@ -471,8 +471,8 @@ package body Node_Splitter is
       use Ada.Containers;
       use ML_Types;
       use Value_Data_Sorting;
---        Routine_Name         : constant String :=
---                                 "Node_Splitter.Process_Non_Constants ";
+      Routine_Name         : constant String :=
+                               "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Features           : Value_Data_List;
@@ -487,7 +487,9 @@ package body Node_Splitter is
 --        Put_Line (Routine_Name & " L352 Current_Split.Feature" &
 --                    Integer'Image (Current_Split.Feature));
       Splitter.Feature_Values.Clear;
-      Splitter.Feature_Values.Set_Length (Count_Type (Stop_Row - Start_Row + 1));
+      Splitter.Feature_Values.Set_Length
+        (Count_Type (Stop_Row - Start_Row + 1));
+      Put_Line (Routine_Name & "L358");
       --  L358 Sort samples along Current.Feature index
       for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Splitter.Sample_Indices.Element (index);
@@ -495,15 +497,18 @@ package body Node_Splitter is
 --                       Integer'Image (index) & ", " &
 --                       Integer'Image (X_Samples_Row));
          X_Features := Splitter.X.Element (X_Samples_Row);
---           Printing.Print_Value_Data_List (Routine_Name & " X_Features",
---                                           X_Features);
+         Printing.Print_Value_Data_List (Routine_Name & " X_Features",
+                                         X_Features);
          --  Splitter.Feature_Values is a Value_Data_List
---           Printing.Print_Value_Record (Routine_Name & " Current_Split.Feature",
---                                           X_Features (Current_Split.Feature));
+         Printing.Print_Value_Record (Routine_Name & " Current_Split.Feature",
+                                         X_Features (Current_Split.Feature));
+         Put_Line (Routine_Name & "Replace_Element");
          Splitter.Feature_Values.Replace_Element
            (index, X_Features (Current_Split.Feature));
+         Put_Line (Routine_Name & "Element replaced");
       end loop;
 
+      Put_Line (Routine_Name & "L361");
       --  L361
 --        Printing.Print_Value_Data_List
 --          (Routine_Name & "L361 Splitter.Feature_Values",
@@ -662,6 +667,7 @@ package body Node_Splitter is
                 " called with empty Sample_Indices");
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
+      Put_Line (Routine_Name & "L319");
       --  L319
       --        Printing.Print_Split_Record (Routine_Name & "L319 Best_Split",
       --                                     Best_Split);
@@ -671,6 +677,7 @@ package body Node_Splitter is
                        Num_Total_Constants, Best_Split);
 --        Printing.Print_Value_Data_List (Routine_Name & "L417 Feature_Values",
 --                                        Self.Feature_Values);
+      Put_Line (Routine_Name & "L417");
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);

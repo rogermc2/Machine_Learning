@@ -1,7 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx L119
 --  class DepthFirstTreeBuilder
 
---  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -106,14 +105,17 @@ package body Ada_Tree_Builder is
       Is_Leaf_Node := Is_Leaf_Node or
       abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
 
+      Put_Line (Routine_Name & "L216");
       --  L216
       if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
+         Put_Line (Routine_Name & "L221");
          --  L221
          Is_Leaf_Node := Split.Split_Row > Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
       end if;
+      Put_Line (Routine_Name & "L225");
 
       --  tree.add_node adds one node to the tree
       --  right and left children are added to the stack at
