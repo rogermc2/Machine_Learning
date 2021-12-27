@@ -2,12 +2,12 @@
 
 with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Node_Splitter is
 
@@ -47,7 +47,7 @@ package body Node_Splitter is
                        F_I, F_J              : Natural)
                        return Boolean is
       use ML_Types;
-      Routine_Name : constant String := "Node_Splitter.Can_Split";
+      Routine_Name : constant String := "Node_Splitter.Can_Split ";
       X_F_Start    : constant Value_Record :=
                        Self.Feature_Values.Element (Self.Feature_Values.First_Index);
       X_F_End      : constant Value_Record :=
@@ -57,7 +57,11 @@ package body Node_Splitter is
       OK           : Boolean := False;
    begin
       --  L368
-      if X_F_End.Value_Kind = X_F_Start.Value_Kind then
+--        if X_F_End.Value_Kind = X_F_Start.Value_Kind then
+         Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
+                 Routine_Name & "X_F_End.Value_Kind " &
+                   Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
+                   Data_Type'Image (X_F_Start.Value_Kind));
          case X_F_Start.Value_Kind is
          when Float_Type =>
             LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
@@ -83,11 +87,11 @@ package body Node_Splitter is
          else  --  L378
             OK := not LE and F_I > 1;
          end if;
-      else
-         Put_Line (Routine_Name & "X_F_End.Value_Kind /= X_F_Start.Value_Kind");
-         Printing.Print_Value_Record (Routine_Name & "X_F_Start", X_F_Start);
-         Printing.Print_Value_Record (Routine_Name & "X_F_End", X_F_End);
-      end if;
+--        else
+--           Put_Line (Routine_Name & "X_F_End.Value_Kind /= X_F_Start.Value_Kind");
+--           Printing.Print_Value_Record (Routine_Name & "X_F_Start", X_F_Start);
+--           Printing.Print_Value_Record (Routine_Name & "X_F_End", X_F_End);
+--        end if;
 
       return OK;
 
@@ -469,8 +473,8 @@ package body Node_Splitter is
       Best_Split          : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
-      Routine_Name         : constant String :=
-                                       "Node_Splitter.Process_Non_Constants ";
+--        Routine_Name         : constant String :=
+--                                         "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Samples            : Value_Data_List;
@@ -511,8 +515,6 @@ package body Node_Splitter is
       --  Splitter.Feature_Values is a value_data_list
       --  If can't split, Can_Split swaps Feature_Indices (F_J) with
       --  Feature_Indices (Num_Total_Constants)
-      Put_Line (Routine_Name & "after sort Num_Total_Constants: " &
-                         Integer'Image (Num_Total_Constants));
       if Can_Split (Splitter, Num_Total_Constants, F_I, F_J) then
          --  L375 Implement Fisher-Yates permutation by swapping F_J feature
          --  with preceding F_I feature
@@ -537,9 +539,6 @@ package body Node_Splitter is
       else -- L366 can't split
          Num_Found_Constants := Num_Found_Constants + 1;
          Num_Total_Constants := Num_Total_Constants + 1;
-         Put_Line (Routine_Name & "L366 can't split Num_Total_Constants: " &
-                         Integer'Image (Num_Total_Constants));
-                         New_Line;
       end if;
 
    end Process_Non_Constants;
@@ -661,8 +660,6 @@ package body Node_Splitter is
       Num_Found_Constants  : Natural := 0;
       Best_Split           : Split_Record;
    begin
-      Put_Line ( Routine_Name & "Num_Known_Constants: " &
-                      Integer'Image (Num_Known_Constants));
       --  L271 samples is a pointer to self.samples
       --  L275 features is a pointer to self.features
       --  L276 constant_features is a pointer to self.constant_features
@@ -672,19 +669,12 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
-      Put_Line ( Routine_Name & "319 Num_Total_Constants: " &
-                      Integer'Image (Num_Total_Constants));
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
-      Put_Line ( Routine_Name & "417 Num_Total_Constants: " &
-                      Integer'Image (Num_Total_Constants));
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
-
-      Put_Line ( Routine_Name & "454 Num_Total_Constants: " &
-                      Integer'Image (Num_Total_Constants));
 
       --  L454
       Num_Constant_Features := Num_Total_Constants;

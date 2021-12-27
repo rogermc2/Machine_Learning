@@ -63,8 +63,6 @@ package body Ada_Tree_Builder is
       Put_Line (Routine_Name & " Start_Row, Stop_Row" &
                      Integer'Image (Start_Row) & ", " &
                      Integer'Image (Stop_Row));
-      Put_Line ( Routine_Name & "Num_Constant_Features: " &
-                      Integer'Image (Num_Constant_Features));
 
       --  L204
       Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
@@ -112,8 +110,6 @@ package body Ada_Tree_Builder is
       if not Is_Leaf_Node then
          Split := Split_Node (Builder.Splitter, Impurity,
                               Num_Constant_Features);
-         Put_Line ( Routine_Name & "L221 Num_Constant_Features: " &
-                      Integer'Image (Num_Constant_Features));
          --  L221
          Is_Leaf_Node := Split.Split_Row > Stop_Row or
            Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
@@ -140,8 +136,6 @@ package body Ada_Tree_Builder is
 
       --  L240
       if not Is_Leaf_Node then
-         Put_Line ( Routine_Name & "L240 Num_Constant_Features: " &
-                      Integer'Image (Num_Constant_Features));
          --  Add right branch
          Push (theStack, Split.Split_Row, Stop_Row, Data.Depth + 1,
                Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
