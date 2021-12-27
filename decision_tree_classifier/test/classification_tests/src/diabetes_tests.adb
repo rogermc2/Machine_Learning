@@ -26,9 +26,10 @@ package body Diabetes_Tests is
       use Decision_Tree_Classification;
       --        use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name    : constant String := "Diabetes_Tests.Test_Diabetes_Overfit";
+      Routine_Name    : constant String :=
+                            "Diabetes_Tests.Test_Diabetes_Overfit";
       Diabetes_Data   : constant Multi_Output_Data_Record :=
-                         Load_Data ("src/diabetes2.csv");
+                         Load_Data ("src/diabetes3.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;

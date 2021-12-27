@@ -468,7 +468,6 @@ package body Node_Splitter is
       F_I                 : in out Natural;
       F_J                 : Natural;
       Best_Split          : in out Split_Record) is
-      use Ada.Containers;
       use ML_Types;
       use Value_Data_Sorting;
       Routine_Name         : constant String :=
@@ -480,16 +479,13 @@ package body Node_Splitter is
    begin
       --  L359 Xf is a pointer to self.feature_values
       --  L352
---        Put_Line (Routine_Name & " L352 Start_Row, Stop_Row" &
---                    Integer'Image (Start_Row) & ", " &
---                    Integer'Image (Stop_Row));
+      Put_Line (Routine_Name & " L352 Start_Row, Stop_Row" &
+                  Integer'Image (Start_Row) & ", " &
+                  Integer'Image (Stop_Row));
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
 --        Put_Line (Routine_Name & " L352 Current_Split.Feature" &
 --                    Integer'Image (Current_Split.Feature));
-      Splitter.Feature_Values.Clear;
-      Splitter.Feature_Values.Set_Length
-        (Count_Type (Stop_Row - Start_Row + 1));
-      Put_Line (Routine_Name & "L358");
+
       --  L358 Sort samples along Current.Feature index
       for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Splitter.Sample_Indices.Element (index);
@@ -497,22 +493,22 @@ package body Node_Splitter is
 --                       Integer'Image (index) & ", " &
 --                       Integer'Image (X_Samples_Row));
          X_Features := Splitter.X.Element (X_Samples_Row);
-         Printing.Print_Value_Data_List (Routine_Name & " X_Features",
-                                         X_Features);
+--           Printing.Print_Value_Data_List (Routine_Name & " X_Features",
+--                                           X_Features);
          --  Splitter.Feature_Values is a Value_Data_List
-         Printing.Print_Value_Record (Routine_Name & " Current_Split.Feature",
-                                         X_Features (Current_Split.Feature));
-         Put_Line (Routine_Name & "Replace_Element");
+--           Printing.Print_Value_Record (Routine_Name & " Current_Split.Feature",
+--                                           X_Features (Current_Split.Feature));
+--           Put_Line (Routine_Name & "Replace_Element");
          Splitter.Feature_Values.Replace_Element
            (index, X_Features (Current_Split.Feature));
-         Put_Line (Routine_Name & "Element replaced");
+--           Put_Line (Routine_Name & "Element replaced");
       end loop;
 
       Put_Line (Routine_Name & "L361");
       --  L361
---        Printing.Print_Value_Data_List
---          (Routine_Name & "L361 Splitter.Feature_Values",
---           Splitter.Feature_Values);
+      Printing.Print_Value_Data_List
+        (Routine_Name & "L361 Splitter.Feature_Values",
+         Splitter.Feature_Values);
       Sort (Splitter.Feature_Values);
 --        Printing.Print_Value_Data_List
 --          (Routine_Name & "sorted Splitter.Feature_Values",
