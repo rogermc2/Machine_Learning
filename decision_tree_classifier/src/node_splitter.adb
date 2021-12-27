@@ -199,6 +199,8 @@ package body Node_Splitter is
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
+                     Printing.Print_Value_Data_List
+                       (Routine_Name & " L414 Feature_Values", Feature_Values);
                      Put_Line (Routine_Name & " L414 P_Index, Stop_Row: " &
                               Integer'Image (P_Index) & ", " &
                               Integer'Image (Splitter.Stop_Row));
