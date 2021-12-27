@@ -53,7 +53,7 @@ package body Diabetes_Tests is
                 " invalid Diabetes_Target vector");
       --  L309
       Classification_Fit (theClassifier, X, Diabetes_Target, No_Weights);
-      --        Printing.Print_Tree ("The Tree", theClassifier);
+      Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 

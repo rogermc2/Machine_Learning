@@ -57,12 +57,12 @@ package body Node_Splitter is
       OK           : Boolean := False;
    begin
       --  L368
---        if X_F_End.Value_Kind = X_F_Start.Value_Kind then
-         Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
-                 Routine_Name & "X_F_End.Value_Kind " &
-                   Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
-                   Data_Type'Image (X_F_Start.Value_Kind));
-         case X_F_Start.Value_Kind is
+      --        if X_F_End.Value_Kind = X_F_Start.Value_Kind then
+      Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
+              Routine_Name & "X_F_End.Value_Kind " &
+                Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
+                Data_Type'Image (X_F_Start.Value_Kind));
+      case X_F_Start.Value_Kind is
          when Float_Type =>
             LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
               Feature_Threshold;
@@ -73,25 +73,25 @@ package body Node_Splitter is
          when others =>
             raise Node_Splitter_Error with Routine_Name & ", invalid X_Features"
               & ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
-         end case;
+      end case;
 
-         --  Still L368
-         if LE then
-            Swap := Self.Feature_Indices.Element (F_J);
-            Self.Feature_Indices.Replace_Element
-              (F_J, Self.Feature_Indices.Element
-                 (Num_Total_Constants + 1));
-            Self.Feature_Indices.Replace_Element
-              (Num_Total_Constants + 1, Swap);
+      --  Still L368
+      if LE then
+         Swap := Self.Feature_Indices.Element (F_J);
+         Self.Feature_Indices.Replace_Element
+           (F_J, Self.Feature_Indices.Element
+              (Num_Total_Constants + 1));
+         Self.Feature_Indices.Replace_Element
+           (Num_Total_Constants + 1, Swap);
 
-         else  --  L378
-            OK := not LE and F_I > 1;
-         end if;
---        else
---           Put_Line (Routine_Name & "X_F_End.Value_Kind /= X_F_Start.Value_Kind");
---           Printing.Print_Value_Record (Routine_Name & "X_F_Start", X_F_Start);
---           Printing.Print_Value_Record (Routine_Name & "X_F_End", X_F_End);
---        end if;
+      else  --  L378
+         OK := not LE and F_I > 1;
+      end if;
+      --        else
+      --           Put_Line (Routine_Name & "X_F_End.Value_Kind /= X_F_Start.Value_Kind");
+      --           Printing.Print_Value_Record (Routine_Name & "X_F_Start", X_F_Start);
+      --           Printing.Print_Value_Record (Routine_Name & "X_F_End", X_F_End);
+      --        end if;
 
       return OK;
 
@@ -201,9 +201,6 @@ package body Node_Splitter is
                   if Current_Proxy_Improvement > Best_Proxy_Improvement then
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
-                     --                       Put_Line (Routine_Name &
-                     --                                   "L409 Current_Proxy_Improvement " &
-                     --                                   Float'Image (Current_Proxy_Improvement));
                      case Feature_Values.Element (P_Index).Value_Kind is
                         when Float_Type =>
                            Current.Threshold := 0.5 *
@@ -338,8 +335,8 @@ package body Node_Splitter is
             --  L349 F_J >= Num_Known_Constants
             --  F_J is in the interval
             --  Num_Known_Constants + 1 .. F_I - Num_Found_Constants
---              Put_Line (Routine_Name & "L349 Num_Total_Constants: " &
---                           Integer'Image (Num_Known_Constants));
+            --              Put_Line (Routine_Name & "L349 Num_Total_Constants: " &
+            --                           Integer'Image (Num_Known_Constants));
             Assert (F_J > Num_Known_Constants and
                       F_J <= F_I - Num_Found_Constants,
                     Routine_Name & "F_J: " & Integer'Image (F_J) &
@@ -348,13 +345,13 @@ package body Node_Splitter is
                       Integer'Image (F_I - Num_Found_Constants));
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
---              Put_Line (Routine_Name & "Process_Non_Constants Num_Total_Constants: " &
---                           Integer'Image (Num_Total_Constants));
+            --              Put_Line (Routine_Name & "Process_Non_Constants Num_Total_Constants: " &
+            --                           Integer'Image (Num_Total_Constants));
             Process_Non_Constants
               (Self, Num_Total_Constants, Num_Found_Constants, Start_Row,
                Stop_Row, F_I, F_J, Best_Split);
---              Put_Line (Routine_Name & "after Process_Non_Constants Num_Total_Constants: " &
---                           Integer'Image (Num_Total_Constants));
+            --              Put_Line (Routine_Name & "after Process_Non_Constants Num_Total_Constants: " &
+            --                           Integer'Image (Num_Total_Constants));
          end if;
       end loop;  --  L415
 
@@ -471,47 +468,50 @@ package body Node_Splitter is
       F_I                 : in out Natural;
       F_J                 : Natural;
       Best_Split          : in out Split_Record) is
+      use Ada.Containers;
       use ML_Types;
       use Value_Data_Sorting;
 --        Routine_Name         : constant String :=
---                                         "Node_Splitter.Process_Non_Constants ";
+--                                 "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
-      X_Samples            : Value_Data_List;
+      X_Features           : Value_Data_List;
       Swap                 : Natural;
    begin
---        Printing.Print_Value_Data_List (Routine_Name & " Feature_Values",
---                                        Splitter.Feature_Values);
       --  L359 Xf is a pointer to self.feature_values
       --  L352
---        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
---                       Integer'Image (Start_Row) & ", " &
---                       Integer'Image (Stop_Row));
+--        Put_Line (Routine_Name & " L352 Start_Row, Stop_Row" &
+--                    Integer'Image (Start_Row) & ", " &
+--                    Integer'Image (Stop_Row));
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
---        Put_Line (Routine_Name & " Current_Split.Feature" &
---           Integer'Image (Current_Split.Feature));
+--        Put_Line (Routine_Name & " L352 Current_Split.Feature" &
+--                    Integer'Image (Current_Split.Feature));
+      Splitter.Feature_Values.Clear;
+      Splitter.Feature_Values.Set_Length (Count_Type (Stop_Row - Start_Row + 1));
       --  L358 Sort samples along Current.Feature index
       for index in Start_Row .. Stop_Row loop
          X_Samples_Row := Splitter.Sample_Indices.Element (index);
 --           Put_Line (Routine_Name & " index, X_Samples_Row" &
 --                       Integer'Image (index) & ", " &
 --                       Integer'Image (X_Samples_Row));
-         X_Samples := Splitter.X.Element (X_Samples_Row);
---           Printing.Print_Value_Data_List (Routine_Name & " X_Samples",
---                                           X_Samples);
+         X_Features := Splitter.X.Element (X_Samples_Row);
+--           Printing.Print_Value_Data_List (Routine_Name & " X_Features",
+--                                           X_Features);
          --  Splitter.Feature_Values is a Value_Data_List
+--           Printing.Print_Value_Record (Routine_Name & " Current_Split.Feature",
+--                                           X_Features (Current_Split.Feature));
          Splitter.Feature_Values.Replace_Element
-           (index, X_Samples (Current_Split.Feature));
+           (index, X_Features (Current_Split.Feature));
       end loop;
 
       --  L361
 --        Printing.Print_Value_Data_List
---                  (Routine_Name & "L361 Splitter.Feature_Values",
---                   Splitter.Feature_Values);
+--          (Routine_Name & "L361 Splitter.Feature_Values",
+--           Splitter.Feature_Values);
       Sort (Splitter.Feature_Values);
-      --          Printing.Print_Value_Data_List
-      --            (Routine_Name & "sorted Splitter.Feature_Values",
-      --             Splitter.Feature_Values);
+--        Printing.Print_Value_Data_List
+--          (Routine_Name & "sorted Splitter.Feature_Values",
+--           Splitter.Feature_Values);
       --  Splitter.Feature_Values is a value_data_list
       --  If can't split, Can_Split swaps Feature_Indices (F_J) with
       --  Feature_Indices (Num_Total_Constants)
@@ -608,12 +608,6 @@ package body Node_Splitter is
          Criterion.Children_Impurity_Gini
            (Self.Criteria, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
-         --           Put_Line (Routine_Name &
-         --                       " Children_Impurity_Gini Best_Split.Impurity_Left " &
-         --                       Float'Image (Best_Split.Impurity_Left));
-         --           Put_Line (Routine_Name &
-         --                       " Gini_Children_Impurity Best_Split.Impurity_Right " &
-         --                       Float'Image (Best_Split.Impurity_Right));
          Best_Split.Improvement := Criterion.Impurity_Improvement
            (Self.Criteria, Impurity, Best_Split.Impurity_Left,
             Best_Split.Impurity_Right);
@@ -669,8 +663,14 @@ package body Node_Splitter is
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
+      --        Printing.Print_Split_Record (Routine_Name & "L319 Best_Split",
+      --                                     Best_Split);
+--        Printing.Print_Value_Data_List (Routine_Name & "L319 Feature_Values",
+--                                         Self.Feature_Values);
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
+--        Printing.Print_Value_Data_List (Routine_Name & "L417 Feature_Values",
+--                                        Self.Feature_Values);
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
