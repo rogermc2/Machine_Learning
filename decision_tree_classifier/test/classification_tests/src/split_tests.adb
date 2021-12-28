@@ -117,7 +117,7 @@ package body Split_Tests is
       Assert (Check_Min_Split (theClassifier, Min_Split),
               Routine_Name & "failed with Min_Split " &
                 Integer'Image (Min_Split) & " less than 10");
-      Put_Line (Routine_Name & " Min_Split integer test Min_Split: " &
+      Put_Line (Routine_Name & " Min_Split integer test passed Min_Split: " &
                   Integer'Image (Min_Split));
 
       Graphviz_Exporter.C_Init
@@ -139,7 +139,7 @@ package body Split_Tests is
       Assert (Check_Min_Split (theClassifier, Min_Split),
               Routine_Name & "failed with Min_Split " &
                 Integer'Image (Min_Split) & " less than 10");
-      Put_Line (Routine_Name & " Min_Split float test Min_Split: " &
+      Put_Line (Routine_Name & " Min_Split float test passed Min_Split: " &
                   Integer'Image (Min_Split));
 
       Graphviz_Exporter.C_Init
