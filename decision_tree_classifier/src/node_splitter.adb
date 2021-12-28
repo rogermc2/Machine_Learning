@@ -42,9 +42,10 @@ package body Node_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   function Can_Split (Self                  : in out Splitter_Class;
-                       Num_Total_Constants   : Natural;
-                       F_I, F_J              : Natural)
+   function Can_Split (Self                : in out Splitter_Class;
+                       Num_Total_Constants : in out Natural;
+                       Num_Found_Constants : in out Natural;
+                       F_I, F_J            : Natural)
                        return Boolean is
       use ML_Types;
       Routine_Name : constant String := "Node_Splitter.Can_Split ";
@@ -61,6 +62,7 @@ package body Node_Splitter is
               Routine_Name & "X_F_End.Value_Kind " &
                 Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
                 Data_Type'Image (X_F_Start.Value_Kind));
+      --  L363
       case X_F_Start.Value_Kind is
          when Float_Type =>
             LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
@@ -74,7 +76,7 @@ package body Node_Splitter is
               & ML_Types.Data_Type'Image (X_F_Start.Value_Kind);
       end case;
 
-      --  Still L368
+      --  Still L363
       if LE then
          Swap := Self.Feature_Indices.Element (F_J);
          Self.Feature_Indices.Replace_Element
@@ -85,6 +87,12 @@ package body Node_Splitter is
 
       else  --  L378
          OK := not LE and F_I > 1;
+      end if;
+
+      if not OK then
+         --  L366
+         Num_Found_Constants := Num_Found_Constants + 1;
+         Num_Total_Constants := Num_Total_Constants + 1;
       end if;
       --        else
       --           Put_Line (Routine_Name & "X_F_End.Value_Kind /= X_F_Start.Value_Kind");
@@ -291,9 +299,9 @@ package body Node_Splitter is
               & Integer'Image (Start_Row));
       --  L319
       Printing.Print_Natural_List
-           (Routine_Name & "L319 Feature_Indices", Self.Feature_Indices);
+        (Routine_Name & "L319 Feature_Indices", Self.Feature_Indices);
       while F_I > Num_Total_Constants + 1 and
-        (Num_Visited_Features < Positive (Max_Features) or
+        (Num_Visited_Features <= Positive (Max_Features) or
            --   At least one drawn feature must be a non-constant.
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
@@ -304,6 +312,10 @@ package body Node_Splitter is
          --             (Routine_Name & "Feature_Values", Self.Feature_Values);
          --  L329
          Num_Visited_Features := Num_Visited_Features + 1;
+         New_Line;
+         Put_Line (Routine_Name & "Num_Visited_Features, Max_Features: " &
+                     Integer'Image (Num_Visited_Features) & ", " &
+                     Tree.Index_Range'Image (Max_Features));
          --  L339
          --  Draw a feature at random
          --  F_J = random integer in the range
@@ -313,7 +325,9 @@ package body Node_Splitter is
          F_J := Num_Drawn_Constants + 1 +
            Natural (abs (Maths.Random_Float) *
                         Float (F_I - Num_Found_Constants - 1));
-         Put_Line (Routine_Name & "F_J: " & Integer'Image (F_J));
+         Put_Line (Routine_Name & "Num_Drawn_Constants, F_J: " &
+                     Integer'Image (Num_Drawn_Constants) & ", " &
+                     Integer'Image (F_J));
          Printing.Print_Natural_List
            (Routine_Name & "Feature_Indices pre swap", Self.Feature_Indices);
          if F_J + 1 < Num_Known_Constants then
@@ -321,9 +335,9 @@ package body Node_Splitter is
             --  Num_Drawn_Constants .. Num_Found_Constants
             --  Implement Fisher-Yates shuffle by swapping value indexed by
             --  swapping the value indexed by F_J with the last Drawn_Constant
-            Swap := Self.Feature_Indices.Element (Num_Drawn_Constants);
+            Swap := Self.Feature_Indices.Element (Num_Drawn_Constants + 1);
             Self.Feature_Indices.Replace_Element
-              (Num_Drawn_Constants, Self.Feature_Indices.Element (F_J));
+              (Num_Drawn_Constants + 1, Self.Feature_Indices.Element (F_J));
             Self.Feature_Indices.Replace_Element (F_J, Swap);
             Printing.Print_Natural_List
               (Routine_Name & "L346 Feature_Indices", Self.Feature_Indices);
@@ -409,10 +423,6 @@ package body Node_Splitter is
       --  prior to deallocation, up to the lesser of the new and old sizes.
       --  Self.Feature_Values is set by Process_Non_Constants
       Self.Feature_Values.Set_Length (Count_Type (Num_Samples));
-      Self.Constant_Features_I.Clear;
-      for index in 1 .. Num_Features loop
-         Self.Constant_Features_I.Append (0);
-      end loop;
 
       --  L250
       Self.X := Input_X;
@@ -481,9 +491,9 @@ package body Node_Splitter is
       Put_Line (Routine_Name & " L352 Start_Row, Stop_Row" &
                   Integer'Image (Start_Row) & ", " &
                   Integer'Image (Stop_Row));
---        Put_Line (Routine_Name & " L352 F_J:" & Integer'Image (F_J));
---        Printing.Print_Natural_List
---          (Routine_Name & "L352 Feature_Indices", Splitter.Feature_Indices);
+      --        Put_Line (Routine_Name & " L352 F_J:" & Integer'Image (F_J));
+      --        Printing.Print_Natural_List
+      --          (Routine_Name & "L352 Feature_Indices", Splitter.Feature_Indices);
       Current_Split.Feature := Splitter.Feature_Indices.Element (F_J);
       --        Put_Line (Routine_Name & " L352 Current_Split.Feature" &
       --                    Integer'Image (Current_Split.Feature));
@@ -515,23 +525,24 @@ package body Node_Splitter is
       --  Splitter.Feature_Values is a value_data_list
       --  If can't split, Can_Split swaps Feature_Indices (F_J) with
       --  Feature_Indices (Num_Total_Constants)
-      if Can_Split (Splitter, Num_Total_Constants, F_I, F_J) then
+      if Can_Split (Splitter, Num_Total_Constants, Num_Found_Constants,
+                    F_I, F_J) then
          --  L375 Implement Fisher-Yates permutation by swapping F_J feature
          --  with preceding F_I feature
          F_I := F_I - 1;
---           Put_Line (Routine_Name & " L375 swapping features " &
---                       Integer'Image (F_I) & " and " & Integer'Image (F_J));
---           Printing.Print_Natural_List
---             (Routine_Name & "Feature_Indices", Splitter.Feature_Indices);
+         --           Put_Line (Routine_Name & " L375 swapping features " &
+         --                       Integer'Image (F_I) & " and " & Integer'Image (F_J));
+         --           Printing.Print_Natural_List
+         --             (Routine_Name & "Feature_Indices", Splitter.Feature_Indices);
          if F_J /= F_I then
             Swap := Splitter.Feature_Indices.Element (F_I);
             Splitter.Feature_Indices.Replace_Element
               (F_I, Splitter.Feature_Indices.Element (F_J));
             Splitter.Feature_Indices.Replace_Element (F_J, Swap);
          end if;
---           Printing.Print_Natural_List
---             (Routine_Name & "Feature_Indices post swap",
---              Splitter.Feature_Indices);
+         --           Printing.Print_Natural_List
+         --             (Routine_Name & "Feature_Indices post swap",
+         --              Splitter.Feature_Indices);
 
          --  L374 Reset the criterion to pos = start
          Criterion.Reset (Splitter.Criteria);
@@ -542,8 +553,6 @@ package body Node_Splitter is
          Printing.Print_Natural_List
            (Routine_Name & "L366 can't split Feature_Indices",
             Splitter.Feature_Indices);
-         Num_Found_Constants := Num_Found_Constants + 1;
-         Num_Total_Constants := Num_Total_Constants + 1;
       end if;
 
    end Process_Non_Constants;
@@ -668,7 +677,7 @@ package body Node_Splitter is
       --  L308
       New_Line;
       Printing.Print_Natural_List
-           (Routine_Name & "L308 Feature_Indices", Self.Feature_Indices);
+        (Routine_Name & "L308 Feature_Indices", Self.Feature_Indices);
       Init_Split (Best_Split, Self.Stop_Row);
       --  L319
       --        Printing.Print_Split_Record (Routine_Name & "L319 Best_Split",
@@ -676,7 +685,7 @@ package body Node_Splitter is
       --        Printing.Print_Value_Data_List (Routine_Name & "L319 Feature_Values",
       --                                         Self.Feature_Values);
       Printing.Print_Natural_List
-           (Routine_Name & "L319 Feature_Indices", Self.Feature_Indices);
+        (Routine_Name & "L319 Feature_Indices", Self.Feature_Indices);
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
       --        Printing.Print_Value_Data_List (Routine_Name & "L417 Feature_Values",
@@ -686,10 +695,12 @@ package body Node_Splitter is
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
       --  L440
       Printing.Print_Natural_List
-           (Routine_Name & "L440 Feature_Indices", Self.Feature_Indices);
+        (Routine_Name & "L440 Feature_Indices after Reorder_Rows",
+         Self.Feature_Indices);
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
       Printing.Print_Natural_List
-           (Routine_Name & "L449 Feature_Indices", Self.Feature_Indices);
+        (Routine_Name & "L449 Feature_Indices after Update_Constants",
+         Self.Feature_Indices);
       --  L449
       Num_Constant_Features := Num_Total_Constants;
 
@@ -707,21 +718,25 @@ package body Node_Splitter is
       --  Respect invariant for constant features: the original order of
       --  element in features[:n_known_constants] must be preserved for
       --  sibling and child nodes.
+      Put_Line ("Node_Splitter.Update_Constants L442 Num_Known_Constants: " &
+                  Integer'Image (Num_Known_Constants));
       if Num_Known_Constants > 0 then
          for index in 1 .. Num_Known_Constants loop
             Self.Feature_Indices.Replace_Element
               (index, Self.Constant_Features_I.Element (index));
          end loop;
-
-         --  L443 Copy newly found constant features
-         for index in Num_Known_Constants + 1 ..
-           Num_Known_Constants + Num_Found_Constants loop
-            Self.Constant_Features_I.Append
-              (Self.Feature_Indices.Element (index));
---              Self.Constant_Features_I.Replace_Element
---                (index, Self.Feature_Indices.Element (index));
-         end loop;
       end if;
+
+      Put_Line ("Node_Splitter.Update_Constants  L443");
+      --  L443 Copy newly found constant features
+      for index in Num_Known_Constants + 1 ..
+        Num_Known_Constants + Num_Found_Constants loop
+         Self.Constant_Features_I.Append
+           (Self.Feature_Indices.Element (index));
+      end loop;
+      Printing.Print_Natural_List
+        ("Node_Splitter.Update_Constants Self.Constant_Features_I",
+         Self.Constant_Features_I);
 
    end Update_Constants;
 
