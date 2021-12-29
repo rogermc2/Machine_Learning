@@ -17,28 +17,38 @@ with Weights;
 
 procedure Lesson_3 is
    use ML_Types;
+   use ML_Types.String_Package;
    use Decision_Tree_Classification;
-   Routine_Name   : constant String := "Lesson_3";
-   Data           : constant Multi_Output_Data_Record :=
-                      Classifier_Utilities.Load_Data ("src/diabetes.csv");
-   X              : constant Value_Data_Lists_2D := Data.Feature_Values;
-   Num_Samples    : constant Natural := Natural (X.Length);
-   aClassifier    : Base_Decision_Tree.Classifier
+   Routine_Name  : constant String := "Lesson_3";
+   Min_Split     : constant String := "2";
+   Data          : constant Multi_Output_Data_Record :=
+                     Classifier_Utilities.Load_Data ("src/diabetes.csv");
+   Feature_Names : constant String_List := Data.Feature_Names;
+   X             : constant Value_Data_Lists_2D := Data.Feature_Values;
+   Num_Samples   : constant Natural := Natural (X.Length);
+   Names_Cursor  : String_Package.Cursor := Feature_Names.First;
+   Features      : Feature_Names_List;
+   aClassifier   : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-   --  Iris_Target (Y) : num outputs x num samples
-   Target         : Value_Data_Lists_2D;
-   No_Weights     : Weights.Weight_List :=
-                      Classifier_Types.Float_Package.Empty_Vector;
-   Exporter       : Graphviz_Exporter.DOT_Tree_Exporter;
+   Target        : Value_Data_Lists_2D;
+   No_Weights    : Weights.Weight_List :=
+                     Classifier_Types.Float_Package.Empty_Vector;
+   Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
    Put_Line ("Lesson 3");
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
-   --  Iris_Target is 2D list num outputs x num samples
+   --  Target is 2D list num outputs x num samples
    Target := Data.Label_Values;
-   Put_Line ("Feature Names:");
+   while Has_Element (Names_Cursor) loop
+      Features.Append (Element (Names_Cursor));
+      Next (Names_Cursor);
+   end loop;
+   Printing.Print_Unbounded_List (Routine_Name & "Features", Features);
+
+   C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria);
+
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
-   C_Init (aClassifier, "2", Criterion.Gini_Criteria);
    Classification_Fit (aClassifier, X, Target, No_Weights);
    Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
