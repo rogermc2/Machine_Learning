@@ -49,21 +49,24 @@ package body Best_First_Builder is
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                   Weighted_Node_Samples);
---        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
---                       Integer'Image (Start_Row) & ", " &
---                       Integer'Image (Stop_Row));
+      --        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
+      --                       Integer'Image (Start_Row) & ", " &
+      --                       Integer'Image (Stop_Row));
 
       --  L204
-      Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
+      Is_Leaf_Node :=
+        (Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth) or
         Builder.Splitter.Num_Samples = 1 or
         Num_Node_Samples < Builder.Min_Samples_Split or
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf;
 
-      if Data.Depth > Builder.Max_Depth then
-         null;
-         --           Put_Line (Routine_Name &
-         --                       " L207 Leaf_Node Data.Depth >= Builder.Max_Depth");
+      if Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth then
+          null;
+--           Put_Line (Routine_Name &
+--                       " L207 Leaf_Node Data.Depth " &
+--                       Integer'Image (Data.Depth) & " >= Builder.Max_Depth " &
+--                       Integer'Image (Builder.Max_Depth));
       elsif Builder.Splitter.Num_Samples = 1 then
          Put_Line (Routine_Name &
                      " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
