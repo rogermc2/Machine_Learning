@@ -46,6 +46,7 @@ begin
    end loop;
    Print_Unbounded_List ("Features", Features);
    Print_Value_Data_List ("Features row 16", X_Dat.Element (16));
+   New_Line;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 3);
@@ -53,9 +54,9 @@ begin
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
    Classification_Fit (aClassifier, X_Dat, Labels, No_Weights);
-   Printing.Print_Tree ("Diabetes Tree", aClassifier);
-   Put_Line ("----------------------------------------------");
-   New_Line;
+--     Printing.Print_Tree ("Diabetes Tree", aClassifier);
+--     Put_Line ("----------------------------------------------");
+--     New_Line;
 
    Graphviz_Exporter.C_Init
      (Exporter, aClassifier.Attributes.Decision_Tree);
