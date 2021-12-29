@@ -73,10 +73,10 @@ package body Decision_Path_Tests is
       X                 :  constant Value_Data_Lists_2D :=
                             Iris_Data.Feature_Values;
       Num_Samples       : constant Natural := Natural (X.Length);
-      T                 : constant Classifier_Types.Multi_Value_Array
-        (1 .. 2, 1 .. 3) := ((1, 1, 0), (1, 0, 1));
-      Expected          : constant Value_Data_Lists_2D :=
-                            To_Multi_Value_List (T);
+--        T                 : constant Classifier_Types.Multi_Value_Array
+--          (1 .. 2, 1 .. 3) := ((1, 1, 0), (1, 0, 1));
+--        Expected          : constant Value_Data_Lists_2D :=
+--                              To_Multi_Value_List (T);
       X2                : Value_Data_Lists_2D;
       theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
