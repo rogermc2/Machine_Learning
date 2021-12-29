@@ -83,6 +83,44 @@ package body Tree_Build is
     end Change_To_Leaf_Node;
 
     --  ------------------------------------------------------------------------
+
+   procedure Init_Builder
+     (Builder               : in out Tree_Build.Tree_Builder;
+      Max_Leaf_Nodes        : Integer;
+      Splitter              : Node_Splitter.Splitter_Class;
+      Min_Samples_Split     : Natural := 0;
+      Min_Samples_Leaf      : Natural := 0;
+      Min_Weight_Leaf       : Float := 0.0;
+      Max_Depth             : Integer := -1;
+      Min_Impurity_Decrease : Float := 0.0) is
+   begin
+      if Max_Leaf_Nodes < 0 then
+         declare
+            Build : Tree_Builder (Depth_First_Tree);
+         begin
+            Builder := Build;
+         end;
+      else
+         declare
+            Build : Tree_Builder (Best_First_Tree);
+         begin
+            Build.Max_Leaf_Nodes := Max_Leaf_Nodes;
+            Builder := Build;
+         end;
+      end if;
+
+      Builder.Splitter := Splitter;
+      Builder.Min_Samples_Split := Min_Samples_Split;
+      Builder.Min_Samples_Leaf := Min_Samples_Leaf;
+      Builder.Min_Weight_Leaf := Min_Weight_Leaf;
+      Builder.Max_Depth := Max_Depth;
+      Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
+      Tree_Build.Reset_Last_Node;
+
+   end Init_Builder;
+
+   --  -------------------------------------------------------------------------
+
     procedure Reset_Last_Node is
     begin
         Last_Node := 0;

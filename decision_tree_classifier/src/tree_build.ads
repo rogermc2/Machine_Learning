@@ -39,6 +39,15 @@ package Tree_Build is
                        Weighted_Node_Samples : Float) return Tree.Tree_Cursor;
     procedure Change_To_Leaf_Node (aTree : in out Tree.Tree_Class;
                                    Node_Cursor : in out Tree.Tree_Cursor);
-   procedure Reset_Last_Node;
+    procedure Init_Builder
+      (Builder               : in out Tree_Build.Tree_Builder;
+       Max_Leaf_Nodes        : Integer;
+       Splitter              : Node_Splitter.Splitter_Class;
+       Min_Samples_Split     : Natural := 0;
+       Min_Samples_Leaf      : Natural := 0;
+       Min_Weight_Leaf       : Float := 0.0;
+       Max_Depth             : Integer := -1;
+       Min_Impurity_Decrease : Float := 0.0);
+    procedure Reset_Last_Node;
 
 end Tree_Build;
