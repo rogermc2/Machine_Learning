@@ -22,7 +22,8 @@ package Tree_Build is
         Min_Impurity_Decrease : Float := 0.0;
         case Tree_Kind is
             when Best_First_Tree =>
-                Max_Leaf_Nodes : Natural := 0;
+                Max_Leaf_Nodes  : Natural := 0;
+                Max_Split_Nodes : Natural := 0;
             when Depth_First_Tree => null;
         end case;
     end record;
