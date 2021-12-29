@@ -8,7 +8,6 @@ with Build_Utils;
 with Node_Splitter;
 --  with Printing;
 with Tree;
-with Tree_Build;
 with Weights;
 
 package body Best_First_Builder is
@@ -22,7 +21,7 @@ package body Best_First_Builder is
    --  DepthFirstTreeBuilder.build
    procedure Add_Branch
      (theTree  : in out Tree.Tree_Class;
-      Builder  : in out Tree_Builder;
+      Builder  : in out Tree_Build.Tree_Builder;
       theStack : in out Build_Utils.Stack_List;
       Split    : in out Node_Splitter.Split_Record;
       First    : in out Boolean) is
@@ -148,26 +147,20 @@ package body Best_First_Builder is
    --  L129 DepthFirstTreeBuilder.build
    procedure Build_Tree
      (theTree               : in out Tree.Tree_Class;
-      Splitter              : in out Node_Splitter.Splitter_Class;
-      X                     : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded             : Classifier_Types.Natural_Lists_2D;
-      Sample_Weights        : Weights.Weight_List) is
+      Builder               : in out Tree_Build.Tree_Builder;
+      Y_Encoded             : Classifier_Types.Natural_Lists_2D) is
       use Build_Utils;
       use Tree.Nodes_Package;
       Routine_Name      : constant String := "Ada_Tree_Builder.Build_Tree ";
       Depth             : constant Natural := 1;
       Start_Row         : constant Positive := 1;
       Stop_Row          : constant Positive := Positive (Y_Encoded.Length);
-      Builder           : Tree_Builder;
       First             : Boolean := True;
       Impurity          : constant Float := Float'Last;
       Constant_Features : constant Natural := 0;
       Stack             : Stack_List;
       Split             : Node_Splitter.Split_Record;
    begin
-      --  L159
-      Node_Splitter.Initialize_Splitter (Splitter, X, Y_Encoded,
-                                         Sample_Weights);
       --  L184
       Push (Stack, Start_Row, Stop_Row, Depth, theTree.Nodes.Root,
             Tree.Left_Node, Impurity, Constant_Features);

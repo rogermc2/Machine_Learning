@@ -54,9 +54,9 @@ begin
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
    Classification_Fit (aClassifier, X_Dat, Labels, No_Weights);
---     Printing.Print_Tree ("Diabetes Tree", aClassifier);
---     Put_Line ("----------------------------------------------");
---     New_Line;
+   Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   Put_Line ("----------------------------------------------");
+   New_Line;
 
    Graphviz_Exporter.C_Init
      (Exporter, aClassifier.Attributes.Decision_Tree);
