@@ -10,5 +10,7 @@ project Lesson_03 is
       for Default_Switches ("ada") use ("-gnatwkmru", "-gnatyclux");
    end Compiler;
 
+   for Exec_Dir use ".";
+
 end Lesson_03;
 
