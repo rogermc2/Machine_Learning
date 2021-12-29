@@ -8,7 +8,6 @@ with Build_Utils;
 with Node_Splitter;
 --  with Printing;
 with Tree;
-with Tree_Build;
 with Weights;
 
 package body Ada_Tree_Builder is
@@ -17,21 +16,12 @@ package body Ada_Tree_Builder is
 
    Max_Depth_Seen : Positive := 1;
 
-   procedure Init_Tree_Builder
-     (Builder               : in out Tree_Builder;
-      Splitter              : Node_Splitter.Splitter_Class;
-      Min_Samples_Split     : Positive := 2;
-      Min_Samples_Leaf      : Positive := 1;
-      Min_Weight_Leaf       : Float := 0.0;
-      Max_Depth             : Integer := -1;
-      Min_Impurity_Decrease : Float := 0.0);
-
    --  ------------------------------------------------------------------
    --  Based on scikit-learn/sklearn/tree _tree.pyx
    --  DepthFirstTreeBuilder.build
    procedure Add_Branch
      (theTree  : in out Tree.Tree_Class;
-      Builder  : in out Tree_Builder;
+      Builder  : in out Tree_Build.Tree_Builder;
       theStack : in out Build_Utils.Stack_List;
       Split    : in out Node_Splitter.Split_Record;
       First    : in out Boolean) is
@@ -47,7 +37,7 @@ package body Ada_Tree_Builder is
       Start_Row             : constant Positive := Data.Start;
       Stop_Row              : constant Positive := Data.Stop;
       Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
-      Impurity              : Float;
+      Impurity              : Float := Data.Impurity;
       Num_Constant_Features : Natural := Data.Num_Constant_Features;
       Is_Leaf_Node          : Boolean := False;
       Weighted_Node_Samples : Float := 0.0;
@@ -59,39 +49,43 @@ package body Ada_Tree_Builder is
       --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
       Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                   Weighted_Node_Samples);
---        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
---                       Integer'Image (Start_Row) & ", " &
---                       Integer'Image (Stop_Row));
+      --        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
+      --                       Integer'Image (Start_Row) & ", " &
+      --                       Integer'Image (Stop_Row));
 
       --  L204
-      Is_Leaf_Node := Data.Depth > Builder.Max_Depth or
+      Is_Leaf_Node :=
+        (Builder.Max_Depth > 0 and Data.Depth > Builder.Max_Depth) or
         Builder.Splitter.Num_Samples = 1 or
         Num_Node_Samples < Builder.Min_Samples_Split or
         Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf;
 
-      if Data.Depth > Builder.Max_Depth then
+      if Builder.Max_Depth > 0 and then
+        Data.Depth > Builder.Max_Depth then
          null;
-         --           Put_Line (Routine_Name &
-         --                       " L207 Leaf_Node Data.Depth >= Builder.Max_Depth");
+         Put_Line (Routine_Name &
+                     " L207 Leaf_Node Data.Depth " &
+                     Integer'Image (Data.Depth) & ">= Builder.Max_Depth " &
+                     Integer'Image (Builder.Max_Depth));
       elsif Builder.Splitter.Num_Samples = 1 then
          Put_Line (Routine_Name &
                      " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
-         --        elsif Num_Node_Samples < Builder.Min_Samples_Split then
-         --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
-         --                       " Builder.Min_Samples_Split: "  &
-         --                       Integer'Image (Builder.Min_Samples_Split));
-         --        elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
-         --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
-         --                       "2 * Builder.Min_Samples_Leaf");
+      elsif Num_Node_Samples < Builder.Min_Samples_Split then
+         Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
+                     " Builder.Min_Samples_Split: "  &
+                     Integer'Image (Builder.Min_Samples_Split));
+      elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
+         Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
+                     "2 * Builder.Min_Samples_Leaf");
       elsif Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf then
          Put_Line
            (Routine_Name & " L207 Leaf_Node Weighted_Node_Samples < " &
               "2.0 * Builder.Min_Weight_Leaf");
-         --        elsif abs (Impurity) <= Epsilon then
-         --           Put_Line (Routine_Name &
-         --                       " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
-         --                       ") <= Epsilon");
+--        elsif not First and then abs (Impurity) <= Epsilon then
+--           Put_Line (Routine_Name &
+--                       " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
+--                       ") <= Epsilon");
       end if;
 
       --  L209
@@ -156,38 +150,21 @@ package body Ada_Tree_Builder is
    --  ------------------------------------------------------------------
    --  L129 DepthFirstTreeBuilder.build
    procedure Build_Tree
-     (theTree               : in out Tree.Tree_Class;
-      Splitter              : in out Node_Splitter.Splitter_Class;
-      X                     : ML_Types.Value_Data_Lists_2D;
-      Y_Encoded             : Classifier_Types.Natural_Lists_2D;
-      Sample_Weights        : Weights.Weight_List;
-      Min_Samples_Split     : Positive;
-      Min_Samples_Leaf      : Positive;
-      Min_Weight_Leaf       : Float;
-      Max_Depth             : Integer;
-      Min_Impurity_Decrease : Float) is
+     (theTree   : in out Tree.Tree_Class;
+      Builder   : in out Tree_Build.Tree_Builder;
+      Y_Encoded : Classifier_Types.Natural_Lists_2D) is
       use Build_Utils;
       use Tree.Nodes_Package;
       Routine_Name      : constant String := "Ada_Tree_Builder.Build_Tree ";
       Depth             : constant Natural := 1;
       Start_Row         : constant Positive := 1;
       Stop_Row          : constant Positive := Positive (Y_Encoded.Length);
-      Builder           : Tree_Builder;
       First             : Boolean := True;
       Impurity          : constant Float := Float'Last;
       Constant_Features : constant Natural := 0;
       Stack             : Stack_List;
       Split             : Node_Splitter.Split_Record;
    begin
-      --  L159
-      Node_Splitter.Initialize_Splitter (Splitter, X, Y_Encoded,
-                                         Sample_Weights);
-      Init_Tree_Builder (Builder, Splitter,
-                         Min_Samples_Split     => Min_Samples_Split,
-                         Min_Samples_Leaf      => Min_Samples_Leaf,
-                         Min_Weight_Leaf       => Min_Weight_Leaf,
-                         Max_Depth             => Max_Depth,
-                         Min_Impurity_Decrease => Min_Impurity_Decrease);
       --  L184
       Push (Stack, Start_Row, Stop_Row, Depth, theTree.Nodes.Root,
             Tree.Left_Node, Impurity, Constant_Features);
@@ -201,28 +178,6 @@ package body Ada_Tree_Builder is
       New_Line;
 
    end Build_Tree;
-
-   --  ------------------------------------------------------------------
-
-   procedure Init_Tree_Builder
-     (Builder               : in out Tree_Builder;
-      Splitter              : Node_Splitter.Splitter_Class;
-      Min_Samples_Split     : Positive := 2;
-      Min_Samples_Leaf      : Positive := 1;
-      Min_Weight_Leaf       : Float := 0.0;
-      Max_Depth             : Integer := -1;
-      Min_Impurity_Decrease : Float := 0.0) is
-
-   begin
-      Builder.Splitter := Splitter;
-      Builder.Min_Samples_Split := Min_Samples_Split;
-      Builder.Min_Samples_Leaf := Min_Samples_Leaf;
-      Builder.Min_Weight_Leaf := Min_Weight_Leaf;
-      Builder.Max_Depth := Max_Depth;
-      Builder.Min_Impurity_Decrease := Min_Impurity_Decrease;
-      Tree_Build.Reset_Last_Node;
-
-   end Init_Tree_Builder;
 
    --  ------------------------------------------------------------------
 

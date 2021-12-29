@@ -130,6 +130,10 @@ package body Base_Decision_Tree is
            * Sum_Sample_Weight;
       end if;
 
+      --  L379
+      Node_Splitter.Initialize_Splitter
+        (aClassifier.Parameters.Splitter, X, Y_Encoded, Sample_Weights);
+
       aClassifier.Parameters.Splitter.Min_Leaf_Weight := Min_Weight_Leaf;
 
       --  L392
@@ -141,7 +145,7 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
-      --  L426
+      --  L400
       Init_Builder (Builder, aClassifier.Parameters.Max_Leaf_Nodes,
                     aClassifier.Parameters.Splitter);
 
@@ -150,12 +154,7 @@ package body Base_Decision_Tree is
          when Tree_Build.Depth_First_Tree =>
             Put_Line (Routine_Name & "build Depth_First_Tree");
             Ada_Tree_Builder.Build_Tree
-              (aClassifier.Attributes.Decision_Tree,
-               aClassifier.Parameters.Splitter, X, Y_Encoded,
-               Sample_Weights, Min_Samples_Split,
-               aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf,
-               aClassifier.Parameters.Max_Depth,
-               aClassifier.Parameters.Min_Impurity_Decrease);
+              (aClassifier.Attributes.Decision_Tree, Builder, Y_Encoded);
          when Tree_Build.Best_First_Tree =>
             Put_Line (Routine_Name & "build Best_First_Tree");
             Best_First_Builder.Build_Tree
