@@ -5,11 +5,8 @@
 --  Tree_Builder controls the various stopping criteria and the node splitting
 --  evaluation order, e.g. depth-first or best-first.
 
-with Classifier_Types;
-with ML_Types;
 with Node_Splitter;
 with Tree;
-with Weights;
 
 package Tree_Build is
 
@@ -40,36 +37,8 @@ package Tree_Build is
                        Threshold, Impurity   : Float;
                        Num_Samples           : Positive;
                        Weighted_Node_Samples : Float) return Tree.Tree_Cursor;
-    procedure Build_Best_First_Tree
-      (Best_Builder  : in out Tree_Builder;
-       theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.Value_Data_Lists_2D;
-       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
-       Sample_Weight : Weights.Weight_List);
-    procedure Build_Depth_First_Tree
-      (Depth_Builder : in out Tree_Builder;
-       theTree       : in out Tree.Tree_Class;
-       X             : ML_Types.Value_Data_Lists_2D;
-       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
-       Sample_Weight : Weights.Weight_List);
     procedure Change_To_Leaf_Node (aTree : in out Tree.Tree_Class;
                                    Node_Cursor : in out Tree.Tree_Cursor);
-    procedure Init_Best_First_Tree
-      (Best_Builder          : in out Tree_Builder;
-       Splitter              : Node_Splitter.Splitter_Class;
-       Min_Samples_Split     : Natural := 0;
-       Min_Samples_Leaf      : Natural := 0;
-       Min_Weight_Leaf       : Float := 0.0;
-       Max_Depth             : Integer := -1;
-       Max_Leaf_Nodes        : Integer := -1;  --  -1 means undefined
-       Min_Impurity_Decrease : Float := 0.0);
-    procedure Init_Depth_First_Tree
-      (Depth_Builder                       : in out Tree_Builder;
-       Splitter                            : Node_Splitter.Splitter_Class;
-       Min_Samples_Split, Min_Samples_Leaf : Natural := 0;
-       Min_Weight_Leaf                     : Float := 0.0;
-       Max_Depth                           : Integer := -1;
-       Min_Impurity_Decrease               : Float := 0.0);
    procedure Reset_Last_Node;
 
 end Tree_Build;
