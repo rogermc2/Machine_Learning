@@ -30,7 +30,8 @@ package body Classification is
       use Classifier_Types.Float_Package;
       Routine_Name    : constant String :=
                           "Classification.Classify_Iris ";
-      Iris_Data       : constant Data_Record := Load_Data ("src/iris.csv");
+      Iris_Data       : constant Multi_Output_Data_Record :=
+                            Load_Data ("src/iris.csv");
 --        Feature_Names   : constant String_List := Iris_Data.Feature_Names;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
@@ -60,7 +61,7 @@ package body Classification is
                 " called with empty Features vector.");
 
       --  Iris_Target is 2D list num outputs x num classes
-      Iris_Target := To_Value_2D_List (Iris_Data.Label_Values);
+      Iris_Target := Iris_Data.Label_Values;
       Assert (Integer (Iris_Target.Length) = Num_Samples, Routine_Name &
                 " invalid Iris_Target vector");
 

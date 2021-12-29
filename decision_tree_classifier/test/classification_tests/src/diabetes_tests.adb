@@ -26,7 +26,8 @@ package body Diabetes_Tests is
       use Decision_Tree_Classification;
       --        use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name    : constant String := "Diabetes_Tests.Test_Diabetes_Overfit";
+      Routine_Name    : constant String :=
+                            "Diabetes_Tests.Test_Diabetes_Overfit";
       Diabetes_Data   : constant Multi_Output_Data_Record :=
                          Load_Data ("src/diabetes2.csv");
       theClassifier   : Base_Decision_Tree.Classifier
@@ -48,7 +49,7 @@ package body Diabetes_Tests is
       --  L1689
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
-      --  Iris_Target is 2D list num outputs x num samples
+      --  Diabetes_Target is 2D list num outputs x num samples
       Diabetes_Target := Diabetes_Data.Label_Values;
       Assert (Positive (Diabetes_Target.Length) = Num_Samples, Routine_Name &
                 " invalid Diabetes_Target vector");
