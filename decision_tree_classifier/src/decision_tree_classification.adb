@@ -4,12 +4,15 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 with Base_Decision_Tree;
 with Classifier_Utilities;
 with Criterion;
 with Estimator;
 with Node_Splitter;
 --  with Printing;
+with Utilities;
 with Weights;
 
 package body Decision_Tree_Classification is
@@ -22,9 +25,10 @@ package body Decision_Tree_Classification is
       Y              : ML_Types.Value_Data_Lists_2D;
       Sample_Weights : in out Weights.Weight_List) is
       use Estimator;
+      Routine_Name : constant String := "Decision_Tree_Classifer.Classification_Fit ";
    begin
       Assert (aClassifier.Estimator_Kind = Classifier_Estimator,
-              "Decision_Tree_Classifer.Classification_Fit, invalid estimator "
+              Routine_Name & " invalid estimator "
               & Estimator_Type'Image (aClassifier.Estimator_Kind));
 
       --  L920 X is 2D list num samples x num features
@@ -36,32 +40,41 @@ package body Decision_Tree_Classification is
    --  -------------------------------------------------------------------------
 
    --  L852 DecisionTreeClassifier.__init__
-   procedure C_Init (aClassifier              : in out
-                       Base_Decision_Tree.Classifier;
-                     Criteria                 : Criterion.Criterion_Class;
-                     Splitter                 : Node_Splitter.Splitter_Class;
-                     Min_Split_Samples        :
-                     Base_Decision_Tree.Split_Value_Record :=
-                       Base_Decision_Tree.Default_Min_Split;
-                     theCriterion             : Criterion.
-                       Classifier_Criteria_Type := Criterion.Gini_Criteria;
-                     Max_Depth                : Integer := -1;
-                     Min_Leaf_Samples         : Positive := 1;
-                     Min_Leaf_Weight_Fraction : Float := 0.0;
-                     Max_Features             : Tree.Index_Range :=
-                       Tree.Index_Range'Last;
-                     Max_Leaf_Nodes           : Integer := -1;
-                     Class_Weight             : Weights.Weight_Type :=
-                       Weights.No_Weight;
-                     Min_Impurity_Decrease    : Float := 0.0;
-                     CCP_Alpha                : Float := 0.0;
-                     Random_State             : Integer := 0) is
+   procedure C_Init
+     (aClassifier              : in out Base_Decision_Tree.Classifier;
+      Min_Split_Samples        : String;
+      Criterion_Type           : Criterion.Classifier_Criteria_Type :=
+        Criterion.Gini_Criteria;
+      Max_Depth                : Integer := -1;
+      Min_Leaf_Samples         : Positive := 1;
+      Min_Leaf_Weight_Fraction : Float := 0.0;
+      Max_Features             : Tree.Index_Range := Tree.Index_Range'Last;
+      Max_Leaf_Nodes           : Integer := -1;
+      Class_Weight             : Weights.Weight_Type := Weights.No_Weight;
+      Min_Impurity_Decrease    : Float := 0.0;
+      CCP_Alpha                : Float := 0.0;
+      Random_State             : Integer := 0) is
+      use Base_Decision_Tree;
    begin
-      aClassifier.Parameters.Critera := Criteria;
-      aClassifier.Parameters.Splitter := Splitter;
-      aClassifier.Parameters.Criterion_Kind := theCriterion;
+      if Utilities.Is_Float (To_Unbounded_String (Min_Split_Samples)) then
+         declare
+            Min_Split : Split_Value_Record (Split_Float);
+         begin
+            Min_Split.Float_Value := Float'Value (Min_Split_Samples);
+            aClassifier.Parameters.Min_Samples_Split := Min_Split;
+         end;
+      elsif Utilities.Is_Integer
+        (To_Unbounded_String (Min_Split_Samples)) then
+         declare
+            Min_Split : Base_Decision_Tree.Split_Value_Record
+              (Split_Integer);
+         begin
+            Min_Split.Integer_Value := Integer'Value (Min_Split_Samples);
+            aClassifier.Parameters.Min_Samples_Split := Min_Split;
+         end;
+
+      end if;
       aClassifier.Parameters.Max_Depth := Max_Depth;
-      aClassifier.Parameters.Min_Samples_Split := Min_Split_Samples;
       aClassifier.Parameters.Min_Samples_Leaf := Min_Leaf_Samples;
       aClassifier.Parameters.Min_Weight_Fraction_Leaf := Min_Leaf_Weight_Fraction;
       aClassifier.Parameters.Max_Features := Max_Features;
@@ -70,6 +83,9 @@ package body Decision_Tree_Classification is
       aClassifier.Parameters.Class_Weight := Class_Weight;
       aClassifier.Parameters.CCP_Alpha := CCP_Alpha;
       aClassifier.Parameters.Random_State := Random_State;
+
+      aClassifier.Parameters.Criterion_Kind := Criterion_Type;
+      Node_Splitter.C_Init (aClassifier.Parameters.Splitter);
 
    end C_Init;
 
@@ -82,21 +98,21 @@ package body Decision_Tree_Classification is
                                  X    : ML_Types.Value_Data_Lists_2D)
                                  return Weights.Weight_Lists_3D is
       use Weights;
-      Num_Outputs     : constant Positive :=
-                          Positive (Self.Attributes.Num_Outputs);
+      Num_Outputs : constant Positive :=
+                      Positive (Self.Attributes.Num_Outputs);
       --  L978
-      --  Proba: num nodes x num outputs x num classes
-      Proba           : constant Weight_Lists_3D :=
-                          Tree.Predict (Self.Attributes.Decision_Tree, X);
-      Output_K        : Weight_Lists_2D;
-      Node_K          : Weight_List;
-      --  All_Proba: num nodes x num outputs x num classes
-      All_Proba       : Weight_Lists_3D;
-      F_Class         : Float;
-      Normalizer      : Float;
+      --  Proba: num samples x num outputs x num classes
+      Proba       : constant Weight_Lists_3D :=
+                      Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Output_K    : Weight_Lists_2D;
+      Node_K      : Weight_List;
+      --  All_Proba: num samples x num outputs x num classes
+      All_Proba   : Weight_Lists_3D;
+      F_Class     : Float;
+      Normalizer  : Float;
    begin
-      --  All_Proba: num_outputs x num nodes x num classes
-      All_Proba := Classifier_Utilities.Nodes_3D_To_Outputs_3D
+      --  All_Proba: num_outputs x num samples x num classes
+      All_Proba := Classifier_Utilities.Samples_3D_To_Outputs_3D
         (Proba, Num_Outputs);
       --  L969
       for output_index in All_Proba.First_Index .. All_Proba.Last_Index loop
@@ -133,6 +149,39 @@ package body Decision_Tree_Classification is
       return All_Proba;
 
    end Predict_Probability;
+
+   --  -------------------------------------------------------------------------
+
+   function Predict_Log_Probability (Self : in out Base_Decision_Tree.Classifier;
+                                     X    : ML_Types.Value_Data_Lists_2D)
+                                     return Weights.Weight_Lists_3D is
+      use Maths.Float_Math_Functions;
+      use Weights;
+      Output_K    : Weight_Lists_2D;
+      Node_K      : Weight_List;
+      --  Proba: num samples x num outputs x num classes
+      Proba       : Weight_Lists_3D := Predict_Probability (Self, X);
+      Log_Class   : Float;
+   begin
+
+      for output_index in Proba.First_Index .. Proba.Last_Index loop
+         Output_K := Proba.Element (output_index);
+         --  Output_K: list of num nodes x num classes
+         for node_index in Output_K.First_Index .. Output_K.Last_Index loop
+            Node_K := Output_K.Element (node_index);
+            --  Node_K List of classes
+            for class_index in Node_K.First_Index  .. Node_K.Last_Index loop
+               Log_Class := Log (Node_K.Element (class_index));
+               Node_K.Replace_Element (class_index, Log_Class);
+            end loop;
+            Output_K.Replace_Element (node_index, Node_K);
+         end loop;
+         Proba.Replace_Element (output_index, Output_K);
+      end loop;
+
+      return Proba;
+
+   end Predict_Log_Probability;
 
    --  -------------------------------------------------------------------------
 

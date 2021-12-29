@@ -35,9 +35,10 @@ package body Maths is
    end Radians;
 
    --  ------------------------------------------------------------------------
-
+   --  Random_Float generates a random number in the range  -1.0 .. 1.0
    function Random_Float return Float is
       use Ada.Numerics.Float_Random;
+      --  Random range 0.0 .. 1.0
    begin
       return 2.0 * Float (Random (Float_Gen)) - 1.0;
    end Random_Float;

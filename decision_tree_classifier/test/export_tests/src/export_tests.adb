@@ -10,7 +10,6 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
 with Printing;
 with Tree;
 with Weights;
@@ -36,8 +35,6 @@ package body Export_Tests is
       use Float_Package;
       Routine_Name      : constant String :=
                            "Export_Tests.Test_Graphviz_Toy";
-      Criteria          : Criterion.Criterion_Class;
-      Splitter          : Node_Splitter.Splitter_Class;
       theClassifier     : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter          : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -56,13 +53,14 @@ package body Export_Tests is
       Num_Samples       : constant Natural := Natural (X.Length);
       No_Weights        : Weights.Weight_List := Empty_Vector;
    begin
+      Put_Line (Routine_Name);
       Class_Names.Append (To_Unbounded_String ("Yes"));
       Class_Names.Append (To_Unbounded_String ("No"));
       Feature_Names.Append (To_Unbounded_String ("feature_1"));
       Feature_Names.Append (To_Unbounded_String ("feature_2"));
 
-      C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3);
-      Put_Line (Routine_Name);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria,
+               Max_Depth => 3);
       Assert (Num_Samples > 0,
               Routine_Name & " called with empty X vector.");
 
@@ -72,7 +70,12 @@ package body Export_Tests is
       New_Line;
 
       Graphviz_Exporter.C_Init
-          (Exporter, theClassifier.Attributes.Decision_Tree);
+        (Exporter, theClassifier.Attributes.Decision_Tree);
+
+      --  Test export code
+      Graphviz_Exporter.Export_Graphviz
+        (Exporter, theClassifier.Attributes.Decision_Tree,
+         Output_File_Name => To_Unbounded_String ("export.dot"));
 
       --  Test with feature_names
       Graphviz_Exporter.Export_Graphviz
@@ -94,6 +97,8 @@ package body Export_Tests is
          Output_File_Name => To_Unbounded_String ("plot.dot"));
 
       --  Test max depth
+      Class_Names.Clear;
+      Class_Names.Append (To_Unbounded_String ("True"));
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree, Max_Depth => 0,
          Class_Names => Class_Names,
@@ -105,8 +110,7 @@ package body Export_Tests is
          Filled => True, Node_Ids => True,
          Output_File_Name => To_Unbounded_String ("max_depth_plot.dot"));
 
-      C_Init (theClassifier, Criteria, Splitter, Max_Depth => 3,
-              theCriterion => Criterion.Gini_Criteria);
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 3);
       Classification_Fit (theClassifier, X, Y2, W);
       Printing.Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
@@ -116,9 +120,15 @@ package body Export_Tests is
           (Exporter, theClassifier.Attributes.Decision_Tree);
 
       --  Test multi-output with weighted samples
+      C_Init (theClassifier, "2", Criterion.Gini_Criteria, Max_Depth => 3);
+      Classification_Fit (theClassifier, X, Y2, W);
+      Printing.Print_Tree ("The Tree", theClassifier);
+      Put_Line ("----------------------------------------------");
+      New_Line;
+
       Graphviz_Exporter.Export_Graphviz
         (Exporter, theClassifier.Attributes.Decision_Tree, Filled => True,
-         Impurity => False, Max_Depth => 5,
+         Impurity => False,
          Output_File_Name => To_Unbounded_String ("multi_output.dot"));
 
    end Test_Graphviz_Toy;

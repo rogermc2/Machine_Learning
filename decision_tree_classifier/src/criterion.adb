@@ -11,367 +11,408 @@ with ML_Types;
 
 package body Criterion is
 
-   --  -------------------------------------------------------------------------
-   --  L214 __cinit__
-   procedure C_Init (Criteria    : in out Criterion_Class;
-                     Num_Outputs : Tree.Index_Range;
-                     Classes     : Classifier_Types.Natural_List) is
-   begin
-      --  L220
-      Criteria.Num_Outputs := Num_Outputs;
-      Criteria.Classes := Classes;
+    --  -------------------------------------------------------------------------
+    --  L214 __cinit__
+    procedure C_Init (Criteria    : in out Criterion_Class;
+                      Num_Outputs : Tree.Index_Range := 1;
+                      Num_Classes : Classifier_Types.Natural_List :=
+                        Classifier_Types.Natural_Package.Empty_Vector) is
+    begin
+        --  L220
+        Criteria.Num_Outputs := Num_Outputs;
+        Criteria.Num_Classes := Num_Classes;
+        Criteria.Sum_Total.Clear;
+        Criteria.Sum_Left.Clear;
+        Criteria.Sum_Right.Clear;
+        Criteria.Sample_Indices.Clear;
 
-   end C_Init;
+    end C_Init;
 
-   --  ------------------------------------------------------------------------
-   --  L59, L214, 280
-   procedure Classification_Init
-     (Criteria            : in out Criterion_Class;
-      Y                   : Classifier_Types.Natural_Lists_2D;
-      Sample_Indices      : Classifier_Types.Natural_List;
-      --  Sample_Weight contains the weight of each sample
-      Sample_Weight       : Weights.Weight_List;
-      Weighted_Samples    : Float;
-      Start_Row, Stop_Row : Natural) is
-      --  In Python a[start:stop] means items start through stop - 1
---        Routine_Name    : constant String := "Criterion.Classification_Init ";
-      Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
-      Sum_Total_K     : Classifier_Types.Float_List;
-      Y_I_Index       : Positive;  --  Class index
-      Y_I             : Classifier_Types.Natural_List;  --  Class
-      Y_Ik            : Natural; --  Class.output
-      Weight          : Float := 1.0;
-   begin
-      --  L302
-      Criteria.Y := Y;
-      Criteria.Sample_Weight := Sample_Weight;
-      Criteria.Sample_Indices := Sample_Indices;
-      Criteria.Start_Row := Start_Row;
-      Criteria.Stop_Row := Stop_Row;
-      Criteria.Num_Node_Samples := Stop_Row - Start_Row + 1;
-      Criteria.Num_Weighted_Samples := Weighted_Samples;
-      Criteria.Num_Weighted_Node_Samples := 0.0;
-      Criteria.Sum_Total.Clear;
+    --  ------------------------------------------------------------------------
+    --  L630
+    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
+                                      Impurity_Left,
+                                      Impurity_Right : out Float) is
+        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
+        Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
+        Num_Classes    :  constant Classifier_Types.Natural_List :=
+                           Criteria.Num_Classes;
+        Sum_Left_K     : Classifier_Types.Float_List;
+        Sum_Right_K    : Classifier_Types.Float_List;
+        Count_K        : Float;
+        Sq_Count_Left  : Float;
+        Sq_Count_Right : Float;
+        Gini_Left      : Float := 0.0;
+        Gini_Right     : Float := 0.0;
+    begin
+        Assert (Criteria.Num_Weighted_Left > 0.0,
+                Routine_Name & "Criteria.Num_Weighted_Left " &
+                  Float'Image (Criteria.Num_Weighted_Left) &
+                  " should be > 0.0.");
+        Assert (Criteria.Num_Weighted_Right > 0.0,
+                Routine_Name & "Criteria.Num_Weighted_Right " &
+                  Float'Image (Criteria.Num_Weighted_Right) &
+                  " should be > 0.0.");
+        --  L656
+        for k in 1 .. Num_Outputs loop
+            Sq_Count_Left := 0.0;
+            Sq_Count_Right := 0.0;
+            Sum_Left_K := Criteria.Sum_Left.Element (k);
+            Sum_Right_K := Criteria.Sum_Right.Element (k);
 
-      Assert (not Criteria.Classes.Is_Empty,
-              "Criterion.Classification_Init Criteria.Classes is empty");
-      --  L325 Initialize Sum_Total
-      --  Sum_Total dimensions: num outputs x num classes
-      for row in 1 .. Num_Outputs loop
-         Sum_Total_K.Clear;
-         for c in 1 .. Criteria.Classes.Element (row) loop
-            Sum_Total_K.Append (0.0);
-         end loop;
-         Criteria.Sum_Total.Append (Sum_Total_K);
-      end loop;
+            for c in 1 .. Num_Classes.Element (k) loop
+                Count_K := Sum_Left_K.Element (c);
+                Sq_Count_Left := Sq_Count_Left + Count_K ** 2;
 
-      --  L325
-      for p in Start_Row .. Stop_Row loop
-         Y_I_Index := Sample_Indices.Element (p);
+                Count_K := Sum_Right_K.Element (c);
+                Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
+            end loop;
 
-         --  Weight is originally set to be 1.0, meaning that if no
-         --  sample weights are given, the default weight of each sample is 1.0
-         if not Sample_Weight.Is_Empty then
-            Weight := Sample_Weight.Element (Y_I_Index);
-         end if;
+            Gini_Left := Gini_Left + 1.0 -
+              Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
+            Gini_Right := Gini_Right + 1.0 -
+              Sq_Count_Right / Criteria.Num_Weighted_Right ** 2;
+        end loop;
 
-         --  L338 Count weighted class frequency for each target
-         --  Y_I is Class
-         Y_I := Y.Element (Y_I_Index);
-         for k in 1 .. Num_Outputs loop
-            Sum_Total_K := Criteria.Sum_Total.Element (k);
-            --  L339 c = Y_Ik is an index into Y (output k) class i
-            Y_Ik := Y_I.Element (k);   --  output.class
-            --  sum_total[k * self.sum_stride + c] += w
-            --  Add Weight to Y (output k, class Y_I)
-            Sum_Total_K.Replace_Element
-              (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
-            Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
-         end loop;
+        Impurity_Left := Gini_Left / Float (Num_Outputs);
+        Impurity_Right := Gini_Right / Float (Num_Outputs);
 
-         Criteria.Num_Weighted_Node_Samples :=
-           Criteria.Num_Weighted_Node_Samples + Weight;
-      end loop;
+    end Children_Impurity_Gini;
 
-      Reset (Criteria);
+    --  ------------------------------------------------------------------------
 
-   end Classification_Init;
+    function Impurity_Improvement (Criteria       : Criterion_Class;
+                                   Impurity_Parent, Impurity_Left,
+                                   Impurity_Right : Float) return float is
+        Routine_Name          : constant String := "Criterion.Impurity_Improvement";
+        Weighted_Node_Samples : constant Float :=
+                                  Criteria.Num_Weighted_Node_Samples;
+        Right_Component       : constant Float
+          := (Criteria.Num_Weighted_Right / Weighted_Node_Samples) * Impurity_Right;
+        Left_Component        : constant Float
+          := (Criteria.Num_Weighted_Left / Weighted_Node_Samples) * Impurity_Left;
+    begin
+        Assert (Weighted_Node_Samples > 0.0,
+                Routine_Name & "Criteria.Weighted_Node_Samples " &
+                  Float'Image (Weighted_Node_Samples) & " should be > 0.0");
+        Assert (Criteria.Num_Weighted_Samples > 0.0,
+                Routine_Name & "Criteria.Num_Weighted_Samples " &
+                  Float'Image (Criteria.Num_Weighted_Samples) &
+                  " should be > 0.0");
+        return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
+          (Impurity_Parent - Right_Component - Left_Component);
 
-   --  ------------------------------------------------------------------------
-   --  L637
-   procedure Gini_Children_Impurity (Criteria       : Criterion_Class;
-                                     Impurity_Left,
-                                     Impurity_Right : out Float) is
-      use Maths.Float_Math_Functions;
---        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
-      Num_Outputs    : constant Positive :=
-                         Positive (Criteria.Y.Element (1).Length);
-      Class_List     :  constant Classifier_Types.Natural_List :=
-                           Criteria.Classes;
-      Sum_Left_K     : Classifier_Types.Float_List;
-      Sum_Right_K    : Classifier_Types.Float_List;
-      Count_K        : Float;
-      Sq_Count_Left  : Float;
-      Sq_Count_Right : Float;
-   begin
-      --  L662
-      for k in Class_List.First_Index .. Class_List.Last_Index loop
-         Sq_Count_Left := 0.0;
-         Sq_Count_Right := 0.0;
-         Sum_Left_K := Criteria.Sum_Left.Element (k);
-         Sum_Right_K := Criteria.Sum_Right.Element (k);
-         for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Count_K := Sum_Left_K.Element (c);
-            if Count_K > 0.0 then
-               Count_K := Count_K / Criteria.Num_Weighted_Left;
-               Sq_Count_Left := Sq_Count_Left - Count_K * Log (Count_K);
+    end Impurity_Improvement;
+
+    --  ------------------------------------------------------------------------
+    --  L59, L214, 280
+    procedure Initialize_Node_Criterion
+      (Criteria            : in out Criterion_Class;
+       Y                   : Classifier_Types.Natural_Lists_2D;
+       Sample_Indices      : Classifier_Types.Natural_List;
+       --  Sample_Weight contains the weight of each sample
+       Sample_Weight       : Weights.Weight_List;
+       Weighted_Samples    : Float;
+       Start_Row, Stop_Row : Natural) is
+    --  In Python a[start:stop] means items start through stop - 1
+        Routine_Name    : constant String := "Criterion.Initialize_Node_Criterion ";
+        Num_Outputs     : constant Positive := Positive (Y.Element (1).Length);
+        Sum_Total_K     : Classifier_Types.Float_List;
+        Y_I_Index       : Positive;  --  Class index
+        Y_I             : Classifier_Types.Natural_List;  --  Class
+        Y_Ik            : Natural; --  Class.output
+        Weight          : Float := 1.0;
+    begin
+        --  L302
+        Criteria.Y := Y;
+        Criteria.Sample_Weight := Sample_Weight;
+        Criteria.Sample_Indices := Sample_Indices;
+        Criteria.Start_Row := Start_Row;
+        Criteria.Stop_Row := Stop_Row;
+        Criteria.Num_Node_Samples := Stop_Row - Start_Row + 1;
+        Criteria.Num_Weighted_Samples := Weighted_Samples;
+        Criteria.Num_Weighted_Node_Samples := 0.0;
+        Criteria.Sum_Total.Clear;
+
+        Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
+                  " Criteria.Num_Classes is empty");
+        --  L321 Initialize Sum_Total
+        --  Sum_Total dimensions: num outputs x num classes
+        for row in 1 .. Num_Outputs loop
+            Sum_Total_K.Clear;
+            for c in 1 .. Criteria.Num_Classes.Element (row) loop
+                Sum_Total_K.Append (0.0);
+            end loop;
+            Criteria.Sum_Total.Append (Sum_Total_K);
+        end loop;
+
+        --  L325
+        for p in Start_Row .. Stop_Row loop
+            Y_I_Index := Sample_Indices.Element (p);
+
+            --  Weight is originally set to be 1.0, meaning that if no
+            --  sample weights are given the default weight of each sample is 1.0
+            if not Sample_Weight.Is_Empty then
+                Weight := Sample_Weight.Element (Y_I_Index);
             end if;
 
-            Count_K := Sum_Right_K.Element (c);
-            if Count_K > 0.0 then
-               Count_K := Count_K / Criteria.Num_Weighted_Right;
---                  Put_Line (Routine_Name & " right Count_K: " & Float'Image (Count_K));
-               Sq_Count_Right := Sq_Count_Right - Count_K * Log (Count_K);
-            end if;
-         end loop;
-      end loop;
+            --  L333 Count weighted class frequency for each target
+            --  Y_I is Class
+            Y_I := Y.Element (Y_I_Index);
+            for k in 1 .. Num_Outputs loop
+                Sum_Total_K := Criteria.Sum_Total.Element (k);
+                --  L339 c = Y_Ik is an index into Y (output k) class i
+                Y_Ik := Y_I.Element (k);   --  output.class
+                --  sum_total[k * self.sum_stride + c] += w
+                --  Add Weight to Y (output k, class Y_I)
+                Sum_Total_K.Replace_Element
+                  (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
+                Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
+            end loop;
 
-      Impurity_Left := Sq_Count_Left / Float (Num_Outputs);
-      Impurity_Right := Sq_Count_Right / Float (Num_Outputs);
+            Criteria.Num_Weighted_Node_Samples :=
+              Criteria.Num_Weighted_Node_Samples + Weight;
+        end loop;
 
-   end Gini_Children_Impurity;
+        Reset (Criteria);
 
-   --  ------------------------------------------------------------------------
-   --  L 608 Gini_Node_Impurity evaluates the Gini criterion as the impurity
-   --  of the current node.
-   --  Gini_Node_Impurity handles cases where the target is a classification
-   --  taking values 0, 1, ... K-2, K-1.
-   --  If node m represents a region Rm with Nm observations then:
-   --  Let count_k = 1/ Nm \ sum_{x_i in Rm} I(yi = k)
-   --  be the proportion of class k observations in node m.
-   --  The Gini Index is then defined as:
-   --  index = \sum_{k = 0}^{K - 1} count_k (1 - count_k)
-   --        = 1 - \sum_{k=0}^{K-1} count_k ** 2
-   function Gini_Node_Impurity (Criteria : Criterion_Class) return Float is
---        Routine_Name   : constant String := "Criterion.Gini_Node_Impurity ";
-      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes    : constant Classifier_Types.Natural_List :=
-                         Criteria.Classes;
-      Sum_Total_K    : Weights.Weight_List;
-      Num_Classes_K  : Positive;
-      Count_K        : Float;
-      Gini           : Float := 0.0;
-      Sq_Count       : Float := 0.0;
-   begin
-      --  L620
-      for index_k in 1 .. Criteria.Num_Outputs loop
-         Sq_Count := 0.0;
-         Num_Classes_K := Num_Classes.Element (Integer (index_k));
-         Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
+--          Printing.Print_Weight_Lists_2D (Routine_Name & "Criteria.Sum_Total",
+--                                          Criteria.Sum_Total);
 
-         for class_index in 1 .. Num_Classes_K loop
-            Count_K := Float (Sum_Total_K.Element (class_index));
-            Sq_Count := Sq_Count + Count_K ** 2;
-         end loop;
+    end Initialize_Node_Criterion;
 
-         Gini := Gini + 1.0 -
-           Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
-      end loop;
+    --  ------------------------------------------------------------------------
+    --  L 605 Node_Impurity_Gini evaluates the Gini criterion as the impurity
+    --  of the current node.
+    --  Gini impurity is calculated by subtracting the sum of the squared
+    --  probabilities of each class from one
+    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float is
+    --        Routine_Name   : constant String := "Criterion.Node_Impurity_Gini ";
+        Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
+        Num_Classes    : constant Classifier_Types.Natural_List :=
+                           Criteria.Num_Classes;
+        Sum_Total_K    : Weights.Weight_List;
+        Count_K        : Float;
+        Gini           : Float := 0.0;
+        Sq_Count       : Float := 0.0;
+    begin
+        --  L620
+        for index_k in 1 .. Criteria.Num_Outputs loop
+            Sq_Count := 0.0;
+            Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
 
-      return Gini / Float (Num_Outputs);
+            for class_index in 1 .. Num_Classes.Element (Integer (index_k)) loop
+                Count_K := Float (Sum_Total_K.Element (class_index));
+                Sq_Count := Sq_Count + Count_K ** 2;
+            end loop;
 
-   end Gini_Node_Impurity;
+            Gini := Gini + 1.0 -
+              Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
+        end loop;
 
-   --  ------------------------------------------------------------------------
-   --  L524 Entropy_Node_Impurity evaluates the cross-entropy criterion as
-   --  impurity of the current node.  i.e. the impurity of samples[start:end].
-   --  The smaller the impurity the better.
-   function Entropy_Node_Impurity (Self : Criterion_Class) return Float is
-      use Maths.Float_Math_Functions;
-      Class_List  : ML_Types.Value_Data_List;
-      Sum_Total_K : Classifier_Types.Float_List;
-      Count_K     : Float := 0.0;
-      Entropy     : Float := 0.0;
-   begin
-      Assert (not Self.Classes.Is_Empty,
-              "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
+        return Gini / Float (Num_Outputs);
 
-      --  L535 Y structure samples (rows) x outputs (columns)
-      --  k in range(self.n_outputs)
-      for index_k in Self.Y.Element (1).First_Index
-        .. Self.Y.Element (1).Last_Index loop
-         Sum_Total_K := Self.Sum_Total.Element (index_k);
-         for c in Class_List.First_Index .. Class_List.Last_Index loop
-            Count_K := Sum_Total_K.Element (c);
-            if Count_K > 0.0 then
-               Count_K := Count_K / Self.Num_Weighted_Node_Samples;
-               Entropy := Entropy - Count_K * Log (Count_K);
-            end if;
-         end loop;
-      end loop;
+    end Node_Impurity_Gini;
 
-      return Entropy / Float (Self.Sum_Total.Length);
+    --  ------------------------------------------------------------------------
+    --  L521 Node_Impurity_Entropy evaluates the cross-entropy criterion as
+    --  impurity of the current node.  i.e. the impurity of samples[start:end].
+    --  The smaller the impurity the better.
+    function Node_Impurity_Entropy (Self : Criterion_Class) return Float is
+        use Maths.Float_Math_Functions;
+        Num_Classes : constant Classifier_Types.Natural_List := Self.Num_Classes;
+        Sum_Total_K : Classifier_Types.Float_List;
+        Count_K     : Float := 0.0;
+        Entropy     : Float := 0.0;
+    begin
+        Assert (not Self.Num_Classes.Is_Empty,
+                "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
 
-   end Entropy_Node_Impurity;
+        --  L535 Y structure samples (rows) x outputs (columns)
+        --  k in range(self.n_outputs)
+        for index_k in Self.Y.Element (1).First_Index
+          .. Self.Y.Element (1).Last_Index loop
+            Sum_Total_K := Self.Sum_Total.Element (index_k);
+            for c in 1 .. Num_Classes.Element (index_k) loop
+                Count_K := Sum_Total_K.Element (c);
+                if Count_K > 0.0 then
+                    Count_K := Count_K / Self.Num_Weighted_Node_Samples;
+                    Entropy := Entropy - Count_K * Log (Count_K);
+                end if;
+            end loop;
+        end loop;
 
-   --  ------------------------------------------------------------------------
+        return Entropy / Float (Self.Sum_Total.Length);
 
-   function Impurity_Improvement (Criteria       : Criterion_Class;
-                                  Impurity_Parent, Impurity_Left,
-                                  Impurity_Right : Float) return float is
-   begin
-      return (Criteria.Num_Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
-        (Impurity_Parent -
-           (Criteria.Num_Weighted_Right / Criteria.Num_Weighted_Node_Samples *
-                Impurity_Right) -
-           (Criteria.Num_Weighted_Left / Criteria.Num_Weighted_Node_Samples *
-                Impurity_Left));
+    end Node_Impurity_Entropy;
 
-   end Impurity_Improvement;
+    --  ------------------------------------------------------------------------
+    --  L200
+    --  L490  ClassificationCriterion(Criterion).node_value
+    procedure Node_Value (Self  : Criterion_Class;
+                          Value : out Weights.Weight_Lists_2D) is
+    begin
+        Assert (not Self.Sum_Total.Is_Empty,
+                "Criterion.Node_Value Self.Sum_Total is empty");
+        --  Value dimensions: num outputs x num classes
+        Value := Self.Sum_Total;
 
-   --  ------------------------------------------------------------------------
-   --  L490  ClassificationCriterion(Criterion).node_value
-   procedure Node_Value (Self  : Criterion_Class;
-                         Value : out Weights.Weight_Lists_2D) is
-   begin
-      Assert (not Self.Sum_Total.Is_Empty,
-              "Criterion.Node_Value Self.Sum_Total is empty");
-      --  Value dimensions: num outputs x num classes
-      Value := Self.Sum_Total;
+    end Node_Value;
 
-   end Node_Value;
+    --  -------------------------------------------------------------------------
 
-   --  -------------------------------------------------------------------------
-
-   function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
+    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                         return Float is
-      Impurity_Left  : Float;
-      Impurity_Right : Float;
-   begin
-      Gini_Children_Impurity (Criteria, Impurity_Left, Impurity_Right);
-      return -Criteria.Num_Weighted_Right * Impurity_Right -
-        Criteria.Num_Weighted_Left * Impurity_Left;
+--          Routine_Name   : constant String :=
+--                             "Criterion.Proxy_Impurity_Improvement ";
+        Impurity_Left  : Float;
+        Impurity_Right : Float;
+    begin
+--          Printing.Print_Criterion (Routine_Name & "Criteria", Criteria);
+        Children_Impurity_Gini (Criteria, Impurity_Left, Impurity_Right);
+        --        Put_Line (Routine_Name & "Num_Weighted_Left " &
+        --                    Float'Image (Criteria.Num_Weighted_Left));
+        --        Put_Line (Routine_Name & "Num_Weighted_Right " &
+        --                    Float'Image (Criteria.Num_Weighted_Right));
+        --        Put_Line (Routine_Name & "Impurity_Left " &
+        --                    Float'Image (Impurity_Left));
+        --        Put_Line (Routine_Name & "Impurity_Right " &
+        --                    Float'Image (Impurity_Right));
+        return -Criteria.Num_Weighted_Right * Impurity_Right -
+          Criteria.Num_Weighted_Left * Impurity_Left;
 
-   end Proxy_Impurity_Improvement;
+    end Proxy_Impurity_Improvement;
 
-   --  ------------------------------------------------------------------------
-   --  L348 Reset the criterion to pos=start
-   procedure Reset (Criteria : in out Criterion_Class) is
-      Num_Outputs : constant Positive :=
-                      Positive (Criteria.Y.Element (1).Length);
-      Sum_Left_K  : Classifier_Types.Float_List;
-   begin
-      Criteria.Split_Row := Criteria.Start_Row;
-      Criteria.Num_Weighted_Left := 0.0;
-      Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples;
+    --  ------------------------------------------------------------------------
+    --  L348 Reset the criterion to pos=start
+    procedure Reset (Criteria : in out Criterion_Class) is
+        Num_Outputs : constant Positive :=
+                        Positive (Criteria.Y.Element (1).Length);
+        Sum_Left_K  : Classifier_Types.Float_List;
+    begin
+        Criteria.Split_Row := Criteria.Start_Row;
+        Criteria.Num_Weighted_Left := 0.0;
+        Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples;
 
-      Criteria.Sum_Left.Clear;
-      Criteria.Sum_Right.Clear;
-      for k in 1 .. Num_Outputs loop
-         Sum_Left_K.Clear;
-         for c in 1 .. Criteria.Classes.Element (k) loop
-            Sum_Left_K.Append (0.0);
-         end loop;
-         Criteria.Sum_Left.Append (Sum_Left_K);
-      end loop;
-      Criteria.Sum_Right := Criteria.Sum_Total;
-
-   end Reset;
-
-   --  ------------------------------------------------------------------------
-   --  L378
-   procedure Reverse_Reset (Criteria : in out Criterion_Class) is
-      Num_Outputs : constant Positive :=
-                      Positive (Criteria.Y.Element (1).Length);
-      Sum_Right_K : Classifier_Types.Float_List;
-   begin
-      Criteria.Split_Row := Criteria.Stop_Row + 1;
-      Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Node_Samples;
-      Criteria.Num_Weighted_Right := 0.0;
-
-      Criteria.Sum_Right.Clear;
-      for index in 1 .. Num_Outputs loop
-         Sum_Right_K.Clear;
-         for c in 1 .. Criteria.Classes.Element (index) loop
-            Sum_Right_K.Append (0.0);
-         end loop;
-         Criteria.Sum_Right.Append (Sum_Right_K);
-      end loop;
-      Criteria.Sum_Left := Criteria.Sum_Total;
-
-   end Reverse_Reset;
-
-   --  ------------------------------------------------------------------------
-   --  L398 Update statistics by moving samples[pos:new_pos] to the left child.
-   procedure Update (Criteria : in out Criterion_Class;
-                     New_Pos  : Positive) is
-      Num_Outputs : constant Positive :=
-                      Positive (Criteria.Y.Element (1).Length);
-      i           : Positive;
-      Y_I         : Classifier_Types.Natural_List;
-      Y_Ik        : Natural;  --  Class index
-      Sum_Left_K  : Classifier_Types.Float_List;
-      Sum_Right_K : Classifier_Types.Float_List;
-      Sum_K       : Classifier_Types.Float_List;
-      Weight      : Float := 1.0;
-   begin
-      --  L435
-      if (New_Pos - Criteria.Split_Row) < (Criteria.Stop_Row - New_Pos) then
-         for p in Criteria.Split_Row .. New_Pos - 1 loop
-            i := Criteria.Sample_Indices.Element (p);
-            if not Criteria.Sample_Weight.Is_Empty then
-               Weight := Criteria.Sample_Weight.Element (i);
-            end if;
-
-            Y_I := Criteria.Y.Element (i);
-            for k in 1 .. Num_Outputs loop
-               Sum_Left_K := Criteria.Sum_Left.Element (k);
-               Y_Ik := Y_I.Element (k);  --  Class index
-               Sum_Left_K.Replace_Element
-                 (Y_Ik, Sum_Left_K.Element (Y_Ik) + Weight);
-               Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
+        Criteria.Sum_Left.Clear;
+        Criteria.Sum_Right.Clear;
+        for k in 1 .. Num_Outputs loop
+            Sum_Left_K.Clear;
+            for c in 1 .. Criteria.Num_Classes.Element (k) loop
+                Sum_Left_K.Append (0.0);
             end loop;
-            Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
-         end loop;
+            Criteria.Sum_Left.Append (Sum_Left_K);
+        end loop;
+        Criteria.Sum_Right := Criteria.Sum_Total;
 
-      else  --  L449
-         Reverse_Reset (Criteria);
-         for p in reverse Criteria.Stop_Row .. New_Pos loop
-            i := Criteria.Sample_Indices.Element (p);
-            if not Criteria.Sample_Weight.Is_Empty then
-               Weight := Criteria.Sample_Weight.Element (i);
-            end if;
+    end Reset;
 
-            Y_I := Criteria.Y.Element (i);
-            for k in 1 .. Num_Outputs loop
-               Y_Ik := Y_I.Element (k);
-               Sum_Left_K := Criteria.Sum_Left.Element (k);
-               Sum_Left_K.Replace_Element
-                 (Y_Ik, Sum_Left_K.Element (Y_Ik) - Weight);
-               Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
+    --  ------------------------------------------------------------------------
+    --  L378
+    procedure Reverse_Reset (Criteria : in out Criterion_Class) is
+        Num_Outputs : constant Positive :=
+                        Positive (Criteria.Y.Element (1).Length);
+        Sum_Right_K : Classifier_Types.Float_List;
+    begin
+        Criteria.Split_Row := Criteria.Stop_Row + 1;
+        Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Node_Samples;
+        Criteria.Num_Weighted_Right := 0.0;
+
+        Criteria.Sum_Right.Clear;
+        for index in 1 .. Num_Outputs loop
+            Sum_Right_K.Clear;
+            for c in 1 .. Criteria.Num_Classes.Element (index) loop
+                Sum_Right_K.Append (0.0);
+            end loop;
+            Criteria.Sum_Right.Append (Sum_Right_K);
+        end loop;
+        Criteria.Sum_Left := Criteria.Sum_Total;
+
+    end Reverse_Reset;
+
+    --  ------------------------------------------------------------------------
+    --  L398 Update statistics by moving samples[pos:new_pos] to the left child.
+    procedure Update (Criteria : in out Criterion_Class;
+                      New_Pos  : Positive) is
+    --        Routine_Name : constant String := "Criterion.Update ";
+        Num_Outputs  : constant Positive :=
+                         Positive (Criteria.Y.Element (1).Length);
+        i            : Positive;
+        Y_I          : Classifier_Types.Natural_List;
+        Label_Index  : Positive;  --  Class index?
+        Sum_Left_K   : Classifier_Types.Float_List;
+        Sum_Right_K  : Classifier_Types.Float_List;
+        Sum_K        : Classifier_Types.Float_List;
+        Weight       : Float := 1.0;
+    begin
+        --  L435  Update statistics up to new_pos given that
+        --  sum_left[x] +  sum_right[x] = sum_total[x] and that sum_total
+        --  is known, update sum_left from the direction that requires
+        --  the least amount of computations.
+        --  Criteria.Split_Row is the start position of the current right side.
+        --  New_Pos is the start position of the updated right side.
+        --  New_Pos - 1 is the new ending position for which to move samples from
+        --  the right child to the left child.
+        --  Move Criteria.Split_Row .. New_Pos - 1 to left side
+
+        if (New_Pos - Criteria.Split_Row) <= (Criteria.Stop_Row - New_Pos) then
+            for p in Criteria.Split_Row .. New_Pos - 1 loop
+                i := Criteria.Sample_Indices.Element (p);
+                if not Criteria.Sample_Weight.Is_Empty then
+                    Weight := Criteria.Sample_Weight.Element (i);
+                end if;
+
+                Y_I := Criteria.Y.Element (i);
+                for k in 1 .. Num_Outputs loop
+                    Sum_Left_K := Criteria.Sum_Left.Element (k);
+                    Label_Index := Y_I.Element (k);  --  Class index
+                    Sum_Left_K.Replace_Element
+                      (Label_Index, Sum_Left_K.Element (Label_Index) + Weight);
+                    Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
+                end loop;
+                Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left + Weight;
             end loop;
 
-            Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left - Weight;
-         end loop;
-      end if;
+        else  --  L449
+            Reverse_Reset (Criteria);
+            --  Num_Weighted_Left set to Num_Weighted_Node_Samples by Reverse_Reset
+            for p in reverse New_Pos .. Criteria.Stop_Row loop
+                i := Criteria.Sample_Indices.Element (p);
+                if not Criteria.Sample_Weight.Is_Empty then
+                    Weight := Criteria.Sample_Weight.Element (i);
+                end if;
 
-      --  L467 Update right part statistics
-      Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples -
-        Criteria.Num_Weighted_Left;
-      for k in 1 .. Num_Outputs loop
-         Sum_Left_K := Criteria.Sum_Left.Element (k);
-         Sum_Right_K := Criteria.Sum_Right.Element (k);
-         Sum_K := Criteria.Sum_Total.Element (k);
-         for class_index in 1 .. Criteria.Classes.Element (k) loop
-            Sum_Right_K.Replace_Element (class_index, Sum_K.Element (class_index) -
-                                           Sum_Left_K.Element (class_index));
-         end loop;
-         Criteria.Sum_Right.Replace_Element (k, Sum_Right_K);
-      end loop;
-      Criteria.Split_Row := New_Pos;
+                --  L446
+                Y_I := Criteria.Y.Element (i);
+                for k in 1 .. Num_Outputs loop
+                    Label_Index := Y_I.Element (k);
+                    Sum_Left_K := Criteria.Sum_Left.Element (k);
+                    Sum_Left_K.Replace_Element
+                      (Label_Index, Sum_Left_K.Element (Label_Index) - Weight);
+                    Criteria.Sum_Left.Replace_Element (k, Sum_Left_K);
+                end loop;
 
-   end Update;
+                Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Left - Weight;
+            end loop;
+        end if;
 
-   --  ------------------------------------------------------------------------
+        --  L467 Update right part statistics
+        Criteria.Num_Weighted_Right := Criteria.Num_Weighted_Node_Samples -
+          Criteria.Num_Weighted_Left;
+        for k in 1 .. Num_Outputs loop
+            Sum_Left_K := Criteria.Sum_Left.Element (k);
+            Sum_Right_K := Criteria.Sum_Right.Element (k);
+            Sum_K := Criteria.Sum_Total.Element (k);
+            for class_index in 1 .. Criteria.Num_Classes.Element (k) loop
+                Sum_Right_K.Replace_Element (class_index, Sum_K.Element (class_index) -
+                                               Sum_Left_K.Element (class_index));
+            end loop;
+            Criteria.Sum_Right.Replace_Element (k, Sum_Right_K);
+        end loop;
+        Criteria.Split_Row := New_Pos;
+
+    end Update;
+
+    --  ------------------------------------------------------------------------
 
 end Criterion;

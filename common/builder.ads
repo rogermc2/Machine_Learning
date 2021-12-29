@@ -26,6 +26,7 @@ package Builder is
    function Match (Question     : Question_Data;
                    Example_Data : Row_Data) return Boolean;
    function Num_Features (aString : String) return Class_Range;
+   function Parse_Header (Header : String) return Header_Data_Type;
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
                         return Partitioned_Rows;
    procedure Set_Header_Data (Header_Line : String);

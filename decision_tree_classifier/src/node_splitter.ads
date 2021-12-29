@@ -22,20 +22,22 @@ package Node_Splitter is
       Impurity_Right : Float := -Float'Last;
    end record;
 
+   use Classifier_Types;
    type Splitter_Class is record
       Criteria             : Criterion.Criterion_Class;
       Max_Features         : Tree.Index_Range := 1;  --  Number of features to test
       Min_Leaf_Samples     : Natural := 0;
       Min_Leaf_Weight      : Float := 0.0;
-      Sample_Indices       : Classifier_Types.Natural_List;  --  Samples
-      Feature_Indices      : Classifier_Types.Natural_List;
-      Constant_Features_I  : Classifier_Types.Natural_List;
-      Num_Classes          : Classifier_Types.Natural_List;
+      --  Samples:
+      Sample_Indices       : Natural_List;
+      Feature_Indices      : Natural_List;
+      Constant_Features_I  : Natural_List;
+      Num_Classes          : Natural_List;
       Feature_Values       : ML_Types.Value_Data_List;
       Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
       --  encoded version of sample Y
-      Y                    : Classifier_Types.Natural_Lists_2D;
+      Y_Encoded            : Natural_Lists_2D;
       Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
@@ -47,16 +49,16 @@ package Node_Splitter is
 
    Node_Splitter_Error : Exception;
 
-    procedure C_Init (Self          : in out Splitter_Class;
-                      Criteria      : Criterion.Criterion_Class;
-                      Max_Features  : Tree.Index_Range := 1;
-                      Min_Leaf_Samples : Integer := 0;
-                      Min_Leaf_Weight : Float := 0.0);
-   procedure Init (Self             : in out Splitter_Class;
-                   Input_X          : ML_Types.Value_Data_Lists_2D;
-                   Y_Encoded        : Classifier_Types.Natural_Lists_2D;
-                   Sample_Weight    : Weights.Weight_List;
-                   Min_Leaf_Samples : Positive := 1);
+   procedure C_Init (Self             : in out Splitter_Class;
+                     Max_Features     : Tree.Index_Range := 1;
+                     Min_Leaf_Samples : Integer := 0;
+                     Min_Leaf_Weight  : Float := 0.0);
+   procedure Initialize_Splitter
+     (Self             : in out Splitter_Class;
+      Input_X          : ML_Types.Value_Data_Lists_2D;
+      Y_Encoded        : Classifier_Types.Natural_Lists_2D;
+      Sample_Weight    : Weights.Weight_List;
+      Min_Leaf_Samples : Positive := 1);
    function Entropy_Node_Impurity (Self : Splitter_Class) return Float;
    function Gini_Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self   : Splitter_Class;

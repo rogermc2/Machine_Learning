@@ -12,8 +12,7 @@ with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
 with ML_Types;
-with Node_Splitter;
-with Printing;
+--  with Printing;
 with Tree;
 with Weights;
 
@@ -66,28 +65,25 @@ package body Split_Tests is
       use Base_Decision_Tree;
       use Classifier_Utilities;
       use Decision_Tree_Classification;
-      use Printing;
+--        use Printing;
       use Classifier_Types.Float_Package;
-      Routine_Name              : constant String := "Split_Tests.Test_Min_Samples_Split ";
-      Iris_Data                 : constant Data_Record := Load_Data ("src/iris.csv");
-      Criteria                  : Criterion.Criterion_Class;
-      Splitter                  : Node_Splitter.Splitter_Class;
+      Routine_Name              : constant String :=
+                                    "Split_Tests.Test_Min_Samples_Split ";
+      Iris_Data                 : constant Multi_Output_Data_Record :=
+                                    Load_Data ("src/iris.csv");
+      --  L666
+      X                         : constant Value_Data_Lists_2D :=
+                                    Iris_Data.Feature_Values;
+      Num_Samples               : constant Natural := Natural (X.Length);
       theClassifier             : Classifier (Tree.Float_Type, Tree.Float_Type,
                                               Tree.Float_Type);
       Exporter                  : Graphviz_Exporter.DOT_Tree_Exporter;
-      X                         : Value_Data_Lists_2D;
       --        Short         :  Value_Data_Lists_2D;
       --  Y: num outputs x num classes
       Y                         : Value_Data_Lists_2D;
       No_Weights                : Weights.Weight_List := Empty_Vector;
-      Num_Samples               : Natural;
-      Min_Split_Float_Samples   : Split_Value_Record (Split_Float);
-      Min_Split_Integer_Samples : Split_Value_Record (Split_Integer);
       Min_Split                 : Natural;
    begin
-      --  L666
-      X := Iris_Data.Feature_Values;
-      Num_Samples := Natural (X.Length);
       --        for index in 1 .. 10 loop
       --           Short.Append (X.Element (index));
       --        end loop;
@@ -98,7 +94,7 @@ package body Split_Tests is
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
       --  L667 Y is 2D list num outputs x num classes
-      Y := To_Value_2D_List (Iris_Data.Label_Values);
+      Y := Iris_Data.Label_Values;
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
 
@@ -109,21 +105,19 @@ package body Split_Tests is
 
       --  L675 test for integer parameter
       --  Max_Leaf_Nodes is only used for Best First tree building
-      Min_Split_Integer_Samples.Integer_Value := 10;
-      Base_Decision_Tree.C_Init (theClassifier, Criteria, Splitter,
-                                 Min_Split_Integer_Samples);
+      Base_Decision_Tree.C_Init (theClassifier, "10", Criterion.Gini_Criteria);
 
       Classification_Fit (theClassifier, X, Y, No_Weights);
       Put_Line (Routine_Name & " Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-      Print_Tree ("The Tree", theClassifier);
+--        Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
       Assert (Check_Min_Split (theClassifier, Min_Split),
               Routine_Name & "failed with Min_Split " &
                 Integer'Image (Min_Split) & " less than 10");
-      Put_Line (Routine_Name & " Min_Split integer test Min_Split: " &
+      Put_Line (Routine_Name & " Min_Split integer test passed Min_Split: " &
                   Integer'Image (Min_Split));
 
       Graphviz_Exporter.C_Init
@@ -133,21 +127,19 @@ package body Split_Tests is
          Output_File_Name => To_Unbounded_String ("integer_test.dot"));
 
       --  L684 test for float parameter
-      Min_Split_Float_Samples.Float_Value := 0.2;
-      Base_Decision_Tree.C_Init (theClassifier, Criteria, Splitter,
-                                 Min_Split_Float_Samples);
+      Base_Decision_Tree.C_Init (theClassifier, "0.2", Criterion.Gini_Criteria);
       Classification_Fit (theClassifier, X, Y, No_Weights);
 
       Put_Line (Routine_Name & " Node_Count" & Count_Type'Image
                 (theClassifier.Attributes.Decision_Tree.Nodes.Node_Count - 1));
-      Print_Tree ("The Tree", theClassifier);
+--        Print_Tree ("The Tree", theClassifier);
       Put_Line ("----------------------------------------------");
       New_Line;
 
       Assert (Check_Min_Split (theClassifier, Min_Split),
               Routine_Name & "failed with Min_Split " &
                 Integer'Image (Min_Split) & " less than 10");
-      Put_Line (Routine_Name & " Min_Split float test Min_Split: " &
+      Put_Line (Routine_Name & " Min_Split float test passed Min_Split: " &
                   Integer'Image (Min_Split));
 
       Graphviz_Exporter.C_Init

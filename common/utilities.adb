@@ -4,6 +4,10 @@ with Ada.Containers;
 with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
+with Maths;
+
+--  with Printing;
+
 package body Utilities is
 
    use ML_Types;
@@ -67,7 +71,7 @@ package body Utilities is
 
    function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
                         Column_Index : Positive)
-                        return ML_Types.Value_Data_List is
+                         return ML_Types.Value_Data_List is
       use ML_Types;
       aList  : Value_Data_List;
       Column : Value_Data_List;
@@ -218,7 +222,7 @@ package body Utilities is
       Builder.Set_Header_Data (To_String (Data_Line));
 
       declare
-         Values       : Feature_Data_Array (1 .. Num_Features);
+         Values : Feature_Data_Array (1 .. Num_Features);
       begin
          while not End_Of_File (Data_File) loop
             declare
@@ -243,11 +247,88 @@ package body Utilities is
             end;  --  declare block
          end loop;
       end;  --  declare block
-      --        Put_Line ("Data length: " & Count_Type'Image (Data.Data.Length));
-      --        Print_Data_Item (Data.Data, Num_Features, 15);
-      --        Print_Data (Data.Data, Num_Features);
 
    end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_CSV_Data
+     (Data_File : File_Type; Header_Line : out Header_Data_Type)
+       return ML_Types.Rows_Vector is
+      use Ada.Strings.Unbounded;
+      use ML_Types;
+      use ML_Types.String_Package;
+      Data_Line    : Unbounded_String :=
+                       To_Unbounded_String (Get_Line (Data_File));
+      Num_Features : ML_Types.Class_Range;
+      CSV_Line     : String_List;
+      Curs         : ML_Types.String_Package.Cursor;
+      Data         : ML_Types.Rows_Vector;
+   begin
+      Num_Features :=
+        Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
+      Header_Line := Builder.Parse_Header (To_String (Data_Line));
+
+      declare
+         Values : Feature_Data_Array (1 .. Num_Features);
+      begin
+         while not End_Of_File (Data_File) loop
+            declare
+               Value_Index  : Class_Range := 1;
+               Row          : Row_Data (Num_Features);
+            begin
+               Data_Line := To_Unbounded_String (Get_Line (Data_File));
+               CSV_Line := Utilities.Split_String
+                 (To_String (Data_Line), ",");
+               Curs := CSV_Line.First;
+               while Has_Element (Curs) loop
+                  if Curs /= CSV_Line.Last then
+                     Values (Value_Index) := Element (Curs);
+                     Value_Index := Value_Index + 1;
+                  else
+                     Row.Label := Element (Curs);
+                  end if;
+                  Next (Curs);
+               end loop;
+               Row.Features := Values;
+               Data.Append (Row);
+            end;  --  declare block
+         end loop;
+      end;  --  declare block
+
+      return Data;
+
+   end Load_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Raw_CSV_Data (Data_File : File_Type)
+                                return ML_Types.Raw_Data_Vector is
+      use Ada.Strings.Unbounded;
+      use ML_Types;
+      use ML_Types.String_Package;
+      Data_Line : Unbounded_String;
+      CSV_Line  : String_List;
+      Curs      : ML_Types.String_Package.Cursor;
+      Values    : Unbounded_List;
+      Data      : ML_Types.Raw_Data_Vector;
+   begin
+      while not End_Of_File (Data_File) loop
+         Data_Line := To_Unbounded_String (Get_Line (Data_File));
+         CSV_Line := Utilities.Split_String
+           (To_String (Data_Line), ",");
+         Curs := CSV_Line.First;
+         Values.Clear;
+         while Has_Element (Curs) loop
+            Values.Append (Element (Curs));
+            Next (Curs);
+         end loop;
+         Data.Append (Values);
+      end loop;
+
+      return Data;
+
+   end Load_Raw_CSV_Data;
 
    --  -------------------------------------------------------------------------
 
@@ -263,6 +344,69 @@ package body Utilities is
    begin
       return Class_Range (Rows.Length);
    end Number_Of_Features;
+
+   --  -------------------------------------------------------------------------
+
+   function Permute (aList : ML_Types.Value_Data_Lists_2D)
+                      return ML_Types.Value_Data_Lists_2D is
+      use ML_Types;
+      List_Length  : constant Positive := Positive (aList.Length);
+      Rand         : Positive;
+      Permutation  : Value_Data_Lists_2D := aList;
+
+   begin
+      if List_Length > 1 then
+         for index in 1 .. List_Length - 1 loop
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Swap (Permutation, index, Rand);
+         end loop;
+      end if;
+
+      return Permutation;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
+   function Permute (aList : ML_Types.Value_Data_Lists_2D)
+                      return ML_Types.Value_Data_Lists_3D is
+      use ML_Types;
+      List_Length  : constant Positive := Positive (aList.Length);
+      Permutation  : Value_Data_Lists_2D := aList;
+      Permutations : Value_Data_Lists_3D;
+
+      procedure Recurse (K : Positive; A : in out Value_Data_Lists_2D) is
+      begin
+         if K > 1 then
+            --  Generate permutations with k-th element unaltered
+            Recurse (K - 1, A);
+            --  Generate permutations for k-th element swapped with each
+            --  k-1 first element
+            for index in 1 .. K - 1 loop
+               if K mod 2 = 0 then
+                  Swap (A, index, K);
+               else
+                  Swap (A, A.First_Index, K);
+               end if;
+
+               Recurse (K - 1, A);
+            end loop;
+         else
+            Permutations.Append (A);
+         end if;
+
+      end Recurse;
+
+   begin
+      if List_Length > 1 then
+         Recurse (List_Length, Permutation);
+      else
+         Permutations.Append (Permutation);
+      end if;
+
+      return Permutations;
+   end Permute;
 
    --  -------------------------------------------------------------------------
 
@@ -398,7 +542,7 @@ package body Utilities is
    --  ------------------------------------------------------------------------
 
    function Prediction_String (Label_Counts : Predictions_List)
-                               return String is
+                                return String is
       use Prediction_Data_Package;
       Count_Cursor : Cursor := Label_Counts.First;
       Prediction   : Prediction_Data;
@@ -725,7 +869,8 @@ package body Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Split_Row_Data (Row_Data : ML_Types.Rows_Vector) return Data_Record is
+   function Split_Row_Data (Row_Data : ML_Types.Rows_Vector)
+                             return Data_Record is
       use Rows_Package;
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;
@@ -733,18 +878,21 @@ package body Utilities is
       Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
       Label_Type     : Data_Type;
       Label_Values   : Value_Data_List;
+      Labels_List    : Value_Data_Lists_2D;
       Data           : Data_Record;
    begin
       Data.Label_Name := aRow.Label;
 
       for row_index in Row_Data.First_Index .. Row_Data.Last_Index loop
          aRow := Row_Data.Element (row_index);
+         Label_Values.Clear;
          declare
             Features                : constant Feature_Data_Array
               (1 .. aRow.Class_Count) := aRow.Features;
             Feature_Values          : Value_Data_List :=
                                         Value_Data_Package.Empty_Vector;
-            Label                   : constant Unbounded_String := aRow.Label;
+            Label                   : constant Unbounded_String :=
+                                        aRow.Label;
          begin
             if row_index = Row_Data.First_Index then
                Label_Type := Get_Data_Type (aRow.Label);
@@ -779,7 +927,7 @@ package body Utilities is
             Features_List.Append (Feature_Values);
 
             declare
-               Label_Value    : Value_Record (Label_Type);
+               Label_Value : Value_Record (Label_Type);
             begin
                case Label_Type is
                   when Boolean_Type =>
@@ -796,11 +944,12 @@ package body Utilities is
                end case;
                Label_Values.Append (Label_Value);
             end;  --  declare block;
+            Labels_List.Append (Label_Values);
          end;
       end loop;
 
       Data.Feature_Values := Features_List;
-      Data.Label_Values := Label_Values;
+      Data.Label_Values := Labels_List;
       return Data;
 
    end Split_Row_Data;
@@ -826,6 +975,17 @@ package body Utilities is
       return Split_List;
 
    end Split_String;
+
+   --  -------------------------------------------------------------------------
+
+      procedure Swap (Data : in out Value_Data_Lists_2D;
+                      L, R : Positive) is
+         Item : Value_Data_List;
+      begin
+         Item := Data.Element (L);
+         Data.Replace_Element (L, Data.Element (R));
+         Data.Replace_Element (R, Item);
+      end Swap;
 
    --  -------------------------------------------------------------------------
 
@@ -920,7 +1080,7 @@ package body Utilities is
    --  --------------------------------------------------------------------------
 
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
-                        return Rows_Vector is
+                         return Rows_Vector is
 
       Feature_Values   : Value_Data_List;
       Label_Values     : Value_Data_List;

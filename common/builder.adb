@@ -27,7 +27,6 @@ package body Builder is
    Num_Leaves  : Natural := 0;
 
    function Parse (aString : String) return Row_Data;
-   function Parse_Header (Header : String) return Header_Data_Type;
    procedure Split (Rows     : Rows_Vector; Uncertainty : Float;
                     Question : in out Question_Data;
                     Best     : out Best_Data);
@@ -96,7 +95,7 @@ package body Builder is
    --  A Leaf node is a dictionary of classes  (features) (e.g., "Apple") and,
    --  for each class, the number of times that the class appears in the rows
    --  from the training data that reach this leaf.
-   function Build_Tree (Rows : in out Rows_Vector;
+   function Build_Tree (Rows       : in out Rows_Vector;
                         Max_Leaves : Natural := 0) return Tree_Type is
       use Tree_Package;
       theTree   : Tree_Type := Empty_Tree;
@@ -120,15 +119,14 @@ package body Builder is
          Leaf : Tree_Node_Type (Prediction_Node);
       begin
          if Max_Leaves > 0 then
-                Num_Leaves := Num_Leaves + 1;
+            Num_Leaves := Num_Leaves + 1;
          end if;
---           New_Line;
          Leaf.Decision_Branch := False;
          Leaf.Prediction := Rows.First_Element;
          Leaf.Rows := Rows;
          Leaf.Prediction_List := Utilities.Predictions (Leaf);
---           Utilities.Print_Rows ("Prediction", Rows);
---           New_Line;
+         --           Utilities.Print_Rows ("Prediction", Rows);
+         --           New_Line;
          theTree.Insert_Child (Parent_Cursor, No_Element, Leaf);
       end Add_Prediction_Node;
 
@@ -141,27 +139,27 @@ package body Builder is
          True_Split_Rows  : Rows_Vector;
          False_Split_Rows : Rows_Vector;
       begin
---           Utilities.Print_Rows ("Add_Branch Rows", Rows);
+         --            Utilities.Print_Rows ("Add_Branch Rows", Rows);
          if Best_Split.Gain = 0.0 then
             Utilities.Print_Question ("Add_Branch prediction", Best_Split.Question);
             Put_Line ("Add_Branch prediction Gini" &
                         Float'Image (Best_Split.Gini));
-                        New_Line;
+            New_Line;
             Add_Prediction_Node (Parent_Cursor, Rows);
          elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
---              Utilities.Print_Question ("Add_Branch Best split",
---                                        Best_Split.Question);
+            --              Utilities.Print_Question ("Add_Branch Best split",
+            --                                        Best_Split.Question);
             Add_Decision_Node (Parent_Cursor, Best_Split);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
             Child_Cursor := Last_Child (Parent_Cursor);
---              Utilities.Print_Rows ("Add_Branch True_Split_Rows",
---                                    True_Split_Rows);
+            --              Utilities.Print_Rows ("Add_Branch True_Split_Rows",
+            --                                    True_Split_Rows);
             Add_Branch (True_Split_Rows, Child_Cursor);
---              Utilities.Print_Rows ("Add_Branch False_Split_Rows",
---                                    False_Split_Rows);
+            --              Utilities.Print_Rows ("Add_Branch False_Split_Rows",
+            --                                    False_Split_Rows);
             Add_Branch (False_Split_Rows, Child_Cursor);
---              New_Line;
+            --              New_Line;
          end if;
       end Add_Branch;
 
@@ -274,7 +272,7 @@ package body Builder is
    --  container.
 
    function Classify (Node_Cursor : Tree_Cursor; aRow : Row_Data)
-                       return Predictions_List is
+                      return Predictions_List is
       use Tree_Package;
       aNode       : constant Tree_Node_Type := Element (Node_Cursor);
       Predictions : Predictions_List;
@@ -339,12 +337,14 @@ package body Builder is
       Best                : Best_Data;
       Integer_Value       : Integer;
    begin
+      Put_Line ("Finding best split ");
       for col in 1 .. Num_Features loop
          Feature_Name := Feature_Name_Type (Header_Data.Features (col));
          Feature_Data_Type := Utilities.Get_Data_Type (Row1_Features (col));
+         Put_Line ("Feature_Name: " & To_String (Feature_Name));
+
          for row in
-           Rows.First_Index .. Rows.Last_Index loop
-            Feature_Value := Rows.Element (row).Features (col);
+           Rows.First_Index .. Rows.Last_Index loop Feature_Value := Rows.Element (row).Features (col);
             case Feature_Data_Type is
                when Boolean_Type =>
                   Best_Boolean_Value
@@ -366,6 +366,7 @@ package body Builder is
             end case;
          end loop;
       end loop;
+      New_Line;
 
       Best.Gini := Current_Uncertainty;
       return Best;
@@ -469,7 +470,7 @@ package body Builder is
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Question : Question_Data; Example_Data : Row_Data)
-                    return Boolean is
+                   return Boolean is
       Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
       Feat_Index       : Class_Range;
       Example_Feature  : Unbounded_String;
@@ -573,12 +574,13 @@ package body Builder is
       end loop;
       Header_Row.Label := To_Unbounded_String (Header (Pos_1 + 1 .. Last));
       return Header_Row;
+
    end Parse_Header;
 
    --  ---------------------------------------------------------------------------
 
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                        return Partitioned_Rows is
+                       return Partitioned_Rows is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
       Data       : Row_Data;

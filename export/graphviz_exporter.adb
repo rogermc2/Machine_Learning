@@ -236,6 +236,10 @@ package body Graphviz_Exporter is
          Dec_Colour    : Natural;
          Hex_Colour_UB : Unbounded_String;
       begin
+--           Put_Line (Routine_Name & ".Set_Colour Colour: " &
+--                       Integer'Image (Colour));
+--           Put_Line (Routine_Name & ".Set_Colour Alpha: " &
+--                       Float'Image (Alpha));
          Dec_Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
                                   Alpha_1));
          Put (Hex_Colour, Dec_Colour, Base => 16);
@@ -275,9 +279,13 @@ package body Graphviz_Exporter is
       else
          --  L237 Regression or multi-output
          Colour := Exporter.Colours.Element (1);
-         Alpha :=
-           (Value.Element (1) - Max_Bound (Exporter.Bounds.Element (1))) /
-             (Exporter.Bounds.Element (1).V - Exporter.Bounds.Element (1).H);
+         if Exporter.Bounds.Element (1).V = Exporter.Bounds.Element (1).H then
+            Alpha := 1.0;
+         else
+            Alpha :=
+              (Value.Element (1) - Max_Bound (Exporter.Bounds.Element (1))) /
+                (Exporter.Bounds.Element (1).V - Exporter.Bounds.Element (1).H);
+         end if;
       end if;
       Alpha_1 := 255.0 * (1.0 - Alpha);
 
@@ -418,8 +426,8 @@ package body Graphviz_Exporter is
 
       procedure Do_Node (Node_Curs : Tree.Tree_Cursor) is
          use Export_Types.Export_Maps;
-         Routine_Name : constant String :=
-                          "Graphviz_Exporter.Recurse.Do_Node ";
+         --           Routine_Name : constant String :=
+         --                            "Graphviz_Exporter.Recurse.Do_Node ";
          Node_ID      : constant Positive := Element (Node_Curs).Node_ID;
          Node_ID_S    : constant String := Integer'Image (Node_ID);
          Node_ID_UB   : constant Unbounded_String :=
@@ -432,7 +440,7 @@ package body Graphviz_Exporter is
          Left_Child   : Tree.Tree_Cursor;
          Angles       : array (1 .. 2) of Integer;
       begin
---           Put_Line (Routine_Name & "Node ID" & Node_ID_S);
+         --           Put_Line (Routine_Name & "Node ID" & Node_ID_S);
          if Node_ID > 1 then
             Node_Parent := Parent (Node_Curs);
             Parent_ID := Element (Node_Parent).Node_ID;
@@ -440,10 +448,11 @@ package body Graphviz_Exporter is
 
          --  L510
          if Depth <= Exporter.Max_Depth then
-            if not Element (Node_Curs).Leaf_Node then
-               Assert (Child_Count (Node_Curs) > 0,
-                       Routine_Name & "decision node" & Integer'Image (Node_ID) &
-                         " has no children.");
+            if not Element (Node_Curs).Leaf_Node and then
+              Child_Count (Node_Curs) > 0 then
+               --                 Assert (Child_Count (Node_Curs) > 0,
+               --                         Routine_Name & "decision node" & Integer'Image (Node_ID) &
+               --                           " has no children.");
                Left_Child := First_Child (Node_Curs);
                --  L512 Collect ranks for for 'leaf' option in plot_options
                if Element (Left_Child).Leaf_Node then

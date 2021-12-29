@@ -12,9 +12,11 @@ package ML_Types is
    pragma Ordered (Data_Type);
 
    type Class_Range is new Positive range 1 .. Max_Features;
-   type Feature_Name_Type is new Unbounded_String;
-   type Feature_Names_Array is array (Class_Range range <>) of Feature_Name_Type;
+   subtype Feature_Name_Type is Unbounded_String;
+   type Feature_Names_Array is array (Class_Range range <>)
+     of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
+   type Data_Array is array (Class_Range range <>) of Unbounded_String;
    type Features_ID_Array is array (Class_Range range <>) of Positive;
    type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
@@ -28,6 +30,7 @@ package ML_Types is
    package Unbounded_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
    subtype Unbounded_List is Unbounded_Package.Vector;
+   subtype Features_List is Unbounded_Package.Vector;
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
 
@@ -46,6 +49,11 @@ package ML_Types is
 
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
+
+   use Unbounded_Package;
+   package Raw_Data_Package is new Ada.Containers.Vectors
+     (Positive, Unbounded_List);
+   subtype Raw_Data_Vector is Raw_Data_Package.Vector;
 
    type Data_Rows is array (Integer range <>) of Unbounded_String;
 
@@ -88,6 +96,17 @@ package ML_Types is
    function "<" (L, R : Value_Record) return Boolean;
    function "<=" (L, R : Value_Record) return Boolean;
 
+   function "=" (L, R : Value_Record) return Value_Record;
+   function "+" (L, R : Value_Record) return Value_Record;
+   function "-" (L, R : Value_Record) return Value_Record;
+   function "abs" (Value : Value_Record) return Value_Record;
+
+   function "=" (L, R : Value_Data_List) return Value_Data_List;
+   function "-" (L, R : Value_Data_List) return Value_Data_List;
+   function "abs" (aVector : Value_Data_List) return Value_Data_List;
+   procedure Check_Length (Routine_Name : String; L, R : Value_Data_List);
+   function Dot (L, R : Value_Data_List) return Value_Record;
+
    package Value_Data_Sorting is new
      Value_Data_Package.Generic_Sorting ("<");
 
@@ -95,6 +114,12 @@ package ML_Types is
    package Value_Lists_Data_Package is new
      Ada.Containers.Vectors (Positive, Value_Data_List);
    subtype Value_Data_Lists_2D is Value_Lists_Data_Package.Vector;
+
+   function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   procedure Check_Lengths (Routine_Name : String; L, R : Value_Data_Lists_2D);
+   function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
 
    use Value_Lists_Data_Package;
    package Value_Lists_3D_Package is new
@@ -154,7 +179,14 @@ package ML_Types is
       Feature_Names  : String_List;
       Label_Name     : Unbounded_String := To_Unbounded_String ("");
       Feature_Values : Value_Data_Lists_2D;
-      Label_Values   : Value_Data_List;
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
+   end record;
+
+   type Multi_Output_Data_Record is record
+      Feature_Names  : String_List;
+      Label_Names    : Unbounded_List;
+      Feature_Values : Value_Data_Lists_2D;
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
    end record;
 
    type Raw_Question is record

@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 with Build_Utils;
@@ -36,11 +36,12 @@ package body Tree_Build is
       use Ada.Containers;
       use Tree;
       use Nodes_Package;
+      Routine_Name : constant String := "Tree_Build.Add_Node ";
       New_Node    : Tree_Node (Is_Leaf);
       Node_Cursor : Tree.Tree_Cursor;
    begin
       Assert (Parent_Cursor /= No_Element,
-              "Tree_Build.Add_Node, parent cursor is null.");
+             Routine_Name & "parent cursor is null.");
 
       Last_Node := Last_Node + 1;
       New_Node.Node_ID := Last_Node;
@@ -84,6 +85,7 @@ package body Tree_Build is
       Res                : in out Build_Utils.Priority_Record) is
       use Ada.Containers;
       use Tree.Nodes_Package;
+      Routine_Name          : constant String := "Tree_Build.Add_Split_Node";
       Parent_Node           : constant Tree.Tree_Node :=
                                 Element (Parent_Cursor);
       Num_Samples           : constant Positive :=
@@ -96,6 +98,7 @@ package body Tree_Build is
       Values                : Weights.Weight_Lists_2D;
    begin
       --  L429
+      Put_Line (Routine_Name & "L429 Reset_Node");
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
                                 Splitter.Weighted_Samples);
       if Is_First then
@@ -103,7 +106,7 @@ package body Tree_Build is
       end if;
 
       --  L440
-      Is_Leaf := (Depth >= theBuilder.Max_Depth) or
+      Is_Leaf := (Depth > theBuilder.Max_Depth) or
         (Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split) or
         (Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
         (Impurity <= Epsilon);
@@ -187,7 +190,7 @@ package body Tree_Build is
       Is_Leaf          : Boolean := False;
    begin
       --  L324
-      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
+      Node_Splitter.Initialize_Splitter (Splitter, X, Y_Encoded, Sample_Weight);
       if Best_Builder.Max_Leaf_Nodes <= 0 then
          raise Tree_Build_Error with
            "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
@@ -261,7 +264,7 @@ package body Tree_Build is
       Node_Cursor       : Tree.Tree_Cursor := theTree.Nodes.Root;
    begin
       --  L159
-      Node_Splitter.Init (Splitter, X, Y_Encoded, Sample_Weight);
+      Node_Splitter.Initialize_Splitter (Splitter, X, Y_Encoded, Sample_Weight);
       Num_Node_Samples := Natural (Splitter.Sample_Indices.Length);
 
       Data.Parent_Cursor := Node_Cursor;
@@ -290,7 +293,7 @@ package body Tree_Build is
          end if;
 
          --  L204
-         Is_Leaf := Depth >= Depth_Builder.Max_Depth or
+         Is_Leaf := Depth > Depth_Builder.Max_Depth or
            Num_Node_Samples < Depth_Builder.Min_Samples_Split or
            Num_Node_Samples < 2 * Depth_Builder.Min_Samples_Leaf or
            Weighted_Samples < 2.0 * Depth_Builder.Min_Weight_Leaf or
