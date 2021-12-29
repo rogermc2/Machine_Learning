@@ -71,7 +71,7 @@ package body Utilities is
 
    function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
                         Column_Index : Positive)
-                         return ML_Types.Value_Data_List is
+                        return ML_Types.Value_Data_List is
       use ML_Types;
       aList  : Value_Data_List;
       Column : Value_Data_List;
@@ -254,7 +254,7 @@ package body Utilities is
 
    function Load_CSV_Data
      (Data_File : File_Type; Header_Line : out Header_Data_Type)
-       return ML_Types.Rows_Vector is
+      return ML_Types.Rows_Vector is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
@@ -303,7 +303,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Raw_CSV_Data (Data_File : File_Type)
-                                return ML_Types.Raw_Data_Vector is
+                               return ML_Types.Raw_Data_Vector is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
@@ -348,7 +348,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_2D is
+                     return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
@@ -370,7 +370,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_3D is
+                     return ML_Types.Value_Data_Lists_3D is
       use ML_Types;
       List_Length  : constant Positive := Positive (aList.Length);
       Permutation  : Value_Data_Lists_2D := aList;
@@ -542,7 +542,7 @@ package body Utilities is
    --  ------------------------------------------------------------------------
 
    function Prediction_String (Label_Counts : Predictions_List)
-                                return String is
+                               return String is
       use Prediction_Data_Package;
       Count_Cursor : Cursor := Label_Counts.First;
       Prediction   : Prediction_Data;
@@ -743,6 +743,26 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Row (Message    : String; Rows : ML_Types.Rows_Vector;
+                        Row_Number : Positive) is
+      use Rows_Package;
+      aRow : Row_Data;
+   begin
+      Put_Line (Message & ":");
+      aRow := Rows.Element (Row_Number);
+      Put ("  Feature values: (");
+      for feat in aRow.Features'First .. aRow.Features'Last loop
+         Put (To_String (aRow.Features (feat)));
+         if feat /= aRow.Features'Last then
+            Put (", ");
+         end if;
+      end loop;
+      Put_Line ("), Label: " & To_String (aRow.Label));
+
+   end Print_Row;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Rows (Message : String; Rows : Rows_Vector) is
       use Rows_Package;
       aRow : Row_Data;
@@ -870,7 +890,7 @@ package body Utilities is
    --  -----------------------------------------------------------------------
 
    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector)
-                             return Data_Record is
+                            return Data_Record is
       use Rows_Package;
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;
@@ -978,14 +998,14 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-      procedure Swap (Data : in out Value_Data_Lists_2D;
-                      L, R : Positive) is
-         Item : Value_Data_List;
-      begin
-         Item := Data.Element (L);
-         Data.Replace_Element (L, Data.Element (R));
-         Data.Replace_Element (R, Item);
-      end Swap;
+   procedure Swap (Data : in out Value_Data_Lists_2D;
+                   L, R : Positive) is
+      Item : Value_Data_List;
+   begin
+      Item := Data.Element (L);
+      Data.Replace_Element (L, Data.Element (R));
+      Data.Replace_Element (R, Item);
+   end Swap;
 
    --  -------------------------------------------------------------------------
 
@@ -1080,7 +1100,7 @@ package body Utilities is
    --  --------------------------------------------------------------------------
 
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
-                         return Rows_Vector is
+                        return Rows_Vector is
 
       Feature_Values   : Value_Data_List;
       Label_Values     : Value_Data_List;
