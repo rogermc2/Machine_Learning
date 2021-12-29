@@ -10,7 +10,7 @@ with Node_Splitter;
 with Tree;
 with Weights;
 
-package body Ada_Tree_Builder is
+package body Depth_First_Builder is
 
    Epsilon : constant Float := 10.0 ** (-10);
 
@@ -31,7 +31,7 @@ package body Ada_Tree_Builder is
       use Tree;
       use Nodes_Package;
       Routine_Name          : constant String :=
-                                "Ada_Tree_Builder.Add_Branch ";
+                                "Depth_First_Builder.Add_Branch ";
       --  L199
       Data                  : constant Stack_Record := Pop (theStack);
       Start_Row             : constant Positive := Data.Start;
@@ -155,7 +155,7 @@ package body Ada_Tree_Builder is
       Y_Encoded : Classifier_Types.Natural_Lists_2D) is
       use Build_Utils;
       use Tree.Nodes_Package;
-      Routine_Name      : constant String := "Ada_Tree_Builder.Build_Tree ";
+      Routine_Name      : constant String := "Depth_First_Builder.Build_Tree ";
       Depth             : constant Natural := 1;
       Start_Row         : constant Positive := 1;
       Stop_Row          : constant Positive := Positive (Y_Encoded.Length);
@@ -181,4 +181,4 @@ package body Ada_Tree_Builder is
 
    --  ------------------------------------------------------------------
 
-end Ada_Tree_Builder;
+end Depth_First_Builder;

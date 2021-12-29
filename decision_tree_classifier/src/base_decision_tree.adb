@@ -4,7 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Ada_Tree_Builder;
+with Depth_First_Builder;
 with Best_First_Builder;
 with Classifier_Utilities;
 with Criterion;
@@ -153,7 +153,7 @@ package body Base_Decision_Tree is
       case Builder.Tree_Kind is
          when Tree_Build.Depth_First_Tree =>
             Put_Line (Routine_Name & "build Depth_First_Tree");
-            Ada_Tree_Builder.Build_Tree
+            Depth_First_Builder.Build_Tree
               (aClassifier.Attributes.Decision_Tree, Builder, Y_Encoded);
          when Tree_Build.Best_First_Tree =>
             Put_Line (Routine_Name & "build Best_First_Tree");

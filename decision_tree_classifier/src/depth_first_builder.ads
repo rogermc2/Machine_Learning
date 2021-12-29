@@ -4,7 +4,7 @@ with Node_Splitter;
 with Tree;
 with Tree_Build;
 
-package Ada_Tree_Builder is
+package Depth_First_Builder is
 
     type Tree_Builder is record
         Splitter              : Node_Splitter.Splitter_Class;
@@ -22,4 +22,4 @@ package Ada_Tree_Builder is
                           Builder   : in out Tree_Build.Tree_Builder;
                           Y_Encoded : Classifier_Types.Natural_Lists_2D);
 
-end Ada_Tree_Builder;
+end Depth_First_Builder;
