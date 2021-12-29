@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Base_Decision_Tree;
 with Classifier_Types;
 with Classifier_Utilities;
-with Classification_Metrics;
+with Regression_Metrics;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
@@ -39,6 +39,7 @@ package body Diabetes_Tests is
       Diabetes_Target : Value_Data_Lists_2D;
       No_Weights      : Weights.Weight_List := Empty_Vector;
       Prediction      : ML_Types.Value_Data_Lists_2D;
+      Scores          : Float_List;
       Score           : Float;
       Success         : Boolean := False;
    begin
@@ -61,17 +62,17 @@ package body Diabetes_Tests is
       Prediction := Base_Decision_Tree.Predict (theClassifier, X);
       Printing.Print_Value_Data_Lists_2D
         (Routine_Name & " Predictions", Transpose (Prediction));
-      Score := Classification_Metrics.Accuracy_Score
+      Scores := Regression_Metrics.Mean_Squared_Error
         (Diabetes_Target, Prediction);
-      Put_Line (Routine_Name & " Score" &  Float'Image (Score));
+      Score := Scores.Element (1);
 
       Success := Score > 0.9;
       if Success then
          Put_Line
-           ("Classification_Tests Iris prediction test passed.");
+           (Routine_Name & " diabetes prediction test passed.");
       else
          Put_Line
-           ("Classification_Tests Iris prediction test failed.");
+           (Routine_Name & " diabetes prediction test failed.");
          Put_Line (Routine_Name & " Score" &  Float'Image (Score));
          New_Line;
       end if;

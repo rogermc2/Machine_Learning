@@ -48,7 +48,9 @@ package body Regression_Metrics is
    end Average;
 
    --  ------------------------------------------------------------------------
-
+   --  raw_values returns a full set of errors in case of multioutput input.
+   --  uniform_average returns errors of all outputs averaged
+   --  with uniform weight.
    function Mean_Squared_Error
      (Y_True, Y_Prediction : ML_Types.Value_Data_Lists_2D;
       Sample_Weight        : Weights.Weight_List :=
@@ -76,8 +78,8 @@ package body Regression_Metrics is
       end if;
 
       case Multioutput is
-         when MO_Raw_Values => Loss.Append (Output_Errors);
-         when MO_Uniform_Average => null;
+         when MO_Raw_Values => null;
+         when MO_Uniform_Average => Loss.Append (Output_Errors);
       end case;
 
       return Loss;
