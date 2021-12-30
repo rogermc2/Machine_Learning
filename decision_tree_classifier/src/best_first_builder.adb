@@ -15,143 +15,228 @@ package body Best_First_Builder is
 
    Epsilon : constant Float := 10.0 ** (-10);
 
-   Max_Depth_Seen : Positive := 1;
+--     Max_Depth_Seen : Positive := 1;
 
    --  ------------------------------------------------------------------
    --  Based on scikit-learn/sklearn/tree _tree.pyx BestFirstTreeBuilder.build
-   procedure Add_Branch
-     (theTree  : in out Tree.Tree_Class;
-      Builder  : in out Tree_Build.Tree_Builder;
-      theStack : in out Build_Utils.Stack_List;
-      Split    : in out Node_Splitter.Split_Record;
-      First    : in out Boolean) is
-      use Ada.Containers;
-      use Build_Utils;
-      use Node_Splitter;
-      use Tree;
-      use Nodes_Package;
-      Routine_Name          : constant String :=
-                                "Best_First_Builder.Add_Branch ";
-      --  L199
-      Data                  : constant Stack_Record := Pop (theStack);
-      Start_Row             : constant Positive := Data.Start;
-      Stop_Row              : constant Positive := Data.Stop;
-      Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
-      Impurity              : Float;
-      Num_Constant_Features : Natural := Data.Num_Constant_Features;
-      Is_Leaf_Node          : Boolean := False;
-      Weighted_Node_Samples : Float := 0.0;
-      Values                : Weights.Weight_Lists_2D;
-      Child_Cursor          : Tree.Tree_Cursor;
-      Node_ID               : Positive := 1;
-   begin
-      --  L202
-      --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
-      Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
-                  Weighted_Node_Samples);
-      --        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
-      --                       Integer'Image (Start_Row) & ", " &
-      --                       Integer'Image (Stop_Row));
-      --  L204
-      Is_Leaf_Node :=
-        (Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth) or
-        Builder.Splitter.Num_Samples = 1 or
-        Num_Node_Samples < Builder.Min_Samples_Split or
-        Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
-        Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf;
-
-      if Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth then
-         null;
-         --           Put_Line (Routine_Name &
-         --                       " L207 Leaf_Node Data.Depth " &
-         --                       Integer'Image (Data.Depth) & " >= Builder.Max_Depth " &
-         --                       Integer'Image (Builder.Max_Depth));
-      elsif Builder.Splitter.Num_Samples = 1 then
-         Put_Line (Routine_Name &
-                     " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
-         --        elsif Num_Node_Samples < Builder.Min_Samples_Split then
-         --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
-         --                       " Builder.Min_Samples_Split: "  &
-         --                       Integer'Image (Builder.Min_Samples_Split));
-         --        elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
-         --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
-         --                       "2 * Builder.Min_Samples_Leaf");
-      elsif Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf then
-         Put_Line
-           (Routine_Name & " L207 Leaf_Node Weighted_Node_Samples < " &
-              "2.0 * Builder.Min_Weight_Leaf");
-         --        elsif abs (Impurity) <= Epsilon then
-         --           Put_Line (Routine_Name &
-         --                       " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
-         --                       ") <= Epsilon");
-      end if;
-
-      --  L209
-      if First then
-         Impurity := Gini_Node_Impurity (Builder.Splitter);
-         First := False;
-      else
-         Impurity := Data.Impurity;
-      end if;
-
-      Is_Leaf_Node := Is_Leaf_Node or
-      abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
-
-      --  L216
-      if not Is_Leaf_Node then
-         Split := Split_Node (Builder.Splitter, Impurity,
-                              Num_Constant_Features);
-         --  L221
-         Is_Leaf_Node := Split.Split_Row > Stop_Row or
-           Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
-      end if;
-
-      --  tree.add_node adds one node to the tree
-      --  right and left children are added to the stack at
-      --  L238 and L245 respectively
-      --  L225 Add a node to theTree
-      Child_Cursor := Tree_Build.Add_Node
-        (theTree, Data.Parent_Cursor, Data.Branch, Is_Leaf_Node,
-         Split.Feature, Split.Threshold, Impurity, Num_Node_Samples,
-         Weighted_Node_Samples);
-      Node_ID := Element (Child_Cursor).Node_ID;
-
-      --  238
-      --  Values dimensions: num outputs x num classes
-      Node_Splitter.Node_Value (Builder.Splitter, Values);
-
-      if Node_ID > Integer (theTree.Values.Length) then
-         theTree.Values.Set_Length (Count_Type (Node_ID));
-      end if;
-      theTree.Values.Replace_Element (Node_ID, Values);
-
-      --  L240
-      if not Is_Leaf_Node then
-         --  Add right branch
-         Push (theStack, Split.Split_Row, Stop_Row, Data.Depth + 1,
-               Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
-               Num_Constant_Features);
-         --  Add left branch
-         Push (theStack, Start_Row, Split.Split_Row - 1, Data.Depth + 1,
-               Child_Cursor, Tree.Left_Node, Split.Impurity_Left,
-               Num_Constant_Features);
-      end if;
-
-      --  L254
-      if Data.Depth + 1 > Max_Depth_Seen then
-         Max_Depth_Seen := Data.Depth + 1;
-      end if;
-      theTree.Max_Depth := Max_Depth_Seen;
-
-   end Add_Branch;
+--     procedure Add_Branch
+--       (theTree  : in out Tree.Tree_Class;
+--        Builder  : in out Tree_Build.Tree_Builder;
+--        theStack : in out Build_Utils.Stack_List;
+--        Split    : in out Node_Splitter.Split_Record;
+--        First    : in out Boolean) is
+--        use Ada.Containers;
+--        use Build_Utils;
+--        use Node_Splitter;
+--        use Tree;
+--        use Nodes_Package;
+--        Routine_Name          : constant String :=
+--                                  "Best_First_Builder.Add_Branch ";
+--        --  L199
+--        Data                  : constant Stack_Record := Pop (theStack);
+--        Start_Row             : constant Positive := Data.Start;
+--        Stop_Row              : constant Positive := Data.Stop;
+--        Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
+--        Impurity              : Float;
+--        Num_Constant_Features : Natural := Data.Num_Constant_Features;
+--        Is_Leaf_Node          : Boolean := False;
+--        Weighted_Node_Samples : Float := 0.0;
+--        Values                : Weights.Weight_Lists_2D;
+--        Child_Cursor          : Tree.Tree_Cursor;
+--        Node_ID               : Positive := 1;
+--     begin
+--        --  L202
+--        --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
+--        Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
+--                    Weighted_Node_Samples);
+--        --        Put_Line (Routine_Name & " Start_Row, Stop_Row" &
+--        --                       Integer'Image (Start_Row) & ", " &
+--        --                       Integer'Image (Stop_Row));
+--        --  L204
+--        Is_Leaf_Node :=
+--          (Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth) or
+--          Builder.Splitter.Num_Samples = 1 or
+--          Num_Node_Samples < Builder.Min_Samples_Split or
+--          Num_Node_Samples < 2 * Builder.Min_Samples_Leaf or
+--          Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf;
+--
+--        if Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth then
+--           null;
+--           --           Put_Line (Routine_Name &
+--           --                       " L207 Leaf_Node Data.Depth " &
+--           --                       Integer'Image (Data.Depth) & " >= Builder.Max_Depth " &
+--           --                       Integer'Image (Builder.Max_Depth));
+--        elsif Builder.Splitter.Num_Samples = 1 then
+--           Put_Line (Routine_Name &
+--                       " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
+--           --        elsif Num_Node_Samples < Builder.Min_Samples_Split then
+--           --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples <" &
+--           --                       " Builder.Min_Samples_Split: "  &
+--           --                       Integer'Image (Builder.Min_Samples_Split));
+--           --        elsif Num_Node_Samples < 2 * Builder.Min_Samples_Leaf then
+--           --           Put_Line (Routine_Name & " L207 Leaf_Node Num_Node_Samples < " &
+--           --                       "2 * Builder.Min_Samples_Leaf");
+--        elsif Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf then
+--           Put_Line
+--             (Routine_Name & " L207 Leaf_Node Weighted_Node_Samples < " &
+--                "2.0 * Builder.Min_Weight_Leaf");
+--           --        elsif abs (Impurity) <= Epsilon then
+--           --           Put_Line (Routine_Name &
+--           --                       " L207 Leaf_Node abs (Impurity" & Float'Image (Impurity) &
+--           --                       ") <= Epsilon");
+--        end if;
+--
+--        --  L209
+--        if First then
+--           Impurity := Gini_Node_Impurity (Builder.Splitter);
+--           First := False;
+--        else
+--           Impurity := Data.Impurity;
+--        end if;
+--
+--        Is_Leaf_Node := Is_Leaf_Node or
+--        abs (Impurity) <= Epsilon;  --  0.0 with tolerance for rounding errors
+--
+--        --  L216
+--        if not Is_Leaf_Node then
+--           Split := Split_Node (Builder.Splitter, Impurity,
+--                                Num_Constant_Features);
+--           --  L221
+--           Is_Leaf_Node := Split.Split_Row > Stop_Row or
+--             Split.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
+--        end if;
+--
+--        --  tree.add_node adds one node to the tree
+--        --  right and left children are added to the stack at
+--        --  L238 and L245 respectively
+--        --  L225 Add a node to theTree
+--        Child_Cursor := Tree_Build.Add_Node
+--          (theTree, Data.Parent_Cursor, Data.Branch, Is_Leaf_Node,
+--           Split.Feature, Split.Threshold, Impurity, Num_Node_Samples,
+--           Weighted_Node_Samples);
+--        Node_ID := Element (Child_Cursor).Node_ID;
+--
+--        --  238
+--        --  Values dimensions: num outputs x num classes
+--        Node_Splitter.Node_Value (Builder.Splitter, Values);
+--
+--        if Node_ID > Integer (theTree.Values.Length) then
+--           theTree.Values.Set_Length (Count_Type (Node_ID));
+--        end if;
+--        theTree.Values.Replace_Element (Node_ID, Values);
+--
+--        --  L240
+--        if not Is_Leaf_Node then
+--           --  Add right branch
+--           Push (theStack, Split.Split_Row, Stop_Row, Data.Depth + 1,
+--                 Child_Cursor, Tree.Right_Node, Split.Impurity_Right,
+--                 Num_Constant_Features);
+--           --  Add left branch
+--           Push (theStack, Start_Row, Split.Split_Row - 1, Data.Depth + 1,
+--                 Child_Cursor, Tree.Left_Node, Split.Impurity_Left,
+--                 Num_Constant_Features);
+--        end if;
+--
+--        --  L254
+--        if Data.Depth + 1 > Max_Depth_Seen then
+--           Max_Depth_Seen := Data.Depth + 1;
+--        end if;
+--        theTree.Max_Depth := Max_Depth_Seen;
+--
+--     end Add_Branch;
 
    --  ------------------------------------------------------------------
 
-   --     procedure Add_To_Frontier (Rec      : Build_Utils.Priority_Record;
-   --                                Frontier : in out Build_Utils.Frontier_List) is
-   --     begin
-   --        Frontier.Append (Rec);
-   --     end Add_To_Frontier;
+   procedure Add_Split_Node
+     (theBuilder         : in out Tree_Build.Tree_Builder;
+      Splitter           : in out Node_Splitter.Splitter_Class;
+      theTree            : in out Tree.Tree_Class;
+      Start_Row, End_Row : Positive;
+      Impurity           : in out Float;
+      Is_First           : Boolean;
+      Branch             : Tree.Node_Type;
+      Parent_Cursor      : Tree.Tree_Cursor;
+      Depth              : Natural;
+      Res                : in out Build_Utils.Priority_Record) is
+      use Ada.Containers;
+      use Tree.Nodes_Package;
+      Routine_Name          : constant String := "Tree_Build.Add_Split_Node";
+      Parent_Node           : constant Tree.Tree_Node :=
+                                Element (Parent_Cursor);
+      Num_Samples           : constant Positive :=
+                                End_Row - Start_Row + 1;
+      Is_Leaf               : Boolean;
+      aSplit                : Node_Splitter.Split_Record;
+      Num_Constant_Features : Natural := 0;
+      Node_Cursor           : Tree.Tree_Cursor;
+      Node                  : Tree.Tree_Node;
+      Values                : Weights.Weight_Lists_2D;
+   begin
+      --  L429
+      Put_Line (Routine_Name & "L429 Reset_Node");
+      Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
+                                Splitter.Weighted_Samples);
+      if Is_First then
+         Impurity := Splitter.Node_Impurity;
+      end if;
+
+      --  L440
+      Is_Leaf := (Depth > theBuilder.Max_Depth) or
+        (Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split) or
+        (Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
+        (Impurity <= Epsilon);
+
+      if not Is_Leaf then
+         aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
+                                             Num_Constant_Features);
+         Is_Leaf :=
+           aSplit.Split_Row > End_Row or
+           aSplit.Improvement + Epsilon < theBuilder.Min_Impurity_Decrease;
+      end if;
+
+      Node_Cursor := Tree_Build.Add_Node
+        (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
+         aSplit.Threshold, Impurity, Splitter.Num_Samples,
+         Float (Parent_Node.Weighted_Num_Node_Samples));
+      Node := Element (Node_Cursor);
+
+      --  L461
+      Node_Splitter.Node_Value (Splitter, Values);
+      if Node.Node_ID > Integer (theTree.Values.Length) then
+         theTree.Values.Set_Length (Count_Type (Node.Node_ID));
+      end if;
+      theTree.Values.Replace_Element (Node.Node_ID, Values);
+
+      Res.Node_Cursor := Tree_Build.Add_Node
+        (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
+         aSplit.Threshold, Impurity, Splitter.Num_Samples,
+         Splitter.Weighted_Samples);
+      Res.Node_Params := Element (Res.Node_Cursor);
+      Res.Depth := Depth + 1;
+      Res.Impurity := Impurity;
+      Res.Is_Leaf := Is_Leaf;
+
+      if Is_Leaf then
+         Res.Position := Res.Stop_Row;
+         Res.Improvement := 0.0;
+         Res.Impurity_Left := Impurity;
+         Res.Impurity_Right := Impurity;
+      else
+         Res.Position := End_Row;
+         Res.Improvement := aSplit.Improvement;
+         Res.Impurity_Left := aSplit.Impurity_Left;
+         Res.Impurity_Right := aSplit.Impurity_Right;
+      end if;
+
+   end Add_Split_Node;
+
+   --  ------------------------------------------------------------------------
+
+      procedure Add_To_Frontier (Rec      : Build_Utils.Priority_Record;
+                                 Frontier : in out Build_Utils.Frontier_List) is
+      begin
+         Frontier.Append (Rec);
+      end Add_To_Frontier;
 
    --  ------------------------------------------------------------------------
    --  L300 BestFirstTreeBuilder.build
@@ -215,10 +300,10 @@ package body Best_First_Builder is
       Node_Splitter.Initialize_Splitter (Splitter, X, Y_Encoded, Sample_Weight);
       Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
 
-      Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
+      Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
       --  L344 add root to frontier
       Add_Split_Node
-        (Best_Builder, Splitter, theTree, 1, Splitter.Num_Samples, Impurity,
+        (Builder, Splitter, theTree, 1, Splitter.Num_Samples, Impurity,
          True, Tree.Left_Node, theTree.Nodes.Root, 0, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
 
@@ -232,7 +317,7 @@ package body Best_First_Builder is
             --  L371
             Max_Split_Nodes := Max_Split_Nodes - 1;
             Add_Split_Node
-              (Best_Builder, Splitter, theTree, Heap_Record.Start,
+              (Builder, Splitter, theTree, Heap_Record.Start,
                Heap_Record.Position, Heap_Record.Impurity, False,
                Tree.Left_Node, Node_Cursor, Heap_Record.Depth + 1, Split_Node_Left);
             --  L383 tree.nodes may have changed
@@ -240,7 +325,7 @@ package body Best_First_Builder is
             Node_Cursor := Heap_Record.Node_Cursor;
             --  Compute right split node
             Add_Split_Node
-              (Best_Builder, Splitter, theTree, Heap_Record.Position,
+              (Builder, Splitter, theTree, Heap_Record.Position,
                Heap_Record.Stop_Row, Heap_Record.Impurity_Right, False,
                Tree.Right_Node, Node_Cursor, Heap_Record.Depth + 1,
                Split_Node_Right);
