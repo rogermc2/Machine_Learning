@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx L119
 --  class DepthFirstTreeBuilder
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -38,7 +39,6 @@ package body Best_First_Builder is
       Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
       Impurity              : Float;
       Num_Constant_Features : Natural := Data.Num_Constant_Features;
-      Max_Split_Nodes       : Natural := Builder.Max_Split_Nodes - 1;
       Is_Leaf_Node          : Boolean := False;
       Weighted_Node_Samples : Float := 0.0;
       Values                : Weights.Weight_Lists_2D;
@@ -61,11 +61,11 @@ package body Best_First_Builder is
         Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf;
 
       if Builder.Max_Depth > 0 and then Data.Depth > Builder.Max_Depth then
-          null;
---           Put_Line (Routine_Name &
---                       " L207 Leaf_Node Data.Depth " &
---                       Integer'Image (Data.Depth) & " >= Builder.Max_Depth " &
---                       Integer'Image (Builder.Max_Depth));
+         null;
+         --           Put_Line (Routine_Name &
+         --                       " L207 Leaf_Node Data.Depth " &
+         --                       Integer'Image (Data.Depth) & " >= Builder.Max_Depth " &
+         --                       Integer'Image (Builder.Max_Depth));
       elsif Builder.Splitter.Num_Samples = 1 then
          Put_Line (Routine_Name &
                      " L207 Leaf_Node Builder.Splitter.Num_Samples = 1");
@@ -147,57 +147,58 @@ package body Best_First_Builder is
 
    --  ------------------------------------------------------------------
 
---     procedure Add_To_Frontier (Rec      : Build_Utils.Priority_Record;
---                                Frontier : in out Build_Utils.Frontier_List) is
---     begin
---        Frontier.Append (Rec);
---     end Add_To_Frontier;
+   --     procedure Add_To_Frontier (Rec      : Build_Utils.Priority_Record;
+   --                                Frontier : in out Build_Utils.Frontier_List) is
+   --     begin
+   --        Frontier.Append (Rec);
+   --     end Add_To_Frontier;
 
    --  ------------------------------------------------------------------------
    --  L300 BestFirstTreeBuilder.build
---     procedure Build_Tree
---       (theTree               : in out Tree.Tree_Class;
---        Builder               : in out Tree_Build.Tree_Builder;
---        Y_Encoded             : Classifier_Types.Natural_Lists_2D) is
---        use Build_Utils;
---  --        use Frontier_Package;
---        use Tree.Nodes_Package;
---        Routine_Name      : constant String := "Best_First_Builder.Build_Tree ";
---        Depth             : constant Natural := 1;
---        Start_Row         : constant Positive := 1;
---        Stop_Row          : constant Positive := Positive (Y_Encoded.Length);
---        First             : Boolean := True;
---        Impurity          : constant Float := Float'Last;
---  --        Frontier          : Build_Utils.Frontier_List;
---  --        Curs              : Frontier_Cursor;
---        Constant_Features : constant Natural := 0;
---        Stack             : Stack_List;
---        Split             : Node_Splitter.Split_Record;
---     begin
---        --  L344
---        Push (Stack, Start_Row, Stop_Row, Depth, theTree.Nodes.Root,
---              Tree.Left_Node, Impurity, Constant_Features);
---
---        --  L190
---        while not Stack.Is_Empty loop
---           Add_Branch (theTree, Builder, Stack, Split, First);
---        end loop;
---
---        Put_Line (Routine_Name & "tree built.");
---        New_Line;
---
---     end Build_Tree;
+   --     procedure Build_Tree
+   --       (theTree               : in out Tree.Tree_Class;
+   --        Builder               : in out Tree_Build.Tree_Builder;
+   --        Y_Encoded             : Classifier_Types.Natural_Lists_2D) is
+   --        use Build_Utils;
+   --  --        use Frontier_Package;
+   --        use Tree.Nodes_Package;
+   --        Routine_Name      : constant String := "Best_First_Builder.Build_Tree ";
+   --        Depth             : constant Natural := 1;
+   --        Start_Row         : constant Positive := 1;
+   --        Stop_Row          : constant Positive := Positive (Y_Encoded.Length);
+   --        First             : Boolean := True;
+   --        Impurity          : constant Float := Float'Last;
+   --  --        Frontier          : Build_Utils.Frontier_List;
+   --  --        Curs              : Frontier_Cursor;
+   --        Constant_Features : constant Natural := 0;
+   --        Stack             : Stack_List;
+   --        Split             : Node_Splitter.Split_Record;
+   --     begin
+   --        --  L344
+   --        Push (Stack, Start_Row, Stop_Row, Depth, theTree.Nodes.Root,
+   --              Tree.Left_Node, Impurity, Constant_Features);
+   --
+   --        --  L190
+   --        while not Stack.Is_Empty loop
+   --           Add_Branch (theTree, Builder, Stack, Split, First);
+   --        end loop;
+   --
+   --        Put_Line (Routine_Name & "tree built.");
+   --        New_Line;
+   --
+   --     end Build_Tree;
 
    --  ------------------------------------------------------------------
 
- procedure Build_Tree
-     (Best_Builder  : in out Tree_Builder;
+   procedure Build_Tree
+     (Builder       : in out Tree_Build.Tree_Builder;
       theTree       : in out Tree.Tree_Class;
       X             : ML_Types.Value_Data_Lists_2D;
       Y_Encoded     : Classifier_Types.Natural_Lists_2D;
       Sample_Weight : Weights.Weight_List) is
       use Build_Utils;
       use Frontier_Package;
+      Routine_Name     : constant String := "Best_First_Builder.Build_Tree ";
       Splitter         : Node_Splitter.Splitter_Class;
       Heap_Record      : Priority_Record;
       Split_Node_Left  : Priority_Record;
@@ -212,10 +213,7 @@ package body Best_First_Builder is
    begin
       --  L324
       Node_Splitter.Initialize_Splitter (Splitter, X, Y_Encoded, Sample_Weight);
-      if Best_Builder.Max_Leaf_Nodes <= 0 then
-         raise Tree_Build_Error with
-           "Tree_Build.Build_Best_First_Tree Max_Leaf_Nodes = 0";
-      end if;
+      Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
 
       Max_Split_Nodes := Best_Builder.Max_Leaf_Nodes - 1;
       --  L344 add root to frontier
