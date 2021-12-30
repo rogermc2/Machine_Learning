@@ -148,7 +148,7 @@ package body Base_Decision_Tree is
          when Tree_Build.Best_First_Tree =>
             Put_Line (Routine_Name & "build Best_First_Tree");
             Best_First_Builder.Build_Tree
-              (aClassifier.Attributes.Decision_Tree, Builder, Y_Encoded);
+              (Builder, aClassifier.Attributes.Decision_Tree);
       end case;
 
       --  L426
