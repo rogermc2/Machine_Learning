@@ -85,12 +85,13 @@ package body Tree_Build is
     --  ------------------------------------------------------------------------
 
    procedure Init_Builder
-     (Builder               : in out Tree_Build.Tree_Builder;
+     (Builder               : in out Tree_Builder;
       Max_Leaf_Nodes        : Integer;
       Splitter              : Node_Splitter.Splitter_Class;
       Min_Samples_Split     : Natural := 0;
       Min_Samples_Leaf      : Natural := 0;
       Min_Weight_Leaf       : Float := 0.0;
+      Max_Split_Nodes       : Natural := Integer'Last;
       Max_Depth             : Integer := -1;
       Min_Impurity_Decrease : Float := 0.0) is
    begin
@@ -105,6 +106,7 @@ package body Tree_Build is
             Build : Tree_Builder (Best_First_Tree);
          begin
             Build.Max_Leaf_Nodes := Max_Leaf_Nodes;
+            Build.Max_Split_Nodes := Max_Split_Nodes;
             Builder := Build;
          end;
       end if;

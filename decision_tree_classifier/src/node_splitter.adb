@@ -354,6 +354,8 @@ package body Node_Splitter is
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
+--        Routine_Name     : constant String :=
+--                             "Node_Splitter.Initialize_Splitter ";
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Num_Features     : constant Positive :=
                            Positive (Input_X.Element (1).Length);

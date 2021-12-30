@@ -23,7 +23,7 @@ package Tree_Build is
         case Tree_Kind is
             when Best_First_Tree =>
                 Max_Leaf_Nodes  : Natural := 0;
-                Max_Split_Nodes : Natural := 0;
+                Max_Split_Nodes : Natural := Integer'Last;
             when Depth_First_Tree => null;
         end case;
     end record;
@@ -47,6 +47,7 @@ package Tree_Build is
        Min_Samples_Split     : Natural := 0;
        Min_Samples_Leaf      : Natural := 0;
        Min_Weight_Leaf       : Float := 0.0;
+       Max_Split_Nodes       : Natural := Integer'Last;
        Max_Depth             : Integer := -1;
        Min_Impurity_Decrease : Float := 0.0);
     procedure Reset_Last_Node;

@@ -30,7 +30,8 @@ package body Best_First_Builder is
       Res                : in out Build_Utils.Priority_Record) is
       use Ada.Containers;
       use Tree.Nodes_Package;
-      Routine_Name          : constant String := "Tree_Build.Add_Split_Node";
+--        Routine_Name          : constant String :=
+--                                  "Best_First_Builder.Add_Split_Node ";
       Parent_Node           : constant Tree.Tree_Node :=
                                 Element (Parent_Cursor);
       Num_Samples           : constant Positive :=
@@ -43,7 +44,6 @@ package body Best_First_Builder is
       Values                : Weights.Weight_Lists_2D;
    begin
       --  L429
-      Put_Line (Routine_Name & "L429 Reset_Node");
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
                                 Splitter.Weighted_Samples);
       if Is_First then
@@ -118,7 +118,7 @@ package body Best_First_Builder is
       use Build_Utils;
       use Frontier_Package;
       Routine_Name     : constant String := "Best_First_Builder.Build_Tree ";
-      Splitter         : Node_Splitter.Splitter_Class;
+      Splitter         : Node_Splitter.Splitter_Class := Builder.Splitter;
       Heap_Record      : Priority_Record;
       Split_Node_Left  : Priority_Record;
       Split_Node_Right : Priority_Record;
@@ -132,10 +132,13 @@ package body Best_First_Builder is
    begin
       Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
+
       --  L344 add root to frontier
+      Append_Child (theTree.Nodes, theTree.Nodes.Root, Node);
+      Node_Cursor := First_Child (theTree.Nodes.Root);
       Add_Split_Node
         (Builder, Splitter, theTree, 1, Splitter.Num_Samples, Impurity,
-         True, Tree.Left_Node, theTree.Nodes.Root, 0, Split_Node_Left);
+         True, Tree.Left_Node, Node_Cursor, 0, Split_Node_Left);
       Add_To_Frontier (Split_Node_Left, Frontier);
 
       --  L345
@@ -174,6 +177,7 @@ package body Best_First_Builder is
 
          Next (Curs);
       end loop;
+      Put_Line ("Best first tree built.");
 
    end Build_Tree;
 
