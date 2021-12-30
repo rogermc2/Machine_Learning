@@ -17,6 +17,8 @@ package body Best_First_Builder is
 
    Max_Depth_Seen : Positive := 1;
 
+   --  ------------------------------------------------------------------------
+
    procedure Add_Split_Node
      (theBuilder         : in out Tree_Build.Tree_Builder;
       Splitter           : in out Node_Splitter.Splitter_Class;
@@ -32,10 +34,9 @@ package body Best_First_Builder is
       use Tree.Nodes_Package;
 --        Routine_Name          : constant String :=
 --                                  "Best_First_Builder.Add_Split_Node ";
-      Parent_Node           : constant Tree.Tree_Node :=
-                                Element (Parent_Cursor);
       Num_Samples           : constant Positive :=
                                 End_Row - Start_Row + 1;
+      Weighted_Node_Samples : Float := Splitter.Weighted_Samples;
       Is_Leaf               : Boolean;
       aSplit                : Node_Splitter.Split_Record;
       Num_Constant_Features : Natural := 0;
@@ -45,16 +46,17 @@ package body Best_First_Builder is
    begin
       --  L429
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
-                                Splitter.Weighted_Samples);
+                                Weighted_Node_Samples);
       if Is_First then
          Impurity := Splitter.Node_Impurity;
       end if;
 
-      --  L440
-      Is_Leaf := (Depth > theBuilder.Max_Depth) or
-        (Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split) or
-        (Num_Samples < 2 * theBuilder.Min_Samples_Leaf) or
-        (Impurity <= Epsilon);
+      --  L435
+      Is_Leaf := Depth > theBuilder.Max_Depth or
+        Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split or
+        Num_Samples < 2 * theBuilder.Min_Samples_Leaf or
+        Weighted_Node_Samples < 2.0 * theBuilder.Min_Weight_Leaf or
+        Impurity <= Epsilon;
 
       if not Is_Leaf then
          aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
@@ -64,35 +66,37 @@ package body Best_First_Builder is
            aSplit.Improvement + Epsilon < theBuilder.Min_Impurity_Decrease;
       end if;
 
+      --  L449
       Node_Cursor := Tree_Build.Add_Node
         (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
          aSplit.Threshold, Impurity, Splitter.Num_Samples,
-         Float (Parent_Node.Weighted_Num_Node_Samples));
+         Weighted_Node_Samples);
       Node := Element (Node_Cursor);
 
-      --  L461
+      --  L459
       Node_Splitter.Node_Value (Splitter, Values);
       if Node.Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node.Node_ID));
       end if;
       theTree.Values.Replace_Element (Node.Node_ID, Values);
 
-      Res.Node_Cursor := Tree_Build.Add_Node
-        (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
-         aSplit.Threshold, Impurity, Splitter.Num_Samples,
-         Splitter.Weighted_Samples);
-      Res.Node_Params := Element (Res.Node_Cursor);
-      Res.Depth := Depth + 1;
+      Res.Node_Cursor := Node_Cursor;
+      Res.Node_Params := Element (Node_Cursor);
+      Res.Start := Start_Row;
+      Res.Stop_Row := End_Row;
+      Res.Depth := Depth;
       Res.Impurity := Impurity;
       Res.Is_Leaf := Is_Leaf;
 
       if Is_Leaf then
-         Res.Position := Res.Stop_Row;
+         --  L477
+         Res.Position := End_Row;
          Res.Improvement := 0.0;
          Res.Impurity_Left := Impurity;
          Res.Impurity_Right := Impurity;
       else
-         Res.Position := End_Row;
+         --  L468
+         Res.Position := aSplit.Split_Row;
          Res.Improvement := aSplit.Improvement;
          Res.Impurity_Left := aSplit.Impurity_Left;
          Res.Impurity_Right := aSplit.Impurity_Right;
