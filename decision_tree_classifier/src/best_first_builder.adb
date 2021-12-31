@@ -22,7 +22,7 @@ package body Best_First_Builder is
       Splitter           : in out Node_Splitter.Splitter_Class;
       theTree            : in out Tree.Tree_Class;
       Start_Row, End_Row : Positive;
-      Impurity           : in out Float;
+      Impurity           : Float;
       Is_First           : in out Boolean;
       Branch             : Tree.Node_Type;
       Parent_Cursor      : Tree.Tree_Cursor;
@@ -44,7 +44,7 @@ package body Best_First_Builder is
 --        Routine_Name          : constant String :=
 --                                  "Best_First_Builder.Add_Branch ";
       --  L346
-      Data                  : Priority_Record := Pop (Frontier);
+      Data                  : constant Priority_Record := Pop (Frontier);
       Start_Row             : constant Positive := Data.Start;
       Stop_Row              : constant Positive := Data.Stop_Row;
       Split_Node_Left       : Priority_Record;
@@ -100,7 +100,7 @@ package body Best_First_Builder is
       Splitter           : in out Node_Splitter.Splitter_Class;
       theTree            : in out Tree.Tree_Class;
       Start_Row, End_Row : Positive;
-      Impurity           : in out Float;
+      Impurity           : Float;
       Is_First           : in out Boolean;
       Branch             : Tree.Node_Type;
       Parent_Cursor      : Tree.Tree_Cursor;
@@ -124,7 +124,7 @@ package body Best_First_Builder is
       Node_Splitter.Reset_Node (Splitter, Start_Row, End_Row,
                                 Weighted_Node_Samples);
       if Is_First then
-         Impurity := Splitter.Node_Impurity;
+--           Impurity := Node_Splitter.Gini_Node_Impurity (Builder.Splitter);
          Is_First := False;
       end if;
 
@@ -219,7 +219,7 @@ package body Best_First_Builder is
       Start_Row             : constant Positive := 1;
       Stop_Row              : constant Positive := Builder.Splitter.Num_Samples;
       Depth                 : constant Natural := 1;
-      Impurity_Left         : constant Float := Float'Last;
+      Impurity_Left         : Float := Float'Last;
       Impurity_Right        : constant Float := Float'Last;
       Improvement           : constant Float := -Float'Last;
       Is_Leaf               : constant Boolean := False;
@@ -236,6 +236,7 @@ package body Best_First_Builder is
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
       Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                                 Weighted_Node_Samples);
+      Impurity_Left := Node_Splitter.Gini_Node_Impurity (Builder.Splitter);
       --  L335 Add_Node used instead of Add_Split_Node
       Top_Cursor := Tree_Build.Add_Node
         (theTree, theTree.Nodes.Root, Tree.Left_Node, Is_Leaf,
