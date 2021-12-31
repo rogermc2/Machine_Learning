@@ -38,7 +38,17 @@ package Build_Utils is
    subtype Stack_List is Stack_Package.List;
    subtype Stack_Cursor is Stack_Package.Cursor;
 
+   function Pop (aStack : in out Frontier_List) return Priority_Record;
    function Pop (aStack : in out Stack_List) return Stack_Record;
+   procedure Push (aStack : in out Frontier_List; Data : Priority_Record);
+   procedure Push (aStack                : in out Frontier_List;
+                   Is_Leaf               : Boolean;
+                   Start, Stop, Position : Positive;
+                   Depth                 : Natural;
+                   Parent                : Tree.Tree_Cursor;
+                   Impurity_Left         : Float;
+                   Impurity_Right        : Float;
+                   Improvement           : Float);
    procedure Push (aStack                : in out Stack_List;
                    Start, Stop           : Positive;
                    Depth                 : Natural;

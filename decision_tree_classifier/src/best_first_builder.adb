@@ -106,13 +106,6 @@ package body Best_First_Builder is
 
    --  ------------------------------------------------------------------------
 
-      procedure Add_To_Frontier (Rec      : Build_Utils.Priority_Record;
-                                 Frontier : in out Build_Utils.Frontier_List) is
-      begin
-         Frontier.Append (Rec);
-      end Add_To_Frontier;
-
-   --  ------------------------------------------------------------------
    --  The best node to expand is given by the node at the frontier that has
    --  the highest impurity improvement.
    procedure Build_Tree
@@ -121,35 +114,40 @@ package body Best_First_Builder is
       use Tree.Nodes_Package;
       use Build_Utils;
       use Frontier_Package;
-      Routine_Name     : constant String := "Best_First_Builder.Build_Tree ";
-      Splitter         : Node_Splitter.Splitter_Class := Builder.Splitter;
-      Heap_Record      : Priority_Record;
-      Split_Node_Left  : Priority_Record;
-      Split_Node_Right : Priority_Record;
-      Max_Split_Nodes  : Natural;
-      Impurity         : Float := 0.0;
-      Frontier         : Build_Utils.Frontier_List;
-      Node_Cursor      : Tree.Tree_Cursor := theTree.Nodes.Root;
-      Node             : Tree.Tree_Node;
-      Curs             : Frontier_Cursor := Frontier.First;
-      Is_Leaf          : Boolean := False;
+      Routine_Name          : constant String := "Best_First_Builder.Build_Tree ";
+      Splitter              : Node_Splitter.Splitter_Class := Builder.Splitter;
+      Start_Row             : constant Positive := 1;
+      Stop_Row              : constant Positive := Builder.Splitter.Num_Samples;
+      Depth                 : constant Natural := 1;
+      Impurity_Left         : constant Float := Float'Last;
+      Impurity_Right        : constant Float := Float'Last;
+      Improvement           : constant Float := -Float'Last;
+      Weighted_Node_Samples : Float := 0.0;
+      Heap_Record           : Priority_Record;
+      Split_Node_Left       : Priority_Record;
+      Split_Node_Right      : Priority_Record;
+      Max_Split_Nodes       : Natural;
+      Frontier              : Build_Utils.Frontier_List;
+      Stack                 : Frontier_List;
+      Node_Cursor           : Tree.Tree_Cursor := theTree.Nodes.Root;
+      Node                  : Tree.Tree_Node;
+      Curs                  : Frontier_Cursor := Frontier.First;
+      Is_Leaf               : Boolean := False;
    begin
       Put_Line (Routine_Name);
       Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
 
-      --  L344 add root to frontier
-      Append_Child (theTree.Nodes, theTree.Nodes.Root, Node);
-      Node_Cursor := First_Child (theTree.Nodes.Root);
-      Add_Split_Node
-        (Builder, Splitter, theTree, 1, Splitter.Num_Samples, Impurity,
-         True, Tree.Left_Node, Node_Cursor, 0, Split_Node_Left);
-      Add_To_Frontier (Split_Node_Left, Frontier);
-
+      --  L335
+      Push (Stack, False, Start_Row, Start_Row, Start_Row + 1, Depth, theTree.Nodes.Root,
+            Impurity_Left, Impurity_Right, Improvement);
+--        Put_Line (Routine_Name & "Frontier Has_Element " & Boolean'Image ( Has_Element (Curs)));
       --  L345
-      Put_Line (Routine_Name & "Frontier Has_Element " & Boolean'Image ( Has_Element (Curs)));
       while Has_Element (Curs) loop
-         Heap_Record := Element (Curs);
+         --  Reset_Node resets splitter to use samples (Start_Row .. End_Row)
+         Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
+                                   Weighted_Node_Samples);
+         Heap_Record := Pop (Stack);
          Node_Cursor := Heap_Record.Node_Cursor;
          Node := Element (Node_Cursor);
          --  L349
@@ -173,8 +171,8 @@ package body Best_First_Builder is
                Heap_Record.Stop_Row, Heap_Record.Impurity_Right, False,
                Tree.Right_Node, Node_Cursor, Heap_Record.Depth + 1,
                Split_Node_Right);
-            Add_To_Frontier (Split_Node_Left, Frontier);
-            Add_To_Frontier (Split_Node_Right, Frontier);
+            Push (Frontier, Split_Node_Left);
+            Push (Frontier, Split_Node_Right);
          end if;
 
          if Heap_Record.Depth > Max_Depth_Seen then
