@@ -41,8 +41,8 @@ package body Best_First_Builder is
       use Build_Utils;
       use Tree;
       use Nodes_Package;
-      Routine_Name          : constant String :=
-                                      "Best_First_Builder.Add_Branch ";
+--        Routine_Name          : constant String :=
+--                                  "Best_First_Builder.Add_Branch ";
       --  L346
       Data                  : Priority_Record := Pop (Frontier);
       Start_Row             : constant Positive := Data.Start;
@@ -62,20 +62,19 @@ package body Best_First_Builder is
       Node := Element (Node_Cursor);
       --  L349
       --           Put_Line ("Max_Split_Nodes: " & Integer'Image (Max_Split_Nodes));
-      Is_Leaf := Data.Is_Leaf or Max_Split_Nodes < 0;
-      Put_Line (Routine_Name & "L349 Is_Leaf: " & Boolean'Image (Is_Leaf));
+      Is_Leaf := Data.Is_Leaf or Max_Split_Nodes <= 0;
+--        Put_Line (Routine_Name & "L349 Is_Leaf: " & Boolean'Image (Is_Leaf));
       if Is_Leaf then
          Tree_Build.Change_To_Leaf_Node (theTree, Node_Cursor);
       else --  Node is expandable
-         --  L362
+         --  L362 Decrement number of split nodes available
          Max_Split_Nodes := Max_Split_Nodes - 1;
          --  Compute left split node
          Add_Split_Node
            (Builder, Splitter, theTree, Data.Start,
-            Data.Position, Data.Impurity, Is_First,
+            Data.Position - 1, Data.Impurity, Is_First,
             Tree.Left_Node, Node_Cursor, Data.Depth + 1, Split_Node_Left);
          --  L374 tree.nodes may have changed
-         --           Data := Element (Curs);
          Node := Element (Data.Node_Cursor);
          --  L378 Compute right split node
          Add_Split_Node
@@ -110,7 +109,7 @@ package body Best_First_Builder is
       use Ada.Containers;
       use Tree.Nodes_Package;
       Routine_Name          : constant String :=
-                                      "Best_First_Builder.Add_Split_Node ";
+                                "Best_First_Builder.Add_Split_Node ";
       Num_Samples           : constant Positive :=
                                 End_Row - Start_Row + 1;
       Weighted_Node_Samples : Float := Splitter.Weighted_Samples;
@@ -155,14 +154,15 @@ package body Best_First_Builder is
          Put_Line
            (Routine_Name & " L435 Leaf_Node Weighted_Node_Samples < " &
               "2.0 * Builder.Min_Weight_Leaf");
---        elsif not First and then abs (Impurity) <= Epsilon then
---           Put_Line (Routine_Name &
---                       " v Leaf_Node abs (Impurity" & Float'Image (Impurity) &
---                       ") <= Epsilon");
+      elsif abs (Impurity) <= Epsilon then
+         Put_Line (Routine_Name &
+                     " v Leaf_Node abs (Impurity" & Float'Image (Impurity) &
+                     ") <= Epsilon");
       end if;
+
       if not Is_Leaf then
-         aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
-                                             Num_Constant_Features);
+         aSplit :=
+           Node_Splitter.Split_Node (Splitter, Impurity, Num_Constant_Features);
          Is_Leaf :=
            aSplit.Split_Row > End_Row or
            aSplit.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
@@ -171,8 +171,7 @@ package body Best_First_Builder is
       --  L445
       Node_Cursor := Tree_Build.Add_Node
         (theTree, Parent_Cursor, Branch, Is_Leaf, aSplit.Feature,
-         aSplit.Threshold, Impurity, Splitter.Num_Samples,
-         Weighted_Node_Samples);
+         aSplit.Threshold, Impurity, Num_Samples, Weighted_Node_Samples);
       Node := Element (Node_Cursor);
 
       --  L459
@@ -233,7 +232,7 @@ package body Best_First_Builder is
    begin
       --  L315 Splitter is initialzed in Base_Decision_Tree.Base_Fit
       Assert (Builder.Max_Leaf_Nodes > 1, Routine_Name & "Max_Leaf_Nodes = 0");
-      --  L323
+      --  L323 Number of split nodes available
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
       Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                                 Weighted_Node_Samples);
@@ -251,7 +250,6 @@ package body Best_First_Builder is
                      Is_First);
       end loop;
 
-      Put_Line (".");
       Put_Line ("Best first tree built with" &
                   Integer'Image (Integer (theTree.Nodes.Node_Count) - 1) &
                   " nodes.");
