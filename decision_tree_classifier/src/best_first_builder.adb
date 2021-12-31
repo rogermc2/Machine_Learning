@@ -18,7 +18,7 @@ package body Best_First_Builder is
    Max_Depth_Seen : Positive := 1;
 
    procedure Add_Split_Node
-     (theBuilder         : in out Tree_Build.Tree_Builder;
+     (Builder            : in out Tree_Build.Tree_Builder;
       Splitter           : in out Node_Splitter.Splitter_Class;
       theTree            : in out Tree.Tree_Class;
       Start_Row, End_Row : Positive;
@@ -36,7 +36,7 @@ package body Best_First_Builder is
       Builder         : in out Tree_Build.Tree_Builder;
       Splitter        : in out Node_Splitter.Splitter_Class;
       Frontier        : in out Build_Utils.Frontier_List;
-      Max_Split_Nodes : in out Natural;
+      Max_Split_Nodes : in out Integer;
       Is_First        : in out Boolean) is
       use Build_Utils;
       use Tree;
@@ -97,7 +97,7 @@ package body Best_First_Builder is
    --  ------------------------------------------------------------------------
 
    procedure Add_Split_Node
-     (theBuilder         : in out Tree_Build.Tree_Builder;
+     (Builder            : in out Tree_Build.Tree_Builder;
       Splitter           : in out Node_Splitter.Splitter_Class;
       theTree            : in out Tree.Tree_Class;
       Start_Row, End_Row : Positive;
@@ -109,8 +109,8 @@ package body Best_First_Builder is
       Res                : in out Build_Utils.Priority_Record) is
       use Ada.Containers;
       use Tree.Nodes_Package;
-      --        Routine_Name          : constant String :=
-      --                                  "Best_First_Builder.Add_Split_Node ";
+      Routine_Name          : constant String :=
+                                      "Best_First_Builder.Add_Split_Node ";
       Num_Samples           : constant Positive :=
                                 End_Row - Start_Row + 1;
       Weighted_Node_Samples : Float := Splitter.Weighted_Samples;
@@ -130,18 +130,42 @@ package body Best_First_Builder is
       end if;
 
       --  L435
-      Is_Leaf := Depth > theBuilder.Max_Depth or
-        Num_Samples = 1 or Num_Samples < theBuilder.Min_Samples_Split or
-        Num_Samples < 2 * theBuilder.Min_Samples_Leaf or
-        Weighted_Node_Samples < 2.0 * theBuilder.Min_Weight_Leaf or
+      Is_Leaf := (Builder.Max_Depth > 0 and then Depth > Builder.Max_Depth) or
+        Num_Samples = 1 or Num_Samples < Builder.Min_Samples_Split or
+        Num_Samples < 2 * Builder.Min_Samples_Leaf or
+        Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf or
         Impurity <= Epsilon;
 
+      if Builder.Max_Depth > 0 and then Depth > Builder.Max_Depth then
+         null;
+         Put_Line (Routine_Name & " L435 Leaf_Node Depth " &
+                     Integer'Image (Depth) & " >= Builder.Max_Depth " &
+                     Integer'Image (Builder.Max_Depth));
+      elsif Builder.Splitter.Num_Samples = 1 then
+         Put_Line (Routine_Name &
+                     " L435 Leaf_Node Builder.Splitter.Num_Samples = 1");
+      elsif Num_Samples < Builder.Min_Samples_Split then
+         Put_Line (Routine_Name & " L435 Leaf_Node Num_Samples <" &
+                     " Builder.Min_Samples_Split: "  &
+                     Integer'Image (Builder.Min_Samples_Split));
+      elsif Num_Samples < 2 * Builder.Min_Samples_Leaf then
+         Put_Line (Routine_Name & " L435 Leaf_Node Num_Samples < " &
+                     "2 * Builder.Min_Samples_Leaf");
+      elsif Weighted_Node_Samples < 2.0 * Builder.Min_Weight_Leaf then
+         Put_Line
+           (Routine_Name & " L435 Leaf_Node Weighted_Node_Samples < " &
+              "2.0 * Builder.Min_Weight_Leaf");
+--        elsif not First and then abs (Impurity) <= Epsilon then
+--           Put_Line (Routine_Name &
+--                       " v Leaf_Node abs (Impurity" & Float'Image (Impurity) &
+--                       ") <= Epsilon");
+      end if;
       if not Is_Leaf then
          aSplit := Node_Splitter.Split_Node (Splitter, Impurity,
                                              Num_Constant_Features);
          Is_Leaf :=
            aSplit.Split_Row > End_Row or
-           aSplit.Improvement + Epsilon < theBuilder.Min_Impurity_Decrease;
+           aSplit.Improvement + Epsilon < Builder.Min_Impurity_Decrease;
       end if;
 
       --  L445
@@ -202,13 +226,13 @@ package body Best_First_Builder is
       Is_Leaf               : constant Boolean := False;
       Split                 : Node_Splitter.Split_Record;
       Weighted_Node_Samples : Float := 0.0;
-      Max_Split_Nodes       : Natural;
+      Max_Split_Nodes       : Integer;
       Top_Cursor            : Tree.Tree_Cursor;
       Frontier              : Frontier_List;
       Is_First              : Boolean := True;
    begin
       --  L315 Splitter is initialzed in Base_Decision_Tree.Base_Fit
-      Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
+      Assert (Builder.Max_Leaf_Nodes > 1, Routine_Name & "Max_Leaf_Nodes = 0");
       --  L323
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
       Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,

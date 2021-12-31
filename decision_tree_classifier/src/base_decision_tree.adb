@@ -255,12 +255,12 @@ package body Base_Decision_Tree is
            aClassifier.Attributes.Num_Features;
       end if;
 
-      --  L316
+      --  L313
       Assert (Max_Leaf_Nodes = -1 or Max_Leaf_Nodes > 1, Routine_Name &
                 ", Max_Leaf_Nodes " & Integer'Image (Max_Leaf_Nodes) &
                 "must be > 1");
 
-      --  L323
+      --  L320
       if not Sample_Weights.Is_Empty then
          Assert (Integer (Sample_Weights.Length) = Num_Samples,
                  Routine_Name & ", Sample_Weight length " &
