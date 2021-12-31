@@ -81,7 +81,7 @@ package body Best_First_Builder is
       theTree.Values.Replace_Element (Node.Node_ID, Values);
 
       Res.Node_Cursor := Node_Cursor;
-      Res.Node_Params := Element (Node_Cursor);
+--        Res.Node_Params := Element (Node_Cursor);
       Res.Start := Start_Row;
       Res.Stop_Row := End_Row;
       Res.Depth := Depth;
@@ -134,6 +134,7 @@ package body Best_First_Builder is
       Curs             : Frontier_Cursor := Frontier.First;
       Is_Leaf          : Boolean := False;
    begin
+      Put_Line (Routine_Name);
       Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
 
@@ -146,11 +147,13 @@ package body Best_First_Builder is
       Add_To_Frontier (Split_Node_Left, Frontier);
 
       --  L345
+      Put_Line (Routine_Name & "Frontier Has_Element " & Boolean'Image ( Has_Element (Curs)));
       while Has_Element (Curs) loop
          Heap_Record := Element (Curs);
          Node_Cursor := Heap_Record.Node_Cursor;
          Node := Element (Node_Cursor);
          --  L349
+            Put_Line ("Max_Split_Nodes: " & Integer'Image (Max_Split_Nodes));
          Is_Leaf := Heap_Record.Is_Leaf or Max_Split_Nodes < 0;
          if Is_Leaf then
             Tree_Build.Change_To_Leaf_Node (theTree, Node_Cursor);
@@ -181,7 +184,10 @@ package body Best_First_Builder is
 
          Next (Curs);
       end loop;
+
       Put_Line ("Best first tree built.");
+      Put_Line ("Num nodes: " &
+                  Integer'Image (Integer (theTree.Nodes.Node_Count)));
 
    end Build_Tree;
 

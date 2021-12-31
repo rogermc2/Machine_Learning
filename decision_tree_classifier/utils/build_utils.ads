@@ -7,7 +7,6 @@ package Build_Utils is
 
    type Priority_Record is record
       Node_Cursor    : Tree.Tree_Cursor;
-      Node_Params    : Tree.Tree_Node;
       Depth          : Natural;
       Is_Leaf        : Boolean := False;
       Impurity       : Float;
