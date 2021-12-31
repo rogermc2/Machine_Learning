@@ -37,21 +37,20 @@ package body Best_First_Builder is
       Splitter        : in out Node_Splitter.Splitter_Class;
       Frontier        : in out Build_Utils.Frontier_List;
       Max_Split_Nodes : in out Natural;
---        Split    : in out Build_Utils.Priority_Record;
       First           : in out Boolean) is
       use Build_Utils;
       use Tree;
       use Nodes_Package;
---        Routine_Name          : constant String :=
---                                  "Best_First_Builder.Add_Branch ";
+      --        Routine_Name          : constant String :=
+      --                                  "Best_First_Builder.Add_Branch ";
       --  L199
       Data                  : Priority_Record := Pop (Frontier);
       Start_Row             : constant Positive := Data.Start;
       Stop_Row              : constant Positive := Data.Stop_Row;
---        Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
+      Num_Node_Samples      : constant Positive := Stop_Row - Start_Row + 1;
+      Split                 : Node_Splitter.Split_Record;
       Split_Node_Left       : Priority_Record;
       Split_Node_Right      : Priority_Record;
---        Impurity              : Float := Data.Impurity;
       Is_Leaf               : Boolean := False;
       Weighted_Node_Samples : Float := 0.0;
       Node_Cursor           : Tree.Tree_Cursor;
@@ -61,35 +60,39 @@ package body Best_First_Builder is
       Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                                 Weighted_Node_Samples);
       if First then
-         Data.Node_Cursor := First_Child (Data.Node_Cursor);
+         Data.Node_Cursor := Tree_Build.Add_Node
+           (theTree, Data.Node_Cursor, Left_Node, Data.Is_Leaf,
+            Split.Feature, Split.Threshold, Data.Impurity, Num_Node_Samples,
+            Weighted_Node_Samples);
+         Push (Frontier, Data);
          First := False;
-      end if;
-
-      Node_Cursor := Data.Node_Cursor;
-      Node := Element (Node_Cursor);
-      --  L349
-      Put_Line ("Max_Split_Nodes: " & Integer'Image (Max_Split_Nodes));
-      Is_Leaf := Data.Is_Leaf or Max_Split_Nodes < 0;
-      if Is_Leaf then
-         Tree_Build.Change_To_Leaf_Node (theTree, Node_Cursor);
-      else --  Node is expandable
-         --  L362
-         Max_Split_Nodes := Max_Split_Nodes - 1;
-         Add_Split_Node
-           (Builder, Splitter, theTree, Data.Start,
-            Data.Position, Data.Impurity, False,
-            Tree.Left_Node, Node_Cursor, Data.Depth + 1, Split_Node_Left);
-         --  L374 tree.nodes may have changed
---           Data := Element (Curs);
+      else
          Node_Cursor := Data.Node_Cursor;
-         --  L378 Compute right split node
-         Add_Split_Node
-           (Builder, Splitter, theTree, Data.Position,
-            Data.Stop_Row, Data.Impurity_Right, False,
-            Tree.Right_Node, Node_Cursor, Data.Depth + 1,
-            Split_Node_Right);
-         Push (Frontier, Split_Node_Left);
-         Push (Frontier, Split_Node_Right);
+         Node := Element (Node_Cursor);
+         --  L349
+--           Put_Line ("Max_Split_Nodes: " & Integer'Image (Max_Split_Nodes));
+         Is_Leaf := Data.Is_Leaf or Max_Split_Nodes < 0;
+         if Is_Leaf then
+            Tree_Build.Change_To_Leaf_Node (theTree, Node_Cursor);
+         else --  Node is expandable
+            --  L362
+            Max_Split_Nodes := Max_Split_Nodes - 1;
+            Add_Split_Node
+              (Builder, Splitter, theTree, Data.Start,
+               Data.Position, Data.Impurity, False,
+               Tree.Left_Node, Node_Cursor, Data.Depth + 1, Split_Node_Left);
+            --  L374 tree.nodes may have changed
+            --           Data := Element (Curs);
+            Node_Cursor := Data.Node_Cursor;
+            --  L378 Compute right split node
+            Add_Split_Node
+              (Builder, Splitter, theTree, Data.Position,
+               Data.Stop_Row, Data.Impurity_Right, False,
+               Tree.Right_Node, Node_Cursor, Data.Depth + 1,
+               Split_Node_Right);
+            Push (Frontier, Split_Node_Left);
+            Push (Frontier, Split_Node_Right);
+         end if;
       end if;
 
       if Data.Depth > Max_Depth_Seen then
@@ -205,30 +208,26 @@ package body Best_First_Builder is
       Impurity_Right        : constant Float := Float'Last;
       Improvement           : constant Float := -Float'Last;
       Is_Leaf               : constant Boolean := False;
---        Split                 : Priority_Record;
       Max_Split_Nodes       : Natural;
       Frontier              : Frontier_List;
-      Curs                  : Frontier_Cursor;
       First                 : Boolean := True;
    begin
-      Put_Line (Routine_Name);
       Assert (Builder.Max_Leaf_Nodes > 0, Routine_Name & "Max_Leaf_Nodes = 0");
       Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
 
       --  L335
       Push (Frontier, Is_Leaf, Start_Row, Stop_Row, Start_Row + 1, Depth, theTree.Nodes.Root,
             Impurity_Left, Impurity_Right, Improvement);
-      Curs := Frontier.First;
-      Put_Line (Routine_Name & "Frontier Has_Element " & Boolean'Image (Has_Element (Curs)));
+      --        Put_Line (Routine_Name & "Frontier Has_Element " & Boolean'Image (Has_Element (Curs)));
       --  L345
       while not Frontier.Is_Empty loop
          Add_Branch (theTree, Builder, Splitter, Frontier, Max_Split_Nodes, First);
       end loop;
 
-      Put_Line ("Best first tree built.");
-      Put_Line ("Num nodes: " &
-                  Integer'Image (Integer (theTree.Nodes.Node_Count)));
-
+      Put_Line (".");
+      Put_Line ("Best first tree built with " &
+                  Integer'Image (Integer (theTree.Nodes.Node_Count)) &
+                  " nodes.");
    end Build_Tree;
 
    --  ------------------------------------------------------------------------
