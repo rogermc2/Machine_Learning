@@ -34,16 +34,14 @@ package body Build_Utils is
                    Start, Stop, Position : Positive;
                    Depth                 : Natural;
                    Parent                : Tree.Tree_Cursor;
-                   Impurity_Left         : Float;
-                   Impurity_Right        : Float;
+                   Impurity              : Float;
                    Improvement           : Float) is
       Data : Priority_Record;
    begin
       Data.Node_Cursor := Parent;
       Data.Depth := Depth;
       Data.Is_Leaf := Is_Leaf;
-      Data.Impurity_Left := Impurity_Left;
-      Data.Impurity_Right := Impurity_Right;
+      Data.Impurity := Impurity;
       Data.Improvement := Improvement;
       Data.Start := Start;
       Data.Stop_Row := Stop;

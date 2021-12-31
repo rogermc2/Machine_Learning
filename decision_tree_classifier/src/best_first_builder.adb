@@ -79,7 +79,7 @@ package body Best_First_Builder is
          --  L378 Compute right split node
          Add_Split_Node
            (Builder, Splitter, theTree, Data.Position,
-            Data.Stop_Row, Data.Impurity_Right, Is_First,
+            Data.Stop_Row, Data.Impurity, Is_First,
             Tree.Right_Node, Node_Cursor, Data.Depth + 1,
             Split_Node_Right);
          Push (Frontier, Split_Node_Left);
@@ -192,14 +192,10 @@ package body Best_First_Builder is
          --  L475
          Res.Position := End_Row;
          Res.Improvement := 0.0;
-         Res.Impurity_Left := Impurity;
-         Res.Impurity_Right := Impurity;
       else
          --  L465
          Res.Position := aSplit.Split_Row;
          Res.Improvement := aSplit.Improvement;
-         Res.Impurity_Left := aSplit.Impurity_Left;
-         Res.Impurity_Right := aSplit.Impurity_Right;
       end if;
 
    end Add_Split_Node;
@@ -227,6 +223,8 @@ package body Best_First_Builder is
       Max_Split_Nodes       : Integer;
       Top_Cursor            : Tree.Tree_Cursor;
       Frontier              : Frontier_List;
+      Num_Constant_Features : Natural := 0;
+      Values                : Weights.Weight_Lists_2D;
       Is_First              : Boolean := True;
    begin
       --  L315 Splitter is initialzed in Base_Decision_Tree.Base_Fit
@@ -236,14 +234,19 @@ package body Best_First_Builder is
       Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                                 Weighted_Node_Samples);
       Impurity := Node_Splitter.Gini_Node_Impurity (Builder.Splitter);
+      Split := Node_Splitter.Split_Node (Builder.Splitter,
+                                         Impurity, Num_Constant_Features);
       --  L335 Add_Node used instead of Add_Split_Node
       Top_Cursor := Tree_Build.Add_Node
         (theTree, theTree.Nodes.Root, Tree.Left_Node, Is_Leaf,
          Split.Feature, Split.Threshold, Impurity,
          Builder.Splitter.Num_Samples, Weighted_Node_Samples);
+      Node_Splitter.Node_Value (Builder.Splitter, Values);
+      theTree.Values.Clear;
+      theTree.Values.Append (Values);
       --  L339
       Push (Frontier, Is_Leaf, Start_Row, Stop_Row, Start_Row + 1, Depth,
-            Top_Cursor, Impurity, Impurity, Improvement);
+            Top_Cursor, Impurity, Improvement);
       --  L345
       while not Frontier.Is_Empty loop
          Add_Branch (theTree, Builder, Splitter, Frontier, Max_Split_Nodes,

@@ -10,8 +10,6 @@ package Build_Utils is
       Depth          : Natural;
       Is_Leaf        : Boolean := False;
       Impurity       : Float;
-      Impurity_Left  : Float;
-      Impurity_Right : Float;
       Improvement    : Float;
       Start          : Positive := 1;
       Stop_Row       : Positive := 1;
@@ -46,8 +44,7 @@ package Build_Utils is
                    Start, Stop, Position : Positive;
                    Depth                 : Natural;
                    Parent                : Tree.Tree_Cursor;
-                   Impurity_Left         : Float;
-                   Impurity_Right        : Float;
+                   Impurity              : Float;
                    Improvement           : Float);
    procedure Push (aStack                : in out Stack_List;
                    Start, Stop           : Positive;
