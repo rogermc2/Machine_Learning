@@ -80,8 +80,6 @@ package body Best_First_Builder is
             if First then
                 First := False;
             else
-                --  L374 tree.nodes may have changed
-                Node_Cursor := First_Child (Node_Cursor);
                 --  L378 Compute right split node
                 Add_Split_Node
                   (Builder, Splitter, theTree, Data.Position, Data.Stop_Row,
@@ -237,7 +235,7 @@ package body Best_First_Builder is
         Assert (Builder.Max_Leaf_Nodes > 1,
                 Routine_Name & "Max_Leaf_Nodes = 0");
         --  L323 Number of split nodes available
-        Max_Split_Nodes := Builder.Max_Leaf_Nodes - 1;
+        Max_Split_Nodes := Builder.Max_Leaf_Nodes;
         Node_Splitter.Reset_Node (Builder.Splitter, Start_Row, Stop_Row,
                                   Weighted_Samples);
         --  L339

@@ -61,7 +61,7 @@ begin
    Graphviz_Exporter.C_Init
      (Exporter, aClassifier.Attributes.Decision_Tree);
    Graphviz_Exporter.Export_Graphviz
-     (Exporter, aClassifier.Attributes.Decision_Tree,
+     (Exporter, aClassifier.Attributes.Decision_Tree, Feature_Names => Features,
       Output_File_Name => To_Unbounded_String ("diabetes.dot"));
 
 end Lesson_3;
