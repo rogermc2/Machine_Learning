@@ -486,13 +486,13 @@ package body Classifier_Utilities is
       use Ada.Strings.Unbounded;
       use Value_Data_Package;
 --        Routine_Name   : constant String :=
---                             "Classifier_Utilities.Split_Raw_Data ";
+--                           "Classifier_Utilities.Split_Raw_Data ";
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
-      Feature_Types  : array  (1 .. Num_Features) of Data_Type;
+      Feature_Types  : Feature_Type_Array (1 .. Num_Features);
       Features_List  : Value_Data_Lists_2D;
-      Label_Types    : array  (1 .. Num_Outputs) of Data_Type;
+      Label_Types    : Label_Type_Array  (1 .. Num_Outputs);
       Label_Values   : Value_Data_List;
       Labels_List    : Value_Data_Lists_2D;
       Feature_Values : Value_Data_List;
@@ -501,18 +501,37 @@ package body Classifier_Utilities is
       Parse_Header (aRow, Num_Features, Data);
       aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
       for f_index in 1 .. Num_Features loop
-         Feature_Types (Positive (f_index)) :=
-           Utilities.Get_Data_Type (aRow (Positive (f_index)));
+         declare
+            Row_S     : constant String := To_String (aRow (f_index));
+            S_Last    : constant Integer := Row_S'Last;
+            Last_Char : constant Character := Row_S (S_Last);
+         begin
+            if Character'Pos (Last_Char) = 13 then
+               aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+            end if;
+            Feature_Types (Positive (f_index)) :=
+              Utilities.Get_Data_Type (aRow (Positive (f_index)));
+         end;
       end loop;
 
-      for f_index in 1 .. Num_Outputs loop
-         Label_Types (Positive (f_index)) :=
-           Utilities.Get_Data_Type (aRow (Positive (Num_Features + f_index)));
+      for l_index in 1 .. Num_Outputs loop
+         declare
+            Row_S     : constant String := To_String (aRow (Num_Features + l_index));
+            S_Last    : constant Integer := Row_S'Last;
+            Last_Char : constant Character := Row_S (S_Last);
+         begin
+            if Character'Pos (Last_Char) = 13 then
+               aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+            end if;
+            Label_Types (Positive (l_index)) :=
+              Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
+         end;
       end loop;
+
       for row_index in Positive'Succ (Raw_Data.First_Index) ..
-          Raw_Data.Last_Index loop
+        Raw_Data.Last_Index loop
          aRow := Raw_Data.Element (row_index);  --  Unbound list
-         Label_Values.Clear;
+
          Feature_Values.Clear;
          for f_index in 1 .. Num_Features loop
             declare
@@ -535,6 +554,19 @@ package body Classifier_Utilities is
          Features_List.Append (Feature_Values);
 
          for o_index in 1 .. Num_Outputs loop
+            Label_Values.Clear;
+            declare
+               Row_S     : constant String :=
+                             To_String (aRow (Num_Features + o_index));
+               S_Last    : constant Integer := Row_S'Last;
+               Last_Char : constant Character := Row_S (S_Last);
+            begin
+               if Character'Pos (Last_Char) = 13 then
+                  aRow (Num_Features + o_index) :=
+                    To_Unbounded_String (Row_S (1 .. S_Last - 1));
+               end if;
+            end;
+
             declare
                Label       : constant String :=
                                To_String (aRow (Num_Features + o_index));
@@ -559,6 +591,7 @@ package body Classifier_Utilities is
 
       Data.Feature_Values := Features_List;
       Data.Label_Values := Labels_List;
+
       return Data;
 
    end Split_Raw_Data;

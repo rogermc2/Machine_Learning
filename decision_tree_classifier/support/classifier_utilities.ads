@@ -7,6 +7,9 @@ with Weights;
 
 package Classifier_Utilities is
 
+   type Feature_Type_Array is array (Positive range <>) of ML_Types.Data_Type;
+   type Label_Type_Array is array (Positive range <>) of ML_Types.Data_Type;
+
    Value_Error : Exception;
 
    function Arg_Max (Values : Weights.Weight_List) return Positive;

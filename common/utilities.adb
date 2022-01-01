@@ -122,19 +122,28 @@ package body Utilities is
    --  ---------------------------------------------------------------------------
 
    function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type is
-      theType : Data_Type;
+      theType   : Data_Type;
+      aString   : constant String := To_String (Data);
+      S_Last    : constant Integer := aString'Last;
+      Last_Char : constant Character := aString (S_Last);
+      UB_Data   : Unbounded_String := Data;
    begin
-      if Is_Integer (Data) then
+      if Character'Pos (Last_Char) = 13 then
+            UB_Data := To_Unbounded_String (aString (1 .. S_Last - 1));
+      end if;
+
+      if Is_Integer (UB_Data) then
          theType := Integer_Type;
-      elsif Is_Float (Data) then
+      elsif Is_Float (UB_Data) then
          theType := Float_Type;
-      elsif Is_Boolean (Data) then
+      elsif Is_Boolean (UB_Data) then
          theType := Boolean_Type;
       else
          theType := UB_String_Type;
       end if;
 
       return theType;
+
    end Get_Data_Type;
 
    --  ---------------------------------------------------------------------------
@@ -157,21 +166,25 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Is_Integer (Item : in Unbounded_String) return Boolean is
-      UB_String   : Unbounded_String := Item;
-      Dig         : Boolean := True;
+   function Is_Integer (Item : Unbounded_String) return Boolean is
+      UB_String : Unbounded_String := Item;
+      Dig       : Boolean := True;
    begin
       UB_String := Trim (UB_String, Ada.Strings.Left);
       UB_String := Trim (UB_String, Ada.Strings.Right);
+
       declare
          Item_String : constant String := To_String (UB_String);
       begin
-         for index in Item_String'Range loop
+         for index in Item_String'First .. Item_String'Last loop
             Dig := Dig and then
-              Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index));
+              (Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index)) or
+              Character'Pos (Item_String (index)) = 13);
          end loop;
       end;
+
       return Dig;
+
    end Is_Integer;
 
    --  ---------------------------------------------------------------------------
@@ -588,6 +601,54 @@ package body Utilities is
       end loop;
 
    end Print_Feature_Values;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Feature_Types
+     (Message : String; theTypes : Classifier_Utilities.Feature_Type_Array) is
+      Count : Natural := 0;
+   begin
+      Put_Line (Message & " Feature types:");
+      for index in theTypes'First .. theTypes'Last loop
+         Count := Count + 1;
+         Put (ML_Types.Data_Type'Image (theTypes (index)));
+         if index /= theTypes'Last then
+            Put (", ");
+         end if;
+
+         if index /= theTypes'Last and Count > 5 then
+            New_Line;
+            Count := 0;
+         end if;
+
+      end loop;
+      New_Line;
+
+   end Print_Feature_Types;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Label_Types
+     (Message : String; theTypes : Classifier_Utilities.Label_Type_Array) is
+      Count : Natural := 0;
+   begin
+      Put_Line (Message & " Label types:");
+      for index in theTypes'First .. theTypes'Last loop
+         Count := Count + 1;
+         Put (ML_Types.Data_Type'Image (theTypes (index)));
+         if index /= theTypes'Last then
+            Put (", ");
+         end if;
+
+         if index /= theTypes'Last and Count > 5 then
+            New_Line;
+            Count := 0;
+         end if;
+
+      end loop;
+      New_Line;
+
+   end Print_Label_Types;
 
    --  ------------------------------------------------------------------------
 

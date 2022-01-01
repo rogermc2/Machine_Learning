@@ -5,6 +5,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Builder;
 with ML_Types;
 
+with Classifier_Utilities;
+
 package Utilities is
 
    Utilities_Exception : exception;
@@ -17,9 +19,9 @@ package Utilities is
                         Column_Index : Positive)
                          return ML_Types.Value_Data_List;
    function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type;
-   function Is_Boolean (Item : in Unbounded_String) return Boolean;
-   function Is_Float (Item : in Unbounded_String) return Boolean;
-   function Is_Integer (Item : in Unbounded_String) return Boolean;
+   function Is_Boolean (Item : Unbounded_String) return Boolean;
+   function Is_Float (Item : Unbounded_String) return Boolean;
+   function Is_Integer (Item : Unbounded_String) return Boolean;
    function Label_Array (Data : ML_Types.Rows_Vector)
                           return  ML_Types.Value_Data_Array;
    procedure Load_CSV_Data (Data_File : File_Type;
@@ -45,6 +47,10 @@ package Utilities is
    procedure Print_Classification (Classification : ML_Types.Predictions_List);
    procedure Print_Feature_Values (Message : String; Rows : ML_Types.Rows_Vector;
                                    Column  : ML_Types.Class_Range);
+   procedure Print_Feature_Types
+     (Message : String; theTypes : Classifier_Utilities.Feature_Type_Array);
+   procedure Print_Label_Types
+     (Message : String; theTypes : Classifier_Utilities.Label_Type_Array);
    procedure Print_Leaf (Label_Counts : ML_Types.Predictions_List);
    procedure Print_Node (Node : ML_Types.Tree_Node_Type);
    procedure Print_Question (Message  : String;

@@ -253,11 +253,7 @@ package body Encode_Utils is
             when Integer_Type =>
                Unique_Integers.Include (aValue.Integer_Value);
             when UB_String_Type =>
---                 Put_Line ("Encode_Utils.Unique UB_String: '" &
---                             To_String (aValue.UB_String_Value) & "'");
                Unique_UB_Strings.Include (aValue.UB_String_Value);
-                Printing.Print_Unbounded_Set
-                  ("Encode_Utils.Unique Unique_UB_Strings", Unique_UB_Strings);
          end case;
          Next (Values_Curs);
       end loop;
@@ -285,8 +281,6 @@ package body Encode_Utils is
       end loop;
 
       UB_Strings_Curs := Unique_UB_Strings.First;
-      Printing.Print_Unbounded_Set
-              ("Encode_Utils.Unique Unique_UB_Strings", Unique_UB_Strings);
       while UB_String_Sets.Has_Element (UB_Strings_Curs) loop
          UB_String_Value.UB_String_Value :=
            UB_String_Sets.Element (UB_Strings_Curs);
@@ -294,10 +288,9 @@ package body Encode_Utils is
          UB_String_Sets.Next (UB_Strings_Curs);
       end loop;
 
-      Printing.Print_Value_Data_List
-              ("Encode_Utils.Unique Uniq_List strings", Uniq_List);
       Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);
+
       return Uniq_List;
 
    end Unique;
