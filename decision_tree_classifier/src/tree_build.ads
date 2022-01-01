@@ -15,8 +15,8 @@ package Tree_Build is
     type Tree_Builder (Tree_Kind : Type_Of_Tree := Depth_First_Tree) is record
         Splitter              : Node_Splitter.Splitter_Class;
         --  Minimum samples in an internal node
-        Min_Samples_Split     : Natural := 0;
-        Min_Samples_Leaf      : Natural := 0;
+        Min_Samples_Split     : Positive := 1;
+        Min_Samples_Leaf      : Positive := 1;
         Min_Weight_Leaf       : Float := 0.0;
         Max_Depth             : Integer := -1;
         Min_Impurity_Decrease : Float := 0.0;
@@ -44,8 +44,8 @@ package Tree_Build is
       (Builder               : in out Tree_Build.Tree_Builder;
        Max_Leaf_Nodes        : Integer;
        Splitter              : Node_Splitter.Splitter_Class;
-       Min_Samples_Split     : Natural := 0;
-       Min_Samples_Leaf      : Natural := 0;
+       Min_Samples_Split     : Positive := 1;
+       Min_Samples_Leaf      : Positive := 1;
        Min_Weight_Leaf       : Float := 0.0;
        Max_Split_Nodes       : Natural := Integer'Last;
        Max_Depth             : Integer := -1;

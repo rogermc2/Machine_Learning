@@ -81,7 +81,8 @@ package body Base_Decision_Tree is
         Tree.Index_Range (X.Element (1).Length);
 
       --  L229
-      Base_Fit_Checks (aClassifier, X, Y_Encoded, Min_Samples_Split, Sample_Weights);
+      Base_Fit_Checks (aClassifier, X, Y_Encoded, Min_Samples_Split,
+                       Sample_Weights);
       --  Base_Fit_Checks ends at L350
 
       Node_Splitter.C_Init
@@ -142,11 +143,9 @@ package body Base_Decision_Tree is
       --  L420
       case Builder.Tree_Kind is
          when Tree_Build.Depth_First_Tree =>
---              Put_Line (Routine_Name & "build Depth_First_Tree");
             Depth_First_Builder.Build_Tree
               (aClassifier.Attributes.Decision_Tree, Builder, Y_Encoded);
          when Tree_Build.Best_First_Tree =>
---              Put_Line (Routine_Name & "build Best_First_Tree");
             Best_First_Builder.Build_Tree
               (Builder, aClassifier.Attributes.Decision_Tree);
       end case;
