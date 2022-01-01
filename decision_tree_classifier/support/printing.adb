@@ -598,6 +598,31 @@ package body Printing is
 
     --  ------------------------------------------------------------------------
 
+    procedure Print_Unbounded_Set (Name   : String;
+                                   theSet : Encode_Utils.UB_String_Sets.Set) is
+        use Encode_Utils;
+        UB_Strings_Curs : UB_String_Sets.Cursor := theSet.First;
+        Count           : Integer := 1;
+    begin
+        if Name'Length > 0 then
+            Put (Name & ": ");
+        end if;
+
+        while UB_String_Sets.Has_Element (UB_Strings_Curs) loop
+            Put (To_String (UB_String_Sets.Element (UB_Strings_Curs)) & "   ");
+            Count := Count + 1;
+            if Count > 10 then
+                New_Line;
+                Count := 1;
+            end if;
+            UB_String_Sets.Next (UB_Strings_Curs);
+        end loop;
+        New_Line;
+
+    end Print_Unbounded_Set;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Value_List (Name    : String;
                                 theList : Tree.Values_List) is
         Count : Integer := 1;

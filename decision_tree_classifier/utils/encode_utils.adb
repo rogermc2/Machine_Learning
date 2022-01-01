@@ -2,7 +2,6 @@
 --  Adapted from scikit-learn/scikit-learn.git sklearn/utils/_encode.py
 
 with Ada.Containers.Ordered_Sets;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Printing;
@@ -13,7 +12,6 @@ package body Encode_Utils is
    package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
    package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
-   package UB_String_Sets is new Ada.Containers.Ordered_Sets (Unbounded_String);
 
    function Encode_Check_Unknown
      (Values : ML_Types.Value_Data_List; Uniques : ML_Types.Value_Data_List)
@@ -245,8 +243,6 @@ package body Encode_Utils is
       UB_Strings_Curs   : UB_String_Sets.Cursor;
       Uniq_List         : Value_Data_List;
    begin
-      Inverse.Clear;
-
       while Has_Element (Values_Curs) loop
          aValue := Element (Values_Curs);
          case aValue.Value_Kind is
@@ -257,10 +253,15 @@ package body Encode_Utils is
             when Integer_Type =>
                Unique_Integers.Include (aValue.Integer_Value);
             when UB_String_Type =>
+--                 Put_Line ("Encode_Utils.Unique UB_String: '" &
+--                             To_String (aValue.UB_String_Value) & "'");
                Unique_UB_Strings.Include (aValue.UB_String_Value);
+                Printing.Print_Unbounded_Set
+                  ("Encode_Utils.Unique Unique_UB_Strings", Unique_UB_Strings);
          end case;
          Next (Values_Curs);
       end loop;
+      New_Line;
 
       Booleans_Curs := Unique_Booleans.First;
       while Bool_Sets.Has_Element (Booleans_Curs) loop
@@ -284,6 +285,8 @@ package body Encode_Utils is
       end loop;
 
       UB_Strings_Curs := Unique_UB_Strings.First;
+      Printing.Print_Unbounded_Set
+              ("Encode_Utils.Unique Unique_UB_Strings", Unique_UB_Strings);
       while UB_String_Sets.Has_Element (UB_Strings_Curs) loop
          UB_String_Value.UB_String_Value :=
            UB_String_Sets.Element (UB_Strings_Curs);
@@ -291,6 +294,8 @@ package body Encode_Utils is
          UB_String_Sets.Next (UB_Strings_Curs);
       end loop;
 
+      Printing.Print_Value_Data_List
+              ("Encode_Utils.Unique Uniq_List strings", Uniq_List);
       Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);
       return Uniq_List;

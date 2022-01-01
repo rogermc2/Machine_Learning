@@ -2,14 +2,14 @@
 --  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Depth_First_Builder;
 with Best_First_Builder;
 with Classifier_Utilities;
 with Criterion;
 with Encode_Utils;
---  with Printing;
+with Printing;
 with Tree_Build;
 with Utilities;
 
@@ -351,7 +351,7 @@ package body Base_Decision_Tree is
       Classes.Clear;
       Y_Encoded.Set_Length (Y_Orig.Length);
       aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
-
+        Put_Line (Routine_Name & "Y_Orig.Length " & Integer'Image (Integer (Y_Orig.Length)));
       --  Y is 2D list num samples x num outputs
       --  Y_Encoded is 2D list num samples x num outputs
       --  L215  Initialize Y_Encoded
@@ -374,6 +374,10 @@ package body Base_Decision_Tree is
             Yk_Row.Append (Y_Row.Element (op));
          end loop;
          Class_List := (Encode_Utils.Unique (Yk_Row, Inverse));
+         Put_Line (Routine_Name & "Class_List.Length" &
+                     Integer'Image (Integer (Class_List.Length)));
+         Printing.Print_Value_Data_List
+              (Routine_Name & "Class_List", Class_List);
          aClassifier.Attributes.Decision_Tree.Num_Classes.Append
            (Positive (Class_List.Length));
 
