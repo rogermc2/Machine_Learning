@@ -224,6 +224,7 @@ package body Utilities is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
+      Routine_Name : constant String := "Utilities.Load_CSV_Data 1 ";
       Data_Line    : Unbounded_String :=
                        To_Unbounded_String (Get_Line (Data_File));
       Num_Features : ML_Types.Class_Range;
@@ -233,7 +234,7 @@ package body Utilities is
       Num_Features :=
         Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
       Builder.Set_Header_Data (To_String (Data_Line));
-
+      Put_Line (Routine_Name );
       declare
          Values : Feature_Data_Array (1 .. Num_Features);
       begin
@@ -271,6 +272,7 @@ package body Utilities is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
+--        Routine_Name : constant String := "Utilities.Load_CSV_Data 2 ";
       Data_Line    : Unbounded_String :=
                        To_Unbounded_String (Get_Line (Data_File));
       Num_Features : ML_Types.Class_Range;
