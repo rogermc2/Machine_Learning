@@ -11,6 +11,7 @@ with Classifier_Utilities;
 with Criterion;
 with Decision_Tree_Classification;
 with Graphviz_Exporter;
+with Openml;
 with Printing;
 with Tree;
 with Weights;

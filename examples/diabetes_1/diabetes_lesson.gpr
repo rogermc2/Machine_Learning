@@ -10,5 +10,7 @@ project Diabetes_Lesson is
       for Default_Switches ("ada") use ("-gnatwkmru", "-gnatyclux");
    end Compiler;
 
+   for Exec_Dir use ".";
+
 end Diabetes_Lesson;
 
