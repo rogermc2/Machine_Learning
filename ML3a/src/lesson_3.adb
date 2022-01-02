@@ -25,8 +25,8 @@ procedure Lesson_3 is
    Data          : constant Multi_Output_Data_Record :=
                      Classifier_Utilities.Load_Data ("src/diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
-   X_Dat         : constant Value_Data_Lists_2D := Data.Feature_Values;
-   Num_Samples   : constant Natural := Natural (X_Dat.Length);
+   X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
+   Num_Samples   : constant Natural := Natural (X_Data.Length);
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
    aClassifier   : Base_Decision_Tree.Classifier
@@ -34,6 +34,7 @@ procedure Lesson_3 is
    Labels        : Value_Data_Lists_2D;
    No_Weights    : Weights.Weight_List :=
                      Classifier_Types.Float_Package.Empty_Vector;
+   Correct       : Natural := 0;
    Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
    Put_Line ("Lesson 3");
@@ -45,7 +46,7 @@ begin
       Next (Names_Cursor);
    end loop;
    Print_Unbounded_List ("Features", Features);
-   Print_Value_Data_List ("Features row 16", X_Dat.Element (16));
+   Print_Value_Data_List ("Features row 16", X_Data.Element (16));
    New_Line;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
@@ -53,9 +54,20 @@ begin
 
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
-   Classification_Fit (aClassifier, X_Dat, Labels, No_Weights);
+   Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
    Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
+   New_Line;
+
+   for index in X_Data.First_Index .. X_Data.Last_Index loop
+        if Base_Decision_Tree.Predict
+          (aClassifier, X_Data).Element (index).Element (1) =
+              Labels.Element (index).Element (1) then
+           Correct := Correct + 1;
+        end if;
+   end loop;
+   Put_Line ("Prediction: " &
+               Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
    New_Line;
 
    Graphviz_Exporter.C_Init
