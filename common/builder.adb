@@ -177,7 +177,7 @@ package body Builder is
     --  Class_Counts counts the number of each type of example in a dataset.
     function Class_Counts (Rows : Rows_Vector) return Label_Maps is
         use Rows_Package;
-        Routine_Name         : constant String := "Builder.Class_Counts ";
+--          Routine_Name         : constant String := "Builder.Class_Counts ";
         Boolean_Label_Counts : Boolean_Label_Map;
         Float_Label_Counts   : Float_Label_Map;
         Integer_Label_Counts : Integer_Label_Map;
@@ -193,7 +193,6 @@ package body Builder is
         Integer_Count        : Natural := 0;
         UB_Count             : Natural := 0;
     begin
-        Put_Line (Routine_Name);
         for index in Rows.First_Index .. Rows.Last_Index loop
             aRow := Rows.Element (index);
             Label := To_Label (aRow.Label);
@@ -224,7 +223,8 @@ package body Builder is
                 end if;
                 Integer_Count_Cursor :=
                   Integer_Label_Counts.Find (Label.Integer_Value);
-                Integer_Count := Integer_Label_Counts.Element (Label.Integer_Value);
+                Integer_Count :=
+                  Integer_Label_Counts.Element (Label.Integer_Value);
                 Integer_Count := Integer_Count + 1;
                 Integer_Label_Counts.Replace_Element
                   (Integer_Count_Cursor, Integer_Count);
@@ -232,6 +232,7 @@ package body Builder is
                 if not UB_Label_Counts.Contains (Label.UB_String_Value) then
                     UB_Label_Counts.Insert (Label.UB_String_Value, 0);
                 end if;
+
                 UB_Count_Cursor := UB_Label_Counts.Find (Label.UB_String_Value);
                 UB_Count := UB_Label_Counts.Element (Label.UB_String_Value);
                 UB_Count := UB_Count + 1;
@@ -395,7 +396,6 @@ package body Builder is
         use Float_Label_Map_Package;
         use Integer_Label_Map_Package;
         use UB_Label_Map_Package;
-        Routine_Name   : constant String := "Builder.Gini ";
         Count_Maps     : Label_Maps := Class_Counts (Rows);
         Boolean_Counts : Boolean_Label_Map := Count_Maps.Boolean_Map;
         Float_Counts   : Float_Label_Map := Count_Maps.Float_Map;
@@ -431,7 +431,6 @@ package body Builder is
         end Calc_UB_Impurity;
 
     begin
-        Put_Line (Routine_Name);
         Count_Maps := Class_Counts (Rows);
         Boolean_Counts := Count_Maps.Boolean_Map;
         Float_Counts := Count_Maps.Float_Map;

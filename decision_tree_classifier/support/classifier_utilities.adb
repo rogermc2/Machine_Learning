@@ -506,7 +506,7 @@ package body Classifier_Utilities is
             S_Last    : constant Integer := Row_S'Last;
             Last_Char : constant Character := Row_S (S_Last);
          begin
-            if Character'Pos (Last_Char) = 13 then
+            if Character'Pos (Last_Char) < 32 then
                aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
             end if;
             Feature_Types (Positive (f_index)) :=
@@ -520,7 +520,7 @@ package body Classifier_Utilities is
             S_Last    : constant Integer := Row_S'Last;
             Last_Char : constant Character := Row_S (S_Last);
          begin
-            if Character'Pos (Last_Char) = 13 then
+            if Character'Pos (Last_Char) < 32 then
                aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
             end if;
             Label_Types (Positive (l_index)) :=
@@ -561,7 +561,7 @@ package body Classifier_Utilities is
                S_Last    : constant Integer := Row_S'Last;
                Last_Char : constant Character := Row_S (S_Last);
             begin
-               if Character'Pos (Last_Char) = 13 then
+               if Character'Pos (Last_Char) < 32 then
                   aRow (Num_Features + o_index) :=
                     To_Unbounded_String (Row_S (1 .. S_Last - 1));
                end if;
