@@ -1,6 +1,7 @@
 
 package Openml is
 
-    procedure Fetch_Openml (Name : String; Return_X_Y : Boolean := FAlse);
+   procedure Fetch_Openml (Name       : String;  Version : Integer;
+                           Return_X_Y : Boolean := False);
 
 end Openml;
