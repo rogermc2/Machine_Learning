@@ -50,7 +50,7 @@ begin
    New_Line;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
-           Max_Leaf_Nodes => 3);
+           Max_Leaf_Nodes => 6);
 
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
