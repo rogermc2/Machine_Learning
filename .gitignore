@@ -2,6 +2,7 @@
 *.ads1
 *.pdf
 *.o
+*.obj
 *.a
 *.ali
 *.json

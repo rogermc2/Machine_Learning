@@ -16,17 +16,21 @@
 --  to http://www.gnu.org/licenses for a complete copy of the license.      --
 ------------------------------------------------------------------------------
 
---  with "../shared";
+with "../shared";
 
 with "crypto_lib";
 with "ssl_lib";
 
 library project SSL is
 
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+
+
 --     case Shared.Socket is
 --        when "std" =>
 --           for Languages use ("Ada", "Project file");
---           for Source_Dirs use (".", "../config/ssl");
+           for Source_Dirs use (".", "../config/ssl");
 --        when "gnutls" =>
 --           for Languages use ("Ada", "Project file", "C");
 --           for Source_Dirs use (".", "../config/ssl", "../config/ssl/gnutls");
@@ -57,21 +61,21 @@ library project SSL is
    ------------
    -- Naming --
    ------------
-   SSL_Socket = "openssl";
-   package Naming is
+   SSL_Socket := "openssl";
+--     package Naming is
 
       --  SSL Lib
 
 --      case Shared.Socket is
-      case SSL_Socket is
-         when "std" =>
-            for Specification ("SSL.Thin") use "ssl-thin__dummy.ads";
-         when "ssl" | "openssl" =>
-            for Specification ("SSL.Thin") use "ssl-thin__openssl.ads";
-         when "gnutls" =>
-            for Specification ("SSL.Thin") use "ssl-thin__gnutls.ads";
-      end case;
+--        case SSL_Socket is
+--           when "std" =>
+--              for Specification ("SSL.Thin") use "ssl-thin__dummy.ads";
+--           when "ssl" | "openssl" =>
+--              for Specification ("SSL.Thin") use "ssl-thin__openssl.ads";
+--           when "gnutls" =>
+--              for Specification ("SSL.Thin") use "ssl-thin__gnutls.ads";
+--        end case;
 
-   end Naming;
+--     end Naming;
 
 end SSL;

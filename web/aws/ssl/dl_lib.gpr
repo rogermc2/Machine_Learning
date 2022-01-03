@@ -21,22 +21,28 @@
 --  Note that we are always linking to the shared version of this library as
 --  it is hightly recommended.
 
-with "../.build/projects/aws_lib_shared";
+-- with "../.build/projects/aws_lib_shared";
+with "../projects/aws_lib_shared";
 with "../shared";
 
 project DL_Lib is
 
    for Source_Files use ();
 
-   case Shared.S_Target is
-      when "Windows_NT" | "vxworks" | "freebsd" =>
-         null;
+   --    case Shared.S_Target is
+   --       when "Windows_NT" | "vxworks" | "freebsd" =>
+   --          null;
 
-      when others =>
-         for Library_Dir use AWS_Lib_Shared.LIB_Path;
-         for Library_Name use "dl";
-         for Library_Kind use "relocatable";
-         for Externally_Built use "true";
-   end case;
+   --       when others =>
+   for Library_Dir use "lib";
+   for Library_Name use "dl";
+   for Library_Kind use "relocatable";
+   for Externally_Built use "True";
+   --    end case;
+
+   for Library_Ali_Dir use "obj";
+   for Object_Dir use "obj";
+   for Exec_Dir use ".";
 
 end DL_Lib;
+

@@ -950,7 +950,8 @@ package body AWS.Server is
 
          S.Phase := Wait_For_Client;
 
-         Reference := S.Wait_For_Data'Access;
+         Reference := S.Wait_For_Data'Unchecked_Access;
+--           Reference := S.Wait_For_Data'Access;
       end Get_Wait_For_Data;
 
       -------------------------------------

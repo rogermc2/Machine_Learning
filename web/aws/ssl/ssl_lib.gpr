@@ -1,3 +1,5 @@
+with "gnatcoll.gpr";
+
 ------------------------------------------------------------------------------
 --                              Ada Web Server                              --
 --                                                                          --
@@ -20,11 +22,28 @@
 
 --  with "../.build/projects/aws_config";
 --  with "../.build/projects/aws_lib_shared";
+with "../projects/aws_config";
+with "../projects/aws_lib_shared";
 
-project SSL_Lib is
+library project SSL_Lib is
 
-   for Source_Dirs use ("../../aws", "../config/**", "../core", ".", "../http2", "../include", "../templates_parser", "../templates_parser/src");
+   for Source_Dirs use ();
    for Object_Dir use "obj";
+   for Library_Name use "S_SSL_Lib";
+   for Library_Dir use "lib";
+   for Library_Ali_Dir use "lib";
+
+   package Builder is
+      for Switches ("ada") use ("-s");
+   end Builder;
+
+   package Compiler is
+      for Switches ("ada") use ("-gnat12");
+   end Compiler;
+
+   for Exec_Dir use ".";
+
+   --  for Library_Src_Dir use ".";
 
    --   case AWS_Config.Socket is
    --      when "std" =>
@@ -52,7 +71,7 @@ project SSL_Lib is
    --   end case;
 
    --   for Library_Kind use AWS_Lib_Shared.SSL_Library_Type;
-   --   for Externally_Built use "true";
+   for Externally_Built use "true";
 
 end SSL_Lib;
 
