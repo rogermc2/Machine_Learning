@@ -1,8 +1,8 @@
-with "../aws/ssl/ssl_lib.gpr";
+with "aws.gpr";
 
 project Download_Manager is
 
-   for Source_Dirs use ("../aws/core", "../aws/templates_parser/src", "../aws/extended", "../aws/include", "../aws/http2", "../aws/config/**", "src");
+   for Source_Dirs use ("src");
    for Main use ("download_manager.adb");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
@@ -17,7 +17,6 @@ project Download_Manager is
    end Compiler;
 
    package Linker is
-      for Switches ("ada") use ("-L../aws/ssl/lib", "-laws_ssl", "-lS_SSL_Lib", "-L../aws/templates_parser/lib", "-ltemplates_parser");
    end Linker;
 
 end Download_Manager;

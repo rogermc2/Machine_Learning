@@ -1,2 +1,0 @@
-
-raised TEMPLATES_PARSER.TEMPLATE_ERROR : @@END_IF@@ found, @@END_TABLE@@ expected, in testme3.tmplt at line 5

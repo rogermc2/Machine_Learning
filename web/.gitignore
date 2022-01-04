@@ -17,3 +17,6 @@ b__*
 .#*
 *.lyx~
 *.lyx#
+agent
+download_manager
+dm_file.data

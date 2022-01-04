@@ -1,9 +1,0 @@
-<p>Here is the ages of some peoples:
-
-<table>
-@@TABLE@@
-   <tr>
-   <td>@_NAME_@
-   <td>@_AGE_@
-@@END_TABLE@@
-</table>

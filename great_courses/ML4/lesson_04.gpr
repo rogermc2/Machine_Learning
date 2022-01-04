@@ -1,3 +1,4 @@
+with "aws.gpr";
 with "../../decision_tree_classifier/classifier";
 
 project Lesson_04 is

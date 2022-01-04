@@ -1,8 +1,0 @@
-
-@_REPLACE(([a-z]+)_([a-z]+)/\2:\1):VT_@
-@_REPLACE(([a-z]+)_([a-z]+)/\2\):\1):VT_@
-@_UPPER:REPLACE(([a-z]+)_([a-z]+)/\2:\1):VT_@
-@_UPPER:REPLACE(([a-z]+)_([a-z]+)/\2\(:\1):VT_@
-@_REPLACE(([a-z]+)_([a-z]+)/\2\)_\@\1):VT_@
-@_REPLACE(([a-z]+)_([a-z]+)/\2\)@\_\1):VT_@
-@_REPLACE(([a-z]+)_([a-z]+)/\2\)@\\_\1):VT_@

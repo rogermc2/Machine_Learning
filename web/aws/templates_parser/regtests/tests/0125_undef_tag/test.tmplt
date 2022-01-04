@@ -1,5 +1,0 @@
-@@IF@@ @_TAG_@ > 0
-   NOK
-@@ELSE@@
-   OK
-@@END_IF@@
