@@ -1,18 +1,20 @@
-with "../aws/ssl/ssl.gpr";
-
---  with "../aws/aws";
+with "../aws/ssl/ssl_lib.gpr";
 
 project Download_Manager is
 
-   for Source_Dirs use ("../aws/core", "../aws/templates_parser/src", "../aws/extended", "../aws/include", "../aws/ssl", "../aws/http2", "../aws/config/**", "src");
-   for Main use ();
+   for Source_Dirs use ("../aws/core", "../aws/templates_parser/src", "../aws/extended", "../aws/include", "../aws/http2", "../aws/config/**", "src");
+   for Main use ("download_manager.adb");
    for Object_Dir use "obj";
    for Exec_Dir use ".";
 
    package Builder is
-      for Default_Switches ("ada") use ("-gnat12");
+      for Default_Switches ("ada") use ("-gnat12", "-s");
       for Switches ("ada") use ("-gnat12");
    end Builder;
+
+   package Compiler is
+      for Switches ("ada") use ("-gnat12");
+   end Compiler;
 
 end Download_Manager;
 
