@@ -16,5 +16,9 @@ project Download_Manager is
       for Switches ("ada") use ("-gnat12");
    end Compiler;
 
+   package Linker is
+      for Switches ("ada") use ("-L../aws/ssl/lib", "-laws_ssl", "-lS_SSL_Lib", "-L../aws/templates_parser/lib", "-ltemplates_parser");
+   end Linker;
+
 end Download_Manager;
 
