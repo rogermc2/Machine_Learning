@@ -21,66 +21,62 @@ with "tp_xmlada";
 
 library project Templates_Parser is
 
-   type Tasking_Type is
-      ("No_Tasking", "Standard_Tasking");
-   type Xmlada_Type is
-      ("Installed", "Disabled");
-   type Library_Kind is
-      ("relocatable", "static");
    for Source_Dirs use ("src");
-   for Object_Dir use Tp_Shared.Build_Dir & "/obj";
+   for Object_Dir use "obj";
+   for Library_Dir use "lib";
+   for Library_Ali_Dir use "lib";
    for Library_Name use "templates_parser";
-   for Library_Kind use Tp_Shared.Library_Type;
-   for Library_Version use "libtemplates_parser-" & Tp_Shared.Version & ".so";
---     LIBRARY_TYPE : Library_Kind := external ("LIBRARY_TYPE");
-   TP_XMLADA : Xmlada_Type := external ("TP_XMLADA");
-   TP_TASKING : Tasking_Type := external ("TP_TASKING");
+   --     for Library_Kind use Tp_Shared.Library_Type;
+   --     for Library_Version use "libtemplates_parser-" & Tp_Shared.Version & ".so";
+   --     LIBRARY_TYPE : Library_Kind := external ("LIBRARY_TYPE");
+   --     TP_XMLADA : Xmlada_Type := external ("TP_XMLADA");
+   --     TP_TASKING : Tasking_Type := external ("TP_TASKING");
 
---     case LIBRARY_TYPE is
---
---        when "relocatable" =>
---
---           case TP_XMLADA is
---
---              when "Installed" =>
---                 for Library_Dir use "obj" & "/lib";
---                 for Library_Options use Tp_Shared.Ldflags;
---                 for Source_Dirs use project'Source_Dirs & ("xsrc");
---                 for Library_Ali_Dir use "lib";
---
---              when "Disabled" =>
---                 for Library_Dir use "obj" & "/lib";
---                 for Library_Options use Tp_Shared.Ldflags;
---                 for Library_Ali_Dir use "lib";
---           end case;
---
---        when "static" =>
+   --     case LIBRARY_TYPE is
+   --
+   --        when "relocatable" =>
+   --
+   --           case TP_XMLADA is
+   --
+   --              when "Installed" =>
+   --                 for Library_Dir use "obj" & "/lib";
+   --                 for Library_Options use Tp_Shared.Ldflags;
+   --                 for Source_Dirs use project'Source_Dirs & ("xsrc");
+   --                 for Library_Ali_Dir use "lib";
+   --
+   --              when "Disabled" =>
+   --                 for Library_Dir use "obj" & "/lib";
+   --                 for Library_Options use Tp_Shared.Ldflags;
+   --                 for Library_Ali_Dir use "lib";
+   --           end case;
+   --
+   --        when "static" =>
 
-         case TP_XMLADA is
-
-            when "Installed" =>
-               for Library_Dir use "obj" & "/lib";
-               for Source_Dirs use project'Source_Dirs & ("xsrc");
-               for Library_Ali_Dir use "lib";
-
-            when "Disabled" =>
-               for Library_Dir use "obj" & "/lib";
-               for Library_Ali_Dir use "lib";
-         end case;
---     end case;
+   --           case TP_XMLADA is
+   --
+   --              when "Installed" =>
+   --                 for Library_Dir use "obj" & "/lib";
+   --                 for Source_Dirs use project'Source_Dirs & ("xsrc");
+   --                 for Library_Ali_Dir use "lib";
+   --
+   --              when "Disabled" =>
+   --                 for Library_Dir use "obj" & "/lib";
+   --                 for Library_Ali_Dir use "lib";
+   --           end case;
+   --     end case;
 
    package Naming is
-      for Spec ("templates_parser.configuration") use "templates_parser-configuration__standalone.ads";
-      for Body ("templates_parser.input") use "templates_parser-input__standalone.adb";
+      for Spec ("templates_parser.configuration") use "templates_parser-configuration.ads";
+      for Body ("templates_parser.input") use "templates_parser-input.adb";
 
-      case TP_TASKING is
-
-         when "No_Tasking" =>
-            for Body ("templates_parser_tasking") use "templates_parser_tasking__no_tasking.adb";
-
-         when "Standard_Tasking" =>
-            for Body ("templates_parser_tasking") use "templates_parser_tasking__standard_tasking.adb";
-      end case;
+      --        case TP_TASKING is
+      --
+      --           when "No_Tasking" =>
+      --              for Body ("templates_parser_tasking") use "templates_parser_tasking__no_tasking.adb";
+      --
+      --           when "Standard_Tasking" =>
+      --              for Body ("templates_parser_tasking") use "templates_parser_tasking__standard_tasking.adb";
+      --        end case;
    end Naming;
 
    package Compiler is
@@ -89,11 +85,11 @@ library project Templates_Parser is
       --  Disable validity check on those units to work-around N728-028
    end Compiler;
 
-   package Binder renames Tp_Shared.Binder;
-
-   package Builder renames Tp_Shared.Builder;
-
-   package Ide renames Tp_Shared.Ide;
+   --     package Binder renames Tp_Shared.Binder;
+   --
+   --     package Builder renames Tp_Shared.Builder;
+   --
+   --     package Ide renames Tp_Shared.Ide;
 
    package Install is
       for Artifacts ("share/doc/templates_parser") use ("docs/build/html");

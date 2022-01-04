@@ -1,6 +1,8 @@
 *.pdf
 *.o
 *.a
+*.obj
+*.obj/
 *.ali
 *.json
 *.stderr

@@ -20,8 +20,8 @@ abstract project TP_Shared is
 
    for Source_Dirs use ();
 
-   type Build_Type is ("Debug", "Release");
-   Build : Build_Type := external ("PRJ_BUILD", "Debug");
+--   type Build_Type is ("Debug", "Release");
+--   Build : Build_Type := external ("PRJ_BUILD", "Debug");
 
    type Tasking_Type is ("No_Tasking", "Standard_Tasking");
    Tasking : Tasking_Type := external ("TP_TASKING", "Standard_Tasking");
@@ -29,14 +29,14 @@ abstract project TP_Shared is
    type XMLAda_Type is ("Installed", "Disabled");
    XMLAda : XMLAda_Type := external ("TP_XMLADA", "Disabled");
 
-   type Library_Kind is ("relocatable", "static");
-   Library_Type : Library_Kind := external ("LIBRARY_TYPE", "static");
+--   type Library_Kind is ("relocatable", "static");
+--   Library_Type : Library_Kind := external ("LIBRARY_TYPE", "static");
 
-   Processors := external ("PROCESSORS", "0");
+--   Processors := external ("PROCESSORS", "0");
 
-   Version := external ("VERSION", "dev");
+--   Version := external ("VERSION", "dev");
 
-   Build_Dir := ".build";
+   Build_Dir := "lib";
 
    Adaflags := external_as_list ("ADAFLAGS", " ");
    Ldflags := external_as_list ("LDFLAGS", " ");
@@ -56,12 +56,12 @@ abstract project TP_Shared is
      ("-O2", "-gnatn");
 
    package Compiler is
-      case Build is
-         when "Release" =>
+--        case Build is
+--           when "Release" =>
             for Default_Switches ("Ada") use Common_Options & Release_Options;
-         when "Debug" =>
-            for Default_Switches ("Ada") use Common_Options & Debug_Options;
-      end case;
+--           when "Debug" =>
+--              for Default_Switches ("Ada") use Common_Options & Debug_Options;
+--        end case;
 
       for Default_Switches ("Ada")
         use Compiler'Default_Switches ("Ada") & Adaflags;
@@ -73,7 +73,7 @@ abstract project TP_Shared is
    ------------
 
    package Binder is
-      for Default_Switches ("Ada") use ("-E", "-Vversion=" & Version);
+      for Default_Switches ("Ada") use ("-E");
    end Binder;
 
    -------------
@@ -81,7 +81,7 @@ abstract project TP_Shared is
    -------------
 
    package Builder is
-      for Default_Switches ("Ada") use ("-m", "-j" & Processors);
+      for Default_Switches ("Ada") use ("-m");
    end Builder;
 
    ------------
@@ -96,8 +96,8 @@ abstract project TP_Shared is
    -- Ide --
    ---------
 
-   package Ide is
-      for VCS_Kind use "auto";
-   end Ide;
+--     package Ide is
+--        for VCS_Kind use "auto";
+--     end Ide;
 
 end TP_Shared;
