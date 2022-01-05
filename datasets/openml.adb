@@ -79,8 +79,8 @@ package body Openml is
                                          return Unbounded_String;
    function Get_Data_Features (Data_ID : Integer) return Features_Map;
    function Get_Data_Info_By_Name (Name : String; Version : Integer)
-                                    return Json_Data;
-   function Get_Json_Content_From_Openml_Api (URL : String) return Json_Data;
+                                    return JSON_Array;
+   function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Array;
    function Valid_Data_Column_Names (Features_List : Features_Map)
                                       return Names_List;
    --  ------------------------------------------------------------------------
@@ -90,20 +90,16 @@ package body Openml is
                            Return_X_Y   : Boolean := False) is
       use Ada.Characters.Handling;
       Name_LC       : constant String := To_Lower (Dataset_Name);
-      Data_Info     : Json_Data;
+      Data_Info     : JSON_Array;
       Description   : Unbounded_String;
       Features_List : Features_Map;
-      Data          : AWS.Response.Data;
-      URL_Object    : AWS.URL.Object;
       Return_Sparse : Boolean := False;
    begin
       Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
-      Data_Id := Data_Info.ID;
+--        Data_Id := Data_Info.ID;
       Description := Get_Data_Description_By_ID (Data_Id);
       Features_List := Get_Data_Features (Data_ID);
 
-      Data := AWS.Client.Get
-        (URL => "http://perso.wanadoo.fr/pascal.obry/contrib.html");
    end ;
 
    --  ------------------------------------------------------------------------
@@ -131,7 +127,7 @@ package body Openml is
       URL      : constant String :=
                    Openml_Prefix & Data_Features & Integer'Image (Data_ID);
       Features : Features_Map;
-      Data     : Json_Data;
+      Data     : JSON_Array;
    begin
       Data := Get_Json_Content_From_Openml_Api (URL);
       --        Features := GNATCOLL.JSON.
@@ -143,10 +139,11 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Info_By_Name (Name : String; Version : Integer)
-                                    return Json_Data is
-      Data : Json_Data;
+                                    return JSON_Array is
+      Data_Info : JSON_Array;
    begin
-      return Data;
+
+      return Data_Info;
 
    end Get_Data_Info_By_Name;
 
@@ -159,19 +156,18 @@ package body Openml is
    --  Square brackets hold arrays
    --  The data type of a JSON value must be:
    --  a string, a number, an object, an array, a boolean or null.
-   function Get_Json_Content_From_Openml_Api (URL : String) return Json_Data is
+   function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Array is
       use AWS.Client;
       use AWS.Response;
       Data              : Json_Data;
       JSON_Message      : constant String := Message_Body (Get (URL));
       JSON_Main_Node    : JSON_Value := Create;
       JSON_Result_Array : JSON_Array := Empty_Array;
-      Pair_Settings     : Pair_Settings_Vector;
 
-      procedure Parse (Name : UTF8_String; Value : JSON_Value) is
-      begin
-            null;
-      end Parse;
+--        procedure Parse (Name : UTF8_String; Value : JSON_Value) is
+--        begin
+--              null;
+--        end Parse;
 
    begin
       JSON_Main_Node := Read (JSON_Message);
@@ -182,9 +178,9 @@ package body Openml is
 --              Pair_Settings.Append (Get (JSON_Result_Array, index));
 --           end loop;
 --        end if;
-      Map_JSON_Object (JSON_Main_Node, Parse'Access);
+--        Map_JSON_Object (JSON_Main_Node, Parse'Access);
 
-      return Data;
+      return JSON_Result_Array;
 
    end Get_Json_Content_From_Openml_Api;
 
