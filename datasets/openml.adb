@@ -10,22 +10,20 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNATCOLL.JSON;
 
 with AWS.Client;
---  with AWS.Default;
---  with AWS.Headers;
---  with AWS.Resources;
 with AWS.Response;
---  with AWS.Messages;
---  with AWS.MIME;
---  with AWS.Net.SSL.Certificate;
 --  with AWS.Status;
 with AWS.URL;
---  with AWS.Utils;
 
 package body Openml is
 
+   type JSON_Item is record
+      Name  : Unbounded_String;
+      Value : Unbounded_String;
+   end record;
+
    use GNATCOLL.JSON;
    package Pair_Settings_Vector_Package is new
-     Ada.Containers.Vectors (Natural, JSON_Value);
+     Ada.Containers.Vectors (Natural, JSON_Item);
    subtype Pair_Settings_Vector is Pair_Settings_Vector_Package.Vector;
 
    package ML_Names_Package is new
@@ -179,11 +177,11 @@ package body Openml is
       JSON_Main_Node := Read (JSON_Message);
       JSON_Result_Array := Get (JSON_Main_Node);
 
-      if Length (JSON_Result_Array) > 0 then
-         for index in 1 .. Length (JSON_Result_Array) loop
-            Pair_Settings.Append (Get (JSON_Result_Array, index));
-         end loop;
-      end if;
+--        if Length (JSON_Result_Array) > 0 then
+--           for index in 1 .. Length (JSON_Result_Array) loop
+--              Pair_Settings.Append (Get (JSON_Result_Array, index));
+--           end loop;
+--        end if;
       Map_JSON_Object (JSON_Main_Node, Parse'Access);
 
       return Data;
