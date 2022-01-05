@@ -6,6 +6,7 @@ with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.JSON;
 
@@ -75,14 +76,13 @@ package body Openml is
    Data_Qualities : constant String := "api/v1/json/data/qualities/";
    Data_File      : constant String := "data/v1/download/";
 
-   function Get_Data_Description_By_ID (Data_ID : Integer)
-                                         return Unbounded_String;
+   function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
    function Get_Data_Features (Data_ID : Integer) return Features_Map;
    function Get_Data_Info_By_Name (Name : String; Version : Integer)
-                                    return JSON_Array;
+                                   return JSON_Array;
    function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Array;
    function Valid_Data_Column_Names (Features_List : Features_Map)
-                                      return Names_List;
+                                     return Names_List;
    --  ------------------------------------------------------------------------
 
    procedure Fetch_Openml (Dataset_Name : String; Version : Integer;
@@ -91,12 +91,12 @@ package body Openml is
       use Ada.Characters.Handling;
       Name_LC       : constant String := To_Lower (Dataset_Name);
       Data_Info     : JSON_Array;
-      Description   : Unbounded_String;
+      Description   : JSON_Value;
       Features_List : Features_Map;
       Return_Sparse : Boolean := False;
    begin
       Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
---        Data_Id := Data_Info.ID;
+      --        Data_Id := Data_Info.ID;
       Description := Get_Data_Description_By_ID (Data_Id);
       Features_List := Get_Data_Features (Data_ID);
 
@@ -104,11 +104,12 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Data_Description_By_ID (Data_ID : Integer)
-                                         return Unbounded_String is
-      URL        : constant String := Data_Features & Integer'Image (Data_ID);
-      URL_Object : AWS.URL.Object;
-      Desc       :  Unbounded_String;
+   function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value is
+      URL          : constant String := Data_Features & Integer'Image (Data_ID);
+      URL_Object   : AWS.URL.Object;
+      Json_Content : JSON_Array;
+      Data_Desc    : JSON_Value;
+      Value_Type   : JSON_Value_Type;
    begin
       --  URL.Parse parses an URL and returns an Object representing this URL.
       --  It is then possible to extract each part of the URL with other
@@ -117,7 +118,16 @@ package body Openml is
       Assert (AWS.URL.Is_Valid (URL_Object),
               "Get_Data_Description_By_ID object returned by URL " &
                 URL & "is invalid");
-      return Desc;
+      Json_Content := Get_Json_Content_From_Openml_Api (URL);
+      Data_Desc := Get (Json_Content, 1);
+      Value_Type := Kind (Data_Desc);
+
+      if not Has_Field (Data_Desc, "data_set_description") then
+         Put_Line ("Openml.Get_Data_Description_By_ID error, " &
+                     "Json_Content is not a data_set_description");
+      end if;
+
+      return Data_Desc;
 
    end Get_Data_Description_By_ID;
 
@@ -139,7 +149,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Info_By_Name (Name : String; Version : Integer)
-                                    return JSON_Array is
+                                   return JSON_Array is
       Data_Info : JSON_Array;
    begin
 
@@ -164,21 +174,21 @@ package body Openml is
       JSON_Main_Node    : JSON_Value := Create;
       JSON_Result_Array : JSON_Array := Empty_Array;
 
---        procedure Parse (Name : UTF8_String; Value : JSON_Value) is
---        begin
---              null;
---        end Parse;
+      --        procedure Parse (Name : UTF8_String; Value : JSON_Value) is
+      --        begin
+      --              null;
+      --        end Parse;
 
    begin
       JSON_Main_Node := Read (JSON_Message);
       JSON_Result_Array := Get (JSON_Main_Node);
 
---        if Length (JSON_Result_Array) > 0 then
---           for index in 1 .. Length (JSON_Result_Array) loop
---              Pair_Settings.Append (Get (JSON_Result_Array, index));
---           end loop;
---        end if;
---        Map_JSON_Object (JSON_Main_Node, Parse'Access);
+      --        if Length (JSON_Result_Array) > 0 then
+      --           for index in 1 .. Length (JSON_Result_Array) loop
+      --              Pair_Settings.Append (Get (JSON_Result_Array, index));
+      --           end loop;
+      --        end if;
+      --        Map_JSON_Object (JSON_Main_Node, Parse'Access);
 
       return JSON_Result_Array;
 
@@ -187,7 +197,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Valid_Data_Column_Names (Features_List : Features_Map)
-                                      return Names_List is
+                                     return Names_List is
       Names : Names_List;
    begin
       return Names;
