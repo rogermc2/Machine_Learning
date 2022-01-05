@@ -1,6 +1,19 @@
+--  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Characters.Handling;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
+with AWS.Client;
+--  with AWS.Default;
+--  with AWS.Headers;
+--  with AWS.Resources;
+with AWS.Response;
+--  with AWS.Messages;
+--  with AWS.MIME;
+--  with AWS.Net.SSL.Certificate;
+--  with AWS.Status;
+with AWS.URL;
+--  with AWS.Utils;
 
 package body Openml is
 
@@ -34,12 +47,24 @@ package body Openml is
       Md5_Checksum             : Unbounded_String;
    end record;
 
-   procedure Fetch_Openml (Name       : String; Version : Integer;
+   function Get_Data_Info_By_Name (Name : String; Version : Integer)
+                                   return Json_Data;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Fetch_Openml (Dataset_Name : String; Version : Integer;
+                           Data_Id : in out Integer;
                            Return_X_Y : Boolean := False) is
       use Ada.Characters.Handling;
-      Name_LC : constant String := To_Lower (Name);
+      Name_LC : constant String := To_Lower (Dataset_Name);
+      Data_Info  : Json_Data;
+      Data       : AWS.Response.Data;
+      URL_Object : AWS.URL.Object;
    begin
-      null;
+      Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
+      Data_Id := Data_Info.ID;
+      Data := AWS.Client.Get
+          (URL => "http://perso.wanadoo.fr/pascal.obry/contrib.html");
    end ;
 
    --  ------------------------------------------------------------------------
