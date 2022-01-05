@@ -109,7 +109,7 @@ package body Openml is
       URL_Object   : AWS.URL.Object;
       Json_Content : JSON_Array;
       Data_Desc    : JSON_Value;
-      Value_Type   : JSON_Value_Type;
+--        Value_Type   : JSON_Value_Type;
    begin
       --  URL.Parse parses an URL and returns an Object representing this URL.
       --  It is then possible to extract each part of the URL with other
@@ -122,7 +122,9 @@ package body Openml is
       Data_Desc := Get (Json_Content, 1);
       Value_Type := Kind (Data_Desc);
 
-      if not Has_Field (Data_Desc, "data_set_description") then
+      if Has_Field (Data_Desc, "data_set_description") then
+         Data_Desc := Get (Data_Desc, "data_set_description");
+      else
          Put_Line ("Openml.Get_Data_Description_By_ID error, " &
                      "Json_Content is not a data_set_description");
       end if;
