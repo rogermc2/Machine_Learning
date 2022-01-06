@@ -8,8 +8,6 @@ with Ada.Characters.Handling;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with GNATCOLL.JSON; use GNATCOLL.JSON;
-
 with AWS.Client;
 with AWS.Response;
 --  with AWS.Status;
@@ -77,9 +75,6 @@ package body Openml is
 
     function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
     function Get_Data_Features (Data_ID : Integer) return JSON_Value;
-    function Get_Data_Info_By_Name (Name   : String; Version : Integer;
-                                    Active : Boolean := False)
-                                   return JSON_Value;
     function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Array;
     function Valid_Data_Column_Names
       (Features_List, Target_Columns : JSON_Value) return JSON_Array;
