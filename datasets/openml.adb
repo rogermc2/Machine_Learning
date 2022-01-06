@@ -66,7 +66,7 @@ package body Openml is
         Md5_Checksum             : Unbounded_String;
     end record;
 
-    Openml_Prefix  : constant String := "https://openml.org/";
+    Openml_Prefix  : constant String := "http://openml.org/";
     Search_Name    : constant String := "api/v1/json/data/list/data_name/";
     --     Data_Info      : constant String := "api/v1/json/data/";
     Data_Features  : constant String := "api/v1/json/data/features/";
@@ -190,7 +190,8 @@ package body Openml is
     function Get_Data_Features (Data_ID : Integer) return JSON_Value is
         URL      : constant String :=
                      Openml_Prefix & Data_Features & Integer'Image (Data_ID);
-        Data     : constant JSON_Array := Get_Json_Content_From_Openml_Api (URL);
+        Data     : constant JSON_Array :=
+                     Get_Json_Content_From_Openml_Api (URL);
         Features : JSON_Value;
     begin
         null;
@@ -201,11 +202,13 @@ package body Openml is
 
     --  ------------------------------------------------------------------------
 
-    function Get_Data_Info_By_Name (Name   : String; Version : Integer;
+    function Get_Data_Info_By_Name (Dataset_Name   : String; Version : Integer;
                                     Active : Boolean := False)
                                    return JSON_Value is
+        Routine_Name : constant String := "Openml.Get_Data_Info_By_Name ";
         URL          : Unbounded_String :=
-                         To_Unbounded_String (Search_Name & Name & "/limit/2");
+                         To_Unbounded_String (Openml_Prefix & Search_Name
+                                              & Dataset_Name & "/limit/2");
         URL_Object   : AWS.URL.Object;
         Json_Data    : JSON_Array;
         Content      : JSON_Value;
@@ -215,7 +218,7 @@ package body Openml is
         if Active then
             URL := URL & "/status/active/";
         else
-            URL := URL & "/data_version/" & Name &
+            URL := URL & "/data_version/" & Dataset_Name &
               Integer'Image (Version) & "/limit/2";
         end if;
 
@@ -223,6 +226,7 @@ package body Openml is
             URL_S : constant String := To_String (URL);
         begin
             URL_Object := AWS.URL.Parse (URL_S);
+            Put_Line (Routine_Name & "URL: " & URL_S);
             Assert (AWS.URL.Is_Valid (URL_Object),
                     "Get_Data_Description_By_ID object returned by URL " &
                       URL_S & "is invalid");
