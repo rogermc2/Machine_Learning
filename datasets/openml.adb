@@ -205,7 +205,7 @@ package body Openml is
                                     Active : Boolean := False)
                                    return JSON_Value is
         URL          : Unbounded_String :=
-                         To_Unbounded_String (Search_Name & Name);
+                         To_Unbounded_String (Search_Name & Name & "/limit/2");
         URL_Object   : AWS.URL.Object;
         Json_Data    : JSON_Array;
         Content      : JSON_Value;

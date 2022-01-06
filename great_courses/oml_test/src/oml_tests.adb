@@ -1,6 +1,6 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
-with Ada.Characters.Handling;
+--  with Ada.Characters.Handling;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
@@ -18,13 +18,11 @@ package body OML_Tests is
     --     Data_File      : constant String := "data/v1/download/";
 
    procedure Test_Data_Info is
-      use Ada.Characters.Handling;
-      Dataset_Name    : constant String := "";
-      Dataset_Name_LC : constant String := To_Lower (Dataset_Name);
+      Dataset_Name    : constant String := "mnist_784";
       Version         : constant Integer := 1;
       Data_Info       : JSON_Value;
    begin
-      Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version);
+      Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
    end ;
 
 end OML_Tests;
