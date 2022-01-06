@@ -8,7 +8,7 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with GNATCOLL.JSON;
+with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 with AWS.Client;
 with AWS.Response;
@@ -17,15 +17,14 @@ with AWS.URL;
 
 package body Openml is
 
-   --     type JSON_Item is record
-   --        Name  : Unbounded_String;
-   --        Value : Unbounded_String;
-   --     end record;
+--     type JSON_Item is record
+--        Name  : Unbounded_String;
+--        Value : Unbounded_String;
+--     end record;
 
-   use GNATCOLL.JSON;
-   --     package Pair_Settings_Vector_Package is new
-   --       Ada.Containers.Vectors (Natural, JSON_Item);
-   --     subtype Pair_Settings_Vector is Pair_Settings_Vector_Package.Vector;
+--     package Pair_Settings_Vector_Package is new
+--       Ada.Containers.Doubly_Linked_Lists (JSON_Item);
+--     subtype Pair_List is Pair_Settings_Vector_Package.List;
 
    package ML_Names_Package is new
      Ada.Containers.Doubly_Linked_Lists (Unbounded_String);
@@ -98,22 +97,31 @@ package body Openml is
       JSON_Data_Id    : JSON_Value;
       Description     : JSON_Value;
       Data_Format     : JSON_Value;
-      Data_Type       : JSON_Value;
       Features_List   : JSON_Value;
+      Target_Columns  : JSON_Array;
       Return_Sparse   : Boolean := False;
 
       procedure Process_Feature (Name : Utf8_String; Value : JSON_Value) is
       begin
          if Name /= "is_ignore" and Name /= "is_row_identifier" then
             if Name = "data_type" then
-               Data_Type := Get (Features_List, Name);
-               Assert (Kind (Data_Type) /= JSON_String_Type,
+               Assert (Kind (Value) /= JSON_String_Type,
                        Routine_Name & ".Process_Feature" &
                          "STRING attributes are not supported for " &
                          "array representation. Try as_frame=True");
             end if;
          end if;
       end Process_Feature;
+
+      procedure Process_Target (Name : Utf8_String; Value : JSON_Value) is
+      Target_Value : JSON_Value := Create_Object;
+      begin
+         if Name = "is_target" then
+            Target_Value.Set_Field (Field_Name => "name",
+                                    Field  => "true");
+            Append (Target_Columns, Create ("true"));
+         end if;
+      end Process_Target;
 
    begin
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version);
@@ -142,7 +150,9 @@ package body Openml is
       end if;
 
       if Target_Column = "default-target" then
-         null;
+         Feature_Name := Get (Features_List, "name");
+         Append (Target_Columns, Feature_Name);
+         Map_JSON_Object (Features_List, Process_Target'Access);
       end if;
 
    end Fetch_Openml;
