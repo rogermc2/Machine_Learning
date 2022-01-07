@@ -67,7 +67,7 @@ package body Openml is
         Md5_Checksum             : Unbounded_String;
     end record;
 
-    Yann_Prefix    : constant String := "http://yann.lecun.com/exdb/";
+--      Yann_Prefix    : constant String := "http://yann.lecun.com/exdb/";
     Openml_Prefix  : constant String := "http://openml.org/";
     Search_Name    : constant String := "api/v1/json/data/list/data_name/";
     --     Data_Info      : constant String := "api/v1/json/data/";
@@ -289,16 +289,21 @@ package body Openml is
                               return AWS.Response.Data is
         use AWS.Response;
         use AWS.Client;
-        Routine_Name      : constant String := "Openml.Open_Openml_URL ";
-        URL_Object : constant AWS.URL.Object :=
-                       AWS.URL.Parse (Openml_Prefix & Openml_Path);
-        ML_Stream  : Data;
+        Routine_Name : constant String := "Openml.Open_Openml_URL ";
+        URL_Object   : constant AWS.URL.Object :=
+                            AWS.URL.Parse (Openml_Prefix & Openml_Path);
+        Headers      : Header_List;
+        ML_Stream    : Data;
     begin
         Assert (AWS.URL.Is_Valid (URL_Object),
                 "Get_Data_Description_By_ID object returned by URL " &
                   Openml_Prefix & Openml_Path & "is invalid");
-        Put_Line (Routine_Name & "done");
-        return ML_Stream;
+      Headers.Add ("Accept-encoding", "gzip");
+      ML_Stream := Get (Openml_Prefix & Openml_Path, Headers => Headers);
+
+      Put_Line (Routine_Name & "done");
+      return ML_Stream;
+
     end Open_Openml_URL;
 
     --  ------------------------------------------------------------------------
