@@ -223,9 +223,9 @@ package body Openml is
       --          if Dataset_Name = "mnist" then
       --              URL := To_Unbounded_String (Yann_Prefix & Dataset_Name);
       if Active then
-         URL := URL & "/limit/2/status/active/";
+         URL := URL & "limit/2/status/active/";
       else
-         URL := URL & "/data_version/" & Dataset_Name & Version & "/limit/2";
+         URL := URL & Dataset_Name & "/limit/2/" & "data_version/" & Version;
       end if;
 
       ML_Stream := Open_Openml_URL (To_String (URL));

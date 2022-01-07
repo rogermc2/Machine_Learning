@@ -18,11 +18,11 @@ package body OML_Tests is
     --     Data_File      : constant String := "data/v1/download/";
 
    procedure Test_Data_Info is
-      Dataset_Name : constant String := "mnist";
---        Version      : constant String := "1";
+      Dataset_Name : constant String := "mnist_784";
+      Version      : constant String := "1";
       Data_Info    : JSON_Value;
    begin
-      Data_Info := Get_Data_Info_By_Name (Dataset_Name);
+      Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
    end ;
 
 end OML_Tests;
