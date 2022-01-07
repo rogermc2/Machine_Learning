@@ -261,7 +261,7 @@ package body Openml is
         Data              : Json_Data;
         --        AWS_Reply         : constant String :=
         --                              AWS.Response.Message_Body (Get (URL));
-        AWS_Reply         : constant Aws.Response.Data := Get (URL);
+        AWS_Reply         : constant Aws.Response.Data := Open_Openml_URL (URL);
         AWS_Response      : constant Unbounded_String :=
                               AWS.Response.Message_Body (AWS_Reply);
         JSON_Main_Node    : JSON_Value := Create;
@@ -285,24 +285,25 @@ package body Openml is
 
     --  ------------------------------------------------------------------------
 
-    function Open_Openml_URL (Openml_Path : String)
-                              return AWS.Response.Data is
-        use AWS.Response;
+    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data is
+        use AWS;
         use AWS.Client;
         Routine_Name : constant String := "Openml.Open_Openml_URL ";
         URL_Object   : constant AWS.URL.Object :=
                             AWS.URL.Parse (Openml_Prefix & Openml_Path);
         Headers      : Header_List;
-        ML_Stream    : Data;
+        AWS_Reply    : Response.Data;
+--          AWS_Response : Unbounded_String;
     begin
         Assert (AWS.URL.Is_Valid (URL_Object),
                 "Get_Data_Description_By_ID object returned by URL " &
                   Openml_Prefix & Openml_Path & "is invalid");
       Headers.Add ("Accept-encoding", "gzip");
-      ML_Stream := Get (Openml_Prefix & Openml_Path, Headers => Headers);
+      AWS_Reply := Get (Openml_Prefix & Openml_Path, Headers => Headers);
 
+--        AWS_Response := AWS.Response.Message_Body (AWS_Reply);
       Put_Line (Routine_Name & "done");
-      return ML_Stream;
+      return AWS_Reply;
 
     end Open_Openml_URL;
 
