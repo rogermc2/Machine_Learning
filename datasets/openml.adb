@@ -217,23 +217,26 @@ package body Openml is
       Data         : JSON_Value;
       Data_Set     : JSON_Value;
    begin
-      Put_Line (Routine_Name & "Dataset_Name: " & Dataset_Name);
-      Put_Line (Routine_Name & "URL: " & URL);
-      Put_Line (Routine_Name & "URL: " & URL & "/data_version/" & Dataset_Name
-                & Trim (Integer'Image (Version), Ada.Strings.Both) &
-                  "/limit/2");
       if Active then
+         --           Json_Data := Get_Json_Content_From_Openml_Api
+         --             (URL & Dataset_Name & "/limit/2/status/active/");
          URL_Object := AWS.URL.Parse (URL & Dataset_Name & "/limit/2/status/active/");
       else
+         --           Json_Data := Get_Json_Content_From_Openml_Api
+         --             (URL & "/data_version/" & Dataset_Name &
+         --                Trim (Integer'Image (Version),
+         --                Ada.Strings.Both) & "/limit/2");
          URL_Object := AWS.URL.Parse (URL & "/data_version/" & Dataset_Name &
-                                        Integer'Image (Version) & "/limit/2");
+                                        Trim (Integer'Image (Version),
+                                        Ada.Strings.Both) & "/limit/2");
       end if;
 
-      URL_Object := AWS.URL.Parse (URL);
       Assert (AWS.URL.Is_Valid (URL_Object),
               "Get_Data_Description_By_ID object returned by URL " &
                 URL & "is invalid");
-      Json_Data := Get_Json_Content_From_Openml_Api (URL);
+      Json_Data := Get_Json_Content_From_Openml_Api (URL & "data_version/" & Dataset_Name &
+                                        Trim (Integer'Image (Version),
+                                        Ada.Strings.Both) & "/limit/2");
       Put_Line (Routine_Name & "Json_Data");
 
       Content := Get (Json_Data, 1);
@@ -263,6 +266,11 @@ package body Openml is
       JSON_Main_Node    : JSON_Value := Create;
       JSON_Result_Array : JSON_Array := Empty_Array;
    begin
+      Put_Line (Routine_Name & "URL:");
+      Put_Line (URL);
+      New_Line;
+      Put_Line (Routine_Name & "JSON_Message:");
+      Put_Line (JSON_Message);
       Put_Line (Routine_Name & "Get_Json_Content_From_Openml_Api 1");
       JSON_Main_Node := Read (JSON_Message);
       Put_Line (Routine_Name & "Get_Json_Content_From_Openml_Api 2");
