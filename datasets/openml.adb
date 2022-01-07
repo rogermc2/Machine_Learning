@@ -8,6 +8,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with AWS.Client;
+with AWS.Resources;
 with AWS.Response;
 --  with AWS.Status;
 with AWS.URL;
@@ -293,14 +294,15 @@ package body Openml is
                             AWS.URL.Parse (Openml_Prefix & Openml_Path);
         Headers      : Header_List;
         AWS_Reply    : Response.Data;
---          AWS_Response : Unbounded_String;
+      --          AWS_Response : Unbounded_String;
+      File : AWS.Resources.File_Type;
     begin
         Assert (AWS.URL.Is_Valid (URL_Object),
                 "Get_Data_Description_By_ID object returned by URL " &
                   Openml_Prefix & Openml_Path & "is invalid");
       Headers.Add ("Accept-encoding", "gzip");
       AWS_Reply := Get (Openml_Prefix & Openml_Path, Headers => Headers);
-
+      Response.Create_Resource (AWS_Reply, File, GZip => True);
 --        AWS_Response := AWS.Response.Message_Body (AWS_Reply);
       Put_Line (Routine_Name & "done");
       return AWS_Reply;
