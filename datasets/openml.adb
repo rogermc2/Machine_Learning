@@ -8,7 +8,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with AWS.Client;
-with AWS.Resources;
+--  with AWS.Resources;
 with AWS.Response;
 --  with AWS.Status;
 with AWS.URL;
@@ -68,7 +68,6 @@ package body Openml is
       Md5_Checksum             : Unbounded_String;
    end record;
 
-   --      Yann_Prefix    : constant String := "http://yann.lecun.com/exdb/";
    Openml_Prefix  : constant String := "http://openml.org/";
    Search_Name    : constant String := "api/v1/json/data/list/data_name/";
    --     Data_Info      : constant String := "api/v1/json/data/";
@@ -212,28 +211,22 @@ package body Openml is
                                    Active       : Boolean := False)
                                     return JSON_Value is
       Routine_Name : constant String := "Openml.Get_Data_Info_By_Name ";
-      URL          : Unbounded_String :=
-                       To_Unbounded_String (Openml_Prefix & Search_Name);
+      Openml_Path  : Unbounded_String :=
+                       To_Unbounded_String (Search_Name);
       ML_Stream    : AWS.Response.Data;
       Json_Data    : JSON_Array;
       Content      : JSON_Value;
       Data         : JSON_Value;
       Data_Set     : JSON_Value;
    begin
-      --          if Dataset_Name = "mnist" then
-      --              URL := To_Unbounded_String (Yann_Prefix & Dataset_Name);
       if Active then
-         URL := URL & "limit/2/status/active/";
+         Openml_Path := Openml_Path & "limit/2/status/active/";
       else
-         URL := URL & Dataset_Name & "/limit/2/" & "data_version/" & Version;
+         Openml_Path := Openml_Path & Dataset_Name & "/limit/2/" &
+           "data_version/" & Version;
       end if;
 
-      ML_Stream := Open_Openml_URL (To_String (URL));
-
-      --          Assert (AWS.URL.Is_Valid (URL_Object),
-      --                  "Get_Data_Description_By_ID object returned by URL " &
-      --                    URL & "is invalid");
-      Json_Data := Get_Json_Content_From_Openml_Api (To_String (URL));
+      Json_Data := Get_Json_Content_From_Openml_Api (To_String (Openml_Path));
       Put_Line (Routine_Name & "Json_Data");
 
       Content := Get (Json_Data, 1);
@@ -256,7 +249,6 @@ package body Openml is
    --  a string, a number, an object, an array, a boolean or null.
    function Get_Json_Content_From_Openml_Api (URL : String)
                                                return JSON_Array is
-      use AWS.Client;
       Routine_Name      : constant String :=
                             "Openml.Get_Json_Content_From_Openml_Api ";
       Data              : Json_Data;
@@ -288,25 +280,41 @@ package body Openml is
 
    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data is
       use AWS;
-      use AWS.Client;
-      Routine_Name : constant String := "Openml.Open_Openml_URL ";
-      URL_Object   : constant AWS.URL.Object :=
-                       AWS.URL.Parse (Openml_Prefix & Openml_Path);
-      Headers      : Header_List;
-      AWS_Reply    : Response.Data;
-      --          AWS_Response : Unbounded_String;
-      File         : AWS.Resources.File_Type;
-
+      Routine_Name   : constant String := "Openml.Open_Openml_URL ";
+      URL_Object     : constant AWS.URL.Object :=
+                         AWS.URL.Parse (Openml_Prefix & Openml_Path);
+--        Headers        : Client.Header_List;
+      AWS_Reply      : Response.Data;
+      JSON_Main_Node : JSON_Value := Create;
+      Main_Node      : JSON_Array;
+      AWS_Response   : Unbounded_String;
+      aValue         : JSON_Value := Create;
    begin
       Assert (AWS.URL.Is_Valid (URL_Object),
               "Get_Data_Description_By_ID object returned by URL " &
                 Openml_Prefix & Openml_Path & "is invalid");
-      Headers.Add ("Accept-encoding", "gzip");
-      AWS_Reply := Get (Openml_Prefix & Openml_Path, Headers => Headers);
-      Put_Line (Routine_Name & "data type" & Response.Content_Type (AWS_Reply));
+--        Headers.Add ("application", "json");
+      Put_Line (Routine_Name & "aws url:");
+      Put_Line (AWS.URL.URL (URL_Object));
+      New_Line;
 
-      Response.Create_Resource (AWS_Reply, File, GZip => True);
-      --        AWS_Response := AWS.Response.Message_Body (AWS_Reply);
+--        AWS_Reply := Get (AWS.URL.URL (URL_Object));
+      AWS_Reply := AWS.Client.Get
+        ("http://www.openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1",
+          Follow_Redirection => False);
+      Put_Line (Routine_Name & "data type: " &
+                  Response.Content_Type (AWS_Reply));
+      New_Line;
+--        JSON_Main_Node := Read
+--          (Strm => Unbounded_String'(Aws.Response.Message_Body(Aws_Reply)),
+--           Filename => "");
+--        Main_Node := Get (JSON_Main_Node);
+--        aValue := Get (Main_Node, 1);
+--        Put_Line (Routine_Name & "data type: " &
+--                    JSON_Value_Type'Image (Kind (aValue)));
+
+      Put_Line  (Routine_Name & "Response ");
+      Put_Line  (To_String (AWS.Response.Message_Body (AWS_Reply)));
       Put_Line (Routine_Name & "done");
       return AWS_Reply;
 
