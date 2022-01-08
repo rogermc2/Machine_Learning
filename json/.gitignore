@@ -1,4 +1,5 @@
 *.lyx~
 *.lyx#
 *.dot
-obj/*
+*/obj/*
+test_json
