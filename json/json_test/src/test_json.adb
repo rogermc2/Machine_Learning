@@ -17,7 +17,9 @@ procedure Test_JSON is
    use  Ada.Strings;
    URL1           : constant String := "http://api.exmo.com/v1/pair_settings";
    URL2           : constant String
-     := "http://www.openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1";
+     := "http://new.openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1";
+   URL3           : constant String :=
+      "http://www.openml.org/api/v1/json/data/554";
    Aws_Reply      : Aws.Response.Data;
    Reply_Type     : Unbounded_String;
    JSON_Main_Node : JSON_Value := Create;
@@ -43,7 +45,7 @@ procedure Test_JSON is
    --  -------------------------------------------------------------------------
 
 begin
-   Aws_Reply := Aws.Client.Get (URL2);
+   Aws_Reply := Aws.Client.Get (URL3);
    Reply_Type := To_Unbounded_String (Aws.Response.Content_Type (Aws_Reply));
    Put_Line ("Data type: " & To_String (Reply_Type));
    New_Line;
