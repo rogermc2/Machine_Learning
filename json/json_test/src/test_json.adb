@@ -8,7 +8,10 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 with Aws;
 with Aws.Client;
+with Aws.Config;
 with Aws.Response;
+
+with Html_Processor;
 
 procedure Test_JSON is
    use  Ada.Strings;
