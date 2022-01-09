@@ -8,6 +8,7 @@ package Openml is
                            Target_Column : String := "default-target";
                            Return_X_Y    : Boolean := False;
                            As_Frame      : String := "false");
+   function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
    function Get_Data_Info_By_Name (Dataset_Name : String;
                                    Version : String := "";
                                    Active, From_File : Boolean := False)
