@@ -1,3 +1,6 @@
+--  From https://franckbehaghel.eu/programming/ada/ada-web-server-example/
+--       http_req.php
+
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Characters.Latin_1;
 

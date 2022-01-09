@@ -54,7 +54,7 @@ begin
     New_Line;
     if Slice (Trim (Reply_Type, Left), 1, 9) = "text/html" then
         Put_Line ("HTML message received:");
---          Put_Line (To_String (Aws_Response));
+        Put_Line (To_String (Aws_Response));
         Html_Processor.Process_Request (Aws_Response);
     else
         JSON_Main_Node := Read
