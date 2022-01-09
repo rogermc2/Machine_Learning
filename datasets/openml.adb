@@ -125,8 +125,8 @@ package body Openml is
 
    begin
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version);
-      JSON_Data_Id := Get (Data_Info, "did");
-      Data_Id := Get (JSON_Data_Id);
+      JSON_Data_Id := Get (Data_Info, "data_id");
+      Data_Id := Integer'Value (Get (JSON_Data_Id));
 
       Description := Get_Data_Description_By_ID (Data_Id);
       Data_Format := Get (Description, "format");
