@@ -32,7 +32,7 @@ procedure Test_JSON is
 
     procedure Report_Outer_Field_Name (Name : Utf8_String; Value : JSON_Value) is
     begin
-        Put_Line ("field: " & Name);
+        Put_Line ("Field: " & Name & ", value kind: " &  JSON_Value_Type'Image (Value.Kind));
         Map_JSON_Object (Value, Report_Inner_Field_Name'Access);
     end Report_Outer_Field_Name;
 
@@ -47,7 +47,7 @@ procedure Test_JSON is
     --  -------------------------------------------------------------------------
 
 begin
-    Aws_Reply := Aws.Client.Get (URL3);
+    Aws_Reply := Aws.Client.Get (URL1);
     Reply_Type := To_Unbounded_String (Aws.Response.Content_Type (Aws_Reply));
     Aws_Response := Aws.Response.Message_Body (Aws_Reply);
     Put_Line ("Data type: " & To_String (Reply_Type));

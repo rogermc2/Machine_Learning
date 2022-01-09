@@ -1,4 +1,6 @@
 
+
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -8,8 +10,6 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 with AWS.Client;
 with AWS.Response;
-with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded;
 
 procedure Test_JSON_File is
    File           : File_Type;
@@ -23,10 +23,20 @@ procedure Test_JSON_File is
    --  -------------------------------------------------------------------------
 
    procedure Report_Outer_Field_Name (Name : Utf8_String; Value : JSON_Value) is
-      J_Val : String := Get (Value);
+      use Ada.Strings;
+      J_Kind : constant String :=
+                 Fixed.Trim (JSON_Value_Type'Image (Value.Kind), Both);
    begin
-      Put_Line ("Outer_Field: " & Name & ": " & J_Val);
-      Map_JSON_Object (Value, Report_Inner_Field_Name'Access);
+      if J_Kind = "JSON_STRING_TYPE" then
+         Put_Line ("Outer_Field: " & Name & ": " & Get (Value) &
+                     "  Value kind: " & J_Kind);
+
+      elsif J_Kind = "JSON_OBJECT_TYPE" then
+         Map_JSON_Object (Value, Report_Inner_Field_Name'Access);
+      else
+         Put_Line ("Outer_Field Value kind: " & J_Kind);
+      end if;
+
    end Report_Outer_Field_Name;
 
    --  -------------------------------------------------------------------------
@@ -52,6 +62,8 @@ begin
    end;
 
    JSON_Main_Node := Read (JSON_Data, Filename => "");
+   Put_Line ("JSON_Main_Node kind: " &
+               JSON_Value_Type'Image (JSON_Main_Node.Kind));
    Put_Line ("Map JSON_Main_Node");
    Map_JSON_Object (JSON_Main_Node, Report_Outer_Field_Name'Access);
 
