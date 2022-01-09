@@ -4,6 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Containers.Doubly_Linked_Lists;
 --  with Ada.Containers.Ordered_Maps;
 --  with Ada.Containers.Vectors;
+with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -75,7 +76,6 @@ package body Openml is
    --     Data_Qualities : constant String := "api/v1/json/data/qualities/";
    --     Data_File      : constant String := "data/v1/download/";
 
-   function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
    function Get_Data_Features (Data_ID : Integer) return JSON_Value;
    function Get_Json_Content_From_File return JSON_Value;
    function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Value;
@@ -162,8 +162,9 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value is
-      URL          : constant String := Openml_Prefix & Data_Features &
-                       Integer'Image (Data_ID);
+      use Ada.Strings;
+      URL          : constant String := Data_Features &
+                       Fixed.Trim (Integer'Image (Data_ID), Both);
       URL_Object   : AWS.URL.Object;
 --        Json_Content : JSON_Array;
       Data_Desc    : JSON_Value;
