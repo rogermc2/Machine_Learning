@@ -10,32 +10,49 @@ with AWS.Client;
 with AWS.Response;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded;
-with Ada.Command_Line;
-
-with Html_Processor;
-with Configure_AWS;
-with Html_Processor;
-
 
 procedure Test_JSON_File is
-    use  Ada.Command_Line;
-    use Configure_AWS;
---      URL1          : String := "http://www.openml.org/api/v1/json/data/554";
-    File          : File_Type;
-    Res           : AWS.Response.Data;
-    Page_Raw_Data : Unbounded_String;
-    CL_Config     : Config_Maps.Map;
-begin
-    Put_Line ("JSON File Name: ");
-    declare
-        File_Name : String := Get_Line;
-    begin
-        Open (File, In_File, File_Name);
---          Res := AWS.Client.Get (URL);
-    end;
-    New_Line;
+   File           : File_Type;
+   Response       : AWS.Response.Data;
+   JSON_Data      : Unbounded_String;
+   Reply_Type     : Unbounded_String;
+   JSON_Main_Node : JSON_Value := Create;
 
-    Page_Raw_Data := AWS.Response.Message_Body (Res);
-    Html_Processor.Process_Request (CL_Config, Page_Raw_Data);
+   procedure Report_Inner_Field_Name (Name : Utf8_String; Value : JSON_Value);
+
+   --  -------------------------------------------------------------------------
+
+   procedure Report_Outer_Field_Name (Name : Utf8_String; Value : JSON_Value) is
+      J_Val : String := Get (Value);
+   begin
+      Put_Line ("Outer_Field: " & Name & ": " & J_Val);
+      Map_JSON_Object (Value, Report_Inner_Field_Name'Access);
+   end Report_Outer_Field_Name;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Report_Inner_Field_Name (Name : Utf8_String; Value : JSON_Value)
+   is
+   begin
+      Put_Line ("Report_Inner_Field_Name field: " & Name);
+      Put_Line (" field: " & Name & ", kind: " & Kind (Value)'Image);
+   end Report_Inner_Field_Name;
+
+   --  -------------------------------------------------------------------------
+
+begin
+   Put_Line ("JSON Dataset Name: ");
+   New_Line;
+   declare
+      File_Name : String := Get_Line & ".json";
+   begin
+      Open (File, In_File, File_Name);
+      JSON_Data := To_Unbounded_String (Get_Line (File));
+      Close (File);
+   end;
+
+   JSON_Main_Node := Read (JSON_Data, Filename => "");
+   Put_Line ("Map JSON_Main_Node");
+   Map_JSON_Object (JSON_Main_Node, Report_Outer_Field_Name'Access);
 
 end Test_JSON_File;
