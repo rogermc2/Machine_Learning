@@ -3,3 +3,4 @@
 *.dot
 */obj/*
 test_json
+test_json_file
