@@ -233,13 +233,8 @@ package body Openml is
          Json_Data := Get_Json_Content_From_Openml_Api
            (To_String (Openml_Path));
       else
---           Put_Line ("JSON Dataset Name: ");
          Json_Data := Get_Json_Content_From_File;
       end if;
-
---        Content := Get (Json_Data, 1);
---        Put_Line (Routine_Name & "Content: ");
---        Data := Get (Content, "data");
 
       return Json_Data;
 
@@ -248,12 +243,11 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_File return JSON_Value is
-      Routine_Name      : constant String :=
-                            "Openml.Get_Json_Content_From_File ";
-      File              : File_Type;
-      JSON_Data         : Unbounded_String;
-      JSON_Main_Node    : JSON_Value := Create;
-      JSON_Result_Array : JSON_Array := Empty_Array;
+      Routine_Name   : constant String :=
+                        "Openml.Get_Json_Content_From_File ";
+      File           : File_Type;
+      JSON_Data      : Unbounded_String;
+      JSON_Main_Node : JSON_Value := Create;
    begin
       declare
          File_Name : String := Get_Line & ".json";
@@ -267,9 +261,6 @@ package body Openml is
       JSON_Main_Node := Read (JSON_Data, Filename => "");
       Put_Line (Routine_Name & "JSON_Main_Node kind: " &
                   JSON_Value_Type'Image (JSON_Main_Node.Kind));
---        JSON_Result_Array := Get (JSON_Main_Node);
-
---        return JSON_Result_Array;
       return JSON_Main_Node;
 
    end Get_Json_Content_From_File;
@@ -281,13 +272,10 @@ package body Openml is
       Routine_Name      : constant String :=
                             "Openml.Get_Json_Content_From_Openml_Api ";
       Data              : Json_Data;
-      --        AWS_Reply         : constant String :=
-      --                              AWS.Response.Message_Body (Get (URL));
       AWS_Reply         : constant Aws.Response.Data := Open_Openml_URL (URL);
       AWS_Response      : constant Unbounded_String :=
                             AWS.Response.Message_Body (AWS_Reply);
       JSON_Main_Node    : JSON_Value := Create;
-      JSON_Result_Array : JSON_Array := Empty_Array;
    begin
       Put_Line (Routine_Name & "URL:");
       Put_Line (URL);
@@ -297,9 +285,7 @@ package body Openml is
       JSON_Main_Node := GNATCOLL.JSON.Read
         (Strm => Unbounded_String'(AWS_Response),
          Filename => "");
---        JSON_Result_Array := Get (JSON_Main_Node);
 
---        return JSON_Result_Array;
       return JSON_Main_Node;
 
    end Get_Json_Content_From_Openml_Api;
