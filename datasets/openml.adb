@@ -161,12 +161,12 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value is
+   function Get_Data_Description_By_ID
+      (Data_ID : Integer; From_File : Boolean := False) return JSON_Value is
       use Ada.Strings;
       URL          : constant String := Data_Features &
                        Fixed.Trim (Integer'Image (Data_ID), Both);
       URL_Object   : AWS.URL.Object;
---        Json_Content : JSON_Array;
       Data_Desc    : JSON_Value;
       --        Value_Type   : JSON_Value_Type;
    begin
@@ -177,12 +177,14 @@ package body Openml is
       Assert (AWS.URL.Is_Valid (URL_Object),
               "Get_Data_Description_By_ID object returned by URL " &
                 URL & "is invalid");
---        Json_Content := Get_Json_Content_From_Openml_Api (URL);
-      Data_Desc := Get_Json_Content_From_Openml_Api (URL);
---        Data_Desc := Get (Json_Content, 1);
+      if From_File then
+            Data_Desc := Get_Json_Content_From_File;
+      else
+            Data_Desc := Get_Json_Content_From_Openml_Api (URL);
+      end if;
 
-      if Has_Field (Data_Desc, "data_set_description") then
-         Data_Desc := Get (Data_Desc, "data_set_description");
+      if Has_Field (Data_Desc, "description") then
+         Data_Desc := Get (Data_Desc, "description");
       else
          Put_Line ("Openml.Get_Data_Description_By_ID error, " &
                      "Json_Content is not a data_set_description");
@@ -250,6 +252,7 @@ package body Openml is
       JSON_Data      : Unbounded_String;
       JSON_Main_Node : JSON_Value := Create;
    begin
+        Put_Line ("Dataset name:");
       declare
          File_Name : String := Get_Line & ".json";
       begin

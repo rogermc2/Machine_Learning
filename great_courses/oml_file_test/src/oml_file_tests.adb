@@ -31,7 +31,7 @@ package body OML_File_Tests is
       Data_Id := Integer'Value (Get (JSON_Data_Id));
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
       New_Line;
-      Description := Get_Data_Description_By_ID (Data_Id);
+      Description := Get_Data_Description_By_ID (Data_Id, From_File => True);
 
    end ;
 
