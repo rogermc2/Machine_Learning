@@ -10,7 +10,7 @@ package Openml is
                            As_Frame      : String := "false");
    function Get_Data_Info_By_Name (Dataset_Name : String;
                                    Version : String := "";
-                                   Active : Boolean := False)
+                                   Active, From_File : Boolean := False)
                                     return JSON_Value;
 
 end Openml;
