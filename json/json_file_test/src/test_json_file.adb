@@ -21,15 +21,17 @@ procedure Test_JSON_File is
     use  Ada.Command_Line;
     use Configure_AWS;
 --      URL1          : String := "http://www.openml.org/api/v1/json/data/554";
+    File          : File_Type;
     Res           : AWS.Response.Data;
     Page_Raw_Data : Unbounded_String;
     CL_Config     : Config_Maps.Map;
 begin
-    Put_Line ("URL: ");
+    Put_Line ("JSON File Name: ");
     declare
-        URL : String := Get_Line;
+        File_Name : String := Get_Line;
     begin
-        Res := AWS.Client.Get (URL);
+        Open (File, In_File, File_Name);
+--          Res := AWS.Client.Get (URL);
     end;
     New_Line;
 
