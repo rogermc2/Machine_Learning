@@ -7,20 +7,13 @@ with Openml; use Openml;
 
 package body OML_File_Tests is
 
-   --      Openml_Prefix  : constant String := "https://openml.org/";
-   --      Search_Name    : constant String := "api/v1/json/data/list/data_name/";
-   --     Data_Info      : constant String := "api/v1/json/data/";
-   --      Data_Features  : constant String := "api/v1/json/data/features/";
-   --     Data_Qualities : constant String := "api/v1/json/data/qualities/";
-   --     Data_File      : constant String := "data/v1/download/";
-
    --  -------------------------------------------------------------------------
 
-    procedure Report_Feature (Name : Utf8_String; Value : JSON_Value) is
-    begin
-      Put_Line ("Field: " & Name & ", value kind: " &
-                  JSON_Value_Type'Image (Value.Kind));
-    end Report_Feature;
+--      procedure Report_Feature (Name : Utf8_String; Value : JSON_Value) is
+--      begin
+--        Put_Line ("Field: " & Name & ", value kind: " &
+--                    JSON_Value_Type'Image (Value.Kind));
+--      end Report_Feature;
 
    --  -------------------------------------------------------------------------
 
@@ -74,5 +67,20 @@ package body OML_File_Tests is
       New_Line;
 
    end Test_Data_Info;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Test_Fetch_OML is
+      Routine_Name  : constant String := "Test_Fetch_OML ";
+      Dataset_Name  : constant String := "mnist_784";
+      Version       : constant String := "1";
+      Data_Id       : Integer := 0;
+   begin
+      Fetch_Openml (Dataset_Name, Version, Data_Id);
+      Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
+
+   end Test_Fetch_OML;
+
+   --  -------------------------------------------------------------------------
 
 end OML_File_Tests;
