@@ -14,14 +14,28 @@ package body OML_File_Tests is
    --     Data_Qualities : constant String := "api/v1/json/data/qualities/";
    --     Data_File      : constant String := "data/v1/download/";
 
+   --  -------------------------------------------------------------------------
+
+    procedure Report_Feature (Name : Utf8_String; Value : JSON_Value) is
+    begin
+      Put_Line ("Field: " & Name & ", value kind: " &
+                  JSON_Value_Type'Image (Value.Kind));
+    end Report_Feature;
+
+   --  -------------------------------------------------------------------------
+
    procedure Test_Data_Info is
-      Routine_Name : constant String := "Test_Data_Info ";
-      Dataset_Name : constant String := "mnist_784";
-      Version      : constant String := "1";
-      Data_Info    : JSON_Value;
-      JSON_Data_Id : JSON_Value;
-      Data_Id      : Integer := 0;
-      Description  : JSON_Value;
+      Routine_Name  : constant String := "Test_Data_Info ";
+      Dataset_Name  : constant String := "mnist_784";
+      Version       : constant String := "1";
+      Data_Info     : JSON_Value;
+      JSON_Data_Id  : JSON_Value;
+      Data_Id       : Integer := 0;
+      Description   : JSON_Value;
+      Features      : JSON_Value;
+      Feature_Array : JSON_Array;
+      Feature_Index : Positive;
+      aFeature      : JSON_Value;
    begin
       New_Line;
       Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version,
@@ -40,6 +54,19 @@ package body OML_File_Tests is
 --           Put_Line (Routine_Name & "Description:");
 --           Put_Line (Desc);
       end;
+      New_Line;
+
+      Put_Line (Routine_Name & "Get features");
+      Features := Get_Data_Features (Data_Id, File_Name => "mnist_784");
+      Feature_Array := Get (Features);
+      Put_Line (Routine_Name & "Feature_Array set");
+      Feature_Index := Array_First (Feature_Array);
+      while Array_Has_Element (Feature_Array, Feature_Index) loop
+         aFeature := Array_Element (Feature_Array, Feature_Index);
+         Put_Line ("JSON type: " & JSON_Value_Type'Image (Kind (aFeature)));
+         Feature_Index := Array_Next (Feature_Array, Feature_Index);
+      end loop;
+
       New_Line;
 
    end Test_Data_Info;

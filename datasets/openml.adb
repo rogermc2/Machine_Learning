@@ -76,7 +76,6 @@ package body Openml is
    --     Data_Qualities : constant String := "api/v1/json/data/qualities/";
    --     Data_File      : constant String := "data/v1/download/";
 
-   function Get_Data_Features (Data_ID : Integer) return JSON_Value;
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Value;
    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data;
@@ -164,6 +163,7 @@ package body Openml is
    function Get_Data_Description_By_ID
      (Data_ID : Integer; File_Name : String := "") return JSON_Value is
       use Ada.Strings;
+      Routine_Name : constant String := "Openml.Get_Data_Description_By_ID ";
       URL          : constant String := Data_Features &
                        Fixed.Trim (Integer'Image (Data_ID), Both);
       URL_Object   : AWS.URL.Object;
@@ -174,9 +174,9 @@ package body Openml is
       --  It is then possible to extract each part of the URL with other
       --  AWS.URL services.
       URL_Object := AWS.URL.Parse (URL);
-      Assert (AWS.URL.Is_Valid (URL_Object),
-              "Get_Data_Description_By_ID object returned by URL " &
-                URL & "is invalid");
+      Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
+                "object returned by URL " & URL & "is invalid");
+
       if File_Name = "" then
          Data_Desc := Get_Json_Content_From_Openml_Api (URL);
       else
@@ -186,8 +186,7 @@ package body Openml is
       if Has_Field (Data_Desc, "description") then
          Data_Desc := Get (Data_Desc, "description");
       else
-         Put_Line ("Openml.Get_Data_Description_By_ID error, " &
-                     "Json_Content is not a data_set_description");
+         Put_Line (Routine_Name & "Data_Desc is not a data_set_description");
       end if;
 
       return Data_Desc;
@@ -196,17 +195,34 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Data_Features (Data_ID : Integer) return JSON_Value is
-      URL      : constant String :=
-                   Openml_Prefix & Data_Features & Integer'Image (Data_ID);
-      --        Data     : constant JSON_Array :=
-      Data     : constant JSON_Value :=
-                   Get_Json_Content_From_Openml_Api (URL);
-      Features : JSON_Value;
+   function Get_Data_Features (Data_ID   : Integer;
+                               File_Name : String := "") return JSON_Value is
+      Routine_Name  : constant String := "Openml.Get_Data_Features ";
+      URL           : constant String := Data_Features & Integer'Image (Data_ID);
+      Json_Data     : JSON_Value := Create_Object;
+      Features      : JSON_Value := Create_Object;
+      Feature_Array : JSON_Value := Create_Object;
    begin
-      null;
+      if File_Name = "" then
+         Json_Data := Get_Json_Content_From_Openml_Api (Data_Features);
+      else
+         Json_Data := Get_Json_Content_From_File (File_Name);
+      end if;
+      Put_Line ("Json_Data JSON type: " &
+                  JSON_Value_Type'Image (Kind (Json_Data)));
 
-      return Features;
+      Assert (Has_Field (Json_Data, "data_features"), Routine_Name &
+                "data_features is not a Json_Data field.");
+
+      Put_Line ("Features JSON type: " &
+                  JSON_Value_Type'Image (Kind (Features)));
+
+      Feature_Array := Get (Json_Data, "feature");
+      Put_Line (Routine_Name & "Feature_Array set");
+      Put_Line ("Feature_Array JSON type: " &
+                  JSON_Value_Type'Image (Kind (Feature_Array)));
+
+      return Get (Feature_Array, "feature");
 
    end Get_Data_Features;
 
