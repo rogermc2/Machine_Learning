@@ -253,13 +253,16 @@ package body Openml is
       Quality_Array : JSON_Array;
 
       procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
-         Bool_Quality   : Boolean;
-         Float_Quality  : Float;
-         Int_Quality    : Integer;
-         Quality        : constant JSON_Value := Create_Object;
+         Array_Quality : Boolean;
+         Bool_Quality  : Boolean;
+         Float_Quality : Float;
+         Int_Quality   : Integer;
+         Quality       : constant JSON_Value := Create_Object;
       begin
          case Kind (Value) is
-            when JSON_Array_Type => null;
+            when JSON_Array_Type =>
+               Array_Quality := Get (Value);
+               Quality.Set_Field (Name, Array_Quality);
             when JSON_Boolean_Type =>
                Bool_Quality := Get (Value);
                Quality.Set_Field (Name, Bool_Quality);
