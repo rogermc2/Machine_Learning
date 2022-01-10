@@ -25,7 +25,6 @@ package body OML_File_Tests is
       JSON_Data_Id  : JSON_Value;
       Data_Id       : Integer := 0;
       Description   : JSON_Value;
-      Features      : JSON_Value;
       Feature_Array : JSON_Array;
       Index         : Positive;
       aFeature      : JSON_Value;
@@ -41,7 +40,7 @@ package body OML_File_Tests is
       Description := Get_Data_Description_By_ID (Data_Id,
                                                  File_Name => "mnist_784");
       declare
-         Desc : String := Get (Description);
+         Desc : constant String := Get (Description);
       begin
          Put_Line (Routine_Name & "Description length:" &
                      Integer'Image (Desc'Length) & " characters.");

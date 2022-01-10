@@ -17,5 +17,7 @@ package Openml is
                                    Active    : Boolean := False;
                                    File_Name : String := "")
                                     return JSON_Value;
+   function Get_Data_Qualities (Data_ID   : Integer;
+                                File_Name : String := "") return JSON_Array;
 
 end Openml;
