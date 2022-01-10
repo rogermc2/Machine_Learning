@@ -9,10 +9,11 @@ package Openml is
                            Return_X_Y    : Boolean := False;
                            As_Frame      : String := "false");
    function Get_Data_Description_By_ID
-      (Data_ID : Integer; From_File : Boolean := False) return JSON_Value;
+      (Data_ID : Integer; File_Name : String := "") return JSON_Value;
    function Get_Data_Info_By_Name (Dataset_Name : String;
-                                   Version : String := "";
-                                   Active, From_File : Boolean := False)
+                                   Version   : String := "";
+                                   Active    : Boolean := False;
+                                   File_Name : String := "")
                                     return JSON_Value;
 
 end Openml;

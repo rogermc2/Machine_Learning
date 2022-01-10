@@ -77,7 +77,7 @@ package body Openml is
    --     Data_File      : constant String := "data/v1/download/";
 
    function Get_Data_Features (Data_ID : Integer) return JSON_Value;
-   function Get_Json_Content_From_File return JSON_Value;
+   function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Value;
    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data;
    function Valid_Data_Column_Names
@@ -162,7 +162,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Description_By_ID
-      (Data_ID : Integer; From_File : Boolean := False) return JSON_Value is
+     (Data_ID : Integer; File_Name : String := "") return JSON_Value is
       use Ada.Strings;
       URL          : constant String := Data_Features &
                        Fixed.Trim (Integer'Image (Data_ID), Both);
@@ -177,10 +177,10 @@ package body Openml is
       Assert (AWS.URL.Is_Valid (URL_Object),
               "Get_Data_Description_By_ID object returned by URL " &
                 URL & "is invalid");
-      if From_File then
-            Data_Desc := Get_Json_Content_From_File;
+      if File_Name = "" then
+         Data_Desc := Get_Json_Content_From_Openml_Api (URL);
       else
-            Data_Desc := Get_Json_Content_From_Openml_Api (URL);
+         Data_Desc := Get_Json_Content_From_File (File_Name);
       end if;
 
       if Has_Field (Data_Desc, "description") then
@@ -199,7 +199,7 @@ package body Openml is
    function Get_Data_Features (Data_ID : Integer) return JSON_Value is
       URL      : constant String :=
                    Openml_Prefix & Data_Features & Integer'Image (Data_ID);
---        Data     : constant JSON_Array :=
+      --        Data     : constant JSON_Array :=
       Data     : constant JSON_Value :=
                    Get_Json_Content_From_Openml_Api (URL);
       Features : JSON_Value;
@@ -214,8 +214,9 @@ package body Openml is
 
    function Get_Data_Info_By_Name (Dataset_Name      : String;
                                    Version           : String := "";
-                                   Active, From_File : Boolean := False)
-                                    return JSON_Value is
+                                   Active            : Boolean := False;
+                                   File_Name         : String := "")
+                                   return JSON_Value is
       Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
       Openml_Path    : Unbounded_String :=
                          To_Unbounded_String (Search_Name);
@@ -225,7 +226,7 @@ package body Openml is
       Data           : JSON_Value;
       Data_Set       : JSON_Value;
    begin
-      if not From_File then
+      if File_Name = "" then
          if Active then
             Openml_Path := Openml_Path & "limit/2/status/active/";
          else
@@ -236,7 +237,7 @@ package body Openml is
          Json_Data := Get_Json_Content_From_Openml_Api
            (To_String (Openml_Path));
       else
-         Json_Data := Get_Json_Content_From_File;
+         Json_Data := Get_Json_Content_From_File (File_Name);
       end if;
 
       return Json_Data;
@@ -245,26 +246,19 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Json_Content_From_File return JSON_Value is
+   function Get_Json_Content_From_File (File_Name : String) return JSON_Value is
       Routine_Name   : constant String :=
-                        "Openml.Get_Json_Content_From_File ";
+                         "Openml.Get_Json_Content_From_File ";
+      Name           : constant String := File_Name & ".json";
       File           : File_Type;
       JSON_Data      : Unbounded_String;
       JSON_Main_Node : JSON_Value := Create;
    begin
-        Put_Line ("Dataset name:");
-      declare
-         File_Name : String := Get_Line & ".json";
-      begin
-         New_Line;
-         Open (File, In_File, File_Name);
-         JSON_Data := To_Unbounded_String (Get_Line (File));
-         Close (File);
-      end;
+      Open (File, In_File, Name);
+      JSON_Data := To_Unbounded_String (Get_Line (File));
+      Close (File);
 
       JSON_Main_Node := Read (JSON_Data, Filename => "");
-      Put_Line (Routine_Name & "JSON_Main_Node kind: " &
-                  JSON_Value_Type'Image (JSON_Main_Node.Kind));
       return JSON_Main_Node;
 
    end Get_Json_Content_From_File;
@@ -272,7 +266,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_Openml_Api (URL : String)
-                                               return JSON_Value is
+                                              return JSON_Value is
       Routine_Name      : constant String :=
                             "Openml.Get_Json_Content_From_Openml_Api ";
       Data              : Json_Data;
