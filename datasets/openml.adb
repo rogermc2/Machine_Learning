@@ -100,7 +100,9 @@ package body Openml is
       Features_List   : JSON_Array;
       Feature_Index   : Positive;
       Ignore          : JSON_Value;
-      Feature_Name    : JSON_Value := Create_Object;
+      Is_Row_ID       : JSON_Value;
+      Data_Type_Item  : JSON_Value;
+      Feature_Name    : JSON_Value;
       Target_Columns  : JSON_Array;
       Data_Columns    : JSON_Array;
 
@@ -146,6 +148,7 @@ package body Openml is
               Routine_Name & "cannot return dataframe with sparse data");
 
       Put_Line (Routine_Name & "As_Frame: " & As_Frame);
+      --  L910
       Features_List := Get_Data_Features (Data_ID);
       if As_Frame = "false" then
          Feature_Index := Array_First (Features_List);
@@ -153,17 +156,35 @@ package body Openml is
             Feature_Name := Array_Element (Features_List, Feature_Index);
             Put_Line (Routine_Name & "Feature_Name JSON type: " &
                         JSON_Value_Type'Image (Kind (Feature_Name)));
+            Ignore := Get (Feature_Name, "is_ignore");
+            Is_Row_ID := Get (Feature_Name, "is_row_identifier");
+            declare
+               Ignore_Status : String := Get (Ignore);
+               Row_ID_Status : String := Get (Is_Row_ID);
+            begin
+               if Ignore_Status /= "true" and Row_ID_Status /= "true" then
+                  Data_Type_Item := Get (Feature_Name, "data_type");
+                  declare
+                     Data_Type : String := Get (Data_Type_Item);
+                  begin
+                     Assert (Data_Type /= "string", Routine_Name & Dataset_Name
+                             & " invalid as STRING attributes are not " &
+                               "supported for array representation. " &
+                               "Try as_frame=True");
+                  end;
+               end if;
+            end;
             Feature_Index := Array_Next (Features_List, Feature_Index);
          end loop;
       end if;
 
---        Feature_Name := Get (Features_List, "name");
---        if Target_Column = "default-target" then
---           Map_JSON_Object (Features_List, Process_Target'Access);
---        end if;
---
---        Data_Columns := Valid_Data_Column_Names
---          (Features_List, Get (Target_Columns, 1));
+      --        if Target_Column = "default-target" then
+      --           Map_JSON_Object (Features_List, Process_Target'Access);
+      --        end if;
+
+      --  L944
+      --        Data_Columns := Valid_Data_Column_Names
+      --          (Features_List, Get (Target_Columns, 1));
 
    end Fetch_Openml;
 
