@@ -253,11 +253,18 @@ package body Openml is
       Quality_Array : JSON_Array;
 
       procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
-         Quality_Value : constant Integer := Get (Value);
-         Quality       : JSON_Value;
+         Int_Quality : Integer;
+         Quality     : JSON_Value := Create_Object;
       begin
-         Set_Field (Quality, Name, Quality_Value);
-         Append (Quality_Array, Quality);
+         case Kind (Value) is
+            when JSON_Int_Type =>
+               Int_Quality := Get (Value);
+               Put_Line (Routine_Name & "setting Quality " & Name & ":" &
+                          Integer'Image (Int_Quality));
+               Set_Field (Quality, Name, Int_Quality);
+               Append (Quality_Array, Quality);
+            when others => Put_Line (Routine_Name & "other");
+         end case;
       end Get_Quality;
 
    begin
@@ -271,12 +278,8 @@ package body Openml is
       if Has_Field (Json_Data, "qualities") then
          Qualities := Get (Json_Data, "qualities");
          Put_Line (Routine_Name & "Qualities set");
-         --           if Has_Field (Qualities, "quality") then
-         --              Put_Line (Routine_Name & "has quality");
          Map_JSON_Object (Qualities, Get_Quality'access);
-         Put_Line (Routine_Name & "Quality set");
-         Put_Line (Routine_Name & "Quality appended");
-         --           end if;
+         Put_Line (Routine_Name & "Quality_Array loaded");
       end if;
 
       return Quality_Array;
