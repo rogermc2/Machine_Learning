@@ -97,7 +97,9 @@ package body Openml is
       Description     : JSON_Value;
       Return_Sparse   : Boolean := False;
       Data_Format     : JSON_Value;
-      Features_List   : JSON_Value;
+      Features_List   : JSON_Array;
+      Feature_Index   : Positive;
+      Ignore          : JSON_Value;
       Feature_Name    : JSON_Value := Create_Object;
       Target_Columns  : JSON_Array;
       Data_Columns    : JSON_Array;
@@ -143,18 +145,25 @@ package body Openml is
       Assert (not (As_Frame = "true" and Return_Sparse),
               Routine_Name & "cannot return dataframe with sparse data");
 
+      Put_Line (Routine_Name & "As_Frame: " & As_Frame);
       Features_List := Get_Data_Features (Data_ID);
       if As_Frame = "false" then
-         Map_JSON_Object (Features_List, Process_Feature'Access);
+         Feature_Index := Array_First (Features_List);
+         while Array_Has_Element (Features_List, Feature_Index) loop
+            Feature_Name := Array_Element (Features_List, Feature_Index);
+            Put_Line (Routine_Name & "Feature_Name JSON type: " &
+                        JSON_Value_Type'Image (Kind (Feature_Name)));
+            Feature_Index := Array_Next (Features_List, Feature_Index);
+         end loop;
       end if;
 
-      Feature_Name := Get (Features_List, "name");
-      if Target_Column = "default-target" then
-         Map_JSON_Object (Features_List, Process_Target'Access);
-      end if;
-
-      Data_Columns := Valid_Data_Column_Names
-        (Features_List, Get (Target_Columns, 1));
+--        Feature_Name := Get (Features_List, "name");
+--        if Target_Column = "default-target" then
+--           Map_JSON_Object (Features_List, Process_Target'Access);
+--        end if;
+--
+--        Data_Columns := Valid_Data_Column_Names
+--          (Features_List, Get (Target_Columns, 1));
 
    end Fetch_Openml;
 
@@ -196,33 +205,30 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Features (Data_ID   : Integer;
-                               File_Name : String := "") return JSON_Value is
+                               File_Name : String := "") return JSON_Array is
       Routine_Name  : constant String := "Openml.Get_Data_Features ";
       URL           : constant String := Data_Features & Integer'Image (Data_ID);
       Json_Data     : JSON_Value := Create_Object;
       Features      : JSON_Value := Create_Object;
-      Feature_Array : JSON_Value := Create_Object;
+      Feature       : JSON_Value := Create_Object;
+      Feature_Array : JSON_Array;
    begin
       if File_Name = "" then
          Json_Data := Get_Json_Content_From_Openml_Api (Data_Features);
       else
          Json_Data := Get_Json_Content_From_File (File_Name);
       end if;
-      Put_Line ("Json_Data JSON type: " &
-                  JSON_Value_Type'Image (Kind (Json_Data)));
 
       Assert (Has_Field (Json_Data, "data_features"), Routine_Name &
                 "data_features is not a Json_Data field.");
+      Features := Get (Json_Data, "data_features");
 
-      Put_Line ("Features JSON type: " &
-                  JSON_Value_Type'Image (Kind (Features)));
+      Assert (Has_Field (Features, "feature"), Routine_Name &
+                "data_features is not a Json_Data field.");
+      Feature := Get (Features, "feature");
+      Feature_Array := Get (Feature);
 
-      Feature_Array := Get (Json_Data, "feature");
-      Put_Line (Routine_Name & "Feature_Array set");
-      Put_Line ("Feature_Array JSON type: " &
-                  JSON_Value_Type'Image (Kind (Feature_Array)));
-
-      return Get (Feature_Array, "feature");
+      return Feature_Array;
 
    end Get_Data_Features;
 
