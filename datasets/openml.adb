@@ -247,24 +247,40 @@ package body Openml is
    function Get_Data_Qualities (Data_ID   : Integer;
                                 File_Name : String := "") return JSON_Array is
       use Ada.Strings;
-      Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
+--        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
       Qualities     : JSON_Value;
       Quality_Array : JSON_Array;
 
       procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
-         Int_Quality : Integer;
-         Quality     : JSON_Value := Create_Object;
+         Bool_Quality   : Boolean;
+         Float_Quality  : Float;
+         Int_Quality    : Integer;
+         Quality        : constant JSON_Value := Create_Object;
       begin
          case Kind (Value) is
+            when JSON_Array_Type => null;
+            when JSON_Boolean_Type =>
+               Bool_Quality := Get (Value);
+               Quality.Set_Field (Name, Bool_Quality);
+            when JSON_Float_Type =>
+               Float_Quality := Get (Value);
+               Quality.Set_Field (Name, Float_Quality);
             when JSON_Int_Type =>
                Int_Quality := Get (Value);
-               Put_Line (Routine_Name & "setting Quality " & Name & ":" &
-                          Integer'Image (Int_Quality));
-               Set_Field (Quality, Name, Int_Quality);
-               Append (Quality_Array, Quality);
-            when others => Put_Line (Routine_Name & "other");
+               Quality.Set_Field (Name, Int_Quality);
+            when JSON_Null_Type => null;
+            when JSON_Object_Type =>
+               Quality.Set_Field (Name, Value);
+            when JSON_String_Type =>
+               declare
+                  String_Quality : constant String := Get (Value);
+               begin
+                  Quality.Set_Field (Name, String_Quality);
+               end;
          end case;
+         Append (Quality_Array, Quality);
+
       end Get_Quality;
 
    begin
@@ -274,12 +290,10 @@ package body Openml is
       else
          Json_Data := Get_Json_Content_From_File (File_Name);
       end if;
-      Put_Line (Routine_Name);
+
       if Has_Field (Json_Data, "qualities") then
          Qualities := Get (Json_Data, "qualities");
-         Put_Line (Routine_Name & "Qualities set");
          Map_JSON_Object (Qualities, Get_Quality'access);
-         Put_Line (Routine_Name & "Quality_Array loaded");
       end if;
 
       return Quality_Array;

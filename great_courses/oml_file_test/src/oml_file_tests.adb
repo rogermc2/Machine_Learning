@@ -108,6 +108,7 @@ package body OML_File_Tests is
    begin
       Put_Line (Routine_Name & "Get qualities");
       Quality_Array := Get_Data_Qualities (Data_Id, File_Name => File_Name);
+      Put_Line (Routine_Name & "Quality_Array loaded");
       if Is_Empty (Quality_Array) then
          Put_Line (Routine_Name & "there are no qualities");
       else
