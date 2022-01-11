@@ -13,11 +13,11 @@ package body ARFF is
          Current_Line : Integer := 0;
    end record;
 
-function Decode (Decoder : in Out Arff_Decoder; File_Data : String; Encode_Nominal : Boolean := False;
+function Decode (Decoder : in Out Arff_Decoder; Text : String; Encode_Nominal : Boolean := False;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                  return JSON_Value is
       use Ada.Strings;
-      Data_Length         : constant Integer := File_Data'Length;
+      Text_Length         : constant Integer := Text'Length;
       Pos1                : Integer := 1;
       Pos2                : Integer := 1;
       Message_Lines       : String_List;
@@ -26,14 +26,15 @@ function Decode (Decoder : in Out Arff_Decoder; File_Data : String; Encode_Nomin
       Attribute_Names     : JSON_Value := Create_Object;
    begin
       Decoder.Current_Line := 0;
-      while Pos2 /= 0 and Pos1 < Data_Length loop
-         Pos2 := Fixed.Index (File_Data, "\r\n");
-         Message_Lines.Append (To_Unbounded_String (File_Data (Pos1 .. Pos2)));
-         Pos1 := Pos2 + 4;
-      end loop;
-      if Pos1 < Data_Length - 4 then
+      while Pos2 /= 0 and Pos1 < Text_Length loop
+         Pos2 := Fixed.Index (Text, "\r\n");
          Message_Lines.Append
-           (To_Unbounded_String (File_Data (Pos1 .. Data_Length - 4)));
+           (To_Unbounded_String (Text (Pos1 .. Pos2 - 1)));
+         Pos1 := Pos2 + 3;
+      end loop;
+      if Pos1 < Text_Length - 4 then
+         Message_Lines.Append
+           (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
       end if;
 
       Arff_Container_Type.Set_Field ("description", "");
