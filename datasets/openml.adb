@@ -71,7 +71,7 @@ package body Openml is
    --     Data_Info      : constant String := "api/v1/json/data/";
    Data_Features  : constant String := "api/v1/json/data/features/";
    --     Data_Qualities : constant String := "api/v1/json/data/qualities/";
-   --     Data_File      : constant String := "data/v1/download/";
+   Data_File      : constant String := "data/v1/download/";
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Value;
@@ -83,10 +83,45 @@ package body Openml is
                              Target_Columns : out JSON_Array);
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
+   procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
+                                      Target_Columns : JSON_Array);
 
    --  ------------------------------------------------------------------------
 
-   procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
+  procedure Download_Data_To_Bunch (URL : String; Sparse, S_Frame : Boolean;
+                                    Features_List  : JSON_Array;
+                                    Target_Columns : JSON_Array;
+                                    Shape : Shape_Data) is
+
+      Feature_Index : Positive := Array_First (Features_List);
+      Col_Index     : Positive := Array_First (Features_List);
+      Features_Dict : JSON_Value;
+      aFeature      : JSON_Value;
+      aColumn       : JSON_Value;
+      Feature_Name  : JSON_Value;
+      Col_Slice_Y   : JSON_Array;
+  begin
+      while Array_Has_Element (Features_List, Feature_Index) loop
+         aFeature := Array_Element (Features_List, Feature_Index);
+         Feature_Name := Get (aFeature, "name");
+         Features_Dict.Append (Feature_Name);
+         Feature_Index := Array_Next (Features_List, Feature_Index);
+      end loop;
+
+      Verify_Target_Data_Type (Features_Dict, Target_Columns);
+
+      while Array_Has_Element (Target_Columns, Col_Index) loop
+         aColumn := Array_Element (Target_Columns, Col_Index);
+         aColumn := Get (aFeature, "index");
+         Col_Slice_Y.Append (aColumn);
+         Col_Index := Array_Next (Target_Columns, Col_Index);
+      end loop;
+
+  end Download_Data_To_Bunch;
+
+   --  ------------------------------------------------------------------------
+
+procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
                            Data_Id       : in out Integer;
                            Target_Column : String := "default-target";
                            --                             Return_X_Y    : Boolean := False;
@@ -94,6 +129,7 @@ package body Openml is
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
       Dataset_Name_LC : constant String := To_Lowercase (Dataset_Name);
+      Data_Url        : constant String := Data_File & "file_id";
       Data_Info       : JSON_Value;
       JSON_Data_Id    : JSON_Value;
       Description     : JSON_Value;
@@ -151,6 +187,7 @@ package body Openml is
             Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
          end if;
       end if;
+
       --  L970
       --        if Return_X_Y then
       --           null;
@@ -550,6 +587,14 @@ package body Openml is
       return Column_Names;
 
    end Valid_Data_Column_Names;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
+                                      Target_Columns : JSON_Array) is
+   begin
+    null;
+   end Verify_Target_Data_Type;
 
    --  ------------------------------------------------------------------------
 
