@@ -19,6 +19,8 @@ package body Openml is
    --        Value : Unbounded_String;
    --     end record;
 
+   type ARFF_Type is (ARFF_COO, ARFF_DENSE_GEN);
+
       type Shape_Data is record
          Num_Samples     : Natural := 0;
          Features_Length : Natural := 0;
@@ -88,18 +90,31 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-  procedure Download_Data_To_Bunch (URL : String; Sparse, S_Frame : Boolean;
+   procedure Convert_Arff_Data_Dataframe is
+
+   begin
+      null;
+   end Convert_Arff_Data_Dataframe;
+
+   --  ------------------------------------------------------------------------
+
+  procedure Download_Data_To_Bunch (URL : String; Sparse, As_Frame : Boolean;
                                     Features_List  : JSON_Array;
+                                    Data_Columns   : JSON_Array;
                                     Target_Columns : JSON_Array;
                                     Shape : Shape_Data) is
-
+      Routine_Name    : constant String := "Openml.Download_Data_To_Bunch ";
       Feature_Index : Positive := Array_First (Features_List);
-      Col_Index     : Positive := Array_First (Features_List);
+      Col_Name      : Positive := Array_First (Features_List);
       Features_Dict : JSON_Value;
       aFeature      : JSON_Value;
       aColumn       : JSON_Value;
       Feature_Name  : JSON_Value;
+      Col_Slice_X   : JSON_Array;
       Col_Slice_Y   : JSON_Array;
+      Num_Missing   : Integer;
+      Return_Type   : ARFF_Type;
+      Columns       : JSON_Array;
   begin
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
@@ -110,12 +125,59 @@ package body Openml is
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
-      while Array_Has_Element (Target_Columns, Col_Index) loop
-         aColumn := Array_Element (Target_Columns, Col_Index);
+      --  L568 col_slice_y =
+      --        [
+      --          int(features_dict[col_name]["index"])
+      --          for col_name in target_columns
+      --        ]
+      while Array_Has_Element (Target_Columns, Col_Name) loop
+         aFeature := Array_Element (Features_List, Col_Name);
          aColumn := Get (aFeature, "index");
-         Col_Slice_Y.Append (aColumn);
-         Col_Index := Array_Next (Target_Columns, Col_Index);
+         Append (Col_Slice_Y, aColumn);
+         Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
+
+      Col_Name := Array_First (Features_List);
+      while Array_Has_Element (Data_Columns, Col_Name) loop
+         aFeature := Array_Element (Features_List, Col_Name);
+         aColumn := Get (aFeature, "index");
+         Append (Col_Slice_X, aColumn);
+         Col_Name := Array_Next (Data_Columns, Col_Name);
+      end loop;
+
+      Col_Name := Array_First (Col_Slice_Y);
+      while Array_Has_Element (Col_Slice_Y, Col_Name) loop
+         aFeature := Array_Element (Features_List, Col_Name);
+         Num_Missing := Get (aFeature, "number_of_missing_values");
+         Assert (Num_Missing >= 0,
+                Routine_Name & "Target column " & " has " & " missing values."
+                & "Missing values are not supported for target columns.");
+         Col_Name := Array_Next (Col_Slice_Y, Col_Name);
+      end loop;
+
+      if Sparse then
+         Return_Type := ARFF_COO;
+      else
+         Return_Type := ARFF_DENSE_GEN;
+      end if;
+
+      --  L593
+      if As_Frame then
+         Put_Line (Routine_Name & "As_Frame not supported.");
+--           Col_Name := Array_First (Data_Columns);
+--           while Array_Has_Element (Data_Columns, Col_Name) loop
+--              Append (Columns, Array_Element (Data_Columns, Col_Name));
+--              Col_Name := Array_Next (Data_Columns, Col_Name);
+--           end loop;
+--
+--           Col_Name := Array_First (Target_Columns);
+--           while Array_Has_Element (Target_Columns, Col_Name) loop
+--              Append (Columns, Array_Element (Target_Columns, Col_Name));
+--              Col_Name := Array_Next (Target_Columns, Col_Name);
+--           end loop;
+      else
+         null;
+      end if;
 
   end Download_Data_To_Bunch;
 
@@ -444,6 +506,14 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
       return Num_Samples;
 
    end Get_Num_Samples;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Load_Arff_Response (URL : String) is
+      Response : AWS.Response.Data := Open_Openml_URL (URL);
+   begin
+      null;
+   end Load_Arff_Response;
 
    --  ------------------------------------------------------------------------
 
