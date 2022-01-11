@@ -19,6 +19,11 @@ package body Openml is
    --        Value : Unbounded_String;
    --     end record;
 
+      type Shape_Data is record
+         Num_Samples     : Natural := 0;
+         Features_Length : Natural := 0;
+      end record;
+
    --     package Pair_Settings_Vector_Package is new
    --       Ada.Containers.Doubly_Linked_Lists (JSON_Item);
    --     subtype Pair_List is Pair_Settings_Vector_Package.List;
@@ -70,6 +75,7 @@ package body Openml is
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Value;
+   function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data;
    procedure Process_Feature (Dataset_Name  : String;
                               Features_List : JSON_Array);
@@ -83,7 +89,7 @@ package body Openml is
    procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
                            Data_Id       : in out Integer;
                            Target_Column : String := "default-target";
---                             Return_X_Y    : Boolean := False;
+                           --                             Return_X_Y    : Boolean := False;
                            As_Frame      : String := "false") is
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
@@ -97,7 +103,8 @@ package body Openml is
       Ignore          : JSON_Value;
       Target_Columns  : JSON_Array;
       Data_Columns    : JSON_Array;
---        Data_Qualities  : Qualities_Map;
+      Shape           : Shape_Data;
+      Data_Qualities  : Qualities_Map;
    begin
       --  L862
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version);
@@ -138,9 +145,12 @@ package body Openml is
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
       --  L948
---        if not Return_Sparse then
---           Data_Qualities := Get_Data_Qualities (Data_Id, Dataset_Name);
---        end if;
+      if not Return_Sparse then
+         Data_Qualities := Get_Data_Qualities (Data_Id, Dataset_Name);
+         if Get_Num_Samples (Data_Qualities) > -1 then
+            Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
+         end if;
+      end if;
       --  L970
       --        if Return_X_Y then
       --           null;
@@ -249,13 +259,13 @@ package body Openml is
    function Get_Data_Qualities (Data_ID : Integer; Dataset_Name : String := "")
                                 return Qualities_Map is
       use Ada.Strings;
---        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
+      --        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
       Qualities     : JSON_Value;
       Quality_Array : Qualities_Map;
 
       procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
-        use ML_Qualities_Package;
+         use ML_Qualities_Package;
          Array_Quality : Boolean;
          Bool_Quality  : Boolean;
          Float_Quality : Float;
@@ -357,20 +367,43 @@ package body Openml is
 
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer is
       use ML_Qualities_Package;
---        Routine_Name  : constant String := "Openml.Get_Num_Samples ";
+      --        Routine_Name  : constant String := "Openml.Get_Num_Samples ";
       Curs          : Cursor := Qualities.First;
       Quality       : JSON_Value;
       Num_Samples   : Integer := -1;
-   begin
---        Assert (Has_Field (Qualities, "data_features"), Routine_Name &
---                  "data_features is not a Json_Data field.");
---        Features := Get (Json_Data, "data_features");
 
-      Quality := Qualities.Element (To_Unbounded_String ("name"));
-      Num_Samples := Num_Samples + 1;
+      procedure Get_Num_Instances (Name : Utf8_String; Value : JSON_Value) is
+         Num_Instances : Float := 0.0;
+      begin
+         if Name = "NumberOfInstances" then
+            Num_Instances := Get (Value);
+            Num_Samples := Integer (Num_Instances);
+         end if;
+      end Get_Num_Instances;
+
+      procedure Get_Qual (Name : Utf8_String; Value : JSON_Value) is
+         Name_Quality : constant JSON_Value := Create_Object;
+      begin
+         if Name = "name" and then Kind (Value) = JSON_String_Type then
+            declare
+               String_Value : constant String := Get (Value);
+            begin
+               if String_Value = "value" then
+                  Name_Quality.Set_Field (Name, Value);
+               end if;
+               Map_JSON_Object (Name_Quality, Get_Num_Instances'access);
+            end;
+         end if;
+
+      end Get_Qual;
+
+   begin
       while Has_Element (Curs) loop
+         Quality := Element (Curs);
+         Map_JSON_Object (Quality, Get_Qual'access);
          Next (Curs);
       end loop;
+
       return Num_Samples;
 
    end Get_Num_Samples;
