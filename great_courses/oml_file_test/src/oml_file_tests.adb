@@ -7,18 +7,18 @@ with Openml; use Openml;
 
 package body OML_File_Tests is
 
-   procedure Test_Features (Data_Id : Integer; File_Name : String := "");
-   procedure Test_Qualities (Data_Id : Integer; File_Name : String := "");
+   procedure Test_Features (Data_Id : Integer; Dataset : String := "");
+   procedure Test_Qualities (Data_Id : Integer; Dataset : String := "");
 
    --  -------------------------------------------------------------------------
 
    procedure Test_Data_Description (Data_Id   : Integer;
-                                    File_Name : String := "") is
+                                    Dataset   : String := "") is
       Routine_Name  : constant String := "Test_Data_Description ";
       Description   : JSON_Value;
    begin
       New_Line;
-      Description := Get_Data_Description_By_ID (Data_Id, File_Name);
+      Description := Get_Data_Description_By_ID (Data_Id, Dataset);
       declare
          Desc : constant String := Get (Description);
       begin
@@ -58,7 +58,7 @@ package body OML_File_Tests is
 
    --  -------------------------------------------------------------------------
 
-   procedure Test_Features (Data_Id : Integer; File_Name : String := "") is
+   procedure Test_Features (Data_Id : Integer; Dataset : String := "") is
       Routine_Name   : constant String := "Test_Features ";
       Feature_Array  : JSON_Array;
       Index          : Positive;
@@ -66,7 +66,7 @@ package body OML_File_Tests is
       Feature_Index  : Natural;
    begin
       Put_Line (Routine_Name & "Get features");
-      Feature_Array := Get_Data_Features (Data_Id, File_Name => File_Name);
+      Feature_Array := Get_Data_Features (Data_Id, File_Name => Dataset);
       Index := Array_First (Feature_Array);
       while Array_Has_Element (Feature_Array, Index) loop
          aFeature := Array_Element (Feature_Array, Index);
@@ -98,45 +98,48 @@ package body OML_File_Tests is
 
    --  -------------------------------------------------------------------------
 
-   procedure Test_Qualities (Data_Id   : Integer; File_Name : String := "") is
+   procedure Test_Qualities (Data_Id : Integer; Dataset : String := "") is
+      use ML_Qualities_Package;
       Routine_Name  : constant String := "Test_Qualities ";
-      Index         : Positive;
+      Count         : Natural := 0;
       Quality_Array : Qualities_Map;
+      Curs          : Cursor;
       Quality       : JSON_Value;
 
-      procedure Process_Quality (Name : Utf8_String; Value : JSON_Value) is
+      procedure Process_Quality (Value : JSON_Value) is
       begin
-         if Index < 11 then
-            Put (Name & ": ");
+         Count := Count + 1;
+         if Count > 20 and Count < 31 then
+            Put ("Quality value:");
             case Kind (Value) is
-            when JSON_Array_Type => Put_Line ("JSON_Array");
+            when JSON_Array_Type => Put_Line (" JSON_Array");
             when JSON_Boolean_Type =>
                Put_Line (Boolean'Image (Get (Value)));
             when JSON_Float_Type =>
                Put_Line (Float'Image (Get (Value)));
             when JSON_Int_Type =>
                Put_Line (Integer'Image (Get (Value)));
-            when JSON_Null_Type => null;
-            when JSON_Object_Type => Put_Line ("JSON_Object");
+            when JSON_Null_Type => Put_Line (" Null");
+            when JSON_Object_Type => Put_Line (" JSON_Object");
             when JSON_String_Type => Put_Line (Get (Value));
             end case;
          end if;
+
       end Process_Quality;
 
    begin
-      Quality_Array := Get_Data_Qualities (Data_Id, File_Name => File_Name);
+      Quality_Array := Get_Data_Qualities (Data_Id, Dataset_Name => Dataset);
 
-      if Is_Empty (Quality_Array) then
+      if Quality_Array.Is_Empty then
          Put_Line (Routine_Name & "there are no qualities");
       else
-         Index := Array_First (Quality_Array);
-         while Array_Has_Element (Quality_Array, Index) loop
-            Quality := Array_Element (Quality_Array, Index);
-            Map_JSON_Object (Quality, Process_Quality'Access);
-            Index := Array_Next (Quality_Array, Index);
+         Curs := Quality_Array.First;
+         while Has_Element (Curs) loop
+            Quality := Element (Curs);
+            Process_Quality (Quality);
+            Next (Curs);
          end loop;
       end if;
-
       New_Line;
 
    end Test_Qualities;

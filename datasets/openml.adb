@@ -261,6 +261,7 @@ package body Openml is
          Float_Quality : Float;
          Int_Quality   : Integer;
          Quality       : constant JSON_Value := Create_Object;
+         Null_Value    : Boolean := False;
       begin
          case Kind (Value) is
             when JSON_Array_Type =>
@@ -275,7 +276,7 @@ package body Openml is
             when JSON_Int_Type =>
                Int_Quality := Get (Value);
                Quality.Set_Field (Name, Int_Quality);
-            when JSON_Null_Type => null;
+            when JSON_Null_Type => Null_Value := True;
             when JSON_Object_Type =>
                Quality.Set_Field (Name, Value);
             when JSON_String_Type =>
@@ -285,7 +286,10 @@ package body Openml is
                   Quality.Set_Field (Name, String_Quality);
                end;
          end case;
-         Quality_Array.Include (To_Unbounded_String (Name), Value);
+
+         if not Null_Value then
+            Quality_Array.Include (To_Unbounded_String (Name), Value);
+         end if;
 
       end Get_Quality;
 
