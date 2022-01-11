@@ -2,16 +2,12 @@
 
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Containers.Doubly_Linked_Lists;
---  with Ada.Containers.Ordered_Maps;
 --  with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with AWS.Client;
---  with AWS.Resources;
 with AWS.Response;
---  with AWS.Status;
 with AWS.URL;
 
 with Dataset_Utilities;
@@ -34,10 +30,6 @@ package body Openml is
    --      package ML_Features_Package is new
    --        Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
    --      subtype Features_Map is ML_Features_Package.Map;
-
-   --     package ML_Qualities_Package is new
-   --       Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
-   --     subtype Qualities_Map is ML_Qualities_Package.Map;
 
    --     type Json_Data is record
    --        ID                       : Integer := 1;
@@ -91,7 +83,7 @@ package body Openml is
    procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
                            Data_Id       : in out Integer;
                            Target_Column : String := "default-target";
-                           Return_X_Y    : Boolean := False;
+--                             Return_X_Y    : Boolean := False;
                            As_Frame      : String := "false") is
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
@@ -105,11 +97,14 @@ package body Openml is
       Ignore          : JSON_Value;
       Target_Columns  : JSON_Array;
       Data_Columns    : JSON_Array;
+--        Data_Qualities  : Qualities_Map;
    begin
+      --  L862
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version);
       JSON_Data_Id := Get (Data_Info, "data_id");
       Data_Id := Integer'Value (Get (JSON_Data_Id));
 
+      --  L877
       Description := Get_Data_Description_By_ID (Data_Id);
       Data_Format := Get (Description, "format");
       declare
@@ -119,6 +114,7 @@ package body Openml is
          Return_Sparse := Format = "sparse_arff";
       end;
 
+      --  L903
       if As_Frame = "auto" then
          Return_Sparse := not Return_Sparse;
       end if;
@@ -133,13 +129,19 @@ package body Openml is
          Process_Feature (Dataset_Name, Features_List);
       end if;
 
+      --  L922
       if Target_Column = "default-target" then
          Process_Target (Features_List, Target_Columns);
       end if;
 
-      --  L941
+      --  L944
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
+      --  L948
+--        if not Return_Sparse then
+--           Data_Qualities := Get_Data_Qualities (Data_Id, Dataset_Name);
+--        end if;
+      --  L970
       --        if Return_X_Y then
       --           null;
       --        end if;
@@ -244,15 +246,16 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Data_Qualities (Data_ID   : Integer;
-                                File_Name : String := "") return JSON_Array is
+   function Get_Data_Qualities (Data_ID : Integer; Dataset_Name : String := "")
+                                return Qualities_Map is
       use Ada.Strings;
 --        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
       Qualities     : JSON_Value;
-      Quality_Array : JSON_Array;
+      Quality_Array : Qualities_Map;
 
       procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
+        use ML_Qualities_Package;
          Array_Quality : Boolean;
          Bool_Quality  : Boolean;
          Float_Quality : Float;
@@ -282,16 +285,16 @@ package body Openml is
                   Quality.Set_Field (Name, String_Quality);
                end;
          end case;
-         Append (Quality_Array, Quality);
+         Quality_Array.Include (To_Unbounded_String (Name), Value);
 
       end Get_Quality;
 
    begin
-      if File_Name = "" then
+      if Dataset_Name = "" then
          Json_Data := Get_Json_Content_From_Openml_Api
            (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
       else
-         Json_Data := Get_Json_Content_From_File (File_Name);
+         Json_Data := Get_Json_Content_From_File (Dataset_Name);
       end if;
 
       if Has_Field (Json_Data, "qualities") then
@@ -345,6 +348,28 @@ package body Openml is
       return JSON_Main_Node;
 
    end Get_Json_Content_From_Openml_Api;
+
+   --  ------------------------------------------------------------------------
+
+   function Get_Num_Samples (Qualities : Qualities_Map) return Integer is
+      use ML_Qualities_Package;
+--        Routine_Name  : constant String := "Openml.Get_Num_Samples ";
+      Curs          : Cursor := Qualities.First;
+      Quality       : JSON_Value;
+      Num_Samples   : Integer := -1;
+   begin
+--        Assert (Has_Field (Qualities, "data_features"), Routine_Name &
+--                  "data_features is not a Json_Data field.");
+--        Features := Get (Json_Data, "data_features");
+
+      Quality := Qualities.Element (To_Unbounded_String ("name"));
+      Num_Samples := Num_Samples + 1;
+      while Has_Element (Curs) loop
+         Next (Curs);
+      end loop;
+      return Num_Samples;
+
+   end Get_Num_Samples;
 
    --  ------------------------------------------------------------------------
 

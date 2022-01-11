@@ -101,7 +101,7 @@ package body OML_File_Tests is
    procedure Test_Qualities (Data_Id   : Integer; File_Name : String := "") is
       Routine_Name  : constant String := "Test_Qualities ";
       Index         : Positive;
-      Quality_Array : JSON_Array;
+      Quality_Array : Qualities_Map;
       Quality       : JSON_Value;
 
       procedure Process_Quality (Name : Utf8_String; Value : JSON_Value) is
