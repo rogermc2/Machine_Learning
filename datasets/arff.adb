@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/externals _arff.py
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -24,6 +25,8 @@ package body ARFF is
 
    procedure Decode_Comment
      (UC_Row : String; Arff_Container : in out JSON_Value);
+   procedure Decode_Relation
+     (UC_Row : String; Arff_Container : in out JSON_Value);
 
    --  -------------------------------------------------------------------------
 
@@ -33,6 +36,8 @@ package body ARFF is
                     return JSON_Value is
       use Ada.Strings;
       use String_Package;
+      Routine_Name    : constant String := "ARFF.Decode ";
+      Bad_Layout      : constant String := " layout of ARFF file is bad.";
       Text_Length     : constant Integer := Text'Length;
       State           : TK_State := TK_Descrition;
       Pos1            : Integer := 1;
@@ -47,7 +52,7 @@ package body ARFF is
       while Pos2 /= 0 and Pos1 < Text_Length loop
          Pos2 := Fixed.Index (Text, "\r\n");
          Message_Lines.Append
-           (To_Unbounded_String (Text (Pos1 .. Pos2 - 1)));
+           (To_Unbounded_String (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
          Pos1 := Pos2 + 3;
       end loop;
       if Pos1 < Text_Length - 4 then
@@ -71,7 +76,9 @@ package body ARFF is
                if UC_Row (1 .. 1) = "%" then
                   Decode_Comment (UC_Row, Arff_Container);
                elsif UC_Row = "@RELATION" then
+                  Assert (State = TK_Descrition, Routine_Name & Bad_Layout);
                   State := TK_Relation;
+                  Decode_Relation (UC_Row, Arff_Container);
                elsif UC_Row = "@ATTRIBUTE" then
                   State := TK_Attribute;
                elsif UC_Row = "@DATA" then
@@ -107,6 +114,29 @@ package body ARFF is
       end;
 
    end Decode_Comment;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Decode_Relation (UC_Row         : String;
+                              Arff_Container : in out JSON_Value) is
+      use Ada.Strings;
+      use GNAT.Regpat;
+      Slices  : Array (1 .. 2) of Unbounded_String;
+      Pos     : Integer;
+      Matches : Match_Array (1 .. 2);
+   begin
+      Pos := Fixed.Index (UC_Row, " ");
+      declare
+         Slice_1 : String := UC_Row (1 .. Pos - 1);
+         Slice_2 : String :=
+                     Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
+      begin
+         Match (Compile ("^([^\{\}%,\s]*|"".*""|\'.*\')$"), Slice_2, Matches);
+      end;
+
+--        Arff_Container.Set_Field ("description", Desc);
+
+   end Decode_Relation;
 
    --  -------------------------------------------------------------------------
 

@@ -190,7 +190,7 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
                            As_Frame      : String := "false") is
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
-      Dataset_Name_LC : constant String := To_Lowercase (Dataset_Name);
+      Dataset_Name_LC : constant String := To_Lower_Case (Dataset_Name);
       Data_Url        : constant String := Data_File & "file_id";
       Data_Info       : JSON_Value;
       JSON_Data_Id    : JSON_Value;
@@ -215,7 +215,7 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
       declare
          Format : String := Get (Data_Format);
       begin
-         Format := To_Lowercase (Format);
+         Format := To_Lower_Case (Format);
          Return_Sparse := Format = "sparse_arff";
       end;
 

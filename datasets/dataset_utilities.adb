@@ -1,7 +1,34 @@
 
 with Ada.Characters.Handling;
 
+with GNAT.String_Split;
+
 package body Dataset_Utilities is
+
+   function Split (Line : String; Sep : String) return String_Array is
+      use GNAT.String_Split;
+      Tokens : Slice_Set;
+   begin
+      Create (S => Tokens, From => Line, Separators => Sep,
+              Mode => GNAT.String_Split.Multiple);
+
+      declare
+         Slices : String_Array
+           (1 .. Natural (Slice_Count (Tokens)));
+      begin
+         for index in Slices'Range loop
+            Slices (index) :=
+              Ada.Strings.Unbounded.To_Unbounded_String
+                (GNAT.String_Split.Slice
+                   (Tokens, GNAT.String_Split.Slice_Number (index)));
+         end loop;
+
+         return Slices;
+      end;
+
+   end Split;
+
+   --  -------------------------------------------------------------------------
 
    function To_Lower_Case (Text : String) return String is
       use Ada.Characters.Handling;
