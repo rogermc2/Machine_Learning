@@ -23,7 +23,7 @@ package body ARFF is
    end record;
 
    procedure Decode_Comment
-     (Row : String; Arff_Container : in out JSON_Value);
+     (UC_Row : String; Arff_Container : in out JSON_Value);
 
    --  -------------------------------------------------------------------------
 
@@ -62,7 +62,25 @@ package body ARFF is
 
       Curs := Message_Lines.First;
       while Has_Element (Curs) loop
-         Decode_Comment (To_String (Element (Curs)), Arff_Container);
+         declare
+            UC_Row : String :=
+                       Dataset_Utilities.To_Upper_Case
+                         (To_String (Element (Curs)));
+         begin
+            if UC_Row /= "" then
+               if UC_Row (1 .. 1) = "%" then
+                  Decode_Comment (UC_Row, Arff_Container);
+               elsif UC_Row = "@RELATION" then
+                  State := TK_Relation;
+               elsif UC_Row = "@ATTRIBUTE" then
+                  State := TK_Attribute;
+               elsif UC_Row = "@DATA" then
+                  State := TK_Data;
+               end if;
+
+            end if;
+
+         end;
          Next (Curs);
       end loop;
 
@@ -72,26 +90,21 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   procedure Decode_Comment (Row            : String;
+   procedure Decode_Comment (UC_Row         : String;
                              Arff_Container : in out JSON_Value) is
       use GNAT.Regpat;
-      UC_Row  : String := Dataset_Utilities.To_Upper_Case (Row);
       Matches : Match_Array (1 .. 2);
    begin
-      if UC_Row /= "" then
-         if UC_Row (1 .. 1) = "%" then
-            Match (Compile ("^\%( )?"), Row, Matches);
-            declare
-               Comment : constant String :=
-                           UC_Row (Matches (1).First .. Matches (1).Last)
-                           & "\n";
-               Desc    : constant String :=
-                           Arff_Container.Get ("description") & Comment;
-            begin
-               Arff_Container.Set_Field ("description", Desc);
-            end;
-         end if;
-      end if;
+      Match (Compile ("^\%( )?"), UC_Row, Matches);
+      declare
+         Comment : constant String :=
+                     UC_Row (Matches (1).First .. Matches (1).Last)
+                     & "\n";
+         Desc    : constant String :=
+                     Arff_Container.Get ("description") & Comment;
+      begin
+         Arff_Container.Set_Field ("description", Desc);
+      end;
 
    end Decode_Comment;
 
