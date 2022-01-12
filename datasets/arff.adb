@@ -128,11 +128,17 @@ package body ARFF is
         Slice_2      : String :=
                          Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
         --        Matches : Match_Array (1 .. 2);
+        S            : Membership;
+        First        : Positive;
+        Last         : Natural;
     begin
         --           Match (Compile ("^([^\{\}%,\s]*|"".*""|\'.*\')$"), Slice_2, Matches);
         Assert (Match (Compile ("^([^\{\}%,\s]*|"".*""|\'.*\')$"), Slice_2),
           Routine_Name & " relation declaration '" & Slice_2 &
           "' has an invalid format");
+
+        Find_Token (To_Unbounded_String (Slice_2), """'", 1, Inside,
+                    First, Last);
 
         --        Arff_Container.Set_Field ("description", Desc);
 
