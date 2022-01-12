@@ -37,7 +37,7 @@ package body ARFF is
    function Decode (Decoder     : in Out Arff_Decoder;
                     Text        : String; Encode_Nominal : Boolean := False;
                     Return_Type : ARFF_Return_Type := Arff_Dense)
-                     return JSON_Value is
+                    return JSON_Value is
       use Ada.Strings;
       use String_Package;
       Routine_Name    : constant String := "ARFF.Decode ";
@@ -108,21 +108,21 @@ package body ARFF is
       use Ada.Strings;
       use Ada.Strings.Maps;
       use GNAT.Regpat;
-      Routine_Name : constant String := "ARFF.Decode_Relation ";
-      Regex        : constant String := "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
-      Trim_Seq     : constant Character_Sequence := "{} ";
-      Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
-      Slices       : Array (1 .. 2) of Unbounded_String;
-      Pos          : Integer := Fixed.Index (UC_Row, " ");
-      Slice_1      : constant String := UC_Row (1 .. Pos - 1);
-      Slice_2      : String :=
-                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
-      Name         : Unbounded_String := To_Unbounded_String (Slice_1);
-      Attr_Type    : Unbounded_String := To_Unbounded_String (Slice_2);
-      Values       : String_List;
+      Routine_Name   : constant String := "ARFF.Decode_Relation ";
+      Regex          : constant String := "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
+      Trim_Seq       : constant Character_Sequence := "{} ";
+      Trim_Set       : constant Character_Set := To_Set (Trim_Seq);
+      Slices         : Array (1 .. 2) of Unbounded_String;
+      Pos            : Integer := Fixed.Index (UC_Row, " ");
+      Slice_1        : constant String := UC_Row (1 .. Pos - 1);
+      Attr_Type      : String :=
+                         Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
+      Name           : Unbounded_String := To_Unbounded_String (Slice_1);
+      --        Attr_Type    : Unbounded_String := To_Unbounded_String (Slice_2);
+      Values         : String_List;
    begin
-      Assert (Match (Compile (Regex), Slice_2),
-              Routine_Name & " relation declaration '" & Slice_2 &
+      Assert (Match (Compile (Regex), Attr_Type),
+              Routine_Name & " attribute declaration '" & Attr_Type &
                 "' has an invalid format");
 
       Pos := 1;
@@ -137,9 +137,14 @@ package body ARFF is
          end if;
       end loop;
 
-      if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2'Last) = '{' then
-         Slice_2 := Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set);
-         Values := Parse_Values (To_String (Attr_Type));
+      if Attr_Type (Attr_Type'First) = '{' and Attr_Type (Attr_Type'Last) = '{' then
+         Attr_Type := Fixed.Trim (Attr_Type, Left => Trim_Set, Right => Trim_Set);
+         Values := Parse_Values (Attr_Type);
+      else
+         Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
+         Assert (Attr_Type = "NUMERIC" or Attr_Type = "REAL" or
+                   Attr_Type = "INTEGER" or Attr_Type = "STRING",
+                 Routine_Name & " invalid attribute type, " & Attr_Type);
       end if;
 
       Arff_Container.Set_Field ("attributes", Name);
@@ -221,7 +226,7 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
    function Get_Data_Object_For_Decoding (Matrix_Type : ARFF_Return_Type)
-                                           return JSON_Value is
+                                          return JSON_Value is
       Data_Object : JSON_Value;
    begin
       case Matrix_Type is
@@ -240,7 +245,7 @@ package body ARFF is
 
    function Load (File_Data   : String; Encode_Nominal : Boolean := False;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
-                   return JSON_Value is
+                  return JSON_Value is
       Decoder   : Arff_Decoder;
       ARFF_Data : constant JSON_Value :=
                     Decode (Decoder, File_Data, Encode_Nominal, Return_Type);
