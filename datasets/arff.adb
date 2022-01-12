@@ -100,9 +100,10 @@ package body ARFF is
     procedure Decode_Comment (UC_Row         : String;
                               Arff_Container : in out JSON_Value) is
         use GNAT.Regpat;
+        Regex   : constant String := "^\%( )?";
         Matches : Match_Array (1 .. 2);
     begin
-        Match (Compile ("^\%( )?"), UC_Row, Matches);
+        Match (Compile (Regex), UC_Row, Matches);
         declare
             Comment : constant String :=
                         UC_Row (Matches (1).First .. Matches (1).Last)
@@ -122,25 +123,32 @@ package body ARFF is
         use Ada.Strings;
         use GNAT.Regpat;
         Routine_Name : constant String := "ARFF.Decode_Relation ";
+        Regex        : constant String := "^([^\{\}%,\s]*|"".*""|'.*')$";
         Slices       : Array (1 .. 2) of Unbounded_String;
-        Pos          : constant Integer := Fixed.Index (UC_Row, " ");
-        Slice_1      : String := UC_Row (1 .. Pos - 1);
+        Pos          : Integer := Fixed.Index (UC_Row, " ");
+        Slice_1      : constant String := UC_Row (1 .. Pos - 1);
         Slice_2      : String :=
                          Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
-        --        Matches : Match_Array (1 .. 2);
-        S            : Membership;
-        First        : Positive;
-        Last         : Natural;
+        UB_Slice     : Unbounded_String := To_Unbounded_String (Slice_2);
     begin
         --           Match (Compile ("^([^\{\}%,\s]*|"".*""|\'.*\')$"), Slice_2, Matches);
-        Assert (Match (Compile ("^([^\{\}%,\s]*|"".*""|\'.*\')$"), Slice_2),
+        Assert (Match (Compile (Regex), Slice_2),
           Routine_Name & " relation declaration '" & Slice_2 &
           "' has an invalid format");
 
-        Find_Token (To_Unbounded_String (Slice_2), """'", 1, Inside,
-                    First, Last);
+      Pos := 1;
+      while Pos > 0 and Pos < Length (UB_Slice) loop
+         Pos := Fixed.Index (To_String (UB_Slice), """");
+         if Pos > 0 and Pos < Length (UB_Slice) then
+            if Slice (UB_Slice, Pos + 1, Pos + 1) = "'" then
+               UB_Slice := To_Unbounded_String
+                 (Slice (UB_Slice, 1, Pos - 1) &
+                    Slice (UB_Slice, Pos + 2, Length (UB_Slice)));
+            end if;
+         end if;
+      end loop;
 
-        --        Arff_Container.Set_Field ("description", Desc);
+      Arff_Container.Set_Field ("relation", UB_Slice);
 
     end Decode_Relation;
 
