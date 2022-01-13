@@ -211,7 +211,7 @@ package body ARFF is
                Converser_Map.Set_Field ("STRING", "");
                Converser_Map.Set_Field ("INTEGER", Integer (0));
                Converser_Map.Set_Field ("NUMERIC", 0.0);
-               Converser_Map.Set_Field ("Integer", 0.0);
+               Converser_Map.Set_Field ("REAL", 0.0);
 
                Converser := Get (Converser_Map, Get (Attribute, "name"));
             end;
