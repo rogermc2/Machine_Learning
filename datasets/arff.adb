@@ -22,11 +22,22 @@ package body ARFF is
    subtype String_List is String_Package.List;
 
    type Arff_Decoder is record
+      Conversers   : String_List;
       Current_Line : Integer := 0;
+   end record;
+
+   type Nominal_Conversor is record
+      Values     : String_List;
+      Zero_Value : Unbounded_String := To_Unbounded_String ("");
+   end record;
+
+   type Encoded_Nominal_Conversor is record
+      Values : String_List;
    end record;
 
    procedure Decode_Attribute (Decoder         : in Out Arff_Decoder;
                                UC_Row          : String;
+                               Encode_Nominal  : Boolean := False;
                                Attribute_Names : in out JSON_Value;
                                Arff_Container  : in out JSON_Value);
    procedure Decode_Comment
@@ -94,8 +105,8 @@ package body ARFF is
                             State = TK_Attribute,
                           Routine_Name & Bad_Layout);
                   State := TK_Attribute;
-                  Decode_Attribute (Decoder, UC_Row, Attribute_Names,
-                                    Arff_Container);
+                  Decode_Attribute (Decoder, UC_Row, Encode_Nominal,
+                                    Attribute_Names, Arff_Container);
 
                elsif UC_Row = "@DATA" then
                   State := TK_Data;
@@ -115,6 +126,7 @@ package body ARFF is
 
    procedure Decode_Attribute (Decoder         : in Out Arff_Decoder;
                                UC_Row          : String;
+                               Encode_Nominal  : Boolean := False;
                                Attribute_Names : in out JSON_Value;
                                Arff_Container  : in out JSON_Value) is
       use Ada.Strings;
@@ -136,6 +148,7 @@ package body ARFF is
       Attr_Type    : Unbounded_String;
       Attribute    : JSON_Value := Create_Object;
       Values       : String_List;
+      Converser    : JSON_Value;
    begin
       Name := To_Unbounded_String (Slice_1);
       Assert (Match (Compile (Regex), Slice_2),
@@ -171,33 +184,40 @@ package body ARFF is
 
       declare
          Attr_Name : String := To_String (Name);
-         Converser : JSON_Value;
+         Converser : Unbounded_String;
       begin
-      Assert (not Attribute_Names.Has_Field
-              (Attr_Name), Routine_Name &
-                " duplicate attribute name: " & Attr_Name);
-      Attribute_Names.Set_Field
+         Assert (not Attribute_Names.Has_Field
+                 (Attr_Name), Routine_Name &
+                   " duplicate attribute name: " & Attr_Name);
+         Attribute_Names.Set_Field
            (Attr_Name, Trimmed_Integer (Decoder.Current_Line));
 
-      Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
-      Arff_Container.Set_Field ("attributes", Attribute);
+         Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
+         Arff_Container.Set_Field ("attributes", Attribute);
 
-      if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
-            null;
-      else
+         --  L832
+         if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
+            if Encode_Nominal then
+              null;
+            else
+              null;
+            end if;
+
+         else
             declare
                Converser_Map : JSON_Value := Create_Object;
+               Lambda        : JSON_Value := Create_Object;
             begin
                Converser_Map.Set_Field ("STRING", "");
                Converser_Map.Set_Field ("INTEGER", Integer (0));
                Converser_Map.Set_Field ("NUMERIC", 0.0);
                Converser_Map.Set_Field ("Integer", 0.0);
+
+               Converser := Get (Converser_Map, Get (Attribute, "name"));
             end;
-
-      end if;
+         end if;
+         Decoder.Conversers.Append (Converser);
       end;
-
-
 
    end Decode_Attribute;
 
@@ -290,6 +310,36 @@ package body ARFF is
       return Data_Object;
 
    end Get_Data_Object_For_Decoding;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Init_Encoded_Nominal_Conversor (Conversor : in out Encoded_Nominal_Conversor;
+                                             Values    : String_List) is
+   begin
+      Conversor.Values := Values;
+
+   end Init_Encoded_Nominal_Conversor;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Init_Nominal_Conversor (Conversor : in out Nominal_Conversor;
+                                     Values     : String_List) is
+   begin
+      Conversor.Values := Values;
+      Conversor.Zero_Value := Values.First_Element;
+
+   end Init_Nominal_Conversor;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Init_Nominal_Conversor (Conversor : in out Nominal_Conversor;
+                                     Value     : String) is
+   begin
+      Conversor.Values.Clear;
+      Conversor.Zero_Value := To_Unbounded_String (Value);
+      Conversor.Values.Append (To_Unbounded_String (Value));
+
+   end Init_Nominal_Conversor;
 
    --  -------------------------------------------------------------------------
 
