@@ -55,9 +55,9 @@ package body ARFF is
      (UC_Row : String; Arff_Container : in out JSON_Value);
    procedure Decode_Relation
      (UC_Row : String; Arff_Container : in out JSON_Value);
-   procedure Decode_Rows_COO (UC_Row         : String;
+   procedure Decode_Rows_COO (Stream         : String_List;
                               Arff_Container : in out JSON_Value);
-   procedure Decode_Rows_Dense (UC_Row         : String;
+   procedure Decode_Rows_Dense (Stream         : String_List;
                                 Arff_Container : in out JSON_Value);
    function Parse_Values (UC_Row : Unbounded_String) return String_List;
 
@@ -162,7 +162,7 @@ package body ARFF is
       --  L872
       case Matrix_Type is
          when Arff_Dense =>
-            Decode_Rows_Dense (Stream, ARFF_Data);
+            Decode_Rows_Dense (Message_Lines, ARFF_Data);
          when others => null;
       end case;
 
@@ -350,7 +350,7 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   procedure Decode_Rows_COO (UC_Row         : String;
+   procedure Decode_Rows_COO (Stream         : String_List;
                               Arff_Container : in out JSON_Value) is
 
    begin
@@ -359,11 +359,19 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
    --  L460
-   procedure Decode_Rows_Dense (UC_Row         : String;
+   procedure Decode_Rows_Dense (Stream         : String_List;
                                 Arff_Container : in out JSON_Value) is
-
+      use String_Package;
+      Curs   : Cursor := Stream.First;
+      Row    : Unbounded_String;
+      Values : String_List;
    begin
-      null;
+      while Has_Element (Curs) loop
+         Row := Element (Curs);
+         Values := Parse_Values (Row);
+         Next (Curs);
+      end loop;
+
    end Decode_Rows_Dense;
 
    --  -------------------------------------------------------------------------
