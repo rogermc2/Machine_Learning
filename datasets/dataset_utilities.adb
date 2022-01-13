@@ -1,5 +1,6 @@
 
 with Ada.Characters.Handling;
+with Ada.Strings.Fixed;
 
 with GNAT.String_Split;
 
@@ -59,5 +60,15 @@ package body Dataset_Utilities is
       return UC;
 
    end To_Upper_Case;
+
+   --  -------------------------------------------------------------------------
+
+   function Trimmed_Integer (Value : Integer) return String is
+      use Ada.Strings;
+   begin
+      return Fixed.Trim (Integer'Image (Value), Both);
+   end Trimmed_Integer;
+
+   --  -------------------------------------------------------------------------
 
 end Dataset_Utilities;
