@@ -517,7 +517,7 @@ package body ARFF is
         aMatch := Matches (0);
          if aMatch.Last = 0 then
             --  not nontrivial
-                Values := Load_CSV_Data (Row);
+                Values := Get_CSV_Data (Row);
             end if;
         end if;
 

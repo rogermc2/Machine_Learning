@@ -10,11 +10,11 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Load_CSV_Data (CSV_Data : String) return String_List is
+   function Get_CSV_Data (CSV_Data : String) return String_List is
    begin
       return Split_String (CSV_Data, ",");
 
-   end Load_CSV_Data;
+   end Get_CSV_Data;
 
    --  -------------------------------------------------------------------------
 
