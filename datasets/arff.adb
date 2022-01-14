@@ -9,7 +9,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Regpat;
 
-with Dataset_Utilities;
+with Dataset_Utilities; use Dataset_Utilities;
 
 pragma Warnings (Off);
 
@@ -17,10 +17,6 @@ package body ARFF is
 
     type TK_State is (TK_Descrition, TK_Comment, TK_Relation, TK_Attribute,
                       TK_Data);
-
-    package String_Package is new
-      Ada.Containers.Doubly_Linked_Lists (Unbounded_String);
-    subtype String_List is String_Package.List;
 
     type Conversor_Type is (Conversor_Unencoded, Conversor_Encoded,
                             Conversor_Map);
@@ -508,18 +504,20 @@ package body ARFF is
     --  Matches (N) is for the  N'th parenthesized subexpressions;
     --  Matches (0) is for the whole expression.
     function Parse_Values (Row : String) return String_List is
-        use GNAT.Regpat;
+      use GNAT.Regpat;
+      use Dataset_Utilities;
         use String_Package;
-        Regex   : constant String := """'{}\s";
-        Matches : Match_Array (0 .. 0);
-        aMatch  : Match_Location;
-        Values  : String_List;
+        Non_Trivial : constant String := """'{}\s";
+        Matches     : Match_Array (0 .. 0);
+        aMatch      : Match_Location;
+        Values      : String_List;
     begin
         if Row'Length /= 0 and then Row /= "?" then
-        Match (Compile (Regex), Row, Matches);
+        Match (Compile (Non_Trivial), Row, Matches);
         aMatch := Matches (0);
-        if aMatch.Last = 0 then
-                null;
+         if aMatch.Last = 0 then
+            --  not nontrivial
+                Values := Load_CSV_Data (Row);
             end if;
         end if;
 
