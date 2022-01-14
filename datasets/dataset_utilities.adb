@@ -11,22 +11,8 @@ package body Dataset_Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_CSV_Data (CSV_Data : String) return String_List is
---        use String_Package;
---        CSV_Line  : String_List;
---        Curs      : String_Package.Cursor;
---        Values    : Unbounded_List;
-      Data      : String_List;
    begin
-      Data := Split_String (CSV_Data, ",");
---        Curs := CSV_Line.First;
---        Values.Clear;
---        while Has_Element (Curs) loop
---           Values.Append (Element (Curs));
---           Next (Curs);
---        end loop;
---        Data.Append (Values);
-
-      return Data;
+      return Split_String (CSV_Data, ",");
 
    end Load_CSV_Data;
 
