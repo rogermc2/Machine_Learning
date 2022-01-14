@@ -17,6 +17,7 @@ package body ARFF is
 
    type TK_State is (TK_Descrition, TK_Comment, TK_Relation, TK_Attribute,
                      TK_Data);
+
    package String_Package is new
      Ada.Containers.Doubly_Linked_Lists (Unbounded_String);
    subtype String_List is String_Package.List;
@@ -35,6 +36,13 @@ package body ARFF is
          when Conversor_Map =>
             Mapping        : Unbounded_String := To_Unbounded_String ("");
       end case;
+   end record;
+
+   type Converser_Map is record
+      Text    : Unbounded_String := To_Unbounded_String ("");
+      Int     : Integer := 0;
+      Numeric : Float := 0.0;
+      Real    : Float := 0.0;
    end record;
 
    package Conversor_Package is new
