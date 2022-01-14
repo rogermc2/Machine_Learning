@@ -1,3 +1,4 @@
+with "utilada_http.gpr";
 with "gnatcoll.gpr";
 with "aws.gpr";
 
