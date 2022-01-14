@@ -501,10 +501,12 @@ package body ARFF is
    end Load;
 
    --  -------------------------------------------------------------------------
-
+   --  L283
    function Parse_Values (Row : String) return String_List is
       use String_Package;
+      Regex  : constant String := """'{}\s";
    begin
+
       return String_Package.Empty_List;
 
    end Parse_Values;
