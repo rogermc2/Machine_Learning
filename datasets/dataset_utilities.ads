@@ -19,7 +19,7 @@ package Dataset_Utilities is
       Ada.Containers.Doubly_Linked_Lists (Unbounded_String);
     subtype String_List is String_Package.List;
 
-    procedure CSV_Reader;
+    procedure CSV_Reader (CSV_File_Name : String; Data : out String_List);
     function Get_CSV_Data (CSV_Data : String) return String_List;
     function Split (Line : String; Sep : String) return String_Array;
     function To_Lower_Case (Text : String) return String;
