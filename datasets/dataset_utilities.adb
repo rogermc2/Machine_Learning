@@ -1,12 +1,73 @@
 
 with Ada.Characters.Handling;
+with Ada.Directories;
 with Ada.Strings.Fixed;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.String_Split;
+
+with Util.Serialize.IO.CSV;
+with Util.Serialize.Mappers;
 
 package body Dataset_Utilities is
 
    function Split_String (aString, Pattern : String) return String_List;
+
+    --  ------------------------------------------------------------------------
+
+    procedure CSV_Reader is
+        use Util.Serialize.IO.CSV;
+        type CSV_Parser is new Util.Serialize.IO.CSV.Parser with null record;
+
+        Prev_Row       : Row_Type;
+        Data_File_Name : constant String := "data";
+        Data_File      : File_Type;
+
+        overriding
+        procedure Set_Cell (Parser : in out CSV_Parser;
+                            Value  : in String;
+                            Row    : in Util.Serialize.IO.CSV.Row_Type;
+                            Column : in Util.Serialize.IO.CSV.Column_Type);
+
+        overriding
+        procedure Set_Cell (Parser : in out CSV_Parser;
+                            Value  : in String;
+                            Row    : in Util.Serialize.IO.CSV.Row_Type;
+                            Column : in Util.Serialize.IO.CSV.Column_Type) is
+            pragma Unreferenced (Parser, Column);
+
+        begin
+            if Prev_Row /= Row then
+                Ada.Text_IO.New_Line;
+                Ada.Text_IO.New_Line (Data_File);
+                Prev_Row := Row;
+            else
+                Put (" ");
+                Put (Data_File, " ");
+            end if;
+            Ada.Text_IO.Put (Value);
+            Ada.Text_IO.Put (Data_File, Value);
+        end Set_Cell;
+
+        CSV_File_Name  : constant String := "iris.csv";
+        aLine          : Unbounded_String;
+        Parser         : CSV_Parser;
+        Mapper         : Util.Serialize.Mappers.Processing;
+    begin
+        pragma Unreferenced (aLine);
+
+        if not Ada.Directories.Exists (Data_File_Name) then
+            Create (Data_File, Out_File, Data_File_Name);
+        else
+            Open (Data_File, Out_File, Data_File_Name);
+        end if;
+
+        Prev_Row := Row_Type'Last;
+        Parser.Parse (CSV_File_Name, Mapper);
+
+        Close (Data_File);
+
+    end CSV_Reader;
 
    --  -------------------------------------------------------------------------
 

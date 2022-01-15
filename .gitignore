@@ -2,6 +2,7 @@
 *.ads1
 *.orig
 *.pdf
+*.csv
 *.o
 *.obj
 *.a
