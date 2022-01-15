@@ -63,8 +63,10 @@ package body ARFF is
    Stream_Cursor : String_Package.Cursor;
    Quoted_Re  : constant String :=
                   """(?:(?<!\)(?:\\)*\""|\[^""]|[^""\])*""";
+   Quoted_Re2 : constant String :=
+                  "'(?:(?<!\)(?:\\)*\'|\[^']|[^'\])*""";
    Value_Re   : constant String := "(?:" & Quoted_Re & "|" &
-                  Quoted_Re & "|[^,\s""'{}]+)";
+                  Quoted_Re2 & "|[^,\s""'{}]+)";
 
    procedure Decode_Attribute (Decoder         : in Out Arff_Decoder;
                                UC_Row          : String;
@@ -112,8 +114,6 @@ package body ARFF is
 
    function Build_Re_Sparse return GNAT.Regpat.Pattern_Matcher is
       use GNAT.Regpat;
-      Quoted_Re2 : constant String :=
-                     "'(?:(?<!\)(?:\\)*\'|\[^']|[^'\])*""";
    begin
       return Compile ("(?x)(?:^\s*\{|,)\s*(\d+)\s+(" & Value_Re &
                         "s)|(?!}\s*$)(?!^\s*{\s*}\s*$)\S.*");
@@ -168,7 +168,7 @@ package body ARFF is
       while Has_Element (Curs) loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
          declare
-            UC_Row : String :=
+            UC_Row : constant String :=
                        Dataset_Utilities.To_Upper_Case
                          (To_String (Element (Curs)));
          begin
@@ -226,18 +226,17 @@ package body ARFF is
       use Ada.Strings;
       use Ada.Strings.Maps;
       use GNAT.Regpat;
-      use Dataset_Utilities;
       Routine_Name : constant String := "ARFF.Decode_Relation ";
       Regex        : constant String :=
                        "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
       Trim_Seq     : constant Character_Sequence := "{} ";
       Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
-      Slices       : Array (1 .. 2) of Unbounded_String;
+--        Slices       : Array (1 .. 2) of Unbounded_String;
       --  L749 Extract raw name and type
       Pos          : Integer := Fixed.Index (UC_Row, " ");
-      Slice_1      : constant String := UC_Row (1 .. Pos - 1);
+      Slice_1      : constant String := UC_Row (UC_Row'First .. Pos - 1);
       Slice_2      : String :=
-                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
+                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
       Name         : Unbounded_String;
       Attr_Type    : Unbounded_String;
       Attribute    : JSON_Value := Create_Object;
@@ -277,7 +276,7 @@ package body ARFF is
       end if;
 
       declare
-         Attr_Name : String := To_String (Name);
+         Attr_Name : constant String := To_String (Name);
       begin
          Assert (not Attribute_Names.Has_Field
                  (Attr_Name), Routine_Name &
@@ -317,13 +316,13 @@ package body ARFF is
                Converser_Map : JSON_Value := Create_Object;
                Lambda        : JSON_Value := Create_Object;
             begin
+               --  L838
                Converser_Map.Set_Field ("STRING", "");
                Converser_Map.Set_Field ("INTEGER", Integer (0));
                Converser_Map.Set_Field ("NUMERIC", 0.0);
                Converser_Map.Set_Field ("REAL", 0.0);
 
-               Converser.Mapping := Get (Converser_Map,
-                                         Get (Attribute, "attributes"));
+--                 Converser := Element (Converser_Map, "INTEGER");
                Decoder.Conversers.Append (Converser);
             end;
          end if;
@@ -360,11 +359,11 @@ package body ARFF is
       use GNAT.Regpat;
       Routine_Name : constant String := "ARFF.Decode_Relation ";
       Regex        : constant String := "^([^\{\}%,\s]*|"".*""|'.*')$";
-      Slices       : Array (1 .. 2) of Unbounded_String;
+--        Slices       : Array (1 .. 2) of Unbounded_String;
       Pos          : Integer := Fixed.Index (UC_Row, " ");
-      Slice_1      : constant String := UC_Row (1 .. Pos - 1);
-      Slice_2      : String :=
-                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Length), Both);
+--        Slice_1      : constant String := UC_Row (1 .. Pos - 1);
+      Slice_2      : constant String :=
+                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
       UB_Slice     : Unbounded_String := To_Unbounded_String (Slice_2);
    begin
       Assert (Match (Compile (Regex), Slice_2),
@@ -423,7 +422,7 @@ package body ARFF is
       use String_Package;
       use Conversor_Tuple_Package;
 
-      Routine_Name   : String := "ARFF.Decode_Values ";
+      Routine_Name   : constant String := "ARFF.Decode_Values ";
       Zip_Values     : Conversor_Tuple_List;
       Conv_Cursor    : Conversor_Package.Cursor;
       Values_Cursor  : String_Package.Cursor;
@@ -519,7 +518,6 @@ package body ARFF is
    --  Matches (0) is for the whole expression.
    function Parse_Values (Row : String) return String_List is
       use GNAT.Regpat;
-      use Dataset_Utilities;
       use String_Package;
       Non_Trivial : constant String := "[""'{}\s]";
       Matches     : Match_Array (0 .. 0);
@@ -554,7 +552,8 @@ package body ARFF is
    function Stream_Data (Decoder : in out Arff_Decoder) return String is
       use Ada.Strings;
       use String_Package;
-      Row  : Unbounded_String;
+      Row    : Unbounded_String;
+      Result : Unbounded_String;
    begin
       while Has_Element (Stream_Cursor) loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
@@ -565,11 +564,13 @@ package body ARFF is
               (To_String (Row));
          begin
             if Length (Row) > 0 and UC_Row (1 .. 1) /= "%" then
-               return To_String (Row);
+               Result := Row;
             end if;
          end;
          Next (Stream_Cursor);
       end loop;
+
+      return To_String (Result);
 
    end Stream_Data;
 
