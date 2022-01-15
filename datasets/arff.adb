@@ -17,7 +17,6 @@ package body ARFF is
 
     type TK_State is (TK_Descrition, TK_Comment, TK_Relation, TK_Attribute,
                       TK_Data);
-
     type Conversor_Type is (Conversor_Unencoded, Conversor_Encoded,
                             Conversor_Map);
 
@@ -60,7 +59,7 @@ package body ARFF is
     end record;
 
     type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
-                                             return String;
+                                              return String;
     Stream_Cursor : String_Package.Cursor;
 
     procedure Decode_Attribute (Decoder         : in Out Arff_Decoder;
@@ -76,42 +75,29 @@ package body ARFF is
                                Arff_Container : in out JSON_Value);
     function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                 Stream_Func : Stream_Func_Type)
-                               return String_List;
+                                return String_List;
     function Decode_Values (Values : String_List; Conversers : Conversor_List)
-                           return String_List;
+                            return String_List;
     function Max_Value (Values : String_List) return Integer;
     function Parse_Values (Row : String) return String_List;
+    function Stream_Data (Decoder : in out Arff_Decoder) return String;
 
     --  -------------------------------------------------------------------------
 
-    function Stream_Data (Decoder : in out Arff_Decoder) return String is
-        use Ada.Strings;
-        use String_Package;
-        Row  : Unbounded_String;
+    procedure Build_Re_Values is
+        Quoted_Re : constant String :=
+                      """(?:(?<!\)(?:\\)*\""|\[^""]|[^""\])*""";
+        Value_Re  : constant String := "(?:%s|%s|[^,\s""'{}]+)";
     begin
-        while Has_Element (Stream_Cursor) loop
-            Decoder.Current_Line := Decoder.Current_Line + 1;
-            Row := Element (Stream_Cursor);
-            Trim (Row, Both);
-            declare
-                UC_Row : String := Dataset_Utilities.To_Upper_Case
-                  (To_String (Row));
-            begin
-                if Length (Row) > 0 and UC_Row (1 .. 1) /= "%" then
-                    return To_String (Row);
-                end if;
-            end;
-            Next (Stream_Cursor);
-        end loop;
-
-    end Stream_Data;
+        null;
+    end Build_Re_Values;
 
     --  -------------------------------------------------------------------------
     --  L771
     function Decode (Decoder     : in Out Arff_Decoder;
                      Text        : String; Encode_Nominal : Boolean := False;
                      Matrix_Type : ARFF_Return_Type := Arff_Dense)
-                    return JSON_Value is
+                     return JSON_Value is
         use Ada.Strings;
         use String_Package;
         Routine_Name    : constant String := "ARFF.Decode ";
@@ -386,7 +372,7 @@ package body ARFF is
     --  L460
     function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                 Stream_Func : Stream_Func_Type)
-                               return String_List is
+                                return String_List is
         use String_Package;
         Routine_Name     : String := "ARFF.Decode_Rows_Dense ";
         Converser_Length : Natural := Natural (Decoder.Conversers.Length);
@@ -487,7 +473,7 @@ package body ARFF is
 
     function Load (File_Data   : String; Encode_Nominal : Boolean := False;
                    Return_Type : ARFF_Return_Type := Arff_Dense)
-                  return JSON_Value is
+                   return JSON_Value is
         Decoder   : Arff_Decoder;
         ARFF_Data : constant JSON_Value :=
                       Decode (Decoder, File_Data, Encode_Nominal, Return_Type);
@@ -504,26 +490,55 @@ package body ARFF is
     --  Matches (N) is for the  N'th parenthesized subexpressions;
     --  Matches (0) is for the whole expression.
     function Parse_Values (Row : String) return String_List is
-      use GNAT.Regpat;
-      use Dataset_Utilities;
+        use GNAT.Regpat;
+        use Dataset_Utilities;
         use String_Package;
-        Non_Trivial : constant String := """'{}\s";
+        Non_Trivial : constant String := "[""'{}\s]";
         Matches     : Match_Array (0 .. 0);
         aMatch      : Match_Location;
         Values      : String_List;
     begin
         if Row'Length /= 0 and then Row /= "?" then
-        Match (Compile (Non_Trivial), Row, Matches);
-        aMatch := Matches (0);
-         if aMatch.Last = 0 then
-            --  not nontrivial
+            Match (Compile (Non_Trivial), Row, Matches);
+            aMatch := Matches (0);
+            if aMatch.Last = 0 then
+                --  not nontrivial
+                --  Row contains none of the Non_Trivial characters
                 Values := Get_CSV_Data (Row);
+            else
+                --  Row contains Non_Trivial characters
+                --  _RE_DENSE_VALUES
+                Build_Re_Values;
             end if;
         end if;
 
         return Values;
 
     end Parse_Values;
+
+    --  -------------------------------------------------------------------------
+
+    function Stream_Data (Decoder : in out Arff_Decoder) return String is
+        use Ada.Strings;
+        use String_Package;
+        Row  : Unbounded_String;
+    begin
+        while Has_Element (Stream_Cursor) loop
+            Decoder.Current_Line := Decoder.Current_Line + 1;
+            Row := Element (Stream_Cursor);
+            Trim (Row, Both);
+            declare
+                UC_Row : String := Dataset_Utilities.To_Upper_Case
+                  (To_String (Row));
+            begin
+                if Length (Row) > 0 and UC_Row (1 .. 1) /= "%" then
+                    return To_String (Row);
+                end if;
+            end;
+            Next (Stream_Cursor);
+        end loop;
+
+    end Stream_Data;
 
     --  -------------------------------------------------------------------------
 
