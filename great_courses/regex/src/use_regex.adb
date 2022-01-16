@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Gnat.Regpat; use Gnat.Regpat;
 
-with ML_Types;
+with Dataset_Utilities;
 
 procedure Use_Regex is
 
@@ -24,9 +24,11 @@ procedure Use_Regex is
             Last := Result (1).Last;
         end if;
 
-    end Find_Match;
+   end Find_Match;
 
-    use ML_Types.Strings_Package;
+   --  -------------------------------------------------------------------------
+
+    use Dataset_Utilities.String_Package;
     --  [a-zA-Z]+ selects a sequence [] of one or more (+)
     --  alphabetic characters (a-zA-Z)
     --  () combines [a-zA-Z]+ into a group
@@ -36,7 +38,7 @@ procedure Use_Regex is
     Current_First : Positive := Str'First;
     First         : Positive;
     Last          : Positive;
-    Words         : ML_Types.Strings_List;
+    Words         : Dataset_Utilities.String_List;
     Curs          : Cursor;
     Found         : Boolean := True;
 begin

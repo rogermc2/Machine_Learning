@@ -1,3 +1,4 @@
+with "utilada_unit.gpr";
 
 project Regex_Example is
 
