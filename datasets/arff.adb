@@ -521,8 +521,11 @@ package body ARFF is
       use String_Package;
       Non_Trivial : constant String := "[""'{}\s]";
       Matches     : Match_Array (0 .. 0);
+      Matches_2   : Match_Array (0 .. 0);
+      Matches_3   : Match_Array (0 .. 0);
       aMatch      : Match_Location;
       Values      : String_List;
+      Zip_Values     : Conversor_Tuple_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
          Match (Compile (Non_Trivial), Row, Matches);
@@ -538,7 +541,8 @@ package body ARFF is
                Dense  : GNAT.Regpat.Pattern_Matcher := Build_Re_Dense;
                Sparse : GNAT.Regpat.Pattern_Matcher := Build_Re_Sparse;
             begin
-               null;
+                Match (Dense, "," & Row, Matches_2);
+                Match (Sparse, "," & Row, Matches_3);
             end;
          end if;
       end if;
