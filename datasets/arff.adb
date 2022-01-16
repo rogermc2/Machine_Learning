@@ -87,9 +87,11 @@ package body ARFF is
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    function Stream_Data (Decoder : in out Arff_Decoder) return String;
+   function Unquote (Values : String_List) return String_List;
 
    --  -------------------------------------------------------------------------
-
+   --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
+   --  despite quoting, whitespace, etc.
    function Build_Re_Dense return GNAT.Regpat.Pattern_Matcher is
       use GNAT.Regpat;
       --  "         open quote followed by zero or more:
@@ -486,6 +488,20 @@ package body ARFF is
    end Init_Nominal_Conversor;
 
    --  -------------------------------------------------------------------------
+   --  match.group returns one or more subgroups of the match.
+   --  If there is a single argument, the result is a single string;
+   --  if there are multiple arguments, the result is a tuple with one item
+   --  per argument.
+   --  Without arguments, group1 defaults to zero (the whole match is returned).
+   function Escape_Sub_Callback (Values : String_List) return String_List is
+      use String_Package;
+      Result : String_List := Empty_List;
+   begin
+      return Result;
+
+   end Escape_Sub_Callback;
+
+   --  -------------------------------------------------------------------------
 
    procedure Init_Nominal_Conversor (Conversor : in out Conversor_Data;
                                      Value     : String) is
@@ -519,31 +535,44 @@ package body ARFF is
    function Parse_Values (Row : String) return String_List is
       use GNAT.Regpat;
       use String_Package;
-      Non_Trivial : constant String := "[""'{}\s]";
-      Matches     : Match_Array (0 .. 0);
-      Matches_2   : Match_Array (0 .. 0);
-      Matches_3   : Match_Array (0 .. 0);
-      aMatch      : Match_Location;
-      Values      : String_List;
-      Zip_Values     : Conversor_Tuple_List;
+      Non_Trivial  : constant String := "[""'{}\s]";
+      First        : Positive;
+      Last         : Positive;
+      Match_Found  : Boolean;
+      Dense_Match  : Boolean;
+      Sparse_Match : Boolean;
+      Values       : String_List;
+      Errors       : String_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         Match (Compile (Non_Trivial), Row, Matches);
-         aMatch := Matches (0);
-         if aMatch.Last = 0 then
+         Find_Match (Compile (Non_Trivial), Row, First, Last, Match_Found);
+         if Match_Found then
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
          else
             --  Row contains Non_Trivial characters
-            --  _RE_DENSE_VALUES
+            --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
+            --  despite quoting, whitespace, etc.
             declare
                Dense  : GNAT.Regpat.Pattern_Matcher := Build_Re_Dense;
                Sparse : GNAT.Regpat.Pattern_Matcher := Build_Re_Sparse;
             begin
-                Match (Dense, "," & Row, Matches_2);
-                Match (Sparse, "," & Row, Matches_3);
-            end;
+               Find_Match (Dense, Row, First, Last, Dense_Match);
+               if Dense_Match then
+                  Values := Get_CSV_Data (Row (First .. Last));
+               end if;
+               Find_Match (Sparse, Row, First, Last, Sparse_Match);
+               if Sparse_Match then
+                  Errors := Get_CSV_Data (Row (First .. Last));
+               end if;
+            end;  --  declare block
+
+            if not Errors.Is_Empty then
+               null;
+            else
+               null;
+            end if;
          end if;
       end if;
 
@@ -579,5 +608,16 @@ package body ARFF is
    end Stream_Data;
 
    --  -------------------------------------------------------------------------
+
+   function Unquote (Values : String_List) return String_List is
+      use String_Package;
+      Unquoted_List : String_List := Empty_List;
+   begin
+      return Unquoted_List;
+
+   end Unquote;
+
+   --  -------------------------------------------------------------------------
+
 
 end ARFF;
