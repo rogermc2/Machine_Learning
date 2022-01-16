@@ -24,7 +24,7 @@ procedure Use_Regex is
    end Search_For_Pattern;
 
    Word_Pattern  : constant String := "([a-zA-Z]+)";
---     Matcher       : constant Pattern_Matcher := Compile (Word_Pattern);
+   Matcher       : constant Pattern_Matcher := Compile (Word_Pattern);
    Str           : String := "I love PATTERN matching!";
    Current_First : Positive := Str'First;
    First         : Positive;
@@ -34,7 +34,7 @@ procedure Use_Regex is
 begin
    --  first, find all the words in Str
    loop
-      Search_For_Pattern (Compile (Word_Pattern),
+      Search_For_Pattern (Matcher,
                           Str (Current_First .. Str'Last),
                           First, Last, Found);
       exit when not Found;
