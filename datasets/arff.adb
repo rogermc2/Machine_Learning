@@ -621,19 +621,35 @@ package body ARFF is
       --  . match any single character except new line characters
       Pattern       : constant String := "\([0-9]{1,3}|u[0-9a-f]{4}|.)";
       Matcher       : constant Pattern_Matcher := Compile (Pattern);
+      First         : Integer;
+      Last          : Integer;
+      Match_Found   : Boolean := False;
       Unquoted_List : String_List := Empty_List;
       Curs          : Cursor := Values.First;
    begin
       while Has_Element (Curs) loop
+         Unquoted_List.Append (Element (Curs));
+         Next (Curs);
+      end loop;
+
+      Curs := Unquoted_List.First;
+      while Has_Element (Curs) loop
          declare
-            Row : String := To_String (Element (Curs));
+            UB_Row : Unbounded_String := Element (Curs);
+            Row    : String := To_String (UB_Row);
          begin
             if Row (1 .. 1) = ("""") or else Row (1 .. 1) =  (",") then
                --  re.sub(r'\\([0-9]{1,3}|u[0-9a-f]{4}|.)',
                --  _escape_sub_callback,v[1:-1])
-               null;
+               --  use Replace_Slice?
+               Regex.Find_Match (Matcher, Row (2 .. Row'Last - 1),
+                                 First, Last, Match_Found);
+               Delete (UB_Row, 1, 1);
+               Delete (UB_Row, Length (UB_Row), Length (UB_Row));
             end if;
          end;
+
+         Next (Curs);
       end loop;
 
       return Unquoted_List;
