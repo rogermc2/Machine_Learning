@@ -618,7 +618,9 @@ package body ARFF is
             declare
                 Row : String := To_String (Element (Curs));
             begin
-                if Row (1 .. 1) = ("""") or else Row (1 .. 1) =  (",") then
+            if Row (1 .. 1) = ("""") or else Row (1 .. 1) =  (",") then
+               --  re.sub(r'\\([0-9]{1,3}|u[0-9a-f]{4}|.)',
+               --  _escape_sub_callback,v[1:-1])
                     null;
                 end if;
             end;

@@ -11,11 +11,13 @@ with Util.Serialize.Mappers;
 
 package body Dataset_Utilities is
 
-   function Split_String (aString, Pattern : String) return String_List;
+   function Split_String (aString, Pattern : String)
+                          return ML_Types.String_List;
 
    --  ------------------------------------------------------------------------
 
-   procedure CSV_Reader (CSV_File_Name : String; Data : out String_List) is
+   procedure CSV_Reader (CSV_File_Name : String;
+                         Data          : out ML_Types.String_List) is
       use Util.Serialize.IO.CSV;
       type CSV_Parser is new Util.Serialize.IO.CSV.Parser with null record;
 
@@ -76,27 +78,7 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Find_Match
-      (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
-       First, Last : out Positive; Found : out Boolean) is
-      use Gnat.Regpat;
-      Result : Match_Array (0 .. 1);
-    begin
-        --  Match selects the first substring of Text that matches
-        --  Compiled_Expression
-        Match (Compiled_Expression, Text, Result);
-        Found := Result (1) /= No_Match;
-
-        if Found then
-            First := Result (1).First;
-            Last := Result (1).Last;
-        end if;
-
-   end Find_Match;
-
-   --  -------------------------------------------------------------------------
-
-   function Get_CSV_Data (CSV_Data : String) return String_List is
+   function Get_CSV_Data (CSV_Data : String) return ML_Types.String_List is
    begin
       return Split_String (CSV_Data, ",");
 
@@ -129,12 +111,13 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_String (aString, Pattern : String) return String_List is
+   function Split_String (aString, Pattern : String)
+                          return ML_Types.String_List is
       use Ada.Strings;
       Last       : constant Integer := aString'Last;
       Last_Char  : constant Character := aString (Last);
       UB_String  : Unbounded_String;
-      Split_List : String_List;
+      Split_List : ML_Types.String_List;
    begin
       if Character'Pos (Last_Char) < 32 then
          UB_String :=

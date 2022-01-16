@@ -1,9 +1,8 @@
 
-with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Gnat.Regpat;
+with ML_Types;
 
 package Dataset_Utilities is
 
@@ -17,15 +16,9 @@ package Dataset_Utilities is
      (Positive, Unbounded_List);
    subtype Raw_Data_Vector is Raw_Data_Package.Vector;
 
-   package String_Package is new
-     Ada.Containers.Doubly_Linked_Lists (Unbounded_String);
-   subtype String_List is String_Package.List;
-
-   procedure CSV_Reader (CSV_File_Name : String; Data : out String_List);
-   procedure Find_Match
-     (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
-      First, Last         : out Positive; Found : out Boolean);
-   function Get_CSV_Data (CSV_Data : String) return String_List;
+   procedure CSV_Reader (CSV_File_Name : String;
+                         Data          : out ML_Types.String_List);
+   function Get_CSV_Data (CSV_Data : String) return ML_Types.String_List;
    function Split (Line : String; Sep : String) return String_Array;
    function To_Lower_Case (Text : String) return String;
    function To_Upper_Case (Text : String) return String;
