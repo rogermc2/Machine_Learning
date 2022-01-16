@@ -1,6 +1,7 @@
 --  Based on regex example from Rosettacode
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Gnat.Regpat; use Gnat.Regpat;
@@ -64,7 +65,7 @@ begin
     New_Line;
     Curs := Words.First;
     while Has_Element (Curs) loop
-        Put_Line ("<<" & To_String (Element (Curs)) & ">>");
+        Put_Line ("<<" & Element (Curs) & ">>");
         Next (Curs);
     end loop;
 
