@@ -1,4 +1,3 @@
-with "utilada_http.gpr";
 
 project Regex_Example is
 
