@@ -62,7 +62,7 @@ package body ARFF is
    end record;
 
    type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
-                                              return String;
+                                             return String;
    Stream_Cursor : ML_Types.String_Package.Cursor;
    Quoted_Re  : constant String :=
                   """(?:(?<!\)(?:\\)*\""|\[^""]|[^""\])*""";
@@ -84,9 +84,9 @@ package body ARFF is
                               Arff_Container : in out JSON_Value);
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
-                                return String_List;
+                               return String_List;
    function Decode_Values (Values : String_List; Conversers : Conversor_List)
-                            return String_List;
+                           return String_List;
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    function Stream_Data (Decoder : in out Arff_Decoder) return String;
@@ -130,7 +130,7 @@ package body ARFF is
    function Decode (Decoder     : in Out Arff_Decoder;
                     Text        : String; Encode_Nominal : Boolean := False;
                     Matrix_Type : ARFF_Return_Type := Arff_Dense)
-                     return JSON_Value is
+                    return JSON_Value is
       use Ada.Strings;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "ARFF.Decode ";
@@ -404,7 +404,7 @@ package body ARFF is
    --  L460
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
-                                return String_List is
+                               return String_List is
       use String_Package;
       Routine_Name     : String := "ARFF.Decode_Rows_Dense ";
       Converser_Length : Natural := Natural (Decoder.Conversers.Length);
@@ -519,7 +519,7 @@ package body ARFF is
 
    function Load (File_Data   : String; Encode_Nominal : Boolean := False;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
-                   return JSON_Value is
+                  return JSON_Value is
       Decoder   : Arff_Decoder;
       ARFF_Data : constant JSON_Value :=
                     Decode (Decoder, File_Data, Encode_Nominal, Return_Type);
@@ -616,10 +616,11 @@ package body ARFF is
    function Unquote (Values : String_List) return String_List is
       use GNAT.Regpat;
       use String_Package;
-      --  [0-9]{1,3} match when any digit appears from 1 to 3 times
-      --  u[0-9a-f]{4} match string starting with followed 4 times by a hex digit
-      --  . match any single character except new line characters
-      Pattern       : constant String := "\([0-9]{1,3}|u[0-9a-f]{4}|.)";
+      --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
+      --  \u[0-9a-f]{4} match string starting with \u followed by 4 hex digits
+      --  \. match \.
+      --  In each case first to last refers to the characters follwing the /
+      Pattern       : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
       Matcher       : constant Pattern_Matcher := Compile (Pattern);
       First         : Integer;
       Last          : Integer;
@@ -627,30 +628,36 @@ package body ARFF is
       Unquoted_List : String_List := Empty_List;
       Curs          : Cursor := Values.First;
    begin
-      while Has_Element (Curs) loop
-         Unquoted_List.Append (Element (Curs));
-         Next (Curs);
-      end loop;
+      if not Is_Empty (Values) and
+        not (Natural (Length (Values)) = 1 and First_Element (Values) = "?")
+      then
+         while Has_Element (Curs) loop
+            Unquoted_List.Append (Element (Curs));
+            Next (Curs);
+         end loop;
 
-      Curs := Unquoted_List.First;
-      while Has_Element (Curs) loop
-         declare
-            UB_Row : Unbounded_String := Element (Curs);
-            Row    : String := To_String (UB_Row);
-         begin
-            if Row (1 .. 1) = ("""") or else Row (1 .. 1) =  (",") then
-               --  re.sub(r'\\([0-9]{1,3}|u[0-9a-f]{4}|.)',
-               --  _escape_sub_callback,v[1:-1])
-               --  use Replace_Slice?
-               Regex.Find_Match (Matcher, Row (2 .. Row'Last - 1),
-                                 First, Last, Match_Found);
-               Delete (UB_Row, 1, 1);
-               Delete (UB_Row, Length (UB_Row), Length (UB_Row));
-            end if;
-         end;
+         Curs := Unquoted_List.First;
+         while Has_Element (Curs) loop
+            declare
+               UB_Row : Unbounded_String := Element (Curs);
+               Row    : String := To_String (UB_Row);
+            begin
+               if Row (1 .. 1) = ("""") or else Row (1 .. 1) =  (",") then
+                  --  re.sub(r'\\([0-9]{1,3}|u[0-9a-f]{4}|.)',
+                  --  _escape_sub_callback,v[1:-1])
+                  --  use Replace_Slice?
+                  Regex.Find_Match (Matcher, Row (2 .. Row'Last - 1),
+                                    First, Last, Match_Found);
+                  Delete (UB_Row, 1, 1);
+                  Delete (UB_Row, Length (UB_Row), Length (UB_Row));
+               elsif Row = "?" or Row = "" then
+                  Unquoted_List := Empty_List;
+               end if;
+            end;
 
-         Next (Curs);
-      end loop;
+            Next (Curs);
+         end loop;
+      end if;
 
       return Unquoted_List;
 
