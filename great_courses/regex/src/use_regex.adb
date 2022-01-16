@@ -23,24 +23,27 @@ procedure Use_Regex is
 
    end Search_For_Pattern;
 
+   use ML_Types.Strings_Package;
    Word_Pattern  : constant String := "([a-zA-Z]+)";
    Matcher       : constant Pattern_Matcher := Compile (Word_Pattern);
    Str           : String := "I love PATTERN matching!";
    Current_First : Positive := Str'First;
    First         : Positive;
    Last          : Positive;
-   Words         : ML_Types.String_List;
-   Found         : Boolean := False;
+   Words         : ML_Types.Strings_List;
+   Curs          : Cursor;
+   Found         : Boolean := True;
 begin
    --  first, find all the words in Str
-   loop
+   while Found loop
       Search_For_Pattern (Matcher,
                           Str (Current_First .. Str'Last),
                           First, Last, Found);
-      exit when not Found;
 
-      Words.Append (To_Unbounded_String (Str));
-      Put_Line ("<" & Str (First .. Last) & ">");
+      if Found then
+         Words.Append (To_Unbounded_String (Str (First .. Last)));
+         Put_Line ("<" & Str (First .. Last) & ">");
+      end if;
       Current_First := Last + 1;
    end loop;
 
@@ -50,5 +53,12 @@ begin
    Str :=
      Str (Str'First .. First - 1) & "pattern" & Str (Last + 1 .. Str'Last);
    Put_Line (Str);
+
+   New_Line;
+   Curs := Words.First;
+   while Has_Element (Curs) loop
+      Put_Line ("<<" & To_String (Element (Curs)) & ">>");
+      Next (Curs);
+   end loop;
 
 end Use_Regex;
