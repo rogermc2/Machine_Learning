@@ -26,6 +26,11 @@ procedure Regex_Tester is
    Curs          : Cursor;
    Found         : Boolean := True;
 begin
+    New_Line;
+    Put_Line ("Regex_Tester, parenthese count:" &
+                Integer'Image (Paren_Count (Matcher)));
+    New_Line;
+
    --  Find all the words in Str
    Put_Line ("Find_Match results:");
    while Found loop
