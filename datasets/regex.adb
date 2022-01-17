@@ -2,7 +2,7 @@
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 package body Regex is
    use GNAT.Regpat;
@@ -13,7 +13,7 @@ package body Regex is
 
    function All_Matches
      (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
-      Found : out Boolean) return Matches_List is
+      Found               : out Boolean) return Matches_List is
       Num_Parens : constant Natural := Paren_Count (Compiled_Expression);
       Matches    : Match_Array (0 .. Num_Parens);
       Result     : Matches_List;
@@ -38,7 +38,7 @@ package body Regex is
    procedure Find_Match
      (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
       First, Last         : out Positive; Found : out Boolean;
-      Group_Index : Natural := 0) is
+      Group_Index         : Natural := 0) is
       Matches : constant Matches_List
         := All_Matches (Compiled_Expression, Text, Found);
       Result  : Match_Location;
@@ -54,22 +54,23 @@ package body Regex is
    --  -------------------------------------------------------------------------
 
    function Get_Groups (Regex : String) return String is
+      UB_Regex : constant Unbounded_String := To_Unbounded_String (Regex);
       Pattern  : constant String := "c";
       Matcher  : constant Pattern_Matcher := Compile (Pattern);
-      UB_Regex : constant Unbounded_String := To_Unbounded_String (Regex);
-      First    : Positive;
-      Last     : Positive;
-      Found    : Boolean := True;
+      Found    : Boolean;
+      Matches  : constant Matches_List := All_Matches (Matcher, Regex, Found);
+      aMatch   : Match_Location;
       Groups   : Unbounded_String := To_Unbounded_String ("");
    begin
-      while Found loop
-         Find_Match (Matcher, Regex, First, Last, Found);
-         if Found then
-            Put_Line ("Group found");
-            Groups := Groups & Slice (UB_Regex, First, Last);
-         end if;
-         Put_Line (Groups);
-      end loop;
+      if Found then
+         for index in Matches.First_Index .. Matches.Last_Index loop
+            aMatch := Matches.Element (index);
+            if Slice (UB_Regex, aMatch.First, aMatch.First) = "(" then
+               Groups := Groups & Slice (UB_Regex, aMatch.First, aMatch.Last);
+            end if;
+            Put_Line (Groups);
+         end loop;
+      end if;
 
       return To_String (Groups);
 

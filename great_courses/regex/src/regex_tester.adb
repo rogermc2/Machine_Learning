@@ -57,4 +57,12 @@ begin
       Next (Curs);
    end loop;
 
+   New_Line;
+   Put_Line ("Groups:");
+   Curs := Words.First;
+   while Has_Element (Curs) loop
+      Put_Line (Regex.Get_Groups (To_String (Element (Curs))));
+      Next (Curs);
+   end loop;
+
 end Regex_Tester;
