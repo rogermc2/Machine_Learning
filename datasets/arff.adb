@@ -65,11 +65,11 @@ package body ARFF is
                                              return String;
    Stream_Cursor : ML_Types.String_Package.Cursor;
    Quoted_Re  : constant String :=
-                  """(?:(?<!\)(?:\\)*\""|\[^""]|[^""\])*""";
+                  "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^']|[^""\\])*""";
    Quoted_Re2 : constant String :=
-                  "'(?:(?<!\)(?:\\)*\'|\[^']|[^'\])*""";
-   Value_Re   : constant String := "(?:" & Quoted_Re & "|" &
-                  Quoted_Re2 & "|[^,\s""'{}]+)";
+                  "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+   Value_Re   : constant String := "''(?:''" & Quoted_Re & "|" &
+                  Quoted_Re2 & "|[^,\s""'{}]+)''";
 
    procedure Decode_Attribute (Decoder         : in Out Arff_Decoder;
                                UC_Row          : String;
@@ -111,7 +111,7 @@ package body ARFF is
       --  Because empty values are allowed, we cannot just look for empty
       --  values to handle syntax errors.
       --  We presume the line has had ',' prepended...
-      return Compile ("(?x),\s*((?=,)|$|{" & Value_Re & "})|(\S.*)");
+      return Compile ("''(?x),\s*((?=,)|$|{" & Value_Re & "})|(\S.*)''");
 
    end Build_Re_Dense;
 
@@ -539,7 +539,7 @@ package body ARFF is
       use GNAT.Regpat;
       use Regex;
       use String_Package;
-      Non_Trivial  : constant String := "[""'{}\s]";
+      Non_Trivial  : constant String := "[""\'{}\\s]";
       First        : Positive;
       Last         : Positive;
       Match_Found  : Boolean;
