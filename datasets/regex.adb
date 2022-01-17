@@ -9,16 +9,16 @@ package body Regex is
       (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
        First, Last : out Positive; Found : out Boolean) is
       use Gnat.Regpat;
-      Result : Match_Array (0 .. 1);
+      Result : Match_Array (0 .. Paren_Count (Compiled_Expression));
     begin
         --  Match selects the first substring of Text that matches
-        --  Compiled_Expression
+        --  the Compiled_Expression
         Match (Compiled_Expression, Text, Result);
-        Found := Result (1) /= No_Match;
+        Found := Result (0) /= No_Match;
 
         if Found then
-            First := Result (1).First;
-            Last := Result (1).Last;
+            First := Result (0).First;
+            Last := Result (0).Last;
         end if;
 
    end Find_Match;

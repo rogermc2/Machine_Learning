@@ -16,9 +16,12 @@ procedure Regex_Tester is
    --  [a-zA-Z]+ selects a sequence [] of one or more (+)
    --  alphabetic characters (a-zA-Z)
    --  () combines [a-zA-Z]+ into a group
-   Word_Pattern  : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
+--     Word_Pattern  : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
+   Word_Pattern  : constant String := "ab\d";
+
    Matcher       : constant Pattern_Matcher := Compile (Word_Pattern);
-   Str           : constant String := "\123 \test \u23af \. rt";
+--     Str           : constant String := "\123 \test \u23af \. rt";
+   Str           : constant String := "ab123e5f6g";
    Current_First : Positive := Str'First;
    First         : Positive;
    Last          : Positive;
@@ -32,7 +35,8 @@ begin
     New_Line;
 
    --  Find all the words in Str
-   Put_Line ("Find_Match results:");
+   Put_Line ("Find_Match results for matching "  & Str & " with " &
+   Word_Pattern);
    while Found loop
       Regex.Find_Match (Matcher, Str (Current_First .. Str'Last),
                         First, Last, Found);
