@@ -8,7 +8,7 @@ with Gnat.Regpat; use Gnat.Regpat;
 
 with ML_Types;
 
-procedure Use_Regex is
+procedure Regex_Example is
 
     procedure Find_Match
       (Compiled_Expression : Pattern_Matcher; Text : String;
@@ -69,4 +69,4 @@ begin
         Next (Curs);
     end loop;
 
-end Use_Regex;
+end Regex_Example;
