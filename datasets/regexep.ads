@@ -1,7 +1,7 @@
 
 with Gnat.Regpat;
 
-package Regex is
+package Regexep is
 
    procedure Find_Match
      (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
@@ -9,4 +9,4 @@ package Regex is
       Group_Index         : Natural := 0);
    function Get_Groups (Regex : String) return String;
 
-end Regex;
+end Regexep;

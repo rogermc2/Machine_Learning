@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Gnat.Regpat; use Gnat.Regpat;
 
 with ML_Types;
-with Regex;
+with Regexep;
 
 procedure Regex_Tester is
 
@@ -38,7 +38,7 @@ begin
    Put_Line ("Find_Match results for matching "  & Str & " with " &
    Word_Pattern);
    while Found loop
-      Regex.Find_Match (Matcher, Str (Current_First .. Str'Last),
+      Regexep.Find_Match (Matcher, Str (Current_First .. Str'Last),
                         First, Last, Found);
       if Found then
          Words.Append (To_Unbounded_String (Str (First .. Last)));
@@ -61,7 +61,7 @@ begin
    Put_Line ("Groups:");
    Curs := Words.First;
    while Has_Element (Curs) loop
-      Put_Line (Regex.Get_Groups (To_String (Element (Curs))));
+      Put_Line (Regexep.Get_Groups (To_String (Element (Curs))));
       Next (Curs);
    end loop;
 

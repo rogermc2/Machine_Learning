@@ -4,7 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-package body Regex is
+package body Regexep is
    use GNAT.Regpat;
 
    package Matches_Package is new Ada.Containers.Vectors
@@ -78,4 +78,4 @@ package body Regex is
 
    --  -------------------------------------------------------------------------
 
-end Regex;
+end Regexep;
