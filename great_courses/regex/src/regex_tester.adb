@@ -1,6 +1,6 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
+--  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Gnat.Regpat; use Gnat.Regpat;
@@ -18,16 +18,15 @@ procedure Regex_Tester is
    --  alphabetic characters (a-zA-Z)
    --  () combines [a-zA-Z]+ into a group
 --     Word_Pattern  : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
-   Word_Pattern  : constant String := "^(file_.+)\.pdf$";
+   Word_Pattern  : constant String := "(\d+)x(\d+)";
 
    Matcher       : constant Pattern_Matcher := Compile (Word_Pattern);
 --     Str           : constant String := "\123 \test \u23af \. rt";
-   Str           : constant String := "file_07241999.pdf";
-   Current_First : Positive := Str'First;
+   Str           : constant String := "1920x1600";
+--     Current_First : Positive := Str'First;
    First         : Positive;
    Last          : Positive;
    Words         : ML_Types.String_List;
-   Curs          : ML_Types.String_Package.Cursor;
    Match_Curs    : Regexep.Matches_Package.Cursor;
    Matches       : Regexep.Matches_List;
    Groups        : Regexep.Matches_List;
@@ -43,9 +42,7 @@ begin
    --  Find all the words in Str
    Put_Line ("Find_Match results for matching "  & Str & " with " &
    Word_Pattern);
-   while Found loop
-      Matches := Regexep.Find_Match (Matcher, Str (Current_First .. Str'Last),
-                                     First, Last, Found);
+      Matches := Regexep.Find_Match (Matcher, Str, First, Last, Found);
       if Found then
          Words.Append (To_Unbounded_String (Str (First .. Last)));
          Put_Line ("Match:  <" & Str (First .. Last) & ">");
@@ -64,23 +61,12 @@ begin
             Match_Curs := Groups.First;
             while Has_Element (Match_Curs) loop
                 aGroup := Element (Match_Curs);
-                Put_Line (Integer'Image (aGroup.First) & ", " & Integer'Image (aGroup.Last));
+--                  Put_Line (Integer'Image (aGroup.First) & ", " & Integer'Image (aGroup.Last));
                 Put_Line (Str (aGroup.First .. aGroup.Last));
                 Next (Match_Curs);
             end loop;
       else
          Put_Line ("No match");
       end if;
-      Current_First := Last + 1;
-   end loop;
-
-   New_Line;
-   Put_Line ("String_List:");
-   Curs := Words.First;
-   while Has_Element (Curs) loop
-      Put_Line ("<<" & Element (Curs) & ">>");
-      Next (Curs);
-   end loop;
-
 
 end Regex_Tester;
