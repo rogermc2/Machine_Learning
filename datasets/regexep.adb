@@ -75,10 +75,13 @@ package body Regexep is
             Part_1  : constant String :=
                         Text (Text'First .. Matches (1).First - 1);
             Part_2  : constant String :=
-                        Text (Matches (2).First .. Text'Last);
+                        Text (Matches (1).First .. Matches (1).Last);
+            Part_3  : constant String :=
+                        Text (Matches (1).Last + 1 .. Text'Last);
         begin
-            Result := To_Unbounded_String (Subs_Func (Part_1)) &
-              To_Unbounded_String (Part_2);
+            Result := To_Unbounded_String (Part_1) &
+              To_Unbounded_String (Subs_Func (Part_2)) &
+              To_Unbounded_String (Part_3);
         end;
 
         return To_String (Result);
