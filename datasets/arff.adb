@@ -2,6 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -61,8 +62,12 @@ package body ARFF is
       Current_Line : Integer := 0;
    end record;
 
+   package Escape_Sub_Map_Package is new Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
+
    type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
                                              return String;
+
+   Escape_Sub_Map : Escape_Sub_Map_Package.Map;
    Stream_Cursor : ML_Types.String_Package.Cursor;
    Quoted_Re  : constant String :=
                   "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^']|[^""\\])*""";
@@ -496,10 +501,26 @@ package body ARFF is
    --  if there are multiple arguments, the result is a tuple with one item
    --  per argument.
    --  Without arguments, group1 defaults to zero (the whole match is returned).
-   function Escape_Sub_Callback (Values : Regexep.Matches_List) return String_List is
-      use String_Package;
-      Result : String_List := Empty_List;
+   function Escape_Sub_Callback (Values : Regexep.Matches_List)
+                                 return Regexep.Matches_List is
+      use Ada.Containers;
+      use Regexep;
+      use Escape_Sub_Map_Package;
+      S        : Matches_List := Get_Groups (Values);
+      S_1      : GNAT.Regpat.Match_Location;
+      S_2      : GNAT.Regpat.Match_Location;
+      Map_Cursor : Cursor := Escape_Sub_Map.First;
+      Map_Item : Unbounded_String;
+      Result   : Matches_List;
    begin
+      if S.Length = 2 then
+         S_1 := S.First_Element;
+         S_2 := S.Last_Element;
+         while Has_Element (Map_Cursor) loop
+            Map_Item := Element (Map_Cursor);
+            Next (Map_Cursor);
+         end loop;
+      end if;
       return Result;
 
    end Escape_Sub_Callback;
@@ -650,7 +671,7 @@ package body ARFF is
                   --  _escape_sub_callback,v[1:-1])
                   --  use Replace_Slice?
                   Matches := Find_Match (Matcher, Row (2 .. Row'Last - 1),
-                                    First, Last, Match_Found);
+                                         First, Last, Match_Found);
                   Delete (UB_Row, 1, 1);
                   Delete (UB_Row, Length (UB_Row), Length (UB_Row));
                elsif Row = "?" or Row = "" then
@@ -668,5 +689,24 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
+begin
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\\\"),
+                           To_Unbounded_String ("\\"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\"""),
+                           To_Unbounded_String (""""));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\'"),
+                           To_Unbounded_String ( "'"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\t"),
+                           To_Unbounded_String ("\t"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\n"),
+                           To_Unbounded_String ("\n"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\r"),
+                           To_Unbounded_String ("\r"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\b"),
+                           To_Unbounded_String ("\b"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\f"),
+                           To_Unbounded_String ("\f"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\%"),
+                           To_Unbounded_String ("%"));
 
 end ARFF;
