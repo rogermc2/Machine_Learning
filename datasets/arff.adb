@@ -6,7 +6,6 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Unbounded; use Ada.Strings.Wide_Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
@@ -64,7 +63,7 @@ package body ARFF is
    end record;
 
    package Escape_Sub_Map_Package is new
-      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_Wide_String);
+      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
 
    type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
                                              return String;
@@ -693,36 +692,48 @@ package body ARFF is
 
    use Escape_Sub_Map_Package;
    Escape_Key : Unbounded_String;
-   Escape_Val : Unbounded_Wide_String;
+   Escape_Val : Unbounded_String;
 begin
    Escape_Sub_Map.Include (To_Unbounded_String ("\\\\"),
-                           To_Unbounded_Wide_String ("\\"));
+                           To_Unbounded_String ("\\"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\"""),
-                           To_Unbounded_Wide_String (""""));
+                           To_Unbounded_String (""""));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\'"),
-                           To_Unbounded_Wide_String ( "'"));
+                           To_Unbounded_String ( "'"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\t"),
-                           To_Unbounded_Wide_String ("\t"));
+                           To_Unbounded_String ("\t"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\n"),
-                           To_Unbounded_Wide_String ("\n"));
+                           To_Unbounded_String ("\n"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\r"),
-                           To_Unbounded_Wide_String ("\r"));
+                           To_Unbounded_String ("\r"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\b"),
-                           To_Unbounded_Wide_String ("\b"));
+                           To_Unbounded_String ("\b"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\f"),
-                           To_Unbounded_Wide_String ("\f"));
+                           To_Unbounded_String ("\f"));
    Escape_Sub_Map.Include (To_Unbounded_String ("\\%"),
-                           To_Unbounded_Wide_String ("%"));
+                           To_Unbounded_String ("%"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\0"),
+                           To_Unbounded_String ("\x00"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\1"),
+                           To_Unbounded_String ("\x01"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\2"),
+                           To_Unbounded_String ("\x02"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\3"),
+                           To_Unbounded_String ("\x03"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\4"),
+                           To_Unbounded_String ("\x04"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\5"),
+                           To_Unbounded_String ("\x05"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\6"),
+                           To_Unbounded_String ("\x06"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\7"),
+                           To_Unbounded_String ("\x07"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\8"),
+                           To_Unbounded_String ("\x08"));
+   Escape_Sub_Map.Include (To_Unbounded_String ("\\9"),
+                           To_Unbounded_String ("\t"));
 
-  for index in 0 .. 9 loop
-        Escape_Key := To_Unbounded_String ("\\" & Trimmed_Integer (index));
-        Escape_Val := To_Unbounded_Wide_String (Trimmed_Integer (index));
-        if Escape_Sub_Map.Find (Escape_Key) = No_Element then
-           Escape_Sub_Map.Insert (Escape_Key, Escape_Val);
-        else
-           Escape_Sub_Map.Replace (Escape_Key, Escape_Val);
-        end if;
-  end loop;
+
 
 
 end ARFF;

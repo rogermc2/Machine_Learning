@@ -1,7 +1,6 @@
 
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Wide_Unbounded;
 
 with ML_Types;
 
@@ -24,7 +23,5 @@ package Dataset_Utilities is
     function To_Lower_Case (Text : String) return String;
     function To_Upper_Case (Text : String) return String;
     function Trimmed_Integer (Value : Integer) return String;
-    function Wide_Trimmed_Integer
-      (Value : Integer) return Ada.Strings.Wide_Unbounded.Unbounded_Wide_String;
 
 end Dataset_Utilities;
