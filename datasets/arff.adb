@@ -538,6 +538,39 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
+    function Escape_Sub_Callback (S : String) return String is
+      use Ada.Containers;
+      use Ada.Strings;
+      use Regexep;
+      use Escape_Sub_Map_Package;
+      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      UB_S         : constant Unbounded_String := To_Unbounded_String (S);
+      S_Length     : constant Natural := S'Length;
+      Int_Value    : Integer;
+      Based_Int    : String (1 .. 2 * S_Length);
+      Result       : Unbounded_String;
+   begin
+      if S_Length = 4 then
+         Assert (Escape_Sub_Map.Contains (UB_S), Routine_Name &
+                   "Unsupported escape sequence: " & S);
+         Result := Escape_Sub_Map.Element (UB_S);
+
+      elsif S (2) = 'u' then
+         Int_Value := Integer'Value (Slice (UB_S, 3, S_Length));
+         Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 16);
+         Result := Trim (To_Unbounded_String (Based_Int), Both);
+      else
+         Int_Value := Integer'Value (Slice (UB_S, 2, S_Length));
+         Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 8);
+         Result := Trim (To_Unbounded_String (Based_Int), Both);
+      end if;
+
+      return To_String (Result);
+
+   end Escape_Sub_Callback;
+
+   --  -------------------------------------------------------------------------
+
    procedure Init_Nominal_Conversor (Conversor : in out Conversor_Data;
                                      Value     : String) is
    begin
@@ -665,8 +698,9 @@ package body ARFF is
       if Values = "" or  Values (1) = '?' then
          null;
       elsif Values (1) = '"' or Values (1) = ''' then
-         Result := To_Unbounded_String (Pattern);
-
+         Result := To_Unbounded_String
+              (Substitute (Values (Values'First + 1 .. Values'Last - 1),
+              Pattern, Escape_Sub_Callback'Access));
       else
          Result := To_Unbounded_String (Values);
       end if;
