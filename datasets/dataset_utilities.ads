@@ -1,27 +1,30 @@
 
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Wide_Unbounded;
 
 with ML_Types;
 
 package Dataset_Utilities is
 
-   type String_Array is array (Positive range <>) of Unbounded_String;
-   package Unbounded_Package is new Ada.Containers.Vectors
-     (Positive, Unbounded_String);
-   subtype Unbounded_List is Unbounded_Package.Vector;
+    type String_Array is array (Positive range <>) of Unbounded_String;
+    package Unbounded_Package is new Ada.Containers.Vectors
+      (Positive, Unbounded_String);
+    subtype Unbounded_List is Unbounded_Package.Vector;
 
-   use Unbounded_Package;
-   package Raw_Data_Package is new Ada.Containers.Vectors
-     (Positive, Unbounded_List);
-   subtype Raw_Data_Vector is Raw_Data_Package.Vector;
+    use Unbounded_Package;
+    package Raw_Data_Package is new Ada.Containers.Vectors
+      (Positive, Unbounded_List);
+    subtype Raw_Data_Vector is Raw_Data_Package.Vector;
 
-   procedure CSV_Reader (CSV_File_Name : String;
-                         Data          : out ML_Types.String_List);
-   function Get_CSV_Data (CSV_Data : String) return ML_Types.String_List;
-   function Split (Line : String; Sep : String) return String_Array;
-   function To_Lower_Case (Text : String) return String;
-   function To_Upper_Case (Text : String) return String;
-   function Trimmed_Integer (Value : Integer) return String;
+    procedure CSV_Reader (CSV_File_Name : String;
+                          Data          : out ML_Types.String_List);
+    function Get_CSV_Data (CSV_Data : String) return ML_Types.String_List;
+    function Split (Line : String; Sep : String) return String_Array;
+    function To_Lower_Case (Text : String) return String;
+    function To_Upper_Case (Text : String) return String;
+    function Trimmed_Integer (Value : Integer) return String;
+    function Wide_Trimmed_Integer
+      (Value : Integer) return Ada.Strings.Wide_Unbounded.Unbounded_Wide_String;
 
 end Dataset_Utilities;
