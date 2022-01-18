@@ -3,6 +3,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
+with Ada.Integer_Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -511,6 +512,8 @@ package body ARFF is
       Match_Groups : constant Match_Strings_List := Get_Groups (Match);
       S            : constant Unbounded_String := Match_Groups.Element (0);
       S_Length     : constant Natural := Length (S);
+      Int_Value    : Integer;
+      Based_Int    : String (1 .. S_Length);
       Result       : Unbounded_String;
    begin
       if S_Length = 4 then
@@ -518,9 +521,14 @@ package body ARFF is
                    "Unsupported escape sequence: " & To_String (S));
          Result := Escape_Sub_Map.Element (S);
 
-         --        elsif To_String (S) (1) = 'u' then
+      elsif To_String (S) (2) = 'u' then
+         Int_Value := Integer'Value (Slice (S, 3, S_Length));
+         Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 16);
+         Result := To_Unbounded_String (Based_Int);
       else
-         Result := To_Unbounded_String (Slice (S, 2, S_Length));
+         Int_Value := Integer'Value (Slice (S, 2, S_Length));
+         Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 8);
+         Result := To_Unbounded_String (Based_Int);
       end if;
 
       return To_String (Result);
