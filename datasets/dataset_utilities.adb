@@ -12,7 +12,7 @@ with Util.Serialize.Mappers;
 package body Dataset_Utilities is
 
    function Split_String (aString, Pattern : String)
-                          return ML_Types.String_List;
+                           return ML_Types.String_List;
 
    --  ------------------------------------------------------------------------
 
@@ -40,14 +40,14 @@ package body Dataset_Utilities is
 
       begin
          if Prev_Row /= Row then
---              Ada.Text_IO.New_Line;
+            --              Ada.Text_IO.New_Line;
             Ada.Text_IO.New_Line (Data_File);
             Prev_Row := Row;
          else
---              Put (" ");
+            --              Put (" ");
             Put (Data_File, " ");
          end if;
---           Ada.Text_IO.Put (Value);
+         --           Ada.Text_IO.Put (Value);
          Ada.Text_IO.Put (Data_File, Value);
       end Set_Cell;
 
@@ -73,6 +73,7 @@ package body Dataset_Utilities is
          Data.Append (To_Unbounded_String (Get_Line (Data_File)));
       end loop;
       Close (Data_File);
+      pragma Unreferenced (Data_File);
 
    end CSV_Reader;
 
@@ -112,7 +113,7 @@ package body Dataset_Utilities is
    --  -------------------------------------------------------------------------
 
    function Split_String (aString, Pattern : String)
-                          return ML_Types.String_List is
+                           return ML_Types.String_List is
       use Ada.Strings;
       Last       : constant Integer := aString'Last;
       Last_Char  : constant Character := aString (Last);
@@ -186,6 +187,7 @@ package body Dataset_Utilities is
       use Ada.Strings;
    begin
       return Fixed.Trim (Integer'Image (Value), Both);
+
    end Trimmed_Integer;
 
    --  -------------------------------------------------------------------------
