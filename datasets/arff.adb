@@ -506,6 +506,7 @@ package body ARFF is
    function Escape_Sub_Callback (Match : Regexep.Match_Strings_List)
                                  return String is
       use Ada.Containers;
+      use Ada.Strings;
       use Regexep;
       use Escape_Sub_Map_Package;
       Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
@@ -524,11 +525,11 @@ package body ARFF is
       elsif To_String (S) (2) = 'u' then
          Int_Value := Integer'Value (Slice (S, 3, S_Length));
          Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 16);
-         Result := To_Unbounded_String (Based_Int);
+         Result := Trim (To_Unbounded_String (Based_Int), Both);
       else
          Int_Value := Integer'Value (Slice (S, 2, S_Length));
          Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 8);
-         Result := To_Unbounded_String (Based_Int);
+         Result := Trim (To_Unbounded_String (Based_Int), Both);
       end if;
 
       return To_String (Result);
