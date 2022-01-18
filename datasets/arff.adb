@@ -63,19 +63,19 @@ package body ARFF is
    end record;
 
    package Escape_Sub_Map_Package is new
-      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
+     Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
 
    type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
                                              return String;
 
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
-   Stream_Cursor : ML_Types.String_Package.Cursor;
-   Quoted_Re  : constant String :=
-                  "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^']|[^""\\])*""";
-   Quoted_Re2 : constant String :=
-                  "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
-   Value_Re   : constant String := "''(?:''" & Quoted_Re & "|" &
-                  Quoted_Re2 & "|[^,\s""'{}]+)''";
+   Stream_Cursor  : ML_Types.String_Package.Cursor;
+   Quoted_Re      : constant String :=
+                      "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^']|[^""\\])*""";
+   Quoted_Re2     : constant String :=
+                      "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+   Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
+                      Quoted_Re2 & "|[^,\s""'{}]+)''";
 
    procedure Decode_Attribute (Decoder         : in Out Arff_Decoder;
                                UC_Row          : String;
@@ -96,7 +96,7 @@ package body ARFF is
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    function Stream_Data (Decoder : in out Arff_Decoder) return String;
-   function Unquote (Values : String_List) return String_List;
+   function Unquote (Values : String) return String;
 
    --  -------------------------------------------------------------------------
    --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
@@ -515,10 +515,10 @@ package body ARFF is
    begin
       if S_Length = 4 then
          Assert (Escape_Sub_Map.Contains (S), Routine_Name &
-                 "Unsupported escape sequence: " & To_String (S));
+                   "Unsupported escape sequence: " & To_String (S));
          Result := Escape_Sub_Map.Element (S);
 
---        elsif To_String (S) (1) = 'u' then
+         --        elsif To_String (S) (1) = 'u' then
       else
          Result := To_Unbounded_String (Slice (S, 2, S_Length));
       end if;
@@ -637,7 +637,7 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Unquote (Values : String_List) return String_List is
+   function Unquote (Values : String) return String is
       use GNAT.Regpat;
       use String_Package;
       use Regexep;
@@ -651,41 +651,18 @@ package body ARFF is
       First         : Integer;
       Last          : Integer;
       Match_Found   : Boolean := False;
-      Unquoted_List : String_List := Empty_List;
-      Curs          : Cursor := Values.First;
+      Result        : Unbounded_String := To_Unbounded_String ("");
    begin
-      if not Is_Empty (Values) and
-        not (Natural (Length (Values)) = 1 and First_Element (Values) = "?")
-      then
-         while Has_Element (Curs) loop
-            Unquoted_List.Append (Element (Curs));
-            Next (Curs);
-         end loop;
+      if Values = "" or  Values (1) = '?' then
+         null;
+      elsif Values (1) = '"' or Values (1) = ''' then
+         Result := To_Unbounded_String (Pattern);
 
-         Curs := Unquoted_List.First;
-         while Has_Element (Curs) loop
-            declare
-               UB_Row : Unbounded_String := Element (Curs);
-               Row    : String := To_String (UB_Row);
-            begin
-               if Row (1 .. 1) = ("""") or else Row (1 .. 1) =  (",") then
-                  --  re.sub(r'\\([0-9]{1,3}|u[0-9a-f]{4}|.)',
-                  --  _escape_sub_callback,v[1:-1])
-                  --  use Replace_Slice?
-                  Matches := Find_Match (Matcher, Row (2 .. Row'Last - 1),
-                                         First, Last, Match_Found);
-                  Delete (UB_Row, 1, 1);
-                  Delete (UB_Row, Length (UB_Row), Length (UB_Row));
-               elsif Row = "?" or Row = "" then
-                  Unquoted_List := Empty_List;
-               end if;
-            end;
-
-            Next (Curs);
-         end loop;
+      else
+         Result := To_Unbounded_String (Values);
       end if;
 
-      return Unquoted_List;
+      return To_String (Result);
 
    end Unquote;
 
