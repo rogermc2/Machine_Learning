@@ -12,7 +12,7 @@ with GNAT.Regpat;
 
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
-with Regex;
+with Regexep;
 
 pragma Warnings (Off);
 
@@ -496,7 +496,7 @@ package body ARFF is
    --  if there are multiple arguments, the result is a tuple with one item
    --  per argument.
    --  Without arguments, group1 defaults to zero (the whole match is returned).
-   function Escape_Sub_Callback (Values : String_List) return String_List is
+   function Escape_Sub_Callback (Values : Regexep.Matches_List) return String_List is
       use String_Package;
       Result : String_List := Empty_List;
    begin
@@ -537,7 +537,7 @@ package body ARFF is
    --  Matches (0) is for the whole expression.
    function Parse_Values (Row : String) return String_List is
       use GNAT.Regpat;
-      use Regex;
+      use Regexep;
       use String_Package;
       Non_Trivial  : constant String := "[""\'{}\\s]";
       First        : Positive;
@@ -545,11 +545,12 @@ package body ARFF is
       Match_Found  : Boolean;
       Dense_Match  : Boolean;
       Sparse_Match : Boolean;
+      Matches      : Matches_List;
       Values       : String_List;
       Errors       : String_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         Find_Match (Compile (Non_Trivial), Row, First, Last, Match_Found);
+         Matches := Find_Match (Compile (Non_Trivial), Row, First, Last, Match_Found);
          if Match_Found then
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
@@ -562,11 +563,11 @@ package body ARFF is
                Dense  : GNAT.Regpat.Pattern_Matcher := Build_Re_Dense;
                Sparse : GNAT.Regpat.Pattern_Matcher := Build_Re_Sparse;
             begin
-               Find_Match (Dense, Row, First, Last, Dense_Match);
+               Matches := Find_Match (Dense, Row, First, Last, Dense_Match);
                if Dense_Match then
                   Values := Get_CSV_Data (Row (First .. Last));
                end if;
-               Find_Match (Sparse, Row, First, Last, Sparse_Match);
+               Matches := Find_Match (Sparse, Row, First, Last, Sparse_Match);
                if Sparse_Match then
                   Errors := Get_CSV_Data (Row (First .. Last));
                end if;
@@ -616,12 +617,14 @@ package body ARFF is
    function Unquote (Values : String_List) return String_List is
       use GNAT.Regpat;
       use String_Package;
+      use Regexep;
       --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
       --  \u[0-9a-f]{4} match string starting with \u followed by 4 hex digits
       --  \. match \.
       --  In each case first to last refers to the characters follwing the /
       Pattern       : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
       Matcher       : constant Pattern_Matcher := Compile (Pattern);
+      Matches       : Matches_List;
       First         : Integer;
       Last          : Integer;
       Match_Found   : Boolean := False;
@@ -646,7 +649,7 @@ package body ARFF is
                   --  re.sub(r'\\([0-9]{1,3}|u[0-9a-f]{4}|.)',
                   --  _escape_sub_callback,v[1:-1])
                   --  use Replace_Slice?
-                  Regex.Find_Match (Matcher, Row (2 .. Row'Last - 1),
+                  Matches := Find_Match (Matcher, Row (2 .. Row'Last - 1),
                                     First, Last, Match_Found);
                   Delete (UB_Row, 1, 1);
                   Delete (UB_Row, Length (UB_Row), Length (UB_Row));

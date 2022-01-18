@@ -1,33 +1,5 @@
 
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
---  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
---  with Ada.Text_IO; use Ada.Text_IO;
-
 package body Regexep is
-
---      function All_Matches
---        (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
---         Found               : out Boolean) return Matches_List is
---          Num_Parens : constant Natural := Paren_Count (Compiled_Expression);
---          Matches    : Match_Array (0 .. Num_Parens);
---          Result     : Matches_List;
---      begin
---          --  Match selects the first substring of Text that matches
---          --  the Compiled_Expression
---          Match (Compiled_Expression, Text, Matches);
---          Found := Matches (0) /= No_Match;
---
---          if Found then
---              for index in 0 .. Num_Parens loop
---                  Result.Append (Matches (index));
---              end loop;
---          end if;
---
---          return Result;
---
---      end All_Matches;
-
-    --  -------------------------------------------------------------------------
 
     function Find_Match
       (Compiled_Expression : Gnat.Regpat.Pattern_Matcher; Text : String;
