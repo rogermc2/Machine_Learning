@@ -502,27 +502,28 @@ package body ARFF is
    --  if there are multiple arguments, the result is a tuple with one item
    --  per argument.
    --  Without arguments, group1 defaults to zero (the whole match is returned).
-   function Escape_Sub_Callback (Values : Regexep.Matches_List)
-                                 return Regexep.Matches_List is
+   function Escape_Sub_Callback (Match : Regexep.Match_Strings_List)
+                                 return String is
       use Ada.Containers;
       use Regexep;
       use Escape_Sub_Map_Package;
-      S        : Matches_List := Get_Groups (Values);
-      S_1      : GNAT.Regpat.Match_Location;
-      S_2      : GNAT.Regpat.Match_Location;
-      Map_Cursor : Cursor := Escape_Sub_Map.First;
-      Map_Item : Unbounded_String;
-      Result   : Matches_List;
+      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      Match_Groups : constant Match_Strings_List := Get_Groups (Match);
+      S            : constant Unbounded_String := Match_Groups.Element (0);
+      S_Length     : constant Natural := Length (S);
+      Result       : Unbounded_String;
    begin
-      if S.Length = 2 then
-         S_1 := S.First_Element;
-         S_2 := S.Last_Element;
-         while Has_Element (Map_Cursor) loop
-            Map_Item := Element (Map_Cursor);
-            Next (Map_Cursor);
-         end loop;
+      if S_Length = 4 then
+         Assert (Escape_Sub_Map.Contains (S), Routine_Name &
+                 "Unsupported escape sequence: " & To_String (S));
+         Result := Escape_Sub_Map.Element (S);
+
+--        elsif To_String (S) (1) = 'u' then
+      else
+         Result := To_Unbounded_String (Slice (S, 2, S_Length));
       end if;
-      return Result;
+
+      return To_String (Result);
 
    end Escape_Sub_Callback;
 

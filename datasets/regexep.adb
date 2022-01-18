@@ -46,4 +46,20 @@ package body Regexep is
 
     --  -------------------------------------------------------------------------
 
+    function Get_Groups (Matches : Match_Strings_List) return Match_Strings_List is
+        use Ada.Containers;
+        Groups : Match_Strings_List;
+    begin
+        if Matches.Length > 1 then
+            for index in Matches.First_Index + 1 .. Matches.Last_Index loop
+                Groups.Append (Matches.Element (index));
+            end loop;
+        end if;
+
+        return Groups;
+
+    end Get_Groups;
+
+    --  -------------------------------------------------------------------------
+
 end Regexep;
