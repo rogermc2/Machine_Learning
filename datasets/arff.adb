@@ -514,7 +514,7 @@ package body ARFF is
       S            : constant Unbounded_String := Match_Groups.Element (0);
       S_Length     : constant Natural := Length (S);
       Int_Value    : Integer;
-      Based_Int    : String (1 .. S_Length);
+      Based_Int    : String (1 .. 2 * S_Length);
       Result       : Unbounded_String;
    begin
       if S_Length = 4 then
