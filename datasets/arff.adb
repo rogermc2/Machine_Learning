@@ -96,10 +96,23 @@ package body ARFF is
                            return String_List;
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
+   procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
+                                 Attribute      : JSON_Value;
+                                 Encode_Nominal : Boolean);
+   function Sparse_Line (Row : String) return Boolean;
    function Stream_Data (Decoder : in out Arff_Decoder) return String;
-   function Unquote (Values : String) return String;
+   function Unquote (Values : String) return Unbounded_String;
 
    --  -------------------------------------------------------------------------
+
+   procedure ARFF_Syntax_Error (Row : String) is
+   begin
+      raise ARFF_Error with "ARFF unknown parsing error";
+
+   end ARFF_Syntax_Error;
+
+   --  -------------------------------------------------------------------------
+
    --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
    --  despite quoting, whitespace, etc.
    function Build_Re_Dense return GNAT.Regpat.Pattern_Matcher is
@@ -198,8 +211,11 @@ package body ARFF is
                                     Attribute_Names, Arff_Container);
 
                elsif UC_Row = "@DATA" then
+                  --  L850
                   Assert (State = TK_Attribute, Routine_Name & Bad_Layout);
+
                elsif UC_Row (1 .. 1) = "%" then
+                  --  L806
                   Decode_Comment (UC_Row, Arff_Container);
                else
                   Assert (False, Routine_Name & Bad_Layout);
@@ -259,7 +275,7 @@ package body ARFF is
       Assert (Match (Compile (Regex), Slice_2),
               Routine_Name & " attribute declaration '" &
                 To_String (Attr_Type) &
-                "' has an invalid format");
+                "' has an invalid format.");
 
       --  L751 Extract the final name
       Pos := 1;
@@ -301,26 +317,7 @@ package body ARFF is
 
          --  L832
          if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
-            if Encode_Nominal then
-               declare
-                  Converser : Conversor_Data (Conversor_Encoded);
-                  Values    : String_List;
-               begin
-                  Values.Append (Get (Attribute, "attributes"));
-                  Converser.Encoded_Values := Values;
-                  Decoder.Conversers.Append (Converser);
-               end;
-
-            else
-               declare
-                  Converser : Conversor_Data (Conversor_Unencoded);
-                  Values    : String_List;
-               begin
-                  Values.Append (Get (Attribute, "attributes"));
-                  Converser.Values := Values;
-                  Decoder.Conversers.Append (Converser);
-               end;
-            end if;
+            Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
 
          else
             declare
@@ -333,8 +330,11 @@ package body ARFF is
                Converser_Map.Set_Field ("INTEGER", Integer (0));
                Converser_Map.Set_Field ("NUMERIC", 0.0);
                Converser_Map.Set_Field ("REAL", 0.0);
-
-               --                 Converser := Element (Converser_Map, "INTEGER");
+               declare
+                  data : UTF8_String := Converser_Map.Get ("INTEGER");
+               begin
+                  Converser.Encoded_Values.Append (To_Unbounded_String (Data));
+               end;
                Decoder.Conversers.Append (Converser);
             end;
          end if;
@@ -537,7 +537,7 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-    function Escape_Sub_Callback (S : String) return String is
+   function Escape_Sub_Callback (S : String) return String is
       use Ada.Strings;
       use Escape_Sub_Map_Package;
       Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
@@ -609,10 +609,13 @@ package body ARFF is
       Sparse_Match : Boolean;
       Matches      : Matches_List;
       Values       : String_List;
+      Value_Cursor : Cursor;
       Errors       : String_List;
+      Result       : String_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         Matches := Find_Match (Compile (Non_Trivial), Row, First, Last, Match_Found);
+         Matches := Find_Match (Compile (Non_Trivial), Row, First, Last,
+                                Match_Found);
          if Match_Found then
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
@@ -636,9 +639,14 @@ package body ARFF is
             end;  --  declare block
 
             if not Errors.Is_Empty then
-               null;
-            else
-               null;
+               Value_Cursor := Values.First;
+               while Has_Element (Value_Cursor) loop
+                  Result.Append (Unquote (To_String (Element (Value_Cursor))));
+                  Next (Value_Cursor);
+               end loop;
+
+            elsif not Sparse_Line (Row) then
+               ARFF_Syntax_Error (Row);
             end if;
          end if;
       end if;
@@ -646,6 +654,58 @@ package body ARFF is
       return Values;
 
    end Parse_Values;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
+                                 Attribute      : JSON_Value;
+                                 Encode_Nominal : Boolean) is
+   begin
+      if Encode_Nominal then
+         declare
+            Converser : Conversor_Data (Conversor_Encoded);
+            Values    : String_List;
+         begin
+            Values.Append (Get (Attribute, "attributes"));
+            Converser.Encoded_Values := Values;
+            Decoder.Conversers.Append (Converser);
+         end;
+
+      else
+         declare
+            Converser : Conversor_Data (Conversor_Unencoded);
+            Values    : String_List;
+         begin
+            Values.Append (Get (Attribute, "attributes"));
+            Converser.Values := Values;
+            Decoder.Conversers.Append (Converser);
+         end;
+      end if;
+
+   end Process_JSON_Array;
+
+   --  -------------------------------------------------------------------------
+
+   function Sparse_Line (Row : String) return Boolean is
+      use GNAT.Regpat;
+      use Regexep;
+      use String_Package;
+      Regex       : constant String := "^\s*\{.*\}\s*$";
+      Matcher     : constant Pattern_Matcher := Build_Re_Sparse;
+      First       : Positive;
+      Last        : Positive;
+      Matches     : Matches_List;
+      Match_Found : Boolean;
+      Result      : Boolean := False;
+   begin
+      Matches := Find_Match (Matcher, Row, First, Last, Match_Found);
+      if Match_Found then
+         null;
+      end if;
+
+      return Result;
+
+   end Sparse_Line;
 
    --  -------------------------------------------------------------------------
 
@@ -676,7 +736,7 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Unquote (Values : String) return String is
+   function Unquote (Values : String) return Unbounded_String is
       use GNAT.Regpat;
       use Regexep;
       --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
@@ -684,7 +744,6 @@ package body ARFF is
       --  \. match \.
       --  In each case first to last refers to the characters follwing the /
       Pattern       : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
-      Matcher       : constant Pattern_Matcher := Compile (Pattern);
       Matches       : Matches_List;
       First         : Integer;
       Last          : Integer;
@@ -695,13 +754,13 @@ package body ARFF is
          null;
       elsif Values (Values'First) = '"' or Values (Values'First) = ''' then
          Result := To_Unbounded_String
-              (Substitute (Values (Values'First + 1 .. Values'Last - 1),
-              Pattern, Escape_Sub_Callback'Access));
+           (Substitute (Values (Values'First + 1 .. Values'Last - 1),
+            Pattern, Escape_Sub_Callback'Access));
       else
          Result := To_Unbounded_String (Values);
       end if;
 
-      return To_String (Result);
+      return Result;
 
    end Unquote;
 
