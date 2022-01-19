@@ -236,6 +236,7 @@ package body ARFF is
             Values := Decode_Rows_COO (Decoder, Stream_Data'Access);
          when others => null;
       end case;
+
       Curs := Values.First;
       while Has_Element (Curs) loop
          Append (JSON_Values, Create (Element (Curs)));
@@ -264,6 +265,7 @@ package body ARFF is
       use Ada.Strings;
       use Ada.Strings.Maps;
       use GNAT.Regpat;
+      use ML_Types.String_Package;
       Routine_Name : constant String := "ARFF.Decode_Relation ";
       Regex        : constant String :=
                        "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
@@ -277,7 +279,9 @@ package body ARFF is
       Name         : Unbounded_String;
       Attr_Type    : Unbounded_String;
       Attribute    : constant JSON_Value := Create_Object;
+      Curs         : Cursor;
       Values       : String_List;
+      JSON_Values  : JSON_Array;
       --          Converser    : Conversor_Data;
    begin
       Name := To_Unbounded_String (Slice_1);
@@ -311,6 +315,12 @@ package body ARFF is
                    Slice_2 = "INTEGER" or Slice_2 = "STRING",
                  Routine_Name & " invalid attribute type, " & Slice_2);
       end if;
+
+      Curs := Values.First;
+      while Has_Element (Curs) loop
+         Append (JSON_Values, Create (Element (Curs)));
+         Next (Curs);
+      end loop;
 
       declare
          Attr_Name : constant String := To_String (Name);
