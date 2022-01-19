@@ -413,8 +413,8 @@ package body ARFF is
                                Stream_Func : Stream_Func_Type)
                                return String_List is
       use String_Package;
-      Routine_Name     : String := "ARFF.Decode_Rows_Dense ";
-      Converser_Length : Natural := Natural (Decoder.Conversers.Length);
+      Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
+      Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
       Row              : String := Stream_Func (Decoder);
       Values           : String_List := Parse_Values (Row);
    begin
@@ -505,7 +505,6 @@ package body ARFF is
    --  Without arguments, group1 defaults to zero (the whole match is returned).
    function Escape_Sub_Callback (Match : Regexep.Match_Strings_List)
                                  return String is
-      use Ada.Containers;
       use Ada.Strings;
       use Regexep;
       use Escape_Sub_Map_Package;
@@ -539,9 +538,7 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
     function Escape_Sub_Callback (S : String) return String is
-      use Ada.Containers;
       use Ada.Strings;
-      use Regexep;
       use Escape_Sub_Map_Package;
       Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
       UB_S         : constant Unbounded_String := To_Unbounded_String (S);
@@ -555,7 +552,7 @@ package body ARFF is
                    "Unsupported escape sequence: " & S);
          Result := Escape_Sub_Map.Element (UB_S);
 
-      elsif S (2) = 'u' then
+      elsif S (S'First + 1) = 'u' then
          Int_Value := Integer'Value (Slice (UB_S, 3, S_Length));
          Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 16);
          Result := Trim (To_Unbounded_String (Based_Int), Both);
@@ -681,7 +678,6 @@ package body ARFF is
 
    function Unquote (Values : String) return String is
       use GNAT.Regpat;
-      use String_Package;
       use Regexep;
       --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
       --  \u[0-9a-f]{4} match string starting with \u followed by 4 hex digits
@@ -695,9 +691,9 @@ package body ARFF is
       Match_Found   : Boolean := False;
       Result        : Unbounded_String := To_Unbounded_String ("");
    begin
-      if Values = "" or  Values (1) = '?' then
+      if Values = "" or  Values (Values'First) = '?' then
          null;
-      elsif Values (1) = '"' or Values (1) = ''' then
+      elsif Values (Values'First) = '"' or Values (Values'First) = ''' then
          Result := To_Unbounded_String
               (Substitute (Values (Values'First + 1 .. Values'Last - 1),
               Pattern, Escape_Sub_Callback'Access));
