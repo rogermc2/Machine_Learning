@@ -426,8 +426,10 @@ package body ARFF is
       --          use String_Package;
       --          Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
-      Row              : constant String := Stream_Func (Decoder);
-      Values           : String_List := Parse_Values (Row);
+      Rows   : String_List;
+      Cols   : String_List;
+      Data   : String_List;
+      Values : String_List;
    begin
       return Values;
    end Decode_Rows_COO;

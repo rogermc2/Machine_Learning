@@ -87,7 +87,7 @@ package body Openml is
                              Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
      (Arff_Data : ARFF.Arff_Container_Type; Include_Columns : ML_Types.String_List)
-      return JSON_Value;
+      return JSON_Array;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
    procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
@@ -108,8 +108,8 @@ package body Openml is
    procedure Convert_Arff_To_Data
      (ARFF : JSON_Value; Col_Slice_X , Col_Slice_Y : ML_Types.String_List;
       X, Y : out JSON_Array) is
-      Arff_Data   : JSON_Value := Get (ARFF, "data");
-      Arff_Data_X : JSON_Value;
+      Arff_Data   : JSON_Array := Get (ARFF, "data");
+      Arff_Data_X : JSON_Array;
       Tuple_Length : Positive;
    begin
       --  L283
@@ -651,11 +651,11 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
    end Process_Target;
 
    --  ------------------------------------------------------------------------
-
+   --  L184
    function Split_Sparse_Columns
-     (Arff_Data : JSON_Value; Include_Columns : ML_Types.String_List)
-      return JSON_Value is
-      Arff_Data_New : JSON_Value := Arff_Data;
+     (Arff_Data : ARFF.Arff_Container_Type; Include_Columns : ML_Types.String_List)
+      return JSON_Array is
+      Arff_Data_New : ARFF.Arff_Sparse_Data_Type := Arff_Data;
    begin
       return Arff_Data_New;
 

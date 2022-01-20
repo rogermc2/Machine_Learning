@@ -4,6 +4,7 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 package ARFF is
 
    subtype Arff_Container_Type is JSON_Value;
+   subtype Arff_Sparse_Data_Type is JSON_Value;
 
    type ARFF_Return_Type is (Arff_Dense, Arff_Coo, Arff_Lod,
                              Arff_Dense_Gen, Arff_Lod_Gen);
