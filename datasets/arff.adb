@@ -162,7 +162,7 @@ package body ARFF is
       Pos2            : Integer := 1;
       Message_Lines   : String_List;
       Curs            : Cursor;
-      Arff_Container  : JSON_Value := Create_Object;
+      Arff_Container  : Arff_Container_Type := Create_Object;
       Attribute_Names : JSON_Value := Create_Object;
       Stream_Row      : Unbounded_String;
       Values          : String_List;
@@ -205,6 +205,7 @@ package body ARFF is
                           Routine_Name & Bad_Layout);
                   State := TK_Relation;
                   Decode_Relation (UC_Row, Arff_Container);
+
                elsif UC_Row = "@ATTRIBUTE" then
                   Assert (State = TK_Relation or State = TK_Attribute,
                           Routine_Name & Bad_Layout);

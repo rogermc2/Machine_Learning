@@ -1,8 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Containers.Doubly_Linked_Lists;
---  with Ada.Containers.Vectors;
+--  with Ada.Containers.Doubly_Linked_Lists; with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -10,6 +9,9 @@ with AWS.Client;
 with AWS.Response;
 with AWS.URL;
 
+with ML_Types;
+
+with ARFF;
 with Dataset_Utilities;
 
 package body Openml is
@@ -83,6 +85,9 @@ package body Openml is
                               Features_List : JSON_Array);
    procedure Process_Target (Features_List  : JSON_Array;
                              Target_Columns : out JSON_Array);
+   function Split_Sparse_Columns
+     (Arff_Data : ARFF.Arff_Container_Type; Include_Columns : ML_Types.String_List)
+      return JSON_Value;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
    procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
@@ -90,11 +95,26 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   procedure Convert_Arff_Data_Dataframe is
+--     function Convert_Arff_Data_Dataframe
+--       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value) return JSON_Value is
+--        Result : JSON_Value;
+--     begin
+--        return Result;
+--
+--     end Convert_Arff_Data_Dataframe;
 
+   --  ------------------------------------------------------------------------
+   --  A Tuple is a collection of Python objects separated by commas.
+   procedure Convert_Arff_To_Data
+     (ARFF : JSON_Value; Col_Slice_X , Col_Slice_Y : ML_Types.String_List;
+      X, Y : out JSON_Array) is
+      Arff_Data   : JSON_Value := Get (ARFF, "data");
+      Arff_Data_X : JSON_Value;
+      Tuple_Length : Positive;
    begin
-      null;
-   end Convert_Arff_Data_Dataframe;
+      --  L283
+      Arff_Data_X := Split_Sparse_Columns (ARFF, Col_Slice_X);
+   end Convert_Arff_To_Data;
 
    --  ------------------------------------------------------------------------
 
@@ -115,8 +135,9 @@ package body Openml is
       Num_Missing   : Integer;
       Return_Type   : ARFF_Type;
       Columns       : JSON_Array;
+      Parsed_ARFF   : JSON_Array;
 
-        procedure Parse_ARFF (ARFF : JSON_Array) is
+        procedure Parse_ARFF (ARFF : JSON_Array; X, Y : out JSON_Array) is
         begin
             null;
         end Parse_ARFF;
@@ -281,8 +302,8 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
       --        Value_Type   : JSON_Value_Type;
    begin
       --  URL.Parse parses an URL and returns an Object representing this URL.
-      --  It is then possible to extract each part of the URL with other
-      --  AWS.URL services.
+      --  It is then possible to extract each part of the URL with other AWS.URL
+      --  services.
       URL_Object := AWS.URL.Parse (URL);
       Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
                 "object returned by URL " & URL & "is invalid");
@@ -628,6 +649,17 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
       end loop;
 
    end Process_Target;
+
+   --  ------------------------------------------------------------------------
+
+   function Split_Sparse_Columns
+     (Arff_Data : JSON_Value; Include_Columns : ML_Types.String_List)
+      return JSON_Value is
+      Arff_Data_New : JSON_Value := Arff_Data;
+   begin
+      return Arff_Data_New;
+
+   end Split_Sparse_Columns;
 
    --  ------------------------------------------------------------------------
 
