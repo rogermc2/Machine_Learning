@@ -115,6 +115,11 @@ package body Openml is
       Num_Missing   : Integer;
       Return_Type   : ARFF_Type;
       Columns       : JSON_Array;
+
+        procedure Parse_ARFF (ARFF : JSON_Array) is
+        begin
+            null;
+        end Parse_ARFF;
   begin
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
@@ -125,7 +130,7 @@ package body Openml is
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
-      --  L568 col_slice_y =
+      --  L566 col_slice_y =
       --        [
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
@@ -137,6 +142,7 @@ package body Openml is
          Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
 
+      --  L566 continued
       Col_Name := Array_First (Features_List);
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
@@ -145,6 +151,15 @@ package body Openml is
          Col_Name := Array_Next (Data_Columns, Col_Name);
       end loop;
 
+      --  L568
+      while Array_Has_Element (Data_Columns, Col_Name) loop
+         aFeature := Array_Element (Features_List, Col_Name);
+         aColumn := Get (aFeature, "index");
+         Append (Col_Slice_X, aColumn);
+         Col_Name := Array_Next (Data_Columns, Col_Name);
+      end loop;
+
+      --  L569
       Col_Name := Array_First (Col_Slice_Y);
       while Array_Has_Element (Col_Slice_Y, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
@@ -155,6 +170,7 @@ package body Openml is
          Col_Name := Array_Next (Col_Slice_Y, Col_Name);
       end loop;
 
+        --  L582
       if Sparse then
          Return_Type := ARFF_COO;
       else
@@ -163,18 +179,13 @@ package body Openml is
 
       --  L593
       if As_Frame then
-         Put_Line (Routine_Name & "As_Frame not supported.");
---           Col_Name := Array_First (Data_Columns);
---           while Array_Has_Element (Data_Columns, Col_Name) loop
---              Append (Columns, Array_Element (Data_Columns, Col_Name));
---              Col_Name := Array_Next (Data_Columns, Col_Name);
---           end loop;
---
---           Col_Name := Array_First (Target_Columns);
---           while Array_Has_Element (Target_Columns, Col_Name) loop
---              Append (Columns, Array_Element (Target_Columns, Col_Name));
---              Col_Name := Array_Next (Target_Columns, Col_Name);
---           end loop;
+         Columns := Data_Columns;
+         Col_Name := Array_First (Target_Columns);
+         while Array_Has_Element (Target_Columns, Col_Name) loop
+            Append (Columns, Array_Element (Target_Columns, Col_Name));
+            Col_Name := Array_Next (Target_Columns, Col_Name);
+         end loop;
+
       else
          null;
       end if;
