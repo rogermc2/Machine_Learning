@@ -14,6 +14,8 @@ with ML_Types;
 with ARFF;
 with Dataset_Utilities;
 
+pragma Warnings (Off);
+
 package body Openml is
 
    --     type JSON_Item is record
@@ -86,8 +88,9 @@ package body Openml is
    procedure Process_Target (Features_List  : JSON_Array;
                              Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
-     (Arff_Data : ARFF.Arff_Container_Type; Include_Columns : ML_Types.String_List)
-      return JSON_Array;
+     (Arff_Data : ARFF.Arff_Container_Type;
+      Include_Columns : ML_Types.String_List)
+      return ARFF.Arff_Sparse_Data_Type;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
    procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
@@ -104,16 +107,18 @@ package body Openml is
 --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
+   --  ArffSparseDataType = Tuple[List, ...]
    --  A Tuple is a collection of Python objects separated by commas.
    procedure Convert_Arff_To_Data
-     (ARFF : JSON_Value; Col_Slice_X , Col_Slice_Y : ML_Types.String_List;
+     (ARFF_Data : JSON_Value; Col_Slice_X , Col_Slice_Y : ML_Types.String_List;
       X, Y : out JSON_Array) is
-      Arff_Data   : JSON_Array := Get (ARFF, "data");
-      Arff_Data_X : JSON_Array;
+      Data        : JSON_Array := Get (ARFF_Data, "data");
+      Arff_Data_X : ARFF.Arff_Sparse_Data_Type;
       Tuple_Length : Positive;
    begin
       --  L283
-      Arff_Data_X := Split_Sparse_Columns (ARFF, Col_Slice_X);
+      Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+
    end Convert_Arff_To_Data;
 
    --  ------------------------------------------------------------------------
@@ -651,12 +656,26 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
    end Process_Target;
 
    --  ------------------------------------------------------------------------
-   --  L184
+   --  L184  ArffSparseDataType = Tuple[List, ...]
+   --  _split_sparse_columns
+   --  (arff_data: ArffSparseDataType, include_columns: List)
+   --  - > ArffSparseDataType
    function Split_Sparse_Columns
-     (Arff_Data : ARFF.Arff_Container_Type; Include_Columns : ML_Types.String_List)
-      return JSON_Array is
-      Arff_Data_New : ARFF.Arff_Sparse_Data_Type := Arff_Data;
+     (Arff_Data : ARFF.Arff_Container_Type;
+      Include_Columns : ML_Types.String_List)
+      return ARFF.Arff_Sparse_Data_Type is
+      use ML_Types;
+      Arff_Data_New : ARFF.Arff_Sparse_Data_Type;
+      Data_1        : String_List;
+      Data_2        : String_List;
+      Data_3        : String_List;
    begin
+
+
+        Arff_Data_New.Append (Data_1);
+        Arff_Data_New.Append (Data_2);
+        Arff_Data_New.Append (Data_3);
+
       return Arff_Data_New;
 
    end Split_Sparse_Columns;

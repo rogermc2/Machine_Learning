@@ -175,6 +175,11 @@ package ML_Types is
      (Ada.Strings.Unbounded.Unbounded_String);
    subtype String_List is  String_Package.List;
 
+   use String_Package;
+   package String_List_Package is new Ada.Containers.Doubly_Linked_Lists
+     (String_List);
+   subtype String_Multi_List is  String_List_Package.List;
+
    type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
       Feature_Names  : String_List;
       Label_Name     : Unbounded_String := To_Unbounded_String ("");
