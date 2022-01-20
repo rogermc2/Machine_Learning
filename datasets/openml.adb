@@ -89,7 +89,7 @@ package body Openml is
                              Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
      (Arff_Data : ARFF.Arff_Container_Type;
-      Include_Columns : ML_Types.String_List)
+      Include_Columns : ARFF.Arff_Sparse_Data_Type)
       return ARFF.Arff_Sparse_Data_Type;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
@@ -117,8 +117,8 @@ package body Openml is
       Tuple_Length : Positive;
    begin
       --  L283
-      Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
-
+--        Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+      null;
    end Convert_Arff_To_Data;
 
    --  ------------------------------------------------------------------------
@@ -662,15 +662,23 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
    --  - > ArffSparseDataType
    function Split_Sparse_Columns
      (Arff_Data : ARFF.Arff_Container_Type;
-      Include_Columns : ML_Types.String_List)
+      Include_Columns : ARFF.Arff_Sparse_Data_Type)
       return ARFF.Arff_Sparse_Data_Type is
       use ML_Types;
-      Arff_Data_New : ARFF.Arff_Sparse_Data_Type;
-      Data_1        : String_List;
-      Data_2        : String_List;
-      Data_3        : String_List;
+      use String_List_Package;
+      use ARFF;
+      Arff_Data_New     : Arff_Sparse_Data_Type;
+      Data_1            : String_List;
+      Data_2            : String_List;
+      Data_3            : String_List;
+      Reindexed_Columns : Arff_Sparse_Data_Type;
+      Data_Array        : String_List;
+      Array_Cursor        : String_List_Package.Cursor := Include_Columns.First;
    begin
-
+        while Has_Element (Array_Cursor) loop
+            Data_Array := Include_Columns (Array_Cursor);
+            Next (Array_Cursor);
+        end loop;
 
         Arff_Data_New.Append (Data_1);
         Arff_Data_New.Append (Data_2);
