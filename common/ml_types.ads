@@ -23,6 +23,9 @@ package ML_Types is
    subtype Feature_Class is Class_Range;
    subtype Question_Type is Class_Range;
 
+   package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
+   subtype Integer_List is Integer_Package.Vector;
+
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
    subtype Character_List is Character_Package.Vector;

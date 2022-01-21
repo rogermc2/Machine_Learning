@@ -1,7 +1,6 @@
 --  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -30,14 +29,14 @@ package body Openml is
       Features_Length : Natural := 0;
    end record;
 
-   package Tupple_Package is new
-     Ada.Containers.Vectors (Positive, Unbounded_String);
-   subtype Tupple_Vector is Tupple_Package.Vector;
-
-   use Tupple_Package;
-   package Zip_Package is new
-     Ada.Containers.Vectors (Positive, Tupple_Vector);
-   subtype Zip_Vector is Zip_Package.Vector;
+   --     package Tupple_Package is new
+   --       Ada.Containers.Vectors (Positive, Unbounded_String);
+   --     subtype Tupple_Vector is Tupple_Package.Vector;
+   --
+   --     use Tupple_Package;
+   --     package Zip_Package is new
+   --       Ada.Containers.Vectors (Positive, Tupple_Vector);
+   --     subtype Zip_Vector is Zip_Package.Vector;
 
    --     package Pair_Settings_Vector_Package is new
    --       Ada.Containers.Doubly_Linked_Lists (JSON_Item);
@@ -98,14 +97,11 @@ package body Openml is
                              Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
-      Include_Columns : ARFF.Arff_Sparse_Data_Type)
-      return ARFF.Arff_Sparse_Data_Type;
+      Include_Columns : ML_Types.Integer_List) return ARFF.Arff_Sparse_Data_Type;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
    procedure Verify_Target_Data_Type (Features_Dict  : JSON_Value;
                                       Target_Columns : JSON_Array);
-   function Zip (List_1, List_2, List_3 : ML_Types.String_Vector)
-                 return Zip_Vector;
 
    --  ------------------------------------------------------------------------
 
@@ -673,45 +669,42 @@ package body Openml is
    --  - > ArffSparseDataType
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
-      Include_Columns : ARFF.Arff_Sparse_Data_Type)
+      Include_Columns : ML_Types.Integer_List)
       return ARFF.Arff_Sparse_Data_Type is
       use ML_Types;
+      use ML_Types.Integer_Package;
+      use ML_Types.String_Package;
       use ARFF;
+      Length_1          : constant Positive :=
+                            Positive (Arff_Data.Element (1).Length);
+      Length_2          : constant Positive :=
+                            Positive (Arff_Data.Element (2).Length);
+      Length_3          : constant Positive :=
+                            Positive (Arff_Data.Element (3).Length);
+      Reindexed_Columns : Integer_List;
+      Tuple             : String_Vector;
       Arff_Data_New     : Arff_Sparse_Data_Type;
-      Data_1            : String_Vector;
-      Data_2            : String_Vector;
-      Data_3            : String_Vector;
-      Reindexed_Columns : Arff_Sparse_Data_Type;
-      Zipped_Data       : Zip_Vector;
-      Tuple             : Tupple_Vector;
-      Tuple_String      : Unbounded_String;
-      Data_Array        : String_Vector;
    begin
       Reindexed_Columns.Set_Length (Include_Columns.Length);
-      for a_index in Include_Columns.First_Index.. Include_Columns.Last_Index loop
-         Data_Array := Include_Columns (a_index);
-         for col_index in Data_Array.First_Index .. Data_Array.Last_Index loop
-            Reindexed_Columns.Replace_Element (col_index, Data_Array);
-         end loop;
+      for a_index in Include_Columns.First_Index
+        .. Include_Columns.Last_Index loop
+         Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
       end loop;
 
-      Zipped_Data := Zip (Arff_Data.Element (1), Arff_Data.Element (2),
-                          Arff_Data.Element (3));
-
-      --  for val, row_idx, col_idx in zip(arff_data[0], arff_data[1], arff_data[2])
-      for val in Zipped_Data.First_Index.. Zipped_Data.Last_Index loop
-         Tuple := Zipped_Data (val);
-         for Row_index in Tuple.First_Index .. Tuple.Last_Index loop
-            Tuple_String := Tuple(Row_index);
-            for col_index in Include_Columns.First_Index .. Include_Columns.Last_Index loop
-               null;
+      for val in 1 .. Length_1 loop
+         for row in 1 .. Length_2 loop
+            for col in 1 .. Length_3 loop
+               Tuple.Clear;
+               if Include_Columns.Find_Index (col) /= No_Index then
+                  Tuple.Append (Arff_Data.Element (1) (val));
+                  Tuple.Append (Arff_Data.Element (2) (row));
+                  Tuple.Append (Arff_Data.Element (3)
+                                (Reindexed_Columns.Element (col)));
+                  Arff_Data_New.Append (Tuple);
+               end if;
             end loop;
          end loop;
       end loop;
-
-      Arff_Data_New.Append (Data_1);
-      Arff_Data_New.Append (Data_2);
-      Arff_Data_New.Append (Data_3);
 
       return Arff_Data_New;
 
@@ -772,33 +765,33 @@ package body Openml is
    --  If the passed iterators have different lengths then the iterator with
    --  the least number of items decides the length of the new iterator.
 
-   function Zip (List_1, List_2, List_3 : ML_Types.String_Vector)
-                 return Zip_Vector is
-      use ML_Types;
-      Zip_Length : Positive := Positive (List_1.Length);
-      Tuple      : Tupple_Vector;
-      Result     : Zip_Vector;
-   begin
-      if Positive (List_2.Length) <  Zip_Length then
-         Zip_Length := Positive (List_2.Length);
-      end if;
-      if Positive (List_3.Length) <  Zip_Length then
-         Zip_Length := Positive (List_3.Length);
-      end if;
-
-      for index in 1 .. Zip_Length loop
-         Tuple.Clear;
-         for index in 1 .. 3 loop
-            Tuple.Append (List_1.Element (index));
-            Tuple.Append (List_2.Element (index));
-            Tuple.Append (List_3.Element (index));
-         end loop;
-         Result.Append (Tuple);
-      end loop;
-
-      return Result;
-
-   end Zip;
+   --     function Zip (List_1, List_2, List_3 : ML_Types.String_Vector)
+   --                   return Zip_Vector is
+   --        use ML_Types;
+   --        Zip_Length : Positive := Positive (List_1.Length);
+   --        Tuple      : Tupple_Vector;
+   --        Result     : Zip_Vector;
+   --     begin
+   --        if Positive (List_2.Length) <  Zip_Length then
+   --           Zip_Length := Positive (List_2.Length);
+   --        end if;
+   --        if Positive (List_3.Length) <  Zip_Length then
+   --           Zip_Length := Positive (List_3.Length);
+   --        end if;
+   --
+   --        for index in 1 .. Zip_Length loop
+   --           Tuple.Clear;
+   --           for index in 1 .. 3 loop
+   --              Tuple.Append (List_1.Element (index));
+   --              Tuple.Append (List_2.Element (index));
+   --              Tuple.Append (List_3.Element (index));
+   --           end loop;
+   --           Result.Append (Tuple);
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end Zip;
 
    --  ------------------------------------------------------------------------
 
