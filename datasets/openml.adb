@@ -117,15 +117,15 @@ package body Openml is
    --  ArffSparseDataType = Tuple[List, ...]
    --  A Tuple is a collection of Python objects separated by commas.
    procedure Convert_Arff_To_Data
-     (ARFF_Data : JSON_Value; Col_Slice_X , Col_Slice_Y : ML_Types.String_List;
-      X, Y      : out JSON_Array) is
-      Data         : JSON_Array := Get (ARFF_Data, "data");
+     (ARFF_Data                 : ARFF.Arff_Sparse_Data_Type;
+      Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
+      X, Y                      : out JSON_Array) is
       Arff_Data_X  : ARFF.Arff_Sparse_Data_Type;
       Tuple_Length : Positive;
    begin
       --  L283
-      --        Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
-      null;
+      Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+
    end Convert_Arff_To_Data;
 
    --  ------------------------------------------------------------------------
