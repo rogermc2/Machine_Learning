@@ -425,7 +425,7 @@ package body ARFF is
    function Decode_Rows_COO (Decoder     : in Out Arff_Decoder;
                              Stream_Func : Stream_Func_Type)
                               return String_List is
-      --          use String_Package;
+     use String_Package;
       --          Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
       Rows   : Integer_List;
@@ -433,7 +433,16 @@ package body ARFF is
       Data   : Classifier_Types.Float_List;
       Values : String_List;
    begin
+      while Has_Element (Stream_Cursor) loop
+         declare
+            Row : constant String := Stream_Func (Decoder);
+         begin
+            Values := Parse_Values (Row);
+         end;
+      end loop;
+
       return Values;
+
    end Decode_Rows_COO;
 
    --  -------------------------------------------------------------------------
@@ -732,9 +741,9 @@ package body ARFF is
       use Ada.Strings;
       use String_Package;
       Row    : Unbounded_String;
-      Result : Unbounded_String;
+      Result : Unbounded_String := To_Unbounded_String ("");
    begin
-      while Has_Element (Stream_Cursor) loop
+      while Has_Element (Stream_Cursor) and then Length (Row) > 0 loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
          Row := Element (Stream_Cursor);
          Trim (Row, Both);
