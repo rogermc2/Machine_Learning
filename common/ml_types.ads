@@ -173,12 +173,22 @@ package ML_Types is
 
    package String_Package is new Ada.Containers.Doubly_Linked_Lists
      (Ada.Strings.Unbounded.Unbounded_String);
-   subtype String_List is  String_Package.List;
+   subtype String_List is String_Package.List;
 
    use String_Package;
    package String_List_Package is new Ada.Containers.Doubly_Linked_Lists
      (String_List);
-   subtype String_Multi_List is  String_List_Package.List;
+   subtype String_Multi_List is String_List_Package.List;
+
+   package String_Vector_Package is new Ada.Containers.Vectors
+     (Positive, Ada.Strings.Unbounded.Unbounded_String);
+   subtype String_Vector is String_Vector_Package.Vector;
+
+   use String_Vector_Package;
+   package String_Multi_Vector_Package is new Ada.Containers.Vectors
+     (Positive, String_Vector);
+   subtype String_Multi_Vector is String_Multi_Vector_Package.Vector;
+
 
    type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
       Feature_Names  : String_List;

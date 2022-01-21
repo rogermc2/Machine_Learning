@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Containers.Doubly_Linked_Lists; with Ada.Containers.Vectors;
+with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -25,10 +25,19 @@ package body Openml is
 
    type ARFF_Type is (ARFF_COO, ARFF_DENSE_GEN);
 
-      type Shape_Data is record
-         Num_Samples     : Natural := 0;
-         Features_Length : Natural := 0;
-      end record;
+   type Shape_Data is record
+      Num_Samples     : Natural := 0;
+      Features_Length : Natural := 0;
+   end record;
+
+   type String_Vector_Tuple is record
+      Key   : Unbounded_String;
+      Value : Unbounded_String;
+   end record;
+
+   package Zip_Package is new
+     Ada.Containers.Vectors (Positive, String_Vector_Tuple);
+   subtype Zip_Vector is Zip_Package.Vector;
 
    --     package Pair_Settings_Vector_Package is new
    --       Ada.Containers.Doubly_Linked_Lists (JSON_Item);
@@ -88,65 +97,66 @@ package body Openml is
    procedure Process_Target (Features_List  : JSON_Array;
                              Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
-     (Arff_Data : ARFF.Arff_Container_Type;
+     (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : ARFF.Arff_Sparse_Data_Type)
       return ARFF.Arff_Sparse_Data_Type;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
-   procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
+   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Value;
                                       Target_Columns : JSON_Array);
+   function Zip (List_1, List_2 : ML_Types.String_Vector) return Zip_Vector;
 
    --  ------------------------------------------------------------------------
 
---     function Convert_Arff_Data_Dataframe
---       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value) return JSON_Value is
---        Result : JSON_Value;
---     begin
---        return Result;
---
---     end Convert_Arff_Data_Dataframe;
+   --     function Convert_Arff_Data_Dataframe
+   --       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value) return JSON_Value is
+   --        Result : JSON_Value;
+   --     begin
+   --        return Result;
+   --
+   --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
    --  ArffSparseDataType = Tuple[List, ...]
    --  A Tuple is a collection of Python objects separated by commas.
    procedure Convert_Arff_To_Data
      (ARFF_Data : JSON_Value; Col_Slice_X , Col_Slice_Y : ML_Types.String_List;
-      X, Y : out JSON_Array) is
-      Data        : JSON_Array := Get (ARFF_Data, "data");
-      Arff_Data_X : ARFF.Arff_Sparse_Data_Type;
+      X, Y      : out JSON_Array) is
+      Data         : JSON_Array := Get (ARFF_Data, "data");
+      Arff_Data_X  : ARFF.Arff_Sparse_Data_Type;
       Tuple_Length : Positive;
    begin
       --  L283
---        Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+      --        Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
       null;
    end Convert_Arff_To_Data;
 
    --  ------------------------------------------------------------------------
 
-  procedure Download_Data_To_Bunch (URL : String; Sparse, As_Frame : Boolean;
-                                    Features_List  : JSON_Array;
-                                    Data_Columns   : JSON_Array;
-                                    Target_Columns : JSON_Array;
-                                    Shape : Shape_Data) is
+   procedure Download_Data_To_Bunch (URL            : String; Sparse, As_Frame : Boolean;
+                                     Features_List  : JSON_Array;
+                                     Data_Columns   : JSON_Array;
+                                     Target_Columns : JSON_Array;
+                                     Shape          : Shape_Data) is
       Routine_Name    : constant String := "Openml.Download_Data_To_Bunch ";
-      Feature_Index : Positive := Array_First (Features_List);
-      Col_Name      : Positive := Array_First (Features_List);
-      Features_Dict : JSON_Value;
-      aFeature      : JSON_Value;
-      aColumn       : JSON_Value;
-      Feature_Name  : JSON_Value;
-      Col_Slice_X   : JSON_Array;
-      Col_Slice_Y   : JSON_Array;
-      Num_Missing   : Integer;
-      Return_Type   : ARFF_Type;
-      Columns       : JSON_Array;
-      Parsed_ARFF   : JSON_Array;
+      Feature_Index   : Positive := Array_First (Features_List);
+      Col_Name        : Positive := Array_First (Features_List);
+      Features_Dict   : JSON_Value;
+      aFeature        : JSON_Value;
+      aColumn         : JSON_Value;
+      Feature_Name    : JSON_Value;
+      Col_Slice_X     : JSON_Array;
+      Col_Slice_Y     : JSON_Array;
+      Num_Missing     : Integer;
+      Return_Type     : ARFF_Type;
+      Columns         : JSON_Array;
+      Parsed_ARFF     : JSON_Array;
 
-        procedure Parse_ARFF (ARFF : JSON_Array; X, Y : out JSON_Array) is
-        begin
-            null;
-        end Parse_ARFF;
-  begin
+      procedure Parse_ARFF (ARFF : JSON_Array; X, Y : out JSON_Array) is
+      begin
+         null;
+      end Parse_ARFF;
+   begin
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Get (aFeature, "name");
@@ -191,12 +201,12 @@ package body Openml is
          aFeature := Array_Element (Features_List, Col_Name);
          Num_Missing := Get (aFeature, "number_of_missing_values");
          Assert (Num_Missing >= 0,
-                Routine_Name & "Target column " & " has " & " missing values."
-                & "Missing values are not supported for target columns.");
+                 Routine_Name & "Target column " & " has " & " missing values."
+                 & "Missing values are not supported for target columns.");
          Col_Name := Array_Next (Col_Slice_Y, Col_Name);
       end loop;
 
-        --  L582
+      --  L582
       if Sparse then
          Return_Type := ARFF_COO;
       else
@@ -216,11 +226,11 @@ package body Openml is
          null;
       end if;
 
-  end Download_Data_To_Bunch;
+   end Download_Data_To_Bunch;
 
    --  ------------------------------------------------------------------------
 
-procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
+   procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
                            Data_Id       : in out Integer;
                            Target_Column : String := "default-target";
                            --                             Return_X_Y    : Boolean := False;
@@ -661,28 +671,33 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
    --  (arff_data: ArffSparseDataType, include_columns: List)
    --  - > ArffSparseDataType
    function Split_Sparse_Columns
-     (Arff_Data : ARFF.Arff_Container_Type;
+     (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : ARFF.Arff_Sparse_Data_Type)
       return ARFF.Arff_Sparse_Data_Type is
       use ML_Types;
-      use String_List_Package;
       use ARFF;
       Arff_Data_New     : Arff_Sparse_Data_Type;
-      Data_1            : String_List;
-      Data_2            : String_List;
-      Data_3            : String_List;
+      Data_1            : String_Vector;
+      Data_2            : String_Vector;
+      Data_3            : String_Vector;
       Reindexed_Columns : Arff_Sparse_Data_Type;
-      Data_Array        : String_List;
-      Array_Cursor        : String_List_Package.Cursor := Include_Columns.First;
+      Zipped_Data       : Zip_Vector;
+      Data_Array        : String_Vector;
    begin
-        while Has_Element (Array_Cursor) loop
-            Data_Array := Include_Columns (Array_Cursor);
-            Next (Array_Cursor);
-        end loop;
+      Reindexed_Columns.Set_Length (Include_Columns.Length);
+      for a_index in Include_Columns.First_Index.. Include_Columns.Last_Index loop
+         Data_Array := Include_Columns (a_index);
+         for col_index in Data_Array.First_Index .. Data_Array.Last_Index loop
+            Reindexed_Columns.Replace_Element (col_index, Data_Array);
+         end loop;
+      end loop;
 
-        Arff_Data_New.Append (Data_1);
-        Arff_Data_New.Append (Data_2);
-        Arff_Data_New.Append (Data_3);
+      Zipped_Data := Zip (Arff_Data.Element (1), Arff_Data.Element (2));
+
+
+      Arff_Data_New.Append (Data_1);
+      Arff_Data_New.Append (Data_2);
+      Arff_Data_New.Append (Data_3);
 
       return Arff_Data_New;
 
@@ -730,11 +745,36 @@ procedure Fetch_Openml (Dataset_Name  : String; Version : String := "";
 
    --  ------------------------------------------------------------------------
 
-   procedure Verify_Target_Data_Type (Features_Dict : JSON_Value;
+   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Value;
                                       Target_Columns : JSON_Array) is
    begin
-    null;
+      null;
    end Verify_Target_Data_Type;
+
+   --  ------------------------------------------------------------------------
+   --  The zip() function returns an iterator of tuples where the first item in
+   --  each passed iterator is paired together and then the second item in each
+   --  passed iterator are paired together etc.
+   --  If the passed iterators have different lengths then the iterator with
+   --  the least number of items decides the length of the new iterator.
+
+   function Zip (List_1, List_2 : ML_Types.String_Vector)
+                 return Zip_Vector is
+      use ML_Types;
+      Zip_Length : Positive := Positive (List_1.Length);
+      Result     : Zip_Vector;
+   begin
+      if Positive (List_2.Length) <  Zip_Length then
+         Zip_Length := Positive (List_2.Length);
+      end if;
+
+      for index in 1 .. Zip_Length loop
+         Result.Append ((List_1.Element (index), List_2.Element (index)));
+      end loop;
+
+      return Result;
+
+   end Zip;
 
    --  ------------------------------------------------------------------------
 
