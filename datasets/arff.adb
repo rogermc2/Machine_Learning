@@ -12,6 +12,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Regpat;
 
+with Classifier_Types;
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
 with Regexep;
@@ -230,6 +231,7 @@ package body ARFF is
       end loop;
 
       --  L872 Alter the data object
+      Stream_Cursor := Message_Lines.First;
       case Matrix_Type is
          when Arff_Dense =>
             Values := Decode_Rows_Dense (Decoder, Stream_Data'Access);
@@ -426,9 +428,9 @@ package body ARFF is
       --          use String_Package;
       --          Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
-      Rows   : String_List;
-      Cols   : String_List;
-      Data   : String_List;
+      Rows   : Integer_List;
+      Cols   : Integer_List;
+      Data   : Classifier_Types.Float_List;
       Values : String_List;
    begin
       return Values;

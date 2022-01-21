@@ -11,6 +11,7 @@ with AWS.URL;
 with ML_Types;
 
 with ARFF;
+with Coo;
 with Dataset_Utilities;
 
 pragma Warnings (Off);
@@ -125,6 +126,8 @@ package body Openml is
       Data_List     : String_Vector;
       String_Length : Positive;
       Num_Obs       : Positive := 0;
+      X_Shape       : Coo.Shape_Dimensions;
+      Coo_X         : Coo.Coo_Matrix (Coo.Coo_Data);
    begin
       --  L283
       Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
@@ -135,6 +138,9 @@ package body Openml is
                 Num_Obs := String_Length;
             end if;
       end loop;
+
+      X_Shape := (Num_Obs, Positive (Col_Slice_X.Length));
+      Coo_X.Data := Arff_Data_X.Element (1);
 
    end Convert_Arff_To_Data;
 
