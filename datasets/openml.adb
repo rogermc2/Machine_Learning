@@ -120,11 +120,21 @@ package body Openml is
      (ARFF_Data                 : ARFF.Arff_Sparse_Data_Type;
       Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
       X, Y                      : out JSON_Array) is
-      Arff_Data_X  : ARFF.Arff_Sparse_Data_Type;
-      Tuple_Length : Positive;
+      use ML_Types;
+      Arff_Data_X   : ARFF.Arff_Sparse_Data_Type;
+      Data_List     : String_Vector;
+      String_Length : Positive;
+      Num_Obs       : Positive := 0;
    begin
       --  L283
       Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+      Data_List := ARFF_Data.Element (2);
+      for index in Data_List.First_Index .. Data_List.Last_Index loop
+            String_Length := Length (Data_List.Element (index));
+            if String_Length > Num_Obs then
+                Num_Obs := String_Length;
+            end if;
+      end loop;
 
    end Convert_Arff_To_Data;
 
