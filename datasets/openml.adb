@@ -140,7 +140,7 @@ package body Openml is
       end loop;
 
       X_Shape := (Num_Obs, Positive (Col_Slice_X.Length));
-      Coo_X.Data := Arff_Data_X.Element (1);
+--        Coo_X.Data := Arff_Data_X.Element (1);
 
    end Convert_Arff_To_Data;
 

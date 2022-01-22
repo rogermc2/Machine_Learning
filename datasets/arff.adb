@@ -68,7 +68,7 @@ package body ARFF is
      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
 
    type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
-                                              return String;
+                                             return String;
 
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
    Stream_Cursor  : ML_Types.String_Package.Cursor;
@@ -79,9 +79,10 @@ package body ARFF is
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
 
-   function Decode_Attribute (Decoder         : in Out Arff_Decoder;
-                               UC_Row          : String;
-                               Encode_Nominal  : Boolean := False)
+   function Decode_Attribute (Decoder           : in Out Arff_Decoder;
+                              UC_Row            : String;
+                              Attribute_Names   : in out JSON_Value;
+                              Encode_Nominal    : Boolean := False)
                               return JSON_Value;
    procedure Decode_Comment
      (UC_Row : String; Arff_Container : in out JSON_Value);
@@ -89,12 +90,12 @@ package body ARFF is
      (UC_Row : String; Arff_Container : in out JSON_Value);
    function Decode_Rows_COO (Decoder        : in Out Arff_Decoder;
                              Stream_Func    : Stream_Func_Type)
-                              return String_List;
+                             return String_List;
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
-                                return String_List;
+                               return String_List;
    function Decode_Values (Values : String_List; Conversers : Conversor_List)
-                            return String_List;
+                           return String_List;
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
@@ -151,7 +152,7 @@ package body ARFF is
    function Decode (Decoder     : in Out Arff_Decoder;
                     Text        : String; Encode_Nominal : Boolean := False;
                     Matrix_Type : ARFF_Return_Type := Arff_Dense)
-                     return JSON_Value is
+                    return JSON_Value is
       use Ada.Strings;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "ARFF.Decode ";
@@ -164,6 +165,7 @@ package body ARFF is
       Curs            : Cursor;
       Arff_Container  : Arff_Container_Type := Create_Object;
       Attr            : JSON_Value := Create_Object;
+      Attribute_Names : JSON_Value := Create_Object;
       Stream_Row      : Unbounded_String;
       Values          : String_List;
       JSON_Values     : JSON_Array;
@@ -182,7 +184,7 @@ package body ARFF is
            (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
       end if;
 
-      --  L784
+      --  L784 Arff_Container implements obj: ArffContainerType
       Arff_Container.Set_Field ("description", "");
       Arff_Container.Set_Field ("relation", "");
       Arff_Container.Set_Field ("attributes", Create (Empty_Array));
@@ -207,12 +209,15 @@ package body ARFF is
                   State := TK_Relation;
                   Decode_Relation (UC_Row, Arff_Container);
 
-               --  L821 _TK_ATTRIBUTE = "@ATTRIBUTE"
+                  --  L821 _TK_ATTRIBUTE = "@ATTRIBUTE"
                elsif UC_Row (1 .. 10) = "@ATTRIBUTE" then
                   Assert (State = TK_Relation or State = TK_Attribute,
                           Routine_Name & Bad_Layout);
                   State := TK_Attribute;
-                  Attr := Decode_Attribute (Decoder, UC_Row, Encode_Nominal);
+                  Attr := Decode_Attribute (Decoder, UC_Row, Attribute_Names,
+                                            Encode_Nominal);
+                  --  _decode lines 827 - 830 (update attribute_names) are
+                  --  implemented in Decode_Attribute
                   --  L832
                   Attribute_Array := Get (Arff_Container, "attributes");
                   Append (Attribute_Array, Attr);
@@ -266,31 +271,30 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
    function Decode_Attribute
-      (Decoder  : in Out Arff_Decoder; UC_Row : String;
-       Encode_Nominal : Boolean := False) return JSON_Value is
+     (Decoder         : in Out Arff_Decoder; UC_Row : String;
+      Attribute_Names : in out JSON_Value;
+      Encode_Nominal  : Boolean := False) return JSON_Value is
       use Ada.Strings;
       use Ada.Strings.Maps;
       use GNAT.Regpat;
       use ML_Types.String_Package;
-      Routine_Name : constant String := "ARFF.Decode_Relation ";
-      Regex        : constant String :=
-                       "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
-      Trim_Seq     : constant Character_Sequence := "{} ";
-      Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
-      Attribute_Names : JSON_Value;
+      Routine_Name    : constant String := "ARFF.Decode_Relation ";
+      Regex           : constant String :=
+                          "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
+      Trim_Seq        : constant Character_Sequence := "{} ";
+      Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
       Arff_Container  : JSON_Value;
       --  L749 Extract raw name and type
-      Pos          : Integer := Fixed.Index (UC_Row, " ");
-      Slice_1      : constant String := UC_Row (UC_Row'First .. Pos - 1);
-      Slice_2      : String :=
-                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
-      Name         : Unbounded_String;
-      Attr_Type    : Unbounded_String;
-      Attribute    : constant JSON_Value := Create_Object;
-      Curs         : Cursor;
-      Values       : String_List;
-      JSON_Values  : JSON_Array;
-      --          Converser    : Conversor_Data;
+      Pos             : Integer := Fixed.Index (UC_Row, " ");
+      Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
+      Slice_2         : String :=
+                          Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
+      Name            : Unbounded_String;
+      Attr_Type       : Unbounded_String;
+      Attribute       : constant JSON_Value := Create_Object;
+      Curs            : Cursor;
+      Values          : String_List;
+      JSON_Values     : JSON_Array;
    begin
       Name := To_Unbounded_String (Slice_1);
       Assert (Match (Compile (Regex), Slice_2),
@@ -431,8 +435,8 @@ package body ARFF is
    --  L531
    function Decode_Rows_COO (Decoder     : in Out Arff_Decoder;
                              Stream_Func : Stream_Func_Type)
-                              return String_List is
-     use String_Package;
+                             return String_List is
+      use String_Package;
       --          Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
       Rows   : Integer_List;
@@ -456,7 +460,7 @@ package body ARFF is
    --  L460
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
-                                return String_List is
+                               return String_List is
       use String_Package;
       Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
@@ -538,7 +542,7 @@ package body ARFF is
    --  per argument.
    --  Without arguments, group1 defaults to zero (the whole match is returned).
    function Escape_Sub_Callback (Match : Regexep.Match_Strings_List)
-                                  return String is
+                                 return String is
       use Ada.Strings;
       use Regexep;
       use Escape_Sub_Map_Package;
@@ -616,7 +620,7 @@ package body ARFF is
 
    function Load (File_Data   : String; Encode_Nominal : Boolean := False;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
-                   return JSON_Value is
+                  return JSON_Value is
       Decoder   : Arff_Decoder;
       ARFF_Data : constant JSON_Value :=
                     Decode (Decoder, File_Data, Encode_Nominal, Return_Type);
