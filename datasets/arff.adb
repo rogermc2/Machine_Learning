@@ -81,9 +81,7 @@ package body ARFF is
 
    function Decode_Attribute (Decoder         : in Out Arff_Decoder;
                                UC_Row          : String;
-                               Encode_Nominal  : Boolean := False;
-                               Attribute_Names : in out JSON_Value;
-                               Arff_Container  : in out JSON_Value)
+                               Encode_Nominal  : Boolean := False)
                               return JSON_Value;
    procedure Decode_Comment
      (UC_Row : String; Arff_Container : in out JSON_Value);
@@ -165,8 +163,7 @@ package body ARFF is
       Message_Lines   : String_List;
       Curs            : Cursor;
       Arff_Container  : Arff_Container_Type := Create_Object;
-      Attribute_Names : JSON_Value := Create_Object;
-      Attr_Type       : JSON_Value := Create_Object;
+      Attr            : JSON_Value := Create_Object;
       Stream_Row      : Unbounded_String;
       Values          : String_List;
       JSON_Values     : JSON_Array;
@@ -203,20 +200,21 @@ package body ARFF is
                          (To_String (Element (Curs)));
          begin
             if UC_Row /= "" then
-               if UC_Row = "@RELATION" then
+               if UC_Row (1 .. 9) = "@RELATION" then
                   Assert (State = TK_Descrition,
                           Routine_Name & Bad_Layout);
                   State := TK_Relation;
                   Decode_Relation (UC_Row, Arff_Container);
 
-               elsif UC_Row = "@ATTRIBUTE" then
+               --  L821 _TK_ATTRIBUTE = "@ATTRIBUTE"
+               elsif UC_Row (1 .. 10) = "@ATTRIBUTE" then
                   Assert (State = TK_Relation or State = TK_Attribute,
                           Routine_Name & Bad_Layout);
                   State := TK_Attribute;
-                  Attr_Type := Decode_Attribute (Decoder, UC_Row, Encode_Nominal,
-                                                 Attribute_Names, Arff_Container);
+                  Attr := Decode_Attribute (Decoder, UC_Row,
+                                                 Encode_Nominal);
 
-               elsif UC_Row = "@DATA" then
+               elsif UC_Row (1 .. 5) = "@DATA" then
                   --  L850
                   Assert (State = TK_Attribute, Routine_Name & Bad_Layout);
 
@@ -262,12 +260,9 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Decode_Attribute (Decoder         : in Out Arff_Decoder;
-                               UC_Row          : String;
-                               Encode_Nominal  : Boolean := False;
-                               Attribute_Names : in out JSON_Value;
-                              Arff_Container  : in out JSON_Value)
-                              return JSON_Value is
+   function Decode_Attribute
+      (Decoder  : in Out Arff_Decoder; UC_Row : String;
+       Encode_Nominal : Boolean := False) return JSON_Value is
       use Ada.Strings;
       use Ada.Strings.Maps;
       use GNAT.Regpat;
@@ -277,6 +272,8 @@ package body ARFF is
                        "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
       Trim_Seq     : constant Character_Sequence := "{} ";
       Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
+      Attribute_Names : JSON_Value;
+      Arff_Container  : JSON_Value;
       --  L749 Extract raw name and type
       Pos          : Integer := Fixed.Index (UC_Row, " ");
       Slice_1      : constant String := UC_Row (UC_Row'First .. Pos - 1);
@@ -340,7 +337,7 @@ package body ARFF is
          Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
          Arff_Container.Set_Field ("attributes", Attribute);
 
-         --  L832
+         --  L832  Originally in ATTRIBUTE sectopn of _decode
          if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
             Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
 
