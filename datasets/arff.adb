@@ -478,7 +478,7 @@ package body ARFF is
       use Conversor_Tuple_Package;
 
       Routine_Name   : constant String := "ARFF.Decode_Values ";
-      Zip_Values     : Conversor_Tuple_List;
+      Zipped_Values  : Conversor_Tuple_List;
       Conv_Cursor    : Conversor_Package.Cursor;
       Values_Cursor  : String_Package.Cursor;
       Zip_Cursor     : Conversor_Tuple_Package.Cursor;
@@ -493,13 +493,13 @@ package body ARFF is
       Values_Cursor := Values.First;
 
       while Has_Element (Conv_Cursor) loop
-         Zip_Values.Append
+         Zipped_Values.Append
            ((Element (Conv_Cursor), Element (Values_Cursor)));
          Next (Conv_Cursor);
          Next (Values_Cursor);
       end loop;
 
-      Zip_Cursor := Zip_Values.First;
+      Zip_Cursor := Zipped_Values.First;
       while Has_Element (Zip_Cursor) loop
          Decoded_Values.Append (Element (Zip_Cursor).Value);
          Next (Zip_Cursor);
