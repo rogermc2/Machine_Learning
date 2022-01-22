@@ -167,6 +167,7 @@ package body ARFF is
       Stream_Row      : Unbounded_String;
       Values          : String_List;
       JSON_Values     : JSON_Array;
+      Attribute_Array : JSON_Array;
    begin
       Decoder.Current_Line := 0;
       while Pos2 /= 0 and Pos1 < Text_Length loop
@@ -211,8 +212,11 @@ package body ARFF is
                   Assert (State = TK_Relation or State = TK_Attribute,
                           Routine_Name & Bad_Layout);
                   State := TK_Attribute;
-                  Attr := Decode_Attribute (Decoder, UC_Row,
-                                                 Encode_Nominal);
+                  Attr := Decode_Attribute (Decoder, UC_Row, Encode_Nominal);
+                  --  L832
+                  Attribute_Array := Get (Arff_Container, "attributes");
+                  Append (Attribute_Array, Attr);
+                  Arff_Container.Set_Field ("attributes", Attribute_Array);
 
                elsif UC_Row (1 .. 5) = "@DATA" then
                   --  L850
@@ -221,6 +225,7 @@ package body ARFF is
                elsif UC_Row (1 .. 1) = "%" then
                   --  L806
                   Decode_Comment (UC_Row, Arff_Container);
+
                else
                   Assert (False, Routine_Name & Bad_Layout);
                end if;
