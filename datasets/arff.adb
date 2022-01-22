@@ -88,9 +88,10 @@ package body ARFF is
      (UC_Row : String; Arff_Container : in out JSON_Value);
    procedure Decode_Relation
      (UC_Row : String; Arff_Container : in out JSON_Value);
-   function Decode_Rows_COO (Decoder        : in Out Arff_Decoder;
-                             Stream_Func    : Stream_Func_Type)
-                             return String_List;
+   function Decode_Rows_COO
+     (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
+      Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
+      return String_List;
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
                                return String_List;
@@ -170,6 +171,8 @@ package body ARFF is
       Values          : String_List;
       JSON_Values     : JSON_Array;
       Attribute_Array : JSON_Array;
+      Data            : Classifier_Types.Float_List;
+      Rows, Cols      : Integer_List;
    begin
       Decoder.Current_Line := 0;
       while Pos2 /= 0 and Pos1 < Text_Length loop
@@ -246,7 +249,8 @@ package body ARFF is
          when Arff_Dense =>
             Values := Decode_Rows_Dense (Decoder, Stream_Data'Access);
          when Arff_Coo =>
-            Values := Decode_Rows_COO (Decoder, Stream_Data'Access);
+            Values := Decode_Rows_COO (Decoder, Stream_Data'Access, Data,
+                                       Rows, Cols);
          when others => null;
       end case;
 
@@ -433,22 +437,42 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
    --  L531
-   function Decode_Rows_COO (Decoder     : in Out Arff_Decoder;
-                             Stream_Func : Stream_Func_Type)
-                             return String_List is
+   function Decode_Rows_COO
+     (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
+      Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
+      return String_List is
       use String_Package;
+
+      function "<" (L, R : Unbounded_String) return Boolean is
+         L_String : constant String := To_String (L);
+         R_String : constant String := To_String (R);
+      begin
+         return L_String < R_String;
+      end "<";
+      package String_Package_Sorting is new
+        String_Package.Generic_Sorting ("<");
+
       --          Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
-      Rows   : Integer_List;
-      Cols   : Integer_List;
-      Data   : Classifier_Types.Float_List;
-      Values : String_List;
+      Values         : String_List;
+      Row_Col_Values : String_Vector;
+      Curs           : String_Package.Cursor;
    begin
+      --  L532
       while Has_Element (Stream_Cursor) loop
          declare
             Row : constant String := Stream_Func (Decoder);
          begin
             Values := Parse_Values (Row);
+            if not Is_Empty (Values) then
+               String_Package_Sorting.Sort (Values);
+               --  L538
+               Curs := Values.First;
+               while Has_Element (Curs) loop
+                  Row_Col_Values.Append (Element (Curs));
+                  Next (Curs);
+               end loop;
+            end if;
          end;
       end loop;
 
