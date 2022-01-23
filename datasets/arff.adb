@@ -24,6 +24,8 @@ package body ARFF is
    --                       TK_Comment, TK_Data);
    type Conversor_Type is (Conversor_Unencoded, Conversor_Encoded,
                            Conversor_Map);
+   type Conversor_Data_Type is (Conv_Integer, Conv_Numeric, Conv_Real,
+                                Conv_String);
 
    type Conversor_Data (Encoded : Conversor_Type := Conversor_Map)
    is record
@@ -57,6 +59,15 @@ package body ARFF is
    package Conversor_Tuple_Package is new
      Ada.Containers.Doubly_Linked_Lists (Conversor_Tuple);
    subtype Conversor_Tuple_List is Conversor_Tuple_Package.List;
+
+   type Conversor_Item is record
+      Name      : Unbounded_String;
+      Data_Type : Conversor_Data_Type;
+   end record;
+
+   package Conversor_Item_Package is new
+     Ada.Containers.Doubly_Linked_Lists (Conversor_Item);
+   subtype Conversor_Item_List is Conversor_Item_Package.List;
 
    type Arff_Decoder is record
       Conversers   : Conversor_List;
@@ -278,6 +289,69 @@ package body ARFF is
 
    function Decode_Attribute
      (Decoder         : in Out Arff_Decoder; UC_Row : String;
+      Attribute_Names : in out String_List;
+      Encode_Nominal  : Boolean := False) return Conversor_Item is
+      use GNAT.Regpat;
+      use ML_Types.String_Package;
+      use Ada.Strings;
+      use Ada.Strings.Maps;
+      Routine_Name    : constant String := "ARFF.Decode_Relation ";
+      Regex           : constant String :=
+                          "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
+      Trim_Seq        : constant Character_Sequence := "{} ";
+      Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
+      Arff_Container  : JSON_Value;
+      --  L749 Extract raw name and type
+      Pos             : Integer := Fixed.Index (UC_Row, " ");
+      Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
+      Slice_2         : String :=
+                          Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
+      Name            : Unbounded_String;
+      Attr_Type       : Unbounded_String;
+      Values          : String_List;
+      Conv_Item       : Conversor_Item;
+   begin
+      Name := To_Unbounded_String (Slice_1);
+      Assert (Match (Compile (Regex), Slice_2),
+              Routine_Name & " attribute declaration '" &
+                To_String (Attr_Type) &
+                "' has an invalid format.");
+
+      --  L751 Extract the final name
+      Pos := 1;
+      while Pos > 0 and Pos < Length (Name) loop
+         Pos := Fixed.Index (To_String (Name), """");
+         if Pos > 0 and Pos < Length (Name) then
+            if Slice (Name, Pos + 1, Pos + 1) = "'" then
+               Name := To_Unbounded_String
+                 (Slice (Name, 1, Pos - 1) &
+                    Slice (Name, Pos + 2, Length (Name)));
+            end if;
+         end if;
+      end loop;
+
+      --  L755 Extract the final type
+      Attr_Type := To_Unbounded_String (Slice_2);
+      if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2'Last) = '{' then
+         Attr_Type := To_Unbounded_String
+           (Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set));
+         Values := Parse_Values (To_String (Attr_Type));
+      else
+         Slice_2 := Dataset_Utilities.To_Upper_Case (Slice_2);
+         Assert (Slice_2 = "NUMERIC" or Slice_2 = "REAL" or
+                   Slice_2 = "INTEGER" or Slice_2 = "STRING",
+                 Routine_Name & " invalid attribute type, " & Slice_2);
+      end if;
+      --  end Python _arff._decode_attribute
+
+      return Conv_Item;
+
+   end Decode_Attribute;
+
+   --  -------------------------------------------------------------------------
+
+   function Decode_Attribute
+     (Decoder         : in Out Arff_Decoder; UC_Row : String;
       Attribute_Names : in out JSON_Value;
       Encode_Nominal  : Boolean := False) return JSON_Value is
       use Ada.Strings;
@@ -333,6 +407,7 @@ package body ARFF is
                    Slice_2 = "INTEGER" or Slice_2 = "STRING",
                  Routine_Name & " invalid attribute type, " & Slice_2);
       end if;
+      --  end Python _arff._decode_attribute
 
       Curs := Values.First;
       while Has_Element (Curs) loop
@@ -340,6 +415,7 @@ package body ARFF is
          Next (Curs);
       end loop;
 
+      --  L827  Originally in ATTRIBUTE section of _decode
       declare
          Attr_Name : constant String := To_String (Name);
       begin
@@ -352,7 +428,7 @@ package body ARFF is
          Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
          Arff_Container.Set_Field ("attributes", Attribute);
 
-         --  L832  Originally in ATTRIBUTE section of _decode
+         --  L832
          if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
             Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
 
