@@ -12,7 +12,6 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNAT.Regpat;
 
-with Classifier_Types;
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
 with Regexep;
@@ -88,15 +87,15 @@ package body ARFF is
      (UC_Row : String; Arff_Container : in out JSON_Value);
    procedure Decode_Relation
      (UC_Row : String; Arff_Container : in out JSON_Value);
-   function Decode_Rows_COO
-     (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
-      Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
-      return String_List;
+   --     function Decode_Rows_COO
+   --       (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
+   --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
+   --        return String_List;
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
                                return String_List;
-   function Decode_Values (Values : String_List; Conversers : Conversor_List)
-                           return String_List;
+   function Decode_Dense_Values (Values : String_List; Conversers : Conversor_List)
+                                 return String_List;
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
@@ -149,14 +148,15 @@ package body ARFF is
    end Build_Re_Sparse;
 
    --  -------------------------------------------------------------------------
-   --  L771
-   function Decode (Decoder     : in Out Arff_Decoder;
-                    Text        : String; Encode_Nominal : Boolean := False;
-                    Matrix_Type : ARFF_Return_Type := Arff_Dense)
-                    return JSON_Value is
+   --  L771  and, by reference, L879
+   function Decode_ARFF (Decoder     : in Out Arff_Decoder;
+                         Text           : String;
+                         Encode_Nominal : Boolean := False;
+                         Matrix_Type : ARFF_Return_Type := Arff_Dense)
+                         return JSON_Value is
       use Ada.Strings;
       use ML_Types.String_Package;
-      Routine_Name    : constant String := "ARFF.Decode ";
+      Routine_Name    : constant String := "ARFF.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
       Text_Length     : constant Integer := Text'Length;
       State           : TK_State := TK_Descrition;
@@ -171,7 +171,7 @@ package body ARFF is
       Values          : String_List;
       JSON_Values     : JSON_Array;
       Attribute_Array : JSON_Array;
-      Data            : Classifier_Types.Float_List;
+      Data            : JSON_Value;
       Rows, Cols      : Integer_List;
    begin
       Decoder.Current_Line := 0;
@@ -245,12 +245,14 @@ package body ARFF is
 
       --  L872 Alter the data object
       Stream_Cursor := Message_Lines.First;
+      --  case Matrix_Type implements
+      --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
          when Arff_Dense =>
             Values := Decode_Rows_Dense (Decoder, Stream_Data'Access);
-         when Arff_Coo =>
-            Values := Decode_Rows_COO (Decoder, Stream_Data'Access, Data,
-                                       Rows, Cols);
+         when Arff_Coo => null;
+            --              Values := Decode_Rows_COO (Decoder, Stream_Data'Access, Data,
+            --                                         Rows, Cols);
          when others => null;
       end case;
 
@@ -270,7 +272,7 @@ package body ARFF is
 
       return Arff_Container;
 
-   end Decode;
+   end Decode_ARFF;
 
    --  -------------------------------------------------------------------------
 
@@ -436,55 +438,56 @@ package body ARFF is
    end Decode_Relation;
 
    --  -------------------------------------------------------------------------
-   --  L531
-   function Decode_Rows_COO
-     (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
-      Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
-      return String_List is
-      use String_Package;
-
-      function "<" (L, R : Unbounded_String) return Boolean is
-         L_String : constant String := To_String (L);
-         R_String : constant String := To_String (R);
-      begin
-         return L_String < R_String;
-      end "<";
-      package String_Package_Sorting is new
-        String_Package.Generic_Sorting ("<");
-
-      Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
-      --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
-      Values         : String_List;
-      Row_Col_Values : String_Vector;
-      Curs           : String_Package.Cursor;
-   begin
-      --  L532
-      while Has_Element (Stream_Cursor) loop
-         declare
-            Row : constant String := Stream_Func (Decoder);
-         begin
-            Values := Parse_Values (Row);
-            if not Is_Empty (Values) then
-               Assert (Values.First_Element = "{" and Values.Last_Element = "}",
-                       Routine_Name & "invalid layout in ARFF file: " & Row);
-               Values.Delete_First;
-               Values.Delete_Last;
-               String_Package_Sorting.Sort (Values);
-               --  L538
-               Curs := Values.First;
-               while Has_Element (Curs) loop
-                  Row_Col_Values.Append (Element (Curs));
-                  Next (Curs);
-               end loop;
-            end if;
-         end;
-      end loop;
-
-      return Values;
-
-   end Decode_Rows_COO;
+   --  L531 COO refers to a matrix iCOOrdinate format
+   --  which can be defined by:
+   --  data[:] the entries of the matrix in any order
+   --  i[:] the row indices of the matrix entries
+   --  j[:] the column indices of the matrix entries
+   --     function Decode_Rows_COO
+   --       (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
+   --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
+   --        return String_List is
+   --        use String_Package;
+   --
+   --        function "<" (L, R : Unbounded_String) return Boolean is
+   --           L_String : constant String := To_String (L);
+   --           R_String : constant String := To_String (R);
+   --        begin
+   --           return L_String < R_String;
+   --        end "<";
+   --        package String_Package_Sorting is new
+   --          String_Package.Generic_Sorting ("<");
+   --
+   --        Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
+   --        --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
+   --        Values         : String_List;
+   --        Row_Col_Values : String_Vector;
+   --        Curs           : String_Package.Cursor;
+   --     begin
+   --        --  L532
+   --        while Has_Element (Stream_Cursor) loop
+   --           declare
+   --              Row : constant String := Stream_Func (Decoder);
+   --           begin
+   --              Values := Parse_Values (Row);
+   --              if not Is_Empty (Values) then
+   --                 String_Package_Sorting.Sort (Values);
+   --                 --  L538
+   --                 Curs := Values.First;
+   --                 while Has_Element (Curs) loop
+   --                    Row_Col_Values.Append (Element (Curs));
+   --                    Next (Curs);
+   --                 end loop;
+   --              end if;
+   --           end;
+   --        end loop;
+   --
+   --        return Values;
+   --
+   --     end Decode_Rows_COO;
 
    --  -------------------------------------------------------------------------
+
    --  L460
    function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
@@ -492,20 +495,22 @@ package body ARFF is
       use String_Package;
       Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
+      --  L462  for row in stream:
       Row              : constant String := Stream_Func (Decoder);
+      --  L463
       Values           : constant String_List := Parse_Values (Row);
    begin
       Assert (not Values.Is_Empty and Max_Value (Values) < Converser_Length ,
               Routine_Name & Row & " format is invalid.");
-
-      return Decode_Values (Values, Decoder.Conversers);
+      --  L475
+      return Decode_Dense_Values (Values, Decoder.Conversers);
 
    end Decode_Rows_Dense;
 
    --  -------------------------------------------------------------------------
-
-   function Decode_Values (Values     : String_List;
-                           Conversers : Conversor_List) return String_List is
+   --  L478
+   function Decode_Dense_Values
+     (Values : String_List; Conversers : Conversor_List) return String_List is
       use Ada.Containers;
       use Conversor_Package;
       use String_Package;
@@ -541,7 +546,7 @@ package body ARFF is
 
       return Decoded_Values;
 
-   end Decode_Values;
+   end Decode_Dense_Values;
 
    --  -------------------------------------------------------------------------
 
@@ -651,7 +656,8 @@ package body ARFF is
                   return JSON_Value is
       Decoder   : Arff_Decoder;
       ARFF_Data : constant JSON_Value :=
-                    Decode (Decoder, File_Data, Encode_Nominal, Return_Type);
+                    Decode_ARFF (Decoder, File_Data, Encode_Nominal,
+                                 Return_Type);
    begin
       return ARFF_Data;
 
@@ -700,6 +706,7 @@ package body ARFF is
                   Values := Get_CSV_Data (Row (First .. Last));
                end if;
                Matches := Find_Match (Sparse, Row, First, Last, Sparse_Match);
+
                if Sparse_Match then
                   Errors := Get_CSV_Data (Row (First .. Last));
                end if;
