@@ -93,9 +93,9 @@ package body ARFF is
    --        return String_List;
    function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
-                               return String_List;
+                               return JSON_Array;
    function Decode_Dense_Values (Values : String_List; Conversers : Conversor_List)
-                                 return String_List;
+                                 return JSON_Array;
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
@@ -168,11 +168,11 @@ package body ARFF is
       Attr            : JSON_Value := Create_Object;
       Attribute_Names : JSON_Value := Create_Object;
       Stream_Row      : Unbounded_String;
-      Values          : String_List;
+      Values          : JSON_Array;
       JSON_Values     : JSON_Array;
       Attribute_Array : JSON_Array;
-      Data            : JSON_Value;
-      Rows, Cols      : Integer_List;
+--        Data            : JSON_Value;
+--        Rows, Cols      : Integer_List;
    begin
       Decoder.Current_Line := 0;
       while Pos2 /= 0 and Pos1 < Text_Length loop
@@ -256,11 +256,11 @@ package body ARFF is
          when others => null;
       end case;
 
-      Curs := Values.First;
-      while Has_Element (Curs) loop
-         Append (JSON_Values, Create (Element (Curs)));
-         Next (Curs);
-      end loop;
+--        Curs := Values.First;
+--        while Has_Element (Curs) loop
+--           Append (JSON_Values, Create (Element (Curs)));
+--           Next (Curs);
+--        end loop;
       Arff_Container.Set_Field ("data", JSON_Values);
 
       Stream_Row := Get (Arff_Container, "description");
@@ -352,7 +352,7 @@ package body ARFF is
          Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
          Arff_Container.Set_Field ("attributes", Attribute);
 
-         --  L832  Originally in ATTRIBUTE sectopn of _decode
+         --  L832  Originally in ATTRIBUTE section of _decode
          if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
             Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
 
@@ -491,7 +491,7 @@ package body ARFF is
    --  L460
    function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
-                               return String_List is
+                               return JSON_Array is
       use String_Package;
       Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
@@ -510,18 +510,23 @@ package body ARFF is
    --  -------------------------------------------------------------------------
    --  L478
    function Decode_Dense_Values
-     (Values : String_List; Conversers : Conversor_List) return String_List is
+     (Values : String_List; Conversers : Conversor_List) return JSON_Array is
       use Ada.Containers;
       use Conversor_Package;
       use String_Package;
       use Conversor_Tuple_Package;
 
-      Routine_Name   : constant String := "ARFF.Decode_Values ";
-      Zipped_Values  : Conversor_Tuple_List;
-      Conv_Cursor    : Conversor_Package.Cursor;
-      Values_Cursor  : String_Package.Cursor;
-      Zip_Cursor     : Conversor_Tuple_Package.Cursor;
-      Decoded_Values : String_List;
+      Routine_Name         : constant String := "ARFF.Decode_Values ";
+      Zipped_Values        : Conversor_Tuple_List;
+      Conv_Cursor          : Conversor_Package.Cursor;
+      Values_Cursor        : String_Package.Cursor;
+--        Zip_Cursor     : Conversor_Tuple_Package.Cursor;
+      aConverser           : Conversor_Data (Conversor_Encoded);
+      Converser_Values     : ML_Types.String_List;
+      Converser_Zero_Value : Unbounded_String;
+      Converser_String     : Unbounded_String;
+      Value_String         : Unbounded_String;
+      Decoded_Values       : JSON_Array;
    begin
       Assert (Values.Length = Conversers.Length, Routine_Name &
                 "lengths of Values " & Count_Type'Image (Values.Length) &
@@ -534,15 +539,19 @@ package body ARFF is
       while Has_Element (Conv_Cursor) loop
          Zipped_Values.Append
            ((Element (Conv_Cursor), Element (Values_Cursor)));
+         aConverser := Element (Conv_Cursor);
+         Converser_String := aConverser.Encoded_Values;
+         Value_String := Element (Values_Cursor);
          Next (Conv_Cursor);
          Next (Values_Cursor);
       end loop;
 
-      Zip_Cursor := Zipped_Values.First;
-      while Has_Element (Zip_Cursor) loop
-         Decoded_Values.Append (Element (Zip_Cursor).Value);
-         Next (Zip_Cursor);
-      end loop;
+--        Zip_Cursor := Zipped_Values.First;
+--        while Has_Element (Zip_Cursor) loop
+--           aValue :=
+--           Decoded_Values.Append (Element (Zip_Cursor).Value);
+--           Next (Zip_Cursor);
+--        end loop;
 
       return Decoded_Values;
 
@@ -689,6 +698,7 @@ package body ARFF is
       if Row'Length /= 0 and then Row /= "?" then
          Matches := Find_Match (Compile (Non_Trivial), Row, First, Last,
                                 Match_Found);
+         pragma Unreferenced (Matches);
          if Match_Found then
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
