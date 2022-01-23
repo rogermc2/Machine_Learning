@@ -300,7 +300,6 @@ package body ARFF is
                           "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
       Trim_Seq        : constant Character_Sequence := "{} ";
       Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
-      Arff_Container  : JSON_Value;
       --  L749 Extract raw name and type
       Pos             : Integer := Fixed.Index (UC_Row, " ");
       Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
@@ -343,6 +342,17 @@ package body ARFF is
                  Routine_Name & " invalid attribute type, " & Slice_2);
       end if;
       --  end Python _arff._decode_attribute
+
+      Conv_Item.Name := Name;
+      if Slice_2 = "INTEGER" then
+            Conv_Item.Data_Type := Conv_Integer;
+      elsif Slice_2 = "NUMERIC" then
+            Conv_Item.Data_Type := Conv_Numeric;
+      elsif Slice_2 = "REAL" then
+            Conv_Item.Data_Type := Conv_Real;
+      elsif Slice_2 = "STRING" then
+            Conv_Item.Data_Type := Conv_String;
+      end if;
 
       return Conv_Item;
 
