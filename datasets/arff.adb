@@ -452,7 +452,7 @@ package body ARFF is
       package String_Package_Sorting is new
         String_Package.Generic_Sorting ("<");
 
-      --          Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
+      Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
       --          Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
       Values         : String_List;
       Row_Col_Values : String_Vector;
@@ -465,6 +465,10 @@ package body ARFF is
          begin
             Values := Parse_Values (Row);
             if not Is_Empty (Values) then
+               Assert (Values.First_Element = "{" and Values.Last_Element = "}",
+                       Routine_Name & "invalid layout in ARFF file: " & Row);
+               Values.Delete_First;
+               Values.Delete_Last;
                String_Package_Sorting.Sort (Values);
                --  L538
                Curs := Values.First;
