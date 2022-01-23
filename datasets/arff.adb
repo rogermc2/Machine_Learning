@@ -87,11 +87,11 @@ package body ARFF is
      (UC_Row : String; Arff_Container : in out JSON_Value);
    procedure Decode_Relation
      (UC_Row : String; Arff_Container : in out JSON_Value);
-   --     function Decode_Rows_COO
+   --     function Decode_COO_Rows
    --       (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
    --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
    --        return String_List;
-   function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
+   function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
                                return String_List;
    function Decode_Dense_Values (Values : String_List; Conversers : Conversor_List)
@@ -249,9 +249,9 @@ package body ARFF is
       --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
          when Arff_Dense =>
-            Values := Decode_Rows_Dense (Decoder, Stream_Data'Access);
+            Values := Decode_Dense_Rows (Decoder, Stream_Data'Access);
          when Arff_Coo => null;
-            --              Values := Decode_Rows_COO (Decoder, Stream_Data'Access, Data,
+            --              Values := Decode_COO_Rows (Decoder, Stream_Data'Access, Data,
             --                                         Rows, Cols);
          when others => null;
       end case;
@@ -443,7 +443,7 @@ package body ARFF is
    --  data[:] the entries of the matrix in any order
    --  i[:] the row indices of the matrix entries
    --  j[:] the column indices of the matrix entries
-   --     function Decode_Rows_COO
+   --     function Decode_COO_Rows
    --       (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
    --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
    --        return String_List is
@@ -484,12 +484,12 @@ package body ARFF is
    --
    --        return Values;
    --
-   --     end Decode_Rows_COO;
+   --     end Decode_COO_Rows;
 
    --  -------------------------------------------------------------------------
 
    --  L460
-   function Decode_Rows_Dense (Decoder     : in Out Arff_Decoder;
+   function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
                                return String_List is
       use String_Package;
@@ -505,7 +505,7 @@ package body ARFF is
       --  L475
       return Decode_Dense_Values (Values, Decoder.Conversers);
 
-   end Decode_Rows_Dense;
+   end Decode_Dense_Rows;
 
    --  -------------------------------------------------------------------------
    --  L478
