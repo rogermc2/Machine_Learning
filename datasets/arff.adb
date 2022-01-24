@@ -114,17 +114,17 @@ package body ARFF is
     --     procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
     --                                   Attribute      : JSON_Value;
     --                                   Encode_Nominal : Boolean);
-    function Sparse_Line (Row : String) return Boolean;
+    function Split_Sparse_Line (Row : String) return String_List;
     function Stream_Data (Decoder : in out Arff_Decoder) return String;
     function Unquote (Values : String) return Unbounded_String;
 
     --  -------------------------------------------------------------------------
 
-    procedure ARFF_Syntax_Error (Row : String) is
-    begin
-        raise ARFF_Error with "ARFF unknown parsing error";
-
-    end ARFF_Syntax_Error;
+--      procedure ARFF_Syntax_Error (Row : String) is
+--      begin
+--          raise ARFF_Error with "ARFF unknown parsing error";
+--
+--      end ARFF_Syntax_Error;
 
     --  -------------------------------------------------------------------------
 
@@ -208,9 +208,6 @@ package body ARFF is
         Arff_Container.Set_Field ("attributes", Create (Empty_Array));
         Arff_Container.Set_Field ("description", Create (Empty_Array));
 
-        --  L793  Create the data helper object
-        --        Data := Get_Data_Object_For_Decoding (Matrix_Type);
-
         --  L796  Read all lines
         Curs := Message_Lines.First;
         while Has_Element (Curs) loop
@@ -233,17 +230,13 @@ package body ARFF is
                                 Routine_Name & Bad_Layout);
                         State := TK_Attribute;
                         Attr := Decode_Attribute (Decoder, UC_Row);
-                        --                    Attr := Decode_Attribute (Decoder, UC_Row, Encode_Nominal);
-                        --  _decode lines 827 - 830 (update attribute_names) are
-                        --  implemented in Decode_Attribute
-                        --  L832
-                        --                    Attribute_Array := Get (Arff_Container, "attributes");
-                        --                    Append (Attribute_Array, Attr);
-                        --                    Arff_Container.Set_Field ("attributes", Attribute_Array);
+                        --  _decode lines 827 - 846 (update attribute_names)
+                        --  are implemented in Decode_Attribute
 
                     elsif UC_Row (1 .. 5) = "@DATA" then
                         --  L850
-                        Assert (State = TK_Attribute, Routine_Name & Bad_Layout);
+                        Assert (State = TK_Attribute,
+                                Routine_Name & Bad_Layout);
 
                     elsif UC_Row (1 .. 1) = "%" then
                         --  L806
@@ -620,7 +613,7 @@ package body ARFF is
         Values_Cursor  : String_Package.Cursor;
         aConverser     : Conversor_Item;
         Data_Type      : Conversor_Data_Type;
-        Value          : JSON_Value := Create_Object;
+        Value          : constant JSON_Value := Create_Object;
         Decoded_Values : JSON_Array;
     begin
         Assert (Values.Length = Attribute_List.Length, Routine_Name &
@@ -832,8 +825,8 @@ package body ARFF is
                         Next (Value_Cursor);
                     end loop;
 
-                elsif not Sparse_Line (Row) then
-                    ARFF_Syntax_Error (Row);
+                else
+                    Values := Split_Sparse_Line (Row);
                 end if;
             end if;
         end if;
@@ -873,26 +866,33 @@ package body ARFF is
 
     --  -------------------------------------------------------------------------
 
-    function Sparse_Line (Row : String) return Boolean is
+    function Split_Sparse_Line (Row : String) return String_List is
         use GNAT.Regpat;
         use Regexep;
-        use String_Package;
-        Regex       : constant String := "^\s*\{.*\}\s*$";
+        use Matches_Package;
         Matcher     : constant Pattern_Matcher := Build_Re_Sparse;
         First       : Positive;
         Last        : Positive;
         Matches     : Matches_List;
+        Loc         : Match_Location;
         Match_Found : Boolean;
-        Result      : Boolean := False;
+        Result      : String_List;
     begin
         Matches := Find_Match (Matcher, Row, First, Last, Match_Found);
         if Match_Found then
-            null;
+            for index in Matches.First_Index .. Matches.Last_Index loop
+                Loc := Matches.Element (index);
+                declare
+                    Match    : constant String := Row (Loc.First .. Loc.Last);
+                begin
+                    Result.Append (Unquote (Match));
+                end;
+            end loop;
         end if;
 
         return Result;
 
-    end Sparse_Line;
+    end Split_Sparse_Line;
 
     --  -------------------------------------------------------------------------
 
