@@ -616,11 +616,11 @@ package body ARFF is
       use Ada.Strings;
       use Conversor_Item_Package;
       use String_Package;
-      Routine_Name         : constant String := "ARFF.Decode_Values ";
-      Attr_Cursor          : Conversor_Item_Package.Cursor;
-      Values_Cursor        : String_Package.Cursor;
-      aConverser           : Conversor_Item;
-      Data_Type            : Conversor_Data_Type;
+      Routine_Name   : constant String := "ARFF.Decode_Values ";
+      Attr_Cursor    : Conversor_Item_Package.Cursor;
+      Values_Cursor  : String_Package.Cursor;
+      aConverser     : Conversor_Item;
+      Data_Type      : Conversor_Data_Type;
       Value_String   : Unbounded_String;
       Value          : JSON_Value := Create_Object;
       Decoded_Values : JSON_Array;
@@ -633,30 +633,26 @@ package body ARFF is
       Attr_Cursor := Attribute_List.First;
       Values_Cursor := Values.First;
       while Has_Element (Attr_Cursor) loop
-         Value_String := Element (Values_Cursor);
          aConverser := Element (Attr_Cursor);
          Data_Type := aConverser.Data_Type;
-
-         case Data_Type is
+         declare
+            Name         : constant String := To_String (aConverser.Name);
+            Value_String : constant String :=
+                             To_String (Element (Values_Cursor));
+         begin
+            case Data_Type is
             when Conv_Integer =>
-               Value.Set_Field (To_String (aConverser.Name),
-                                Integer'Value (To_String (Value_String)));
+               Value.Set_Field (Name, Integer'Value (Value_String));
             when Conv_Nominal => null;
-            when Conv_Numeric =>
-               if Fixed.Index (To_String (Value_String), ".") = 0 then
-                  Value_String := Value_String & ".0";
+            when Conv_Numeric | Conv_Real =>
+               if Fixed.Index (Value_String, ".") = 0 then
+                  Value.Set_Field (Name, Float (Integer'Value (Value_String)));
+               else
+                  Value.Set_Field (Name, Float'Value (Value_String));
                end if;
-               Value.Set_Field (To_String (aConverser.Name),
-                                Float'Value (To_String (Value_String)));
-            when Conv_Real =>
-               if Fixed.Index (To_String (Value_String), ".") = 0 then
-                  Value_String := Value_String & ".0";
-               end if;
-               Value.Set_Field (To_String (aConverser.Name),
-                                Float'Value (To_String (Value_String)));
-            when Conv_String =>
-               Value.Set_Field (To_String (aConverser.Name), Value_String);
-         end case;
+            when Conv_String => Value.Set_Field (Name, Value_String);
+            end case;
+         end;  --  declare block
 
          Append (Decoded_Values, Value);
          Next (Attr_Cursor);
