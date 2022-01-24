@@ -13,7 +13,8 @@ package ARFF is
 
    ARFF_Error : Exception;
 
-   function Load (File_Data : String; Return_Type : ARFF_Return_Type := Arff_Dense)
-                  return JSON_Value;
+   function Load
+     (File_Data : String; Return_Type : ARFF_Return_Type := Arff_Dense)
+      return JSON_Value;
 
 end ARFF;
