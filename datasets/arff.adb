@@ -25,7 +25,7 @@ package body ARFF is
    type Conversor_Type is (Conversor_Unencoded, Conversor_Encoded,
                            Conversor_Map);
    type Conversor_Data_Type is (Conv_Integer, Conv_Numeric, Conv_Real,
-                                Conv_String);
+                                Conv_String, Conv_Nominal);
 
    type Conversor_Data (Encoded : Conversor_Type := Conversor_Map)
    is record
@@ -51,14 +51,14 @@ package body ARFF is
      Ada.Containers.Doubly_Linked_Lists (Conversor_Data);
    subtype Conversor_List is Conversor_Package.List;
 
-   type Conversor_Tuple is record
-      Key   : Conversor_Data;
-      Value : Unbounded_String;
-   end record;
-
-   package Conversor_Tuple_Package is new
-     Ada.Containers.Doubly_Linked_Lists (Conversor_Tuple);
-   subtype Conversor_Tuple_List is Conversor_Tuple_Package.List;
+   --     type Conversor_Tuple is record
+   --        Key   : Conversor_Data;
+   --        Value : Unbounded_String;
+   --     end record;
+   --
+   --     package Conversor_Tuple_Package is new
+   --       Ada.Containers.Doubly_Linked_Lists (Conversor_Tuple);
+   --     subtype Conversor_Tuple_List is Conversor_Tuple_Package.List;
 
    type Conversor_Item is record
       Name      : Unbounded_String;
@@ -89,11 +89,13 @@ package body ARFF is
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
 
-   function Decode_Attribute (Decoder           : in Out Arff_Decoder;
-                              UC_Row            : String;
-                              Attribute_Names   : in out JSON_Value;
-                              Encode_Nominal    : Boolean := False)
-                              return JSON_Value;
+   --     function Decode_Attribute (Decoder           : in Out Arff_Decoder;
+   --                                UC_Row            : String;
+   --                                Encode_Nominal    : Boolean := False)
+   --                                return JSON_Value;
+   function Decode_Attribute
+     (UC_Row : String;  Attribute_List  : in out Conversor_Item_List)
+      return Conversor_Item;
    procedure Decode_Comment
      (UC_Row : String; Arff_Container : in out JSON_Value);
    procedure Decode_Relation
@@ -105,13 +107,14 @@ package body ARFF is
    function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream_Func : Stream_Func_Type)
                                return JSON_Array;
-   function Decode_Dense_Values (Values : String_List; Conversers : Conversor_List)
-                                 return JSON_Array;
+   function Decode_Dense_Values
+     (Values : String_List; Attribute_List : Conversor_Item_List)
+      return JSON_Array;
    function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
-   procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
-                                 Attribute      : JSON_Value;
-                                 Encode_Nominal : Boolean);
+   --     procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
+   --                                   Attribute      : JSON_Value;
+   --                                   Encode_Nominal : Boolean);
    function Sparse_Line (Row : String) return Boolean;
    function Stream_Data (Decoder : in out Arff_Decoder) return String;
    function Unquote (Values : String) return Unbounded_String;
@@ -160,10 +163,10 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
    --  L771  and, by reference, L879
-   function Decode_ARFF (Decoder     : in Out Arff_Decoder;
+   function Decode_ARFF (Decoder        : in Out Arff_Decoder;
                          Text           : String;
-                         Encode_Nominal : Boolean := False;
-                         Matrix_Type : ARFF_Return_Type := Arff_Dense)
+                         --                           Encode_Nominal : Boolean := False;
+                         Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
       use Ada.Strings;
       use ML_Types.String_Package;
@@ -176,14 +179,16 @@ package body ARFF is
       Message_Lines   : String_List;
       Curs            : Cursor;
       Arff_Container  : Arff_Container_Type := Create_Object;
-      Attr            : JSON_Value := Create_Object;
-      Attribute_Names : JSON_Value := Create_Object;
+      --        Attr            : JSON_Value := Create_Object;
+      Attr            : Conversor_Item;
       Stream_Row      : Unbounded_String;
+      --        Values          : JSON_Array;
       Values          : JSON_Array;
       JSON_Values     : JSON_Array;
-      Attribute_Array : JSON_Array;
---        Data            : JSON_Value;
---        Rows, Cols      : Integer_List;
+      --        Attribute_Array : JSON_Array;
+      Attribute_List  : Conversor_Item_List;
+      --        Data            : JSON_Value;
+      --        Rows, Cols      : Integer_List;
    begin
       Decoder.Current_Line := 0;
       while Pos2 /= 0 and Pos1 < Text_Length loop
@@ -228,14 +233,14 @@ package body ARFF is
                   Assert (State = TK_Relation or State = TK_Attribute,
                           Routine_Name & Bad_Layout);
                   State := TK_Attribute;
-                  Attr := Decode_Attribute (Decoder, UC_Row, Attribute_Names,
-                                            Encode_Nominal);
+                  Attr := Decode_Attribute (UC_Row, Attribute_List);
+                  --                    Attr := Decode_Attribute (Decoder, UC_Row, Encode_Nominal);
                   --  _decode lines 827 - 830 (update attribute_names) are
                   --  implemented in Decode_Attribute
                   --  L832
-                  Attribute_Array := Get (Arff_Container, "attributes");
-                  Append (Attribute_Array, Attr);
-                  Arff_Container.Set_Field ("attributes", Attribute_Array);
+                  --                    Attribute_Array := Get (Arff_Container, "attributes");
+                  --                    Append (Attribute_Array, Attr);
+                  --                    Arff_Container.Set_Field ("attributes", Attribute_Array);
 
                elsif UC_Row (1 .. 5) = "@DATA" then
                   --  L850
@@ -267,11 +272,11 @@ package body ARFF is
          when others => null;
       end case;
 
---        Curs := Values.First;
---        while Has_Element (Curs) loop
---           Append (JSON_Values, Create (Element (Curs)));
---           Next (Curs);
---        end loop;
+      --        Curs := Values.First;
+      --        while Has_Element (Curs) loop
+      --           Append (JSON_Values, Create (Element (Curs)));
+      --           Next (Curs);
+      --        end loop;
       Arff_Container.Set_Field ("data", JSON_Values);
 
       Stream_Row := Get (Arff_Container, "description");
@@ -288,27 +293,27 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
    function Decode_Attribute
-     (Decoder         : in Out Arff_Decoder; UC_Row : String;
-      Attribute_Names : in out String_List;
-      Encode_Nominal  : Boolean := False) return Conversor_Item is
+     (UC_Row : String;  Attribute_List : in out Conversor_Item_List)
+      return Conversor_Item is
       use GNAT.Regpat;
-      use ML_Types.String_Package;
       use Ada.Strings;
       use Ada.Strings.Maps;
-      Routine_Name    : constant String := "ARFF.Decode_Relation ";
-      Regex           : constant String :=
-                          "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
-      Trim_Seq        : constant Character_Sequence := "{} ";
-      Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
+      use Conversor_Item_Package;
+      Routine_Name : constant String := "ARFF.Decode_Relation ";
+      Regex        : constant String :=
+                       "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
+      Trim_Seq     : constant Character_Sequence := "{} ";
+      Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
       --  L749 Extract raw name and type
-      Pos             : Integer := Fixed.Index (UC_Row, " ");
-      Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
-      Slice_2         : String :=
-                          Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
-      Name            : Unbounded_String;
-      Attr_Type       : Unbounded_String;
-      Values          : String_List;
-      Conv_Item       : Conversor_Item;
+      Pos          : Integer := Fixed.Index (UC_Row, " ");
+      Slice_1      : constant String := UC_Row (UC_Row'First .. Pos - 1);
+      Slice_2      : String :=
+                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
+      Name         : Unbounded_String;
+      Attr_Type    : Unbounded_String;
+      Conv_Item    : Conversor_Item;
+      Curs         : Cursor := Attribute_List.First;
+      Found        : Boolean := False;
    begin
       Name := To_Unbounded_String (Slice_1);
       Assert (Match (Compile (Regex), Slice_2),
@@ -329,12 +334,21 @@ package body ARFF is
          end if;
       end loop;
 
+      while Has_Element (Curs) and not Found loop
+         Found := Element (Curs).Name = Name;
+         Next  (Curs);
+      end loop;
+      Assert (not Found, Routine_Name & " duplicate attribute name: " &
+                To_String (Name));
+
       --  L755 Extract the final type
       Attr_Type := To_Unbounded_String (Slice_2);
       if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2'Last) = '{' then
          Attr_Type := To_Unbounded_String
            (Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set));
-         Values := Parse_Values (To_String (Attr_Type));
+         Conv_Item.Data_Type := Conv_Nominal;
+         Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
+                   " Nominal data type not implemented");
       else
          Slice_2 := Dataset_Utilities.To_Upper_Case (Slice_2);
          Assert (Slice_2 = "NUMERIC" or Slice_2 = "REAL" or
@@ -345,14 +359,16 @@ package body ARFF is
 
       Conv_Item.Name := Name;
       if Slice_2 = "INTEGER" then
-            Conv_Item.Data_Type := Conv_Integer;
+         Conv_Item.Data_Type := Conv_Integer;
       elsif Slice_2 = "NUMERIC" then
-            Conv_Item.Data_Type := Conv_Numeric;
+         Conv_Item.Data_Type := Conv_Numeric;
       elsif Slice_2 = "REAL" then
-            Conv_Item.Data_Type := Conv_Real;
+         Conv_Item.Data_Type := Conv_Real;
       elsif Slice_2 = "STRING" then
-            Conv_Item.Data_Type := Conv_String;
+         Conv_Item.Data_Type := Conv_String;
       end if;
+
+      Attribute_List.Append (Conv_Item);
 
       return Conv_Item;
 
@@ -360,112 +376,111 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Decode_Attribute
-     (Decoder         : in Out Arff_Decoder; UC_Row : String;
-      Attribute_Names : in out JSON_Value;
-      Encode_Nominal  : Boolean := False) return JSON_Value is
-      use Ada.Strings;
-      use Ada.Strings.Maps;
-      use GNAT.Regpat;
-      use ML_Types.String_Package;
-      Routine_Name    : constant String := "ARFF.Decode_Relation ";
-      Regex           : constant String :=
-                          "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
-      Trim_Seq        : constant Character_Sequence := "{} ";
-      Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
-      Arff_Container  : JSON_Value;
-      --  L749 Extract raw name and type
-      Pos             : Integer := Fixed.Index (UC_Row, " ");
-      Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
-      Slice_2         : String :=
-                          Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
-      Name            : Unbounded_String;
-      Attr_Type       : Unbounded_String;
-      Attribute       : constant JSON_Value := Create_Object;
-      Curs            : Cursor;
-      Values          : String_List;
-      JSON_Values     : JSON_Array;
-   begin
-      Name := To_Unbounded_String (Slice_1);
-      Assert (Match (Compile (Regex), Slice_2),
-              Routine_Name & " attribute declaration '" &
-                To_String (Attr_Type) &
-                "' has an invalid format.");
-
-      --  L751 Extract the final name
-      Pos := 1;
-      while Pos > 0 and Pos < Length (Name) loop
-         Pos := Fixed.Index (To_String (Name), """");
-         if Pos > 0 and Pos < Length (Name) then
-            if Slice (Name, Pos + 1, Pos + 1) = "'" then
-               Name := To_Unbounded_String
-                 (Slice (Name, 1, Pos - 1) &
-                    Slice (Name, Pos + 2, Length (Name)));
-            end if;
-         end if;
-      end loop;
-
-      --  L755 Extract the final type
-      Attr_Type := To_Unbounded_String (Slice_2);
-      if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2'Last) = '{' then
-         Attr_Type := To_Unbounded_String
-           (Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set));
-         Values := Parse_Values (To_String (Attr_Type));
-      else
-         Slice_2 := Dataset_Utilities.To_Upper_Case (Slice_2);
-         Assert (Slice_2 = "NUMERIC" or Slice_2 = "REAL" or
-                   Slice_2 = "INTEGER" or Slice_2 = "STRING",
-                 Routine_Name & " invalid attribute type, " & Slice_2);
-      end if;
-      --  end Python _arff._decode_attribute
-
-      Curs := Values.First;
-      while Has_Element (Curs) loop
-         Append (JSON_Values, Create (Element (Curs)));
-         Next (Curs);
-      end loop;
-
-      --  L827  Originally in ATTRIBUTE section of _decode
-      declare
-         Attr_Name : constant String := To_String (Name);
-      begin
-         Assert (not Attribute_Names.Has_Field
-                 (Attr_Name), Routine_Name &
-                   " duplicate attribute name: " & Attr_Name);
-         Attribute_Names.Set_Field
-           (Attr_Name, Trimmed_Integer (Decoder.Current_Line));
-
-         Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
-         Arff_Container.Set_Field ("attributes", Attribute);
-
-         --  L832
-         if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
-            Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
-
-         else
-            declare
-               Converser     : Conversor_Data (Conversor_Encoded);
-               Converser_Map : constant JSON_Value := Create_Object;
-               --                      Lambda        : JSON_Value := Create_Object;
-            begin
-               --  L838
-               Converser_Map.Set_Field ("STRING", "");
-               Converser_Map.Set_Field ("INTEGER", Integer (0));
-               Converser_Map.Set_Field ("NUMERIC", 0.0);
-               Converser_Map.Set_Field ("REAL", 0.0);
-               declare
-                  data : constant UTF8_String := Converser_Map.Get ("INTEGER");
-               begin
-                  Converser.Encoded_Values.Append (To_Unbounded_String (Data));
-               end;
-               Decoder.Conversers.Append (Converser);
-            end;
-         end if;
-      end;
-
-      return Attribute;
-
-   end Decode_Attribute;
+   --     function Decode_Attribute
+   --       (Decoder         : in Out Arff_Decoder; UC_Row : String;
+   --        Encode_Nominal  : Boolean := False) return JSON_Value is
+   --        use Ada.Strings;
+   --        use Ada.Strings.Maps;
+   --        use GNAT.Regpat;
+   --        use ML_Types.String_Package;
+   --        Routine_Name    : constant String := "ARFF.Decode_Relation ";
+   --        Regex           : constant String :=
+   --                            "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
+   --        Trim_Seq        : constant Character_Sequence := "{} ";
+   --        Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
+   --        Arff_Container  : JSON_Value;
+   --        --  L749 Extract raw name and type
+   --        Pos             : Integer := Fixed.Index (UC_Row, " ");
+   --        Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
+   --        Slice_2         : String :=
+   --                            Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
+   --        Name            : Unbounded_String;
+   --        Attr_Type       : Unbounded_String;
+   --        Attribute       : constant JSON_Value := Create_Object;
+   --        Curs            : Cursor;
+   --        Values          : String_List;
+   --        JSON_Values     : JSON_Array;
+   --     begin
+   --        Name := To_Unbounded_String (Slice_1);
+   --        Assert (Match (Compile (Regex), Slice_2),
+   --                Routine_Name & " attribute declaration '" &
+   --                  To_String (Attr_Type) &
+   --                  "' has an invalid format.");
+   --
+   --        --  L751 Extract the final name
+   --        Pos := 1;
+   --        while Pos > 0 and Pos < Length (Name) loop
+   --           Pos := Fixed.Index (To_String (Name), """");
+   --           if Pos > 0 and Pos < Length (Name) then
+   --              if Slice (Name, Pos + 1, Pos + 1) = "'" then
+   --                 Name := To_Unbounded_String
+   --                   (Slice (Name, 1, Pos - 1) &
+   --                      Slice (Name, Pos + 2, Length (Name)));
+   --              end if;
+   --           end if;
+   --        end loop;
+   --
+   --        --  L755 Extract the final type
+   --        Attr_Type := To_Unbounded_String (Slice_2);
+   --        if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2'Last) = '{' then
+   --           Attr_Type := To_Unbounded_String
+   --             (Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set));
+   --           Values := Parse_Values (To_String (Attr_Type));
+   --        else
+   --           Slice_2 := Dataset_Utilities.To_Upper_Case (Slice_2);
+   --           Assert (Slice_2 = "NUMERIC" or Slice_2 = "REAL" or
+   --                     Slice_2 = "INTEGER" or Slice_2 = "STRING",
+   --                   Routine_Name & " invalid attribute type, " & Slice_2);
+   --        end if;
+   --        --  end Python _arff._decode_attribute
+   --
+   --        Curs := Values.First;
+   --        while Has_Element (Curs) loop
+   --           Append (JSON_Values, Create (Element (Curs)));
+   --           Next (Curs);
+   --        end loop;
+   --
+   --        --  L827  Originally in ATTRIBUTE section of _decode
+   --        declare
+   --           Attr_Name : constant String := To_String (Name);
+   --        begin
+   --  --           Assert (not Attribute_Names.Has_Field
+   --  --                   (Attr_Name), Routine_Name &
+   --  --                     " duplicate attribute name: " & Attr_Name);
+   --  --           Attribute_Names.Set_Field
+   --  --             (Attr_Name, Trimmed_Integer (Decoder.Current_Line));
+   --
+   --           Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
+   --           Arff_Container.Set_Field ("attributes", Attribute);
+   --
+   --           --  L832
+   --           if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
+   --              Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
+   --
+   --           else
+   --              declare
+   --                 Converser     : Conversor_Data (Conversor_Encoded);
+   --                 Converser_Map : constant JSON_Value := Create_Object;
+   --                 --                      Lambda        : JSON_Value := Create_Object;
+   --              begin
+   --                 --  L838
+   --                 Converser_Map.Set_Field ("STRING", "");
+   --                 Converser_Map.Set_Field ("INTEGER", Integer (0));
+   --                 Converser_Map.Set_Field ("NUMERIC", 0.0);
+   --                 Converser_Map.Set_Field ("REAL", 0.0);
+   --                 declare
+   --                    data : constant UTF8_String := Converser_Map.Get ("INTEGER");
+   --                 begin
+   --                    Converser.Encoded_Values.Append (To_Unbounded_String (Data));
+   --                 end;
+   --                 Decoder.Conversers.Append (Converser);
+   --              end;
+   --           end if;
+   --        end;
+   --
+   --        return Attribute;
+   --
+   --     end Decode_Attribute;
 
    --  -------------------------------------------------------------------------
 
@@ -596,48 +611,74 @@ package body ARFF is
    --  -------------------------------------------------------------------------
    --  L478
    function Decode_Dense_Values
-     (Values : String_List; Conversers : Conversor_List) return JSON_Array is
+     (Values : String_List; Attribute_List : Conversor_Item_List) return JSON_Array is
       use Ada.Containers;
-      use Conversor_Package;
+      use Ada.Strings;
+      use Conversor_Item_Package;
       use String_Package;
-      use Conversor_Tuple_Package;
-
       Routine_Name         : constant String := "ARFF.Decode_Values ";
-      Zipped_Values        : Conversor_Tuple_List;
-      Conv_Cursor          : Conversor_Package.Cursor;
+      Attr_Cursor          : Conversor_Item_Package.Cursor;
       Values_Cursor        : String_Package.Cursor;
---        Zip_Cursor     : Conversor_Tuple_Package.Cursor;
-      aConverser           : Conversor_Data (Conversor_Encoded);
-      Converser_Values     : ML_Types.String_List;
-      Converser_Zero_Value : Unbounded_String;
-      Converser_String     : Unbounded_String;
-      Value_String         : Unbounded_String;
-      Decoded_Values       : JSON_Array;
+      aConverser           : Conversor_Item;
+      Data_Type            : Conversor_Data_Type;
+      Value_String   : Unbounded_String;
+      Value          : JSON_Value := Create_Object;
+      Decoded_Values : JSON_Array;
    begin
-      Assert (Values.Length = Conversers.Length, Routine_Name &
+      Assert (Values.Length = Attribute_List.Length, Routine_Name &
                 "lengths of Values " & Count_Type'Image (Values.Length) &
-                " and Conversers" & Count_Type'Image (Conversers.Length) &
+                " and Conversers" & Count_Type'Image (Attribute_List.Length) &
                 " are diferrent.");
 
-      Conv_Cursor := Conversers.First;
+      Attr_Cursor := Attribute_List.First;
       Values_Cursor := Values.First;
-
-      while Has_Element (Conv_Cursor) loop
-         Zipped_Values.Append
-           ((Element (Conv_Cursor), Element (Values_Cursor)));
-         aConverser := Element (Conv_Cursor);
-         Converser_String := aConverser.Encoded_Values;
+      while Has_Element (Attr_Cursor) loop
          Value_String := Element (Values_Cursor);
-         Next (Conv_Cursor);
+         aConverser := Element (Attr_Cursor);
+         Data_Type := aConverser.Data_Type;
+
+         case Data_Type is
+            when Conv_Integer =>
+               Value.Set_Field (To_String (aConverser.Name),
+                                Integer'Value (To_String (Value_String)));
+            when Conv_Nominal => null;
+            when Conv_Numeric =>
+               if Fixed.Index (To_String (Value_String), ".") = 0 then
+                  Value_String := Value_String & ".0";
+               end if;
+               Value.Set_Field (To_String (aConverser.Name),
+                                Float'Value (To_String (Value_String)));
+            when Conv_Real =>
+               if Fixed.Index (To_String (Value_String), ".") = 0 then
+                  Value_String := Value_String & ".0";
+               end if;
+               Value.Set_Field (To_String (aConverser.Name),
+                                Float'Value (To_String (Value_String)));
+            when Conv_String =>
+               Value.Set_Field (To_String (aConverser.Name), Value_String);
+         end case;
+
+         Append (Decoded_Values, Value);
+         Next (Attr_Cursor);
          Next (Values_Cursor);
       end loop;
 
---        Zip_Cursor := Zipped_Values.First;
---        while Has_Element (Zip_Cursor) loop
---           aValue :=
---           Decoded_Values.Append (Element (Zip_Cursor).Value);
---           Next (Zip_Cursor);
---        end loop;
+      --        while Has_Element (Conv_Cursor) loop
+      --           Zipped_Values.Append
+      --             ((Element (Conv_Cursor), Element (Values_Cursor)));
+      --           aConverser := Element (Conv_Cursor);
+      --           Converser_String := aConverser.Encoded_Values;
+      --           Value_String := Element (Values_Cursor);
+      --           Next (Conv_Cursor);
+      --           Next (Values_Cursor);
+      --        end loop;
+
+      --        Zip_Cursor := Zipped_Values.First;
+      --        while Has_Element (Zip_Cursor) loop
+      --           aValue :=
+      --           Decoded_Values.Append (Element (Zip_Cursor).Value);
+      --           Next (Zip_Cursor);
+      --        end loop;
 
       return Decoded_Values;
 
@@ -735,24 +776,23 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   procedure Init_Nominal_Conversor (Conversor : in out Conversor_Data;
-                                     Value     : String) is
-   begin
-      Conversor.Values.Clear;
-      Conversor.Zero_Value := To_Unbounded_String (Value);
-      Conversor.Values.Append (To_Unbounded_String (Value));
-
-   end Init_Nominal_Conversor;
+   --     procedure Init_Nominal_Conversor (Conversor : in out Conversor_Data;
+   --                                       Value     : String) is
+   --     begin
+   --        Conversor.Values.Clear;
+   --        Conversor.Zero_Value := To_Unbounded_String (Value);
+   --        Conversor.Values.Append (To_Unbounded_String (Value));
+   --
+   --     end Init_Nominal_Conversor;
 
    --  -------------------------------------------------------------------------
 
-   function Load (File_Data   : String; Encode_Nominal : Boolean := False;
+   function Load (File_Data   : String;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                   return JSON_Value is
       Decoder   : Arff_Decoder;
-      ARFF_Data : constant JSON_Value :=
-                    Decode_ARFF (Decoder, File_Data, Encode_Nominal,
-                                 Return_Type);
+      ARFF_Data : constant JSON_Value := Decode_ARFF (Decoder, File_Data,
+                                                      Return_Type);
    begin
       return ARFF_Data;
 
@@ -827,32 +867,32 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
-                                 Attribute      : JSON_Value;
-                                 Encode_Nominal : Boolean) is
-   begin
-      if Encode_Nominal then
-         declare
-            Converser : Conversor_Data (Conversor_Encoded);
-            Values    : String_List;
-         begin
-            Values.Append (Get (Attribute, "attributes"));
-            Converser.Encoded_Values := Values;
-            Decoder.Conversers.Append (Converser);
-         end;
-
-      else
-         declare
-            Converser : Conversor_Data (Conversor_Unencoded);
-            Values    : String_List;
-         begin
-            Values.Append (Get (Attribute, "attributes"));
-            Converser.Values := Values;
-            Decoder.Conversers.Append (Converser);
-         end;
-      end if;
-
-   end Process_JSON_Array;
+   --     procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
+   --                                   Attribute      : JSON_Value;
+   --                                   Encode_Nominal : Boolean) is
+   --     begin
+   --        if Encode_Nominal then
+   --           declare
+   --              Converser : Conversor_Data (Conversor_Encoded);
+   --              Values    : String_List;
+   --           begin
+   --              Values.Append (Get (Attribute, "attributes"));
+   --              Converser.Encoded_Values := Values;
+   --              Decoder.Conversers.Append (Converser);
+   --           end;
+   --
+   --        else
+   --           declare
+   --              Converser : Conversor_Data (Conversor_Unencoded);
+   --              Values    : String_List;
+   --           begin
+   --              Values.Append (Get (Attribute, "attributes"));
+   --              Converser.Values := Values;
+   --              Decoder.Conversers.Append (Converser);
+   --           end;
+   --        end if;
+   --
+   --     end Process_JSON_Array;
 
    --  -------------------------------------------------------------------------
 
