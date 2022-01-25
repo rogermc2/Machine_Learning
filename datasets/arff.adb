@@ -84,10 +84,14 @@ package body ARFF is
 
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
    Stream_Cursor  : ML_Types.String_Package.Cursor;
+   --  L190
    Quoted_Re      : constant String :=
-                      "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
+                      "''""(?:(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
+   --                        "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
    Quoted_Re2     : constant String :=
-                      "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+                      "'''(?:(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+   --                        "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+   --  L204
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
 
@@ -132,33 +136,41 @@ package body ARFF is
 
    --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
    --  despite quoting, whitespace, etc.
+   --  Build_Re_Dense captures (value, error) groups.
+   --  Because empty values are allowed we cannot just look for empty values
+   --  to handle syntax errors.
+   --  the line is assumed to have ',' prepended.
    --  L214
    function Build_Re_Dense return GNAT.Regpat.Pattern_Matcher is
       use GNAT.Regpat;
-      Regex  : constant String := "''(?x),\s*((?=,)|$|{" & Value_Re &
-                  "})|(\S.*)''";
+      --        Regex  : constant String := "''(?x),\s*((?=,)|$|{" &
+      Regex  : constant String := "'',\s*(|$|{" &
+                 Value_Re & "})|(\S.*)''";
    begin
-      --  Dense captures (value, error) groups.
-      --  Because empty values are allowed, we cannot just look for empty
-      --  values to handle syntax errors.
-      --  We presume the line has had ',' prepended...
-      Put_Line ("ARFF.Build_Re_Dense Regex set");
       declare
-            Result : GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
+         Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
       begin
-      Put_Line ("ARFF.Build_Re_Dense Regex compiled");
-      return Result;
+--           Put_Line ("ARFF.Build_Re_Dense Regex compiled");
+         return Result;
       end;
 
    end Build_Re_Dense;
 
    --  -------------------------------------------------------------------------
-
+   --  L225
    function Build_Re_Sparse return GNAT.Regpat.Pattern_Matcher is
       use GNAT.Regpat;
+      --        Regex : constant String :=  "(?x)(?:^\s*\{|,)\s*(\d+)\s+("
+      Regex : constant String := "(?:^\s*\{|,)\s*(\d+)\s+("
+                & Value_Re & "s)|\S.*";
+--                  & Value_Re & "s)|(?!}\s*$)(?!^\s*{\s*}\s*$)\S.*";
    begin
-      return Compile ("(?x)(?:^\s*\{|,)\s*(\d+)\s+(" & Value_Re &
-                        "s)|(?!}\s*$)(?!^\s*{\s*}\s*$)\S.*");
+      declare
+         Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
+      begin
+--           Put_Line ("ARFF.Build_Re_Sparse Regex compiled");
+         return Result;
+      end;
 
    end Build_Re_Sparse;
 
@@ -306,13 +318,13 @@ package body ARFF is
                               return Conversor_Item is
       use GNAT.Regpat;
       use Ada.Strings;
---        use Ada.Strings.Maps;
+      --        use Ada.Strings.Maps;
       use Conversor_Item_Package;
-      Routine_Name : constant String := "ARFF.Decode_Attribute ";
-      Regex        : constant String :=
-                       "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
---        Trim_Seq     : constant Character_Sequence := "{} ";
---        Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
+      Routine_Name   : constant String := "ARFF.Decode_Attribute ";
+      Regex          : constant String :=
+                         "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
+      --        Trim_Seq     : constant Character_Sequence := "{} ";
+      --        Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
       --  L749 Extract raw name and type
       Pos            : Positive := Fixed.Index (UC_Row, " ");
       Pos_1          : Natural;
@@ -379,8 +391,8 @@ package body ARFF is
          Printing.Print_Strings (Routine_Name &
                                    "Nominal_Values", Nominal_Values);
          Conv_Item.Nominal_List := Nominal_Values;
-         Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
-                   " Nominal data type not implemented");
+--           Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
+--                     " Nominal data type not implemented");
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
          Assert (Attr_Type = "NUMERIC" or Attr_Type = "REAL" or
@@ -854,14 +866,15 @@ package body ARFF is
                Dense_Matcher  : constant Pattern_Matcher := Build_Re_Dense;
                Sparse_Matcher : constant Pattern_Matcher := Build_Re_Sparse;
             begin
-               Put_Line (Routine_Name & "Dense Match test");
-               Matches := Find_Match (Dense_Matcher, Row, First, Last, Dense_Match);
+               Matches := Find_Match
+                 (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
                   Put_Line (Routine_Name & "Dense Match_Found");
                   Values := Get_CSV_Data (Row (First .. Last));
+               else
+                  Put_Line (Routine_Name & "No Dense Match Found");
                end if;
 
-               Put_Line (Routine_Name & " Sparse Match test");
                Matches := Find_Match (Sparse_Matcher, Row, First, Last, Sparse_Match);
 
                if Sparse_Match then
