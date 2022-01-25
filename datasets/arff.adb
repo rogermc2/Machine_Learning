@@ -144,8 +144,8 @@ package body ARFF is
    function Build_Re_Dense return GNAT.Regpat.Pattern_Matcher is
       use GNAT.Regpat;
       --        Regex  : constant String := "''(?x),\s*((?=,)|$|{" &
-      Regex  : constant String := "'',\s*(|$|{" &
-                 Value_Re & "})|(\S.*)''";
+      Regex  : constant String := ",\s*(|$|{" &
+                 Value_Re & "})|(\S.*)";
    begin
       declare
          Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
