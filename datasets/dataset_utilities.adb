@@ -183,6 +183,16 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function To_Upper_Case (Text : Unbounded_String) return Unbounded_String is
+      UC : constant String := To_String (Text);
+   begin
+
+      return To_Unbounded_String (To_Upper_Case (UC));
+
+   end To_Upper_Case;
+
+   --  -------------------------------------------------------------------------
+
    function Trimmed_Integer (Value : Integer) return String is
       use Ada.Strings;
    begin

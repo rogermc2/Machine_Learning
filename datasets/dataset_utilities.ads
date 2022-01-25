@@ -22,6 +22,7 @@ package Dataset_Utilities is
     function Split (Line : String; Sep : String) return String_Array;
     function To_Lower_Case (Text : String) return String;
     function To_Upper_Case (Text : String) return String;
+    function To_Upper_Case (Text : Unbounded_String) return Unbounded_String;
     function Trimmed_Integer (Value : Integer) return String;
 
 end Dataset_Utilities;
