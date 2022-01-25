@@ -21,8 +21,8 @@ with Regexep;
 
 package body ARFF is
 
-   type TK_State is (TK_Descrition, TK_Relation, TK_Attribute);
-   --                       TK_Comment, TK_Data);
+   type TK_State is (TK_Descrition, TK_Relation, TK_Attribute, TK_Data);
+   --                       TK_Comment);
    --      type Conversor_Type is (Conversor_Unencoded, Conversor_Encoded,
    --                              Conversor_Map);
    type Conversor_Data_Type is (Conv_Integer, Conv_Numeric, Conv_Real,
@@ -229,7 +229,7 @@ package body ARFF is
 
       --  L796  Read all lines
       Curs := Message_Lines.First;
-      while Has_Element (Curs) loop
+      while Has_Element (Curs) and State /= TK_Data loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
          declare
             UC_Row : constant String :=
@@ -271,14 +271,16 @@ package body ARFF is
                   Assert (State = TK_Attribute, Routine_Name &
                             "TK_Attribute state expected but in " &
                             TK_State'Image (State) & " state");
+                  State := TK_Data;
 
                elsif UC_Row (1 .. 1) = "%" then
                   --  L806
                   Decode_Comment (UC_Row, Arff_Container);
 
                else
+                  Put_Line (Routine_Name & "Row: " & UC_Row);
                   Assert (False, Routine_Name & "in unexpected state " &
-                            TK_State'Image (State) & Bad_Layout);
+                            TK_State'Image (State));
                end if;
             end if;
          end;
@@ -287,7 +289,7 @@ package body ARFF is
       end loop;
 
       --  L872 Alter the data object
-      Stream_Cursor := Message_Lines.First;
+--        Stream_Cursor := Message_Lines.First;
       --  case Matrix_Type implements
       --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
