@@ -36,7 +36,8 @@ package Classifier_Utilities is
                                       return Weights.Weight_Lists_3D;
    function Ones (List_Length : Positive) return Weights.Weight_List;
    function Search_Sorted_Value_List
-     (List_A, List_B : ML_Types.Value_Data_List) return Integer_List;
+     (List_A, List_B : ML_Types.Value_Data_List)
+      return Classifier_Types.Integer_List;
    function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
    function Set_Value (List_Length : Positive; Value : Float)
                        return Weights.Weight_List;

@@ -7,7 +7,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Depth_First_Builder;
 with Best_First_Builder;
 with Classifier_Utilities;
-with Criterion;
 with Encode_Utils;
 --  with Printing;
 with Tree_Build;
@@ -296,8 +295,7 @@ package body Base_Decision_Tree is
             Min_Split.Float_Value := Float'Value (Min_Samples_Split);
             aClassifier.Parameters.Min_Samples_Split := Min_Split;
          end;
-      elsif Utilities.Is_Integer
-        (To_Unbounded_String (Min_Samples_Split)) then
+      elsif Utilities.Is_Integer (To_Unbounded_String (Min_Samples_Split)) then
          declare
             Min_Split : Split_Value_Record (Split_Integer);
          begin

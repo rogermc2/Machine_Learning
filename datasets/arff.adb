@@ -14,6 +14,7 @@ with GNAT.Regpat;
 
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
+with Printing;
 with Regexep;
 
 --  pragma Warnings (Off);
@@ -61,8 +62,9 @@ package body ARFF is
    --     subtype Conversor_Tuple_List is Conversor_Tuple_Package.List;
 
    type Conversor_Item is record
-      Name      : Unbounded_String;
-      Data_Type : Conversor_Data_Type;
+      Name         : Unbounded_String;
+      Data_Type    : Conversor_Data_Type;
+      Nominal_List : String_List;
    end record;
 
    package Conversor_Item_Package is new
@@ -312,19 +314,20 @@ package body ARFF is
 --        Trim_Seq     : constant Character_Sequence := "{} ";
 --        Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
       --  L749 Extract raw name and type
-      Pos          : Positive := Fixed.Index (UC_Row, " ");
-      Pos_1        : Natural;
-      Slice_1      : constant String := UC_Row (UC_Row'First .. Pos - 1);
-      Slice_2      : constant String :=
-                       Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
-      Slice_2_UB   : constant Unbounded_String := To_Unbounded_String (Slice_2);
-      Slice_2_Last : constant Positive := Slice_2'Last;
-      H_Tab        : String (1 .. 1);
-      Name         : Unbounded_String;
-      Attr_Type    : Unbounded_String;
-      Conv_Item    : Conversor_Item;
-      Curs         : Cursor := Decoder.Conversers.First;
-      Found        : Boolean := False;
+      Pos            : Positive := Fixed.Index (UC_Row, " ");
+      Pos_1          : Natural;
+      Slice_1        : constant String := UC_Row (UC_Row'First .. Pos - 1);
+      Slice_2        : constant String :=
+                         Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
+      Slice_2_UB     : constant Unbounded_String := To_Unbounded_String (Slice_2);
+      Slice_2_Last   : constant Positive := Slice_2'Last;
+      H_Tab          : String (1 .. 1);
+      Name           : Unbounded_String;
+      Attr_Type      : Unbounded_String;
+      Nominal_Values : String_List;
+      Conv_Item      : Conversor_Item;
+      Curs           : Cursor := Decoder.Conversers.First;
+      Found          : Boolean := False;
    begin
       Assert (Slice_1 = "@ATTRIBUTE", Routine_Name & "Declaration for " &
                 Slice_1 & " but @ATTRIBUTE expected.");
@@ -363,9 +366,6 @@ package body ARFF is
            To_Unbounded_String (Slice (Attr_Type, 2, Length (Attr_Type)));
       end if;
 
---        Put_Line (Routine_Name & "Name: " & To_String (Name));
---        Put_Line (Routine_Name & "Attr_Type UC: '" & To_String (Attr_Type)
---                  & "'");
       if Slice (Attr_Type, 1, 1) = "{" and
         Slice (Attr_Type, Length (Attr_Type), Length (Attr_Type)) = "}"
       then
@@ -375,6 +375,10 @@ package body ARFF is
          Put_Line (Routine_Name & "Nominal Attr_Type UC: '" & To_String (Attr_Type)
                    & "'");
          Conv_Item.Data_Type := Conv_Nominal;
+         Nominal_Values := Parse_Values (To_String (Attr_Type));
+         Printing.Print_Strings (Routine_Name &
+                                   "Nominal_Values", Nominal_Values);
+         Conv_Item.Nominal_List := Nominal_Values;
          Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
                    " Nominal data type not implemented");
       else

@@ -8,7 +8,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Build_Utils;
 with Node_Splitter;
 --  with Printing;
-with Tree;
 with Weights;
 
 package body Best_First_Builder is

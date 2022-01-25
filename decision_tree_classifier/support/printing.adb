@@ -2,10 +2,6 @@
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Base_Decision_Tree;
-with Classifier_Types;
-with Export_Types;
-
 package body Printing is
 
     --  -------------------------------------------------------------------------
@@ -130,45 +126,45 @@ package body Printing is
 
     --  ------------------------------------------------------------------------
 
-    generic
-        type Index_Type is (<>);
-        type Vector_Type is  array (Index_Type) of aliased Float;
-    procedure Print_Floats_Vector (Name : String; aVector : Vector_Type);
-
-    procedure Print_Floats_Vector (Name : String; aVector : Vector_Type) is
-    begin
-        if Name = "" then
-            Put ("  ");
-        else
-            Put (Name & ":  ");
-        end if;
-        for Index in aVector'Range loop
-            Put (Float'Image (aVector (Index)) & "   ");
-        end loop;
-        New_Line;
-    end Print_Floats_Vector;
-
-    --  -------------------------------------------------------------------
-
-    generic
-        type Index_Type is (<>);
-        type Vector_Type is  array (Index_Type) of aliased Integer;
-    procedure Print_Integer_Vector (Name : String; aVector : Vector_Type);
+--      generic
+--          type Index_Type is (<>);
+--          type Vector_Type is  array (Index_Type) of aliased Float;
+--      procedure Print_Floats_Vector (Name : String; aVector : Vector_Type);
+--
+--      procedure Print_Floats_Vector (Name : String; aVector : Vector_Type) is
+--      begin
+--          if Name = "" then
+--              Put ("  ");
+--          else
+--              Put (Name & ":  ");
+--          end if;
+--          for Index in aVector'Range loop
+--              Put (Float'Image (aVector (Index)) & "   ");
+--          end loop;
+--          New_Line;
+--      end Print_Floats_Vector;
 
     --  -------------------------------------------------------------------
 
-    procedure Print_Integer_Vector (Name : String; aVector : Vector_Type) is
-    begin
-        if Name = "" then
-            Put ("  ");
-        else
-            Put (Name & ":  ");
-        end if;
-        for Index in aVector'Range loop
-            Put (Integer'Image (aVector (Index)) & "   ");
-        end loop;
-        New_Line;
-    end Print_Integer_Vector;
+--      generic
+--          type Index_Type is (<>);
+--          type Vector_Type is  array (Index_Type) of aliased Integer;
+--      procedure Print_Integer_Vector (Name : String; aVector : Vector_Type);
+--
+--      --  -------------------------------------------------------------------
+--
+--      procedure Print_Integer_Vector (Name : String; aVector : Vector_Type) is
+--      begin
+--          if Name = "" then
+--              Put ("  ");
+--          else
+--              Put (Name & ":  ");
+--          end if;
+--          for Index in aVector'Range loop
+--              Put (Integer'Image (aVector (Index)) & "   ");
+--          end loop;
+--          New_Line;
+--      end Print_Integer_Vector;
 
     --  -------------------------------------------------------------------
 
