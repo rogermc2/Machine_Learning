@@ -85,7 +85,7 @@ package body ARFF is
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
    Stream_Cursor  : ML_Types.String_Package.Cursor;
    Quoted_Re      : constant String :=
-                      "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^']|[^""\\])*""";
+                      "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
    Quoted_Re2     : constant String :=
                       "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
@@ -132,23 +132,23 @@ package body ARFF is
 
    --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
    --  despite quoting, whitespace, etc.
+   --  L214
    function Build_Re_Dense return GNAT.Regpat.Pattern_Matcher is
       use GNAT.Regpat;
-      --  "         open quote followed by zero or more:
-      --  (?:
-      --  (?<!\\)    no additional backslash
-      --  (?:\\\\)*  maybe escaped backslashes
-      --  \\"        escaped quote
-      --  \\[^"]     escaping a non-quote
-      --  [^"\\]     non-quote char
-      --  )*
-      --  "          close quote
+      Regex  : constant String := "''(?x),\s*((?=,)|$|{" & Value_Re &
+                  "})|(\S.*)''";
    begin
       --  Dense captures (value, error) groups.
       --  Because empty values are allowed, we cannot just look for empty
       --  values to handle syntax errors.
       --  We presume the line has had ',' prepended...
-      return Compile ("''(?x),\s*((?=,)|$|{" & Value_Re & "})|(\S.*)''");
+      Put_Line ("ARFF.Build_Re_Dense Regex set");
+      declare
+            Result : GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
+      begin
+      Put_Line ("ARFF.Build_Re_Dense Regex compiled");
+      return Result;
+      end;
 
    end Build_Re_Dense;
 
@@ -821,41 +821,51 @@ package body ARFF is
       use GNAT.Regpat;
       use Regexep;
       use String_Package;
-      Non_Trivial  : constant String := "[""\'{}\\s]";
-      First        : Positive;
-      Last         : Positive;
-      Match_Found  : Boolean;
-      Dense_Match  : Boolean;
-      Sparse_Match : Boolean;
-      Matches      : Matches_List;
-      Values       : String_List;
-      Value_Cursor : Cursor;
-      Errors       : String_List;
-      Result       : String_List;
+      Routine_Name        : constant String := "ARFF.Parse_Values ";
+      Non_Trivial         : constant String := "[""\'{}\\s]";
+      Non_Trivial_Matcher : constant Pattern_Matcher := Compile (Non_Trivial);
+      First               : Positive;
+      Last                : Positive;
+      Match_Found         : Boolean;
+      Dense_Match         : Boolean;
+      Sparse_Match        : Boolean;
+      Matches             : Matches_List;
+      Values              : String_List;
+      Value_Cursor        : Cursor;
+      Errors              : String_List;
+      Result              : String_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         Matches := Find_Match (Compile (Non_Trivial), Row, First, Last,
+         Put_Line (Routine_Name & "Row: " & Row);
+         Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
          pragma Unreferenced (Matches);
          if Match_Found then
+            Put_Line (Routine_Name & "Match_Found");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
          else
+            Put_Line (Routine_Name & "Match not found");
             --  Row contains Non_Trivial characters
             --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
             --  despite quoting, whitespace, etc.
             declare
-               Dense  : constant Pattern_Matcher := Build_Re_Dense;
-               Sparse : constant Pattern_Matcher := Build_Re_Sparse;
+               Dense_Matcher  : constant Pattern_Matcher := Build_Re_Dense;
+               Sparse_Matcher : constant Pattern_Matcher := Build_Re_Sparse;
             begin
-               Matches := Find_Match (Dense, Row, First, Last, Dense_Match);
+               Put_Line (Routine_Name & "Dense Match test");
+               Matches := Find_Match (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
+                  Put_Line (Routine_Name & "Dense Match_Found");
                   Values := Get_CSV_Data (Row (First .. Last));
                end if;
-               Matches := Find_Match (Sparse, Row, First, Last, Sparse_Match);
+
+               Put_Line (Routine_Name & " Sparse Match test");
+               Matches := Find_Match (Sparse_Matcher, Row, First, Last, Sparse_Match);
 
                if Sparse_Match then
+                  Put_Line (Routine_Name & " Sparse Match_Found");
                   Errors := Get_CSV_Data (Row (First .. Last));
                end if;
             end;  --  declare block

@@ -1,7 +1,6 @@
 
 --  Adapted from scikit-learn/scikit-learn.git sklearn/utils/_encode.py
 
-with Ada.Containers.Ordered_Sets;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Printing;
