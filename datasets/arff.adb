@@ -232,6 +232,7 @@ package body ARFF is
                             "TK_Descrition state expected but in " &
                             TK_State'Image (State) & " state");
                   Decode_Comment (UC_Row, Arff_Container);
+                  Put_Line (Routine_Name & "Comment decoded");
 
                elsif UC_Row'Length >= 9 and then UC_Row (1 .. 9) = "@RELATION"
                then
