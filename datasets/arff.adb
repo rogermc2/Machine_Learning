@@ -5,7 +5,7 @@ with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
 with Ada.Strings.Fixed;
-with Ada.Strings.Maps;
+--  with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -247,7 +247,7 @@ package body ARFF is
                             "TK_Relation or TK_Attribute state expected but in "
                           & TK_State'Image (State) & " state");
                   State := TK_Attribute;
---                    Put_Line (Routine_Name & "Attribute state, UC_Row: " & UC_Row);
+                  --                    Put_Line (Routine_Name & "Attribute state, UC_Row: " & UC_Row);
                   Attr := Decode_Attribute (Decoder, UC_Row);
                   --  _decode lines 827 - 846 (update attribute_names)
                   --  are implemented in Decode_Attribute
@@ -304,13 +304,13 @@ package body ARFF is
                               return Conversor_Item is
       use GNAT.Regpat;
       use Ada.Strings;
-      use Ada.Strings.Maps;
+--        use Ada.Strings.Maps;
       use Conversor_Item_Package;
       Routine_Name : constant String := "ARFF.Decode_Attribute ";
       Regex        : constant String :=
                        "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
-      Trim_Seq     : constant Character_Sequence := "{} ";
-      Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
+--        Trim_Seq     : constant Character_Sequence := "{} ";
+--        Trim_Set     : constant Character_Set := To_Set (Trim_Seq);
       --  L749 Extract raw name and type
       Pos          : Positive := Fixed.Index (UC_Row, " ");
       Pos_1        : Natural;
@@ -344,8 +344,6 @@ package body ARFF is
       Name := To_Unbounded_String (Slice (Slice_2_UB, 1, Pos_1 - 1));
       Pos := Pos_1 + 1;
 
-      Put_Line (Routine_Name & "Name: " & To_String (Name));
-
       while Has_Element (Curs) and not Found loop
          Found := Element (Curs).Name = Name;
          Next  (Curs);
@@ -358,28 +356,34 @@ package body ARFF is
 
       Attr_Type := To_Unbounded_String
         (Fixed.Trim (Slice (Slice_2_UB, Pos, Slice_2_Last), Both));
---        Put_Line (Routine_Name & "Trimmed Slice_2_UB: '" & To_String (Attr_Type)
---                 & "'");
+      --        Put_Line (Routine_Name & "Trimmed Slice_2_UB: '" & To_String (Attr_Type)
+      --                 & "'");
       if Slice (Attr_Type, 1, 1) = H_Tab then
          Attr_Type :=
            To_Unbounded_String (Slice (Attr_Type, 2, Length (Attr_Type)));
       end if;
 
-      if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2_Last) = '{' then
+--        Put_Line (Routine_Name & "Name: " & To_String (Name));
+--        Put_Line (Routine_Name & "Attr_Type UC: '" & To_String (Attr_Type)
+--                  & "'");
+      if Slice (Attr_Type, 1, 1) = "{" and
+        Slice (Attr_Type, Length (Attr_Type), Length (Attr_Type)) = "}"
+      then
+         Put_Line (Routine_Name & "Nominal Name: " & To_String (Name));
          Attr_Type := To_Unbounded_String
-           (Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set));
+           (Slice (Attr_Type, 2, Length (Attr_Type) - 1));
+         Put_Line (Routine_Name & "Nominal Attr_Type UC: '" & To_String (Attr_Type)
+                   & "'");
          Conv_Item.Data_Type := Conv_Nominal;
          Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
                    " Nominal data type not implemented");
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
-         Put_Line (Routine_Name & "Attr_Type UC: '" & To_String (Attr_Type) & "'");
          Assert (Attr_Type = "NUMERIC" or Attr_Type = "REAL" or
                    Attr_Type = "INTEGER" or Attr_Type = "STRING",
                  Routine_Name & " invalid attribute type, " & Slice_2);
       end if;
       --  end Python _arff._decode_attribute
---        Put_Line (Routine_Name & "type set");
 
       Conv_Item.Name := Name;
       if Slice_2 = "INTEGER" then
@@ -393,7 +397,7 @@ package body ARFF is
       end if;
 
       Decoder.Conversers.Append (Conv_Item);
---        Put_Line (Routine_Name & "done");
+      --        Put_Line (Routine_Name & "done");
 
       return Conv_Item;
 
