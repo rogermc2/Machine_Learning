@@ -115,7 +115,8 @@ package body ARFF is
    function Decode_Dense_Values
      (Values : String_List; Attribute_List : Conversor_Item_List)
       return JSON_Array;
-   function Max_Value (Values : String_List) return Integer;
+   --     function Max_Value (Values : String_List) return Float;
+   --     function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
    --     procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
    --                                   Attribute      : JSON_Value;
@@ -641,16 +642,23 @@ package body ARFF is
                                return JSON_Array is
       use String_Package;
       Routine_Name     : constant String := "ARFF.Decode_Dense_Rows ";
-      Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
+      Converser_Length : constant Positive :=
+                           Positive (Decoder.Conversers.Length);
       --  L462  for row in stream:
       Row              : constant String := Stream_Func (Decoder);
       --  L463
       Values           : constant String_List := Parse_Values (Row);
+      Values_Length    : constant Natural := Natural (Length (Values));
    begin
+      Printing.Print_Strings (Routine_Name & "Values", Values);
       Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
                 "' has no valid values.");
-      Assert (Max_Value (Values) < Converser_Length, Routine_Name & "Row '" &
-                Row & "' is invalid, Max_Value (Values) < Converser_Length.");
+      Assert (Values_Length <= Converser_Length, Routine_Name & "Row '" & Row &
+                "' is invalid, Values length"  &
+                Integer'Image (Values_Length) & " < Converser_Length" &
+                Integer'Image (Converser_Length));
+
+      Printing.Print_Strings (Routine_Name & "L475 Values", Values);
       --  L475
       return Decode_Dense_Values (Values, Decoder.Conversers);
 
@@ -660,12 +668,12 @@ package body ARFF is
    --  L478
    function Decode_Dense_Values (Values         : String_List;
                                  Attribute_List : Conversor_Item_List)
-                                 return JSON_Array is
+                                            return JSON_Array is
       use Ada.Containers;
       use Ada.Strings;
       use Conversor_Item_Package;
       use String_Package;
-      Routine_Name   : constant String := "ARFF.Decode_Values ";
+      Routine_Name   : constant String := "ARFF.Decode_Dense_Values ";
       Attr_Cursor    : Conversor_Item_Package.Cursor;
       Values_Cursor  : String_Package.Cursor;
       aConverser     : Conversor_Item;
@@ -673,6 +681,7 @@ package body ARFF is
       Value          : constant JSON_Value := Create_Object;
       Decoded_Values : JSON_Array;
    begin
+      Put_Line (Routine_Name);
       Assert (Values.Length = Attribute_List.Length, Routine_Name &
                 "lengths of Values " & Count_Type'Image (Values.Length) &
                 " and Conversers" & Count_Type'Image (Attribute_List.Length) &
@@ -688,16 +697,19 @@ package body ARFF is
             Value_String : constant String :=
                              To_String (Element (Values_Cursor));
          begin
+            Put_Line (Routine_Name & "Value_String: " & Value_String);
             case Data_Type is
                when Conv_Integer =>
                   Value.Set_Field (Name, Integer'Value (Value_String));
                when Conv_Nominal => null;
                when Conv_Numeric | Conv_Real =>
+                  Put_Line (Routine_Name & "float Value_String: " & Value_String);
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field (Name, Float (Integer'Value (Value_String)));
                   else
                      Value.Set_Field (Name, Float'Value (Value_String));
                   end if;
+                  Put_Line (Routine_Name & "Value: " & Value.Write);
                when Conv_String => Value.Set_Field (Name, Value_String);
             end case;
          end;  --  declare block
@@ -713,23 +725,43 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Max_Value (Values : String_List) return Integer is
-      use String_Package;
-      Curs : Cursor := Values.First;
-      Val  : Integer;
-      Max  : Integer := -Integer'Last;
-   begin
-      while Has_Element (Curs) loop
-         Val := Integer'Value (To_String (Element (Curs)));
-         if Val > Max then
-            Max := Val;
-         end if;
-         Next (Curs);
-      end loop;
+   --     function Max_Value (Values : String_List) return Float is
+   --        use String_Package;
+   --        Curs : Cursor := Values.First;
+   --        Val  : Float;
+   --        Max  : Float := -Float'Last;
+   --     begin
+   --        while Has_Element (Curs) loop
+   --           Val := Float'Value (To_String (Element (Curs)));
+   --           if Val > Max then
+   --              Max := Val;
+   --           end if;
+   --           Next (Curs);
+   --        end loop;
+   --
+   --        return Max;
+   --
+   --     end Max_Value;
 
-      return Max;
+   --  -------------------------------------------------------------------------
 
-   end Max_Value;
+   --     function Max_Value (Values : String_List) return Integer is
+   --        use String_Package;
+   --        Curs : Cursor := Values.First;
+   --        Val  : Integer;
+   --        Max  : Integer := -Integer'Last;
+   --     begin
+   --        while Has_Element (Curs) loop
+   --           Val := Integer'Value (To_String (Element (Curs)));
+   --           if Val > Max then
+   --              Max := Val;
+   --           end if;
+   --           Next (Curs);
+   --        end loop;
+   --
+   --        return Max;
+   --
+   --     end Max_Value;
 
    --  -------------------------------------------------------------------------
    --  match.group returns one or more subgroups of the match.
@@ -738,7 +770,7 @@ package body ARFF is
    --  per argument.
    --  Without arguments, group1 defaults to zero (the whole match is returned).
    function Escape_Sub_Callback (Match : Regexep.Match_Strings_List)
-                                 return String is
+                                            return String is
       use Ada.Strings;
       use Regexep;
       use Escape_Sub_Map_Package;
@@ -816,7 +848,7 @@ package body ARFF is
 
    function Load (File_Data   : String;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
-                  return JSON_Value is
+                             return JSON_Value is
       Decoder   : Arff_Decoder;
       ARFF_Data : constant JSON_Value := Decode_ARFF (Decoder, File_Data,
                                                       Return_Type);
@@ -833,7 +865,7 @@ package body ARFF is
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
    function Parse_Values (Row : String) return String_List is
---        use Ada.Strings;
+      --        use Ada.Strings;
       use GNAT.Regpat;
       use Regexep;
       use String_Package;
@@ -848,7 +880,7 @@ package body ARFF is
       Matches             : Matches_List;
       Values              : String_List;
       Value_Cursor        : Cursor;
---        aValue              : Unbounded_String;
+      --        aValue              : Unbounded_String;
       Errors              : String_List;
       Result              : String_List;
    begin
@@ -862,7 +894,7 @@ package body ARFF is
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
---              Printing.Print_Strings (Routine_Name & "Values", Values);
+            --              Printing.Print_Strings (Routine_Name & "Values", Values);
          else
             Put_Line (Routine_Name & "Match not found");
             --  Row contains Non_Trivial characters
@@ -902,13 +934,13 @@ package body ARFF is
          end if;
       end if;
 
---        Value_Cursor := Values.First;
---        while Has_Element (Value_Cursor) loop
---           aValue := Element (Value_Cursor);
---           Trim (aValue, Both);
---           Values.Replace_Element (Value_Cursor, aValue);
---           Next (Value_Cursor);
---        end loop;
+      --        Value_Cursor := Values.First;
+      --        while Has_Element (Value_Cursor) loop
+      --           aValue := Element (Value_Cursor);
+      --           Trim (aValue, Both);
+      --           Values.Replace_Element (Value_Cursor, aValue);
+      --           Next (Value_Cursor);
+      --        end loop;
       Printing.Print_Strings (Routine_Name & "Values", Values);
 
       return Values;
