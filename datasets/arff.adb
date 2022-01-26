@@ -539,14 +539,14 @@ package body ARFF is
                              Arff_Container : in out JSON_Value) is
       use GNAT.Regpat;
 --        Routine_Name : constant String := "ARFF.Decode_Comment ";
-      Regex        : constant String := "^%.*";
+      Regex        : constant String := "^%(.*)";
       Matcher      : constant Pattern_Matcher := Compile (Regex);
-      Matches      : Match_Array (0 .. Paren_Count (Matcher) + 1);
+      Matches      : Match_Array (0 .. Paren_Count (Matcher));
    begin
       Match (Matcher, UC_Row, Matches);
       declare
          Comment : constant String :=
-                     UC_Row (Matches (0).First .. Matches (0).Last);
+                     UC_Row (Matches (1).First .. Matches (1).Last);
          aLine   : constant JSON_Value := Create_Object;
          Desc    : JSON_Array:= Arff_Container.Get ("description");
       begin
