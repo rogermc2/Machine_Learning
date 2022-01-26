@@ -28,15 +28,15 @@ procedure Test_ARFF is
       J_Kind : constant String :=
                  Fixed.Trim (JSON_Value_Type'Image (Value.Kind), Both);
    begin
+      Put_Line ("Outer_Field Value kind: " & J_Kind);
+
       if J_Kind = "JSON_STRING_TYPE" then
-         Put_Line ("Outer_Field: " & Name & ": " & Get (Value) &
-                     "  Value kind: " & J_Kind);
+         Put_Line (Name & ": " & Get (Value) & "  Value kind: " & J_Kind);
 
       elsif J_Kind = "JSON_OBJECT_TYPE" then
          Map_JSON_Object (Value, Print_Inner_Field'Access);
-      else
-         Put_Line ("Outer_Field Value kind: " & J_Kind);
       end if;
+      New_Line;
 
    end Print_Outer_Field;
 
@@ -52,7 +52,7 @@ begin
    Close (File);
 
    Result := ARFF.Load (To_String (Data), ARFF.Arff_Dense);
-
+   Put_Line (Routine_Name & "Result Outer_Field:");
    Map_JSON_Object (Result, Print_Outer_Field'Access);
 
 end Test_ARFF;
