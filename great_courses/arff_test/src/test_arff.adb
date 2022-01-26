@@ -43,11 +43,11 @@ procedure Test_ARFF is
 
       elsif J_Kind = "JSON_ARRAY_TYPE" then
          J_Array := Get (Value);
+         Put_Line ("Array length " & Natural'Image (Length (J_Array)));
          Index := Array_First (J_Array);
          while Array_Has_Element (J_Array, Index) loop
             aValue := Array_Element (J_Array, Index);
             aLine := Get (aValue, "text");
---              Put_Line ("Line length " & Natural'Image (Length (aLine)));
             Unbounded_IO.Put_Line (aLine);
             Index := Array_Next (J_Array, Index);
          end loop;
