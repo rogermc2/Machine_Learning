@@ -150,7 +150,7 @@ package body ARFF is
       declare
          Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
       begin
---           Put_Line ("ARFF.Build_Re_Dense Regex compiled");
+         --           Put_Line ("ARFF.Build_Re_Dense Regex compiled");
          return Result;
       end;
 
@@ -163,12 +163,12 @@ package body ARFF is
       --        Regex : constant String :=  "(?x)(?:^\s*\{|,)\s*(\d+)\s+("
       Regex : constant String := "(?:^\s*\{|,)\s*(\d+)\s+("
                 & Value_Re & "s)|\S.*";
---                  & Value_Re & "s)|(?!}\s*$)(?!^\s*{\s*}\s*$)\S.*";
+      --                  & Value_Re & "s)|(?!}\s*$)(?!^\s*{\s*}\s*$)\S.*";
    begin
       declare
          Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
       begin
---           Put_Line ("ARFF.Build_Re_Sparse Regex compiled");
+         --           Put_Line ("ARFF.Build_Re_Sparse Regex compiled");
          return Result;
       end;
 
@@ -195,7 +195,6 @@ package body ARFF is
       Attr            : Conversor_Item;
       Stream_Row      : Unbounded_String;
       Values          : JSON_Array;
-      JSON_Values     : JSON_Array;
    begin
       Decoder.Current_Line := 0;
 
@@ -288,8 +287,8 @@ package body ARFF is
          Next (Curs);
       end loop;
 
+      Stream_Cursor := Curs;
       --  L872 Alter the data object
---        Stream_Cursor := Message_Lines.First;
       --  case Matrix_Type implements
       --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
@@ -300,8 +299,9 @@ package body ARFF is
             --                                         Rows, Cols);
          when others => null;
       end case;
+      Put_Line (Routine_Name & "Values set");
 
-      Arff_Container.Set_Field ("data", JSON_Values);
+      Arff_Container.Set_Field ("data", Values);
 
       Stream_Row := Get (Arff_Container, "description");
       if Tail (Stream_Row, 2) = "\n" then
@@ -393,8 +393,8 @@ package body ARFF is
          Printing.Print_Strings (Routine_Name &
                                    "Nominal_Values", Nominal_Values);
          Conv_Item.Nominal_List := Nominal_Values;
---           Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
---                     " Nominal data type not implemented");
+         --           Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
+         --                     " Nominal data type not implemented");
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
          Assert (Attr_Type = "NUMERIC" or Attr_Type = "REAL" or
@@ -415,7 +415,6 @@ package body ARFF is
       end if;
 
       Decoder.Conversers.Append (Conv_Item);
-      --        Put_Line (Routine_Name & "done");
 
       return Conv_Item;
 
@@ -641,15 +640,17 @@ package body ARFF is
                                Stream_Func : Stream_Func_Type)
                                return JSON_Array is
       use String_Package;
-      Routine_Name     : constant String := "ARFF.Decode_Rows_Dense ";
+      Routine_Name     : constant String := "ARFF.Decode_Dense_Rows ";
       Converser_Length : constant Natural := Natural (Decoder.Conversers.Length);
       --  L462  for row in stream:
       Row              : constant String := Stream_Func (Decoder);
       --  L463
       Values           : constant String_List := Parse_Values (Row);
    begin
-      Assert (not Values.Is_Empty and Max_Value (Values) < Converser_Length ,
-              Routine_Name & Row & " format is invalid.");
+      Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
+                "' has no valid values.");
+      Assert (Max_Value (Values) < Converser_Length, Routine_Name & "Row '" &
+                Row & "' is invalid, Max_Value (Values) < Converser_Length.");
       --  L475
       return Decode_Dense_Values (Values, Decoder.Conversers);
 
@@ -832,6 +833,7 @@ package body ARFF is
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
    function Parse_Values (Row : String) return String_List is
+--        use Ada.Strings;
       use GNAT.Regpat;
       use Regexep;
       use String_Package;
@@ -846,6 +848,7 @@ package body ARFF is
       Matches             : Matches_List;
       Values              : String_List;
       Value_Cursor        : Cursor;
+--        aValue              : Unbounded_String;
       Errors              : String_List;
       Result              : String_List;
    begin
@@ -859,6 +862,7 @@ package body ARFF is
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
+--              Printing.Print_Strings (Routine_Name & "Values", Values);
          else
             Put_Line (Routine_Name & "Match not found");
             --  Row contains Non_Trivial characters
@@ -897,6 +901,15 @@ package body ARFF is
             end if;
          end if;
       end if;
+
+--        Value_Cursor := Values.First;
+--        while Has_Element (Value_Cursor) loop
+--           aValue := Element (Value_Cursor);
+--           Trim (aValue, Both);
+--           Values.Replace_Element (Value_Cursor, aValue);
+--           Next (Value_Cursor);
+--        end loop;
+      Printing.Print_Strings (Routine_Name & "Values", Values);
 
       return Values;
 
@@ -968,16 +981,19 @@ package body ARFF is
       use String_Package;
       Row    : Unbounded_String;
       Result : Unbounded_String := To_Unbounded_String ("");
+      Found  : Boolean := False;
    begin
-      while Has_Element (Stream_Cursor) and then Length (Row) > 0 loop
+      while Has_Element (Stream_Cursor) and not Found loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
          Row := Element (Stream_Cursor);
+         --           Put_Line ("ARFF.Stream_Data Row '" & To_String (Row) & "'");
          Trim (Row, Both);
          declare
             UC_Row : constant String := Dataset_Utilities.To_Upper_Case
               (To_String (Row));
          begin
-            if Length (Row) > 0 and UC_Row (1 .. 1) /= "%" then
+            Found := Length (Row) > 0 and UC_Row (1 .. 1) /= "%";
+            if Found then
                Result := Row;
             end if;
          end;

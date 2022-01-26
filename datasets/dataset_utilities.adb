@@ -115,6 +115,7 @@ package body Dataset_Utilities is
    function Split_String (aString, Pattern : String)
                            return ML_Types.String_List is
       use Ada.Strings;
+--        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Last       : constant Integer := aString'Last;
       Last_Char  : constant Character := aString (Last);
       UB_String  : Unbounded_String;
@@ -145,6 +146,7 @@ package body Dataset_Utilities is
          Split_List.Append
            (To_Unbounded_String (String_2 (B_Index .. Last_2)));
       end;
+
       return Split_List;
 
    end Split_String;
