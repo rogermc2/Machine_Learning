@@ -371,50 +371,54 @@ package body ARFF is
                 To_String (Name));
 
       --  L755 Extract the final type
-
       Attr_Type := To_Unbounded_String
         (Fixed.Trim (Slice (Slice_2_UB, Pos, Slice_2_Last), Both));
-      --        Put_Line (Routine_Name & "Trimmed Slice_2_UB: '" & To_String (Attr_Type)
-      --                 & "'");
+--        Put_Line (Routine_Name & "Trimmed Slice_2_UB: '" & To_String (Attr_Type)
+--                       & "'");
       if Slice (Attr_Type, 1, 1) = H_Tab then
          Attr_Type :=
            To_Unbounded_String (Slice (Attr_Type, 2, Length (Attr_Type)));
       end if;
+--        Put_Line (Routine_Name & "Attr_Type: " & To_String (Attr_Type));
 
       if Slice (Attr_Type, 1, 1) = "{" and
         Slice (Attr_Type, Length (Attr_Type), Length (Attr_Type)) = "}"
       then
-         Put_Line (Routine_Name & "Nominal Name: " & To_String (Name));
+--           Put_Line (Routine_Name & "Nominal Name: " & To_String (Name));
          Attr_Type := To_Unbounded_String
            (Slice (Attr_Type, 2, Length (Attr_Type) - 1));
-         Put_Line (Routine_Name & "Nominal Attr_Type UC: '" & To_String (Attr_Type)
-                   & "'");
+--           Put_Line (Routine_Name & "Nominal Attr_Type UC: '" & To_String (Attr_Type)
+--                     & "'");
          Conv_Item.Data_Type := Conv_Nominal;
          Nominal_Values := Parse_Values (To_String (Attr_Type));
-         Printing.Print_Strings (Routine_Name &
-                                   "Nominal_Values", Nominal_Values);
+--           Printing.Print_Strings (Routine_Name &
+--                                     "Nominal_Values", Nominal_Values);
          Conv_Item.Nominal_List := Nominal_Values;
-         --           Assert (Conv_Item.Data_Type /= Conv_Nominal, Routine_Name &
-         --                     " Nominal data type not implemented");
+--           Put_Line (Routine_Name & "Conv_Item.Data_Type: " &
+--                      Conversor_Data_Type'Image (Conv_Item.Data_Type));
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
          Assert (Attr_Type = "NUMERIC" or Attr_Type = "REAL" or
                    Attr_Type = "INTEGER" or Attr_Type = "STRING",
                  Routine_Name & " invalid attribute type, " & Slice_2);
+         if Attr_Type = "INTEGER" then
+            Conv_Item.Data_Type := Conv_Integer;
+         elsif Attr_Type = "NUMERIC" then
+            Conv_Item.Data_Type := Conv_Numeric;
+         elsif Attr_Type = "REAL" then
+            Conv_Item.Data_Type := Conv_Real;
+         elsif Attr_Type = "STRING" then
+            Conv_Item.Data_Type := Conv_String;
+         end if;
       end if;
       --  end Python _arff._decode_attribute
 
       Conv_Item.Name := Name;
-      if Slice_2 = "INTEGER" then
-         Conv_Item.Data_Type := Conv_Integer;
-      elsif Slice_2 = "NUMERIC" then
-         Conv_Item.Data_Type := Conv_Numeric;
-      elsif Slice_2 = "REAL" then
-         Conv_Item.Data_Type := Conv_Real;
-      elsif Slice_2 = "STRING" then
-         Conv_Item.Data_Type := Conv_String;
-      end if;
-
+--        New_Line;
+--       Put_Line (Routine_Name & "Conv_Item.Name: " & To_String (Conv_Item.Name));
+--       Put_Line (Routine_Name & "Conv_Item.Data_Type: " &
+--                 Conversor_Data_Type'Image (Conv_Item.Data_Type));
+--        New_Line;
       Decoder.Conversers.Append (Conv_Item);
 
       return Conv_Item;
@@ -650,7 +654,7 @@ package body ARFF is
       Values           : constant String_List := Parse_Values (Row);
       Values_Length    : constant Natural := Natural (Length (Values));
    begin
-      Printing.Print_Strings (Routine_Name & "Values", Values);
+--        Printing.Print_Strings (Routine_Name & "Values", Values);
       Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
                 "' has no valid values.");
       Assert (Values_Length <= Converser_Length, Routine_Name & "Row '" & Row &
@@ -681,7 +685,6 @@ package body ARFF is
       Value          : constant JSON_Value := Create_Object;
       Decoded_Values : JSON_Array;
    begin
-      Put_Line (Routine_Name);
       Assert (Values.Length = Attribute_List.Length, Routine_Name &
                 "lengths of Values " & Count_Type'Image (Values.Length) &
                 " and Conversers" & Count_Type'Image (Attribute_List.Length) &
@@ -691,6 +694,12 @@ package body ARFF is
       Values_Cursor := Values.First;
       while Has_Element (Attr_Cursor) loop
          aConverser := Element (Attr_Cursor);
+--           Put_Line (Routine_Name & "aConverser.Name: " &
+--                       To_String (aConverser.Name));
+--           Printing.Print_Strings (Routine_Name & "aConverser.Nominal_List",
+--                                  aConverser.Nominal_List);
+--           Put_Line (Routine_Name & "Data_Type: " &
+--                      Conversor_Data_Type'Image (aConverser.Data_Type));
          Data_Type := aConverser.Data_Type;
          declare
             Name         : constant String := To_String (aConverser.Name);
@@ -869,7 +878,7 @@ package body ARFF is
       use GNAT.Regpat;
       use Regexep;
       use String_Package;
-      Routine_Name        : constant String := "ARFF.Parse_Values ";
+--        Routine_Name        : constant String := "ARFF.Parse_Values ";
       Non_Trivial         : constant String := "[""\'{}\\s]";
       Non_Trivial_Matcher : constant Pattern_Matcher := Compile (Non_Trivial);
       First               : Positive;
@@ -880,23 +889,22 @@ package body ARFF is
       Matches             : Matches_List;
       Values              : String_List;
       Value_Cursor        : Cursor;
-      --        aValue              : Unbounded_String;
       Errors              : String_List;
       Result              : String_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         Put_Line (Routine_Name & "Row: " & Row);
+--           Put_Line (Routine_Name & "Row: " & Row);
          Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
          pragma Unreferenced (Matches);
          if Match_Found then
-            Put_Line (Routine_Name & "Match_Found");
+--              Put_Line (Routine_Name & "Match_Found");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
             --              Printing.Print_Strings (Routine_Name & "Values", Values);
          else
-            Put_Line (Routine_Name & "Match not found");
+--              Put_Line (Routine_Name & "Match not found");
             --  Row contains Non_Trivial characters
             --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
             --  despite quoting, whitespace, etc.
@@ -907,16 +915,16 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
-                  Put_Line (Routine_Name & "Dense Match_Found");
+--                    Put_Line (Routine_Name & "Dense Match_Found");
                   Values := Get_CSV_Data (Row (First .. Last));
-               else
-                  Put_Line (Routine_Name & "No Dense Match Found");
+--                 else
+--                    Put_Line (Routine_Name & "No Dense Match Found");
                end if;
 
                Matches := Find_Match (Sparse_Matcher, Row, First, Last, Sparse_Match);
 
                if Sparse_Match then
-                  Put_Line (Routine_Name & " Sparse Match_Found");
+--                    Put_Line (Routine_Name & " Sparse Match_Found");
                   Errors := Get_CSV_Data (Row (First .. Last));
                end if;
             end;  --  declare block
@@ -934,14 +942,7 @@ package body ARFF is
          end if;
       end if;
 
-      --        Value_Cursor := Values.First;
-      --        while Has_Element (Value_Cursor) loop
-      --           aValue := Element (Value_Cursor);
-      --           Trim (aValue, Both);
-      --           Values.Replace_Element (Value_Cursor, aValue);
-      --           Next (Value_Cursor);
-      --        end loop;
-      Printing.Print_Strings (Routine_Name & "Values", Values);
+--        Printing.Print_Strings (Routine_Name & "Values", Values);
 
       return Values;
 
