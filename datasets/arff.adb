@@ -515,10 +515,11 @@ package body ARFF is
                                Stream_Func : Stream_Func_Type)
                                return JSON_Array is
       use String_Package;
-      Routine_Name       : constant String := "ARFF.Decode_Dense_Rows ";
-      Converser_Length   : constant Positive :=
+      Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
+      Converser_Length  : constant Positive :=
                              Positive (Decoder.Conversers.Length);
-      Dense_Values_List : String_List;
+      Data_Values       : constant JSON_Value := Create_Object;
+      Values_Array      : JSON_Array;
    begin
       while Row_Found loop
          declare
@@ -540,11 +541,12 @@ package body ARFF is
                          Integer'Image (Converser_Length));
             end if;
             Dense_Values := Decode_Dense_Values  (Values, Decoder.Conversers);
---              Append (Dense_Values_Array, Dense_Values);
+            Data_Values.Set_Field ("values", Dense_Values);
+            Append (Values_Array, Data_Values);
          end;
       end loop;
       --  L475
-      return Decode_Dense_Values (Dense_Values_List, Decoder.Conversers);
+      return Values_Array;
 
    end Decode_Dense_Rows;
 
