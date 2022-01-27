@@ -531,20 +531,21 @@ package body ARFF is
             Dense_Values     : JSON_Array;
          begin
             if Row'Length > 0 then
-               Put_Line (Routine_Name & "Row: " & Row);
-               --        Printing.Print_Strings (Routine_Name & "Values", Values);
                Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
                          "' has no valid values.");
-               Assert (Values_Length <= Converser_Length, Routine_Name & "Row '" & Row &
-                         "' is invalid, Values length"  &
-                         Integer'Image (Values_Length) & " < Converser_Length" &
-                         Integer'Image (Converser_Length));
+               Assert (Values_Length <= Converser_Length, Routine_Name &
+                         "Row '" & Row &"' is invalid, Values length"  &
+                         Integer'Image (Values_Length) & " < Converser_Length"
+                         & Integer'Image (Converser_Length));
+                    Dense_Values :=
+                      Decode_Dense_Values (Values, Decoder.Conversers);
+                    Data_Values.Set_Field ("values", Dense_Values);
+                    Append (Values_Array, Data_Values);
             end if;
-            Dense_Values := Decode_Dense_Values  (Values, Decoder.Conversers);
-            Data_Values.Set_Field ("values", Dense_Values);
-            Append (Values_Array, Data_Values);
          end;
+
       end loop;
+
       --  L475
       return Values_Array;
 
