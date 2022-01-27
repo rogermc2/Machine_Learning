@@ -99,8 +99,8 @@ package body ARFF is
    --                                UC_Row            : String;
    --                                Encode_Nominal    : Boolean := False)
    --                                return JSON_Value;
-   function Decode_Attribute (Decoder : in out Arff_Decoder; UC_Row : String)
-                              return Conversor_Item;
+   procedure Decode_Attribute (Decoder : in out Arff_Decoder; UC_Row : String;
+                               Arff_Container : in out JSON_Value);
    procedure Decode_Comment
      (UC_Row : String; Arff_Container : in out JSON_Value);
    procedure Decode_Relation
@@ -192,10 +192,9 @@ package body ARFF is
       Pos2            : Integer := 1;
       Message_Lines   : String_List;
       Curs            : Cursor;
-      Arff_Container  : Arff_Container_Type := Create_Object;
-      Attr            : Conversor_Item;
 --        Stream_Row      : Unbounded_String;
       Values          : JSON_Array;
+      Arff_Container  : JSON_Value := Create_Object;
    begin
       Decoder.Current_Line := 0;
 
@@ -261,7 +260,7 @@ package body ARFF is
                           & TK_State'Image (State) & " state");
                   State := TK_Attribute;
                   --                    Put_Line (Routine_Name & "Attribute state, UC_Row: " & UC_Row);
-                  Attr := Decode_Attribute (Decoder, UC_Row);
+                  Decode_Attribute (Decoder, UC_Row, Arff_Container);
                   --  _decode lines 827 - 846 (update attribute_names)
                   --  are implemented in Decode_Attribute
 
@@ -302,21 +301,14 @@ package body ARFF is
 
       Arff_Container.Set_Field ("data", Values);
 
---        Stream_Row := Get (Arff_Container, "description");
---        if Tail (Stream_Row, 2) = "\n" then
---           Stream_Row := To_Unbounded_String
---             (Slice (Stream_Row, 1, Length (Stream_Row) - 2));
---           Arff_Container.Set_Field ("description", Stream_Row);
---        end if;
-
       return Arff_Container;
 
    end Decode_ARFF;
 
    --  -------------------------------------------------------------------------
 
-   function Decode_Attribute (Decoder : in out Arff_Decoder; UC_Row : String)
-                              return Conversor_Item is
+   procedure Decode_Attribute (Decoder : in out Arff_Decoder; UC_Row : String;
+                               Arff_Container : in out JSON_Value) is
       use GNAT.Regpat;
       use Ada.Strings;
       --        use Ada.Strings.Maps;
@@ -335,8 +327,10 @@ package body ARFF is
       Slice_2_UB     : constant Unbounded_String := To_Unbounded_String (Slice_2);
       Slice_2_Last   : constant Positive := Slice_2'Last;
       H_Tab          : String (1 .. 1);
+      Attr           : constant JSON_Value := Create_Object;
       Name           : Unbounded_String;
       Attr_Type      : Unbounded_String;
+      Attr_Array     : JSON_Array;
       Nominal_Values : String_List;
       Conv_Item      : Conversor_Item;
       Curs           : Cursor := Decoder.Conversers.First;
@@ -371,29 +365,19 @@ package body ARFF is
       --  L755 Extract the final type
       Attr_Type := To_Unbounded_String
         (Fixed.Trim (Slice (Slice_2_UB, Pos, Slice_2_Last), Both));
-      --        Put_Line (Routine_Name & "Trimmed Slice_2_UB: '" & To_String (Attr_Type)
-      --                       & "'");
       if Slice (Attr_Type, 1, 1) = H_Tab then
          Attr_Type :=
            To_Unbounded_String (Slice (Attr_Type, 2, Length (Attr_Type)));
       end if;
-      --        Put_Line (Routine_Name & "Attr_Type: " & To_String (Attr_Type));
 
       if Slice (Attr_Type, 1, 1) = "{" and
         Slice (Attr_Type, Length (Attr_Type), Length (Attr_Type)) = "}"
       then
-         --           Put_Line (Routine_Name & "Nominal Name: " & To_String (Name));
          Attr_Type := To_Unbounded_String
            (Slice (Attr_Type, 2, Length (Attr_Type) - 1));
-         --           Put_Line (Routine_Name & "Nominal Attr_Type UC: '" & To_String (Attr_Type)
-         --                     & "'");
          Conv_Item.Data_Type := Conv_Nominal;
          Nominal_Values := Parse_Values (To_String (Attr_Type));
-         --           Printing.Print_Strings (Routine_Name &
-         --                                     "Nominal_Values", Nominal_Values);
          Conv_Item.Nominal_List := Nominal_Values;
-         --           Put_Line (Routine_Name & "Conv_Item.Data_Type: " &
-         --                      Conversor_Data_Type'Image (Conv_Item.Data_Type));
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
          Assert (Attr_Type = "NUMERIC" or Attr_Type = "REAL" or
@@ -411,125 +395,15 @@ package body ARFF is
       end if;
       --  end Python _arff._decode_attribute
 
+      Attr_Array := Get (Arff_Container, "attributes");
+      Attr.Set_Field (To_String (Name), Attr_Type);
+      Append (Attr_Array, Attr);
+      Arff_Container.Set_Field ("attributes", Attr_Array);
+
       Conv_Item.Name := Name;
-      --        New_Line;
-      --       Put_Line (Routine_Name & "Conv_Item.Name: " & To_String (Conv_Item.Name));
-      --       Put_Line (Routine_Name & "Conv_Item.Data_Type: " &
-      --                 Conversor_Data_Type'Image (Conv_Item.Data_Type));
-      --        New_Line;
       Decoder.Conversers.Append (Conv_Item);
 
-      return Conv_Item;
-
    end Decode_Attribute;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Decode_Attribute
-   --       (Decoder         : in Out Arff_Decoder; UC_Row : String;
-   --        Encode_Nominal  : Boolean := False) return JSON_Value is
-   --        use Ada.Strings;
-   --        use Ada.Strings.Maps;
-   --        use GNAT.Regpat;
-   --        use ML_Types.String_Package;
-   --        Routine_Name    : constant String := "ARFF.Decode_Relation ";
-   --        Regex           : constant String :=
-   --                            "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
-   --        Trim_Seq        : constant Character_Sequence := "{} ";
-   --        Trim_Set        : constant Character_Set := To_Set (Trim_Seq);
-   --        Arff_Container  : JSON_Value;
-   --        --  L749 Extract raw name and type
-   --        Pos             : Integer := Fixed.Index (UC_Row, " ");
-   --        Slice_1         : constant String := UC_Row (UC_Row'First .. Pos - 1);
-   --        Slice_2         : String :=
-   --                            Fixed.Trim (UC_Row (Pos + 1 .. UC_Row'Last), Both);
-   --        Name            : Unbounded_String;
-   --        Attr_Type       : Unbounded_String;
-   --        Attribute       : constant JSON_Value := Create_Object;
-   --        Curs            : Cursor;
-   --        Values          : String_List;
-   --        JSON_Values     : JSON_Array;
-   --     begin
-   --        Name := To_Unbounded_String (Slice_1);
-   --        Assert (Match (Compile (Regex), Slice_2),
-   --                Routine_Name & " attribute declaration '" &
-   --                  To_String (Attr_Type) &
-   --                  "' has an invalid format.");
-   --
-   --        --  L751 Extract the final name
-   --        Pos := 1;
-   --        while Pos > 0 and Pos < Length (Name) loop
-   --           Pos := Fixed.Index (To_String (Name), """");
-   --           if Pos > 0 and Pos < Length (Name) then
-   --              if Slice (Name, Pos + 1, Pos + 1) = "'" then
-   --                 Name := To_Unbounded_String
-   --                   (Slice (Name, 1, Pos - 1) &
-   --                      Slice (Name, Pos + 2, Length (Name)));
-   --              end if;
-   --           end if;
-   --        end loop;
-   --
-   --        --  L755 Extract the final type
-   --        Attr_Type := To_Unbounded_String (Slice_2);
-   --        if Slice_2 (Slice_2'First) = '{' and Slice_2 (Slice_2'Last) = '{' then
-   --           Attr_Type := To_Unbounded_String
-   --             (Fixed.Trim (Slice_2, Left => Trim_Set, Right => Trim_Set));
-   --           Values := Parse_Values (To_String (Attr_Type));
-   --        else
-   --           Slice_2 := Dataset_Utilities.To_Upper_Case (Slice_2);
-   --           Assert (Slice_2 = "NUMERIC" or Slice_2 = "REAL" or
-   --                     Slice_2 = "INTEGER" or Slice_2 = "STRING",
-   --                   Routine_Name & " invalid attribute type, " & Slice_2);
-   --        end if;
-   --        --  end Python _arff._decode_attribute
-   --
-   --        Curs := Values.First;
-   --        while Has_Element (Curs) loop
-   --           Append (JSON_Values, Create (Element (Curs)));
-   --           Next (Curs);
-   --        end loop;
-   --
-   --        --  L827  Originally in ATTRIBUTE section of _decode
-   --        declare
-   --           Attr_Name : constant String := To_String (Name);
-   --        begin
-   --  --           Assert (not Attribute_Names.Has_Field
-   --  --                   (Attr_Name), Routine_Name &
-   --  --                     " duplicate attribute name: " & Attr_Name);
-   --  --           Attribute_Names.Set_Field
-   --  --             (Attr_Name, Trimmed_Integer (Decoder.Current_Line));
-   --
-   --           Attribute.Set_Field (Attr_Name, To_String (Attr_Type));
-   --           Arff_Container.Set_Field ("attributes", Attribute);
-   --
-   --           --  L832
-   --           if Kind (Get (Attribute, Attr_Name)) = JSON_Array_Type then
-   --              Process_JSON_Array (Decoder, Attribute, Encode_Nominal);
-   --
-   --           else
-   --              declare
-   --                 Converser     : Conversor_Data (Conversor_Encoded);
-   --                 Converser_Map : constant JSON_Value := Create_Object;
-   --                 --                      Lambda        : JSON_Value := Create_Object;
-   --              begin
-   --                 --  L838
-   --                 Converser_Map.Set_Field ("STRING", "");
-   --                 Converser_Map.Set_Field ("INTEGER", Integer (0));
-   --                 Converser_Map.Set_Field ("NUMERIC", 0.0);
-   --                 Converser_Map.Set_Field ("REAL", 0.0);
-   --                 declare
-   --                    data : constant UTF8_String := Converser_Map.Get ("INTEGER");
-   --                 begin
-   --                    Converser.Encoded_Values.Append (To_Unbounded_String (Data));
-   --                 end;
-   --                 Decoder.Conversers.Append (Converser);
-   --              end;
-   --           end if;
-   --        end;
-   --
-   --        return Attribute;
-   --
-   --     end Decode_Attribute;
 
    --  -------------------------------------------------------------------------
 
