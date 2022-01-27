@@ -14,7 +14,7 @@ with GNAT.Regpat;
 
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
-with Printing;
+--  with Printing;
 with Regexep;
 
 --  pragma Warnings (Off);
@@ -299,7 +299,6 @@ package body ARFF is
             --                                         Rows, Cols);
          when others => null;
       end case;
-      Put_Line (Routine_Name & "Values set");
 
       Arff_Container.Set_Field ("data", Values);
 
@@ -309,7 +308,6 @@ package body ARFF is
 --             (Slice (Stream_Row, 1, Length (Stream_Row) - 2));
 --           Arff_Container.Set_Field ("description", Stream_Row);
 --        end if;
-      Put_Line (Routine_Name & "done");
 
       return Arff_Container;
 
@@ -663,7 +661,6 @@ package body ARFF is
                 Integer'Image (Values_Length) & " < Converser_Length" &
                 Integer'Image (Converser_Length));
 
-      Printing.Print_Strings (Routine_Name & "L475 Values", Values);
       --  L475
       return Decode_Dense_Values (Values, Decoder.Conversers);
 
@@ -697,12 +694,12 @@ package body ARFF is
       Values_Cursor := Values.First;
       while Has_Element (Attr_Cursor) loop
          aConverser := Element (Attr_Cursor);
-         Put_Line (Routine_Name & "aConverser.Name: " &
-                     To_String (aConverser.Name));
-         Printing.Print_Strings (Routine_Name & "aConverser.Nominal_List",
-                                 aConverser.Nominal_List);
-         Put_Line (Routine_Name & "Data_Type: " &
-                     Conversor_Data_Type'Image (aConverser.Data_Type));
+--           Put_Line (Routine_Name & "aConverser.Name: " &
+--                       To_String (aConverser.Name));
+--           Printing.Print_Strings (Routine_Name & "aConverser.Nominal_List",
+--                                   aConverser.Nominal_List);
+--           Put_Line (Routine_Name & "Data_Type: " &
+--                       Conversor_Data_Type'Image (aConverser.Data_Type));
          Data_Type := aConverser.Data_Type;
          declare
             Name          : constant String := To_String (aConverser.Name);
@@ -733,8 +730,6 @@ package body ARFF is
                   Value.Set_Field ("Nominal_List", Nominal_Values);
 
                when Conv_Numeric | Conv_Real =>
-                  Put_Line (Routine_Name & "float Value_String: " &
-                              Value_String);
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field (Name, Float (Integer'Value (Value_String)));
                   else
