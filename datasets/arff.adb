@@ -694,10 +694,8 @@ package body ARFF is
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                   return JSON_Value is
       Decoder   : Arff_Decoder;
-      ARFF_Data : constant JSON_Value := Decode_ARFF (Decoder, File_Data,
-                                                      Return_Type);
    begin
-      return ARFF_Data;
+      return Decode_ARFF (Decoder, File_Data,  Return_Type);
 
    end Load;
 

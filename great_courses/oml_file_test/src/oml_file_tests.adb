@@ -1,10 +1,8 @@
 
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
-with ARFF;
 with Openml; use Openml;
 
 package body OML_File_Tests is
@@ -20,10 +18,6 @@ package body OML_File_Tests is
 --        Routine_Name   : constant String := "Test_Convert_Arff_To_Data ";
       File_Name      : constant String := "iris.arff";
       File           : File_Type;
-      Data           : Unbounded_String := To_Unbounded_String ("");
-      Result         : JSON_Value;
-      --  Arff_Sparse_Data_Type is a subtype of JSON_Array
---        ARFF_Data      : ARFF.Arff_Sparse_Data_Type;
       Features       : JSON_Array;
       Data_Columns   : JSON_Array;
       Target_Columns : JSON_Array;
@@ -32,16 +26,6 @@ package body OML_File_Tests is
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
          Target_Columns => Target_Columns, Shape => (1, 1));
-
-      Open (File, In_File, File_Name);
-      while not End_Of_File (File) loop
-         Data := Data & To_Unbounded_String (Get_Line (File));
-         Data := Data & "\r\n";
-      end loop;
-      Close (File);
-
-      Result := ARFF.Load (To_String (Data), ARFF.Arff_Dense);
---        Convert_Arff_To_Data (Dataset_Name, Version, Data_Id);
 
    end Test_Convert_Arff_To_Data;
 
