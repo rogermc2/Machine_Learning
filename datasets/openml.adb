@@ -158,6 +158,7 @@ package body Openml is
       aFeature        : JSON_Value;
       aColumn         : JSON_Value;
       Feature_Name    : JSON_Value;
+      ARFF_Data       : ARFF.Arff_Sparse_Data_Type;
       Col_Slice_X     : JSON_Array;
       Col_Slice_Y     : JSON_Array;
       Num_Missing     : Integer;
@@ -166,9 +167,14 @@ package body Openml is
       Parsed_ARFF     : JSON_Array;
 
       procedure Parse_ARFF (ARFF : JSON_Array; X, Y : out JSON_Array) is
+            use ML_Types;
+            Col_List_X : Integer_List;
+            Col_List_Y : Integer_List;
       begin
+            Convert_Arff_To_Data (ARFF_Data, Col_List_X, Col_List_Y, X, Y);
          null;
       end Parse_ARFF;
+
    begin
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
@@ -236,7 +242,7 @@ package body Openml is
          end loop;
 
       else
-         null;
+         Parse_ARFF (Parsed_ARFF, Col_Slice_X, Col_Slice_Y);
       end if;
 
    end Download_Data_To_Bunch;

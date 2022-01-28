@@ -906,7 +906,4 @@ begin
    Escape_Sub_Map.Include (To_Unbounded_String ("\\9"),
                            To_Unbounded_String ("\t"));
 
-
-
-
 end ARFF;
