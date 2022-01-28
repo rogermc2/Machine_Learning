@@ -517,30 +517,36 @@ package body ARFF is
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
       Converser_Length  : constant Positive :=
-                             Positive (Decoder.Conversers.Length);
-      Data_Values       : constant JSON_Value := Create_Object;
+                            Positive (Decoder.Conversers.Length);
       Values_Array      : JSON_Array;
    begin
       while Row_Found loop
          declare
             --  L462  for row in stream:
-            Row              : constant String := Stream_Func (Decoder);
+            Row           : constant String := Stream_Func (Decoder);
             --  L463
-            Values           : constant String_List := Parse_Values (Row);
-            Values_Length    : constant Natural := Natural (Length (Values));
-            Dense_Values     : JSON_Array;
+            Values        : constant String_List := Parse_Values (Row);
+            Values_Length : constant Natural := Natural (Length (Values));
+            Data_Values   : constant JSON_Value := Create_Object;
+            Dense_Values  : JSON_Array;
          begin
+            Clear (Dense_Values);
+            Data_Values.Unset_Field ("values");
+--              Put_Line (Routine_Name & "Row: " & Row);
             if Row'Length > 0 then
                Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
                          "' has no valid values.");
                Assert (Values_Length <= Converser_Length, Routine_Name &
                          "Row '" & Row &"' is invalid, Values length"  &
                          Integer'Image (Values_Length) & " < Converser_Length"
-                         & Integer'Image (Converser_Length));
-                    Dense_Values :=
-                      Decode_Dense_Values (Values, Decoder.Conversers);
-                    Data_Values.Set_Field ("values", Dense_Values);
-                    Append (Values_Array, Data_Values);
+                       & Integer'Image (Converser_Length));
+               Dense_Values :=
+                 Decode_Dense_Values (Values, Decoder.Conversers);
+               New_Line;
+               Data_Values.Set_Field ("values", Dense_Values);
+--                 Put_Line ("Data_Values field: " & Data_Values.Get ("values").Write);
+               Append (Values_Array, Data_Values);
+               New_Line;
             end if;
          end;
 
@@ -566,7 +572,6 @@ package body ARFF is
       Nominal_Cursor : String_Package.Cursor;
       aConverser     : Conversor_Item;
       Data_Type      : Conversor_Data_Type;
-      Value          : constant JSON_Value := Create_Object;
       Nominal_Values : JSON_Array;
       Decoded_Values : JSON_Array;
    begin
@@ -588,10 +593,10 @@ package body ARFF is
          Data_Type := aConverser.Data_Type;
          declare
             Name          : constant String := To_String (aConverser.Name);
+            Value         : constant JSON_Value := Create_Object;
             Value_String  : constant String :=
                               To_String (Element (Values_Cursor));
          begin
-            --              Put_Line (Routine_Name & "Value_String: " & Value_String);
             case Data_Type is
                when Conv_Integer =>
                   Value.Set_Field (Name, Integer'Value (Value_String));
@@ -625,13 +630,17 @@ package body ARFF is
                   Value.Set_Field (Name, Value_String);
 
             end case;
+            Append (Decoded_Values, Value);
          end;  --  declare block
 
-         Append (Decoded_Values, Value);
          Next (Attr_Cursor);
          Next (Values_Cursor);
       end loop;
 
+--        Put_Line ("Decoded_Values length: " &
+--                    Integer'Image (Length (Decoded_Values)));
+--        Put_Line ("Decoded_Values 1: " & Get (Decoded_Values, 1).Write);
+--        Put_Line ("Decoded_Values 2: " & Get (Decoded_Values, 2).Write);
       return Decoded_Values;
 
    end Decode_Dense_Values;

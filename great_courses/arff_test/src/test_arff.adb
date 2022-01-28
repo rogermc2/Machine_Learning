@@ -20,7 +20,6 @@ procedure Test_ARFF is
    --  -------------------------------------------------------------------------
 
    procedure Print_Array (Name : Utf8_String; Value : JSON_Value) is
---        use Ada.Strings;
       J_Array     : constant JSON_Array := Get (Value);
       aValue      : JSON_Value;
       aLine       : Unbounded_String;
@@ -43,29 +42,12 @@ procedure Test_ARFF is
          elsif Kind (aValue) = JSON_Array_Type then
             Put_Line ("Inner JSON_Array_Type");
             Print_Array (Name, aValue);
---              declare
---                 Inner_Kind  : constant String
---                   := Fixed.Trim (JSON_Value_Type'Image
---                                  (Get (J_Array, 1).Kind), Both);
---                 Inner_Array : constant JSON_Array := Get (aValue);
---                 Inner_Value : JSON_Value := Create_Object;
---                 Inner_Index : Positive := 1;
---              begin
---                 Put_Line ("Inner_Field Value kind: " & Inner_Kind);
---                 while Array_Has_Element (Inner_Array, Inner_Index) loop
---                    Put_Line ("Inner_Index: " & Integer'Image (Inner_Index));
---                    Inner_Value := Array_Element (Inner_Array, Inner_Index);
---                    Map_JSON_Object (Inner_Value, Print_Inner_Field'Access);
---                    Inner_Index := Array_Next (Inner_Array, Inner_Index);
---                 end loop;
---              end;
 
          elsif Kind (aValue) = JSON_Object_Type then
-            New_Line;
             if Kind (Get (aValue, "values")) = JSON_Array_Type then
+               New_Line;
                Put_Line ("Printing array values");
                Print_Array (Name, Get (aValue, "values"));
-               New_Line;
             else
                Map_JSON_Object (aValue, Print_Inner_Field'Access);
             end if;
