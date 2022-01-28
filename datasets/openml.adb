@@ -105,13 +105,25 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   --     function Convert_Arff_Data_Dataframe
-   --       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value) return JSON_Value is
-   --        Result : JSON_Value;
-   --     begin
-   --        return Result;
-   --
-   --     end Convert_Arff_Data_Dataframe;
+   function Convert_Arff_Data_Dataframe
+     (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value)
+      return JSON_Value is
+      Routine_Name    : constant String := "Opemml.Convert_Arff_Data_Dataframe";
+      Description     : constant JSON_Array :=
+                          Arff_Container.Get ("description");
+      Relation        : constant String :=
+                          Arff_Container.Get ("relation");
+      Attributes      : constant JSON_Array :=
+                          Arff_Container.Get ("attributes");
+      ARFF_Data       : constant JSON_Array :=
+                          Arff_Container.Get ("data");
+      First_Row       : constant JSON_Value :=
+                          Array_Element (ARFF_Data, Array_First (ARFF_Data));
+      Result          : JSON_Value;
+   begin
+      return Result;
+
+   end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
    --  ArffSparseDataType = Tuple[List, ...]
@@ -414,7 +426,7 @@ package body Openml is
                                    Version           : String := "";
                                    Active            : Boolean := False;
                                    File_Name         : String := "")
-                                    return JSON_Value is
+                                   return JSON_Value is
       --        Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
       Openml_Path    : Unbounded_String :=
                          To_Unbounded_String (Search_Name);
@@ -441,7 +453,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Qualities (Data_ID : Integer; Dataset_Name : String := "")
-                                 return Qualities_Map is
+                                return Qualities_Map is
       use Ada.Strings;
       --        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
@@ -526,7 +538,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_Openml_Api (URL : String)
-                                               return JSON_Value is
+                                              return JSON_Value is
       Routine_Name      : constant String :=
                             "Openml.Get_Json_Content_From_Openml_Api ";
       AWS_Reply         : constant Aws.Response.Data := Open_Openml_URL (URL);
@@ -732,7 +744,7 @@ package body Openml is
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array)
-       return ARFF.Arff_Sparse_Data_Type is
+      return ARFF.Arff_Sparse_Data_Type is
       use ML_Types;
       use ML_Types.Integer_Package;
       use ML_Types.String_Package;
