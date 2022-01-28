@@ -128,12 +128,13 @@ package body Openml is
    --  ------------------------------------------------------------------------
    --  ArffSparseDataType = Tuple[List, ...]
    --  A Tuple is a collection of Python objects separated by commas.
-   procedure Convert_Arff_To_Data
+   --  L325
+   procedure Convert_Arff_Data
      (Arff_Container            : JSON_Value;
       Col_Slice_X, Col_Slice_Y  : JSON_Array;
       X, Y                      : out JSON_Array) is
       use ML_Types;
-      Routine_Name    : constant String := "Opemml.Convert_Arff_To_Data";
+      Routine_Name    : constant String := "Opemml.Convert_Arff_Data";
       Description     : constant JSON_Array :=
                           Arff_Container.Get ("description");
       Relation        : constant String :=
@@ -164,7 +165,7 @@ package body Openml is
       --        X_Shape := (Num_Obs, Positive (Col_Slice_X.Length));
       --        Coo_X.Data := Arff_Data_X.Element (1);
 
-   end Convert_Arff_To_Data;
+   end Convert_Arff_Data;
 
    --  ------------------------------------------------------------------------
 
@@ -175,29 +176,41 @@ package body Openml is
                                      Data_Columns     : JSON_Array;
                                      Target_Columns   : JSON_Array;
                                      Shape            : Shape_Data) is
-      Routine_Name    : constant String := "Openml.Download_Data_To_Bunch ";
-      Feature_Index   : Positive := Array_First (Features_List);
-      Col_Name        : Positive := Array_First (Features_List);
-      Features_Dict   : JSON_Value;
-      aFeature        : JSON_Value;
-      aColumn         : JSON_Value;
-      Feature_Name    : JSON_Value;
+      Routine_Name       : constant String := "Openml.Download_Data_To_Bunch ";
+      Feature_Index      : Positive := Array_First (Features_List);
+      Col_Name           : Positive := Array_First (Features_List);
+      Features_Dict      : JSON_Value;
+      aFeature           : JSON_Value;
+      aColumn            : JSON_Value;
+      Feature_Name       : JSON_Value;
       --  Arff_Sparse_Data_Type is a subtype of JSON_Array
-      ARFF_Array      : ARFF.Arff_Sparse_Data_Type;
-      Col_Slice_X     : JSON_Array;
-      Col_Slice_Y     : JSON_Array;
-      Num_Missing     : Integer;
-      Return_Type     : ARFF.ARFF_Return_Type;
-      Columns         : JSON_Array;
-      ARFF_Data       : JSON_Value := Create_Object;
-      Parsed_ARFF     : JSON_Array;
+      ARFF_Array         : ARFF.Arff_Sparse_Data_Type;
+      Col_Slice_X        : JSON_Array;
+      Col_Slice_Y        : JSON_Array;
+      Num_Missing        : Integer;
+      Return_Type        : ARFF.ARFF_Return_Type;
+      Columns            : JSON_Array;
+      ARFF_Data          : JSON_Value := Create_Object;
+      X                  : JSON_Array;
+      Y                  : JSON_Array;
+      Nominal_Attributes : JSON_Array;
+      Frame              : Boolean := False;
+      Parsed_ARFF        : JSON_Array;
 
       procedure Parse_ARFF (ARFF_In : JSON_Value; X, Y : out JSON_Array) is
          use ML_Types;
       begin
-         Convert_Arff_To_Data (ARFF_In, Col_Slice_X, Col_Slice_Y, X, Y);
+         Convert_Arff_Data (ARFF_In, Col_Slice_X, Col_Slice_Y, X, Y);
          null;
       end Parse_ARFF;
+
+      procedure
+      Post_Process (ARFF_Data : JSON_Value; X, Y : out JSON_Array;
+                    Frame : Boolean; Nominal_Attributes : JSON_Array) is
+      begin
+         null;
+      end Post_Process;
+
 
    begin
       while Array_Has_Element (Features_List, Feature_Index) loop
@@ -259,6 +272,7 @@ package body Openml is
       --  L652
       if File_Name'Length > 0 then
          ARFF_Data := Load_Arff_From_File (File_Name, Return_Type);
+         Post_Process (ARFF_Data, X, Y, Frame, Nominal_Attributes);
       else
          Load_Arff_Response (URL);
       end if;
