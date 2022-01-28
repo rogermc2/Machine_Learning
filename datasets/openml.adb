@@ -199,18 +199,22 @@ package body Openml is
 
       procedure Parse_ARFF (ARFF_In : JSON_Value; X, Y : out JSON_Array) is
          use ML_Types;
+         Attributes : JSON_Array := Get (ARFF_In, "attributes");
       begin
          Convert_Arff_Data (ARFF_In, Col_Slice_X, Col_Slice_Y, X, Y);
-         null;
+         Col_Name := Array_First (Columns);
+         while Array_Has_Element (Columns, Col_Name) loop
+
+            Col_Name := Array_Next (Columns, Col_Name);
+         end loop;
       end Parse_ARFF;
 
       procedure
       Post_Process (ARFF_Data : JSON_Value; X, Y : out JSON_Array;
-                    Frame : Boolean; Nominal_Attributes : JSON_Array) is
+                    Frame     : Boolean; Nominal_Attributes : JSON_Array) is
       begin
          null;
       end Post_Process;
-
 
    begin
       while Array_Has_Element (Features_List, Feature_Index) loop
@@ -277,17 +281,18 @@ package body Openml is
          Load_Arff_Response (URL);
       end if;
 
-      --  L593
-      if As_Frame then
-         Columns := Data_Columns;
-         Col_Name := Array_First (Target_Columns);
-         while Array_Has_Element (Target_Columns, Col_Name) loop
-            Append (Columns, Array_Element (Target_Columns, Col_Name));
-            Col_Name := Array_Next (Target_Columns, Col_Name);
-         end loop;
+      --  L602
+      Columns := Data_Columns;
+      Col_Name := Array_First (Target_Columns);
+      while Array_Has_Element (Target_Columns, Col_Name) loop
+         Append (Columns, Array_Element (Target_Columns, Col_Name));
+         Col_Name := Array_Next (Target_Columns, Col_Name);
+      end loop;
 
+      if As_Frame then
+         null;
       else
-         Parse_ARFF (ARFF_Data, Col_Slice_X, Col_Slice_Y);
+         Parse_ARFF (ARFF_Data, X, Y);
       end if;
 
    end Download_Data_To_Bunch;
