@@ -572,7 +572,6 @@ package body ARFF is
       Nominal_Cursor : String_Package.Cursor;
       aConverser     : Conversor_Item;
       Data_Type      : Conversor_Data_Type;
-      Nominal_Values : JSON_Array;
       Decoded_Values : JSON_Array;
    begin
       Assert (Values.Length = Attribute_List.Length, Routine_Name &
@@ -584,12 +583,6 @@ package body ARFF is
       Values_Cursor := Values.First;
       while Has_Element (Attr_Cursor) loop
          aConverser := Element (Attr_Cursor);
-         --           Put_Line (Routine_Name & "aConverser.Name: " &
-         --                       To_String (aConverser.Name));
-         --           Printing.Print_Strings (Routine_Name & "aConverser.Nominal_List",
-         --                                   aConverser.Nominal_List);
-         --           Put_Line (Routine_Name & "Data_Type: " &
-         --                       Conversor_Data_Type'Image (aConverser.Data_Type));
          Data_Type := aConverser.Data_Type;
          declare
             Name          : constant String := To_String (aConverser.Name);
@@ -597,6 +590,7 @@ package body ARFF is
             Value_String  : constant String :=
                               To_String (Element (Values_Cursor));
          begin
+            Put_Line (Routine_Name & "Value_String: " &Value_String);
             case Data_Type is
                when Conv_Integer =>
                   Value.Set_Field (Name, Integer'Value (Value_String));
@@ -606,26 +600,22 @@ package body ARFF is
                      declare
                         Nominal_String : constant String
                           := To_String (Element (Nominal_Cursor));
-                        Nominal_Value  : constant JSON_Value :=
-                                           Create_Object;
                         Index          : Natural := 0;
                      begin
                         Index := Index + 1;
-                        Nominal_Value.Set_Field
-                          (Integer'Image (Index), Nominal_String);
-                        Append (Nominal_Values, Nominal_Value);
+                        Value.Set_Field ("Iris type", Nominal_String);
+--                            (Integer'Image (Index), Nominal_String);
                      end;
                      Next (Nominal_Cursor);
                   end loop;
-                  Value.Set_Field ("Nominal_List", Nominal_Values);
 
                when Conv_Numeric | Conv_Real =>
                   if Fixed.Index (Value_String, ".") = 0 then
-                     Value.Set_Field (Name, Float (Integer'Value (Value_String)));
+                     Value.Set_Field (Name,
+                                      Float (Integer'Value (Value_String)));
                   else
                      Value.Set_Field (Name, Float'Value (Value_String));
                   end if;
-                  --                    Put_Line (Routine_Name & "Value: " & Value.Write);
                when Conv_String =>
                   Value.Set_Field (Name, Value_String);
 
@@ -637,10 +627,6 @@ package body ARFF is
          Next (Values_Cursor);
       end loop;
 
---        Put_Line ("Decoded_Values length: " &
---                    Integer'Image (Length (Decoded_Values)));
---        Put_Line ("Decoded_Values 1: " & Get (Decoded_Values, 1).Write);
---        Put_Line ("Decoded_Values 2: " & Get (Decoded_Values, 2).Write);
       return Decoded_Values;
 
    end Decode_Dense_Values;
