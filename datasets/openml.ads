@@ -16,11 +16,12 @@ package Openml is
    end record;
 
    procedure Download_Data_To_Bunch (URL              : String;
+                                     File_Name        : String := "";
                                      Sparse, As_Frame : Boolean;
-                                     Features_List  : JSON_Array;
-                                     Data_Columns   : JSON_Array;
-                                     Target_Columns : JSON_Array;
-                                     Shape          : Shape_Data);
+                                     Features_List    : JSON_Array;
+                                     Data_Columns     : JSON_Array;
+                                     Target_Columns   : JSON_Array;
+                                     Shape            : Shape_Data);
    procedure Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                            Data_Id       : in out Integer;
                            Target_Column : String := "default-target";

@@ -17,7 +17,7 @@ package body OML_File_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Convert_Arff_To_Data is
---        Routine_Name   : constant String := "Test_Fetch_OML ";
+--        Routine_Name   : constant String := "Test_Convert_Arff_To_Data ";
       File_Name      : constant String := "iris.arff";
       File           : File_Type;
       Data           : Unbounded_String := To_Unbounded_String ("");
@@ -29,7 +29,7 @@ package body OML_File_Tests is
       Target_Columns : JSON_Array;
    begin
       Openml.Download_Data_To_Bunch
-        (URL => "", Sparse => False, As_Frame => False,
+        (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
          Target_Columns => Target_Columns, Shape => (1, 1));
 
@@ -85,10 +85,9 @@ package body OML_File_Tests is
       Data_Id := Integer'Value (Get (JSON_Data_Id));
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
 
---        Test_Data_Description (Data_Id, Info_File_Name);
---        Test_Features  (Data_Id, Features_File_Name);
---        Test_Qualities (Data_Id, Info_File_Name);
-     Test_Convert_Arff_To_Data;
+      Test_Data_Description (Data_Id, Info_File_Name);
+      Test_Features  (Data_Id, Features_File_Name);
+      Test_Qualities (Data_Id, Info_File_Name);
 
    end Test_Data_Info;
 
