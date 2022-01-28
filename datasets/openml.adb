@@ -25,11 +25,6 @@ package body Openml is
 
    type ARFF_Type is (ARFF_COO, ARFF_DENSE_GEN);
 
-   type Shape_Data is record
-      Num_Samples     : Natural := 0;
-      Features_Length : Natural := 0;
-   end record;
-
    --     package Tupple_Package is new
    --       Ada.Containers.Vectors (Positive, Unbounded_String);
    --     subtype Tupple_Vector is Tupple_Package.Vector;
@@ -98,7 +93,7 @@ package body Openml is
                              Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
-      Include_Columns : ML_Types.Integer_List) return ARFF.Arff_Sparse_Data_Type;
+      Include_Columns : JSON_Array) return ARFF.Arff_Sparse_Data_Type;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
    procedure Verify_Target_Data_Type (Features_Dict  : JSON_Value;
@@ -117,13 +112,15 @@ package body Openml is
    --  ------------------------------------------------------------------------
    --  ArffSparseDataType = Tuple[List, ...]
    --  A Tuple is a collection of Python objects separated by commas.
+   --  Arff_Sparse_Data_Type is a subtype of JSON_Array
    procedure Convert_Arff_To_Data
      (ARFF_Data                 : ARFF.Arff_Sparse_Data_Type;
-      Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
+      Col_Slice_X, Col_Slice_Y  : JSON_Array;
       X, Y                      : out JSON_Array) is
       use ML_Types;
+      Routine_Name  : constant String := "Opemml.Convert_Arff_To_Data";
       Arff_Data_X   : ARFF.Arff_Sparse_Data_Type;
-      Data_List     : String_Vector;
+      Data_List     : JSON_Value;
       String_Length : Positive;
       Num_Obs       : Positive := 0;
       X_Shape       : Coo.Shape_Dimensions;
@@ -131,22 +128,25 @@ package body Openml is
    begin
       --  L283
       Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
-      Data_List := ARFF_Data.Element (2);
-      for index in Data_List.First_Index .. Data_List.Last_Index loop
-            String_Length := Length (Data_List.Element (index));
-            if String_Length > Num_Obs then
-                Num_Obs := String_Length;
-            end if;
-      end loop;
-
-      X_Shape := (Num_Obs, Positive (Col_Slice_X.Length));
+      Data_List := Get (ARFF_Data, 2);
+      Put_Line (Routine_Name & "Data_List type: " &
+                  JSON_Value_Type'Image (Kind (Data_List)));
+--        for index in Data_List.First_Index .. Data_List.Last_Index loop
+--              String_Length := Length (Data_List.Element (index));
+--              if String_Length > Num_Obs then
+--                  Num_Obs := String_Length;
+--              end if;
+--        end loop;
+--
+--        X_Shape := (Num_Obs, Positive (Col_Slice_X.Length));
 --        Coo_X.Data := Arff_Data_X.Element (1);
 
    end Convert_Arff_To_Data;
 
    --  ------------------------------------------------------------------------
 
-   procedure Download_Data_To_Bunch (URL            : String; Sparse, As_Frame : Boolean;
+   procedure Download_Data_To_Bunch (URL              : String;
+                                     Sparse, As_Frame : Boolean;
                                      Features_List  : JSON_Array;
                                      Data_Columns   : JSON_Array;
                                      Target_Columns : JSON_Array;
@@ -158,6 +158,7 @@ package body Openml is
       aFeature        : JSON_Value;
       aColumn         : JSON_Value;
       Feature_Name    : JSON_Value;
+      --  Arff_Sparse_Data_Type is a subtype of JSON_Array
       ARFF_Data       : ARFF.Arff_Sparse_Data_Type;
       Col_Slice_X     : JSON_Array;
       Col_Slice_Y     : JSON_Array;
@@ -168,10 +169,8 @@ package body Openml is
 
       procedure Parse_ARFF (ARFF : JSON_Array; X, Y : out JSON_Array) is
             use ML_Types;
-            Col_List_X : Integer_List;
-            Col_List_Y : Integer_List;
       begin
-            Convert_Arff_To_Data (ARFF_Data, Col_List_X, Col_List_Y, X, Y);
+            Convert_Arff_To_Data (ARFF_Data, Col_Slice_X, Col_Slice_Y, X, Y);
          null;
       end Parse_ARFF;
 
@@ -689,44 +688,45 @@ package body Openml is
    --  _split_sparse_columns
    --  (arff_data: ArffSparseDataType, include_columns: List)
    --  - > ArffSparseDataType
+   --  Arff_Sparse_Data_Type is a subtype of JSON_Array
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
-      Include_Columns : ML_Types.Integer_List)
+      Include_Columns : JSON_Array)
       return ARFF.Arff_Sparse_Data_Type is
       use ML_Types;
       use ML_Types.Integer_Package;
       use ML_Types.String_Package;
       use ARFF;
       Length_1          : constant Positive :=
-                            Positive (Arff_Data.Element (1).Length);
-      Length_2          : constant Positive :=
-                            Positive (Arff_Data.Element (2).Length);
-      Length_3          : constant Positive :=
-                            Positive (Arff_Data.Element (3).Length);
+                            Positive (Length (Arff_Data));
+--        Length_2          : constant Positive :=
+--                              Positive (Arff_Data.Element (2).Length);
+--        Length_3          : constant Positive :=
+--                              Positive (Arff_Data.Element (3).Length);
       Reindexed_Columns : Integer_List;
       Tuple             : String_Vector;
       Arff_Data_New     : Arff_Sparse_Data_Type;
    begin
-      Reindexed_Columns.Set_Length (Include_Columns.Length);
-      for a_index in Include_Columns.First_Index
-        .. Include_Columns.Last_Index loop
-         Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
-      end loop;
+--        Reindexed_Columns.Set_Length (Include_Columns.Length);
+--        for a_index in Include_Columns.First_Index
+--          .. Include_Columns.Last_Index loop
+--           Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
+--        end loop;
 
-      for val in 1 .. Length_1 loop
-         for row in 1 .. Length_2 loop
-            for col in 1 .. Length_3 loop
-               Tuple.Clear;
-               if Include_Columns.Find_Index (col) /= No_Index then
-                  Tuple.Append (Arff_Data.Element (1) (val));
-                  Tuple.Append (Arff_Data.Element (2) (row));
-                  Tuple.Append (Arff_Data.Element (3)
-                                (Reindexed_Columns.Element (col)));
-                  Arff_Data_New.Append (Tuple);
-               end if;
-            end loop;
-         end loop;
-      end loop;
+--        for val in 1 .. Length_1 loop
+--           for row in 1 .. Length_2 loop
+--              for col in 1 .. Length_3 loop
+--                 Tuple.Clear;
+--                 if Include_Columns.Find_Index (col) /= No_Index then
+--                    Tuple.Append (Arff_Data.Element (1) (val));
+--                    Tuple.Append (Arff_Data.Element (2) (row));
+--                    Tuple.Append (Arff_Data.Element (3)
+--                                  (Reindexed_Columns.Element (col)));
+--                    Arff_Data_New.Append (Tuple);
+--                 end if;
+--              end loop;
+--           end loop;
+--        end loop;
 
       return Arff_Data_New;
 

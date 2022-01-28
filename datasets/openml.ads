@@ -10,6 +10,17 @@ package Openml is
      Ada.Containers.Ordered_Maps (Unbounded_String, JSON_Value);
    subtype Qualities_Map is ML_Qualities_Package.Map;
 
+   type Shape_Data is record
+      Num_Samples     : Natural := 0;
+      Features_Length : Natural := 0;
+   end record;
+
+   procedure Download_Data_To_Bunch (URL              : String;
+                                     Sparse, As_Frame : Boolean;
+                                     Features_List  : JSON_Array;
+                                     Data_Columns   : JSON_Array;
+                                     Target_Columns : JSON_Array;
+                                     Shape          : Shape_Data);
    procedure Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                            Data_Id       : in out Integer;
                            Target_Column : String := "default-target";
