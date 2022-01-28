@@ -112,23 +112,10 @@ package body ARFF is
    function Decode_Dense_Values
      (Values : String_List; Attribute_List : Conversor_Item_List)
       return JSON_Array;
-   --     function Max_Value (Values : String_List) return Float;
-   --     function Max_Value (Values : String_List) return Integer;
    function Parse_Values (Row : String) return String_List;
-   --     procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
-   --                                   Attribute      : JSON_Value;
-   --                                   Encode_Nominal : Boolean);
    function Split_Sparse_Line (Row : String) return String_List;
    function Stream_Data (Decoder : in out Arff_Decoder) return String;
    function Unquote (Values : String) return Unbounded_String;
-
-   --  -------------------------------------------------------------------------
-
-   --      procedure ARFF_Syntax_Error (Row : String) is
-   --      begin
-   --          raise ARFF_Error with "ARFF unknown parsing error";
-   --
-   --      end ARFF_Syntax_Error;
 
    --  -------------------------------------------------------------------------
 
@@ -632,46 +619,6 @@ package body ARFF is
    end Decode_Dense_Values;
 
    --  -------------------------------------------------------------------------
-
-   --     function Max_Value (Values : String_List) return Float is
-   --        use String_Package;
-   --        Curs : Cursor := Values.First;
-   --        Val  : Float;
-   --        Max  : Float := -Float'Last;
-   --     begin
-   --        while Has_Element (Curs) loop
-   --           Val := Float'Value (To_String (Element (Curs)));
-   --           if Val > Max then
-   --              Max := Val;
-   --           end if;
-   --           Next (Curs);
-   --        end loop;
-   --
-   --        return Max;
-   --
-   --     end Max_Value;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Max_Value (Values : String_List) return Integer is
-   --        use String_Package;
-   --        Curs : Cursor := Values.First;
-   --        Val  : Integer;
-   --        Max  : Integer := -Integer'Last;
-   --     begin
-   --        while Has_Element (Curs) loop
-   --           Val := Integer'Value (To_String (Element (Curs)));
-   --           if Val > Max then
-   --              Max := Val;
-   --           end if;
-   --           Next (Curs);
-   --        end loop;
-   --
-   --        return Max;
-   --
-   --     end Max_Value;
-
-   --  -------------------------------------------------------------------------
    --  match.group returns one or more subgroups of the match.
    --  If there is a single argument, the result is a single string;
    --  if there are multiple arguments, the result is a tuple with one item
@@ -743,17 +690,6 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   --     procedure Init_Nominal_Conversor (Conversor : in out Conversor_Data;
-   --                                       Value     : String) is
-   --     begin
-   --        Conversor.Values.Clear;
-   --        Conversor.Zero_Value := To_Unbounded_String (Value);
-   --        Conversor.Values.Append (To_Unbounded_String (Value));
-   --
-   --     end Init_Nominal_Conversor;
-
-   --  -------------------------------------------------------------------------
-
    function Load (File_Data   : String;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                   return JSON_Value is
@@ -797,13 +733,11 @@ package body ARFF is
                                 Match_Found);
          pragma Unreferenced (Matches);
          if Match_Found then
-            --              Put_Line (Routine_Name & "Match_Found");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
-            --              Printing.Print_Strings (Routine_Name & "Values", Values);
+
          else
-            --              Put_Line (Routine_Name & "Match not found");
             --  Row contains Non_Trivial characters
             --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
             --  despite quoting, whitespace, etc.
@@ -814,16 +748,13 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
-                  --                    Put_Line (Routine_Name & "Dense Match_Found");
                   Values := Get_CSV_Data (Row (First .. Last));
-                  --                 else
-                  --                    Put_Line (Routine_Name & "No Dense Match Found");
                end if;
 
-               Matches := Find_Match (Sparse_Matcher, Row, First, Last, Sparse_Match);
+               Matches := Find_Match (Sparse_Matcher, Row, First, Last,
+                                      Sparse_Match);
 
                if Sparse_Match then
-                  --                    Put_Line (Routine_Name & " Sparse Match_Found");
                   Errors := Get_CSV_Data (Row (First .. Last));
                end if;
             end;  --  declare block
@@ -841,40 +772,9 @@ package body ARFF is
          end if;
       end if;
 
-      --        Printing.Print_Strings (Routine_Name & "Values", Values);
-
       return Values;
 
    end Parse_Values;
-
-   --  -------------------------------------------------------------------------
-
-   --     procedure Process_JSON_Array (Decoder        : in out Arff_Decoder;
-   --                                   Attribute      : JSON_Value;
-   --                                   Encode_Nominal : Boolean) is
-   --     begin
-   --        if Encode_Nominal then
-   --           declare
-   --              Converser : Conversor_Data (Conversor_Encoded);
-   --              Values    : String_List;
-   --           begin
-   --              Values.Append (Get (Attribute, "attributes"));
-   --              Converser.Encoded_Values := Values;
-   --              Decoder.Conversers.Append (Converser);
-   --           end;
-   --
-   --        else
-   --           declare
-   --              Converser : Conversor_Data (Conversor_Unencoded);
-   --              Values    : String_List;
-   --           begin
-   --              Values.Append (Get (Attribute, "attributes"));
-   --              Converser.Values := Values;
-   --              Decoder.Conversers.Append (Converser);
-   --           end;
-   --        end if;
-   --
-   --     end Process_JSON_Array;
 
    --  -------------------------------------------------------------------------
 
