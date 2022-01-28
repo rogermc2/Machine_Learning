@@ -144,16 +144,23 @@ package body Openml is
       ARFF_Data       : constant JSON_Array :=
                           Arff_Container.Get ("data");
       Arff_Data_X     : JSON_Array;
+      Arff_Data_Y     : JSON_Array;
       Data_List       : JSON_Value;
       String_Length   : Positive;
       Num_Obs         : Natural := 0;
       X_Shape         : Coo.Shape_Dimensions;
       Coo_X           : Coo.Coo_Matrix (Coo.Coo_Data);
    begin
+      Put_Line (Routine_Name & "Col_Slice_X length" &
+                  Integer'Image (Length (Col_Slice_X)));
+        Put_Line (Routine_Name & "Col_Slice_Y length" &
+                  Integer'Image (Length (Col_Slice_Y)));
+
       --  L283
       Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+      Arff_Data_Y := Split_Sparse_Columns (ARFF_Data, Col_Slice_Y);
       Data_List := Get (ARFF_Data, 2);
-      Put_Line (Routine_Name & "Data_List type: " &
+      Put_Line (Routine_Name & "Arff_Data_X type: " &
                   JSON_Value_Type'Image (Kind (Data_List)));
       --        for index in Data_List.First_Index .. Data_List.Last_Index loop
       --              String_Length := Length (Data_List.Element (index));
@@ -217,6 +224,8 @@ package body Openml is
       end Post_Process;
 
    begin
+      Assert (not Is_Empty (Features_List), Routine_Name &
+             "clled with empty Features_List.");
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Get (aFeature, "name");
@@ -234,9 +243,12 @@ package body Openml is
       while Array_Has_Element (Target_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
          aColumn := Get (aFeature, "index");
+         Put_Line ("aFeature " & aFeature.Write);
          Append (Col_Slice_Y, aColumn);
          Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
+        Put_Line (Routine_Name & "Col_Slice_Y length" &
+                  Integer'Image (Length (Col_Slice_Y)));
 
       --  L566 continued
       Col_Name := Array_First (Features_List);
@@ -769,23 +781,21 @@ package body Openml is
       use ML_Types.String_Package;
       use ARFF;
       Routine_Name      : constant String := "Openml.Split_Sparse_Columns ";
-      Length_1          : constant Natural :=
+      Data_Length        : constant Natural :=
                             Natural (Length (Arff_Data));
-      --        Length_2          : constant Natural :=
-      --                              Natural (Arff_Data.Element (2).Length);
-      --        Length_3          : constant Natural :=
-      --                              Natural (Arff_Data.Element (3).Length);
       Reindexed_Columns : Integer_List;
       Tuple             : String_Vector;
       Arff_Data_New     : Arff_Sparse_Data_Type;
    begin
       Put_Line (Routine_Name & "Arff_Data length" &
                   Integer'Image (Length (Arff_Data)));
-      --        Reindexed_Columns.Set_Length (Include_Columns.Length);
-      --        for a_index in Include_Columns.First_Index
-      --          .. Include_Columns.Last_Index loop
-      --           Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
-      --        end loop;
+      Put_Line (Routine_Name & "Include_Columns length" &
+                  Integer'Image (Length (Include_Columns)));
+--              Reindexed_Columns.Set_Length (Include_Columns.Length);
+--              for a_index in Include_Columns.First_Index
+--                .. Include_Columns.Last_Index loop
+--                 Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
+--              end loop;
 
       --        for val in 1 .. Length_1 loop
       --           for row in 1 .. Length_2 loop
