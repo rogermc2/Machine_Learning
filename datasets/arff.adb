@@ -532,7 +532,7 @@ package body ARFF is
          begin
             Clear (Dense_Values);
             Data_Values.Unset_Field ("values");
---              Put_Line (Routine_Name & "Row: " & Row);
+
             if Row'Length > 0 then
                Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
                          "' has no valid values.");
@@ -542,11 +542,8 @@ package body ARFF is
                        & Integer'Image (Converser_Length));
                Dense_Values :=
                  Decode_Dense_Values (Values, Decoder.Conversers);
-               New_Line;
                Data_Values.Set_Field ("values", Dense_Values);
---                 Put_Line ("Data_Values field: " & Data_Values.Get ("values").Write);
                Append (Values_Array, Data_Values);
-               New_Line;
             end if;
          end;
 
@@ -573,6 +570,7 @@ package body ARFF is
       aConverser     : Conversor_Item;
       Data_Type      : Conversor_Data_Type;
       Decoded_Values : JSON_Array;
+      Found          : Boolean := False;
    begin
       Assert (Values.Length = Attribute_List.Length, Routine_Name &
                 "lengths of Values " & Count_Type'Image (Values.Length) &
@@ -585,29 +583,31 @@ package body ARFF is
          aConverser := Element (Attr_Cursor);
          Data_Type := aConverser.Data_Type;
          declare
-            Name          : constant String := To_String (aConverser.Name);
-            Value         : constant JSON_Value := Create_Object;
-            Value_String  : constant String :=
-                              To_String (Element (Values_Cursor));
+            Name           : constant String := To_String (aConverser.Name);
+            Value          : constant JSON_Value := Create_Object;
+            Value_String   : constant String :=
+                               To_String (Element (Values_Cursor));
+            UC_Value       : constant String :=
+                               To_Upper_Case (Value_String);
          begin
-            Put_Line (Routine_Name & "Value_String: " &Value_String);
             case Data_Type is
                when Conv_Integer =>
                   Value.Set_Field (Name, Integer'Value (Value_String));
                when Conv_Nominal =>
                   Nominal_Cursor := aConverser.Nominal_List.First;
-                  while Has_Element (Nominal_Cursor) loop
+                  while Has_Element (Nominal_Cursor) and not Found loop
                      declare
                         Nominal_String : constant String
                           := To_String (Element (Nominal_Cursor));
-                        Index          : Natural := 0;
                      begin
-                        Index := Index + 1;
-                        Value.Set_Field ("Iris type", Nominal_String);
---                            (Integer'Image (Index), Nominal_String);
+                        Found := UC_Value = Nominal_String;
                      end;
                      Next (Nominal_Cursor);
                   end loop;
+
+                  Assert (Found, Routine_Name & UC_Value &
+                            " is an invalid iris type");
+                  Value.Set_Field ("Iris type", UC_Value);
 
                when Conv_Numeric | Conv_Real =>
                   if Fixed.Index (Value_String, ".") = 0 then

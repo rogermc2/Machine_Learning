@@ -20,13 +20,11 @@ procedure Test_ARFF is
    --  -------------------------------------------------------------------------
 
    procedure Print_Array (Name : Utf8_String; Value : JSON_Value) is
-      J_Array     : constant JSON_Array := Get (Value);
-      aValue      : JSON_Value;
-      aLine       : Unbounded_String;
-      Index       : Positive := Array_First (J_Array);
+      J_Array : constant JSON_Array := Get (Value);
+      aValue  : JSON_Value;
+      aLine   : Unbounded_String;
+      Index   : Positive := Array_First (J_Array);
    begin
-      Put_Line ("Array " & Name);
-      Put_Line ("J_Array length " & Natural'Image (Length (J_Array)));
       while Array_Has_Element (J_Array, Index) loop
          aValue := Array_Element (J_Array, Index);
          if Has_Field (aValue, "text") then
@@ -46,7 +44,6 @@ procedure Test_ARFF is
          elsif Kind (aValue) = JSON_Object_Type then
             if Kind (Get (aValue, "values")) = JSON_Array_Type then
                New_Line;
-               Put_Line ("Printing array values");
                Print_Array (Name, Get (aValue, "values"));
             else
                Map_JSON_Object (aValue, Print_Inner_Field'Access);
@@ -65,12 +62,8 @@ procedure Test_ARFF is
 
    procedure Print_Inner_Field (Name : Utf8_String; Value : JSON_Value) is
    begin
-      --        Put_Line ("    Inner field: " & Name & ", kind: " & Kind (Value)'Image);
-      --        if Kind (Value) = JSON_FLOAT_TYPE then
-      Put ("    Inner field: " & Name & "   ");
+      Put ("    Field: " & Name & "   ");
       Put_Line (Value.Write);
-      --        else
-      --        end if;
 
    end Print_Inner_Field;
 
@@ -82,7 +75,7 @@ procedure Test_ARFF is
                  Fixed.Trim (JSON_Value_Type'Image (Value.Kind), Both);
       aValue : JSON_Value;
    begin
-      Put_Line ("Outer_Field Value kind: " & J_Kind);
+--        Put_Line ("Outer_Field Value kind: " & J_Kind);
 
       if J_Kind = "JSON_STRING_TYPE" then
          Put_Line (Name & ": " & Get (Value) & "  Value kind: " & J_Kind);
