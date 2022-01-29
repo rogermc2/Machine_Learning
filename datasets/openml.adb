@@ -794,11 +794,10 @@ package body Openml is
       Include_Length     : constant Natural :=
                              Natural (Length (Include_Columns));
       Arff_Data_New      : Arff_Sparse_Data_Type;
-      Arff_Data_Item     : JSON_Value;
-      Arff_Data_Values   : JSON_Value;
-      List_1             : JSON_Array;
-      List_2             : JSON_Array;
-      List_3             : JSON_Array;
+      Arff_Data_Row      : JSON_Value;
+      Arff_Data_Cols     : JSON_Value;
+      Columns            : JSON_Array;
+      aColumn            : JSON_Value;
       Tuple              : JSON_Value := Create_Object;
       Col                : Positive;
       Include_Col        : JSON_Value;
@@ -811,14 +810,15 @@ package body Openml is
       --          Put_Line (Routine_Name & "Include_Columns length" &
       --                      Integer'Image (Length (Include_Columns)));
 
-      Arff_Data_Item := Array_Element (Arff_Data, 1);
-      Put_Line (Routine_Name & "Arff_Data_Item 1: " & (Arff_Data_Item.Write));
-      Arff_Data_Values := Get (Arff_Data_Item, "values");
---        Put_Line (Routine_Name & "Arff_Data_Item 1 values: " &
---                  (Arff_Data_Values.Write));
---        List_1 := Get (Arff_Data_Values);
---        Put_Line (Routine_Name & "Arff_Data_Item 1 value 1: " &
---                    Array_Element (List_1,  1).Write);
+      --  Arff_Data is a row array of column arrays
+      Arff_Data_Row := Array_Element (Arff_Data, 1);  --  row 1
+      Put_Line (Routine_Name & "Arff_Data_Row 1: " & (Arff_Data_Row.Write));
+      Arff_Data_Cols:= Get (Arff_Data_Row, "values");
+      Put_Line (Routine_Name & "Arff_Data_Row 1 columns: " &
+                (Arff_Data_Cols.Write));
+      Columns := Get (Arff_Data_Cols);
+      aColumn := Array_Element (Columns,  1);
+      Put_Line (Routine_Name & "Arff_Data_Row 1 column 1: " & aColumn.Write);
 --        while Array_Has_Element (Include_Columns, Reindex) loop
 --           Include_Col := Get (Include_Columns, Reindex);
 --           Include_Val := To_Upper_Case (Get (Include_Col));
@@ -836,8 +836,10 @@ package body Openml is
 --        Put_Line ("Include_Col 4: " & Include_Col.Write);
 
       for sample in 1 .. Data_Length loop
-         Arff_Data_Item := Array_Element (Arff_Data, sample);
-         Arff_Data_Values := Get (Arff_Data_Item, "values");
+         Arff_Data_Row := Array_Element (Arff_Data, sample);
+         Arff_Data_Cols := Get (Arff_Data_Row, "values");
+         Columns := Get (Arff_Data_Cols);
+         aColumn := Array_Element (Columns, 1);
          Col := Array_First (Include_Columns);
          while Array_Has_Element (Include_Columns, Col) loop
             Include_Col := Get (Include_Columns, Col);
