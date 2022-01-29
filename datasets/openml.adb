@@ -98,8 +98,6 @@ package body Openml is
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array) return ARFF.Arff_Sparse_Data_Type;
-   function Valid_Data_Column_Names
-     (Features_List, Target_Columns : JSON_Array) return JSON_Array;
    procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
                                       Target_Columns : JSON_Array);
 
@@ -153,7 +151,7 @@ package body Openml is
    begin
       Put_Line (Routine_Name & "Col_Slice_X length" &
                   Integer'Image (Length (Col_Slice_X)));
-        Put_Line (Routine_Name & "Col_Slice_Y length" &
+      Put_Line (Routine_Name & "Col_Slice_Y length" &
                   Integer'Image (Length (Col_Slice_Y)));
 
       --  L283
@@ -224,9 +222,14 @@ package body Openml is
       end Post_Process;
 
    begin
-      Put_Line (Routine_Name);
+--        Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
-             "called with empty Features_List.");
+                "called with empty Features_List.");
+      Assert (not Is_Empty (Target_Columns), Routine_Name &
+                "Target_Columns is empty.");
+      Assert (not Is_Empty (Data_Columns), Routine_Name &
+                "Data_Columns is empty.");
+
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Get (aFeature, "name");
@@ -236,8 +239,6 @@ package body Openml is
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
-      Assert (not Is_Empty (Target_Columns), Routine_Name &
-                "Target_Columns is empty.");
       --  L566 col_slice_y =
       --        [
       --          int(features_dict[col_name]["index"])
@@ -246,17 +247,16 @@ package body Openml is
       while Array_Has_Element (Target_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
          aColumn := Get (aFeature, "index");
---           Put_Line ("aFeature " & aFeature.Write);
+--           Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
          Append (Col_Slice_Y, aColumn);
          Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
-        Put_Line (Routine_Name & "Col_Slice_Y length" &
-                  Integer'Image (Length (Col_Slice_Y)));
 
       --  L566 continued
       Col_Name := Array_First (Features_List);
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
+          Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
          aColumn := Get (aFeature, "index");
          Append (Col_Slice_X, aColumn);
          Col_Name := Array_Next (Data_Columns, Col_Name);
@@ -274,7 +274,9 @@ package body Openml is
       Col_Name := Array_First (Col_Slice_Y);
       while Array_Has_Element (Col_Slice_Y, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
-         Num_Missing := Get (aFeature, "number_of_missing_values");
+--           Put_Line (Routine_Name & "aFeature " & aFeature.Write);
+         Num_Missing := Integer'Value
+           (Get (aFeature, "number_of_missing_values"));
          Assert (Num_Missing >= 0,
                  Routine_Name & "Target column " & " has " & " missing values."
                  & "Missing values are not supported for target columns.");
@@ -288,6 +290,10 @@ package body Openml is
          Return_Type := ARFF.Arff_Dense;
       end if;
 
+      Put_Line (Routine_Name & "Col_Slice_X length" &
+                  Integer'Image (Length (Col_Slice_X)));
+      Put_Line (Routine_Name & "Col_Slice_Y length" &
+                  Integer'Image (Length (Col_Slice_Y)));
       --  L652
       if File_Name'Length > 0 then
          ARFF_Data := Load_Arff_From_File (File_Name, Return_Type);
@@ -783,22 +789,22 @@ package body Openml is
       use ML_Types.Integer_Package;
       use ML_Types.String_Package;
       use ARFF;
-      Routine_Name      : constant String := "Openml.Split_Sparse_Columns ";
+      Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
       Data_Length        : constant Natural :=
-                            Natural (Length (Arff_Data));
-      Reindexed_Columns : Integer_List;
-      Tuple             : String_Vector;
-      Arff_Data_New     : Arff_Sparse_Data_Type;
+                             Natural (Length (Arff_Data));
+      Reindexed_Columns  : Integer_List;
+      Tuple              : String_Vector;
+      Arff_Data_New      : Arff_Sparse_Data_Type;
    begin
       Put_Line (Routine_Name & "Arff_Data length" &
                   Integer'Image (Length (Arff_Data)));
       Put_Line (Routine_Name & "Include_Columns length" &
                   Integer'Image (Length (Include_Columns)));
---              Reindexed_Columns.Set_Length (Include_Columns.Length);
---              for a_index in Include_Columns.First_Index
---                .. Include_Columns.Last_Index loop
---                 Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
---              end loop;
+      --              Reindexed_Columns.Set_Length (Include_Columns.Length);
+      --              for a_index in Include_Columns.First_Index
+      --                .. Include_Columns.Last_Index loop
+      --                 Reindexed_Columns.Replace_Element (a_index, Include_Columns (a_index));
+      --              end loop;
 
       --        for val in 1 .. Length_1 loop
       --           for row in 1 .. Length_2 loop
@@ -823,28 +829,36 @@ package body Openml is
 
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array is
-      --        Routine_Name  : constant String := "Openml.Valid_Data_Column_Names ";
+      Routine_Name  : constant String := "Openml.Valid_Data_Column_Names ";
       Feature_Index : Positive;
+      Feature       : JSON_Value;
       Feature_Name  : JSON_Value;
       Name_Index    : Positive;
       Ignore        : JSON_Value;
       Is_Row_ID     : JSON_Value;
-      Found         : Boolean;
+      Found         : Boolean := False;
       Column_Names  : JSON_Array;
    begin
       Feature_Index := Array_First (Target_Columns);
       while Array_Has_Element (Features_List, Feature_Index) loop
-         Feature_Name := Array_Element (Features_List, Feature_Index);
+         Feature := Array_Element (Features_List, Feature_Index);
+         Feature_Name := Feature.Get ("name");
+--           New_Line;
+--           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
          Found := False;
          Name_Index := Array_First (Target_Columns);
          while Array_Has_Element (Target_Columns, Name_Index) and
            not Found loop
-            Ignore := Get (Feature_Name, "is_ignore");
-            Is_Row_ID := Get (Feature_Name, "is_row_identifier");
+            Ignore := Feature.Get ("is_ignore");
+            Is_Row_ID := Feature.Get ("is_row_identifier");
+--              Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
+--                          Get (Target_Columns, Name_Index).Write);
             declare
                Ignore_Status : constant String := Get (Ignore);
                Row_ID_Status : constant String := Get (Is_Row_ID);
             begin
+--                 Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
+--                             Array_Element (Target_Columns, Name_Index).Write);
                Found :=
                  Feature_Name = Array_Element (Target_Columns, Name_Index)
                  and Ignore_Status /= "true" and Row_ID_Status /= "true";
@@ -852,6 +866,9 @@ package body Openml is
             Name_Index := Array_Next (Target_Columns, Name_Index);
          end loop;
 
+         if Found then
+           Append (Column_Names, Feature_Name);
+         end if;
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
 
@@ -867,12 +884,12 @@ package body Openml is
       Target_Column : Positive := Array_First (Target_Columns);
       Found         : Boolean := False;
    begin
---        Put_Line (Routine_Name & "Target_Columns length" &
---                    Integer'Image (Length (Target_Columns)));
+      --        Put_Line (Routine_Name & "Target_Columns length" &
+      --                    Integer'Image (Length (Target_Columns)));
       while Array_Has_Element (Target_Columns, Target_Column) loop
          Assert (Array_Has_Element (Features_Dict, Target_Column),
                  Routine_Name & "Features_Dict does not have element " &
-                 Integer'Image (Target_Column));
+                   Integer'Image (Target_Column));
          Target_Column := Array_Next (Target_Columns, Target_Column);
       end loop;
 

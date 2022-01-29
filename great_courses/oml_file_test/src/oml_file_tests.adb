@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
@@ -22,8 +23,8 @@ package body OML_File_Tests is
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
       Target             : constant JSON_Value := Create_Object;
-      Data_Columns       : JSON_Array;
       Target_Columns     : JSON_Array;
+      Data_Columns       : JSON_Array;
    begin
       Put_Line (Routine_Name);
       Target.Set_Field ("target", "sepallength");
@@ -34,6 +35,10 @@ package body OML_File_Tests is
       Append (Target_Columns, Target);
       Target.Set_Field ("target", "petallength");
       Append (Target_Columns, Target);
+
+      Data_Columns := Valid_Data_Column_Names (Features, Target_Columns);
+      Assert (not Is_Empty (Data_Columns), Routine_Name &
+              "Data_Columns is empty");
 
       Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
