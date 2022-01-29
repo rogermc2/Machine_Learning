@@ -22,19 +22,22 @@ package body OML_File_Tests is
       File_Name          : constant String := "iris.arff";
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
-      Target             : constant JSON_Value := Create_Object;
+      Target_SL          : constant JSON_Value := Create_Object;
+      Target_SW          : constant JSON_Value := Create_Object;
+      Target_PL          : constant JSON_Value := Create_Object;
+      Target_PW          : constant JSON_Value := Create_Object;
       Target_Columns     : JSON_Array;
       Data_Columns       : JSON_Array;
    begin
       Put_Line (Routine_Name);
-      Target.Set_Field ("target", "sepallength");
-      Append (Target_Columns, Target);
-      Target.Set_Field ("target", "sepalwidth");
-      Append (Target_Columns, Target);
-      Target.Set_Field ("target", "petallength");
-      Append (Target_Columns, Target);
-      Target.Set_Field ("target", "petalwidth");
-      Append (Target_Columns, Target);
+      Target_SL.Set_Field ("target", "sepallength");
+      Append (Target_Columns, Target_SL);
+      Target_SW.Set_Field ("target", "sepalwidth");
+      Append (Target_Columns, Target_SW);
+      Target_PL.Set_Field ("target", "petallength");
+      Append (Target_Columns, Target_PL);
+      Target_PW.Set_Field ("target", "petalwidth");
+      Append (Target_Columns, Target_PW);
 
       Data_Columns := Valid_Data_Column_Names (Features, Target_Columns);
       Assert (not Is_Empty (Data_Columns), Routine_Name &

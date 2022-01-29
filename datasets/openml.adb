@@ -256,7 +256,7 @@ package body Openml is
       Col_Name := Array_First (Features_List);
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
-         Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
+--           Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
          aColumn := Get (aFeature, "index");
          Append (Col_Slice_X, aColumn);
          Col_Name := Array_Next (Data_Columns, Col_Name);
@@ -833,6 +833,8 @@ package body Openml is
       Feature_Index : Positive;
       Feature       : JSON_Value;
       Feature_Name  : JSON_Value;
+      Target        : JSON_Value;
+      Target_Name   : JSON_Value;
       Name_Index    : Positive;
       Ignore        : JSON_Value;
       Is_Row_ID     : JSON_Value;
@@ -843,27 +845,25 @@ package body Openml is
       while Array_Has_Element (Features_List, Feature_Index) loop
          Feature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Feature.Get ("name");
-         New_Line;
-         Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
+--           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
          Found := False;
          Name_Index := Array_First (Target_Columns);
          while Array_Has_Element (Target_Columns, Name_Index) and
            not Found loop
-            Put_Line (Routine_Name & "Name_Index: " &
-                        Integer'Image (Name_Index));
+            Target := Array_Element (Target_Columns, Name_Index);
             Ignore := Feature.Get ("is_ignore");
             Is_Row_ID := Feature.Get ("is_row_identifier");
-            Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
-                        Get (Target_Columns, Name_Index).Write);
+            Target_Name := Target.Get ("target");
             declare
                Ignore_Status : constant String := Get (Ignore);
                Row_ID_Status : constant String := Get (Is_Row_ID);
             begin
-               Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
-                           Array_Element (Target_Columns, Name_Index).Write);
+--                 Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
+--                             Target.Write);
                Found :=
-                 Feature_Name = Array_Element (Target_Columns, Name_Index)
-                 and Ignore_Status /= "true" and Row_ID_Status /= "true";
+                 Feature_Name = Target_Name and Ignore_Status = "false" and
+                      Row_ID_Status = "false";
+--                 Put_Line (Routine_Name & "Found: " & Boolean'Image (Found));
             end;
             Name_Index := Array_Next (Target_Columns, Name_Index);
          end loop;
