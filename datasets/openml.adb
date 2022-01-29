@@ -789,17 +789,31 @@ package body Openml is
                                Natural (Length (Arff_Data));
         Include_Length    : constant Natural :=
                               Natural (Length (Include_Columns));
-        Tuple              : JSON_Value := Create_Object;
         Arff_Data_New      : Arff_Sparse_Data_Type;
+        Arff_Data_Item     : JSON_Value;
+        Arff_Data_Values   : JSON_Value;
+        List_1             : JSON_Array;
+        List_2             : JSON_Array;
+        List_3             : JSON_Array;
+        Tuple              : JSON_Value := Create_Object;
         Col                : Positive;
         Include_Col        : JSON_Value;
     begin
-        --        Put_Line (Routine_Name & "Arff_Data length" &
-        --                    Integer'Image (Length (Arff_Data)));
-        --        Put_Line (Routine_Name & "Include_Columns length" &
-        --                    Integer'Image (Length (Include_Columns)));
+        Put_Line (Routine_Name & "Arff_Data length" &
+                   Integer'Image (Length (Arff_Data)));
+        Put_Line (Routine_Name & "Include_Columns length" &
+                    Integer'Image (Length (Include_Columns)));
+
+        Arff_Data_Item := Array_Element (Arff_Data, 1);
+        Put_Line (Routine_Name & "Arff_Data_Item 1: " & (Arff_Data_Item.Write));
+        Arff_Data_Values := Get (Arff_Data_Item, "values");
+        Put_Line (Routine_Name & "Arff_Data_Item 1 values: " &
+                  (Arff_Data_Values.Write));
+        New_Line;
 
         for sample in 1 .. Data_Length loop
+            Arff_Data_Item := Array_Element (Arff_Data, sample);
+            Arff_Data_Values := Get (Arff_Data_Item, "values");
             Col := Array_First (Include_Columns);
             while Array_Has_Element (Include_Columns, Col) loop
                 Include_Col := Get (Include_Columns, Col);
