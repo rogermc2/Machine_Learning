@@ -33,7 +33,7 @@ package body OML_File_Tests is
       Append (Target_Columns, Target);
       Target.Set_Field ("target", "petallength");
       Append (Target_Columns, Target);
-      Target.Set_Field ("target", "petallength");
+      Target.Set_Field ("target", "petalwidth");
       Append (Target_Columns, Target);
 
       Data_Columns := Valid_Data_Column_Names (Features, Target_Columns);

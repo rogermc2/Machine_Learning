@@ -222,7 +222,7 @@ package body Openml is
       end Post_Process;
 
    begin
---        Put_Line (Routine_Name);
+      Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
                 "called with empty Features_List.");
       Assert (not Is_Empty (Target_Columns), Routine_Name &
@@ -247,7 +247,7 @@ package body Openml is
       while Array_Has_Element (Target_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
          aColumn := Get (aFeature, "index");
---           Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
+         --           Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
          Append (Col_Slice_Y, aColumn);
          Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
@@ -256,7 +256,7 @@ package body Openml is
       Col_Name := Array_First (Features_List);
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
-          Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
+         Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
          aColumn := Get (aFeature, "index");
          Append (Col_Slice_X, aColumn);
          Col_Name := Array_Next (Data_Columns, Col_Name);
@@ -274,7 +274,7 @@ package body Openml is
       Col_Name := Array_First (Col_Slice_Y);
       while Array_Has_Element (Col_Slice_Y, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
---           Put_Line (Routine_Name & "aFeature " & aFeature.Write);
+         --           Put_Line (Routine_Name & "aFeature " & aFeature.Write);
          Num_Missing := Integer'Value
            (Get (aFeature, "number_of_missing_values"));
          Assert (Num_Missing >= 0,
@@ -843,22 +843,24 @@ package body Openml is
       while Array_Has_Element (Features_List, Feature_Index) loop
          Feature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Feature.Get ("name");
---           New_Line;
---           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
+         New_Line;
+         Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
          Found := False;
          Name_Index := Array_First (Target_Columns);
          while Array_Has_Element (Target_Columns, Name_Index) and
            not Found loop
+            Put_Line (Routine_Name & "Name_Index: " &
+                        Integer'Image (Name_Index));
             Ignore := Feature.Get ("is_ignore");
             Is_Row_ID := Feature.Get ("is_row_identifier");
---              Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
---                          Get (Target_Columns, Name_Index).Write);
+            Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
+                        Get (Target_Columns, Name_Index).Write);
             declare
                Ignore_Status : constant String := Get (Ignore);
                Row_ID_Status : constant String := Get (Is_Row_ID);
             begin
---                 Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
---                             Array_Element (Target_Columns, Name_Index).Write);
+               Put_Line (Routine_Name & "Target_Columns, Name_Index: " &
+                           Array_Element (Target_Columns, Name_Index).Write);
                Found :=
                  Feature_Name = Array_Element (Target_Columns, Name_Index)
                  and Ignore_Status /= "true" and Row_ID_Status /= "true";
@@ -867,7 +869,7 @@ package body Openml is
          end loop;
 
          if Found then
-           Append (Column_Names, Feature_Name);
+            Append (Column_Names, Feature_Name);
          end if;
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
