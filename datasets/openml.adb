@@ -5,8 +5,8 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Dataset_Utilities;
-with ML_Types;
-with Printing;
+--  with ML_Types;
+--  with Printing;
 
 with AWS.Client;
 with AWS.Response;
@@ -246,7 +246,7 @@ package body Openml is
       --        ]
       while Array_Has_Element (Target_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
-         aColumn := Get (aFeature, "name");
+         aColumn := Get (aFeature, "index");
          --           Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
          Append (Col_Slice_Y, aColumn);
          Col_Name := Array_Next (Target_Columns, Col_Name);
@@ -257,7 +257,7 @@ package body Openml is
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
          --           Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
-         aColumn := Get (aFeature, "name");
+         aColumn := Get (aFeature, "index");
          Append (Col_Slice_X, aColumn);
          Col_Name := Array_Next (Data_Columns, Col_Name);
       end loop;
@@ -265,7 +265,7 @@ package body Openml is
       --  L568
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
-         aColumn := Get (aFeature, "name");
+         aColumn := Get (aFeature, "index");
          Append (Col_Slice_X, aColumn);
          Col_Name := Array_Next (Data_Columns, Col_Name);
       end loop;
@@ -787,7 +787,7 @@ package body Openml is
        return ARFF.Arff_Sparse_Data_Type is
       use ARFF;
       use Dataset_Utilities;
-      use ML_Types;
+--        use ML_Types;
       Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
       Data_Length        : constant Natural :=
                              Natural (Length (Arff_Data));
@@ -803,8 +803,8 @@ package body Openml is
       Col                : Positive;
       Include_Col        : JSON_Value;
       Include_Val        : Unbounded_String;
-      Reindexed_Columns  : String_List;
-      Reindex            : Positive := Array_First (Include_Columns);
+--        Reindexed_Columns  : String_List;
+--        Reindex            : Positive := Array_First (Include_Columns);
    begin
       --          Put_Line (Routine_Name & "Arff_Data length" &
       --                     Integer'Image (Length (Arff_Data)));
@@ -812,26 +812,26 @@ package body Openml is
       --                      Integer'Image (Length (Include_Columns)));
 
       Arff_Data_Item := Array_Element (Arff_Data, 1);
-      --          Put_Line (Routine_Name & "Arff_Data_Item 1: " & (Arff_Data_Item.Write));
+      Put_Line (Routine_Name & "Arff_Data_Item 1: " & (Arff_Data_Item.Write));
       Arff_Data_Values := Get (Arff_Data_Item, "values");
 --        Put_Line (Routine_Name & "Arff_Data_Item 1 values: " &
 --                  (Arff_Data_Values.Write));
 --        List_1 := Get (Arff_Data_Values);
 --        Put_Line (Routine_Name & "Arff_Data_Item 1 value 1: " &
 --                    Array_Element (List_1,  1).Write);
-      while Array_Has_Element (Include_Columns, Reindex) loop
-         Include_Col := Get (Include_Columns, Reindex);
-         Include_Val := To_Upper_Case (Get (Include_Col));
-         Reindexed_Columns.Append (Include_Val);
-         Reindex := Array_Next (Include_Columns, Reindex);
-      end loop;
-
-      Printing.Print_Strings ("Reindexed_Columns", Reindexed_Columns);
+--        while Array_Has_Element (Include_Columns, Reindex) loop
+--           Include_Col := Get (Include_Columns, Reindex);
+--           Include_Val := To_Upper_Case (Get (Include_Col));
+--           Reindexed_Columns.Append (Include_Val);
+--           Reindex := Array_Next (Include_Columns, Reindex);
+--        end loop;
+--
+--        Printing.Print_Strings ("Reindexed_Columns", Reindexed_Columns);
       New_Line;
---        Include_Col := Get (Include_Columns, 1);
---        Include_Val := To_Upper_Case (Get (Include_Col));
---        Put_Line ("Include_Col 1: " & Include_Col.Write);
---        Put_Line ("Include_Col 1: " & To_String (Include_Val));
+      Include_Col := Get (Include_Columns, 1);
+      Include_Val := To_Upper_Case (Get (Include_Col));
+      Put_Line ("Include_Col 1: " & Include_Col.Write);
+      Put_Line ("Include_Col 1: " & To_String (Include_Val));
 --        Include_Col := Get (Include_Columns, 4);
 --        Put_Line ("Include_Col 4: " & Include_Col.Write);
 
