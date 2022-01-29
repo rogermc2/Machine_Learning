@@ -244,19 +244,16 @@ package body Openml is
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
       --        ]
-      while Array_Has_Element (Target_Columns, Col_Name) loop
-         aFeature := Array_Element (Features_List, Col_Name);
-         aColumn := Get (aFeature, "index");
-         --           Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
-         Append (Col_Slice_Y, aColumn);
-         Col_Name := Array_Next (Target_Columns, Col_Name);
-      end loop;
+      aFeature := Array_Element (Features_List, 5);
+      aColumn := Get (aFeature, "index");
+--        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
+      Append (Col_Slice_Y, aColumn);
 
       --  L566 continued
       Col_Name := Array_First (Features_List);
       while Array_Has_Element (Data_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
-         --           Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
+--           Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
          aColumn := Get (aFeature, "index");
          Append (Col_Slice_X, aColumn);
          Col_Name := Array_Next (Data_Columns, Col_Name);
@@ -810,13 +807,13 @@ package body Openml is
          Columns := Get (Arff_Data_Cols);
          Col := Array_First (Include_Columns);
          while Array_Has_Element (Include_Columns, Col) loop
---              Put_Line (Routine_Name & "Col: " & Integer'Image (Col));
+            --              Put_Line (Routine_Name & "Col: " & Integer'Image (Col));
             Select_Col := False;
             aColumn := Array_Element (Columns, Col);
             Include_Col := Array_First (Include_Columns);
             while Array_Has_Element (Include_Columns, Include_Col) loop
---                 Put_Line (Routine_Name & "Include_Col: " &
---                             Integer'Image (Include_Col));
+               --                 Put_Line (Routine_Name & "Include_Col: " &
+               --                             Integer'Image (Include_Col));
                Select_Col := Select_Col or
                  Col = Integer'Value
                    (Get (Get (Include_Columns, Include_Col))) + 1;
@@ -831,8 +828,8 @@ package body Openml is
             New_Data_Row : JSON_Value := Create_Object;
          begin
             New_Data_Row.Set_Field ("values", New_Row);
---             Put_Line (Routine_Name & "New_Data_Row: " &
---                             New_Data_Row.Write);
+            --             Put_Line (Routine_Name & "New_Data_Row: " &
+            --                             New_Data_Row.Write);
             Append (Arff_Data_New, New_Data_Row);
          end;
       end loop;
