@@ -6,7 +6,6 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
-with ML_Types;
 --  with Printing;
 
 package body Criterion is
@@ -206,7 +205,7 @@ package body Criterion is
          end loop;
 
          Gini := Gini + 1.0 -
-           Sq_Count / Float (Criteria.Num_Weighted_Node_Samples ** 2);
+           Sq_Count / Criteria.Num_Weighted_Node_Samples ** 2;
       end loop;
 
       return Gini / Float (Num_Outputs);
