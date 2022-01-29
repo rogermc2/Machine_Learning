@@ -100,7 +100,7 @@ package body Openml is
       Include_Columns : JSON_Array) return ARFF.Arff_Sparse_Data_Type;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
-   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Value;
+   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
                                       Target_Columns : JSON_Array);
 
    --  ------------------------------------------------------------------------
@@ -186,7 +186,7 @@ package body Openml is
       Routine_Name       : constant String := "Openml.Download_Data_To_Bunch ";
       Feature_Index      : Positive := Array_First (Features_List);
       Col_Name           : Positive := Array_First (Features_List);
-      Features_Dict      : JSON_Value;
+      Features_Dict      : JSON_Array;
       aFeature           : JSON_Value;
       aColumn            : JSON_Value;
       Feature_Name       : JSON_Value;
@@ -224,17 +224,19 @@ package body Openml is
       end Post_Process;
 
    begin
+      Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
-             "clled with empty Features_List.");
+             "called with empty Features_List.");
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Get (aFeature, "name");
-         Features_Dict.Append (Feature_Name);
+         Append (Features_Dict, Feature_Name);
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
+      Assert (not Is_Empty (Target_Columns), Routine_Name &"Target_Columns is empty.");
       --  L566 col_slice_y =
       --        [
       --          int(features_dict[col_name]["index"])
@@ -858,7 +860,7 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Value;
+   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
                                       Target_Columns : JSON_Array) is
    begin
       null;

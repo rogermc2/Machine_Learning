@@ -7,7 +7,7 @@ with Openml; use Openml;
 
 package body OML_File_Tests is
 
-   pragma Warnings (Off);
+--     pragma Warnings (Off);
 
    procedure Test_Features (Data_Id : Integer; Dataset : String := "");
    procedure Test_Qualities (Data_Id : Integer; Dataset : String := "");
@@ -15,13 +15,16 @@ package body OML_File_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Convert_Arff_To_Data is
---        Routine_Name   : constant String := "Test_Convert_Arff_To_Data ";
-      File_Name      : constant String := "iris.arff";
-      File           : File_Type;
-      Features       : JSON_Array;
-      Data_Columns   : JSON_Array;
-      Target_Columns : JSON_Array;
+      Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
+      Features_File_Name : constant String := "iris_features";
+      Data_Id            : constant Integer := 0;
+      File_Name          : constant String := "iris.arff";
+      Features           : constant JSON_Array :=
+                             Get_Data_Features (Data_Id, Features_File_Name);
+      Data_Columns       : JSON_Array;
+      Target_Columns     : JSON_Array;
    begin
+      Put_Line (Routine_Name);
       Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
