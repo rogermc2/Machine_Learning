@@ -21,10 +21,20 @@ package body OML_File_Tests is
       File_Name          : constant String := "iris.arff";
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
+      Target             : constant JSON_Value := Create_Object;
       Data_Columns       : JSON_Array;
       Target_Columns     : JSON_Array;
    begin
       Put_Line (Routine_Name);
+      Target.Set_Field ("target", "sepallength");
+      Append (Target_Columns, Target);
+      Target.Set_Field ("target", "sepalwidth");
+      Append (Target_Columns, Target);
+      Target.Set_Field ("target", "petallength");
+      Append (Target_Columns, Target);
+      Target.Set_Field ("target", "petallength");
+      Append (Target_Columns, Target);
+
       Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,

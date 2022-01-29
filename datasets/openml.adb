@@ -236,7 +236,8 @@ package body Openml is
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
-      Assert (not Is_Empty (Target_Columns), Routine_Name &"Target_Columns is empty.");
+      Assert (not Is_Empty (Target_Columns), Routine_Name &
+                "Target_Columns is empty.");
       --  L566 col_slice_y =
       --        [
       --          int(features_dict[col_name]["index"])
@@ -245,7 +246,7 @@ package body Openml is
       while Array_Has_Element (Target_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, Col_Name);
          aColumn := Get (aFeature, "index");
-         Put_Line ("aFeature " & aFeature.Write);
+--           Put_Line ("aFeature " & aFeature.Write);
          Append (Col_Slice_Y, aColumn);
          Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
@@ -862,8 +863,19 @@ package body Openml is
 
    procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
                                       Target_Columns : JSON_Array) is
+      Routine_Name  : constant String := "Openml.Verify_Target_Data_Type ";
+      Target_Column : Positive := Array_First (Target_Columns);
+      Found         : Boolean := False;
    begin
-      null;
+--        Put_Line (Routine_Name & "Target_Columns length" &
+--                    Integer'Image (Length (Target_Columns)));
+      while Array_Has_Element (Target_Columns, Target_Column) loop
+         Assert (Array_Has_Element (Features_Dict, Target_Column),
+                 Routine_Name & "Features_Dict does not have element " &
+                 Integer'Image (Target_Column));
+         Target_Column := Array_Next (Target_Columns, Target_Column);
+      end loop;
+
    end Verify_Target_Data_Type;
 
    --  ------------------------------------------------------------------------
