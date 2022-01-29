@@ -818,7 +818,8 @@ package body Openml is
 --                 Put_Line (Routine_Name & "Include_Col: " &
 --                             Integer'Image (Include_Col));
                Select_Col := Select_Col or
-                 Col = Integer'Value (Get (Get (Include_Columns, Include_Col)));
+                 Col = Integer'Value
+                   (Get (Get (Include_Columns, Include_Col))) + 1;
                Include_Col := Array_Next (Include_Columns, Include_Col);
             end loop;
             if Select_Col then
