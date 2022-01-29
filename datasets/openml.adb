@@ -89,7 +89,7 @@ package body Openml is
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    function Load_Arff_From_File
      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
-       return JSON_Value;
+      return JSON_Value;
    procedure Load_Arff_Response (URL : String);
    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data;
    procedure Process_Feature (Dataset_Name  : String;
@@ -106,7 +106,7 @@ package body Openml is
 
    function Convert_Arff_Data_Dataframe
      (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value)
-       return JSON_Value is
+      return JSON_Value is
       Routine_Name    : constant String := "Opemml.Convert_Arff_Data_Dataframe";
       Description     : constant JSON_Array :=
                           Arff_Container.Get ("description");
@@ -466,7 +466,7 @@ package body Openml is
                                    Version           : String := "";
                                    Active            : Boolean := False;
                                    File_Name         : String := "")
-                                    return JSON_Value is
+                                   return JSON_Value is
       --        Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
       Openml_Path    : Unbounded_String :=
                          To_Unbounded_String (Search_Name);
@@ -493,7 +493,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Qualities (Data_ID : Integer; Dataset_Name : String := "")
-                                 return Qualities_Map is
+                                return Qualities_Map is
       use Ada.Strings;
       --        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
@@ -578,7 +578,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_Openml_Api (URL : String)
-                                               return JSON_Value is
+                                              return JSON_Value is
       Routine_Name      : constant String :=
                             "Openml.Get_Json_Content_From_Openml_Api ";
       AWS_Reply         : constant Aws.Response.Data := Open_Openml_URL (URL);
@@ -648,7 +648,7 @@ package body Openml is
 
    function Load_Arff_From_File
      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
-       return JSON_Value is
+      return JSON_Value is
       File           : File_Type;
       Data           : Unbounded_String := To_Unbounded_String ("");
    begin
@@ -784,67 +784,56 @@ package body Openml is
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array)
-       return ARFF.Arff_Sparse_Data_Type is
+      return ARFF.Arff_Sparse_Data_Type is
       use ARFF;
       use Dataset_Utilities;
---        use ML_Types;
+      --        use ML_Types;
       Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
       Data_Length        : constant Natural :=
                              Natural (Length (Arff_Data));
       Include_Length     : constant Natural :=
                              Natural (Length (Include_Columns));
       Arff_Data_New      : Arff_Sparse_Data_Type;
+      New_Row            : JSON_Array;
       Arff_Data_Row      : JSON_Value;
       Arff_Data_Cols     : JSON_Value;
       Columns            : JSON_Array;
       aColumn            : JSON_Value;
-      Tuple              : JSON_Value := Create_Object;
       Col                : Positive;
-      Include_Col        : JSON_Value;
-      Include_Val        : Unbounded_String;
---        Reindexed_Columns  : String_List;
---        Reindex            : Positive := Array_First (Include_Columns);
+      Include_Col        : Positive;
+      Select_Col         : Boolean;
    begin
-      --          Put_Line (Routine_Name & "Arff_Data length" &
-      --                     Integer'Image (Length (Arff_Data)));
-      --          Put_Line (Routine_Name & "Include_Columns length" &
-      --                      Integer'Image (Length (Include_Columns)));
-
-      --  Arff_Data is a row array of column arrays
-      Arff_Data_Row := Array_Element (Arff_Data, 1);  --  row 1
-      Put_Line (Routine_Name & "Arff_Data_Row 1: " & (Arff_Data_Row.Write));
-      Arff_Data_Cols:= Get (Arff_Data_Row, "values");
-      Put_Line (Routine_Name & "Arff_Data_Row 1 columns: " &
-                (Arff_Data_Cols.Write));
-      Columns := Get (Arff_Data_Cols);
-      aColumn := Array_Element (Columns,  1);
-      Put_Line (Routine_Name & "Arff_Data_Row 1 column 1: " & aColumn.Write);
---        while Array_Has_Element (Include_Columns, Reindex) loop
---           Include_Col := Get (Include_Columns, Reindex);
---           Include_Val := To_Upper_Case (Get (Include_Col));
---           Reindexed_Columns.Append (Include_Val);
---           Reindex := Array_Next (Include_Columns, Reindex);
---        end loop;
---
---        Printing.Print_Strings ("Reindexed_Columns", Reindexed_Columns);
-      New_Line;
-      Include_Col := Get (Include_Columns, 1);
-      Include_Val := To_Upper_Case (Get (Include_Col));
-      Put_Line ("Include_Col 1: " & Include_Col.Write);
-      Put_Line ("Include_Col 1: " & To_String (Include_Val));
---        Include_Col := Get (Include_Columns, 4);
---        Put_Line ("Include_Col 4: " & Include_Col.Write);
-
       for sample in 1 .. Data_Length loop
+         Clear (New_Row);
          Arff_Data_Row := Array_Element (Arff_Data, sample);
          Arff_Data_Cols := Get (Arff_Data_Row, "values");
          Columns := Get (Arff_Data_Cols);
-         aColumn := Array_Element (Columns, 1);
          Col := Array_First (Include_Columns);
          while Array_Has_Element (Include_Columns, Col) loop
-            Include_Col := Get (Include_Columns, Col);
+--              Put_Line (Routine_Name & "Col: " & Integer'Image (Col));
+            Select_Col := False;
+            aColumn := Array_Element (Columns, Col);
+            Include_Col := Array_First (Include_Columns);
+            while Array_Has_Element (Include_Columns, Include_Col) loop
+--                 Put_Line (Routine_Name & "Include_Col: " &
+--                             Integer'Image (Include_Col));
+               Select_Col := Select_Col or
+                 Col = Integer'Value (Get (Get (Include_Columns, Include_Col)));
+               Include_Col := Array_Next (Include_Columns, Include_Col);
+            end loop;
+            if Select_Col then
+               Append (New_Row, aColumn);
+            end if;
             Col := Array_Next (Include_Columns, Col);
          end loop;
+         declare
+            New_Data_Row : JSON_Value := Create_Object;
+         begin
+            New_Data_Row.Set_Field ("values", New_Row);
+--             Put_Line (Routine_Name & "New_Data_Row: " &
+--                             New_Data_Row.Write);
+            Append (Arff_Data_New, New_Data_Row);
+         end;
       end loop;
 
       return Arff_Data_New;
