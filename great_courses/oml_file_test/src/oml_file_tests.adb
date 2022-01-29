@@ -22,26 +22,34 @@ package body OML_File_Tests is
       File_Name          : constant String := "iris.arff";
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
-      Target_SL          : constant JSON_Value := Create_Object;
-      Target_SW          : constant JSON_Value := Create_Object;
-      Target_PL          : constant JSON_Value := Create_Object;
-      Target_PW          : constant JSON_Value := Create_Object;
-      Target_Columns     : JSON_Array;
+      Data_SL            : constant JSON_Value := Create_Object;
+      Data_SW            : constant JSON_Value := Create_Object;
+      Data_PL            : constant JSON_Value := Create_Object;
+      Data_PW            : constant JSON_Value := Create_Object;
+      Target             : constant JSON_Value := Create_Object;
+      Feature_Columns    : JSON_Array;
       Data_Columns       : JSON_Array;
+      Target_Columns     : JSON_Array;
    begin
       Put_Line (Routine_Name);
-      Target_SL.Set_Field ("target", "sepallength");
-      Append (Target_Columns, Target_SL);
-      Target_SW.Set_Field ("target", "sepalwidth");
-      Append (Target_Columns, Target_SW);
-      Target_PL.Set_Field ("target", "petallength");
-      Append (Target_Columns, Target_PL);
-      Target_PW.Set_Field ("target", "petalwidth");
-      Append (Target_Columns, Target_PW);
+      Data_SL.Set_Field ("target", "sepallength");
+      Append (Feature_Columns, Data_SL);
+      Data_SW.Set_Field ("target", "sepalwidth");
+      Append (Feature_Columns, Data_SW);
+      Data_PL.Set_Field ("target", "petallength");
+      Append (Feature_Columns, Data_PL);
+      Data_PW.Set_Field ("target", "petalwidth");
+      Append (Feature_Columns, Data_PW);
 
-      Data_Columns := Valid_Data_Column_Names (Features, Target_Columns);
+      Target.Set_Field ("target", "class");
+      Append (Target_Columns, Target);
+
+      Data_Columns := Valid_Data_Column_Names (Features, Feature_Columns);
+      Target_Columns := Valid_Data_Column_Names (Features, Target_Columns);
       Assert (not Is_Empty (Data_Columns), Routine_Name &
               "Data_Columns is empty");
+      Assert (not Is_Empty (Target_Columns), Routine_Name &
+              "Target_Columns is empty");
 
       Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
