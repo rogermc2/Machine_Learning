@@ -13,7 +13,6 @@ with AWS.Response;
 with AWS.URL;
 
 with ARFF;
-with Coo;
 
 pragma Warnings (Off);
 
@@ -132,43 +131,12 @@ package body Openml is
      (Arff_Container            : JSON_Value;
       Col_Slice_X, Col_Slice_Y  : JSON_Array;
       X, Y                      : out JSON_Array) is
-      Routine_Name    : constant String := "Opemml.Convert_Arff_Data ";
-      Description     : constant JSON_Array :=
-                          Arff_Container.Get ("description");
-      Relation        : constant String :=
-                          Arff_Container.Get ("relation");
-      Attributes      : constant JSON_Array :=
-                          Arff_Container.Get ("attributes");
-      ARFF_Data       : constant JSON_Array :=
-                          Arff_Container.Get ("data");
-      Arff_Data_X     : JSON_Array;
-      Arff_Data_Y     : JSON_Array;
-      Data_List       : JSON_Value;
-      String_Length   : Positive;
-      Num_Obs         : Natural := 0;
-      X_Shape         : Coo.Shape_Dimensions;
-      Coo_X           : Coo.Coo_Matrix (Coo.Coo_Data);
+--        Routine_Name    : constant String := "Opemml.Convert_Arff_Data ";
+      ARFF_Data       : constant JSON_Array := Arff_Container.Get ("data");
    begin
-      --        Put_Line (Routine_Name & "Col_Slice_X length" &
-      --                    Integer'Image (Length (Col_Slice_X)));
-      --        Put_Line (Routine_Name & "Col_Slice_Y length" &
-      --                    Integer'Image (Length (Col_Slice_Y)));
-
-      --  L283
-      Arff_Data_X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
-      Arff_Data_Y := Split_Sparse_Columns (ARFF_Data, Col_Slice_Y);
-      Data_List := Get (ARFF_Data, 2);
-      Put_Line (Routine_Name & "Arff_Data_X type: " &
-                  JSON_Value_Type'Image (Kind (Data_List)));
-      --        for index in Data_List.First_Index .. Data_List.Last_Index loop
-      --              String_Length := Length (Data_List.Element (index));
-      --              if String_Length > Num_Obs then
-      --                  Num_Obs := String_Length;
-      --              end if;
-      --        end loop;
-      --
-      --        X_Shape := (Num_Obs, Positive (Col_Slice_X.Length));
-      --        Coo_X.Data := Arff_Data_X.Element (1);
+      --  L278
+      X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
+      Y := Split_Sparse_Columns (ARFF_Data, Col_Slice_Y);
 
    end Convert_Arff_Data;
 
@@ -203,13 +171,14 @@ package body Openml is
       Parsed_ARFF        : JSON_Array;
 
       procedure Parse_ARFF (ARFF_In      : JSON_Value;
-                            X_out, Y_out : out JSON_Array) is
+                            Cols         : JSON_Array;
+                            X_out, Y_out : out JSON_Array;
+                            Nominal_Out  : out JSON_Array) is
          Attributes : JSON_Array := Get (ARFF_In, "attributes");
       begin
          Convert_Arff_Data (ARFF_In, Col_Slice_X, Col_Slice_Y, X_out, Y_out);
          Col_Name := Array_First (Columns);
          while Array_Has_Element (Columns, Col_Name) loop
-
             Col_Name := Array_Next (Columns, Col_Name);
          end loop;
       end Parse_ARFF;
@@ -310,7 +279,7 @@ package body Openml is
       if As_Frame then
          null;
       else
-         Parse_ARFF (ARFF_Data, X, Y);
+         Parse_ARFF (ARFF_Data, Columns, X, Y, Nominal_Attributes);
       end if;
 
    end Download_Data_To_Bunch;
