@@ -809,7 +809,12 @@ package body Openml is
         Arff_Data_Values := Get (Arff_Data_Item, "values");
         Put_Line (Routine_Name & "Arff_Data_Item 1 values: " &
                   (Arff_Data_Values.Write));
+        List_1 := Get (Arff_Data_Values);
+        Put_Line (Routine_Name & "Arff_Data_Item 1 value 1: " &
+                  Array_Element (List_1, 1).Write);
         New_Line;
+        Include_Col := Get (Include_Columns, 1);
+        Put_Line ("Include_Col 1: " & Include_Col.Write);
 
         for sample in 1 .. Data_Length loop
             Arff_Data_Item := Array_Element (Arff_Data, sample);
@@ -817,7 +822,6 @@ package body Openml is
             Col := Array_First (Include_Columns);
             while Array_Has_Element (Include_Columns, Col) loop
                 Include_Col := Get (Include_Columns, Col);
-
                 Col := Array_Next (Include_Columns, Col);
             end loop;
         end loop;
