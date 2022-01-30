@@ -192,7 +192,6 @@ package ML_Types is
      (Positive, String_Vector);
    subtype String_Multi_Vector is String_Multi_Vector_Package.Vector;
 
-
    type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
       Feature_Names  : String_List;
       Label_Name     : Unbounded_String := To_Unbounded_String ("");

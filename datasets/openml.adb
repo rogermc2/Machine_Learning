@@ -668,10 +668,11 @@ package body Openml is
       Put_Line (AWS.URL.URL (URL_Object));
       New_Line;
 
-      --        AWS_Reply := Get (AWS.URL.URL (URL_Object));
       AWS_Reply := AWS.Client.Get
         ("http://www.openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1",
          Follow_Redirection => False);
+      --  Follow_Redirection => True fails if the redirection is to https which
+      --  AWS doesn't support.
       Put_Line (Routine_Name & "data type: " &
                   Response.Content_Type (AWS_Reply));
       New_Line;
