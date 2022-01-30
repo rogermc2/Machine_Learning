@@ -55,7 +55,7 @@ package body OML_File_Tests is
       Bunch := Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
-         Target_Columns => Target_Columns, Shape => (1, 1));
+         Target_Columns => Target_Columns);  --  , Shape => (1, 1));
 
    end Test_Convert_Arff_To_Data;
 
