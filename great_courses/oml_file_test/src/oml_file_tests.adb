@@ -74,7 +74,7 @@ package body OML_File_Tests is
          Put_Line (Routine_Name & "Description length:" &
                      Integer'Image (Desc'Length) & " characters.");
          Put_Line (Routine_Name & "Description:");
-         --           Put_Line (Desc);
+         Put_Line (Desc);
       end;
       New_Line;
 
