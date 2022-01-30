@@ -176,7 +176,6 @@ package body ARFF is
       Pos2            : Integer := 1;
       Message_Lines   : String_List;
       Curs            : Cursor;
-      --        Stream_Row      : Unbounded_String;
       Values          : JSON_Array;
       Arff_Container  : JSON_Value := Create_Object;
    begin
@@ -190,14 +189,14 @@ package body ARFF is
          Pos1 := Pos2 + 4;
       end loop;
 
-      --        Put_Line (Routine_Name & "Message_Lines:");
-      --          Curs := Message_Lines.First;
-      --          while Has_Element (Curs) loop
-      --              Put_Line (To_String (Element (Curs)));
-      --              Next  (Curs);
-      --          end loop;
-      --        Put_Line (Routine_Name & "end of Message_Lines");
-      New_Line;
+--        Put_Line (Routine_Name & "Message_Lines:");
+--        Curs := Message_Lines.First;
+--        while Has_Element (Curs) loop
+--           Put_Line (To_String (Element (Curs)));
+--           Next  (Curs);
+--        end loop;
+--        Put_Line (Routine_Name & "end of Message_Lines");
+--        New_Line;
 
       if Pos1 < Text_Length - 4 then
          Message_Lines.Append
@@ -566,6 +565,7 @@ package body ARFF is
 
       Attr_Cursor := Attribute_List.First;
       Values_Cursor := Values.First;
+
       while Has_Element (Attr_Cursor) loop
          aConverser := Element (Attr_Cursor);
          Data_Type := aConverser.Data_Type;
@@ -579,7 +579,13 @@ package body ARFF is
          begin
             case Data_Type is
                when Conv_Integer =>
-                  Value.Set_Field (Name, Integer'Value (Value_String));
+                  if Fixed.Index (Value_String, ".") = 0 then
+                     Value.Set_Field
+                       (Name, Integer'Value (Value_String));
+                  else
+                     Value.Set_Field
+                       (Name, Integer (Float'Value (Value_String)));
+                  end if;
                when Conv_Nominal =>
                   Nominal_Cursor := aConverser.Nominal_List.First;
                   while Has_Element (Nominal_Cursor) and not Found loop
@@ -598,11 +604,12 @@ package body ARFF is
 
                when Conv_Numeric | Conv_Real =>
                   if Fixed.Index (Value_String, ".") = 0 then
-                     Value.Set_Field (Name,
-                                      Float (Integer'Value (Value_String)));
+                     Value.Set_Field
+                       (Name, Float (Integer'Value (Value_String)));
                   else
                      Value.Set_Field (Name, Float'Value (Value_String));
                   end if;
+
                when Conv_String =>
                   Value.Set_Field (Name, Value_String);
 

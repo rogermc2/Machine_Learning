@@ -17,15 +17,21 @@ package body OML_File_Tests is
 
    procedure Test_Convert_Arff_To_Data is
       Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
-      Features_File_Name : constant String := "iris_features";
+      Features_File_Name : constant String := "diabetes_features";
       Data_Id            : constant Integer := 0;
-      File_Name          : constant String := "iris.arff";
+      File_Name          : constant String := "diabetes.arff";
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
-      Data_SL            : constant JSON_Value := Create_Object;
-      Data_SW            : constant JSON_Value := Create_Object;
-      Data_PL            : constant JSON_Value := Create_Object;
-      Data_PW            : constant JSON_Value := Create_Object;
+      Data_Age           : constant JSON_Value := Create_Object;
+      Data_Sex           : constant JSON_Value := Create_Object;
+      Data_BMI           : constant JSON_Value := Create_Object;
+      Data_BP            : constant JSON_Value := Create_Object;
+      Data_S1            : constant JSON_Value := Create_Object;
+      Data_S2            : constant JSON_Value := Create_Object;
+      Data_S3            : constant JSON_Value := Create_Object;
+      Data_S4            : constant JSON_Value := Create_Object;
+      Data_S5            : constant JSON_Value := Create_Object;
+      Data_S6            : constant JSON_Value := Create_Object;
       Target             : constant JSON_Value := Create_Object;
       Feature_Columns    : JSON_Array;
       Data_Columns       : JSON_Array;
@@ -33,14 +39,26 @@ package body OML_File_Tests is
       Bunch              : Bunch_Data;
    begin
       Put_Line (Routine_Name);
-      Data_SL.Set_Field ("target", "sepallength");
-      Append (Feature_Columns, Data_SL);
-      Data_SW.Set_Field ("target", "sepalwidth");
-      Append (Feature_Columns, Data_SW);
-      Data_PL.Set_Field ("target", "petallength");
-      Append (Feature_Columns, Data_PL);
-      Data_PW.Set_Field ("target", "petalwidth");
-      Append (Feature_Columns, Data_PW);
+      Data_Age.Set_Field ("target", "age");
+      Append (Feature_Columns, Data_Age);
+      Data_Sex.Set_Field ("target", "sex");
+      Append (Feature_Columns, Data_Sex);
+      Data_BMI.Set_Field ("target", "bmi");
+      Append (Feature_Columns, Data_BMI);
+      Data_Bp.Set_Field ("target", "bp");
+      Append (Feature_Columns, Data_Bp);
+      Data_S1.Set_Field ("target", "s1");
+      Append (Feature_Columns, Data_S1);
+      Data_S2.Set_Field ("target", "s2");
+      Append (Feature_Columns, Data_S2);
+      Data_S3.Set_Field ("target", "s2");
+      Append (Feature_Columns, Data_S3);
+      Data_S4.Set_Field ("target", "s4");
+      Append (Feature_Columns, Data_S4);
+      Data_S5.Set_Field ("target", "s5");
+      Append (Feature_Columns, Data_S5);
+      Data_S6.Set_Field ("target", "s6");
+      Append (Feature_Columns, Data_S6);
 
       Target.Set_Field ("target", "class");
       Append (Target_Columns, Target);
