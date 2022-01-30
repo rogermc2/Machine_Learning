@@ -144,13 +144,14 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   procedure Download_Data_To_Bunch (URL              : String;
+   function Download_Data_To_Bunch (URL              : String;
                                      File_Name        : String := "";
                                      Sparse, As_Frame : Boolean;
                                      Features_List    : JSON_Array;
                                      Data_Columns     : JSON_Array;
                                      Target_Columns   : JSON_Array;
-                                     Shape            : Shape_Data) is
+                                     Shape            : Shape_Data)
+                                    return Bunch_Data is
       Routine_Name       : constant String := "Openml.Download_Data_To_Bunch ";
       Feature_Index      : Positive := Array_First (Features_List);
       Col_Name           : Positive := Array_First (Features_List);
@@ -171,6 +172,7 @@ package body Openml is
       Nominal_Attributes : JSON_Array;
       Frame              : Boolean := False;
       Parsed_ARFF        : JSON_Array;
+      Bunch              : Bunch_Data;
 
       procedure Parse_ARFF
         (ARFF_In      : JSON_Value; Target_Cols : JSON_Array;
@@ -183,9 +185,13 @@ package body Openml is
 
       procedure
       Post_Process (ARFF_Data : JSON_Value; X, Y : out JSON_Array;
-                    Frame     : Boolean; Nominal_Attributes : JSON_Array) is
+                    Frame              : Boolean := False;
+                    Nominal_Attributes : JSON_Array) is
       begin
-         null;
+         if Frame then
+            null;
+         end if;
+
       end Post_Process;
 
    begin
@@ -254,14 +260,12 @@ package body Openml is
          Return_Type := ARFF.Arff_Dense;
       end if;
 
-      Put_Line (Routine_Name & "Col_Slice_X length" &
-                  Integer'Image (Length (Col_Slice_X)));
-      Put_Line (Routine_Name & "Col_Slice_Y length" &
-                  Integer'Image (Length (Col_Slice_Y)));
       --  L652
       if File_Name'Length > 0 then
+         --  Load_Arff_Response from file
          ARFF_Data := Load_Arff_From_File (File_Name, Return_Type);
-         Post_Process (ARFF_Data, X, Y, Frame, Nominal_Attributes);
+         Post_Process (ARFF_Data, X, Y, Frame => False,
+                       Nominal_Attributes =>  Nominal_Attributes);
       else
          Load_Arff_Response (URL);
       end if;
@@ -274,11 +278,23 @@ package body Openml is
          Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
 
+      --  L601
       if As_Frame then
          null;
       else
+      --  L667
          Parse_ARFF (ARFF_Data, All_Columns, X, Y, Nominal_Attributes);
       end if;
+
+      --  L672
+      Bunch.Data := X;
+      Bunch.Target := Y;
+      Bunch.Frame := False;
+      Bunch.Categories := Nominal_Attributes;
+      Bunch.Feature_Names := Data_Columns;
+      Bunch.Target_Names := Target_Columns;
+
+      return Bunch;
 
    end Download_Data_To_Bunch;
 
@@ -613,8 +629,8 @@ package body Openml is
    function Load_Arff_From_File
      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
       return JSON_Value is
-      File           : File_Type;
-      Data           : Unbounded_String := To_Unbounded_String ("");
+      File : File_Type;
+      Data : Unbounded_String := To_Unbounded_String ("");
    begin
       Open (File, In_File, File_Name);
       while not End_Of_File (File) loop

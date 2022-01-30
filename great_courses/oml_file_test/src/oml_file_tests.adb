@@ -30,6 +30,7 @@ package body OML_File_Tests is
       Feature_Columns    : JSON_Array;
       Data_Columns       : JSON_Array;
       Target_Columns     : JSON_Array;
+      Bunch              : Bunch_Data;
    begin
       Put_Line (Routine_Name);
       Data_SL.Set_Field ("target", "sepallength");
@@ -51,7 +52,7 @@ package body OML_File_Tests is
       Assert (not Is_Empty (Target_Columns), Routine_Name &
               "Target_Columns is empty");
 
-      Openml.Download_Data_To_Bunch
+      Bunch := Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
          Target_Columns => Target_Columns, Shape => (1, 1));
