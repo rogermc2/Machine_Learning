@@ -1,5 +1,6 @@
 --  Ref: https://github.com/random-forests/tutorials/blob/master/decision_tree.py
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -98,6 +99,7 @@ package body Builder is
    function Build_Tree (Rows       : in out Rows_Vector;
                         Max_Leaves : Natural := 0) return Tree_Type is
       use Tree_Package;
+      --          Routine_Name : constant String := "Builder.Build_Tree ";
       theTree   : Tree_Type := Empty_Tree;
 
       procedure Add_Decision_Node (Parent_Cursor : Tree_Cursor;
@@ -134,21 +136,23 @@ package body Builder is
                             Parent_Cursor : Tree_Cursor) is
          --  Parent_Cursor is a cursor to an existing node which is the head
          --  of this branch
+         Routine_Name     : constant String := "Builder.Build_Tree.Add_Branch ";
          Best_Split       : constant Best_Data := Find_Best_Split (Rows);
          Child_Cursor     : Tree_Cursor;
          True_Split_Rows  : Rows_Vector;
          False_Split_Rows : Rows_Vector;
       begin
-         --            Utilities.Print_Rows ("Add_Branch Rows", Rows);
+--           Utilities.Print_Rows (Routine_Name & " Rows", Rows);
          if Best_Split.Gain = 0.0 then
-            Utilities.Print_Question ("Add_Branch prediction", Best_Split.Question);
-            Put_Line ("Add_Branch prediction Gini" &
+            Utilities.Print_Question
+              (Routine_Name & " prediction", Best_Split.Question);
+            Put_Line (Routine_Name & " prediction Gini" &
                         Float'Image (Best_Split.Gini));
             New_Line;
             Add_Prediction_Node (Parent_Cursor, Rows);
          elsif Max_Leaves = 0 or else Num_Leaves < Max_Leaves then
-            --              Utilities.Print_Question ("Add_Branch Best split",
-            --                                        Best_Split.Question);
+            Utilities.Print_Question (Routine_Name & " Best split",
+                                      Best_Split.Question);
             Add_Decision_Node (Parent_Cursor, Best_Split);
             True_Split_Rows := Best_Split.True_Rows;
             False_Split_Rows := Best_Split.False_Rows;
@@ -174,6 +178,7 @@ package body Builder is
    --  Class_Counts counts the number of each type of example in a dataset.
    function Class_Counts (Rows : Rows_Vector) return Label_Maps is
       use Rows_Package;
+      --          Routine_Name         : constant String := "Builder.Class_Counts ";
       Boolean_Label_Counts : Boolean_Label_Map;
       Float_Label_Counts   : Float_Label_Map;
       Integer_Label_Counts : Integer_Label_Map;
@@ -219,7 +224,8 @@ package body Builder is
                end if;
                Integer_Count_Cursor :=
                  Integer_Label_Counts.Find (Label.Integer_Value);
-               Integer_Count := Integer_Label_Counts.Element (Label.Integer_Value);
+               Integer_Count :=
+                 Integer_Label_Counts.Element (Label.Integer_Value);
                Integer_Count := Integer_Count + 1;
                Integer_Label_Counts.Replace_Element
                  (Integer_Count_Cursor, Integer_Count);
@@ -227,6 +233,7 @@ package body Builder is
                if not UB_Label_Counts.Contains (Label.UB_String_Value) then
                   UB_Label_Counts.Insert (Label.UB_String_Value, 0);
                end if;
+
                UB_Count_Cursor := UB_Label_Counts.Find (Label.UB_String_Value);
                UB_Count := UB_Label_Counts.Element (Label.UB_String_Value);
                UB_Count := UB_Count + 1;
@@ -272,7 +279,7 @@ package body Builder is
    --  container.
 
    function Classify (Node_Cursor : Tree_Cursor; aRow : Row_Data)
-                      return Predictions_List is
+                       return Predictions_List is
       use Tree_Package;
       aNode       : constant Tree_Node_Type := Element (Node_Cursor);
       Predictions : Predictions_List;
@@ -320,13 +327,11 @@ package body Builder is
    --   feature / value and calculating the information gain.
    function Find_Best_Split (Rows : Rows_Vector) return Best_Data is
       use Rows_Package;
+      Routine_Name        : constant String := "Builder.Find_Best_Split ";
       Current_Uncertainty : constant Float := Gini (Rows);
-      Cols                : constant Row_Data := Rows.First_Element;
-      Row1                : constant Row_Data :=
-                              Rows.Element (Rows.First_Index);
+      Cols                : Row_Data;
+      Row1                : Row_Data;
       Num_Features        : constant Class_Range := Cols.Class_Count;
-      Row1_Features       : constant Feature_Data_Array (1 .. Num_Features) :=
-                              Row1.Features;
       Feature_Value       : Unbounded_String;
       Feature_Name        : Feature_Name_Type;
       Feature_Data_Type   : Data_Type;
@@ -337,11 +342,18 @@ package body Builder is
       Best                : Best_Data;
       Integer_Value       : Integer;
    begin
-      Put_Line ("Finding best split ");
+      Put_Line (Routine_Name);
+      Cols := Rows.First_Element;
+      Row1 := Rows.Element (Rows.First_Index);
+      Put_Line (Routine_Name & "Finding best split ");
+      Assert (Header_Data.Features'Length >= Num_Features,
+              Routine_Name & "called with Header_Data.Features length " &
+                Integer'Image (Header_Data.Features'Length) &
+                " < num features " & Class_Range'Image (Num_Features));
       for col in 1 .. Num_Features loop
          Feature_Name := Feature_Name_Type (Header_Data.Features (col));
-         Feature_Data_Type := Utilities.Get_Data_Type (Row1_Features (col));
-         Put_Line ("Feature_Name: " & To_String (Feature_Name));
+         Feature_Data_Type :=
+           Utilities.Get_Data_Type (Header_Data.Features (col));
 
          for row in
            Rows.First_Index .. Rows.Last_Index loop Feature_Value := Rows.Element (row).Features (col);
@@ -387,15 +399,16 @@ package body Builder is
       use Float_Label_Map_Package;
       use Integer_Label_Map_Package;
       use UB_Label_Map_Package;
-      Count_Maps     : constant Label_Maps := Class_Counts (Rows);
-      Boolean_Counts : constant Boolean_Label_Map := Count_Maps.Boolean_Map;
-      Float_Counts   : constant Float_Label_Map := Count_Maps.Float_Map;
-      Integer_Counts : constant Integer_Label_Map := Count_Maps.Integer_Map;
-      UB_Counts      : constant UB_Label_Map := Count_Maps.UB_String_Map;
+      Count_Maps     : Label_Maps := Class_Counts (Rows);
+      Boolean_Counts : Boolean_Label_Map := Count_Maps.Boolean_Map;
+      Float_Counts   : Float_Label_Map := Count_Maps.Float_Map;
+      Integer_Counts : Integer_Label_Map := Count_Maps.Integer_Map;
+      UB_Counts      : UB_Label_Map := Count_Maps.UB_String_Map;
       Rows_Size      : constant Float := Float (Rows.Length);
       Impurity       : Float := 1.0;
 
-      procedure Calc_Boolean_Impurity (Curs : Boolean_Label_Map_Package.Cursor) is
+      procedure Calc_Boolean_Impurity
+        (Curs : Boolean_Label_Map_Package.Cursor) is
          Label_Probability : Float range 0.0 .. 1.0;
       begin
          Label_Probability := Float (Element (Curs)) / Rows_Size;
@@ -421,6 +434,11 @@ package body Builder is
       end Calc_UB_Impurity;
 
    begin
+      Count_Maps := Class_Counts (Rows);
+      Boolean_Counts := Count_Maps.Boolean_Map;
+      Float_Counts := Count_Maps.Float_Map;
+      Integer_Counts := Count_Maps.Integer_Map;
+      UB_Counts := Count_Maps.UB_String_Map;
       if not Boolean_Counts.Is_Empty then
          Boolean_Counts.Iterate (Calc_Boolean_Impurity'Access);
       end if;
@@ -470,7 +488,7 @@ package body Builder is
    --  Match compares the feature value in an example to the
    --  feature value in a question.
    function Match (Question : Question_Data; Example_Data : Row_Data)
-                   return Boolean is
+                    return Boolean is
       Feature_Name     : constant Feature_Name_Type := Question.Feature_Name;
       Feat_Index       : Class_Range;
       Example_Feature  : Unbounded_String;
@@ -580,7 +598,7 @@ package body Builder is
    --  ---------------------------------------------------------------------------
 
    function Partition (Rows : Rows_Vector; aQuestion : Question_Data)
-                       return Partitioned_Rows is
+                        return Partitioned_Rows is
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
       Data       : Row_Data;

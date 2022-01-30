@@ -136,7 +136,6 @@ package body Classifier_Utilities is
    function Bin_Count (Numbers : ML_Types.Value_Data_List)
                        return Natural_List is
       use Ada.Containers;
-      use ML_Types;
       use Natural_Package;
       aNumber    : Natural := 0;
       Max_Number : Natural := 0;
@@ -308,7 +307,6 @@ package body Classifier_Utilities is
 
    function Init_Samples_Copy (Samples : ML_Types.Value_Data_Lists_2D)
                                return ML_Types.Value_Data_Lists_2D is
-      use ML_Types;
       Num_Samples    : constant Positive := Positive (Samples.Length);
       Sample_1       : constant Value_Data_List := Samples.Element (1);
       Num_Features   : constant Positive := Positive (Sample_1.Length);
@@ -421,14 +419,12 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Value_List (List_A, List_B : ML_Types.Value_Data_List)
-                                      return Integer_List is
-      use ML_Types;
-      use Integer_Package;
-      use Value_Data_Package;
+                                      return Classifier_Types.Integer_List is
+      use Classifier_Types.Integer_Package;
       use Value_Data_Sorting;
       Item    : Value_Record;
       Index_A : Positive;
-      theList : Integer_List;
+      theList : Classifier_Types.Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -482,17 +478,17 @@ package body Classifier_Utilities is
    function Split_Raw_Data (Raw_Data    : ML_Types.Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
                             return Multi_Output_Data_Record is
+      use Ada.Containers;
       use Ada.Strings;
       use Ada.Strings.Unbounded;
-      use Value_Data_Package;
---        Routine_Name   : constant String :=
---                             "Classifier_Utilities.Split_Raw_Data ";
+      --        Routine_Name   : constant String :=
+      --                           "Classifier_Utilities.Split_Raw_Data ";
       aRow           : ML_Types.Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
-      Feature_Types  : array  (1 .. Num_Features) of Data_Type;
+      Feature_Types  : Feature_Type_Array (1 .. Num_Features);
       Features_List  : Value_Data_Lists_2D;
-      Label_Types    : array  (1 .. Num_Outputs) of Data_Type;
+      Label_Types    : Label_Type_Array  (1 .. Num_Outputs);
       Label_Values   : Value_Data_List;
       Labels_List    : Value_Data_Lists_2D;
       Feature_Values : Value_Data_List;
@@ -500,26 +496,46 @@ package body Classifier_Utilities is
    begin
       Parse_Header (aRow, Num_Features, Data);
       aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
-      for f_index in 1 .. Num_Features loop
-         Feature_Types (Positive (f_index)) :=
-           Utilities.Get_Data_Type (aRow (Positive (f_index)));
-      end loop;
-
-      for f_index in 1 .. Num_Outputs loop
-         Label_Types (Positive (f_index)) :=
-           Utilities.Get_Data_Type (aRow (Positive (Num_Features + f_index)));
-      end loop;
-      for row_index in Positive'Succ (Raw_Data.First_Index) ..
-          Raw_Data.Last_Index loop
-         aRow := Raw_Data.Element (row_index);  --  Unbound list
-         Label_Values.Clear;
-         Feature_Values.Clear;
+      if aRow.Length > 1 then
          for f_index in 1 .. Num_Features loop
             declare
-               Feat_String : constant String := To_String (aRow (f_index));
-               Value       : Value_Record (Feature_Types (Positive (f_index)));
+               Row_S     : constant String := To_String (aRow (f_index));
+               S_Last    : constant Integer := Row_S'Last;
+               Last_Char : constant Character := Row_S (S_Last);
             begin
-               case Feature_Types (Positive (f_index)) is
+               if Character'Pos (Last_Char) < 32 then
+                  aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+               end if;
+               Feature_Types (Positive (f_index)) :=
+                 Utilities.Get_Data_Type (aRow (Positive (f_index)));
+            end;
+         end loop;
+
+         for l_index in 1 .. Num_Outputs loop
+            declare
+               Row_S     : constant String := To_String (aRow (Num_Features + l_index));
+               S_Last    : constant Integer := Row_S'Last;
+               Last_Char : constant Character := Row_S (S_Last);
+            begin
+               if Character'Pos (Last_Char) < 32 then
+                  aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+               end if;
+               Label_Types (Positive (l_index)) :=
+                 Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
+            end;
+         end loop;
+
+         for row_index in Positive'Succ (Raw_Data.First_Index) ..
+           Raw_Data.Last_Index loop
+            aRow := Raw_Data.Element (row_index);  --  Unbound list
+
+            Feature_Values.Clear;
+            for f_index in 1 .. Num_Features loop
+               declare
+                  Feat_String : constant String := To_String (aRow (f_index));
+                  Value       : Value_Record (Feature_Types (Positive (f_index)));
+               begin
+                  case Feature_Types (Positive (f_index)) is
                   when Boolean_Type =>
                      Value.Boolean_Value := Boolean'Value (Feat_String);
                   when Integer_Type =>
@@ -528,19 +544,32 @@ package body Classifier_Utilities is
                      Value.Float_Value := Float'Value (Feat_String);
                   when UB_String_Type =>
                      Value.UB_String_Value := aRow (f_index);
-               end case;
-               Feature_Values.Append (Value);
-            end;  --  declare block
-         end loop;
-         Features_List.Append (Feature_Values);
+                  end case;
+                  Feature_Values.Append (Value);
+               end;  --  declare block
+            end loop;
+            Features_List.Append (Feature_Values);
 
-         for o_index in 1 .. Num_Outputs loop
-            declare
-               Label       : constant String :=
-                               To_String (aRow (Num_Features + o_index));
-               Label_Value : Value_Record (Label_Types (o_index));
-            begin
-               case Label_Types (Positive (o_index)) is
+            for o_index in 1 .. Num_Outputs loop
+               Label_Values.Clear;
+               declare
+                  Row_S     : constant String :=
+                                To_String (aRow (Num_Features + o_index));
+                  S_Last    : constant Integer := Row_S'Last;
+                  Last_Char : constant Character := Row_S (S_Last);
+               begin
+                  if Character'Pos (Last_Char) < 32 then
+                     aRow (Num_Features + o_index) :=
+                       To_Unbounded_String (Row_S (1 .. S_Last - 1));
+                  end if;
+               end;
+
+               declare
+                  Label       : constant String :=
+                                  To_String (aRow (Num_Features + o_index));
+                  Label_Value : Value_Record (Label_Types (o_index));
+               begin
+                  case Label_Types (Positive (o_index)) is
                   when Boolean_Type =>
                      Label_Value.Boolean_Value := Boolean'Value (Label);
                   when Integer_Type =>
@@ -550,15 +579,17 @@ package body Classifier_Utilities is
                   when UB_String_Type =>
                      Label_Value.UB_String_Value :=
                        aRow (Num_Features + o_index);
-               end case;
-               Label_Values.Append (Label_Value);
-            end;  --  declare block;
-            Labels_List.Append (Label_Values);
+                  end case;
+                  Label_Values.Append (Label_Value);
+               end;  --  declare block;
+               Labels_List.Append (Label_Values);
+            end loop;
          end loop;
-      end loop;
 
-      Data.Feature_Values := Features_List;
-      Data.Label_Values := Labels_List;
+         Data.Feature_Values := Features_List;
+         Data.Label_Values := Labels_List;
+      end if;
+
       return Data;
 
    end Split_Raw_Data;
@@ -587,7 +618,6 @@ package body Classifier_Utilities is
 
    function Sum_Cols (aList : ML_Types.Value_Data_Lists_2D)
                       return ML_Types.Value_Data_List is
-      use ML_Types;
       theSum     : Value_Data_List;
       Value_Type : constant Data_Type :=
                      aList.Element (1).Element (1).Value_Kind;
@@ -662,7 +692,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Array (L : Integer_List) return Integer_Array is
+   function To_Array (L : Classifier_Types.Integer_List) return Integer_Array is
       New_Array : Integer_Array (1 .. Integer (L.Length));
       A_Index   : Integer := 0;
    begin
@@ -706,8 +736,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_List (A : Integer_Array) return Integer_List is
-      A_List : Integer_List;
+   function To_Integer_List (A : Classifier_Types.Integer_Array)
+                             return Classifier_Types.Integer_List is
+      A_List : Classifier_Types.Integer_List;
    begin
       for index in A'First .. A'Last loop
          A_List.Append (A (index));
@@ -719,9 +750,9 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List (Ints : ML_Types.Value_Data_List)
-                             return Integer_List is
+                             return Classifier_Types.Integer_List is
       Item   : Value_Record;
-      Values : Integer_List;
+      Values : Classifier_Types.Integer_List;
    begin
       for index in Ints.First_Index .. Ints.Last_Index loop
          Item := Ints.Element (index);
@@ -740,7 +771,6 @@ package body Classifier_Utilities is
 
    function To_Integer_Value_List (A : Integer_Array)
                                    return ML_Types.Value_Data_List is
-      use ML_Types;
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
    begin
@@ -756,7 +786,6 @@ package body Classifier_Utilities is
 
    function To_Integer_Value_List_2D (A : Integer_Array)
                                       return ML_Types.Value_Data_Lists_2D is
-      use ML_Types;
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
       Multi_List : Value_Data_Lists_2D;
@@ -775,7 +804,6 @@ package body Classifier_Utilities is
 
    function To_Multi_Value_List (A : Multi_Value_Array)
                                  return ML_Types.Value_Data_Lists_2D is
-      use ML_Types;
       Value    : Value_Record (Integer_Type);
       Row_List : Value_Data_Lists_2D;
       Col_List : Value_Data_List;
@@ -843,8 +871,6 @@ package body Classifier_Utilities is
 
    function To_Value_2D_List (A : ML_Types.Value_Data_List)
                               return ML_Types.Value_Data_Lists_2D is
-      use ML_Types;
-      use Value_Data_Package;
       Output_List : Value_Data_List;
       A2_List     : Value_Data_Lists_2D;
    begin
@@ -864,7 +890,6 @@ package body Classifier_Utilities is
    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
                        return  ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
-      use  ML_Types;
       Num_Rows : constant Positive := Positive (Values.Length);
       Num_Cols : constant Count_Type := Values.Element (1).Length;
       In_Row   : Value_Data_List;
@@ -914,13 +939,14 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Nums : Integer_List) return Integer_List is
+   function Unique (Nums : Classifier_Types.Integer_List)
+                    return Classifier_Types.Integer_List is
       use Int_Sets;
-      use Integer_Package;
+      use Classifier_Types.Integer_Package;
       Unique_Set : Int_Sets.Set;
-      Int_Curs   : Integer_Package.Cursor := Nums.First;
+      Int_Curs   : Classifier_Types.Integer_Package.Cursor := Nums.First;
       Set_Curs   : Int_Sets.Cursor;
-      Nums_List  : Integer_List;
+      Nums_List  : Classifier_Types.Integer_List;
    begin
       while Has_Element (Int_Curs) loop
          Unique_Set.Include (Element (Int_Curs));
@@ -991,7 +1017,6 @@ package body Classifier_Utilities is
    function Unique_Values (Values : ML_Types.Value_Data_List)
                            return ML_Types.Value_Data_List is
       use Value_Sets;
-      use Value_Data_Package;
       Unique_Set  : Value_Sets.Set;
       Int_Curs    : Value_Data_Package.Cursor := Values.First;
       Set_Curs    : Value_Sets.Cursor;
@@ -1019,7 +1044,6 @@ package body Classifier_Utilities is
       use Weights;
       use Float_Package;
       use Weight_Lists_2D_Package;
-      use Weight_Lists_3D_Package;
       Unique_Set     : Weight_Sets.Set;
       Weight_3D_Curs : Weight_Lists_3D_Package.Cursor := Values.First;
       Weight_2D_Curs : Weight_Lists_2D_Package.Cursor;

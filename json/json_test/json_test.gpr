@@ -1,0 +1,12 @@
+with "gnatcoll.gpr";
+with "aws.gpr";
+
+project Json_Test is
+
+   for Source_Dirs use ("src", "../../datasets");
+   for Object_Dir use "obj";
+   for Main use ("test_json.adb");
+   for Exec_Dir use ".";
+
+end Json_Test;
+

@@ -5,7 +5,7 @@ with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
-with Printing;
+--  with Printing;
 
 package body Tree is
 
@@ -131,7 +131,8 @@ package body Tree is
 
    --  ------------------------------------------------------------------------
 
-   procedure C_Init (aTree        : in out Tree_Class; Num_Features : Natural := 0;
+   procedure C_Init (aTree        : in out Tree_Class;
+                     Num_Features : Natural := 0;
                      Num_Classes  : Classifier_Types.Natural_List :=
                        Classifier_Types.Natural_Package.Empty_Vector;
                      Num_Outputs  : Index_Range := 1) is
@@ -179,20 +180,20 @@ package body Tree is
       --  Out_Data: num samples x num nodes
       Out_Data       : Classifier_Types.Natural_Lists_2D;
    begin
-     Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
+      Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
                 "Top node has no children");
-         Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
-         Put_Line (Routine_Name & "Max_Depth" & Integer'Image (aTree.Max_Depth));
+      Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
+      Put_Line (Routine_Name & "Max_Depth" & Integer'Image (aTree.Max_Depth));
 
       --  L924 for each sample
       for index in X.First_Index .. X.Last_Index loop
-         New_Line;
-         Put_Line (Routine_Name & "Sample " & Integer'Image (index));
+--           New_Line;
+--           Put_Line (Routine_Name & "Sample " & Integer'Image (index));
          Node_Cursor := Top_Cursor;
          --  Current_Sample is a list of feature values
          Current_Sample := X.Element (index);
-         Printing.Print_Value_Data_List (Routine_Name & "Current_Sample",
-                                         Current_Sample);
+--           Printing.Print_Value_Data_List (Routine_Name & "Current_Sample",
+--                                           Current_Sample);
 
          --  L928 Add all external nodes
          Continue := True;
@@ -205,9 +206,9 @@ package body Tree is
 
             Feature_Value :=
               Current_Sample.Element (Node.Best_Fit_Feature_Index);
-            Put_Line (Routine_Name & "Node_ID " & Integer'Image (Node.Node_ID));
-            Printing.Print_Value_Record (Routine_Name & "Feature_Value",
-                                         Feature_Value);
+--              Put_Line (Routine_Name & "Node_ID " & Integer'Image (Node.Node_ID));
+--              Printing.Print_Value_Record (Routine_Name & "Feature_Value",
+--                                           Feature_Value);
             Assert (Feature_Value.Value_Kind = Float_Type or
                       Feature_Value.Value_Kind = Integer_Type,
                     "Tree.Apply_Dense Self.Nodes invalid feature data type");
@@ -250,8 +251,8 @@ package body Tree is
          --  L939 Add leaf node
          Node := Element (Node_Cursor);
          Node_ID_List.Append (Node.Node_ID);
-         Printing.Print_Natural_List (Routine_Name & "Node_ID_List",
-                                         Node_ID_List);
+--           Printing.Print_Natural_List (Routine_Name & "Node_ID_List",
+--                                        Node_ID_List);
          Out_Data.Append (Node_ID_List);
       end loop;
 

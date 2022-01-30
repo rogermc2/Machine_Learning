@@ -1,6 +1,6 @@
 project Test_Classifier_Functions is
 
-   for Source_Dirs use ("src", "../../support", "../../../common", "../../utils", "../../src", "../../../export", "../../metrics");
+   for Source_Dirs use ("src", "../../support", "../../../common", "../../src", "../../../export", "../../metrics", "../../../utils");
    for Main use ("test_classifier");
    for Object_Dir use "obj";
    for Exec_Dir use ".";

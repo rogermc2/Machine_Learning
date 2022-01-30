@@ -6,7 +6,6 @@ with Ada.Containers;
 
 with Maths;
 
-with Classifier_Types;
 --  with Printing;
 
 package body Node_Splitter is
@@ -121,7 +120,6 @@ package body Node_Splitter is
 
       function Compare (Features : ML_Types.Value_Data_List;
                         P_Index  : Positive) return Boolean is
-         use ML_Types;
          Feature_Index : constant Positive :=
                            P_Index - Splitter.Start_Row + 1;
          XP            : constant Value_Record :=
@@ -354,6 +352,8 @@ package body Node_Splitter is
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
+--        Routine_Name     : constant String :=
+--                             "Node_Splitter.Initialize_Splitter ";
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Num_Features     : constant Positive :=
                            Positive (Input_X.Element (1).Length);

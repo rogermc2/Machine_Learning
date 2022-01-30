@@ -4,11 +4,12 @@
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Ada_Tree_Builder;
+with Depth_First_Builder;
+with Best_First_Builder;
 with Classifier_Utilities;
-with Criterion;
 with Encode_Utils;
 --  with Printing;
+with Tree_Build;
 with Utilities;
 
 package body Base_Decision_Tree is
@@ -50,6 +51,7 @@ package body Base_Decision_Tree is
       Routine_Name          : constant String :=
                                 "Base_Decision_Tree.Base_Fit ";
       Num_Samples           : constant Positive := Positive (X.Length);
+      Builder               : Tree_Build.Tree_Builder;
       Y_Encoded             : Classifier_Types.Natural_Lists_2D;
       Classes               : ML_Types.Value_Data_Lists_2D;
       Min_Samples_Split     : Positive := 1;
@@ -78,7 +80,8 @@ package body Base_Decision_Tree is
         Tree.Index_Range (X.Element (1).Length);
 
       --  L229
-      Base_Fit_Checks (aClassifier, X, Y_Encoded, Min_Samples_Split, Sample_Weights);
+      Base_Fit_Checks (aClassifier, X, Y_Encoded, Min_Samples_Split,
+                       Sample_Weights);
       --  Base_Fit_Checks ends at L350
 
       Node_Splitter.C_Init
@@ -117,6 +120,10 @@ package body Base_Decision_Tree is
            * Sum_Sample_Weight;
       end if;
 
+      --  L379
+      Node_Splitter.Initialize_Splitter
+        (aClassifier.Parameters.Splitter, X, Y_Encoded, Sample_Weights);
+
       aClassifier.Parameters.Splitter.Min_Leaf_Weight := Min_Weight_Leaf;
 
       --  L392
@@ -128,15 +135,21 @@ package body Base_Decision_Tree is
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
-      --  L410
-      Ada_Tree_Builder.Build_Tree
-        (aClassifier.Attributes.Decision_Tree,
-         aClassifier.Parameters.Splitter, X, Y_Encoded,
-         Sample_Weights, Min_Samples_Split,
-         aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf,
-         aClassifier.Parameters.Max_Depth,
-         aClassifier.Parameters.Min_Impurity_Decrease);
+      --  L400
+      Tree_Build.Init_Builder (Builder, aClassifier.Parameters.Max_Leaf_Nodes,
+                                 aClassifier.Parameters.Splitter);
 
+      --  L420
+      case Builder.Tree_Kind is
+         when Tree_Build.Depth_First_Tree =>
+            Depth_First_Builder.Build_Tree
+              (aClassifier.Attributes.Decision_Tree, Builder, Y_Encoded);
+         when Tree_Build.Best_First_Tree =>
+            Best_First_Builder.Build_Tree
+              (Builder, aClassifier.Attributes.Decision_Tree);
+      end case;
+
+      --  L426
       Prune_Tree (aClassifier);
 
    end Base_Fit;
@@ -240,12 +253,12 @@ package body Base_Decision_Tree is
            aClassifier.Attributes.Num_Features;
       end if;
 
-      --  L316
+      --  L313
       Assert (Max_Leaf_Nodes = -1 or Max_Leaf_Nodes > 1, Routine_Name &
                 ", Max_Leaf_Nodes " & Integer'Image (Max_Leaf_Nodes) &
                 "must be > 1");
 
-      --  L323
+      --  L320
       if not Sample_Weights.Is_Empty then
          Assert (Integer (Sample_Weights.Length) = Num_Samples,
                  Routine_Name & ", Sample_Weight length " &
@@ -282,8 +295,7 @@ package body Base_Decision_Tree is
             Min_Split.Float_Value := Float'Value (Min_Samples_Split);
             aClassifier.Parameters.Min_Samples_Split := Min_Split;
          end;
-      elsif Utilities.Is_Integer
-        (To_Unbounded_String (Min_Samples_Split)) then
+      elsif Utilities.Is_Integer (To_Unbounded_String (Min_Samples_Split)) then
          declare
             Min_Split : Split_Value_Record (Split_Integer);
          begin
@@ -337,7 +349,6 @@ package body Base_Decision_Tree is
       Classes.Clear;
       Y_Encoded.Set_Length (Y_Orig.Length);
       aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
-
       --  Y is 2D list num samples x num outputs
       --  Y_Encoded is 2D list num samples x num outputs
       --  L215  Initialize Y_Encoded

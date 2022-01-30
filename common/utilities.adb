@@ -1,4 +1,5 @@
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Strings.Fixed;
@@ -71,7 +72,7 @@ package body Utilities is
 
    function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
                         Column_Index : Positive)
-                         return ML_Types.Value_Data_List is
+                        return ML_Types.Value_Data_List is
       use ML_Types;
       aList  : Value_Data_List;
       Column : Value_Data_List;
@@ -122,19 +123,31 @@ package body Utilities is
    --  ---------------------------------------------------------------------------
 
    function Get_Data_Type (Data : Unbounded_String) return ML_Types.Data_Type is
-      theType : Data_Type;
+      theType   : Data_Type;
+      aString   : constant String := To_String (Data);
+      S_Last    : constant Integer := aString'Last;
+      Last_Char : Character;
+      UB_Data   : Unbounded_String := Data;
    begin
-      if Is_Integer (Data) then
+      Assert (aString'Length > 0,
+              "Utilities.Get_Data_Type called with empty string");
+      Last_Char := aString (S_Last);
+      if Character'Pos (Last_Char) < 32 then
+         UB_Data := To_Unbounded_String (aString (1 .. S_Last - 1));
+      end if;
+
+      if Is_Integer (UB_Data) then
          theType := Integer_Type;
-      elsif Is_Float (Data) then
+      elsif Is_Float (UB_Data) then
          theType := Float_Type;
-      elsif Is_Boolean (Data) then
+      elsif Is_Boolean (UB_Data) then
          theType := Boolean_Type;
       else
          theType := UB_String_Type;
       end if;
 
       return theType;
+
    end Get_Data_Type;
 
    --  ---------------------------------------------------------------------------
@@ -157,21 +170,26 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Is_Integer (Item : in Unbounded_String) return Boolean is
-      UB_String   : Unbounded_String := Item;
-      Dig         : Boolean := True;
+   function Is_Integer (Item : Unbounded_String) return Boolean is
+      UB_String : Unbounded_String := Item;
+      Dig       : Boolean := True;
    begin
       UB_String := Trim (UB_String, Ada.Strings.Left);
       UB_String := Trim (UB_String, Ada.Strings.Right);
+
       declare
          Item_String : constant String := To_String (UB_String);
       begin
-         for index in Item_String'Range loop
+         for index in Item_String'First .. Item_String'Last loop
             Dig := Dig and then
-              Ada.Characters.Handling.Is_Decimal_Digit (Item_String (index));
+              (Ada.Characters.Handling.Is_Decimal_Digit
+                 (Item_String (index)) or
+                   Character'Pos (Item_String (index)) < 32);
          end loop;
       end;
+
       return Dig;
+
    end Is_Integer;
 
    --  ---------------------------------------------------------------------------
@@ -211,6 +229,7 @@ package body Utilities is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
+      --          Routine_Name : constant String := "Utilities.Load_CSV_Data 1 ";
       Data_Line    : Unbounded_String :=
                        To_Unbounded_String (Get_Line (Data_File));
       Num_Features : ML_Types.Class_Range;
@@ -228,22 +247,25 @@ package body Utilities is
             declare
                Value_Index  : Class_Range := 1;
                Row          : Row_Data (Num_Features);
+               aLine        : constant String := Get_Line (Data_File);
             begin
-               Data_Line := To_Unbounded_String (Get_Line (Data_File));
-               CSV_Line := Utilities.Split_String
-                 (To_String (Data_Line), ",");
-               Curs := CSV_Line.First;
-               while Has_Element (Curs) loop
-                  if Curs /= CSV_Line.Last then
-                     Values (Value_Index) := Element (Curs);
-                     Value_Index := Value_Index + 1;
-                  else
-                     Row.Label := Element (Curs);
-                  end if;
-                  Next (Curs);
-               end loop;
-               Row.Features := Values;
-               Data.Append (Row);
+               if aLine'Length > 1 then
+                  Data_Line := To_Unbounded_String (aLine);
+                  CSV_Line := Utilities.Split_String
+                    (To_String (Data_Line), ",");
+                  Curs := CSV_Line.First;
+                  while Has_Element (Curs) loop
+                     if Curs /= CSV_Line.Last then
+                        Values (Value_Index) := Element (Curs);
+                        Value_Index := Value_Index + 1;
+                     else
+                        Row.Label := Element (Curs);
+                     end if;
+                     Next (Curs);
+                  end loop;
+                  Row.Features := Values;
+                  Data.Append (Row);
+               end if;
             end;  --  declare block
          end loop;
       end;  --  declare block
@@ -254,10 +276,11 @@ package body Utilities is
 
    function Load_CSV_Data
      (Data_File : File_Type; Header_Line : out Header_Data_Type)
-       return ML_Types.Rows_Vector is
+      return ML_Types.Rows_Vector is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
+      --        Routine_Name : constant String := "Utilities.Load_CSV_Data 2 ";
       Data_Line    : Unbounded_String :=
                        To_Unbounded_String (Get_Line (Data_File));
       Num_Features : ML_Types.Class_Range;
@@ -303,7 +326,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Raw_CSV_Data (Data_File : File_Type)
-                                return ML_Types.Raw_Data_Vector is
+                               return ML_Types.Raw_Data_Vector is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use ML_Types.String_Package;
@@ -348,7 +371,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_2D is
+                     return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
@@ -370,7 +393,7 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
-                      return ML_Types.Value_Data_Lists_3D is
+                     return ML_Types.Value_Data_Lists_3D is
       use ML_Types;
       List_Length  : constant Positive := Positive (aList.Length);
       Permutation  : Value_Data_Lists_2D := aList;
@@ -542,7 +565,7 @@ package body Utilities is
    --  ------------------------------------------------------------------------
 
    function Prediction_String (Label_Counts : Predictions_List)
-                                return String is
+                               return String is
       use Prediction_Data_Package;
       Count_Cursor : Cursor := Label_Counts.First;
       Prediction   : Prediction_Data;
@@ -588,6 +611,54 @@ package body Utilities is
       end loop;
 
    end Print_Feature_Values;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Feature_Types
+     (Message : String; theTypes : Classifier_Utilities.Feature_Type_Array) is
+      Count : Natural := 0;
+   begin
+      Put_Line (Message & " Feature types:");
+      for index in theTypes'First .. theTypes'Last loop
+         Count := Count + 1;
+         Put (ML_Types.Data_Type'Image (theTypes (index)));
+         if index /= theTypes'Last then
+            Put (", ");
+         end if;
+
+         if index /= theTypes'Last and Count > 5 then
+            New_Line;
+            Count := 0;
+         end if;
+
+      end loop;
+      New_Line;
+
+   end Print_Feature_Types;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Label_Types
+     (Message : String; theTypes : Classifier_Utilities.Label_Type_Array) is
+      Count : Natural := 0;
+   begin
+      Put_Line (Message & " Label types:");
+      for index in theTypes'First .. theTypes'Last loop
+         Count := Count + 1;
+         Put (ML_Types.Data_Type'Image (theTypes (index)));
+         if index /= theTypes'Last then
+            Put (", ");
+         end if;
+
+         if index /= theTypes'Last and Count > 5 then
+            New_Line;
+            Count := 0;
+         end if;
+
+      end loop;
+      New_Line;
+
+   end Print_Label_Types;
 
    --  ------------------------------------------------------------------------
 
@@ -743,6 +814,26 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Row (Message    : String; Rows : ML_Types.Rows_Vector;
+                        Row_Number : Positive) is
+      use Rows_Package;
+      aRow : Row_Data;
+   begin
+      Put_Line (Message & ":");
+      aRow := Rows.Element (Row_Number);
+      Put ("  Feature values: (");
+      for feat in aRow.Features'First .. aRow.Features'Last loop
+         Put (To_String (aRow.Features (feat)));
+         if feat /= aRow.Features'Last then
+            Put (", ");
+         end if;
+      end loop;
+      Put_Line ("), Label: " & To_String (aRow.Label));
+
+   end Print_Row;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Rows (Message : String; Rows : Rows_Vector) is
       use Rows_Package;
       aRow : Row_Data;
@@ -870,7 +961,7 @@ package body Utilities is
    --  -----------------------------------------------------------------------
 
    function Split_Row_Data (Row_Data : ML_Types.Rows_Vector)
-                             return Data_Record is
+                            return Data_Record is
       use Rows_Package;
       use Value_Data_Package;
       aRow           : ML_Types.Row_Data := Row_Data.First_Element;
@@ -959,33 +1050,50 @@ package body Utilities is
    function Split_String (aString, Pattern : String) return String_List is
       use Ada.Strings;
       use Ada.Strings.Unbounded;
-      Last       : constant Integer := aString'Length;
-      A_Index    : Integer;
-      B_Index    : Integer := 1;
+      Last       : constant Integer := aString'Last;
+      Last_Char  : constant Character := aString (Last);
+      UB_String  : Unbounded_String;
       Split_List : String_List;
    begin
-      for index in 1 .. Fixed.Count (aString, Pattern) loop
-         A_Index := Fixed.Index (aString (B_Index .. Last), Pattern);
-         --  process string slice in any way
-         Split_List.Append (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
-         B_Index := A_Index + Pattern'Length;
-      end loop;
-      --  process last string
-      Split_List.Append (To_Unbounded_String (aString (B_Index .. Last)));
+      if Character'Pos (Last_Char) < 32 then
+         UB_String :=
+           To_Unbounded_String (aString (aString'First .. Last - 1));
+      else
+         UB_String := To_Unbounded_String (aString);
+      end if;
+
+      declare
+         String_2 : constant String := To_String (UB_String);
+         Last_2   : constant Integer := String_2'Last;
+         A_Index  : Integer;
+         B_Index  : Integer := String_2'First;
+      begin
+         for index in String_2'First .. Fixed.Count (String_2, Pattern) loop
+            A_Index :=
+              Fixed.Index (String_2 (B_Index .. Last_2), Pattern);
+            --  process string slice in any way
+            Split_List.Append
+              (To_Unbounded_String (String_2 (B_Index .. A_Index - 1)));
+            B_Index := A_Index + Pattern'Length;
+         end loop;
+         --  process last string
+         Split_List.Append
+           (To_Unbounded_String (String_2 (B_Index .. Last_2)));
+      end;
       return Split_List;
 
    end Split_String;
 
    --  -------------------------------------------------------------------------
 
-      procedure Swap (Data : in out Value_Data_Lists_2D;
-                      L, R : Positive) is
-         Item : Value_Data_List;
-      begin
-         Item := Data.Element (L);
-         Data.Replace_Element (L, Data.Element (R));
-         Data.Replace_Element (R, Item);
-      end Swap;
+   procedure Swap (Data : in out Value_Data_Lists_2D;
+                   L, R : Positive) is
+      Item : Value_Data_List;
+   begin
+      Item := Data.Element (L);
+      Data.Replace_Element (L, Data.Element (R));
+      Data.Replace_Element (R, Item);
+   end Swap;
 
    --  -------------------------------------------------------------------------
 
@@ -1080,7 +1188,7 @@ package body Utilities is
    --  --------------------------------------------------------------------------
 
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
-                         return Rows_Vector is
+                        return Rows_Vector is
 
       Feature_Values   : Value_Data_List;
       Label_Values     : Value_Data_List;
