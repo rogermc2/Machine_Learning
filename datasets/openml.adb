@@ -767,30 +767,45 @@ package body Openml is
       Ignore         : JSON_Value;
       Is_Row_ID      : JSON_Value;
       Data_Type_Item : JSON_Value;
+
+      procedure Process_Status (Ignore_Status, Row_ID_Status : JSON_Value) is
+      begin
+         if not Is_Empty (Ignore_Status) and  not Is_Empty (Row_ID_Status) then
+            declare
+               Ignore_Stat : constant String := Get (Ignore_Status);
+               Row_ID_Stat : constant String := Get (Row_ID_Status);
+            begin
+               if Ignore_Stat /= "true" and Row_ID_Stat /= "true" then
+                  Data_Type_Item := Get (Feature_Name, "data_type");
+                  if not Is_Empty (Data_Type_Item) then
+                     Put_Line (Routine_Name & "Data_Type_Item set");
+                     declare
+                        Data_Type : constant String := Get (Data_Type_Item);
+                     begin
+                        Assert (Data_Type /= "string", Routine_Name & Dataset_Name
+                                & " invalid as STRING attributes are not " &
+                                  "supported for array representation. " &
+                                  "Try as_frame=True");
+                     end;
+                  end if;
+               end if;
+            end;
+         end if;
+      end Process_Status;
+
    begin
       Feature_Index := Array_First (Features_List);
       while Array_Has_Element (Features_List, Feature_Index) loop
+         Put_Line (Routine_Name & "Feature_Index: " &
+                     Integer'Image (Feature_Index));
          Feature_Name := Array_Element (Features_List, Feature_Index);
-         Put_Line (Routine_Name & "Feature_Name JSON type: " &
-                     JSON_Value_Type'Image (Kind (Feature_Name)));
+         --           Put_Line (Routine_Name & "Feature_Name JSON type: " &
+         --                       JSON_Value_Type'Image (Kind (Feature_Name)));
          Ignore := Get (Feature_Name, "is_ignore");
          Is_Row_ID := Get (Feature_Name, "is_row_identifier");
-         declare
-            Ignore_Status : constant String := Get (Ignore);
-            Row_ID_Status : constant String := Get (Is_Row_ID);
-         begin
-            if Ignore_Status /= "true" and Row_ID_Status /= "true" then
-               Data_Type_Item := Get (Feature_Name, "data_type");
-               declare
-                  Data_Type : constant String := Get (Data_Type_Item);
-               begin
-                  Assert (Data_Type /= "string", Routine_Name & Dataset_Name
-                          & " invalid as STRING attributes are not " &
-                            "supported for array representation. " &
-                            "Try as_frame=True");
-               end;
-            end if;
-         end;
+         Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
+         Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+         Process_Status (Ignore, Is_Row_ID);
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
 
@@ -829,7 +844,7 @@ package body Openml is
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array)
-      return ARFF.Arff_Sparse_Data_Type is
+            return ARFF.Arff_Sparse_Data_Type is
       use ARFF;
       --        Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
       Data_Length        : constant Natural := Length (Arff_Data);
