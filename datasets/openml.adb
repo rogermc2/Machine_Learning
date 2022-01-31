@@ -359,12 +359,11 @@ package body Openml is
 
       --  L910
       Features_List := Get_Data_Features (Data_ID, File_Name);
-      Put_Line (Routine_Name & "Features_List set");
+
       if As_Frame = "false" then
          Process_Feature (Dataset_Name, Features_List);
       end if;
 
-      Put_Line (Routine_Name & "L922");
       --  L922
       if Target_Column = "default-target" then
          Process_Target (Features_List, Target_Columns);
@@ -373,6 +372,7 @@ package body Openml is
       --  L944
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
+      Put_Line (Routine_Name & "L948");
       --  L948
       if not Return_Sparse then
          Data_Qualities := Get_Data_Qualities (Data_Id, Dataset_Name);
@@ -796,16 +796,14 @@ package body Openml is
    begin
       Feature_Index := Array_First (Features_List);
       while Array_Has_Element (Features_List, Feature_Index) loop
-         Put_Line (Routine_Name & "Feature_Index: " &
-                     Integer'Image (Feature_Index));
          Feature_Name := Array_Element (Features_List, Feature_Index);
          --           Put_Line (Routine_Name & "Feature_Name JSON type: " &
          --                       JSON_Value_Type'Image (Kind (Feature_Name)));
          Ignore := Get (Feature_Name, "is_ignore");
          Is_Row_ID := Get (Feature_Name, "is_row_identifier");
-         Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
-         Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+
          Process_Status (Ignore, Is_Row_ID);
+
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
 
@@ -815,6 +813,7 @@ package body Openml is
 
    procedure Process_Target (Features_List  : JSON_Array;
                              Target_Columns : out JSON_Array) is
+--        Routine_Name  : constant String := "Openml.Process_Target ";
       Feature_Index : Positive;
       Feature_Name  : JSON_Value;
       Target        : JSON_Value;
@@ -822,7 +821,13 @@ package body Openml is
       Feature_Index := Array_First (Target_Columns);
       while Array_Has_Element (Features_List, Feature_Index) loop
          Feature_Name := Array_Element (Features_List, Feature_Index);
-         Target := Get (Feature_Name, "is_target");
+
+         if Has_Field (Feature_Name, "is_target") then
+            Target := Get (Feature_Name, "is_target");
+         elsif Has_Field (Feature_Name, "target") then
+            Target := Get (Feature_Name, "target");
+         end if;
+
          declare
             Target_Status : constant String := Get (Target);
          begin
@@ -844,7 +849,7 @@ package body Openml is
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array)
-            return ARFF.Arff_Sparse_Data_Type is
+      return ARFF.Arff_Sparse_Data_Type is
       use ARFF;
       --        Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
       Data_Length        : constant Natural := Length (Arff_Data);
