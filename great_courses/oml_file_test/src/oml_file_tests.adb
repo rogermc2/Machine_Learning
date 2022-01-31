@@ -87,12 +87,12 @@ package body OML_File_Tests is
       New_Line;
       Description := Get_Data_Description_By_ID (Data_Id, Dataset);
       declare
-         Desc : constant String := Get (Description);
+         Desc : constant String := Get (Description, "description");
       begin
          Put_Line (Routine_Name & "Description length:" &
                      Integer'Image (Desc'Length) & " characters.");
-         Put_Line (Routine_Name & "Description:");
-         Put_Line (Desc);
+--           Put_Line (Routine_Name & "Description:");
+--           Put_Line (Desc);
       end;
       New_Line;
 
@@ -118,7 +118,9 @@ package body OML_File_Tests is
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
 
       Test_Data_Description (Data_Id, Info_File_Name);
-      Test_Features  (Data_Id, Features_File_Name);
+      Put_Line (Routine_Name & "Test_Data_Description completed");
+      Test_Features (Data_Id, Features_File_Name);
+      Put_Line (Routine_Name & "Test_Features completed");
       Test_Qualities (Data_Id, Info_File_Name);
 
    end Test_Data_Info;
@@ -197,7 +199,8 @@ package body OML_File_Tests is
       end Process_Quality;
 
    begin
-      Quality_Array := Get_Data_Qualities (Data_Id, Dataset_Name => Dataset);
+      Put_Line (Routine_Name);
+      Quality_Array := Get_Data_Qualities (Data_Id, File_Name => Dataset);
 
       if Quality_Array.Is_Empty then
          Put_Line (Routine_Name & "there are no qualities");
@@ -209,6 +212,7 @@ package body OML_File_Tests is
             Next (Curs);
          end loop;
       end if;
+      Put_Line (Routine_Name & "Test_Qualities completed");
       New_Line;
 
    end Test_Qualities;

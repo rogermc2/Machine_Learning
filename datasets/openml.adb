@@ -322,6 +322,7 @@ package body Openml is
       Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
    begin
+      Put_Line (Routine_Name);
       --  L862
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version,
                                           File_Name =>  File_Name);
@@ -330,6 +331,7 @@ package body Openml is
 
       --  L877
       Description := Get_Data_Description_By_ID (Data_Id, File_Name);
+      Put_Line (Routine_Name & "Description read");
       Data_Status := Get (Description, "status");
       if To_String (Get (Data_Status)) /= "active" then
          Put_Line (Routine_Name & "Version " &
@@ -502,7 +504,7 @@ package body Openml is
    function Get_Data_Qualities (Data_ID : Integer; File_Name : String := "")
                                 return Qualities_Map is
       use Ada.Strings;
---        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
+      Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
       Qualities     : JSON_Value;
       Quality_Array : Qualities_Map;
@@ -557,6 +559,9 @@ package body Openml is
       if Has_Field (Json_Data, "qualities") then
          Qualities := Get (Json_Data, "qualities");
          Map_JSON_Object (Qualities, Get_Quality'access);
+      else
+         Put_Line (Routine_Name & File_Name &
+                     " does not have a qualities field.");
       end if;
 
       return Quality_Array;
@@ -613,7 +618,7 @@ package body Openml is
       use ML_Qualities_Package;
       Routine_Name  : constant String := "Openml.Get_Num_Samples ";
       Curs          : ML_Qualities_Package.Cursor := Qualities.First;
-      Quality       : JSON_Value;
+      Quality       : JSON_Value := Create;
       Num_Samples   : Integer := -1;
 
       procedure Get_Num_Instances (Name : Utf8_String; Value : JSON_Value) is
@@ -649,6 +654,7 @@ package body Openml is
          Quality := Element (Curs);
          Put_Line (Routine_Name & "Quality: " & Quality.Write);
          Map_JSON_Object (Quality, Get_Qual'access);
+         Put_Line (Routine_Name & "mapped");
          Next (Curs);
       end loop;
 
