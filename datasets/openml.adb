@@ -2,6 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Fixed;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Dataset_Utilities;
@@ -322,7 +323,6 @@ package body Openml is
       Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
    begin
-      Put_Line (Routine_Name);
       --  L862
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version,
                                           File_Name =>  File_Name);
@@ -331,7 +331,6 @@ package body Openml is
 
       --  L877
       Description := Get_Data_Description_By_ID (Data_Id, File_Name);
-      Put_Line (Routine_Name & "Description read");
       Data_Status := Get (Description, "status");
       if To_String (Get (Data_Status)) /= "active" then
          Put_Line (Routine_Name & "Version " &
@@ -374,7 +373,6 @@ package body Openml is
       --  L944
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
-      Put_Line (Routine_Name & "L948");
       --  L948
       if not Return_Sparse then
          Data_Qualities := Get_Data_Qualities (Data_Id, File_Name);
@@ -384,7 +382,6 @@ package body Openml is
          end if;
       end if;
 
-      Put_Line (Routine_Name & "L970");
       --  L970
       Bunch.Data := Data_Columns;
       Bunch.Target := Target_Columns;
@@ -410,7 +407,6 @@ package body Openml is
       Data_Desc    : JSON_Value;
       --        Value_Type   : JSON_Value_Type;
    begin
-
       if File_Name = "" then
          --  URL.Parse parses an URL and returns an Object representing this URL.
          --  It is then possible to extract each part of the URL with other AWS.URL
@@ -510,41 +506,10 @@ package body Openml is
       Quality_Array : Qualities_Map;
 
       procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
-         use ML_Qualities_Package;
-         Array_Quality : Boolean;
-         Bool_Quality  : Boolean;
-         Float_Quality : Float;
-         Int_Quality   : Integer;
-         Quality       : constant JSON_Value := Create_Object;
-         Null_Value    : Boolean := False;
+         Quality : constant JSON_Value := Create_Object;
       begin
-         case Kind (Value) is
-            when JSON_Array_Type =>
-               Array_Quality := Get (Value);
-               Quality.Set_Field (Name, Array_Quality);
-            when JSON_Boolean_Type =>
-               Bool_Quality := Get (Value);
-               Quality.Set_Field (Name, Bool_Quality);
-            when JSON_Float_Type =>
-               Float_Quality := Get (Value);
-               Quality.Set_Field (Name, Float_Quality);
-            when JSON_Int_Type =>
-               Int_Quality := Get (Value);
-               Quality.Set_Field (Name, Int_Quality);
-            when JSON_Null_Type => Null_Value := True;
-            when JSON_Object_Type =>
-               Quality.Set_Field (Name, Value);
-            when JSON_String_Type =>
-               declare
-                  String_Quality : constant String := Get (Value);
-               begin
-                  Quality.Set_Field (Name, String_Quality);
-               end;
-         end case;
-
-         if not Null_Value then
-            Quality_Array.Include (To_Unbounded_String (Name), Value);
-         end if;
+         Quality.Set_Field (Name, Value);
+            Append (Quality_Array, Quality);
 
       end Get_Quality;
 
@@ -615,10 +580,9 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer is
-      use ML_Qualities_Package;
-      Routine_Name  : constant String := "Openml.Get_Num_Samples ";
-      Curs          : ML_Qualities_Package.Cursor := Qualities.First;
+--        Routine_Name  : constant String := "Openml.Get_Num_Samples ";
       Quality       : JSON_Value := Create;
+      Index         : Positive := Array_First (Qualities);
       Num_Samples   : Integer := -1;
 
       procedure Get_Num_Instances (Name : Utf8_String; Value : JSON_Value) is
@@ -633,9 +597,7 @@ package body Openml is
       procedure Get_Qual (Name : Utf8_String; Value : JSON_Value) is
          Name_Quality : constant JSON_Value := Create_Object;
       begin
-         Put_Line (Routine_Name & ".Get_Qual");
          if Name = "name" and then Kind (Value) = JSON_String_Type then
-            Put_Line (Routine_Name & ".Get_Qual Name: " & Name);
             declare
                String_Value : constant String := Get (Value);
             begin
@@ -649,13 +611,10 @@ package body Openml is
       end Get_Qual;
 
    begin
-      while Has_Element (Curs) loop
-         Put_Line (Routine_Name & "loop");
-         Quality := Element (Curs);
-         Put_Line (Routine_Name & "Quality: " & Quality.Write);
+      while Array_Has_Element (Qualities, Index) loop
+         Quality := Array_Element (Qualities, Index);
          Map_JSON_Object (Quality, Get_Qual'access);
-         Put_Line (Routine_Name & "mapped");
-         Next (Curs);
+         Index := Array_Next (Qualities, Index);
       end loop;
 
       return Num_Samples;

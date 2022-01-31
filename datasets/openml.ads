@@ -1,14 +1,12 @@
 
-with Ada.Containers.Ordered_Maps;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+--  with Ada.Containers.Ordered_Maps;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 package Openml is
 
-   package ML_Qualities_Package is new
-     Ada.Containers.Ordered_Maps (Unbounded_String, JSON_Value);
-   subtype Qualities_Map is ML_Qualities_Package.Map;
+   subtype Qualities_Map is JSON_Array;
 
    type Bunch_Data (Only_XY : Boolean := False) is record
       Data          : JSON_Array;

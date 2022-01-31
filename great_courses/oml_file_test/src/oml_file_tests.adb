@@ -8,7 +8,7 @@ with Openml; use Openml;
 
 package body OML_File_Tests is
 
---     pragma Warnings (Off);
+   --     pragma Warnings (Off);
 
    procedure Test_Features (Data_Id : Integer; Dataset : String := "");
    procedure Test_Qualities (Data_Id : Integer; Dataset : String := "");
@@ -66,9 +66,9 @@ package body OML_File_Tests is
       Data_Columns := Valid_Data_Column_Names (Features, Feature_Columns);
       Target_Columns := Valid_Data_Column_Names (Features, Target_Columns);
       Assert (not Is_Empty (Data_Columns), Routine_Name &
-              "Data_Columns is empty");
+                "Data_Columns is empty");
       Assert (not Is_Empty (Target_Columns), Routine_Name &
-              "Target_Columns is empty");
+                "Target_Columns is empty");
 
       Bunch := Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
@@ -91,8 +91,8 @@ package body OML_File_Tests is
       begin
          Put_Line (Routine_Name & "Description length:" &
                      Integer'Image (Desc'Length) & " characters.");
---           Put_Line (Routine_Name & "Description:");
---           Put_Line (Desc);
+         --           Put_Line (Routine_Name & "Description:");
+         --           Put_Line (Desc);
       end;
       New_Line;
 
@@ -136,6 +136,8 @@ package body OML_File_Tests is
    begin
       Put_Line (Routine_Name & "Get features");
       Feature_Array := Get_Data_Features (Data_Id, File_Name => Dataset);
+      Put_Line (Routine_Name & "number of features: " &
+                  Integer'Image (Length (Feature_Array)));
       Index := Array_First (Feature_Array);
       while Array_Has_Element (Feature_Array, Index) loop
          aFeature := Array_Element (Feature_Array, Index);
@@ -143,8 +145,6 @@ package body OML_File_Tests is
          if Feature_Index < 4 then
             Put_Line ("aFeature index: " & Integer'Image (Feature_Index));
          end if;
-         --           Put_Line ("aFeature JSON type: " &
-         --                       JSON_Value_Type'Image (kind (aFeature)));
          Index := Array_Next (Feature_Array, Index);
       end loop;
 
@@ -159,59 +159,65 @@ package body OML_File_Tests is
       Dataset_Name  : constant String := "mnist_784";
       File_Name     : constant String := "mnist_784";
       Version       : constant String := "1";
+      Feature_Array : JSON_Array;
       Data_Id       : Integer := 0;
       Bunch         : Bunch_Data (True);
    begin
-      Bunch := Fetch_Openml (Dataset_Name, Version, File_Name, Data_Id);
-      Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
+      Put_Line (Routine_Name);
+      Feature_Array := Get_Data_Features (Data_Id, File_Name => Dataset_Name);
+      declare
+         Target_Column : constant String :=
+                           Integer'Image (Length (Feature_Array) + 1);
+      begin
+         Bunch := Fetch_Openml
+           (Dataset_Name  => Dataset_Name, Version => Version,
+            File_Name => File_Name, Data_Id => Data_Id,
+            Target_Column => Target_Column, Return_X_Y => True,
+            As_Frame => "false");
+      end;
+
+      Put_Line (Routine_Name & "X length: " &
+                  Integer'Image (Length (Bunch.Data)));
+      Put_Line (Routine_Name & "Y length: " &
+                  Integer'Image (Length (Bunch.Target)));
+      Put_Line (Routine_Name & "completed");
 
    end Test_Fetch_OML;
 
    --  -------------------------------------------------------------------------
 
    procedure Test_Qualities (Data_Id : Integer; Dataset : String := "") is
-      use ML_Qualities_Package;
       Routine_Name  : constant String := "Test_Qualities ";
+      Max_Count     : constant Natural := 10;
       Count         : Natural := 0;
       Quality_Array : Qualities_Map;
-      Curs          : Cursor;
+      Index         : Positive;
       Quality       : JSON_Value;
-
-      procedure Process_Quality (Value : JSON_Value) is
-      begin
-         Count := Count + 1;
-         if Count > 20 and Count < 31 then
-            Put ("Quality value:");
-            case Kind (Value) is
-            when JSON_Array_Type => Put_Line (" JSON_Array");
-            when JSON_Boolean_Type =>
-               Put_Line (Boolean'Image (Get (Value)));
-            when JSON_Float_Type =>
-               Put_Line (Float'Image (Get (Value)));
-            when JSON_Int_Type =>
-               Put_Line (Integer'Image (Get (Value)));
-            when JSON_Null_Type => Put_Line (" Null");
-            when JSON_Object_Type => Put_Line (" JSON_Object");
-            when JSON_String_Type => Put_Line (Get (Value));
-            end case;
-         end if;
-
-      end Process_Quality;
-
    begin
+      New_Line;
       Put_Line (Routine_Name);
       Quality_Array := Get_Data_Qualities (Data_Id, File_Name => Dataset);
 
-      if Quality_Array.Is_Empty then
+      if Is_Empty (Quality_Array) then
          Put_Line (Routine_Name & "there are no qualities");
       else
-         Curs := Quality_Array.First;
-         while Has_Element (Curs) loop
-            Quality := Element (Curs);
-            Process_Quality (Quality);
-            Next (Curs);
+         Put_Line (Routine_Name & "Quality_Array length: " &
+                     Integer'Image (Length (Quality_Array)));
+         Index := Array_First (Quality_Array);
+
+         Put_Line (Routine_Name & "first" & Integer'Image (Max_Count) &
+                     " qualities:");
+         while Array_Has_Element (Quality_Array, Index) loop
+            Count := Count + 1;
+            Quality := Array_Element (Quality_Array, Index);
+            if Count <= Max_Count then
+               Put_Line (Routine_Name & "Quality: " & Quality.Write);
+            end if;
+
+            Index := Array_Next (Quality_Array, Index);
          end loop;
       end if;
+
       Put_Line (Routine_Name & "Test_Qualities completed");
       New_Line;
 
