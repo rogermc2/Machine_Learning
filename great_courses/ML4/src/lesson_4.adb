@@ -28,6 +28,8 @@ procedure Lesson_4 is
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
+   Data_Id       : Integer := 0;
+   XY            : Openml.Bunch_Data (True);
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
    aClassifier   : Base_Decision_Tree.Classifier
@@ -39,6 +41,12 @@ procedure Lesson_4 is
    Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
    Put_Line (Routine_Name);
+   XY := Openml.Fetch_Openml
+     (Dataset_Name  => "mnist_784", Version  => "",
+      File_Name => "src/mnist_784", Data_Id  => Data_Id,
+      Target_Column => "default-target", Return_X_Y  => True,
+      As_Frame => "false");
+
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
    --  Labels is 2D list num outputs x num samples
    Labels := Data.Label_Values;
