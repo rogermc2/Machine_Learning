@@ -299,10 +299,10 @@ package body Openml is
 
    function Fetch_Openml (Dataset_Name   : String; Version : String := "";
                           File_Name      : String := "";
-                          Data_Id       : in out Integer;
-                          Target_Column : String := "default-target";
-                          Return_X_Y    : Boolean := False;
-                          As_Frame      : String := "false")
+                          Data_Id        : in out Integer;
+                          Target_Column  : String := "default-target";
+                          Return_X_Y     : Boolean := False;
+                          As_Frame       : String := "false")
                           return Bunch_Data is
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
@@ -313,6 +313,7 @@ package body Openml is
       Description     : JSON_Value;
       Return_Sparse   : Boolean := False;
       Data_Format     : JSON_Value;
+      Data_Status     : JSON_Value;
       Features_List   : JSON_Array;
       Ignore          : JSON_Value;
       Target_Columns  : JSON_Array;
@@ -324,15 +325,23 @@ package body Openml is
       --  L862
       Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version,
                                           File_Name =>  File_Name);
-      Put_Line (Routine_Name & "Data_Info set");
       JSON_Data_Id := Get (Data_Info, "data_id");
       Data_Id := Integer'Value (Get (JSON_Data_Id));
 
       --  L877
       Description := Get_Data_Description_By_ID (Data_Id, File_Name);
-      Put_Line (Routine_Name & "Data_desc set");
+      Data_Status := Get (Description, "status");
+      if To_String (Get (Data_Status)) /= "active" then
+         Put_Line (Routine_Name & "Version " &
+                     To_String (Get (Get (Description, "version"))) &
+                     " of dataset " &
+                     To_String (Get (Get (Description, "name"))) &
+                     " is inactive meaning that issues have been found in" &
+                     " the dataset. Try using a newer version.");
+      end if;
+
       Data_Format := Get (Description, "format");
-      Put_Line (Routine_Name & "Data_Format set");
+      --        Put_Line (Description.Write);
       declare
          Format : String := Get (Data_Format);
       begin
@@ -345,18 +354,17 @@ package body Openml is
          Return_Sparse := not Return_Sparse;
       end if;
 
-      Put_Line (Routine_Name & "L903");
-
       Assert (not (As_Frame = "true" and Return_Sparse),
               Routine_Name & "cannot return dataframe with sparse data");
 
-      Put_Line (Routine_Name & "As_Frame: " & As_Frame);
       --  L910
       Features_List := Get_Data_Features (Data_ID, File_Name);
+      Put_Line (Routine_Name & "Features_List set");
       if As_Frame = "false" then
          Process_Feature (Dataset_Name, Features_List);
       end if;
 
+      Put_Line (Routine_Name & "L922");
       --  L922
       if Target_Column = "default-target" then
          Process_Target (Features_List, Target_Columns);
@@ -399,24 +407,24 @@ package body Openml is
       Data_Desc    : JSON_Value;
       --        Value_Type   : JSON_Value_Type;
    begin
-      --  URL.Parse parses an URL and returns an Object representing this URL.
-      --  It is then possible to extract each part of the URL with other AWS.URL
-      --  services.
-      URL_Object := AWS.URL.Parse (URL);
-      Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
-                "object returned by URL " & URL & "is invalid");
 
       if File_Name = "" then
+         --  URL.Parse parses an URL and returns an Object representing this URL.
+         --  It is then possible to extract each part of the URL with other AWS.URL
+         --  services.
+         URL_Object := AWS.URL.Parse (URL);
+         Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
+                   "object returned by URL " & URL & "is invalid");
          Data_Desc := Get_Json_Content_From_Openml_Api (URL);
       else
          Data_Desc := Get_Json_Content_From_File (File_Name);
       end if;
 
-      if Has_Field (Data_Desc, "description") then
-         Data_Desc := Get (Data_Desc, "description");
-      else
-         Put_Line (Routine_Name & "Data_Desc is not a data_set_description");
-      end if;
+      --        if Has_Field (Data_Desc, "description") then
+      --           Data_Desc := Get (Data_Desc, "description");
+      --        else
+      --           Put_Line (Routine_Name & "Data_Desc is not a data_set_description");
+      --        end if;
 
       return Data_Desc;
 
@@ -440,14 +448,19 @@ package body Openml is
          Json_Data := Get_Json_Content_From_File (File_Name);
       end if;
 
-      Assert (Has_Field (Json_Data, "data_features"), Routine_Name &
+      Assert (Has_Field (Json_Data, "data_features") or
+                Has_Field (Json_Data, "features"), Routine_Name &
                 "data_features is not a Json_Data field.");
-      Features := Get (Json_Data, "data_features");
 
-      Assert (Has_Field (Features, "feature"), Routine_Name &
-                "data_features is not a Json_Data field.");
-      Feature := Get (Features, "feature");
-      Feature_Array := Get (Feature);
+      if Has_Field (Json_Data, "data_features") then
+         Features := Get (Json_Data, "data_features");
+         Assert (Has_Field (Features, "feature"), Routine_Name &
+                   "data_features is not a Json_Data field.");
+         Feature := Get (Features, "feature");
+         Feature_Array := Get (Feature);
+      else
+         Feature_Array := Get (Json_Data, "features");
+      end if;
 
       return Feature_Array;
 
@@ -552,8 +565,8 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value is
---        Routine_Name   : constant String :=
---                                 "Openml.Get_Json_Content_From_File ";
+      --        Routine_Name   : constant String :=
+      --                                 "Openml.Get_Json_Content_From_File ";
       Name           : constant String := File_Name & ".json";
       File           : File_Type;
       JSON_Data      : Unbounded_String;
