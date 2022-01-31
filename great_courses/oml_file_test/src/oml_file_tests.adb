@@ -155,10 +155,12 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       Routine_Name  : constant String := "Test_Fetch_OML ";
       Dataset_Name  : constant String := "mnist_784";
+      File_Name     : constant String := "mnist_784";
       Version       : constant String := "1";
       Data_Id       : Integer := 0;
+      Bunch         : Bunch_Data (True);
    begin
-      Fetch_Openml (Dataset_Name, Version, Data_Id);
+      Bunch := Fetch_Openml (Dataset_Name, Version, File_Name, Data_Id);
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
 
    end Test_Fetch_OML;
