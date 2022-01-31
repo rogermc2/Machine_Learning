@@ -49,7 +49,7 @@ package Openml is
                                    Active       : Boolean := False;
                                    File_Name    : String := "")
                                     return JSON_Value;
-   function Get_Data_Qualities (Data_ID : Integer; Dataset_Name : String := "")
+   function Get_Data_Qualities (Data_ID : Integer; File_Name : String := "")
                                  return Qualities_Map;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;

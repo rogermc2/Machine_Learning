@@ -375,13 +375,14 @@ package body Openml is
       Put_Line (Routine_Name & "L948");
       --  L948
       if not Return_Sparse then
-         Data_Qualities := Get_Data_Qualities (Data_Id, Dataset_Name);
-         if Get_Num_Samples (Data_Qualities) > -1 then
+         Data_Qualities := Get_Data_Qualities (Data_Id, File_Name);
+         if Get_Num_Samples (Data_Qualities) > - 1 then
             null;
             --              Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
          end if;
       end if;
 
+      Put_Line (Routine_Name & "L970");
       --  L970
       Bunch.Data := Data_Columns;
       Bunch.Target := Target_Columns;
@@ -498,10 +499,10 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Data_Qualities (Data_ID : Integer; Dataset_Name : String := "")
+   function Get_Data_Qualities (Data_ID : Integer; File_Name : String := "")
                                 return Qualities_Map is
       use Ada.Strings;
-      --        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
+--        Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
       Qualities     : JSON_Value;
       Quality_Array : Qualities_Map;
@@ -546,11 +547,11 @@ package body Openml is
       end Get_Quality;
 
    begin
-      if Dataset_Name = "" then
+      if File_Name = "" then
          Json_Data := Get_Json_Content_From_Openml_Api
            (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
       else
-         Json_Data := Get_Json_Content_From_File (Dataset_Name);
+         Json_Data := Get_Json_Content_From_File (File_Name);
       end if;
 
       if Has_Field (Json_Data, "qualities") then
@@ -610,7 +611,7 @@ package body Openml is
 
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer is
       use ML_Qualities_Package;
-      --        Routine_Name  : constant String := "Openml.Get_Num_Samples ";
+      Routine_Name  : constant String := "Openml.Get_Num_Samples ";
       Curs          : ML_Qualities_Package.Cursor := Qualities.First;
       Quality       : JSON_Value;
       Num_Samples   : Integer := -1;
@@ -627,7 +628,9 @@ package body Openml is
       procedure Get_Qual (Name : Utf8_String; Value : JSON_Value) is
          Name_Quality : constant JSON_Value := Create_Object;
       begin
+         Put_Line (Routine_Name & ".Get_Qual");
          if Name = "name" and then Kind (Value) = JSON_String_Type then
+            Put_Line (Routine_Name & ".Get_Qual Name: " & Name);
             declare
                String_Value : constant String := Get (Value);
             begin
@@ -642,7 +645,9 @@ package body Openml is
 
    begin
       while Has_Element (Curs) loop
+         Put_Line (Routine_Name & "loop");
          Quality := Element (Curs);
+         Put_Line (Routine_Name & "Quality: " & Quality.Write);
          Map_JSON_Object (Quality, Get_Qual'access);
          Next (Curs);
       end loop;
