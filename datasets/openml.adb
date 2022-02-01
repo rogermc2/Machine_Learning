@@ -96,8 +96,8 @@ package body Openml is
                                 Include_Columns : JSON_Array) return JSON_Array;
    procedure Process_Feature (Dataset_Name  : String;
                               Features_List : JSON_Array);
-   procedure Process_Target (Features_List  : JSON_Array;
-                             Target_Columns : out JSON_Array);
+   procedure Set_Default_Target (Features_List  : JSON_Array;
+                                 Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array) return ARFF.Arff_Sparse_Data_Type;
@@ -371,7 +371,7 @@ package body Openml is
       --  L922
       if Target_Column = "default-target" then
          Put_Line (Routine_Name & "default-target");
-         Process_Target (Features_List, Target_Columns);
+         Set_Default_Target (Features_List, Target_Columns);
       else
          Target_Value := Trim (To_Unbounded_String (Target_Column
                                (Target_Column'First + 1 .. Target_Column'Last)), Both);
@@ -793,46 +793,32 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
    --  L922
-   procedure Process_Target (Features_List  : JSON_Array;
-                             Target_Columns : out JSON_Array) is
-      Routine_Name  : constant String := "Openml.Process_Target ";
+   procedure Set_Default_Target (Features_List  : JSON_Array;
+                                 Target_Columns : out JSON_Array) is
+      Routine_Name  : constant String := "Openml.Set_Default_Target ";
       Feature_Index : Positive;
-      Feature_Name  : JSON_Value;
+      Feature       : JSON_Value;
       Target        : JSON_Value;
    begin
-      --          Put_Line (Routine_Name & "Features_List length" &
-      --                      Integer'Image (Length (Features_List)));
       Feature_Index := Array_First (Target_Columns);
       while Array_Has_Element (Features_List, Feature_Index) loop
-         Feature_Name := Array_Element (Features_List, Feature_Index);
-         if Has_Field (Feature_Name, "target") then
-            Target := Get (Feature_Name, "target");
-            Append (Target_Columns, Target);
-            Put_Line (Routine_Name & "Target: " & Target.Write);
-            --                  declare
-            --                      Target_Val : constant String := Get (Target);
-            --                  begin
-            --                      Put_Line (Routine_Name & "Target: " & Target_Val);
-            --                  end;
+         Feature := Array_Element (Features_List, Feature_Index);
+         if Has_Field (Feature, "is_target") then
+            declare
+               Is_Target : constant String := Get (Feature, "is_target");
+            begin
+               if Is_Target = "true" then
+                  Target := Get (Feature, "name");
+                  Append (Target_Columns, Target);
+                  Put_Line (Routine_Name & "Target: " & Target.Write);
+               end if;
+            end;
          end if;
 
-         if Has_Field (Feature_Name, "is_target") then
-            Put_Line (Routine_Name & "is_target");
-         elsif Has_Field (Feature_Name, "target") then
-            Put_Line (Routine_Name & "target");
-         end if;
-
-         --           declare
-         --              Target_Status : constant String := Get (Target);
-         --           begin
-         --              if Target_Status = "true" then
-         --           Target_Columns := Get (Feature_Name, "name");
-         --              end if;
-         --           end;
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
 
-   end Process_Target;
+   end Set_Default_Target;
 
    --  ------------------------------------------------------------------------
    --  L184  ArffSparseDataType = Tuple[List, ...]
@@ -896,7 +882,7 @@ package body Openml is
    --  L699
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array is
-      Routine_Name  : constant String := "Openml.Valid_Data_Column_Names ";
+--        Routine_Name  : constant String := "Openml.Valid_Data_Column_Names ";
       Feature_Index : Positive;
       Feature       : JSON_Value;
       Feature_Name  : JSON_Value;
@@ -918,11 +904,11 @@ package body Openml is
            not Target_Found loop
             Target := Array_Element (Target_Columns, Target_Index);
             if not Is_Empty (Target)   then
-               Put_Line (Routine_Name & "Target: " & Target.Write);
+--                 Put_Line (Routine_Name & "Target: " & Target.Write);
                declare
                   Target_Val : constant String := Get (Target, "target");
                begin
-                  Put_Line (Routine_Name & "Target_Val: " & Target_Val);
+--                    Put_Line (Routine_Name & "Target_Val: " & Target_Val);
                   Target_Found := Target_Val = Feature_Val;
                end;
             end if;
@@ -940,12 +926,12 @@ package body Openml is
          Feature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Feature.Get ("name");
          Feature_Val := Get (Feature_Name);
-         Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
+--           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
 
          Ignore := Feature.Get ("is_ignore");
          Is_Row_ID := Feature.Get ("is_row_identifier");
-         Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
-         Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+--           Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
+--           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
          Found := False;
 
          if not Is_Empty (Ignore) and not Is_Empty (Is_Row_ID) then
