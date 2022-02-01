@@ -909,17 +909,22 @@ package body Openml is
         function Check_Target return Boolean is
             Target_Index : Positive;
             Target       : JSON_Value;
-            Target_Val   : Unbounded_String;
             Target_Found : Boolean := False;
         begin
+            --  L707
+--              Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
             Target_Index := Array_First (Target_Columns);
             while Array_Has_Element (Target_Columns, Target_Index) and
               not Target_Found loop
                 Target := Array_Element (Target_Columns, Target_Index);
                 if not Is_Empty (Target)   then
---                      Put_Line (Routine_Name & "Target: " & Target.Write);
-                    Target_Val := Get (Target);
+                    Put_Line (Routine_Name & "Target: " & Target.Write);
+                    declare
+                        Target_Val : constant String := Get (Target,"target");
+                    begin
+                    Put_Line (Routine_Name & "Target_Val: " & Target_Val);
                     Target_Found := Target_Val = Feature_Val;
+                    end;
                 end if;
                 Target_Index := Array_Next (Target_Columns, Target_Index);
             end loop;
@@ -939,17 +944,19 @@ package body Openml is
 
             Ignore := Feature.Get ("is_ignore");
             Is_Row_ID := Feature.Get ("is_row_identifier");
-            --              Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
-            --              Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+--              Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
+--              Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
             Found := False;
 
             if not Is_Empty (Ignore) and not Is_Empty (Is_Row_ID)  then
-                Put_Line (Routine_Name & "Is_Row_ID and Ignore both not empty");
+--                  Put_Line (Routine_Name & "Is_Row_ID and Ignore both not empty");
                 declare
                     Ignore_Status : constant String := Get (Ignore);
                     Row_ID_Status : constant String := Get (Is_Row_ID);
                 begin
-                    if Ignore_Status = "false" and Row_ID_Status = "false" then
+                    if Ignore_Status /= "true" and Row_ID_Status /= "true" then
+--                          Put_Line (Routine_Name &
+--                                      "Ignore_Status and Row_ID_Status not true");
                         Found := Check_Target;
                     end if;
                 end;
