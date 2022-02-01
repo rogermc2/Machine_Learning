@@ -378,16 +378,8 @@ package body Openml is
             Append (Target_Columns, Target);
         end if;
 
-        Put_Line (Routine_Name & "Features_List length: " &
-                    Integer'Image (Length (Features_List)));
-        Put_Line (Routine_Name & "Target_Columns (1): " &
-                    Array_Element
-                    (Target_Columns, Array_First (Target_Columns)).Write);
-
         --  L944
         Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
-        Put_Line (Routine_Name & "Data_Columns length: " &
-                    Integer'Image (Length (Data_Columns)));
 
         --  L948
         if not Return_Sparse then
@@ -930,7 +922,7 @@ package body Openml is
                 Name_Index := Array_Next (Target_Columns, Name_Index);
             end loop;
 
-            if Found then
+            if not Found then
                 Append (Column_Names, Feature_Name);
             end if;
 

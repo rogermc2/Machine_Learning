@@ -3,6 +3,8 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with GNATCOLL.JSON; use GNATCOLL.JSON;
+
 with ML_Types;
 
 with Base_Decision_Tree;
@@ -46,6 +48,8 @@ begin
       File_Name => "src/mnist_784", Data_Id  => Data_Id,
       Target_Column => "default-target", Return_X_Y  => True,
       As_Frame => "false");
+   Put_Line (Routine_Name & "X length" & Integer'Image (Length (XY.Data)));
+   Put_Line (Routine_Name & "Y length" & Integer'Image (Length (XY.Target)));
 
    Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
    --  Labels is 2D list num outputs x num samples
