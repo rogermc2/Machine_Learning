@@ -1,0 +1,43 @@
+{"data":{"dataset":[
+    {"did":554,
+   "name":"mnist_784",
+   "version":1,
+   "status":"active",
+   "format":"ARFF",
+   "md5_checksum":"",
+      "file_id": 52667,
+      "quality":[
+        {"name":"MajorityClassSize",
+     "value":"7877.0"
+    }
+    ,    {"name":"MaxNominalAttDistinctValues",
+     "value":"10.0"
+    }
+    ,    {"name":"MinorityClassSize",
+     "value":"6313.0"
+    }
+    ,    {"name":"NumberOfClasses",
+     "value":"10.0"
+    }
+    ,    {"name":"NumberOfFeatures",
+     "value":"785.0"
+    }
+    ,    {"name":"NumberOfInstances",
+     "value":"70000.0"
+    }
+    ,    {"name":"NumberOfInstancesWithMissingValues",
+     "value":"0.0"
+    }
+    ,    {"name":"NumberOfMissingValues",
+     "value":"0.0"
+    }
+    ,    {"name":"NumberOfNumericFeatures",
+     "value":"784.0"
+    }
+    ,    {"name":"NumberOfSymbolicFeatures",
+     "value":"1.0"
+    }
+        ]
+      }
+    ]}
+}

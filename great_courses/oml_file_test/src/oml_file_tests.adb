@@ -17,9 +17,9 @@ package body OML_File_Tests is
 
    procedure Test_Convert_Arff_To_Data is
       Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
-      Features_File_Name : constant String := "diabetes_features";
+      Features_File_Name : constant String := "../diabetes_features";
       Data_Id            : constant Integer := 0;
-      File_Name          : constant String := "diabetes.arff";
+      File_Name          : constant String := "../diabetes.arff";
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
       Data_Age           : constant JSON_Value := Create_Object;
@@ -103,8 +103,8 @@ package body OML_File_Tests is
    procedure Test_Data_Info is
       Routine_Name       : constant String := "Test_Data_Info ";
       Dataset_Name       : constant String := "mnist_784";
-      Info_File_Name     : constant String := "mnist_784";
-      Features_File_Name : constant String := "features";
+      Info_File_Name     : constant String := "../mnist_784";
+      Features_File_Name : constant String := "../features";
       Version            : constant String := "1";
       Data_Info          : JSON_Value;
       JSON_Data_Id       : JSON_Value;
@@ -157,14 +157,15 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       Routine_Name  : constant String := "Test_Fetch_OML ";
       Dataset_Name  : constant String := "mnist_784";
-      File_Name     : constant String := "mnist_784";
+      File_Name     : constant String := "../mnist_784";
       Version       : constant String := "1";
       Feature_Array : JSON_Array;
       Data_Id       : Integer := 0;
       Bunch         : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
-      Feature_Array := Get_Data_Features (Data_Id, File_Name => Dataset_Name);
+      Feature_Array := Get_Data_Features (Data_Id, File_Name => File_Name);
+      Put_Line (Routine_Name & "Feature_Array set");
       declare
          Target_Column : constant String :=
                            Integer'Image (Length (Feature_Array) + 1);

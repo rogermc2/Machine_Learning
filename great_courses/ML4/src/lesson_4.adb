@@ -45,7 +45,7 @@ begin
    Put_Line (Routine_Name);
    XY := Openml.Fetch_Openml
      (Dataset_Name  => "mnist_784", Version  => "",
-      File_Name => "src/mnist_784", Data_Id  => Data_Id,
+      File_Name => "../mnist_784", Data_Id  => Data_Id,
       Target_Column => "default-target", Return_X_Y  => True,
       As_Frame => "false");
    Put_Line (Routine_Name & "X length" & Integer'Image (Length (XY.Data)));
