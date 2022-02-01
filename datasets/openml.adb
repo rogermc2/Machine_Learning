@@ -921,9 +921,10 @@ package body Openml is
                     begin
                         Found :=
                           Feature_Name = Target_Name and
-                          Ignore_Status = "false" and
-                          Row_ID_Status = "false";
+                          Ignore_Status = "false" and Row_ID_Status = "false";
                     end;
+                else
+                    Found := Feature_Name = Target_Name;
                 end if;
 
                 Name_Index := Array_Next (Target_Columns, Name_Index);
