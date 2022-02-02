@@ -1,6 +1,5 @@
 
---  with Ada.Containers.Ordered_Maps;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
@@ -33,10 +32,11 @@ package Openml is
        return Bunch_Data;
    function Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                           File_Name     : String := "";
+                          Features_File_Name : String := "";
                           Data_Id       : in out Integer;
                           Target_Column : String := "default-target";
                           Return_X_Y    : Boolean := False;
-                          As_Frame      : String := "false")
+                          As_Frame      : in out Unbounded_String)
                            return Bunch_Data;
    function Get_Data_Description_By_ID
      (Data_ID : Integer; File_Name : String := "") return JSON_Value;

@@ -2,7 +2,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Fixed;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Dataset_Utilities;
@@ -298,12 +297,13 @@ package body Openml is
 
    --  ------------------------------------------------------------------------
 
-   function Fetch_Openml (Dataset_Name   : String; Version : String := "";
-                          File_Name      : String := "";
-                          Data_Id        : in out Integer;
-                          Target_Column  : String := "default-target";
-                          Return_X_Y     : Boolean := False;
-                          As_Frame       : String := "false")
+   function Fetch_Openml (Dataset_Name       : String; Version : String := "";
+                          File_Name          : String := "";
+                          Features_File_Name : String := "";
+                          Data_Id            : in out Integer;
+                          Target_Column      : String := "default-target";
+                          Return_X_Y         : Boolean := False;
+                          As_Frame           : in out Unbounded_String)
                            return Bunch_Data is
       use Ada.Strings;
       use Dataset_Utilities;
@@ -344,8 +344,9 @@ package body Openml is
                      " the dataset. Try using a newer version.");
       end if;
 
+      --  L897
       Data_Format := Get (Description, "format");
-      --        Put_Line (Description.Write);
+--            Put_Line (Routine_Name & Description.Write);
       declare
          Format : String := Get (Data_Format);
       begin
@@ -355,14 +356,18 @@ package body Openml is
 
       --  L903
       if As_Frame = "auto" then
-         Return_Sparse := not Return_Sparse;
+         if not Return_Sparse then
+              As_Frame := To_Unbounded_String ("true");
+         end if;
+      else
+         As_Frame := To_Unbounded_String ("false");
       end if;
 
       Assert (not (As_Frame = "true" and Return_Sparse),
               Routine_Name & "cannot return dataframe with sparse data");
 
       --  L910
-      Features_List := Get_Data_Features (Data_ID, File_Name);
+      Features_List := Get_Data_Features (Data_ID, Features_File_Name);
 
       if As_Frame = "false" then
          Process_Feature (Dataset_Name, Features_List);
@@ -758,8 +763,7 @@ package body Openml is
                Row_ID_Stat : constant String := Get (Row_ID_Status);
             begin
                if Ignore_Stat /= "true" and Row_ID_Stat /= "true" then
-                  Data_Type_Item := Get (Feature_Name, "data_type");
-                  if not Is_Empty (Data_Type_Item) then
+                  if Is_Empty (Data_Type_Item) then
                      Put_Line (Routine_Name & "Data_Type_Item set");
                      declare
                         Data_Type : constant String := Get (Data_Type_Item);
@@ -770,6 +774,8 @@ package body Openml is
                                   "Try as_frame=True");
                      end;
                   end if;
+               else
+                  Data_Type_Item := Get (Feature_Name, "data_type");
                end if;
             end;
          end if;

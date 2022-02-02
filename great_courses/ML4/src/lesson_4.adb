@@ -1,6 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
@@ -31,6 +31,7 @@ procedure Lesson_4 is
 --     X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
 --     Num_Samples   : constant Natural := Natural (X_Data.Length);
    Data_Id       : Integer := 0;
+   As_Frame      : Unbounded_String := To_Unbounded_String ("false");
    XY            : Openml.Bunch_Data (True);
 --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
 --     Features      : Feature_Names_List;
@@ -45,9 +46,10 @@ begin
    Put_Line (Routine_Name);
    XY := Openml.Fetch_Openml
      (Dataset_Name  => "mnist_784", Version  => "",
-      File_Name => "../mnist_784", Data_Id  => Data_Id,
+      File_Name => "../mnist_784",
+      Features_File_Name => "../dataset_554_features", Data_Id  => Data_Id,
       Target_Column => "default-target", Return_X_Y  => True,
-      As_Frame => "false");
+      As_Frame => As_Frame);
    Put_Line (Routine_Name & "X length" & Integer'Image (Length (XY.Data)));
    Put_Line (Routine_Name & "Y length" & Integer'Image (Length (XY.Target)));
    Assert (Length (XY.Data) > 0, Routine_Name & "X is empty.");
