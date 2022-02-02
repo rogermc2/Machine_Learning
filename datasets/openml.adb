@@ -149,7 +149,8 @@ package body Openml is
                                     Sparse, As_Frame : Boolean;
                                     Features_List    : JSON_Array;
                                     Data_Columns     : JSON_Array;
-                                    Target_Columns   : JSON_Array)
+                                    Target_Columns   : JSON_Array;
+                                    Return_X_Y       : Boolean := False)
      --                                       Shape            : Shape_Data)
                                     return Bunch_Data is
       Routine_Name       : constant String := "Openml.Download_Data_To_Bunch ";
@@ -169,7 +170,7 @@ package body Openml is
       Y                  : JSON_Array;
       Nominal_Attributes : JSON_Array;
       --        Frame              : Boolean := False;
-      Bunch              : Bunch_Data;
+      Bunch              : Bunch_Data (Return_X_Y);
 
       procedure Parse_ARFF
         (ARFF_In          : JSON_Value; X_out, Y_out : out JSON_Array;
@@ -267,6 +268,7 @@ package body Openml is
          Load_Arff_Response (URL);
       end if;
 
+      Put_Line (Routine_Name & "L602");
       --  L602
       All_Columns := Data_Columns;
       Col_Name := Array_First (Target_Columns);
@@ -289,10 +291,12 @@ package body Openml is
       --  L672
       Bunch.Data := X;
       Bunch.Target := Y;
-      Bunch.As_Frame := False;
-      Bunch.Categories := Nominal_Attributes;
-      Bunch.Feature_Names := Data_Columns;
-      Bunch.Target_Names := Target_Columns;
+      if not Return_X_Y then
+         Bunch.As_Frame := False;
+         Bunch.Categories := Nominal_Attributes;
+         Bunch.Feature_Names := Data_Columns;
+         Bunch.Target_Names := Target_Columns;
+      end if;
 
       return Bunch;
 
@@ -648,17 +652,31 @@ package body Openml is
    function Load_Arff_From_File
      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
       return JSON_Value is
-      File : File_Type;
-      Data : Unbounded_String := To_Unbounded_String ("");
+      File_ID  : File_Type;
+      Data     : ML_Types.String_List;
+      Count    : Natural := 0;
    begin
-      Open (File, In_File, File_Name);
-      while not End_Of_File (File) loop
-         Data := Data & To_Unbounded_String (Get_Line (File));
-         Data := Data & "\r\n";
+      Put_Line ("Openml.Load_Arff_From_File");
+      Open (File_ID, In_File, File_Name);
+      while not End_Of_File (File_ID) loop
+         declare
+            Text : constant String := Get_Line (File_ID);
+         begin
+            Count := Count + 1;
+--              Put_Line ("Openml.Load_Arff_From_File line length " &
+--                       Integer'Image (Text'Length));
+            Data.Append (To_Unbounded_String (Text));
+         end;
+--           Data := Data & To_Unbounded_String (Get_Line (File_ID));
+--           Data := Data & "\r\n";
       end loop;
-      Close (File);
+      Close (File_ID);
+      Put_Line ("Openml.Load_Arff_From_File data loaded");
+      Put_Line ("Openml.Load_Arff_From_File:" & Integer'Image (Count) &
+                " lines loaded");
 
-      return ARFF.Load (To_String (Data), Return_Type);
+      return ARFF.Load (Data, Return_Type);
+--        return ARFF.Load (To_String (Data), Return_Type);
 
    end Load_Arff_From_File;
 

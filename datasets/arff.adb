@@ -162,32 +162,33 @@ package body ARFF is
    --  -------------------------------------------------------------------------
    --  L771  and, by reference, L879
    function Decode_ARFF (Decoder        : in Out Arff_Decoder;
-                         Text           : String;
+                         Text           : ML_Types.String_List;
                          --                           Encode_Nominal : Boolean := False;
                          Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
-      use Ada.Strings;
+--        use Ada.Strings;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "ARFF.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
-      Text_Length     : constant Integer := Text'Length;
+--        Text_Length     : constant Integer := Text'Length;
+--        Text_Length     : constant Positive := Positive (Length (Text));
       State           : TK_State := TK_Descrition;
-      Pos1            : Integer := 1;
-      Pos2            : Integer := 1;
-      Message_Lines   : String_List;
-      Curs            : Cursor;
+--        Pos1            : Integer := 1;
+--        Pos2            : Integer := 1;
+--        Message_Lines   : String_List;
+      Curs            : Cursor := Text.First;
       Values          : JSON_Array;
       Arff_Container  : JSON_Value := Create_Object;
    begin
       Decoder.Current_Line := 0;
 
-      while Pos2 /= 0 and Pos1 < Text_Length loop
-         Pos2 := Fixed.Index (Text (Pos1 .. Text_Length), "\r\n");
-         Message_Lines.Append
-           (To_Unbounded_String
-              (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
-         Pos1 := Pos2 + 4;
-      end loop;
+--        while Pos2 /= 0 and Pos1 < Text_Length loop
+--           Pos2 := Fixed.Index (Text (Pos1 .. Text_Length), "\r\n");
+--           Message_Lines.Append
+--             (To_Unbounded_String
+--                (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
+--           Pos1 := Pos2 + 4;
+--        end loop;
 
 --        Put_Line (Routine_Name & "Message_Lines:");
 --        Curs := Message_Lines.First;
@@ -198,10 +199,10 @@ package body ARFF is
 --        Put_Line (Routine_Name & "end of Message_Lines");
 --        New_Line;
 
-      if Pos1 < Text_Length - 4 then
-         Message_Lines.Append
-           (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
-      end if;
+--        if Pos1 < Text_Length - 4 then
+--           Message_Lines.Append
+--             (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
+--        end if;
 
       --  L784 Arff_Container implements obj: ArffContainerType
       Arff_Container.Set_Field ("description", Create (Empty_Array));
@@ -210,7 +211,7 @@ package body ARFF is
       Arff_Container.Set_Field ("data", Create (Empty_Array));
 
       --  L796  Read all lines
-      Curs := Message_Lines.First;
+      Curs := Text.First;
       while Has_Element (Curs) and State /= TK_Data loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
          declare
@@ -269,6 +270,7 @@ package body ARFF is
          Next (Curs);
       end loop;
 
+      Put_Line (Routine_Name & "L872");
       Stream_Cursor := Curs;
       --  L872 Alter the data object
       --  case Matrix_Type implements
@@ -283,6 +285,7 @@ package body ARFF is
       end case;
 
       Arff_Container.Set_Field ("data", Values);
+      Put_Line (Routine_Name & "done");
 
       return Arff_Container;
 
@@ -518,6 +521,7 @@ package body ARFF is
          begin
             Clear (Dense_Values);
             Data_Values.Unset_Field ("values");
+            Put_Line (Routine_Name);
 
             if Row'Length > 0 then
                Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
@@ -535,6 +539,7 @@ package body ARFF is
 
       end loop;
 
+      Put_Line (Routine_Name & "L475");
       --  L475
       return Values_Array;
 
@@ -697,7 +702,18 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Load (File_Data   : String;
+--     function Load (File_Data   : String;
+--                    Return_Type : ARFF_Return_Type := Arff_Dense)
+--                    return JSON_Value is
+--        Decoder   : Arff_Decoder;
+--     begin
+--        return Decode_ARFF (Decoder, File_Data,  Return_Type);
+--
+--     end Load;
+
+   --  -------------------------------------------------------------------------
+
+   function Load (File_Data   : ML_Types.String_List;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                   return JSON_Value is
       Decoder   : Arff_Decoder;

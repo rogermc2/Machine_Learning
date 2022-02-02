@@ -30,8 +30,8 @@ package Openml is
    function Download_Data_To_Bunch
      (URL              : String; File_Name : String := "";
       Sparse, As_Frame : Boolean;  Features_List  : JSON_Array;
-      Data_Columns     : JSON_Array; Target_Columns : JSON_Array)
-       return Bunch_Data;
+      Data_Columns     : JSON_Array; Target_Columns : JSON_Array;
+      Return_X_Y       : Boolean := False) return Bunch_Data;
    function Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                           File_Name     : String := "";
                           Features_File_Name : String := "";

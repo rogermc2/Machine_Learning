@@ -1,6 +1,8 @@
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
+with ML_Types;
+
 package ARFF is
 
    subtype Arff_Container_Type is JSON_Value;
@@ -11,8 +13,11 @@ package ARFF is
 
    ARFF_Error : Exception;
 
+--     function Load
+--       (File_Data : String; Return_Type : ARFF_Return_Type := Arff_Dense)
+--        return JSON_Value;
    function Load
-     (File_Data : String; Return_Type : ARFF_Return_Type := Arff_Dense)
+     (File_Data : ML_Types.String_List; Return_Type : ARFF_Return_Type := Arff_Dense)
       return JSON_Value;
 
 end ARFF;
