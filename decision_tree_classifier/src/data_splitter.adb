@@ -2,6 +2,8 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Utilities;
 
 package body Data_Splitter is
@@ -81,6 +83,7 @@ package body Data_Splitter is
                               Test, Train : out ML_Types.String_Vector) is
       use ML_Types;
       use String_Package;
+      Routine_Name  : constant String := "Utilities.Train_Test_Split ";
       Num_Samples   : constant Positive := Positive (Length (X));
       Shuffle_Data  : Base_Shuffle_Data;
       X_Cursor      : Cursor := X.First;
@@ -90,8 +93,13 @@ package body Data_Splitter is
       Test_Indices  : Integer_List;
       Train_Indices : Integer_List;
    begin
+      Assert (Natural (Length (Y)) = Num_Samples, Routine_Name &
+             "Y length" & Integer'Image (Integer (Length (Y))) &
+             " is different to X length" & Natural'Image (Num_Samples));
+
       Init_Base_Shuffle_Split (Shuffle_Data, 1, Test_Size, Num_Samples / 4,
                                Train_Size);
+      Put_Line (Routine_Name);
 
       while Has_Element (X_Cursor) loop
             X_Vec.Append (Element (X_Cursor));
@@ -99,6 +107,7 @@ package body Data_Splitter is
             Next (X_Cursor);
             Next (Y_Cursor);
       end loop;
+      Put_Line (Routine_Name);
 
       Base_Shuffle_Split (Shuffle_Data, X, Test_Indices, Train_Indices);
 

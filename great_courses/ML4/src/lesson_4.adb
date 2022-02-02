@@ -22,7 +22,7 @@ with Utilities;
 
 procedure Lesson_4 is
    use ML_Types;
---     use ML_Types.String_Package;
+   use String_Package;
 --     use Decision_Tree_Classification;
 --     use Printing;
    Routine_Name  : constant String := "Lesson_4 ";
@@ -30,16 +30,15 @@ procedure Lesson_4 is
 --     Data          : constant Multi_Output_Data_Record :=
 --                       Classifier_Utilities.Load_Data ("src/diabetes.csv");
 --     Feature_Names : constant String_List := Data.Feature_Names;
---     X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
---     Num_Samples   : constant Natural := Natural (X_Data.Length);
+   Train_Samples : constant Positive := 5000;
+   Test_Size     : constant Positive := 1500;
+   Train_Size    : constant Positive := Train_Samples - Test_Size;
    Data_Id       : Integer := 0;
    As_Frame      : Unbounded_String := To_Unbounded_String ("false");
    XY            : Openml.Bunch_Data (True);
    X             : String_List;
    Y             : String_List;
-   Train_Samples : constant Positive := 5000;
-   Test_Size     : constant Positive := 1500;
-   Train_Size    : constant Positive := Train_Samples - Test_Size;
+   Num_Samples   : Positive;
    Test_Data     : String_Vector;
    Train_Data    : String_Vector;
 --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
@@ -59,6 +58,7 @@ begin
       Features_File_Name => "../dataset_554_features", Data_Id  => Data_Id,
       Target_Column => "default-target", Return_X_Y  => True,
       As_Frame => As_Frame);
+
    Put_Line (Routine_Name & "X length" & Integer'Image (Length (XY.Data)));
    Put_Line (Routine_Name & "Y length" & Integer'Image (Length (XY.Target)));
    Assert (Length (XY.Data) > 0, Routine_Name & "X is empty.");
@@ -66,6 +66,12 @@ begin
 
    X := Openml.J_Array_To_String_List (XY.Data);
    Y := Openml.J_Array_To_String_List (XY.Target);
+   Num_Samples := Positive (Length (X));
+
+   Assert (Natural (Length (Y)) = Num_Samples, Routine_Name &
+             "Y length" & Integer'Image (Integer (Length (Y))) &
+             " is different to X length" & Natural'Image (Num_Samples));
+
    Utilities.Permute (X);
    Utilities.Permute (Y);
 

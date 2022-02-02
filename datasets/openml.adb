@@ -260,7 +260,7 @@ package body Openml is
       --  L652
       if File_Name'Length > 0 then
          --  Load_Arff_Response from file
-         ARFF_Data := Load_Arff_From_File (File_Name, Return_Type);
+         ARFF_Data := Load_Arff_From_File (File_Name & ".arff", Return_Type);
          --           Post_Process (ARFF_Data, X, Y, Frame => False,
          --                         Nominal_Attributes =>  Nominal_Attributes);
       else
@@ -282,6 +282,9 @@ package body Openml is
          --  L667
          Parse_ARFF (ARFF_Data, X, Y, Nominal_Attributes);
       end if;
+
+      Put_Line (Routine_Name & "X length" & Integer'Image (Length (X)));
+      Put_Line (Routine_Name & "Y length" & Integer'Image (Length (Y)));
 
       --  L672
       Bunch.Data := X;
@@ -396,14 +399,19 @@ package body Openml is
          end if;
       end if;
 
-      --  L970
-      Bunch.Data := Data_Columns;
-      Bunch.Target := Target_Columns;
-      if not Return_X_Y then
-         Bunch.As_Frame := False;
-         Bunch.Feature_Names := Data_Columns;
-         Bunch.Target_Names := Target_Columns;
-      end if;
+      Put_Line (Routine_Name & "L955 setting bunch");
+      --  L955
+      Bunch := Download_Data_To_Bunch (Dataset_Name, File_Name, False,
+      False, Features_List, Data_Columns, Target_Columns);
+      Put_Line (Routine_Name & "Bunch set");
+
+--        Bunch.Data := Data_Columns;
+--        Bunch.Target := Target_Columns;
+--        if not Return_X_Y then
+--           Bunch.As_Frame := False;
+--           Bunch.Feature_Names := Data_Columns;
+--           Bunch.Target_Names := Target_Columns;
+--        end if;
 
       return Bunch;
 

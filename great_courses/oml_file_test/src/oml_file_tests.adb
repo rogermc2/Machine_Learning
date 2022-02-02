@@ -20,7 +20,7 @@ package body OML_File_Tests is
       Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
       Features_File_Name : constant String := "../diabetes_features";
       Data_Id            : constant Integer := 0;
-      File_Name          : constant String := "../diabetes.arff";
+      File_Name          : constant String := "../diabetes";
       Features           : constant JSON_Array :=
                              Get_Data_Features (Data_Id, Features_File_Name);
       Data_Age           : constant JSON_Value := Create_Object;
