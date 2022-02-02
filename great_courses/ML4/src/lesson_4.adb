@@ -38,6 +38,10 @@ procedure Lesson_4 is
    X             : String_List;
    Y             : String_List;
    Train_Samples : constant Positive := 5000;
+   Test_Size     : constant Positive := 1500;
+   Train_Size    : constant Positive := Train_Samples - Test_Size;
+   Test_Data     : String_Vector;
+   Train_Data    : String_Vector;
 --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
 --     Features      : Feature_Names_List;
 --     aClassifier   : Base_Decision_Tree.Classifier
@@ -65,7 +69,8 @@ begin
    Utilities.Permute (X);
    Utilities.Permute (Y);
 
-   Data_Splitter.Train_Test_Split (X, Y);
+   Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size, Test_Data,
+                                   Train_Data);
 
 --     Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 --     --  Labels is 2D list num outputs x num samples

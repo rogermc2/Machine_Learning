@@ -7,26 +7,26 @@ with Utilities;
 package body Data_Splitter is
 
    procedure Iterate_Indices
-     (Self : in out Base_Shuffle_Data; X, Y : ML_Types.String_List;
+     (Self : in out Base_Shuffle_Data; X : ML_Types.String_List;
       Test_Indices, Train_Indices : out ML_Types.Integer_List);
 
    --  -------------------------------------------------------------------------
-   --  Shuffle_Split generates indices to split data into training and test set
+   --  L1569 Shuffle_Split generates indices to split data into training and test set
    procedure Base_Shuffle_Split
-     (Self : in out Base_Shuffle_Data; X, Y : ML_Types.String_List;
+     (Self : in out Base_Shuffle_Data; X : ML_Types.String_List;
       Test_Indices, Train_Indices : out ML_Types.Integer_List) is
---        use ML_Types;
    begin
-      Iterate_Indices (Self, X, Y, Test_Indices, Train_Indices);
+      Iterate_Indices (Self, X, Test_Indices, Train_Indices);
+
    end Base_Shuffle_Split;
 
    --  -------------------------------------------------------------------------
 
-   procedure Base_Shuffle_Split (Self : in out Base_Shuffle_Data;
-                                 X, Y : ML_Types.Value_Data_Lists_2D) is
-   begin
-      null;
-   end Base_Shuffle_Split;
+--     procedure Base_Shuffle_Split (Self : in out Base_Shuffle_Data;
+--                                   X, Y : ML_Types.Value_Data_Lists_2D) is
+--     begin
+--        null;
+--     end Base_Shuffle_Split;
 
    --  -------------------------------------------------------------------------
 
@@ -42,9 +42,9 @@ package body Data_Splitter is
    end Init_Base_Shuffle_Split;
 
    --  -------------------------------------------------------------------------
-
+   --  L1706
    procedure Iterate_Indices
-     (Self : in out Base_Shuffle_Data; X, Y : ML_Types.String_List;
+     (Self : in out Base_Shuffle_Data; X : ML_Types.String_List;
       Test_Indices, Train_Indices : out ML_Types.Integer_List) is
       use ML_Types;
       use Integer_Package;
@@ -61,6 +61,7 @@ package body Data_Splitter is
          Perms.Append (index);
       end loop;
 
+      --  L1716
       for index in 1 .. Self.Num_Splits loop
          Utilities.Permute (Perms);
          for test in 1 .. Num_Test loop
@@ -75,16 +76,42 @@ package body Data_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Train_Test_Split (X, Y : ML_Types.String_List) is
+   procedure Train_Test_Split (X, Y : ML_Types.String_List;
+                              Test_Size, Train_Size : Natural;
+                              Test, Train : out ML_Types.String_Vector) is
+      use ML_Types;
+      use String_Package;
+      Num_Samples   : constant Positive := Positive (Length (X));
+      Shuffle_Data  : Base_Shuffle_Data;
+      X_Cursor      : Cursor := X.First;
+      Y_Cursor      : Cursor := Y.First;
+      X_Vec         : String_Vector;
+      Y_Vec         : String_Vector;
+      Test_Indices  : Integer_List;
+      Train_Indices : Integer_List;
    begin
-      null;
-   end Train_Test_Split;
+      Init_Base_Shuffle_Split (Shuffle_Data, 1, Test_Size, Num_Samples / 4,
+                               Train_Size);
 
-   --  -------------------------------------------------------------------------------
+      while Has_Element (X_Cursor) loop
+            X_Vec.Append (Element (X_Cursor));
+            Y_Vec.Append (Element (Y_Cursor));
+            Next (X_Cursor);
+            Next (Y_Cursor);
+      end loop;
 
-   procedure Train_Test_Split (X, Y : ML_Types.Value_Data_Lists_2D) is
-   begin
-      null;
+      Base_Shuffle_Split (Shuffle_Data, X, Test_Indices, Train_Indices);
+
+      for index in Test_Indices.First_Index .. Test_Indices.Last_Index loop
+            Test.Append (X_Vec.Element (Test_Indices (index)));
+            Train.Append (X_Vec.Element (Test_Indices (index)));
+      end loop;
+
+      for index in Train_Indices.First_Index .. Train_Indices.Last_Index loop
+            Train.Append (X_Vec.Element (Train_Indices (index)));
+            Train.Append (Y_Vec.Element (Train_Indices (index)));
+      end loop;
+
    end Train_Test_Split;
 
    --  -------------------------------------------------------------------------------
