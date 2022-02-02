@@ -88,7 +88,7 @@ package body Openml is
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    function Load_Arff_From_File
      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
-       return JSON_Value;
+      return JSON_Value;
    procedure Load_Arff_Response (URL : String);
    function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data;
    function Parse_Nominal_Data (Arff_Data       : JSON_Value;
@@ -151,7 +151,7 @@ package body Openml is
                                     Data_Columns     : JSON_Array;
                                     Target_Columns   : JSON_Array)
      --                                       Shape            : Shape_Data)
-                                     return Bunch_Data is
+                                    return Bunch_Data is
       Routine_Name       : constant String := "Openml.Download_Data_To_Bunch ";
       Feature_Index      : Positive := Array_First (Features_List);
       Col_Name           : Positive := Array_First (Features_List);
@@ -304,7 +304,7 @@ package body Openml is
                           Target_Column      : String := "default-target";
                           Return_X_Y         : Boolean := False;
                           As_Frame           : in out Unbounded_String)
-                           return Bunch_Data is
+                          return Bunch_Data is
       use Ada.Strings;
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
@@ -346,7 +346,7 @@ package body Openml is
 
       --  L897
       Data_Format := Get (Description, "format");
---            Put_Line (Routine_Name & Description.Write);
+      --            Put_Line (Routine_Name & Description.Write);
       declare
          Format : String := Get (Data_Format);
       begin
@@ -357,7 +357,7 @@ package body Openml is
       --  L903
       if As_Frame = "auto" then
          if not Return_Sparse then
-              As_Frame := To_Unbounded_String ("true");
+            As_Frame := To_Unbounded_String ("true");
          end if;
       else
          As_Frame := To_Unbounded_String ("false");
@@ -366,14 +366,14 @@ package body Openml is
       Assert (not (As_Frame = "true" and Return_Sparse),
               Routine_Name & "cannot return dataframe with sparse data");
 
-      --  L910
+      --  L917
       Features_List := Get_Data_Features (Data_ID, Features_File_Name);
 
       if As_Frame = "false" then
          Process_Feature (Dataset_Name, Features_List);
       end if;
 
-      --  L922
+      --  L929
       if Target_Column = "default-target" then
          Put_Line (Routine_Name & "default-target");
          Set_Default_Target (Features_List, Target_Columns);
@@ -488,7 +488,7 @@ package body Openml is
                                    Version           : String := "";
                                    Active            : Boolean := False;
                                    File_Name         : String := "")
-                                    return JSON_Value is
+                                   return JSON_Value is
       --        Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
       Openml_Path    : Unbounded_String;
       Json_Data      : JSON_Value;
@@ -515,7 +515,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Qualities (Data_ID : Integer; File_Name : String := "")
-                                 return Qualities_Map is
+                                return Qualities_Map is
       use Ada.Strings;
       Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
       Json_Data     : JSON_Value;
@@ -553,8 +553,8 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value is
---        Routine_Name   : constant String :=
---                           "Openml.Get_Json_Content_From_File ";
+      --        Routine_Name   : constant String :=
+      --                           "Openml.Get_Json_Content_From_File ";
       Name           : constant String := File_Name & ".json";
       File           : File_Type;
       JSON_Data      : Unbounded_String;
@@ -573,7 +573,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_Openml_Api (URL : String)
-                                               return JSON_Value is
+                                              return JSON_Value is
       Routine_Name      : constant String :=
                             "Openml.Get_Json_Content_From_Openml_Api ";
       AWS_Reply         : constant Aws.Response.Data := Open_Openml_URL (URL);
@@ -642,7 +642,7 @@ package body Openml is
 
    function Load_Arff_From_File
      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
-       return JSON_Value is
+      return JSON_Value is
       File : File_Type;
       Data : Unbounded_String := To_Unbounded_String ("");
    begin
@@ -711,7 +711,7 @@ package body Openml is
 
    function Parse_Nominal_Data (Arff_Data       : JSON_Value;
                                 Include_Columns : JSON_Array)
-                                 return JSON_Array is
+                                return JSON_Array is
       Routine_Name : constant String := "Openml.Parse_Nominal_Data ";
       Attributes   : constant JSON_Array := Get (Arff_Data, "attributes");
       Index_V      : Positive;
@@ -757,17 +757,18 @@ package body Openml is
 
       procedure Process_Status (Ignore_Status, Row_ID_Status : JSON_Value) is
       begin
+         --  L921
          if not Is_Empty (Ignore_Status) and  not Is_Empty (Row_ID_Status) then
             declare
                Ignore_Stat : constant String := Get (Ignore_Status);
                Row_ID_Stat : constant String := Get (Row_ID_Status);
             begin
                if Ignore_Stat /= "true" and Row_ID_Stat /= "true" then
-                  if Is_Empty (Data_Type_Item) then
-                     Put_Line (Routine_Name & "Data_Type_Item set");
+                  if not Is_Empty (Data_Type_Item) then
                      declare
                         Data_Type : constant String := Get (Data_Type_Item);
                      begin
+                        --  923
                         Assert (Data_Type /= "string", Routine_Name & Dataset_Name
                                 & " invalid as STRING attributes are not " &
                                   "supported for array representation. " &
@@ -776,12 +777,14 @@ package body Openml is
                   end if;
                else
                   Data_Type_Item := Get (Feature_Name, "data_type");
+                  Put_Line (Routine_Name & "Data_Type_Item set");
                end if;
             end;
          end if;
       end Process_Status;
 
    begin
+      --  L920
       Feature_Index := Array_First (Features_List);
       while Array_Has_Element (Features_List, Feature_Index) loop
          Feature_Name := Array_Element (Features_List, Feature_Index);
@@ -835,7 +838,7 @@ package body Openml is
    function Split_Sparse_Columns
      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array)
-       return ARFF.Arff_Sparse_Data_Type is
+      return ARFF.Arff_Sparse_Data_Type is
       use ARFF;
       --        Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
       Data_Length        : constant Natural := Length (Arff_Data);
@@ -904,20 +907,28 @@ package body Openml is
          Target_Found : Boolean := False;
       begin
          --  L707
-         --              Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
+         --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
          Target_Index := Array_First (Target_Columns);
          while Array_Has_Element (Target_Columns, Target_Index) and
            not Target_Found loop
             Target := Array_Element (Target_Columns, Target_Index);
-            if not Is_Empty (Target)   then
---                 Put_Line (Routine_Name & "Target: " & Target.Write);
-               declare
-                  Target_Val : constant String := Get (Target, "target");
-               begin
---                    Put_Line (Routine_Name & "Target_Val: " & Target_Val);
-                  Target_Found := Target_Val = Feature_Val;
-               end;
+            if not Is_Empty (Target) then
+               if Kind (Target) = JSON_Object_Type then
+                  declare
+                     Target_Val : constant String := Get (Target, "target");
+                  begin
+                     Target_Found := Target_Val = Feature_Val;
+                  end;
+
+               elsif Kind (Target) = JSON_String_Type then
+                  declare
+                     Target_String : constant String := Get (Target);
+                  begin
+                     Target_Found := Target_String = Feature_Val;
+                  end;
+               end if;
             end if;
+
             Target_Index := Array_Next (Target_Columns, Target_Index);
          end loop;
 
@@ -932,12 +943,12 @@ package body Openml is
          Feature := Array_Element (Features_List, Feature_Index);
          Feature_Name := Feature.Get ("name");
          Feature_Val := Get (Feature_Name);
---           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
+         --           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name.Write);
 
          Ignore := Feature.Get ("is_ignore");
          Is_Row_ID := Feature.Get ("is_row_identifier");
---           Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
---           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+         --           Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
+         --           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
          Found := False;
 
          if not Is_Empty (Ignore) and not Is_Empty (Is_Row_ID) then

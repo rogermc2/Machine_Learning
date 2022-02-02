@@ -1,5 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
@@ -155,13 +156,15 @@ package body OML_File_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Fetch_OML is
-      Routine_Name  : constant String := "Test_Fetch_OML ";
-      Dataset_Name  : constant String := "mnist_784";
-      File_Name     : constant String := "../mnist_784";
-      Version       : constant String := "1";
-      Feature_Array : JSON_Array;
-      Data_Id       : Integer := 0;
-      Bunch         : Bunch_Data (True);
+      Routine_Name      : constant String := "Test_Fetch_OML ";
+      Dataset_Name      : constant String := "mnist_784";
+      File_Name         : constant String := "../mnist_784";
+      Feature_File_Name : constant String := "../dataset_554_features";
+      Version           : constant String := "1";
+      As_Frame          : Unbounded_String := To_Unbounded_String ("false");
+      Feature_Array     : JSON_Array;
+      Data_Id           : Integer := 0;
+      Bunch             : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
       Feature_Array := Get_Data_Features (Data_Id, File_Name => File_Name);
@@ -172,9 +175,9 @@ package body OML_File_Tests is
       begin
          Bunch := Fetch_Openml
            (Dataset_Name  => Dataset_Name, Version => Version,
-            File_Name => File_Name, Data_Id => Data_Id,
-            Target_Column => Target_Column, Return_X_Y => True,
-            As_Frame => "false");
+            File_Name => File_Name, Features_File_Name => Feature_File_Name,
+            Data_Id => Data_Id, Target_Column => Target_Column,
+            Return_X_Y => True, As_Frame => As_Frame);
       end;
 
       Put_Line (Routine_Name & "X length: " &
