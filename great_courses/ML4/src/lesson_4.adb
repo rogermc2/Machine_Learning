@@ -11,6 +11,7 @@ with ML_Types;
 --  with Classifier_Types;
 --  with Classifier_Utilities;
 --  with Criterion;
+with Data_Splitter;
 --  with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
 with Openml;
@@ -61,7 +62,10 @@ begin
 
    X := Openml.J_Array_To_String_List (XY.Data);
    Y := Openml.J_Array_To_String_List (XY.Target);
-   X := Utilities.Permute (X);
+   Utilities.Permute (X);
+   Utilities.Permute (Y);
+
+   Data_Splitter.Train_Test_Split (X, Y);
 
 --     Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 --     --  Labels is 2D list num outputs x num samples

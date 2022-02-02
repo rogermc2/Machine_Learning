@@ -370,6 +370,38 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   procedure Permute (aList : in out ML_Types.Integer_List) is
+      use Integer_Package;
+      List_Length  : constant Positive := Positive (aList.Length);
+      Curs_1       : Cursor := aList.First;
+      Curs_2       : Cursor := aList.First;
+      Rand         : Positive;
+      Index        : Natural := 0;
+      Index_2      : Natural := 0;
+   begin
+      if List_Length > 1 then
+         while Has_Element (Curs_1) loop
+            Index := Index + 1;
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Curs_2 := Next (Curs_1);
+            Index_2 := 0;
+            while Has_Element (Curs_2) and Index_2 < Rand loop
+               Index_2 := Index_2 + 1;
+               Curs_2 := Next (Curs_2);
+            end loop;
+
+            if Has_Element (Curs_2) then
+               Swap (aList, Curs_1, Curs_2);
+            end if;
+            Next (Curs_1);
+         end loop;
+      end if;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    procedure Permute (aList : in out ML_Types.String_List) is
       use String_Package;
       List_Length  : constant Positive := Positive (aList.Length);

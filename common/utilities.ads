@@ -35,6 +35,8 @@ package Utilities is
                                  return ML_Types.Class_Range;
    function Number_Of_Features (Rows : ML_Types.Value_Data_List)
                                  return ML_Types.Class_Range;
+   procedure Permute (aList : in out ML_Types.Integer_List);
+   procedure Permute (aList : in out ML_Types.String_List);
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D;
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
