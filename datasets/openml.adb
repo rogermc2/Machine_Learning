@@ -383,13 +383,10 @@ package body Openml is
          Set_Field (Target, "target", To_String (Target_Value));
          Append (Target_Columns, Target);
       end if;
-      Put_Line (Routine_Name & "L944 Target_Columns length" &
-                  Integer'Image (Length (Target_Columns)));
 
       --  L944
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
-      Put_Line (Routine_Name & "L948");
       --  L948
       if not Return_Sparse then
          Data_Qualities := Get_Data_Qualities (Data_Id, File_Name);
@@ -875,6 +872,7 @@ package body Openml is
             end if;
             Col := Array_Next (Include_Columns, Col);
          end loop;
+
          declare
             New_Data_Row : constant JSON_Value := Create_Object;
          begin
@@ -888,10 +886,33 @@ package body Openml is
    end Split_Sparse_Columns;
 
    --  ------------------------------------------------------------------------
+
+   function J_Array_To_String_List (J_Array : JSON_Array)
+                                    return ML_Types.String_List is
+      use ML_Types;
+--        Routine_Name  : constant String := "Openml.J_Array_To_String_List ";
+      theList       : String_List;
+      Index         : Positive := Array_First (J_Array);
+      J_Item        : JSON_Value;
+      Item          : Unbounded_String;
+   begin
+      while Array_Has_Element (J_Array, Index) loop
+         J_Item := Array_Element (J_Array, Index);
+--           Put_Line (Routine_Name & "J_Item: " & J_Item.Write);
+         Item := Get (J_Item);
+         theList.Append (Item);
+         Index := Array_Next (J_Array, Index);
+      end loop;
+
+      return theList;
+
+   end J_Array_To_String_List;
+
+   --  ------------------------------------------------------------------------
    --  L699
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array is
---        Routine_Name  : constant String := "Openml.Valid_Data_Column_Names ";
+      --        Routine_Name  : constant String := "Openml.Valid_Data_Column_Names ";
       Feature_Index : Positive;
       Feature       : JSON_Value;
       Feature_Name  : JSON_Value;

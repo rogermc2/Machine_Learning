@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
---  with ML_Types;
+with ML_Types;
 
 --  with Base_Decision_Tree;
 --  with Classifier_Types;
@@ -16,10 +16,11 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 with Openml;
 --  with Printing;
 --  with Tree;
+with Utilities;
 --  with Weights;
 
 procedure Lesson_4 is
---     use ML_Types;
+   use ML_Types;
 --     use ML_Types.String_Package;
 --     use Decision_Tree_Classification;
 --     use Printing;
@@ -33,6 +34,9 @@ procedure Lesson_4 is
    Data_Id       : Integer := 0;
    As_Frame      : Unbounded_String := To_Unbounded_String ("false");
    XY            : Openml.Bunch_Data (True);
+   X             : String_List;
+   Y             : String_List;
+   Train_Samples : constant Positive := 5000;
 --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
 --     Features      : Feature_Names_List;
 --     aClassifier   : Base_Decision_Tree.Classifier
@@ -54,6 +58,10 @@ begin
    Put_Line (Routine_Name & "Y length" & Integer'Image (Length (XY.Target)));
    Assert (Length (XY.Data) > 0, Routine_Name & "X is empty.");
    Assert (Length (XY.Target) > 0, Routine_Name & "Y is empty.");
+
+   X := Openml.J_Array_To_String_List (XY.Data);
+   Y := Openml.J_Array_To_String_List (XY.Target);
+   X := Utilities.Permute (X);
 
 --     Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 --     --  Labels is 2D list num outputs x num samples

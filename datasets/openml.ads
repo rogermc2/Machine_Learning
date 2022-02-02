@@ -3,6 +3,8 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
+with ML_Types;
+
 package Openml is
 
    subtype Qualities_Map is JSON_Array;
@@ -48,7 +50,9 @@ package Openml is
                                    File_Name    : String := "")
                                     return JSON_Value;
    function Get_Data_Qualities (Data_ID : Integer; File_Name : String := "")
-                                 return Qualities_Map;
+                                return Qualities_Map;
+   function J_Array_To_String_List (J_Array : JSON_Array)
+                                    return ML_Types.String_List;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
 

@@ -370,6 +370,32 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Permute (aList : ML_Types.String_List)
+                     return ML_Types.String_List is
+      use ML_Types;
+      use String_Package;
+      List_Length  : constant Positive := Positive (aList.Length);
+      Curs         : Cursor := aList.First;
+      Rand         : Positive;
+      Index        : Natural := 0;
+      Permutation  : String_List := aList;
+   begin
+      if List_Length > 1 then
+         while Has_Element (Curs) loop
+            Index := Index + 1;
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Swap (Permutation, index, Rand);
+            Next (Curs);
+         end loop;
+      end if;
+
+      return Permutation;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
