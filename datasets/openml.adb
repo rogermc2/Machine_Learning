@@ -145,8 +145,8 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Download_Data_To_Bunch (URL              : String;
-                                    --                                      File_Name        : String := "";
-                                    Use_Files        : Boolean := True;
+                                    File_Name        : String := "";
+--                                      Use_Files        : Boolean := True;
                                     Sparse, As_Frame : Boolean;
                                     Features_List    : JSON_Array;
                                     Data_Columns     : JSON_Array;
@@ -194,7 +194,7 @@ package body Openml is
       --        end Post_Process;
 
    begin
-      --        Put_Line (Routine_Name);
+      Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
                 "called with empty Features_List.");
       Assert (not Is_Empty (Target_Columns), Routine_Name &
@@ -260,10 +260,10 @@ package body Openml is
       end if;
 
       --  L652
-      --        if File_Name'Length > 0 then
-      if Use_Files then
+      if File_Name'Length > 0 then
+--        if Use_Files then
          --  Load_Arff_Response from file
-         ARFF_Data := Load_Arff_From_File (URL & ".arff", Return_Type);
+         ARFF_Data := Load_Arff_From_File (File_Name & ".arff", Return_Type);
          --           Post_Process (ARFF_Data, X, Y, Frame => False,
          --                         Nominal_Attributes =>  Nominal_Attributes);
       else
@@ -409,8 +409,15 @@ package body Openml is
 
       Put_Line (Routine_Name & "L955 setting bunch");
       --  L955
-      Bunch := Download_Data_To_Bunch (Dataset_Name, True, False,
-                                       False, Features_List, Data_Columns, Target_Columns);
+      if Use_Files then
+         Bunch := Download_Data_To_Bunch
+           (Dataset_Name, Dataset_Name, False, False, Features_List,
+            Data_Columns, Target_Columns);
+      else
+         Bunch := Download_Data_To_Bunch
+           (Dataset_Name, "", False, False, Features_List,
+            Data_Columns, Target_Columns);
+      end if;
       Put_Line (Routine_Name & "Bunch set");
 
       --        Bunch.Data := Data_Columns;
@@ -486,6 +493,7 @@ package body Openml is
                           Fixed.Trim (Integer'Image (Data_ID), Both) &
                           "_features";
          begin
+            Put_Line (Routine_Name & "File_Name: " & File_Name);
             Json_Data := Get_Json_Content_From_File (File_Name);
          end;
       else

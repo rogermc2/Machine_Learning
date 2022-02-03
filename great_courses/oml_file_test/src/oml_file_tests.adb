@@ -20,11 +20,9 @@ package body OML_File_Tests is
 
    procedure Test_Convert_Arff_To_Data is
       Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
---        Features_File_Name : constant String := "../diabetes_features";
+      File_Name          : constant String := "diabetes";
       Data_Id            : constant Integer := 0;
---        File_Name          : constant String := "../diabetes";
       Features           : constant JSON_Array := Get_Data_Features (Data_Id);
---                               Get_Data_Features (Data_Id, Features_File_Name);
       Data_Age           : constant JSON_Value := Create_Object;
       Data_Sex           : constant JSON_Value := Create_Object;
       Data_BMI           : constant JSON_Value := Create_Object;
@@ -74,7 +72,7 @@ package body OML_File_Tests is
                 "Target_Columns is empty");
 
       Bunch := Openml.Download_Data_To_Bunch
-        (URL => "", Use_Files => True, Sparse => False, As_Frame => False,
+        (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
          Target_Columns => Target_Columns);  --  , Shape => (1, 1));
 
@@ -168,17 +166,16 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       Routine_Name      : constant String := "Test_Fetch_OML ";
       Dataset_Name      : constant String := "mnist_784";
---        File_Name         : constant String := "../mnist_784";
---        Feature_File_Name : constant String := "../dataset_554_features";
       Version           : constant String := "1";
       As_Frame          : Unbounded_String := To_Unbounded_String ("false");
       Feature_Array     : JSON_Array;
-      Data_Id           : Integer := 0;
+      Data_Id           : Integer := 554;
       Bunch             : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
-      Feature_Array := Get_Data_Features (Data_Id);  --  , File_Name => File_Name);
+      Feature_Array := Get_Data_Features (Data_Id);
       Put_Line (Routine_Name & "Feature_Array set");
+
       declare
          Target_Column : constant String :=
                            Integer'Image (Length (Feature_Array) + 1);

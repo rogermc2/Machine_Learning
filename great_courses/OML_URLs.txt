@@ -18,3 +18,10 @@ https://openml.org/data/v1/download/<data_description["file_id"]>
 
 https://openml.org/data/v1/download/52667
 Downloads text file mnist_784.arff
+
+Diabetes:
+https://openml.org/api/v1/json/data/list/data_name/diabetes/limit/2/data_version/1
+<data_id> = "did":37
+
+https://www.openml.org/d/41517/json
+<data_id> = "did":41517

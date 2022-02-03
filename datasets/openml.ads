@@ -28,14 +28,13 @@ package Openml is
    end record;
 
    function Download_Data_To_Bunch
-     (URL              : String; Use_Files : Boolean := True;
-      Sparse, As_Frame : Boolean;  Features_List  : JSON_Array;
+     (URL              : String;
+      File_Name        : String := "";
+      Sparse, As_Frame : Boolean;  Features_List : JSON_Array;
       Data_Columns     : JSON_Array; Target_Columns : JSON_Array;
       Return_X_Y       : Boolean := False) return Bunch_Data;
    function Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                           Use_Files     : Boolean := True;
---                            File_Name     : String := "";
---                            Features_File_Name : String := "";
                           Data_Id       : in out Integer;
                           Target_Column : String := "default-target";
                           Return_X_Y    : Boolean := False;
