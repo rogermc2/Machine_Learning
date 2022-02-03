@@ -263,7 +263,8 @@ package body Openml is
       if File_Name'Length > 0 then
 --        if Use_Files then
          --  Load_Arff_Response from file
-         ARFF_Data := Load_Arff_From_File (File_Name & ".arff", Return_Type);
+         ARFF_Data := Load_Arff_From_File
+           ("../" & File_Name & ".arff", Return_Type);
          --           Post_Process (ARFF_Data, X, Y, Frame => False,
          --                         Nominal_Attributes =>  Nominal_Attributes);
       else
@@ -781,7 +782,7 @@ package body Openml is
    function Parse_Nominal_Data (Arff_Data       : JSON_Value;
                                 Include_Columns : JSON_Array)
                                 return JSON_Array is
-      Routine_Name : constant String := "Openml.Parse_Nominal_Data ";
+--        Routine_Name : constant String := "Openml.Parse_Nominal_Data ";
       Attributes   : constant JSON_Array := Get (Arff_Data, "attributes");
       Index_V      : Positive;
       Index_K      : Positive;
@@ -798,7 +799,7 @@ package body Openml is
             declare
                Nominal : constant JSON_Value := Attribute;
             begin
-               Put_Line  (Routine_Name & "Nominal: " & Nominal.Write);
+--                 Put_Line  (Routine_Name & "Nominal: " & Nominal.Write);
                Append (Nominal_Data, Nominal);
             end;
 

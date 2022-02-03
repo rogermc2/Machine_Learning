@@ -21,7 +21,7 @@ package body OML_File_Tests is
    procedure Test_Convert_Arff_To_Data is
       Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
       File_Name          : constant String := "diabetes";
-      Data_Id            : constant Integer := 0;
+      Data_Id            : constant Integer := 37;
       Features           : constant JSON_Array := Get_Data_Features (Data_Id);
       Data_Age           : constant JSON_Value := Create_Object;
       Data_Sex           : constant JSON_Value := Create_Object;
@@ -76,6 +76,8 @@ package body OML_File_Tests is
          Features_List => Features, Data_Columns  => Data_Columns,
          Target_Columns => Target_Columns);  --  , Shape => (1, 1));
 
+      Put_Line (Routine_Name & "completed");
+
    end Test_Convert_Arff_To_Data;
 
    --  -------------------------------------------------------------------------
@@ -86,6 +88,7 @@ package body OML_File_Tests is
       Description   : JSON_Value;
    begin
       New_Line;
+      Put_Line (Routine_Name);
       Description := Get_Data_Description_By_ID (Data_Id, Use_Files);
       declare
          Desc : constant String := Get (Description, "description");
@@ -114,6 +117,7 @@ package body OML_File_Tests is
       Data_Id         : Integer := 0;
    begin
       New_Line;
+      Put_Line (Routine_Name);
       Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
       Data_Info_Data := Get (Data_Info, "data");
       Data_Info_Set := Get (Data_Info_Data, "dataset");
@@ -143,7 +147,8 @@ package body OML_File_Tests is
       aFeature       : JSON_Value;
       Feature_Index  : Natural;
    begin
-      Put_Line (Routine_Name & "Get features");
+      Put_Line (Routine_Name);
+      Put_Line (Routine_Name & "Data_Id: " & Integer'Image (Feature_Index));
       Feature_Array := Get_Data_Features (Data_Id, Use_Files);
       Put_Line (Routine_Name & "number of features: " &
                   Integer'Image (Length (Feature_Array)));
@@ -174,18 +179,20 @@ package body OML_File_Tests is
    begin
       Put_Line (Routine_Name);
       Feature_Array := Get_Data_Features (Data_Id);
-      Put_Line (Routine_Name & "Feature_Array set");
 
       declare
          Target_Column : constant String :=
                            Integer'Image (Length (Feature_Array) + 1);
       begin
+         Put_Line (Routine_Name & "Target_Column set");
+         Put_Line (Routine_Name & "Dataset_Name: " & Dataset_Name);
          Bunch := Fetch_Openml
-           (Dataset_Name  => Dataset_Name, Version => Version,
-            Use_Files =>  True, Data_Id => Data_Id,
+           (Dataset_Name => Dataset_Name, Version => Version,
+            Use_Files => True, Data_Id => Data_Id,
             Target_Column => Target_Column, Return_X_Y => True,
             As_Frame => As_Frame);
       end;
+         Put_Line (Routine_Name & "Bunch set");
 
       Put_Line (Routine_Name & "X length: " &
                   Integer'Image (Length (Bunch.Data)));
