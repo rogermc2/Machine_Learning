@@ -434,35 +434,37 @@ package body Openml is
       URL          : constant String := Data_Features &
                        Fixed.Trim (Integer'Image (Data_ID), Both);
       URL_Object   : AWS.URL.Object;
-      Data_Desc    : JSON_Value;
-      --        Value_Type   : JSON_Value_Type;
+      Data_Desc    : JSON_Value := Create_Object;
    begin
-      --        if File_Name = "" then
-      if not Use_Files then
-         --  URL.Parse parses an URL and returns an Object representing this URL.
-         --  It is then possible to extract each part of the URL with other AWS.URL
-         --  services.
-         URL_Object := AWS.URL.Parse (URL);
-         Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
-                   "object returned by URL " & URL & "is invalid");
-         Data_Desc := Get_Json_Content_From_Openml_Api (URL);
-      else
-         declare
-            File_Name : constant String := "../dataset_" &
-                          Fixed.Trim (Integer'Image (Data_ID), Both) &
-                          "_description";
-         begin
-            Data_Desc := Get_Json_Content_From_File (File_Name);
-         end;
-      end if;
+        if Use_Files then
+            declare
+                File_Name : constant String := "../dataset_" &
+                              Fixed.Trim (Integer'Image (Data_ID), Both) &
+                              "_description";
+            begin
+                Data_Desc := Get_Json_Content_From_File (File_Name);
+            end;
+        else
+            --  URL.Parse parses an URL and returns an Object representing this URL.
+            --  It is then possible to extract each part of the URL with other AWS.URL
+            --  services.
+            URL_Object := AWS.URL.Parse (URL);
+            Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
+                      "object returned by URL " & URL & "is invalid");
+            Data_Desc := Get_Json_Content_From_Openml_Api (URL);
+        end if;
 
-      --        if Has_Field (Data_Desc, "description") then
-      --           Data_Desc := Get (Data_Desc, "description");
-      --        else
-      --           Put_Line (Routine_Name & "Data_Desc is not a data_set_description");
-      --        end if;
+--           Put_Line (Routine_Name & "Data_Desc empty? " &
+--                      Boolean'Image (Is_Empty (Data_Desc)));
+        if Has_Field (Data_Desc, "data_set_description") then
+--              Put_Line (Routine_Name &
+--                          "Data_Desc has data_set_description field");
+            Data_Desc := Get (Data_Desc, "data_set_description");
+        else
+            Put_Line (Routine_Name & "Data_Desc is not a data_set_description");
+        end if;
 
-      return Data_Desc;
+        return Data_Desc;
 
    end Get_Data_Description_By_ID;
 
@@ -471,7 +473,6 @@ package body Openml is
    function Get_Data_Features (Data_ID   : Integer;
                                Use_Files : Boolean := True)
                                return JSON_Array is
-      --                                 File_Name : String := "") return JSON_Array is
       use Ada.Strings;
       Routine_Name  : constant String := "Openml.Get_Data_Features ";
       Json_Data     : JSON_Value := Create_Object;
@@ -479,17 +480,17 @@ package body Openml is
       Feature       : JSON_Value := Create_Object;
       Feature_Array : JSON_Array;
    begin
-      --        if File_Name = "" then
-      if not Use_Files then
-         Json_Data := Get_Json_Content_From_Openml_Api
-           (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
-      else
+      if Use_Files then
          declare
-            File_Name : constant String :=
-                          Fixed.Trim (Integer'Image (Data_ID), Both);
+            File_Name : constant String := "../dataset_" &
+                          Fixed.Trim (Integer'Image (Data_ID), Both) &
+                          "_features";
          begin
             Json_Data := Get_Json_Content_From_File (File_Name);
          end;
+      else
+         Json_Data := Get_Json_Content_From_Openml_Api
+           (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
       end if;
 
       Assert (Has_Field (Json_Data, "data_features") or
@@ -580,13 +581,14 @@ package body Openml is
          end;
       end if;
 
-      if Has_Field (Json_Data, "qualities") then
-         Qualities := Get (Json_Data, "qualities");
+      if Has_Field (Json_Data, "data_qualities") then
+         Qualities := Get (Json_Data, "data_qualities");
          Map_JSON_Object (Qualities, Get_Quality'access);
       else
          Put_Line
            (Routine_Name & "Qualities file with" &
-              Integer'Image (Data_ID) & " does not have a qualities field.");
+              Integer'Image (Data_ID) &
+              " does not have a data_qualities field.");
       end if;
 
       return Quality_Array;
@@ -603,7 +605,6 @@ package body Openml is
       JSON_Data      : Unbounded_String;
       JSON_Main_Node : JSON_Value := Create_Object;
    begin
---        Put_Line (Routine_Name & "File_Name: " & Name);
       Open (File, In_File, Name);
       while not End_Of_File (File) loop
          Append (JSON_Data, To_Unbounded_String (Get_Line (File)));
@@ -611,7 +612,6 @@ package body Openml is
       Close (File);
 
       JSON_Main_Node := GNATCOLL.JSON.Read (Strm => JSON_Data, Filename => "");
---        Put_Line (Routine_Name & "JSON_Main_Node loaded");
 
       return JSON_Main_Node;
 

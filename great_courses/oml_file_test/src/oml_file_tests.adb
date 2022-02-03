@@ -84,17 +84,13 @@ package body OML_File_Tests is
 
    procedure Test_Data_Description (Data_Id   : Integer;
                                     Use_Files : Boolean := True) is
---                                      Dataset   : String := "") is
       Routine_Name  : constant String := "Test_Data_Description ";
       Description   : JSON_Value;
    begin
       New_Line;
-      Put_Line (Routine_Name);
-      Description := Get_Data_Description_By_ID (Data_Id, Use_Files);  --  , Dataset);
-      Put_Line (Routine_Name & "Description set");
-      Put_Line (Routine_Name & Get (Description, "data_set_description"));
+      Description := Get_Data_Description_By_ID (Data_Id, Use_Files);
       declare
-         Desc : constant String := Get (Description, "data_set_description");
+         Desc : constant String := Get (Description, "description");
       begin
          Put_Line (Routine_Name & "Description length:" &
                      Integer'Image (Desc'Length) & " characters.");
@@ -110,8 +106,6 @@ package body OML_File_Tests is
    procedure Test_Data_Info is
       Routine_Name    : constant String := "Test_Data_Info ";
       Dataset_Name    : constant String := "mnist_784";
---        Info_File_Name     : constant String := "../mnist_784";
---        Features_File_Name : constant String := "../features";
       Version         : constant String := "1";
       Data_Info       : JSON_Value;
       Data_Info_Data  : JSON_Value;
@@ -123,7 +117,6 @@ package body OML_File_Tests is
    begin
       New_Line;
       Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
---                                            File_Name => Info_File_Name);
       Data_Info_Data := Get (Data_Info, "data");
       Data_Info_Set := Get (Data_Info_Data, "dataset");
       Data_Info_Array := Get (Data_Info_Set);
@@ -133,18 +126,19 @@ package body OML_File_Tests is
       Data_Id := Get (JSON_Data_Id);
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
 
-      Test_Data_Description (Data_Id);  --  , Info_File_Name);
+      Test_Data_Description (Data_Id);
       Put_Line (Routine_Name & "Test_Data_Description completed");
+
       Test_Features (Data_Id);  --  , Features_File_Name);
       Put_Line (Routine_Name & "Test_Features completed");
-      Test_Qualities (Data_Id);  --  , Info_File_Name);
+
+      Test_Qualities (Data_Id);
 
    end Test_Data_Info;
 
    --  -------------------------------------------------------------------------
 
    procedure Test_Features (Data_Id : Integer; Use_Files : Boolean := True) is
---     Dataset : String := "") is
       Routine_Name   : constant String := "Test_Features ";
       Feature_Array  : JSON_Array;
       Index          : Positive;
@@ -152,7 +146,7 @@ package body OML_File_Tests is
       Feature_Index  : Natural;
    begin
       Put_Line (Routine_Name & "Get features");
-      Feature_Array := Get_Data_Features (Data_Id, Use_Files);  --  , File_Name => Dataset);
+      Feature_Array := Get_Data_Features (Data_Id, Use_Files);
       Put_Line (Routine_Name & "number of features: " &
                   Integer'Image (Length (Feature_Array)));
       Index := Array_First (Feature_Array);
@@ -207,17 +201,16 @@ package body OML_File_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True) is
---     Dataset : String := "") is
       Routine_Name  : constant String := "Test_Qualities ";
-      Max_Count     : constant Natural := 10;
-      Count         : Natural := 0;
       Quality_Array : Qualities_Map;
       Index         : Positive;
       Quality       : JSON_Value;
+      Quality_Name  : JSON_Value;
+
    begin
       New_Line;
       Put_Line (Routine_Name);
-      Quality_Array := Get_Data_Qualities (Data_Id, Use_Files);  --  , File_Name => Dataset);
+      Quality_Array := Get_Data_Qualities (Data_Id, Use_Files);
 
       if Is_Empty (Quality_Array) then
          Put_Line (Routine_Name & "there are no qualities");
@@ -225,16 +218,11 @@ package body OML_File_Tests is
          Put_Line (Routine_Name & "Quality_Array length: " &
                      Integer'Image (Length (Quality_Array)));
          Index := Array_First (Quality_Array);
-
-         Put_Line (Routine_Name & "first" & Integer'Image (Max_Count) &
-                     " qualities:");
          while Array_Has_Element (Quality_Array, Index) loop
-            Count := Count + 1;
             Quality := Array_Element (Quality_Array, Index);
-            if Count <= Max_Count then
-               Put_Line (Routine_Name & "Quality: " & Quality.Write);
-            end if;
-
+            Quality_Name := Get (Quality, "name");
+            Put_Line (Routine_Name & "Quality name: " & Quality_Name.Write);
+            New_Line;
             Index := Array_Next (Quality_Array, Index);
          end loop;
       end if;
