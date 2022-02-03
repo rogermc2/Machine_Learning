@@ -105,20 +105,29 @@ package body OML_File_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Data_Info is
-      Routine_Name       : constant String := "Test_Data_Info ";
-      Dataset_Name       : constant String := "mnist_784";
+      Routine_Name    : constant String := "Test_Data_Info ";
+      Dataset_Name    : constant String := "mnist_784";
 --        Info_File_Name     : constant String := "../mnist_784";
 --        Features_File_Name : constant String := "../features";
-      Version            : constant String := "1";
-      Data_Info          : JSON_Value;
-      JSON_Data_Id       : JSON_Value;
-      Data_Id            : Integer := 0;
+      Version         : constant String := "1";
+      Data_Info       : JSON_Value;
+      Data_Info_Data  : JSON_Value;
+      Data_Info_Set   : JSON_Value;
+      Data_Info_Array : JSON_Array;
+      Data            : JSON_Value;
+      JSON_Data_Id    : JSON_Value;
+      Data_Id         : Integer := 0;
    begin
       New_Line;
       Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
 --                                            File_Name => Info_File_Name);
-      JSON_Data_Id := Get (Data_Info, "data_id");
-      Data_Id := Integer'Value (Get (JSON_Data_Id));
+      Data_Info_Data := Get (Data_Info, "data");
+      Data_Info_Set := Get (Data_Info_Data, "dataset");
+      Data_Info_Array := Get (Data_Info_Set);
+      Data := Array_Element (Data_Info_Array,
+                             Array_First (Data_Info_Array));
+      JSON_Data_Id := Get (Data, "did");
+      Data_Id := Get (JSON_Data_Id);
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
 
       Test_Data_Description (Data_Id);  --  , Info_File_Name);

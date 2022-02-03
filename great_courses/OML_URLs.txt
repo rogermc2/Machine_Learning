@@ -4,6 +4,7 @@ https://openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_versio
 
 DATA_INFO
 https://openml.org/api/v1/json/data/<data_id>
+https://openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1
 
 DATA_FEATURES
 https://openml.org/api/v1/json/data/features/<data_id>

@@ -521,7 +521,6 @@ package body ARFF is
          begin
             Clear (Dense_Values);
             Data_Values.Unset_Field ("values");
-            Put_Line (Routine_Name);
 
             if Row'Length > 0 then
                Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &

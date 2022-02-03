@@ -145,8 +145,8 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Download_Data_To_Bunch (URL              : String;
---                                      File_Name        : String := "";
-                                    Use_Files : Boolean := True;
+                                    --                                      File_Name        : String := "";
+                                    Use_Files        : Boolean := True;
                                     Sparse, As_Frame : Boolean;
                                     Features_List    : JSON_Array;
                                     Data_Columns     : JSON_Array;
@@ -260,7 +260,7 @@ package body Openml is
       end if;
 
       --  L652
---        if File_Name'Length > 0 then
+      --        if File_Name'Length > 0 then
       if Use_Files then
          --  Load_Arff_Response from file
          ARFF_Data := Load_Arff_From_File (URL & ".arff", Return_Type);
@@ -308,8 +308,8 @@ package body Openml is
 
    function Fetch_Openml (Dataset_Name       : String; Version : String := "";
                           Use_Files          : Boolean := True;
---                            File_Name          : String := "";
---                            Features_File_Name : String := "";
+                          --                            File_Name          : String := "";
+                          --                            Features_File_Name : String := "";
                           Data_Id            : in out Integer;
                           Target_Column      : String := "default-target";
                           Return_X_Y         : Boolean := False;
@@ -410,16 +410,16 @@ package body Openml is
       Put_Line (Routine_Name & "L955 setting bunch");
       --  L955
       Bunch := Download_Data_To_Bunch (Dataset_Name, True, False,
-      False, Features_List, Data_Columns, Target_Columns);
+                                       False, Features_List, Data_Columns, Target_Columns);
       Put_Line (Routine_Name & "Bunch set");
 
---        Bunch.Data := Data_Columns;
---        Bunch.Target := Target_Columns;
---        if not Return_X_Y then
---           Bunch.As_Frame := False;
---           Bunch.Feature_Names := Data_Columns;
---           Bunch.Target_Names := Target_Columns;
---        end if;
+      --        Bunch.Data := Data_Columns;
+      --        Bunch.Target := Target_Columns;
+      --        if not Return_X_Y then
+      --           Bunch.As_Frame := False;
+      --           Bunch.Feature_Names := Data_Columns;
+      --           Bunch.Target_Names := Target_Columns;
+      --        end if;
 
       return Bunch;
 
@@ -437,24 +437,24 @@ package body Openml is
       Data_Desc    : JSON_Value;
       --        Value_Type   : JSON_Value_Type;
    begin
---        if File_Name = "" then
-        if not Use_Files then
-            --  URL.Parse parses an URL and returns an Object representing this URL.
-            --  It is then possible to extract each part of the URL with other AWS.URL
-            --  services.
-            URL_Object := AWS.URL.Parse (URL);
-            Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
-                      "object returned by URL " & URL & "is invalid");
-            Data_Desc := Get_Json_Content_From_Openml_Api (URL);
-        else
-            declare
-                File_Name : constant String := "dataset_" &
-                              Fixed.Trim (Integer'Image (Data_ID), Both) &
-                              "_description";
-            begin
-                Data_Desc := Get_Json_Content_From_File (File_Name);
-            end;
-        end if;
+      --        if File_Name = "" then
+      if not Use_Files then
+         --  URL.Parse parses an URL and returns an Object representing this URL.
+         --  It is then possible to extract each part of the URL with other AWS.URL
+         --  services.
+         URL_Object := AWS.URL.Parse (URL);
+         Assert (AWS.URL.Is_Valid (URL_Object), Routine_Name &
+                   "object returned by URL " & URL & "is invalid");
+         Data_Desc := Get_Json_Content_From_Openml_Api (URL);
+      else
+         declare
+            File_Name : constant String := "../dataset_" &
+                          Fixed.Trim (Integer'Image (Data_ID), Both) &
+                          "_description";
+         begin
+            Data_Desc := Get_Json_Content_From_File (File_Name);
+         end;
+      end if;
 
       --        if Has_Field (Data_Desc, "description") then
       --           Data_Desc := Get (Data_Desc, "description");
@@ -470,8 +470,8 @@ package body Openml is
 
    function Get_Data_Features (Data_ID   : Integer;
                                Use_Files : Boolean := True)
-                                return JSON_Array is
---                                 File_Name : String := "") return JSON_Array is
+                               return JSON_Array is
+      --                                 File_Name : String := "") return JSON_Array is
       use Ada.Strings;
       Routine_Name  : constant String := "Openml.Get_Data_Features ";
       Json_Data     : JSON_Value := Create_Object;
@@ -479,18 +479,18 @@ package body Openml is
       Feature       : JSON_Value := Create_Object;
       Feature_Array : JSON_Array;
    begin
---        if File_Name = "" then
-        if not Use_Files then
-            Json_Data := Get_Json_Content_From_Openml_Api
-              (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
-        else
-            declare
-                File_Name : constant String :=
-                              Fixed.Trim (Integer'Image (Data_ID), Both);
-            begin
-                Json_Data := Get_Json_Content_From_File (File_Name);
-            end;
-        end if;
+      --        if File_Name = "" then
+      if not Use_Files then
+         Json_Data := Get_Json_Content_From_Openml_Api
+           (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
+      else
+         declare
+            File_Name : constant String :=
+                          Fixed.Trim (Integer'Image (Data_ID), Both);
+         begin
+            Json_Data := Get_Json_Content_From_File (File_Name);
+         end;
+      end if;
 
       Assert (Has_Field (Json_Data, "data_features") or
                 Has_Field (Json_Data, "features"), Routine_Name &
@@ -511,18 +511,18 @@ package body Openml is
    end Get_Data_Features;
 
    --  ------------------------------------------------------------------------
-
+   --  L384
    function Get_Data_Info_By_Name (Dataset_Name : String;
                                    Version      : String := "";
                                    Active       : Boolean := False;
                                    Use_Files    : Boolean := True)
---                                     File_Name         : String := "")
+     --                                     File_Name         : String := "")
                                    return JSON_Value is
-      --        Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
+--        Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
       Openml_Path    : Unbounded_String;
       Json_Data      : JSON_Value;
    begin
---        if File_Name = "" then
+      --        if File_Name = "" then
       if not Use_Files then
          Openml_Path := To_Unbounded_String (Search_Name);
          if Active then
@@ -535,10 +535,10 @@ package body Openml is
          Json_Data := Get_Json_Content_From_Openml_Api
            (To_String (Openml_Path));
       else
-            declare
-            File_Name : constant String := Dataset_Name;
-            begin
-         Json_Data := Get_Json_Content_From_File (File_Name);
+         declare
+            File_Name : constant String := "../" & Dataset_Name & "_info";
+         begin
+            Json_Data := Get_Json_Content_From_File (File_Name);
          end;
       end if;
 
@@ -549,7 +549,7 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Data_Qualities (Data_ID : Integer; Use_Files : Boolean := True)
---                                     File_Name : String := "")
+     --                                     File_Name : String := "")
                                 return Qualities_Map is
       use Ada.Strings;
       Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
@@ -566,27 +566,27 @@ package body Openml is
       end Get_Quality;
 
    begin
---        if File_Name = "" then
-        if not Use_Files then
-            Json_Data := Get_Json_Content_From_Openml_Api
-              (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
-        else
-            declare
-                File_Name : constant String := "dataset_" &
-                              Fixed.Trim (Integer'Image (Data_ID), Both) &
-                              "_qualities";
-            begin
-                Json_Data := Get_Json_Content_From_File (File_Name);
-            end;
-        end if;
+      --        if File_Name = "" then
+      if not Use_Files then
+         Json_Data := Get_Json_Content_From_Openml_Api
+           (Data_Features & Fixed.Trim (Integer'Image (Data_ID), Both));
+      else
+         declare
+            File_Name : constant String := "dataset_" &
+                          Fixed.Trim (Integer'Image (Data_ID), Both) &
+                          "_qualities";
+         begin
+            Json_Data := Get_Json_Content_From_File (File_Name);
+         end;
+      end if;
 
       if Has_Field (Json_Data, "qualities") then
          Qualities := Get (Json_Data, "qualities");
          Map_JSON_Object (Qualities, Get_Quality'access);
       else
          Put_Line
-              (Routine_Name & "Qualities file with" &
-               Integer'Image (Data_ID) & " does not have a qualities field.");
+           (Routine_Name & "Qualities file with" &
+              Integer'Image (Data_ID) & " does not have a qualities field.");
       end if;
 
       return Quality_Array;
@@ -596,18 +596,22 @@ package body Openml is
    --  ------------------------------------------------------------------------
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value is
-      --        Routine_Name   : constant String :=
-      --                           "Openml.Get_Json_Content_From_File ";
+--       Routine_Name   : constant String :=
+--                           "Openml.Get_Json_Content_From_File ";
       Name           : constant String := File_Name & ".json";
       File           : File_Type;
       JSON_Data      : Unbounded_String;
-      JSON_Main_Node : JSON_Value := Create;
+      JSON_Main_Node : JSON_Value := Create_Object;
    begin
+--        Put_Line (Routine_Name & "File_Name: " & Name);
       Open (File, In_File, Name);
-      JSON_Data := To_Unbounded_String (Get_Line (File));
+      while not End_Of_File (File) loop
+         Append (JSON_Data, To_Unbounded_String (Get_Line (File)));
+      end loop;
       Close (File);
 
-      JSON_Main_Node := Read (JSON_Data, Filename => "");
+      JSON_Main_Node := GNATCOLL.JSON.Read (Strm => JSON_Data, Filename => "");
+--        Put_Line (Routine_Name & "JSON_Main_Node loaded");
 
       return JSON_Main_Node;
 
@@ -697,20 +701,20 @@ package body Openml is
             Text : constant String := Get_Line (File_ID);
          begin
             Count := Count + 1;
---              Put_Line ("Openml.Load_Arff_From_File line length " &
---                       Integer'Image (Text'Length));
+            --              Put_Line ("Openml.Load_Arff_From_File line length " &
+            --                       Integer'Image (Text'Length));
             Data.Append (To_Unbounded_String (Text));
          end;
---           Data := Data & To_Unbounded_String (Get_Line (File_ID));
---           Data := Data & "\r\n";
+         --           Data := Data & To_Unbounded_String (Get_Line (File_ID));
+         --           Data := Data & "\r\n";
       end loop;
       Close (File_ID);
       Put_Line ("Openml.Load_Arff_From_File data loaded");
       Put_Line ("Openml.Load_Arff_From_File:" & Integer'Image (Count) &
-                " lines loaded");
+                  " lines loaded");
 
       return ARFF.Load (Data, Return_Type);
---        return ARFF.Load (To_String (Data), Return_Type);
+      --        return ARFF.Load (To_String (Data), Return_Type);
 
    end Load_Arff_From_File;
 
@@ -950,7 +954,7 @@ package body Openml is
    function J_Array_To_String_List (J_Array : JSON_Array)
                                     return ML_Types.String_List is
       use ML_Types;
---        Routine_Name  : constant String := "Openml.J_Array_To_String_List ";
+      --        Routine_Name  : constant String := "Openml.J_Array_To_String_List ";
       theList       : String_List;
       Index         : Positive := Array_First (J_Array);
       J_Item        : JSON_Value;
@@ -958,7 +962,7 @@ package body Openml is
    begin
       while Array_Has_Element (J_Array, Index) loop
          J_Item := Array_Element (J_Array, Index);
---           Put_Line (Routine_Name & "J_Item: " & J_Item.Write);
+         --           Put_Line (Routine_Name & "J_Item: " & J_Item.Write);
          Item := Get (J_Item);
          theList.Append (Item);
          Index := Array_Next (J_Array, Index);
