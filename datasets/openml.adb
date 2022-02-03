@@ -194,7 +194,7 @@ package body Openml is
       --        end Post_Process;
 
    begin
-      Put_Line (Routine_Name);
+--        Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
                 "called with empty Features_List.");
       Assert (not Is_Empty (Target_Columns), Routine_Name &
@@ -320,9 +320,11 @@ package body Openml is
       use Dataset_Utilities;
       Routine_Name    : constant String := "Openml.Fetch_Openml ";
       Dataset_Name_LC : constant String := To_Lower_Case (Dataset_Name);
-      --        Data_Url        : constant String := Data_File & "file_id";
-      Data_Info       : JSON_Value;
-      JSON_Data_Id    : JSON_Value;
+      JSON_Data_Set   : JSON_Value;
+      JSON_Data       : JSON_Value;
+      JSON_Data_Info  : JSON_Value;
+      JSON_Data_Array : JSON_Array;
+      JSON_Data_Item  : JSON_Value;
       Description     : JSON_Value;
       Return_Sparse   : Boolean := False;
       Data_Format     : JSON_Value;
@@ -337,12 +339,19 @@ package body Openml is
       Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
    begin
-
+      Put_Line (Routine_Name);
       --  L862
-      Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version,
-                                          Use_Files => Use_Files);
-      JSON_Data_Id := Get (Data_Info, "data_id");
-      Data_Id := Integer'Value (Get (JSON_Data_Id));
+      JSON_Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version,
+                                               Use_Files => Use_Files);
+
+      JSON_Data := Get (JSON_Data_Info, "data");
+      JSON_Data_Set := Get (JSON_Data, "dataset");
+      New_Line;
+      JSON_Data_Array := Get (JSON_Data_Set);
+      JSON_Data_Item := Array_Element (JSON_Data_Array,
+                                       Array_First (JSON_Data_Array));
+      Data_Id := Get (JSON_Data_Item, "did");
+      Put_Line (Routine_Name & "Data_Id: " & Integer'Image (Data_Id));
 
       --  L877
       Description := Get_Data_Description_By_ID (Data_Id, True);
@@ -494,7 +503,7 @@ package body Openml is
                           Fixed.Trim (Integer'Image (Data_ID), Both) &
                           "_features";
          begin
-            Put_Line (Routine_Name & "File_Name: " & File_Name);
+--              Put_Line (Routine_Name & "File_Name: " & File_Name);
             Json_Data := Get_Json_Content_From_File (File_Name);
          end;
       else
@@ -703,7 +712,7 @@ package body Openml is
       Data     : ML_Types.String_List;
       Count    : Natural := 0;
    begin
-      Put_Line ("Openml.Load_Arff_From_File");
+--        Put_Line ("Openml.Load_Arff_From_File");
       Open (File_ID, In_File, File_Name);
       while not End_Of_File (File_ID) loop
          declare
@@ -718,7 +727,6 @@ package body Openml is
          --           Data := Data & "\r\n";
       end loop;
       Close (File_ID);
-      Put_Line ("Openml.Load_Arff_From_File data loaded");
       Put_Line ("Openml.Load_Arff_From_File:" & Integer'Image (Count) &
                   " lines loaded");
 

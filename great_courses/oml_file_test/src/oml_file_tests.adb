@@ -184,7 +184,6 @@ package body OML_File_Tests is
          Target_Column : constant String :=
                            Integer'Image (Length (Feature_Array) + 1);
       begin
-         Put_Line (Routine_Name & "Target_Column set");
          Put_Line (Routine_Name & "Dataset_Name: " & Dataset_Name);
          Bunch := Fetch_Openml
            (Dataset_Name => Dataset_Name, Version => Version,
