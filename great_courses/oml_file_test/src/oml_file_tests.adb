@@ -89,9 +89,12 @@ package body OML_File_Tests is
       Description   : JSON_Value;
    begin
       New_Line;
+      Put_Line (Routine_Name);
       Description := Get_Data_Description_By_ID (Data_Id, Use_Files);  --  , Dataset);
+      Put_Line (Routine_Name & "Description set");
+      Put_Line (Routine_Name & Get (Description, "data_set_description"));
       declare
-         Desc : constant String := Get (Description, "description");
+         Desc : constant String := Get (Description, "data_set_description");
       begin
          Put_Line (Routine_Name & "Description length:" &
                      Integer'Image (Desc'Length) & " characters.");
