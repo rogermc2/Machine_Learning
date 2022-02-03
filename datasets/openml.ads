@@ -28,28 +28,30 @@ package Openml is
    end record;
 
    function Download_Data_To_Bunch
-     (URL              : String; File_Name : String := "";
+     (URL              : String; Use_Files : Boolean := True;
       Sparse, As_Frame : Boolean;  Features_List  : JSON_Array;
       Data_Columns     : JSON_Array; Target_Columns : JSON_Array;
       Return_X_Y       : Boolean := False) return Bunch_Data;
    function Fetch_Openml (Dataset_Name  : String;  Version : String := "";
-                          File_Name     : String := "";
-                          Features_File_Name : String := "";
+                          Use_Files     : Boolean := True;
+--                            File_Name     : String := "";
+--                            Features_File_Name : String := "";
                           Data_Id       : in out Integer;
                           Target_Column : String := "default-target";
                           Return_X_Y    : Boolean := False;
                           As_Frame      : in out Unbounded_String)
                            return Bunch_Data;
    function Get_Data_Description_By_ID
-     (Data_ID : Integer; File_Name : String := "") return JSON_Value;
+     (Data_ID : Integer; Use_Files : Boolean := True) return JSON_Value;
    function Get_Data_Features (Data_ID   : Integer;
-                               File_Name : String := "") return JSON_Array;
+                               Use_Files : Boolean := True) return JSON_Array;
    function Get_Data_Info_By_Name (Dataset_Name : String;
                                    Version      : String := "";
                                    Active       : Boolean := False;
-                                   File_Name    : String := "")
+                                   Use_Files    : Boolean := True)
                                     return JSON_Value;
-   function Get_Data_Qualities (Data_ID : Integer; File_Name : String := "")
+   function Get_Data_Qualities (Data_ID   : Integer;
+                                Use_Files : Boolean := True)
                                 return Qualities_Map;
    function J_Array_To_String_List (J_Array : JSON_Array)
                                     return ML_Types.String_List;

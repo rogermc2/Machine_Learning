@@ -11,18 +11,20 @@ package body OML_File_Tests is
 
    --     pragma Warnings (Off);
 
-   procedure Test_Features (Data_Id : Integer; Dataset : String := "");
-   procedure Test_Qualities (Data_Id : Integer; Dataset : String := "");
+   procedure Test_Features (Data_Id : Integer;  Use_Files : Boolean := True);
+--     Dataset : String := "");
+   procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True);
+--     Dataset : String := "");
 
    --  -------------------------------------------------------------------------
 
    procedure Test_Convert_Arff_To_Data is
       Routine_Name       : constant String := "Test_Convert_Arff_To_Data ";
-      Features_File_Name : constant String := "../diabetes_features";
+--        Features_File_Name : constant String := "../diabetes_features";
       Data_Id            : constant Integer := 0;
-      File_Name          : constant String := "../diabetes";
-      Features           : constant JSON_Array :=
-                             Get_Data_Features (Data_Id, Features_File_Name);
+--        File_Name          : constant String := "../diabetes";
+      Features           : constant JSON_Array := Get_Data_Features (Data_Id);
+--                               Get_Data_Features (Data_Id, Features_File_Name);
       Data_Age           : constant JSON_Value := Create_Object;
       Data_Sex           : constant JSON_Value := Create_Object;
       Data_BMI           : constant JSON_Value := Create_Object;
@@ -72,7 +74,7 @@ package body OML_File_Tests is
                 "Target_Columns is empty");
 
       Bunch := Openml.Download_Data_To_Bunch
-        (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,
+        (URL => "", Use_Files => True, Sparse => False, As_Frame => False,
          Features_List => Features, Data_Columns  => Data_Columns,
          Target_Columns => Target_Columns);  --  , Shape => (1, 1));
 
@@ -81,12 +83,13 @@ package body OML_File_Tests is
    --  -------------------------------------------------------------------------
 
    procedure Test_Data_Description (Data_Id   : Integer;
-                                    Dataset   : String := "") is
+                                    Use_Files : Boolean := True) is
+--                                      Dataset   : String := "") is
       Routine_Name  : constant String := "Test_Data_Description ";
       Description   : JSON_Value;
    begin
       New_Line;
-      Description := Get_Data_Description_By_ID (Data_Id, Dataset);
+      Description := Get_Data_Description_By_ID (Data_Id, Use_Files);  --  , Dataset);
       declare
          Desc : constant String := Get (Description, "description");
       begin
@@ -104,31 +107,32 @@ package body OML_File_Tests is
    procedure Test_Data_Info is
       Routine_Name       : constant String := "Test_Data_Info ";
       Dataset_Name       : constant String := "mnist_784";
-      Info_File_Name     : constant String := "../mnist_784";
-      Features_File_Name : constant String := "../features";
+--        Info_File_Name     : constant String := "../mnist_784";
+--        Features_File_Name : constant String := "../features";
       Version            : constant String := "1";
       Data_Info          : JSON_Value;
       JSON_Data_Id       : JSON_Value;
       Data_Id            : Integer := 0;
    begin
       New_Line;
-      Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version,
-                                          File_Name => Info_File_Name);
+      Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
+--                                            File_Name => Info_File_Name);
       JSON_Data_Id := Get (Data_Info, "data_id");
       Data_Id := Integer'Value (Get (JSON_Data_Id));
       Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
 
-      Test_Data_Description (Data_Id, Info_File_Name);
+      Test_Data_Description (Data_Id);  --  , Info_File_Name);
       Put_Line (Routine_Name & "Test_Data_Description completed");
-      Test_Features (Data_Id, Features_File_Name);
+      Test_Features (Data_Id);  --  , Features_File_Name);
       Put_Line (Routine_Name & "Test_Features completed");
-      Test_Qualities (Data_Id, Info_File_Name);
+      Test_Qualities (Data_Id);  --  , Info_File_Name);
 
    end Test_Data_Info;
 
    --  -------------------------------------------------------------------------
 
-   procedure Test_Features (Data_Id : Integer; Dataset : String := "") is
+   procedure Test_Features (Data_Id : Integer; Use_Files : Boolean := True) is
+--     Dataset : String := "") is
       Routine_Name   : constant String := "Test_Features ";
       Feature_Array  : JSON_Array;
       Index          : Positive;
@@ -136,7 +140,7 @@ package body OML_File_Tests is
       Feature_Index  : Natural;
    begin
       Put_Line (Routine_Name & "Get features");
-      Feature_Array := Get_Data_Features (Data_Id, File_Name => Dataset);
+      Feature_Array := Get_Data_Features (Data_Id, Use_Files);  --  , File_Name => Dataset);
       Put_Line (Routine_Name & "number of features: " &
                   Integer'Image (Length (Feature_Array)));
       Index := Array_First (Feature_Array);
@@ -158,8 +162,8 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       Routine_Name      : constant String := "Test_Fetch_OML ";
       Dataset_Name      : constant String := "mnist_784";
-      File_Name         : constant String := "../mnist_784";
-      Feature_File_Name : constant String := "../dataset_554_features";
+--        File_Name         : constant String := "../mnist_784";
+--        Feature_File_Name : constant String := "../dataset_554_features";
       Version           : constant String := "1";
       As_Frame          : Unbounded_String := To_Unbounded_String ("false");
       Feature_Array     : JSON_Array;
@@ -167,7 +171,7 @@ package body OML_File_Tests is
       Bunch             : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
-      Feature_Array := Get_Data_Features (Data_Id, File_Name => File_Name);
+      Feature_Array := Get_Data_Features (Data_Id);  --  , File_Name => File_Name);
       Put_Line (Routine_Name & "Feature_Array set");
       declare
          Target_Column : constant String :=
@@ -175,9 +179,9 @@ package body OML_File_Tests is
       begin
          Bunch := Fetch_Openml
            (Dataset_Name  => Dataset_Name, Version => Version,
-            File_Name => File_Name, Features_File_Name => Feature_File_Name,
-            Data_Id => Data_Id, Target_Column => Target_Column,
-            Return_X_Y => True, As_Frame => As_Frame);
+            Use_Files =>  True, Data_Id => Data_Id,
+            Target_Column => Target_Column, Return_X_Y => True,
+            As_Frame => As_Frame);
       end;
 
       Put_Line (Routine_Name & "X length: " &
@@ -190,7 +194,8 @@ package body OML_File_Tests is
 
    --  -------------------------------------------------------------------------
 
-   procedure Test_Qualities (Data_Id : Integer; Dataset : String := "") is
+   procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True) is
+--     Dataset : String := "") is
       Routine_Name  : constant String := "Test_Qualities ";
       Max_Count     : constant Natural := 10;
       Count         : Natural := 0;
@@ -200,7 +205,7 @@ package body OML_File_Tests is
    begin
       New_Line;
       Put_Line (Routine_Name);
-      Quality_Array := Get_Data_Qualities (Data_Id, File_Name => Dataset);
+      Quality_Array := Get_Data_Qualities (Data_Id, Use_Files);  --  , File_Name => Dataset);
 
       if Is_Empty (Quality_Array) then
          Put_Line (Routine_Name & "there are no qualities");
