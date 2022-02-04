@@ -133,7 +133,7 @@ package body Openml is
      (Arff_Container            : JSON_Value;
       Col_Slice_X, Col_Slice_Y  : JSON_Array;
       X, Y                      : out JSON_Array) is
-      --        Routine_Name    : constant String := "Opemml.Convert_Arff_Data ";
+--        Routine_Name    : constant String := "Opemml.Convert_Arff_Data ";
       ARFF_Data       : constant JSON_Array := Arff_Container.Get ("data");
    begin
       --  L278
@@ -146,7 +146,6 @@ package body Openml is
 
    function Download_Data_To_Bunch (URL              : String;
                                     File_Name        : String := "";
---                                      Use_Files        : Boolean := True;
                                     Sparse, As_Frame : Boolean;
                                     Features_List    : JSON_Array;
                                     Data_Columns     : JSON_Array;
@@ -174,10 +173,12 @@ package body Openml is
       Bunch              : Bunch_Data (Return_X_Y);
 
       procedure Parse_ARFF
-        (ARFF_In          : JSON_Value; X_out, Y_out : out JSON_Array;
+        (ARFF_In          : JSON_Value;
+         X_Slice, Y_Slice : JSON_Array;
+         X_out, Y_out     : out JSON_Array;
          Nominal_Data_Out : out JSON_Array) is
       begin
-         Convert_Arff_Data (ARFF_In, Col_Slice_X, Col_Slice_Y, X_out, Y_out);
+         Convert_Arff_Data (ARFF_In, X_Slice, Y_Slice, X_out, Y_out);
          Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
 
       end Parse_ARFF;
@@ -194,13 +195,16 @@ package body Openml is
       --        end Post_Process;
 
    begin
---        Put_Line (Routine_Name);
+      Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
                 "called with empty Features_List.");
-      Assert (not Is_Empty (Target_Columns), Routine_Name &
-                "Target_Columns is empty.");
       Assert (not Is_Empty (Data_Columns), Routine_Name &
                 "Data_Columns is empty.");
+      Assert (Length (Target_Columns) = Length (Data_Columns), Routine_Name &
+                " Target_Columns length" &
+                Integer'Image (Length (Target_Columns)) &
+                " is different to Data_Columns length"&
+                Integer'Image (Length (Data_Columns)));
 
       while Array_Has_Element (Features_List, Feature_Index) loop
          aFeature := Array_Element (Features_List, Feature_Index);
@@ -208,6 +212,8 @@ package body Openml is
          Append (Features_Dict, Feature_Name);
          Feature_Index := Array_Next (Features_List, Feature_Index);
       end loop;
+      Put_Line (Routine_Name & "Features_Dict length" &
+                  Integer'Image (Length (Features_Dict)));
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
@@ -216,10 +222,16 @@ package body Openml is
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
       --        ]
-      aFeature := Array_Element (Features_List, 5);
-      aColumn := Get (aFeature, "index");
-      --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
-      Append (Col_Slice_Y, aColumn);
+      Col_Name := Array_First (Features_List);
+      while Array_Has_Element (Target_Columns, Col_Name) loop
+         aFeature := Array_Element (Features_List, 5);
+         aColumn := Get (aFeature, "index");
+         --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
+         Append (Col_Slice_Y, aColumn);
+         Col_Name := Array_Next (Target_Columns, Col_Name);
+      end loop;
+      Put_Line (Routine_Name & "Col_Slice_Y length" &
+                  Integer'Image (Length (Col_Slice_Y)));
 
       --  L566 continued
       Col_Name := Array_First (Features_List);
@@ -270,24 +282,22 @@ package body Openml is
       else
          Load_Arff_Response (URL);
       end if;
-
-      Put_Line (Routine_Name & "L602");
-      --  L602
-      All_Columns := Data_Columns;
-      Col_Name := Array_First (Target_Columns);
-      while Array_Has_Element (Target_Columns, Col_Name) loop
-         Append (All_Columns, Array_Element (Target_Columns, Col_Name));
-         Col_Name := Array_Next (Target_Columns, Col_Name);
-      end loop;
+--        Put_Line (Routine_Name & "L601 ARFF_Data");
+--        Put_Line (ARFF_Data.Write);
 
       --  L601
       if As_Frame then
-         null;
-      else
-         --  L667
-         Parse_ARFF (ARFF_Data, X, Y, Nominal_Attributes);
+         All_Columns := Data_Columns;
+         Col_Name := Array_First (Target_Columns);
+         while Array_Has_Element (Target_Columns, Col_Name) loop
+            Append (All_Columns, Array_Element (Target_Columns, Col_Name));
+            Col_Name := Array_Next (Target_Columns, Col_Name);
+         end loop;
       end if;
 
+      Put_Line (Routine_Name & "L667");
+      --  L667
+      Parse_ARFF (ARFF_Data, Col_Slice_X, Col_Slice_Y, X, Y, Nominal_Attributes);
       Put_Line (Routine_Name & "X length" & Integer'Image (Length (X)));
       Put_Line (Routine_Name & "Y length" & Integer'Image (Length (Y)));
 

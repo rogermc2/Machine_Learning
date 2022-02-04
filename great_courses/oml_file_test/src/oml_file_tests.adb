@@ -68,8 +68,11 @@ package body OML_File_Tests is
       Target_Columns := Valid_Data_Column_Names (Features, Target_Columns);
       Assert (not Is_Empty (Data_Columns), Routine_Name &
                 "Data_Columns is empty");
-      Assert (not Is_Empty (Target_Columns), Routine_Name &
-                "Target_Columns is empty");
+      Assert (Length (Target_Columns) = Length (Data_Columns), Routine_Name &
+                " Target_Columns length" &
+                Integer'Image (Length (Target_Columns)) &
+                " is different to Data_Columns length"&
+                Integer'Image (Length (Data_Columns)));
 
       Bunch := Openml.Download_Data_To_Bunch
         (URL => "", File_Name => File_Name, Sparse => False, As_Frame => False,

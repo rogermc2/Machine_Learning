@@ -270,7 +270,6 @@ package body ARFF is
          Next (Curs);
       end loop;
 
-      Put_Line (Routine_Name & "L872");
       Stream_Cursor := Curs;
       --  L872 Alter the data object
       --  case Matrix_Type implements
@@ -285,7 +284,6 @@ package body ARFF is
       end case;
 
       Arff_Container.Set_Field ("data", Values);
-      Put_Line (Routine_Name & "done");
 
       return Arff_Container;
 
@@ -538,7 +536,6 @@ package body ARFF is
 
       end loop;
 
-      Put_Line (Routine_Name & "L475");
       --  L475
       return Values_Array;
 
