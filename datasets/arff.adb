@@ -79,11 +79,11 @@ package body ARFF is
    package Escape_Sub_Map_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
 
---     type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
---                                               return String;
+   --     type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
+   --                                               return String;
 
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
---     Stream_Cursor  : ML_Types.String_Package.Cursor;
+   --     Stream_Cursor  : ML_Types.String_Package.Cursor;
    --  L190
    Quoted_Re      : constant String :=
                       "''""(?:(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
@@ -94,7 +94,7 @@ package body ARFF is
    --  L204
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
---     Row_Found      : Boolean := True;
+   --     Row_Found      : Boolean := True;
 
    procedure Decode_Attribute (Decoder        : in out Arff_Decoder; UC_Row : String;
                                Arff_Container : in out JSON_Value);
@@ -108,14 +108,14 @@ package body ARFF is
    --        return String_List;
    function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream      : String_List)
---                                 Stream_Func : Stream_Func_Type)
+     --                                 Stream_Func : Stream_Func_Type)
                                return JSON_Array;
    function Decode_Dense_Values
      (Values : String_List; Attribute_List : Conversor_Item_List)
       return JSON_Array;
    function Parse_Values (Row : String) return String_List;
    function Split_Sparse_Line (Row : String) return String_List;
---     function Stream_Data (Decoder : in out Arff_Decoder) return String;
+   --     function Stream_Data (Decoder : in out Arff_Decoder) return String;
    function Unquote (Values : String) return Unbounded_String;
 
    --  -------------------------------------------------------------------------
@@ -166,16 +166,16 @@ package body ARFF is
                          --                           Encode_Nominal : Boolean := False;
                          Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
---        use Ada.Strings;
+      --        use Ada.Strings;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "ARFF.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
---        Text_Length     : constant Integer := Text'Length;
---        Text_Length     : constant Positive := Positive (Length (Text));
+      --        Text_Length     : constant Integer := Text'Length;
+      --        Text_Length     : constant Positive := Positive (Length (Text));
       State           : TK_State := TK_Descrition;
---        Pos1            : Integer := 1;
---        Pos2            : Integer := 1;
---        Message_Lines   : String_List;
+      --        Pos1            : Integer := 1;
+      --        Pos2            : Integer := 1;
+      --        Message_Lines   : String_List;
       Curs            : Cursor := Text.First;
       Values          : JSON_Array;
       Arff_Container  : JSON_Value := Create_Object;
@@ -183,27 +183,27 @@ package body ARFF is
       Decoder.Current_Line := 0;
       Put_Line (Routine_Name);
 
---        while Pos2 /= 0 and Pos1 < Text_Length loop
---           Pos2 := Fixed.Index (Text (Pos1 .. Text_Length), "\r\n");
---           Message_Lines.Append
---             (To_Unbounded_String
---                (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
---           Pos1 := Pos2 + 4;
---        end loop;
+      --        while Pos2 /= 0 and Pos1 < Text_Length loop
+      --           Pos2 := Fixed.Index (Text (Pos1 .. Text_Length), "\r\n");
+      --           Message_Lines.Append
+      --             (To_Unbounded_String
+      --                (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
+      --           Pos1 := Pos2 + 4;
+      --        end loop;
 
---        Put_Line (Routine_Name & "Message_Lines:");
---        Curs := Message_Lines.First;
---        while Has_Element (Curs) loop
---           Put_Line (To_String (Element (Curs)));
---           Next  (Curs);
---        end loop;
---        Put_Line (Routine_Name & "end of Message_Lines");
---        New_Line;
+      --        Put_Line (Routine_Name & "Message_Lines:");
+      --        Curs := Message_Lines.First;
+      --        while Has_Element (Curs) loop
+      --           Put_Line (To_String (Element (Curs)));
+      --           Next  (Curs);
+      --        end loop;
+      --        Put_Line (Routine_Name & "end of Message_Lines");
+      --        New_Line;
 
---        if Pos1 < Text_Length - 4 then
---           Message_Lines.Append
---             (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
---        end if;
+      --        if Pos1 < Text_Length - 4 then
+      --           Message_Lines.Append
+      --             (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
+      --        end if;
 
       --  L784 Arff_Container implements obj: ArffContainerType
       Arff_Container.Set_Field ("description", Create (Empty_Array));
@@ -261,7 +261,7 @@ package body ARFF is
                   Decode_Comment (UC_Row, Arff_Container);
 
                else
---                    Put_Line (Routine_Name & "Row: " & UC_Row);
+                  --                    Put_Line (Routine_Name & "Row: " & UC_Row);
                   Assert (False, Routine_Name & "in unexpected state " &
                             TK_State'Image (State));
                end if;
@@ -272,7 +272,7 @@ package body ARFF is
       end loop;
       Put_Line (Routine_Name & "L872");
 
---        Stream_Cursor := Curs;
+      --        Stream_Cursor := Curs;
       --  L872 Alter the data object
       --  case Matrix_Type implements
       --  L792 data = _get_data_object_for_decoding(matrix_type)
@@ -503,42 +503,46 @@ package body ARFF is
    --  L460
    function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
                                Stream      : String_List)
---                                 Stream_Func : Stream_Func_Type)
+     --                                 Stream_Func : Stream_Func_Type)
                                return JSON_Array is
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
       Stream_Cursor     : ML_Types.String_Package.Cursor;
-      Converser_Length  : constant Positive :=
-                            Positive (Decoder.Conversers.Length);
+      --        Converser_Length  : constant Positive :=
+      --                              Positive (Decoder.Conversers.Length);
       Values_Array      : JSON_Array;
       --        Count             : Natural := 0;
 
-      function Stream_Data (Decoder : in out Arff_Decoder;
-                            aRow : in out Unbounded_String) return String is
-      use Ada.Strings;
-      Result : Unbounded_String := To_Unbounded_String ("");
-   begin
-         Decoder.Current_Line := Decoder.Current_Line + 1;
---           Put_Line (Routine_Name & "Stream_Data Row length" &
---                          Integer'Image (Integer (Length (aRow))));
+      --        function Stream_Data (Decoder : in out Arff_Decoder;
+      function Stream_Data (aRow : in out Unbounded_String) return String is
+         use Ada.Strings;
+         Result : Unbounded_String := To_Unbounded_String ("");
+      begin
+         --           Decoder.Current_Line := Decoder.Current_Line + 1;
+         --           Put_Line (Routine_Name & "Stream_Data Row length" &
+         --                          Integer'Image (Integer (Length (aRow))));
          if Integer (Length (aRow)) > 0 then
-               Trim (aRow, Both);
---                 Put_Line (Routine_Name & "Stream_Data trimmed Row: " & To_String (aRow));
-               declare
-                  UC_Row : constant String := Dataset_Utilities.To_Upper_Case
-                    (To_String (aRow));
-               begin
---                 Put_Line (Routine_Name & "Stream_Data UC_Row length" &
---                          Integer'Image (UC_Row'Length));
-                  if  UC_Row'Length > 0 and UC_Row (1 .. 1) /= "%" then
-                     Result := aRow;
-                  end if;
-               end;
+            Trim (aRow, Both);
+            --                 Put_Line (Routine_Name & "Stream_Data trimmed Row: " & To_String (aRow));
+            --                 declare
+            --                    UC_Row : constant String := Dataset_Utilities.To_Upper_Case
+            --                      (To_String (aRow));
+            --                 begin
+            --                 Put_Line (Routine_Name & "Stream_Data UC_Row length" &
+            --                          Integer'Image (UC_Row'Length));
+            --                 if  UC_Row'Length > 0 and UC_Row (1 .. 1) /= "%" and
+            --                   UC_Row (1 .. 1) /= "@"
+            if  Length (aRow) > 0 and then Slice (aRow, 1, 1) /= "%" and then
+              Slice (aRow, 1, 1) /= "@"
+            then
+               Result := aRow;
+            end if;
+            --                 end;
          end if;
 
-      Put_Line (Routine_Name & "Stream_Data Result: " & To_String (Result));
+         --        Put_Line (Routine_Name & "Stream_Data Result: " & To_String (Result));
 
-      return To_String (Result);
+         return To_String (Result);
 
       end Stream_Data;
 
@@ -547,34 +551,35 @@ package body ARFF is
                   Integer'Image (Integer (Length (Stream))));
       Stream_Cursor := Stream.First;
       while Has_Element (Stream_Cursor) loop
---           Count := Count + 1;
---           Put_Line (Routine_Name & Integer'Image (Count));
+         --           Count := Count + 1;
+         --           Put_Line (Routine_Name & Integer'Image (Count));
          declare
             --  L462  for row in stream:
             Row           : Unbounded_String := Element (Stream_Cursor);
-            Filtered_Row  : constant String := Stream_Data (Decoder, Row);
---              Row           : constant String := Stream_Func (Decoder);
+            Filtered_Row  : constant String := Stream_Data (Row);
+            --              Filtered_Row  : constant String := Stream_Data (Decoder, Row);
+            --              Row           : constant String := Stream_Func (Decoder);
             --  L463
             Values        : constant String_List := Parse_Values (Filtered_Row);
-            Values_Length : constant Natural := Natural (Length (Values));
+            --              Values_Length : constant Natural := Natural (Length (Values));
             Data_Values   : constant JSON_Value := Create_Object;
             Dense_Values  : JSON_Array;
          begin
             Clear (Dense_Values);
             Data_Values.Unset_Field ("values");
-            Put_Line (Routine_Name & "Filtered_Row: " & Filtered_Row);
-            Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
---              delay (1.0);
-            New_Line;
+            --              Put_Line (Routine_Name & "Filtered_Row: " & Filtered_Row);
+            --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
+            --              delay (1.0);
+            --              New_Line;
 
             if Filtered_Row'Length > 0 then
-               Assert (not Values.Is_Empty, Routine_Name & "Row '" &
-                         Filtered_Row & "' has no valid values.");
-               Assert (Values_Length <= Converser_Length, Routine_Name &
-                         "Row '" & Filtered_Row &
-                         "' is invalid, Values length"  &
-                         Integer'Image (Values_Length) & " < Converser_Length"
-                         & Integer'Image (Converser_Length));
+               --                 Assert (not Values.Is_Empty, Routine_Name & "Row '" &
+               --                           Filtered_Row & "' has no valid values.");
+               --                 Assert (Values_Length <= Converser_Length, Routine_Name &
+               --                           "Row '" & Filtered_Row &
+               --                           "' is invalid, Values length"  &
+               --                           Integer'Image (Values_Length) & " < Converser_Length"
+               --                           & Integer'Image (Converser_Length));
                Dense_Values :=
                  Decode_Dense_Values (Values, Decoder.Conversers);
                Data_Values.Set_Field ("values", Dense_Values);
@@ -583,6 +588,7 @@ package body ARFF is
          end;
 
          Next (Stream_Cursor);
+         --        delay (1.0);
       end loop;
 
       Put_Line (Routine_Name & "Values_Array length" &
@@ -750,14 +756,14 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
---     function Load (File_Data   : String;
---                    Return_Type : ARFF_Return_Type := Arff_Dense)
---                    return JSON_Value is
---        Decoder   : Arff_Decoder;
---     begin
---        return Decode_ARFF (Decoder, File_Data,  Return_Type);
---
---     end Load;
+   --     function Load (File_Data   : String;
+   --                    Return_Type : ARFF_Return_Type := Arff_Dense)
+   --                    return JSON_Value is
+   --        Decoder   : Arff_Decoder;
+   --     begin
+   --        return Decode_ARFF (Decoder, File_Data,  Return_Type);
+   --
+   --     end Load;
 
    --  -------------------------------------------------------------------------
 
@@ -796,21 +802,21 @@ package body ARFF is
       Result              : String_List;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         Put_Line (Routine_Name & "Row: '" & Row & "'");
+         --           Put_Line (Routine_Name & "Row: '" & Row & "'");
          Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
          pragma Unreferenced (Matches);
-         if not Match_Found then
-            Put_Line (Routine_Name & "not nontrivial");
+         if Match_Found then
+            Put_Line (Routine_Name & "trivial");
             Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
-            Put_Line (Routine_Name & "not nontrivial Values length:" &
-                     Integer'Image (Integer (Length (Values))));
+            Put_Line (Routine_Name & "trivial Values length:" &
+                        Integer'Image (Integer (Length (Values))));
 
          else
-            Put_Line (Routine_Name & "nontrivial");
+            --              Put_Line (Routine_Name & "nontrivial");
             --  Row contains Non_Trivial characters
             --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
             --  despite quoting, whitespace, etc.
@@ -880,34 +886,34 @@ package body ARFF is
    end Split_Sparse_Line;
 
    --  -------------------------------------------------------------------------
---
---     function Stream_Data (Decoder : in out Arff_Decoder) return String is
---        use Ada.Strings;
---        use String_Package;
---        Row    : Unbounded_String;
---        Result : Unbounded_String := To_Unbounded_String ("");
---     begin
---        Row_Found := False;
---        while Has_Element (Stream_Cursor) and not Row_Found loop
---           Decoder.Current_Line := Decoder.Current_Line + 1;
---           Row := Element (Stream_Cursor);
---                    Put_Line ("ARFF.Stream_Data Row '" & To_String (Row) & "'");
---           Trim (Row, Both);
---           declare
---              UC_Row : constant String := Dataset_Utilities.To_Upper_Case
---                (To_String (Row));
---           begin
---              Row_Found := Length (Row) > 0 and UC_Row (1 .. 1) /= "%";
---              if Row_Found then
---                 Result := Row;
---              end if;
---           end;
---           Next (Stream_Cursor);
---        end loop;
---
---        return To_String (Result);
---
---     end Stream_Data;
+   --
+   --     function Stream_Data (Decoder : in out Arff_Decoder) return String is
+   --        use Ada.Strings;
+   --        use String_Package;
+   --        Row    : Unbounded_String;
+   --        Result : Unbounded_String := To_Unbounded_String ("");
+   --     begin
+   --        Row_Found := False;
+   --        while Has_Element (Stream_Cursor) and not Row_Found loop
+   --           Decoder.Current_Line := Decoder.Current_Line + 1;
+   --           Row := Element (Stream_Cursor);
+   --                    Put_Line ("ARFF.Stream_Data Row '" & To_String (Row) & "'");
+   --           Trim (Row, Both);
+   --           declare
+   --              UC_Row : constant String := Dataset_Utilities.To_Upper_Case
+   --                (To_String (Row));
+   --           begin
+   --              Row_Found := Length (Row) > 0 and UC_Row (1 .. 1) /= "%";
+   --              if Row_Found then
+   --                 Result := Row;
+   --              end if;
+   --           end;
+   --           Next (Stream_Cursor);
+   --        end loop;
+   --
+   --        return To_String (Result);
+   --
+   --     end Stream_Data;
 
    --  -------------------------------------------------------------------------
 
