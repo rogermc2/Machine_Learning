@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
-with Ada.Real_Time;
+with Ada.Calendar;
 with Ada.Strings.Fixed;
 --  with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -521,14 +521,13 @@ package body ARFF is
       End_Time          : Time;
       Loop_Start_Time   : Time;
       Loop_End_Time     : Time;
-      --        Milli_Sec         : Duration;
       --        Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
                   Integer'Image (Integer (Length (Stream))));
       Stream_Cursor := Stream.First;
-         Loop_Start_Time := Clock;
       while Has_Element (Stream_Cursor) loop
+         Loop_Start_Time := Clock;
          --           Count := Count + 1;
          --           Put_Line (Routine_Name & Integer'Image (Count));
          --  L462  for row in stream:
@@ -545,11 +544,11 @@ package body ARFF is
             then
                Result := Row;
                --  L463
-               Start_Time := Clock;
+--                 Start_Time := Clock;
                Values := Parse_Values (To_String (Result));
-               End_Time := Clock;
-               Put_Line (Routine_Name & "Parse time" &
-                           Duration'Image (End_Time - Start_Time) & " Milli_Sec");
+--                 End_Time := Clock;
+--                 Put_Line (Routine_Name & "Parse time" &
+--                             Duration'Image (End_Time - Start_Time) & " Milli_Sec");
                --              Values_Length := Natural (Length (Values));
                Clear (Dense_Values);
                Data_Values.Unset_Field ("values");
@@ -571,8 +570,8 @@ package body ARFF is
                     Decode_Dense_Values (Values, Decoder.Conversers);
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
-                  Put_Line (Routine_Name & "Values_Array length" &
-                              Integer'Image (Length (Values_Array)));
+--                    Put_Line (Routine_Name & "Values_Array length" &
+--                                Integer'Image (Length (Values_Array)));
                end if;
             end if;
          end if;
@@ -582,7 +581,7 @@ package body ARFF is
          Put_Line (Routine_Name & "Loop time" &
                      Duration'Image (Loop_End_Time - Loop_Start_Time) &
                      " Micro_Sec");
---           delay (1.0);
+         delay (0.1);
       end loop;
 
       Put_Line (Routine_Name & "Values_Array length" &
