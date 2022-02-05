@@ -36,7 +36,8 @@ package Openml is
    function Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                           Use_Files     : Boolean := True;
                           Data_Id       : in out Integer;
-                          Target_Column : String := "default-target";
+                          Target_Column : ML_Types.String_List;
+--                            Target_Column : String := "default-target";
                           Return_X_Y    : Boolean := False;
                           As_Frame      : in out Unbounded_String)
                            return Bunch_Data;
