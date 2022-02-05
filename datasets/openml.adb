@@ -407,23 +407,25 @@ package body Openml is
             Process_Feature (Dataset_Name, Features_List);
         end if;
 
+        Put_Line (Routine_Name & "L929");
         --  L929
---          if Target_Column = "default-target" then
         if Target_Column.Is_Empty then
             Put_Line (Routine_Name & "default-target");
             Set_Default_Target (Features_List, Target_Columns);
         else
             Curs := Target_Column.First;
             while Has_Element (Curs) loop
-                Target_Value := Element (Curs);
-                Target_Value :=
-                Trim ((Target_Value'First + 1 .. Target_Value'Last), Both);
+            Target_Value := Element (Curs);
+            Target_Value := To_Unbounded_String
+              (Slice (Target_Value, 2, Length (Target_Value)));
+                Trim (Target_Value, Both);
                 Set_Field (Target, "target", To_String (Target_Value));
                 Append (Target_Columns, Target);
                 Next (Curs);
             end loop;
         end if;
 
+        Put_Line (Routine_Name & "L944");
         --  L944
         Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
@@ -750,7 +752,6 @@ package body Openml is
                     " lines loaded");
 
         return ARFF.Load (Data, Return_Type);
-        --        return ARFF.Load (To_String (Data), Return_Type);
 
     end Load_Arff_From_File;
 
