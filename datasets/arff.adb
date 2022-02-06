@@ -839,13 +839,17 @@ package body ARFF is
 --                                Row (First .. Last));
                   Start_Time := Clock;
                   declare
-                     XValues : constant GNATCOLL.Strings.XString_Array :=
-                                 Split (Row (First .. Last), ",");
+--                       XValues : constant GNATCOLL.Strings.XString_Array :=
+--                                   Split (Row (First .. Last), ",");
+                     Text    : constant XString :=
+                                 To_XString (Row (First .. Last));
+                     XValues : constant XString_Array :=
+                        Split (Text, ",", Omit_Empty => True);
                   begin
-                  End_Time := Clock;
                   for index in 1 .. XValues'Length loop
                         Values.Append (To_String (XValues (index)));
                   end loop;
+                  End_Time := Clock;
                   Put_Line (Routine_Name & "split string execution time" &
                               Duration'Image (1000 * ( End_Time - Start_Time)) &
                               " Milli_Sec");
