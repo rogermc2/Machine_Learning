@@ -508,19 +508,19 @@ package body ARFF is
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
-      --        Converser_Length  : constant Positive :=
-      --                              Positive (Decoder.Conversers.Length);
+      Converser_Length  : constant Positive :=
+                            Positive (Decoder.Conversers.Length);
       Row               : Unbounded_String;
       Values            : String_List;
-      --              Values_Length : Natural;
+      Values_Length     : Natural;
       Data_Values       : constant JSON_Value := Create_Object;
       Dense_Values      : JSON_Array;
       Result            : Unbounded_String := To_Unbounded_String ("");
       Values_Array      : JSON_Array;
-      Start_Time        : Time;
-      End_Time          : Time;
-      Decode_Start_Time : Time;
-      Decode_End_Time   : Time;
+--        Start_Time        : Time;
+--        End_Time          : Time;
+--        Decode_Start_Time : Time;
+--        Decode_End_Time   : Time;
       --        Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
@@ -531,48 +531,47 @@ package body ARFF is
          --  L462  for row in stream:
          Row  := Element (Stream_Cursor);
          Trim (Row, Both);
---           Put_Line (Routine_Name & To_String (Row));
+         --           Put_Line (Routine_Name & To_String (Row));
          if Row /= "" then
             if Slice (Row, 1, 1) /= "%" and then
               Slice (Row, 1, 1) /= "@"
             then
                Result := Row;
                --  L463
-               Start_Time := Clock;
+--                 Start_Time := Clock;
                Values := Parse_Values (To_String (Result));
-               End_Time := Clock;
---                 Put_Line (Routine_Name & "Parse time" &
---                             Duration'Image (1000 * (End_Time - Start_Time)) &
---                             " Milli_Sec");
-               --              Values_Length := Natural (Length (Values));
+--                 End_Time := Clock;
+               --                 Put_Line (Routine_Name & "Parse time" &
+               --                             Duration'Image (1000 * (End_Time - Start_Time)) &
+               --                             " Milli_Sec");
+               Values_Length := Natural (Length (Values));
                Clear (Dense_Values);
                Data_Values.Unset_Field ("values");
-               --              Put_Line (Routine_Name & "Filtered_Row: " & Filtered_Row);
+               --                 Put_Line (Routine_Name & "Result: " & To_String (Result));
                --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
                --              delay (1.0);
                --              New_Line;
 
                if Length (Result) > 0 then
-                  --              if Filtered_Row'Length > 0 then
                   --                 Assert (not Values.Is_Empty, Routine_Name & "Row '" &
                   --                           Filtered_Row & "' has no valid values.");
-                  --                 Assert (Values_Length <= Converser_Length, Routine_Name &
-                  --                           "Row '" & Filtered_Row &
-                  --                           "' is invalid, Values length"  &
-                  --                           Integer'Image (Values_Length) & " < Converser_Length"
-                  --                           & Integer'Image (Converser_Length));
-                  Decode_Start_Time := Clock;
+                  Assert (Values_Length <= Converser_Length, Routine_Name &
+                            "Row is invalid, Values length"  &
+                            Integer'Image (Values_Length) &
+                            " is different to Converser_Length" &
+                            Integer'Image (Converser_Length));
+--                    Decode_Start_Time := Clock;
                   Dense_Values :=
                     Decode_Dense_Values (Values, Decoder.Conversers);
-                  Decode_End_Time := Clock;
---                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
---                                Duration'Image
---                                (1000 * (Decode_End_Time - Decode_Start_Time)) &
---                                " Milli_Sec");
+--                    Decode_End_Time := Clock;
+                  --                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
+                  --                                Duration'Image
+                  --                                (1000 * (Decode_End_Time - Decode_Start_Time)) &
+                  --                                " Milli_Sec");
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
---                    Put_Line (Routine_Name & "Values_Array length" &
---                                Integer'Image (Length (Values_Array)));
+                  --                    Put_Line (Routine_Name & "Values_Array length" &
+                  --                                Integer'Image (Length (Values_Array)));
                end if;
             end if;
          end if;
@@ -648,8 +647,8 @@ package body ARFF is
                   end loop;
 
                   Assert (Found, Routine_Name & UC_Value &
-                            " is an invalid iris type");
-                  Value.Set_Field ("Iris type", UC_Value);
+                            " is an invalid nominal type");
+                  Value.Set_Field ("nominal type", UC_Value);
 
                when Conv_Numeric | Conv_Real =>
                   if Fixed.Index (Value_String, ".") = 0 then
@@ -796,13 +795,13 @@ package body ARFF is
    begin
       if Row'Length /= 0 and then Row /= "?" then
          --           Put_Line (Routine_Name & "Row: '" & Row & "'");
---           Start_Time := Clock;
+         --           Start_Time := Clock;
          Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
---           End_Time := Clock;
---           Put_Line (Routine_Name & "Non_Trivial Match time" &
---                     Duration'Image (1000 * ( End_Time - Start_Time)) &
---                     " Milli_Sec");
+         --           End_Time := Clock;
+         --           Put_Line (Routine_Name & "Non_Trivial Match time" &
+         --                     Duration'Image (1000 * ( End_Time - Start_Time)) &
+         --                     " Milli_Sec");
          pragma Unreferenced (Matches);
          if Match_Found then
             Put_Line (Routine_Name & "trivial");
@@ -829,8 +828,10 @@ package body ARFF is
                   Values := Split_String (Row (First .. Last), ",");
                   End_Time := Clock;
                   Put_Line (Routine_Name & "Dense_Match time" &
-                   Duration'Image (1000 * ( End_Time - Start_Time)) &
-                   " Milli_Sec");
+                              Duration'Image (1000 * ( End_Time - Start_Time)) &
+                              " Milli_Sec");
+                  Put_Line (Routine_Name & "dense Values length:" &
+                              Integer'Image (Integer (Length (Values))));
                else
                   Matches := Find_Match (Sparse_Matcher, Row, First, Last,
                                          Sparse_Match);

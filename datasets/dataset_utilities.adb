@@ -112,37 +112,29 @@ package body Dataset_Utilities is
    function Split_String (aString, Pattern : String)
                           return ML_Types.String_List is
       use Ada.Strings;
-      --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
-      Last       : constant Integer := aString'Last;
-      Last_Char  : constant Character := aString (Last);
-      UB_String  : Unbounded_String;
-      Split_List : ML_Types.String_List;
+--        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
+      Last         : Integer := aString'Last;
+      Last_Char    : constant Character := aString (Last);
+      A_Index      : Integer := 1;
+      B_Index      : Integer;
+      Split_List   : ML_Types.String_List;
    begin
       if Character'Pos (Last_Char) < 32 then
-         UB_String :=
-           To_Unbounded_String (aString (aString'First .. Last - 1));
-      else
-         UB_String := To_Unbounded_String (aString);
+         Last := Last - 1;
       end if;
 
-      declare
-         String_2 : constant String := To_String (UB_String);
-         Last_2   : constant Integer := String_2'Last;
-         A_Index  : Integer := 1;
-         B_Index  : Integer := Length (UB_String);
-      begin
-         for index in String_2'First .. Fixed.Count (String_2, Pattern) loop
-            A_Index :=
-              Fixed.Index (String_2 (B_Index .. Last_2), Pattern);
-            --  process string slice in any way
-            Split_List.Append
-              (To_Unbounded_String (String_2 (B_Index .. A_Index - 1)));
-            B_Index := A_Index + Pattern'Length;
-            --  process last string
-            Split_List.Append
-              (To_Unbounded_String (String_2 (B_Index .. Last_2)));
-         end loop;
-      end;
+      B_Index := Last;
+      for index in aString'First .. Fixed.Count (aString, Pattern) loop
+         A_Index :=
+           Fixed.Index (aString (B_Index .. Last), Pattern);
+         --  process string slice in any way
+         Split_List.Append
+           (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
+         B_Index := A_Index + Pattern'Length;
+      end loop;
+      --  process last string
+      Split_List.Append
+        (To_Unbounded_String (aString (B_Index .. Last)));
 
       return Split_List;
 
