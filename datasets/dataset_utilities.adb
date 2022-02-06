@@ -2,7 +2,6 @@
 with Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Strings.Fixed;
-with Ada.Strings.Maps;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.String_Split;
@@ -112,7 +111,6 @@ package body Dataset_Utilities is
 
    function Split_String (aString, Pattern : String)
                           return ML_Types.String_List is
-      use Ada.Strings.Maps;
       use Ada.Strings;
       --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Last       : constant Integer := aString'Last;
@@ -128,30 +126,22 @@ package body Dataset_Utilities is
       end if;
 
       declare
-         --           String_2 : constant String := To_String (UB_String);
-         --           Last_2   : constant Integer := String_2'Last;
+         String_2 : constant String := To_String (UB_String);
+         Last_2   : constant Integer := String_2'Last;
          A_Index  : Integer := 1;
---           B_Index  : Integer := Length (UB_String);
-         First    : Natural;
-         Last     : Natural;
+         B_Index  : Integer := Length (UB_String);
       begin
-         while A_Index <  Length (UB_String) loop
-            Ada.Strings.Unbounded.Find_Token (UB_String, To_Set (Pattern),
-                                              A_Index, Inside, First, Last);
-            Split_List.Append (To_Unbounded_String
-                               (Slice (UB_String, First, Last)));
-            A_Index := Last + 1;
+         for index in String_2'First .. Fixed.Count (String_2, Pattern) loop
+            A_Index :=
+              Fixed.Index (String_2 (B_Index .. Last_2), Pattern);
+            --  process string slice in any way
+            Split_List.Append
+              (To_Unbounded_String (String_2 (B_Index .. A_Index - 1)));
+            B_Index := A_Index + Pattern'Length;
+            --  process last string
+            Split_List.Append
+              (To_Unbounded_String (String_2 (B_Index .. Last_2)));
          end loop;
-         --           for index in First (UB_String) .. Count (UB_String, Pattern) loop
-         --              A_Index :=
-         --                Index (UB_String (B_Index .. Last_2), Pattern);
-         --              --  process string slice in any way
-         --              Split_List.Append (UB_String (B_Index .. A_Index - 1));
-         --              B_Index := A_Index + Pattern'Length;
-         --           end loop;
-         --  process last string
-         --           Split_List.Append (UB_String (B_Index .. Last_2));
-         --           Split_List.Append (UB_String (B_Index .. Length (UB_String) - 2));
       end;
 
       return Split_List;
