@@ -107,8 +107,9 @@ package body ARFF is
    --       (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
    --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
    --        return String_List;
-   function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
-                               Stream      : String_List)
+   function Decode_Dense_Rows (Decoder       : in Out Arff_Decoder;
+                               Stream        : String_List;
+                               Stream_Cursor : in out String_Package.Cursor)
                                return JSON_Array;
    function Decode_Dense_Values
      (Values : String_List; Attribute_List : Conversor_Item_List)
@@ -165,7 +166,6 @@ package body ARFF is
                          --                           Encode_Nominal : Boolean := False;
                          Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
-      --        use Ada.Strings;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "ARFF.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
@@ -277,7 +277,7 @@ package body ARFF is
       --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
          when Arff_Dense =>
-            Values := Decode_Dense_Rows (Decoder, Text);
+            Values := Decode_Dense_Rows (Decoder, Text, Curs);
          when Arff_Coo => null;
             --              Values := Decode_COO_Rows (Decoder, Stream_Data'Access, Data,
             --                                         Rows, Cols);
@@ -500,14 +500,14 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
    --  L460
-   function Decode_Dense_Rows (Decoder : in Out Arff_Decoder;
-                               Stream  : String_List)
+   function Decode_Dense_Rows (Decoder       : in out Arff_Decoder;
+                               Stream        : String_List;
+                               Stream_Cursor : in out String_Package.Cursor)
                                return JSON_Array is
       use Ada.Calendar;
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
-      Stream_Cursor     : ML_Types.String_Package.Cursor;
       --        Converser_Length  : constant Positive :=
       --                              Positive (Decoder.Conversers.Length);
       Row               : Unbounded_String;
@@ -519,36 +519,30 @@ package body ARFF is
       Values_Array      : JSON_Array;
       Start_Time        : Time;
       End_Time          : Time;
-      Loop_Start_Time   : Time;
-      Loop_End_Time     : Time;
+      Decode_Start_Time : Time;
+      Decode_End_Time   : Time;
       --        Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
                   Integer'Image (Integer (Length (Stream))));
-      Stream_Cursor := Stream.First;
       while Has_Element (Stream_Cursor) loop
-         Loop_Start_Time := Clock;
          --           Count := Count + 1;
          --           Put_Line (Routine_Name & Integer'Image (Count));
          --  L462  for row in stream:
          Row  := Element (Stream_Cursor);
-         if Integer (Length (Row)) > 0 then
---              Start_Time := Clock;
-            Trim (Row, Both);
---              End_Time := Clock;
---              Put_Line (Routine_Name & "Trim time" &
---                             Duration'Image (End_Time - Start_Time) & " Milli_Sec");
-            if  Length (Row) > 0 and then
-              Slice (Row, 1, 1) /= "%" and then
+         Trim (Row, Both);
+--           Put_Line (Routine_Name & To_String (Row));
+         if Row /= "" then
+            if Slice (Row, 1, 1) /= "%" and then
               Slice (Row, 1, 1) /= "@"
             then
                Result := Row;
                --  L463
---                 Start_Time := Clock;
+               Start_Time := Clock;
                Values := Parse_Values (To_String (Result));
---                 End_Time := Clock;
---                 Put_Line (Routine_Name & "Parse time" &
---                             Duration'Image (End_Time - Start_Time) & " Milli_Sec");
+               End_Time := Clock;
+               Put_Line (Routine_Name & "Parse time" &
+                           Duration'Image (1000 * (End_Time - Start_Time)) & " Milli_Sec");
                --              Values_Length := Natural (Length (Values));
                Clear (Dense_Values);
                Data_Values.Unset_Field ("values");
@@ -566,8 +560,14 @@ package body ARFF is
                   --                           "' is invalid, Values length"  &
                   --                           Integer'Image (Values_Length) & " < Converser_Length"
                   --                           & Integer'Image (Converser_Length));
+                  Decode_Start_Time := Clock;
                   Dense_Values :=
                     Decode_Dense_Values (Values, Decoder.Conversers);
+                  Decode_End_Time := Clock;
+                  Put_Line (Routine_Name & "Decode_Dense_Values time" &
+                              Duration'Image
+                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
+                              " Milli_Sec");
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
 --                    Put_Line (Routine_Name & "Values_Array length" &
@@ -577,11 +577,7 @@ package body ARFF is
          end if;
 
          Next (Stream_Cursor);
-         Loop_End_Time := Clock;
-         Put_Line (Routine_Name & "Loop time" &
-                     Duration'Image (Loop_End_Time - Loop_Start_Time) &
-                     " Micro_Sec");
-         delay (0.1);
+         delay (0.3);
       end loop;
 
       Put_Line (Routine_Name & "Values_Array length" &
