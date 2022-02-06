@@ -547,7 +547,7 @@ package body ARFF is
                Values_Length := Natural (Length (Values));
                Clear (Dense_Values);
                Data_Values.Unset_Field ("values");
-               --                 Put_Line (Routine_Name & "Result: " & To_String (Result));
+--                 Put_Line (Routine_Name & "Result: '" & To_String (Result) & "'");
                --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
                --              delay (1.0);
                --              New_Line;
@@ -625,8 +625,12 @@ package body ARFF is
             UC_Value       : constant String :=
                                To_Upper_Case (Value_String);
          begin
+--              Put_Line (Routine_Name & "Conversor Data_Type " &
+--                          Conversor_Data_Type'Image (Data_Type));
+--              Put_Line (Routine_Name & "Value_String: " & Value_String);
             case Data_Type is
                when Conv_Integer =>
+                  Put_Line (Routine_Name & "Data_Type Conv_Integer");
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field
                        (Name, Integer'Value (Value_String));
@@ -634,6 +638,7 @@ package body ARFF is
                      Value.Set_Field
                        (Name, Integer (Float'Value (Value_String)));
                   end if;
+
                when Conv_Nominal =>
                   Nominal_Cursor := aConverser.Nominal_List.First;
                   while Has_Element (Nominal_Cursor) and not Found loop
@@ -651,6 +656,8 @@ package body ARFF is
                   Value.Set_Field ("nominal type", UC_Value);
 
                when Conv_Numeric | Conv_Real =>
+--                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
+--                                Value_String);
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field
                        (Name, Float (Integer'Value (Value_String)));
@@ -824,14 +831,16 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
+--                    Put_Line (Routine_Name & "Row (First .. Last):" &
+--                                Row (First .. Last));
                   Start_Time := Clock;
                   Values := Split_String (Row (First .. Last), ",");
                   End_Time := Clock;
                   Put_Line (Routine_Name & "Dense_Match time" &
                               Duration'Image (1000 * ( End_Time - Start_Time)) &
                               " Milli_Sec");
-                  Put_Line (Routine_Name & "dense Values length:" &
-                              Integer'Image (Integer (Length (Values))));
+--                    Put_Line (Routine_Name & "dense Values length:" &
+--                                Integer'Image (Integer (Length (Values))));
                else
                   Matches := Find_Match (Sparse_Matcher, Row, First, Last,
                                          Sparse_Match);

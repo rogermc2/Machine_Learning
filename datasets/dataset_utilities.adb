@@ -116,14 +116,13 @@ package body Dataset_Utilities is
       Last         : Integer := aString'Last;
       Last_Char    : constant Character := aString (Last);
       A_Index      : Integer := 1;
-      B_Index      : Integer;
+      B_Index      : Integer := aString'First;
       Split_List   : ML_Types.String_List;
    begin
       if Character'Pos (Last_Char) < 32 then
          Last := Last - 1;
       end if;
 
-      B_Index := Last;
       for index in aString'First .. Fixed.Count (aString, Pattern) loop
          A_Index :=
            Fixed.Index (aString (B_Index .. Last), Pattern);
