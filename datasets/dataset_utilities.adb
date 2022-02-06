@@ -113,6 +113,7 @@ package body Dataset_Utilities is
                           return ML_Types.String_List is
       use Ada.Strings;
 --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
+      Patt_Length  : constant Integer := Pattern'Length;
       Last         : Integer := aString'Last;
       Last_Char    : constant Character := aString (Last);
       A_Index      : Integer := 1;
@@ -129,11 +130,42 @@ package body Dataset_Utilities is
          --  process string slice in any way
          Split_List.Append
            (To_Unbounded_String (aString (B_Index .. A_Index - 1)));
-         B_Index := A_Index + Pattern'Length;
+         B_Index := A_Index + Patt_Length;
       end loop;
       --  process last string
       Split_List.Append
         (To_Unbounded_String (aString (B_Index .. Last)));
+
+      return Split_List;
+
+   end Split_String;
+
+   --  -------------------------------------------------------------------------
+
+   function Split_String (aString, Pattern : String)
+                          return ML_Types.Indef_String_List is
+      use Ada.Strings;
+--        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
+      Patt_Length  : constant Integer := Pattern'Length;
+      Last         : Integer := aString'Last;
+      Last_Char    : constant Character := aString (Last);
+      A_Index      : Integer := 1;
+      B_Index      : Integer := aString'First;
+      Split_List   : ML_Types.Indef_String_List;
+   begin
+      if Character'Pos (Last_Char) < 32 then
+         Last := Last - 1;
+      end if;
+
+      for index in aString'First .. Fixed.Count (aString, Pattern) loop
+         A_Index :=
+           Fixed.Index (aString (B_Index .. Last), Pattern);
+         --  process string slice in any way
+         Split_List.Append (aString (B_Index .. A_Index - 1));
+         B_Index := A_Index + Patt_Length;
+      end loop;
+      --  process last string
+      Split_List.Append (aString (B_Index .. Last));
 
       return Split_List;
 

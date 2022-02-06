@@ -1,5 +1,6 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
@@ -173,6 +174,10 @@ package ML_Types is
    package Prediction_Data_Package is new
      Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
    subtype Predictions_List is Prediction_Data_Package.List;
+
+   package Indefinite_String_Package is new Ada.Containers.Indefinite_Doubly_Linked_Lists
+     (String);
+   subtype Indef_String_List is Indefinite_String_Package.List;
 
    package String_Package is new Ada.Containers.Doubly_Linked_Lists
      (Ada.Strings.Unbounded.Unbounded_String);
