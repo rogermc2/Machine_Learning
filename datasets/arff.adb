@@ -541,8 +541,9 @@ package body ARFF is
                Start_Time := Clock;
                Values := Parse_Values (To_String (Result));
                End_Time := Clock;
-               Put_Line (Routine_Name & "Parse time" &
-                           Duration'Image (1000 * (End_Time - Start_Time)) & " Milli_Sec");
+--                 Put_Line (Routine_Name & "Parse time" &
+--                             Duration'Image (1000 * (End_Time - Start_Time)) &
+--                             " Milli_Sec");
                --              Values_Length := Natural (Length (Values));
                Clear (Dense_Values);
                Data_Values.Unset_Field ("values");
@@ -564,10 +565,10 @@ package body ARFF is
                   Dense_Values :=
                     Decode_Dense_Values (Values, Decoder.Conversers);
                   Decode_End_Time := Clock;
-                  Put_Line (Routine_Name & "Decode_Dense_Values time" &
-                              Duration'Image
-                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
-                              " Milli_Sec");
+--                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
+--                                Duration'Image
+--                                (1000 * (Decode_End_Time - Decode_Start_Time)) &
+--                                " Milli_Sec");
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
 --                    Put_Line (Routine_Name & "Values_Array length" &
@@ -773,6 +774,7 @@ package body ARFF is
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
    function Parse_Values (Row : String) return String_List is
+      use Ada.Calendar;
       use GNAT.Regpat;
       use Regexep;
       use String_Package;
@@ -789,11 +791,18 @@ package body ARFF is
       Value_Cursor        : Cursor;
       Errors              : String_List;
       Result              : String_List;
+      Start_Time          : Time;
+      End_Time            : Time;
    begin
       if Row'Length /= 0 and then Row /= "?" then
          --           Put_Line (Routine_Name & "Row: '" & Row & "'");
+--           Start_Time := Clock;
          Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
+--           End_Time := Clock;
+--           Put_Line (Routine_Name & "Non_Trivial Match time" &
+--                     Duration'Image (1000 * ( End_Time - Start_Time)) &
+--                     " Milli_Sec");
          pragma Unreferenced (Matches);
          if Match_Found then
             Put_Line (Routine_Name & "trivial");
@@ -816,27 +825,33 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
-                  Values := Get_CSV_Data (Row (First .. Last));
-               end if;
+                  Start_Time := Clock;
+                  Values := Split_String (Row (First .. Last), ",");
+                  End_Time := Clock;
+                  Put_Line (Routine_Name & "Dense_Match time" &
+                   Duration'Image (1000 * ( End_Time - Start_Time)) &
+                   " Milli_Sec");
+               else
+                  Matches := Find_Match (Sparse_Matcher, Row, First, Last,
+                                         Sparse_Match);
+                  if Sparse_Match then
+                     Put_Line (Routine_Name & "Sparse_Match");
+                     Errors := Split_String (Row (First .. Last), ",");
+                     if not Errors.Is_Empty then
+                        Value_Cursor := Values.First;
+                        while Has_Element (Value_Cursor) loop
+                           Result.Append
+                             (Unquote (To_String (Element (Value_Cursor))));
+                           Next (Value_Cursor);
+                        end loop;
 
-               Matches := Find_Match (Sparse_Matcher, Row, First, Last,
-                                      Sparse_Match);
-
-               if Sparse_Match then
-                  Errors := Get_CSV_Data (Row (First .. Last));
+                     else
+                        Values := Split_Sparse_Line (Row);
+                     end if;
+                  end if;
                end if;
             end;  --  declare block
 
-            if not Errors.Is_Empty then
-               Value_Cursor := Values.First;
-               while Has_Element (Value_Cursor) loop
-                  Result.Append (Unquote (To_String (Element (Value_Cursor))));
-                  Next (Value_Cursor);
-               end loop;
-
-            else
-               Values := Split_Sparse_Line (Row);
-            end if;
          end if;
       end if;
 

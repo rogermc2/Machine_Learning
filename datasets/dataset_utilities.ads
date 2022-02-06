@@ -20,6 +20,8 @@ package Dataset_Utilities is
                           Data          : out ML_Types.String_List);
     function Get_CSV_Data (CSV_Data : String) return ML_Types.String_List;
     function Split (Line : String; Sep : String) return String_Array;
+    function Split_String (aString, Pattern : String)
+                           return ML_Types.String_List;
     function To_Lower_Case (Text : String) return String;
     function To_Upper_Case (Text : String) return String;
     function To_Upper_Case (Text : Unbounded_String) return Unbounded_String;
