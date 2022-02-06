@@ -836,7 +836,7 @@ package body ARFF is
 --                    Put_Line (Routine_Name & "Row (First .. Last):" &
 --                                Row (First .. Last));
                   Start_Time := Clock;
-                  Values := Split_String (Row (First .. Last), ",");
+                  Values := Split (Row (First .. Last), ",");
                   End_Time := Clock;
                   Put_Line (Routine_Name & "split string execution time" &
                               Duration'Image (1000 * ( End_Time - Start_Time)) &
