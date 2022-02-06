@@ -5,7 +5,6 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.String_Split;
-with GNATCOLL.Strings;
 
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
@@ -111,20 +110,13 @@ package body Dataset_Utilities is
    --  -------------------------------------------------------------------------
 
    function Split (Line : String; Sep : String)
-                   return ML_Types.Indef_String_List is
+                   return GNATCOLL.Strings.XString_Array is
       use GNATCOLL.Strings;
       Text     : constant XString := To_XString (Line);
       Elements : constant XString_Array :=
                         Split (Text, Sep, Omit_Empty => True);
-      Slices   : ML_Types.Indef_String_List;
    begin
-      begin
-         for index in 1 .. Elements'Length loop
-            Slices.Append (To_String (Elements (index)));
-         end loop;
-
-         return Slices;
-      end;
+      return Elements;
 
    end Split;
 

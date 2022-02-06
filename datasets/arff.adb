@@ -12,6 +12,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.Regpat;
+with GNATCOLL.Strings;
 
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
@@ -783,6 +784,7 @@ package body ARFF is
    function Parse_Values (Row : String) return Indef_String_List is
       use Ada.Calendar;
       use GNAT.Regpat;
+      use GNATCOLL.Strings;
       use Regexep;
       use Indefinite_String_Package;
       use String_Package;
@@ -817,9 +819,9 @@ package body ARFF is
             Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
-            Values := Split_String (Row, ",");
-            Put_Line (Routine_Name & "trivial Values length:" &
-                        Integer'Image (Integer (Length (Values))));
+--              Values := Split (Row, ",");
+--              Put_Line (Routine_Name & "trivial Values length:" &
+--                          Integer'Image (Integer (Length (Values))));
 
          else
             --              Put_Line (Routine_Name & "nontrivial");
@@ -836,11 +838,18 @@ package body ARFF is
 --                    Put_Line (Routine_Name & "Row (First .. Last):" &
 --                                Row (First .. Last));
                   Start_Time := Clock;
-                  Values := Split (Row (First .. Last), ",");
+                  declare
+                     XValues : constant GNATCOLL.Strings.XString_Array :=
+                                 Split (Row (First .. Last), ",");
+                  begin
                   End_Time := Clock;
+                  for index in 1 .. XValues'Length loop
+                        Values.Append (To_String (XValues (index)));
+                  end loop;
                   Put_Line (Routine_Name & "split string execution time" &
                               Duration'Image (1000 * ( End_Time - Start_Time)) &
                               " Milli_Sec");
+                  end;
 --                    Put_Line (Routine_Name & "dense Values length:" &
 --                                Integer'Image (Integer (Length (Values))));
                else
