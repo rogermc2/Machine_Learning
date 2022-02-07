@@ -55,6 +55,8 @@ package Printing is
     procedure Print_Stack_Record (Name : String;
                                   Data : Build_Utils.Stack_Record);
     procedure Print_Strings (Name : String; theList : ML_Types.String_List);
+    procedure Print_Strings (Name    : String;
+                             theList : ML_Types.Indef_String_List);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
     procedure Print_Tree (Name : String; aTree : Tree.Tree_Class);
     procedure Print_Unbounded_List (Name    : String;

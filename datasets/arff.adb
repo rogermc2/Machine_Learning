@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
-with Ada.Calendar;
+--  with Ada.Calendar;
 with Ada.Strings.Fixed;
 --  with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -12,7 +12,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.Regpat;
-with GNATCOLL.Strings;
+--  with GNATCOLL.Strings;
 
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
@@ -782,9 +782,9 @@ package body ARFF is
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
    function Parse_Values (Row : String) return Indef_String_List is
-      use Ada.Calendar;
+--        use Ada.Calendar;
       use GNAT.Regpat;
-      use GNATCOLL.Strings;
+--        use GNATCOLL.Strings;
       use Regexep;
       use Indefinite_String_Package;
       use String_Package;
@@ -801,8 +801,8 @@ package body ARFF is
       Value_Cursor        : Indefinite_String_Package.Cursor;
       Errors              : String_List;
       Result              : String_List;
-      Start_Time          : Time;
-      End_Time            : Time;
+--        Start_Time          : Time;
+--        End_Time            : Time;
    begin
       if Row'Length /= 0 and then Row /= "?" then
          --           Put_Line (Routine_Name & "Row: '" & Row & "'");
@@ -835,27 +835,28 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
+                  Values := Split_R (Row (First .. Last), ",");
 --                    Put_Line (Routine_Name & "Row (First .. Last):" &
 --                                Row (First .. Last));
-                  Start_Time := Clock;
-                  declare
---                       XValues : constant GNATCOLL.Strings.XString_Array :=
---                                   Split (Row (First .. Last), ",");
-                     Text    : constant XString :=
-                                 To_XString (Row (First .. Last));
-                     XValues : constant XString_Array :=
-                        Split (Text, ",", Omit_Empty => True);
-                  begin
-                  for index in 1 .. XValues'Length loop
-                        Values.Append (To_String (XValues (index)));
-                  end loop;
-                  End_Time := Clock;
-                  Put_Line (Routine_Name & "split string execution time" &
-                              Duration'Image (1000 * ( End_Time - Start_Time)) &
-                              " Milli_Sec");
-                  end;
---                    Put_Line (Routine_Name & "dense Values length:" &
---                                Integer'Image (Integer (Length (Values))));
+--                    Start_Time := Clock;
+--                    declare
+--  --                       XValues : constant GNATCOLL.Strings.XString_Array :=
+--  --                                   Split (Row (First .. Last), ",");
+--                       Text    : constant XString :=
+--                                   To_XString (Row (First .. Last));
+--                       XValues : constant XString_Array :=
+--                          Split (Text, ",", Omit_Empty => True);
+--                    begin
+--                    for index in 1 .. XValues'Length loop
+--                          Values.Append (To_String (XValues (index)));
+--                    end loop;
+--                    End_Time := Clock;
+--                    Put_Line (Routine_Name & "split string execution time" &
+--                                Duration'Image (1000 * ( End_Time - Start_Time)) &
+--                                " Milli_Sec");
+--                    end;
+                  Put_Line (Routine_Name & "dense Values length:" &
+                              Integer'Image (Integer (Length (Values))));
                else
                   Matches := Find_Match (Sparse_Matcher, Row, First, Last,
                                          Sparse_Match);

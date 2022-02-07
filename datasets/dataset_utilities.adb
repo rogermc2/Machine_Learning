@@ -1,13 +1,19 @@
 
+--  with Ada.Calendar;
 with Ada.Characters.Handling;
 with Ada.Directories;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with GNAT.Regpat;
 with GNAT.String_Split;
 
+--  From Ada-utils
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
+
+with Printing;
+with Regexep;
 
 package body Dataset_Utilities is
 
@@ -114,7 +120,7 @@ package body Dataset_Utilities is
       use GNATCOLL.Strings;
       Text     : constant XString := To_XString (Line);
       Elements : constant XString_Array :=
-                        Split (Text, Sep, Omit_Empty => True);
+                   Split (Text, Sep, Omit_Empty => True);
    begin
       return Elements;
 
@@ -122,10 +128,69 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Split_R (Line : String; Sep : String) return ML_Types.Indef_String_List is
+--        use Ada.Calendar;
+      use ML_Types;
+      use GNAT.Regpat;
+      use Regexep;
+      Routine_Name        : constant String := "Dataset_Utilities.Split_R";
+      Regex               : constant String := "[^" & Sep & "]+";
+      Matcher             : constant Pattern_Matcher := Compile (Regex);
+      Num_Parens          : constant Natural := Paren_Count (Matcher);
+      Group_Index         : constant Natural := 0;
+      Line_Last           : constant Positive := Line'Last;
+      Groups              : Match_Array (0 .. Num_Parens);
+      Matches             : Matches_List;
+      --        pragma Unreferenced (Matches);
+      First               : Positive := Line'First;
+      Last                : Positive := Line'Last;
+      Result              : Match_Location;
+      Match_Found         : Boolean;
+      Slices              : Indef_String_List;
+--        Start_Time          : Time;
+--        End_Time            : Time;
+--        Count               : Natural := 0;
+   begin
+      while First < Line_Last loop
+--           Count := Count + 1;
+--           Put_Line ("Dataset_Utilities.Split_R Count:" & Integer'Image (Count));
+--           Start_Time := Clock;
+         --  Match selects the first substring of Text that matches
+         --  the Compiled_Expression
+         Match (Matcher, Line (First .. Line_Last), Groups);
+         Match_Found := Groups (0) /= No_Match;
+
+         if Match_Found then
+            for index in 0 .. Num_Parens loop
+               Matches.Append (Groups (index));
+            end loop;
+
+            Result := Groups (Group_Index);
+            First := Result.First;
+            Last := Result.Last;
+            Slices.Append (Line (First .. Last));
+--              Put_Line ("Dataset_Utilities.Split_R First, Last" &
+--                          Integer'Image (First) & Integer'Image (Last));
+         end if;
+         First := Last + 1;
+--           End_Time := Clock;
+--           Put_Line (Routine_Name & "Non_Trivial Match time: " &
+--                       Duration'Image (1000 * ( End_Time - Start_Time)) &
+--                       " Milli_Sec");
+      end loop;
+
+      Printing.Print_Strings (Routine_Name, Slices);
+      New_Line;
+      return Slices;
+
+   end Split_R;
+
+   --  -------------------------------------------------------------------------
+
    function Split_String (aString, Pattern : String)
                           return ML_Types.String_List is
       use Ada.Strings;
---        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
+      --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Patt_Length  : constant Integer := Pattern'Length;
       Last         : Integer := aString'Last;
       Last_Char    : constant Character := aString (Last);
@@ -158,7 +223,7 @@ package body Dataset_Utilities is
    function Split_String (aString, Pattern : String)
                           return ML_Types.Indef_String_List is
       use Ada.Strings;
---        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
+      --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Patt_Length  : constant Integer := Pattern'Length;
       Last         : Integer := aString'Last;
       Last_Char    : constant Character := aString (Last);

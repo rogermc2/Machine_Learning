@@ -24,6 +24,8 @@ package Dataset_Utilities is
    function Split (Line : String; Sep : String) return String_Array;
    function Split (Line : String; Sep : String) return
      GNATCOLL.Strings.XString_Array;
+   function Split_R (Line : String; Sep : String)
+                     return ML_Types.Indef_String_List;
    function Split_String (aString, Pattern : String)
                           return ML_Types.String_List;
    function Split_String (aString, Pattern : String)
