@@ -6,13 +6,11 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
 --  with Ada.Calendar;
 with Ada.Strings.Fixed;
---  with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with GNAT.Regpat;
---  with GNATCOLL.Strings;
 
 with Dataset_Utilities; use Dataset_Utilities;
 with ML_Types; use ML_Types;
@@ -96,7 +94,7 @@ package body ARFF is
    --  L204
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
-   --     Row_Found      : Boolean := True;
+   Stream_Cursor  : String_Package.Cursor;
 
    procedure Decode_Attribute (Decoder        : in out Arff_Decoder; UC_Row : String;
                                Arff_Container : in out JSON_Value);
@@ -109,8 +107,7 @@ package body ARFF is
    --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
    --        return String_List;
    function Decode_Dense_Rows (Decoder       : in Out Arff_Decoder;
-                               Stream        : String_List;
-                               Stream_Cursor : in out String_Package.Cursor)
+                               Stream        : String_List)
                                return JSON_Array;
    function Decode_Dense_Values
      (Values : Indef_String_List; Attribute_List : Conversor_Item_List)
@@ -273,13 +270,13 @@ package body ARFF is
       end loop;
       Put_Line (Routine_Name & "L872");
 
-      --        Stream_Cursor := Curs;
+      Stream_Cursor := Curs;
       --  L872 Alter the data object
       --  case Matrix_Type implements
       --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
          when Arff_Dense =>
-            Values := Decode_Dense_Rows (Decoder, Text, Curs);
+            Values := Decode_Dense_Rows (Decoder, Text);
          when Arff_Coo => null;
             --              Values := Decode_COO_Rows (Decoder, Stream_Data'Access, Data,
             --                                         Rows, Cols);
@@ -502,10 +499,8 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
    --  L460
-   function Decode_Dense_Rows (Decoder       : in out Arff_Decoder;
-                               Stream        : String_List;
-                               Stream_Cursor : in out String_Package.Cursor)
-                               return JSON_Array is
+   function Decode_Dense_Rows (Decoder : in out Arff_Decoder;
+                               Stream  : String_List) return JSON_Array is
 --        use Ada.Calendar;
       use Ada.Strings;
       use String_Package;
@@ -523,13 +518,13 @@ package body ARFF is
 --        End_Time          : Time;
 --        Decode_Start_Time : Time;
 --        Decode_End_Time   : Time;
-      --        Count             : Natural := 0;
+--         Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
-                  Integer'Image (Integer (Length (Stream))));
+                  Integer'Image (Integer (Length (Stream))) & " rows");
       while Has_Element (Stream_Cursor) loop
-         --           Count := Count + 1;
-         --           Put_Line (Routine_Name & Integer'Image (Count));
+--            Count := Count + 1;
+--            Put_Line (Routine_Name & "Stream line" & Integer'Image (Count));
          --  L462  for row in stream:
          Row  := Element (Stream_Cursor);
          Trim (Row, Both);
@@ -784,7 +779,6 @@ package body ARFF is
    function Parse_Values (Row : String) return Indef_String_List is
 --        use Ada.Calendar;
       use GNAT.Regpat;
---        use GNATCOLL.Strings;
       use Regexep;
       use Indefinite_String_Package;
       use String_Package;
@@ -819,7 +813,7 @@ package body ARFF is
             Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
---              Values := Split (Row, ",");
+            Values := Split_R (Row, ",");
 --              Put_Line (Routine_Name & "trivial Values length:" &
 --                          Integer'Image (Integer (Length (Values))));
 
@@ -835,28 +829,16 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
-                  Values := Split_R (Row (First .. Last), ",");
---                    Put_Line (Routine_Name & "Row (First .. Last):" &
---                                Row (First .. Last));
 --                    Start_Time := Clock;
---                    declare
---  --                       XValues : constant GNATCOLL.Strings.XString_Array :=
---  --                                   Split (Row (First .. Last), ",");
---                       Text    : constant XString :=
---                                   To_XString (Row (First .. Last));
---                       XValues : constant XString_Array :=
---                          Split (Text, ",", Omit_Empty => True);
---                    begin
---                    for index in 1 .. XValues'Length loop
---                          Values.Append (To_String (XValues (index)));
---                    end loop;
+                  Values := Split_R (Row (First .. Last), ",");
 --                    End_Time := Clock;
 --                    Put_Line (Routine_Name & "split string execution time" &
 --                                Duration'Image (1000 * ( End_Time - Start_Time)) &
 --                                " Milli_Sec");
---                    end;
-                  Put_Line (Routine_Name & "dense Values length:" &
-                              Integer'Image (Integer (Length (Values))));
+--                    Put_Line (Routine_Name & "Row (First .. Last):" &
+--                                Row (First .. Last));
+--                    Put_Line (Routine_Name & "dense Values length:" &
+--                                Integer'Image (Integer (Length (Values))));
                else
                   Matches := Find_Match (Sparse_Matcher, Row, First, Last,
                                          Sparse_Match);
