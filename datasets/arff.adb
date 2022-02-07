@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
---  with Ada.Calendar;
+with Ada.Calendar;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
@@ -501,7 +501,7 @@ package body ARFF is
    --  L460
    function Decode_Dense_Rows (Decoder : in out Arff_Decoder;
                                Stream  : String_List) return JSON_Array is
---        use Ada.Calendar;
+      use Ada.Calendar;
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
@@ -514,10 +514,10 @@ package body ARFF is
       Dense_Values      : JSON_Array;
       Result            : Unbounded_String := To_Unbounded_String ("");
       Values_Array      : JSON_Array;
---        Start_Time        : Time;
---        End_Time          : Time;
---        Decode_Start_Time : Time;
---        Decode_End_Time   : Time;
+      Start_Time        : Time;
+      End_Time          : Time;
+      Decode_Start_Time : Time;
+      Decode_End_Time   : Time;
 --         Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
@@ -535,12 +535,12 @@ package body ARFF is
             then
                Result := Row;
                --  L463
---                 Start_Time := Clock;
+               Start_Time := Clock;
                Values := Parse_Values (To_String (Result));
---                 End_Time := Clock;
-               --                 Put_Line (Routine_Name & "Parse time" &
-               --                             Duration'Image (1000 * (End_Time - Start_Time)) &
-               --                             " Milli_Sec");
+               End_Time := Clock;
+                Put_Line (Routine_Name & "Parse time" &
+                           Duration'Image (1000 * (End_Time - Start_Time)) &
+                           " Milli_Sec");
 --                 Values_Length := Natural (Length (Values));
                Values_Length := Natural (Values.Length);
                Clear (Dense_Values);
@@ -558,14 +558,14 @@ package body ARFF is
                             Integer'Image (Values_Length) &
                             " is different to Converser_Length" &
                             Integer'Image (Converser_Length));
---                    Decode_Start_Time := Clock;
+                  Decode_Start_Time := Clock;
                   Dense_Values :=
                     Decode_Dense_Values (Values, Decoder.Conversers);
---                    Decode_End_Time := Clock;
-                  --                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
-                  --                                Duration'Image
-                  --                                (1000 * (Decode_End_Time - Decode_Start_Time)) &
-                  --                                " Milli_Sec");
+                  Decode_End_Time := Clock;
+                  Put_Line (Routine_Name & "Decode_Dense_Values time" &
+                            Duration'Image
+                            (1000 * (Decode_End_Time - Decode_Start_Time)) &
+                             " Milli_Sec");
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
                   --                    Put_Line (Routine_Name & "Values_Array length" &
@@ -813,7 +813,7 @@ package body ARFF is
             Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
-            Values := Split_R (Row, ",");
+            Values := Split_CSV (Row);
 --              Put_Line (Routine_Name & "trivial Values length:" &
 --                          Integer'Image (Integer (Length (Values))));
 
@@ -830,7 +830,7 @@ package body ARFF is
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
 --                    Start_Time := Clock;
-                  Values := Split_R (Row (First .. Last), ",");
+                  Values := Split_CSV (Row (First .. Last));
 --                    End_Time := Clock;
 --                    Put_Line (Routine_Name & "split string execution time" &
 --                                Duration'Image (1000 * ( End_Time - Start_Time)) &

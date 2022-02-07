@@ -17,6 +17,11 @@ with Regexep;
 
 package body Dataset_Utilities is
 
+   Regex_CSV      : constant String := "[^,]+";
+   Matcher_CSV    : constant GNAT.Regpat.Pattern_Matcher :=
+                      GNAT.Regpat.Compile (Regex_CSV);
+   Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
+
    --  ------------------------------------------------------------------------
 
    procedure CSV_Reader (CSV_File_Name : String;
@@ -128,18 +133,15 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_R (Line : String; Sep : String) return ML_Types.Indef_String_List is
+   function Split_CSV (Line : String) return ML_Types.Indef_String_List is
 --        use Ada.Calendar;
       use ML_Types;
       use GNAT.Regpat;
       use Regexep;
---        Routine_Name        : constant String := "Dataset_Utilities.Split_R";
-      Regex               : constant String := "[^" & Sep & "]+";
-      Matcher             : constant Pattern_Matcher := Compile (Regex);
-      Num_Parens          : constant Natural := Paren_Count (Matcher);
+--        Routine_Name        : constant String := "Dataset_Utilities.Split_CSV";
       Group_Index         : constant Natural := 0;
       Line_Last           : constant Positive := Line'Last;
-      Groups              : Match_Array (0 .. Num_Parens);
+      Groups              : Match_Array (0 .. Num_Parens_CSV);
       Matches             : Matches_List;
       --        pragma Unreferenced (Matches);
       First               : Positive := Line'First;
@@ -157,11 +159,11 @@ package body Dataset_Utilities is
 --           Start_Time := Clock;
          --  Match selects the first substring of Text that matches
          --  the Compiled_Expression
-         Match (Matcher, Line (First .. Line_Last), Groups);
+         Match (Matcher_CSV, Line (First .. Line_Last), Groups);
          Match_Found := Groups (0) /= No_Match;
 
          if Match_Found then
-            for index in 0 .. Num_Parens loop
+            for index in 0 .. Num_Parens_CSV loop
                Matches.Append (Groups (index));
             end loop;
 
@@ -183,7 +185,7 @@ package body Dataset_Utilities is
 --        New_Line;
       return Slices;
 
-   end Split_R;
+   end Split_CSV;
 
    --  -------------------------------------------------------------------------
 
