@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
-with Ada.Calendar;
+--  with Ada.Calendar;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
@@ -112,10 +112,9 @@ package body ARFF is
    function Decode_Dense_Values
      (Values : Indef_String_List; Attribute_List : Conversor_Item_List)
       return JSON_Array;
-   function Parse_Values (Row : String) return Indef_String_List;
+   procedure Parse_Values (Row : String; Values : out Indef_String_List);
    function Split_Sparse_Line (Row : String) return Indef_String_List;
    function Unquote (Values : String) return String;
-   function Unquote (Values : String) return Unbounded_String;
 
    --  -------------------------------------------------------------------------
 
@@ -361,7 +360,7 @@ package body ARFF is
          Attr_Type := To_Unbounded_String
            (Slice (Attr_Type, 2, Length (Attr_Type) - 1));
          Conv_Item.Data_Type := Conv_Nominal;
-         Nominal_Values := Parse_Values (To_String (Attr_Type));
+         Parse_Values (To_String (Attr_Type), Nominal_Values);
          Conv_Item.Nominal_List := Nominal_Values;
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
@@ -501,7 +500,7 @@ package body ARFF is
    --  L460
    function Decode_Dense_Rows (Decoder : in out Arff_Decoder;
                                Stream  : String_List) return JSON_Array is
-      use Ada.Calendar;
+--        use Ada.Calendar;
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
@@ -512,19 +511,23 @@ package body ARFF is
       Values_Length     : Natural;
       Data_Values       : constant JSON_Value := Create_Object;
       Dense_Values      : JSON_Array;
-      Result            : Unbounded_String := To_Unbounded_String ("");
       Values_Array      : JSON_Array;
-      Start_Time        : Time;
-      End_Time          : Time;
-      Decode_Start_Time : Time;
-      Decode_End_Time   : Time;
---         Count             : Natural := 0;
+--        Start_Time        : Time;
+--        End_Time          : Time;
+--        Decode_Start_Time : Time;
+--        Decode_End_Time   : Time;
+      Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
                   Integer'Image (Integer (Length (Stream))) & " rows");
       while Has_Element (Stream_Cursor) loop
---            Count := Count + 1;
---            Put_Line (Routine_Name & "Stream line" & Integer'Image (Count));
+         Count := Count + 1;
+         Put (".");
+         if Count > 80 then
+            Put_Line (".");
+            Count := 0;
+         end if;
+--           Put_Line (Integer'Image (Count));
          --  L462  for row in stream:
          Row  := Element (Stream_Cursor);
          Trim (Row, Both);
@@ -533,14 +536,13 @@ package body ARFF is
             if Slice (Row, 1, 1) /= "%" and then
               Slice (Row, 1, 1) /= "@"
             then
-               Result := Row;
                --  L463
-               Start_Time := Clock;
-               Values := Parse_Values (To_String (Result));
-               End_Time := Clock;
-                Put_Line (Routine_Name & "Parse time" &
-                           Duration'Image (1000 * (End_Time - Start_Time)) &
-                           " Milli_Sec");
+--                 Start_Time := Clock;
+               Parse_Values (To_String (Row), Values);
+--                 End_Time := Clock;
+--                  Put_Line (Routine_Name & "Parse time" &
+--                             Duration'Image (1000 * (End_Time - Start_Time)) &
+--                             " Milli_Sec");
 --                 Values_Length := Natural (Length (Values));
                Values_Length := Natural (Values.Length);
                Clear (Dense_Values);
@@ -550,7 +552,7 @@ package body ARFF is
                --              delay (1.0);
                --              New_Line;
 
-               if Length (Result) > 0 then
+               if Length (Row) > 0 then
                   --                 Assert (not Values.Is_Empty, Routine_Name & "Row '" &
                   --                           Filtered_Row & "' has no valid values.");
                   Assert (Values_Length <= Converser_Length, Routine_Name &
@@ -558,14 +560,14 @@ package body ARFF is
                             Integer'Image (Values_Length) &
                             " is different to Converser_Length" &
                             Integer'Image (Converser_Length));
-                  Decode_Start_Time := Clock;
+--                    Decode_Start_Time := Clock;
                   Dense_Values :=
                     Decode_Dense_Values (Values, Decoder.Conversers);
-                  Decode_End_Time := Clock;
-                  Put_Line (Routine_Name & "Decode_Dense_Values time" &
-                            Duration'Image
-                            (1000 * (Decode_End_Time - Decode_Start_Time)) &
-                             " Milli_Sec");
+--                    Decode_End_Time := Clock;
+--                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
+--                              Duration'Image
+--                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
+--                               " Milli_Sec");
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
                   --                    Put_Line (Routine_Name & "Values_Array length" &
@@ -575,7 +577,7 @@ package body ARFF is
          end if;
 
          Next (Stream_Cursor);
-         delay (0.3);
+--           delay (0.3);
       end loop;
 
       Put_Line (Routine_Name & "Values_Array length" &
@@ -776,7 +778,7 @@ package body ARFF is
    --  matches substring or to No_Match if no match.
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
-   function Parse_Values (Row : String) return Indef_String_List is
+   procedure Parse_Values (Row : String; Values : out Indef_String_List) is
 --        use Ada.Calendar;
       use GNAT.Regpat;
       use Regexep;
@@ -791,10 +793,8 @@ package body ARFF is
       Dense_Match         : Boolean;
       Sparse_Match        : Boolean;
       Matches             : Matches_List;
-      Values              : Indef_String_List;
-      Value_Cursor        : Indefinite_String_Package.Cursor;
       Errors              : String_List;
-      Result              : String_List;
+      Errors_Cursor       : String_Package.Cursor;
 --        Start_Time          : Time;
 --        End_Time            : Time;
    begin
@@ -846,10 +846,11 @@ package body ARFF is
                      Put_Line (Routine_Name & "Sparse_Match");
                      Errors := Split_String (Row (First .. Last), ",");
                      if not Errors.Is_Empty then
-                        Value_Cursor := Values.First;
-                        while Has_Element (Value_Cursor) loop
-                           Result.Append (Unquote (Element (Value_Cursor)));
-                           Next (Value_Cursor);
+                        Errors_Cursor := Errors.First;
+                        while Has_Element (Errors_Cursor) loop
+                           Values.Append
+                             (Unquote (To_String (Element (Errors_Cursor))));
+                           Next (Errors_Cursor);
                         end loop;
 
                      else
@@ -861,8 +862,6 @@ package body ARFF is
 
          end if;
       end if;
-
-      return Values;
 
    end Parse_Values;
 
@@ -914,31 +913,6 @@ package body ARFF is
       else
          return Values;
       end if;
-
-   end Unquote;
-
-   --  -------------------------------------------------------------------------
-
-   function Unquote (Values : String) return Unbounded_String is
-      use Regexep;
-      --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
-      --  \u[0-9a-f]{4} match string starting with \u followed by 4 hex digits
-      --  \. match \.
-      --  In each case first to last refers to the characters follwing the /
-      Pattern       : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
-      Result        : Unbounded_String := To_Unbounded_String ("");
-   begin
-      if Values = "" or  Values (Values'First) = '?' then
-         null;
-      elsif Values (Values'First) = '"' or Values (Values'First) = ''' then
-         Result := To_Unbounded_String
-           (Substitute (Values (Values'First + 1 .. Values'Last - 1),
-            Pattern, Escape_Sub_Callback'Access));
-      else
-         Result := To_Unbounded_String (Values);
-      end if;
-
-      return Result;
 
    end Unquote;
 
