@@ -4,7 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
---  with Ada.Calendar;
+with Ada.Calendar;
 with Ada.Strings.Fixed;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
@@ -109,9 +109,9 @@ package body ARFF is
    function Decode_Dense_Rows (Decoder       : in Out Arff_Decoder;
                                Stream        : String_List)
                                return JSON_Array;
-   function Decode_Dense_Values
-     (Values : Indef_String_List; Attribute_List : Conversor_Item_List)
-      return JSON_Array;
+   procedure Decode_Dense_Values
+     (Values         : Indef_String_List; Attribute_List : Conversor_Item_List;
+      Decoded_Values : out JSON_Array);
    procedure Parse_Values (Row : String; Values : out Indef_String_List);
    function Split_Sparse_Line (Row : String) return Indef_String_List;
    function Unquote (Values : String) return String;
@@ -500,7 +500,7 @@ package body ARFF is
    --  L460
    function Decode_Dense_Rows (Decoder : in out Arff_Decoder;
                                Stream  : String_List) return JSON_Array is
---        use Ada.Calendar;
+      use Ada.Calendar;
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
@@ -512,18 +512,21 @@ package body ARFF is
       Data_Values       : constant JSON_Value := Create_Object;
       Dense_Values      : JSON_Array;
       Values_Array      : JSON_Array;
---        Start_Time        : Time;
---        End_Time          : Time;
---        Decode_Start_Time : Time;
---        Decode_End_Time   : Time;
+      Start_Time        : Time;
+      End_Time          : Time;
+      --        Decode_Start_Time : Time;
+      --        Decode_End_Time   : Time;
       Count             : Natural := 0;
    begin
       Put_Line (Routine_Name & "Stream length" &
                   Integer'Image (Integer (Length (Stream))) & " rows");
+      Start_Time := Clock;
       while Has_Element (Stream_Cursor) loop
          Count := Count + 1;
-         Put (".");
-         if Count > 80 then
+         if Count mod 100 = 0 then
+            Put (".");
+         end if;
+         if Count > 8000 then
             Put_Line (".");
             Count := 0;
          end if;
@@ -537,17 +540,12 @@ package body ARFF is
               Slice (Row, 1, 1) /= "@"
             then
                --  L463
---                 Start_Time := Clock;
                Parse_Values (To_String (Row), Values);
---                 End_Time := Clock;
---                  Put_Line (Routine_Name & "Parse time" &
---                             Duration'Image (1000 * (End_Time - Start_Time)) &
---                             " Milli_Sec");
---                 Values_Length := Natural (Length (Values));
+               --                 Values_Length := Natural (Length (Values));
                Values_Length := Natural (Values.Length);
                Clear (Dense_Values);
                Data_Values.Unset_Field ("values");
---                 Put_Line (Routine_Name & "Result: '" & To_String (Result) & "'");
+               --                 Put_Line (Routine_Name & "Result: '" & To_String (Result) & "'");
                --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
                --              delay (1.0);
                --              New_Line;
@@ -560,14 +558,13 @@ package body ARFF is
                             Integer'Image (Values_Length) &
                             " is different to Converser_Length" &
                             Integer'Image (Converser_Length));
---                    Decode_Start_Time := Clock;
-                  Dense_Values :=
-                    Decode_Dense_Values (Values, Decoder.Conversers);
---                    Decode_End_Time := Clock;
---                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
---                              Duration'Image
---                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
---                               " Milli_Sec");
+                  --                    Decode_Start_Time := Clock;
+                  Decode_Dense_Values (Values, Decoder.Conversers, Dense_Values);
+                  --                    Decode_End_Time := Clock;
+                  --                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
+                  --                              Duration'Image
+                  --                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
+                  --                               " Milli_Sec");
                   Data_Values.Set_Field ("values", Dense_Values);
                   Append (Values_Array, Data_Values);
                   --                    Put_Line (Routine_Name & "Values_Array length" &
@@ -578,8 +575,10 @@ package body ARFF is
 
          Next (Stream_Cursor);
       end loop;
-
+      End_Time := Clock;
       New_Line;
+      Put_Line (Routine_Name & "Decode_Dense_Rows time" &
+                  Duration'Image (End_Time - Start_Time) & " Seconds");
       Put_Line (Routine_Name & "Values_Array length" &
                   Integer'Image (Length (Values_Array)));
 
@@ -590,10 +589,10 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
    --  L478
-   function Decode_Dense_Values (Values         : Indef_String_List;
-                                 Attribute_List : Conversor_Item_List)
-                                 return JSON_Array is
-      use Ada.Containers;
+   procedure Decode_Dense_Values (Values         : Indef_String_List;
+                                  Attribute_List : Conversor_Item_List;
+                                  Decoded_Values : out JSON_Array) is
+      --        use Ada.Containers;
       use Ada.Strings;
       use Conversor_Item_Package;
       use Indefinite_String_Package;
@@ -603,13 +602,12 @@ package body ARFF is
       Nominal_Cursor : Indefinite_String_Package.Cursor;
       aConverser     : Conversor_Item;
       Data_Type      : Conversor_Data_Type;
-      Decoded_Values : JSON_Array;
       Found          : Boolean := False;
    begin
-      Assert (Values.Length = Attribute_List.Length, Routine_Name &
-                "lengths of Values " & Count_Type'Image (Values.Length) &
-                " and Conversers" & Count_Type'Image (Attribute_List.Length) &
-                " are diferrent.");
+      --        Assert (Values.Length = Attribute_List.Length, Routine_Name &
+      --                  "lengths of Values " & Count_Type'Image (Values.Length) &
+      --                  " and Conversers" & Count_Type'Image (Attribute_List.Length) &
+      --                  " are diferrent.");
 
       Attr_Cursor := Attribute_List.First;
       Values_Cursor := Values.First;
@@ -624,9 +622,9 @@ package body ARFF is
             UC_Value       : constant String :=
                                To_Upper_Case (Value_String);
          begin
---              Put_Line (Routine_Name & "Conversor Data_Type " &
---                          Conversor_Data_Type'Image (Data_Type));
---              Put_Line (Routine_Name & "Value_String: " & Value_String);
+            --              Put_Line (Routine_Name & "Conversor Data_Type " &
+            --                          Conversor_Data_Type'Image (Data_Type));
+            --              Put_Line (Routine_Name & "Value_String: " & Value_String);
             case Data_Type is
                when Conv_Integer =>
                   Put_Line (Routine_Name & "Data_Type Conv_Integer");
@@ -655,8 +653,8 @@ package body ARFF is
                   Value.Set_Field ("nominal type", UC_Value);
 
                when Conv_Numeric | Conv_Real =>
---                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
---                                Value_String);
+                  --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
+                  --                                Value_String);
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field
                        (Name, Float (Integer'Value (Value_String)));
@@ -674,8 +672,6 @@ package body ARFF is
          Next (Attr_Cursor);
          Next (Values_Cursor);
       end loop;
-
-      return Decoded_Values;
 
    end Decode_Dense_Values;
 
@@ -804,9 +800,9 @@ package body ARFF is
             Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
-            Values := Split_CSV (Row);
---              Put_Line (Routine_Name & "trivial Values length:" &
---                          Integer'Image (Integer (Length (Values))));
+            Values := Get_CSV_Data (Row);
+            --              Put_Line (Routine_Name & "trivial Values length:" &
+            --                          Integer'Image (Integer (Length (Values))));
 
          else
             --              Put_Line (Routine_Name & "nontrivial");
@@ -820,7 +816,7 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
-                  Values := Split_CSV (Row (First .. Last));
+                  Values := Get_CSV_Data (Row (First .. Last));
                else
                   Matches := Find_Match (Sparse_Matcher, Row, First, Last,
                                          Sparse_Match);
@@ -892,7 +888,7 @@ package body ARFF is
          return "";
       elsif Values (Values'First) = '"' or Values (Values'First) = ''' then
          return Substitute (Values (Values'First + 1 .. Values'Last - 1),
-            Pattern, Escape_Sub_Callback'Access);
+                            Pattern, Escape_Sub_Callback'Access);
       else
          return Values;
       end if;

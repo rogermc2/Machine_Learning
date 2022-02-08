@@ -48,14 +48,11 @@ package body Dataset_Utilities is
 
       begin
          if Prev_Row /= Row then
-            --              Ada.Text_IO.New_Line;
             Ada.Text_IO.New_Line (Data_File);
             Prev_Row := Row;
          else
-            --              Put (" ");
             Put (Data_File, " ");
          end if;
-         --           Ada.Text_IO.Put (Value);
          Ada.Text_IO.Put (Data_File, Value);
       end Set_Cell;
 
@@ -84,14 +81,6 @@ package body Dataset_Utilities is
       pragma Unreferenced (Data_File);
 
    end CSV_Reader;
-
-   --  -------------------------------------------------------------------------
-
-   function Get_CSV_Data (CSV_Data : String) return ML_Types.String_List is
-   begin
-      return Split_String (CSV_Data, ",");
-
-   end Get_CSV_Data;
 
    --  -------------------------------------------------------------------------
 
@@ -133,33 +122,26 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_CSV (Line : String) return ML_Types.Indef_String_List is
---        use Ada.Calendar;
+   function Get_CSV_Data (CSV_Data : String) return ML_Types.Indef_String_List is
       use ML_Types;
       use GNAT.Regpat;
       use Regexep;
---        Routine_Name        : constant String := "Dataset_Utilities.Split_CSV";
+--        Routine_Name        : constant String := "Dataset_Utilities.Get_CSV_Data";
       Group_Index         : constant Natural := 0;
-      Line_Last           : constant Positive := Line'Last;
+      Line_Last           : constant Positive := CSV_Data'Last;
       Groups              : Match_Array (0 .. Num_Parens_CSV);
       Matches             : Matches_List;
       --        pragma Unreferenced (Matches);
-      First               : Positive := Line'First;
-      Last                : Positive := Line'Last;
+      First               : Positive := CSV_Data'First;
+      Last                : Positive := CSV_Data'Last;
       Result              : Match_Location;
       Match_Found         : Boolean;
       Slices              : Indef_String_List;
---        Start_Time          : Time;
---        End_Time            : Time;
---        Count               : Natural := 0;
    begin
       while First < Line_Last loop
---           Count := Count + 1;
---           Put_Line ("Dataset_Utilities.Split_R Count:" & Integer'Image (Count));
---           Start_Time := Clock;
          --  Match selects the first substring of Text that matches
          --  the Compiled_Expression
-         Match (Matcher_CSV, Line (First .. Line_Last), Groups);
+         Match (Matcher_CSV, CSV_Data (First .. Line_Last), Groups);
          Match_Found := Groups (0) /= No_Match;
 
          if Match_Found then
@@ -170,22 +152,14 @@ package body Dataset_Utilities is
             Result := Groups (Group_Index);
             First := Result.First;
             Last := Result.Last;
-            Slices.Append (Line (First .. Last));
---              Put_Line ("Dataset_Utilities.Split_R First, Last" &
---                          Integer'Image (First) & Integer'Image (Last));
+            Slices.Append (CSV_Data (First .. Last));
          end if;
          First := Last + 1;
---           End_Time := Clock;
---           Put_Line (Routine_Name & "Non_Trivial Match time: " &
---                       Duration'Image (1000 * ( End_Time - Start_Time)) &
---                       " Milli_Sec");
       end loop;
 
---        Printing.Print_Strings (Routine_Name, Slices);
---        New_Line;
       return Slices;
 
-   end Split_CSV;
+   end Get_CSV_Data;
 
    --  -------------------------------------------------------------------------
 
@@ -301,6 +275,23 @@ package body Dataset_Utilities is
       return Fixed.Trim (Integer'Image (Value), Both);
 
    end Trimmed_Integer;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Write_JSON_Array_To_File
+     (Data : GNATCOLL.JSON.JSON_Array; File_Name : String) is
+      use GNATCOLL.JSON;
+      File_ID  : File_Type;
+      Index    : Positive := Array_First (Data);
+   begin
+      Create (File_ID, Out_File, File_Name);
+      while Array_Has_Element (Data, Index) loop
+         Put_Line (File_ID, Array_Element (Data, Index).Write);
+         Index := Array_Next (Data, Index);
+      end loop;
+      Close (File_ID);
+
+   end Write_JSON_Array_To_File;
 
    --  -------------------------------------------------------------------------
 
