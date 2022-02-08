@@ -110,7 +110,7 @@ package body Dataset_Utilities is
     --  -------------------------------------------------------------------------
 
     function Split (Line : String; Sep : String)
-                   return GNATCOLL.Strings.XString_Array is
+                    return GNATCOLL.Strings.XString_Array is
         use GNATCOLL.Strings;
         Text     : constant XString := To_XString (Line);
         Elements : constant XString_Array :=
@@ -163,8 +163,31 @@ package body Dataset_Utilities is
 
     --  -------------------------------------------------------------------------
 
+    function Read_JSON_Array (File_Name : String)
+                              return  GNATCOLL.JSON.JSON_Array is
+        use GNATCOLL.JSON;
+        File_ID  : File_Type;
+        theArray : JSON_Array;
+    begin
+        Open (File_ID, In_File, File_Name);
+
+        while not End_Of_File (File_ID) loop
+            declare
+                aLine : constant String := Get_Line (File_ID);
+            begin
+                Append (theArray, Read (aLine));
+            end;
+        end loop;
+        Close (File_ID);
+
+        return theArray;
+
+    end Read_JSON_Array;
+
+    --  -------------------------------------------------------------------------
+
     function Split_String (aString, Pattern : String)
-                          return ML_Types.String_List is
+                           return ML_Types.String_List is
         use Ada.Strings;
         --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
         Patt_Length  : constant Integer := Pattern'Length;
@@ -197,7 +220,7 @@ package body Dataset_Utilities is
     --  -------------------------------------------------------------------------
 
     function Split_String (aString, Pattern : String)
-                          return ML_Types.Indef_String_List is
+                           return ML_Types.Indef_String_List is
         use Ada.Strings;
         --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
         Patt_Length  : constant Integer := Pattern'Length;
@@ -281,8 +304,8 @@ package body Dataset_Utilities is
     procedure Write_JSON_Array_To_File
       (Data : GNATCOLL.JSON.JSON_Array; File_Name : String) is
         use GNATCOLL.JSON;
-        File_ID  : File_Type;
-        Index    : Positive := Array_First (Data);
+        File_ID : File_Type;
+        Index   : Positive := Array_First (Data);
     begin
         if Ada.Directories.Exists (File_Name) then
             Ada.Directories.Delete_File (File_Name);
