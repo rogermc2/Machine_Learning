@@ -581,6 +581,7 @@ package body ARFF is
                   Duration'Image (End_Time - Start_Time) & " Seconds");
       Put_Line (Routine_Name & "Values_Array length" &
                   Integer'Image (Length (Values_Array)));
+      Write_JSON_Array_To_File (Values_Array, "./dense_data.json");
 
       --  L475
       return Values_Array;
