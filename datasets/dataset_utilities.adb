@@ -12,7 +12,7 @@ with GNAT.String_Split;
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
 
-with UnZip.Streams;
+--  with UnZip.Streams;
 with Zip.Create;
 
 --  with Printing;
@@ -169,10 +169,10 @@ package body Dataset_Utilities is
    function Read_JSON_Array (File_Name : String)
                               return  GNATCOLL.JSON.JSON_Array is
       use GNATCOLL.JSON;
-      use UnZip.Streams;
+--        use UnZip.Streams;
       File_ID     : File_Type;
-      Zip_File    : Zipped_File_Type;
-      Stream      : Stream_Access;
+--        Zip_File    : Zipped_File_Type;
+--        Stream      : Stream_Access;
       theArray    : JSON_Array;
    begin
 
@@ -312,27 +312,37 @@ package body Dataset_Utilities is
      (Data : GNATCOLL.JSON.JSON_Array; File_Name : String) is
       use GNATCOLL.JSON;
       use Zip.Create;
-      File_ID  : File_Type;
+--        File_ID  : File_Type;
       Zip_File : aliased Zip_File_Stream;
       Archive  : Zip_Create_Info;
       Index    : Positive := Array_First (Data);
    begin
-      if Ada.Directories.Exists (File_Name) then
-         Ada.Directories.Delete_File (File_Name);
-      end if;
-      Create (File_ID, Out_File, File_Name);
-
-      while Array_Has_Element (Data, Index) loop
-         Put_Line (File_ID, Array_Element (Data, Index).Write);
-         Index := Array_Next (Data, Index);
-      end loop;
-      Close (File_ID);
+--        if Ada.Directories.Exists (File_Name) then
+--           Ada.Directories.Delete_File (File_Name);
+--        end if;
+--        Create (File_ID, Out_File, File_Name);
+--
+--        while Array_Has_Element (Data, Index) loop
+--           Put_Line (File_ID, Array_Element (Data, Index).Write);
+--           Index := Array_Next (Data, Index);
+--        end loop;
+--        Close (File_ID);
 
       Create_Archive (Archive, Zip_File'Unchecked_Access, File_Name & ".zip");
-      Add_File (Archive, File_Name);
+      --        Add_File (Archive, File_Name);
+
+      while Array_Has_Element (Data, Index) loop
+         declare
+            Item : constant String := Array_Element (Data, Index).Write;
+         begin
+            Add_String (Info  => Archive, Contents  => Item,
+                        Name_in_archive => "Data");
+         end;
+         Index := Array_Next (Data, Index);
+      end loop;
       Finish (Archive);
 
-      Delete (File_ID);
+--        Delete (File_ID);
 
    end Write_JSON_Array_To_File;
 
