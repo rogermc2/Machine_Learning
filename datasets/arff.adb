@@ -527,7 +527,7 @@ package body ARFF is
             Put_Line (".");
             Count := 0;
          end if;
---           Put_Line (Integer'Image (Count));
+
          --  L462  for row in stream:
          Row  := Element (Stream_Cursor);
          Trim (Row, Both);
@@ -577,9 +577,9 @@ package body ARFF is
          end if;
 
          Next (Stream_Cursor);
---           delay (0.3);
       end loop;
 
+      New_Line;
       Put_Line (Routine_Name & "Values_Array length" &
                   Integer'Image (Length (Values_Array)));
 
@@ -779,7 +779,6 @@ package body ARFF is
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
    procedure Parse_Values (Row : String; Values : out Indef_String_List) is
---        use Ada.Calendar;
       use GNAT.Regpat;
       use Regexep;
       use Indefinite_String_Package;
@@ -795,18 +794,10 @@ package body ARFF is
       Matches             : Matches_List;
       Errors              : String_List;
       Errors_Cursor       : String_Package.Cursor;
---        Start_Time          : Time;
---        End_Time            : Time;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         --           Put_Line (Routine_Name & "Row: '" & Row & "'");
-         --           Start_Time := Clock;
          Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
-         --           End_Time := Clock;
-         --           Put_Line (Routine_Name & "Non_Trivial Match time" &
-         --                     Duration'Image (1000 * ( End_Time - Start_Time)) &
-         --                     " Milli_Sec");
          pragma Unreferenced (Matches);
          if Match_Found then
             Put_Line (Routine_Name & "trivial");
@@ -829,16 +820,7 @@ package body ARFF is
                Matches := Find_Match
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
---                    Start_Time := Clock;
                   Values := Split_CSV (Row (First .. Last));
---                    End_Time := Clock;
---                    Put_Line (Routine_Name & "split string execution time" &
---                                Duration'Image (1000 * ( End_Time - Start_Time)) &
---                                " Milli_Sec");
---                    Put_Line (Routine_Name & "Row (First .. Last):" &
---                                Row (First .. Last));
---                    Put_Line (Routine_Name & "dense Values length:" &
---                                Integer'Image (Integer (Length (Values))));
                else
                   Matches := Find_Match (Sparse_Matcher, Row, First, Last,
                                          Sparse_Match);
@@ -857,6 +839,7 @@ package body ARFF is
                         Values := Split_Sparse_Line (Row);
                      end if;
                   end if;
+
                end if;
             end;  --  declare block
 
