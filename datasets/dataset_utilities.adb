@@ -1,8 +1,7 @@
 
---  with Ada.Calendar;
 with Ada.Characters.Handling;
 with Ada.Directories;
-with Ada.Streams;
+with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -13,7 +12,8 @@ with GNAT.String_Split;
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
 
-with UnZip.Streams;
+--  with UnZip.Streams;
+ with UnZip;
 with Zip.Create;
 
 --  with Printing;
@@ -169,43 +169,35 @@ package body Dataset_Utilities is
 
    function Read_JSON_Array (Zip_File_Name : String)
                              return  GNATCOLL.JSON.JSON_Array is
+      use Ada.Streams;
+      use Stream_IO;
       use GNATCOLL.JSON;
-      use UnZip.Streams;
+      use UnZip;
       Routine_Name : constant String := "Dataset_Utilities.Read_JSON_Array ";
-      Unzipped_File_Name : constant String := "./unzip.json";
-      --        File_ID      : File_Type;
-      Zip_Type     : Zipped_File_Type;
-      theStream    : Stream_Access;
-      Item         : Ada.Streams.Stream_Element_Array (1 .. 80);
-      Last         : Ada.Streams.Stream_Element_Offset;
-      theArray     : JSON_Array;
-
---        function Try_With_Zip (Zip_File_Name : String) return String is
---        begin
---           if Zip.Exists (Zip_File_Name) then
---              return Zip_File_Name;
---           else
---              return Zip_File_Name & ".zip";
---              --  Maybe the file doesn't exist, but we tried our best...
---           end if;
---        end Try_With_Zip;
-
+      Unzipped_File_Name : constant String := "./unzipped.json";
+      File_ID            : Stream_IO.File_Type;
+      Data_Stream        : Stream_IO.Stream_Access;
+      aValue             : JSON_Value;
+      theArray           : JSON_Array;
    begin
-      Open (Zip_Type, Zip_File_Name, Unzipped_File_Name,
-            Ignore_Directory => True);
-      theStream := Stream (Zip_Type);
-      --        Open (File_ID, In_File, File_Name);
-      while not End_Of_File (Zip_Type) loop
-         declare
---              aLine : constant String := Read (theStream, Item);
-         begin
-                null;
---              UnZip.Extract (Zip_Type, aLine'Read);
---              Put_Line (Routine_Name & "aLine: " & aLine);
---              Append (theArray, Read (aLine));
-         end;
+      Put_Line (Routine_Name & "extracting" &  Zip_File_Name);
+      Extract (from                 => Zip_File_Name,
+               what                 => "data",
+               rename => Unzipped_File_Name);
+      Put_Line (Routine_Name &  Zip_File_Name  & "extracted to " &
+                  Unzipped_File_Name);
+      Open (File_ID, In_File, Unzipped_File_Name);
+      Data_Stream := Stream (File_ID);
+      Put_Line (Routine_Name & "Data_Stream set");
+
+      while not End_Of_File (File_ID) loop
+             JSON_Value'Read (Data_Stream, aValue);
+            Put_Line (Routine_Name & "aValue: " & aValue.Write);
+            Append (theArray, aValue);
       end loop;
---        Close (File_ID);
+
+      Stream_IO.Close (File_ID);
+--        Delete (File_ID);
 
       return theArray;
 
