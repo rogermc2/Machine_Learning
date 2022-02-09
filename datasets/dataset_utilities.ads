@@ -22,7 +22,7 @@ package Dataset_Utilities is
    procedure CSV_Reader (CSV_File_Name : String;
                          Data          : out ML_Types.String_List);
    function Get_CSV_Data (CSV_Data : String) return ML_Types.Indef_String_List;
-   function Read_JSON_Array (File_Name : String)
+   function Read_JSON_Array (Zip_File_Name : String)
                              return  GNATCOLL.JSON.JSON_Array;
    function Split (Line : String; Sep : String) return String_Array;
    function Split (Line : String; Sep : String) return

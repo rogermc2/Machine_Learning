@@ -521,73 +521,75 @@ package body ARFF is
       Count             : Natural := 0;
    begin
       if Ada.Directories.Exists (Zip_File_Name) then
-         null;
-      end if;
+         Put_Line (Routine_Name & Zip_File_Name & " exists");
+         Values_Array := Read_JSON_Array (Zip_File_Name);
+      else
+         Put_Line (Routine_Name & "Stream length" &
+                     Integer'Image (Integer (Length (Stream))) & " rows");
+         Start_Time := Clock;
+         while Has_Element (Stream_Cursor) loop
+            Count := Count + 1;
+            if Count mod 100 = 0 then
+               Put (".");
+            end if;
+            if Count > 8000 then
+               Put_Line (".");
+               Count := 0;
+            end if;
 
-      Put_Line (Routine_Name & "Stream length" &
-                  Integer'Image (Integer (Length (Stream))) & " rows");
-      Start_Time := Clock;
-      while Has_Element (Stream_Cursor) loop
-         Count := Count + 1;
-         if Count mod 100 = 0 then
-            Put (".");
-         end if;
-         if Count > 8000 then
-            Put_Line (".");
-            Count := 0;
-         end if;
+            --  L462  for row in stream:
+            Row  := Element (Stream_Cursor);
+            Trim (Row, Both);
+            --           Put_Line (Routine_Name & To_String (Row));
+            if Row /= "" then
+               if Slice (Row, 1, 1) /= "%" and then
+                 Slice (Row, 1, 1) /= "@"
+               then
+                  --  L463
+                  Parse_Values (To_String (Row), Values);
+                  --                 Values_Length := Natural (Length (Values));
+                  Values_Length := Natural (Values.Length);
+                  Clear (Dense_Values);
+                  Data_Values.Unset_Field ("values");
+                  --                 Put_Line (Routine_Name & "Result: '" & To_String (Result) & "'");
+                  --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
+                  --              delay (1.0);
+                  --              New_Line;
 
-         --  L462  for row in stream:
-         Row  := Element (Stream_Cursor);
-         Trim (Row, Both);
-         --           Put_Line (Routine_Name & To_String (Row));
-         if Row /= "" then
-            if Slice (Row, 1, 1) /= "%" and then
-              Slice (Row, 1, 1) /= "@"
-            then
-               --  L463
-               Parse_Values (To_String (Row), Values);
-               --                 Values_Length := Natural (Length (Values));
-               Values_Length := Natural (Values.Length);
-               Clear (Dense_Values);
-               Data_Values.Unset_Field ("values");
-               --                 Put_Line (Routine_Name & "Result: '" & To_String (Result) & "'");
-               --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
-               --              delay (1.0);
-               --              New_Line;
-
-               if Length (Row) > 0 then
-                  --                 Assert (not Values.Is_Empty, Routine_Name & "Row '" &
-                  --                           Filtered_Row & "' has no valid values.");
-                  Assert (Values_Length <= Converser_Length, Routine_Name &
-                            "Row is invalid, Values length"  &
-                            Integer'Image (Values_Length) &
-                            " is different to Converser_Length" &
-                            Integer'Image (Converser_Length));
-                  --                    Decode_Start_Time := Clock;
-                  Decode_Dense_Values (Values, Decoder.Conversers, Dense_Values);
-                  --                    Decode_End_Time := Clock;
-                  --                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
-                  --                              Duration'Image
-                  --                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
-                  --                               " Milli_Sec");
-                  Data_Values.Set_Field ("values", Dense_Values);
-                  Append (Values_Array, Data_Values);
-                  --                    Put_Line (Routine_Name & "Values_Array length" &
-                  --                                Integer'Image (Length (Values_Array)));
+                  if Length (Row) > 0 then
+                     --                 Assert (not Values.Is_Empty, Routine_Name & "Row '" &
+                     --                           Filtered_Row & "' has no valid values.");
+                     Assert (Values_Length <= Converser_Length, Routine_Name &
+                               "Row is invalid, Values length"  &
+                               Integer'Image (Values_Length) &
+                               " is different to Converser_Length" &
+                               Integer'Image (Converser_Length));
+                     --                    Decode_Start_Time := Clock;
+                     Decode_Dense_Values (Values, Decoder.Conversers, Dense_Values);
+                     --                    Decode_End_Time := Clock;
+                     --                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
+                     --                              Duration'Image
+                     --                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
+                     --                               " Milli_Sec");
+                     Data_Values.Set_Field ("values", Dense_Values);
+                     Append (Values_Array, Data_Values);
+                     --                    Put_Line (Routine_Name & "Values_Array length" &
+                     --                                Integer'Image (Length (Values_Array)));
+                  end if;
                end if;
             end if;
-         end if;
 
-         Next (Stream_Cursor);
-      end loop;
-      End_Time := Clock;
-      New_Line;
-      Put_Line (Routine_Name & "Decode_Dense_Rows time" &
-                  Duration'Image (End_Time - Start_Time) & " Seconds");
+            Next (Stream_Cursor);
+         end loop;
+         End_Time := Clock;
+         New_Line;
+         Put_Line (Routine_Name & "Decode_Dense_Rows time" &
+                     Duration'Image (End_Time - Start_Time) & " Seconds");
+         Write_JSON_Array_To_File (Values_Array, Zip_File_Name);
+      end if;
+
       Put_Line (Routine_Name & "Values_Array length" &
-                  Integer'Image (Length (Values_Array)));
-      Write_JSON_Array_To_File (Values_Array, Zip_File_Name);
+                Integer'Image (Length (Values_Array)));
 
       --  L475
       return Values_Array;

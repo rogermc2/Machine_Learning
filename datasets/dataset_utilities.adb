@@ -12,7 +12,7 @@ with GNAT.String_Split;
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
 
---  with UnZip.Streams;
+with UnZip.Streams;
 with Zip.Create;
 
 --  with Printing;
@@ -166,27 +166,50 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Read_JSON_Array (File_Name : String)
-                              return  GNATCOLL.JSON.JSON_Array is
+   function Read_JSON_Array (Zip_File_Name : String)
+                             return  GNATCOLL.JSON.JSON_Array is
       use GNATCOLL.JSON;
---        use UnZip.Streams;
-      File_ID     : File_Type;
---        Zip_File    : Zipped_File_Type;
---        Stream      : Stream_Access;
-      theArray    : JSON_Array;
+      use UnZip.Streams;
+      Routine_Name : constant String := "Dataset_Utilities.Read_JSON_Array ";
+      Unzipped_File_Name : constant String := "./unzip.json";
+      --        File_ID      : File_Type;
+      Zip_Type     : Zipped_File_Type;
+      theStream    : Stream_Access;
+      theArray     : JSON_Array;
+
+--        function Try_With_Zip (Zip_File_Name : String) return String is
+--        begin
+--           if Zip.Exists (Zip_File_Name) then
+--              return Zip_File_Name;
+--           else
+--              return Zip_File_Name & ".zip";
+--              --  Maybe the file doesn't exist, but we tried our best...
+--           end if;
+--        end Try_With_Zip;
+
    begin
+      Open (Zip_Type, Zip_File_Name, Unzipped_File_Name,
+            Ignore_Directory => True);
+      theStream := Stream (Zip_Type);
+      --        Open (File_ID, In_File, File_Name);
 
-      Open (File_ID, In_File, File_Name);
-
-      while not End_Of_File (File_ID) loop
+      while not End_Of_File (Zip_Type) loop
          declare
-            aLine : constant String := Get_Line (File_ID);
+            aLine : constant String := String'Read (Zip_Type);
          begin
+--              UnZip.Extract (Zip_Type, aLine'Read);
+            Put_Line (Routine_Name & "aLine: " & aLine);
             Append (theArray, Read (aLine));
          end;
       end loop;
-      Close (File_ID);
+--        Close (File_ID);
 
+      return theArray;
+
+   exception
+      when Zip.Archive_open_error =>
+         Put_Line (Routine_Name & "can't open " & Zip_File_Name);
+      raise;
       return theArray;
 
    end Read_JSON_Array;
@@ -194,7 +217,7 @@ package body Dataset_Utilities is
    --  -------------------------------------------------------------------------
 
    function Split_String (aString, Pattern : String)
-                          return ML_Types.String_List is
+                                             return ML_Types.String_List is
       use Ada.Strings;
       --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Patt_Length  : constant Integer := Pattern'Length;
@@ -227,7 +250,7 @@ package body Dataset_Utilities is
    --  -------------------------------------------------------------------------
 
    function Split_String (aString, Pattern : String)
-                          return ML_Types.Indef_String_List is
+                                             return ML_Types.Indef_String_List is
       use Ada.Strings;
       --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Patt_Length  : constant Integer := Pattern'Length;
@@ -327,7 +350,9 @@ package body Dataset_Utilities is
          end;
          Index := Array_Next (Data, Index);
       end loop;
+
       Finish (Archive);
+      pragma Unreferenced (Archive);
 
    end Write_JSON_Array_To_File;
 
