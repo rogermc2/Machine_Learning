@@ -3,6 +3,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
+with Ada.Directories;
 with Ada.Integer_Text_IO;
 with Ada.Calendar;
 with Ada.Strings.Fixed;
@@ -504,6 +505,7 @@ package body ARFF is
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
+      Zip_File_Name     : constant String := "./dense_data.zip";
       Converser_Length  : constant Positive :=
                             Positive (Decoder.Conversers.Length);
       Row               : Unbounded_String;
@@ -518,6 +520,10 @@ package body ARFF is
       --        Decode_End_Time   : Time;
       Count             : Natural := 0;
    begin
+      if Ada.Directories.Exists (Zip_File_Name) then
+         null;
+      end if;
+
       Put_Line (Routine_Name & "Stream length" &
                   Integer'Image (Integer (Length (Stream))) & " rows");
       Start_Time := Clock;
@@ -581,7 +587,7 @@ package body ARFF is
                   Duration'Image (End_Time - Start_Time) & " Seconds");
       Put_Line (Routine_Name & "Values_Array length" &
                   Integer'Image (Length (Values_Array)));
-      Write_JSON_Array_To_File (Values_Array, "./dense_data.json");
+      Write_JSON_Array_To_File (Values_Array, Zip_File_Name);
 
       --  L475
       return Values_Array;

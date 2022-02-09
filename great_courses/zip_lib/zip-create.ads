@@ -240,7 +240,7 @@ private
      Duplicates         : Duplicate_name_policy;
      --  We set up a name dictionary just for detecting duplicate entries:
      name_dictionary    : Name_mapping.Map;
-     zip_archive_format : Zip_archive_format_type := Zip_32;
+     zip_archive_format : Zip_archive_format_type := Zip_64;
    end record;
 
    type Stream_Element_Array_Access is

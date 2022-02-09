@@ -312,24 +312,11 @@ package body Dataset_Utilities is
      (Data : GNATCOLL.JSON.JSON_Array; File_Name : String) is
       use GNATCOLL.JSON;
       use Zip.Create;
---        File_ID  : File_Type;
       Zip_File : aliased Zip_File_Stream;
       Archive  : Zip_Create_Info;
       Index    : Positive := Array_First (Data);
    begin
---        if Ada.Directories.Exists (File_Name) then
---           Ada.Directories.Delete_File (File_Name);
---        end if;
---        Create (File_ID, Out_File, File_Name);
---
---        while Array_Has_Element (Data, Index) loop
---           Put_Line (File_ID, Array_Element (Data, Index).Write);
---           Index := Array_Next (Data, Index);
---        end loop;
---        Close (File_ID);
-
-      Create_Archive (Archive, Zip_File'Unchecked_Access, File_Name & ".zip");
-      --        Add_File (Archive, File_Name);
+      Create_Archive (Archive, Zip_File'Unchecked_Access, File_Name);
 
       while Array_Has_Element (Data, Index) loop
          declare
@@ -341,8 +328,6 @@ package body Dataset_Utilities is
          Index := Array_Next (Data, Index);
       end loop;
       Finish (Archive);
-
---        Delete (File_ID);
 
    end Write_JSON_Array_To_File;
 
