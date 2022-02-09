@@ -2,6 +2,7 @@
 --  with Ada.Calendar;
 with Ada.Characters.Handling;
 with Ada.Directories;
+with Ada.Streams;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -175,6 +176,8 @@ package body Dataset_Utilities is
       --        File_ID      : File_Type;
       Zip_Type     : Zipped_File_Type;
       theStream    : Stream_Access;
+      Item         : Ada.Streams.Stream_Element_Array (1 .. 80);
+      Last         : Ada.Streams.Stream_Element_Offset;
       theArray     : JSON_Array;
 
 --        function Try_With_Zip (Zip_File_Name : String) return String is
@@ -192,14 +195,14 @@ package body Dataset_Utilities is
             Ignore_Directory => True);
       theStream := Stream (Zip_Type);
       --        Open (File_ID, In_File, File_Name);
-
       while not End_Of_File (Zip_Type) loop
          declare
-            aLine : constant String := String'Read (Zip_Type);
+--              aLine : constant String := Read (theStream, Item);
          begin
+                null;
 --              UnZip.Extract (Zip_Type, aLine'Read);
-            Put_Line (Routine_Name & "aLine: " & aLine);
-            Append (theArray, Read (aLine));
+--              Put_Line (Routine_Name & "aLine: " & aLine);
+--              Append (theArray, Read (aLine));
          end;
       end loop;
 --        Close (File_ID);
