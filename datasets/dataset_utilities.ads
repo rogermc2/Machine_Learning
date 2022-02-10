@@ -36,6 +36,6 @@ package Dataset_Utilities is
    function To_Upper_Case (Text : Unbounded_String) return Unbounded_String;
    function Trimmed_Integer (Value : Integer) return String;
    procedure Write_JSON_Array_To_File
-     (Data : GNATCOLL.JSON.JSON_Array; File_Name : String);
+     (Data : GNATCOLL.JSON.JSON_Array; Zip_File_Name : String);
 
 end Dataset_Utilities;

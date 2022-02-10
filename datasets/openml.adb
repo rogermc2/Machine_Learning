@@ -5,7 +5,6 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Dataset_Utilities;
---  with ML_Types;
 --  with Printing;
 
 with AWS.Client;
@@ -352,7 +351,6 @@ package body Openml is
         Data_Qualities  : Qualities_Map;
         Bunch           : Bunch_Data (Return_X_Y);
     begin
-        Put_Line (Routine_Name);
         --  L862
         JSON_Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC, Version,
                                                  Use_Files => Use_Files);
@@ -407,7 +405,6 @@ package body Openml is
             Process_Feature (Dataset_Name, Features_List);
         end if;
 
-        Put_Line (Routine_Name & "L929");
         --  L929
         if Target_Column.Is_Empty then
             Put_Line (Routine_Name & "default-target");
@@ -425,7 +422,6 @@ package body Openml is
             end loop;
         end if;
 
-        Put_Line (Routine_Name & "L944");
         --  L944
         Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
