@@ -179,14 +179,11 @@ package body Dataset_Utilities is
                              "Dataset_Utilities.Read_JSON_Array ";
       File_ID            : Zipped_File_Type;
       Data_Stream        : Stream_Access;
-      String_ID          : Natural := 0;
-      Item               : Unbounded_String;
---        aValue             : JSON_Value;
+      aValue             : JSON_Value := Create_Object;
       theArray           : JSON_Array;
       Count              : Natural := 0;
    begin
       Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
-      String_ID := String_ID + 1;
       Open (File_ID, Zip_File_Name, "./data.txt");
       Put_Line (Routine_Name & Zip_File_Name  & " opened" );
       Data_Stream := Stream (File_ID);
@@ -195,11 +192,10 @@ package body Dataset_Utilities is
       while not End_Of_File (File_ID) loop
          Count := Count + 1;
          Put_Line (Integer'Image (Count));
---           Put_Line (Routine_Name & " read Item.");
-         Unbounded_String'Read (Data_Stream, Item);
-         Put_Line (Integer'Image (Count));
+         JSON_Value'Read (Data_Stream, aValue);
+         Put_Line (aValue.Write);
 --           Put_Line (Routine_Name & "Item: " & To_String (Item));
-         Append (theArray, Create (Item));
+         Append (theArray, aValue);
          Put_Line (Integer'Image (Count));
       end loop;
 
@@ -348,42 +344,25 @@ package body Dataset_Utilities is
       File_ID       : File_Type;
       Zip_File      : aliased Zip_File_Stream;
       Archive       : Zip_Create_Info;
-      Value         : constant JSON_Value := Create_Object;
---        Item          : Unbounded_String;
---        Index         : Positive := Array_First (Data);
+      Index         : Positive := Array_First (Data);
    begin
-      Value.Set_Field ("array", Data);
       if Ada.Directories.Exists (Data_Name) then
          Open (File_ID, Out_File, Data_Name);
          Delete (File_ID);
       end if;
       Create (File_ID, Out_File, Data_Name);
       Put_Line (Routine_Name & "writing to " & Data_Name);
-      Put_Line (File_ID, Value.Write);
---        while Array_Has_Element (Data, Index) loop
---           Item :=To_Unbounded_String (Array_Element (Data, Index).Write);
---           Ada.Text_IO.Unbounded_IO.Put_Line (File_ID, Item);
---           Index := Array_Next (Data, Index);
---        end loop;
+      while Array_Has_Element (Data, Index) loop
+         Put_Line (File_ID, Array_Element (Data, Index).Write);
+         Index := Array_Next (Data, Index);
+      end loop;
       Put_Line (Routine_Name & Data_Name & " written ");
 
       Close (File_ID);
---        pragma Unreferenced (File_ID);
 
       Put_Line (Routine_Name & "zipping " & Data_Name & " to " & Zip_File_Name);
       Create_Archive (Archive, Zip_File'Unchecked_Access, Zip_File_Name);
       Add_File (Archive, Data_Name);
-
-      --  while Array_Has_Element (Data, Index) loop
-      --           declare
-      --              Item : constant String := Array_Element (Data, Index).Write;
-      --           begin
-      --              Add_String
-      --                    (Info  => Archive, Contents  => Item,
-      --                     Name_in_archive => "Data_" & Trimmed_Integer (String_ID));
-      --           end;
-      --           Index := Array_Next (Data, Index);
-      --        end loop;
 
       Finish (Archive);
       pragma Unreferenced (Archive);
