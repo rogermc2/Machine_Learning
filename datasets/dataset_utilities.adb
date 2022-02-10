@@ -183,6 +183,7 @@ package body Dataset_Utilities is
       Item               : Unbounded_String;
 --        aValue             : JSON_Value;
       theArray           : JSON_Array;
+      Count              : Natural := 0;
    begin
       Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
       String_ID := String_ID + 1;
@@ -192,11 +193,14 @@ package body Dataset_Utilities is
       Put_Line (Routine_Name & "Data_Stream set");
 
       while not End_Of_File (File_ID) loop
-         Put_Line (Routine_Name & " read Item.");
+         Count := Count + 1;
+         Put_Line (Integer'Image (Count));
+--           Put_Line (Routine_Name & " read Item.");
          Unbounded_String'Read (Data_Stream, Item);
+         Put_Line (Integer'Image (Count));
 --           Put_Line (Routine_Name & "Item: " & To_String (Item));
-         --              Put_Line (Routine_Name & "aValue: " & aValue.Write);
          Append (theArray, Create (Item));
+         Put_Line (Integer'Image (Count));
       end loop;
 
       Close (File_ID);
