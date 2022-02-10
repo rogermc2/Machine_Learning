@@ -4,7 +4,7 @@ with Ada.Directories;
 with Ada.Exceptions; use Ada.Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
-with Ada.Text_IO.Unbounded_IO;
+--  with Ada.Text_IO.Unbounded_IO;
 
 with GNAT.Regpat;
 with GNAT.String_Split;
@@ -348,21 +348,23 @@ package body Dataset_Utilities is
       File_ID       : File_Type;
       Zip_File      : aliased Zip_File_Stream;
       Archive       : Zip_Create_Info;
-      Item          : Unbounded_String;
-      Index         : Positive := Array_First (Data);
+      Value         : constant JSON_Value := Create_Object;
+--        Item          : Unbounded_String;
+--        Index         : Positive := Array_First (Data);
    begin
+      Value.Set_Field ("array", Data);
       if Ada.Directories.Exists (Data_Name) then
          Open (File_ID, Out_File, Data_Name);
          Delete (File_ID);
       end if;
       Create (File_ID, Out_File, Data_Name);
       Put_Line (Routine_Name & "writing to " & Data_Name);
-
-      while Array_Has_Element (Data, Index) loop
-         Item :=To_Unbounded_String (Array_Element (Data, Index).Write);
-         Ada.Text_IO.Unbounded_IO.Put_Line (File_ID, Item);
-         Index := Array_Next (Data, Index);
-      end loop;
+      Put_Line (File_ID, Value.Write);
+--        while Array_Has_Element (Data, Index) loop
+--           Item :=To_Unbounded_String (Array_Element (Data, Index).Write);
+--           Ada.Text_IO.Unbounded_IO.Put_Line (File_ID, Item);
+--           Index := Array_Next (Data, Index);
+--        end loop;
       Put_Line (Routine_Name & Data_Name & " written ");
 
       Close (File_ID);
