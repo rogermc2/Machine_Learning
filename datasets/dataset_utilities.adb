@@ -1,7 +1,7 @@
 
 with Ada.Characters.Handling;
 with Ada.Directories;
-with Ada.Streams.Stream_IO;
+--  with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -12,8 +12,8 @@ with GNAT.String_Split;
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
 
---  with UnZip.Streams;
- with UnZip;
+with UnZip.Streams;
+with UnZip;
 with Zip.Create;
 
 --  with Printing;
@@ -169,34 +169,42 @@ package body Dataset_Utilities is
 
    function Read_JSON_Array (Zip_File_Name : String)
                              return  GNATCOLL.JSON.JSON_Array is
-      use Ada.Streams;
-      use Stream_IO;
+--        use Ada.Streams;
+--        use Stream_IO;
       use GNATCOLL.JSON;
       use UnZip;
+      use UnZip.Streams;
       Routine_Name : constant String := "Dataset_Utilities.Read_JSON_Array ";
-      Unzipped_File_Name : constant String := "./unzipped.json";
-      File_ID            : Stream_IO.File_Type;
-      Data_Stream        : Stream_IO.Stream_Access;
+--        Unzipped_File_Name : constant String := "./unzipped.json";
+      File_ID            : Zipped_File_Type;
+--        File_ID            : Stream_IO.File_Type;
+--        Data_Stream        : Stream_IO.Stream_Access;
+      Data_Stream        : Stream_Access;
+      String_ID          : Natural := 0;
       aValue             : JSON_Value;
       theArray           : JSON_Array;
    begin
-      Put_Line (Routine_Name & "extracting" &  Zip_File_Name);
-      Extract (from                 => Zip_File_Name,
-               what                 => "data",
-               rename => Unzipped_File_Name);
-      Put_Line (Routine_Name &  Zip_File_Name  & "extracted to " &
-                  Unzipped_File_Name);
-      Open (File_ID, In_File, Unzipped_File_Name);
+      Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
+      String_ID := String_ID + 1;
+      Open (File_ID, Zip_File_Name, "Data_" & Trimmed_Integer (String_ID));
+      Put_Line (Routine_Name & Zip_File_Name  & " opened" );
       Data_Stream := Stream (File_ID);
+--        Extract (from                 => Zip_File_Name,
+--                 what                 => "data",
+--                 rename => Unzipped_File_Name);
+--        Put_Line (Routine_Name &  Zip_File_Name  & "extracted to " &
+--                    Unzipped_File_Name);
+--        Open (File_ID, In_File, Unzipped_File_Name);
+--        Data_Stream := Stream (File_ID);
       Put_Line (Routine_Name & "Data_Stream set");
 
       while not End_Of_File (File_ID) loop
-             JSON_Value'Read (Data_Stream, aValue);
+            JSON_Value'Read (Data_Stream, aValue);
             Put_Line (Routine_Name & "aValue: " & aValue.Write);
             Append (theArray, aValue);
       end loop;
 
-      Stream_IO.Close (File_ID);
+      Close (File_ID);
 --        Delete (File_ID);
 
       return theArray;
@@ -330,9 +338,10 @@ package body Dataset_Utilities is
      (Data : GNATCOLL.JSON.JSON_Array; File_Name : String) is
       use GNATCOLL.JSON;
       use Zip.Create;
-      Zip_File : aliased Zip_File_Stream;
-      Archive  : Zip_Create_Info;
-      Index    : Positive := Array_First (Data);
+      Zip_File  : aliased Zip_File_Stream;
+      Archive   : Zip_Create_Info;
+      Index     : Positive := Array_First (Data);
+      String_ID : Natural := 0;
    begin
       Create_Archive (Archive, Zip_File'Unchecked_Access, File_Name);
 
@@ -340,8 +349,10 @@ package body Dataset_Utilities is
          declare
             Item : constant String := Array_Element (Data, Index).Write;
          begin
-            Add_String (Info  => Archive, Contents  => Item,
-                        Name_in_archive => "Data");
+            String_ID := String_ID + 1;
+            Add_String
+                  (Info  => Archive, Contents  => Item,
+                   Name_in_archive => "Data_" & Trimmed_Integer (String_ID));
          end;
          Index := Array_Next (Data, Index);
       end loop;
