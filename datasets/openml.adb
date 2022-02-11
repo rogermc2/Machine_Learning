@@ -973,7 +973,7 @@ package body Openml is
                 end if;
                 Col := Array_Next (Include_Columns, Col);
             end loop;
-            Put_Line (Routine_Name & "end outer while:");
+--              Put_Line (Routine_Name & "end outer while:");
 
             declare
                 New_Data_Row : constant JSON_Value := Create_Object;
