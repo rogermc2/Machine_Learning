@@ -180,7 +180,7 @@ package body Dataset_Utilities is
       Data_Stream := Stream (File_ID);
       Put_Line (Routine_Name & File_Name & " opened" );
 
-      while not  Stream_IO.End_Of_File (File_ID) loop
+      while not Stream_IO.End_Of_File (File_ID) loop
          JSON_Value'Read (Data_Stream, aValue);
          if not Is_Empty (aValue) then
             Put_Line (Routine_Name & " aValue");
@@ -316,26 +316,31 @@ package body Dataset_Utilities is
 
    procedure Write_JSON_Array_To_File (Data : GNATCOLL.JSON.JSON_Array;
                                        File_Name : String) is
+      use Ada.Streams;
       use GNATCOLL.JSON;
       Routine_Name   : constant String :=
                         "Dataset_Utilities.Write_JSON_Array_To_File ";
-      File_ID        : File_Type;
-      Index          : Positive := Array_First (Data);
+--        File_ID        : File_Type;
+      File_ID     : Stream_IO.File_Type;
+      Data_Stream : Stream_IO.Stream_Access;
+      Index       : Positive := Array_First (Data);
    begin
       if Ada.Directories.Exists (File_Name) then
-         Open (File_ID, Out_File, File_Name);
-         Delete (File_ID);
+         Stream_IO.Open (File_ID, Stream_IO.In_File, File_Name);
+         Stream_IO.Delete (File_ID);
       end if;
 
-      Create (File_ID, Out_File, File_Name);
+      Stream_IO.Create (File_ID, Stream_IO.Out_File, File_Name);
+      Data_Stream := Stream_IO.Stream (File_ID);
       Put_Line (Routine_Name & "writing to " & File_Name);
       while Array_Has_Element (Data, Index) loop
-         Put_Line (File_ID, Array_Element (Data, Index).Write);
+         JSON_Value'Write (Data_Stream, Array_Element (Data, Index));
+--           Put_Line (File_ID, Array_Element (Data, Index).Write);
          Index := Array_Next (Data, Index);
       end loop;
       Put_Line (Routine_Name & File_Name & " written.");
 
-      Close (File_ID);
+      Stream_IO.Close (File_ID);
       pragma Unreferenced (File_ID);
 
    end Write_JSON_Array_To_File;
