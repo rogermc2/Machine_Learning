@@ -505,9 +505,7 @@ package body ARFF is
       use Ada.Strings;
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
---        Zip_File_Name     : constant String := "./dense_data.zip";
-      File_Name     : constant String := "./dense_data.json";
---        Archive_Name      : constant String := "data";
+      File_Name         : constant String := "./dense_data.json";
       Converser_Length  : constant Positive :=
                             Positive (Decoder.Conversers.Length);
       Row               : Unbounded_String;
@@ -516,18 +514,16 @@ package body ARFF is
       Data_Values       : constant JSON_Value := Create_Object;
       Dense_Values      : JSON_Array;
       Values_Array      : JSON_Array;
+      aValue            : JSON_Value := Create_Object;
       Start_Time        : Time;
       End_Time          : Time;
       --        Decode_Start_Time : Time;
       --        Decode_End_Time   : Time;
       Count             : Natural := 0;
    begin
---        if Ada.Directories.Exists (Zip_File_Name) then
---           Put_Line (Routine_Name & Zip_File_Name & " exists");
       if Ada.Directories.Exists (File_Name) then
          Put_Line (Routine_Name & File_Name & " exists");
-         Values_Array := Read_JSON_Array (File_Name);
---           Values_Array := Read_JSON_Array (Zip_File_Name, Archive_Name);
+         Read_JSON_Array (File_Name, Values_Array);
       else
          Put_Line (Routine_Name & "Stream length" &
                      Integer'Image (Integer (Length (Stream))) & " rows");
@@ -591,14 +587,14 @@ package body ARFF is
          Put_Line (Routine_Name & "Decode_Dense_Rows time" &
                      Duration'Image (End_Time - Start_Time) & " Seconds");
          Write_JSON_Array_To_File (Values_Array, File_Name);
---           Write_JSON_Array_To_File (Values_Array, Zip_File_Name, Archive_Name);
       end if;
 
       Put_Line (Routine_Name & "Values_Array length" &
                 Integer'Image (Length (Values_Array)));
 
+      aValue := Array_Element (Values_Array, Array_First (Values_Array));
       Put_Line (Routine_Name & "Values_Array (1)");
-      Put_Line (Array_Element (Values_Array, Array_First (Values_Array)).Write);
+      Put_Line (aValue.Write);
       --  L475
       return Values_Array;
 
