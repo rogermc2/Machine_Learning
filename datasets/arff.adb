@@ -506,6 +506,7 @@ package body ARFF is
       use String_Package;
       Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
       Zip_File_Name     : constant String := "./dense_data.zip";
+      Archive_Name      : constant String := "data";
       Converser_Length  : constant Positive :=
                             Positive (Decoder.Conversers.Length);
       Row               : Unbounded_String;
@@ -522,7 +523,7 @@ package body ARFF is
    begin
       if Ada.Directories.Exists (Zip_File_Name) then
          Put_Line (Routine_Name & Zip_File_Name & " exists");
-         Values_Array := Read_JSON_Array (Zip_File_Name);
+         Values_Array := Read_JSON_Array (Zip_File_Name, Archive_Name);
       else
          Put_Line (Routine_Name & "Stream length" &
                      Integer'Image (Integer (Length (Stream))) & " rows");
@@ -585,7 +586,7 @@ package body ARFF is
          New_Line;
          Put_Line (Routine_Name & "Decode_Dense_Rows time" &
                      Duration'Image (End_Time - Start_Time) & " Seconds");
-         Write_JSON_Array_To_File (Values_Array, Zip_File_Name);
+         Write_JSON_Array_To_File (Values_Array, Zip_File_Name, Archive_Name);
       end if;
 
       Put_Line (Routine_Name & "Values_Array length" &

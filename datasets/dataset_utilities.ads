@@ -22,7 +22,7 @@ package Dataset_Utilities is
    procedure CSV_Reader (CSV_File_Name : String;
                          Data          : out ML_Types.String_List);
    function Get_CSV_Data (CSV_Data : String) return ML_Types.Indef_String_List;
-   function Read_JSON_Array (Zip_File_Name : String)
+   function Read_JSON_Array (Zip_File_Name, Archive_Name : String)
                              return  GNATCOLL.JSON.JSON_Array;
    function Split (Line : String; Sep : String) return String_Array;
    function Split (Line : String; Sep : String) return
@@ -36,6 +36,7 @@ package Dataset_Utilities is
    function To_Upper_Case (Text : Unbounded_String) return Unbounded_String;
    function Trimmed_Integer (Value : Integer) return String;
    procedure Write_JSON_Array_To_File
-     (Data : GNATCOLL.JSON.JSON_Array; Zip_File_Name : String);
+     (Data : GNATCOLL.JSON.JSON_Array; Zip_File_Name : String;
+      Archive_Name : String);
 
 end Dataset_Utilities;

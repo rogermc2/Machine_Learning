@@ -934,7 +934,7 @@ package body Openml is
        Include_Columns : JSON_Array)
       return ARFF.Arff_Sparse_Data_Type is
         use ARFF;
-        --        Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
+        Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
         Data_Length        : constant Natural := Length (Arff_Data);
         --        Include_Length     : constant Natural :=
         --                               Natural (Length (Include_Columns));
@@ -947,7 +947,8 @@ package body Openml is
         Col                : Positive;
         Include_Col        : Positive;
         Select_Col         : Boolean;
-    begin
+   begin
+      Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
         for sample in 1 .. Data_Length loop
             Clear (New_Row);
             Arff_Data_Row := Array_Element (Arff_Data, sample);

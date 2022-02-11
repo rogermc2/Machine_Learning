@@ -13,7 +13,7 @@ with GNAT.String_Split;
 with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
 
-with UnZip.Streams;
+--  with UnZip.Streams;
 with UnZip;
 with Zip.Create;
 
@@ -168,38 +168,31 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Read_JSON_Array (Zip_File_Name : String)
+   function Read_JSON_Array (Zip_File_Name, Archive_Name : String)
                              return  GNATCOLL.JSON.JSON_Array is
-      --        use Ada.Streams;
-      --        use Stream_IO;
       use GNATCOLL.JSON;
       use UnZip;
-      use UnZip.Streams;
-      Routine_Name       : constant String :=
-                             "Dataset_Utilities.Read_JSON_Array ";
-      File_ID            : Zipped_File_Type;
-      Data_Stream        : Stream_Access;
-      aValue             : JSON_Value := Create_Object;
-      theArray           : JSON_Array;
-      Count              : Natural := 0;
+      Routine_Name : constant String := "Dataset_Utilities.Read_JSON_Array ";
+      File_ID      : File_Type;
+      theArray     : JSON_Array;
    begin
       Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
-      Open (File_ID, Zip_File_Name, "./data.txt");
-      Put_Line (Routine_Name & Zip_File_Name  & " opened" );
-      Data_Stream := Stream (File_ID);
-      Put_Line (Routine_Name & "Data_Stream set");
+      Extract (from => Zip_File_Name, what => Archive_Name,
+               rename => "./unzipped.json");
+
+      Ada.Text_IO.Open (File_ID, In_File, "./unzipped.json");
+      Put_Line (Routine_Name & "./unzipped.json opened" );
 
       while not End_Of_File (File_ID) loop
-         Count := Count + 1;
-         Put_Line (Integer'Image (Count));
-         JSON_Value'Read (Data_Stream, aValue);
-         Put_Line (aValue.Write);
---           Put_Line (Routine_Name & "Item: " & To_String (Item));
-         Append (theArray, aValue);
-         Put_Line (Integer'Image (Count));
+         declare
+            aLine : constant String := Get_Line (File_ID);
+         begin
+            Append (theArray, Create (aLine));
+         end;
       end loop;
 
-      Close (File_ID);
+      Delete (File_ID);
+      Put_Line (Routine_Name & "JSON array loaded.");
 
       return theArray;
 
@@ -335,40 +328,45 @@ package body Dataset_Utilities is
    --  -------------------------------------------------------------------------
 
    procedure Write_JSON_Array_To_File
-     (Data : GNATCOLL.JSON.JSON_Array; Zip_File_Name : String) is
+     (Data : GNATCOLL.JSON.JSON_Array; Zip_File_Name : String;
+      Archive_Name : String) is
       use GNATCOLL.JSON;
       use Zip.Create;
-      Routine_Name  : constant String :=
+      Routine_Name   : constant String :=
                         "Dataset_Utilities.Write_JSON_Array_To_File ";
-      Data_Name     : constant String := "./data.txt";
-      File_ID       : File_Type;
-      Zip_File      : aliased Zip_File_Stream;
-      Archive       : Zip_Create_Info;
-      Index         : Positive := Array_First (Data);
+      Data_File_Name : constant String := "./data.txt";
+      File_ID        : File_Type;
+      Zip_File       : aliased Zip_File_Stream;
+      Archive        : Zip_Create_Info;
+      Index          : Positive := Array_First (Data);
    begin
-      if Ada.Directories.Exists (Data_Name) then
-         Open (File_ID, Out_File, Data_Name);
+      if Ada.Directories.Exists (Data_File_Name) then
+         Open (File_ID, Out_File, Data_File_Name);
          Delete (File_ID);
       end if;
-      Create (File_ID, Out_File, Data_Name);
-      Put_Line (Routine_Name & "writing to " & Data_Name);
+      Create (File_ID, Out_File, Data_File_Name);
+      Put_Line (Routine_Name & "writing to " & Data_File_Name);
       while Array_Has_Element (Data, Index) loop
          Put_Line (File_ID, Array_Element (Data, Index).Write);
          Index := Array_Next (Data, Index);
       end loop;
-      Put_Line (Routine_Name & Data_Name & " written ");
+      Put_Line (Routine_Name & Data_File_Name & " written ");
 
       Close (File_ID);
 
-      Put_Line (Routine_Name & "zipping " & Data_Name & " to " & Zip_File_Name);
-      Create_Archive (Archive, Zip_File'Unchecked_Access, Zip_File_Name);
-      Add_File (Archive, Data_Name);
+      Put_Line (Routine_Name & "zipping " & Data_File_Name & " to " &
+                  Zip_File_Name);
+      Create_Archive (Info => Archive, Z_Stream => Zip_File'Unchecked_Access,
+                      Archive_Name => Zip_File_Name);
+      Add_File (Archive, Data_File_Name, Archive_Name,
+                Delete_file_after => True);
 
       Finish (Archive);
       pragma Unreferenced (Archive);
       Put_Line (Routine_Name & Zip_File_Name & " written");
-      Open (File_ID, In_File, Data_Name);
-      Delete  (File_ID);
+
+--        Open (File_ID, In_File, Data_File_Name);
+--        Delete  (File_ID);
       pragma Unreferenced (File_ID);
 
    end Write_JSON_Array_To_File;
