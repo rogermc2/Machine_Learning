@@ -172,16 +172,19 @@ package body Dataset_Utilities is
                              return  GNATCOLL.JSON.JSON_Array is
       use GNATCOLL.JSON;
       use UnZip;
-      Routine_Name : constant String := "Dataset_Utilities.Read_JSON_Array ";
-      File_ID      : File_Type;
-      theArray     : JSON_Array;
+      Routine_Name    : constant String := "Dataset_Utilities.Read_JSON_Array ";
+      Unzip_File_Name : constant String := "./unzipped.json";
+      File_ID         : File_Type;
+      theArray        : JSON_Array;
    begin
+      if not Ada.Directories.Exists (Unzip_File_Name) then
       Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
       Extract (from => Zip_File_Name, what => Archive_Name,
-               rename => "./unzipped.json");
+               rename => Unzip_File_Name);
+      end if;
 
-      Ada.Text_IO.Open (File_ID, In_File, "./unzipped.json");
-      Put_Line (Routine_Name & "./unzipped.json opened" );
+      Ada.Text_IO.Open (File_ID, In_File, Unzip_File_Name);
+      Put_Line (Routine_Name & Unzip_File_Name & " opened" );
 
       while not End_Of_File (File_ID) loop
          declare
@@ -191,7 +194,8 @@ package body Dataset_Utilities is
          end;
       end loop;
 
-      Delete (File_ID);
+      Close  (File_ID);
+--        Delete (File_ID);
       Put_Line (Routine_Name & "JSON array loaded.");
 
       return theArray;

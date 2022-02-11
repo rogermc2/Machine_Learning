@@ -955,21 +955,25 @@ package body Openml is
             Arff_Data_Cols := Get (Arff_Data_Row, "values");
             Columns := Get (Arff_Data_Cols);
             Col := Array_First (Include_Columns);
+
             while Array_Has_Element (Include_Columns, Col) loop
                 Select_Col := False;
                 aColumn := Array_Element (Columns, Col);
                 Include_Col := Array_First (Include_Columns);
+
                 while Array_Has_Element (Include_Columns, Include_Col) loop
                     Select_Col := Select_Col or
                       Col = Integer'Value
                         (Get (Get (Include_Columns, Include_Col))) + 1;
                     Include_Col := Array_Next (Include_Columns, Include_Col);
                 end loop;
+
                 if Select_Col then
                     Append (New_Row, aColumn);
                 end if;
                 Col := Array_Next (Include_Columns, Col);
             end loop;
+            Put_Line (Routine_Name & "end outer while:");
 
             declare
                 New_Data_Row : constant JSON_Value := Create_Object;
