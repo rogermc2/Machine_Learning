@@ -14,8 +14,8 @@ with Util.Serialize.IO.CSV;
 with Util.Serialize.Mappers;
 
 --  with UnZip.Streams;
-with UnZip;
-with Zip.Create;
+--  with UnZip;
+--  with Zip.Create;
 
 --  with Printing;
 with Regexep;
@@ -168,23 +168,25 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Read_JSON_Array (Zip_File_Name, Archive_Name : String)
-                             return  GNATCOLL.JSON.JSON_Array is
+--     function Read_JSON_Array (Zip_File_Name, Archive_Name : String)
+   function Read_JSON_Array (File_Name : String)
+                             return GNATCOLL.JSON.JSON_Array is
       use GNATCOLL.JSON;
-      use UnZip;
+--        use UnZip;
       Routine_Name    : constant String := "Dataset_Utilities.Read_JSON_Array ";
-      Unzip_File_Name : constant String := "./unzipped.json";
+--        Unzip_File_Name : constant String := "./unzipped.json";
       File_ID         : File_Type;
       theArray        : JSON_Array;
    begin
-      if not Ada.Directories.Exists (Unzip_File_Name) then
-      Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
-      Extract (from => Zip_File_Name, what => Archive_Name,
-               rename => Unzip_File_Name);
-      end if;
+--        if not Ada.Directories.Exists (Unzip_File_Name) then
+--        Put_Line (Routine_Name & "extracting " &  Zip_File_Name);
+--        Extract (from => Zip_File_Name, what => Archive_Name,
+--                 rename => Unzip_File_Name);
+--        end if;
 
-      Ada.Text_IO.Open (File_ID, In_File, Unzip_File_Name);
-      Put_Line (Routine_Name & Unzip_File_Name & " opened" );
+--        Ada.Text_IO.Open (File_ID, In_File, Unzip_File_Name);
+      Ada.Text_IO.Open (File_ID, In_File, File_Name);
+      Put_Line (Routine_Name & File_Name & " opened" );
 
       while not End_Of_File (File_ID) loop
          declare
@@ -201,10 +203,10 @@ package body Dataset_Utilities is
       return theArray;
 
    exception
-      when Zip.Archive_open_error =>
-         Put_Line (Routine_Name & "can't open " & Zip_File_Name);
-         raise;
-         return theArray;
+--        when Zip.Archive_open_error =>
+--           Put_Line (Routine_Name & "can't open " & Zip_File_Name);
+--           raise;
+--           return theArray;
 
       when anError : others =>
          Put_Line (Routine_Name & "exception ");
@@ -331,43 +333,45 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Write_JSON_Array_To_File
-     (Data : GNATCOLL.JSON.JSON_Array; Zip_File_Name : String;
-      Archive_Name : String) is
+   procedure Write_JSON_Array_To_File (Data : GNATCOLL.JSON.JSON_Array;
+                                       File_Name : String) is
+--       Zip_File_Name : String;
+--        Archive_Name : String) is
       use GNATCOLL.JSON;
-      use Zip.Create;
+--        use Zip.Create;
       Routine_Name   : constant String :=
                         "Dataset_Utilities.Write_JSON_Array_To_File ";
-      Data_File_Name : constant String := "./data.txt";
+--        Data_File_Name : constant String := "./data.txt";
       File_ID        : File_Type;
-      Zip_File       : aliased Zip_File_Stream;
-      Archive        : Zip_Create_Info;
+--        Zip_File       : aliased Zip_File_Stream;
+--        Archive        : Zip_Create_Info;
       Index          : Positive := Array_First (Data);
    begin
-      if Ada.Directories.Exists (Data_File_Name) then
-         Open (File_ID, Out_File, Data_File_Name);
+      if Ada.Directories.Exists (File_Name) then
+         Open (File_ID, Out_File, File_Name);
          Delete (File_ID);
       end if;
-      Create (File_ID, Out_File, Data_File_Name);
-      Put_Line (Routine_Name & "writing to " & Data_File_Name);
+
+      Create (File_ID, Out_File, File_Name);
+      Put_Line (Routine_Name & "writing to " & File_Name);
       while Array_Has_Element (Data, Index) loop
          Put_Line (File_ID, Array_Element (Data, Index).Write);
          Index := Array_Next (Data, Index);
       end loop;
-      Put_Line (Routine_Name & Data_File_Name & " written ");
+      Put_Line (Routine_Name & File_Name & " written.");
 
       Close (File_ID);
-
-      Put_Line (Routine_Name & "zipping " & Data_File_Name & " to " &
-                  Zip_File_Name);
-      Create_Archive (Info => Archive, Z_Stream => Zip_File'Unchecked_Access,
-                      Archive_Name => Zip_File_Name);
-      Add_File (Archive, Data_File_Name, Archive_Name,
-                Delete_file_after => True);
-
-      Finish (Archive);
-      pragma Unreferenced (Archive);
-      Put_Line (Routine_Name & Zip_File_Name & " written");
+--
+--        Put_Line (Routine_Name & "zipping " & Data_File_Name & " to " &
+--                    Zip_File_Name);
+--        Create_Archive (Info => Archive, Z_Stream => Zip_File'Unchecked_Access,
+--                        Archive_Name => Zip_File_Name);
+--        Add_File (Archive, Data_File_Name, Archive_Name,
+--                  Delete_file_after => True);
+--
+--        Finish (Archive);
+--        pragma Unreferenced (Archive);
+--        Put_Line (Routine_Name & Zip_File_Name & " written");
 
 --        Open (File_ID, In_File, Data_File_Name);
 --        Delete  (File_ID);
