@@ -1,20 +1,206 @@
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers.Ordered_Maps;
+with Ada.Integer_Text_IO;
 with Ada.IO_Exceptions;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Unbounded_IO;
 
+with GNAT.Regpat;
+
+with Dataset_Utilities;
+with Regexep;
+
 package body Load_ARFF_Data is
 
-   procedure Load_ARFF_Header (File_ID : File_Type;
-                               aLine   : out Unbounded_String;
-                               Header  : out ARFF_Header_Record);
+   package Escape_Sub_Map_Package is new
+     Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
+
+   Escape_Sub_Map : Escape_Sub_Map_Package.Map;
+   --  L190
+   Quoted_Re      : constant String :=
+                      "''""(?:(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
+   --                        "''""(?:(?<!\\)(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
+   Quoted_Re2     : constant String :=
+                      "'''(?:(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+   --                        "'''(?:(?<!\\)(?:\\\\)*\\'|\\[^']|[^'\\])*''";
+   --  L204
+   Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
+                      Quoted_Re2 & "|[^,\s""'{}]+)''";
+   Regex_CSV      : constant String := "[^,]+";
+   Matcher_CSV    : constant GNAT.Regpat.Pattern_Matcher :=
+                      GNAT.Regpat.Compile (Regex_CSV);
+   Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
+
    procedure Load_Attributes (File_ID : File_Type;
                               aLine   : in out Unbounded_String;
                               Header  : in out ARFF_Header_Record);
+   procedure Load_Data (File_ID : File_Type; aLine : in out Unbounded_String;
+                        Data    : out ARFF_Data_Record);
+   procedure Load_Header (File_ID : File_Type; aLine : out Unbounded_String;
+                          Header  : out ARFF_Header_Record);
+   procedure Parse_Values (Row    : String;
+                           Values : out ML_Types.Indef_String_List);
+   function Split_Sparse_Line (Row : String) return ML_Types.Indef_String_List;
+   function Unquote (Values : String) return String;
 
    --  ------------------------------------------------------------------------
+   --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
+   --  despite quoting, whitespace, etc.
+   --  Build_Re_Dense captures (value, error) groups.
+   --  Because empty values are allowed we cannot just look for empty values
+   --  to handle syntax errors.
+   --  the line is assumed to have ',' prepended.
+   --  L214
+   function Build_Re_Dense return GNAT.Regpat.Pattern_Matcher is
+      use GNAT.Regpat;
+      --        Regex  : constant String := "''(?x),\s*((?=,)|$|{" &
+      Regex  : constant String := ",\s*(|$|{" &
+                 Value_Re & "})|(\S.*)";
+   begin
+      declare
+         Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
+      begin
+         return Result;
+      end;
+
+   end Build_Re_Dense;
+
+   --  -------------------------------------------------------------------------
+   --  L225
+   function Build_Re_Sparse return GNAT.Regpat.Pattern_Matcher is
+      use GNAT.Regpat;
+      --        Regex : constant String :=  "(?x)(?:^\s*\{|,)\s*(\d+)\s+("
+      Regex : constant String := "(?:^\s*\{|,)\s*(\d+)\s+("
+                & Value_Re & "s)|\S.*";
+      --                  & Value_Re & "s)|(?!}\s*$)(?!^\s*{\s*}\s*$)\S.*";
+   begin
+      declare
+         Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
+      begin
+         --           Put_Line ("ARFF.Build_Re_Sparse Regex compiled");
+         return Result;
+      end;
+
+   end Build_Re_Sparse;
+
+   --  -------------------------------------------------------------------------
+  --  L478
+   procedure Decode_Dense_Values (Values         : ML_Types.Indef_String_List;
+                                  Attributes : Attribute_List;
+                                  Decoded_Values : out ARFF_Data_List) is
+      use Ada.Strings;
+      use ML_Types;
+      use Indefinite_String_Package;
+      use Attribute_Data_Package;
+      Routine_Name   : constant String := "ARFF.Decode_Dense_Values ";
+      Attr_Cursor    : Attribute_Data_Package.Cursor;
+      Values_Cursor  : Indefinite_String_Package.Cursor;
+      Nominal_Cursor : Indefinite_String_Package.Cursor;
+      ARFF_Data_Kind : ARFF_Data_Type;
+      Data_Kind      : Data_Type;
+      Attribute      : Attribute_Record;
+      Found          : Boolean := False;
+   begin
+      Attr_Cursor := Attributes.First;
+      Values_Cursor := Values.First;
+
+      while Has_Element (Attr_Cursor) loop
+         Attribute := Element (Attr_Cursor);
+         ARFF_Data_Kind := Attribute.Data_Kind;
+         declare
+            Name           : constant String := To_String (Attribute.Name);
+--              Value          : constant JSON_Value := Create_Object;
+            Value_String   : constant String := Element (Values_Cursor);
+            UC_Value       : constant String :=
+                               Dataset_Utilities.To_Upper_Case (Value_String);
+         begin
+            --              Put_Line (Routine_Name & "Conversor Data_Type " &
+            --                          Conversor_Data_Type'Image (Data_Type));
+            --              Put_Line (Routine_Name & "Value_String: " & Value_String);
+            case Data_Kind is
+               when Integer_Type =>
+                  Put_Line (Routine_Name & "Data_Type Conv_Integer");
+                  if Fixed.Index (Value_String, ".") = 0 then
+                     Value.Set_Field
+                       (Name, Integer'Value (Value_String));
+                  else
+                     Value.Set_Field
+                       (Name, Integer (Float'Value (Value_String)));
+                  end if;
+
+               when Conv_Nominal =>
+                  Nominal_Cursor := Attribute_List.Nominal_List.First;
+                  while Has_Element (Nominal_Cursor) and not Found loop
+                     declare
+                        Nominal_String : constant String
+                          := Element (Nominal_Cursor);
+                     begin
+                        Found := UC_Value = Nominal_String;
+                     end;
+                     Next (Nominal_Cursor);
+                  end loop;
+
+                  Assert (Found, Routine_Name & UC_Value &
+                            " is an invalid nominal type");
+                  Value.Set_Field ("nominal type", UC_Value);
+
+               when Conv_Numeric | Conv_Real =>
+                  --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
+                  --                                Value_String);
+                  if Fixed.Index (Value_String, ".") = 0 then
+                     Value.Set_Field
+                       (Name, Float (Integer'Value (Value_String)));
+                  else
+                     Value.Set_Field (Name, Float'Value (Value_String));
+                  end if;
+
+               when Conv_String =>
+                  Value.Set_Field (Name, Value_String);
+
+            end case;
+            Append (Decoded_Values, Value);
+         end;  --  declare block
+
+         Next (Attr_Cursor);
+         Next (Values_Cursor);
+      end loop;
+
+   end Decode_Dense_Values;
+
+   --  -------------------------------------------------------------------------
+
+   function Escape_Sub_Callback (S : String) return String is
+      use Ada.Strings;
+      use Escape_Sub_Map_Package;
+      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      UB_S         : constant Unbounded_String := To_Unbounded_String (S);
+      S_Length     : constant Natural := S'Length;
+      Int_Value    : Integer;
+      Based_Int    : String (1 .. 2 * S_Length);
+      Result       : Unbounded_String;
+   begin
+      if S_Length = 4 then
+         Assert (Escape_Sub_Map.Contains (UB_S), Routine_Name &
+                   "Unsupported escape sequence: " & S);
+         Result := Escape_Sub_Map.Element (UB_S);
+
+      elsif S (S'First + 1) = 'u' then
+         Int_Value := Integer'Value (Slice (UB_S, 3, S_Length));
+         Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 16);
+         Result := Trim (To_Unbounded_String (Based_Int), Both);
+      else
+         Int_Value := Integer'Value (Slice (UB_S, 2, S_Length));
+         Ada.Integer_Text_IO.Put (Based_Int, Int_Value, 8);
+         Result := Trim (To_Unbounded_String (Based_Int), Both);
+      end if;
+
+      return To_String (Result);
+
+   end Escape_Sub_Callback;
+
+   --  -------------------------------------------------------------------------
 
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record) is
       Routine_Name : constant String := "Load_ARFF_Data.Load_ARFF ";
@@ -23,7 +209,7 @@ package body Load_ARFF_Data is
       Header       : ARFF_Header_Record;
    begin
       Open (File_ID, In_File, File_Name);
-      Load_ARFF_Header (File_ID, aLine, Header);
+      Load_Header (File_ID, aLine, Header);
       Data.Header := Header;
       Close (File_ID);
       pragma Unreferenced (File_ID);
@@ -40,11 +226,11 @@ package body Load_ARFF_Data is
 
    --  ------------------------------------------------------------------------
 
-   procedure Load_ARFF_Header (File_ID : File_Type;
-                               aLine   : out Unbounded_String;
-                               Header  : out ARFF_Header_Record) is
+   procedure Load_Header (File_ID : File_Type;
+                          aLine   : out Unbounded_String;
+                          Header  : out ARFF_Header_Record) is
       use Unbounded_IO;
---        Routine_Name : constant String := "Load_ARFF_Data.Load_ARFF_Header ";
+      --        Routine_Name : constant String := "Load_ARFF_Data.Load_ARFF_Header ";
       Is_Info      : Boolean := True;
    begin
       while Is_Info loop
@@ -57,7 +243,7 @@ package body Load_ARFF_Data is
 
       Load_Attributes (File_ID, aLine, Header);
 
-   end Load_ARFF_Header;
+   end Load_Header;
 
    --  ------------------------------------------------------------------------
 
@@ -129,5 +315,155 @@ package body Load_ARFF_Data is
    end Load_Attributes;
 
    --  ------------------------------------------------------------------------
+
+   procedure Load_Data (File_ID : File_Type; aLine : in out Unbounded_String;
+                        Data    : out ARFF_Data_Record )is
+      use Unbounded_IO;
+      --        Routine_Name : constant String := "Load_ARFF_Data.Load_Data ";
+      Values : ML_Types.Indef_String_List;
+   begin
+      while not End_Of_File (File_ID) loop
+         aLine := Get_Line (File_ID);
+         Parse_Values (Get_Line (File_ID), Values);
+
+      end loop;
+
+   end Load_Data;
+
+   --  ------------------------------------------------------------------------
+   --  L283 Parse_Values splits a line into a list of values
+   --  Match produces Matches of type Match_Array.
+   --  Each component of Matches is set to the subrange of the
+   --  matches substring or to No_Match if no match.
+   --  Matches (N) is for the  N'th parenthesized subexpressions;
+   --  Matches (0) is for the whole expression.
+   procedure Parse_Values (Row    : String;
+                           Values : out ML_Types.Indef_String_List) is
+      use GNAT.Regpat;
+      use Regexep;
+      use ML_Types;
+      use Indefinite_String_Package;
+      use String_Package;
+      Routine_Name        : constant String := "Load_ARFF_Data.Parse_Values ";
+      Non_Trivial         : constant String := "[""\'{}\\s]";
+      Non_Trivial_Matcher : constant Pattern_Matcher := Compile (Non_Trivial);
+      First               : Positive;
+      Last                : Positive;
+      Match_Found         : Boolean;
+      Dense_Match         : Boolean;
+      Sparse_Match        : Boolean;
+      Matches             : Matches_List;
+      Errors              : String_List;
+      Errors_Cursor       : String_Package.Cursor;
+   begin
+      if Row'Length /= 0 and then Row /= "?" then
+         Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
+                                Match_Found);
+         pragma Unreferenced (Matches);
+         if Match_Found then
+            Put_Line (Routine_Name & "trivial");
+            Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
+            --  not nontrivial
+            --  Row contains none of the Non_Trivial characters
+            Values := Dataset_Utilities.Get_CSV_Data (Row);
+            --              Put_Line (Routine_Name & "trivial Values length:" &
+            --                          Integer'Image (Integer (Length (Values))));
+
+         else
+            --              Put_Line (Routine_Name & "nontrivial");
+            --  Row contains Non_Trivial characters
+            --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
+            --  despite quoting, whitespace, etc.
+            declare
+               Dense_Matcher  : constant Pattern_Matcher := Build_Re_Dense;
+               Sparse_Matcher : constant Pattern_Matcher := Build_Re_Sparse;
+            begin
+               Matches := Find_Match
+                 (Dense_Matcher, Row, First, Last, Dense_Match);
+               if Dense_Match then
+                  Values := Dataset_Utilities.Get_CSV_Data
+                    (Row (First .. Last));
+               else
+                  Matches := Find_Match (Sparse_Matcher, Row, First, Last,
+                                         Sparse_Match);
+                  if Sparse_Match then
+                     Put_Line (Routine_Name & "Sparse_Match");
+                     Errors := Dataset_Utilities.Split_String
+                       (Row (First .. Last), ",");
+                     if not Errors.Is_Empty then
+                        Errors_Cursor := Errors.First;
+                        while Has_Element (Errors_Cursor) loop
+                           Values.Append
+                             (Unquote (To_String (Element (Errors_Cursor))));
+                           Next (Errors_Cursor);
+                        end loop;
+
+                     else
+                        Values := Split_Sparse_Line (Row);
+                     end if;
+                  end if;
+
+               end if;
+            end;  --  declare block
+
+         end if;
+      end if;
+
+   end Parse_Values;
+
+   --  -------------------------------------------------------------------------
+
+   function Split_Sparse_Line (Row : String)
+                               return ML_Types.Indef_String_List is
+      use GNAT.Regpat;
+      use Regexep;
+      use Matches_Package;
+      use ML_Types;
+      Matcher     : constant Pattern_Matcher := Build_Re_Sparse;
+      First       : Positive;
+      Last        : Positive;
+      Matches     : Matches_List;
+      Loc         : Match_Location;
+      Match_Found : Boolean;
+      Result      : Indef_String_List;
+   begin
+      Matches := Find_Match (Matcher, Row, First, Last, Match_Found);
+      if Match_Found then
+         for index in Matches.First_Index .. Matches.Last_Index loop
+            Loc := Matches.Element (index);
+            declare
+               Match    : constant String := Row (Loc.First .. Loc.Last);
+            begin
+               Result.Append (Unquote (Match));
+            end;
+         end loop;
+      end if;
+
+      return Result;
+
+   end Split_Sparse_Line;
+
+   --  -------------------------------------------------------------------------
+
+   function Unquote (Values : String) return String is
+      use Regexep;
+      --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
+      --  \u[0-9a-f]{4} match string starting with \u followed by 4 hex digits
+      --  \. match \.
+      --  In each case first to last refers to the characters follwing the /
+      Pattern       : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
+   begin
+      if Values = "" or  Values (Values'First) = '?' then
+         return "";
+      elsif Values (Values'First) = '"' or Values (Values'First) = ''' then
+         return Substitute (Values (Values'First + 1 .. Values'Last - 1),
+                            Pattern, Escape_Sub_Callback'Access);
+      else
+         return Values;
+      end if;
+
+   end Unquote;
+
+   --  -------------------------------------------------------------------------
 
 end Load_ARFF_Data;

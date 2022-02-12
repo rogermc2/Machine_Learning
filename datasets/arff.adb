@@ -80,11 +80,8 @@ package body ARFF is
    package Escape_Sub_Map_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
 
-   --     type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
-   --                                               return String;
-
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
-   --     Stream_Cursor  : ML_Types.String_Package.Cursor;
+
    --  L190
    Quoted_Re      : constant String :=
                       "''""(?:(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
