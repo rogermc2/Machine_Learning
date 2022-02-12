@@ -287,12 +287,15 @@ package body Load_ARFF_Data is
       use Ada.Strings;
       use Unbounded_IO;
       Routine_Name : constant String := "Load_ARFF_Data.Load_Attributes ";
+      H_Tab        : String (1 .. 1);
       Pos_1        : Positive;
       Pos_2        : Natural;
       EOL          : Boolean := False;
       Data_Kind    : Unbounded_String;
       Attribute    : Attribute_Record;
    begin
+      H_Tab (1) := ASCII.HT;
+
       while Length (aLine) = 0 or else Slice (aLine, 1, 1) /= "@" loop
          aLine := Get_Line (File_ID);
       end loop;
@@ -303,7 +306,10 @@ package body Load_ARFF_Data is
                    " line beginning @ATTRIBUTE expected");
          Pos_1 := 12;
          Pos_2 := Fixed.Index (Slice (aLine, Pos_1, Length (aLine)), " ");
-         Put_Line (Routine_Name & "Name: " & Slice (aLine, Pos_1, Pos_2));
+         if Pos_2 = 0 then
+            Pos_2 := Fixed.Index (Slice (aLine, Pos_1, Length (aLine)), H_Tab);
+         end if;
+
          Attribute.Name := Trim (To_Unbounded_String
                                  (Slice (aLine, Pos_1, Pos_2)), Both);
          Put_Line (Routine_Name & "Attribute.Name: " &
