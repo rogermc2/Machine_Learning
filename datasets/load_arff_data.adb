@@ -11,6 +11,7 @@ with GNAT.Regpat;
 
 with Dataset_Utilities;
 with Regexep;
+--  with Utilities;
 
 package body Load_ARFF_Data is
 
@@ -28,16 +29,17 @@ package body Load_ARFF_Data is
    --  L204
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
-   Regex_CSV      : constant String := "[^,]+";
-   Matcher_CSV    : constant GNAT.Regpat.Pattern_Matcher :=
-                      GNAT.Regpat.Compile (Regex_CSV);
-   Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
+--     Regex_CSV      : constant String := "[^,]+";
+--     Matcher_CSV    : constant GNAT.Regpat.Pattern_Matcher :=
+--                        GNAT.Regpat.Compile (Regex_CSV);
+--     Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
 
    procedure Load_Attributes (File_ID : File_Type;
                               aLine   : in out Unbounded_String;
                               Header  : in out ARFF_Header_Record);
    procedure Load_Data (File_ID : File_Type; aLine : in out Unbounded_String;
-                        Data    : out ARFF_Data_Record);
+                        Attributes : Attribute_List;
+                        Decoded_Values : out ARFF_Data_List);
    procedure Load_Header (File_ID : File_Type; aLine : out Unbounded_String;
                           Header  : out ARFF_Header_Record);
    procedure Parse_Values (Row    : String;
@@ -86,20 +88,19 @@ package body Load_ARFF_Data is
    end Build_Re_Sparse;
 
    --  -------------------------------------------------------------------------
-  --  L478
+   --  L478
    procedure Decode_Dense_Values (Values         : ML_Types.Indef_String_List;
-                                  Attributes : Attribute_List;
-                                  Decoded_Values : out ARFF_Data_List) is
+                                  Attributes     : Attribute_List;
+                                  Decoded_Values : in out ARFF_Data_List) is
       use Ada.Strings;
       use ML_Types;
       use Indefinite_String_Package;
       use Attribute_Data_Package;
-      Routine_Name   : constant String := "ARFF.Decode_Dense_Values ";
+--        Routine_Name   : constant String := "ARFF.Decode_Dense_Values ";
       Attr_Cursor    : Attribute_Data_Package.Cursor;
       Values_Cursor  : Indefinite_String_Package.Cursor;
       Nominal_Cursor : Indefinite_String_Package.Cursor;
       ARFF_Data_Kind : ARFF_Data_Type;
-      Data_Kind      : Data_Type;
       Attribute      : Attribute_Record;
       Found          : Boolean := False;
    begin
@@ -110,28 +111,44 @@ package body Load_ARFF_Data is
          Attribute := Element (Attr_Cursor);
          ARFF_Data_Kind := Attribute.Data_Kind;
          declare
-            Name           : constant String := To_String (Attribute.Name);
---              Value          : constant JSON_Value := Create_Object;
+--              Name           : constant String := To_String (Attribute.Name);
             Value_String   : constant String := Element (Values_Cursor);
+--              ML_Data_Type   : constant Data_Type := Utilities.Get_Data_Type
+--                (To_Unbounded_String (Value_String));
             UC_Value       : constant String :=
                                Dataset_Utilities.To_Upper_Case (Value_String);
          begin
             --              Put_Line (Routine_Name & "Conversor Data_Type " &
             --                          Conversor_Data_Type'Image (Data_Type));
             --              Put_Line (Routine_Name & "Value_String: " & Value_String);
-            case Data_Kind is
-               when Integer_Type =>
-                  Put_Line (Routine_Name & "Data_Type Conv_Integer");
+            case ARFF_Data_Kind is
+               when ARFF_Date =>
+                  declare
+                     Value : ARFF_Data_Record (UB_String_Type);
+                  begin
+                     Value.UB_String_Data := To_Unbounded_String (Value_String);
+                     Decoded_Values.Append (Value);
+                  end;
+
+               when ARFF_Numeric =>
                   if Fixed.Index (Value_String, ".") = 0 then
-                     Value.Set_Field
-                       (Name, Integer'Value (Value_String));
+                     declare
+                        Value : ARFF_Data_Record (Integer_Type);
+                     begin
+                        Value.Integer_Data := Integer'Value (Value_String);
+                        Decoded_Values.Append (Value);
+                     end;
                   else
-                     Value.Set_Field
-                       (Name, Integer (Float'Value (Value_String)));
+                     declare
+                        Value : ARFF_Data_Record (Float_Type);
+                     begin
+                        Value.Real_Data := Float'Value (Value_String);
+                        Decoded_Values.Append (Value);
+                     end;
                   end if;
 
-               when Conv_Nominal =>
-                  Nominal_Cursor := Attribute_List.Nominal_List.First;
+               when ARFF_Nominal =>
+                  Nominal_Cursor := Attribute.Nominal_Names.First;
                   while Has_Element (Nominal_Cursor) and not Found loop
                      declare
                         Nominal_String : constant String
@@ -142,25 +159,29 @@ package body Load_ARFF_Data is
                      Next (Nominal_Cursor);
                   end loop;
 
-                  Assert (Found, Routine_Name & UC_Value &
-                            " is an invalid nominal type");
-                  Value.Set_Field ("nominal type", UC_Value);
+--                    Assert (Found, Routine_Name & UC_Value &
+--                              " is an invalid nominal type");
+--                    Value.Set_Field ("nominal type", UC_Value);
 
-               when Conv_Numeric | Conv_Real =>
-                  --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
-                  --                                Value_String);
-                  if Fixed.Index (Value_String, ".") = 0 then
-                     Value.Set_Field
-                       (Name, Float (Integer'Value (Value_String)));
-                  else
-                     Value.Set_Field (Name, Float'Value (Value_String));
-                  end if;
+                  --                 when Conv_Numeric | Conv_Real =>
+                  --                    --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
+                  --                    --                                Value_String);
+                  --                    if Fixed.Index (Value_String, ".") = 0 then
+                  --                       Value.Set_Field
+                  --                         (Name, Float (Integer'Value (Value_String)));
+                  --                    else
+                  --                       Value.Set_Field (Name, Float'Value (Value_String));
+                  --                    end if;
 
-               when Conv_String =>
-                  Value.Set_Field (Name, Value_String);
+               when ARFF_String =>
+                  declare
+                     Value : ARFF_Data_Record (UB_String_Type);
+                  begin
+                     Value.UB_String_Data := To_Unbounded_String (Value_String);
+                     Decoded_Values.Append (Value);
+                  end;
 
             end case;
-            Append (Decoded_Values, Value);
          end;  --  declare block
 
          Next (Attr_Cursor);
@@ -207,10 +228,12 @@ package body Load_ARFF_Data is
       File_ID      : File_Type;
       aLine        : Unbounded_String;
       Header       : ARFF_Header_Record;
+      Values       : ARFF_Data_List;
    begin
       Open (File_ID, In_File, File_Name);
       Load_Header (File_ID, aLine, Header);
       Data.Header := Header;
+      Load_Data (File_ID, aLine, Header.Attributes, Values);
       Close (File_ID);
       pragma Unreferenced (File_ID);
 
@@ -317,15 +340,16 @@ package body Load_ARFF_Data is
    --  ------------------------------------------------------------------------
 
    procedure Load_Data (File_ID : File_Type; aLine : in out Unbounded_String;
-                        Data    : out ARFF_Data_Record )is
+                        Attributes : Attribute_List;
+                        Decoded_Values : out ARFF_Data_List)is
       use Unbounded_IO;
       --        Routine_Name : constant String := "Load_ARFF_Data.Load_Data ";
-      Values : ML_Types.Indef_String_List;
+      Values         : ML_Types.Indef_String_List;
    begin
       while not End_Of_File (File_ID) loop
          aLine := Get_Line (File_ID);
          Parse_Values (Get_Line (File_ID), Values);
-
+         Decode_Dense_Values (Values, Attributes, Decoded_Values);
       end loop;
 
    end Load_Data;
