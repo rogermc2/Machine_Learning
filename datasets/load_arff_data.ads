@@ -16,8 +16,9 @@ private
    subtype ARFF_Header is ML_Types.Indef_String_List;
 
     type Attribute_Record is record
-        Name      : Unbounded_String;
-        Data_Kind : ARFF_Data_Type;
+        Name        : Unbounded_String;
+      Data_Kind     : ARFF_Data_Type;
+      Nominal_Names : ML_Types.Indef_String_List;
    end record;
 
    package Attribute_Data_Package is new
