@@ -11,7 +11,6 @@ package Load_ARFF_Data is
     type ARFF_Data_Type is (ARFF_Numeric, ARFF_Nominal, ARFF_String, ARFF_Date);
 
     procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
-    procedure Print_ARFF (Data : ARFF_Record);
 
 private
 
