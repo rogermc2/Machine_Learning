@@ -321,8 +321,13 @@ package body Load_ARFF_Data is
 
          Attribute.Name := Trim (To_Unbounded_String
                                  (Slice (aLine, Pos_1, Pos_2)), Both);
---           Put_Line (Routine_Name & "Attribute.Name: " &
---                       To_String (Attribute.Name));
+         if Element (Attribute.Name, Length (Attribute.Name)) = ASCII.HT then
+                Attribute.Name := To_Unbounded_String
+                  (Slice (Attribute.Name, 1, Length (Attribute.Name) - 1));
+         end if;
+--           Put_Line (Routine_Name & "Attribute.Name: '" &
+--                       To_String (Attribute.Name) & "'");
+
          Pos_1 := Pos_2;
          while Element (aLine, Pos_1) = ' ' or else
            Element (aLine, Pos_1) = ASCII.HT loop
