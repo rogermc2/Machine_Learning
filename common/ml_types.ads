@@ -175,7 +175,8 @@ package ML_Types is
      Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
    subtype Predictions_List is Prediction_Data_Package.List;
 
-   package Indefinite_String_Package is new Ada.Containers.Indefinite_Doubly_Linked_Lists
+   package Indefinite_String_Package is new
+     Ada.Containers.Indefinite_Doubly_Linked_Lists
      (String);
    subtype Indef_String_List is Indefinite_String_Package.List;
 

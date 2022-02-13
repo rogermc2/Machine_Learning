@@ -32,6 +32,8 @@ package Printing is
                                  Start  : Integer := 1;
                                  Finish : Integer := 0);
     procedure Print_Float_List (Name  : String; theList : Float_List);
+    procedure Print_Indefinite_List (Name   : String;
+                                    theList : ML_Types.Indef_String_List);
     procedure Print_Integer_List (Name : String; theList : Integer_List);
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);

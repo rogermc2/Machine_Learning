@@ -254,6 +254,14 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Relation (Data : ARFF_Record) return String is
+   begin
+      return To_String (Data.Header.Relation);
+
+   end Get_Relation;
+
+   --  -------------------------------------------------------------------------
+
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record) is
       Routine_Name : constant String := "Load_ARFF_Data.Load_ARFF ";
       File_ID      : File_Type;
@@ -265,6 +273,7 @@ package body Load_ARFF_Data is
       Load_Header (File_ID, aLine, Data.Header);
       Put_Line (Routine_Name & " Header loaded");
       Load_Data (File_ID, aLine, Header.Attributes, Data.Data);
+      Put_Line (Routine_Name & " data loaded");
       Close (File_ID);
       pragma Unreferenced (File_ID);
       pragma Unreferenced (aLine);

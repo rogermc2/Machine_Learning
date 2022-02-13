@@ -181,7 +181,8 @@ package body Node_Splitter is
             if Current.Split_Row - Splitter.Start_Row >=
               Splitter.Min_Leaf_Samples and
               Splitter.Stop_Row - Current.Split_Row + 1 >=
-                Splitter.Min_Leaf_Samples then
+                Splitter.Min_Leaf_Samples
+            then
                --  L396
                Criterion.Update (Splitter.Criteria, Current.Split_Row);
 
@@ -352,8 +353,8 @@ package body Node_Splitter is
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
---        Routine_Name     : constant String :=
---                             "Node_Splitter.Initialize_Splitter ";
+      --        Routine_Name     : constant String :=
+      --                             "Node_Splitter.Initialize_Splitter ";
       Num_Samples      : constant Positive := Positive (Input_X.Length);
       Num_Features     : constant Positive :=
                            Positive (Input_X.Element (1).Length);
@@ -457,8 +458,8 @@ package body Node_Splitter is
       Best_Split          : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
---        Routine_Name         : constant String :=
---                                 "Node_Splitter.Process_Non_Constants ";
+      --        Routine_Name         : constant String :=
+      --                                 "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Features           : Value_Data_List;
