@@ -300,7 +300,7 @@ package body Load_ARFF_Data is
          aLine := Get_Line (File_ID);
       end loop;
 
-      while Slice (aLine, 1, 1) = "@" loop
+      while Length (aLine) > 0 and then  Slice (aLine, 1, 1) = "@" loop
          Assert (Slice (aLine, 1, 10) = "@ATTRIBUTE", Routine_Name &
                    "invalid ARFF format, " & To_String (aLine) & " but " &
                    " line beginning @ATTRIBUTE expected");
@@ -312,11 +312,17 @@ package body Load_ARFF_Data is
 
          Attribute.Name := Trim (To_Unbounded_String
                                  (Slice (aLine, Pos_1, Pos_2)), Both);
-         Put_Line (Routine_Name & "Attribute.Name: " &
-                     To_String (Attribute.Name));
-         Pos_1 := Pos_2 + 1;
+--           Put_Line (Routine_Name & "Attribute.Name: " &
+--                       To_String (Attribute.Name));
+         Pos_1 := Pos_2;
+         while Element (aLine, Pos_1) = ' ' or else
+           Element (aLine, Pos_1) = ASCII.HT loop
+            Pos_1 := Pos_1 + 1;
+         end loop;
+
          Data_Kind := Trim (To_Unbounded_String
-                            (Slice (aLine, Pos_1, Length (aLine))), Both);
+                            (Slice (aLine, Pos_1, Length (aLine))), Right);
+--           Put_Line (Routine_Name & "Data_Kind: " & To_String (Data_Kind));
          if Data_Kind = To_Unbounded_String ("INTEGER") or
            Data_Kind = To_Unbounded_String ("REAL")
          then
@@ -327,7 +333,15 @@ package body Load_ARFF_Data is
             Attribute.Data_Kind := ARFF_String;
          elsif Slice (Data_Kind, 1, 1) = "{" then
             Attribute.Data_Kind := ARFF_Nominal;
-            Pos_1 := 2;
+--              Put_Line (Routine_Name & "Data_Kind: " &
+--                          ARFF_Data_Type'Image (Attribute.Data_Kind));
+            Pos_1 := Pos_2;
+            while Element (aLine, Pos_1) = ' ' or else
+              Element (aLine, Pos_1) = ASCII.HT loop
+               Pos_1 := Pos_1 + 1;
+            end loop;
+            Pos_1 := Pos_1 + 1;
+
             while not EOL loop
                Pos_2 := Fixed.Index
                  (Slice (aLine, Pos_1, Length (aLine)), ",");
@@ -336,6 +350,8 @@ package body Load_ARFF_Data is
                   Pos_2 := Fixed.Index
                     (Slice (aLine, Pos_1, Length (aLine)), "}");
                end if;
+--              Put_Line (Routine_Name & "Nominal_Name: " &
+--                          Slice (aLine, Pos_1, Pos_2 - 1));
                Attribute.Nominal_Names.Append
                  (Slice (aLine, Pos_1, Pos_2 - 1));
                Pos_1 := Pos_2 + 1;
