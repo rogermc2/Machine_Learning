@@ -340,6 +340,9 @@ package body Load_ARFF_Data is
                  (Slice (aLine, Pos_1, Pos_2 - 1));
                Pos_1 := Pos_2 + 1;
             end loop;
+         else
+            Put_Line (Routine_Name & "unknown attribute data type: " &
+                        Data_Kind);
          end if;
 
          Header.Attributes.Append (Attribute);
