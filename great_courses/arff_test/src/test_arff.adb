@@ -19,5 +19,7 @@ begin
    Put_Line ("Relation: " & Get_Relation (Data));
    New_Line;
    Print_Attributes (Data);
+   New_Line;
+   Print_Data (Data);
 
 end Test_ARFF;
