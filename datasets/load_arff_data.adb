@@ -195,8 +195,6 @@ package body Load_ARFF_Data is
             Put_Line (Routine_Name & "Nominal: " & Nominal);
             Found := UC_Value =
               Dataset_Utilities.To_Upper_Case (Nominal);
-            Assert (Found, Routine_Name & Nominal &
-                      " is not a known nominal type");
             ML_Type := Utilities.Get_Data_Type (To_Unbounded_String (Nominal));
             case ML_Type is
                when Boolean_Type | UB_String_Type =>
@@ -225,6 +223,8 @@ package body Load_ARFF_Data is
                   end;
             end case;
          end;
+         Assert (Found, Routine_Name &
+                  " no a nominal value found for " & UC_Value);
          Next (Nominal_Cursor);
       end loop;
       Put_Line (Routine_Name & "done");
