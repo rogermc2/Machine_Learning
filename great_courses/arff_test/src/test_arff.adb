@@ -14,10 +14,10 @@ begin
    Put_Line (Routine_Name);
    Load_ARFF (File_Name, Data);
    Put_Line (Routine_Name & "Data loaded");
---     New_Line;
---     Print_Description (Data);
---     Put_Line ("Relation: " & Get_Relation (Data));
---     Print_Attributes (Data);
---     Print_Data (Data);
+   New_Line;
+   Print_Description (Data);
+   Put_Line ("Relation: " & Get_Relation (Data));
+   Print_Attributes (Data);
+   Print_Data (Data);
 
 end Test_ARFF;
