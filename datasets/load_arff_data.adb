@@ -10,7 +10,7 @@ with Ada.Text_IO.Unbounded_IO;
 with GNAT.Regpat;
 
 with Dataset_Utilities;
-with Printing;
+--  with Printing;
 with Regexep;
 
 package body Load_ARFF_Data is
@@ -89,9 +89,9 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
    --  L478
-   procedure Decode_Dense_Values (Values         : ML_Types.Indef_String_List;
-                                  Attributes     : Attribute_List;
-                                  Decoded_Values : in out ARFF_Data_List) is
+   function Decode_Dense_Values (Values     : ML_Types.Indef_String_List;
+                                 Attributes : Attribute_List)
+                                 return ARFF_Data_List is
       use Ada.Containers;
       use Ada.Strings;
       use ML_Types;
@@ -103,6 +103,7 @@ package body Load_ARFF_Data is
       Nominal_Cursor : Indefinite_String_Package.Cursor;
       ARFF_Data_Kind : ARFF_Data_Type;
       Attribute      : Attribute_Record;
+      Decoded_Values : ARFF_Data_List;
       Found          : Boolean := False;
    begin
       Assert (Values.Length = Attributes.Length, Routine_Name &
@@ -113,10 +114,6 @@ package body Load_ARFF_Data is
 
       Attr_Cursor := Attributes.First;
       Values_Cursor := Values.First;
-      --        Put_Line (Routine_Name & "Attributes length:" &
-      --                    Integer'Image (Integer (Attributes.Length)));
-      --        Put_Line (Routine_Name & "Values length:" &
-      --                    Integer'Image (Integer (Values.Length)));
 
       while Has_Element (Attr_Cursor) loop
          Attribute := Element (Attr_Cursor);
@@ -198,8 +195,10 @@ package body Load_ARFF_Data is
          Next (Attr_Cursor);
          Next (Values_Cursor);
       end loop;
-      Put_Line (Routine_Name & "Decoded_Values length:" &
-                  Integer'Image (Integer (Decoded_Values.Length)));
+--        Put_Line (Routine_Name & "Decoded_Values length:" &
+--                    Integer'Image (Integer (Decoded_Values.Length)));
+
+      return Decoded_Values;
 
    end Decode_Dense_Values;
 
@@ -396,7 +395,7 @@ package body Load_ARFF_Data is
    end Load_Attributes;
 
    --  ------------------------------------------------------------------------
-
+   --  Based onL461 decode rows
    procedure Load_Data
      (File_ID : File_Type; aLine : in out Unbounded_String;
       Data    : in out ARFF_Record) is
@@ -413,13 +412,13 @@ package body Load_ARFF_Data is
       Assert (Slice (aLine, 1, 5) = "@DATA", Routine_Name &
                 "invalid ARFF format, " & To_String (aLine) & " but " &
                 " line beginning @DATA expected");
-
+      --  L461 decode rows
       while not End_Of_File (File_ID) loop
          aLine := Get_Line (File_ID);
          if Length (aLine) > 0 and then Element (aLine, 1) /= '%' then
             Parse_Values (To_String (aLine), Values);
-            Printing.Print_Indefinite_List (Routine_Name & "Values", Values);
-            Decode_Dense_Values (Values, Attributes, Data.Data);
+--              Printing.Print_Indefinite_List (Routine_Name & "Values", Values);
+            Data.Data.Append (Decode_Dense_Values (Values, Attributes));
             --              Put_Line (Routine_Name & "Decoded_Values length:" &
             --                          Integer'Image (Integer (Data.Data.Length)));
          end if;

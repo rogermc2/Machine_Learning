@@ -46,9 +46,14 @@ private
      Ada.Containers.Indefinite_Doubly_Linked_Lists (ARFF_Data_Record);
    subtype ARFF_Data_List is ARFF_Data_Package.List;
 
+   use ARFF_Data_Package;
+   package ARFF_Data_List_Package is new
+     Ada.Containers.Doubly_Linked_Lists (ARFF_Data_List);
+   subtype ARFF_Data_List_2D is ARFF_Data_List_Package.List;
+
    type ARFF_Record is record
       Header : ARFF_Header_Record;
-      Data   : ARFF_Data_List;
+      Data   : ARFF_Data_List_2D;
    end record;
 
 end Load_ARFF_Data;
