@@ -282,9 +282,11 @@ package body Load_ARFF_Data is
    begin
       Open (File_ID, In_File, File_Name);
       Put_Line (Routine_Name & File_Name & " opened");
+      --  L798
       Load_Header (File_ID, aLine, Data.Header);
       Put_Line (Routine_Name & " Header loaded");
       New_Line;
+      --  L873 obj['data'] = data.decode_rows
       Load_Data (File_ID, aLine, Data);
       Put_Line (Routine_Name & " data loaded");
       Close (File_ID);
@@ -395,7 +397,7 @@ package body Load_ARFF_Data is
    end Load_Attributes;
 
    --  ------------------------------------------------------------------------
-   --  Based onL461 decode rows
+   --  Based on L461 decode rows
    procedure Load_Data
      (File_ID : File_Type; aLine : in out Unbounded_String;
       Data    : in out ARFF_Record) is

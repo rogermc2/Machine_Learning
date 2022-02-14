@@ -28,9 +28,9 @@ private
    subtype Attribute_List is Attribute_Data_Package.List;
 
    type ARFF_Header_Record is record
-      Info       : ARFF_Header;
-      Relation   : Unbounded_String;
-      Attributes : Attribute_List;
+      Info       : ARFF_Header;       --  'description': ''
+      Relation   : Unbounded_String;  --  'relation': ''
+      Attributes : Attribute_List;    --  'attributes': []
    end record;
 
    type ARFF_Data_Record (Data_Kind : ML_Types.Data_Type) is record
@@ -51,9 +51,10 @@ private
      Ada.Containers.Doubly_Linked_Lists (ARFF_Data_List);
    subtype ARFF_Data_List_2D is ARFF_Data_List_Package.List;
 
+   --  L783 declaration of return object obj
    type ARFF_Record is record
       Header : ARFF_Header_Record;
-      Data   : ARFF_Data_List_2D;
+      Data   : ARFF_Data_List_2D;    --  'data': []
    end record;
 
 end Load_ARFF_Data;
