@@ -123,8 +123,6 @@ package body Load_ARFF_Data is
          declare
             --              Name           : constant String := To_String (Attribute.Name);
             Value_String   : constant String := Element (Values_Cursor);
-            --              ML_Data_Type   : constant Data_Type := Utilities.Get_Data_Type
-            --                (To_Unbounded_String (Value_String));
             UC_Value       : constant String :=
                                Dataset_Utilities.To_Upper_Case (Value_String);
          begin
@@ -156,30 +154,40 @@ package body Load_ARFF_Data is
                   end if;
 
                when ARFF_Nominal =>
-                  Nominal_Cursor := Attribute.Nominal_Names.First;
-                  while Has_Element (Nominal_Cursor) and not Found loop
-                     declare
-                        Nominal_String : constant String
-                          := Element (Nominal_Cursor);
-                     begin
-                        Found := UC_Value = Nominal_String;
-                     end;
-                     Next (Nominal_Cursor);
-                  end loop;
+                  declare
+                     Nominal_Type : Nominal_Data_Type;
+                     Value        : ARFF_Data_Record (UB_String_Type);
+                  begin
+                     Nominal_Cursor := Attribute.Nominal_Names.First;
+                     while Has_Element (Nominal_Cursor) and not Found loop
+                        declare
+                           Nominal_String : constant String
+                             := Element (Nominal_Cursor);
+                        begin
+                           Found := UC_Value =
+                             Dataset_Utilities.To_Upper_Case (Nominal_String);
+                           Assert (Found, Routine_Name & UC_Value &
+                                     " is an invalid nominal type");
 
-                  --                    Assert (Found, Routine_Name & UC_Value &
-                  --                              " is an invalid nominal type");
-                  --                    Value.Set_Field ("nominal type", UC_Value);
+                           Value.UB_String_Data := To_Unbounded_String (Nominal_String);
+                        end;
+                        Next (Nominal_Cursor);
+                     end loop;
 
-                  --                 when Conv_Numeric | Conv_Real =>
-                  --                    --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
-                  --                    --                                Value_String);
-                  --                    if Fixed.Index (Value_String, ".") = 0 then
-                  --                       Value.Set_Field
-                  --                         (Name, Float (Integer'Value (Value_String)));
-                  --                    else
-                  --                       Value.Set_Field (Name, Float'Value (Value_String));
-                  --                    end if;
+                     case Nominal_Type is
+                       when Nominal_Integer => null;
+                        when Nominal_Numeric | Nominal_Real =>
+                           --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
+                           --                                Value_String);
+                           if Fixed.Index (Value_String, ".") = 0 then
+                              Value.Real_Data :=
+                                Float (Integer'Value (Value_String));
+                           else
+                              Value.Real_Data :=Float'Value (Value_String);
+                           end if;
+                       when Nominal_String => null;
+                     end case;
+                  end;
 
                when ARFF_String =>
                   declare
@@ -190,13 +198,12 @@ package body Load_ARFF_Data is
                   end;
 
             end case;
-         end;  --  declare block
-
+         end;
          Next (Attr_Cursor);
          Next (Values_Cursor);
       end loop;
---        Put_Line (Routine_Name & "Decoded_Values length:" &
---                    Integer'Image (Integer (Decoded_Values.Length)));
+      --        Put_Line (Routine_Name & "Decoded_Values length:" &
+      --                    Integer'Image (Integer (Decoded_Values.Length)));
 
       return Decoded_Values;
 
@@ -419,7 +426,7 @@ package body Load_ARFF_Data is
          aLine := Get_Line (File_ID);
          if Length (aLine) > 0 and then Element (aLine, 1) /= '%' then
             Parse_Values (To_String (aLine), Values);
---              Printing.Print_Indefinite_List (Routine_Name & "Values", Values);
+            --              Printing.Print_Indefinite_List (Routine_Name & "Values", Values);
             Data.Data.Append (Decode_Dense_Values (Values, Attributes));
             --              Put_Line (Routine_Name & "Decoded_Values length:" &
             --                          Integer'Image (Integer (Data.Data.Length)));
@@ -545,7 +552,7 @@ package body Load_ARFF_Data is
    --  -------------------------------------------------------------------------
 
    function Split_Sparse_Line (Row : String)
-                                          return ML_Types.Indef_String_List is
+                            return ML_Types.Indef_String_List is
       use GNAT.Regpat;
       use Regexep;
       use Matches_Package;

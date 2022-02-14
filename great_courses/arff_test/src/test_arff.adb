@@ -18,6 +18,6 @@ begin
 --     Print_Description (Data);
 --     Put_Line ("Relation: " & Get_Relation (Data));
 --     Print_Attributes (Data);
-   Print_Data (Data);
+--     Print_Data (Data);
 
 end Test_ARFF;

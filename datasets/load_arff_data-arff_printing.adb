@@ -48,25 +48,29 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Data (Data : ARFF_Record) is
+   procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
+                         Last : Positive := 10) is
       use ARFF_Data_List_Package;
       Data_List_2D : constant ARFF_Data_List_2D := Data.Data;
       List_Curs    : ARFF_Data_List_Package.Cursor := Data_List_2D.First;
       Data_List    : ARFF_Data_List;
       Data_Curs    : ARFF_Data_Package.Cursor;
+      Count        : Natural := 0;
    begin
       New_Line;
       Put_Line ("Dataset data:");
       Put_Line ("Data length:" & Integer'Image (Integer (Data_List_2D.Length)));
       while Has_Element (List_Curs) loop
+         Count := Count + 1;
          Data_List := Element (List_Curs);
 
-         Data_Curs := Data_List.First;
-         while Has_Element (Data_Curs) loop
-            declare
-               Data_Record : constant ARFF_Data_Record := Element (Data_Curs);
-            begin
-               case Data_Record.Data_Kind is
+         if Count >= Start and then Count <= Last then
+            Data_Curs := Data_List.First;
+            while Has_Element (Data_Curs) loop
+               declare
+                  Data_Record : constant ARFF_Data_Record := Element (Data_Curs);
+               begin
+                  case Data_Record.Data_Kind is
                   when ML_Types.Boolean_Type =>
                      Put_Line (Boolean'Image (Data_Record.Boolean_Data));
                   when ML_Types.Float_Type =>
@@ -75,12 +79,13 @@ package body Load_ARFF_Data.ARFF_Printing is
                      Put_Line (Integer'Image (Data_Record.Integer_Data));
                   when ML_Types.UB_String_Type =>
                      Put_Line (Data_Record.UB_String_Data);
-               end case;
-            end;
-            Next (Data_Curs);
-         end loop;
+                  end case;
+               end;
+               Next (Data_Curs);
+            end loop;
+            New_Line;
+         end if;
          Next (List_Curs);
-         New_Line;
       end loop;
 
    end Print_Data;

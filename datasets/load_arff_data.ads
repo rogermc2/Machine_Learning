@@ -9,6 +9,8 @@ package Load_ARFF_Data is
 
    type ARFF_Record is private;
    type ARFF_Data_Type is (ARFF_Numeric, ARFF_Nominal, ARFF_String, ARFF_Date);
+   type Nominal_Data_Type is (Nominal_Integer, Nominal_Numeric, Nominal_Real,
+                              Nominal_String);
 
    function Get_Relation (Data : ARFF_Record) return String;
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
