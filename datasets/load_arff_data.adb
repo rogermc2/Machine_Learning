@@ -100,7 +100,6 @@ package body Load_ARFF_Data is
       Routine_Name   : constant String := "Load_ARFF_Data.Decode_Dense_Values ";
       Attr_Cursor    : Attribute_Data_Package.Cursor;
       Values_Cursor  : Indefinite_String_Package.Cursor;
-      Nominal_Cursor : Indefinite_String_Package.Cursor;
       ARFF_Data_Kind : ARFF_Data_Type;
       Attribute      : Attribute_Record;
       Decoded_Values : ARFF_Data_List;
@@ -118,15 +117,11 @@ package body Load_ARFF_Data is
       while Has_Element (Attr_Cursor) loop
          Attribute := Element (Attr_Cursor);
          ARFF_Data_Kind := Attribute.Data_Kind;
-         --                Put_Line (Routine_Name & "Attribute.Name: '" &
-         --                    To_String (Attribute.Name) & "'");
          declare
-            --              Name           : constant String := To_String (Attribute.Name);
             Value_String   : constant String := Element (Values_Cursor);
             UC_Value       : constant String :=
                                Dataset_Utilities.To_Upper_Case (Value_String);
          begin
-            --                Put_Line (Routine_Name & "Value_String: " & Value_String);
             case ARFF_Data_Kind is
                when ARFF_Date =>
                   declare
@@ -155,6 +150,7 @@ package body Load_ARFF_Data is
 
                when ARFF_Nominal =>
                   declare
+                     Nominal_Cursor : Indefinite_String_Package.Cursor;
                      Nominal_Type : Nominal_Data_Type;
                      Value        : ARFF_Data_Record (UB_String_Type);
                   begin
@@ -164,6 +160,8 @@ package body Load_ARFF_Data is
                            Nominal_String : constant String
                              := Element (Nominal_Cursor);
                         begin
+                           Put_Line (Routine_Name & "Nominal_String: " &
+                                     Nominal_String);
                            Found := UC_Value =
                              Dataset_Utilities.To_Upper_Case (Nominal_String);
                            Assert (Found, Routine_Name & UC_Value &
@@ -173,6 +171,8 @@ package body Load_ARFF_Data is
                         end;
                         Next (Nominal_Cursor);
                      end loop;
+
+--                       Nominal_Type := get
 
                      case Nominal_Type is
                        when Nominal_Integer => null;
