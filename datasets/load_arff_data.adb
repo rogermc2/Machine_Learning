@@ -478,7 +478,7 @@ package body Load_ARFF_Data is
          if aLine /= "" then
             Is_Info := Slice (aLine, 1, 1) = "%";
             if Is_Info then
-               Header.Info.Append (Slice (aLine, 2, Length (aLine)) & ASCII.LF);
+               Header.Info.Append (Slice (aLine, 2, Length (aLine)));
             end if;
          end if;
       end loop;
