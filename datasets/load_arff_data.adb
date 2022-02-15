@@ -12,7 +12,6 @@ with GNAT.Regpat;
 with Utilities;
 
 with Dataset_Utilities;
---  with Printing;
 with Regexep;
 
 package body Load_ARFF_Data is
@@ -86,7 +85,6 @@ package body Load_ARFF_Data is
       declare
          Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
       begin
-         --           Put_Line ("ARFF.Build_Re_Sparse Regex compiled");
          return Result;
       end;
 
@@ -168,8 +166,6 @@ package body Load_ARFF_Data is
          Next (Attr_Cursor);
          Next (Values_Cursor);
       end loop;
-      --        Put_Line (Routine_Name & "Decoded_Values length:" &
-      --                    Integer'Image (Integer (Decoded_Values.Length)));
 
       return Decoded_Values;
 
@@ -367,8 +363,6 @@ package body Load_ARFF_Data is
             Attribute.Name := To_Unbounded_String
               (Slice (Attribute.Name, 1, Length (Attribute.Name) - 1));
          end if;
-         --           Put_Line (Routine_Name & "Attribute.Name: '" &
-         --                       To_String (Attribute.Name) & "'");
 
          Pos_1 := Pos_2;
          while Element (aLine, Pos_1) = ' ' or else
@@ -378,7 +372,6 @@ package body Load_ARFF_Data is
 
          Data_Kind := Trim (To_Unbounded_String
                             (Slice (aLine, Pos_1, Length (aLine))), Right);
-         --           Put_Line (Routine_Name & "Data_Kind: " & To_String (Data_Kind));
          if Data_Kind = To_Unbounded_String ("INTEGER") or
            Data_Kind = To_Unbounded_String ("REAL")
          then
@@ -389,8 +382,6 @@ package body Load_ARFF_Data is
             Attribute.Data_Kind := ARFF_String;
          elsif Slice (Data_Kind, 1, 1) = "{" then
             Attribute.Data_Kind := ARFF_Nominal;
-            --              Put_Line (Routine_Name & "Data_Kind: " &
-            --                          ARFF_Data_Type'Image (Attribute.Data_Kind));
             Pos_1 := Pos_2;
             while Element (aLine, Pos_1) = ' ' or else
               Element (aLine, Pos_1) = ASCII.HT loop
@@ -406,8 +397,7 @@ package body Load_ARFF_Data is
                   Pos_2 := Fixed.Index
                     (Slice (aLine, Pos_1, Length (aLine)), "}");
                end if;
-               --              Put_Line (Routine_Name & "Nominal_Name: " &
-               --                          Slice (aLine, Pos_1, Pos_2 - 1));
+
                Attribute.Nominal_Names.Append
                  (Slice (aLine, Pos_1, Pos_2 - 1));
                Pos_1 := Pos_2 + 1;
@@ -433,8 +423,6 @@ package body Load_ARFF_Data is
       Attributes   : constant Attribute_List := Data.Header.Attributes;
       Values       : ML_Types.Indef_String_List;
    begin
-      --          Put_Line (Routine_Name & "Attributes length:" &
-      --                      Integer'Image (Integer (Attributes.Length)));
       while Length (aLine) = 0 or else Slice (aLine, 1, 1) /= "@" loop
          aLine := Get_Line (File_ID);
       end loop;
@@ -446,10 +434,7 @@ package body Load_ARFF_Data is
          aLine := Get_Line (File_ID);
          if Length (aLine) > 0 and then Element (aLine, 1) /= '%' then
             Parse_Values (To_String (aLine), Values);
-            --              Printing.Print_Indefinite_List (Routine_Name & "Values", Values);
             Data.Data.Append (Decode_Dense_Values (Values, Attributes));
-            --              Put_Line (Routine_Name & "Decoded_Values length:" &
-            --                          Integer'Image (Integer (Data.Data.Length)));
          end if;
       end loop;
 
@@ -519,16 +504,10 @@ package body Load_ARFF_Data is
                                 Match_Found);
          pragma Unreferenced (Matches);
          if Match_Found then
-            --              Put_Line (Routine_Name & "trivial");
-            --              Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Dataset_Utilities.Get_CSV_Data (Row);
-            --              Put_Line (Routine_Name & "trivial Values length:" &
-            --                          Integer'Image (Integer (Length (Values))));
-
          else
-            --              Put_Line (Routine_Name & "nontrivial");
             --  Row contains Non_Trivial characters
             --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
             --  despite quoting, whitespace, etc.
