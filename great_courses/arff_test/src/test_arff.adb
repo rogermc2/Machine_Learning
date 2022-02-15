@@ -15,7 +15,6 @@ procedure Test_ARFF is
 begin
    Put_Line (Routine_Name);
    Load_ARFF (File_Name, Data);
-   Save_ARFF ("iris.ada", Data);
    Put_Line (Routine_Name & "Data loaded");
    New_Line;
    Print_Description (Data);
@@ -23,5 +22,6 @@ begin
    Print_Attributes (Data);
    Print_Data (Data);
 --     Print_Data (Data, 40, 100);
+   Save_ARFF ("iris.ada", Data);
 
 end Test_ARFF;
