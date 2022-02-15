@@ -11,7 +11,7 @@ with AWS.Client;
 with AWS.Response;
 with AWS.URL;
 
-with ARFF;
+with ARFF_Json;
 
 --  pragma Warnings (Off);
 
@@ -86,8 +86,8 @@ package body Openml is
     function Get_Json_Content_From_Openml_Api (URL : String) return JSON_Value;
     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
     function Load_Arff_From_File
-      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
-      return JSON_Value;
+      (File_Name : String; Return_Type : ARFF_Json.ARFF_Return_Type)
+       return JSON_Value;
     procedure Load_Arff_Response (URL : String);
     function Open_Openml_URL (Openml_Path : String) return AWS.Response.Data;
     function Parse_Nominal_Data (Arff_Data       : JSON_Value;
@@ -97,8 +97,8 @@ package body Openml is
     procedure Set_Default_Target (Features_List  : JSON_Array;
                                   Target_Columns : out JSON_Array);
     function Split_Sparse_Columns
-      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
-       Include_Columns : JSON_Array) return ARFF.Arff_Sparse_Data_Type;
+      (Arff_Data       : ARFF_Json.Arff_Sparse_Data_Type;
+       Include_Columns : JSON_Array) return ARFF_Json.Arff_Sparse_Data_Type;
     procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
                                        Target_Columns : JSON_Array);
 
@@ -151,7 +151,7 @@ package body Openml is
                                      Target_Columns   : JSON_Array;
                                      Return_X_Y       : Boolean := False)
       --                                       Shape            : Shape_Data)
-                                    return Bunch_Data is
+                                     return Bunch_Data is
         Routine_Name       : constant String := "Openml.Download_Data_To_Bunch ";
         Feature_Index      : Positive := Array_First (Features_List);
         Col_Name           : Positive := Array_First (Features_List);
@@ -162,7 +162,7 @@ package body Openml is
         Col_Slice_X        : JSON_Array;
         Col_Slice_Y        : JSON_Array;
         Num_Missing        : Integer;
-        Return_Type        : ARFF.ARFF_Return_Type;
+        Return_Type        : ARFF_Json.ARFF_Return_Type;
         All_Columns        : JSON_Array;
         ARFF_Data          : JSON_Value := Create_Object;
         X                  : JSON_Array;
@@ -265,9 +265,9 @@ package body Openml is
 
         --  L582
         if Sparse then
-            Return_Type := ARFF.Arff_Coo;
+            Return_Type := ARFF_Json.Arff_Coo;
         else
-            Return_Type := ARFF.Arff_Dense;
+            Return_Type := ARFF_Json.Arff_Dense;
         end if;
 
         --  L652
@@ -325,7 +325,7 @@ package body Openml is
                            Target_Column      : ML_Types.String_List;
                            Return_X_Y         : Boolean := False;
                            As_Frame           : in out Unbounded_String)
-                          return Bunch_Data is
+                           return Bunch_Data is
         use Ada.Strings;
         use Dataset_Utilities;
         use ML_Types.String_Package;
@@ -412,9 +412,9 @@ package body Openml is
         else
             Curs := Target_Column.First;
             while Has_Element (Curs) loop
-            Target_Value := Element (Curs);
-            Target_Value := To_Unbounded_String
-              (Slice (Target_Value, 2, Length (Target_Value)));
+                Target_Value := Element (Curs);
+                Target_Value := To_Unbounded_String
+                  (Slice (Target_Value, 2, Length (Target_Value)));
                 Trim (Target_Value, Both);
                 Set_Field (Target, "target", To_String (Target_Value));
                 Append (Target_Columns, Target);
@@ -506,7 +506,7 @@ package body Openml is
 
     function Get_Data_Features (Data_ID   : Integer;
                                 Use_Files : Boolean := True)
-                               return JSON_Array is
+                                return JSON_Array is
         use Ada.Strings;
         Routine_Name  : constant String := "Openml.Get_Data_Features ";
         Json_Data     : JSON_Value := Create_Object;
@@ -553,7 +553,7 @@ package body Openml is
                                     Active       : Boolean := False;
                                     Use_Files    : Boolean := True)
       --                                     File_Name         : String := "")
-                                   return JSON_Value is
+                                    return JSON_Value is
     --        Routine_Name   : constant String := "Openml.Get_Data_Info_By_Name ";
         Openml_Path    : Unbounded_String;
         Json_Data      : JSON_Value;
@@ -586,7 +586,7 @@ package body Openml is
 
     function Get_Data_Qualities (Data_ID : Integer; Use_Files : Boolean := True)
       --                                     File_Name : String := "")
-                                return Qualities_Map is
+                                 return Qualities_Map is
         use Ada.Strings;
         Routine_Name  : constant String := "Openml.Get_Data_Qualities ";
         Json_Data     : JSON_Value;
@@ -655,7 +655,7 @@ package body Openml is
     --  ------------------------------------------------------------------------
 
     function Get_Json_Content_From_Openml_Api (URL : String)
-                                              return JSON_Value is
+                                               return JSON_Value is
         Routine_Name      : constant String :=
                               "Openml.Get_Json_Content_From_Openml_Api ";
         AWS_Reply         : constant Aws.Response.Data := Open_Openml_URL (URL);
@@ -723,8 +723,8 @@ package body Openml is
     --  ------------------------------------------------------------------------
 
     function Load_Arff_From_File
-      (File_Name : String; Return_Type : ARFF.ARFF_Return_Type)
-      return JSON_Value is
+      (File_Name : String; Return_Type : ARFF_Json.ARFF_Return_Type)
+       return JSON_Value is
         File_ID  : File_Type;
         Data     : ML_Types.String_List;
         Count    : Natural := 0;
@@ -747,7 +747,7 @@ package body Openml is
         Put_Line ("Openml.Load_Arff_From_File:" & Integer'Image (Count) &
                     " lines loaded");
 
-        return ARFF.Load (Data, Return_Type);
+        return ARFF_Json.Load (Data, Return_Type);
 
     end Load_Arff_From_File;
 
@@ -805,7 +805,7 @@ package body Openml is
 
     function Parse_Nominal_Data (Arff_Data       : JSON_Value;
                                  Include_Columns : JSON_Array)
-                                return JSON_Array is
+                                 return JSON_Array is
     --        Routine_Name : constant String := "Openml.Parse_Nominal_Data ";
         Attributes   : constant JSON_Array := Get (Arff_Data, "attributes");
         Index_V      : Positive;
@@ -930,10 +930,10 @@ package body Openml is
     --  - > ArffSparseDataType
     --  Arff_Sparse_Data_Type is a subtype of JSON_Array
     function Split_Sparse_Columns
-      (Arff_Data       : ARFF.Arff_Sparse_Data_Type;
+      (Arff_Data       : ARFF_Json.Arff_Sparse_Data_Type;
        Include_Columns : JSON_Array)
-      return ARFF.Arff_Sparse_Data_Type is
-        use ARFF;
+       return ARFF_Json.Arff_Sparse_Data_Type is
+        use ARFF_Json;
         Routine_Name       : constant String := "Openml.Split_Sparse_Columns ";
         Data_Length        : constant Natural := Length (Arff_Data);
         --        Include_Length     : constant Natural :=
@@ -947,8 +947,8 @@ package body Openml is
         Col                : Positive;
         Include_Col        : Positive;
         Select_Col         : Boolean;
-   begin
-      Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
+    begin
+        Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
         for sample in 1 .. Data_Length loop
             Clear (New_Row);
             Arff_Data_Row := Array_Element (Arff_Data, sample);
@@ -973,7 +973,7 @@ package body Openml is
                 end if;
                 Col := Array_Next (Include_Columns, Col);
             end loop;
---              Put_Line (Routine_Name & "end outer while:");
+            --              Put_Line (Routine_Name & "end outer while:");
 
             declare
                 New_Data_Row : constant JSON_Value := Create_Object;
@@ -990,7 +990,7 @@ package body Openml is
     --  ------------------------------------------------------------------------
 
     function J_Array_To_String_List (J_Array : JSON_Array)
-                                    return ML_Types.String_List is
+                                     return ML_Types.String_List is
         use ML_Types;
         --        Routine_Name  : constant String := "Openml.J_Array_To_String_List ";
         theList       : String_List;

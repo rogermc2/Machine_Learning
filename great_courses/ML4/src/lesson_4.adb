@@ -52,12 +52,10 @@ procedure Lesson_4 is
 --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
    Put_Line (Routine_Name);
-   XY := Openml.Fetch_Openml
-     (Dataset_Name  => "mnist_784", Version  => "",
-      File_Name => "../mnist_784",
-      Features_File_Name => "../dataset_554_features", Data_Id  => Data_Id,
-      Target_Column => "default-target", Return_X_Y  => True,
-      As_Frame => As_Frame);
+   XY := Openml.Fetch_Openml (Dataset_Name => "mnist_784", Version => "",
+                              Use_Files    => True, Data_Id => Data_Id,
+                              Target_Column => Empty_List, Return_X_Y => True,
+                              As_Frame  => As_Frame);
 
    Put_Line (Routine_Name & "X length" & Integer'Image (Length (XY.Data)));
    Put_Line (Routine_Name & "Y length" & Integer'Image (Length (XY.Target)));

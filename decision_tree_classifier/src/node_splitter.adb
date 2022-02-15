@@ -45,7 +45,7 @@ package body Node_Splitter is
                         Num_Total_Constants : in out Natural;
                         Num_Found_Constants : in out Natural;
                         F_I, F_J            : Natural)
-                       return Boolean is
+                        return Boolean is
         use ML_Types;
         Routine_Name : constant String := "Node_Splitter.Can_Split ";
         X_F_Start    : constant Value_Record
@@ -213,7 +213,7 @@ package body Node_Splitter is
                                   F_Values.Element (F_Index).Float_Value or
                                   Current.Threshold = Float'Last or
                                   Current.Threshold = (-Float'Last)
-                                  then
+                                then
                                     case F_Values.Element
                                       (F_Index - 1).Value_Kind is
                                     when Float_Type =>
@@ -226,7 +226,7 @@ package body Node_Splitter is
                                     when Boolean_Type =>
                                         if F_Values.Element
                                           (F_Index - 1).Boolean_Value
-                                          then
+                                        then
                                             Current.Threshold := 1.0;
                                         else
                                             Current.Threshold := 0.0;
@@ -244,7 +244,7 @@ package body Node_Splitter is
                                          (F_Index).Integer_Value) or
                                   Current.Threshold = Float'Last or
                                   Current.Threshold = (-Float'Last)
-                                  then
+                                then
                                     Current.Threshold :=
                                       Float (F_Values.Element
                                              (F_Index - 1).Integer_Value);
@@ -379,7 +379,7 @@ package body Node_Splitter is
             --  Only work with positively weighted samples.
             if Sample_Weight.Is_Empty or else
               Sample_Weight.Element (index_i) > 0.0
-              then
+            then
                 Self.Sample_Indices.Append (index_i);
             end if;
 
@@ -489,7 +489,7 @@ package body Node_Splitter is
         --  Feature_Indices (Num_Total_Constants)
         if Can_Split (Splitter, Num_Total_Constants, Num_Found_Constants,
                       F_I, F_J)
-                      then
+        then
             --  L375 Implement Fisher-Yates permutation by swapping F_J feature
             --  with preceding F_I feature
             F_I := F_I - 1;
@@ -609,7 +609,7 @@ package body Node_Splitter is
     function Split_Node (Self                  : in out Splitter_Class;
                          Impurity              : Float;
                          Num_Constant_Features : in out Natural)
-                        return Split_Record is
+                         return Split_Record is
         Routine_Name         : constant String := "Node_Splitter.Split_Node ";
         Num_Known_Constants  : constant Natural := Num_Constant_Features;
         Num_Total_Constants  : Natural := Num_Known_Constants;

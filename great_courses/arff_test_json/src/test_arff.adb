@@ -6,7 +6,7 @@ with Ada.Text_IO.Unbounded_IO;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
-with ARFF;
+with ARFF_Json;
 
 procedure Test_ARFF is
    Routine_Name : constant String := "Test_ARFF ";
@@ -106,7 +106,7 @@ begin
    end loop;
    Close (File);
 
-   Result := ARFF.Load (To_String (Data), ARFF.Arff_Dense);
+   Result := ARFF_Json.Load (To_String (Data), ARFF_Json.Arff_Dense);
    New_Line;
    Put_Line (Routine_Name & "Result Outer_Field:");
    Map_JSON_Object (Result, Print_Outer_Field'Access);

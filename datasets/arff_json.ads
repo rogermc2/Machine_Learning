@@ -3,7 +3,7 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 with ML_Types;
 
-package ARFF is
+package ARFF_Json is
 
    subtype Arff_Container_Type is JSON_Value;
    subtype Arff_Sparse_Data_Type is JSON_Array;
@@ -20,4 +20,4 @@ package ARFF is
      (File_Data : ML_Types.String_List; Return_Type : ARFF_Return_Type := Arff_Dense)
       return JSON_Value;
 
-end ARFF;
+end ARFF_Json;

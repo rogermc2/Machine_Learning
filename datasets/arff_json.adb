@@ -20,7 +20,7 @@ with Regexep;
 
 --  pragma Warnings (Off);
 
-package body ARFF is
+package body ARFF_Json is
 
    type TK_State is (TK_Descrition, TK_Relation, TK_Attribute, TK_Data);
    --                       TK_Comment);
@@ -163,7 +163,7 @@ package body ARFF is
                          Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
       use ML_Types.String_Package;
-      Routine_Name    : constant String := "ARFF.Decode_ARFF ";
+      Routine_Name    : constant String := "ARFF_Json.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
       --        Text_Length     : constant Integer := Text'Length;
       --        Text_Length     : constant Positive := Positive (Length (Text));
@@ -295,7 +295,7 @@ package body ARFF is
       use Ada.Strings;
       --        use Ada.Strings.Maps;
       use Conversor_Item_Package;
-      Routine_Name   : constant String := "ARFF.Decode_Attribute ";
+      Routine_Name   : constant String := "ARFF_Json.Decode_Attribute ";
       Regex          : constant String :=
                          "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
       --        Trim_Seq     : constant Character_Sequence := "{} ";
@@ -392,7 +392,7 @@ package body ARFF is
    procedure Decode_Comment (UC_Row         : String;
                              Arff_Container : in out JSON_Value) is
       use GNAT.Regpat;
-      --        Routine_Name : constant String := "ARFF.Decode_Comment ";
+      --        Routine_Name : constant String := "ARFF_Json.Decode_Comment ";
       Regex        : constant String := "^%(.*)";
       Matcher      : constant Pattern_Matcher := Compile (Regex);
       Matches      : Match_Array (0 .. Paren_Count (Matcher));
@@ -417,7 +417,7 @@ package body ARFF is
                               Arff_Container : in out JSON_Value) is
       use Ada.Strings;
       use GNAT.Regpat;
-      Routine_Name : constant String := "ARFF.Decode_Relation ";
+      Routine_Name : constant String := "ARFF_Json.Decode_Relation ";
       Regex        : constant String := "^([^\{\}%,\s]*|"".*""|'.*')$";
       Pos          : Integer := Fixed.Index (UC_Row, " ");
       Slice_2      : constant String :=
@@ -501,7 +501,7 @@ package body ARFF is
       use Ada.Calendar;
       use Ada.Strings;
       use String_Package;
-      Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
+      Routine_Name      : constant String := "ARFF_Json.Decode_Dense_Rows ";
       File_Name         : constant String := "./dense_data.json";
       Converser_Length  : constant Positive :=
                             Positive (Decoder.Conversers.Length);
@@ -606,7 +606,7 @@ package body ARFF is
       use Ada.Strings;
       use Conversor_Item_Package;
       use Indefinite_String_Package;
-      Routine_Name   : constant String := "ARFF.Decode_Dense_Values ";
+      Routine_Name   : constant String := "ARFF_Json.Decode_Dense_Values ";
       Attr_Cursor    : Conversor_Item_Package.Cursor;
       Values_Cursor  : Indefinite_String_Package.Cursor;
       Nominal_Cursor : Indefinite_String_Package.Cursor;
@@ -696,7 +696,7 @@ package body ARFF is
       use Ada.Strings;
       use Regexep;
       use Escape_Sub_Map_Package;
-      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      Routine_Name : constant String := "ARFF_Json.Escape_Sub_Callback ";
       Match_Groups : constant Match_Strings_List := Get_Groups (Match);
       S            : constant Unbounded_String := Match_Groups.Element (0);
       S_Length     : constant Natural := Length (S);
@@ -729,7 +729,7 @@ package body ARFF is
    function Escape_Sub_Callback (S : String) return String is
       use Ada.Strings;
       use Escape_Sub_Map_Package;
-      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      Routine_Name : constant String := "ARFF_Json.Escape_Sub_Callback ";
       UB_S         : constant Unbounded_String := To_Unbounded_String (S);
       S_Length     : constant Natural := S'Length;
       Int_Value    : Integer;
@@ -789,7 +789,7 @@ package body ARFF is
       use Regexep;
       use Indefinite_String_Package;
       use String_Package;
-      Routine_Name        : constant String := "ARFF.Parse_Values ";
+      Routine_Name        : constant String := "ARFF_Json.Parse_Values ";
       Non_Trivial         : constant String := "[""\'{}\\s]";
       Non_Trivial_Matcher : constant Pattern_Matcher := Compile (Non_Trivial);
       First               : Positive;
@@ -950,4 +950,4 @@ begin
    Escape_Sub_Map.Include (To_Unbounded_String ("\\9"),
                            To_Unbounded_String ("\t"));
 
-end ARFF;
+end ARFF_Json;
