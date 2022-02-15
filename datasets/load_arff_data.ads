@@ -11,6 +11,9 @@ package Load_ARFF_Data is
    type ARFF_Data_Type is (ARFF_Numeric, ARFF_Nominal, ARFF_String, ARFF_Date);
    type Nominal_Data_Type is (Nominal_Integer, Nominal_Numeric, Nominal_Real,
                               Nominal_String);
+   package Nominal_Types_Package is new
+     Ada.Containers.Doubly_Linked_Lists (Nominal_Data_Type);
+   subtype Nominal_Types_List is Nominal_Types_Package.List;
 
    function Get_Relation (Data : ARFF_Record) return String;
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
@@ -23,6 +26,7 @@ private
       Name          : Unbounded_String;
       Data_Kind     : ARFF_Data_Type;
       Nominal_Names : ML_Types.Indef_String_List;
+      Nominal_Types : Nominal_Types_List;
    end record;
 
    package Attribute_Data_Package is new

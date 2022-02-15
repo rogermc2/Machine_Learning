@@ -36,7 +36,8 @@ package body Load_ARFF_Data is
    --                        GNAT.Regpat.Compile (Regex_CSV);
    --     Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
 
-   procedure Decode_Nominal (Attribute      : Attribute_Record; UC_Value : String;
+   procedure Decode_Nominal (Attribute      : in out Attribute_Record;
+                             UC_Value       : String;
                              Decoded_Values : in out ARFF_Data_List);
    procedure Load_Attributes (File_ID : File_Type;
                               aLine   : in out Unbounded_String;
@@ -176,23 +177,21 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
-   procedure Decode_Nominal (Attribute      : Attribute_Record; UC_Value : String;
+   procedure Decode_Nominal (Attribute      : in out Attribute_Record;
+                             UC_Value       : String;
                              Decoded_Values : in out ARFF_Data_List) is
       use ML_Types;
       use Indefinite_String_Package;
       Routine_Name   : constant String := "Load_ARFF_Data.Decode_Nominal ";
       Nominal_Cursor : Indefinite_String_Package.Cursor;
       ML_Type        : Data_Type;
-      --        Nominal_Type   : Nominal_Data_Type;
       Found          : Boolean := False;
    begin
-      Put_Line (Routine_Name);
       Nominal_Cursor := Attribute.Nominal_Names.First;
       while Has_Element (Nominal_Cursor) and not Found loop
          declare
             Nominal : constant String := Element (Nominal_Cursor);
          begin
-            Put_Line (Routine_Name & "Nominal: " & Nominal);
             Found := UC_Value =
               Dataset_Utilities.To_Upper_Case (Nominal);
             ML_Type := Utilities.Get_Data_Type (To_Unbounded_String (Nominal));
@@ -201,33 +200,32 @@ package body Load_ARFF_Data is
                   declare
                      Value : ARFF_Data_Record (UB_String_Type);
                   begin
-                     --                    Nominal_Type := Nominal_String;
                      Value.UB_String_Data := To_Unbounded_String (Nominal);
+                     Attribute.Nominal_Types.Append (Nominal_String);
                      Decoded_Values.Append (Value);
                   end;
                when Integer_Type =>
                   declare
                      Value : ARFF_Data_Record (Integer_Type);
                   begin
-                     --                    Nominal_Type := Nominal_Integer;
                      Value.Integer_Data := Integer'Value (Nominal);
+                     Attribute.Nominal_Types.Append (Nominal_Integer);
                      Decoded_Values.Append (Value);
                   end;
                when Float_Type =>
                   declare
                      Value : ARFF_Data_Record (Float_Type);
                   begin
-                     --                    Nominal_Type := Nominal_Real;
                      Value.Real_Data := Float'Value (Nominal);
+                     Attribute.Nominal_Types.Append (Nominal_Real);
                      Decoded_Values.Append (Value);
                   end;
             end case;
          end;
-         Assert (Found, Routine_Name &
-                  " no a nominal value found for " & UC_Value);
          Next (Nominal_Cursor);
       end loop;
-      Put_Line (Routine_Name & "done");
+
+      Assert (Found, Routine_Name & "no nominal value found for " & UC_Value);
 
    end Decode_Nominal;
 
