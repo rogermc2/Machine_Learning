@@ -125,6 +125,18 @@ package body Load_ARFF_Data is
                                Dataset_Utilities.To_Upper_Case (Value_String);
          begin
             case ARFF_Data_Kind is
+               when ARFF_Integer =>
+                  declare
+                     Value : ARFF_Data_Record (Integer_Type);
+                  begin
+                     if Fixed.Index (Value_String, ".") /= 0 then
+                        Value.Integer_Data := Integer (Float'Value (Value_String));
+                     else
+                        Value.Integer_Data := Integer'Value (Value_String);
+                     end if;
+                     Decoded_Values.Append (Value);
+                  end;
+
                when ARFF_Date =>
                   declare
                      Value : ARFF_Data_Record (UB_String_Type);
@@ -152,6 +164,18 @@ package body Load_ARFF_Data is
 
                when ARFF_Nominal =>
                   Decode_Nominal (Attribute, UC_Value, Decoded_Values);
+
+               when ARFF_Real =>
+                  declare
+                     Value : ARFF_Data_Record (Float_Type);
+                  begin
+                     if Fixed.Index (Value_String, ".") = 0 then
+                        Value.Real_Data := Float (Integer'Value (Value_String));
+                     else
+                        Value.Real_Data := Float'Value (Value_String);
+                     end if;
+                     Decoded_Values.Append (Value);
+                  end;
 
                when ARFF_String =>
                   declare
@@ -371,10 +395,10 @@ package body Load_ARFF_Data is
 
          Data_Kind := Trim (To_Unbounded_String
                             (Slice (aLine, Pos_1, Length (aLine))), Right);
-         if Data_Kind = To_Unbounded_String ("INTEGER") or
-           Data_Kind = To_Unbounded_String ("REAL")
-         then
-            Attribute.Data_Kind := ARFF_Numeric;
+         if Data_Kind = To_Unbounded_String ("REAL") then
+            Attribute.Data_Kind := ARFF_Real;
+         elsif Data_Kind = To_Unbounded_String ("INTEGER") then
+            Attribute.Data_Kind := ARFF_Integer;
          elsif Data_Kind = To_Unbounded_String ("DATE") then
             Attribute.Data_Kind := ARFF_Date;
          elsif Data_Kind = To_Unbounded_String ("STRING") then

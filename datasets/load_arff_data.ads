@@ -8,7 +8,8 @@ with ML_Types;
 package Load_ARFF_Data is
 
    type ARFF_Record is private;
-   type ARFF_Data_Type is (ARFF_Numeric, ARFF_Nominal, ARFF_String, ARFF_Date);
+   type ARFF_Data_Type is (ARFF_Date, ARFF_Integer, ARFF_Numeric, ARFF_Nominal,
+                           ARFF_Real, ARFF_String);
    type Nominal_Data_Type is (Nominal_Integer, Nominal_Numeric, Nominal_Real,
                               Nominal_String);
    package Nominal_Types_Package is new

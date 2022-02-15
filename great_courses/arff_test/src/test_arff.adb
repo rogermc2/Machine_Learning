@@ -8,7 +8,7 @@ procedure Test_ARFF is
    use Load_ARFF_Data;
    use Load_ARFF_Data.ARFF_Printing;
    Routine_Name : constant String := "Test_ARFF ";
-   File_Name    : constant String := "iris.arff";
+   File_Name    : constant String := "../diabetes.arff";
    Data         : ARFF_Record;
 begin
    Put_Line (Routine_Name);
@@ -18,6 +18,7 @@ begin
    Print_Description (Data);
    Put_Line ("Relation: " & Get_Relation (Data));
    Print_Attributes (Data);
-   Print_Data (Data, 40, 100);
+   Print_Data (Data);
+--     Print_Data (Data, 40, 100);
 
 end Test_ARFF;
