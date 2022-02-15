@@ -102,7 +102,11 @@ package body Load_ARFF_Data.ARFF_Printing is
       New_Line;
       Put_Line ("Dataset description:");
       while Has_Element (Curs) loop
-         Put_Line (Element (Curs));
+         declare
+            Text : constant String := Element (Curs);
+         begin
+            Put_Line (Text (Text'First .. Text'Last - 1));
+         end;
          Next (Curs);
       end loop;
 
