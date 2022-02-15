@@ -3,6 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Maps;
 with Ada.Integer_Text_IO;
 with Ada.IO_Exceptions;
+with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Unbounded_IO;
@@ -571,6 +572,33 @@ package body Load_ARFF_Data is
       end if;
 
    end Parse_Values;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Save_ARFF (File_Name : String; Data : ARFF_Record) is
+
+      use Ada.Streams.Stream_IO;
+      use ML_Types;
+      use Indefinite_String_Package;
+      Routine_Name : constant String := "Load_ARFF_Data.Save_ARFF ";
+      File_ID      : Ada.Streams.Stream_IO.File_Type;
+      Data_Stream  : Stream_Access;
+      Curs         : Indefinite_String_Package.Cursor := Data.Header.Info.First;
+   begin
+      Create (File_ID, Out_File, File_Name);
+      Data_Stream := Stream (File_ID);
+
+      while Has_Element (Curs) loop
+            String'Write (Data_Stream, Element (Curs));
+            Next (Curs);
+      end loop;
+
+      Close (File_ID);
+      pragma Unreferenced (File_ID);
+
+      Put_Line (Routine_Name & File_Name & " written");
+
+   end Save_ARFF;
 
    --  -------------------------------------------------------------------------
 
