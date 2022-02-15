@@ -333,8 +333,8 @@ package body Load_ARFF_Data is
       Put_Line (Routine_Name & " Header loaded");
       New_Line;
       --  L873 obj['data'] = data.decode_rows
-      Load_Data (File_ID, aLine, Data);
-      Put_Line (Routine_Name & " data loaded");
+--        Load_Data (File_ID, aLine, Data);
+--        Put_Line (Routine_Name & " data loaded");
       Close (File_ID);
       pragma Unreferenced (File_ID);
       pragma Unreferenced (aLine);
@@ -365,7 +365,6 @@ package body Load_ARFF_Data is
       Attribute    : Attribute_Record;
    begin
       H_Tab (1) := ASCII.HT;
-
       while Length (aLine) = 0 or else Slice (aLine, 1, 1) /= "@" loop
          aLine := Get_Line (File_ID);
       end loop;
@@ -395,6 +394,7 @@ package body Load_ARFF_Data is
 
          Data_Kind := Trim (To_Unbounded_String
                             (Slice (aLine, Pos_1, Length (aLine))), Right);
+         Data_Kind := Dataset_Utilities.To_Upper_Case (Data_Kind);
          if Data_Kind = To_Unbounded_String ("REAL") then
             Attribute.Data_Kind := ARFF_Real;
          elsif Data_Kind = To_Unbounded_String ("INTEGER") then
