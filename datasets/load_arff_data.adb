@@ -35,7 +35,7 @@ package body Load_ARFF_Data is
    --                        GNAT.Regpat.Compile (Regex_CSV);
    --     Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
 
-   procedure Decode_Nominal (Attribute      : in out Attribute_Record;
+   procedure Decode_Nominal (Attribute      : Attribute_Record;
                              UC_Value       : String;
                              Decoded_Values : in out ARFF_Data_List);
    procedure Load_Attributes (File_ID : File_Type;
@@ -173,7 +173,7 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
-   procedure Decode_Nominal (Attribute      : in out Attribute_Record;
+   procedure Decode_Nominal (Attribute      : Attribute_Record;
                              UC_Value       : String;
                              Decoded_Values : in out ARFF_Data_List) is
       use ML_Types;
@@ -190,14 +190,14 @@ package body Load_ARFF_Data is
          begin
             Found := UC_Value =
               Dataset_Utilities.To_Upper_Case (Nominal);
-            ML_Type := Utilities.Get_Data_Type (To_Unbounded_String (Nominal));
-            case ML_Type is
+            if Found then
+               ML_Type := Utilities.Get_Data_Type (To_Unbounded_String (Nominal));
+               case ML_Type is
                when Boolean_Type | UB_String_Type =>
                   declare
                      Value : ARFF_Data_Record (UB_String_Type);
                   begin
                      Value.UB_String_Data := To_Unbounded_String (Nominal);
-                     Attribute.Nominal_Types.Append (Nominal_String);
                      Decoded_Values.Append (Value);
                   end;
                when Integer_Type =>
@@ -205,7 +205,6 @@ package body Load_ARFF_Data is
                      Value : ARFF_Data_Record (Integer_Type);
                   begin
                      Value.Integer_Data := Integer'Value (Nominal);
-                     Attribute.Nominal_Types.Append (Nominal_Integer);
                      Decoded_Values.Append (Value);
                   end;
                when Float_Type =>
@@ -213,10 +212,10 @@ package body Load_ARFF_Data is
                      Value : ARFF_Data_Record (Float_Type);
                   begin
                      Value.Real_Data := Float'Value (Nominal);
-                     Attribute.Nominal_Types.Append (Nominal_Real);
                      Decoded_Values.Append (Value);
                   end;
-            end case;
+               end case;
+            end if;
          end;
          Next (Nominal_Cursor);
       end loop;
