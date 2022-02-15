@@ -30,7 +30,7 @@ package body Load_ARFF_Data.ARFF_Printing is
       Curs       : Attribute_Data_Package.Cursor := Attributes.First;
    begin
       New_Line;
-      Put_Line (Header.Relation & " dataset attributes:");
+      Put_Line ("Dataset attributes:");
       while Has_Element (Curs) loop
          Attribute := Element (Curs);
          Put (Trim (Attribute.Name, Both) & " ");

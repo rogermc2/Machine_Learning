@@ -333,8 +333,8 @@ package body Load_ARFF_Data is
       Put_Line (Routine_Name & " Header loaded");
       New_Line;
       --  L873 obj['data'] = data.decode_rows
---        Load_Data (File_ID, aLine, Data);
---        Put_Line (Routine_Name & " data loaded");
+      Load_Data (File_ID, aLine, Data);
+      Put_Line (Routine_Name & " data loaded");
       Close (File_ID);
       pragma Unreferenced (File_ID);
       pragma Unreferenced (aLine);
@@ -446,6 +446,7 @@ package body Load_ARFF_Data is
       Attributes   : constant Attribute_List := Data.Header.Attributes;
       Values       : ML_Types.Indef_String_List;
    begin
+      Put_Line (Routine_Name & "loading data");
       while Length (aLine) = 0 or else Slice (aLine, 1, 1) /= "@" loop
          aLine := Get_Line (File_ID);
       end loop;

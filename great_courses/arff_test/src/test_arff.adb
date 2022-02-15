@@ -17,7 +17,6 @@ begin
    New_Line;
    Print_Description (Data);
    Put_Line ("Relation: " & Get_Relation (Data));
-   Put_Line ("Attributes: ");
    Print_Attributes (Data);
    Print_Data (Data);
 --     Print_Data (Data, 40, 100);
