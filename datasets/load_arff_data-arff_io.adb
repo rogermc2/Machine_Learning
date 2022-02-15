@@ -14,13 +14,7 @@ package body Load_ARFF_Data.ARFF_IO is
    begin
       Create (File_ID, Out_File, File_Name);
       Data_Stream := Stream (File_ID);
-      ARFF_Header'Write (Data_Stream, Data.Header.Info);
-      String'Write (Data_Stream,"@Relation");
-      String'Write (Data_Stream,To_String (Data.Header.Relation));
-      String'Write (Data_Stream,"@Attributes");
-      Attribute_List'Write (Data_Stream, Data.Header.Attributes);
-      String'Write (Data_Stream,"@Data");
-      ARFF_Data_List_2D'Write (Data_Stream, Data.Data);
+      ARFF_Record'Write (Data_Stream, Data);
       Close (File_ID);
       pragma Unreferenced (File_ID);
 
