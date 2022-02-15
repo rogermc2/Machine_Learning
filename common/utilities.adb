@@ -3,7 +3,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
 with Ada.Containers;
 with Ada.Strings.Fixed;
-with Ada.Text_IO;
 
 with Maths;
 
@@ -73,7 +72,6 @@ package body Utilities is
    function Get_Column (List_2D      : ML_Types.Value_Data_Lists_2D;
                         Column_Index : Positive)
                         return ML_Types.Value_Data_List is
-      use ML_Types;
       aList  : Value_Data_List;
       Column : Value_Data_List;
       Data   : Value_Record;
@@ -226,8 +224,6 @@ package body Utilities is
 
    procedure Load_CSV_Data (Data_File : File_Type;
                             Data      : out ML_Types.Rows_Vector) is
-      use Ada.Strings.Unbounded;
-      use ML_Types;
       use ML_Types.String_Package;
       --          Routine_Name : constant String := "Utilities.Load_CSV_Data 1 ";
       Data_Line    : Unbounded_String :=
@@ -277,8 +273,6 @@ package body Utilities is
    function Load_CSV_Data
      (Data_File : File_Type; Header_Line : out Header_Data_Type)
       return ML_Types.Rows_Vector is
-      use Ada.Strings.Unbounded;
-      use ML_Types;
       use ML_Types.String_Package;
       --        Routine_Name : constant String := "Utilities.Load_CSV_Data 2 ";
       Data_Line    : Unbounded_String :=
@@ -327,8 +321,6 @@ package body Utilities is
 
    function Load_Raw_CSV_Data (Data_File : File_Type)
                                return ML_Types.Raw_Data_Vector is
-      use Ada.Strings.Unbounded;
-      use ML_Types;
       use ML_Types.String_Package;
       Data_Line : Unbounded_String;
       CSV_Line  : String_List;
@@ -436,7 +428,6 @@ package body Utilities is
 
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D is
-      use ML_Types;
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
       Permutation  : Value_Data_Lists_2D := aList;
@@ -457,7 +448,6 @@ package body Utilities is
 
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_3D is
-      use ML_Types;
       List_Length  : constant Positive := Positive (aList.Length);
       Permutation  : Value_Data_Lists_2D := aList;
       Permutations : Value_Data_Lists_3D;
@@ -497,7 +487,6 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Predictions (Node : Tree_Node_Type) return Predictions_List is
-      use ML_Types;
       use Prediction_Data_Package;
       Num_Rows        : constant Positive := Positive (Node.Rows.Length);
       Curs            : Cursor;
@@ -769,7 +758,6 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
-      use ML_Types;
       use Prediction_Data_Package;
       Curs             : Cursor;
       Data             : Prediction_Data;
@@ -1112,7 +1100,6 @@ package body Utilities is
 
    function Split_String (aString, Pattern : String) return String_List is
       use Ada.Strings;
-      use Ada.Strings.Unbounded;
       Last       : constant Integer := aString'Last;
       Last_Char  : constant Character := aString (Last);
       UB_String  : Unbounded_String;

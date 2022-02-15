@@ -18,7 +18,6 @@ package Load_ARFF_Data is
 
    function Get_Relation (Data : ARFF_Record) return String;
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
-   procedure Save_ARFF (File_Name : String; Data : ARFF_Record);
 
 private
 
