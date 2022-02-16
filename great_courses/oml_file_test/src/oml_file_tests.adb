@@ -169,7 +169,8 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       use Ada.Containers;
       Routine_Name      : constant String := "Test_Fetch_OML ";
-      Dataset_Name      : constant String := "mnist_784";
+      Dataset_Name      : constant String := "diabetes";
+--        Dataset_Name      : constant String := "mnist_784";
       Version           : constant String := "1";
       Data_Id           : Integer := 554;
       As_Frame          : Unbounded_String := To_Unbounded_String ("false");
