@@ -38,9 +38,6 @@ package body Openml_Ada is
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
-   function Load_Arff_From_File
-     (File_Name : String; Return_Type : ARFF_Json.ARFF_Return_Type)
-      return JSON_Value;
    function Parse_Nominal_Data (Arff_Data       : JSON_Value;
                                 Include_Columns : JSON_Array) return JSON_Array;
    procedure Process_Feature (Dataset_Name  : String;
@@ -94,14 +91,14 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Download_Data_To_Bunch (File_Name        : String := "";
-                                    Sparse, As_Frame : Boolean;
-                                    Features_List    : JSON_Array;
-                                    Data_Columns     : JSON_Array;
-                                    Target_Columns   : JSON_Array;
-                                    Return_X_Y       : Boolean := False)
+   function Download_Data_To_Bunch
+     (ARFF_Data        : Load_ARFF_Data.ARFF_Data_List_2D;
+      Sparse, As_Frame : Boolean;
+      Features_List    : Load_ARFF_Data.Attribute_List;
+      Data_Columns     : JSON_Array; Target_Columns   : JSON_Array;
+      Return_X_Y       : Boolean := False)
      --                                       Shape            : Shape_Data)
-                                    return Bunch_Data is
+         return Bunch_Data is
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
       Feature_Index      : Positive := Array_First (Features_List);
       Col_Name           : Positive := Array_First (Features_List);
@@ -114,7 +111,6 @@ package body Openml_Ada is
       Num_Missing        : Integer;
       Return_Type        : ARFF_Json.ARFF_Return_Type;
       All_Columns        : JSON_Array;
-      ARFF_Data          : JSON_Value := Create_Object;
       X                  : JSON_Array;
       Y                  : JSON_Array;
       Nominal_Attributes : JSON_Array;
@@ -145,8 +141,8 @@ package body Openml_Ada is
 
    begin
       Put_Line (Routine_Name);
-      Assert (not Is_Empty (Features_List), Routine_Name &
-                "called with empty Features_List.");
+--        Assert (not Is_Empty (Features_List), Routine_Name &
+--                  "called with empty Features_List.");
       Assert (not Is_Empty (Data_Columns), Routine_Name &
                 "Data_Columns is empty.");
       Assert (Length (Target_Columns) = Length (Data_Columns), Routine_Name &
@@ -220,15 +216,6 @@ package body Openml_Ada is
          Return_Type := ARFF_Json.Arff_Dense;
       end if;
 
-      --  L652
-      --  Load_Arff_Response from file
-      ARFF_Data := Load_Arff_From_File
-        ("../" & File_Name & ".arff", Return_Type);
-      --           Post_Process (ARFF_Data, X, Y, Frame => False,
-      --                         Nominal_Attributes =>  Nominal_Attributes);
-      --        Put_Line (Routine_Name & "L601 ARFF_Data");
-      --        Put_Line (ARFF_Data.Write);
-
       --  L601
       if As_Frame then
          All_Columns := Data_Columns;
@@ -261,27 +248,25 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Fetch_Openml (Dataset_Name  : String;
-                          Data_Id       : in out Integer;
+   function Fetch_Openml (Dataset_File_Name : String;
                           Target_Column : ML_Types.String_List;
                           Return_X_Y    : Boolean := False;
                           As_Frame      : in out Unbounded_String)
                           return Bunch_Data is
       use Ada.Strings;
       use Dataset_Utilities;
+      use Load_ARFF_Data;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "Openml_Ada.Fetch_Openml ";
-      Dataset_Name_LC : constant String := To_Lower_Case (Dataset_Name);
-      JSON_Data_Set   : JSON_Value;
-      JSON_Data       : JSON_Value;
-      JSON_Data_Info  : JSON_Value;
+--        Dataset_Name_LC : constant String := To_Lower_Case (Dataset_Name);
+      ARFF_Data      : ARFF_Record;
+      Data_Id        : Integer;
+      Data           : ARFF_Data_List_2D;
+      Description    : ARFF_Header;
       JSON_Data_Array : JSON_Array;
       JSON_Data_Item  : JSON_Value;
-      Description     : JSON_Value;
       Return_Sparse   : Boolean := False;
-      Data_Format     : JSON_Value;
-      Data_Status     : JSON_Value;
-      Features_List   : JSON_Array;
+      Features_List   : Attribute_List;
       Ignore          : JSON_Value;
       Curs            : Cursor;
       Target_Value    : Unbounded_String;
@@ -292,39 +277,16 @@ package body Openml_Ada is
       Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
    begin
+      Load_ARFF (Dataset_File_Name, ARFF_Data);
       --  L862
-      JSON_Data_Info := Get_Data_Info_By_Name (Dataset_Name_LC);
+      Description := Get_Description (ARFF_Data);
 
-      JSON_Data := Get (JSON_Data_Info, "data");
-      JSON_Data_Set := Get (JSON_Data, "dataset");
+      Data := Get_Data (ARFF_Data);
       New_Line;
-      JSON_Data_Array := Get (JSON_Data_Set);
-      JSON_Data_Item := Array_Element (JSON_Data_Array,
-                                       Array_First (JSON_Data_Array));
-      Data_Id := Get (JSON_Data_Item, "did");
-      Put_Line (Routine_Name & "Data_Id: " & Integer'Image (Data_Id));
 
       --  L877
-      Description := Get_Data_Description_By_ID (Data_Id);
-      Data_Status := Get (Description, "status");
-      if To_String (Get (Data_Status)) /= "active" then
-         Put_Line (Routine_Name & "Version " &
-                     To_String (Get (Get (Description, "version"))) &
-                     " of dataset " &
-                     To_String (Get (Get (Description, "name"))) &
-                     " is inactive meaning that issues have been found in" &
-                     " the dataset. Try using a newer version.");
-      end if;
 
       --  L897
-      Data_Format := Get (Description, "format");
-      --            Put_Line (Routine_Name & Description.Write);
-      declare
-         Format : String := Get (Data_Format);
-      begin
-         Format := To_Lower_Case (Format);
-         Return_Sparse := Format = "sparse_arff";
-      end;
 
       --  L903
       if As_Frame = "auto" then
@@ -339,7 +301,7 @@ package body Openml_Ada is
               Routine_Name & "cannot return dataframe with sparse data");
 
       --  L917
-      Features_List := Get_Data_Features (Data_ID);
+      Features_List := Get_Attributes (ARFF_Data);
 
       if As_Frame = "false" then
          Process_Feature (Dataset_Name, Features_List);
@@ -582,37 +544,6 @@ package body Openml_Ada is
       return Num_Samples;
 
    end Get_Num_Samples;
-
-   --  ------------------------------------------------------------------------
-
-   function Load_Arff_From_File
-     (File_Name : String; Return_Type : ARFF_Json.ARFF_Return_Type)
-   return JSON_Value is
-      File_ID  : File_Type;
-      Data     : ML_Types.String_List;
-      Count    : Natural := 0;
-   begin
-      --        Put_Line ("Openml_Ada.Load_Arff_From_File");
-      Open (File_ID, In_File, File_Name);
-      while not End_Of_File (File_ID) loop
-         declare
-            Text : constant String := Get_Line (File_ID);
-         begin
-            Count := Count + 1;
-            --              Put_Line ("Openml_Ada.Load_Arff_From_File line length " &
-            --                       Integer'Image (Text'Length));
-            Data.Append (To_Unbounded_String (Text));
-         end;
-         --           Data := Data & To_Unbounded_String (Get_Line (File_ID));
-         --           Data := Data & "\r\n";
-      end loop;
-      Close (File_ID);
-      Put_Line ("Openml.Load_Arff_From_File:" & Integer'Image (Count) &
-                  " lines loaded");
-
-      return ARFF_Json.Load (Data, Return_Type);
-
-   end Load_Arff_From_File;
 
    --  ------------------------------------------------------------------------
 

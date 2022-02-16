@@ -8,6 +8,10 @@ with ML_Types;
 package Load_ARFF_Data is
 
    type ARFF_Record is private;
+   type Attribute_List is private;
+   type ARFF_Data_List_2D is private;
+   subtype ARFF_Header is ML_Types.Indef_String_List;
+
    type ARFF_Data_Type is (ARFF_Date, ARFF_Integer, ARFF_Numeric, ARFF_Nominal,
                            ARFF_Real, ARFF_String);
    type Nominal_Data_Type is (Nominal_Integer, Nominal_Numeric, Nominal_Real,
@@ -16,12 +20,13 @@ package Load_ARFF_Data is
      Ada.Containers.Doubly_Linked_Lists (Nominal_Data_Type);
    subtype Nominal_Types_List is Nominal_Types_Package.List;
 
+   function Get_Attributes (Data : ARFF_Record) return Attribute_List;
+   function Get_Data (Data : ARFF_Record) return ARFF_Data_List_2D;
+   function Get_Description (Data : ARFF_Record) return ARFF_Header;
    function Get_Relation (Data : ARFF_Record) return String;
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
 
 private
-
-   subtype ARFF_Header is ML_Types.Indef_String_List;
 
    type Attribute_Record is record
       Name          : Unbounded_String;
@@ -32,7 +37,7 @@ private
 
    package Attribute_Data_Package is new
      Ada.Containers.Doubly_Linked_Lists (Attribute_Record);
-   subtype Attribute_List is Attribute_Data_Package.List;
+   type Attribute_List is new Attribute_Data_Package.List with null record;
 
    type ARFF_Header_Record is record
       Info       : ARFF_Header;       --  'description': ''
@@ -56,7 +61,7 @@ private
    use ARFF_Data_Package;
    package ARFF_Data_List_Package is new
      Ada.Containers.Doubly_Linked_Lists (ARFF_Data_List);
-   subtype ARFF_Data_List_2D is ARFF_Data_List_Package.List;
+   type ARFF_Data_List_2D is new ARFF_Data_List_Package.List with null record;
 
    --  L783 declaration of return object obj
    type ARFF_Record is record

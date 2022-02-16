@@ -313,6 +313,30 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
+   function Get_Attributes (Data : ARFF_Record) return Attribute_List is
+   begin
+      return Data.Header.Attributes;
+
+   end Get_Attributes;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Data (Data : ARFF_Record) return ARFF_Data_List_2D is
+   begin
+      return Data.Data;
+
+   end Get_Data;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Description (Data : ARFF_Record) return ARFF_Header is
+   begin
+      return Data.Header.Info;
+
+   end Get_Description;
+
+   --  -------------------------------------------------------------------------
+
    function Get_Relation (Data : ARFF_Record) return String is
    begin
       return To_String (Data.Header.Relation);

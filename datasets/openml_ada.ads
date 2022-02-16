@@ -5,6 +5,8 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 with ML_Types;
 
+with Load_ARFF_Data;
+
 package Openml_Ada is
 
    subtype Qualities_Map is JSON_Array;
@@ -28,15 +30,15 @@ package Openml_Ada is
    end record;
 
    function Download_Data_To_Bunch
-     (File_Name        : String := "";
-      Sparse, As_Frame : Boolean;  Features_List : JSON_Array;
-      Data_Columns     : JSON_Array; Target_Columns : JSON_Array;
-      Return_X_Y       : Boolean := False) return Bunch_Data;
-   function Fetch_Openml (Dataset_Name  : String;
-                          Data_Id       : in out Integer;
-                          Target_Column : ML_Types.String_List;
-                          Return_X_Y    : Boolean := False;
-                          As_Frame      : in out Unbounded_String)
+     (ARFF_Data        : Load_ARFF_Data.ARFF_Data_List_2D;
+      Sparse, As_Frame : Boolean;
+      Features_List  : Load_ARFF_Data.Attribute_List; Data_Columns : JSON_Array;
+      Target_Columns : JSON_Array; Return_X_Y : Boolean := False)
+      return Bunch_Data;
+   function Fetch_Openml (Dataset_File_Name : String;
+                          Target_Column     : ML_Types.String_List;
+                          Return_X_Y        : Boolean := False;
+                          As_Frame          : in out Unbounded_String)
                            return Bunch_Data;
    function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
    function Get_Data_Features (Data_ID : Integer) return JSON_Array;
