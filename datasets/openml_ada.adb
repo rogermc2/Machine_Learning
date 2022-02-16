@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -15,9 +16,10 @@ package body Openml_Ada is
 
    --     type ARFF_Type is (ARFF_COO, ARFF_DENSE_GEN);
 
-   --     package Tupple_Package is new
-   --       Ada.Containers.Vectors (Positive, Unbounded_String);
-   --     subtype Tupple_Vector is Tupple_Package.Vector;
+      package Attribute_Dictionary_Package is new
+        Ada.Containers.Vectors (Positive, Unbounded_String);
+      subtype Attribute_Dictionary_Vector is
+      Attribute_Dictionary_Package.Vector;
    --
    --     use Tupple_Package;
    --     package Zip_Package is new
@@ -42,12 +44,12 @@ package body Openml_Ada is
                                 Include_Columns : JSON_Array) return JSON_Array;
    procedure Process_Feature (Dataset_Name  : String;
                               Features_List : JSON_Array);
-   procedure Set_Default_Target (Features_List  : JSON_Array;
+   procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
                                  Target_Columns : out JSON_Array);
    function Split_Sparse_Columns
      (Arff_Data       : ARFF_Json.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array) return ARFF_Json.Arff_Sparse_Data_Type;
-   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
+   procedure Verify_Target_Data_Type (Features_Dict  : Attribute_Dictionary_Vector;
                                       Target_Columns : JSON_Array);
 
    --  ------------------------------------------------------------------------
@@ -95,7 +97,7 @@ package body Openml_Ada is
      (ARFF_Data        : Load_ARFF_Data.ARFF_Data_List_2D;
       Sparse, As_Frame : Boolean;
       Features_List    : Load_ARFF_Data.Attribute_List;
-      Data_Columns     : JSON_Array; Target_Columns   : JSON_Array;
+      Data_Columns     : JSON_Array; Target_Columns: JSON_Array;
       Return_X_Y       : Boolean := False)
      --                                       Shape            : Shape_Data)
          return Bunch_Data is
@@ -106,7 +108,7 @@ package body Openml_Ada is
       Col_Name           : Cursor := Features_List.First;
 --        Feature_Index      : Positive := Array_First (Features_List);
 --        Col_Name           : Positive := Array_First (Features_List);
-      Features_Dict      : JSON_Array;
+      Features_Dict      : Attribute_Dictionary_Vector;
       aFeature           : Attribute_Record;
       aColumn            : JSON_Value;
       Feature_Name       : Unbounded_String;
@@ -158,11 +160,11 @@ package body Openml_Ada is
       while Has_Element (Feature_Curs) loop
          aFeature := Element (Feature_Curs);
          Feature_Name := Element (Feature_Curs).Name;
-         Append (Features_Dict, Feature_Name);
+         Features_Dict.Append (Feature_Name);
          Next (Feature_Curs);
       end loop;
       Put_Line (Routine_Name & "Features_Dict length" &
-                  Integer'Image (Length (Features_Dict)));
+                  Integer'Image (Integer (Features_Dict.Length)));
 
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
@@ -171,8 +173,8 @@ package body Openml_Ada is
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
       --        ]
-      Col_Name := Array_First (Features_List);
-      while Array_Has_Element (Target_Columns, Col_Name) loop
+      Col_Name := Features_List.First;
+      while Has_Element (Target_Columns, Col_Name) loop
          aFeature := Array_Element (Features_List, 5);
          aColumn := Get (aFeature, "index");
          --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
@@ -644,11 +646,12 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
    --  L922
-   procedure Set_Default_Target (Features_List  : JSON_Array;
+   procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
                                  Target_Columns : out JSON_Array) is
+      use Load_ARFF_Data;
       Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
       Feature_Index : Positive;
-      Feature       : JSON_Value;
+      Feature       : Attribute_Record;
       Target        : JSON_Value;
    begin
       Feature_Index := Array_First (Target_Columns);
@@ -852,7 +855,7 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   procedure Verify_Target_Data_Type (Features_Dict  : JSON_Array;
+   procedure Verify_Target_Data_Type (Features_Dict  : Attribute_Dictionary_Vector;
                                       Target_Columns : JSON_Array) is
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
       Target_Column : Positive := Array_First (Target_Columns);

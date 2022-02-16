@@ -31,7 +31,6 @@ package Load_ARFF_Data is
      Ada.Containers.Doubly_Linked_Lists (Attribute_Record);
    type Attribute_List is new Attribute_Data_Package.List with null record;
 
-
    function Get_Attributes (Data : ARFF_Record) return Attribute_List;
    function Get_Data (Data : ARFF_Record) return ARFF_Data_List_2D;
    function Get_Description (Data : ARFF_Record) return ARFF_Header;
