@@ -12,8 +12,8 @@ procedure Test_ARFF is
    use Load_ARFF_Data.ARFF_IO;
    use Load_ARFF_Data.ARFF_Printing;
    Routine_Name : constant String := "Test_ARFF ";
-   File_Name    : constant String := "../mnist_784.arff";
-   Ada_File     : constant String := "mnist_784.ada";
+   File_Name    : constant String := "../iris.arff";
+   Ada_File     : constant String := "iris.ada";
    Data         : ARFF_Record;
 begin
    Put_Line (Routine_Name);
@@ -33,7 +33,7 @@ begin
    Put_Line ("Relation: " & Get_Relation (Data));
    Print_Attributes (Data);
    --     Print_Data (Data);
-   Print_Data (Data, 1, 2);
+   Print_Data (Data, 10, 14);
 --     Print_Data (Data, 40, 100);
 
 end Test_ARFF;
