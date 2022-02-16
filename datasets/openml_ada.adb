@@ -99,13 +99,17 @@ package body Openml_Ada is
       Return_X_Y       : Boolean := False)
      --                                       Shape            : Shape_Data)
          return Bunch_Data is
+      use Load_ARFF_Data;
+      use Attribute_Data_Package;
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
-      Feature_Index      : Positive := Array_First (Features_List);
-      Col_Name           : Positive := Array_First (Features_List);
+      Feature_Curs       : Cursor := Features_List.First;
+      Col_Name           : Cursor := Features_List.First;
+--        Feature_Index      : Positive := Array_First (Features_List);
+--        Col_Name           : Positive := Array_First (Features_List);
       Features_Dict      : JSON_Array;
-      aFeature           : JSON_Value;
+      aFeature           : Attribute_Record;
       aColumn            : JSON_Value;
-      Feature_Name       : JSON_Value;
+      Feature_Name       : Unbounded_String;
       Col_Slice_X        : JSON_Array;
       Col_Slice_Y        : JSON_Array;
       Num_Missing        : Integer;
@@ -151,11 +155,11 @@ package body Openml_Ada is
                 " is different to Data_Columns length" &
                 Integer'Image (Length (Data_Columns)));
 
-      while Array_Has_Element (Features_List, Feature_Index) loop
-         aFeature := Array_Element (Features_List, Feature_Index);
-         Feature_Name := Get (aFeature, "name");
+      while Has_Element (Feature_Curs) loop
+         aFeature := Element (Feature_Curs);
+         Feature_Name := Element (Feature_Curs).Name;
          Append (Features_Dict, Feature_Name);
-         Feature_Index := Array_Next (Features_List, Feature_Index);
+         Next (Feature_Curs);
       end loop;
       Put_Line (Routine_Name & "Features_Dict length" &
                   Integer'Image (Length (Features_Dict)));
