@@ -55,16 +55,17 @@ package body Load_ARFF_Data.ARFF_Printing is
       List_Curs    : ARFF_Data_List_Package.Cursor := Data_List_2D.First;
       Data_List    : ARFF_Data_List;
       Data_Curs    : ARFF_Data_Package.Cursor;
-      Count        : Natural := 0;
+      Count        : Natural := Start - 1;
    begin
       New_Line;
       Put_Line ("Dataset data:");
       Put_Line ("Data length:" & Integer'Image (Integer (Data_List_2D.Length)));
-      while Has_Element (List_Curs) loop
+      while Has_Element (List_Curs) and Count <= Last loop
          Count := Count + 1;
          Data_List := Element (List_Curs);
 
          if Count >= Start and then Count <= Last then
+            Put_Line ("Data row:" & Integer'Image (Count));
             Data_Curs := Data_List.First;
             while Has_Element (Data_Curs) loop
                declare
@@ -72,19 +73,21 @@ package body Load_ARFF_Data.ARFF_Printing is
                begin
                   case Data_Record.Data_Kind is
                   when ML_Types.Boolean_Type =>
-                     Put_Line (Boolean'Image (Data_Record.Boolean_Data));
+                     Put (Boolean'Image (Data_Record.Boolean_Data));
                   when ML_Types.Float_Type =>
-                     Put_Line (Float'Image (Data_Record.Real_Data));
+                     Put (Float'Image (Data_Record.Real_Data));
                   when ML_Types.Integer_Type =>
-                     Put_Line (Integer'Image (Data_Record.Integer_Data));
+                     Put (Integer'Image (Data_Record.Integer_Data));
                   when ML_Types.UB_String_Type =>
-                     Put_Line (Data_Record.UB_String_Data);
+                     Put (Data_Record.UB_String_Data);
                   end case;
+                  Put (", ");
                end;
                Next (Data_Curs);
             end loop;
             New_Line;
          end if;
+         New_Line;
          Next (List_Curs);
       end loop;
 

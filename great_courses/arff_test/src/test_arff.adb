@@ -18,11 +18,11 @@ procedure Test_ARFF is
 begin
    Put_Line (Routine_Name);
    if Exists (Ada_File) then
-      Put_Line (Routine_Name & "Reading data file");
+      Put_Line (Routine_Name & "Reading data file " & Ada_File);
       Read_ARFF_Ada (Ada_File, Data);
       Put_Line (Routine_Name & "Data file read");
    else
-      Put_Line (Routine_Name & "Loading ARFF data");
+      Put_Line (Routine_Name & "Loading ARFF data from " & File_Name);
       Load_ARFF (File_Name, Data);
       Put_Line (Routine_Name & "Data loaded");
       Save_ARFF (Ada_File, Data);
@@ -32,7 +32,8 @@ begin
    Print_Description (Data);
    Put_Line ("Relation: " & Get_Relation (Data));
    Print_Attributes (Data);
---     Print_Data (Data);
-   Print_Data (Data, 40, 100);
+   --     Print_Data (Data);
+   Print_Data (Data, 1, 2);
+--     Print_Data (Data, 40, 100);
 
 end Test_ARFF;
