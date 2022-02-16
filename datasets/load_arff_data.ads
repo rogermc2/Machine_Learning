@@ -1,6 +1,7 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
+with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with ML_Types;
@@ -28,8 +29,8 @@ package Load_ARFF_Data is
    end record;
 
    package Attribute_Data_Package is new
-     Ada.Containers.Doubly_Linked_Lists (Attribute_Record);
-   type Attribute_List is new Attribute_Data_Package.List with null record;
+     Ada.Containers.Vectors (Positive, Attribute_Record);
+   type Attribute_List is new Attribute_Data_Package.Vector with null record;
 
    function Get_Attributes (Data : ARFF_Record) return Attribute_List;
    function Get_Data (Data : ARFF_Record) return ARFF_Data_List_2D;

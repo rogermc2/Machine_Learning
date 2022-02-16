@@ -45,7 +45,7 @@ package body Openml_Ada is
    procedure Process_Feature (Dataset_Name  : String;
                               Features_List : JSON_Array);
    procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
-                                 Target_Columns : out JSON_Array);
+                                 Target_Columns : out ML_Types.String_List);
    function Split_Sparse_Columns
      (Arff_Data       : ARFF_Json.Arff_Sparse_Data_Type;
       Include_Columns : JSON_Array) return ARFF_Json.Arff_Sparse_Data_Type;
@@ -95,17 +95,22 @@ package body Openml_Ada is
 
    function Download_Data_To_Bunch
      (ARFF_Data        : Load_ARFF_Data.ARFF_Data_List_2D;
-      Sparse, As_Frame : Boolean;
-      Features_List    : Load_ARFF_Data.Attribute_List;
-      Data_Columns     : JSON_Array; Target_Columns: JSON_Array;
-      Return_X_Y       : Boolean := False)
+      Sparse        : Boolean;
+      As_Frame      : As_Frame_State := As_Frame_False;
+      Features_List : Load_ARFF_Data.Attribute_List;
+      Data_Columns, Target_Columns : ML_Types.String_List;
+      Return_X_Y    : Boolean := False)
      --                                       Shape            : Shape_Data)
          return Bunch_Data is
       use Load_ARFF_Data;
+      use ML_Types;
+      use String_Package;
       use Attribute_Data_Package;
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
-      Feature_Curs       : Cursor := Features_List.First;
-      Col_Name           : Cursor := Features_List.First;
+      Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
+      Col_Name           : Attribute_Data_Package.Cursor := Features_List.First;
+      Columns_Curs       : String_Package.Cursor := Data_Columns.First;
+      Target_Curs        : String_Package.Cursor := Target_Columns.First;
 --        Feature_Index      : Positive := Array_First (Features_List);
 --        Col_Name           : Positive := Array_First (Features_List);
       Features_Dict      : Attribute_Dictionary_Vector;
@@ -147,8 +152,8 @@ package body Openml_Ada is
 
    begin
       Put_Line (Routine_Name);
---        Assert (not Is_Empty (Features_List), Routine_Name &
---                  "called with empty Features_List.");
+      Assert (not Is_Empty (Features_List), Routine_Name &
+                "called with empty Features_List.");
       Assert (not Is_Empty (Data_Columns), Routine_Name &
                 "Data_Columns is empty.");
       Assert (Length (Target_Columns) = Length (Data_Columns), Routine_Name &
@@ -253,11 +258,15 @@ package body Openml_Ada is
    end Download_Data_To_Bunch;
 
    --  ------------------------------------------------------------------------
-
+   --  Target_Column : str, list or None, specifies the column name in the data
+   --  to use as target.
+   --  If empty, all columns are returned as data and the target is `None`.
+   --  If a list of strings, all columns with these names are returned as a
+   --  multi-target.
    function Fetch_Openml (Dataset_File_Name : String;
-                          Target_Column : ML_Types.String_List;
-                          Return_X_Y    : Boolean := False;
-                          As_Frame      : in out Unbounded_String)
+                          Target_Column     : ML_Types.String_List;
+                          Return_X_Y        : Boolean := False;
+                          As_Frame          : As_Frame_State := As_Frame_False)
                           return Bunch_Data is
       use Ada.Strings;
       use Dataset_Utilities;
@@ -277,8 +286,8 @@ package body Openml_Ada is
       Curs            : Cursor;
       Target_Value    : Unbounded_String;
       Target          : constant JSON_Value := Create_Object;
-      Target_Columns  : JSON_Array;
-      Data_Columns    : JSON_Array;
+      Target_Columns  : ML_Types.String_List;
+      Data_Columns    : ML_Types.String_List;
       --        Shape           : Shape_Data;
       Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
@@ -647,7 +656,7 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
    --  L922
    procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
-                                 Target_Columns : out JSON_Array) is
+                                 Target_Columns : out ML_Types.String_List) is
       use Load_ARFF_Data;
       Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
       Feature_Index : Positive;

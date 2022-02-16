@@ -9,6 +9,7 @@ with Load_ARFF_Data;
 
 package Openml_Ada is
 
+   type As_Frame_State is (As_Frame_False, As_Frame_True, As_Frame_Auto);
    subtype Qualities_Map is JSON_Array;
 
    type Bunch_Data (Only_XY : Boolean := False) is record
@@ -17,7 +18,7 @@ package Openml_Ada is
       case Only_XY is
          when True => null;
          when False =>
-            As_Frame      : Boolean := False;
+            As_Frame      : As_Frame_State := As_Frame_False;
             Categories    : JSON_Array;
             Feature_Names : JSON_Array;
             Target_Names  : JSON_Array;
@@ -30,15 +31,17 @@ package Openml_Ada is
    end record;
 
    function Download_Data_To_Bunch
-     (ARFF_Data        : Load_ARFF_Data.ARFF_Data_List_2D;
-      Sparse, As_Frame : Boolean;
-      Features_List  : Load_ARFF_Data.Attribute_List; Data_Columns : JSON_Array;
-      Target_Columns : JSON_Array; Return_X_Y : Boolean := False)
+     (ARFF_Data      : Load_ARFF_Data.ARFF_Data_List_2D;
+      Sparse         : Boolean;
+      As_Frame       : As_Frame_State := As_Frame_False;
+      Features_List  : Load_ARFF_Data.Attribute_List;
+      Data_Columns, Target_Columns : ML_Types.String_List;
+      Return_X_Y     : Boolean := False)
       return Bunch_Data;
    function Fetch_Openml (Dataset_File_Name : String;
                           Target_Column     : ML_Types.String_List;
                           Return_X_Y        : Boolean := False;
-                          As_Frame          : in out Unbounded_String)
+                          As_Frame          : As_Frame_State := As_Frame_False)
                            return Bunch_Data;
    function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
    function Get_Data_Features (Data_ID : Integer) return JSON_Array;
