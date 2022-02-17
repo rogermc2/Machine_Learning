@@ -40,7 +40,7 @@ package body Openml_Ada is
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
-   function Parse_Nominal_Data (Arff_Data       : JSON_Value;
+   function Parse_Nominal_Data (Arff_Data       : ML_Types.Value_Data;
                                 Include_Columns : JSON_Array) return JSON_Array;
    procedure Process_Feature (Dataset_Name  : String;
                               Features_List : JSON_Array);
@@ -79,11 +79,12 @@ package body Openml_Ada is
    --  A Tuple is a collection of Python objects separated by commas.
    --  L325
    procedure Convert_Arff_Data
-     (Arff_Container            : JSON_Value;
-      Col_Slice_X, Col_Slice_Y  : JSON_Array;
-      X, Y                      : out JSON_Array) is
+     (Arff_Container            : Load_ARFF_Data.ARFF_Record;
+      Col_Slice_X, Col_Slice_Y  : ML_Types.Value_Data;
+      X, Y                      : out ML_Types.Value_Data) is
       --        Routine_Name    : constant String := "Openml_Ada.Convert_Arff_Data ";
-      ARFF_Data       : constant JSON_Array := Arff_Container.Get ("data");
+      use Load_ARFF_Data;
+      ARFF_Data  : constant ARFF_Data_List_2D := Get_Data (Arff_Container);
    begin
       --  L278
       X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
@@ -107,12 +108,12 @@ package body Openml_Ada is
       use String_Package;
       use Attribute_Data_Package;
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
-      Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
-      Col_Name           : Attribute_Data_Package.Cursor := Features_List.First;
+--        Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
+--        Col_Name           : Attribute_Data_Package.Cursor := Features_List.First;
       Columns_Curs       : String_Package.Cursor := Data_Columns.First;
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
---        Feature_Index      : Positive := Array_First (Features_List);
---        Col_Name           : Positive := Array_First (Features_List);
+      Feature_Index      : Positive := Features_List.First_Index;
+      Col_Name           : Positive := Feature_Index;
       Features_Dict      : Attribute_Dictionary_Vector;
       aFeature           : Attribute_Record;
       aColumn            : JSON_Value;
@@ -131,8 +132,8 @@ package body Openml_Ada is
       procedure Parse_ARFF
         (ARFF_In          : JSON_Value;
          X_Slice, Y_Slice : JSON_Array;
-         X_out, Y_out     : out JSON_Array;
-         Nominal_Data_Out : out JSON_Array) is
+         X_out, Y_out     : out  ML_Types.Value_Data;
+         Nominal_Data_Out : out ML_Types.Value_Data) is
       begin
          Convert_Arff_Data (ARFF_In, X_Slice, Y_Slice, X_out, Y_out);
          Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
@@ -265,8 +266,8 @@ package body Openml_Ada is
    --  multi-target.
    function Fetch_Openml (Dataset_File_Name : String;
                           Target_Column     : ML_Types.String_List;
-                          Return_X_Y        : Boolean := False;
-                          As_Frame          : As_Frame_State := As_Frame_False)
+                          As_Frame          : in out As_Frame_State;
+                          Return_X_Y        : Boolean := False)
                           return Bunch_Data is
       use Ada.Strings;
       use Dataset_Utilities;
@@ -304,21 +305,21 @@ package body Openml_Ada is
       --  L897
 
       --  L903
-      if As_Frame = "auto" then
+      if As_Frame = As_Frame_Auto then
          if not Return_Sparse then
-            As_Frame := To_Unbounded_String ("true");
+            As_Frame := As_Frame_True;
          end if;
       else
-         As_Frame := To_Unbounded_String ("false");
+         As_Frame := As_Frame_False;
       end if;
 
-      Assert (not (As_Frame = "true" and Return_Sparse),
+      Assert (not (As_Frame = As_Frame_True and Return_Sparse),
               Routine_Name & "cannot return dataframe with sparse data");
 
       --  L917
       Features_List := Get_Attributes (ARFF_Data);
 
-      if As_Frame = "false" then
+      if As_Frame = As_Frame_False then
          Process_Feature (Dataset_Name, Features_List);
       end if;
 
@@ -562,7 +563,7 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Parse_Nominal_Data (Arff_Data       : JSON_Value;
+   function Parse_Nominal_Data (Arff_Data       : ML_Types.Value_Data;
                                 Include_Columns : JSON_Array)
                              return JSON_Array is
       --        Routine_Name : constant String := "Openml_Ada.Parse_Nominal_Data ";
@@ -773,7 +774,8 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
    --  L699
    function Valid_Data_Column_Names
-     (Features_List, Target_Columns : JSON_Array) return JSON_Array is
+     (Features_List, Target_Columns : JSON_Array)
+      return Valid_Data_Column_Names is
       --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
       Feature_Index : Positive;
       Feature       : JSON_Value;

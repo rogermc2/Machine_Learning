@@ -40,8 +40,8 @@ package Openml_Ada is
       return Bunch_Data;
    function Fetch_Openml (Dataset_File_Name : String;
                           Target_Column     : ML_Types.String_List;
-                          Return_X_Y        : Boolean := False;
-                          As_Frame          : As_Frame_State := As_Frame_False)
+                          As_Frame          : in out As_Frame_State;
+                          Return_X_Y        : Boolean := False)
                            return Bunch_Data;
    function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
    function Get_Data_Features (Data_ID : Integer) return JSON_Array;
@@ -50,6 +50,6 @@ package Openml_Ada is
    function J_Array_To_String_List (J_Array : JSON_Array)
                                     return ML_Types.String_List;
    function Valid_Data_Column_Names
-     (Features_List, Target_Columns : JSON_Array) return JSON_Array;
+     (Features_List, Target_Columns : JSON_Array) return ML_Types.String_List;
 
 end Openml_Ada;
