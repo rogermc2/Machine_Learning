@@ -14,14 +14,14 @@ package Openml_Ada is
 
    type Bunch_Data (Only_XY : Boolean := False) is record
       Data          : ML_Types.Value_Data_List;
-      Target        : JSON_Array;
+      Target        : ML_Types.Value_Data_List;
       case Only_XY is
          when True => null;
          when False =>
             As_Frame      : As_Frame_State := As_Frame_False;
-            Categories    : JSON_Array;
-            Feature_Names : JSON_Array;
-            Target_Names  : JSON_Array;
+            Categories    : ML_Types.Nominal_Data_List;
+            Feature_Names : ML_Types.String_List;
+            Target_Names  : ML_Types.String_List;
       end case;
    end record;
 
@@ -32,7 +32,7 @@ package Openml_Ada is
 
    function Download_Data_To_Bunch
      (ARFF_Container : Load_ARFF_Data.ARFF_Record;
-      Sparse         : Boolean;
+--        Sparse         : Boolean;
       As_Frame       : As_Frame_State := As_Frame_False;
       Features_List  : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
@@ -50,6 +50,7 @@ package Openml_Ada is
    function J_Array_To_String_List (J_Array : JSON_Array)
                                     return ML_Types.String_List;
    function Valid_Data_Column_Names
-     (Features_List, Target_Columns : JSON_Array) return ML_Types.String_List;
+     (Features_List  : Load_ARFF_Data.Attribute_List;
+      Target_Columns : ML_Types.String_List) return ML_Types.String_List;
 
 end Openml_Ada;

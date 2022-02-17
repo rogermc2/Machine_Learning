@@ -34,9 +34,24 @@ package Load_ARFF_Data is
      Ada.Containers.Vectors (Positive, ARFF_Data_List);
    subtype ARFF_Data_List_2D is ARFF_Data_List_Package.Vector;
 
+   type Nominal_Data_Record (Data_Kind : Nominal_Data_Type) is record
+      case Data_Kind is
+         when Nominal_Real | Nominal_Numeric =>
+            Real_Data      : Float;
+         when Nominal_Integer =>
+            Integer_Data   : Integer;
+         when Nominal_String =>
+            UB_String_Data : Unbounded_String;
+      end case;
+   end record;
+
    package Nominal_Types_Package is new
      Ada.Containers.Doubly_Linked_Lists (Nominal_Data_Type);
    subtype Nominal_Types_List is Nominal_Types_Package.List;
+
+   package Nominal_Data_Package is new
+     Ada.Containers.Indefinite_Doubly_Linked_Lists (Nominal_Data_Record);
+   subtype Nominal_Data_List is Nominal_Data_Package.List;
 
    type Attribute_Record is record
       Name          : Unbounded_String;
