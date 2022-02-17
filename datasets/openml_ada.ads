@@ -35,7 +35,7 @@ package Openml_Ada is
       Sparse         : Boolean;
       As_Frame       : As_Frame_State := As_Frame_False;
       Features_List  : Load_ARFF_Data.Attribute_List;
-      Data_Columns, Target_Columns : ML_Types.String_List;
+      Data_Columns, Target_Columns : Load_ARFF_Data.ARFF_Data_List_2D;
       Return_X_Y     : Boolean := False)
       return Bunch_Data;
    function Fetch_Openml (Dataset_File_Name : String;

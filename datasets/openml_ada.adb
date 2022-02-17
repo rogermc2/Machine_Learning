@@ -1,7 +1,8 @@
 --  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Containers.Vectors;
+with Ada.Containers.Ordered_Maps;
+--  with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -17,9 +18,8 @@ package body Openml_Ada is
    --     type ARFF_Type is (ARFF_COO, ARFF_DENSE_GEN);
 
       package Attribute_Dictionary_Package is new
-        Ada.Containers.Vectors (Positive, Unbounded_String);
-      subtype Attribute_Dictionary_Vector is
-      Attribute_Dictionary_Package.Vector;
+        Ada.Containers.Ordered_Maps (Unbounded_String, Positive);
+      subtype Attribute_Dictionary_Map is Attribute_Dictionary_Package.Map;
    --
    --     use Tupple_Package;
    --     package Zip_Package is new
@@ -40,17 +40,20 @@ package body Openml_Ada is
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
-   function Parse_Nominal_Data (Arff_Data       : ML_Types.Value_Data;
-                                Include_Columns : JSON_Array) return JSON_Array;
+   function Parse_Nominal_Data
+     (Arff_Data       : Load_ARFF_Data.ARFF_Record;
+      Include_Columns : Load_ARFF_Data.ARFF_Data_List_2D)
+      return ML_Types.Value_Data_List;
    procedure Process_Feature (Dataset_Name  : String;
-                              Features_List : JSON_Array);
+                              Features_List : Load_ARFF_Data.Attribute_List);
    procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
                                  Target_Columns : out ML_Types.String_List);
    function Split_Sparse_Columns
-     (Arff_Data       : ARFF_Json.Arff_Sparse_Data_Type;
-      Include_Columns : JSON_Array) return ARFF_Json.Arff_Sparse_Data_Type;
-   procedure Verify_Target_Data_Type (Features_Dict  : Attribute_Dictionary_Vector;
-                                      Target_Columns : JSON_Array);
+     (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
+      Include_Columns : ML_Types.Integer_List) return ML_Types.Value_Data_List;
+   procedure Verify_Target_Data_Type
+     (Features_Dict  : Attribute_Dictionary_Map;
+      Target_Columns : Load_ARFF_Data.ARFF_Data_List_2D);
 
    --  ------------------------------------------------------------------------
 
@@ -75,13 +78,12 @@ package body Openml_Ada is
    --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
-   --  ArffSparseDataType = Tuple[List, ...]
-   --  A Tuple is a collection of Python objects separated by commas.
-   --  L325
+   --  ArffSparseDataType = Tuple[List, ...] A Tuple is a collection of Python
+   --  objects separated by commas. L325
    procedure Convert_Arff_Data
      (Arff_Container            : Load_ARFF_Data.ARFF_Record;
-      Col_Slice_X, Col_Slice_Y  : ML_Types.Value_Data;
-      X, Y                      : out ML_Types.Value_Data) is
+      Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
+      X, Y                      : out  ML_Types.Value_Data_List) is
       --        Routine_Name    : constant String := "Openml_Ada.Convert_Arff_Data ";
       use Load_ARFF_Data;
       ARFF_Data  : constant ARFF_Data_List_2D := Get_Data (Arff_Container);
@@ -95,26 +97,29 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    function Download_Data_To_Bunch
-     (ARFF_Data        : Load_ARFF_Data.ARFF_Data_List_2D;
+     (ARFF_Data     : Load_ARFF_Data.ARFF_Data_List_2D;
       Sparse        : Boolean;
       As_Frame      : As_Frame_State := As_Frame_False;
       Features_List : Load_ARFF_Data.Attribute_List;
-      Data_Columns, Target_Columns : ML_Types.String_List;
+      Data_Columns, Target_Columns : Load_ARFF_Data.ARFF_Data_List_2D;
       Return_X_Y    : Boolean := False)
      --                                       Shape            : Shape_Data)
-         return Bunch_Data is
+      return Bunch_Data is
+      use Ada.Containers;
       use Load_ARFF_Data;
       use ML_Types;
       use String_Package;
       use Attribute_Data_Package;
+      use ARFF_Data_List_Package;
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
 --        Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
 --        Col_Name           : Attribute_Data_Package.Cursor := Features_List.First;
-      Columns_Curs       : String_Package.Cursor := Data_Columns.First;
-      Target_Curs        : String_Package.Cursor := Target_Columns.First;
-      Feature_Index      : Positive := Features_List.First_Index;
-      Col_Name           : Positive := Feature_Index;
-      Features_Dict      : Attribute_Dictionary_Vector;
+      Columns_Curs       : ARFF_Data_List_Package.Cursor := Data_Columns.First;
+      Target_Curs        :  ARFF_Data_List_Package.Cursor :=
+                             Target_Columns.First;
+      Feature_Index      : Positive;
+      Col_Name           : Positive;
+      Features_Dict      : Attribute_Dictionary_Map;
       aFeature           : Attribute_Record;
       aColumn            : JSON_Value;
       Feature_Name       : Unbounded_String;
@@ -130,10 +135,10 @@ package body Openml_Ada is
       Bunch              : Bunch_Data (Return_X_Y);
 
       procedure Parse_ARFF
-        (ARFF_In          : JSON_Value;
-         X_Slice, Y_Slice : JSON_Array;
-         X_out, Y_out     : out  ML_Types.Value_Data;
-         Nominal_Data_Out : out ML_Types.Value_Data) is
+        (ARFF_In          : ARFF_Record;
+         X_Slice, Y_Slice : ML_Types.Integer_List;
+         X_out, Y_out     : out ML_Types.Value_Data_List;
+         Nominal_Data_Out : out ML_Types.Value_Data_List) is
       begin
          Convert_Arff_Data (ARFF_In, X_Slice, Y_Slice, X_out, Y_out);
          Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
@@ -157,17 +162,15 @@ package body Openml_Ada is
                 "called with empty Features_List.");
       Assert (not Is_Empty (Data_Columns), Routine_Name &
                 "Data_Columns is empty.");
-      Assert (Length (Target_Columns) = Length (Data_Columns), Routine_Name &
+      Assert (Target_Columns.Length = Data_Columns.Length, Routine_Name &
                 " Target_Columns length" &
-                Integer'Image (Length (Target_Columns)) &
+                Count_Type'Image (Target_Columns.Length) &
                 " is different to Data_Columns length" &
-                Integer'Image (Length (Data_Columns)));
+                Count_Type'Image (Data_Columns.Length));
 
-      while Has_Element (Feature_Curs) loop
-         aFeature := Element (Feature_Curs);
-         Feature_Name := Element (Feature_Curs).Name;
-         Features_Dict.Append (Feature_Name);
-         Next (Feature_Curs);
+      for index in Features_List.First_Index .. Features_List.Last_Index loop
+         aFeature := Features_List.Element (index);
+         Features_Dict.Include (aFeature.Name, index);
       end loop;
       Put_Line (Routine_Name & "Features_Dict length" &
                   Integer'Image (Integer (Features_Dict.Length)));
@@ -179,13 +182,13 @@ package body Openml_Ada is
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
       --        ]
-      Col_Name := Features_List.First;
-      while Has_Element (Target_Columns, Col_Name) loop
-         aFeature := Array_Element (Features_List, 5);
-         aColumn := Get (aFeature, "index");
+--        Col_Name := Features_List.First;
+      for index in Target_Columns.First_Index .. Target_Columns.Last_Index loop
+         Feature_Name := Target_Columns.Element (index);
+         Feature_Index := Features_Dict.Element (Feature_Name);
+         aColumn := aFeature;
          --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
          Append (Col_Slice_Y, aColumn);
-         Col_Name := Array_Next (Target_Columns, Col_Name);
       end loop;
       Put_Line (Routine_Name & "Col_Slice_Y length" &
                   Integer'Image (Length (Col_Slice_Y)));
@@ -260,10 +263,9 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
    --  Target_Column : str, list or None, specifies the column name in the data
-   --  to use as target.
-   --  If empty, all columns are returned as data and the target is `None`.
-   --  If a list of strings, all columns with these names are returned as a
-   --  multi-target.
+   --  to use as target. If empty, all columns are returned as data and the
+   --  target is `None`. If a list of strings, all columns with these names
+   --  are returned as a multi-target.
    function Fetch_Openml (Dataset_File_Name : String;
                           Target_Column     : ML_Types.String_List;
                           As_Frame          : in out As_Frame_State;
@@ -563,11 +565,13 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Parse_Nominal_Data (Arff_Data       : ML_Types.Value_Data;
-                                Include_Columns : JSON_Array)
-                             return JSON_Array is
+   function Parse_Nominal_Data
+     (Arff_Data       : Load_ARFF_Data.ARFF_Record;
+      Include_Columns : Load_ARFF_Data.ARFF_Data_List_2D)
+         return ML_Types.Value_Data_List is
+      use Load_ARFF_Data;
       --        Routine_Name : constant String := "Openml_Ada.Parse_Nominal_Data ";
-      Attributes   : constant JSON_Array := Get (Arff_Data, "attributes");
+      Attributes   : constant Attribute_List := Get_Attributes (Arff_Data);
       Index_V      : Positive;
       Index_K      : Positive;
       Attribute    : JSON_Value := Create_Object;
@@ -685,20 +689,21 @@ package body Openml_Ada is
    end Set_Default_Target;
 
    --  ------------------------------------------------------------------------
-   --  L184  ArffSparseDataType = Tuple[List, ...]
-   --  _split_sparse_columns
-   --  (arff_data: ArffSparseDataType, include_columns: List)
-   --  - > ArffSparseDataType
-   --  Arff_Sparse_Data_Type is a subtype of JSON_Array
+   --  L184 ArffSparseDataType = Tuple[List, ...] _split_sparse_columns
+   --  (arff_data: ArffSparseDataType, include_columns: List) - >
+   --  ArffSparseDataType Arff_Sparse_Data_Type is a subtype of JSON_Array
    function Split_Sparse_Columns
-     (Arff_Data       : ARFF_Json.Arff_Sparse_Data_Type;
-      Include_Columns : JSON_Array)
-   return ARFF_Json.Arff_Sparse_Data_Type is
+     (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
+      Include_Columns : ML_Types.Integer_List)
+      return  ML_Types.Value_Data_List is
+      use Load_ARFF_Data;
+      use ARFF_Data_List_Package;
       use ARFF_Json;
       Routine_Name       : constant String := "Openml_Ada.Split_Sparse_Columns ";
-      Data_Length        : constant Natural := Length (Arff_Data);
+      Data_Length        : constant Natural := Arff_Data.Length;
       --        Include_Length     : constant Natural :=
       --                               Natural (Length (Include_Columns));
+      Curs_2D            : Cursor := Arff_Data.First;
       Arff_Data_New      : Arff_Sparse_Data_Type;
       New_Row            : JSON_Array;
       Arff_Data_Row      : JSON_Value;
@@ -774,29 +779,30 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
    --  L699
    function Valid_Data_Column_Names
-     (Features_List, Target_Columns : JSON_Array)
-      return Valid_Data_Column_Names is
+     (Features_List  : Load_ARFF_Data.Attribute_List;
+      Target_Columns : Load_ARFF_Data.ARFF_Data_List_2D)
+      return ML_Types.String_List is
+      use Load_ARFF_Data;
+      use ARFF_Data_List_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
       Feature_Index : Positive;
-      Feature       : JSON_Value;
-      Feature_Name  : JSON_Value;
-      Ignore        : JSON_Value;
-      Is_Row_ID     : JSON_Value;
+      Feature       : Attribute_Record;
+      Feature_Name  : Unbounded_String;
+      Ignore        : Boolean;
+      Is_Row_ID     : Boolean;
       Feature_Val   : Unbounded_String;
       Found         : Boolean := False;
-      Column_Names  : JSON_Array;
+      Column_Names  : ML_Types.String_List;
 
       function Check_Target return Boolean is
-         Target_Index : Positive;
-         Target       : JSON_Value;
+         Target_Curs : Cursor := Target_Columns.First;
+         Target       : ARFF_Data_List;
          Target_Found : Boolean := False;
       begin
          --  L707
          --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
-         Target_Index := Array_First (Target_Columns);
-         while Array_Has_Element (Target_Columns, Target_Index) and
-           not Target_Found loop
-            Target := Array_Element (Target_Columns, Target_Index);
+         while Has_Element (Target_Curs) and not Target_Found loop
+            Target := Element (Target_Curs);
             if not Is_Empty (Target) then
                if Kind (Target) = JSON_Object_Type then
                   declare
@@ -814,7 +820,7 @@ package body Openml_Ada is
                end if;
             end if;
 
-            Target_Index := Array_Next (Target_Columns, Target_Index);
+            Next (Target_Curs);
          end loop;
 
          return Target_Found;
@@ -866,8 +872,9 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   procedure Verify_Target_Data_Type (Features_Dict  : Attribute_Dictionary_Vector;
-                                      Target_Columns : JSON_Array) is
+   procedure Verify_Target_Data_Type
+     (Features_Dict  : Attribute_Dictionary_Map;
+      Target_Columns : Load_ARFF_Data.ARFF_Data_List_2D) is
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
       Target_Column : Positive := Array_First (Target_Columns);
    begin
