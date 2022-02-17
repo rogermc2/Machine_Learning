@@ -97,12 +97,12 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    function Download_Data_To_Bunch
-     (ARFF_Data     : Load_ARFF_Data.ARFF_Data_List_2D;
-      Sparse        : Boolean;
-      As_Frame      : As_Frame_State := As_Frame_False;
-      Features_List : Load_ARFF_Data.Attribute_List;
+     (ARFF_Container : Load_ARFF_Data.ARFF_Record;
+      Sparse         : Boolean;
+      As_Frame       : As_Frame_State := As_Frame_False;
+      Features_List  : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
-      Return_X_Y    : Boolean := False)
+      Return_X_Y     : Boolean := False)
      --                                       Shape            : Shape_Data)
       return Bunch_Data is
       use Ada.Containers;
@@ -112,6 +112,8 @@ package body Openml_Ada is
       use Attribute_Data_Package;
       use ARFF_Data_Package;
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
+      ARFF_Data          : constant ARFF_Data_List_2D :=
+                               Get_Data (ARFF_Container);
 --        Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
       Columns_Curs       : String_Package.Cursor := Data_Columns.First;
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
@@ -121,13 +123,13 @@ package body Openml_Ada is
       aFeature           : Attribute_Record;
       aColumn            : ARFF_Data_List;
       Col_Name           : Unbounded_String;
-      Col_Slice_X        : ML_Types.Integer_List;
-      Col_Slice_Y        : ML_Types.Integer_List;
+      Col_Slice_X        : Integer_List;
+      Col_Slice_Y        : Integer_List;
       Num_Missing        : Integer;
       Return_Type        : ARFF_Json.ARFF_Return_Type;
-      All_Columns        : JSON_Array;
-      X                  : JSON_Array;
-      Y                  : JSON_Array;
+      All_Columns        : String_List;
+      X                  : Value_Data_List;
+      Y                  : Value_Data_List;
       Nominal_Attributes : JSON_Array;
       --        Frame              : Boolean := False;
       Bunch              : Bunch_Data (Return_X_Y);
@@ -193,31 +195,26 @@ package body Openml_Ada is
 
       --  L566 continued
       for Col_ID in Features_List.First_Index .. Features_List.Last_Index loop
-         aFeature := Element (Col_ID);
-         --           Put_Line (Routine_Name & "aFeature X " & aFeature.Write);
-         aColumn := Get (aFeature, "index");
-         Append (Col_Slice_X, aColumn);
+         aFeature := Features_List.Element (Col_ID);
+         Feature_Index := Features_Dict.Element (aFeature.Name);
+         Col_Slice_X.Append (Feature_Index);
       end loop;
 
       --  L568
-      while Has_Element (Data_Columns, Col_Name) loop
-         aFeature := Array_Element (Features_List, Col_Name);
-         aColumn := Get (aFeature, "index");
-         Append (Col_Slice_X, aColumn);
-         Col_Name := Array_Next (Data_Columns, Col_Name);
+      while Has_Element (Columns_Curs) loop
+         Col_Name := Element (Columns_Curs);
+         Col_Slice_X.Append (Features_Dict.Element (Col_Name));
+         Next (Columns_Curs);
       end loop;
 
       --  L569
-      Col_Name := Array_First (Col_Slice_Y);
-      while Array_Has_Element (Col_Slice_Y, Col_Name) loop
-         aFeature := Array_Element (Features_List, Col_Name);
-         --           Put_Line (Routine_Name & "aFeature " & aFeature.Write);
-         Num_Missing := Integer'Value
-           (Get (aFeature, "number_of_missing_values"));
-         Assert (Num_Missing >= 0,
-                 Routine_Name & "Target column " & " has " & " missing values."
-                 & "Missing values are not supported for target columns.");
-         Col_Name := Array_Next (Col_Slice_Y, Col_Name);
+      for index in  Col_Slice_Y.First_Index .. Col_Slice_Y.Last_Index loop
+         Feature_Index := Col_Slice_Y.Element (index);
+--           Num_Missing := Integer'Value
+--             (Get (aFeature, "number_of_missing_values"));
+--           Assert (Num_Missing >= 0,
+--                   Routine_Name & "Target column " & " has " & " missing values."
+--                   & "Missing values are not supported for target columns.");
       end loop;
 
       --  L582
@@ -228,20 +225,21 @@ package body Openml_Ada is
       end if;
 
       --  L601
-      if As_Frame then
+      if As_Frame = As_Frame_True then
          All_Columns := Data_Columns;
-         Col_Name := Array_First (Target_Columns);
-         while Array_Has_Element (Target_Columns, Col_Name) loop
-            Append (All_Columns, Array_Element (Target_Columns, Col_Name));
-            Col_Name := Array_Next (Target_Columns, Col_Name);
+         Target_Curs := Target_Columns.First;
+         while Has_Element (Target_Curs) loop
+            All_Columns.Append (Element (Target_Curs));
+            Next (Target_Curs);
          end loop;
       end if;
 
       Put_Line (Routine_Name & "L667");
       --  L667
-      Parse_ARFF (ARFF_Data, Col_Slice_X, Col_Slice_Y, X, Y, Nominal_Attributes);
-      Put_Line (Routine_Name & "X length" & Integer'Image (Length (X)));
-      Put_Line (Routine_Name & "Y length" & Integer'Image (Length (Y)));
+      Parse_ARFF (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y,
+                  Nominal_Attributes);
+      Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
+      Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
       --  L672
       Bunch.Data := X;

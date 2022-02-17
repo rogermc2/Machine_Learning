@@ -13,7 +13,7 @@ package Openml_Ada is
    subtype Qualities_Map is JSON_Array;
 
    type Bunch_Data (Only_XY : Boolean := False) is record
-      Data          : JSON_Array;
+      Data          : ML_Types.Value_Data_List;
       Target        : JSON_Array;
       case Only_XY is
          when True => null;
@@ -31,7 +31,7 @@ package Openml_Ada is
    end record;
 
    function Download_Data_To_Bunch
-     (ARFF_Data      : Load_ARFF_Data.ARFF_Data_List_2D;
+     (ARFF_Container : Load_ARFF_Data.ARFF_Record;
       Sparse         : Boolean;
       As_Frame       : As_Frame_State := As_Frame_False;
       Features_List  : Load_ARFF_Data.Attribute_List;
