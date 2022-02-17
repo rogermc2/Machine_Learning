@@ -113,7 +113,6 @@ package body Openml_Ada is
       use ARFF_Data_Package;
       Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
 --        Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
---        Col_Name           : Attribute_Data_Package.Cursor := Features_List.First;
       Columns_Curs       : String_Package.Cursor := Data_Columns.First;
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
       Feature_Index      : Positive;
@@ -122,8 +121,8 @@ package body Openml_Ada is
       aFeature           : Attribute_Record;
       aColumn            : ARFF_Data_List;
       Col_Name           : Unbounded_String;
-      Col_Slice_X        : JSON_Array;
-      Col_Slice_Y        : JSON_Array;
+      Col_Slice_X        : ML_Types.Integer_List;
+      Col_Slice_Y        : ML_Types.Integer_List;
       Num_Missing        : Integer;
       Return_Type        : ARFF_Json.ARFF_Return_Type;
       All_Columns        : JSON_Array;
@@ -182,18 +181,15 @@ package body Openml_Ada is
       --          for col_name in target_columns
       --        ]
       --  target_columns is a list of feature names
---        Col_Name := Features_List.First;
       while Has_Element (Target_Curs) loop
          Col_Name := Element (Target_Curs);
          Feature_Index := Features_Dict.Element (Col_Name);
-         aFeature := Features_List.Element (Feature_Index);
-         aColumn := aFeature;
          --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
-         Append (Col_Slice_Y, aColumn);
+         Col_Slice_Y.Append (Feature_Index);
          Next (Target_Curs);
       end loop;
       Put_Line (Routine_Name & "Col_Slice_Y length" &
-                  Integer'Image (Length (Col_Slice_Y)));
+                  Count_Type'Image (Col_Slice_Y.Length));
 
       --  L566 continued
       for Col_ID in Features_List.First_Index .. Features_List.Last_Index loop
@@ -876,7 +872,7 @@ package body Openml_Ada is
      (Features_Dict  : Attribute_Dictionary_Map;
       Target_Columns : ML_Types.String_List) is
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
-      Target_Column : Positive := Array_First (Target_Columns);
+--        Target_Column : Positive := Array_First (Target_Columns);
    begin
       --        Put_Line (Routine_Name & "Target_Columns length" &
       --                    Integer'Image (Length (Target_Columns)));
