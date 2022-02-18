@@ -166,7 +166,7 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       use Ada.Containers;
       Routine_Name      : constant String := "Test_Fetch_OML ";
-      Dataset_Name      : constant String := "iris";
+      Dataset_Name      : constant String := "../iris.arff";
 --        Dataset_Name      : constant String := "mnist_784";
 --        Version           : constant String := "1";
 --        Data_Id           : Integer := 554;
