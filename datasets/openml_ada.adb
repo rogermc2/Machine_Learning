@@ -6,7 +6,6 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Dataset_Utilities;
 --  with Printing;
 
 pragma Warnings (Off);
@@ -260,7 +259,6 @@ package body Openml_Ada is
                           Return_X_Y        : Boolean := False)
                           return Bunch_Data is
       use Ada.Strings;
-      use Dataset_Utilities;
       use Load_ARFF_Data;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "Openml_Ada.Fetch_Openml ";
@@ -808,14 +806,18 @@ package body Openml_Ada is
       Target_Columns : ML_Types.String_List) is
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
       --        Target_Column : Positive := Array_First (Target_Columns);
+      use ML_Types;
+      use String_Package;
+      Curs   : Cursor := Target_Columns.First;
+      Column : Unbounded_String;
    begin
       --        Put_Line (Routine_Name & "Target_Columns length" &
       --                    Integer'Image (Length (Target_Columns)));
-      while Array_Has_Element (Target_Columns, Target_Column) loop
-         Assert (Array_Has_Element (Features_Dict, Target_Column),
-                 Routine_Name & "Features_Dict does not have element " &
-                   Integer'Image (Target_Column));
-         Target_Column := Array_Next (Target_Columns, Target_Column);
+      while Has_Element (Curs) loop
+         Column := Element (Curs);
+         Assert (Features_Dict.Contains (Column),
+                 Routine_Name & "Features_Dict does not contain " &
+                   To_String (Column));
       end loop;
 
    end Verify_Target_Data_Type;
