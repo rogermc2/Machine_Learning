@@ -1,5 +1,5 @@
 
-with Ada.Containers.Doubly_Linked_Lists;
+--  with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -35,6 +35,7 @@ package Load_ARFF_Data is
    subtype ARFF_Data_List_2D is ARFF_Data_List_Package.Vector;
 
    type Nominal_Data_Record (Data_Kind : Nominal_Data_Type) is record
+      Name                 : Unbounded_String;
       case Data_Kind is
          when Nominal_Real | Nominal_Numeric =>
             Real_Data      : Float;
@@ -45,9 +46,9 @@ package Load_ARFF_Data is
       end case;
    end record;
 
-   package Nominal_Types_Package is new
-     Ada.Containers.Doubly_Linked_Lists (Nominal_Data_Type);
-   subtype Nominal_Types_List is Nominal_Types_Package.List;
+--     package Nominal_Types_Package is new
+--       Ada.Containers.Doubly_Linked_Lists (Nominal_Data_Type);
+--     subtype Nominal_Types_List is Nominal_Types_Package.List;
 
    package Nominal_Data_Package is new
      Ada.Containers.Indefinite_Doubly_Linked_Lists (Nominal_Data_Record);
@@ -56,8 +57,9 @@ package Load_ARFF_Data is
    type Attribute_Record is record
       Name          : Unbounded_String;
       Data_Kind     : ARFF_Data_Type;
-      Nominal_Names : ML_Types.Indef_String_List;
-      Nominal_Types : Nominal_Types_List;
+      Nominal_Data  : Nominal_Data_List;
+--        Nominal_Names : ML_Types.Indef_String_List;
+--        Nominal_Types : Nominal_Types_List;
       Ignore        : Boolean := False;
       Is_Row_ID     : Boolean := False;
       Is_Target     : Boolean := False;

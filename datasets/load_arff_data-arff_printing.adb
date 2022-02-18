@@ -3,7 +3,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
 
 with ML_Types;
-with Printing;
+--  with Printing;
 
 package body Load_ARFF_Data.ARFF_Printing is
 
@@ -37,9 +37,15 @@ package body Load_ARFF_Data.ARFF_Printing is
          Ada.Text_IO.Unbounded_IO.Put_Line
            (Trim (To_Unbounded_String
             (ARFF_Data_Type'Image (Attribute.Data_Kind)), Both));
-         if not Attribute.Nominal_Names.Is_Empty then
-            Printing.Print_Indefinite_List
-              ("Nominal Names", Attribute.Nominal_Names);
+         if not Attribute.Nominal_Data.Is_Empty then
+            New_Line;
+            Put_Line ("*** Has nominal data ***");
+            New_Line;
+--              Printing.Print_Indefinite_List
+--                ("Nominal Names", Attribute.Nominal_Names);
+--           if not Attribute.Nominal_Names.Is_Empty then
+--              Printing.Print_Indefinite_List
+--                ("Nominal Names", Attribute.Nominal_Names);
          end if;
          Next (Curs);
       end loop;
