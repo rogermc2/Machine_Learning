@@ -58,6 +58,8 @@ package Load_ARFF_Data is
       Data_Kind     : ARFF_Data_Type;
       Nominal_Names : ML_Types.Indef_String_List;
       Nominal_Types : Nominal_Types_List;
+      Ignore        : Boolean := False;
+      Is_Row_ID     : Boolean := False;
    end record;
 
    package Attribute_Data_Package is new
