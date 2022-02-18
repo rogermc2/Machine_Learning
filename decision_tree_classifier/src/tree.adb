@@ -4,7 +4,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Types;
 --  with Printing;
 
 package body Tree is
@@ -43,7 +42,6 @@ package body Tree is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Value_Data_Package;
-      use Nodes_Package;
       Routine_Name   : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
@@ -166,7 +164,6 @@ package body Tree is
       use Ada.Strings.Unbounded;
       use ML_Types;
       use Value_Data_Package;
-      use Nodes_Package;
       Routine_Name   : constant String := "Tree.Decision_Path_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (aTree.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);

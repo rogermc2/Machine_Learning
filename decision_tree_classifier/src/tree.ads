@@ -63,7 +63,6 @@ package Tree is
      (Positive, Tree_Cursor);
    subtype Tree_Cursor_List is Tree_Cursor_Package.Vector;
 
-   use Nodes_Package;
    package Nodes_List_Package is new Ada.Containers.Vectors
      (Positive, Tree_Node);
    subtype Nodes_List is Nodes_List_Package.Vector;
