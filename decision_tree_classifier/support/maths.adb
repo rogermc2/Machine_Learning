@@ -4,9 +4,9 @@ with Ada.Numerics.Discrete_Random;
 with Ada.Numerics.Float_Random;
 
 package body Maths is
-   package Random_Integer_Package is new 
+   package Random_Integer_Package is new
      Ada.Numerics.Discrete_Random (Random_Integer_Range);
-   
+
    Radians_Per_Degree : constant Radian := Ada.Numerics.Pi / 180.0;
    Degrees_Per_Radian : constant Degree := 180.0 / Ada.Numerics.Pi;
 
@@ -28,7 +28,7 @@ package body Maths is
    end Degrees;
 
    --  -----------------------------------------------------------------------
-  
+
    function Radians (Angle : Degree) return Radian is
    begin
       return Radian (Angle) * Radians_Per_Degree;
