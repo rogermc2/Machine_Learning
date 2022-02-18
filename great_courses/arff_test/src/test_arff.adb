@@ -35,7 +35,7 @@ begin
    Put_Line ("Relation: " & Get_Relation (Data));
    Print_Attributes (Data);
    --     Print_Data (Data);
-   Print_Data (Data, 10, 14);
+   Print_Data (Data, 1, 3);
 --     Print_Data (Data, 40, 100);
 
 end Test_ARFF;

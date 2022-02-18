@@ -344,11 +344,11 @@ package body Load_ARFF_Data is
       Put_Line (Routine_Name & File_Name & " opened");
       --  L798
       Load_Header (File_ID, aLine, Data.Header);
-      Put_Line (Routine_Name & " Header loaded");
+      Put_Line (Routine_Name & "Header loaded");
       New_Line;
       --  L873 obj['data'] = data.decode_rows
       Load_Data (File_ID, aLine, Data);
-      Put_Line (Routine_Name & " data loaded");
+      Put_Line (Routine_Name & "data loaded");
       Close (File_ID);
       pragma Unreferenced (File_ID);
       pragma Unreferenced (aLine);
@@ -440,6 +440,7 @@ package body Load_ARFF_Data is
 
                Nominal_Text :=
                  To_Unbounded_String (Slice (aLine, Pos_1, Pos_2 - 1));
+--                 Put_Line (Routine_Name & "Nominal_Text: " & Nominal_Text);
                Nominal_ML_Type := Utilities.Get_Data_Type (Nominal_Text);
                case Nominal_ML_Type is
                   when ML_Types.Integer_Type =>
@@ -453,6 +454,16 @@ package body Load_ARFF_Data is
                declare
                   Nominal : Nominal_Data_Record (Nominal_Kind);
                begin
+                  case Nominal_Kind is
+                  when Nominal_Integer =>
+                     Nominal.Integer_Data :=
+                       Integer'Value (To_String (Nominal_Text));
+                  when Nominal_Numeric | Nominal_Real =>
+                     Nominal.Real_Data :=
+                       Float'Value (To_String (Nominal_Text));
+                  when Nominal_String =>
+                     Nominal.UB_String_Data := Nominal_Text;
+                  end case;
                   Attribute.Nominal_Data.Append (Nominal);
                end;
 

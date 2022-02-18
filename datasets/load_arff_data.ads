@@ -45,10 +45,6 @@ package Load_ARFF_Data is
       end case;
    end record;
 
---     package Nominal_Types_Package is new
---       Ada.Containers.Doubly_Linked_Lists (Nominal_Data_Type);
---     subtype Nominal_Types_List is Nominal_Types_Package.List;
-
    package Nominal_Data_Package is new
      Ada.Containers.Indefinite_Doubly_Linked_Lists (Nominal_Data_Record);
    subtype Nominal_Data_List is Nominal_Data_Package.List;
@@ -57,8 +53,6 @@ package Load_ARFF_Data is
       Name          : Unbounded_String;
       Data_Kind     : ARFF_Data_Type;
       Nominal_Data  : Nominal_Data_List;
---        Nominal_Names : ML_Types.Indef_String_List;
---        Nominal_Types : Nominal_Types_List;
       Ignore        : Boolean := False;
       Is_Row_ID     : Boolean := False;
       Is_Target     : Boolean := False;
