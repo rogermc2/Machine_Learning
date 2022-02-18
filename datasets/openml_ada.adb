@@ -2,18 +2,17 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Maps;
---  with Ada.Containers.Vectors;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Printing;
 
-pragma Warnings (Off);
+--  pragma Warnings (Off);
 
 package body Openml_Ada is
 
-   type ARFF_Return_Type is (Arff_Dense, Arff_Coo, Arff_Lod,
-                             Arff_Dense_Gen, Arff_Lod_Gen);
+   --     type ARFF_Return_Type is (Arff_Dense, Arff_Coo, Arff_Lod,
+   --                               Arff_Dense_Gen, Arff_Lod_Gen);
 
    package Attribute_Dictionary_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Positive);
@@ -37,7 +36,7 @@ package body Openml_Ada is
    --      subtype Features_Map is ML_Features_Package.Map;
 
    function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
-   function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
+   --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    function Parse_Nominal_Data
      (Arff_Data       : Load_ARFF_Data.ARFF_Record;
       Include_Columns : ML_Types.String_List)
@@ -264,34 +263,19 @@ package body Openml_Ada is
       Routine_Name    : constant String := "Openml_Ada.Fetch_Openml ";
       --        Dataset_Name_LC : constant String := To_Lower_Case (Dataset_Name);
       ARFF_Data       : ARFF_Record;
-      Data_Id         : Integer;
-      Data            : ARFF_Data_List_2D;
-      Description     : ARFF_Header;
-      JSON_Data_Array : JSON_Array;
-      JSON_Data_Item  : JSON_Value;
-      Return_Sparse   : Boolean := False;
+      --        Data_Id         : Integer;
+      Return_Sparse   : constant Boolean := False;
       Features_List   : Attribute_List;
-      Ignore          : JSON_Value;
       Curs            : Cursor;
       Target_Value    : Unbounded_String;
-      --        Target          : constant JSON_Value := Create_Object;
       Target_Columns  : ML_Types.String_List;
       Data_Columns    : ML_Types.String_List;
       --        Shape           : Shape_Data;
-      Data_Qualities  : Qualities_Map;
+      --        Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
    begin
       Load_ARFF (Dataset_File_Name, ARFF_Data);
-      --  L862
-      Description := Get_Description (ARFF_Data);
-
-      Data := Get_Data (ARFF_Data);
       New_Line;
-
-      --  L877
-
-      --  L897
-
       --  L903
       if As_Frame = As_Frame_Auto then
          if not Return_Sparse then
@@ -332,13 +316,13 @@ package body Openml_Ada is
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
 
       --  L948
-      if not Return_Sparse then
-         Data_Qualities := Get_Data_Qualities (Data_Id);
-         if Get_Num_Samples (Data_Qualities) > - 1 then
-            null;
-            --              Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
-         end if;
-      end if;
+      --        if not Return_Sparse then
+      --           Data_Qualities := Get_Data_Qualities (Data_Id);
+      --           if Get_Num_Samples (Data_Qualities) > - 1 then
+      --              null;
+      --              --              Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
+      --           end if;
+      --        end if;
 
       Put_Line (Routine_Name & "L955 setting bunch");
       --  L955
@@ -507,47 +491,47 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Num_Samples (Qualities : Qualities_Map) return Integer is
-      --        Routine_Name  : constant String := "Openml_Ada.Get_Num_Samples ";
-      Quality       : JSON_Value := Create;
-      Index         : Positive := Array_First (Qualities);
-      Num_Samples   : Integer := -1;
-
-      procedure Get_Num_Instances (Name : Utf8_String; Value : JSON_Value) is
-         Num_Instances : Float := 0.0;
-      begin
-         if Name = "NumberOfInstances" then
-            Num_Instances := Get (Value);
-            Num_Samples := Integer (Num_Instances);
-         end if;
-      end Get_Num_Instances;
-
-      procedure Get_Qual (Name : Utf8_String; Value : JSON_Value) is
-         Name_Quality : constant JSON_Value := Create_Object;
-      begin
-         if Name = "name" and then Kind (Value) = JSON_String_Type then
-            declare
-               String_Value : constant String := Get (Value);
-            begin
-               if String_Value = "value" then
-                  Name_Quality.Set_Field (Name, Value);
-               end if;
-               Map_JSON_Object (Name_Quality, Get_Num_Instances'access);
-            end;
-         end if;
-
-      end Get_Qual;
-
-   begin
-      while Array_Has_Element (Qualities, Index) loop
-         Quality := Array_Element (Qualities, Index);
-         Map_JSON_Object (Quality, Get_Qual'access);
-         Index := Array_Next (Qualities, Index);
-      end loop;
-
-      return Num_Samples;
-
-   end Get_Num_Samples;
+   --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer is
+   --        --        Routine_Name  : constant String := "Openml_Ada.Get_Num_Samples ";
+   --        Quality       : JSON_Value := Create;
+   --        Index         : Positive := Array_First (Qualities);
+   --        Num_Samples   : Integer := -1;
+   --
+   --        procedure Get_Num_Instances (Name : Utf8_String; Value : JSON_Value) is
+   --           Num_Instances : Float := 0.0;
+   --        begin
+   --           if Name = "NumberOfInstances" then
+   --              Num_Instances := Get (Value);
+   --              Num_Samples := Integer (Num_Instances);
+   --           end if;
+   --        end Get_Num_Instances;
+   --
+   --        procedure Get_Qual (Name : Utf8_String; Value : JSON_Value) is
+   --           Name_Quality : constant JSON_Value := Create_Object;
+   --        begin
+   --           if Name = "name" and then Kind (Value) = JSON_String_Type then
+   --              declare
+   --                 String_Value : constant String := Get (Value);
+   --              begin
+   --                 if String_Value = "value" then
+   --                    Name_Quality.Set_Field (Name, Value);
+   --                 end if;
+   --                 Map_JSON_Object (Name_Quality, Get_Num_Instances'access);
+   --              end;
+   --           end if;
+   --
+   --        end Get_Qual;
+   --
+   --     begin
+   --        while Array_Has_Element (Qualities, Index) loop
+   --           Quality := Array_Element (Qualities, Index);
+   --           Map_JSON_Object (Quality, Get_Qual'access);
+   --           Index := Array_Next (Qualities, Index);
+   --        end loop;
+   --
+   --        return Num_Samples;
+   --
+   --     end Get_Num_Samples;
 
    --  ------------------------------------------------------------------------
 
@@ -583,7 +567,6 @@ package body Openml_Ada is
             while Has_Element (Name_Curs) loop
                Nom_Type := Element (Type_Curs);
                declare
-                  Name    : String := Element (Name_Curs);
                   Nominal : Nominal_Data_Record (Nom_Type);
                begin
                   --                 Put_Line  (Routine_Name & "Nominal: " & Nominal);
@@ -609,7 +592,6 @@ package body Openml_Ada is
       use Load_ARFF_Data;
       Routine_Name   : constant String := "Openml_Ada.Process_Feature ";
       Attribute      : Attribute_Record;
-      Feature_Name   : Unbounded_String;
       Ignore         : Boolean := False;
       Is_Row_ID      : Boolean := False;
       Data_Type_Item : ARFF_Data_Type;
@@ -630,11 +612,9 @@ package body Openml_Ada is
       --  L920
       for index in Features_List.First_Index .. Features_List.Last_Index loop
          Attribute := Features_List.Element (index);
-         --           Put_Line (Routine_Name & "Feature_Name JSON type: " &
-         --                       JSON_Value_Type'Image (Kind (Feature_Name)));
          Ignore := Attribute.Ignore;
          Is_Row_ID := Attribute.Is_Row_ID;
-
+         Data_Type_Item := Attribute.Data_Kind;
          Process_Status (Ignore, Is_Row_ID);
       end loop;
 
@@ -644,7 +624,6 @@ package body Openml_Ada is
    --  L922
    procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
                                  Target_Columns : out ML_Types.String_List) is
-      use ML_Types;
       use Load_ARFF_Data;
       use Attribute_Data_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
@@ -672,14 +651,10 @@ package body Openml_Ada is
       use ARFF_Data_Package;
       Routine_Name    : constant String := "Openml_Ada.Split_Sparse_Columns ";
       Data_Length     : constant Natural := Natural (Arff_Data.Length);
-      --        Include_Length : constant Natural :=
-      --                               Natural (Length (Include_Columns));
       Col_Curs        : ARFF_Data_Package.Cursor;
       Arff_Data_New   : ARFF_Data_List_2D;
       New_Row         : ARFF_Data_List;
       Arff_Data_Row   : ARFF_Data_List;
-      Value           : Unbounded_String;
-      aColumn         : Positive;
       Select_Col      : Boolean;
    begin
       Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
@@ -688,33 +663,26 @@ package body Openml_Ada is
          Arff_Data_Row := Arff_Data.Element (sample);
          Col_Curs := Arff_Data_Row.First;
          while Has_Element (Col_Curs) loop
-            declare
-               Arff_Data : ARFF_Data_Record (ML_Types.UB_String_Type) :=
-                                  Element (Col_Curs);
-            begin
-               Value := Arff_Data.UB_String_Data;
 
-               for col_index in Include_Columns.First_Index ..
-               Include_Columns.Last_Index loop
-                  aColumn := Include_Columns.Element (col_index);
-
-                  Select_Col := False;
-                  for include_col in Include_Columns.First_Index ..
-                          Include_Columns.Last_Index loop
-                     Select_Col := Select_Col or
-                       col_index = Include_Columns.Element (include_col);
-                  end loop;
-
-                  if Select_Col then
-                     New_Row.Append (Element (Col_Curs));
-                  end if;
+            for col_index in Include_Columns.First_Index ..
+              Include_Columns.Last_Index loop
+               Select_Col := False;
+               for include_col in Include_Columns.First_Index ..
+                 Include_Columns.Last_Index loop
+                  Select_Col := Select_Col or
+                    col_index = Include_Columns.Element (include_col);
                end loop;
-            end;
+
+               if Select_Col then
+                  New_Row.Append (Element (Col_Curs));
+               end if;
+            end loop;
+
             Next (Col_Curs);
          end loop;
          --              Put_Line (Routine_Name & "end outer while:");
 
-        Arff_Data_New.Append (New_Row);
+         Arff_Data_New.Append (New_Row);
       end loop;
 
       return Arff_Data_New;
@@ -723,26 +691,26 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
---     function J_Array_To_String_List (J_Array : JSON_Array)
---                                      return ML_Types.String_List is
---        use ML_Types;
---        --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
---        theList       : String_List;
---        Index         : Positive := Array_First (J_Array);
---        J_Item        : JSON_Value;
---        Item          : Unbounded_String;
---     begin
---        --  L707
---        --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
---        while Has_Element (Target_Curs) and not Target_Found loop
---           Target := Element (Target_Curs);
---           Target_Found := Target = Feature_Name;
---           Next (Target_Curs);
---        end loop;
---
---        return theList;
---
---     end J_Array_To_String_List;
+   --     function J_Array_To_String_List (J_Array : JSON_Array)
+   --                                      return ML_Types.String_List is
+   --        use ML_Types;
+   --        --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
+   --        theList       : String_List;
+   --        Index         : Positive := Array_First (J_Array);
+   --        J_Item        : JSON_Value;
+   --        Item          : Unbounded_String;
+   --     begin
+   --        --  L707
+   --        --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
+   --        while Has_Element (Target_Curs) and not Target_Found loop
+   --           Target := Element (Target_Curs);
+   --           Target_Found := Target = Feature_Name;
+   --           Next (Target_Curs);
+   --        end loop;
+   --
+   --        return theList;
+   --
+   --     end J_Array_To_String_List;
 
    --  ------------------------------------------------------------------------
    --  L699
@@ -750,14 +718,9 @@ package body Openml_Ada is
      (Features_List  : Load_ARFF_Data.Attribute_List;
       Target_Columns : ML_Types.String_List) return ML_Types.String_List is
       use Load_ARFF_Data;
-      use ARFF_Data_List_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
-      Feature_Index : Positive;
       Feature       : Attribute_Record;
       Feature_Name  : Unbounded_String;
-      Ignore        : Boolean;
-      Is_Row_ID     : Boolean;
-      Feature_Val   : Unbounded_String;
       Found         : Boolean := False;
       Valid_Names   : ML_Types.String_List;
 
@@ -783,7 +746,7 @@ package body Openml_Ada is
    begin
       --  L705
       for index in Features_List.First_Index .. Features_List.Last_Index loop
-         Feature := Features_List.Element (Feature_Index);
+         Feature := Features_List.Element (index);
          Feature_Name := Feature.Name;
          --           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name);
          Found := Check_Target;
@@ -805,11 +768,9 @@ package body Openml_Ada is
      (Features_Dict  : Attribute_Dictionary_Map;
       Target_Columns : ML_Types.String_List) is
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
-      --        Target_Column : Positive := Array_First (Target_Columns);
-      use ML_Types;
-      use String_Package;
-      Curs   : Cursor := Target_Columns.First;
-      Column : Unbounded_String;
+      use ML_Types.String_Package;
+      Curs          : Cursor := Target_Columns.First;
+      Column        : Unbounded_String;
    begin
       --        Put_Line (Routine_Name & "Target_Columns length" &
       --                    Integer'Image (Length (Target_Columns)));
@@ -818,6 +779,7 @@ package body Openml_Ada is
          Assert (Features_Dict.Contains (Column),
                  Routine_Name & "Features_Dict does not contain " &
                    To_String (Column));
+         Next (Curs);
       end loop;
 
    end Verify_Target_Data_Type;
