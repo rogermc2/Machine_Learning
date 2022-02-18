@@ -48,7 +48,8 @@ package body Openml_Ada is
                                  Target_Columns : out ML_Types.String_List);
    function Split_Sparse_Columns
      (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
-      Include_Columns : ML_Types.Integer_List) return ML_Types.Value_Data_List;
+      Include_Columns : ML_Types.Integer_List)
+      return Load_ARFF_Data.ARFF_Data_List_2D;
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
       Target_Columns : ML_Types.String_List);
@@ -81,7 +82,7 @@ package body Openml_Ada is
    procedure Convert_Arff_Data
      (Arff_Container            : Load_ARFF_Data.ARFF_Record;
       Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
-      X, Y                      : out  ML_Types.Value_Data_List) is
+      X, Y                      : out  Load_ARFF_Data.ARFF_Data_List_2D) is
       --        Routine_Name    : constant String := "Openml_Ada.Convert_Arff_Data ";
       use Load_ARFF_Data;
       ARFF_Data  : constant ARFF_Data_List_2D := Get_Data (Arff_Container);
@@ -121,8 +122,8 @@ package body Openml_Ada is
       --        Num_Missing        : Integer;
       --        Return_Type        : ARFF_Return_Type;
       All_Columns        : String_List;
-      X                  : Value_Data_List;
-      Y                  : Value_Data_List;
+      X                  : ARFF_Data_List_2D;
+      Y                  : ARFF_Data_List_2D;
       Nominal_Attributes : Nominal_Data_List;
       --        Frame              : Boolean := False;
       Bunch              : Bunch_Data (Return_X_Y);
@@ -130,7 +131,7 @@ package body Openml_Ada is
       procedure Parse_ARFF
         (ARFF_In          : ARFF_Record;
          X_Slice, Y_Slice : ML_Types.Integer_List;
-         X_out, Y_out     : out ML_Types.Value_Data_List;
+         X_out, Y_out     : out ARFF_Data_List_2D;
          Nominal_Data_Out : out Nominal_Data_List) is
       begin
          Convert_Arff_Data (ARFF_In, X_Slice, Y_Slice, X_out, Y_out);
@@ -667,7 +668,7 @@ package body Openml_Ada is
    function Split_Sparse_Columns
      (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
       Include_Columns : ML_Types.Integer_List)
-      return  ML_Types.Value_Data_List is
+      return Load_ARFF_Data.ARFF_Data_List_2D is
       use Load_ARFF_Data;
       use ARFF_Data_List_Package;
       use ARFF_Data_Package;
@@ -707,7 +708,7 @@ package body Openml_Ada is
                   end loop;
 
                   if Select_Col then
-                     New_Row.Append (aColumn);
+                     New_Row.Append (Element (Col_Curs));
                   end if;
                end loop;
             end;
@@ -715,12 +716,7 @@ package body Openml_Ada is
          end loop;
          --              Put_Line (Routine_Name & "end outer while:");
 
-         declare
-            New_Data_Row : constant JSON_Value := Create_Object;
-         begin
-            New_Data_Row.Set_Field ("values", New_Row);
-            Append (Arff_Data_New, New_Data_Row);
-         end;
+        Arff_Data_New.Append (New_Row);
       end loop;
 
       return Arff_Data_New;
@@ -729,26 +725,26 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function J_Array_To_String_List (J_Array : JSON_Array)
-                                    return ML_Types.String_List is
-      use ML_Types;
-      --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
-      theList       : String_List;
-      Index         : Positive := Array_First (J_Array);
-      J_Item        : JSON_Value;
-      Item          : Unbounded_String;
-   begin
-      --  L707
-      --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
-      while Has_Element (Target_Curs) and not Target_Found loop
-         Target := Element (Target_Curs);
-         Target_Found := Target = Feature_Name;
-         Next (Target_Curs);
-      end loop;
-
-      return theList;
-
-   end J_Array_To_String_List;
+--     function J_Array_To_String_List (J_Array : JSON_Array)
+--                                      return ML_Types.String_List is
+--        use ML_Types;
+--        --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
+--        theList       : String_List;
+--        Index         : Positive := Array_First (J_Array);
+--        J_Item        : JSON_Value;
+--        Item          : Unbounded_String;
+--     begin
+--        --  L707
+--        --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
+--        while Has_Element (Target_Curs) and not Target_Found loop
+--           Target := Element (Target_Curs);
+--           Target_Found := Target = Feature_Name;
+--           Next (Target_Curs);
+--        end loop;
+--
+--        return theList;
+--
+--     end J_Array_To_String_List;
 
    --  ------------------------------------------------------------------------
    --  L699
@@ -768,7 +764,9 @@ package body Openml_Ada is
       Valid_Names   : ML_Types.String_List;
 
       function Check_Target return Boolean is
-         Target_Curs  : Cursor := Target_Columns.First;
+         use ML_Types;
+         use String_Package;
+         Target_Curs  : String_Package.Cursor := Target_Columns.First;
          Target       : Unbounded_String;
          Target_Found : Boolean := False;
       begin
@@ -791,33 +789,12 @@ package body Openml_Ada is
          Feature_Name := Feature.Name;
          --           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name);
          Found := Check_Target;
-
-         Is_Row_ID := Feature.Get ("is_row_identifier");
-         --           Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
-         --           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
-
-
-         if not Is_Empty (Ignore) and not Is_Empty (Is_Row_ID) then
-            --                  Put_Line (Routine_Name & "Is_Row_ID and Ignore both not empty");
-            declare
-               Ignore_Status : constant String := Get (Ignore);
-               Row_ID_Status : constant String := Get (Is_Row_ID);
-            begin
-               if Ignore_Status /= "true" and Row_ID_Status /= "true" then
-                  --                          Put_Line (Routine_Name &
-                  --                                      "Ignore_Status and Row_ID_Status not true");
-                  Found := Check_Target;
-               end if;
-            end;
-
-         else  --  Is_Empty (Ignore) or Is_Empty (Is_Row_ID)
-            Found := Check_Target;
-         end if;
-
-         if not Found then
+         --           Put_Line (Routine_Name & "Ignore: " & Ignore);
+         --           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID);
+         if not Found and then
+           (not Feature.Ignore and not Feature.Is_Row_ID) then
             Valid_Names.Append (Feature_Name);
          end if;
-
       end loop;
 
       return Valid_Names;

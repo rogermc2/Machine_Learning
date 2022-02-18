@@ -13,13 +13,13 @@ package Openml_Ada is
    subtype Qualities_Map is JSON_Array;
 
    type Bunch_Data (Only_XY : Boolean := False) is record
-      Data          : ML_Types.Value_Data_List;
-      Target        : ML_Types.Value_Data_List;
+      Data          : Load_ARFF_Data.ARFF_Data_List_2D;
+      Target        : Load_ARFF_Data.ARFF_Data_List_2D;
       case Only_XY is
          when True => null;
          when False =>
             As_Frame      : As_Frame_State := As_Frame_False;
-            Categories    : ML_Types.Nominal_Data_List;
+            Categories    : Load_ARFF_Data.Nominal_Data_List;
             Feature_Names : ML_Types.String_List;
             Target_Names  : ML_Types.String_List;
       end case;
@@ -47,8 +47,6 @@ package Openml_Ada is
    function Get_Data_Features (Data_ID : Integer) return JSON_Array;
    function Get_Data_Info_By_Name (Dataset_Name : String) return JSON_Value;
    function Get_Data_Qualities (Data_ID : Integer) return Qualities_Map;
-   function J_Array_To_String_List (J_Array : JSON_Array)
-                                    return ML_Types.String_List;
    function Valid_Data_Column_Names
      (Features_List  : Load_ARFF_Data.Attribute_List;
       Target_Columns : ML_Types.String_List) return ML_Types.String_List;
