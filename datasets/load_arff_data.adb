@@ -9,7 +9,7 @@ with Ada.Text_IO.Unbounded_IO;
 
 with GNAT.Regpat;
 
---  with Utilities;
+with Utilities;
 
 with Dataset_Utilities;
 with Regexep;
@@ -215,7 +215,7 @@ package body Load_ARFF_Data is
          declare
 --              Nominal : constant String := Element (Nominal_Cursor);
             Nominal : constant Nominal_Data_Record := Element (Nominal_Cursor);
-            Name    : constant String := To_String (Nominal.Name);
+            Name    : constant String := To_String (Attribute.Name);
          begin
             Found := UC_Value =
               Dataset_Utilities.To_Upper_Case (Name);
@@ -393,14 +393,16 @@ package body Load_ARFF_Data is
                               Header  : in out ARFF_Header_Record) is
       use Ada.Strings;
       use Unbounded_IO;
-      Routine_Name : constant String := "Load_ARFF_Data.Load_Attributes ";
-      H_Tab        : String (1 .. 1);
-      Pos_1        : Positive;
-      Pos_2        : Natural;
-      EOL          : Boolean := False;
-      Data_Kind    : Unbounded_String;
-      Attribute    : Attribute_Record;
-      Nominal      : Nominal_Data_Record (Nominal_String);
+      Routine_Name    : constant String := "Load_ARFF_Data.Load_Attributes ";
+      H_Tab           : String (1 .. 1);
+      Pos_1           : Positive;
+      Pos_2           : Natural;
+      EOL             : Boolean := False;
+      Data_Kind       : Unbounded_String;
+      Attribute       : Attribute_Record;
+      Nominal_Text    : Unbounded_String;
+      Nominal_ML_Type : ML_Types.Data_Type;
+      Nominal_Kind    : Nominal_Data_Type;
    begin
       H_Tab (1) := ASCII.HT;
       while Length (aLine) = 0 or else Slice (aLine, 1, 1) /= "@" loop
@@ -459,11 +461,24 @@ package body Load_ARFF_Data is
                     (Slice (aLine, Pos_1, Length (aLine)), "}");
                end if;
 
---                 Attribute.Nominal_Names.Append
---                   (Slice (aLine, Pos_1, Pos_2 - 1));
-               Nominal.Name :=
+               Nominal_Text :=
                  To_Unbounded_String (Slice (aLine, Pos_1, Pos_2 - 1));
-               Attribute.Nominal_Data.Append (Nominal);
+               Nominal_ML_Type := Utilities.Get_Data_Type (Nominal_Text);
+               case Nominal_ML_Type is
+                  when ML_Types.Integer_Type =>
+                     Nominal_Kind := Nominal_Integer;
+                  when ML_Types.Float_Type =>
+                     Nominal_Kind := Nominal_Real;
+                  when ML_Types.Boolean_Type | ML_Types.UB_String_Type =>
+                     Nominal_Kind := Nominal_String;
+               end case;
+
+               declare
+                  Nominal : Nominal_Data_Record (Nominal_Kind);
+               begin
+                  Attribute.Nominal_Data.Append (Nominal);
+               end;
+
                Pos_1 := Pos_2 + 1;
             end loop;
          else

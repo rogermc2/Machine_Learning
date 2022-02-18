@@ -35,7 +35,6 @@ package Load_ARFF_Data is
    subtype ARFF_Data_List_2D is ARFF_Data_List_Package.Vector;
 
    type Nominal_Data_Record (Data_Kind : Nominal_Data_Type) is record
-      Name                 : Unbounded_String;
       case Data_Kind is
          when Nominal_Real | Nominal_Numeric =>
             Real_Data      : Float;

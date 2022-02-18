@@ -10,7 +10,7 @@ project ARFF_Test is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Switches ("ada") use ("-gnatw.okmru", "-gnatybcip");
+      for Switches ("ada") use ("-gnatw.okmru", "-gnatybcp");
    end Compiler;
 
 end ARFF_Test;
