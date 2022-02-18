@@ -680,8 +680,7 @@ package body Openml_Ada is
       New_Row         : ARFF_Data_List;
       Arff_Data_Row   : ARFF_Data_List;
       Value           : Unbounded_String;
-      Col             : Positive;
-      Include_Col     : Positive;
+      aColumn         : Positive;
       Select_Col      : Boolean;
    begin
       Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
@@ -695,24 +694,21 @@ package body Openml_Ada is
                                   Element (Col_Curs);
             begin
                Value := Arff_Data.UB_String_Data;
-               Col := Array_First (Include_Columns);
 
-               while Array_Has_Element (Include_Columns, Col) loop
+               for col_index in Include_Columns.First_Index ..
+               Include_Columns.Last_Index loop
+                  aColumn := Include_Columns.Element (col_index);
+
                   Select_Col := False;
-                  aColumn := Array_Element (Columns, Col);
-                  Include_Col := Array_First (Include_Columns);
-
-                  while Array_Has_Element (Include_Columns, Include_Col) loop
+                  for include_col in Include_Columns.First_Index ..
+                          Include_Columns.Last_Index loop
                      Select_Col := Select_Col or
-                       Col = Integer'Value
-                         (Get (Get (Include_Columns, Include_Col))) + 1;
-                     Include_Col := Array_Next (Include_Columns, Include_Col);
+                       col_index = Include_Columns.Element (include_col);
                   end loop;
 
                   if Select_Col then
-                     Append (New_Row, aColumn);
+                     New_Row.Append (aColumn);
                   end if;
-                  Col := Array_Next (Include_Columns, Col);
                end loop;
             end;
             Next (Col_Curs);
@@ -742,12 +738,12 @@ package body Openml_Ada is
       J_Item        : JSON_Value;
       Item          : Unbounded_String;
    begin
-      while Array_Has_Element (J_Array, Index) loop
-         J_Item := Array_Element (J_Array, Index);
-         --           Put_Line (Routine_Name & "J_Item: " & J_Item.Write);
-         Item := Get (J_Item);
-         theList.Append (Item);
-         Index := Array_Next (J_Array, Index);
+      --  L707
+      --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
+      while Has_Element (Target_Curs) and not Target_Found loop
+         Target := Element (Target_Curs);
+         Target_Found := Target = Feature_Name;
+         Next (Target_Curs);
       end loop;
 
       return theList;
