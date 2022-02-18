@@ -4,7 +4,6 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Printing;
-with Tree;
 
 package body Tree_Build is
 
