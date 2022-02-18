@@ -36,7 +36,6 @@ package body Load_ARFF_Data is
    --     Num_Parens_CSV : constant Natural := GNAT.Regpat.Paren_Count (Matcher_CSV);
 
    procedure Decode_Nominal (Attribute      : Attribute_Record;
-                             UC_Value       : String;
                              Decoded_Values : in out ARFF_Data_List);
    procedure Load_Attributes (File_ID : File_Type;
                               aLine   : in out Unbounded_String;
@@ -121,8 +120,6 @@ package body Load_ARFF_Data is
          ARFF_Data_Kind := Attribute.Data_Kind;
          declare
             Value_String   : constant String := Element (Values_Cursor);
-            UC_Value       : constant String :=
-                               Dataset_Utilities.To_Upper_Case (Value_String);
          begin
             case ARFF_Data_Kind is
                when ARFF_Integer =>
@@ -163,7 +160,8 @@ package body Load_ARFF_Data is
                   end if;
 
                when ARFF_Nominal =>
-                  Decode_Nominal (Attribute, UC_Value, Decoded_Values);
+                  Decode_Nominal (Attribute, Decoded_Values);
+--                    Decode_Nominal (Attribute, UC_Value, Decoded_Values);
 
                when ARFF_Real =>
                   declare
@@ -198,66 +196,45 @@ package body Load_ARFF_Data is
    --  -------------------------------------------------------------------------
 
    procedure Decode_Nominal (Attribute      : Attribute_Record;
-                             UC_Value       : String;
                              Decoded_Values : in out ARFF_Data_List) is
       use ML_Types;
-      --        use Indefinite_String_Package;
       use Nominal_Data_Package;
-      Routine_Name   : constant String := "Load_ARFF_Data.Decode_Nominal ";
---        Nominal_Cursor : Indefinite_String_Package.Cursor;
+--        Routine_Name   : constant String := "Load_ARFF_Data.Decode_Nominal ";
       Nominal_Cursor : Nominal_Data_Package.Cursor;
---        ML_Type        : Data_Type;
-      Found          : Boolean := False;
    begin
---        Nominal_Cursor := Attribute.Nominal_Names.First;
-      Nominal_Cursor := Attribute.Nominal_Data.First;
-      while Has_Element (Nominal_Cursor) and not Found loop
-         declare
---              Nominal : constant String := Element (Nominal_Cursor);
-            Nominal : constant Nominal_Data_Record := Element (Nominal_Cursor);
-            Name    : constant String := To_String (Attribute.Name);
-         begin
-            Found := UC_Value =
-              Dataset_Utilities.To_Upper_Case (Name);
---                Dataset_Utilities.To_Upper_Case (Nominal);
-            if Found then
---                 ML_Type := Utilities.Get_Data_Type (To_Unbounded_String (Nominal));
---                 case ML_Type is
-               case Nominal.Data_Kind is
---                 when Boolean_Type | UB_String_Type =>
-               when Nominal_String =>
-                  declare
-                     Value : ARFF_Data_Record (UB_String_Type);
-                  begin
---                       Value.UB_String_Data := To_Unbounded_String (Nominal);
-                     Value.UB_String_Data := Nominal.UB_String_Data;
-                     Decoded_Values.Append (Value);
-                  end;
---                 when Integer_Type =>
-               when Nominal_Integer =>
-                  declare
-                     Value : ARFF_Data_Record (Integer_Type);
-                  begin
---                       Value.Integer_Data := Integer'Value (Nominal);
-                     Value.Integer_Data := Nominal.Integer_Data;
-                     Decoded_Values.Append (Value);
-                  end;
---                 when Float_Type =>
-               when Nominal_Real | Nominal_Numeric =>
-                  declare
-                     Value : ARFF_Data_Record (Float_Type);
-                  begin
-                     Value.Real_Data := Nominal.Real_Data;
---                       Value.Real_Data := Float'Value (Nominal);
-                     Decoded_Values.Append (Value);
-                  end;
-               end case;
-            end if;
-         end;
-         Next (Nominal_Cursor);
-      end loop;
-
-      Assert (Found, Routine_Name & "no nominal value found for " & UC_Value);
+      if not Is_Empty (Attribute.Nominal_Data) then
+         Nominal_Cursor := Attribute.Nominal_Data.First;
+         while Has_Element (Nominal_Cursor) loop
+               declare
+                  Nominal : constant Nominal_Data_Record := Element (Nominal_Cursor);
+               begin
+                  case Nominal.Data_Kind is
+                  when Nominal_String =>
+                     declare
+                        Value : ARFF_Data_Record (UB_String_Type);
+                     begin
+                        Value.UB_String_Data := Nominal.UB_String_Data;
+                        Decoded_Values.Append (Value);
+                     end;
+                  when Nominal_Integer =>
+                     declare
+                        Value : ARFF_Data_Record (Integer_Type);
+                     begin
+                        Value.Integer_Data := Nominal.Integer_Data;
+                        Decoded_Values.Append (Value);
+                     end;
+                  when Nominal_Real | Nominal_Numeric =>
+                     declare
+                        Value : ARFF_Data_Record (Float_Type);
+                     begin
+                        Value.Real_Data := Nominal.Real_Data;
+                        Decoded_Values.Append (Value);
+                     end;
+                  end case;
+            end;
+            Next (Nominal_Cursor);
+         end loop;
+      end if;
 
    end Decode_Nominal;
 
