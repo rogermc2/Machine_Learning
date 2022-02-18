@@ -9,8 +9,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Dataset_Utilities;
 --  with Printing;
 
-with ARFF_Json;
-
 pragma Warnings (Off);
 
 package body Openml_Ada is
@@ -621,239 +619,234 @@ package body Openml_Ada is
       begin
          --  L921
          if not Ignore_Status and not Row_ID_Status then
-               --  923
-               Assert (Data_Type_Item /= ARFF_String, Routine_Name
-                       & " invalid as STRING attributes are not " &
-                         "supported for array representation. " &
-                         "Try as_frame=True");
+            --  923
+            Assert (Data_Type_Item /= ARFF_String, Routine_Name
+                    & " invalid as STRING attributes are not " &
+                      "supported for array representation. " &
+                      "Try as_frame=True");
          end if;
       end Process_Status;
 
-begin
-   --  L920
-   for index in Features_List.First_Index .. Features_List.Last_Index loop
-      Attribute := Features_List.Element (index);
-      --           Put_Line (Routine_Name & "Feature_Name JSON type: " &
-      --                       JSON_Value_Type'Image (Kind (Feature_Name)));
-      Ignore := Attribute.Ignore;
-      Is_Row_ID := Attribute.Is_Row_ID;
+   begin
+      --  L920
+      for index in Features_List.First_Index .. Features_List.Last_Index loop
+         Attribute := Features_List.Element (index);
+         --           Put_Line (Routine_Name & "Feature_Name JSON type: " &
+         --                       JSON_Value_Type'Image (Kind (Feature_Name)));
+         Ignore := Attribute.Ignore;
+         Is_Row_ID := Attribute.Is_Row_ID;
 
-      Process_Status (Ignore, Is_Row_ID);
-   end loop;
+         Process_Status (Ignore, Is_Row_ID);
+      end loop;
 
-end Process_Feature;
+   end Process_Feature;
 
---  ------------------------------------------------------------------------
---  L922
-procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
-                              Target_Columns : out ML_Types.String_List) is
-   use Load_ARFF_Data;
-   Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
-   Feature_Index : Positive;
-   Feature       : Attribute_Record;
-   Target        : JSON_Value;
-begin
-   Feature_Index := Array_First (Target_Columns);
-   while Array_Has_Element (Features_List, Feature_Index) loop
-      Feature := Array_Element (Features_List, Feature_Index);
-      if Has_Field (Feature, "is_target") then
-         declare
-            Is_Target : constant String := Get (Feature, "is_target");
-         begin
-            if Is_Target = "true" then
-               Target := Get (Feature, "name");
-               Append (Target_Columns, Target);
-               Put_Line (Routine_Name & "Target: " & Target.Write);
-            end if;
-         end;
-      end if;
+   --  ------------------------------------------------------------------------
+   --  L922
+   procedure Set_Default_Target (Features_List  : Load_ARFF_Data.Attribute_List;
+                                 Target_Columns : out ML_Types.String_List) is
+      use ML_Types;
+      use Load_ARFF_Data;
+      use Attribute_Data_Package;
+      --        Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
+      Feature       : Attribute_Record;
+   begin
+      for index in Features_List.First_Index .. Features_List.Last_Index loop
+         Feature := Features_List.Element (index);
+         if Feature.Is_Target then
+            Target_Columns.Append (Feature.Name);
+         end if;
+      end loop;
 
-      Feature_Index := Array_Next (Features_List, Feature_Index);
-   end loop;
+   end Set_Default_Target;
 
-end Set_Default_Target;
-
---  ------------------------------------------------------------------------
---  L184 ArffSparseDataType = Tuple[List, ...] _split_sparse_columns
---  (arff_data: ArffSparseDataType, include_columns: List) - >
---  ArffSparseDataType Arff_Sparse_Data_Type is a subtype of JSON_Array
-function Split_Sparse_Columns
-  (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
-   Include_Columns : ML_Types.Integer_List)
+   --  ------------------------------------------------------------------------
+   --  L184 ArffSparseDataType = Tuple[List, ...] _split_sparse_columns
+   --  (arff_data: ArffSparseDataType, include_columns: List) - >
+   --  ArffSparseDataType Arff_Sparse_Data_Type is a subtype of JSON_Array
+   function Split_Sparse_Columns
+     (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
+      Include_Columns : ML_Types.Integer_List)
       return  ML_Types.Value_Data_List is
-   use Load_ARFF_Data;
-   use ARFF_Data_List_Package;
-   use ARFF_Json;
-   Routine_Name       : constant String := "Openml_Ada.Split_Sparse_Columns ";
-   Data_Length        : constant Natural := Arff_Data.Length;
-   --        Include_Length     : constant Natural :=
-   --                               Natural (Length (Include_Columns));
-   Curs_2D            : Cursor := Arff_Data.First;
-   Arff_Data_New      : Arff_Sparse_Data_Type;
-   New_Row            : JSON_Array;
-   Arff_Data_Row      : JSON_Value;
-   Arff_Data_Cols     : JSON_Value;
-   Columns            : JSON_Array;
-   aColumn            : JSON_Value;
-   Col                : Positive;
-   Include_Col        : Positive;
-   Select_Col         : Boolean;
-begin
-   Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
-   for sample in 1 .. Data_Length loop
-      Clear (New_Row);
-      Arff_Data_Row := Array_Element (Arff_Data, sample);
-      Arff_Data_Cols := Get (Arff_Data_Row, "values");
-      Columns := Get (Arff_Data_Cols);
-      Col := Array_First (Include_Columns);
+      use Load_ARFF_Data;
+      use ARFF_Data_List_Package;
+      use ARFF_Data_Package;
+      Routine_Name    : constant String := "Openml_Ada.Split_Sparse_Columns ";
+      Data_Length     : constant Natural := Natural (Arff_Data.Length);
+      --        Include_Length : constant Natural :=
+      --                               Natural (Length (Include_Columns));
+      Col_Curs        : ARFF_Data_Package.Cursor;
+      Arff_Data_New   : ARFF_Data_List_2D;
+      New_Row         : ARFF_Data_List;
+      Arff_Data_Row   : ARFF_Data_List;
+      Value           : Unbounded_String;
+      Col             : Positive;
+      Include_Col     : Positive;
+      Select_Col      : Boolean;
+   begin
+      Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
+      for sample in Arff_Data.First_Index .. Arff_Data.Last_Index loop
+         New_Row.Clear;
+         Arff_Data_Row := Arff_Data.Element (sample);
+         Col_Curs := Arff_Data_Row.First;
+         while Has_Element (Col_Curs) loop
+            declare
+               Arff_Data : ARFF_Data_Record (ML_Types.UB_String_Type) :=
+                                  Element (Col_Curs);
+            begin
+               Value := Arff_Data.UB_String_Data;
+               Col := Array_First (Include_Columns);
 
-      while Array_Has_Element (Include_Columns, Col) loop
-         Select_Col := False;
-         aColumn := Array_Element (Columns, Col);
-         Include_Col := Array_First (Include_Columns);
+               while Array_Has_Element (Include_Columns, Col) loop
+                  Select_Col := False;
+                  aColumn := Array_Element (Columns, Col);
+                  Include_Col := Array_First (Include_Columns);
 
-         while Array_Has_Element (Include_Columns, Include_Col) loop
-            Select_Col := Select_Col or
-              Col = Integer'Value
-                (Get (Get (Include_Columns, Include_Col))) + 1;
-            Include_Col := Array_Next (Include_Columns, Include_Col);
+                  while Array_Has_Element (Include_Columns, Include_Col) loop
+                     Select_Col := Select_Col or
+                       Col = Integer'Value
+                         (Get (Get (Include_Columns, Include_Col))) + 1;
+                     Include_Col := Array_Next (Include_Columns, Include_Col);
+                  end loop;
+
+                  if Select_Col then
+                     Append (New_Row, aColumn);
+                  end if;
+                  Col := Array_Next (Include_Columns, Col);
+               end loop;
+            end;
+            Next (Col_Curs);
+         end loop;
+         --              Put_Line (Routine_Name & "end outer while:");
+
+         declare
+            New_Data_Row : constant JSON_Value := Create_Object;
+         begin
+            New_Data_Row.Set_Field ("values", New_Row);
+            Append (Arff_Data_New, New_Data_Row);
+         end;
+      end loop;
+
+      return Arff_Data_New;
+
+   end Split_Sparse_Columns;
+
+   --  ------------------------------------------------------------------------
+
+   function J_Array_To_String_List (J_Array : JSON_Array)
+                                    return ML_Types.String_List is
+      use ML_Types;
+      --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
+      theList       : String_List;
+      Index         : Positive := Array_First (J_Array);
+      J_Item        : JSON_Value;
+      Item          : Unbounded_String;
+   begin
+      while Array_Has_Element (J_Array, Index) loop
+         J_Item := Array_Element (J_Array, Index);
+         --           Put_Line (Routine_Name & "J_Item: " & J_Item.Write);
+         Item := Get (J_Item);
+         theList.Append (Item);
+         Index := Array_Next (J_Array, Index);
+      end loop;
+
+      return theList;
+
+   end J_Array_To_String_List;
+
+   --  ------------------------------------------------------------------------
+   --  L699
+   function Valid_Data_Column_Names
+     (Features_List  : Load_ARFF_Data.Attribute_List;
+      Target_Columns : ML_Types.String_List) return ML_Types.String_List is
+      use Load_ARFF_Data;
+      use ARFF_Data_List_Package;
+      --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
+      Feature_Index : Positive;
+      Feature       : Attribute_Record;
+      Feature_Name  : Unbounded_String;
+      Ignore        : Boolean;
+      Is_Row_ID     : Boolean;
+      Feature_Val   : Unbounded_String;
+      Found         : Boolean := False;
+      Valid_Names   : ML_Types.String_List;
+
+      function Check_Target return Boolean is
+         Target_Curs  : Cursor := Target_Columns.First;
+         Target       : Unbounded_String;
+         Target_Found : Boolean := False;
+      begin
+         --  L707
+         --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
+         while Has_Element (Target_Curs) and not Target_Found loop
+            Target := Element (Target_Curs);
+            Target_Found := Target = Feature_Name;
+            Next (Target_Curs);
          end loop;
 
-         if Select_Col then
-            Append (New_Row, aColumn);
-         end if;
-         Col := Array_Next (Include_Columns, Col);
-      end loop;
-      --              Put_Line (Routine_Name & "end outer while:");
+         return Target_Found;
 
-      declare
-         New_Data_Row : constant JSON_Value := Create_Object;
-      begin
-         New_Data_Row.Set_Field ("values", New_Row);
-         Append (Arff_Data_New, New_Data_Row);
-      end;
-   end loop;
+      end Check_Target;
 
-   return Arff_Data_New;
-
-end Split_Sparse_Columns;
-
---  ------------------------------------------------------------------------
-
-function J_Array_To_String_List (J_Array : JSON_Array)
-                                    return ML_Types.String_List is
-   use ML_Types;
-   --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
-   theList       : String_List;
-   Index         : Positive := Array_First (J_Array);
-   J_Item        : JSON_Value;
-   Item          : Unbounded_String;
-begin
-   while Array_Has_Element (J_Array, Index) loop
-      J_Item := Array_Element (J_Array, Index);
-      --           Put_Line (Routine_Name & "J_Item: " & J_Item.Write);
-      Item := Get (J_Item);
-      theList.Append (Item);
-      Index := Array_Next (J_Array, Index);
-   end loop;
-
-   return theList;
-
-end J_Array_To_String_List;
-
---  ------------------------------------------------------------------------
---  L699
-function Valid_Data_Column_Names
-  (Features_List  : Load_ARFF_Data.Attribute_List;
-   Target_Columns : ML_Types.String_List) return ML_Types.String_List is
-   use Load_ARFF_Data;
-   use ARFF_Data_List_Package;
-   --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
-   Feature_Index : Positive;
-   Feature       : Attribute_Record;
-   Feature_Name  : Unbounded_String;
-   Ignore        : Boolean;
-   Is_Row_ID     : Boolean;
-   Feature_Val   : Unbounded_String;
-   Found         : Boolean := False;
-   Valid_Names   : ML_Types.String_List;
-
-   function Check_Target return Boolean is
-      Target_Curs  : Cursor := Target_Columns.First;
-      Target       : Unbounded_String;
-      Target_Found : Boolean := False;
    begin
-      --  L707
-      --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
-      while Has_Element (Target_Curs) and not Target_Found loop
-         Target := Element (Target_Curs);
-         Target_Found := Target = Feature_Name;
-         Next (Target_Curs);
+      --  L705
+      for index in Features_List.First_Index .. Features_List.Last_Index loop
+         Feature := Features_List.Element (Feature_Index);
+         Feature_Name := Feature.Name;
+         --           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name);
+         Found := Check_Target;
+
+         Is_Row_ID := Feature.Get ("is_row_identifier");
+         --           Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
+         --           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+
+
+         if not Is_Empty (Ignore) and not Is_Empty (Is_Row_ID) then
+            --                  Put_Line (Routine_Name & "Is_Row_ID and Ignore both not empty");
+            declare
+               Ignore_Status : constant String := Get (Ignore);
+               Row_ID_Status : constant String := Get (Is_Row_ID);
+            begin
+               if Ignore_Status /= "true" and Row_ID_Status /= "true" then
+                  --                          Put_Line (Routine_Name &
+                  --                                      "Ignore_Status and Row_ID_Status not true");
+                  Found := Check_Target;
+               end if;
+            end;
+
+         else  --  Is_Empty (Ignore) or Is_Empty (Is_Row_ID)
+            Found := Check_Target;
+         end if;
+
+         if not Found then
+            Valid_Names.Append (Feature_Name);
+         end if;
+
       end loop;
 
-      return Target_Found;
+      return Valid_Names;
 
-   end Check_Target;
+   end Valid_Data_Column_Names;
 
-begin
-   --  L705
-   for index in Features_List.First_Index .. Features_List.Last_Index loop
-      Feature := Features_List.Element (Feature_Index);
-      Feature_Name := Feature.Name;
-      --           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name);
-      Found := Check_Target;
+   --  ------------------------------------------------------------------------
 
-      Is_Row_ID := Feature.Get ("is_row_identifier");
-      --           Put_Line (Routine_Name & "Ignore: " & Ignore.Write);
-      --           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID.Write);
+   procedure Verify_Target_Data_Type
+     (Features_Dict  : Attribute_Dictionary_Map;
+      Target_Columns : ML_Types.String_List) is
+      Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
+      --        Target_Column : Positive := Array_First (Target_Columns);
+   begin
+      --        Put_Line (Routine_Name & "Target_Columns length" &
+      --                    Integer'Image (Length (Target_Columns)));
+      while Array_Has_Element (Target_Columns, Target_Column) loop
+         Assert (Array_Has_Element (Features_Dict, Target_Column),
+                 Routine_Name & "Features_Dict does not have element " &
+                   Integer'Image (Target_Column));
+         Target_Column := Array_Next (Target_Columns, Target_Column);
+      end loop;
 
+   end Verify_Target_Data_Type;
 
-      if not Is_Empty (Ignore) and not Is_Empty (Is_Row_ID) then
-         --                  Put_Line (Routine_Name & "Is_Row_ID and Ignore both not empty");
-         declare
-            Ignore_Status : constant String := Get (Ignore);
-            Row_ID_Status : constant String := Get (Is_Row_ID);
-         begin
-            if Ignore_Status /= "true" and Row_ID_Status /= "true" then
-               --                          Put_Line (Routine_Name &
-               --                                      "Ignore_Status and Row_ID_Status not true");
-               Found := Check_Target;
-            end if;
-         end;
-
-      else  --  Is_Empty (Ignore) or Is_Empty (Is_Row_ID)
-         Found := Check_Target;
-      end if;
-
-      if not Found then
-         Valid_Names.Append (Feature_Name);
-      end if;
-
-   end loop;
-
-   return Valid_Names;
-
-end Valid_Data_Column_Names;
-
---  ------------------------------------------------------------------------
-
-procedure Verify_Target_Data_Type
-  (Features_Dict  : Attribute_Dictionary_Map;
-   Target_Columns : ML_Types.String_List) is
-   Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
-   --        Target_Column : Positive := Array_First (Target_Columns);
-begin
-   --        Put_Line (Routine_Name & "Target_Columns length" &
-   --                    Integer'Image (Length (Target_Columns)));
-   while Array_Has_Element (Target_Columns, Target_Column) loop
-      Assert (Array_Has_Element (Features_Dict, Target_Column),
-              Routine_Name & "Features_Dict does not have element " &
-                Integer'Image (Target_Column));
-      Target_Column := Array_Next (Target_Columns, Target_Column);
-   end loop;
-
-end Verify_Target_Data_Type;
-
---  ------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------
 
 end Openml_Ada;

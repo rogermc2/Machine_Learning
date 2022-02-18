@@ -60,6 +60,7 @@ package Load_ARFF_Data is
       Nominal_Types : Nominal_Types_List;
       Ignore        : Boolean := False;
       Is_Row_ID     : Boolean := False;
+      Is_Target     : Boolean := False;
    end record;
 
    package Attribute_Data_Package is new
