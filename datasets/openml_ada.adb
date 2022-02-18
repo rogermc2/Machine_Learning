@@ -4,6 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO.Unbounded_IO;
 
 --  with Printing;
 
@@ -164,8 +165,6 @@ package body Openml_Ada is
             aFeature := Features_List.Element (index);
             Features_Dict.Include (aFeature.Name, index);
         end loop;
-        Put_Line (Routine_Name & "Features_Dict length" &
-                    Integer'Image (Integer (Features_Dict.Length)));
 
         Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
@@ -182,8 +181,6 @@ package body Openml_Ada is
             Col_Slice_Y.Append (Feature_Index);
             Next (Target_Curs);
         end loop;
-        Put_Line (Routine_Name & "Col_Slice_Y length" &
-                    Count_Type'Image (Col_Slice_Y.Length));
 
         --  L566 continued
         for Col_ID in Features_List.First_Index .. Features_List.Last_Index loop
@@ -314,7 +311,12 @@ package body Openml_Ada is
 
         --  L944
         Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
-
+        Put_Line (Routine_Name & "Features_List length: " &
+                      Integer'Image (Integer (Features_List.Length)));
+        Put_Line (Routine_Name & "Target_Columns length: " &
+                      Integer'Image (Integer (Target_Columns.Length)));
+        Put_Line (Routine_Name & "Data_Columns length: " &
+                      Integer'Image (Integer (Data_Columns.Length)));
         --  L948
         --        if not Return_Sparse then
         --           Data_Qualities := Get_Data_Qualities (Data_Id);
@@ -727,25 +729,22 @@ package body Openml_Ada is
     function Valid_Data_Column_Names
       (Features_List  : Load_ARFF_Data.Attribute_List;
        Target_Columns : ML_Types.String_List) return ML_Types.String_List is
+--          use Ada.Text_IO.Unbounded_IO;
         use Load_ARFF_Data;
-        --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
+--          Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
         Feature       : Attribute_Record;
         Feature_Name  : Unbounded_String;
-        Found         : Boolean := False;
         Valid_Names   : ML_Types.String_List;
 
         function Check_Target return Boolean is
             use ML_Types;
             use String_Package;
             Target_Curs  : String_Package.Cursor := Target_Columns.First;
-            Target       : Unbounded_String;
             Target_Found : Boolean := False;
         begin
             --  L707
-            --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
             while Has_Element (Target_Curs) and not Target_Found loop
-                Target := Element (Target_Curs);
-                Target_Found := Target = Feature_Name;
+                Target_Found := Element (Target_Curs) = Feature_Name;
                 Next (Target_Curs);
             end loop;
 
@@ -758,11 +757,7 @@ package body Openml_Ada is
         for index in Features_List.First_Index .. Features_List.Last_Index loop
             Feature := Features_List.Element (index);
             Feature_Name := Feature.Name;
-            --           Put_Line (Routine_Name & "Feature_Name: " & Feature_Name);
-            Found := Check_Target;
-            --           Put_Line (Routine_Name & "Ignore: " & Ignore);
-            --           Put_Line (Routine_Name & "Is_Row_ID: " & Is_Row_ID);
-            if not Found and then
+            if Check_Target and then
               (not Feature.Ignore and not Feature.Is_Row_ID) then
                 Valid_Names.Append (Feature_Name);
             end if;
