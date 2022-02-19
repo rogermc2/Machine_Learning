@@ -2,11 +2,14 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Maps;
+with Ada.Directories;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
 
 --  with Printing;
+
+with Load_ARFF_Data.ARFF_IO;
 --  with Load_ARFF_Data.ARFF_Printing;
 
 --  pragma Warnings (Off);
@@ -255,10 +258,18 @@ package body Openml_Ada is
                           As_Frame          : in out As_Frame_State;
                           Return_X_Y        : Boolean := False)
                            return Bunch_Data is
+      use Ada.Directories;
       use Ada.Strings;
       use Load_ARFF_Data;
+      use ARFF_IO;
       use ML_Types.String_Package;
       Routine_Name    : constant String := "Openml_Ada.Fetch_Openml ";
+      Pos             : constant Positive
+        := Fixed.Index (Dataset_File_Name, ".",
+                        Dataset_File_Name'Last, Backward);
+      Ada_File        : constant String
+        := Slice (To_Unbounded_String (Dataset_File_Name),
+                  Dataset_File_Name'First, Pos) & "ada";
       ARFF_Data       : ARFF_Record;
       Return_Sparse   : constant Boolean := False;
       Features_List   : Attribute_List;
@@ -270,7 +281,16 @@ package body Openml_Ada is
       --        Data_Qualities  : Qualities_Map;
       Bunch           : Bunch_Data (Return_X_Y);
    begin
-      Load_ARFF (Dataset_File_Name, ARFF_Data);
+      if Exists (Ada_File) then
+         Put_Line (Routine_Name & "Reading data file " & Ada_File);
+         Read_ARFF_Ada (Ada_File, ARFF_Data);
+         Put_Line (Routine_Name & "Data file read");
+      else
+         Put_Line (Routine_Name & "Loading ARFF data from " & Dataset_File_Name);
+         Load_ARFF (Dataset_File_Name, ARFF_Data);
+         Put_Line (Routine_Name & "Data loaded");
+         Save_ARFF (Ada_File, ARFF_Data);
+      end if;
       New_Line;
       --  L903
       if As_Frame = As_Frame_Auto then

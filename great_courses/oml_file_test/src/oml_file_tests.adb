@@ -1,11 +1,8 @@
 
 with Ada.Containers;
-with Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
-with Load_ARFF_Data;
-with Load_ARFF_Data.ARFF_IO;
 with Openml_Ada; use Openml_Ada;
 
 package body OML_File_Tests is
@@ -168,31 +165,16 @@ package body OML_File_Tests is
 
    procedure Test_Fetch_OML is
       use Ada.Containers;
-      use Ada.Directories;
-      use Load_ARFF_Data;
-      use Load_ARFF_Data.ARFF_IO;
       Routine_Name      : constant String := "Test_Fetch_OML ";
       File_Name         : constant String := "../iris.arff";
-      Ada_File          : constant String := "iris.ada";
-      --        Dataset_Name      : constant String := "mnist_784";
+--        File_Name         : constant String := "../mnist_784.arff";
       --        Version           : constant String := "1";
       --        Data_Id           : Integer := 554;
-      Data              : ARFF_Record;
       As_Frame          : As_Frame_State := As_Frame_False;
       Target_Column     : ML_Types.String_List;
       Bunch             : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
-      if Exists (Ada_File) then
-         Put_Line (Routine_Name & "Reading data file " & Ada_File);
-         Read_ARFF_Ada (Ada_File, Data);
-         Put_Line (Routine_Name & "Data file read");
-      else
-         Put_Line (Routine_Name & "Loading ARFF data from " & File_Name);
-         Load_ARFF (File_Name, Data);
-         Put_Line (Routine_Name & "Data loaded");
-         Save_ARFF (Ada_File, Data);
-      end if;
 
       Bunch := Fetch_Openml (Dataset_File_Name => File_Name,
                              Target_Column     =>Target_Column ,
