@@ -109,7 +109,7 @@ package body Load_ARFF_Data.ARFF_Printing is
                   when ML_Types.Integer_Type =>
                      Put (Integer'Image (Data_Record.Integer_Data));
                   when ML_Types.UB_String_Type =>
-                     Put (Data_Record.UB_String_Data);
+                     Put (", " & Data_Record.UB_String_Data);
                   end case;
                   if Count2 <= Last then
                      Put (", ");
