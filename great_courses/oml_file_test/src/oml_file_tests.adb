@@ -1,17 +1,20 @@
 
 with Ada.Containers;
+with Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
+with Load_ARFF_Data;
+with Load_ARFF_Data.ARFF_IO;
 with Openml_Ada; use Openml_Ada;
 
 package body OML_File_Tests is
 
    --     pragma Warnings (Off);
 
---     procedure Test_Features (Data_Id : Integer;  Use_Files : Boolean := True);
+   --     procedure Test_Features (Data_Id : Integer;  Use_Files : Boolean := True);
    --     Dataset : String := "");
---     procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True);
+   --     procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True);
    --     Dataset : String := "");
 
    --  -------------------------------------------------------------------------
@@ -80,108 +83,118 @@ package body OML_File_Tests is
 
    --  -------------------------------------------------------------------------
 
---     procedure Test_Data_Description (Data_Id   : Integer;
---                                      Use_Files : Boolean := True) is
---        Routine_Name  : constant String := "Test_Data_Description ";
---        Description   : JSON_Value;
---     begin
---        New_Line;
---        Description := Get_Data_Description_By_ID (Data_Id, Use_Files);
---        declare
---           Desc : constant String := Get (Description, "description");
---        begin
---           Put_Line (Routine_Name & "Description length:" &
---                       Integer'Image (Desc'Length) & " characters.");
---           --           Put_Line (Routine_Name & "Description:");
---           --           Put_Line (Desc);
---        end;
---        New_Line;
---
---     end Test_Data_Description;
+   --     procedure Test_Data_Description (Data_Id   : Integer;
+   --                                      Use_Files : Boolean := True) is
+   --        Routine_Name  : constant String := "Test_Data_Description ";
+   --        Description   : JSON_Value;
+   --     begin
+   --        New_Line;
+   --        Description := Get_Data_Description_By_ID (Data_Id, Use_Files);
+   --        declare
+   --           Desc : constant String := Get (Description, "description");
+   --        begin
+   --           Put_Line (Routine_Name & "Description length:" &
+   --                       Integer'Image (Desc'Length) & " characters.");
+   --           --           Put_Line (Routine_Name & "Description:");
+   --           --           Put_Line (Desc);
+   --        end;
+   --        New_Line;
+   --
+   --     end Test_Data_Description;
 
    --  -------------------------------------------------------------------------
 
---     procedure Test_Data_Info is
---        Routine_Name    : constant String := "Test_Data_Info ";
---        Dataset_Name    : constant String := "mnist_784";
---        Version         : constant String := "1";
---        Data_Info       : JSON_Value;
---        Data_Info_Data  : JSON_Value;
---        Data_Info_Set   : JSON_Value;
---        Data_Info_Array : JSON_Array;
---        Data            : JSON_Value;
---        JSON_Data_Id    : JSON_Value;
---        Data_Id         : Integer := 0;
---     begin
---        New_Line;
---        Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
---        Data_Info_Data := Get (Data_Info, "data");
---        Data_Info_Set := Get (Data_Info_Data, "dataset");
---        Data_Info_Array := Get (Data_Info_Set);
---        Data := Array_Element (Data_Info_Array,
---                               Array_First (Data_Info_Array));
---        JSON_Data_Id := Get (Data, "did");
---        Data_Id := Get (JSON_Data_Id);
---        Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
---
---        Test_Data_Description (Data_Id);
---        Put_Line (Routine_Name & "Test_Data_Description completed");
---
---        Test_Features (Data_Id);  --  , Features_File_Name);
---        Put_Line (Routine_Name & "Test_Features completed");
---
---        Test_Qualities (Data_Id);
---
---     end Test_Data_Info;
+   --     procedure Test_Data_Info is
+   --        Routine_Name    : constant String := "Test_Data_Info ";
+   --        Dataset_Name    : constant String := "mnist_784";
+   --        Version         : constant String := "1";
+   --        Data_Info       : JSON_Value;
+   --        Data_Info_Data  : JSON_Value;
+   --        Data_Info_Set   : JSON_Value;
+   --        Data_Info_Array : JSON_Array;
+   --        Data            : JSON_Value;
+   --        JSON_Data_Id    : JSON_Value;
+   --        Data_Id         : Integer := 0;
+   --     begin
+   --        New_Line;
+   --        Data_Info := Get_Data_Info_By_Name (Dataset_Name, Version);
+   --        Data_Info_Data := Get (Data_Info, "data");
+   --        Data_Info_Set := Get (Data_Info_Data, "dataset");
+   --        Data_Info_Array := Get (Data_Info_Set);
+   --        Data := Array_Element (Data_Info_Array,
+   --                               Array_First (Data_Info_Array));
+   --        JSON_Data_Id := Get (Data, "did");
+   --        Data_Id := Get (JSON_Data_Id);
+   --        Put_Line (Routine_Name & "Data_Id" & Integer'Image (Data_Id));
+   --
+   --        Test_Data_Description (Data_Id);
+   --        Put_Line (Routine_Name & "Test_Data_Description completed");
+   --
+   --        Test_Features (Data_Id);  --  , Features_File_Name);
+   --        Put_Line (Routine_Name & "Test_Features completed");
+   --
+   --        Test_Qualities (Data_Id);
+   --
+   --     end Test_Data_Info;
 
    --  -------------------------------------------------------------------------
 
---     procedure Test_Features (Data_Id : Integer; Use_Files : Boolean := True) is
---        Routine_Name   : constant String := "Test_Features ";
---        Feature_Array  : JSON_Array;
---        Index          : Positive;
---        aFeature       : JSON_Value;
---        Feature_Index  : Natural;
---     begin
---        Put_Line (Routine_Name & "Get features");
---        Feature_Array := Get_Data_Features (Data_Id, Use_Files);
---        Put_Line (Routine_Name & "number of features: " &
---                    Integer'Image (Length (Feature_Array)));
---        Index := Array_First (Feature_Array);
---        while Array_Has_Element (Feature_Array, Index) loop
---           aFeature := Array_Element (Feature_Array, Index);
---           Feature_Index := Integer'Value (Get (aFeature, "index"));
---           if Feature_Index < 4 then
---              Put_Line ("aFeature index: " & Integer'Image (Feature_Index));
---           end if;
---           Index := Array_Next (Feature_Array, Index);
---        end loop;
---
---        New_Line;
---
---     end Test_Features;
+   --     procedure Test_Features (Data_Id : Integer; Use_Files : Boolean := True) is
+   --        Routine_Name   : constant String := "Test_Features ";
+   --        Feature_Array  : JSON_Array;
+   --        Index          : Positive;
+   --        aFeature       : JSON_Value;
+   --        Feature_Index  : Natural;
+   --     begin
+   --        Put_Line (Routine_Name & "Get features");
+   --        Feature_Array := Get_Data_Features (Data_Id, Use_Files);
+   --        Put_Line (Routine_Name & "number of features: " &
+   --                    Integer'Image (Length (Feature_Array)));
+   --        Index := Array_First (Feature_Array);
+   --        while Array_Has_Element (Feature_Array, Index) loop
+   --           aFeature := Array_Element (Feature_Array, Index);
+   --           Feature_Index := Integer'Value (Get (aFeature, "index"));
+   --           if Feature_Index < 4 then
+   --              Put_Line ("aFeature index: " & Integer'Image (Feature_Index));
+   --           end if;
+   --           Index := Array_Next (Feature_Array, Index);
+   --        end loop;
+   --
+   --        New_Line;
+   --
+   --     end Test_Features;
 
    --  -------------------------------------------------------------------------
 
    procedure Test_Fetch_OML is
       use Ada.Containers;
+      use Ada.Directories;
+      use Load_ARFF_Data;
+      use Load_ARFF_Data.ARFF_IO;
       Routine_Name      : constant String := "Test_Fetch_OML ";
-      Dataset_Name      : constant String := "../iris.arff";
---        Dataset_Name      : constant String := "mnist_784";
---        Version           : constant String := "1";
---        Data_Id           : Integer := 554;
+      File_Name         : constant String := "../iris.arff";
+      Ada_File          : constant String := "iris.ada";
+      --        Dataset_Name      : constant String := "mnist_784";
+      --        Version           : constant String := "1";
+      --        Data_Id           : Integer := 554;
+      Data              : ARFF_Record;
       As_Frame          : As_Frame_State := As_Frame_False;
---        Feature_Array     : JSON_Array;
       Target_Column     : ML_Types.String_List;
       Bunch             : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
---        Feature_Array := Get_Data_Features (Data_Id);
---        Target_Column.Append (To_Unbounded_String ("  "),
---                              Count_Type (Length (Feature_Array)));
+      if Exists (Ada_File) then
+         Put_Line (Routine_Name & "Reading data file " & Ada_File);
+         Read_ARFF_Ada (Ada_File, Data);
+         Put_Line (Routine_Name & "Data file read");
+      else
+         Put_Line (Routine_Name & "Loading ARFF data from " & File_Name);
+         Load_ARFF (File_Name, Data);
+         Put_Line (Routine_Name & "Data loaded");
+         Save_ARFF (Ada_File, Data);
+      end if;
 
---        Put_Line (Routine_Name & "Feature_Array set");
-      Bunch := Fetch_Openml (Dataset_File_Name => Dataset_Name,
+      Bunch := Fetch_Openml (Dataset_File_Name => File_Name,
                              Target_Column     =>Target_Column ,
                              As_Frame          => As_Frame,
                              Return_X_Y        => True);
@@ -196,37 +209,37 @@ package body OML_File_Tests is
 
    --  -------------------------------------------------------------------------
 
---     procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True) is
---        Routine_Name  : constant String := "Test_Qualities ";
---        Quality_Array : Qualities_Map;
---        Index         : Positive;
---        Quality       : JSON_Value;
---        Quality_Name  : JSON_Value;
---
---     begin
---        New_Line;
---        Put_Line (Routine_Name);
---        Quality_Array := Get_Data_Qualities (Data_Id, Use_Files);
---
---        if Is_Empty (Quality_Array) then
---           Put_Line (Routine_Name & "there are no qualities");
---        else
---           Put_Line (Routine_Name & "Quality_Array length: " &
---                       Integer'Image (Length (Quality_Array)));
---           Index := Array_First (Quality_Array);
---           while Array_Has_Element (Quality_Array, Index) loop
---              Quality := Array_Element (Quality_Array, Index);
---              Quality_Name := Get (Quality, "name");
---              Put_Line (Routine_Name & "Quality name: " & Quality_Name.Write);
---              New_Line;
---              Index := Array_Next (Quality_Array, Index);
---           end loop;
---        end if;
---
---        Put_Line (Routine_Name & "Test_Qualities completed");
---        New_Line;
---
---     end Test_Qualities;
+   --     procedure Test_Qualities (Data_Id : Integer; Use_Files : Boolean := True) is
+   --        Routine_Name  : constant String := "Test_Qualities ";
+   --        Quality_Array : Qualities_Map;
+   --        Index         : Positive;
+   --        Quality       : JSON_Value;
+   --        Quality_Name  : JSON_Value;
+   --
+   --     begin
+   --        New_Line;
+   --        Put_Line (Routine_Name);
+   --        Quality_Array := Get_Data_Qualities (Data_Id, Use_Files);
+   --
+   --        if Is_Empty (Quality_Array) then
+   --           Put_Line (Routine_Name & "there are no qualities");
+   --        else
+   --           Put_Line (Routine_Name & "Quality_Array length: " &
+   --                       Integer'Image (Length (Quality_Array)));
+   --           Index := Array_First (Quality_Array);
+   --           while Array_Has_Element (Quality_Array, Index) loop
+   --              Quality := Array_Element (Quality_Array, Index);
+   --              Quality_Name := Get (Quality, "name");
+   --              Put_Line (Routine_Name & "Quality name: " & Quality_Name.Write);
+   --              New_Line;
+   --              Index := Array_Next (Quality_Array, Index);
+   --           end loop;
+   --        end if;
+   --
+   --        Put_Line (Routine_Name & "Test_Qualities completed");
+   --        New_Line;
+   --
+   --     end Test_Qualities;
 
    --  -------------------------------------------------------------------------
 
