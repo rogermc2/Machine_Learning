@@ -122,6 +122,7 @@ package body Load_ARFF_Data.ARFF_Printing is
          end if;
          Next (Curs);
       end loop;
+      New_Line;
 
    end Print_Attributes;
 

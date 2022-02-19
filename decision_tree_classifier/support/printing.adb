@@ -285,6 +285,25 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Integer_List (Name : String;
+                                 theList : ML_Types.Integer_List) is
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Put (Integer'Image (theList.Element (Index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Integer_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Integer_List (Name : String; theList : Integer_List) is
       Count : Integer := 1;
    begin
@@ -298,6 +317,7 @@ package body Printing is
          end if;
       end loop;
       New_Line;
+
    end Print_Integer_List;
 
    --  ------------------------------------------------------------------------

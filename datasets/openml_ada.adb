@@ -7,7 +7,7 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
 
---  with Printing;
+with Printing;
 
 with Load_ARFF_Data.ARFF_IO;
 with Load_ARFF_Data.ARFF_Printing;
@@ -112,8 +112,8 @@ package body Openml_Ada is
       use ML_Types;
       use String_Package;
       use Attribute_Data_Package;
-      Routine_Name       : constant String := "Openml_Ada.Download_Data_To_Bunch ";
-      --        Feature_Curs       : Attribute_Data_Package.Cursor := Features_List.First;
+      Routine_Name       : constant String :=
+                               "Openml_Ada.Download_Data_To_Bunch ";
       Columns_Curs       : String_Package.Cursor := Data_Columns.First;
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
       Feature_Index      : Positive;
@@ -166,6 +166,9 @@ package body Openml_Ada is
                 " is different to Data_Columns length" &
                 Count_Type'Image (Data_Columns.Length));
 
+      Load_ARFF_Data.ARFF_Printing.Print_Attributes
+          (Routine_Name &"Features_List", Features_List);
+
       for index in Features_List.First_Index .. Features_List.Last_Index loop
          aFeature := Features_List.Element (index);
          Features_Dict.Include (aFeature.Name, index);
@@ -186,6 +189,7 @@ package body Openml_Ada is
          Col_Slice_Y.Append (Feature_Index);
          Next (Target_Curs);
       end loop;
+      Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
 
       --  L566 continued
       for Col_ID in Features_List.First_Index .. Features_List.Last_Index loop
@@ -193,6 +197,7 @@ package body Openml_Ada is
          Feature_Index := Features_Dict.Element (aFeature.Name);
          Col_Slice_X.Append (Feature_Index);
       end loop;
+      Printing.Print_Integer_List (Routine_Name & "Col_Slice_X", Col_Slice_X);
 
       --  L568
       while Has_Element (Columns_Curs) loop
