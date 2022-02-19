@@ -61,7 +61,7 @@ package Load_ARFF_Data is
 
    package Attribute_Data_Package is new
      Ada.Containers.Vectors (Positive, Attribute_Record);
-   type Attribute_List is new Attribute_Data_Package.Vector with null record;
+   subtype Attribute_List is Attribute_Data_Package.Vector;
 
    function Get_Attributes (Data : ARFF_Record) return Attribute_List;
    function Get_Data (Data : ARFF_Record) return ARFF_Data_List_2D;

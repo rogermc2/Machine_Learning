@@ -32,11 +32,11 @@ package Openml_Ada is
 
    function Download_Data_To_Bunch
      (ARFF_Container : Load_ARFF_Data.ARFF_Record;
---        Sparse         : Boolean;
-      As_Frame       : As_Frame_State := As_Frame_False;
       Features_List  : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
-      Return_X_Y     : Boolean := False)
+      Return_X_Y     : Boolean := False;
+      --        Sparse         : Boolean;
+      As_Frame       : As_Frame_State := As_Frame_False)
       return Bunch_Data;
    function Fetch_Openml (Dataset_File_Name : String;
                           Target_Column     : ML_Types.String_List;

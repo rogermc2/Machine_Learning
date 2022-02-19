@@ -7,6 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
 
 --  with Printing;
+--  with Load_ARFF_Data.ARFF_Printing;
 
 --  pragma Warnings (Off);
 
@@ -96,11 +97,11 @@ package body Openml_Ada is
 
    function Download_Data_To_Bunch
      (ARFF_Container               : Load_ARFF_Data.ARFF_Record;
-      --        Sparse         : Boolean;
-      As_Frame                     : As_Frame_State := As_Frame_False;
       Features_List                : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
-      Return_X_Y                   : Boolean := False)
+      Return_X_Y                   : Boolean := False;
+      --        Sparse         : Boolean;
+      As_Frame                     : As_Frame_State := As_Frame_False)
      --                                       Shape            : Shape_Data)
        return Bunch_Data is
       use Ada.Containers;
@@ -134,10 +135,9 @@ package body Openml_Ada is
          Nominal_Data_Out : out Nominal_Data_List) is
       begin
          Convert_Arff_Data (ARFF_In, X_Slice, Y_Slice, X_out, Y_out);
-         Put_Line (Routine_Name & "Parse_ARFF Parse_Nominal_Data");
          Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
-         Put_Line (Routine_Name & "Parse_ARFF Nominal_Data_Out length: " &
-                     Count_Type'Image (Nominal_Data_Out.Length));
+--           Put_Line (Routine_Name & "Parse_ARFF Nominal_Data_Out length: " &
+--                       Count_Type'Image (Nominal_Data_Out.Length));
 
       end Parse_ARFF;
 
@@ -153,7 +153,6 @@ package body Openml_Ada is
       --        end Post_Process;
 
    begin
-      Put_Line (Routine_Name);
       Assert (not Is_Empty (Features_List), Routine_Name &
                 "called with empty Features_List.");
       Assert (Data_Columns.Length > 0, Routine_Name &
@@ -226,12 +225,11 @@ package body Openml_Ada is
          end loop;
       end if;
 
-      Put_Line (Routine_Name & "L667");
       --  L667
       Parse_ARFF (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y,
                   Nominal_Attributes);
-      Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
-      Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
+--        Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
+--        Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
       --  L672
       Bunch.Data := X;
@@ -295,7 +293,6 @@ package body Openml_Ada is
 
       --  L929
       if Target_Column.Is_Empty then
-         Put_Line (Routine_Name & "default-target");
          Set_Default_Target (Features_List, Target_Columns);
       else
          Curs := Target_Column.First;
@@ -304,7 +301,6 @@ package body Openml_Ada is
             Target_Value := To_Unbounded_String
               (Slice (Target_Value, 2, Length (Target_Value)));
             Trim (Target_Value, Both);
-            --              Set_Field (Target, "target", To_String (Target_Value));
             Target_Columns.Append (Target_Value);
             Next (Curs);
          end loop;
@@ -329,17 +325,7 @@ package body Openml_Ada is
 
       --  L955
       Bunch := Download_Data_To_Bunch
-        (ARFF_Data, As_Frame_False, Features_List, Data_Columns,
-         Target_Columns);
-      Put_Line (Routine_Name & "Bunch set");
-
-      --        Bunch.Data := Data_Columns;
-      --        Bunch.Target := Target_Columns;
-      --        if not Return_X_Y then
-      --           Bunch.As_Frame := False;
-      --           Bunch.Feature_Names := Data_Columns;
-      --           Bunch.Target_Names := Target_Columns;
-      --        end if;
+        (ARFF_Data, Features_List, Data_Columns, Target_Columns, Return_X_Y);
 
       return Bunch;
 
@@ -543,69 +529,38 @@ package body Openml_Ada is
       return Load_ARFF_Data.Nominal_Data_List is
 --        use Ada.Containers;
       use ML_Types;
---        use Indefinite_String_Package;
       use String_Package;
       use Load_ARFF_Data;
       use Nominal_Data_Package;
---        use Nominal_Types_Package;
-      Routine_Name  : constant String := "Openml_Ada.Parse_Nominal_Data ";
+--        Routine_Name  : constant String := "Openml_Ada.Parse_Nominal_Data ";
       Attributes    : constant Attribute_List := Get_Attributes (Arff_Data);
       Include_Curs  : String_Package.Cursor := Include_Columns.First;
       Attribute     : Attribute_Record;
---        Nominal_Names : ML_Types.Indef_String_List;
---        Name_Curs     : Indefinite_String_Package.Cursor;
---        Nominal_Types : Nominal_Types_List;
---        Type_Curs     : Nominal_Types_Package.Cursor;
---        Nom_Name      : Unbounded_String;
---        Nom_Type      : Nominal_Data_Type;
       Nominal_Data  : Nominal_Data_List;
       Nominal_Curs  : Nominal_Data_Package.Cursor;
    begin
+--         Put_Line (Routine_Name & "Include_Columns length: " &
+--                       Count_Type'Image (Include_Columns.Length));
       while Has_Element (Include_Curs) loop
          for Index_V in Attributes.First_Index .. Attributes.Last_Index loop
-            Put_Line  (Routine_Name & "Index_V: " & Integer'Image (Index_V));
+--              Put_Line  (Routine_Name & "Index_V: " & Integer'Image (Index_V));
             Attribute := Attributes.Element (Index_V);
---              Nominal_Names := Attribute.Nominal_Names;
---              Nominal_Types := Attribute.Nominal_Types;
---              Nominal_Data := Attribute.Nominal_Data;
---              Nominal_Curs := Nominal_Data.First;
-
---              Name_Curs := Nominal_Names.First;
---              Type_Curs := Nominal_Types.First;
---              Put_Line (Routine_Name & "Nominal_Names length" &
---                           Count_Type'Image (Nominal_Names.Length));
---              Put_Line (Routine_Name & "Nominal_Types length" &
---                           Count_Type'Image (Nominal_Types.Length));
---              while Has_Element (Name_Curs) loop
+            Nominal_Curs := Attribute.Nominal_Data.First;
             while Has_Element (Nominal_Curs) loop
                declare
-                  Nominal: constant Nominal_Data_Record := Element (Nominal_Curs);
+                  Nominal: constant Nominal_Data_Record :=
+                             Element (Nominal_Curs);
                begin
---                    Nom_Name := Nominal.Name;
---                    Nom_Type := Nominal.Data_Kind;
                   Nominal_Data.Append (Nominal);
---                 Nom_Type := Element (Type_Curs);
---                 Put_Line  (Routine_Name & "Nom_Type: " &
---                                 Nominal_Data_Type'Image (Nom_Type));
---                 declare
---                    Nominal : Nominal_Data_Record (Nom_Type);
---                 begin
---                    Put_Line  (Routine_Name & "Nominal: " &
---                                 Nominal_Data_Type'Image (Nominal.Data_Kind));
---                    Nominal_Data.Append (Nominal);
                end;
                Next  (Nominal_Curs);
---                 Next (Name_Curs);
             end loop;
-
---              Put_Line  (Routine_Name & "Next Type_Curs");
---              Next (Type_Curs);
-            Put_Line  (Routine_Name & "end for loop");
          end loop;
-         Put_Line  (Routine_Name & "for loop done");
          Next (Include_Curs);
       end loop;
-      New_Line;
+--         Put_Line (Routine_Name & "Nominal_Data length: " &
+--                       Count_Type'Image (Nominal_Data.Length));
+--        New_Line;
 
       return Nominal_Data;
 
@@ -684,15 +639,13 @@ package body Openml_Ada is
       use Load_ARFF_Data;
       use ARFF_Data_List_Package;
       use ARFF_Data_Package;
-      Routine_Name    : constant String := "Openml_Ada.Split_Sparse_Columns ";
-      Data_Length     : constant Natural := Natural (Arff_Data.Length);
+--        Routine_Name    : constant String := "Openml_Ada.Split_Sparse_Columns ";
       Col_Curs        : ARFF_Data_Package.Cursor;
       Arff_Data_New   : ARFF_Data_List_2D;
       New_Row         : ARFF_Data_List;
       Arff_Data_Row   : ARFF_Data_List;
       Select_Col      : Boolean;
    begin
-      Put_Line (Routine_Name & "Data_Length:" & Integer'Image (Data_Length));
       for sample in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;
          Arff_Data_Row := Arff_Data.Element (sample);
@@ -715,7 +668,6 @@ package body Openml_Ada is
 
             Next (Col_Curs);
          end loop;
-         --              Put_Line (Routine_Name & "end outer while:");
 
          Arff_Data_New.Append (New_Row);
       end loop;

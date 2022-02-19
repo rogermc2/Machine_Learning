@@ -202,11 +202,10 @@ package body Load_ARFF_Data is
         use ML_Types;
         use Nominal_Data_Package;
         use Dataset_Utilities;
-        Routine_Name    : constant String := "Load_ARFF_Data.Decode_Nominal ";
+--          Routine_Name    : constant String := "Load_ARFF_Data.Decode_Nominal ";
         UC_Value_String :  constant String := To_Upper_Case (Value_String);
         Nominal_Cursor  : Nominal_Data_Package.Cursor;
     begin
-        Put_Line (Routine_Name & "Value_String: " & Value_String);
         if not Is_Empty (Attribute.Nominal_Data) then
             Nominal_Cursor := Attribute.Nominal_Data.First;
             while Has_Element (Nominal_Cursor) loop

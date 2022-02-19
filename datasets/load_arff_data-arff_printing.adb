@@ -75,6 +75,58 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Attributes (Text : String; Data : Attribute_List) is
+      use Ada.Containers;
+      use Ada.Strings;
+      use Attribute_Data_Package;
+      use Nominal_Data_Package;
+      Attribute  : Attribute_Record;
+      Curs       : Attribute_Data_Package.Cursor := Data.First;
+      Nom_Curs   : Nominal_Data_Package.Cursor;
+      Count      : Count_Type;
+   begin
+      New_Line;
+      Put_Line (Text & ":");
+      while Has_Element (Curs) loop
+         Attribute := Element (Curs);
+         Put (Trim (Attribute.Name, Both) & " ");
+         Ada.Text_IO.Unbounded_IO.Put_Line
+           (Trim (To_Unbounded_String
+            (ARFF_Data_Type'Image (Attribute.Data_Kind)), Both));
+         if not Attribute.Nominal_Data.Is_Empty then
+            Count := 0;
+            Put_Line ("Nominal attributes:");
+            Nom_Curs := Attribute.Nominal_Data.First;
+            while Has_Element (Nom_Curs) loop
+               Count := Count + 1;
+               declare
+                  Nom_Value : constant Nominal_Data_Record :=
+                                Element (Nom_Curs);
+               begin
+                  case Nom_Value.Data_Kind is
+                  when Nominal_Integer =>
+                     Put (Integer'Image (Nom_Value.Integer_Data));
+                  when Nominal_Numeric | Nominal_Real =>
+                     Put (Float'Image (Nom_Value.Real_Data));
+                  when Nominal_String =>
+                     Put (Nom_Value.UB_String_Data);
+                  end case;
+               end;
+
+               if Count < Attribute.Nominal_Data.Length then
+                  Put (", ");
+               end if;
+               Next (Nom_Curs);
+            end loop;
+            New_Line;
+         end if;
+         Next (Curs);
+      end loop;
+
+   end Print_Attributes;
+
+   --  -------------------------------------------------------------------------
+
    procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
                          Last : Positive := 10) is
       use ARFF_Data_List_Package;
