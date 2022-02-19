@@ -1,8 +1,6 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with GNATCOLL.JSON; use GNATCOLL.JSON;
-
 with ML_Types;
 
 with Load_ARFF_Data;
@@ -10,7 +8,7 @@ with Load_ARFF_Data;
 package Openml_Ada is
 
    type As_Frame_State is (As_Frame_False, As_Frame_True, As_Frame_Auto);
-   subtype Qualities_Map is JSON_Array;
+--     subtype Qualities_Map is JSON_Array;
 
    type Bunch_Data (Only_XY : Boolean := False) is record
       Data          : Load_ARFF_Data.ARFF_Data_List_2D;
@@ -43,10 +41,6 @@ package Openml_Ada is
                           As_Frame          : in out As_Frame_State;
                           Return_X_Y        : Boolean := False)
                            return Bunch_Data;
-   function Get_Data_Description_By_ID (Data_ID : Integer) return JSON_Value;
-   function Get_Data_Features (Data_ID : Integer) return JSON_Array;
-   function Get_Data_Info_By_Name (Dataset_Name : String) return JSON_Value;
-   function Get_Data_Qualities (Data_ID : Integer) return Qualities_Map;
    function Valid_Data_Column_Names
      (Features_List  : Load_ARFF_Data.Attribute_List;
       Target_Columns : ML_Types.String_List) return ML_Types.String_List;

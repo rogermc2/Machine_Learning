@@ -40,7 +40,6 @@ package body Openml_Ada is
    --        Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
    --      subtype Features_Map is ML_Features_Package.Map;
 
-   function Get_Json_Content_From_File (File_Name : String) return JSON_Value;
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    function Parse_Nominal_Data
      (Arff_Data       : Load_ARFF_Data.ARFF_Record;
@@ -359,149 +358,43 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Get_Data_Description_By_ID
-     (Data_ID : Integer) return JSON_Value is
-      use Ada.Strings;
-      Routine_Name : constant String := "Openml_Ada.Get_Data_Description_By_ID ";
-      Data_Desc    : JSON_Value := Create_Object;
-   begin
-      declare
-         File_Name : constant String := "../dataset_" &
-                       Fixed.Trim (Integer'Image (Data_ID), Both) &
-                       "_description";
-      begin
-         Data_Desc := Get_Json_Content_From_File (File_Name);
-      end;
-
-      --           Put_Line (Routine_Name & "Data_Desc empty? " &
-      --                      Boolean'Image (Is_Empty (Data_Desc)));
-      if Has_Field (Data_Desc, "data_set_description") then
-         --              Put_Line (Routine_Name &
-         --                          "Data_Desc has data_set_description field");
-         Data_Desc := Get (Data_Desc, "data_set_description");
-      else
-         Put_Line (Routine_Name & "Data_Desc is not a data_set_description");
-      end if;
-
-      return Data_Desc;
-
-   end Get_Data_Description_By_ID;
-
-   --  ------------------------------------------------------------------------
-
-   function Get_Data_Features (Data_ID   : Integer) return JSON_Array is
-      use Ada.Strings;
-      Routine_Name  : constant String := "Openml_Ada.Get_Data_Features ";
-      Json_Data     : JSON_Value := Create_Object;
-      Features      : JSON_Value := Create_Object;
-      Feature       : JSON_Value := Create_Object;
-      Feature_Array : JSON_Array;
-   begin
-      declare
-         File_Name : constant String := "../dataset_" &
-                       Fixed.Trim (Integer'Image (Data_ID), Both) &
-                       "_features";
-      begin
-         --              Put_Line (Routine_Name & "File_Name: " & File_Name);
-         Json_Data := Get_Json_Content_From_File (File_Name);
-      end;
-
-      Assert (Has_Field (Json_Data, "data_features") or
-                Has_Field (Json_Data, "features"), Routine_Name &
-                "data_features is not a Json_Data field.");
-
-      if Has_Field (Json_Data, "data_features") then
-         Features := Get (Json_Data, "data_features");
-         Assert (Has_Field (Features, "feature"), Routine_Name &
-                   "data_features is not a Json_Data field.");
-         Feature := Get (Features, "feature");
-         Feature_Array := Get (Feature);
-      else
-         Feature_Array := Get (Json_Data, "features");
-      end if;
-
-      return Feature_Array;
-
-   end Get_Data_Features;
-
-   --  ------------------------------------------------------------------------
-   --  L384
-   function Get_Data_Info_By_Name (Dataset_Name : String)
-                                    return JSON_Value is
-      --        Routine_Name   : constant String := "Openml_Ada.Get_Data_Info_By_Name ";
-      Json_Data      : JSON_Value;
-   begin
-      declare
-         File_Name : constant String := "../" & Dataset_Name & "_info";
-      begin
-         Json_Data := Get_Json_Content_From_File (File_Name);
-      end;
-
-      return Json_Data;
-
-   end Get_Data_Info_By_Name;
-
-   --  ------------------------------------------------------------------------
-
-   function Get_Data_Qualities (Data_ID : Integer) return Qualities_Map is
-      use Ada.Strings;
-      Routine_Name  : constant String := "Openml_Ada.Get_Data_Qualities ";
-      Json_Data     : JSON_Value;
-      Qualities     : JSON_Value;
-      Quality_Array : Qualities_Map;
-
-      procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
-         Quality : constant JSON_Value := Create_Object;
-      begin
-         Quality.Set_Field (Name, Value);
-         Append (Quality_Array, Quality);
-
-      end Get_Quality;
-
-   begin
-      declare
-         File_Name : constant String := "../dataset_" &
-                       Fixed.Trim (Integer'Image (Data_ID), Both) &
-                       "_qualities";
-      begin
-         Json_Data := Get_Json_Content_From_File (File_Name);
-      end;
-
-      if Has_Field (Json_Data, "data_qualities") then
-         Qualities := Get (Json_Data, "data_qualities");
-         Map_JSON_Object (Qualities, Get_Quality'access);
-      else
-         Put_Line
-           (Routine_Name & "Qualities file with" &
-              Integer'Image (Data_ID) &
-              " does not have a data_qualities field.");
-      end if;
-
-      return Quality_Array;
-
-   end Get_Data_Qualities;
-
-   --  ------------------------------------------------------------------------
-
-   function Get_Json_Content_From_File (File_Name : String) return JSON_Value is
-      --       Routine_Name   : constant String :=
-      --                           "Openml_Ada.Get_Json_Content_From_File ";
-      Name           : constant String := File_Name & ".json";
-      File           : File_Type;
-      JSON_Data      : Unbounded_String;
-      JSON_Main_Node : JSON_Value := Create_Object;
-   begin
-      Open (File, In_File, Name);
-      while not End_Of_File (File) loop
-         Append (JSON_Data, To_Unbounded_String (Get_Line (File)));
-      end loop;
-      Close (File);
-
-      JSON_Main_Node := GNATCOLL.JSON.Read (Strm => JSON_Data, Filename => "");
-
-      return JSON_Main_Node;
-
-   end Get_Json_Content_From_File;
+--     function Get_Data_Qualities (Data_ID : Integer) return Qualities_Map is
+--        use Ada.Strings;
+--        Routine_Name  : constant String := "Openml_Ada.Get_Data_Qualities ";
+--        Json_Data     : JSON_Value;
+--        Qualities     : JSON_Value;
+--        Quality_Array : Qualities_Map;
+--
+--        procedure Get_Quality (Name : Utf8_String; Value : JSON_Value) is
+--           Quality : constant JSON_Value := Create_Object;
+--        begin
+--           Quality.Set_Field (Name, Value);
+--           Append (Quality_Array, Quality);
+--
+--        end Get_Quality;
+--
+--     begin
+--        declare
+--           File_Name : constant String := "../dataset_" &
+--                         Fixed.Trim (Integer'Image (Data_ID), Both) &
+--                         "_qualities";
+--        begin
+--           Json_Data := Get_Json_Content_From_File (File_Name);
+--        end;
+--
+--        if Has_Field (Json_Data, "data_qualities") then
+--           Qualities := Get (Json_Data, "data_qualities");
+--           Map_JSON_Object (Qualities, Get_Quality'access);
+--        else
+--           Put_Line
+--             (Routine_Name & "Qualities file with" &
+--                Integer'Image (Data_ID) &
+--                " does not have a data_qualities field.");
+--        end if;
+--
+--        return Quality_Array;
+--
+--     end Get_Data_Qualities;
 
    --  ------------------------------------------------------------------------
 
@@ -636,7 +529,7 @@ package body Openml_Ada is
       Feature          : Attribute_Record;
       Target_Specified : Boolean := False;
    begin
-      for index in Features_List.First_Index .. Features_List.Last_Index loop
+      for index in Features_List.First_Index .. Features_List.Last_Index - 1 loop
          Feature := Features_List.Element (index);
          if Feature.Is_Target then
             Target_Specified := True;
