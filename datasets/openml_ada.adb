@@ -10,7 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 --  with Printing;
 
 with Load_ARFF_Data.ARFF_IO;
---  with Load_ARFF_Data.ARFF_Printing;
+with Load_ARFF_Data.ARFF_Printing;
 
 --  pragma Warnings (Off);
 
@@ -234,6 +234,7 @@ package body Openml_Ada is
 --        Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
 --        Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
+      Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
       --  L672
       Bunch.Data := X;
       Bunch.Target := Y;

@@ -3,6 +3,8 @@ with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
+
+with Load_ARFF_Data.ARFF_Printing;
 with Openml_Ada; use Openml_Ada;
 
 package body OML_File_Tests is
@@ -165,6 +167,7 @@ package body OML_File_Tests is
 
    procedure Test_Fetch_OML is
       use Ada.Containers;
+      use Load_ARFF_Data.ARFF_Printing;
       Routine_Name      : constant String := "Test_Fetch_OML ";
       File_Name         : constant String := "../iris.arff";
 --        File_Name         : constant String := "../mnist_784.arff";
@@ -185,6 +188,7 @@ package body OML_File_Tests is
                   Count_Type'Image (Bunch.Data.Length));
       Put_Line (Routine_Name & "Y length: " &
                   Count_Type'Image (Bunch.Target.Length));
+--        Print_Data (Routine_Name & "Bunch.Data", Bunch.Data, 1, 10);
       Put_Line (Routine_Name & "completed");
 
    end Test_Fetch_OML;
