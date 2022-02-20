@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 
-with Load_ARFF_Data.ARFF_Printing;
+--  with Load_ARFF_Data.ARFF_Printing;
 with Openml_Ada; use Openml_Ada;
 
 package body OML_File_Tests is
@@ -167,7 +167,7 @@ package body OML_File_Tests is
 
    procedure Test_Fetch_OML is
       use Ada.Containers;
-      use Load_ARFF_Data.ARFF_Printing;
+--        use Load_ARFF_Data.ARFF_Printing;
       Routine_Name      : constant String := "Test_Fetch_OML ";
       File_Name         : constant String := "../iris.arff";
 --        File_Name         : constant String := "../mnist_784.arff";
