@@ -64,15 +64,17 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
    --  L325
    procedure Convert_Arff_Data
-     (Arff_Container            : Load_ARFF_Data.ARFF_Record;
+     (Arff_Data                 : Load_ARFF_Data.ARFF_Data_List_2D;
       Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
       X, Y                      : out  Load_ARFF_Data.ARFF_Data_List_2D) is
-      use Load_ARFF_Data;
-      ARFF_Data  : constant ARFF_Data_List_2D := Get_Data (Arff_Container);
+      Routine_Name : constant String := "Opemml.Convert_Arff_Data ";
    begin
       --  L278
+      Put_Line (Routine_Name & "ARFF_Data set");
       X := Split_Columns (ARFF_Data, Col_Slice_X);
+      Put_Line (Routine_Name & "X Split");
       Y := Split_Columns (ARFF_Data, Col_Slice_Y);
+      Put_Line (Routine_Name & "Y Split");
 
    end Convert_Arff_Data;
 
@@ -116,11 +118,15 @@ package body Openml_Ada is
          X_Slice, Y_Slice : ML_Types.Integer_List;
          X_out, Y_out     : out ARFF_Data_List_2D;
          Nominal_Data_Out : out Nominal_Data_List) is
+         Routine_Name : constant String :=
+                          "Openml_Ada.Download_Data_To_Bunch.Parse_ARFF";
       begin
-         Convert_Arff_Data (ARFF_In, X_Slice, Y_Slice, X_out, Y_out);
+         Put_Line (Routine_Name);
+         Convert_Arff_Data (ARFF_In.Data, X_Slice, Y_Slice, X_out, Y_out);
+         Put_Line (Routine_Name & "Parse_Nominal_Data");
          Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
-         --           Put_Line (Routine_Name & "Parse_ARFF Nominal_Data_Out length: " &
-         --                       Count_Type'Image (Nominal_Data_Out.Length));
+         Put_Line (Routine_Name & "Nominal_Data_Out length: " &
+                   Count_Type'Image (Nominal_Data_Out.Length));
 
       end Parse_ARFF;
 
@@ -214,8 +220,8 @@ package body Openml_Ada is
       --  L667
       Parse_ARFF (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y,
                   Nominal_Attributes);
-      --        Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
-      --        Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
+      Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
+      Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
       Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
       Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "Y", Y, 1, 2);
@@ -313,8 +319,8 @@ package body Openml_Ada is
 
       --  L944
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
-      --        Put_Line (Routine_Name & "Target_Columns length: " &
-      --                  Integer'Image (Integer (Target_Columns.Length)));
+      Put_Line (Routine_Name & "Target_Columns length: " &
+                Integer'Image (Integer (Target_Columns.Length)));
       --        Put_Line (Routine_Name & "Data_Columns length: " &
       --                  Integer'Image (Integer (Data_Columns.Length)));
       --        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
@@ -523,36 +529,21 @@ package body Openml_Ada is
       use Load_ARFF_Data;
       use ARFF_Data_List_Package;
       use ARFF_Data_Package;
---        Routine_Name    : constant String := "Openml_Ada.Split_Columns ";
-      Col_Curs        : ARFF_Data_Package.Cursor;
-      Col_Index       : Natural;
-      Found_Cols      : ML_Types.Integer_List;
-      Arff_Data_New   : ARFF_Data_List_2D;
-      New_Row         : ARFF_Data_List;
-      Arff_Data_Col   : ARFF_Data_List;
+--        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
+      Arff_Data_New : ARFF_Data_List_2D;
+      New_Row       : ARFF_Data_List;
+      Arff_Data_Row : ARFF_Data_List;  --  list of columns
    begin
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;
-         Found_Cols.Clear;
-         Arff_Data_Col := Arff_Data.Element (row);
-         Col_Curs := Arff_Data_Col.First;
-         Col_Index := 0;
-         while Has_Element (Col_Curs) loop
-            Col_Index := Col_Index + 1;
-            for include_col in Include_Columns.First_Index ..
-              Include_Columns.Last_Index loop
-               if not Found_Cols.Contains (Col_Index) and then
-                 Col_Index = Include_Columns.Element (include_col) then
-                  Found_Cols.Append (Col_Index);
-                  New_Row.Append (Element (Col_Curs));
-               end if;
-            end loop;
-
-            Next (Col_Curs);
+         Arff_Data_Row := Arff_Data.Element (row);
+         for index in Include_Columns.First_Index ..
+           Include_Columns.Last_Index loop
+            New_Row.Append
+              (Arff_Data_Row.Element (Include_Columns.Element (index)));
          end loop;
-
---           Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name &
---                                                      "New_Row", New_Row);
+--           Load_ARFF_Data.ARFF_Printing.Print_Data
+--             (Routine_Name & "New_Row", New_Row);
          Arff_Data_New.Append (New_Row);
       end loop;
 

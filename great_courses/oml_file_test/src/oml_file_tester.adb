@@ -11,7 +11,7 @@ begin
     GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Every_Raise);
 
    Put_Line (Routine_Name);
-   Put_Line (Routine_Name & "Test_Data_Info");
+--     Put_Line (Routine_Name & "Test_Data_Info");
 --     OML_File_Tests.Test_Data_Info;
    New_Line;
 --     Put_Line (Routine_Name & "Test_Convert_Arff_To_Data");

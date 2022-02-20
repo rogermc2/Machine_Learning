@@ -1,6 +1,7 @@
 
 --  with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
+with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -8,7 +9,6 @@ with ML_Types;
 
 package Load_ARFF_Data is
 
-   type ARFF_Record is private;
    subtype ARFF_Header is ML_Types.Indef_String_List;
 
    type ARFF_Data_Type is (ARFF_Date, ARFF_Integer, ARFF_Numeric, ARFF_Nominal,
@@ -26,8 +26,8 @@ package Load_ARFF_Data is
    end record;
 
    package ARFF_Data_Package is new
-     Ada.Containers.Indefinite_Doubly_Linked_Lists (ARFF_Data_Record);
-   subtype ARFF_Data_List is ARFF_Data_Package.List;
+     Ada.Containers.Indefinite_Vectors (Positive, ARFF_Data_Record);
+   subtype ARFF_Data_List is ARFF_Data_Package.Vector;
 
    use ARFF_Data_Package;
    package ARFF_Data_List_Package is new
@@ -63,14 +63,6 @@ package Load_ARFF_Data is
      Ada.Containers.Vectors (Positive, Attribute_Record);
    subtype Attribute_List is Attribute_Data_Package.Vector;
 
-   function Get_Attributes (Data : ARFF_Record) return Attribute_List;
-   function Get_Data (Data : ARFF_Record) return ARFF_Data_List_2D;
-   function Get_Description (Data : ARFF_Record) return ARFF_Header;
-   function Get_Relation (Data : ARFF_Record) return String;
-   procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
-
-private
-
    type ARFF_Header_Record is record
       Info       : ARFF_Header;       --  'description': ''
       Relation   : Unbounded_String;  --  'relation': ''
@@ -82,5 +74,10 @@ private
       Header : ARFF_Header_Record;
       Data   : ARFF_Data_List_2D;    --  'data': []
    end record;
+
+   function Get_Attributes (Data : ARFF_Record) return Attribute_List;
+   function Get_Description (Data : ARFF_Record) return ARFF_Header;
+   function Get_Relation (Data : ARFF_Record) return String;
+   procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
 
 end Load_ARFF_Data;

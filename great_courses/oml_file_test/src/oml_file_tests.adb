@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 
---  with Load_ARFF_Data.ARFF_Printing;
+with Load_ARFF_Data.ARFF_Printing;
 with Openml_Ada; use Openml_Ada;
 
 package body OML_File_Tests is
@@ -103,15 +103,13 @@ package body OML_File_Tests is
 
    procedure Test_Fetch_OML is
       use Ada.Containers;
---        use Load_ARFF_Data.ARFF_Printing;
-      Routine_Name      : constant String := "Test_Fetch_OML ";
-      File_Name         : constant String := "../diabetes.arff";
---        File_Name         : constant String := "../mnist_784.arff";
-      --        Version           : constant String := "1";
-      --        Data_Id           : Integer := 554;
-      As_Frame          : As_Frame_State := As_Frame_False;
-      Target_Column     : ML_Types.String_List;
-      Bunch             : Bunch_Data (True);
+      use Load_ARFF_Data.ARFF_Printing;
+      Routine_Name  : constant String := "Test_Fetch_OML ";
+      File_Name      : constant String := "../iris.arff";
+--        File_Name     : constant String := "../mnist_784.arff";
+      As_Frame      : As_Frame_State := As_Frame_False;
+      Target_Column : ML_Types.String_List;
+      Bunch         : Bunch_Data (True);
    begin
       Put_Line (Routine_Name);
 
@@ -124,7 +122,8 @@ package body OML_File_Tests is
                   Count_Type'Image (Bunch.Data.Length));
       Put_Line (Routine_Name & "Y length: " &
                   Count_Type'Image (Bunch.Target.Length));
---        Print_Data (Routine_Name & "Bunch.Data", Bunch.Data, 1, 10);
+      Print_Data (Routine_Name & "Bunch.Data", Bunch.Data, 1, 2);
+      Print_Data (Routine_Name & "Bunch.Target", Bunch.Target, 1, 2);
       Put_Line (Routine_Name & "completed");
 
    end Test_Fetch_OML;
