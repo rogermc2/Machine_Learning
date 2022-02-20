@@ -33,7 +33,7 @@ package body Openml_Ada is
                                  Target_Columns : out ML_Types.String_List);
    function Split_Columns
      (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
-      Include_Columns : ML_Types.Integer_List)
+      Include_Columns : ML_Types.Integer_DL_List)
        return Load_ARFF_Data.ARFF_Data_List_2D;
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
@@ -62,23 +62,6 @@ package body Openml_Ada is
    --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
-   --  L325
-   procedure Convert_Arff_Data
-     (Arff_Data                 : Load_ARFF_Data.ARFF_Data_List_2D;
-      Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
-      X, Y                      : out  Load_ARFF_Data.ARFF_Data_List_2D) is
-      Routine_Name : constant String := "Opemml.Convert_Arff_Data ";
-   begin
-      --  L278
-      Put_Line (Routine_Name & "ARFF_Data set");
-      X := Split_Columns (ARFF_Data, Col_Slice_X);
-      Put_Line (Routine_Name & "X Split");
-      Y := Split_Columns (ARFF_Data, Col_Slice_Y);
-      Put_Line (Routine_Name & "Y Split");
-
-   end Convert_Arff_Data;
-
-   --  ------------------------------------------------------------------------
 
    function Download_Data_To_Bunch
      (ARFF_Container               : Load_ARFF_Data.ARFF_Record;
@@ -92,6 +75,7 @@ package body Openml_Ada is
       use Ada.Containers;
       use Load_ARFF_Data;
       use ML_Types;
+      use Integer_DLL_Package;
       use String_Package;
       use Attribute_Data_Package;
       Routine_Name       : constant String :=
@@ -102,36 +86,16 @@ package body Openml_Ada is
       Features_Dict      : Attribute_Dictionary_Map;
       aFeature           : Attribute_Record;
       Col_Name           : Unbounded_String;
-      Col_Slice_X        : Integer_List;
-      Col_Slice_Y        : Integer_List;
+      Col_Slice_X        : Integer_DL_List;
+      Col_Slice_Y        : Integer_DL_List;
       --        Num_Missing        : Integer;
       --        Return_Type        : ARFF_Return_Type;
       All_Columns        : String_List;
-      X                  : ARFF_Data_List_2D;
-      Y                  : ARFF_Data_List_2D;
       Nominal_Attributes : Nominal_Data_List;
       --        Frame              : Boolean := False;
       Bunch              : Bunch_Data (Return_X_Y);
-
-      procedure Parse_ARFF
-        (ARFF_In          : ARFF_Record;
-         X_Slice, Y_Slice : ML_Types.Integer_List;
-         X_out, Y_out     : out ARFF_Data_List_2D;
-         Nominal_Data_Out : out Nominal_Data_List) is
-         Routine_Name : constant String :=
-                          "Openml_Ada.Download_Data_To_Bunch.Parse_ARFF";
-      begin
-         Put_Line (Routine_Name & "Convert_Arff_Data");
-         Convert_Arff_Data (ARFF_In.Data, X_Slice, Y_Slice, X_out, Y_out);
-         Put_Line (Routine_Name & "Parse_Nominal_Data");
-         Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
---           Put_Line (Routine_Name & "Nominal_Data_Out length: " &
---                     Count_Type'Image (Nominal_Data_Out.Length));
-
-      end Parse_ARFF;
-
-      --        procedure
-      --        Post_Process (ARFF_Data : JSON_Value; X, Y : out JSON_Array;
+      --
+      --       procedure Post_Process (ARFF_Data : JSON_Value; X, Y : out JSON_Array;
       --                      Frame              : Boolean := False;
       --                      Nominal_Attributes : JSON_Array) is
       --        begin
@@ -191,14 +155,14 @@ package body Openml_Ada is
       end loop;
 
       --  L569
-      for index in  Col_Slice_Y.First_Index .. Col_Slice_Y.Last_Index loop
-         Feature_Index := Col_Slice_Y.Element (index);
+--        for index in  Col_Slice_Y.First_Index .. Col_Slice_Y.Last_Index loop
+--           Feature_Index := Col_Slice_Y.Element (index);
          --           Num_Missing := Integer'Value
          --             (Get (aFeature, "number_of_missing_values"));
          --           Assert (Num_Missing >= 0,
          --                   Routine_Name & "Target column " & " has " & " missing values."
          --                   & "Missing values are not supported for target columns.");
-      end loop;
+--        end loop;
 
       --  L582
       --        if Sparse then
@@ -218,17 +182,26 @@ package body Openml_Ada is
       end if;
 
       --  L667
-      Parse_ARFF (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y,
-                  Nominal_Attributes);
-      Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
-      Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
+      --  L325
+      Put_Line (Routine_Name & "Convert_Arff_Data");
+      --  L278
+      Bunch.Data := Split_Columns (ARFF_Container.Data, Col_Slice_X);
+      Put_Line (Routine_Name & "X Split");
+      Bunch.Target := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
+      Put_Line (Routine_Name & "Y Split");
+
+      Put_Line (Routine_Name & "Data length" &
+                  Count_Type'Image (Bunch.Data.Length));
+      Put_Line (Routine_Name & "Target length" &
+                  Count_Type'Image (Bunch.Target.Length));
 
 --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
 --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "Y", Y, 1, 2);
       --  L672
-      Bunch.Data := X;
-      Bunch.Target := Y;
       if not Return_X_Y then
+         Put_Line (Routine_Name & "Parse_Nominal_Data");
+         Nominal_Attributes :=
+           Parse_Nominal_Data (ARFF_Container, Target_Columns);
          Bunch.As_Frame := As_Frame_False;
          Bunch.Categories := Nominal_Attributes;
          Bunch.Feature_Names := Data_Columns;
@@ -319,8 +292,6 @@ package body Openml_Ada is
 
       --  L944
       Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
-      Put_Line (Routine_Name & "Target_Columns length: " &
-                Integer'Image (Integer (Target_Columns.Length)));
       --        Put_Line (Routine_Name & "Data_Columns length: " &
       --                  Integer'Image (Integer (Data_Columns.Length)));
       --        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
@@ -524,23 +495,26 @@ package body Openml_Ada is
    --  L184
    function Split_Columns
      (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
-      Include_Columns : ML_Types.Integer_List)
+      Include_Columns : ML_Types.Integer_DL_List)
        return Load_ARFF_Data.ARFF_Data_List_2D is
+      use ML_Types;
+      use Integer_DLL_Package;
       use Load_ARFF_Data;
       use ARFF_Data_List_Package;
       use ARFF_Data_Package;
 --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Arff_Data_New : ARFF_Data_List_2D;
+      Include_Curs  : Integer_DLL_Package.Cursor;
       New_Row       : ARFF_Data_List;
       Arff_Data_Row : ARFF_Data_List;  --  list of columns
    begin
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;
          Arff_Data_Row := Arff_Data.Element (row);
-         for index in Include_Columns.First_Index ..
-           Include_Columns.Last_Index loop
-            New_Row.Append
-              (Arff_Data_Row.Element (Include_Columns.Element (index)));
+         Include_Curs := Include_Columns.First;
+         while Has_Element (Include_Curs) loop
+            New_Row.Append (Arff_Data_Row.Element (Element (Include_Curs)));
+            Next  (Include_Curs);
          end loop;
 --           Load_ARFF_Data.ARFF_Printing.Print_Data
 --             (Routine_Name & "New_Row", New_Row);
@@ -550,29 +524,6 @@ package body Openml_Ada is
       return Arff_Data_New;
 
    end Split_Columns;
-
-   --  ------------------------------------------------------------------------
-
-   --     function J_Array_To_String_List (J_Array : JSON_Array)
-   --                                      return ML_Types.String_List is
-   --        use ML_Types;
-   --        --        Routine_Name  : constant String := "Openml_Ada.J_Array_To_String_List ";
-   --        theList       : String_List;
-   --        Index         : Positive := Array_First (J_Array);
-   --        J_Item        : JSON_Value;
-   --        Item          : Unbounded_String;
-   --     begin
-   --        --  L707
-   --        --           Put_Line (Routine_Name & "Feature_Val: " & To_String (Feature_Val));
-   --        while Has_Element (Target_Curs) and not Target_Found loop
-   --           Target := Element (Target_Curs);
-   --           Target_Found := Target = Feature_Name;
-   --           Next (Target_Curs);
-   --        end loop;
-   --
-   --        return theList;
-   --
-   --     end J_Array_To_String_List;
 
    --  ------------------------------------------------------------------------
    --  L699

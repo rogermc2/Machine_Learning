@@ -27,6 +27,10 @@ package ML_Types is
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;
 
+   package Integer_DLL_Package is new
+     Ada.Containers.Doubly_Linked_Lists (Integer);
+   subtype Integer_DL_List is Integer_DLL_Package.List;
+
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
    subtype Character_List is Character_Package.Vector;

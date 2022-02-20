@@ -1,14 +1,14 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
-with GNAT.Exception_Traces;
+--  with GNAT.Exception_Traces;
 
 with OML_File_Tests;
 
 procedure Oml_File_Tester is
    Routine_Name  : constant String := "Oml_File_Tester ";
 begin
-    GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Every_Raise);
+--      GNAT.Exception_Traces.Trace_On (GNAT.Exception_Traces.Every_Raise);
 
    Put_Line (Routine_Name);
 --     Put_Line (Routine_Name & "Test_Data_Info");
