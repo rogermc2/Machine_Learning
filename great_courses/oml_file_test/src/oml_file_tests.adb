@@ -105,8 +105,8 @@ package body OML_File_Tests is
       use Ada.Containers;
       use Load_ARFF_Data.ARFF_Printing;
       Routine_Name  : constant String := "Test_Fetch_OML ";
-      File_Name      : constant String := "../iris.arff";
---        File_Name     : constant String := "../mnist_784.arff";
+--        File_Name      : constant String := "../iris.arff";
+      File_Name     : constant String := "../mnist_784.arff";
       As_Frame      : As_Frame_State := As_Frame_False;
       Target_Column : ML_Types.String_List;
       Bunch         : Bunch_Data (True);

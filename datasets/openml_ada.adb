@@ -7,10 +7,10 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
 
-with Printing;
+--  with Printing;
 
 with Load_ARFF_Data.ARFF_IO;
-with Load_ARFF_Data.ARFF_Printing;
+--  with Load_ARFF_Data.ARFF_Printing;
 
 --  pragma Warnings (Off);
 
@@ -121,12 +121,12 @@ package body Openml_Ada is
          Routine_Name : constant String :=
                           "Openml_Ada.Download_Data_To_Bunch.Parse_ARFF";
       begin
-         Put_Line (Routine_Name);
+         Put_Line (Routine_Name & "Convert_Arff_Data");
          Convert_Arff_Data (ARFF_In.Data, X_Slice, Y_Slice, X_out, Y_out);
          Put_Line (Routine_Name & "Parse_Nominal_Data");
          Nominal_Data_Out := Parse_Nominal_Data (ARFF_In, Target_Columns);
-         Put_Line (Routine_Name & "Nominal_Data_Out length: " &
-                   Count_Type'Image (Nominal_Data_Out.Length));
+--           Put_Line (Routine_Name & "Nominal_Data_Out length: " &
+--                     Count_Type'Image (Nominal_Data_Out.Length));
 
       end Parse_ARFF;
 
@@ -142,10 +142,10 @@ package body Openml_Ada is
       --        end Post_Process;
 
    begin
-      Assert (not Is_Empty (Features_List), Routine_Name &
-                "called with empty Features_List.");
-      Assert (Data_Columns.Length > 0, Routine_Name &
-                "Data_Columns is empty.");
+--        Assert (not Is_Empty (Features_List), Routine_Name &
+--                  "called with empty Features_List.");
+--        Assert (Data_Columns.Length > 0, Routine_Name &
+--                  "Data_Columns is empty.");
 
 --        Load_ARFF_Data.ARFF_Printing.Print_Attributes
 --          (Routine_Name & "Features_List", Features_List);
@@ -155,8 +155,8 @@ package body Openml_Ada is
          Features_Dict.Include (aFeature.Name, index);
       end loop;
 
-      Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
-      Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
+--        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
+--        Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
       --  L566 col_slice_y =
@@ -223,8 +223,8 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
       Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
-      Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
-      Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "Y", Y, 1, 2);
+--        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
+--        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "Y", Y, 1, 2);
       --  L672
       Bunch.Data := X;
       Bunch.Target := Y;
