@@ -22,23 +22,6 @@ package body Openml_Ada is
    package Attribute_Dictionary_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Positive);
    subtype Attribute_Dictionary_Map is Attribute_Dictionary_Package.Map;
-   --
-   --     use Tupple_Package;
-   --     package Zip_Package is new
-   --       Ada.Containers.Vectors (Positive, Tupple_Vector);
-   --     subtype Zip_Vector is Zip_Package.Vector;
-
-   --     package Pair_Settings_Vector_Package is new
-   --       Ada.Containers.Doubly_Linked_Lists (JSON_Item);
-   --     subtype Pair_List is Pair_Settings_Vector_Package.List;
-
-   --      package ML_Names_Package is new
-   --        Ada.Containers.Doubly_Linked_Lists (Unbounded_String);
-   --      subtype Names_List is ML_Names_Package.List;
-   --
-   --      package ML_Features_Package is new
-   --        Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
-   --      subtype Features_Map is ML_Features_Package.Map;
 
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    function Parse_Nominal_Data
@@ -48,7 +31,7 @@ package body Openml_Ada is
    procedure Process_Feature (Features_List : Load_ARFF_Data.Attribute_List);
    procedure Set_Default_Target (Features_List  : in out Load_ARFF_Data.Attribute_List;
                                  Target_Columns : out ML_Types.String_List);
-   function Split_Sparse_Columns
+   function Split_Columns
      (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
       Include_Columns : ML_Types.Integer_List)
        return Load_ARFF_Data.ARFF_Data_List_2D;
@@ -79,19 +62,17 @@ package body Openml_Ada is
    --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
-   --  ArffSparseDataType = Tuple[List, ...] A Tuple is a collection of Python
-   --  objects separated by commas. L325
+   --  L325
    procedure Convert_Arff_Data
      (Arff_Container            : Load_ARFF_Data.ARFF_Record;
       Col_Slice_X, Col_Slice_Y  : ML_Types.Integer_List;
       X, Y                      : out  Load_ARFF_Data.ARFF_Data_List_2D) is
       use Load_ARFF_Data;
-      --          Routine_Name    : constant String := "Openml_Ada.Convert_Arff_Data ";
       ARFF_Data  : constant ARFF_Data_List_2D := Get_Data (Arff_Container);
    begin
       --  L278
-      X := Split_Sparse_Columns (ARFF_Data, Col_Slice_X);
-      Y := Split_Sparse_Columns (ARFF_Data, Col_Slice_Y);
+      X := Split_Columns (ARFF_Data, Col_Slice_X);
+      Y := Split_Columns (ARFF_Data, Col_Slice_Y);
 
    end Convert_Arff_Data;
 
@@ -160,8 +141,8 @@ package body Openml_Ada is
       Assert (Data_Columns.Length > 0, Routine_Name &
                 "Data_Columns is empty.");
 
-      Load_ARFF_Data.ARFF_Printing.Print_Attributes
-        (Routine_Name & "Features_List", Features_List);
+--        Load_ARFF_Data.ARFF_Printing.Print_Attributes
+--          (Routine_Name & "Features_List", Features_List);
 
       for index in Features_List.First_Index .. Features_List.Last_Index loop
          aFeature := Features_List.Element (index);
@@ -356,7 +337,6 @@ package body Openml_Ada is
    end Fetch_Openml;
 
    --  ------------------------------------------------------------------------
-
    --     function Get_Data_Qualities (Data_ID : Integer) return Qualities_Map is
    --        use Ada.Strings;
    --        Routine_Name  : constant String := "Openml_Ada.Get_Data_Qualities ";
@@ -535,17 +515,15 @@ package body Openml_Ada is
    end Set_Default_Target;
 
    --  ------------------------------------------------------------------------
-   --  L184 ArffSparseDataType = Tuple[List, ...] _split_sparse_columns
-   --  (arff_data: ArffSparseDataType, include_columns: List) - >
-   --  ArffSparseDataType Arff_Sparse_Data_Type is a subtype of JSON_Array
-   function Split_Sparse_Columns
+   --  L184
+   function Split_Columns
      (Arff_Data       : Load_ARFF_Data.ARFF_Data_List_2D;
       Include_Columns : ML_Types.Integer_List)
        return Load_ARFF_Data.ARFF_Data_List_2D is
       use Load_ARFF_Data;
       use ARFF_Data_List_Package;
       use ARFF_Data_Package;
---        Routine_Name    : constant String := "Openml_Ada.Split_Sparse_Columns ";
+--        Routine_Name    : constant String := "Openml_Ada.Split_Columns ";
       Col_Curs        : ARFF_Data_Package.Cursor;
       Col_Index       : Natural;
       Found_Cols      : ML_Types.Integer_List;
@@ -580,7 +558,7 @@ package body Openml_Ada is
 
       return Arff_Data_New;
 
-   end Split_Sparse_Columns;
+   end Split_Columns;
 
    --  ------------------------------------------------------------------------
 
