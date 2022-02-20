@@ -109,21 +109,23 @@ package body OML_File_Tests is
       File_Name     : constant String := "../mnist_784.arff";
       As_Frame      : As_Frame_State := As_Frame_False;
       Target_Column : ML_Types.String_List;
-      Bunch         : Bunch_Data (True);
+      X             : Load_ARFF_Data.ARFF_Data_List_2D;
+      Y             : Load_ARFF_Data.ARFF_Data_List_2D;
+      Bunch         : Bunch_Data;
    begin
       Put_Line (Routine_Name);
+      Fetch_Openml (Dataset_File_Name => File_Name,
+                    Target_Column     => Target_Column,
+                    X                 => X,
+                    Y                 => Y,
+                    Bunch             => Bunch,
+                    As_Frame          => As_Frame,
+                    Return_X_Y        => True);
 
-      Bunch := Fetch_Openml (Dataset_File_Name => File_Name,
-                             Target_Column     =>Target_Column ,
-                             As_Frame          => As_Frame,
-                             Return_X_Y        => True);
-
-      Put_Line (Routine_Name & "X length: " &
-                  Count_Type'Image (Bunch.Data.Length));
-      Put_Line (Routine_Name & "Y length: " &
-                  Count_Type'Image (Bunch.Target.Length));
-      Print_Data (Routine_Name & "Bunch.Data", Bunch.Data, 1, 2);
-      Print_Data (Routine_Name & "Bunch.Target", Bunch.Target, 1, 2);
+      Put_Line (Routine_Name & "X length: " & Count_Type'Image (X.Length));
+      Put_Line (Routine_Name & "Y length: " & Count_Type'Image (Y.Length));
+      Print_Data (Routine_Name & "X", X, 1, 2);
+      Print_Data (Routine_Name & "Y", Y, 1, 2);
       Put_Line (Routine_Name & "completed");
 
    end Test_Fetch_OML;

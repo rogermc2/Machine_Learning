@@ -10,7 +10,7 @@ project Oml_File_Test is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Switches ("ada") use ("-gnatw.okmru", "-gnatybcp");
+      for Switches ("ada") use ("-O2", "-gnatw.okmru", "-gnatybcp");
    end Compiler;
 
 end Oml_File_Test;

@@ -63,15 +63,17 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   function Download_Data_To_Bunch
+   procedure Download_Data_To_Bunch
      (ARFF_Container               : Load_ARFF_Data.ARFF_Record;
       Features_List                : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
-      Return_X_Y                   : Boolean := False;
-      --        Sparse         : Boolean;
-      As_Frame                     : As_Frame_State := As_Frame_False)
-     --                                       Shape            : Shape_Data)
-       return Bunch_Data is
+      X                            : out Load_ARFF_Data.ARFF_Data_List_2D;
+      Y                            : out Load_ARFF_Data.ARFF_Data_List_2D;
+      Bunch                        : out Bunch_Data;
+      X_Y_Only                     : Boolean := False;
+      --        Sparse                     : Boolean;
+      As_Frame                     : As_Frame_State := As_Frame_False) is
+     --                                       Shape            : Shape_Data) is
       use Ada.Containers;
       use Load_ARFF_Data;
       use ML_Types;
@@ -93,7 +95,7 @@ package body Openml_Ada is
       All_Columns        : String_List;
       Nominal_Attributes : Nominal_Data_List;
       --        Frame              : Boolean := False;
-      Bunch              : Bunch_Data (Return_X_Y);
+
       --
       --       procedure Post_Process (ARFF_Data : JSON_Value; X, Y : out JSON_Array;
       --                      Frame              : Boolean := False;
@@ -185,20 +187,18 @@ package body Openml_Ada is
       --  L325
       Put_Line (Routine_Name & "Convert_Arff_Data");
       --  L278
-      Bunch.Data := Split_Columns (ARFF_Container.Data, Col_Slice_X);
+      X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
       Put_Line (Routine_Name & "X Split");
-      Bunch.Target := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
+      Y := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
       Put_Line (Routine_Name & "Y Split");
 
-      Put_Line (Routine_Name & "Data length" &
-                  Count_Type'Image (Bunch.Data.Length));
-      Put_Line (Routine_Name & "Target length" &
-                  Count_Type'Image (Bunch.Target.Length));
+      Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
+      Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
 --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
 --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "Y", Y, 1, 2);
       --  L672
-      if not Return_X_Y then
+      if not X_Y_Only then
          Put_Line (Routine_Name & "Parse_Nominal_Data");
          Nominal_Attributes :=
            Parse_Nominal_Data (ARFF_Container, Target_Columns);
@@ -208,8 +208,6 @@ package body Openml_Ada is
          Bunch.Target_Names := Target_Columns;
       end if;
 
-      return Bunch;
-
    end Download_Data_To_Bunch;
 
    --  ------------------------------------------------------------------------
@@ -217,11 +215,13 @@ package body Openml_Ada is
    --  to use as target. If empty, all columns are returned as data and the
    --  target is `None`. If a list of strings, all columns with these names
    --  are returned as a multi-target.
-   function Fetch_Openml (Dataset_File_Name : String;
+   procedure Fetch_Openml (Dataset_File_Name : String;
                           Target_Column     : ML_Types.String_List;
+                          X                 : out Load_ARFF_Data.ARFF_Data_List_2D;
+                          Y                 : out Load_ARFF_Data.ARFF_Data_List_2D;
+                          Bunch             : out Bunch_Data;
                           As_Frame          : in out As_Frame_State;
-                          Return_X_Y        : Boolean := False)
-                           return Bunch_Data is
+                          Return_X_Y        : Boolean := False) is
       use Ada.Directories;
       use Ada.Strings;
       use Load_ARFF_Data;
@@ -243,7 +243,6 @@ package body Openml_Ada is
       Data_Columns    : ML_Types.String_List;
       --        Shape           : Shape_Data;
       --        Data_Qualities  : Qualities_Map;
-      Bunch           : Bunch_Data (Return_X_Y);
    begin
       if Exists (Ada_File) then
          Put_Line (Routine_Name & "Reading data file " & Ada_File);
@@ -306,10 +305,8 @@ package body Openml_Ada is
       --        end if;
 
       --  L955
-      Bunch := Download_Data_To_Bunch
-        (ARFF_Data, Features_List, Data_Columns, Target_Columns, Return_X_Y);
-
-      return Bunch;
+      Download_Data_To_Bunch (ARFF_Data, Features_List, Data_Columns,
+                              Target_Columns, X, Y, Bunch, Return_X_Y);
 
    end Fetch_Openml;
 
