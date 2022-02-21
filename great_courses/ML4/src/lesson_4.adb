@@ -19,7 +19,6 @@ with Load_ARFF_Data;
 with Openml_Ada;
 --  with Printing;
 --  with Tree;
-with Utilities;
 --  with Weights;
 
 procedure Lesson_4 is
@@ -76,8 +75,8 @@ begin
               "Y length" & Count_Type'Image (Y.Length) &
               " is different to X length" & Natural'Image (Num_Samples));
 
-    Utilities.Permute (X);
-    Utilities.Permute (Y);
+    X := Permute (X);
+    Y := Permute (Y);
 
     Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size, Test_Data,
                                     Train_Data);

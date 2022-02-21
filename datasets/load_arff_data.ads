@@ -79,5 +79,6 @@ package Load_ARFF_Data is
    function Get_Description (Data : ARFF_Record) return ARFF_Header;
    function Get_Relation (Data : ARFF_Record) return String;
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
+   function Permute (aList : ARFF_Data_List_2D) return ARFF_Data_List_2D;
 
 end Load_ARFF_Data;
