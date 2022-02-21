@@ -1,7 +1,6 @@
 
 with Ada.Containers;
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
@@ -34,14 +33,13 @@ procedure Lesson_4 is
     Train_Samples : constant Positive := 5000;
     Test_Size     : constant Positive := 1500;
     Train_Size    : constant Positive := Train_Samples - Test_Size;
-    Data_Id       : Integer := 0;
     As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
     Bunch         : Openml_Ada.Bunch_Data;
     X             : ARFF_Data_List_2D;  --  rows of columns of values
     Y             : ARFF_Data_List_2D;
     Num_Samples   : Positive;
-    Test_Data     : String_Vector;
-    Train_Data    : String_Vector;
+    Test_Data     : ARFF_Data_List;
+    Train_Data    : ARFF_Data_List;
     --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
     --     Features      : Feature_Names_List;
     --     aClassifier   : Base_Decision_Tree.Classifier
