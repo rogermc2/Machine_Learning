@@ -7,18 +7,18 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with ML_Types;
 
---  with Base_Decision_Tree;
+with Base_Decision_Tree;
 --  with Classifier_Types;
 --  with Classifier_Utilities;
---  with Criterion;
+with Criterion;
 with Data_Splitter;
---  with Decision_Tree_Classification;
+with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
 with Load_ARFF_Data;
 with Load_ARFF_Data.ARFF_Printing;
 with Openml_Ada;
 with Printing;
---  with Tree;
+with Tree;
 --  with Weights;
 
 procedure Lesson_4 is
@@ -27,15 +27,15 @@ procedure Lesson_4 is
    use ML_Types;
    use String_Package;
    use Load_ARFF_Data;
-   --     use Decision_Tree_Classification;
+   use Decision_Tree_Classification;
    Routine_Name  : constant String := "Lesson_4 ";
---     Dataset_File  : constant String := "../mnist_784.arff";
---     Save_File     : constant String := "mnist_784.oml";
---     State_File    : constant String := "mnist_784.sta";
+   --     Dataset_File  : constant String := "../mnist_784.arff";
+   --     Save_File     : constant String := "mnist_784.oml";
+   --     State_File    : constant String := "mnist_784.sta";
    Dataset_File  : constant String := "../diabetes.arff";
    Save_File     : constant String := "diabetes.oml";
    State_File    : constant String := "diabetes.sta";
-   --     Min_Split     : constant String := "2";
+   Min_Split     : constant String := "2";
    As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    Bunch         : Openml_Ada.Bunch_Data;
    X             : ARFF_Data_List_2D;  --  rows of columns of values
@@ -45,8 +45,8 @@ procedure Lesson_4 is
    Train_Size    : Positive;
    Test_Data     : ARFF_Data_List_2D;
    Train_Data    : ARFF_Data_List_2D;
-   --     aClassifier   : Base_Decision_Tree.Classifier
-   --       (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
+      aClassifier   : Base_Decision_Tree.Classifier
+        (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
    --     No_Weights    : Weights.Weight_List :=
    --                       Classifier_Types.Float_Package.Empty_Vector;
    --     Correct       : Natural := 0;
@@ -136,19 +136,20 @@ begin
    ARFF_Printing.Print_Data ("Train features row 16", Train_Data.Element (16));
    ARFF_Printing.Print_Data ("Test features row 16", Test_Data.Element (16));
    New_Line;
-   --     C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
-   --             Max_Leaf_Nodes => 6);
-   --
+
+   C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
+           Max_Leaf_Nodes => 6);
+
    --     --  Fit function adjusts weights according to data values so that
    --     --  better accuracy can be achieved
-   --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
-   --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
-   --     Put_Line ("----------------------------------------------");
-   --     New_Line;
+   Classification_Fit (aClassifier, Train_Data, Labels, No_Weights);
+   Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   Put_Line ("----------------------------------------------");
+   New_Line;
    --
-   --     for index in X_Data.First_Index .. X_Data.Last_Index loop
+   --     for index in Train_Data.First_Index .. Train_Data.Last_Index loop
    --          if Base_Decision_Tree.Predict
-   --            (aClassifier, X_Data).Element (index).Element (1) =
+   --            (aClassifier, Train_Data).Element (index).Element (1) =
    --                Labels.Element (index).Element (1) then
    --             Correct := Correct + 1;
    --          end if;
