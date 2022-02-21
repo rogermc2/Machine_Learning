@@ -196,11 +196,8 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "Convert_Arff_Data");
       --  L278
       X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
-      Put_Line (Routine_Name & "X Split");
-      Y := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
-      Put_Line (Routine_Name & "Y Split");
-
       Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
+      Y := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
       Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
 
       --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);

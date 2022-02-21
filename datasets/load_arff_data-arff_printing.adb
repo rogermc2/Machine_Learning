@@ -3,7 +3,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
 
 with ML_Types;
---  with Printing;
 
 package body Load_ARFF_Data.ARFF_Printing is
 
@@ -212,6 +211,7 @@ package body Load_ARFF_Data.ARFF_Printing is
          end;
          Next (Data_Curs);
       end loop;
+      New_Line;
 
    end Print_Data;
 

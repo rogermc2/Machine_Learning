@@ -13,8 +13,9 @@ with Data_Splitter;
 --  with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
 with Load_ARFF_Data;
+with Load_ARFF_Data.ARFF_Printing;
 with Openml_Ada;
---  with Printing;
+with Printing;
 --  with Tree;
 --  with Weights;
 
@@ -24,12 +25,8 @@ procedure Lesson_4 is
     use String_Package;
     use Load_ARFF_Data;
     --     use Decision_Tree_Classification;
-    --     use Printing;
     Routine_Name  : constant String := "Lesson_4 ";
     --     Min_Split     : constant String := "2";
-    --     Data          : constant Multi_Output_Data_Record :=
-    --                       Classifier_Utilities.Load_Data ("src/diabetes.csv");
-    --     Feature_Names : constant String_List := Data.Feature_Names;
     As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
     Bunch         : Openml_Ada.Bunch_Data;
     X             : ARFF_Data_List_2D;  --  rows of columns of values
@@ -39,25 +36,22 @@ procedure Lesson_4 is
     Train_Size    : Positive;
     Test_Data     : ARFF_Data_List;
     Train_Data    : ARFF_Data_List;
-    --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
-    --     Features      : Feature_Names_List;
     --     aClassifier   : Base_Decision_Tree.Classifier
     --       (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-    --     Labels        : Value_Data_Lists_2D;
     --     No_Weights    : Weights.Weight_List :=
     --                       Classifier_Types.Float_Package.Empty_Vector;
     --     Correct       : Natural := 0;
     --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
     Put_Line (Routine_Name);
-    Openml_Ada.Fetch_Openml (Dataset_File_Name => "../iris.arff",
-                             Save_File_Name    => "iris.oml",
+    Openml_Ada.Fetch_Openml (Dataset_File_Name => "../diabetes.arff",
+                             Save_File_Name    => "diabetes.oml",
                              Target_Column     => Empty_List,
                              X                 => X,
                              Y                 => Y,
                              Bunch             => Bunch,
                              As_Frame          => As_Frame,
-                             Return_X_Y        => True);
+                             Return_X_Y        => False);
     Num_Samples := Positive (X.Length);
     Test_Size := Num_Samples / 4;
     Train_Size := Num_Samples - Test_Size;
@@ -77,18 +71,13 @@ begin
 
     Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size, Test_Data,
                                     Train_Data);
+--     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
+--     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
 
-    --     Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
-    --     --  Labels is 2D list num outputs x num samples
-    --     Labels := Data.Label_Values;
-    --     while Has_Element (Names_Cursor) loop
-    --        Features.Append (Element (Names_Cursor));
-    --        Next (Names_Cursor);
-    --     end loop;
-    --     Print_Unbounded_List ("Features", Features);
-    --     Print_Value_Data_List ("Features row 16", X_Data.Element (16));
-    --     New_Line;
-    --
+    Printing.Print_Strings ("Features", Bunch.Feature_Names);
+    ARFF_Printing.Print_Data ("Features row 16", X.Element (16));
+    New_Line;
+
     --     C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
     --             Max_Leaf_Nodes => 6);
     --
