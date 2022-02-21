@@ -9,26 +9,19 @@ with Utilities;
 package body Data_Splitter is
 
    procedure Iterate_Indices
-     (Self : in out Base_Shuffle_Data; X : ML_Types.ARFF_Data_List_2D;
+     (Self : in out Base_Shuffle_Data; Num_Samples : Positive;
       Test_Indices, Train_Indices : out ML_Types.Integer_List);
 
    --  -------------------------------------------------------------------------
-   --  L1569 Shuffle_Split generates indices to split data into training and test set
+   --  L1569 Shuffle_Split generates indices to split data rows into training
+   --  and test sets
    procedure Base_Shuffle_Split
-     (Self : in out Base_Shuffle_Data; X : ML_Types.ARFF_Data_List_2D;
+     (Self : in out Base_Shuffle_Data; Num_Samples : Positive;
       Test_Indices, Train_Indices : out ML_Types.Integer_List) is
    begin
-      Iterate_Indices (Self, X, Test_Indices, Train_Indices);
+      Iterate_Indices (Self, Num_Samples, Test_Indices, Train_Indices);
 
    end Base_Shuffle_Split;
-
-   --  -------------------------------------------------------------------------
-
---     procedure Base_Shuffle_Split (Self : in out Base_Shuffle_Data;
---                                   X, Y : ML_Types.Value_Data_Lists_2D) is
---     begin
---        null;
---     end Base_Shuffle_Split;
 
    --  -------------------------------------------------------------------------
 
@@ -46,12 +39,11 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
    --  L1706
    procedure Iterate_Indices
-     (Self : in out Base_Shuffle_Data; X : ML_Types.ARFF_Data_List_2D;
+     (Self : in out Base_Shuffle_Data; Num_Samples : Positive;
       Test_Indices, Train_Indices : out ML_Types.Integer_List) is
       use ML_Types;
       use Integer_Package;
       Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
-      Num_Samples   : constant Positive := Positive (X.Length);
       Num_Test      : constant Natural := Self.Test_Size;
       Num_Train     : constant Natural := Self.Train_Size;
       Perms         : Integer_List;
@@ -79,17 +71,17 @@ package body Data_Splitter is
 
    procedure Train_Test_Split (X, Y : ML_Types.ARFF_Data_List_2D;
                               Test_Size, Train_Size : Natural;
-                              Test, Train : out ML_Types.ARFF_Data_List) is
+                              Test, Train : out ML_Types.ARFF_Data_List_2D) is
       use ML_Types;
-      use ARFF_Data_Package;
+--        use ARFF_Data_Package;
       use ARFF_Data_List_Package;
       Routine_Name  : constant String := "Data_Splitter.Train_Test_Split ";
       Num_Samples   : constant Positive := Positive (X.Length);
       Shuffle_Data  : Base_Shuffle_Data;
       X_Cursor      : ARFF_Data_List_Package.Cursor := X.First;
       Y_Cursor      : ARFF_Data_List_Package.Cursor := Y.First;
-      X_Vec         : ARFF_Data_List;
-      Y_Vec         : ARFF_Data_List;
+      X_Vec         : ARFF_Data_List_2D;
+      Y_Vec         : ARFF_Data_List_2D;
       Test_Indices  : Integer_List;
       Train_Indices : Integer_List;
    begin
@@ -111,16 +103,15 @@ package body Data_Splitter is
             Next (Y_Cursor);
       end loop;
 
-      Base_Shuffle_Split (Shuffle_Data, X, Test_Indices, Train_Indices);
+      Base_Shuffle_Split (Shuffle_Data, Num_Samples, Test_Indices,
+                          Train_Indices);
 
       for index in Test_Indices.First_Index .. Test_Indices.Last_Index loop
             Test.Append (X_Vec.Element (Test_Indices (index)));
-            Train.Append (X_Vec.Element (Test_Indices (index)));
       end loop;
 
       for index in Train_Indices.First_Index .. Train_Indices.Last_Index loop
             Train.Append (X_Vec.Element (Train_Indices (index)));
-            Train.Append (Y_Vec.Element (Train_Indices (index)));
       end loop;
 
    end Train_Test_Split;

@@ -12,7 +12,7 @@ package Data_Splitter is
       Test_Size, Default_Test_Size, Train_Size : Natural);
    procedure Train_Test_Split (X, Y : ML_Types.ARFF_Data_List_2D;
                                Test_Size, Train_Size : Natural;
-                               Test, Train : out ML_Types.ARFF_Data_List);
+                               Test, Train : out ML_Types.ARFF_Data_List_2D);
 
 private
 
