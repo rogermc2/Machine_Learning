@@ -131,6 +131,9 @@ package body OML_File_Tests is
       Print_Data (Routine_Name & "Y", Y, 1, 2);
       Put_Line (Routine_Name & "completed");
 
+      pragma Unreferenced (Bunch);
+      pragma Unreferenced (As_Frame);
+
    end Test_Fetch_OML;
 
    --  -------------------------------------------------------------------------
