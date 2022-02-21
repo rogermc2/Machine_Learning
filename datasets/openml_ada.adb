@@ -2,8 +2,8 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Maps;
-with Ada.Streams.Stream_IO;
 with Ada.Directories;
+with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
@@ -25,6 +25,9 @@ package body Openml_Ada is
    subtype Attribute_Dictionary_Map is Attribute_Dictionary_Package.Map;
 
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
+   procedure Get_OML (File_Name : String;
+                      X, Y      : out Load_ARFF_Data.ARFF_Data_List_2D;
+                      Bunch     : out Bunch_Data; X_Y_Only : Boolean);
    function Parse_Nominal_Data
      (Arff_Data       : Load_ARFF_Data.ARFF_Record;
       Include_Columns : ML_Types.String_List)
@@ -250,71 +253,76 @@ package body Openml_Ada is
       --        Shape           : Shape_Data;
       --        Data_Qualities  : Qualities_Map;
    begin
-      if Exists (Ada_File) then
-         Put_Line (Routine_Name & "Reading data file " & Ada_File);
-         Read_ARFF_Ada (Ada_File, ARFF_Data);
-         Put_Line (Routine_Name & "Data file read");
+      if Exists (Save_File_Name) then
+            Get_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
       else
-         Put_Line (Routine_Name & "Loading ARFF data from " & Dataset_File_Name);
-         Load_ARFF (Dataset_File_Name, ARFF_Data);
-         Put_Line (Routine_Name & "Data loaded");
-         Save_ARFF (Ada_File, ARFF_Data);
-      end if;
-      New_Line;
-      --  L903
-      if As_Frame = As_Frame_Auto then
-         if not Return_Sparse then
-            As_Frame := As_Frame_True;
+         if Exists (Ada_File) then
+            Put_Line (Routine_Name & "Reading data file " & Ada_File);
+            Read_ARFF_Ada (Ada_File, ARFF_Data);
+            Put_Line (Routine_Name & "Data file read");
+         else
+            Put_Line (Routine_Name & "Loading ARFF data from " & Dataset_File_Name);
+            Load_ARFF (Dataset_File_Name, ARFF_Data);
+            Put_Line (Routine_Name & "Data loaded");
+            Save_ARFF (Ada_File, ARFF_Data);
          end if;
-      else
-         As_Frame := As_Frame_False;
-      end if;
+         New_Line;
+         --  L903
+         if As_Frame = As_Frame_Auto then
+            if not Return_Sparse then
+               As_Frame := As_Frame_True;
+            end if;
+         else
+            As_Frame := As_Frame_False;
+         end if;
 
-      Assert (not (As_Frame = As_Frame_True and Return_Sparse),
-              Routine_Name & "cannot return dataframe with sparse data");
+         Assert (not (As_Frame = As_Frame_True and Return_Sparse),
+                 Routine_Name & "cannot return dataframe with sparse data");
 
-      --  L917
-      Features_List := Get_Attributes (ARFF_Data);
+         --  L917
+         Features_List := Get_Attributes (ARFF_Data);
 
-      if As_Frame = As_Frame_False then
-         Process_Feature (Features_List);
-      end if;
+         if As_Frame = As_Frame_False then
+            Process_Feature (Features_List);
+         end if;
 
-      --  L929
-      if Target_Column.Is_Empty then
-         Set_Default_Target (Features_List, Target_Columns);
-      else
-         Curs := Target_Column.First;
-         while Has_Element (Curs) loop
-            Target_Value := Element (Curs);
-            Target_Value := To_Unbounded_String
-              (Slice (Target_Value, 2, Length (Target_Value)));
-            Trim (Target_Value, Both);
-            Target_Columns.Append (Target_Value);
-            Next (Curs);
-         end loop;
-      end if;
+         --  L929
+         if Target_Column.Is_Empty then
+            Set_Default_Target (Features_List, Target_Columns);
+         else
+            Curs := Target_Column.First;
+            while Has_Element (Curs) loop
+               Target_Value := Element (Curs);
+               Target_Value := To_Unbounded_String
+                 (Slice (Target_Value, 2, Length (Target_Value)));
+               Trim (Target_Value, Both);
+               Target_Columns.Append (Target_Value);
+               Next (Curs);
+            end loop;
+         end if;
 
-      --  L944
-      Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
-      --        Put_Line (Routine_Name & "Data_Columns length: " &
-      --                  Integer'Image (Integer (Data_Columns.Length)));
-      --        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
-      --        Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
-      --  L948
-      --        if not Return_Sparse then
-      --           Data_Qualities := Get_Data_Qualities (Data_Id);
-      --           if Get_Num_Samples (Data_Qualities) > - 1 then
-      --              null;
-      --              --              Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
-      --           end if;
-      --        end if;
+         --  L944
+         Data_Columns := Valid_Data_Column_Names (Features_List, Target_Columns);
+         --        Put_Line (Routine_Name & "Data_Columns length: " &
+         --                  Integer'Image (Integer (Data_Columns.Length)));
+         --        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
+         --        Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
+         --  L948
+         --        if not Return_Sparse then
+         --           Data_Qualities := Get_Data_Qualities (Data_Id);
+         --           if Get_Num_Samples (Data_Qualities) > - 1 then
+         --              null;
+         --              --              Shape := (Get_Num_Samples (Data_Qualities), Length (Features_List));
+         --           end if;
+         --        end if;
 
-      --  L955
-      Download_Data_To_Bunch (ARFF_Data, Features_List, Data_Columns,
-                              Target_Columns, X, Y, Bunch, Return_X_Y);
-      if Save_File_Name'Length > 0 then
-         Save_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
+         --  L955
+         Download_Data_To_Bunch (ARFF_Data, Features_List, Data_Columns,
+                                 Target_Columns, X, Y, Bunch, Return_X_Y);
+         if Save_File_Name'Length > 0 then
+            Save_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
+         end if;
+
       end if;
 
    end Fetch_Openml;
@@ -401,6 +409,31 @@ package body Openml_Ada is
    --        return Num_Samples;
    --
    --     end Get_Num_Samples;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Get_OML (File_Name : String;
+                      X, Y      : out Load_ARFF_Data.ARFF_Data_List_2D;
+                      Bunch     : out Bunch_Data; X_Y_Only : Boolean) is
+      use Ada.Streams;
+      use Stream_IO;
+      use Load_ARFF_Data;
+      Routine_Name : constant String := "Openml_Ada.Get_OML ";
+      File_ID      : Stream_IO.File_Type;
+      aStream      : Stream_Access;
+   begin
+      Put_Line (Routine_Name & "Reading OML file " & File_Name);
+      Open (File_ID, In_File, File_Name);
+      aStream := Stream (File_ID);
+      ARFF_Data_List_2D'Read (aStream, X);
+      ARFF_Data_List_2D'Read (aStream, Y);
+      if not X_Y_Only then
+         Bunch_Data'Read (aStream, Bunch);
+      end if;
+      Close (File_ID);
+      pragma Unreferenced (File_ID);
+
+   end Get_OML;
 
    --  ------------------------------------------------------------------------
 
