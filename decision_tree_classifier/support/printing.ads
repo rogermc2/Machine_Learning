@@ -32,6 +32,10 @@ package Printing is
                                  Start  : Integer := 1;
                                  Finish : Integer := 0);
     procedure Print_Float_List (Name  : String; theList : Float_List);
+    procedure Print_Indefinite_List (Name   : String;
+                                    theList : ML_Types.Indef_String_List);
+    procedure Print_Integer_List (Name : String;
+                                  theList : ML_Types.Integer_List);
     procedure Print_Integer_List (Name : String; theList : Integer_List);
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);
@@ -55,6 +59,8 @@ package Printing is
     procedure Print_Stack_Record (Name : String;
                                   Data : Build_Utils.Stack_Record);
     procedure Print_Strings (Name : String; theList : ML_Types.String_List);
+    procedure Print_Strings (Name    : String;
+                             theList : ML_Types.Indef_String_List);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
     procedure Print_Tree (Name : String; aTree : Tree.Tree_Class);
     procedure Print_Unbounded_List (Name    : String;

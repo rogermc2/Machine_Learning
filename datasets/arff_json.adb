@@ -3,9 +3,10 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Ordered_Maps;
+with Ada.Directories;
 with Ada.Integer_Text_IO;
+with Ada.Calendar;
 with Ada.Strings.Fixed;
---  with Ada.Strings.Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Strings.Unbounded.Text_IO; use Ada.Strings.Unbounded.Text_IO;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -19,7 +20,7 @@ with Regexep;
 
 --  pragma Warnings (Off);
 
-package body ARFF is
+package body ARFF_Json is
 
    type TK_State is (TK_Descrition, TK_Relation, TK_Attribute, TK_Data);
    --                       TK_Comment);
@@ -64,7 +65,7 @@ package body ARFF is
    type Conversor_Item is record
       Name         : Unbounded_String;
       Data_Type    : Conversor_Data_Type;
-      Nominal_List : String_List;
+      Nominal_List : Indef_String_List;
    end record;
 
    package Conversor_Item_Package is new
@@ -79,11 +80,8 @@ package body ARFF is
    package Escape_Sub_Map_Package is new
      Ada.Containers.Ordered_Maps (Unbounded_String, Unbounded_String);
 
-   type Stream_Func_Type is access function (Decoder : in out Arff_Decoder)
-                                             return String;
-
    Escape_Sub_Map : Escape_Sub_Map_Package.Map;
-   Stream_Cursor  : ML_Types.String_Package.Cursor;
+
    --  L190
    Quoted_Re      : constant String :=
                       "''""(?:(?:\\\\)*\\""|\\|[^""]|[^""\\])*""";
@@ -94,7 +92,7 @@ package body ARFF is
    --  L204
    Value_Re       : constant String := "''(?:''" & Quoted_Re & "|" &
                       Quoted_Re2 & "|[^,\s""'{}]+)''";
-   Row_Found      : Boolean := True;
+   Stream_Cursor  : String_Package.Cursor;
 
    procedure Decode_Attribute (Decoder        : in out Arff_Decoder; UC_Row : String;
                                Arff_Container : in out JSON_Value);
@@ -106,16 +104,15 @@ package body ARFF is
    --       (Decoder : in Out Arff_Decoder; Stream_Func : Stream_Func_Type;
    --        Data    : out Classifier_Types.Float_List; Rows, Cols : out Integer_List)
    --        return String_List;
-   function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
-                               Stream_Func : Stream_Func_Type)
+   function Decode_Dense_Rows (Decoder       : in Out Arff_Decoder;
+                               Stream        : String_List)
                                return JSON_Array;
-   function Decode_Dense_Values
-     (Values : String_List; Attribute_List : Conversor_Item_List)
-      return JSON_Array;
-   function Parse_Values (Row : String) return String_List;
-   function Split_Sparse_Line (Row : String) return String_List;
-   function Stream_Data (Decoder : in out Arff_Decoder) return String;
-   function Unquote (Values : String) return Unbounded_String;
+   procedure Decode_Dense_Values
+     (Values         : Indef_String_List; Attribute_List : Conversor_Item_List;
+      Decoded_Values : out JSON_Array);
+   procedure Parse_Values (Row : String; Values : out Indef_String_List);
+   function Split_Sparse_Line (Row : String) return Indef_String_List;
+   function Unquote (Values : String) return String;
 
    --  -------------------------------------------------------------------------
 
@@ -135,7 +132,6 @@ package body ARFF is
       declare
          Result : constant GNAT.Regpat.Pattern_Matcher :=  Compile (Regex);
       begin
-         --           Put_Line ("ARFF.Build_Re_Dense Regex compiled");
          return Result;
       end;
 
@@ -162,46 +158,47 @@ package body ARFF is
    --  -------------------------------------------------------------------------
    --  L771  and, by reference, L879
    function Decode_ARFF (Decoder        : in Out Arff_Decoder;
-                         Text           : String;
+                         Text           : ML_Types.String_List;
                          --                           Encode_Nominal : Boolean := False;
                          Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
-      use Ada.Strings;
       use ML_Types.String_Package;
-      Routine_Name    : constant String := "ARFF.Decode_ARFF ";
+      Routine_Name    : constant String := "ARFF_Json.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
-      Text_Length     : constant Integer := Text'Length;
+      --        Text_Length     : constant Integer := Text'Length;
+      --        Text_Length     : constant Positive := Positive (Length (Text));
       State           : TK_State := TK_Descrition;
-      Pos1            : Integer := 1;
-      Pos2            : Integer := 1;
-      Message_Lines   : String_List;
-      Curs            : Cursor;
+      --        Pos1            : Integer := 1;
+      --        Pos2            : Integer := 1;
+      --        Message_Lines   : String_List;
+      Curs            : Cursor := Text.First;
       Values          : JSON_Array;
       Arff_Container  : JSON_Value := Create_Object;
    begin
       Decoder.Current_Line := 0;
+      Put_Line (Routine_Name);
 
-      while Pos2 /= 0 and Pos1 < Text_Length loop
-         Pos2 := Fixed.Index (Text (Pos1 .. Text_Length), "\r\n");
-         Message_Lines.Append
-           (To_Unbounded_String
-              (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
-         Pos1 := Pos2 + 4;
-      end loop;
+      --        while Pos2 /= 0 and Pos1 < Text_Length loop
+      --           Pos2 := Fixed.Index (Text (Pos1 .. Text_Length), "\r\n");
+      --           Message_Lines.Append
+      --             (To_Unbounded_String
+      --                (Fixed.Trim (Text (Pos1 .. Pos2 - 1), Both)));
+      --           Pos1 := Pos2 + 4;
+      --        end loop;
 
---        Put_Line (Routine_Name & "Message_Lines:");
---        Curs := Message_Lines.First;
---        while Has_Element (Curs) loop
---           Put_Line (To_String (Element (Curs)));
---           Next  (Curs);
---        end loop;
---        Put_Line (Routine_Name & "end of Message_Lines");
---        New_Line;
+      --        Put_Line (Routine_Name & "Message_Lines:");
+      --        Curs := Message_Lines.First;
+      --        while Has_Element (Curs) loop
+      --           Put_Line (To_String (Element (Curs)));
+      --           Next  (Curs);
+      --        end loop;
+      --        Put_Line (Routine_Name & "end of Message_Lines");
+      --        New_Line;
 
-      if Pos1 < Text_Length - 4 then
-         Message_Lines.Append
-           (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
-      end if;
+      --        if Pos1 < Text_Length - 4 then
+      --           Message_Lines.Append
+      --             (To_Unbounded_String (Text (Pos1 .. Text_Length - 4)));
+      --        end if;
 
       --  L784 Arff_Container implements obj: ArffContainerType
       Arff_Container.Set_Field ("description", Create (Empty_Array));
@@ -210,7 +207,7 @@ package body ARFF is
       Arff_Container.Set_Field ("data", Create (Empty_Array));
 
       --  L796  Read all lines
-      Curs := Message_Lines.First;
+      Curs := Text.First;
       while Has_Element (Curs) and State /= TK_Data loop
          Decoder.Current_Line := Decoder.Current_Line + 1;
          declare
@@ -259,7 +256,7 @@ package body ARFF is
                   Decode_Comment (UC_Row, Arff_Container);
 
                else
-                  Put_Line (Routine_Name & "Row: " & UC_Row);
+                  --                    Put_Line (Routine_Name & "Row: " & UC_Row);
                   Assert (False, Routine_Name & "in unexpected state " &
                             TK_State'Image (State));
                end if;
@@ -268,6 +265,7 @@ package body ARFF is
 
          Next (Curs);
       end loop;
+      Put_Line (Routine_Name & "L872");
 
       Stream_Cursor := Curs;
       --  L872 Alter the data object
@@ -275,7 +273,7 @@ package body ARFF is
       --  L792 data = _get_data_object_for_decoding(matrix_type)
       case Matrix_Type is
          when Arff_Dense =>
-            Values := Decode_Dense_Rows (Decoder, Stream_Data'Access);
+            Values := Decode_Dense_Rows (Decoder, Text);
          when Arff_Coo => null;
             --              Values := Decode_COO_Rows (Decoder, Stream_Data'Access, Data,
             --                                         Rows, Cols);
@@ -283,6 +281,7 @@ package body ARFF is
       end case;
 
       Arff_Container.Set_Field ("data", Values);
+      Put_Line (Routine_Name & "done");
 
       return Arff_Container;
 
@@ -296,7 +295,7 @@ package body ARFF is
       use Ada.Strings;
       --        use Ada.Strings.Maps;
       use Conversor_Item_Package;
-      Routine_Name   : constant String := "ARFF.Decode_Attribute ";
+      Routine_Name   : constant String := "ARFF_Json.Decode_Attribute ";
       Regex          : constant String :=
                          "^("".*""|'.*'|[^\{\}%,\s]*)\s+(.+)$";
       --        Trim_Seq     : constant Character_Sequence := "{} ";
@@ -314,7 +313,7 @@ package body ARFF is
       Name           : Unbounded_String;
       Attr_Type      : Unbounded_String;
       Attr_Array     : JSON_Array;
-      Nominal_Values : String_List;
+      Nominal_Values : Indef_String_List;
       Conv_Item      : Conversor_Item;
       Curs           : Cursor := Decoder.Conversers.First;
       Found          : Boolean := False;
@@ -359,7 +358,7 @@ package body ARFF is
          Attr_Type := To_Unbounded_String
            (Slice (Attr_Type, 2, Length (Attr_Type) - 1));
          Conv_Item.Data_Type := Conv_Nominal;
-         Nominal_Values := Parse_Values (To_String (Attr_Type));
+         Parse_Values (To_String (Attr_Type), Nominal_Values);
          Conv_Item.Nominal_List := Nominal_Values;
       else
          Attr_Type := Dataset_Utilities.To_Upper_Case (Attr_Type);
@@ -393,7 +392,7 @@ package body ARFF is
    procedure Decode_Comment (UC_Row         : String;
                              Arff_Container : in out JSON_Value) is
       use GNAT.Regpat;
-      --        Routine_Name : constant String := "ARFF.Decode_Comment ";
+      --        Routine_Name : constant String := "ARFF_Json.Decode_Comment ";
       Regex        : constant String := "^%(.*)";
       Matcher      : constant Pattern_Matcher := Compile (Regex);
       Matches      : Match_Array (0 .. Paren_Count (Matcher));
@@ -418,7 +417,7 @@ package body ARFF is
                               Arff_Container : in out JSON_Value) is
       use Ada.Strings;
       use GNAT.Regpat;
-      Routine_Name : constant String := "ARFF.Decode_Relation ";
+      Routine_Name : constant String := "ARFF_Json.Decode_Relation ";
       Regex        : constant String := "^([^\{\}%,\s]*|"".*""|'.*')$";
       Pos          : Integer := Fixed.Index (UC_Row, " ");
       Slice_2      : constant String :=
@@ -497,44 +496,102 @@ package body ARFF is
    --  -------------------------------------------------------------------------
 
    --  L460
-   function Decode_Dense_Rows (Decoder     : in Out Arff_Decoder;
-                               Stream_Func : Stream_Func_Type)
-                               return JSON_Array is
+   function Decode_Dense_Rows (Decoder : in out Arff_Decoder;
+                               Stream  : String_List) return JSON_Array is
+      use Ada.Calendar;
+      use Ada.Strings;
       use String_Package;
-      Routine_Name      : constant String := "ARFF.Decode_Dense_Rows ";
+      Routine_Name      : constant String := "ARFF_Json.Decode_Dense_Rows ";
+      File_Name         : constant String := "./dense_data.json";
       Converser_Length  : constant Positive :=
                             Positive (Decoder.Conversers.Length);
+      Row               : Unbounded_String;
+      Values            : Indef_String_List;
+      Values_Length     : Natural;
+      Data_Values       : constant JSON_Value := Create_Object;
+      Dense_Values      : JSON_Array;
       Values_Array      : JSON_Array;
+      aValue            : JSON_Value := Create_Object;
+      Start_Time        : Time;
+      End_Time          : Time;
+      --        Decode_Start_Time : Time;
+      --        Decode_End_Time   : Time;
+      Count             : Natural := 0;
    begin
-      while Row_Found loop
-         declare
-            --  L462  for row in stream:
-            Row           : constant String := Stream_Func (Decoder);
-            --  L463
-            Values        : constant String_List := Parse_Values (Row);
-            Values_Length : constant Natural := Natural (Length (Values));
-            Data_Values   : constant JSON_Value := Create_Object;
-            Dense_Values  : JSON_Array;
-         begin
-            Clear (Dense_Values);
-            Data_Values.Unset_Field ("values");
-
-            if Row'Length > 0 then
-               Assert (not Values.Is_Empty, Routine_Name & "Row '" & Row &
-                         "' has no valid values.");
-               Assert (Values_Length <= Converser_Length, Routine_Name &
-                         "Row '" & Row &"' is invalid, Values length"  &
-                         Integer'Image (Values_Length) & " < Converser_Length"
-                       & Integer'Image (Converser_Length));
-               Dense_Values :=
-                 Decode_Dense_Values (Values, Decoder.Conversers);
-               Data_Values.Set_Field ("values", Dense_Values);
-               Append (Values_Array, Data_Values);
+      if Ada.Directories.Exists (File_Name) then
+         Put_Line (Routine_Name & File_Name & " exists");
+         Read_JSON_Array (File_Name, Values_Array);
+      else
+         Put_Line (Routine_Name & "Stream length" &
+                     Integer'Image (Integer (Length (Stream))) & " rows");
+         Start_Time := Clock;
+         while Has_Element (Stream_Cursor) loop
+            Count := Count + 1;
+            if Count mod 100 = 0 then
+               Put (".");
             end if;
-         end;
+            if Count > 8000 then
+               Put_Line (".");
+               Count := 0;
+            end if;
 
-      end loop;
+            --  L462  for row in stream:
+            Row  := Element (Stream_Cursor);
+            Trim (Row, Both);
+            --           Put_Line (Routine_Name & To_String (Row));
+            if Row /= "" then
+               if Slice (Row, 1, 1) /= "%" and then
+                 Slice (Row, 1, 1) /= "@"
+               then
+                  --  L463
+                  Parse_Values (To_String (Row), Values);
+                  --                 Values_Length := Natural (Length (Values));
+                  Values_Length := Natural (Values.Length);
+                  Clear (Dense_Values);
+                  Data_Values.Unset_Field ("values");
+                  --                 Put_Line (Routine_Name & "Result: '" & To_String (Result) & "'");
+                  --              Put_Line (Routine_Name & "Values_Length: " & Integer'Image (Values_Length));
+                  --              delay (1.0);
+                  --              New_Line;
 
+                  if Length (Row) > 0 then
+                     --                 Assert (not Values.Is_Empty, Routine_Name & "Row '" &
+                     --                           Filtered_Row & "' has no valid values.");
+                     Assert (Values_Length <= Converser_Length, Routine_Name &
+                               "Row is invalid, Values length"  &
+                               Integer'Image (Values_Length) &
+                               " is different to Converser_Length" &
+                               Integer'Image (Converser_Length));
+                     --                    Decode_Start_Time := Clock;
+                     Decode_Dense_Values (Values, Decoder.Conversers, Dense_Values);
+                     --                    Decode_End_Time := Clock;
+                     --                    Put_Line (Routine_Name & "Decode_Dense_Values time" &
+                     --                              Duration'Image
+                     --                              (1000 * (Decode_End_Time - Decode_Start_Time)) &
+                     --                               " Milli_Sec");
+                     Data_Values.Set_Field ("values", Dense_Values);
+                     Append (Values_Array, Data_Values);
+                     --                    Put_Line (Routine_Name & "Values_Array length" &
+                     --                                Integer'Image (Length (Values_Array)));
+                  end if;
+               end if;
+            end if;
+
+            Next (Stream_Cursor);
+         end loop;
+         End_Time := Clock;
+         New_Line;
+         Put_Line (Routine_Name & "Decode_Dense_Rows time" &
+                     Duration'Image (End_Time - Start_Time) & " Seconds");
+         Write_JSON_Array_To_File (Values_Array, File_Name);
+      end if;
+
+      Put_Line (Routine_Name & "Values_Array length" &
+                Integer'Image (Length (Values_Array)));
+
+      aValue := Array_Element (Values_Array, Array_First (Values_Array));
+      Put_Line (Routine_Name & "Values_Array (1)");
+      Put_Line (aValue.Write);
       --  L475
       return Values_Array;
 
@@ -542,26 +599,25 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
    --  L478
-   function Decode_Dense_Values (Values         : String_List;
-                                 Attribute_List : Conversor_Item_List)
-                                 return JSON_Array is
-      use Ada.Containers;
+   procedure Decode_Dense_Values (Values         : Indef_String_List;
+                                  Attribute_List : Conversor_Item_List;
+                                  Decoded_Values : out JSON_Array) is
+      --        use Ada.Containers;
       use Ada.Strings;
       use Conversor_Item_Package;
-      use String_Package;
-      Routine_Name   : constant String := "ARFF.Decode_Dense_Values ";
+      use Indefinite_String_Package;
+      Routine_Name   : constant String := "ARFF_Json.Decode_Dense_Values ";
       Attr_Cursor    : Conversor_Item_Package.Cursor;
-      Values_Cursor  : String_Package.Cursor;
-      Nominal_Cursor : String_Package.Cursor;
+      Values_Cursor  : Indefinite_String_Package.Cursor;
+      Nominal_Cursor : Indefinite_String_Package.Cursor;
       aConverser     : Conversor_Item;
       Data_Type      : Conversor_Data_Type;
-      Decoded_Values : JSON_Array;
       Found          : Boolean := False;
    begin
-      Assert (Values.Length = Attribute_List.Length, Routine_Name &
-                "lengths of Values " & Count_Type'Image (Values.Length) &
-                " and Conversers" & Count_Type'Image (Attribute_List.Length) &
-                " are diferrent.");
+      --        Assert (Values.Length = Attribute_List.Length, Routine_Name &
+      --                  "lengths of Values " & Count_Type'Image (Values.Length) &
+      --                  " and Conversers" & Count_Type'Image (Attribute_List.Length) &
+      --                  " are diferrent.");
 
       Attr_Cursor := Attribute_List.First;
       Values_Cursor := Values.First;
@@ -572,13 +628,16 @@ package body ARFF is
          declare
             Name           : constant String := To_String (aConverser.Name);
             Value          : constant JSON_Value := Create_Object;
-            Value_String   : constant String :=
-                               To_String (Element (Values_Cursor));
+            Value_String   : constant String := Element (Values_Cursor);
             UC_Value       : constant String :=
                                To_Upper_Case (Value_String);
          begin
+            --              Put_Line (Routine_Name & "Conversor Data_Type " &
+            --                          Conversor_Data_Type'Image (Data_Type));
+            --              Put_Line (Routine_Name & "Value_String: " & Value_String);
             case Data_Type is
                when Conv_Integer =>
+                  Put_Line (Routine_Name & "Data_Type Conv_Integer");
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field
                        (Name, Integer'Value (Value_String));
@@ -586,12 +645,13 @@ package body ARFF is
                      Value.Set_Field
                        (Name, Integer (Float'Value (Value_String)));
                   end if;
+
                when Conv_Nominal =>
                   Nominal_Cursor := aConverser.Nominal_List.First;
                   while Has_Element (Nominal_Cursor) and not Found loop
                      declare
                         Nominal_String : constant String
-                          := To_String (Element (Nominal_Cursor));
+                          := Element (Nominal_Cursor);
                      begin
                         Found := UC_Value = Nominal_String;
                      end;
@@ -599,10 +659,12 @@ package body ARFF is
                   end loop;
 
                   Assert (Found, Routine_Name & UC_Value &
-                            " is an invalid iris type");
-                  Value.Set_Field ("Iris type", UC_Value);
+                            " is an invalid nominal type");
+                  Value.Set_Field ("nominal type", UC_Value);
 
                when Conv_Numeric | Conv_Real =>
+                  --                    Put_Line (Routine_Name & "Conv_Real Value_String: " &
+                  --                                Value_String);
                   if Fixed.Index (Value_String, ".") = 0 then
                      Value.Set_Field
                        (Name, Float (Integer'Value (Value_String)));
@@ -621,8 +683,6 @@ package body ARFF is
          Next (Values_Cursor);
       end loop;
 
-      return Decoded_Values;
-
    end Decode_Dense_Values;
 
    --  -------------------------------------------------------------------------
@@ -636,7 +696,7 @@ package body ARFF is
       use Ada.Strings;
       use Regexep;
       use Escape_Sub_Map_Package;
-      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      Routine_Name : constant String := "ARFF_Json.Escape_Sub_Callback ";
       Match_Groups : constant Match_Strings_List := Get_Groups (Match);
       S            : constant Unbounded_String := Match_Groups.Element (0);
       S_Length     : constant Natural := Length (S);
@@ -669,7 +729,7 @@ package body ARFF is
    function Escape_Sub_Callback (S : String) return String is
       use Ada.Strings;
       use Escape_Sub_Map_Package;
-      Routine_Name : constant String := "ARFF.Escape_Sub_Callback ";
+      Routine_Name : constant String := "ARFF_Json.Escape_Sub_Callback ";
       UB_S         : constant Unbounded_String := To_Unbounded_String (S);
       S_Length     : constant Natural := S'Length;
       Int_Value    : Integer;
@@ -697,7 +757,18 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Load (File_Data   : String;
+   --     function Load (File_Data   : String;
+   --                    Return_Type : ARFF_Return_Type := Arff_Dense)
+   --                    return JSON_Value is
+   --        Decoder   : Arff_Decoder;
+   --     begin
+   --        return Decode_ARFF (Decoder, File_Data,  Return_Type);
+   --
+   --     end Load;
+
+   --  -------------------------------------------------------------------------
+
+   function Load (File_Data   : ML_Types.String_List;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                   return JSON_Value is
       Decoder   : Arff_Decoder;
@@ -713,12 +784,12 @@ package body ARFF is
    --  matches substring or to No_Match if no match.
    --  Matches (N) is for the  N'th parenthesized subexpressions;
    --  Matches (0) is for the whole expression.
-   function Parse_Values (Row : String) return String_List is
-      --        use Ada.Strings;
+   procedure Parse_Values (Row : String; Values : out Indef_String_List) is
       use GNAT.Regpat;
       use Regexep;
+      use Indefinite_String_Package;
       use String_Package;
-      --        Routine_Name        : constant String := "ARFF.Parse_Values ";
+      Routine_Name        : constant String := "ARFF_Json.Parse_Values ";
       Non_Trivial         : constant String := "[""\'{}\\s]";
       Non_Trivial_Matcher : constant Pattern_Matcher := Compile (Non_Trivial);
       First               : Positive;
@@ -727,22 +798,24 @@ package body ARFF is
       Dense_Match         : Boolean;
       Sparse_Match        : Boolean;
       Matches             : Matches_List;
-      Values              : String_List;
-      Value_Cursor        : Cursor;
       Errors              : String_List;
-      Result              : String_List;
+      Errors_Cursor       : String_Package.Cursor;
    begin
       if Row'Length /= 0 and then Row /= "?" then
-         --           Put_Line (Routine_Name & "Row: " & Row);
          Matches := Find_Match (Non_Trivial_Matcher, Row, First, Last,
                                 Match_Found);
          pragma Unreferenced (Matches);
          if Match_Found then
+            Put_Line (Routine_Name & "trivial");
+            Put_Line (Routine_Name & "data contains "", ', { ,} or white space");
             --  not nontrivial
             --  Row contains none of the Non_Trivial characters
             Values := Get_CSV_Data (Row);
+            --              Put_Line (Routine_Name & "trivial Values length:" &
+            --                          Integer'Image (Integer (Length (Values))));
 
          else
+            --              Put_Line (Routine_Name & "nontrivial");
             --  Row contains Non_Trivial characters
             --  Build_Re_Dense and Build_Re_Sparse (_RE_DENSE_VALUES) tokenize
             --  despite quoting, whitespace, etc.
@@ -754,36 +827,36 @@ package body ARFF is
                  (Dense_Matcher, Row, First, Last, Dense_Match);
                if Dense_Match then
                   Values := Get_CSV_Data (Row (First .. Last));
-               end if;
+               else
+                  Matches := Find_Match (Sparse_Matcher, Row, First, Last,
+                                         Sparse_Match);
+                  if Sparse_Match then
+                     Put_Line (Routine_Name & "Sparse_Match");
+                     Errors := Split_String (Row (First .. Last), ",");
+                     if not Errors.Is_Empty then
+                        Errors_Cursor := Errors.First;
+                        while Has_Element (Errors_Cursor) loop
+                           Values.Append
+                             (Unquote (To_String (Element (Errors_Cursor))));
+                           Next (Errors_Cursor);
+                        end loop;
 
-               Matches := Find_Match (Sparse_Matcher, Row, First, Last,
-                                      Sparse_Match);
+                     else
+                        Values := Split_Sparse_Line (Row);
+                     end if;
+                  end if;
 
-               if Sparse_Match then
-                  Errors := Get_CSV_Data (Row (First .. Last));
                end if;
             end;  --  declare block
 
-            if not Errors.Is_Empty then
-               Value_Cursor := Values.First;
-               while Has_Element (Value_Cursor) loop
-                  Result.Append (Unquote (To_String (Element (Value_Cursor))));
-                  Next (Value_Cursor);
-               end loop;
-
-            else
-               Values := Split_Sparse_Line (Row);
-            end if;
          end if;
       end if;
-
-      return Values;
 
    end Parse_Values;
 
    --  -------------------------------------------------------------------------
 
-   function Split_Sparse_Line (Row : String) return String_List is
+   function Split_Sparse_Line (Row : String) return Indef_String_List is
       use GNAT.Regpat;
       use Regexep;
       use Matches_Package;
@@ -793,7 +866,7 @@ package body ARFF is
       Matches     : Matches_List;
       Loc         : Match_Location;
       Match_Found : Boolean;
-      Result      : String_List;
+      Result      : Indef_String_List;
    begin
       Matches := Find_Match (Matcher, Row, First, Last, Match_Found);
       if Match_Found then
@@ -813,56 +886,22 @@ package body ARFF is
 
    --  -------------------------------------------------------------------------
 
-   function Stream_Data (Decoder : in out Arff_Decoder) return String is
-      use Ada.Strings;
-      use String_Package;
-      Row    : Unbounded_String;
-      Result : Unbounded_String := To_Unbounded_String ("");
-   begin
-      Row_Found := False;
-      while Has_Element (Stream_Cursor) and not Row_Found loop
-         Decoder.Current_Line := Decoder.Current_Line + 1;
-         Row := Element (Stream_Cursor);
-         --           Put_Line ("ARFF.Stream_Data Row '" & To_String (Row) & "'");
-         Trim (Row, Both);
-         declare
-            UC_Row : constant String := Dataset_Utilities.To_Upper_Case
-              (To_String (Row));
-         begin
-            Row_Found := Length (Row) > 0 and UC_Row (1 .. 1) /= "%";
-            if Row_Found then
-               Result := Row;
-            end if;
-         end;
-         Next (Stream_Cursor);
-      end loop;
-
-      return To_String (Result);
-
-   end Stream_Data;
-
-   --  -------------------------------------------------------------------------
-
-   function Unquote (Values : String) return Unbounded_String is
+   function Unquote (Values : String) return String is
       use Regexep;
       --  \[0-9]{1,3} match when \ is followed by 1 to 3 digits
       --  \u[0-9a-f]{4} match string starting with \u followed by 4 hex digits
       --  \. match \.
       --  In each case first to last refers to the characters follwing the /
       Pattern       : constant String := "\\([0-9]{1,3}|u[0-9a-f]{4}|.)";
-      Result        : Unbounded_String := To_Unbounded_String ("");
    begin
       if Values = "" or  Values (Values'First) = '?' then
-         null;
+         return "";
       elsif Values (Values'First) = '"' or Values (Values'First) = ''' then
-         Result := To_Unbounded_String
-           (Substitute (Values (Values'First + 1 .. Values'Last - 1),
-            Pattern, Escape_Sub_Callback'Access));
+         return Substitute (Values (Values'First + 1 .. Values'Last - 1),
+                            Pattern, Escape_Sub_Callback'Access);
       else
-         Result := To_Unbounded_String (Values);
+         return Values;
       end if;
-
-      return Result;
 
    end Unquote;
 
@@ -911,4 +950,4 @@ begin
    Escape_Sub_Map.Include (To_Unbounded_String ("\\9"),
                            To_Unbounded_String ("\t"));
 
-end ARFF;
+end ARFF_Json;

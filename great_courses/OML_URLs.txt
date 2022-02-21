@@ -1,0 +1,27 @@
+Search:
+https://openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1
+<data_id> = "did":554
+
+DATA_INFO
+https://openml.org/api/v1/json/data/<data_id>
+https://openml.org/api/v1/json/data/list/data_name/mnist_784/limit/2/data_version/1
+
+DATA_FEATURES
+https://openml.org/api/v1/json/data/features/<data_id>
+
+DATA_QUALITIES
+https://openml.org/api/v1/json/data/qualities/<data_id>
+
+DATA_FILE
+https://openml.org/data/v1/download/<data_description["file_id"]>
+<data_description["file_id"]> = "file_id":"52667"
+
+https://openml.org/data/v1/download/52667
+Downloads text file mnist_784.arff
+
+Diabetes:
+https://openml.org/api/v1/json/data/list/data_name/diabetes/limit/2/data_version/1
+<data_id> = "did":37
+
+https://www.openml.org/d/41517/json
+<data_id> = "did":41517
