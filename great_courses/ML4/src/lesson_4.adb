@@ -29,9 +29,9 @@ procedure Lesson_4 is
    use Load_ARFF_Data;
    --     use Decision_Tree_Classification;
    Routine_Name  : constant String := "Lesson_4 ";
-   --     Dataset_File  : constant String := "../mnist_784.arff";
-   --     Save_File     : constant String := "mnist_784.oml";
-   --     State_File    : constant String := "mnist_784.sta";
+--     Dataset_File  : constant String := "../mnist_784.arff";
+--     Save_File     : constant String := "mnist_784.oml";
+--     State_File    : constant String := "mnist_784.sta";
    Dataset_File  : constant String := "../diabetes.arff";
    Save_File     : constant String := "diabetes.oml";
    State_File    : constant String := "diabetes.sta";
@@ -90,7 +90,9 @@ begin
    Put_Line (Routine_Name);
 
    if Exists (State_File) then
+      Put_Line (Routine_Name & "restoring state");
       Get_State (Test_Data, Train_Data, Bunch);
+      Put_Line (Routine_Name & "state restored");
    else
       Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
                                Save_File_Name    => Save_File,
