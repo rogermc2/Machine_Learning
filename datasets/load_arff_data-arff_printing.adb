@@ -130,7 +130,10 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
                          Last : Positive := 10) is
+      use ML_Types;
+      use ARFF_Data_Package;
       use ARFF_Data_List_Package;
+
       Data_List_2D : constant ARFF_Data_List_2D := Data.Data;
       List_Curs    : ARFF_Data_List_Package.Cursor := Data_List_2D.First;
       Data_List    : ARFF_Data_List;
@@ -180,8 +183,10 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Data (Text  : String; Data : ARFF_Data_List) is
-      Data_Curs    : ARFF_Data_Package.Cursor := Data.First;
+   procedure Print_Data (Text  : String; Data : ML_Types.ARFF_Data_List) is
+      use ML_Types;
+      use ARFF_Data_Package;
+      Data_Curs : Cursor := Data.First;
    begin
       New_Line;
       Put_Line (Text & ":");
@@ -212,9 +217,11 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Data (Text  : String; Data : ARFF_Data_List_2D;
+   procedure Print_Data (Text  : String; Data : ML_Types.ARFF_Data_List_2D;
                          Start : Positive := 1;
                          Last  : Positive := 10) is
+      use ML_Types;
+      use ARFF_Data_Package;
       use ARFF_Data_List_Package;
       List_Curs    : ARFF_Data_List_Package.Cursor := Data.First;
       Data_Length  : constant Positive := Positive (Data.Length);

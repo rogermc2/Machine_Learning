@@ -26,8 +26,8 @@ package Openml_Ada is
      (ARFF_Container               : Load_ARFF_Data.ARFF_Record;
       Features_List                : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
-      X                            : out Load_ARFF_Data.ARFF_Data_List_2D;
-      Y                            : out Load_ARFF_Data.ARFF_Data_List_2D;
+      X                            : out ML_Types.ARFF_Data_List_2D;
+      Y                            : out ML_Types.ARFF_Data_List_2D;
       Bunch                        : out Bunch_Data;
       X_Y_Only                     : Boolean := False;
       --        Sparse                     : Boolean;
@@ -35,8 +35,8 @@ package Openml_Ada is
    procedure Fetch_Openml (Dataset_File_Name : String;
                            Save_File_Name    : String;
                            Target_Column     : ML_Types.String_List;
-                           X                 : out Load_ARFF_Data.ARFF_Data_List_2D;
-                           Y                 : out Load_ARFF_Data.ARFF_Data_List_2D;
+                           X                 : out ML_Types.ARFF_Data_List_2D;
+                           Y                 : out ML_Types.ARFF_Data_List_2D;
                            Bunch             : out Bunch_Data;
                            As_Frame          : in out As_Frame_State;
                            Return_X_Y        : Boolean := False);

@@ -4,8 +4,6 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with GNATCOLL.JSON; use GNATCOLL.JSON;
-
 with ML_Types;
 
 --  with Base_Decision_Tree;
@@ -39,7 +37,7 @@ procedure Lesson_4 is
     Data_Id       : Integer := 0;
     As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
     Bunch         : Openml_Ada.Bunch_Data;
-    X             : ARFF_Data_List_2D;
+    X             : ARFF_Data_List_2D;  --  rows of columns of values
     Y             : ARFF_Data_List_2D;
     Num_Samples   : Positive;
     Test_Data     : String_Vector;

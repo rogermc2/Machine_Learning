@@ -38,7 +38,7 @@ package body Load_ARFF_Data is
 
     procedure Decode_Nominal (Attribute      : Attribute_Record;
                               Value_String   : String;
-                              Decoded_Values : in out ARFF_Data_List);
+                              Decoded_Values : in out ML_Types.ARFF_Data_List);
     procedure Load_Attributes (File_ID : File_Type;
                                aLine   : in out Unbounded_String;
                                Header  : in out ARFF_Header_Record);
@@ -50,7 +50,7 @@ package body Load_ARFF_Data is
     procedure Parse_Values (Row    : String;
                             Values : out ML_Types.Indef_String_List);
     function Split_Sparse_Line (Row : String) return ML_Types.Indef_String_List;
-    procedure Swap (Data : in out ARFF_Data_List_2D; L, R : Positive);
+    procedure Swap (Data : in out ML_Types.ARFF_Data_List_2D; L, R : Positive);
     function Unquote (Values : String) return String;
 
     --  ------------------------------------------------------------------------
@@ -96,7 +96,7 @@ package body Load_ARFF_Data is
     --  L478
     function Decode_Dense_Values (Values     : ML_Types.Indef_String_List;
                                   Attributes : Attribute_List)
-                                 return ARFF_Data_List is
+                                 return ML_Types.ARFF_Data_List is
         use Ada.Containers;
         use Ada.Strings;
         use ML_Types;
@@ -198,16 +198,16 @@ package body Load_ARFF_Data is
 
     --  -------------------------------------------------------------------------
 
-    procedure Decode_Nominal (Attribute      : Attribute_Record;
-                              Value_String   : String;
-                              Decoded_Values : in out ARFF_Data_List) is
+   procedure Decode_Nominal
+     (Attribute       : Attribute_Record; Value_String : String;
+       Decoded_Values : in out ML_Types.ARFF_Data_List) is
         use ML_Types;
         use Nominal_Data_Package;
         use Dataset_Utilities;
 --          Routine_Name    : constant String := "Load_ARFF_Data.Decode_Nominal ";
         UC_Value_String :  constant String := To_Upper_Case (Value_String);
         Nominal_Cursor  : Nominal_Data_Package.Cursor;
-    begin
+   begin
         if not Is_Empty (Attribute.Nominal_Data) then
             Nominal_Cursor := Attribute.Nominal_Data.First;
             while Has_Element (Nominal_Cursor) loop
@@ -244,7 +244,7 @@ package body Load_ARFF_Data is
             end loop;
         end if;
 
-    end Decode_Nominal;
+   end Decode_Nominal;
 
     --  -------------------------------------------------------------------------
 
@@ -619,11 +619,11 @@ package body Load_ARFF_Data is
 
     --  -------------------------------------------------------------------------
 
-   function Permute (aList : ARFF_Data_List_2D)
-                     return ARFF_Data_List_2D is
+   function Permute (aList : ML_Types.ARFF_Data_List_2D)
+                     return ML_Types.ARFF_Data_List_2D is
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
-      Permutation  : ARFF_Data_List_2D := aList;
+      Permutation  : ML_Types.ARFF_Data_List_2D := aList;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -671,8 +671,8 @@ package body Load_ARFF_Data is
 
     --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out ARFF_Data_List_2D; L, R : Positive) is
-      Item : ARFF_Data_List;
+   procedure Swap (Data : in out ML_Types.ARFF_Data_List_2D; L, R : Positive) is
+      Item : ML_Types.ARFF_Data_List;
    begin
       Item := Data.Element (L);
       Data.Replace_Element (L, Data.Element (R));

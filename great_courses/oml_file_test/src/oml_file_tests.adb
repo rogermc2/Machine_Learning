@@ -111,8 +111,8 @@ package body OML_File_Tests is
 --        Save_File     : constant String := "mnist_784.oml";
       As_Frame      : As_Frame_State := As_Frame_False;
       Target_Column : ML_Types.String_List;
-      X             : Load_ARFF_Data.ARFF_Data_List_2D;
-      Y             : Load_ARFF_Data.ARFF_Data_List_2D;
+      X             : ML_Types.ARFF_Data_List_2D;
+      Y             : ML_Types.ARFF_Data_List_2D;
       Bunch         : Bunch_Data;
    begin
       Put_Line (Routine_Name);
