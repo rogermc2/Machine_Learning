@@ -10,9 +10,9 @@ package Data_Splitter is
    procedure Init_Base_Shuffle_Split
      (Self : in out Base_Shuffle_Data; Num_Splits : Natural;
       Test_Size, Default_Test_Size, Train_Size : Natural);
-   procedure Train_Test_Split (X, Y : ML_Types.ARFF_Data_List_2D;
-                               Test_Size, Train_Size : Natural;
-                               Test, Train : out ML_Types.ARFF_Data_List_2D);
+   procedure Train_Test_Split
+     (X, Y : ML_Types.ARFF_Data_List_2D; Test_Size, Train_Size : Natural;
+      Test_X, Test_Y, Train_X, Train_Y : out ML_Types.ARFF_Data_List_2D);
 
 private
 

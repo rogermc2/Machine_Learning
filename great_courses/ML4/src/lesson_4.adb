@@ -43,16 +43,19 @@ procedure Lesson_4 is
    Num_Samples   : Positive;
    Test_Size     : Positive;
    Train_Size    : Positive;
-   Test_Data     : ARFF_Data_List_2D;
-   Train_Data    : ARFF_Data_List_2D;
-      aClassifier   : Base_Decision_Tree.Classifier
-        (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
+   Test_X        : ARFF_Data_List_2D;
+   Test_Y        : ARFF_Data_List_2D;
+   Train_X       : ARFF_Data_List_2D;
+   Train_Y       : ARFF_Data_List_2D;
+   aClassifier   : Base_Decision_Tree.Classifier
+     (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
    --     No_Weights    : Weights.Weight_List :=
    --                       Classifier_Types.Float_Package.Empty_Vector;
    --     Correct       : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
-   procedure Get_State (Saved_Test, Saved_Train : out ARFF_Data_List_2D;
-                        Saved_Bunch             : out Openml_Ada.Bunch_Data) is
+   procedure Get_State
+     (Saved_Test_X, Saved_Test_Y, Saved_Train_X, Saved_Train_Y : out ARFF_Data_List_2D;
+      Saved_Bunch                                              : out Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "Lesson_4.Get_State ";
@@ -61,16 +64,19 @@ procedure Lesson_4 is
    begin
       Open (File_ID, In_File, State_File);
       aStream := Stream (File_ID);
-      ARFF_Data_List_2D'Read (aStream, Saved_Test);
-      ARFF_Data_List_2D'Read (aStream, Saved_Train);
+      ARFF_Data_List_2D'Read (aStream, Saved_Test_X);
+      ARFF_Data_List_2D'Read (aStream, Saved_Test_Y);
+      ARFF_Data_List_2D'Read (aStream, Saved_Train_X);
+      ARFF_Data_List_2D'Read (aStream, Saved_Train_Y);
       Openml_Ada.Bunch_Data'Read (aStream, Saved_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
 
    end Get_State;
 
-   procedure Save_State (Save_Test, Save_Train : ARFF_Data_List_2D;
-                         Save_Bunch            : Openml_Ada.Bunch_Data) is
+   procedure Save_State
+     (Save_Test_X, Save_Test_Y, Save_Train_X, Save_Train_Y : ARFF_Data_List_2D;
+      Save_Bunch                                           : Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "Lesson_4.Save_State ";
@@ -79,8 +85,10 @@ procedure Lesson_4 is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      ARFF_Data_List_2D'Write (aStream, Save_Test);
-      ARFF_Data_List_2D'Write (aStream, Save_Train);
+      ARFF_Data_List_2D'Write (aStream, Save_Test_X);
+      ARFF_Data_List_2D'Write (aStream, Save_Test_Y);
+      ARFF_Data_List_2D'Write (aStream, Save_Train_X);
+      ARFF_Data_List_2D'Write (aStream, Save_Train_Y);
       Openml_Ada.Bunch_Data'Write (aStream, Save_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
@@ -91,7 +99,7 @@ begin
 
    if Exists (State_File) then
       Put_Line (Routine_Name & "restoring state");
-      Get_State (Test_Data, Train_Data, Bunch);
+      Get_State (Test_X, Test_Y, Train_X, Train_Y, Bunch);
       Put_Line (Routine_Name & "state restored");
    else
       Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
@@ -122,19 +130,19 @@ begin
       Put_Line (Routine_Name & "Y permuted");
       ARFF_Printing.Print_Data ("permuted features row 16", X.Element (16));
 
-      Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size, Test_Data,
-                                      Train_Data);
+      Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
+                                      Test_X, Test_Y, Train_X, Train_Y);
       --     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
       --     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
       X.Clear;
       Y.Clear;
 
-      Save_State (Test_Data, Train_Data, Bunch);
+      Save_State (Test_X, Test_Y, Train_X, Train_Y, Bunch);
    end if;
 
    Printing.Print_Strings ("Features", Bunch.Feature_Names);
-   ARFF_Printing.Print_Data ("Train features row 16", Train_Data.Element (16));
-   ARFF_Printing.Print_Data ("Test features row 16", Test_Data.Element (16));
+   ARFF_Printing.Print_Data ("Train features row 16", Train_X.Element (16));
+   ARFF_Printing.Print_Data ("Test features row 16", Test_X.Element (16));
    New_Line;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
@@ -142,9 +150,9 @@ begin
 
    --     --  Fit function adjusts weights according to data values so that
    --     --  better accuracy can be achieved
-   Classification_Fit (aClassifier, Train_Data, Labels, No_Weights);
-   Printing.Print_Tree ("Diabetes Tree", aClassifier);
-   Put_Line ("----------------------------------------------");
+--     Classification_Fit (aClassifier, Train_Data, Labels, No_Weights);
+--     Printing.Print_Tree ("Diabetes Tree", aClassifier);
+--     Put_Line ("----------------------------------------------");
    New_Line;
    --
    --     for index in Train_Data.First_Index .. Train_Data.Last_Index loop

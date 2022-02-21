@@ -69,9 +69,9 @@ package body Data_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Train_Test_Split (X, Y : ML_Types.ARFF_Data_List_2D;
-                              Test_Size, Train_Size : Natural;
-                              Test, Train : out ML_Types.ARFF_Data_List_2D) is
+   procedure Train_Test_Split
+     (X, Y : ML_Types.ARFF_Data_List_2D; Test_Size, Train_Size : Natural;
+      Test_X, Test_Y, Train_X, Train_Y : out ML_Types.ARFF_Data_List_2D) is
       use ML_Types;
 --        use ARFF_Data_Package;
       use ARFF_Data_List_Package;
@@ -107,11 +107,13 @@ package body Data_Splitter is
                           Train_Indices);
 
       for index in Test_Indices.First_Index .. Test_Indices.Last_Index loop
-            Test.Append (X_Vec.Element (Test_Indices (index)));
+            Test_X.Append (X_Vec.Element (Test_Indices (index)));
+            Test_Y.Append (Y_Vec.Element (Test_Indices (index)));
       end loop;
 
       for index in Train_Indices.First_Index .. Train_Indices.Last_Index loop
-            Train.Append (X_Vec.Element (Train_Indices (index)));
+            Train_X.Append (X_Vec.Element (Train_Indices (index)));
+            Train_Y.Append (Y_Vec.Element (Train_Indices (index)));
       end loop;
 
    end Train_Test_Split;
