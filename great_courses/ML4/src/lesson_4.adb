@@ -25,7 +25,11 @@ procedure Lesson_4 is
     use String_Package;
     use Load_ARFF_Data;
     --     use Decision_Tree_Classification;
-    Routine_Name  : constant String := "Lesson_4 ";
+   Routine_Name  : constant String := "Lesson_4 ";
+   Dataset_File  : constant String := "../mnist_784.arff";
+   Save_File     : constant String := "mnist_784.oml";
+--     Dataset_File  : constant String := "../diabetes.arff";
+--     Save_File     : constant String := "diabetes.oml";
     --     Min_Split     : constant String := "2";
     As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
     Bunch         : Openml_Ada.Bunch_Data;
@@ -44,8 +48,8 @@ procedure Lesson_4 is
     --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 begin
     Put_Line (Routine_Name);
-    Openml_Ada.Fetch_Openml (Dataset_File_Name => "../diabetes.arff",
-                             Save_File_Name    => "diabetes.oml",
+    Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
+                             Save_File_Name    => Save_File,
                              Target_Column     => Empty_List,
                              X                 => X,
                              Y                 => Y,
@@ -60,14 +64,14 @@ begin
     Assert (X.Length > 0, Routine_Name & "X is empty.");
     Assert (Y.Length > 0, Routine_Name & "Y is empty.");
 
-    Num_Samples := Positive (X.Length);
-
     Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
               "Y length" & Count_Type'Image (Y.Length) &
               " is different to X length" & Natural'Image (Num_Samples));
-
+   Put_Line (Routine_Name & "permuting");
     X := Permute (X);
+   Put_Line (Routine_Name & "X permuted");
     Y := Permute (Y);
+   Put_Line (Routine_Name & "Y permuted");
 
     Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size, Test_Data,
                                     Train_Data);
