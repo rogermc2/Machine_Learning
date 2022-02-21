@@ -33,12 +33,13 @@ package Openml_Ada is
       --        Sparse                     : Boolean;
       As_Frame                     : As_Frame_State := As_Frame_False);
    procedure Fetch_Openml (Dataset_File_Name : String;
-                          Target_Column     : ML_Types.String_List;
-                          X                 : out Load_ARFF_Data.ARFF_Data_List_2D;
-                          Y                 : out Load_ARFF_Data.ARFF_Data_List_2D;
-                          Bunch             : out Bunch_Data;
-                          As_Frame          : in out As_Frame_State;
-                          Return_X_Y        : Boolean := False);
+                           Save_File_Name    : String;
+                           Target_Column     : ML_Types.String_List;
+                           X                 : out Load_ARFF_Data.ARFF_Data_List_2D;
+                           Y                 : out Load_ARFF_Data.ARFF_Data_List_2D;
+                           Bunch             : out Bunch_Data;
+                           As_Frame          : in out As_Frame_State;
+                           Return_X_Y        : Boolean := False);
    function Valid_Data_Column_Names
      (Features_List  : Load_ARFF_Data.Attribute_List;
       Target_Columns : ML_Types.String_List) return ML_Types.String_List;
