@@ -30,14 +30,13 @@ procedure Lesson_4 is
     --     Data          : constant Multi_Output_Data_Record :=
     --                       Classifier_Utilities.Load_Data ("src/diabetes.csv");
     --     Feature_Names : constant String_List := Data.Feature_Names;
-    Train_Samples : constant Positive := 5000;
-    Test_Size     : constant Positive := 1500;
-    Train_Size    : constant Positive := Train_Samples - Test_Size;
     As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
     Bunch         : Openml_Ada.Bunch_Data;
     X             : ARFF_Data_List_2D;  --  rows of columns of values
     Y             : ARFF_Data_List_2D;
     Num_Samples   : Positive;
+    Test_Size     : Positive;
+    Train_Size    : Positive;
     Test_Data     : ARFF_Data_List;
     Train_Data    : ARFF_Data_List;
     --     Names_Cursor  : String_Package.Cursor := Feature_Names.First;
@@ -59,9 +58,11 @@ begin
                              Bunch             => Bunch,
                              As_Frame          => As_Frame,
                              Return_X_Y        => True);
+    Num_Samples := Positive (X.Length);
+    Test_Size := Num_Samples / 4;
+    Train_Size := Num_Samples - Test_Size;
 
-    Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
-    Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
+    Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
     Assert (X.Length > 0, Routine_Name & "X is empty.");
     Assert (Y.Length > 0, Routine_Name & "Y is empty.");
 
