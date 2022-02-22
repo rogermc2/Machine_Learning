@@ -53,7 +53,7 @@ package Load_ARFF_Data is
    --  L783 declaration of return object obj
    type ARFF_Record is record
       Header : ARFF_Header_Record;
-      Data   : ML_Types.ARFF_Data_List_2D;    --  'data': []
+      Data   : ML_Types.Value_Data_Lists_2D;    --  'data': []
    end record;
 
    function Get_Attributes (Data : ARFF_Record) return Attribute_List;

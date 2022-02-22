@@ -2,7 +2,6 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -262,14 +261,5 @@ package ML_Types is
    package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
-
-   package ARFF_Data_Package is new
-     Ada.Containers.Indefinite_Vectors (Positive, Value_Record);
-   subtype ARFF_Data_List is ARFF_Data_Package.Vector;
-
-   use ARFF_Data_Package;
-   package ARFF_Data_List_Package is new
-     Ada.Containers.Vectors (Positive, ARFF_Data_List);
-   subtype ARFF_Data_List_2D is ARFF_Data_List_Package.Vector;
 
 end ML_Types;

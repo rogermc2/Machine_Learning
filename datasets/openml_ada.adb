@@ -40,7 +40,7 @@ package body Openml_Ada is
      (Features_List  : in out Load_ARFF_Data.Attribute_List;
       Target_Columns : out ML_Types.String_List);
    function Split_Columns
-     (Arff_Data       : ML_Types.ARFF_Data_List_2D;
+     (Arff_Data       : ML_Types.Value_Data_Lists_2D;
       Include_Columns : ML_Types.Integer_DL_List)
       return ML_Types.Value_Data_Lists_2D;
    procedure Verify_Target_Data_Type
@@ -551,17 +551,17 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
    --  L184
    function Split_Columns
-     (Arff_Data       : ML_Types.ARFF_Data_List_2D;
+     (Arff_Data       : ML_Types.Value_Data_Lists_2D;
       Include_Columns : ML_Types.Integer_DL_List)
       return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       use Integer_DLL_Package;
-      use ARFF_Data_List_Package;
-      use ARFF_Data_Package;
+      use Value_Data_Package;
+      use Value_Lists_Data_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Value_Data_Lists_2D;
       Include_Curs  : Integer_DLL_Package.Cursor;
-      Arff_Data_Row : ARFF_Data_List;  --  list of columns
+      Arff_Data_Row : Value_Data_List;  --  list of columns
       New_Row       : Value_Data_List;
    begin
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
