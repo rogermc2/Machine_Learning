@@ -570,26 +570,15 @@ package body Openml_Ada is
          Include_Curs := Include_Columns.First;
          while Has_Element (Include_Curs) loop
             declare
-               Arff_Value : constant ARFF_Data_Record :=
+               Arff_Value : constant Value_Record :=
                               Arff_Data_Row.Element (Element (Include_Curs));
-               New_Value  : Value_Record (Arff_Value.Data_Kind);
+               New_Value  : constant Value_Record (Arff_Value.Value_Kind) :=
+                              Arff_Value;
             begin
-               case Arff_Value.Data_Kind is
-                  when Boolean_Type =>
-                     New_Value.Boolean_Value := Arff_Value.Boolean_Data;
-                  when Integer_Type =>
-                     New_Value.Integer_Value := Arff_Value.Integer_Data;
-                  when Float_Type =>
-                     New_Value.Float_Value := Arff_Value.Real_Data;
-                  when UB_String_Type =>
-                     New_Value.UB_String_Value := Arff_Value.UB_String_Data;
-               end case;
                New_Row.Append (New_Value);
             end;
             Next  (Include_Curs);
          end loop;
-         --           Load_ARFF_Data.ARFF_Printing.Print_Data
-         --             (Routine_Name & "New_Row", New_Row);
          Data_New.Append (New_Row);
       end loop;
 

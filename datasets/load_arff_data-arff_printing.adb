@@ -154,17 +154,17 @@ package body Load_ARFF_Data.ARFF_Printing is
             while Has_Element (Data_Curs) loop
                Count2 := Count2 + 1;
                declare
-                  Data_Record : constant ARFF_Data_Record := Element (Data_Curs);
+                  Data_Record : constant Value_Record := Element (Data_Curs);
                begin
-                  case Data_Record.Data_Kind is
+                  case Data_Record.Value_Kind is
                   when ML_Types.Boolean_Type =>
-                     Put (Boolean'Image (Data_Record.Boolean_Data));
+                     Put (Boolean'Image (Data_Record.Boolean_Value));
                   when ML_Types.Float_Type =>
-                     Put (Float'Image (Data_Record.Real_Data));
+                     Put (Float'Image (Data_Record.Float_Value));
                   when ML_Types.Integer_Type =>
-                     Put (Integer'Image (Data_Record.Integer_Data));
+                     Put (Integer'Image (Data_Record.Integer_Value));
                   when ML_Types.UB_String_Type =>
-                     Put (", " & Data_Record.UB_String_Data);
+                     Put (", " & Data_Record.UB_String_Value);
                   end case;
                   if Count2 <= Last then
                      Put (", ");
@@ -192,17 +192,17 @@ package body Load_ARFF_Data.ARFF_Printing is
 
       while Has_Element (Data_Curs) loop
          declare
-            Data_Record : constant ARFF_Data_Record := Element (Data_Curs);
+            Data_Record : constant Value_Record := Element (Data_Curs);
          begin
-            case Data_Record.Data_Kind is
+            case Data_Record.Value_Kind is
                when ML_Types.Boolean_Type =>
-                  Put (Boolean'Image (Data_Record.Boolean_Data));
+                  Put (Boolean'Image (Data_Record.Boolean_Value));
                when ML_Types.Float_Type =>
-                  Put (Float'Image (Data_Record.Real_Data));
+                  Put (Float'Image (Data_Record.Float_Value));
                when ML_Types.Integer_Type =>
-                  Put (Integer'Image (Data_Record.Integer_Data));
+                  Put (Integer'Image (Data_Record.Integer_Value));
                when ML_Types.UB_String_Type =>
-                  Put (Data_Record.UB_String_Data);
+                  Put (Data_Record.UB_String_Value);
             end case;
 
             if Data_Curs /= Data.Last then
@@ -244,17 +244,17 @@ package body Load_ARFF_Data.ARFF_Printing is
             while Has_Element (Data_Curs) loop
                Count2 := Count2 + 1;
                declare
-                  Data_Record : constant ARFF_Data_Record := Element (Data_Curs);
+                  Data_Record : constant Value_Record := Element (Data_Curs);
                begin
-                  case Data_Record.Data_Kind is
+                  case Data_Record.Value_Kind is
                   when ML_Types.Boolean_Type =>
-                     Put (Boolean'Image (Data_Record.Boolean_Data));
+                     Put (Boolean'Image (Data_Record.Boolean_Value));
                   when ML_Types.Float_Type =>
-                     Put (Float'Image (Data_Record.Real_Data));
+                     Put (Float'Image (Data_Record.Float_Value));
                   when ML_Types.Integer_Type =>
-                     Put (Integer'Image (Data_Record.Integer_Data));
+                     Put (Integer'Image (Data_Record.Integer_Value));
                   when ML_Types.UB_String_Type =>
-                     Put (Data_Record.UB_String_Data);
+                     Put (Data_Record.UB_String_Value);
                   end case;
                   if Count2 < Positive (Data_List.Length) then
                      Put (", ");

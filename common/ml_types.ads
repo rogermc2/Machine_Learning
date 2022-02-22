@@ -263,17 +263,8 @@ package ML_Types is
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
 
-   type ARFF_Data_Record (Data_Kind : ML_Types.Data_Type) is record
-      case Data_Kind is
-         when ML_Types.Boolean_Type => Boolean_Data     : Boolean;
-         when ML_Types.Float_Type => Real_Data          : Float;
-         when ML_Types.Integer_Type => Integer_Data     : Integer;
-         when ML_Types.UB_String_Type => UB_String_Data : Unbounded_String;
-      end case;
-   end record;
-
    package ARFF_Data_Package is new
-     Ada.Containers.Indefinite_Vectors (Positive, ARFF_Data_Record);
+     Ada.Containers.Indefinite_Vectors (Positive, Value_Record);
    subtype ARFF_Data_List is ARFF_Data_Package.Vector;
 
    use ARFF_Data_Package;
