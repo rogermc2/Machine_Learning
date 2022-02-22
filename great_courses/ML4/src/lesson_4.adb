@@ -8,18 +8,17 @@ with Ada.Text_IO; use Ada.Text_IO;
 with ML_Types;
 
 with Base_Decision_Tree;
---  with Classifier_Types;
+with Classifier_Types;
 --  with Classifier_Utilities;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
 with Load_ARFF_Data;
-with Load_ARFF_Data.ARFF_Printing;
 with Openml_Ada;
 with Printing;
 with Tree;
---  with Weights;
+with Weights;
 
 procedure Lesson_4 is
    use Ada.Containers;
@@ -51,8 +50,8 @@ procedure Lesson_4 is
    Train_Y       : Value_Data_Lists_2D;
    aClassifier   : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-   --     No_Weights    : Weights.Weight_List :=
-   --                       Classifier_Types.Float_Package.Empty_Vector;
+   No_Weights    : Weights.Weight_List :=
+                        Classifier_Types.Float_Package.Empty_Vector;
    --     Correct       : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
    procedure Get_State
@@ -125,14 +124,15 @@ begin
       Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
                 "Y length" & Count_Type'Image (Y.Length) &
                 " is different to X length" & Natural'Image (Num_Samples));
-      ARFF_Printing.Print_Data ("Features row 16", X.Element (16));
+      Printing.Print_Value_Data_List ("Features row 16", X.Element (16));
 
       Put_Line (Routine_Name & "permuting");
       X := Permute (X);
       Put_Line (Routine_Name & "X permuted");
       Y := Permute (Y);
       Put_Line (Routine_Name & "Y permuted");
-      ARFF_Printing.Print_Data ("permuted features row 16", X.Element (16));
+      Printing.Print_Value_Data_List ("permuted features row 16",
+                                      X.Element (16));
 
       Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                       Test_X, Test_Y, Train_X, Train_Y);
@@ -147,8 +147,8 @@ begin
    if not Return_X_Y then
       Printing.Print_Strings ("Features", Bunch.Feature_Names);
    end if;
-   ARFF_Printing.Print_Data ("Train features row 16", Train_X.Element (16));
-   ARFF_Printing.Print_Data ("Test features row 16", Test_X.Element (16));
+   Printing.Print_Value_Data_List ("Train features row 16", Train_X.Element (16));
+   Printing.Print_Value_Data_List ("Test features row 16", Test_X.Element (16));
    New_Line;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
