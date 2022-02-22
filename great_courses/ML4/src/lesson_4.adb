@@ -32,9 +32,9 @@ procedure Lesson_4 is
    --     Save_File     : constant String := "mnist_784.oml";
    --     State_File    : constant String := "mnist_784.sta";
    --     Return_X_Y    : constant Boolean := True;
-   Dataset_File  : constant String := "../diabetes.arff";
-   Save_File     : constant String := "diabetes.oml";
-   State_File    : constant String := "diabetes.sta";
+   Dataset_File  : constant String := "../iris.arff";
+   Save_File     : constant String := "iris.oml";
+   State_File    : constant String := "iris.sta";
    Return_X_Y    : constant Boolean := False;
    Min_Split     : constant String := "2";
    As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;

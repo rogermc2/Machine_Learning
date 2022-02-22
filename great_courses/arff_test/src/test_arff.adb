@@ -14,8 +14,8 @@ procedure Test_ARFF is
    Routine_Name : constant String := "Test_ARFF ";
 --     File_Name    : constant String := "../mnist_784.arff";
 --     Ada_File     : constant String := "../mnist_784.ada";
-   File_Name    : constant String := "../diabetes.arff";
-   Ada_File     : constant String := "../diabetes.ada";
+   File_Name    : constant String := "../iris.arff";
+   Ada_File     : constant String := "../iris.ada";
    Data         : ARFF_Record;
 begin
    Put_Line (Routine_Name);

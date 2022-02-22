@@ -104,8 +104,8 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       use Ada.Containers;
       Routine_Name  : constant String := "Test_Fetch_OML ";
-      File_Name      : constant String := "../diabetes.arff";
-      Save_File     : constant String := "diabetes.oml";
+      File_Name      : constant String := "../iris.arff";
+      Save_File     : constant String := "iris.oml";
 --        File_Name     : constant String := "../mnist_784.arff";
 --        Save_File     : constant String := "mnist_784.oml";
       As_Frame      : As_Frame_State := As_Frame_False;

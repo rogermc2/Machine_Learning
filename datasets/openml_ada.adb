@@ -8,7 +8,7 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
 
---  with Printing;
+with Printing;
 
 with Load_ARFF_Data.ARFF_IO;
 --  with Load_ARFF_Data.ARFF_Printing;
@@ -196,12 +196,8 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "Convert_Arff_Data");
       --  L278
       X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
-      Put_Line (Routine_Name & "X length" & Count_Type'Image (X.Length));
       Y := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
-      Put_Line (Routine_Name & "Y length" & Count_Type'Image (Y.Length));
-
-      --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 2);
-      --        Load_ARFF_Data.ARFF_Printing.Print_Data (Routine_Name & "Y", Y, 1, 2);
+      Printing.Print_Value_Data_List (Routine_Name & "X(1)", X.First_Element);
       --  L672
       if not X_Y_Only then
          Put_Line (Routine_Name & "Parse_Nominal_Data");
@@ -558,7 +554,7 @@ package body Openml_Ada is
       use Integer_DLL_Package;
       use Value_Data_Package;
       use Value_Lists_Data_Package;
-      --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
+      Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Value_Data_Lists_2D;
       Include_Curs  : Integer_DLL_Package.Cursor;
       Arff_Data_Row : Value_Data_List;  --  list of columns
@@ -567,6 +563,8 @@ package body Openml_Ada is
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;
          Arff_Data_Row := Arff_Data.Element (row);
+            Printing.Print_Value_Data_List (Routine_Name &
+                                              "Arff_Data_Row", Arff_Data_Row);
          Include_Curs := Include_Columns.First;
          while Has_Element (Include_Curs) loop
             declare
