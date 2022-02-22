@@ -50,7 +50,7 @@ package body Load_ARFF_Data is
     procedure Parse_Values (Row    : String;
                             Values : out ML_Types.Indef_String_List);
     function Split_Sparse_Line (Row : String) return ML_Types.Indef_String_List;
-    procedure Swap (Data : in out ML_Types.ARFF_Data_List_2D; L, R : Positive);
+    procedure Swap (Data : in out ML_Types.Value_Data_Lists_2D; L, R : Positive);
     function Unquote (Values : String) return String;
 
     --  ------------------------------------------------------------------------
@@ -619,11 +619,11 @@ package body Load_ARFF_Data is
 
     --  -------------------------------------------------------------------------
 
-   function Permute (aList : ML_Types.ARFF_Data_List_2D)
-                     return ML_Types.ARFF_Data_List_2D is
+   function Permute (aList : ML_Types.Value_Data_Lists_2D)
+                     return ML_Types.Value_Data_Lists_2D is
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
-      Permutation  : ML_Types.ARFF_Data_List_2D := aList;
+      Permutation  : ML_Types.Value_Data_Lists_2D := aList;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -671,8 +671,8 @@ package body Load_ARFF_Data is
 
     --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out ML_Types.ARFF_Data_List_2D; L, R : Positive) is
-      Item : ML_Types.ARFF_Data_List;
+   procedure Swap (Data : in out ML_Types.Value_Data_Lists_2D; L, R : Positive) is
+      Item : ML_Types.Value_Data_List;
    begin
       Item := Data.Element (L);
       Data.Replace_Element (L, Data.Element (R));

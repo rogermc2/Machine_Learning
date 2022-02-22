@@ -26,7 +26,7 @@ package body Openml_Ada is
 
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    procedure Get_OML (File_Name : String;
-                      X, Y      : out ML_Types.ARFF_Data_List_2D;
+                      X, Y      : out ML_Types.Value_Data_Lists_2D;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean);
    function Parse_Nominal_Data
      (Arff_Data       : Load_ARFF_Data.ARFF_Record;
@@ -34,7 +34,7 @@ package body Openml_Ada is
       return Load_ARFF_Data.Nominal_Data_List;
    procedure Process_Feature (Features_List : Load_ARFF_Data.Attribute_List);
    procedure Save_OML
-     (Save_File_Name : String; X, Y : ML_Types.ARFF_Data_List_2D;
+     (Save_File_Name : String; X, Y : ML_Types.Value_Data_Lists_2D;
       Bunch          : Bunch_Data; X_Y_Only : Boolean);
    procedure Set_Default_Target
      (Features_List  : in out Load_ARFF_Data.Attribute_List;
@@ -42,7 +42,7 @@ package body Openml_Ada is
    function Split_Columns
      (Arff_Data       : ML_Types.ARFF_Data_List_2D;
       Include_Columns : ML_Types.Integer_DL_List)
-      return ML_Types.ARFF_Data_List_2D;
+      return ML_Types.Value_Data_Lists_2D;
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
       Target_Columns : ML_Types.String_List);
@@ -75,8 +75,8 @@ package body Openml_Ada is
      (ARFF_Container               : Load_ARFF_Data.ARFF_Record;
       Features_List                : Load_ARFF_Data.Attribute_List;
       Data_Columns, Target_Columns : ML_Types.String_List;
-      X                            : out ML_Types.ARFF_Data_List_2D;
-      Y                            : out ML_Types.ARFF_Data_List_2D;
+      X                            : out ML_Types.Value_Data_Lists_2D;
+      Y                            : out ML_Types.Value_Data_Lists_2D;
       Bunch                        : out Bunch_Data;
       X_Y_Only                     : Boolean := False;
       --        Sparse                     : Boolean;
@@ -223,8 +223,8 @@ package body Openml_Ada is
    procedure Fetch_Openml (Dataset_File_Name : String;
                            Save_File_Name    : String;
                            Target_Column     : ML_Types.String_List;
-                           X                 : out ML_Types.ARFF_Data_List_2D;
-                           Y                 : out ML_Types.ARFF_Data_List_2D;
+                           X                 : out ML_Types.Value_Data_Lists_2D;
+                           Y                 : out ML_Types.Value_Data_Lists_2D;
                            Bunch             : out Bunch_Data;
                            As_Frame          : in out As_Frame_State;
                            Return_X_Y        : Boolean := False) is
@@ -410,7 +410,7 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Get_OML (File_Name : String;
-                      X, Y      : out ML_Types.ARFF_Data_List_2D;
+                      X, Y      : out ML_Types.Value_Data_Lists_2D;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
@@ -421,8 +421,8 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "Reading OML file " & File_Name);
       Open (File_ID, In_File, File_Name);
       aStream := Stream (File_ID);
-      ML_Types.ARFF_Data_List_2D'Read (aStream, X);
-      ML_Types.ARFF_Data_List_2D'Read (aStream, Y);
+      ML_Types.Value_Data_Lists_2D'Read (aStream, X);
+      ML_Types.Value_Data_Lists_2D'Read (aStream, Y);
       if not X_Y_Only then
          Bunch_Data'Read (aStream, Bunch);
       end if;
@@ -529,7 +529,7 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Save_OML
-     (Save_File_Name : String; X, Y : ML_Types.ARFF_Data_List_2D;
+     (Save_File_Name : String; X, Y : ML_Types.Value_Data_Lists_2D;
       Bunch          : Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
@@ -538,8 +538,8 @@ package body Openml_Ada is
    begin
       Create (File_ID, Out_File, Save_File_Name);
       aStream := Stream (File_ID);
-      ML_Types.ARFF_Data_List_2D'Write (aStream, X);
-      ML_Types.ARFF_Data_List_2D'Write (aStream, Y);
+      ML_Types.Value_Data_Lists_2D'Write (aStream, X);
+      ML_Types.Value_Data_Lists_2D'Write (aStream, Y);
       if not X_Y_Only then
          Bunch_Data'Write (aStream, Bunch);
       end if;
@@ -553,31 +553,47 @@ package body Openml_Ada is
    function Split_Columns
      (Arff_Data       : ML_Types.ARFF_Data_List_2D;
       Include_Columns : ML_Types.Integer_DL_List)
-      return ML_Types.ARFF_Data_List_2D is
+      return ML_Types.Value_Data_Lists_2D is
       use ML_Types;
       use Integer_DLL_Package;
       use ARFF_Data_List_Package;
       use ARFF_Data_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
-      Arff_Data_New : ARFF_Data_List_2D;
+      Data_New      : Value_Data_Lists_2D;
       Include_Curs  : Integer_DLL_Package.Cursor;
-      New_Row       : ARFF_Data_List;
       Arff_Data_Row : ARFF_Data_List;  --  list of columns
+      New_Row       : Value_Data_List;
    begin
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;
          Arff_Data_Row := Arff_Data.Element (row);
          Include_Curs := Include_Columns.First;
          while Has_Element (Include_Curs) loop
-            New_Row.Append (Arff_Data_Row.Element (Element (Include_Curs)));
+            declare
+               Arff_Value : constant ARFF_Data_Record :=
+                              Arff_Data_Row.Element (Element (Include_Curs));
+               New_Value  : Value_Record (Arff_Value.Data_Kind);
+            begin
+               case Arff_Value.Data_Kind is
+                  when Boolean_Type =>
+                     New_Value.Boolean_Value := Arff_Value.Boolean_Data;
+                  when Integer_Type =>
+                     New_Value.Integer_Value := Arff_Value.Integer_Data;
+                  when Float_Type =>
+                     New_Value.Float_Value := Arff_Value.Real_Data;
+                  when UB_String_Type =>
+                     New_Value.UB_String_Value := Arff_Value.UB_String_Data;
+               end case;
+               New_Row.Append (New_Value);
+            end;
             Next  (Include_Curs);
          end loop;
          --           Load_ARFF_Data.ARFF_Printing.Print_Data
          --             (Routine_Name & "New_Row", New_Row);
-         Arff_Data_New.Append (New_Row);
+         Data_New.Append (New_Row);
       end loop;
 
-      return Arff_Data_New;
+      return Data_New;
 
    end Split_Columns;
 

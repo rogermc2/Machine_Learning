@@ -70,18 +70,18 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
 
    procedure Train_Test_Split
-     (X, Y : ML_Types.ARFF_Data_List_2D; Test_Size, Train_Size : Natural;
-      Test_X, Test_Y, Train_X, Train_Y : out ML_Types.ARFF_Data_List_2D) is
+     (X, Y : ML_Types.Value_Data_Lists_2D; Test_Size, Train_Size : Natural;
+      Test_X, Test_Y, Train_X, Train_Y : out ML_Types.Value_Data_Lists_2D) is
       use ML_Types;
---        use ARFF_Data_Package;
-      use ARFF_Data_List_Package;
+--        use ARFF_Data_List_Package;
+      use Value_Lists_Data_Package;
       Routine_Name  : constant String := "Data_Splitter.Train_Test_Split ";
       Num_Samples   : constant Positive := Positive (X.Length);
       Shuffle_Data  : Base_Shuffle_Data;
-      X_Cursor      : ARFF_Data_List_Package.Cursor := X.First;
-      Y_Cursor      : ARFF_Data_List_Package.Cursor := Y.First;
-      X_Vec         : ARFF_Data_List_2D;
-      Y_Vec         : ARFF_Data_List_2D;
+      X_Cursor      : Value_Lists_Data_Package.Cursor := X.First;
+      Y_Cursor      : Value_Lists_Data_Package.Cursor := Y.First;
+      X_Vec         : Value_Data_Lists_2D;
+      Y_Vec         : Value_Data_Lists_2D;
       Test_Indices  : Integer_List;
       Train_Indices : Integer_List;
    begin
