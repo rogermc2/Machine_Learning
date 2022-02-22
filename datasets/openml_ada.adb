@@ -8,7 +8,7 @@ with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;
 
-with Printing;
+--  with Printing;
 
 with Load_ARFF_Data.ARFF_IO;
 --  with Load_ARFF_Data.ARFF_Printing;
@@ -90,7 +90,6 @@ package body Openml_Ada is
       use Attribute_Data_Package;
       Routine_Name       : constant String :=
                              "Openml_Ada.Download_Data_To_Bunch ";
-      Columns_Curs       : String_Package.Cursor := Data_Columns.First;
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
       Feature_Index      : Positive;
       Features_Dict      : Attribute_Dictionary_Map;
@@ -146,7 +145,7 @@ package body Openml_Ada is
          Col_Slice_Y.Append (Feature_Index);
          Next (Target_Curs);
       end loop;
-      --        Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
+--        Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
 
       --  L566 continued
       for Col_ID in Features_List.First_Index ..
@@ -155,24 +154,6 @@ package body Openml_Ada is
          Feature_Index := Features_Dict.Element (aFeature.Name);
          Col_Slice_X.Append (Feature_Index);
       end loop;
-      --        Printing.Print_Integer_List (Routine_Name & "Col_Slice_X", Col_Slice_X);
-
-      --  L568
-      while Has_Element (Columns_Curs) loop
-         Col_Name := Element (Columns_Curs);
-         Col_Slice_X.Append (Features_Dict.Element (Col_Name));
-         Next (Columns_Curs);
-      end loop;
-
-      --  L569
-      --        for index in  Col_Slice_Y.First_Index .. Col_Slice_Y.Last_Index loop
-      --           Feature_Index := Col_Slice_Y.Element (index);
-      --           Num_Missing := Integer'Value
-      --             (Get (aFeature, "number_of_missing_values"));
-      --           Assert (Num_Missing >= 0,
-      --                   Routine_Name & "Target column " & " has " & " missing values."
-      --                   & "Missing values are not supported for target columns.");
-      --        end loop;
 
       --  L582
       --        if Sparse then
@@ -197,7 +178,7 @@ package body Openml_Ada is
       --  L278
       X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
       Y := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
-      Printing.Print_Value_Data_List (Routine_Name & "X(1)", X.First_Element);
+--        Printing.Print_Value_Data_List (Routine_Name & "X(1)", X.First_Element);
       --  L672
       if not X_Y_Only then
          Put_Line (Routine_Name & "Parse_Nominal_Data");
@@ -554,7 +535,7 @@ package body Openml_Ada is
       use Integer_DLL_Package;
       use Value_Data_Package;
       use Value_Lists_Data_Package;
-      Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
+--        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Value_Data_Lists_2D;
       Include_Curs  : Integer_DLL_Package.Cursor;
       Arff_Data_Row : Value_Data_List;  --  list of columns
@@ -563,8 +544,6 @@ package body Openml_Ada is
       for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
          New_Row.Clear;
          Arff_Data_Row := Arff_Data.Element (row);
-            Printing.Print_Value_Data_List (Routine_Name &
-                                              "Arff_Data_Row", Arff_Data_Row);
          Include_Curs := Include_Columns.First;
          while Has_Element (Include_Curs) loop
             declare
