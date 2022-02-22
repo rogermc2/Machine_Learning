@@ -29,12 +29,14 @@ procedure Lesson_4 is
    use Load_ARFF_Data;
    use Decision_Tree_Classification;
    Routine_Name  : constant String := "Lesson_4 ";
-   --     Dataset_File  : constant String := "../mnist_784.arff";
-   --     Save_File     : constant String := "mnist_784.oml";
-   --     State_File    : constant String := "mnist_784.sta";
+--     Dataset_File  : constant String := "../mnist_784.arff";
+--     Save_File     : constant String := "mnist_784.oml";
+--     State_File    : constant String := "mnist_784.sta";
+--     Return_X_Y    : constant Boolean := True;
    Dataset_File  : constant String := "../diabetes.arff";
    Save_File     : constant String := "diabetes.oml";
    State_File    : constant String := "diabetes.sta";
+   Return_X_Y    : constant Boolean := False;
    Min_Split     : constant String := "2";
    As_Frame      : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    Bunch         : Openml_Ada.Bunch_Data;
@@ -109,7 +111,7 @@ begin
                                Y                 => Y,
                                Bunch             => Bunch,
                                As_Frame          => As_Frame,
-                               Return_X_Y        => False);
+                               Return_X_Y        => Return_X_Y);
       Num_Samples := Positive (X.Length);
       Test_Size := Num_Samples / 4;
       Train_Size := Num_Samples - Test_Size;
@@ -140,7 +142,9 @@ begin
       Save_State (Test_X, Test_Y, Train_X, Train_Y, Bunch);
    end if;
 
-   Printing.Print_Strings ("Features", Bunch.Feature_Names);
+   if not Return_X_Y then
+        Printing.Print_Strings ("Features", Bunch.Feature_Names);
+   end if;
    ARFF_Printing.Print_Data ("Train features row 16", Train_X.Element (16));
    ARFF_Printing.Print_Data ("Test features row 16", Test_X.Element (16));
    New_Line;
