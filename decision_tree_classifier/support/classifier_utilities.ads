@@ -66,6 +66,9 @@ package Classifier_Utilities is
                                    return ML_Types.Value_Data_Lists_2D;
    function To_Value_2D_List (A : ML_Types.Value_Data_List)
                               return ML_Types.Value_Data_Lists_2D;
+   function To_Value_2D_List (List_1D  : ML_Types.Value_Data_List;
+                              Num_Rows : Positive)
+                              return ML_Types.Value_Data_Lists_2D;
    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
                        return  ML_Types.Value_Data_Lists_2D;
    function Traverse_Tree (Current_Node : Tree.Tree_Cursor)

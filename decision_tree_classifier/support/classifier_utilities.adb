@@ -887,6 +887,37 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function To_Value_2D_List (List_1D  : ML_Types.Value_Data_List;
+                              Num_Rows : Positive)
+                              return ML_Types.Value_Data_Lists_2D is
+      Routine_Name : constant String :=
+                       "Classifier_Utilities.To_Value_2D_List ";
+      Length_1D    : constant Positive := Positive (List_1D.Length);
+      Num_Cols     : constant Positive := Length_1D / Num_Rows;
+      End_Offset   : constant Positive := Num_Cols - 1;
+      Start        : Positive := List_1D.First_Index;
+      Column_List  : Value_Data_List;
+      List_2D      : Value_Data_Lists_2D;
+   begin
+      Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
+                Integer'Image (Num_Rows) & " is incompatible with List_1D size"
+              & Integer'Image (Length_1D));
+
+      for index in 1 .. Num_Rows loop
+         Column_List.Clear;
+         for col in Start .. Start + End_Offset loop
+            Column_List.Append (List_1D (col));
+         end loop;
+         List_2D.Append (Column_List);
+         Start := Start + Num_Cols;
+      end loop;
+
+      return List_2D;
+
+   end To_Value_2D_List;
+
+   --  -------------------------------------------------------------------------
+
    function Transpose (Values : ML_Types.Value_Data_Lists_2D)
                        return  ML_Types.Value_Data_Lists_2D is
       use Ada.Containers;
