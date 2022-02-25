@@ -30,7 +30,7 @@ package body Plotting is
       
    end gray_cmap;
 
-   procedure Plot is
+   procedure Plot (Bitmap : ML_Types.Integer_List_2D) is
       image  : Real_Matrix(0 .. 310, 0 .. 239);
    begin
       Initialize_PLplot;
