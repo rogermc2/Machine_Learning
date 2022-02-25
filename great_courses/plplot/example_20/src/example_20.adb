@@ -43,15 +43,14 @@ procedure Example_20 is
     PLK_Return : constant unsigned := 16#0D#;
     dbg : Integer := 0;
     nosombrero : Integer := 0;
-    nointeractive : Integer := 0;
+   
     x : Real_Vector(0 .. XDIM - 1);
     y : Real_Vector(0 .. YDIM - 1);
     z, r : Real_Matrix(0 .. XDIM - 1, 0 .. YDIM - 1);
-    xi, yi, xe, ye : Long_Float;
     width, height, num_col : Integer;
     img_f : Real_Matrix(0 .. 310, 0 .. 239); -- Chloe is width 311, height 240.
     img_min, img_max : Long_Float;
-    Get_Clip_Return : Integer;
+   
     type stretch_data is
         record
             xmin, xmax, ymin, ymax : Long_Float;
@@ -208,7 +207,7 @@ procedure Example_20 is
 
 
     -- Set gray colormap.
-    procedure gray_cmap(num_col : Integer) is
+    procedure gray_cmap (num_col : Integer) is
         r, g, b, pos : Real_Vector(0 .. 1);
     begin
         r(0) := 0.0;
@@ -242,11 +241,6 @@ procedure Example_20 is
     end mypltr;
 
 begin
-
-    -- Parse and process command line arguments
---      Parse_Command_Line_Arguments(Parse_Full);
-
-    -- Initialize plplot
     Initialize_PLplot;
 
     -- View image border pixels.
@@ -335,57 +329,12 @@ begin
 
     -- Display Chloe.
     Set_Environment(1.0, Long_Float(width), 1.0, Long_Float(height), Justified, Box);
-
-    if nointeractive = 0 then
-        Write_Labels("Set and drag Button 1 to (re)set selection, Button 2 to finish."," ","Chloe...");
-    else
-        Write_Labels(""," ","Chloe...");
-    end if;
+    Write_Labels (""," ","Chloe...");
 
     Draw_Image_Color_Map_1_Automatic(img_f, 1.0, Long_Float(width), 1.0, Long_Float(height), 0.0, 0.0, 1.0,
         Long_Float(width), 1.0, Long_Float(height));
 
     -- Selection/expansion demo
-    if nointeractive = 0 then
-        xi := 25.0;
-        xe := 130.0;
-        yi := 235.0;
-        ye := 125.0;
-
-        get_clip (xi, xe, yi, ye, Get_Clip_Return); -- get selection rectangle
-        if Get_Clip_Return /= 0 then
-            End_PLplot;
-        end if;
-
-        -- I'm unable to continue, clearing the plot and advancing to the next
-        -- one, without hiting the enter key, or pressing the button... help!
-
-        -- Forcing the xwin driver to leave locate mode and destroying the
-        -- xhairs (in GetCursorCmd()) solves some problems, but I still have
-        -- to press the enter key or press Button-2 to go to next plot, even
-        -- if a Advance_To_Subpage() is not present!  Using Begin_New_Page() solves the problem, but
-        -- it shouldn't be needed!
-
-        -- Begin_New_Page();
-
-        -- Set_Pause(0), Advance_To_Subpage(Next_Subpage), Set_Pause(1), also works,
-        -- but the above question remains.
-        -- With this approach, the previous pause state is lost,
-        -- as there is no API call to get its current state.
-
-        Set_Pause(False);
-        Advance_To_Subpage(Next_Subpage);
-
-        -- Display selection only.
-        Draw_Image_Color_Map_1_Automatic(img_f, 1.0, Long_Float(width), 1.0, Long_Float(height), 0.0, 0.0, xi, xe, ye, yi);
-
-        Set_Pause(True);
-
-        -- Zoom in selection.
-        Set_Environment(xi, xe, ye, yi, Justified, Box);
-        Draw_Image_Color_Map_1_Automatic(img_f, 1.0, Long_Float(width), 1.0, Long_Float(height), 0.0, 0.0, xi, xe, ye, yi);
-    end if;
-
     -- Base the dynamic range on the image contents.
     img_min := Matrix_Min(img_f);
     img_max := Matrix_Max(img_f);
