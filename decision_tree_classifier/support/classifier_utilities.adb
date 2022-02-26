@@ -869,12 +869,11 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   function To_PL_Array (List_1D  : AR_Types.AR_Real_List;
-                              Num_Rows : Positive)
-                              return PLplot_Auxiliary.Real_Matrix is
+   function To_PL_Array (List_1D : AR_Types.AR_Real_List; Num_Rows : Positive)
+                         return PLplot_Auxiliary.Real_Matrix is
       use PLplot_Auxiliary;
       Routine_Name : constant String :=
-                       "Classifier_Utilities.To_Value_2D_List ";
+                       "Classifier_Utilities.To_PL_Array ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
       Num_Cols     : constant Positive := Length_1D / Num_Rows;
       End_Offset   : constant Positive := Num_Cols - 1;
@@ -887,7 +886,7 @@ package body Classifier_Utilities is
 
       for row in 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
-            Result (row, col) := List_1D (col);
+            Result (row, col) := Long_Float (List_1D.Element (col));
          end loop;
          Start := Start + Num_Cols;
       end loop;

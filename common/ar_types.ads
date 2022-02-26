@@ -50,10 +50,6 @@ package AR_Types is
       Attributes : Attribute_List;    --  'attributes': []
    end record;
 
-   package AR_Boolean_Package is new
-     Ada.Containers.Vectors (Positive, Boolean);
-   subtype AR_Boolean_List is AR_Boolean_Package.Vector;
-
    package AR_Integer_Package is new
      Ada.Containers.Vectors (Positive, Integer);
    subtype AR_Integer_List is AR_Integer_Package.Vector;
@@ -80,6 +76,22 @@ package AR_Types is
    package AR_Data_Package_2D is new
      Ada.Containers.Vectors (Positive, AR_Data_List);
    subtype AR_Data_List_2D is AR_Data_Package_2D.Vector;
+
+   type AR_Data_List_Type is (Int_List_Type, Real_List_Type, String_List_Type,
+                              Nominal_List_Type);
+
+   type List_Record (List_Kind : AR_Data_List_Type) is record
+      case List_Kind is
+         when Int_List_Type => Integer_List : AR_Integer_List;
+         when Real_List_Type => Real_List : AR_Real_List;
+         when String_List_Type => String_List : AR_UB_String_List;
+         when Nominal_List_Type => Nominal_List : Nominal_Data_List;
+      end case;
+   end record;
+
+   package AR_Indef_Data_Package_2D is new
+     Ada.Containers.Indefinite_Vectors (Positive, List_Record);
+   subtype AR_Indef_List_2D is AR_Indef_Data_Package_2D.Vector;
 
    --  L783 declaration of return object obj
    type ARFF_Record is record
