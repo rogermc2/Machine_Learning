@@ -95,8 +95,9 @@ package AR_Types is
 
    --  L783 declaration of return object obj
    type ARFF_Record is record
-      Header : ARFF_Header_Record;
-      Data   : AR_Data_List_2D;    --  'data': []
+      Header  : ARFF_Header_Record;
+      Data    : AR_Data_List_2D;    --  'data': []
+      Columns : AR_Indef_List_2D;   --  List of columns
    end record;
 
 end AR_Types;
