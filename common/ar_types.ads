@@ -62,6 +62,11 @@ package AR_Types is
      Ada.Containers.Vectors (Positive, Float);
    subtype AR_Real_List is AR_Real_Package.Vector;
 
+   use AR_Real_Package;
+   package AR_Real_Package_2D is new
+     Ada.Containers.Vectors (Positive, AR_Real_List);
+   subtype AR_Real_List_2D is AR_Real_Package_2D.Vector;
+
    package AR_UB_String_Package is new
      Ada.Containers.Vectors (Positive, Unbounded_String);
    subtype AR_UB_String_List is AR_UB_String_Package.Vector;
