@@ -23,7 +23,7 @@ package body Plotting is
       Num_Rows    : constant Positive := Positive (Bitmap.Length);
       Num_Cols    : constant Positive := Positive (Bitmap.Element (1).Length);
       Num_Colours : constant Integer := 255;
-      Image       : Real_Matrix(0 .. Num_Rows - 1, 0 .. Num_Cols - 1);
+      Image       : Real_Matrix (0 .. Num_Rows - 1, 0 .. Num_Cols - 1);
    begin
       Initialize_PLplot;
       Set_Grey_Colourmap (Num_Colours);

@@ -2,6 +2,7 @@
 with Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with AR_Types;
 with Load_ARFF_Data;
 with Load_ARFF_Data.ARFF_IO;
 with Load_ARFF_Data.ARFF_Printing;
@@ -16,7 +17,7 @@ procedure Test_ARFF is
 --     Ada_File     : constant String := "../mnist_784.ada";
    File_Name    : constant String := "../iris.arff";
    Ada_File     : constant String := "../iris.ada";
-   Data         : ARFF_Record;
+   Data         : AR_Types.ARFF_Record;
 begin
    Put_Line (Routine_Name);
    if Exists (Ada_File) then
