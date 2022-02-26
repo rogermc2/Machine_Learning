@@ -2,7 +2,6 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
 with AR_Types;
-with ML_Types;
 
 package Data_Splitter is
 
@@ -22,10 +21,10 @@ private
       Test_Size         : Natural := 0;
       Default_Test_Size : Natural := 0;
       Train_Size        : Natural := 0;
-      X_Train_Set       : ML_Types.Value_Data_Lists_2D;
-      Y_Train_Set       : ML_Types.Value_Data_Lists_2D;
-      X_Test_Set        : ML_Types.Value_Data_Lists_2D;
-      Y_Test_Set        : ML_Types.Value_Data_Lists_2D;
+      X_Train_Set       : AR_Types.AR_Data_List_2D;
+      Y_Train_Set       : AR_Types.AR_Data_List_2D;
+      X_Test_Set        : AR_Types.AR_Data_List_2D;
+      Y_Test_Set        : AR_Types.AR_Data_List_2D;
    end record;
 
 end Data_Splitter;
