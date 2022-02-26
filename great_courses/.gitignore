@@ -5,4 +5,5 @@
 *.oml
 *.bin
 *.sta
+*.arff
 obj/*

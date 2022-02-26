@@ -7,11 +7,10 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+with AR_Types;
 with ML_Types;
 
 with Base_Decision_Tree;
---  with Classifier_Types;
-with Classifier_Utilities;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
@@ -26,8 +25,8 @@ procedure Lesson_4 is
    use Ada.Containers;
    use Ada.Directories;
    use Maths.Float_Math_Functions;
-   use ML_Types;
-   use String_Package;
+   use AR_Types;
+   use ML_Types.String_Package;
    use Load_ARFF_Data;
    use Decision_Tree_Classification;
    Routine_Name   : constant String := "Lesson_4 ";
@@ -42,16 +41,16 @@ procedure Lesson_4 is
    Min_Split      : constant String := "2";
    As_Frame       : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    Bunch          : Openml_Ada.Bunch_Data;
-   X              : Value_Data_Lists_2D;  --  rows of columns of values
-   Y              : Value_Data_Lists_2D;
+   X              : AR_Data_List_2D;  --  rows of columns of values
+   Y              : AR_Data_List_2D;
    Num_Samples    : Positive;
    Test_Size      : Positive;
    Train_Size     : Positive;
-   Test_X         : Value_Data_Lists_2D;
-   Test_Y         : Value_Data_Lists_2D;
-   Train_X        : Value_Data_Lists_2D;
-   Train_Y        : Value_Data_Lists_2D;
-   Image          : Value_Data_Lists_2D;
+   Test_X         : AR_Data_List_2D;
+   Test_Y         : AR_Data_List_2D;
+   Train_X        : AR_Data_List_2D;
+   Train_Y        : AR_Data_List_2D;
+--     Image          : AR_Data_List_2D;
    Num_Image_Rows : Positive;
    aClassifier    : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
@@ -61,7 +60,7 @@ procedure Lesson_4 is
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
    procedure Get_State
      (Saved_Test_X, Saved_Test_Y, Saved_Train_X, Saved_Train_Y :
-      out Value_Data_Lists_2D;
+      out AR_Data_List_2D;
       Saved_Bunch                                              :
       out Openml_Ada.Bunch_Data) is
       use Ada.Streams;
@@ -72,10 +71,10 @@ procedure Lesson_4 is
    begin
       Open (File_ID, In_File, State_File);
       aStream := Stream (File_ID);
-      Value_Data_Lists_2D'Read (aStream, Saved_Test_X);
-      Value_Data_Lists_2D'Read (aStream, Saved_Test_Y);
-      Value_Data_Lists_2D'Read (aStream, Saved_Train_X);
-      Value_Data_Lists_2D'Read (aStream, Saved_Train_Y);
+      AR_Data_List_2D'Read (aStream, Saved_Test_X);
+      AR_Data_List_2D'Read (aStream, Saved_Test_Y);
+      AR_Data_List_2D'Read (aStream, Saved_Train_X);
+      AR_Data_List_2D'Read (aStream, Saved_Train_Y);
       Openml_Ada.Bunch_Data'Read (aStream, Saved_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
@@ -83,8 +82,9 @@ procedure Lesson_4 is
    end Get_State;
 
    procedure Save_State
-     (Save_Test_X, Save_Test_Y, Save_Train_X, Save_Train_Y : Value_Data_Lists_2D;
-      Save_Bunch                                           : Openml_Ada.Bunch_Data) is
+     (Save_Test_X, Save_Test_Y,
+      Save_Train_X, Save_Train_Y : AR_Data_List_2D;
+      Save_Bunch                 : Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "Lesson_4.Save_State ";
@@ -93,10 +93,10 @@ procedure Lesson_4 is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      Value_Data_Lists_2D'Write (aStream, Save_Test_X);
-      Value_Data_Lists_2D'Write (aStream, Save_Test_Y);
-      Value_Data_Lists_2D'Write (aStream, Save_Train_X);
-      Value_Data_Lists_2D'Write (aStream, Save_Train_Y);
+      AR_Data_List_2D'Write (aStream, Save_Test_X);
+      AR_Data_List_2D'Write (aStream, Save_Test_Y);
+      AR_Data_List_2D'Write (aStream, Save_Train_X);
+      AR_Data_List_2D'Write (aStream, Save_Train_Y);
       Openml_Ada.Bunch_Data'Write (aStream, Save_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
@@ -129,15 +129,14 @@ begin
       Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
                 "Y length" & Count_Type'Image (Y.Length) &
                 " is different to X length" & Natural'Image (Num_Samples));
-      Printing.Print_Value_Data_List ("Features row 16", X.Element (16));
+      Printing.Print_AR_Data_List ("Features row 16", X.Element (16));
 
       Put_Line (Routine_Name & "permuting");
       X := Permute (X);
       Put_Line (Routine_Name & "X permuted");
       Y := Permute (Y);
       Put_Line (Routine_Name & "Y permuted");
-      Printing.Print_Value_Data_List ("permuted features row 16",
-                                      X.Element (16));
+      Printing.Print_AR_Data_List ("permuted features row 16", X.Element (16));
 
       Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                       Test_X, Test_Y, Train_X, Train_Y);
@@ -163,8 +162,8 @@ begin
    Num_Image_Rows := Integer (Sqrt (Float (Train_X.Element (417).Length)));
    Put_Line (Routine_Name & "Num_Image_Rows: " &
                Integer'Image (Num_Image_Rows));
-   Image := Classifier_Utilities.To_Value_2D_List
-     (Train_X.Element (417), Num_Image_Rows);
+--     Image := Classifier_Utilities.To_Value_2D_List
+--       (Train_X.Element (417), Num_Image_Rows);
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 6);

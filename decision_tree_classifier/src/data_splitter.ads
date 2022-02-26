@@ -1,6 +1,7 @@
 
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
+with AR_Types;
 with ML_Types;
 
 package Data_Splitter is
@@ -11,8 +12,8 @@ package Data_Splitter is
      (Self : in out Base_Shuffle_Data; Num_Splits : Natural;
       Test_Size, Default_Test_Size, Train_Size : Natural);
    procedure Train_Test_Split
-     (X, Y : ML_Types.Value_Data_Lists_2D; Test_Size, Train_Size : Natural;
-      Test_X, Test_Y, Train_X, Train_Y : out ML_Types.Value_Data_Lists_2D);
+     (X, Y : AR_Types.AR_Data_List_2D; Test_Size, Train_Size : Natural;
+      Test_X, Test_Y, Train_X, Train_Y : out AR_Types.AR_Data_List_2D);
 
 private
 

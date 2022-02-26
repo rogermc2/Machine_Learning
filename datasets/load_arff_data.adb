@@ -51,6 +51,7 @@ package body Load_ARFF_Data is
                            Values : out ML_Types.Indef_String_List);
    function Split_Sparse_Line (Row : String) return ML_Types.Indef_String_List;
    procedure Swap (Data : in out ML_Types.Value_Data_Lists_2D; L, R : Positive);
+   procedure Swap (Data : in out AR_Data_List_2D; L, R : Positive);
    function Unquote (Values : String) return String;
 
    --  ------------------------------------------------------------------------
@@ -641,6 +642,25 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
+   function Permute (aList : AR_Data_List_2D) return AR_Data_List_2D is
+      List_Length  : constant Positive := Positive (aList.Length);
+      Rand         : Positive;
+      Permutation  : AR_Data_List_2D := aList;
+   begin
+      if List_Length > 1 then
+         for index in 1 .. List_Length - 1 loop
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Swap (Permutation, index, Rand);
+         end loop;
+      end if;
+
+      return Permutation;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    function Split_Sparse_Line (Row : String)
                                 return ML_Types.Indef_String_List is
       use GNAT.Regpat;
@@ -670,6 +690,16 @@ package body Load_ARFF_Data is
       return Result;
 
    end Split_Sparse_Line;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Swap (Data : in out AR_Data_List_2D; L, R : Positive) is
+      Item : AR_Data_List;
+   begin
+      Item := Data.Element (L);
+      Data.Replace_Element (L, Data.Element (R));
+      Data.Replace_Element (R, Item);
+   end Swap;
 
    --  -------------------------------------------------------------------------
 
