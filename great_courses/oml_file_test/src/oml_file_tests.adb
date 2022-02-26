@@ -2,6 +2,7 @@
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with AR_Types;
 with ML_Types;
 with Printing;
 
@@ -104,14 +105,14 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       use Ada.Containers;
       Routine_Name  : constant String := "Test_Fetch_OML ";
-      File_Name      : constant String := "../iris.arff";
-      Save_File     : constant String := "iris.oml";
---        File_Name     : constant String := "../mnist_784.arff";
---        Save_File     : constant String := "mnist_784.oml";
+--        File_Name      : constant String := "../diabetes.arff";
+--        Save_File     : constant String := "diabetes.oml";
+      File_Name     : constant String := "../mnist_784.arff";
+      Save_File     : constant String := "mnist_784.oml";
       As_Frame      : As_Frame_State := As_Frame_False;
       Target_Column : ML_Types.String_List;
-      X             : ML_Types.Value_Data_Lists_2D;
-      Y             : ML_Types.Value_Data_Lists_2D;
+      X             : AR_Types.AR_Data_List_2D;
+      Y             : AR_Types.AR_Data_List_2D;
       Bunch         : Bunch_Data;
    begin
       Put_Line (Routine_Name);
@@ -126,8 +127,8 @@ package body OML_File_Tests is
 
       Put_Line (Routine_Name & "X length: " & Count_Type'Image (X.Length));
       Put_Line (Routine_Name & "Y length: " & Count_Type'Image (Y.Length));
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & "X", X, 2);
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Y", Y, 2);
+      Printing.Print_AR_Data_Lists_2D (Routine_Name & "X", X, 2);
+      Printing.Print_AR_Data_Lists_2D (Routine_Name & "Y", Y, 2);
       Put_Line (Routine_Name & "completed");
 
       pragma Unreferenced (Bunch);
