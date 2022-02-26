@@ -1,4 +1,5 @@
 
+with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
 
@@ -129,14 +130,13 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
                          Last : Positive := 10) is
+      use AR_Data_Package;
+      use AR_Data_Package_2D;
       use ML_Types;
-      use Value_Data_Package;
-      use Value_Lists_Data_Package;
-
-      Data_List_2D : constant Value_Data_Lists_2D := Data.Data;
-      List_Curs    : Value_Lists_Data_Package.Cursor := Data_List_2D.First;
-      Data_List    : Value_Data_List;
-      Data_Curs    : Value_Data_Package.Cursor;
+      Data_List_2D : constant AR_Data_List_2D := Data.Data;
+      List_Curs    : AR_Data_Package_2D.Cursor := Data_List_2D.First;
+      Data_List    : AR_Data_List;
+      Data_Curs    : AR_Data_Package.Cursor;
       Count        : Natural := Start - 1;
       Count2       : Natural := 0;
    begin

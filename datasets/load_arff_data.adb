@@ -38,7 +38,7 @@ package body Load_ARFF_Data is
 
    procedure Decode_Nominal (Attribute      : Attribute_Record;
                              Value_String   : String;
-                             Decoded_Values : in out ML_Types.Value_Data_List);
+                             Decoded_Values : in out AR_Types.AR_Data_List);
    procedure Load_Attributes (File_ID : File_Type;
                               aLine   : in out Unbounded_String;
                               Header  : in out ARFF_Header_Record);
@@ -96,7 +96,7 @@ package body Load_ARFF_Data is
    --  L478
    function Decode_Dense_Values (Values     : ML_Types.Indef_String_List;
                                  Attributes : Attribute_List)
-                                  return ML_Types.Value_Data_List is
+                                  return AR_Types.AR_Data_List is
       use Ada.Containers;
       use Ada.Strings;
       use ML_Types;
@@ -107,7 +107,7 @@ package body Load_ARFF_Data is
       Values_Cursor  : Indefinite_String_Package.Cursor;
       ARFF_Data_Kind : ARFF_Data_Type;
       Attribute      : Attribute_Record;
-      Decoded_Values : Value_Data_List;
+      Decoded_Values : AR_Data_List;
    begin
       Assert (Values.Length = Attributes.Length, Routine_Name &
                 "invalid data, number of values" &
@@ -202,7 +202,7 @@ package body Load_ARFF_Data is
 
    procedure Decode_Nominal
      (Attribute       : Attribute_Record; Value_String : String;
-      Decoded_Values  : in out ML_Types.Value_Data_List) is
+      Decoded_Values  : in out AR_Types.AR_Data_List) is
       use ML_Types;
       use Nominal_Data_Package;
       use Dataset_Utilities;
