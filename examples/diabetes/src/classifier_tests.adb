@@ -44,7 +44,7 @@ package body Classifier_Tests is
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
       --  Y is 2D list num outputs x num classes
-      Y := To_Value_2D_List (Diabetes_Data.Label_Values);
+      Y := Diabetes_Data.Label_Values;
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
       --  L356
