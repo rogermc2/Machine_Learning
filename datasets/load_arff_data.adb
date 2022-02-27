@@ -108,9 +108,6 @@ package body Load_ARFF_Data is
       Values_Cursor  : Indefinite_String_Package.Cursor;
       ARFF_Data_Kind : ARFF_Data_Type;
       Attribute      : Attribute_Record;
-      Float_Value    : Float;
-      Int_Value      : Integer;
-      String_Value   : Unbounded_String;
       Decoded_Values : AR_Data_List;
    begin
       Assert (Values.Length = Attributes.Length, Routine_Name &
@@ -136,10 +133,8 @@ package body Load_ARFF_Data is
                      if Fixed.Index (Value_String, ".") /= 0 then
                         Value.Integer_Value :=
                           Integer (Float'Value (Value_String));
-                        Int_Value := Integer (Float'Value (Value_String));
                      else
                         Value.Integer_Value := Integer'Value (Value_String);
-                        Int_Value := Integer'Value (Value_String);
                      end if;
                      Decoded_Values.Append (Value);
                   end;
@@ -148,8 +143,8 @@ package body Load_ARFF_Data is
                   declare
                      Value : Value_Record (UB_String_Type);
                   begin
-                     Value.UB_String_Value := To_Unbounded_String (Value_String);
-                     String_Value := To_Unbounded_String (Value_String);
+                     Value.UB_String_Value :=
+                     To_Unbounded_String (Value_String);
                      Decoded_Values.Append (Value);
                   end;
 
@@ -159,7 +154,6 @@ package body Load_ARFF_Data is
                         Value : Value_Record (Integer_Type);
                      begin
                         Value.Integer_Value := Integer'Value (Value_String);
-                        Int_Value := Integer'Value (Value_String);
                         Decoded_Values.Append (Value);
                      end;
                   else
@@ -167,7 +161,6 @@ package body Load_ARFF_Data is
                         Value : Value_Record (Float_Type);
                      begin
                         Value.Float_Value := Float'Value (Value_String);
-                        Float_Value := Float'Value (Value_String);
                         Decoded_Values.Append (Value);
                      end;
                   end if;
@@ -183,10 +176,8 @@ package body Load_ARFF_Data is
                      if Fixed.Index (Value_String, ".") = 0 then
                         Value.Float_Value :=
                           Float (Integer'Value (Value_String));
-                        Float_Value := Float (Integer'Value (Value_String));
                      else
                         Value.Float_Value := Float'Value (Value_String);
-                        Float_Value := Float (Integer'Value (Value_String));
                      end if;
                      Decoded_Values.Append (Value);
                   end;
@@ -197,7 +188,6 @@ package body Load_ARFF_Data is
                   begin
                      Value.UB_String_Value :=
                        To_Unbounded_String (Value_String);
-                     String_Value := To_Unbounded_String (Value_String);
                      Decoded_Values.Append (Value);
                   end;
 
