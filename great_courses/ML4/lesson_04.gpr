@@ -11,8 +11,12 @@ project Lesson_04 is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-gnatwkmru", "-gnatyclux");
+      for Default_Switches ("ada") use ("-O2", "-gnatwkmru", "-gnatyclux");
    end Compiler;
+
+   package Linker is
+      for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
+   end Linker;
 
 end Lesson_04;
 

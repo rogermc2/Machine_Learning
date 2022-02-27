@@ -869,6 +869,35 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
+   function To_PL_Array (List_1D : AR_Types.AR_Data_List; Num_Rows : Positive)
+                         return PLplot_Auxiliary.Real_Matrix is
+      use PLplot_Auxiliary;
+      Routine_Name : constant String :=
+                       "Classifier_Utilities.To_PL_Array ";
+      Length_1D    : constant Positive := Positive (List_1D.Length);
+      Num_Cols     : constant Positive := Length_1D / Num_Rows;
+      End_Offset   : constant Positive := Num_Cols - 1;
+      Start        : Positive := List_1D.First_Index;
+      Result       : Real_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+   begin
+      Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
+                Integer'Image (Num_Rows) & " is incompatible with List_1D size"
+              & Integer'Image (Length_1D));
+
+      for row in reverse 1 .. Num_Rows loop
+         for col in Start .. Start + End_Offset loop
+            Result (col - Start + 1, row) :=
+              Long_Float (List_1D.Element (col).Float_Value);
+         end loop;
+         Start := Start + Num_Cols;
+      end loop;
+
+      return Result;
+
+   end To_PL_Array;
+
+   --  -------------------------------------------------------------------------
+
    function To_Value_2D_List (A : ML_Types.Value_Data_List)
                               return ML_Types.Value_Data_Lists_2D is
       Output_List : Value_Data_List;
@@ -882,6 +911,37 @@ package body Classifier_Utilities is
       end loop;
 
       return A2_List;
+
+   end To_Value_2D_List;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Value_2D_List (List_1D  : ML_Types.Value_Data_List;
+                              Num_Rows : Positive)
+                              return ML_Types.Value_Data_Lists_2D is
+      Routine_Name : constant String :=
+                       "Classifier_Utilities.To_Value_2D_List ";
+      Length_1D    : constant Positive := Positive (List_1D.Length);
+      Num_Cols     : constant Positive := Length_1D / Num_Rows;
+      End_Offset   : constant Positive := Num_Cols - 1;
+      Start        : Positive := List_1D.First_Index;
+      Column_List  : Value_Data_List;
+      List_2D      : Value_Data_Lists_2D;
+   begin
+      Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
+                Integer'Image (Num_Rows) & " is incompatible with List_1D size"
+              & Integer'Image (Length_1D));
+
+      for index in 1 .. Num_Rows loop
+         Column_List.Clear;
+         for col in Start .. Start + End_Offset loop
+            Column_List.Append (List_1D (col));
+         end loop;
+         List_2D.Append (Column_List);
+         Start := Start + Num_Cols;
+      end loop;
+
+      return List_2D;
 
    end To_Value_2D_List;
 

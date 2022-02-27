@@ -2,33 +2,27 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
+with ML_Types;
 
 package body Data_Splitter is
 
    procedure Iterate_Indices
-     (Self : in out Base_Shuffle_Data; X : ML_Types.String_List;
+     (Self : in out Base_Shuffle_Data; Num_Samples : Positive;
       Test_Indices, Train_Indices : out ML_Types.Integer_List);
 
    --  -------------------------------------------------------------------------
-   --  L1569 Shuffle_Split generates indices to split data into training and test set
+   --  L1569 Shuffle_Split generates indices to split data rows into training
+   --  and test sets
    procedure Base_Shuffle_Split
-     (Self : in out Base_Shuffle_Data; X : ML_Types.String_List;
+     (Self : in out Base_Shuffle_Data; Num_Samples : Positive;
       Test_Indices, Train_Indices : out ML_Types.Integer_List) is
    begin
-      Iterate_Indices (Self, X, Test_Indices, Train_Indices);
+      Iterate_Indices (Self, Num_Samples, Test_Indices, Train_Indices);
 
    end Base_Shuffle_Split;
-
-   --  -------------------------------------------------------------------------
-
---     procedure Base_Shuffle_Split (Self : in out Base_Shuffle_Data;
---                                   X, Y : ML_Types.Value_Data_Lists_2D) is
---     begin
---        null;
---     end Base_Shuffle_Split;
 
    --  -------------------------------------------------------------------------
 
@@ -46,13 +40,11 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
    --  L1706
    procedure Iterate_Indices
-     (Self : in out Base_Shuffle_Data; X : ML_Types.String_List;
+     (Self : in out Base_Shuffle_Data; Num_Samples : Positive;
       Test_Indices, Train_Indices : out ML_Types.Integer_List) is
       use ML_Types;
       use Integer_Package;
-      use String_Package;
-      Routine_Name  : constant String := "Utilities.Iterate_Indices ";
-      Num_Samples   : constant Positive := Positive (Length (X));
+      Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
       Num_Test      : constant Natural := Self.Test_Size;
       Num_Train     : constant Natural := Self.Train_Size;
       Perms         : Integer_List;
@@ -78,28 +70,32 @@ package body Data_Splitter is
 
    --  -------------------------------------------------------------------------
 
-   procedure Train_Test_Split (X, Y : ML_Types.String_List;
-                              Test_Size, Train_Size : Natural;
-                              Test, Train : out ML_Types.String_Vector) is
+   procedure Train_Test_Split
+     (X, Y : AR_Types.AR_Data_List_2D; Test_Size, Train_Size : Natural;
+      Test_X, Test_Y, Train_X, Train_Y : out AR_Types.AR_Data_List_2D) is
       use ML_Types;
-      use String_Package;
-      Routine_Name  : constant String := "Utilities.Train_Test_Split ";
-      Num_Samples   : constant Positive := Positive (Length (X));
+      use AR_Types;
+      use AR_Data_Package_2D;
+      Routine_Name  : constant String := "Data_Splitter.Train_Test_Split ";
+      Num_Samples   : constant Positive := Positive (X.Length);
       Shuffle_Data  : Base_Shuffle_Data;
-      X_Cursor      : Cursor := X.First;
-      Y_Cursor      : Cursor := Y.First;
-      X_Vec         : String_Vector;
-      Y_Vec         : String_Vector;
+      X_Cursor      : AR_Data_Package_2D.Cursor := X.First;
+      Y_Cursor      : AR_Data_Package_2D.Cursor := Y.First;
+      X_Vec         : AR_Data_List_2D;
+      Y_Vec         : AR_Data_List_2D;
       Test_Indices  : Integer_List;
       Train_Indices : Integer_List;
    begin
       Assert (Natural (Length (Y)) = Num_Samples, Routine_Name &
              "Y length" & Integer'Image (Integer (Length (Y))) &
              " is different to X length" & Natural'Image (Num_Samples));
+      Assert (Train_Size + Test_Size = Num_Samples, Routine_Name &
+                "Train_Size" & Integer'Image (Train_Size) & " + Test_Size" &
+                Integer'Image (Test_Size) &
+                " should equal Num_Samples " & Natural'Image (Num_Samples));
 
       Init_Base_Shuffle_Split (Shuffle_Data, 1, Test_Size, Num_Samples / 4,
                                Train_Size);
-      Put_Line (Routine_Name);
 
       while Has_Element (X_Cursor) loop
             X_Vec.Append (Element (X_Cursor));
@@ -107,18 +103,18 @@ package body Data_Splitter is
             Next (X_Cursor);
             Next (Y_Cursor);
       end loop;
-      Put_Line (Routine_Name);
 
-      Base_Shuffle_Split (Shuffle_Data, X, Test_Indices, Train_Indices);
+      Base_Shuffle_Split (Shuffle_Data, Num_Samples, Test_Indices,
+                          Train_Indices);
 
       for index in Test_Indices.First_Index .. Test_Indices.Last_Index loop
-            Test.Append (X_Vec.Element (Test_Indices (index)));
-            Train.Append (X_Vec.Element (Test_Indices (index)));
+            Test_X.Append (X_Vec.Element (Test_Indices (index)));
+            Test_Y.Append (Y_Vec.Element (Test_Indices (index)));
       end loop;
 
       for index in Train_Indices.First_Index .. Train_Indices.Last_Index loop
-            Train.Append (X_Vec.Element (Train_Indices (index)));
-            Train.Append (Y_Vec.Element (Train_Indices (index)));
+            Train_X.Append (X_Vec.Element (Train_Indices (index)));
+            Train_Y.Append (Y_Vec.Element (Train_Indices (index)));
       end loop;
 
    end Train_Test_Split;

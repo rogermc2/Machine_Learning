@@ -3,4 +3,7 @@
 *.dot
 *.ada
 *.oml
+*.bin
+*.sta
+*.arff
 obj/*

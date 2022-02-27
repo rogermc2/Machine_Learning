@@ -6,6 +6,64 @@ package body Printing is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_AR_Data_List (Name    : String;
+                                 theList : AR_Types.AR_Data_List) is
+      use ML_Types;
+      Value : Value_Record;
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name);
+      end if;
+
+      Put_Line ("List length: " & Integer'Image (Integer (theList.Length)));
+      for Index in theList.First_Index .. theList.Last_Index loop
+         Value := theList.Element (Index);
+         Put ("   ");
+         Print_Value_Record ("", Value);
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_AR_Data_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_AR_Data_Lists_2D
+     (Name      : String; theList : AR_Types.AR_Data_List_2D;
+      Num_Items : Positive := 1000) is
+      Items : Positive;
+   begin
+      if Name'Length > 0 then
+         Put_Line (Name);
+      end if;
+
+      if Integer (theList.Length) = 0 then
+         Put_Line ("List is empty");
+
+      elsif Integer (theList.Element (1).Length) = 0 then
+         Put_Line ("First data list is empty");
+
+      else
+         Items := Positive (theList.Last_Index);
+         if Items > Num_Items then
+            Items := Num_Items;
+         end if;
+
+         for index in theList.First_Index .. Items loop
+            Print_AR_Data_List (Integer'Image (index) & ":",
+                                   theList.Element (index));
+         end loop;
+      end if;
+
+   end Print_AR_Data_Lists_2D;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Boolean_Matrix (Name    : String;
                                    aMatrix : Estimator.Boolean_Matrix) is
    begin
@@ -285,7 +343,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List (Name : String;
+   procedure Print_Integer_List (Name    : String;
                                  theList : ML_Types.Integer_List) is
       Count : Integer := 1;
    begin
@@ -315,6 +373,28 @@ package body Printing is
             New_Line;
             Count := 1;
          end if;
+      end loop;
+      New_Line;
+
+   end Print_Integer_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_List (Name    : String;
+                                 theList : ML_Types.Integer_DL_List) is
+      use ML_Types.Integer_DLL_Package;
+      Curs  : Cursor := theList.First;
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      while Has_Element (Curs) loop
+         Put (Integer'Image (Element (Curs)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
       end loop;
       New_Line;
 
