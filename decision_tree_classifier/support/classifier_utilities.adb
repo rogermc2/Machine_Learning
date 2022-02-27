@@ -886,8 +886,6 @@ package body Classifier_Utilities is
 
       for row in 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
-            Put_Line (Routine_Name & "row, col: " &
-                  Integer'Image (row) & ", " & Integer'Image (col));
             Result (row, col - Start + 1) :=
               Long_Float (List_1D.Element (col).Float_Value);
          end loop;

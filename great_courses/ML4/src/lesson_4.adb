@@ -18,7 +18,7 @@ with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
-with Load_ARFF_Data;
+--  with Load_ARFF_Data;
 with Openml_Ada;
 with Plotting;
 with Printing;
@@ -31,7 +31,7 @@ procedure Lesson_4 is
    use Maths.Float_Math_Functions;
    use AR_Types;
    use ML_Types.String_Package;
-   use Load_ARFF_Data;
+--     use Load_ARFF_Data;
    use Decision_Tree_Classification;
    Routine_Name   : constant String := "Lesson_4 ";
    Dataset_File   : constant String := "../mnist_784.arff";
@@ -132,15 +132,15 @@ begin
       Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
                 "Y length" & Count_Type'Image (Y.Length) &
                 " is different to X length" & Natural'Image (Num_Samples));
-      Printing.Print_AR_Data_List ("Features row 16", X.Element (16));
+--        Printing.Print_AR_Data_List ("Features row 16", X.Element (16));
 
-      Put_Line (Routine_Name & "permuting");
-      X := Permute (X);
-      Put_Line (Routine_Name & "X permuted");
-      Y := Permute (Y);
-      Put_Line (Routine_Name & "Y permuted");
-      Printing.Print_AR_Data_List ("permuted features row 16", X.Element (16));
-
+--        Put_Line (Routine_Name & "permuting");
+--        X := Permute (X);
+--        Put_Line (Routine_Name & "X permuted");
+--        Y := Permute (Y);
+--        Put_Line (Routine_Name & "Y permuted");
+--        Printing.Print_AR_Data_List ("permuted features row 16", X.Element (16));
+      Put_Line (Routine_Name & "splitting data");
       Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                       Test_X, Test_Y, Train_X, Train_Y);
       --     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
@@ -168,16 +168,20 @@ begin
    declare
       Image : PLplot_Auxiliary.Real_Matrix (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
    begin
+      Put_Line (Routine_Name & "Plotting");
       Image := Classifier_Utilities.To_PL_Array
-        (Train_X.Element (417), Num_Image_Rows);
+        (Train_X.Element (2), Num_Image_Rows);
+      Plotting.Plot (Image);
+      Image := Classifier_Utilities.To_PL_Array
+        (Test_X.Element (2), Num_Image_Rows);
       Plotting.Plot (Image);
    end;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 6);
 
-   --     --  Fit function adjusts weights according to data values so that
-   --     --  better accuracy can be achieved
+   --  Fit function adjusts weights according to data values so that
+   --  better accuracy can be achieved
    --      Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
    --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    --     Put_Line ("----------------------------------------------");
