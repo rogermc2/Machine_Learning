@@ -26,18 +26,15 @@ package body Classification is
       use Classifier_Utilities;
       use Decision_Tree_Classification;
       use Printing;
---        use ML_Types.String_Package;
       use Classifier_Types.Float_Package;
       Routine_Name    : constant String :=
                           "Classification.Classify_Iris ";
       Iris_Data       : constant Multi_Output_Data_Record :=
                             Load_Data ("src/iris.csv");
---        Feature_Names   : constant String_List := Iris_Data.Feature_Names;
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Float_Type, Tree.Float_Type, Tree.Float_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
       Class_Names     : Class_Names_List;
---        Names_Cursor    : String_Package.Cursor := Feature_Names.First;
       Features        : Feature_Names_List;
       Iris_Features   : constant Value_Data_Lists_2D :=
                           Iris_Data.Feature_Values;
@@ -50,12 +47,6 @@ package body Classification is
       Class_Names.Append (To_Unbounded_String ("Setosa"));
       Class_Names.Append (To_Unbounded_String ("Versicolour"));
       Class_Names.Append (To_Unbounded_String ("Virginica"));
-
---        while Has_Element (Names_Cursor) loop
---           Features.Append (Element (Names_Cursor));
---           Next (Names_Cursor);
---        end loop;
---        Printing.Print_Unbounded_List (Routine_Name & "Features", Features);
 
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
