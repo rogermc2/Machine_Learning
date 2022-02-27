@@ -884,9 +884,9 @@ package body Classifier_Utilities is
                 Integer'Image (Num_Rows) & " is incompatible with List_1D size"
               & Integer'Image (Length_1D));
 
-      for row in 1 .. Num_Rows loop
+      for row in reverse 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
-            Result (row, col - Start + 1) :=
+            Result (col - Start + 1, row) :=
               Long_Float (List_1D.Element (col).Float_Value);
          end loop;
          Start := Start + Num_Cols;

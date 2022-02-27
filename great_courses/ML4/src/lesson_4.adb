@@ -170,10 +170,10 @@ begin
    begin
       Put_Line (Routine_Name & "Plotting");
       Image := Classifier_Utilities.To_PL_Array
-        (Train_X.Element (2), Num_Image_Rows);
+        (Train_X.Element (4), Num_Image_Rows);
       Plotting.Plot (Image);
       Image := Classifier_Utilities.To_PL_Array
-        (Test_X.Element (2), Num_Image_Rows);
+        (Test_X.Element (4), Num_Image_Rows);
       Plotting.Plot (Image);
    end;
 
