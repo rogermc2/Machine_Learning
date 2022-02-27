@@ -7,20 +7,20 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with PLplot_Auxiliary;
+--  with PLplot_Auxiliary;
 
 with AR_Types;
 with ML_Types;
 
 with Base_Decision_Tree;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
 --  with Load_ARFF_Data;
 with Openml_Ada;
-with Plotting;
+--  with Plotting;
 with Printing;
 with Tree;
 --  with Weights;
@@ -162,29 +162,29 @@ begin
    --     Printing.Print_Value_Data_List ("Train features row 417",
    --                                     Train_X.Element (417));
 
-   Num_Image_Rows := Integer (Sqrt (Float (Train_X.Element (417).Length)));
-   Put_Line (Routine_Name & "Num_Image_Rows: " &
-               Integer'Image (Num_Image_Rows));
-   declare
-      Image : PLplot_Auxiliary.Real_Matrix (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
-   begin
-      Put_Line (Routine_Name & "Plotting");
-      Image := Classifier_Utilities.To_PL_Array
-        (Train_X.Element (4), Num_Image_Rows);
-      Plotting.Plot (Image);
-      Image := Classifier_Utilities.To_PL_Array
-        (Test_X.Element (4), Num_Image_Rows);
-      Plotting.Plot (Image);
-   end;
+--     Num_Image_Rows := Integer (Sqrt (Float (Train_X.Element (417).Length)));
+--     Put_Line (Routine_Name & "Num_Image_Rows: " &
+--                 Integer'Image (Num_Image_Rows));
+--     declare
+--        Image : PLplot_Auxiliary.Real_Matrix (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
+--     begin
+--        Put_Line (Routine_Name & "Plotting");
+--        Image := Classifier_Utilities.To_PL_Array
+--          (Train_X.Element (4), Num_Image_Rows);
+--        Plotting.Plot (Image);
+--        Image := Classifier_Utilities.To_PL_Array
+--          (Test_X.Element (4), Num_Image_Rows);
+--        Plotting.Plot (Image);
+--     end;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 6);
 
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
-   --      Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
-   --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
-   --     Put_Line ("----------------------------------------------");
+   Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
+   Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   Put_Line ("----------------------------------------------");
    New_Line;
    --
    --     for index in Train_Data.First_Index .. Train_Data.Last_Index loop
