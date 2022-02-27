@@ -68,9 +68,12 @@ package AR_Types is
    subtype AR_UB_String_List is AR_UB_String_Package.Vector;
 
    function "=" (L, R : ML_Types.Value_Record) return Boolean;
+   function "<" (L, R : ML_Types.Value_Record) return Boolean;
    package AR_Data_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, ML_Types.Value_Record);
    subtype AR_Data_List is AR_Data_Package.Vector;
+   package AR_Data_Sorting is new
+     AR_Data_Package.Generic_Sorting ("<");
 
    use AR_Data_Package;
    package AR_Data_Package_2D is new
