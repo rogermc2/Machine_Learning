@@ -14,5 +14,9 @@ project Lesson_04 is
       for Default_Switches ("ada") use ("-gnatwkmru", "-gnatyclux");
    end Compiler;
 
+   package Linker is
+      for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
+   end Linker;
+
 end Lesson_04;
 

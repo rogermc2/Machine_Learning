@@ -7,16 +7,20 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+with PLplot_Auxiliary;
+
 with AR_Types;
 with ML_Types;
 
 with Base_Decision_Tree;
+with Classifier_Utilities;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter;
 with Load_ARFF_Data;
 with Openml_Ada;
+with Plotting;
 with Printing;
 with Tree;
 --  with Weights;
@@ -34,10 +38,10 @@ procedure Lesson_4 is
    Save_File      : constant String := "mnist_784.oml";
    State_File     : constant String := "mnist_784.sta";
    Return_X_Y     : constant Boolean := True;
---        Dataset_File  : constant String := "../diabetes.arff";
---        Save_File     : constant String := "diabetes.oml";
---        State_File    : constant String := "diabetes.sta";
---        Return_X_Y    : constant Boolean := False;
+   --        Dataset_File  : constant String := "../diabetes.arff";
+   --        Save_File     : constant String := "diabetes.oml";
+   --        State_File    : constant String := "diabetes.sta";
+   --        Return_X_Y    : constant Boolean := False;
    Min_Split      : constant String := "2";
    As_Frame       : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    Bunch          : Openml_Ada.Bunch_Data;
@@ -50,7 +54,6 @@ procedure Lesson_4 is
    Test_Y         : AR_Data_List_2D;
    Train_X        : AR_Data_List_2D;
    Train_Y        : AR_Data_List_2D;
---     Image          : AR_Data_List_2D;
    Num_Image_Rows : Positive;
    aClassifier    : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
@@ -156,14 +159,19 @@ begin
    New_Line;
 
    Put_Line ("Train_X length: " & Count_Type'Image (Train_X.Length));
---     Printing.Print_Value_Data_List ("Train features row 417",
---                                     Train_X.Element (417));
+   --     Printing.Print_Value_Data_List ("Train features row 417",
+   --                                     Train_X.Element (417));
 
    Num_Image_Rows := Integer (Sqrt (Float (Train_X.Element (417).Length)));
    Put_Line (Routine_Name & "Num_Image_Rows: " &
                Integer'Image (Num_Image_Rows));
---     Image := Classifier_Utilities.To_Value_2D_List
---       (Train_X.Element (417), Num_Image_Rows);
+   declare
+      Image : PLplot_Auxiliary.Real_Matrix (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
+   begin
+      Image := Classifier_Utilities.To_PL_Array
+        (Train_X.Element (417), Num_Image_Rows);
+      Plotting.Plot (Image);
+   end;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 6);

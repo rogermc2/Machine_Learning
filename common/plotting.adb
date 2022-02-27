@@ -1,7 +1,6 @@
 
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with PLplot_Auxiliary; use PLplot_Auxiliary;
 with PLplot_Standard; use PLplot_Standard;
 
 package body Plotting is
@@ -19,11 +18,10 @@ package body Plotting is
    
    --  -------------------------------------------------------------------------
 
-   procedure Plot (Bitmap : ML_Types.Integer_List_2D) is
-      Num_Rows    : constant Positive := Positive (Bitmap.Length);
-      Num_Cols    : constant Positive := Positive (Bitmap.Element (1).Length);
+   procedure Plot (Bitmap : Real_Matrix) is
+      Num_Rows    : constant Positive := Positive (Bitmap'Length);
+      Num_Cols    : constant Positive := Positive (Bitmap'Length (2));
       Num_Colours : constant Integer := 255;
-      Image       : Real_Matrix (0 .. Num_Rows - 1, 0 .. Num_Cols - 1);
    begin
       Initialize_PLplot;
       Set_Grey_Colourmap (Num_Colours);
@@ -32,7 +30,7 @@ package body Plotting is
                        Justified, Box);
       --     Write_Labels ("", " ", "");
       Draw_Image_Color_Map_1_Automatic
-        (Image, 1.0, Long_Float (Num_Cols), 1.0, Long_Float (Num_Rows),
+        (Bitmap, 1.0, Long_Float (Num_Cols), 1.0, Long_Float (Num_Rows),
          0.0, 0.0, 1.0, Long_Float (Num_Cols), 1.0, Long_Float (Num_Rows));
 
       End_PLplot;

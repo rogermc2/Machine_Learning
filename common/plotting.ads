@@ -1,8 +1,8 @@
 
-with ML_Types;
+with PLplot_Auxiliary; use PLplot_Auxiliary;
 
 package Plotting is
    
-   procedure Plot (Bitmap : ML_Types.Integer_List_2D);
+   procedure Plot (Bitmap : Real_Matrix);
    
 end Plotting;
