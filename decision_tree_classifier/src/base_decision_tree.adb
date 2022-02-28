@@ -1,8 +1,8 @@
---  Based on scikit-learn/sklearn/tree/_classes.py
---  class DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
+--  Based on scikit-learn/sklearn/tree/_classes.py class
+--  DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Depth_First_Builder;
 with Best_First_Builder;
@@ -39,8 +39,7 @@ package body Base_Decision_Tree is
    end Apply;
 
    --  -------------------------------------------------------------------------
-   --  if is_classification: part of _classes.py BasesDecisionTree.Fit
-   --  L150
+   --  if is_classification: part of _classes.py BasesDecisionTree.Fit L150
    procedure Base_Fit
      (aClassifier    : in out Classifier;
       X              : ML_Types.Value_Data_Lists_2D;
@@ -67,9 +66,8 @@ package body Base_Decision_Tree is
                    " Sample_Weights must be the same size as X.");
       end if;
 
-      --  X is 2D list num samples x num features
-      --  Y_Orig is 2D list num classes x num outputs
-      --  L207  Generates Y_Encoded and Classes
+      --  X is 2D list num samples x num features Y_Orig is 2D list num classes
+      --  x num outputs L207 Generates Y_Encoded and Classes
       if aClassifier.Estimator_Kind = Classifier_Estimator then
          Classification_Part (aClassifier, Y_Orig, Y_Encoded,
                               Classes, Expanded_Class_Weight);
@@ -139,6 +137,7 @@ package body Base_Decision_Tree is
       Tree_Build.Init_Builder (Builder, aClassifier.Parameters.Max_Leaf_Nodes,
                                  aClassifier.Parameters.Splitter);
 
+      Put_Line (Routine_Name & "L420");
       --  L420
       case Builder.Tree_Kind is
          when Tree_Build.Depth_First_Tree =>
@@ -149,6 +148,7 @@ package body Base_Decision_Tree is
               (Builder, aClassifier.Attributes.Decision_Tree);
       end case;
 
+      Put_Line (Routine_Name & "L426");
       --  L426
       Prune_Tree (aClassifier);
 
@@ -349,9 +349,8 @@ package body Base_Decision_Tree is
       Classes.Clear;
       Y_Encoded.Set_Length (Y_Orig.Length);
       aClassifier.Attributes.Num_Outputs := Tree.Index_Range (Num_Outputs);
-      --  Y is 2D list num samples x num outputs
-      --  Y_Encoded is 2D list num samples x num outputs
-      --  L215  Initialize Y_Encoded
+      --  Y is 2D list num samples x num outputs Y_Encoded is 2D list num
+      --  samples x num outputs L215 Initialize Y_Encoded
       for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
          Column.Clear;
          for op in Y_Orig.Element (1).First_Index
