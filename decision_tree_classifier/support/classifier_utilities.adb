@@ -869,7 +869,7 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   function To_PL_Array (List_1D : AR_Types.AR_Data_List; Num_Rows : Positive)
+   function To_PL_Array (List_1D : ML_Types.Value_Data_List; Num_Rows : Positive)
                          return PLplot_Auxiliary.Real_Matrix is
       use PLplot_Auxiliary;
       Routine_Name : constant String :=

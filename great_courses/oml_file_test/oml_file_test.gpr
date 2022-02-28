@@ -4,7 +4,8 @@ with "aws.gpr";
 
 project Oml_File_Test is
 
-   for Source_Dirs use ("src", "../../datasets", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../decision_tree_classifier/src", "../../export", "../zip_lib");
+   for Source_Dirs use ("src", "../../datasets", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../decision_tree_classifier/src", "../../export", "../zip_lib", 
+      "../../../../usr/local/include/plplot_bindings/ada");
    for Object_Dir use "obj";
    for Main use ("oml_file_tester.adb");
    for Exec_Dir use ".";

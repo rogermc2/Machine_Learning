@@ -130,13 +130,13 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
                          Last : Positive := 10) is
-      use AR_Data_Package;
-      use AR_Data_Package_2D;
       use ML_Types;
-      Data_List_2D : constant AR_Data_List_2D := Data.Data;
-      List_Curs    : AR_Data_Package_2D.Cursor := Data_List_2D.First;
-      Data_List    : AR_Data_List;
-      Data_Curs    : AR_Data_Package.Cursor;
+      use Value_Data_Package;
+      use Value_Lists_Data_Package;
+      Data_List_2D : constant Value_Data_Lists_2D := Data.Data;
+      List_Curs    : Value_Lists_Data_Package.Cursor := Data_List_2D.First;
+      Data_List    : Value_Data_List;
+      Data_Curs    : Value_Data_Package.Cursor;
       Count        : Natural := Start - 1;
       Count2       : Natural := 0;
    begin
@@ -179,96 +179,6 @@ package body Load_ARFF_Data.ARFF_Printing is
       end loop;
 
    end Print_Data;
-
-   --  -------------------------------------------------------------------------
---
---     procedure Print_Data (Text  : String; Data : ML_Types.ARFF_Data_List) is
---        use ML_Types;
---        use ARFF_Data_Package;
---        Data_Curs : Cursor := Data.First;
---     begin
---        New_Line;
---        Put_Line (Text & ":");
---
---        while Has_Element (Data_Curs) loop
---           declare
---              Data_Record : constant Value_Record := Element (Data_Curs);
---           begin
---              case Data_Record.Value_Kind is
---                 when ML_Types.Boolean_Type =>
---                    Put (Boolean'Image (Data_Record.Boolean_Value));
---                 when ML_Types.Float_Type =>
---                    Put (Float'Image (Data_Record.Float_Value));
---                 when ML_Types.Integer_Type =>
---                    Put (Integer'Image (Data_Record.Integer_Value));
---                 when ML_Types.UB_String_Type =>
---                    Put (Data_Record.UB_String_Value);
---              end case;
---
---              if Data_Curs /= Data.Last then
---                 Put (", ");
---              end if;
---           end;
---           Next (Data_Curs);
---        end loop;
---        New_Line;
---
---     end Print_Data;
---
---     --  -------------------------------------------------------------------------
---
---     procedure Print_Data (Text  : String; Data : ML_Types.ARFF_Data_List_2D;
---                           Start : Positive := 1;
---                           Last  : Positive := 10) is
---        use ML_Types;
---        use ARFF_Data_Package;
---        use ARFF_Data_List_Package;
---        List_Curs    : ARFF_Data_List_Package.Cursor := Data.First;
---        Data_Length  : constant Positive := Positive (Data.Length);
---        Data_List    : ARFF_Data_List;
---        Data_Curs    : ARFF_Data_Package.Cursor;
---        Count        : Natural := Start - 1;
---        Count2       : Natural := 0;
---     begin
---        New_Line;
---        Put_Line (Text & ":");
---        Put_Line ("Data length:" & Integer'Image (Data_Length));
---        while Has_Element (List_Curs) and Count <= Last loop
---           Count := Count + 1;
---           Data_List := Element (List_Curs);
---
---           if Count >= Start and then Count <= Last then
---              Put_Line ("Data row:" & Integer'Image (Count));
---              Count2 := 0;
---              Data_Curs := Data_List.First;
---              while Has_Element (Data_Curs) loop
---                 Count2 := Count2 + 1;
---                 declare
---                    Data_Record : constant Value_Record := Element (Data_Curs);
---                 begin
---                    case Data_Record.Value_Kind is
---                    when ML_Types.Boolean_Type =>
---                       Put (Boolean'Image (Data_Record.Boolean_Value));
---                    when ML_Types.Float_Type =>
---                       Put (Float'Image (Data_Record.Float_Value));
---                    when ML_Types.Integer_Type =>
---                       Put (Integer'Image (Data_Record.Integer_Value));
---                    when ML_Types.UB_String_Type =>
---                       Put (Data_Record.UB_String_Value);
---                    end case;
---                    if Count2 < Positive (Data_List.Length) then
---                       Put (", ");
---                    end if;
---                 end;
---                 Next (Data_Curs);
---              end loop;
---              New_Line;
---           end if;
---           New_Line;
---           Next (List_Curs);
---        end loop;
---
---     end Print_Data;
 
    --  -------------------------------------------------------------------------
 
