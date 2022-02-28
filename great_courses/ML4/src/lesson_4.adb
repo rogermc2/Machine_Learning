@@ -5,30 +5,30 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
+--  with Maths;
 
-with PLplot_Auxiliary;
+--  with PLplot_Auxiliary;
 
 with ML_Types;
 
 with Base_Decision_Tree;
---  with Classifier_Types;
-with Classifier_Utilities;
+with Classifier_Types;
+--  with Classifier_Utilities;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter; with Load_ARFF_Data;
 with Openml_Ada;
-with Plotting;
+--  with Plotting;
 with Printing;
 with Tree;
 with Utilities;
---  with Weights;
+with Weights;
 
 procedure Lesson_4 is
    use Ada.Containers;
    use Ada.Directories;
-   use Maths.Float_Math_Functions;
+--     use Maths.Float_Math_Functions;
    use ML_Types;
    use String_Package;
    --     use Load_ARFF_Data;
@@ -54,11 +54,11 @@ procedure Lesson_4 is
    Test_Y         : Value_Data_Lists_2D;
    Train_X        : Value_Data_Lists_2D;
    Train_Y        : Value_Data_Lists_2D;
-   Num_Image_Rows : Positive;
+--     Num_Image_Rows : Positive;
    aClassifier    : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-   --     No_Weights     : Weights.Weight_List :=
-   --                        Classifier_Types.Float_Package.Empty_Vector;
+   No_Weights     : Weights.Weight_List :=
+                      Classifier_Types.Float_Package.Empty_Vector;
    --     Correct       : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
    procedure Get_State
@@ -161,30 +161,30 @@ begin
    --     Printing.Print_Value_Data_List ("Train features row 417",
    --                                     Train_X.Element (417));
 
-   Num_Image_Rows := Integer (Sqrt (Float (Train_X.Element (417).Length)));
-   Put_Line (Routine_Name & "Num_Image_Rows: " &
-               Integer'Image (Num_Image_Rows));
-   declare
-      Image : PLplot_Auxiliary.Real_Matrix (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
-   begin
-      Put_Line (Routine_Name & "Plotting");
-      Image := Classifier_Utilities.To_PL_Array
-        (Train_X.Element (4), Num_Image_Rows);
-      Plotting.Plot (Image);
-      Image := Classifier_Utilities.To_PL_Array
-        (Test_X.Element (4), Num_Image_Rows);
-      Plotting.Plot (Image);
-   end;
+   --     Num_Image_Rows := Integer (Sqrt (Float (Train_X.Element (417).Length)));
+   --     Put_Line (Routine_Name & "Num_Image_Rows: " &
+   --                 Integer'Image (Num_Image_Rows));
+   --     declare
+   --        Image : PLplot_Auxiliary.Real_Matrix (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
+   --     begin
+   --        Put_Line (Routine_Name & "Plotting");
+   --        Image := Classifier_Utilities.To_PL_Array
+   --          (Train_X.Element (4), Num_Image_Rows);
+   --        Plotting.Plot (Image);
+   --        Image := Classifier_Utilities.To_PL_Array
+   --          (Test_X.Element (4), Num_Image_Rows);
+   --        Plotting.Plot (Image);
+   --     end;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 6);
 
    --  Fit function adjusts weights according to data values so that better
    --  accuracy can be achieved
-   --     Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
-   --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
-   --     Put_Line ("----------------------------------------------");
-   --     New_Line;
+   Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
+   Printing.Print_Tree ("Diabetes Tree", aClassifier);
+   Put_Line ("----------------------------------------------");
+   New_Line;
    --
    --     for index in Train_Data.First_Index .. Train_Data.Last_Index loop
    --          if Base_Decision_Tree.Predict
