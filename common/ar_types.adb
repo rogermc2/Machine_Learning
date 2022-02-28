@@ -16,7 +16,7 @@ package body AR_Types is
             Result := L.Integer_Value = R.Integer_Value;
          when Float_Type =>
             Result :=
-              L.Float_Value >= R.Float_Value - Precision and
+              L.Float_Value >= R.Float_Value - Precision and then
               L.Float_Value <= R.Float_Value + Precision;
          when UB_String_Type =>
             Result := L.UB_String_Value = R.UB_String_Value;
