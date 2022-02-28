@@ -181,7 +181,7 @@ package body Utilities is
          for index in Item_String'First .. Item_String'Last loop
             Dig := Dig and then
               (Ada.Characters.Handling.Is_Decimal_Digit
-                 (Item_String (index)) or
+                 (Item_String (index)) or else
                    Character'Pos (Item_String (index)) < 32);
          end loop;
       end;
@@ -378,7 +378,7 @@ package body Utilities is
               Natural (abs (Maths.Random_Float) * Float (List_Length - index));
             Curs_2 := Next (Curs_1);
             Index_2 := 0;
-            while Has_Element (Curs_2) and Index_2 < Rand loop
+            while Has_Element (Curs_2) and then Index_2 < Rand loop
                Index_2 := Index_2 + 1;
                Curs_2 := Next (Curs_2);
             end loop;
@@ -410,7 +410,7 @@ package body Utilities is
               Natural (abs (Maths.Random_Float) * Float (List_Length - index));
             Curs_2 := Next (Curs_1);
             Index_2 := 0;
-            while Has_Element (Curs_2) and Index_2 < Rand loop
+            while Has_Element (Curs_2) and then Index_2 < Rand loop
                Index_2 := Index_2 + 1;
                Curs_2 := Next (Curs_2);
             end loop;
@@ -678,7 +678,7 @@ package body Utilities is
             Put (", ");
          end if;
 
-         if index /= theTypes'Last and Count > 5 then
+         if index /= theTypes'Last and then Count > 5 then
             New_Line;
             Count := 0;
          end if;
@@ -702,7 +702,7 @@ package body Utilities is
             Put (", ");
          end if;
 
-         if index /= theTypes'Last and Count > 5 then
+         if index /= theTypes'Last and then Count > 5 then
             New_Line;
             Count := 0;
          end if;

@@ -188,8 +188,8 @@ package body Classifier_Utilities is
    begin
       if OK then
          for index in L.First_Index .. L.Last_Index loop
-            Diff := Abs (R.Element (index) - L.Element (index));
-            OK := OK and (Diff < 1.5 * 10.0 ** (-6));
+            Diff := abs (R.Element (index) - L.Element (index));
+            OK := OK and then (Diff < 1.5 * 10.0 ** (-6));
             if Diff > Max_Diff then
                Max_Diff := Diff;
             end if;

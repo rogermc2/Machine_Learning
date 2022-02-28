@@ -60,7 +60,7 @@ package body ML_Types is
             Result.Boolean_Value := L.Integer_Value = R.Integer_Value;
          when Float_Type =>
             Result.Boolean_Value :=
-              L.Float_Value >= R.Float_Value - Precision and
+              L.Float_Value >= R.Float_Value - Precision and then
               L.Float_Value <= R.Float_Value + Precision;
          when UB_String_Type =>
             Result.Boolean_Value := L.UB_String_Value = R.UB_String_Value;
@@ -248,7 +248,7 @@ package body ML_Types is
                            L, R         : Value_Data_Lists_2D) is
       use Ada.Containers;
    begin
-      Assert (R.Length = L.Length and
+      Assert (R.Length = L.Length and then
                 R.Element (1).Length = L.Element (1).Length, "ML_Types."
                 & Routine_Name &
                 " right lengths (" & Count_Type'Image (R.Length) & ", " &
