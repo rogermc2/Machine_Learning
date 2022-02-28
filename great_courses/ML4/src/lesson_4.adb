@@ -182,11 +182,12 @@ begin
    --  accuracy can be achieved
    Put_Line ("Classification_Fit");
    Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
-   Printing.Print_Tree ("Diabetes Tree", aClassifier);
+--     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
    New_Line;
 
       for index in Train_X.First_Index .. Train_X.Last_Index loop
+        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
            if Base_Decision_Tree.Predict
              (aClassifier, Train_X).Element (index).Element (1) =
                  Train_Y.Element (index).Element (1) then
