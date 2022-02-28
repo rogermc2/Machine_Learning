@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/tree _criterion.pyx
 --  class ClassificationCriterion(Criterion)
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -32,7 +32,7 @@ package body Criterion is
    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float) is
-      Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
+--        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    :  constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
@@ -44,14 +44,14 @@ package body Criterion is
       Gini_Left      : Float := 0.0;
       Gini_Right     : Float := 0.0;
    begin
-      Assert (Criteria.Num_Weighted_Left > 0.0,
-              Routine_Name & "Criteria.Num_Weighted_Left " &
-                Float'Image (Criteria.Num_Weighted_Left) &
-                " should be > 0.0.");
-      Assert (Criteria.Num_Weighted_Right > 0.0,
-              Routine_Name & "Criteria.Num_Weighted_Right " &
-                Float'Image (Criteria.Num_Weighted_Right) &
-                " should be > 0.0.");
+--        Assert (Criteria.Num_Weighted_Left > 0.0,
+--                Routine_Name & "Criteria.Num_Weighted_Left " &
+--                  Float'Image (Criteria.Num_Weighted_Left) &
+--                  " should be > 0.0.");
+--        Assert (Criteria.Num_Weighted_Right > 0.0,
+--                Routine_Name & "Criteria.Num_Weighted_Right " &
+--                  Float'Image (Criteria.Num_Weighted_Right) &
+--                  " should be > 0.0.");
       --  L656
       for k in 1 .. Num_Outputs loop
          Sq_Count_Left := 0.0;
@@ -83,7 +83,7 @@ package body Criterion is
    function Impurity_Improvement (Criteria       : Criterion_Class;
                                   Impurity_Parent, Impurity_Left,
                                   Impurity_Right : Float) return float is
-      Routine_Name          : constant String := "Criterion.Impurity_Improvement";
+--        Routine_Name          : constant String := "Criterion.Impurity_Improvement";
       Weighted_Node_Samples : constant Float :=
                                 Criteria.Num_Weighted_Node_Samples;
       Right_Component       : constant Float
@@ -91,13 +91,13 @@ package body Criterion is
       Left_Component        : constant Float
         := (Criteria.Num_Weighted_Left / Weighted_Node_Samples) * Impurity_Left;
    begin
-      Assert (Weighted_Node_Samples > 0.0,
-              Routine_Name & "Criteria.Weighted_Node_Samples " &
-                Float'Image (Weighted_Node_Samples) & " should be > 0.0");
-      Assert (Criteria.Num_Weighted_Samples > 0.0,
-              Routine_Name & "Criteria.Num_Weighted_Samples " &
-                Float'Image (Criteria.Num_Weighted_Samples) &
-                " should be > 0.0");
+--        Assert (Weighted_Node_Samples > 0.0,
+--                Routine_Name & "Criteria.Weighted_Node_Samples " &
+--                  Float'Image (Weighted_Node_Samples) & " should be > 0.0");
+--        Assert (Criteria.Num_Weighted_Samples > 0.0,
+--                Routine_Name & "Criteria.Num_Weighted_Samples " &
+--                  Float'Image (Criteria.Num_Weighted_Samples) &
+--                  " should be > 0.0");
       return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
         (Impurity_Parent - Right_Component - Left_Component);
 
@@ -114,8 +114,8 @@ package body Criterion is
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
-      Routine_Name    : constant String :=
-                          "Criterion.Initialize_Node_Criterion ";
+--        Routine_Name    : constant String :=
+--                            "Criterion.Initialize_Node_Criterion ";
       Num_Outputs     : Positive;
       Sum_Total_K     : Classifier_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
@@ -135,8 +135,8 @@ package body Criterion is
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
 
-      Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
-                " Criteria.Num_Classes is empty");
+--        Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
+--                  " Criteria.Num_Classes is empty");
       --  L321 Initialize Sum_Total
       --  Sum_Total dimensions: num outputs x num classes
       for row in 1 .. Num_Outputs loop
@@ -223,8 +223,8 @@ package body Criterion is
       Count_K     : Float := 0.0;
       Entropy     : Float := 0.0;
    begin
-      Assert (not Self.Num_Classes.Is_Empty,
-              "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
+--        Assert (not Self.Num_Classes.Is_Empty,
+--                "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
 
       --  L535 Y structure samples (rows) x outputs (columns)
       --  k in range(self.n_outputs)
@@ -250,8 +250,8 @@ package body Criterion is
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Weights.Weight_Lists_2D) is
    begin
-      Assert (not Self.Sum_Total.Is_Empty,
-              "Criterion.Node_Value Self.Sum_Total is empty");
+--        Assert (not Self.Sum_Total.Is_Empty,
+--                "Criterion.Node_Value Self.Sum_Total is empty");
       --  Value dimensions: num outputs x num classes
       Value := Self.Sum_Total;
 
@@ -304,6 +304,7 @@ package body Criterion is
       Criteria.Sum_Right := Criteria.Sum_Total;
 
    end Reset;
+   pragma Inline (Reset);
 
    --  ------------------------------------------------------------------------
    --  L378
@@ -327,6 +328,7 @@ package body Criterion is
       Criteria.Sum_Left := Criteria.Sum_Total;
 
    end Reverse_Reset;
+   pragma Inline (Reverse_Reset);
 
    --  ------------------------------------------------------------------------
    --  L398 Update statistics by moving samples[pos:new_pos] to the left child.
@@ -410,6 +412,7 @@ package body Criterion is
       Criteria.Split_Row := New_Pos;
 
    end Update;
+   pragma Inline (Update);
 
    --  ------------------------------------------------------------------------
 

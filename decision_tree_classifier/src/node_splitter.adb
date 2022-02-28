@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pyx class BestSplitter
 
-with Ada.Assertions;  use Ada.Assertions;
+--  with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -57,10 +57,10 @@ package body Node_Splitter is
       OK           : Boolean := False;
    begin
       --  L368
-      Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
-              Routine_Name & "X_F_End.Value_Kind " &
-                Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
-                Data_Type'Image (X_F_Start.Value_Kind));
+--        Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
+--                Routine_Name & "X_F_End.Value_Kind " &
+--                  Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
+--                  Data_Type'Image (X_F_Start.Value_Kind));
       --  L363
       case X_F_Start.Value_Kind is
          when Float_Type =>
@@ -109,8 +109,8 @@ package body Node_Splitter is
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record) is
       use ML_Types;
-      Routine_Name              : constant String :=
-                                    "Node_Splitter.Evaluate_All_Splits ";
+--        Routine_Name              : constant String :=
+--                                      "Node_Splitter.Evaluate_All_Splits ";
       F_Values                  : constant ML_Types.Value_Data_List :=
                                     Splitter.Feature_Values;
       P_Index                   : Positive;
@@ -150,22 +150,23 @@ package body Node_Splitter is
          return Result;
 
       end Compare;
+      pragma Inline (Compare);
 
    begin
       --  Set of features to be split:
       --  Splitter.Start_Index through Splitter.End_Index
       --  L375 Evaluate all splits
-      Assert (Integer (F_Values.Length) >=
-                Splitter.Stop_Row - Splitter.Start_Row + 1, Routine_Name &
-                "Invalid Feature_Values Length " &
-                Integer'Image (Integer (F_Values.Length)));
+--        Assert (Integer (F_Values.Length) >=
+--                  Splitter.Stop_Row - Splitter.Start_Row + 1, Routine_Name &
+--                  "Invalid Feature_Values Length " &
+--                  Integer'Image (Integer (F_Values.Length)));
       P_Index := Splitter.Start_Row;
       while P_Index < Splitter.Stop_Row loop
          --  L378
          --  Compare is true for Feature_Values (P_Index + 1) = or <
          --  Feature_Values (P_Index)
          --  The loop skips over repeated values
-         while P_Index + 1 < Splitter.Stop_Row and
+         while P_Index + 1 < Splitter.Stop_Row and then
            Compare (F_Values, P_Index) loop
             --  L380
             P_Index := P_Index + 1;
@@ -262,13 +263,14 @@ package body Node_Splitter is
          end if;
       end loop;
 
-      Assert (Best.Split_Row > Splitter.Start_Row,
-              "Node_Splitter.Evaluate_All_Splits, split position" &
-                Integer'Image (Best.Split_Row) &
-                " should be greater than Start_Index" &
-                Integer'Image (Splitter.Start_Row));
+--        Assert (Best.Split_Row > Splitter.Start_Row,
+--                "Node_Splitter.Evaluate_All_Splits, split position" &
+--                  Integer'Image (Best.Split_Row) &
+--                  " should be greater than Start_Index" &
+--                  Integer'Image (Splitter.Start_Row));
 
    end Evaluate_All_Splits;
+   pragma Inline (Evaluate_All_Splits);
 
    --  -------------------------------------------------------------------------
    ---  BestSplitter.Find_Best_Split samples up to max_features without
@@ -280,8 +282,8 @@ package body Node_Splitter is
                               Num_Found_Constants   : in out Natural;
                               Num_Total_Constants   : in out Natural;
                               Best_Split            : in out Split_Record) is
-      Routine_Name         : constant String :=
-                               "Node_Splitter.Find_Best_Split ";
+--        Routine_Name         : constant String :=
+--                                 "Node_Splitter.Find_Best_Split ";
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -296,10 +298,10 @@ package body Node_Splitter is
       F_J                  : Natural;
       Swap                 : Natural;
    begin
-      Assert (Stop_Row >= Start_Row, Routine_Name & " Stop_Row " &
-                Integer'Image (Stop_Row) &
-                " should be greater than Start_Row "
-              & Integer'Image (Start_Row));
+--        Assert (Stop_Row >= Start_Row, Routine_Name & " Stop_Row " &
+--                  Integer'Image (Stop_Row) &
+--                  " should be greater than Start_Row "
+--                & Integer'Image (Start_Row));
       --  L319
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features <= Positive (Max_Features) or
@@ -335,11 +337,11 @@ package body Node_Splitter is
             --  L349 F_J >= Num_Known_Constants
             --  F_J is in the interval
             --  Num_Known_Constants .. F_I - Num_Found_Constants
-            Assert (F_J <= F_I - Num_Found_Constants,
-                    Routine_Name & "F_J: " & Integer'Image (F_J) &
-                      " should be in the range " &
-                      Integer'Image (Num_Known_Constants + 1) &  " .. " &
-                      Integer'Image (F_I - Num_Found_Constants));
+--              Assert (F_J <= F_I - Num_Found_Constants,
+--                      Routine_Name & "F_J: " & Integer'Image (F_J) &
+--                        " should be in the range " &
+--                        Integer'Image (Num_Known_Constants + 1) &  " .. " &
+--                        Integer'Image (F_I - Num_Found_Constants));
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
             --              Put_Line (Routine_Name & "Process_Non_Constants Num_Total_Constants: " &
@@ -513,6 +515,7 @@ package body Node_Splitter is
       end if;
 
    end Process_Non_Constants;
+   pragma Inline (Process_Non_Constants);
 
    --  -------------------------------------------------------------------------
 
@@ -591,12 +594,12 @@ package body Node_Splitter is
      (Splitter              : in out Splitter_Class;
       Start_Row, Stop_Row   : Positive;
       Weighted_Node_Samples : in out Float) is
-      Routine_Name : constant String := "Node_Splitter.Reset_Node ";
+--        Routine_Name : constant String := "Node_Splitter.Reset_Node ";
    begin
-      Assert (Stop_Row >= Start_Row,
-              Routine_Name & " stop index" & Integer'Image (Stop_Row) &
-                " should not be less than start index" &
-                Integer'Image (Start_Row));
+--        Assert (Stop_Row >= Start_Row,
+--                Routine_Name & " stop index" & Integer'Image (Stop_Row) &
+--                  " should not be less than start index" &
+--                  Integer'Image (Start_Row));
       --  L196
       Splitter.Start_Row := Start_Row;
       Splitter.Stop_Row := Stop_Row;
@@ -626,8 +629,8 @@ package body Node_Splitter is
       --  L275 features is a pointer to self.features
       --  L276 constant_features is a pointer to self.constant_features
       --  L279 Xf is a pointer to self.feature_values
-      Assert (not Self.Sample_Indices.Is_Empty, Routine_Name &
-                " called with empty Sample_Indices");
+--        Assert (not Self.Sample_Indices.Is_Empty, Routine_Name &
+--                  " called with empty Sample_Indices");
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       Put_Line (Routine_Name & "L319 Num_Constant_Features, Num_Found_Constants: " &
