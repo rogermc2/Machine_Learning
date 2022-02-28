@@ -7,6 +7,7 @@
 *.obj
 *.a
 *.ali
+*.dot
 *.json
 *.stderr
 *.stdout

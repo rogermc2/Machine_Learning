@@ -67,19 +67,6 @@ package AR_Types is
      Ada.Containers.Vectors (Positive, Unbounded_String);
    subtype AR_UB_String_List is AR_UB_String_Package.Vector;
 
-   function "=" (L, R : ML_Types.Value_Record) return Boolean;
-   function "<" (L, R : ML_Types.Value_Record) return Boolean;
-   package AR_Data_Package is new
-     Ada.Containers.Indefinite_Vectors (Positive, ML_Types.Value_Record);
-   subtype AR_Data_List is AR_Data_Package.Vector;
-   package AR_Data_Sorting is new
-     AR_Data_Package.Generic_Sorting ("<");
-
-   use AR_Data_Package;
-   package AR_Data_Package_2D is new
-     Ada.Containers.Vectors (Positive, AR_Data_List);
-   subtype AR_Data_List_2D is AR_Data_Package_2D.Vector;
-
    type AR_Data_List_Type is (Int_List_Type, Real_List_Type, String_List_Type,
                               Nominal_List_Type);
 
@@ -99,7 +86,7 @@ package AR_Types is
    --  L783 declaration of return object obj
    type ARFF_Record is record
       Header  : ARFF_Header_Record;
-      Data    : AR_Data_List_2D;    --  'data': []
+      Data    : ML_Types.Value_Data_Lists_2D;    --  'data': []
       Columns : AR_Indef_List_2D;   --  List of columns
    end record;
 

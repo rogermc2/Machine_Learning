@@ -1,7 +1,6 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with AR_Types;
 with Build_Utils;
 with Classifier_Types; use Classifier_Types;
 with Criterion;
@@ -18,11 +17,6 @@ package Printing is
 
     Print_Error : Exception;
 
-   procedure Print_AR_Data_List (Name    : String;
-                                 theList : AR_Types.AR_Data_List);
-   procedure Print_AR_Data_Lists_2D
-     (Name      : String; theList : AR_Types.AR_Data_List_2D;
-      Num_Items : Positive := 1000);
     procedure Print_Boolean_Matrix (Name    : String;
                                     aMatrix : Estimator.Boolean_Matrix);
     procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);

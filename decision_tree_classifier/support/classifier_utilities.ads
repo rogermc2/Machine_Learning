@@ -3,7 +3,6 @@ with PLplot_Auxiliary;
 
 with Base_Decision_Tree;
 with Classifier_Types; use Classifier_Types;
-with AR_Types;
 with ML_Types;
 with Tree;
 with Weights;
@@ -13,7 +12,7 @@ package Classifier_Utilities is
     type Feature_Type_Array is array (Positive range <>) of ML_Types.Data_Type;
     type Label_Type_Array is array (Positive range <>) of ML_Types.Data_Type;
 
-    Value_Error : Exception;
+    Value_Error : exception;
 
     function Arg_Max (Values : Weights.Weight_List) return Positive;
     function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
@@ -67,7 +66,7 @@ package Classifier_Utilities is
                                  return ML_Types.Value_Data_Lists_2D;
     function To_Natural_Value_List (A : Natural_Array)
                                    return ML_Types.Value_Data_Lists_2D;
-    function To_PL_Array (List_1D  : AR_Types.AR_Data_List;
+    function To_PL_Array (List_1D  : ML_Types.Value_Data_List;
                           Num_Rows : Positive)
                          return PLplot_Auxiliary.Real_Matrix;
     function To_Value_2D_List (A : ML_Types.Value_Data_List)

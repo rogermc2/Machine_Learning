@@ -25,7 +25,8 @@ package body Classifier_Tests is
       use Classifier_Types.Float_Package;
       Routine_Name    : constant String :=
                           "Test_Diabetes.Test_Probability";
-      Diabetes_Data   : constant Data_Record := Load_Data ("src/diabetes.csv");
+      Diabetes_Data   : constant Multi_Output_Data_Record :=
+                          Load_Data ("src/diabetes.csv");
       theClassifier   : Base_Decision_Tree.Classifier
         (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
       Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
@@ -43,7 +44,7 @@ package body Classifier_Tests is
       Assert (Num_Samples > 0, Routine_Name & " called with empty X vector.");
 
       --  Y is 2D list num outputs x num classes
-      Y := To_Value_2D_List (Diabetes_Data.Label_Values);
+      Y := Diabetes_Data.Label_Values;
       Assert (Integer (Y.Length) = Num_Samples, Routine_Name &
                 " invalid Y vector");
       --  L356
