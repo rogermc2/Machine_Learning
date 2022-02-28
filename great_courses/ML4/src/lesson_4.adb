@@ -58,7 +58,7 @@ procedure Lesson_4 is
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
    No_Weights     : Weights.Weight_List :=
                       Classifier_Types.Float_Package.Empty_Vector;
-   --     Correct       : Natural := 0;
+   Correct        : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
    procedure Get_State
      (Saved_Test_X, Saved_Test_Y, Saved_Train_X, Saved_Train_Y :
@@ -176,7 +176,7 @@ begin
    --     end;
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
-           Max_Leaf_Nodes => 6);
+           Max_Leaf_Nodes => 170);
 
    --  Fit function adjusts weights according to data values so that better
    --  accuracy can be achieved
@@ -185,17 +185,17 @@ begin
    Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
    New_Line;
-   --
-   --     for index in Train_Data.First_Index .. Train_Data.Last_Index loop
-   --          if Base_Decision_Tree.Predict
-   --            (aClassifier, Train_Data).Element (index).Element (1) =
-   --                Labels.Element (index).Element (1) then
-   --             Correct := Correct + 1;
-   --          end if;
-   --     end loop;
-   --     Put_Line ("Prediction: " &
-   --                 Float'Image (100.0 * Float (Correct) / Float (X_Data.Length)));
-   --     New_Line;
+
+      for index in Train_X.First_Index .. Train_X.Last_Index loop
+           if Base_Decision_Tree.Predict
+             (aClassifier, Train_X).Element (index).Element (1) =
+                 Train_Y.Element (index).Element (1) then
+              Correct := Correct + 1;
+           end if;
+      end loop;
+      Put_Line ("Prediction: " &
+                  Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
+      New_Line;
 
    --
    --     Graphviz_Exporter.C_Init

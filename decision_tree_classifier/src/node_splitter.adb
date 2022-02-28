@@ -150,7 +150,6 @@ package body Node_Splitter is
          return Result;
 
       end Compare;
-      pragma Inline (Compare);
 
    begin
       --  Set of features to be split:
@@ -270,7 +269,6 @@ package body Node_Splitter is
 --                  Integer'Image (Splitter.Start_Row));
 
    end Evaluate_All_Splits;
-   pragma Inline (Evaluate_All_Splits);
 
    --  -------------------------------------------------------------------------
    ---  BestSplitter.Find_Best_Split samples up to max_features without
@@ -282,8 +280,8 @@ package body Node_Splitter is
                               Num_Found_Constants   : in out Natural;
                               Num_Total_Constants   : in out Natural;
                               Best_Split            : in out Split_Record) is
---        Routine_Name         : constant String :=
---                                 "Node_Splitter.Find_Best_Split ";
+      Routine_Name         : constant String :=
+                               "Node_Splitter.Find_Best_Split ";
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -309,6 +307,7 @@ package body Node_Splitter is
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
+         Put_Line (Routine_Name & "L329 F_I " & Integer'Image (F_I));
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L339
          --  Draw a feature at random
@@ -469,8 +468,8 @@ package body Node_Splitter is
       Best_Split          : in out Split_Record) is
       use ML_Types;
       use Value_Data_Sorting;
-      Routine_Name         : constant String :=
-                               "Node_Splitter.Process_Non_Constants ";
+--        Routine_Name         : constant String :=
+--                                 "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
       X_Features           : Value_Data_List;
@@ -488,8 +487,6 @@ package body Node_Splitter is
          Splitter.Feature_Values.Append (X_Features (Current_Split.Feature));
       end loop;
 
-         Put_Line (Routine_Name & "L361 F_I, F_J " &
-                     Integer'Image (F_I) & ", " & Integer'Image (F_J));
       --  L361
       Sort (Splitter.Feature_Values);
       --  Splitter.Feature_Values is a value_data_list
@@ -515,7 +512,6 @@ package body Node_Splitter is
       end if;
 
    end Process_Non_Constants;
-   pragma Inline (Process_Non_Constants);
 
    --  -------------------------------------------------------------------------
 
