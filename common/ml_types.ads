@@ -35,6 +35,13 @@ package ML_Types is
      Ada.Containers.Doubly_Linked_Lists (Integer);
    subtype Integer_DL_List is Integer_DLL_Package.List;
 
+   package Float_Package is new Ada.Containers.Vectors (Positive, Float);
+   subtype Float_List is Float_Package.Vector;
+
+   use Float_Package;
+   package Float_Package_2D is new Ada.Containers.Vectors (Positive, Float_List);
+   subtype Float_List_2D is Float_Package_2D.Vector;
+
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
    subtype Character_List is Character_Package.Vector;
