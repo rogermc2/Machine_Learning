@@ -1,17 +1,21 @@
 
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
+
 package body Multilayer_Perceptron is
 
-   function C_Init (Hidden_Layer_Sizes  : ML_Types.Integer_List;
+   function C_Init (Hidden_Layer_Sizes  : ML_Types.Integer_List :=
+                      ML_Types.Integer_Package.Empty_Vector;
                     Activation          : Activation_Type := Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
-                    Batch_Size          : Positive;
+                    Batch_Size          : Positive := 200;
                     Learning_Rate       : Learning_Rate_Type := Constant_Rate;
                     Learning_Rate_Init  : Float := 0.001;
                     Power_T             : Float := 0.5;
                     Max_Iter            : Integer := 200;
                     Shuffle             : Boolean := True;
-                    Random_State        : Integer;
+                    Random_State        : Integer := 0;
                     Tol                 : Float := 10.0 ** (-4);
                     Verbose             : Boolean := False;
                     Warm_Start          : Boolean := False;
@@ -51,5 +55,21 @@ package body Multilayer_Perceptron is
       Classifier.Parameters.Max_Fun             := Max_Fun;
       return Classifier;
    end;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Fit (Self : in out MLP_Classifier;
+                  X, Y : ML_Types.Value_Data_Lists_2D;
+                  Incremental : Boolean := False) is
+      use Ada.Containers;
+--        use Classifier_Types;
+      use ML_Types.Integer_Package;
+      Routine_Name : constant String := "Multilayer_Perceptron.Fit ";
+   begin
+      Assert (Self.Parameters.Hidden_Layer_Sizes.Length > 0,
+              Routine_Name & "Hidden_Layer_Sizes vector is empty");
+   end Fit;
+
+   --  -------------------------------------------------------------------------
 
 end Multilayer_Perceptron;
