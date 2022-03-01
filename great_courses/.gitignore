@@ -1,5 +1,6 @@
 *.lyx~
 *.lyx#
+*.py
 *.dot
 *.ada
 *.oml
@@ -8,3 +9,5 @@
 *.arff
 *.tre
 obj/*
+*.sublime-project
+*.sublime-workspace

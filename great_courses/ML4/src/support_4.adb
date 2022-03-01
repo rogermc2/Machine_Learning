@@ -3,8 +3,6 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Tree;
-
 package body Support_4 is
 
    function Get_State
@@ -22,7 +20,7 @@ package body Support_4 is
       Dataset_File : constant String := "../" & Dataset_Name & ".arff";
       Save_File    : constant String := Dataset_Name & ".oml";
       State_File   : constant String := Dataset_Name & ".sta";
-      Has_Data     : constant Boolean := Exists (Dataset_Name &  ".sta");
+      Has_Data     : constant Boolean := Exists (State_File);
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
       As_Frame     : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
@@ -55,6 +53,35 @@ package body Support_4 is
       return Has_Data;
 
    end Get_State;
+
+   --  -------------------------------------------------------------------------
+
+   function Get_Tree (Dataset_Name : String; theTree : out Tree.Tree_Class)
+                      return Boolean is
+      use Ada.Directories;
+      use Ada.Streams;
+      use Stream_IO;
+      Routine_Name : constant String := "Support_4.Get_Tree ";
+      Tree_File    : constant String := Dataset_Name & ".tre";
+      Has_Tree     : constant Boolean := Exists (Tree_File);
+      File_ID      : Stream_IO.File_Type;
+      aStream      : Stream_Access;
+   begin
+      if Has_Tree then
+         Put_Line (Routine_Name & "restoring tree");
+
+         Open (File_ID, In_File, Tree_File);
+         aStream := Stream (File_ID);
+         Tree.Tree_Class'Read (aStream, theTree);
+         Close (File_ID);
+         pragma Unreferenced (File_ID);
+
+         Put_Line (Routine_Name & "tree restored");
+      end if;
+
+      return Has_Tree;
+
+   end Get_Tree;
 
    --  -------------------------------------------------------------------------
 

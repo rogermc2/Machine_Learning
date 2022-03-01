@@ -2,6 +2,7 @@
 with Base_Decision_Tree;
 with ML_Types; use ML_Types;
 with Openml_Ada;
+with Tree;
 
 package Support_4 is
 
@@ -11,6 +12,8 @@ package Support_4 is
       Test_X, Test_Y,
       Train_X, Train_Y : out Value_Data_Lists_2D;
       Bunch            : out Openml_Ada.Bunch_Data) return Boolean;
+   function Get_Tree (Dataset_Name : String; theTree : out Tree.Tree_Class)
+                      return Boolean;
    procedure Save_State
      (Dataset_Name               : String;
       Save_Test_X, Save_Test_Y,
