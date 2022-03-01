@@ -45,51 +45,50 @@ procedure Lesson_4 is
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
    No_Weights     : Weights.Weight_List :=
                       Classifier_Types.Float_Package.Empty_Vector;
-   --      Correct        : Natural := 0;
+   Correct        : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 
 begin
    Put_Line (Routine_Name);
+   if not Get_State (Dataset_Name, Return_X_Y, X, Y,
+                     Test_X, Test_Y, Train_X, Train_Y, Bunch) then
+      Num_Samples := Positive (X.Length);
+      Test_Size := Num_Samples / 4;
+      Train_Size := Num_Samples - Test_Size;
+
+      Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
+      Assert (X.Length > 0, Routine_Name & "X is empty.");
+      Assert (Y.Length > 0, Routine_Name & "Y is empty.");
+
+      Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
+                "Y length" & Count_Type'Image (Y.Length) &
+                " is different to X length" & Natural'Image (Num_Samples));
+      --        Printing.Print_Value_Data_List ("Features row 16", X.Element (16));
+
+      Put_Line (Routine_Name & "permuting");
+      X := Utilities.Permute (X);
+      Put_Line (Routine_Name & "X permuted");
+      Y := Utilities.Permute (Y);
+      Put_Line (Routine_Name & "Y permuted");
+      Printing.Print_Value_Data_List ("permuted features row 16", X.Element (16));
+      Put_Line (Routine_Name & "splitting data");
+      Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
+                                      Test_X, Test_Y, Train_X, Train_Y);
+      --     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
+      --     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
+      X.Clear;
+      Y.Clear;
+      Save_State (Dataset_Name, Test_X, Test_Y, Train_X, Train_Y,
+                  Bunch);
+   end if;
+
    if not Get_Tree (Dataset_Name, aClassifier.Attributes.Decision_Tree) then
-      if not Get_State (Dataset_Name, Return_X_Y, X, Y,
-                        Test_X, Test_Y, Train_X, Train_Y, Bunch) then
-         Num_Samples := Positive (X.Length);
-         Test_Size := Num_Samples / 4;
-         Train_Size := Num_Samples - Test_Size;
-
-         Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
-         Assert (X.Length > 0, Routine_Name & "X is empty.");
-         Assert (Y.Length > 0, Routine_Name & "Y is empty.");
-
-         Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
-                   "Y length" & Count_Type'Image (Y.Length) &
-                   " is different to X length" & Natural'Image (Num_Samples));
-         --        Printing.Print_Value_Data_List ("Features row 16", X.Element (16));
-
-         Put_Line (Routine_Name & "permuting");
-         X := Utilities.Permute (X);
-         Put_Line (Routine_Name & "X permuted");
-         Y := Utilities.Permute (Y);
-         Put_Line (Routine_Name & "Y permuted");
-         Printing.Print_Value_Data_List ("permuted features row 16", X.Element (16));
-         Put_Line (Routine_Name & "splitting data");
-         Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
-                                         Test_X, Test_Y, Train_X, Train_Y);
-         --     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
-         --     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
-         X.Clear;
-         Y.Clear;
-         Save_State (Dataset_Name, Test_X, Test_Y, Train_X, Train_Y,
-                     Bunch);
-      end if;
-
       if not Return_X_Y then
          Printing.Print_Strings ("Features", Bunch.Feature_Names);
       end if;
       --      Printing.Print_Value_Data_List ("Train features row 16", Train_X.Element (16));
       --      Printing.Print_Value_Data_List ("Test features row 16", Test_X.Element (16));
 
-      Put_Line ("Train_X length: " & Count_Type'Image (Train_X.Length));
       --     Printing.Print_Value_Data_List ("Train features row 417",
       --                                     Train_X.Element (417));
 
@@ -111,19 +110,20 @@ begin
    Put_Line ("----------------------------------------------");
    New_Line;
 
+   Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
    for index in Train_X.First_Index .. Train_X.Last_Index loop
       Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
-      --          if Base_Decision_Tree.Predict
-      --            (aClassifier, Train_X).Element (index).Element (1) =
-      --            Train_Y.Element (index).Element (1) then
-      --              Correct := Correct + 1;
-      --          end if;
+      if Base_Decision_Tree.Predict
+        (aClassifier, Train_X).Element (index).Element (1) =
+        Train_Y.Element (index).Element (1) then
+         Correct := Correct + 1;
+      end if;
    end loop;
-   --      Put_Line ("Prediction: " &
-   --                  Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
-   --      New_Line;
 
-   --
+   Put_Line ("Prediction: " &
+               Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
+   New_Line;
+
    --     Graphviz_Exporter.C_Init
    --       (Exporter, aClassifier.Attributes.Decision_Tree);
    --     Graphviz_Exporter.Export_Graphviz
