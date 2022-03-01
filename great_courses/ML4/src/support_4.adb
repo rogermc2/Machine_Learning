@@ -1,4 +1,5 @@
 
+with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -6,31 +7,52 @@ with Tree;
 
 package body Support_4 is
 
-   procedure Get_State
-     (Dataset_Name                 : String;
-      Saved_Test_X, Saved_Test_Y,
-      Saved_Train_X, Saved_Train_Y : out Value_Data_Lists_2D;
-      Saved_Bunch                  : out Openml_Ada.Bunch_Data) is
+   function Get_State
+     (Dataset_Name     : String; Return_X_Y : Boolean;
+      X, Y             : out Value_Data_Lists_2D;
+      Test_X, Test_Y,
+      Train_X, Train_Y : out Value_Data_Lists_2D;
+      Bunch            : out Openml_Ada.Bunch_Data)
+      return Boolean is
+      use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
+      use String_Package;
       Routine_Name : constant String := "Support_4.Get_State ";
+      Dataset_File : constant String := "../" & Dataset_Name & ".arff";
+      Save_File    : constant String := Dataset_Name & ".oml";
       State_File   : constant String := Dataset_Name & ".sta";
+      Has_Data     : constant Boolean := Exists (Dataset_Name &  ".sta");
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
+      As_Frame     : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    begin
-      Put_Line (Routine_Name & "restoring state");
+      if Has_Data then
+         Put_Line (Routine_Name & "restoring state");
 
-      Open (File_ID, In_File, State_File);
-      aStream := Stream (File_ID);
-      Value_Data_Lists_2D'Read (aStream, Saved_Test_X);
-      Value_Data_Lists_2D'Read (aStream, Saved_Test_Y);
-      Value_Data_Lists_2D'Read (aStream, Saved_Train_X);
-      Value_Data_Lists_2D'Read (aStream, Saved_Train_Y);
-      Openml_Ada.Bunch_Data'Read (aStream, Saved_Bunch);
-      Close (File_ID);
-      pragma Unreferenced (File_ID);
+         Open (File_ID, In_File, State_File);
+         aStream := Stream (File_ID);
+         Value_Data_Lists_2D'Read (aStream, Test_X);
+         Value_Data_Lists_2D'Read (aStream, Test_Y);
+         Value_Data_Lists_2D'Read (aStream, Train_X);
+         Value_Data_Lists_2D'Read (aStream, Train_Y);
+         Openml_Ada.Bunch_Data'Read (aStream, Bunch);
+         Close (File_ID);
+         pragma Unreferenced (File_ID);
 
-      Put_Line (Routine_Name & "state restored");
+         Put_Line (Routine_Name & "state restored");
+      else
+         Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
+                                  Save_File_Name    => Save_File,
+                                  Target_Column     => Empty_List,
+                                  X                 => X,
+                                  Y                 => Y,
+                                  Bunch             => Bunch,
+                                  As_Frame          => As_Frame,
+                                  Return_X_Y        => Return_X_Y);
+      end if;
+
+      return Has_Data;
 
    end Get_State;
 

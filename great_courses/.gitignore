@@ -6,4 +6,5 @@
 *.bin
 *.sta
 *.arff
+*.tre
 obj/*

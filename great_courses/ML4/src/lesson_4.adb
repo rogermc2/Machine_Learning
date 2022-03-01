@@ -1,6 +1,5 @@
 
 with Ada.Containers;
-with Ada.Directories;
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -23,20 +22,15 @@ with Support_4;
 
 procedure Lesson_4 is
    use Ada.Containers;
-   use Ada.Directories;
    use ML_Types;
-   use String_Package;
    --     use Load_ARFF_Data;
    use Decision_Tree_Classification;
    Routine_Name   : constant String := "Lesson_4 ";
    Dataset_Name   : constant String := "mnist_784";
-   --     Dataset_Name   : constant String := "diabetes";
-   Dataset_File   : constant String := "../" & Dataset_Name & ".arff";
-   Save_File      : constant String := Dataset_Name & ".oml";
    Return_X_Y     : constant Boolean := True;
+   --     Dataset_Name   : constant String := "diabetes";
    --     Return_X_Y    : constant Boolean := False;
    Min_Split      : constant String := "2";
-   As_Frame       : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    Bunch          : Openml_Ada.Bunch_Data;
    X              : Value_Data_Lists_2D;  --  rows of columns of values
    Y              : Value_Data_Lists_2D;
@@ -56,18 +50,8 @@ procedure Lesson_4 is
 
 begin
    Put_Line (Routine_Name);
-   if Exists (Dataset_Name &  ".sta") then
-      Support_4.Get_State (Dataset_Name, Test_X, Test_Y, Train_X, Train_Y,
-                           Bunch);
-   else
-      Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
-                               Save_File_Name    => Save_File,
-                               Target_Column     => Empty_List,
-                               X                 => X,
-                               Y                 => Y,
-                               Bunch             => Bunch,
-                               As_Frame          => As_Frame,
-                               Return_X_Y        => Return_X_Y);
+   if not Support_4.Get_State (Dataset_Name, Return_X_Y, X, Y,
+                               Test_X, Test_Y, Train_X, Train_Y, Bunch) then
       Num_Samples := Positive (X.Length);
       Test_Size := Num_Samples / 4;
       Train_Size := Num_Samples - Test_Size;

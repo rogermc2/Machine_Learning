@@ -5,11 +5,12 @@ with Openml_Ada;
 
 package Support_4 is
 
-   procedure Get_State
-     (Dataset_Name                 : String;
-      Saved_Test_X, Saved_Test_Y,
-      Saved_Train_X, Saved_Train_Y : out Value_Data_Lists_2D;
-      Saved_Bunch                  : out Openml_Ada.Bunch_Data);
+   function Get_State
+     (Dataset_Name     : String; Return_X_Y : Boolean;
+      X, Y             : out Value_Data_Lists_2D;
+      Test_X, Test_Y,
+      Train_X, Train_Y : out Value_Data_Lists_2D;
+      Bunch            : out Openml_Ada.Bunch_Data) return Boolean;
    procedure Save_State
      (Dataset_Name               : String;
       Save_Test_X, Save_Test_Y,
