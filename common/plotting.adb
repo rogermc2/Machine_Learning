@@ -1,9 +1,29 @@
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with PLplot_Standard; use PLplot_Standard;
 
+with Maths;
+
+with Classifier_Utilities;
+
 package body Plotting is
+
+    procedure Display_Image (Data : ML_Types.Value_Data_List) is
+      use Maths.Float_Math_Functions;
+      Routine_Name   : constant String := "Plotting.Display_Image";
+      Num_Image_Rows : constant Positive := Positive (Sqrt (Float (Data.Length)));
+      Image          : PLplot_Auxiliary.Real_Matrix
+          (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
+    begin
+        Put_Line (Routine_Name & "Num_Image_Rows: " &
+                    Integer'Image (Num_Image_Rows));
+        Put_Line (Routine_Name & "Plotting");
+        Image := Classifier_Utilities.To_PL_Array (Data, Num_Image_Rows);
+        Plotting.Plot (Image);
+    end Display_Image;
+  
+   --  -------------------------------------------------------------------------
 
    procedure Set_Grey_Colourmap (Num_Colours : Integer) is
       R   : constant Real_Vector (0 .. 1) := (0.0, 1.0);

@@ -5,21 +5,16 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
-
-with PLplot_Auxiliary;
-
 with ML_Types;
 
 with Base_Decision_Tree;
 with Classifier_Types;
-with Classifier_Utilities;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter; with Load_ARFF_Data;
 with Openml_Ada;
-with Plotting;
+--  with Plotting;
 with Printing;
 with Tree;
 with Utilities;
@@ -28,7 +23,6 @@ with Weights;
 procedure Lesson_4 is
     use Ada.Containers;
     use Ada.Directories;
-    use Maths.Float_Math_Functions;
     use ML_Types;
     use String_Package;
     --     use Load_ARFF_Data;
@@ -59,18 +53,6 @@ procedure Lesson_4 is
                        Classifier_Types.Float_Package.Empty_Vector;
     Correct        : Natural := 0;
     --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
-
-    procedure Display_Image (Data : Value_Data_List) is
-        Num_Image_Rows : constant Positive := Positive (Sqrt (Float (Data.Length)));
-        Image          : PLplot_Auxiliary.Real_Matrix
-          (1 .. Num_Image_Rows, 1 .. Num_Image_Rows);
-    begin
-        Put_Line (Routine_Name & "Num_Image_Rows: " &
-                    Integer'Image (Num_Image_Rows));
-        Put_Line (Routine_Name & "Plotting");
-        Image := Classifier_Utilities.To_PL_Array (Data, Num_Image_Rows);
-        Plotting.Plot (Image);
-    end Display_Image;
 
     procedure Get_State
       (Saved_Test_X, Saved_Test_Y, Saved_Train_X, Saved_Train_Y :
@@ -173,8 +155,8 @@ begin
     --                                     Train_X.Element (417));
 
     --        Put_Line (Routine_Name & "Plotting");
---      Display_Image (Train_X.Element (4));
---      Display_Image (Test_X.Element (4));
+--      Plotting.Display_Image (Train_X.Element (4));
+--      Plotting.Display_Image (Test_X.Element (4));
 
     C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
             Max_Leaf_Nodes => 170);
