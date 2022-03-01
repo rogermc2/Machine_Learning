@@ -33,6 +33,7 @@ procedure Lesson_4 is
     Dataset_File   : constant String := "../" & Dataset_Name & ".arff";
     Save_File      : constant String := Dataset_Name & ".oml";
     State_File     : constant String := Dataset_Name & ".sta";
+    Tree_File      : constant String := Dataset_Name & ".tre";
     Return_X_Y     : constant Boolean := True;
     --     Return_X_Y    : constant Boolean := False;
     Min_Split      : constant String := "2";
@@ -96,6 +97,22 @@ procedure Lesson_4 is
         Close (File_ID);
         pragma Unreferenced (File_ID);
     end Save_State;
+
+    procedure Save_Tree
+      (Classifier : Base_Decision_Tree.Classifier) is
+        use Ada.Streams;
+        use Stream_IO;
+        --        Routine_Name : constant String := "Lesson_4.Save_State ";
+        File_ID      : Stream_IO.File_Type;
+        aStream      : Stream_Access;
+    begin
+        Create (File_ID, Out_File, Tree_File);
+        aStream := Stream (File_ID);
+        Tree.Tree_Class'Write
+          (aStream, Classifier.Attributes.Decision_Tree);
+        Close (File_ID);
+        pragma Unreferenced (File_ID);
+    end Save_Tree;
 
 begin
     Put_Line (Routine_Name);
@@ -165,17 +182,18 @@ begin
     --  accuracy can be achieved
     Put_Line ("Classification_Fit");
     Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
+    Save_Tree (aClassifier);
     --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
     Put_Line ("----------------------------------------------");
     New_Line;
 
     for index in Train_X.First_Index .. Train_X.Last_Index loop
         Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
-        if Base_Decision_Tree.Predict
-          (aClassifier, Train_X).Element (index).Element (1) =
-          Train_Y.Element (index).Element (1) then
-            Correct := Correct + 1;
-        end if;
+--          if Base_Decision_Tree.Predict
+--            (aClassifier, Train_X).Element (index).Element (1) =
+--            Train_Y.Element (index).Element (1) then
+--              Correct := Correct + 1;
+--          end if;
     end loop;
     Put_Line ("Prediction: " &
                 Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
