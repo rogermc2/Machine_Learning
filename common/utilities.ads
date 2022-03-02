@@ -39,6 +39,7 @@ package Utilities is
    procedure Permute (aList : in out ML_Types.String_List);
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_2D;
+   pragma Inline (Permute);
    function Permute (aList : ML_Types.Value_Data_Lists_2D)
                      return ML_Types.Value_Data_Lists_3D;
    function Predictions (Node : ML_Types.Tree_Node_Type)
@@ -74,6 +75,7 @@ package Utilities is
    function Split_String (aString, Pattern : String)
                            return ML_Types.String_List;
    procedure Swap (Data : in out ML_Types.Value_Data_Lists_2D; L, R : Positive);
+   pragma Inline (Swap);
    function XY_To_Rows (X, Y : ML_Types.Value_Data_Lists_2D)
                          return ML_Types.Rows_Vector;
 

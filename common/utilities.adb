@@ -473,6 +473,7 @@ package body Utilities is
          end if;
 
       end Recurse;
+      pragma Inline (Recurse);
 
    begin
       if List_Length > 1 then
