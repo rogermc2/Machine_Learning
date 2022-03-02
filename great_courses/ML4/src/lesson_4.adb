@@ -31,12 +31,12 @@ procedure Lesson_4 is
    --     Dataset_Name   : constant String := "diabetes";
    --     Return_X_Y    : constant Boolean := False;
    Min_Split      : constant String := "2";
+   Test_Size      : constant Positive := 1000;
+   Train_Size     : constant Positive := 5000;
    Bunch          : Openml_Ada.Bunch_Data;
    X              : Value_Data_Lists_2D;  --  rows of columns of values
    Y              : Value_Data_Lists_2D;
    Num_Samples    : Positive;
-   Test_Size      : Positive;
-   Train_Size     : Positive;
    Test_X         : Value_Data_Lists_2D;
    Test_Y         : Value_Data_Lists_2D;
    Train_X        : Value_Data_Lists_2D;
@@ -53,8 +53,6 @@ begin
    if not Get_State (Dataset_Name, Return_X_Y, X, Y,
                      Test_X, Test_Y, Train_X, Train_Y, Bunch) then
       Num_Samples := Positive (X.Length);
-      Test_Size := Num_Samples / 4;
-      Train_Size := Num_Samples - Test_Size;
 
       Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
       Assert (X.Length > 0, Routine_Name & "X is empty.");
@@ -70,10 +68,12 @@ begin
       Put_Line (Routine_Name & "X permuted");
       Y := Utilities.Permute (Y);
       Put_Line (Routine_Name & "Y permuted");
-      Printing.Print_Value_Data_List ("permuted features row 16", X.Element (16));
+--        Printing.Print_Value_Data_List ("permuted features row 16", X.Element (16));
       Put_Line (Routine_Name & "splitting data");
       Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                       Test_X, Test_Y, Train_X, Train_Y);
+      Put_Line ("Requested train size: " & Integer'Image (Train_Size));
+      Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
       --     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
       --     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
       X.Clear;
