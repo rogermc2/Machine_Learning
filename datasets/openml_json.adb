@@ -15,7 +15,7 @@ with ARFF_Json;
 
 --  pragma Warnings (Off);
 
-package body Openml is
+package body Openml_Json is
 
     --     type JSON_Item is record
     --        Name  : Unbounded_String;
@@ -1157,4 +1157,4 @@ package body Openml is
 
     --  ------------------------------------------------------------------------
 
-end Openml;
+end Openml_Json;

@@ -632,21 +632,18 @@ package body Node_Splitter is
 --                  " called with empty Sample_Indices");
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
-      Put_Line (Routine_Name & "L319 Num_Constant_Features, Num_Found_Constants: " &
+      Put_Line (Routine_Name & "Num_Constant_Features, Num_Found_Constants: " &
                   Integer'Image (Num_Constant_Features) & ", " &
                   Integer'Image (Num_Found_Constants));
       --  L319
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);
-      Put_Line (Routine_Name & " L417");
       --  L417  Reorganize into samples
       --        (start .. best.pos) + samples (best.pos .. end)
       Reorder_Rows (Self, Best_Split, Self.Sample_Indices, Impurity);
       --  L440
-      Put_Line (Routine_Name & " L440");
       Update_Constants (Self, Num_Known_Constants, Num_Found_Constants);
       Num_Constant_Features := Num_Total_Constants;
-      Put_Line (Routine_Name & "done");
 
       return Best_Split;
 

@@ -8,6 +8,8 @@ package body Support_4 is
    function Get_State
      (Dataset_Name     : String; Return_X_Y : Boolean;
       X, Y             : out Value_Data_Lists_2D;
+      X_Indices        : out ML_Types.Integer_List;
+      Y_Indices        : out ML_Types.Integer_List;
       Test_X, Test_Y,
       Train_X, Train_Y : out Value_Data_Lists_2D;
       Bunch            : out Openml_Ada.Bunch_Data)
@@ -45,6 +47,8 @@ package body Support_4 is
                                   Target_Column     => Empty_List,
                                   X                 => X,
                                   Y                 => Y,
+                                  X_Indices         => X_Indices,
+                                  Y_Indices         => Y_Indices,
                                   Bunch             => Bunch,
                                   As_Frame          => As_Frame,
                                   Return_X_Y        => Return_X_Y);

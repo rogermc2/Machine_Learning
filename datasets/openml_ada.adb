@@ -27,6 +27,8 @@ package body Openml_Ada is
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    procedure Get_OML (File_Name : String;
                       X, Y      : out ML_Types.Value_Data_Lists_2D;
+                      X_Indices : out ML_Types.Integer_List;
+                      Y_Indices : out ML_Types.Integer_List;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean);
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
@@ -34,8 +36,9 @@ package body Openml_Ada is
       return AR_Types.Nominal_Data_List;
    procedure Process_Feature (Features_List : AR_Types.Attribute_List);
    procedure Save_OML
-     (Save_File_Name : String; X, Y : ML_Types.Value_Data_Lists_2D;
-      Bunch          : Bunch_Data; X_Y_Only : Boolean);
+     (Save_File_Name        : String; X, Y : ML_Types.Value_Data_Lists_2D;
+      X_Indices, Y_Indices  : ML_Types.Integer_List;
+      Bunch                 : Bunch_Data; X_Y_Only : Boolean);
    procedure Set_Default_Target
      (Features_List  : in out AR_Types.Attribute_List;
       Target_Columns : out ML_Types.String_List);
@@ -88,8 +91,8 @@ package body Openml_Ada is
       use Integer_DLL_Package;
       use String_Package;
       use Attribute_Data_Package;
-      Routine_Name       : constant String :=
-                             "Openml_Ada.Download_Data_To_Bunch ";
+--        Routine_Name       : constant String :=
+--                               "Openml_Ada.Download_Data_To_Bunch ";
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
       Feature_Index      : Positive;
       Features_Dict      : Attribute_Dictionary_Map;
@@ -127,7 +130,6 @@ package body Openml_Ada is
          aFeature := Features_List.Element (index);
          Features_Dict.Include (aFeature.Name, index);
       end loop;
-
       --        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
       --        Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
@@ -174,14 +176,14 @@ package body Openml_Ada is
 
       --  L667
       --  L325
-      Put_Line (Routine_Name & "Convert_Arff_Data");
+--        Put_Line (Routine_Name & "Convert_Arff_Data");
       --  L278
       X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
       Y := Split_Columns (ARFF_Container.Data, Col_Slice_Y);
       --        Printing.Print_Value_Data_List (Routine_Name & "X(1)", X.First_Element);
       --  L672
       if not X_Y_Only then
-         Put_Line (Routine_Name & "Parse_Nominal_Data");
+--           Put_Line (Routine_Name & "Parse_Nominal_Data");
          Nominal_Attributes :=
            Parse_Nominal_Data (ARFF_Container, Target_Columns);
          Bunch.As_Frame := As_Frame_False;
@@ -202,6 +204,8 @@ package body Openml_Ada is
                            Target_Column     : ML_Types.String_List;
                            X                 : out ML_Types.Value_Data_Lists_2D;
                            Y                 : out ML_Types.Value_Data_Lists_2D;
+                           X_Indices         : out ML_Types.Integer_List;
+                           Y_Indices         : out ML_Types.Integer_List;
                            Bunch             : out Bunch_Data;
                            As_Frame          : in out As_Frame_State;
                            Return_X_Y        : Boolean := False) is
@@ -229,7 +233,8 @@ package body Openml_Ada is
       --        Data_Qualities  : Qualities_Map;
    begin
       if Exists (Save_File_Name) then
-         Get_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
+         Get_OML (Save_File_Name, X, Y, X_Indices, Y_Indices, Bunch,
+                  Return_X_Y);
       else
          if Exists (Ada_File) then
             Put_Line (Routine_Name & "Reading data file " & Ada_File);
@@ -242,6 +247,7 @@ package body Openml_Ada is
             Save_ARFF (Ada_File, ARFF_Data);
          end if;
          New_Line;
+
          --  L903
          if As_Frame = As_Frame_Auto then
             if not Return_Sparse then
@@ -294,8 +300,14 @@ package body Openml_Ada is
          --  L955
          Download_Data_To_Bunch (ARFF_Data, Features_List, Data_Columns,
                                  Target_Columns, X, Y, Bunch, Return_X_Y);
+         for index in X.First_Index .. X.Last_Index loop
+            X_Indices.Append (index);
+            Y_Indices.Append (index);
+         end loop;
+
          if Save_File_Name'Length > 0 then
-            Save_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
+            Save_OML (Save_File_Name, X, Y, X_Indices, Y_Indices, Bunch,
+                      Return_X_Y);
          end if;
 
       end if;
@@ -389,9 +401,12 @@ package body Openml_Ada is
 
    procedure Get_OML (File_Name : String;
                       X, Y      : out ML_Types.Value_Data_Lists_2D;
+                      X_Indices : out ML_Types.Integer_List;
+                      Y_Indices : out ML_Types.Integer_List;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
+      use ML_Types;
       Routine_Name : constant String := "Openml_Ada.Get_OML ";
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
@@ -399,8 +414,10 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "Reading OML file " & File_Name);
       Open (File_ID, In_File, File_Name);
       aStream := Stream (File_ID);
-      ML_Types.Value_Data_Lists_2D'Read (aStream, X);
-      ML_Types.Value_Data_Lists_2D'Read (aStream, Y);
+      Value_Data_Lists_2D'Read (aStream, X);
+      Value_Data_Lists_2D'Read (aStream, Y);
+      Integer_List'Read (aStream, X_Indices);
+      Integer_List'Read (aStream, Y_Indices);
       if not X_Y_Only then
          Bunch_Data'Read (aStream, Bunch);
       end if;
@@ -509,17 +526,21 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Save_OML
-     (Save_File_Name : String; X, Y : ML_Types.Value_Data_Lists_2D;
-      Bunch          : Bunch_Data; X_Y_Only : Boolean) is
+     (Save_File_Name       : String; X, Y : ML_Types.Value_Data_Lists_2D;
+      X_Indices, Y_Indices : ML_Types.Integer_List;
+      Bunch                : Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
+      use ML_Types;
       File_ID  : Stream_IO.File_Type;
       aStream  : Stream_Access;
    begin
       Create (File_ID, Out_File, Save_File_Name);
       aStream := Stream (File_ID);
-      ML_Types.Value_Data_Lists_2D'Write (aStream, X);
-      ML_Types.Value_Data_Lists_2D'Write (aStream, Y);
+      Value_Data_Lists_2D'Write (aStream, X);
+      Value_Data_Lists_2D'Write (aStream, Y);
+      Integer_List'Write (aStream, X_Indices);
+      Integer_List'Write (aStream, Y_Indices);
       if not X_Y_Only then
          Bunch_Data'Write (aStream, Bunch);
       end if;

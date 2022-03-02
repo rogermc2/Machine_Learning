@@ -5,7 +5,7 @@ with GNATCOLL.JSON; use GNATCOLL.JSON;
 
 with ML_Types;
 
-package Openml is
+package Openml_Json is
 
    subtype Qualities_Map is JSON_Array;
 
@@ -58,4 +58,4 @@ package Openml is
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
 
-end Openml;
+end Openml_Json;

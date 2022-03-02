@@ -35,8 +35,9 @@ package Openml_Ada is
    procedure Fetch_Openml (Dataset_File_Name : String;
                            Save_File_Name    : String;
                            Target_Column     : ML_Types.String_List;
-                           X                 : out ML_Types.Value_Data_Lists_2D;
-                           Y                 : out ML_Types.Value_Data_Lists_2D;
+                           X, Y              : out ML_Types.Value_Data_Lists_2D;
+                           X_Indices         : out ML_Types.Integer_List;
+                           Y_Indices         : out ML_Types.Integer_List;
                            Bunch             : out Bunch_Data;
                            As_Frame          : in out As_Frame_State;
                            Return_X_Y        : Boolean := False);
