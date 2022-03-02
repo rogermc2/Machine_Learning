@@ -111,8 +111,9 @@ begin
    New_Line;
 
    Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
+   Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
    for index in Train_X.First_Index .. Train_X.Last_Index loop
-      Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
+--        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
       if Base_Decision_Tree.Predict
         (aClassifier, Train_X).Element (index).Element (1) =
         Train_Y.Element (index).Element (1) then

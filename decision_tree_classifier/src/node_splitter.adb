@@ -23,6 +23,7 @@ package body Node_Splitter is
       F_I                   : in out Natural;
       F_J                   : Natural;
       Best_Split            : in out Split_Record);
+   pragma Inline (Process_Non_Constants);
    procedure Update_Constants (Self                  : in out Splitter_Class;
                                Num_Known_Constants   : Natural;
                                Num_Found_Constants   : Natural);
@@ -102,6 +103,7 @@ package body Node_Splitter is
       return OK;
 
    end Can_Split;
+   pragma Inline (Can_Split);
 
    --  -------------------------------------------------------------------------
    --  L373
@@ -280,8 +282,8 @@ package body Node_Splitter is
                               Num_Found_Constants   : in out Natural;
                               Num_Total_Constants   : in out Natural;
                               Best_Split            : in out Split_Record) is
-      Routine_Name         : constant String :=
-                               "Node_Splitter.Find_Best_Split ";
+--        Routine_Name         : constant String :=
+--                                 "Node_Splitter.Find_Best_Split ";
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -307,7 +309,7 @@ package body Node_Splitter is
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
-         Put_Line (Routine_Name & "L329 F_I " & Integer'Image (F_I));
+--           Put_Line (Routine_Name & "L329 F_I " & Integer'Image (F_I));
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L339
          --  Draw a feature at random
@@ -352,6 +354,7 @@ package body Node_Splitter is
       end loop;  --  L415
 
    end Find_Best_Split;
+   pragma Inline (Find_Best_Split);
 
    --  -------------------------------------------------------------------------
    --  L116
