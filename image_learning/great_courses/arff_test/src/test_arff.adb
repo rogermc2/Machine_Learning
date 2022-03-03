@@ -5,13 +5,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 with AR_Types;
 with Load_ARFF_Data;
 with Load_ARFF_Data.ARFF_IO;
-with Load_ARFF_Data.ARFF_Printing;
+--  with Load_ARFF_Data.ARFF_Printing;
 
 procedure Test_ARFF is
    use Ada.Directories;
    use Load_ARFF_Data;
    use Load_ARFF_Data.ARFF_IO;
-   use Load_ARFF_Data.ARFF_Printing;
+--     use Load_ARFF_Data.ARFF_Printing;
    Routine_Name : constant String := "Test_ARFF ";
    File_Name    : constant String := "../mnist_784.arff";
    Ada_File     : constant String := "../mnist_784.ada";
@@ -32,11 +32,11 @@ begin
    end if;
 
    New_Line;
-   Print_Description (Data);
-   Put_Line ("Relation: " & Get_Relation (Data));
-   Print_Attributes (Data);
+--     Print_Description (Data);
+--     Put_Line ("Relation: " & Get_Relation (Data));
+--     Print_Attributes (Data);
    --     Print_Data (Data);
-   Print_Data (Data, 1, 2);
+--     Print_Data (Data, 1, 2);
 --     Print_Data (Data, 40, 100);
 
 end Test_ARFF;
