@@ -100,7 +100,7 @@ package body Load_ARFF_Data is
    function Decode_Dense_Values (Values     : IL_Types.Indef_String_List;
                                  Attributes : Attribute_List;
                                  Nominal_Value : out Integer)
-                                 return Classifier_Types.Float_List is
+                                 return AR_Real_List is
       use Ada.Containers;
       use Ada.Strings;
       use IL_Types;
@@ -111,7 +111,7 @@ package body Load_ARFF_Data is
       Values_Cursor  : Indefinite_String_Package.Cursor;
       ARFF_Data_Kind : ARFF_Data_Type;
       Attribute      : Attribute_Record;
-      Decoded_Values : Classifier_Types.Float_List;
+      Decoded_Values : AR_Real_List;
    begin
       Assert (Values.Length = Attributes.Length, Routine_Name &
                 "invalid data, number of values" &
