@@ -4,7 +4,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Types;
 with IL_Types;
-with Printing;
+--  with Printing;
 
 with Openml_Ada; use Openml_Ada;
 
@@ -131,8 +131,8 @@ package body OML_File_Tests is
 
       Put_Line (Routine_Name & "X length: " & Count_Type'Image (X.Length));
       Put_Line (Routine_Name & "Y length: " & Count_Type'Image (Y.Length));
-      Printing.Print_Float_Lists_2D (Routine_Name & "X", X);
-      Printing.Print_Integer_List (Routine_Name & "Y", Y);
+--        Printing.Print_Float_Lists_2D (Routine_Name & "X", X);
+--        Printing.Print_Integer_List (Routine_Name & "Y", Y);
       Put_Line (Routine_Name & "completed");
 
       pragma Unreferenced (Bunch);
