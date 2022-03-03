@@ -4,7 +4,7 @@ with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Classifier_Types; use Classifier_Types;
-with ML_Types;
+with IL_Types;
 
 package Weights is
 
@@ -31,12 +31,12 @@ package Weights is
 
     function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                     Class_Weights : Weight_List;
-                                    Classes       : ML_Types.Value_Data_List;
-                                    Y             : ML_Types.Value_Data_List)
+                                    Classes       : IL_Types.Value_Data_List;
+                                    Y             : IL_Types.Value_Data_List)
                                     return Weight_List;
     function Compute_Sample_Weight
       (Weight_Kind    : Weight_Type;
-       Y              : ML_Types.Value_Data_Lists_2D;
+       Y              : IL_Types.Value_Data_Lists_2D;
        Class_Weights  : Weight_List := Float_Package.Empty_Vector;
        Indices        : Integer_List := Integer_Package.Empty_Vector)
        return Weight_List;

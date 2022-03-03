@@ -4,6 +4,7 @@ with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with Classifier_Types;
 with IL_Types;
 
 package AR_Types is
@@ -86,7 +87,7 @@ package AR_Types is
    --  L783 declaration of return object obj
    type ARFF_Record is record
       Header  : ARFF_Header_Record;
-      Data    : AR_Real_List_2D;    --  'data': []
+      Data    : Classifier_Types.Float_List;    --  'data': []
       Target  : AR_Integer_List;
 --        Columns : AR_Indef_List_2D;   --  List of columns
    end record;
