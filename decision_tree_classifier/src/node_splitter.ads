@@ -67,6 +67,7 @@ package Node_Splitter is
      (Splitter              : in out Splitter_Class;
       Start_Row, Stop_Row   : Positive;
       Weighted_Node_Samples : in out Float);
+   pragma Inline (Reset_Node);
    function Split_Node (Self                  : in out Splitter_Class;
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)

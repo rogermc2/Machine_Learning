@@ -2,11 +2,11 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
 with ML_Types;
-with Printing;
+--  with Printing;
 
 package body Data_Splitter is
 
@@ -26,7 +26,7 @@ package body Data_Splitter is
    end Base_Shuffle_Split;
 
    --  -------------------------------------------------------------------------
-
+   --  L1564
    procedure Init_Base_Shuffle_Split
      (Self                                     : in out Base_Shuffle_Data; Num_Splits : Natural;
       Train_Size, Test_Size, Default_Test_Size : Natural) is
@@ -70,9 +70,10 @@ package body Data_Splitter is
    end Iterate_Indices;
 
    --  -------------------------------------------------------------------------
-
+   --  L1604
    procedure Train_Test_Split
-     (X, Y                             : ML_Types.Value_Data_Lists_2D; Train_Size, Test_Size : Natural;
+     (X, Y                             : ML_Types.Value_Data_Lists_2D;
+      Train_Size, Test_Size            : Natural;
       Train_X, Train_Y, Test_X, Test_Y : out ML_Types.Value_Data_Lists_2D) is
       use ML_Types;
       use Value_Lists_Data_Package;
@@ -90,7 +91,10 @@ package body Data_Splitter is
       Assert (Natural (Length (Y)) = Num_Samples, Routine_Name &
                 "Y length" & Integer'Image (Integer (Length (Y))) &
                 " is different to X length" & Natural'Image (Num_Samples));
+      Assert (Train_Size + Test_Size <= Num_Samples, Routine_Name &
+                "Train_Size + Test_Size > Num_Samples");
 
+      --  L1564
       Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size,
                                Default_Test_Size);
 
@@ -100,24 +104,22 @@ package body Data_Splitter is
          Next (X_Cursor);
          Next (Y_Cursor);
       end loop;
-      Put_Line (Routine_Name & "X_Vec length" &
-                  Integer'Image (Integer (X_Vec.Length)));
-
+--        Put_Line (Routine_Name & "X_Vec length" &
+--                    Integer'Image (Integer (X_Vec.Length)));
+      --  L1569 Shuffle_Split generates indices to split data rows into
+      --        training and test sets
       Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
-      Put_Line (Routine_Name & "Base_Shuffle_Split done");
-      Printing.Print_Integer_List ("Test_Indices", Test_Indices);
+--        Printing.Print_Integer_List ("Test_Indices", Test_Indices);
 
       for index in Test_Indices.First_Index .. Test_Indices.Last_Index loop
          Test_X.Append (X_Vec.Element (Test_Indices (index)));
          Test_Y.Append (Y_Vec.Element (Test_Indices (index)));
       end loop;
-      Put_Line (Routine_Name & "Test_Indices done");
 
       for index in Train_Indices.First_Index .. Train_Indices.Last_Index loop
          Train_X.Append (X_Vec.Element (Train_Indices (index)));
          Train_Y.Append (Y_Vec.Element (Train_Indices (index)));
       end loop;
-      Put_Line (Routine_Name & "done");
 
    end Train_Test_Split;
 

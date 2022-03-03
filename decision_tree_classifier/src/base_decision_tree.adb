@@ -137,7 +137,6 @@ package body Base_Decision_Tree is
       Tree_Build.Init_Builder (Builder, aClassifier.Parameters.Max_Leaf_Nodes,
                                  aClassifier.Parameters.Splitter);
 
-      Put_Line (Routine_Name & "L420");
       --  L420
       case Builder.Tree_Kind is
          when Tree_Build.Depth_First_Tree =>

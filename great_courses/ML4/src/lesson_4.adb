@@ -26,10 +26,10 @@ procedure Lesson_4 is
    use Support_4;
    use Decision_Tree_Classification;
    Routine_Name   : constant String := "Lesson_4 ";
---     Dataset_Name   : constant String := "mnist_784";
---     Return_X_Y     : constant Boolean := True;
-      Dataset_Name   : constant String := "diabetes";
-      Return_X_Y    : constant Boolean := False;
+   Dataset_Name   : constant String := "mnist_784";
+   Return_X_Y     : constant Boolean := True;
+--        Dataset_Name   : constant String := "diabetes";
+--        Return_X_Y    : constant Boolean := False;
    Min_Split      : constant String := "2";
    Test_Size      : constant Positive := 1000;
    Train_Size     : constant Positive := 5000;
