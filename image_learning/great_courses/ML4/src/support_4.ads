@@ -1,6 +1,7 @@
 
 with Base_Decision_Tree;
-with ML_Types; use ML_Types;
+with Classifier_Types;
+with IL_Types; use IL_Types;
 with Openml_Ada;
 with Tree;
 
@@ -8,9 +9,10 @@ package Support_4 is
 
    function Get_State
      (Dataset_Name     : String; Return_X_Y : Boolean;
-      X, Y             : out Value_Data_Lists_2D;
-      X_Indices        : out ML_Types.Integer_List;
-      Y_Indices        : out ML_Types.Integer_List;
+      X                : out Classifier_Types.Float_List_2D
+      Y                : out Classifier_Types.Integer_List;
+      X_Indices        : out IL_Types.Integer_List;
+      Y_Indices        : out IL_Types.Integer_List;
       Test_X, Test_Y,
       Train_X, Train_Y : out Value_Data_Lists_2D;
       Bunch            : out Openml_Ada.Bunch_Data) return Boolean;

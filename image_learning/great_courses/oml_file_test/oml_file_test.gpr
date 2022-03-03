@@ -1,6 +1,5 @@
 with "utilada_http.gpr";
 with "gnatcoll.gpr";
-with "aws.gpr";
 
 project Oml_File_Test is
 

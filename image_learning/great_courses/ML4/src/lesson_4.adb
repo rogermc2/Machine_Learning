@@ -3,7 +3,7 @@ with Ada.Containers;
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with ML_Types;
+with IL_Types;
 
 with Base_Decision_Tree;
 with Classifier_Types;
