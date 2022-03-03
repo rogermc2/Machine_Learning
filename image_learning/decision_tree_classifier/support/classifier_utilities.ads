@@ -82,9 +82,9 @@ package Classifier_Utilities is
                                   return Integer_Array;
     function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
     function Unique (Nums : Integer_List) return Integer_List;
-    function Unique_Values (Values : IL_Types.Value_Data_List)
-                           return IL_Types.Value_Data_List;
-    function Unique_Weights (Values : Weights.Weight_Lists_3D)
-                            return Weights.Weight_List;
+--      function Unique_Values (Values : IL_Types.Value_Data_List)
+--                             return IL_Types.Value_Data_List;
+--      function Unique_Weights (Values : Weights.Weight_Lists_3D)
+--                              return Weights.Weight_List;
 
 end Classifier_Utilities;

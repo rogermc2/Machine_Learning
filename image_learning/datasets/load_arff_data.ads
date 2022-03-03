@@ -12,6 +12,6 @@ package Load_ARFF_Data is
    procedure Load_ARFF (File_Name : String; Data : out ARFF_Record);
    function Permute (aList : Classifier_Types.Float_List_2D) return
      Classifier_Types.Float_List_2D;
---     function Permute (aList : AR_Data_List_2D) return AR_Data_List_2D;
+   pragma Inline (Permute);
 
 end Load_ARFF_Data;

@@ -130,13 +130,13 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
                          Last : Positive := 10) is
-      use IL_Types;
-      use Value_Data_Package;
-      use Value_Lists_Data_Package;
-      Data_List_2D : constant Value_Data_Lists_2D := Data.Data;
-      List_Curs    : Value_Lists_Data_Package.Cursor := Data_List_2D.First;
-      Data_List    : Value_Data_List;
-      Data_Curs    : Value_Data_Package.Cursor;
+      use Classifier_Types;
+      use Float_List_Package;
+      use Float_Package;
+      Data_List_2D : constant Float_List_2D := Data.Data;
+      List_Curs    : Float_List_Package.Cursor := Data_List_2D.First;
+      Data_List    : Float_List;
+      Data_Curs    : Float_Package.Cursor;
       Count        : Natural := Start - 1;
       Count2       : Natural := 0;
    begin
@@ -153,23 +153,10 @@ package body Load_ARFF_Data.ARFF_Printing is
             Data_Curs := Data_List.First;
             while Has_Element (Data_Curs) loop
                Count2 := Count2 + 1;
-               declare
-                  Data_Record : constant Value_Record := Element (Data_Curs);
-               begin
-                  case Data_Record.Value_Kind is
-                  when IL_Types.Boolean_Type =>
-                     Put (Boolean'Image (Data_Record.Boolean_Value));
-                  when IL_Types.Float_Type =>
-                     Put (Float'Image (Data_Record.Float_Value));
-                  when IL_Types.Integer_Type =>
-                     Put (Integer'Image (Data_Record.Integer_Value));
-                  when IL_Types.UB_String_Type =>
-                     Put (", " & Data_Record.UB_String_Value);
-                  end case;
-                  if Count2 <= Last then
-                     Put (", ");
-                  end if;
-               end;
+               Put (Float'Image (Element (Data_Curs)));
+               if Count2 <= Last then
+                  Put (", ");
+               end if;
                Next (Data_Curs);
             end loop;
             New_Line;

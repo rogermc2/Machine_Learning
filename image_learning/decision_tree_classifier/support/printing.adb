@@ -270,8 +270,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Indefinite_List (Name    : String;
-                                    theList : ML_Types.Indef_String_List) is
-      use  ML_Types.Indefinite_String_Package;
+                                    theList : IL_Types.Indef_String_List) is
+      use  IL_Types.Indefinite_String_Package;
       Curs : Cursor := theList.First;
    begin
       Put_Line (Name & ": ");
@@ -286,7 +286,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List (Name    : String;
-                                 theList : ML_Types.Integer_List) is
+                                 theList : IL_Types.Integer_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -323,8 +323,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List (Name    : String;
-                                 theList : ML_Types.Integer_DL_List) is
-      use ML_Types.Integer_DLL_Package;
+                                 theList : IL_Types.Integer_DL_List) is
+      use IL_Types.Integer_DLL_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -546,8 +546,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Strings (Name : String; theList : ML_Types.String_List) is
-      use ML_Types.String_Package;
+   procedure Print_Strings (Name : String; theList : IL_Types.String_List) is
+      use IL_Types.String_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -571,8 +571,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Strings (Name    : String;
-                            theList : ML_Types.Indef_String_List) is
-      use ML_Types.Indefinite_String_Package;
+                            theList : IL_Types.Indef_String_List) is
+      use IL_Types.Indefinite_String_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -657,7 +657,7 @@ package body Printing is
    --  -------------------------------------------------------------------------
 
    procedure Print_Unbounded_List (Name    : String;
-                                   theList : ML_Types.Unbounded_List) is
+                                   theList : IL_Types.Unbounded_List) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -722,8 +722,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_List (Name    : String;
-                                    theList : ML_Types.Value_Data_List) is
-      use ML_Types;
+                                    theList : IL_Types.Value_Data_List) is
+      use IL_Types;
       Value : Value_Record;
       Count : Integer := 1;
    begin
@@ -749,7 +749,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_2D
-     (Name      : String; theList : ML_Types.Value_Data_Lists_2D;
+     (Name      : String; theList : IL_Types.Value_Data_Lists_2D;
       Num_Items : Positive := 1000) is
       Items : Positive;
    begin
@@ -780,7 +780,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_3D
-     (Name : String; theList : ML_Types.Value_Data_Lists_3D) is
+     (Name : String; theList : IL_Types.Value_Data_Lists_3D) is
    begin
       if Name'Length > 0 then
          Put_Line (Name & ":");
@@ -801,8 +801,8 @@ package body Printing is
    --  -------------------------------------------------------------
 
    procedure Print_Value_Record
-     (Name : String; Value : ML_Types.Value_Record) is
-      use ML_Types;
+     (Name : String; Value : IL_Types.Value_Record) is
+      use IL_Types;
    begin
       if Name'Length > 0 then
          Put_Line (Name & ":");

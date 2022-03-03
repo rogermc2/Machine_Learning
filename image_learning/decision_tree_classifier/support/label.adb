@@ -41,7 +41,7 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  Fit fits label encoder
     procedure Fit (Encoder : in out Label_Encoder;
-                   Y       : ML_Types.Value_Data_List) is
+                   Y       : IL_Types.Value_Data_List) is
     begin
         if Encoder.Encoder_Kind = Class_Unique then
             Encoder.Uniques := Encode_Utils.Unique (Y);
@@ -56,7 +56,7 @@ package body Label is
     --  Balanced class weights should be given by
     --  n_samples / (n_classes * np.bincount(y))
     function Fit_Transform (Encoder : in out Label_Encoder;
-                            Y    : ML_Types.Value_Data_List)
+                            Y    : IL_Types.Value_Data_List)
                            return Natural_List is
         Encoded_Labels : Natural_List;
     begin
@@ -75,11 +75,11 @@ package body Label is
     --   Inverse_Transform transforms labels back to original encoding
     function Inverse_Transform (Self    : in out Label_Encoder;
                                 Labels  : Natural_List)
-                               return ML_Types.Value_Data_List is
+                               return IL_Types.Value_Data_List is
         aRange  : Natural_List := Natural_Package.Empty_Vector;
         Diff    : Natural_List;
-        Result  : ML_Types.Value_Data_List :=
-                    ML_Types.Value_Data_Package.Empty_Vector;
+        Result  : IL_Types.Value_Data_List :=
+                    IL_Types.Value_Data_Package.Empty_Vector;
     begin
         if not Labels.Is_Empty then
             for index in 1 .. Positive (Self.Uniques.Length) loop
@@ -102,7 +102,7 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  Transform returns labels as normalized encodings
     function Transform (Self : in out Label_Encoder;
-                        Y    : ML_Types.Value_Data_List)
+                        Y    : IL_Types.Value_Data_List)
                        return Natural_List is
         Labels  : Natural_List := Natural_Package.Empty_Vector;
     begin

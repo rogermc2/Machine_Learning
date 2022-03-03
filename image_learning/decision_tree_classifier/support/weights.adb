@@ -15,7 +15,7 @@ package body Weights is
    --  -------------------------------------------------------------------------
 
    function Compute_Balanced_Class_Weights
-     (Classes : ML_Types.Value_Data_List;  Y : ML_Types.Value_Data_List)
+     (Classes : IL_Types.Value_Data_List;  Y : IL_Types.Value_Data_List)
       return Weight_List is
       use Label;
       use Natural_Package;
@@ -58,8 +58,8 @@ package body Weights is
 
    function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                    Class_Weights : Weight_List;
-                                   Classes       : ML_Types.Value_Data_List;
-                                   Y             : ML_Types.Value_Data_List)
+                                   Classes       : IL_Types.Value_Data_List;
+                                   Y             : IL_Types.Value_Data_List)
                                    return Weight_List is
       Weights : Weight_List;
    begin
@@ -93,8 +93,8 @@ package body Weights is
    --  -------------------------------------------------------------------------
 
    function Compute_Balanced_Sample_Weight
-     (Y : ML_Types.Value_Data_Lists_2D) return Weight_List is
-      use ML_Types;
+     (Y : IL_Types.Value_Data_Lists_2D) return Weight_List is
+      use IL_Types;
       Y_1                   : Value_Data_List;
       Y_Full                : Value_Data_List;
       Classes_Full          : Value_Data_List;
@@ -139,13 +139,13 @@ package body Weights is
    --     Weights associated with classes
    --  Indices : list of indices to be used in a subsample
    function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
-                                   Y              : ML_Types.Value_Data_Lists_2D;
+                                   Y              : IL_Types.Value_Data_Lists_2D;
                                    Class_Weights  : Weight_List :=
                                      Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List is
-      use ML_Types;
+      use IL_Types;
       use Value_Data_Package;
       Num_Outputs           : constant Integer := Integer (Y.Length);
       Y_Full                : Value_Data_List;

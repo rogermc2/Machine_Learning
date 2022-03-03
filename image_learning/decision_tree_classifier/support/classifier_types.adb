@@ -30,7 +30,7 @@ package body Classifier_Types is
    --  ----------------------------------------------------------------------------
 
    procedure Check_Length (Routine_Name : String; L : Float_List;
-                           R            : ML_Types.Value_Data_List) is
+                           R            : IL_Types.Value_Data_List) is
       use Ada.Containers;
    begin
       Assert (R.Length = L.Length, Routine_Name &
@@ -42,7 +42,7 @@ package body Classifier_Types is
    --  ----------------------------------------------------------------------------
 
    procedure Check_Length (Routine_Name : String; L : Float_List;
-                           R            : ML_Types.Value_Data_Lists_2D) is
+                           R            : IL_Types.Value_Data_Lists_2D) is
       use Ada.Containers;
    begin
       Assert (R.Length = L.Length, Routine_Name &
@@ -54,7 +54,7 @@ package body Classifier_Types is
    --  ----------------------------------------------------------------------------
 
    procedure Check_Length
-     (Routine_Name : String; L : ML_Types.Value_Data_Lists_2D;
+     (Routine_Name : String; L : IL_Types.Value_Data_Lists_2D;
       R            : Float_List) is
       use Ada.Containers;
    begin
@@ -79,9 +79,9 @@ package body Classifier_Types is
 
    --  ----------------------------------------------------------------------------
 
-   function Dot (L : Classifier_Types.Float_List; R : ML_Types.Value_Data_Lists_2D)
+   function Dot (L : Classifier_Types.Float_List; R : IL_Types.Value_Data_Lists_2D)
                  return Float is
-      use ML_Types;
+      use IL_Types;
       R_List : Value_Data_List;
       Result : Float := 0.0;
    begin

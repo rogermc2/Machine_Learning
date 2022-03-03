@@ -51,7 +51,9 @@ package body Load_ARFF_Data is
    procedure Parse_Values (Row    : String;
                            Values : out IL_Types.Indef_String_List);
    function Split_Sparse_Line (Row : String) return IL_Types.Indef_String_List;
-   procedure Swap (Data : in out Classifier_Types.Float_List_2D; L, R : Positive);
+   procedure Swap (Data : in out Classifier_Types.Float_List_2D;
+                   L, R : Positive);
+   pragma Inline (Swap);
    function Unquote (Values : String) return String;
 
    --  ------------------------------------------------------------------------
@@ -614,7 +616,7 @@ package body Load_ARFF_Data is
 
    procedure Swap (Data : in out Classifier_Types.Float_List_2D;
                    L, R : Positive) is
-      Item : Classifier_Types.Float_List_2D;
+      Item : Classifier_Types.Float_List;
    begin
       Item := Data.Element (L);
       Data.Replace_Element (L, Data.Element (R));
