@@ -36,8 +36,8 @@ package body Criterion is
       Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    :  constant Classifier_Types.Natural_List :=
                          Criteria.Num_Classes;
-      Sum_Left_K     : Classifier_Types.Float_List;
-      Sum_Right_K    : Classifier_Types.Float_List;
+      Sum_Left_K     : IL_Types.Float_List;
+      Sum_Right_K    : IL_Types.Float_List;
       Count_K        : Float;
       Sq_Count_Left  : Float;
       Sq_Count_Right : Float;
@@ -117,7 +117,7 @@ package body Criterion is
 --        Routine_Name    : constant String :=
 --                            "Criterion.Initialize_Node_Criterion ";
       Num_Outputs     : Positive;
-      Sum_Total_K     : Classifier_Types.Float_List;
+      Sum_Total_K     : IL_Types.Float_List;
       Y_I_Index       : Positive;  --  Class index
       Y_I             : Classifier_Types.Natural_List;  --  Class
       Y_Ik            : Natural; --  Class.output
@@ -219,7 +219,7 @@ package body Criterion is
    function Node_Impurity_Entropy (Self : Criterion_Class) return Float is
       use Maths.Float_Math_Functions;
       Num_Classes : constant Classifier_Types.Natural_List := Self.Num_Classes;
-      Sum_Total_K : Classifier_Types.Float_List;
+      Sum_Total_K : IL_Types.Float_List;
       Count_K     : Float := 0.0;
       Entropy     : Float := 0.0;
    begin
@@ -286,7 +286,7 @@ package body Criterion is
    procedure Reset (Criteria : in out Criterion_Class) is
       Num_Outputs : constant Positive :=
                       Positive (Criteria.Y.Element (1).Length);
-      Sum_Left_K  : Classifier_Types.Float_List;
+      Sum_Left_K  : IL_Types.Float_List;
    begin
       Criteria.Split_Row := Criteria.Start_Row;
       Criteria.Num_Weighted_Left := 0.0;
@@ -311,7 +311,7 @@ package body Criterion is
    procedure Reverse_Reset (Criteria : in out Criterion_Class) is
       Num_Outputs : constant Positive :=
                       Positive (Criteria.Y.Element (1).Length);
-      Sum_Right_K : Classifier_Types.Float_List;
+      Sum_Right_K : IL_Types.Float_List;
    begin
       Criteria.Split_Row := Criteria.Stop_Row + 1;
       Criteria.Num_Weighted_Left := Criteria.Num_Weighted_Node_Samples;
@@ -340,9 +340,9 @@ package body Criterion is
       i            : Positive;
       Y_I          : Classifier_Types.Natural_List;
       Label_Index  : Positive;  --  Class index?
-      Sum_Left_K   : Classifier_Types.Float_List;
-      Sum_Right_K  : Classifier_Types.Float_List;
-      Sum_K        : Classifier_Types.Float_List;
+      Sum_Left_K   : IL_Types.Float_List;
+      Sum_Right_K  : IL_Types.Float_List;
+      Sum_K        : IL_Types.Float_List;
       Weight       : Float := 1.0;
    begin
       --  L435  Update statistics up to new_pos given that

@@ -65,7 +65,7 @@ package body Printing is
                               Data : Criterion.Criterion_Class) is
       use Criterion;
       use Classifier_Types.Natural_List_Package;
-      use Classifier_Types.Float_Package;
+      use IL_Types.Float_Package;
    begin
       Put_Line (Name & ": ");
       Put_Line ("Criterion_Type: " &
@@ -198,7 +198,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_List (Name : String; theList : Float_List) is
+   procedure Print_Float_List (Name : String; theList : IL_Types.Float_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -304,24 +304,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List (Name : String; theList : Integer_List) is
-      Count : Integer := 1;
-   begin
-      Put_Line (Name & ": ");
-      for Index in theList.First_Index .. theList.Last_Index loop
-         Put (Integer'Image (theList.Element (Index)) & "   ");
-         Count := Count + 1;
-         if Count > 10 then
-            New_Line;
-            Count := 1;
-         end if;
-      end loop;
-      New_Line;
-
-   end Print_Integer_List;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_Integer_List (Name    : String;
                                  theList : IL_Types.Integer_DL_List) is
       use IL_Types.Integer_DLL_Package;
@@ -345,7 +327,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Lists_2D (Name : String;
-                                   Data : Float_List_2D) is
+                                   Data : IL_Types.Float_List_2D) is
    begin
       Put_Line (Name & ": ");
       for index in Data.First_Index .. Data.Last_Index loop

@@ -420,12 +420,12 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Value_List (List_A, List_B : IL_Types.Value_Data_List)
-                                      return Classifier_Types.Integer_List is
-      use Classifier_Types.Integer_Package;
+                                      return IL_Types.Integer_List is
+      use IL_Types.Integer_Package;
       use Value_Data_Sorting;
       Item    : Value_Record;
       Index_A : Positive;
-      theList : Classifier_Types.Integer_List;
+      theList : IL_Types.Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -597,9 +597,9 @@ package body Classifier_Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Sum_Cols (aList : Classifier_Types.Float_List_2D)
-                      return Classifier_Types.Float_List is
-      theSum : Classifier_Types.Float_List;
+   function Sum_Cols (aList : IL_Types.Float_List_2D)
+                      return IL_Types.Float_List is
+      theSum : IL_Types.Float_List;
       Value  : Float;
    begin
       for index in aList.First_Index .. aList.Last_Index loop
@@ -693,7 +693,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Array (L : Classifier_Types.Integer_List) return Integer_Array is
+   function To_Array (L : IL_Types.Integer_List) return Integer_Array is
       New_Array : Integer_Array (1 .. Integer (L.Length));
       A_Index   : Integer := 0;
    begin
@@ -738,8 +738,8 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List (A : Classifier_Types.Integer_Array)
-                             return Classifier_Types.Integer_List is
-      A_List : Classifier_Types.Integer_List;
+                             return IL_Types.Integer_List is
+      A_List : IL_Types.Integer_List;
    begin
       for index in A'First .. A'Last loop
          A_List.Append (A (index));
@@ -751,9 +751,9 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List (Ints : IL_Types.Value_Data_List)
-                             return Classifier_Types.Integer_List is
+                             return IL_Types.Integer_List is
       Item   : Value_Record;
-      Values : Classifier_Types.Integer_List;
+      Values : IL_Types.Integer_List;
    begin
       for index in Ints.First_Index .. Ints.Last_Index loop
          Item := Ints.Element (index);
@@ -1000,14 +1000,14 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Nums : Classifier_Types.Integer_List)
-                    return Classifier_Types.Integer_List is
+   function Unique (Nums : IL_Types.Integer_List)
+                    return IL_Types.Integer_List is
       use Int_Sets;
-      use Classifier_Types.Integer_Package;
+      use IL_Types.Integer_Package;
       Unique_Set : Int_Sets.Set;
-      Int_Curs   : Classifier_Types.Integer_Package.Cursor := Nums.First;
+      Int_Curs   : IL_Types.Integer_Package.Cursor := Nums.First;
       Set_Curs   : Int_Sets.Cursor;
-      Nums_List  : Classifier_Types.Integer_List;
+      Nums_List  : IL_Types.Integer_List;
    begin
       while Has_Element (Int_Curs) loop
          Unique_Set.Include (Element (Int_Curs));

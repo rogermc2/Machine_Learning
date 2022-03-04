@@ -12,7 +12,6 @@ with GNAT.Regpat;
 with Maths;
 with Utilities;
 
-with IL_Types;
 with Dataset_Utilities;
 with Regexep;
 
@@ -51,7 +50,7 @@ package body Load_ARFF_Data is
    procedure Parse_Values (Row    : String;
                            Values : out IL_Types.Indef_String_List);
    function Split_Sparse_Line (Row : String) return IL_Types.Indef_String_List;
-   procedure Swap (Data : in out Classifier_Types.Float_List_2D;
+   procedure Swap (Data : in out IL_Types.Float_List_2D;
                    L, R : Positive);
    pragma Inline (Swap);
    function Unquote (Values : String) return String;
@@ -562,11 +561,11 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Classifier_Types.Float_List_2D)
-                  return Classifier_Types.Float_List_2D is
+   function Permute (aList : IL_Types.Float_List_2D)
+                     return IL_Types.Float_List_2D is
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
-      Permutation  : Classifier_Types.Float_List_2D := aList;
+      Permutation  : IL_Types.Float_List_2D := aList;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -614,9 +613,9 @@ package body Load_ARFF_Data is
 
    --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out Classifier_Types.Float_List_2D;
+   procedure Swap (Data : in out IL_Types.Float_List_2D;
                    L, R : Positive) is
-      Item : Classifier_Types.Float_List;
+      Item : IL_Types.Float_List;
    begin
       Item := Data.Element (L);
       Data.Replace_Element (L, Data.Element (R));

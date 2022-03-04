@@ -19,13 +19,13 @@ package body Base_Decision_Tree is
       X                 : IL_Types.Value_Data_Lists_2D;
       Y                 : Classifier_Types.Natural_Lists_2D;
       Min_Samples_Split : out Positive;
-      Sample_Weights    : in out Classifier_Types.Float_List);
+      Sample_Weights    : in out IL_Types.Float_List);
    procedure Classification_Part
      (aClassifier            : in out Classifier;
       Y_Orig                 : IL_Types.Value_Data_Lists_2D;
       Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
       Classes                : out IL_Types.Value_Data_Lists_2D;
-      Expanded_Class_Weights : in out Classifier_Types.Float_List);
+      Expanded_Class_Weights : in out IL_Types.Float_List);
    procedure Prune_Tree (aClassifier : in out Classifier);
 
    --  -------------------------------------------------------------------------
@@ -161,7 +161,7 @@ package body Base_Decision_Tree is
       X                 : IL_Types.Value_Data_Lists_2D;
       Y                 : Classifier_Types.Natural_Lists_2D;
       Min_Samples_Split : out Positive;
-      Sample_Weights    : in out Classifier_Types.Float_List) is
+      Sample_Weights    : in out IL_Types.Float_List) is
       --        use Maths.Float_Math_Functions;
       use Tree;
       Routine_Name      : constant String :=

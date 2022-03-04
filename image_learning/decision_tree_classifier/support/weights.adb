@@ -94,12 +94,11 @@ package body Weights is
 
    function Compute_Balanced_Sample_Weight
      (Y : IL_Types.Value_Data_Lists_2D) return Weight_List is
-      use IL_Types;
       Y_1                   : Value_Data_List;
       Y_Full                : Value_Data_List;
       Classes_Full          : Value_Data_List;
       Inverse               : Natural_List := Natural_Package.Empty_Vector;
-      K_Indices             : Classifier_Types.Integer_List;
+      K_Indices             : Integer_List;
       Weight_K              : Weight_List;
       aWeight               : Float;
       Weights               : Weight_List;
@@ -145,7 +144,6 @@ package body Weights is
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List is
-      use IL_Types;
       use Value_Data_Package;
       Num_Outputs           : constant Integer := Integer (Y.Length);
       Y_Full                : Value_Data_List;
@@ -159,7 +157,7 @@ package body Weights is
       Classes_Subsample     : Value_Data_List;
       Weight_K              : Weight_List;
       aWeight               : Float;
-      K_Indices             : Classifier_Types.Integer_List;
+      K_Indices             : Integer_List;
       Inverse               : Natural_List;
       Class_K_Weights       : Weight_List;
       Expanded_Class_Weight : Weight_Lists_2D;

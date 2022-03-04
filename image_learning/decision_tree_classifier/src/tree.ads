@@ -31,9 +31,9 @@ package Tree is
       end case;
    end record;
 
-   subtype Values_List is Classifier_Types.Float_List;
-   subtype Values_List_2D is Classifier_Types.Float_List_2D;
-   subtype Values_List_3D is Classifier_Types.Float_List_3D;
+   subtype Values_List is IL_Types.Float_List;
+   subtype Values_List_2D is IL_Types.Float_List_2D;
+   subtype Values_List_3D is IL_Types.Float_List_3D;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
       Node_ID                   : Positive := 1;

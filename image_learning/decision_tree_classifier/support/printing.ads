@@ -31,17 +31,16 @@ package Printing is
     procedure Print_Float_Array (Name   : String; anArray : Float_Array;
                                  Start  : Integer := 1;
                                  Finish : Integer := 0);
-    procedure Print_Float_List (Name  : String; theList : Float_List);
+    procedure Print_Float_List (Name  : String; theList : IL_Types.Float_List);
     procedure Print_Indefinite_List (Name   : String;
                                     theList : IL_Types.Indef_String_List);
     procedure Print_Integer_List (Name : String;
                                   theList : IL_Types.Integer_List);
     procedure Print_Integer_List (Name : String;
                                   theList : IL_Types.Integer_DL_List);
-    procedure Print_Integer_List (Name : String; theList : Integer_List);
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);
-    procedure Print_Float_Lists_2D (Name : String; Data : Float_List_2D);
+    procedure Print_Float_Lists_2D (Name : String; Data : IL_Types.Float_List_2D);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
     procedure Print_Value_Lists_2D
