@@ -58,7 +58,7 @@ package Criterion is
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Initialize_Node_Criterion
       (Criteria           : in out Criterion_Class;
-      Y                   : Natural_Lists_2D;
+      Y                   : Natural_List;
       --  Samples:
       Sample_Indices      : Natural_List;
       --  Sample_Weight contains the weight of each sample

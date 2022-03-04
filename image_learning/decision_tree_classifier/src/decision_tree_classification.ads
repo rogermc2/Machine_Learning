@@ -19,7 +19,7 @@
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with IL_Types;
+with IL_Types; use IL_Types;
 with Tree;
 
 with Base_Decision_Tree;
@@ -47,7 +47,6 @@ package Decision_Tree_Classification is
          when Tree.Integer_Type =>  Min_Split         : Integer := 2;
          when Tree.Float_Type   => Min_Fraction_Split : Float := 2.0;
          when Tree.Enum_Type    => null;
-         when others    => null;
       end case;
    end record;
 
@@ -56,7 +55,6 @@ package Decision_Tree_Classification is
          when Tree.Integer_Type =>  Min_Leaf       : Integer := 1;
          when Tree.Float_Type => Min_Fraction_Leaf : Float := 1.0;
          when Tree.Enum_Type => null;
-         when others => null;
       end case;
    end record;
 
@@ -83,14 +81,14 @@ package Decision_Tree_Classification is
       Random_State             : Integer := 0);
    procedure Classification_Fit
      (aClassifier    : in out Base_Decision_Tree.Classifier;
-      X              : IL_Types.Value_Data_Lists_2D;
-      Y              : IL_Types.Value_Data_Lists_2D;
+      X              : Float_List_2D;
+      Y              : Integer_List;
       Sample_Weights : in out Weights.Weight_List);
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                 X    : IL_Types.Value_Data_Lists_2D)
+                                 X    : Value_Data_Lists_2D)
                                   return Weights.Weight_Lists_3D;
    function Predict_Log_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                     X    : IL_Types.Value_Data_Lists_2D)
+                                     X    : Value_Data_Lists_2D)
                                      return Weights.Weight_Lists_3D;
 
 end Decision_Tree_Classification;

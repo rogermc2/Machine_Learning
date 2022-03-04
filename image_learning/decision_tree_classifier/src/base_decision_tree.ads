@@ -83,8 +83,7 @@ package Base_Decision_Tree is
    --  class DecisionTree parameters additional to Base_Parameter_Data
    type Attribute_Data is record
       --  The classes labels (single output problem)
-      --  or a list of arrays of class labels (multi-output problem).
-      Classes             : Value_Data_Lists_2D;
+      Classes             : Integer_List;
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
@@ -106,7 +105,7 @@ package Base_Decision_Tree is
    Classifier_Error : Exception;
    Value_Error      : Exception;
 
-   function Apply (aClassifier : Classifier; X : Value_Data_Lists_2D)
+   function Apply (aClassifier : Classifier; X : Float_List_2D)
                    return Natural_List;
    --  BaseDecisionTree.Fit (super of class DecisionTreeClassifier)
    --  Fit builds a decision tree classifier from the training set (X, Y).
@@ -114,8 +113,8 @@ package Base_Decision_Tree is
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
    procedure Base_Fit
      (aClassifier    : in out Classifier;
-      X              : Value_Data_Lists_2D;
-      Y_Orig         : Value_Data_Lists_2D;
+      X              : Float_List_2D;
+      Y_Orig         : Integer_List;
       Sample_Weights : out Weights.Weight_List);
    procedure C_Init
      (aClassifier              : in out Classifier;
@@ -132,11 +131,9 @@ package Base_Decision_Tree is
       Min_Impurity_Decrease    : Float := 0.0;
       CCP_Alpha                : Float := 0.0;
       Random_State             : Integer := 0);
-   function Predict (Self : in out Classifier;
-                     X    : Value_Data_Lists_2D)
-                     return Value_Data_Lists_2D;
-   function Decision_Path (aClassifier : Classifier;
-                           X           : Value_Data_Lists_2D)
+   function Predict (Self : in out Classifier; X : Float_List_2D)
+                     return Float_List_2D;
+   function Decision_Path (aClassifier : Classifier; X : Float_List_2D)
                            return Natural_Lists_2D;
 
 end Base_Decision_Tree;

@@ -44,6 +44,7 @@ procedure Lesson_4 is
    aClassifier    : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
    No_Weights     : Weights.Weight_List := Float_Package.Empty_Vector;
+   Prediction     : Float;
    Correct        : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 
@@ -65,7 +66,7 @@ begin
       Put_Line (Routine_Name & "permuting");
       X := Utilities.Permute (X);
       Put_Line (Routine_Name & "X permuted");
-      Y := Utilities.Permute (Y);
+      Utilities.Permute (Y);
       Put_Line (Routine_Name & "Y permuted");
 --        Printing.Print_Value_Data_List ("permuted features row 16", X.Element (16));
       Put_Line (Routine_Name & "splitting data");
@@ -113,9 +114,9 @@ begin
    Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
    for index in Train_X.First_Index .. Train_X.Last_Index loop
 --        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
-      if Base_Decision_Tree.Predict
-        (aClassifier, Train_X).Element (index).Element (1) =
-        Train_Y.Element (index).Element (1) then
+      Prediction := Base_Decision_Tree.Predict
+        (aClassifier, Train_X).Element (index).Element (1);
+      if Integer (Prediction) = Train_Y.Element (index) then
          Correct := Correct + 1;
       end if;
    end loop;

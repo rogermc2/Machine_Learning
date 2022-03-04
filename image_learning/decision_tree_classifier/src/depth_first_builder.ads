@@ -20,6 +20,6 @@ package Depth_First_Builder is
 
     procedure Build_Tree (theTree   : in out Tree.Tree_Class;
                           Builder   : in out Tree_Build.Tree_Builder;
-                          Y_Encoded : Natural_Lists_2D);
+                          Y_Encoded : Natural_List);
 
 end Depth_First_Builder;

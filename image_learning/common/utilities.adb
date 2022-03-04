@@ -10,9 +10,7 @@ with Maths;
 
 package body Utilities is
 
-   use IL_Types;
-
-   procedure Print_Results_Question (Question : IL_Types.Question_Data);
+   procedure Print_Results_Question (Question : Question_Data);
    function Unique_Values (Rows    : Rows_Vector;
                            Feature : Feature_Name_Type) return Value_List;
 
@@ -69,9 +67,9 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   function Get_Column (List_2D      : IL_Types.Value_Data_Lists_2D;
+   function Get_Column (List_2D      : Value_Data_Lists_2D;
                         Column_Index : Positive)
-                        return IL_Types.Value_Data_List is
+                        return Value_Data_List is
       aList  : Value_Data_List;
       Column : Value_Data_List;
       Data   : Value_Record;
@@ -88,7 +86,7 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Feature_Array (Data    : IL_Types.Rows_Vector;
+   function Feature_Array (Data    : Rows_Vector;
                            Col_Num : Class_Range) return Value_Data_Array is
       Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
       UB_Feature : Unbounded_String;
@@ -120,7 +118,7 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
-   function Get_Data_Type (Data : Unbounded_String) return IL_Types.Data_Type is
+   function Get_Data_Type (Data : Unbounded_String) return Data_Type is
       theType   : Data_Type;
       aString   : constant String := To_String (Data);
       S_Last    : constant Integer := aString'Last;
@@ -192,7 +190,7 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
-   function Label_Array (Data : IL_Types.Rows_Vector) return Value_Data_Array is
+   function Label_Array (Data : Rows_Vector) return Value_Data_Array is
       Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
       UB_Label   : Unbounded_String;
       Data_Kind  : Data_Type;
@@ -223,14 +221,14 @@ package body Utilities is
    --  ---------------------------------------------------------------------------
 
    procedure Load_CSV_Data (Data_File : File_Type;
-                            Data      : out IL_Types.Rows_Vector) is
-      use IL_Types.String_Package;
+                            Data      : out Rows_Vector) is
+      use String_Package;
       --          Routine_Name : constant String := "Utilities.Load_CSV_Data 1 ";
       Data_Line    : Unbounded_String :=
                        To_Unbounded_String (Get_Line (Data_File));
-      Num_Features : IL_Types.Class_Range;
+      Num_Features : Class_Range;
       CSV_Line     : String_List;
-      Curs         : IL_Types.String_Package.Cursor;
+      Curs         : String_Package.Cursor;
    begin
       Num_Features :=
         Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
@@ -272,15 +270,15 @@ package body Utilities is
 
    function Load_CSV_Data
      (Data_File : File_Type; Header_Line : out Header_Data_Type)
-      return IL_Types.Rows_Vector is
-      use IL_Types.String_Package;
+      return Rows_Vector is
+      use String_Package;
       --        Routine_Name : constant String := "Utilities.Load_CSV_Data 2 ";
       Data_Line    : Unbounded_String :=
                        To_Unbounded_String (Get_Line (Data_File));
-      Num_Features : IL_Types.Class_Range;
+      Num_Features : Class_Range;
       CSV_Line     : String_List;
-      Curs         : IL_Types.String_Package.Cursor;
-      Data         : IL_Types.Rows_Vector;
+      Curs         : String_Package.Cursor;
+      Data         : Rows_Vector;
    begin
       Num_Features :=
         Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
@@ -320,13 +318,13 @@ package body Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Raw_CSV_Data (Data_File : File_Type)
-                               return IL_Types.Raw_Data_Vector is
-      use IL_Types.String_Package;
+                               return Raw_Data_Vector is
+      use String_Package;
       Data_Line : Unbounded_String;
       CSV_Line  : String_List;
-      Curs      : IL_Types.String_Package.Cursor;
+      Curs      : String_Package.Cursor;
       Values    : Unbounded_List;
-      Data      : IL_Types.Raw_Data_Vector;
+      Data      : Raw_Data_Vector;
    begin
       while not End_Of_File (Data_File) loop
          Data_Line := To_Unbounded_String (Get_Line (Data_File));
@@ -362,7 +360,7 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Permute (aList : in out IL_Types.Integer_List) is
+   procedure Permute (aList : in out Integer_List) is
       use Integer_Package;
       List_Length  : constant Positive := Positive (aList.Length);
       Curs_1       : Cursor := aList.First;
@@ -394,7 +392,7 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Permute (aList : in out IL_Types.String_List) is
+   procedure Permute (aList : in out String_List) is
       use String_Package;
       List_Length  : constant Positive := Positive (aList.Length);
       Curs_1       : Cursor := aList.First;
@@ -426,11 +424,10 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : IL_Types.Value_Data_Lists_2D)
-                     return IL_Types.Value_Data_Lists_2D is
+   function Permute (aList : Float_List_2D) return Float_List_2D is
       List_Length  : constant Positive := Positive (aList.Length);
       Rand         : Positive;
-      Permutation  : Value_Data_Lists_2D := aList;
+      Permutation  : Float_List_2D := aList;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -446,13 +443,12 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : IL_Types.Value_Data_Lists_2D)
-                     return IL_Types.Value_Data_Lists_3D is
+   function Permute (aList : Float_List_2D) return Float_List_3D is
       List_Length  : constant Positive := Positive (aList.Length);
-      Permutation  : Value_Data_Lists_2D := aList;
-      Permutations : Value_Data_Lists_3D;
+      Permutation  : Float_List_2D := aList;
+      Permutations : Float_List_3D;
 
-      procedure Recurse (K : Positive; A : in out Value_Data_Lists_2D) is
+      procedure Recurse (K : Positive; A : in out Float_List_2D) is
       begin
          if K > 1 then
             --  Generate permutations with k-th element unaltered
@@ -674,7 +670,7 @@ package body Utilities is
       Put_Line (Message & " Feature types:");
       for index in theTypes'First .. theTypes'Last loop
          Count := Count + 1;
-         Put (IL_Types.Data_Type'Image (theTypes (index)));
+         Put (Data_Type'Image (theTypes (index)));
          if index /= theTypes'Last then
             Put (", ");
          end if;
@@ -698,7 +694,7 @@ package body Utilities is
       Put_Line (Message & " Label types:");
       for index in theTypes'First .. theTypes'Last loop
          Count := Count + 1;
-         Put (IL_Types.Data_Type'Image (theTypes (index)));
+         Put (Data_Type'Image (theTypes (index)));
          if index /= theTypes'Last then
             Put (", ");
          end if;
@@ -784,7 +780,7 @@ package body Utilities is
    --  ------------------------------------------------------------------------
 
    procedure Print_Question (Message  : String;
-                             Question : IL_Types.Question_Data) is
+                             Question : Question_Data) is
       Col          : constant String := To_String (Question.Feature_Name);
       Feature_Kind : constant Data_Type := Question.Feature_Kind;
    begin
@@ -822,7 +818,7 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Results_Question (Question : IL_Types.Question_Data) is
+   procedure Print_Results_Question (Question : Question_Data) is
       UB_String : Unbounded_String;
    begin
       Put ("Is " & To_String (Question.Feature_Name));
@@ -866,7 +862,7 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Row (Message    : String; Rows : IL_Types.Rows_Vector;
+   procedure Print_Row (Message    : String; Rows : Rows_Vector;
                         Row_Number : Positive) is
       use Rows_Package;
       aRow : Row_Data;
@@ -1012,10 +1008,9 @@ package body Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Split_Row_Data (Row_Data : IL_Types.Rows_Vector)
+   function Split_Row_Data (Row_Data : Rows_Vector)
                             return Data_Record is
       use Rows_Package;
-      use Value_Data_Package;
       aRow           : IL_Types.Row_Data := Row_Data.First_Element;
       Features_List  : Value_Data_Lists_2D;
       Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
@@ -1137,9 +1132,20 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out Value_Data_Lists_2D;
+   procedure Swap (Data : in out Float_List_2D;
                    L, R : Positive) is
-      Item : Value_Data_List;
+      Item : Float_List;
+   begin
+      Item := Data.Element (L);
+      Data.Replace_Element (L, Data.Element (R));
+      Data.Replace_Element (R, Item);
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Swap (Data : in out Integer_List;
+                   L, R : Positive) is
+      Item : Integer;
    begin
       Item := Data.Element (L);
       Data.Replace_Element (L, Data.Element (R));
@@ -1238,7 +1244,7 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   function XY_To_Rows (X, Y : IL_Types.Value_Data_Lists_2D)
+   function XY_To_Rows (X, Y : Value_Data_Lists_2D)
                         return Rows_Vector is
 
       Feature_Values   : Value_Data_List;

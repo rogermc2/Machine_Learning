@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
-with IL_Types;
+with IL_Types; use IL_Types;
 
 package Data_Splitter is
 
@@ -10,8 +10,9 @@ package Data_Splitter is
      (Self : in out Base_Shuffle_Data; Num_Splits : Natural;
       Train_Size, Test_Size, Default_Test_Size : Natural);
    procedure Train_Test_Split
-     (X, Y : IL_Types.Value_Data_Lists_2D; Train_Size, Test_Size : Natural;
-      Train_X, Train_Y, Test_X, Test_Y : out IL_Types.Value_Data_Lists_2D);
+     (X : Float_List_2D; Y : Integer_List; Train_Size, Test_Size : Natural;
+      Train_X : out Float_List_2D; Train_Y : out Integer_List;
+      Test_X  : out Float_List_2D; Test_Y : out Integer_List);
 
 private
 
@@ -20,10 +21,10 @@ private
       Train_Size        : Natural := 0;
       Test_Size         : Natural := 0;
       Default_Test_Size : Natural := 0;
-      X_Train_Set       : IL_Types.Value_Data_Lists_2D;
-      Y_Train_Set       : IL_Types.Value_Data_Lists_2D;
-      X_Test_Set        : IL_Types.Value_Data_Lists_2D;
-      Y_Test_Set        : IL_Types.Value_Data_Lists_2D;
+      X_Train_Set       : Float_List_2D;
+      Y_Train_Set       : Integer_List;
+      X_Test_Set        : Float_List_2D;
+      Y_Test_Set        : Integer_List;
    end record;
 
 end Data_Splitter;

@@ -47,33 +47,22 @@ package body Node_Splitter is
                        Num_Found_Constants : in out Natural;
                        F_I, F_J            : Natural)
                        return Boolean is
-      Routine_Name : constant String := "Node_Splitter.Can_Split ";
-      X_F_Start    : constant Value_Record
+      --        Routine_Name : constant String := "Node_Splitter.Can_Split ";
+      X_F_Start    : constant Float
         := Self.Feature_Values.Element (Self.Feature_Values.First_Index);
-      X_F_End      : constant Value_Record
+      X_F_End      : constant Float
         := Self.Feature_Values.Element (Self.Feature_Values.Last_Index);
       Swap         : Natural;
       LE           : Boolean;
       OK           : Boolean := False;
    begin
       --  L368
---        Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
---                Routine_Name & "X_F_End.Value_Kind " &
---                  Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
---                  Data_Type'Image (X_F_Start.Value_Kind));
+      --        Assert (X_F_End.Value_Kind = X_F_Start.Value_Kind,
+      --                Routine_Name & "X_F_End.Value_Kind " &
+      --                  Data_Type'Image (X_F_End.Value_Kind) & " /= X_F_Start.Value_Kind " &
+      --                  Data_Type'Image (X_F_Start.Value_Kind));
       --  L363
-      case X_F_Start.Value_Kind is
-         when Float_Type =>
-            LE := X_F_End.Float_Value <= X_F_Start.Float_Value +
-              Feature_Threshold;
-
-         when Integer_Type =>
-            LE := X_F_End.Integer_Value <= X_F_Start.Integer_Value;
-
-         when others =>
-            raise Node_Splitter_Error with Routine_Name & ", invalid X_Features"
-              & IL_Types.Data_Type'Image (X_F_Start.Value_Kind);
-      end case;
+      LE := X_F_End <= X_F_Start + Feature_Threshold;
 
       --  Still L363
       if LE then
@@ -109,44 +98,30 @@ package body Node_Splitter is
    procedure Evaluate_All_Splits (Splitter   : in out Splitter_Class;
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record) is
---        Routine_Name              : constant String :=
---                                      "Node_Splitter.Evaluate_All_Splits ";
-      F_Values                  : constant IL_Types.Value_Data_List :=
+      --        Routine_Name              : constant String :=
+      --                                      "Node_Splitter.Evaluate_All_Splits ";
+      F_Values                  : constant Float_List :=
                                     Splitter.Feature_Values;
       P_Index                   : Positive;
       F_Index                   : Positive;
       Current_Proxy_Improvement : Float := -Float'Last;
       Best_Proxy_Improvement    : Float := -Float'Last;
 
-      function Compare (Features : IL_Types.Value_Data_List;
+      function Compare (Features : Float_List;
                         P_Index  : Positive) return Boolean is
          Feature_Index : constant Positive :=
                            P_Index - Splitter.Start_Row + 1;
-         XP            : constant Value_Record :=
+         XP            : constant Float :=
                            Features.Element (Feature_Index);
-         XP_1          : constant Value_Record :=
+         XP_1          : constant Float :=
                            Features.Element (Feature_Index + 1);
          Result        : Boolean;
       begin
          --  Check for next feature value equal to or less than
          --  current feature value
          --  Less than shoudn't occur as Features has been sorted
-         Result := XP_1.Value_Kind = XP.Value_Kind;
-         --           Put_Line (Routine_Name & "Compare Result " & Boolean'Image (Result));
-         if Result then
-            case XP.Value_Kind is
-               when Boolean_Type =>
-                  Result := not XP_1.Boolean_Value and XP.Boolean_Value;
-               when Float_Type =>
-                  Result := XP_1.Float_Value <= XP.Float_Value +
-                    Feature_Threshold;
-               when Integer_Type =>
-                  Result := XP_1.Integer_Value <= XP.Integer_Value;
-               when UB_String_Type =>
-                  Result := XP_1.UB_String_Value <= XP.UB_String_Value;
-            end case;
-         end if;
 
+         Result := XP_1 <= XP + Feature_Threshold;
          return Result;
 
       end Compare;
@@ -155,10 +130,10 @@ package body Node_Splitter is
       --  Set of features to be split:
       --  Splitter.Start_Index through Splitter.End_Index
       --  L375 Evaluate all splits
---        Assert (Integer (F_Values.Length) >=
---                  Splitter.Stop_Row - Splitter.Start_Row + 1, Routine_Name &
---                  "Invalid Feature_Values Length " &
---                  Integer'Image (Integer (F_Values.Length)));
+      --        Assert (Integer (F_Values.Length) >=
+      --                  Splitter.Stop_Row - Splitter.Start_Row + 1, Routine_Name &
+      --                  "Invalid Feature_Values Length " &
+      --                  Integer'Image (Integer (F_Values.Length)));
       P_Index := Splitter.Start_Row;
       while P_Index < Splitter.Stop_Row loop
          --  L378
@@ -204,54 +179,16 @@ package body Node_Splitter is
                      F_Index := P_Index - Splitter.Start_Row + 1;
                      Best_Proxy_Improvement := Current_Proxy_Improvement;
                      --  L414
-                     case F_Values.Element (F_Index).Value_Kind is
-                        when Float_Type =>
-                           Current.Threshold := 0.5 *
-                             (F_Values.Element (F_Index - 1).Float_Value +
-                                  F_Values.Element (F_Index).Float_Value);
-                           if Current.Threshold =
-                             F_Values.Element (F_Index).Float_Value or
-                             Current.Threshold = Float'Last or
-                             Current.Threshold = (-Float'Last)
-                           then
-                              case F_Values.Element
-                                (F_Index - 1).Value_Kind is
-                                 when Float_Type =>
-                                    Current.Threshold := F_Values.Element
-                                      (F_Index - 1).Float_Value;
-                                 when Integer_Type =>
-                                    Current.Threshold :=
-                                      Float (F_Values.Element
-                                             (F_Index - 1).Integer_Value);
-                                 when Boolean_Type =>
-                                    if F_Values.Element
-                                      (F_Index - 1).Boolean_Value
-                                    then
-                                       Current.Threshold := 1.0;
-                                    else
-                                       Current.Threshold := 0.0;
-                                    end if;
-                                 when UB_String_Type => null;
-                              end case;
-                           end if;
-
-                        when Integer_Type =>
-                           Current.Threshold := 0.5 * Float
-                             (F_Values.Element (F_Index - 1).Integer_Value
-                              + F_Values.Element (F_Index).Integer_Value);
-                           if Current.Threshold =
-                             Float (F_Values.Element
-                                    (F_Index).Integer_Value) or
-                             Current.Threshold = Float'Last or
-                             Current.Threshold = (-Float'Last)
-                           then
-                              Current.Threshold :=
-                                Float (F_Values.Element
-                                       (F_Index - 1).Integer_Value);
-                           end if;
-
-                        when Boolean_Type | UB_String_Type => null;
-                     end case;
+                     Current.Threshold := 0.5 *
+                       (F_Values.Element (F_Index - 1) +
+                            F_Values.Element (F_Index));
+                     if Current.Threshold =
+                       F_Values.Element (F_Index) or
+                       Current.Threshold = Float'Last or
+                       Current.Threshold = (-Float'Last)
+                     then
+                        Current.Threshold := F_Values.Element (F_Index - 1);
+                     end if;
 
                      --  L419 Only update if Current_Proxy_Improvement
                      --       > Best_Proxy_Improvement
@@ -262,11 +199,11 @@ package body Node_Splitter is
          end if;
       end loop;
 
---        Assert (Best.Split_Row > Splitter.Start_Row,
---                "Node_Splitter.Evaluate_All_Splits, split position" &
---                  Integer'Image (Best.Split_Row) &
---                  " should be greater than Start_Index" &
---                  Integer'Image (Splitter.Start_Row));
+      --        Assert (Best.Split_Row > Splitter.Start_Row,
+      --                "Node_Splitter.Evaluate_All_Splits, split position" &
+      --                  Integer'Image (Best.Split_Row) &
+      --                  " should be greater than Start_Index" &
+      --                  Integer'Image (Splitter.Start_Row));
 
    end Evaluate_All_Splits;
 
@@ -280,8 +217,8 @@ package body Node_Splitter is
                               Num_Found_Constants   : in out Natural;
                               Num_Total_Constants   : in out Natural;
                               Best_Split            : in out Split_Record) is
---        Routine_Name         : constant String :=
---                                 "Node_Splitter.Find_Best_Split ";
+      --        Routine_Name         : constant String :=
+      --                                 "Node_Splitter.Find_Best_Split ";
       Num_Features         : constant Natural :=
                                Natural (Self.Feature_Indices.Length);
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
@@ -296,10 +233,10 @@ package body Node_Splitter is
       F_J                  : Natural;
       Swap                 : Natural;
    begin
---        Assert (Stop_Row >= Start_Row, Routine_Name & " Stop_Row " &
---                  Integer'Image (Stop_Row) &
---                  " should be greater than Start_Row "
---                & Integer'Image (Start_Row));
+      --        Assert (Stop_Row >= Start_Row, Routine_Name & " Stop_Row " &
+      --                  Integer'Image (Stop_Row) &
+      --                  " should be greater than Start_Row "
+      --                & Integer'Image (Start_Row));
       --  L319
       while F_I > Num_Total_Constants + 1 and
         (Num_Visited_Features <= Positive (Max_Features) or
@@ -307,7 +244,7 @@ package body Node_Splitter is
            Num_Visited_Features <=
              Num_Found_Constants + Num_Drawn_Constants) loop
          --  L329
---           Put_Line (Routine_Name & "L329 F_I " & Integer'Image (F_I));
+         --           Put_Line (Routine_Name & "L329 F_I " & Integer'Image (F_I));
          Num_Visited_Features := Num_Visited_Features + 1;
          --  L339
          --  Draw a feature at random
@@ -318,10 +255,10 @@ package body Node_Splitter is
          F_J := Num_Drawn_Constants + 1 +
            Natural (abs (Maths.Random_Float) *
                         Float (F_I - Num_Found_Constants - 1));
---           Put_Line (Routine_Name & " F_I, F_J " &
---                       Integer'Image (F_I) & ", " & Integer'Image (F_J));
---           Put_Line (Routine_Name & "Num_Known_Constants " &
---                       Integer'Image (Num_Known_Constants));
+         --           Put_Line (Routine_Name & " F_I, F_J " &
+         --                       Integer'Image (F_I) & ", " & Integer'Image (F_J));
+         --           Put_Line (Routine_Name & "Num_Known_Constants " &
+         --                       Integer'Image (Num_Known_Constants));
          if F_J + 1 < Num_Known_Constants then
             --  L343 F_J indexes a constant in the interval
             --  Num_Drawn_Constants .. Num_Found_Constants
@@ -336,11 +273,11 @@ package body Node_Splitter is
             --  L349 F_J >= Num_Known_Constants
             --  F_J is in the interval
             --  Num_Known_Constants .. F_I - Num_Found_Constants
---              Assert (F_J <= F_I - Num_Found_Constants,
---                      Routine_Name & "F_J: " & Integer'Image (F_J) &
---                        " should be in the range " &
---                        Integer'Image (Num_Known_Constants + 1) &  " .. " &
---                        Integer'Image (F_I - Num_Found_Constants));
+            --              Assert (F_J <= F_I - Num_Found_Constants,
+            --                      Routine_Name & "F_J: " & Integer'Image (F_J) &
+            --                        " should be in the range " &
+            --                        Integer'Image (Num_Known_Constants + 1) &  " .. " &
+            --                        Integer'Image (F_I - Num_Found_Constants));
             F_J := F_J + Num_Found_Constants;
             --  F_J is in the interval Num_ Total_Constants .. F_I
             --              Put_Line (Routine_Name & "Process_Non_Constants Num_Total_Constants: " &
@@ -358,8 +295,8 @@ package body Node_Splitter is
    --  L116
    procedure Initialize_Splitter
      (Self             : in out Splitter_Class;
-      Input_X          : IL_Types.Value_Data_Lists_2D;
-      Y_Encoded        : Natural_Lists_2D;
+      Input_X          : Float_List_2D;
+      Y_Encoded        : Natural_List;
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
@@ -467,12 +404,12 @@ package body Node_Splitter is
       F_I                 : in out Natural;
       F_J                 : Natural;
       Best_Split          : in out Split_Record) is
-      use Value_Data_Sorting;
---        Routine_Name         : constant String :=
---                                 "Node_Splitter.Process_Non_Constants ";
+      use Float_Sorting;
+      --        Routine_Name         : constant String :=
+      --                                 "Node_Splitter.Process_Non_Constants ";
       Current_Split        : Split_Record;
       X_Samples_Row        : Natural;
-      X_Features           : Value_Data_List;
+      X_Features           : Float_List;
       Swap                 : Natural;
    begin
       --  L359 Xf is a pointer to self.feature_values
@@ -520,12 +457,12 @@ package body Node_Splitter is
                            X_Samples   : in out Natural_List;
                            Impurity    : Float) is
       use Natural_Package;
-      Routine_Name  : constant String := "Node_Splitter.Reorder_Rows ";
+--        Routine_Name  : constant String := "Node_Splitter.Reorder_Rows ";
       Partition_End : Natural;
       P_Index       : Positive;
       Sample_PI     : Positive;
-      X_1           : IL_Types.Value_Data_List;
-      X             : IL_Types.Value_Record;
+      X_1           : Float_List;
+      X             : Float;
       Swap          : Positive;
    begin
       --  L417 Reorganize into samples[start:best.pos] + samples[best.pos:end]
@@ -538,33 +475,15 @@ package body Node_Splitter is
             X_1 := Self.X.Element (Sample_PI);
             X := X_1.Element (Best_Split.Feature);
 
-            case X.Value_Kind is
-               when IL_Types.Float_Type =>
-                  if X.Float_Value <= Best_Split.Threshold then
-                     P_Index := P_Index + 1;
-                  else
-                     Partition_End := Partition_End - 1;
-                     Swap := X_Samples.Element (P_Index);
-                     X_Samples.Replace_Element
-                       (P_Index, X_Samples.Element (Partition_End));
-                     X_Samples.Replace_Element (Partition_End, Swap);
-                  end if;
-
-               when IL_Types.Integer_Type =>
-                  if Float (X.Integer_Value) <= Best_Split.Threshold then
-                     P_Index := P_Index + 1;
-                  else
-                     Partition_End := Partition_End - 1;
-                     Swap := X_Samples.Element (P_Index);
-                     X_Samples.Replace_Element
-                       (P_Index, X_Samples.Element (Partition_End));
-                     X_Samples.Replace_Element (Partition_End, Swap);
-                  end if;
-
-               when others =>
-                  raise Node_Splitter_Error with Routine_Name &
-                    "Node_Splitter.Reorder_Rows X.Value_Kind is invalid";
-            end case;
+            if X <= Best_Split.Threshold then
+               P_Index := P_Index + 1;
+            else
+               Partition_End := Partition_End - 1;
+               Swap := X_Samples.Element (P_Index);
+               X_Samples.Replace_Element
+                 (P_Index, X_Samples.Element (Partition_End));
+               X_Samples.Replace_Element (Partition_End, Swap);
+            end if;
          end loop;
 
          --  L436
@@ -589,12 +508,12 @@ package body Node_Splitter is
      (Splitter              : in out Splitter_Class;
       Start_Row, Stop_Row   : Positive;
       Weighted_Node_Samples : in out Float) is
---        Routine_Name : constant String := "Node_Splitter.Reset_Node ";
+      --        Routine_Name : constant String := "Node_Splitter.Reset_Node ";
    begin
---        Assert (Stop_Row >= Start_Row,
---                Routine_Name & " stop index" & Integer'Image (Stop_Row) &
---                  " should not be less than start index" &
---                  Integer'Image (Start_Row));
+      --        Assert (Stop_Row >= Start_Row,
+      --                Routine_Name & " stop index" & Integer'Image (Stop_Row) &
+      --                  " should not be less than start index" &
+      --                  Integer'Image (Start_Row));
       --  L196
       Splitter.Start_Row := Start_Row;
       Splitter.Stop_Row := Stop_Row;
@@ -624,8 +543,8 @@ package body Node_Splitter is
       --  L275 features is a pointer to self.features
       --  L276 constant_features is a pointer to self.constant_features
       --  L279 Xf is a pointer to self.feature_values
---        Assert (not Self.Sample_Indices.Is_Empty, Routine_Name &
---                  " called with empty Sample_Indices");
+      --        Assert (not Self.Sample_Indices.Is_Empty, Routine_Name &
+      --                  " called with empty Sample_Indices");
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
       Put_Line (Routine_Name & "Num_Constant_Features, Num_Found_Constants: " &

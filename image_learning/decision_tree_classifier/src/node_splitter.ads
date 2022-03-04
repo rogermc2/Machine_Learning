@@ -1,14 +1,12 @@
 
 --  Based on scikit-learn/sklearn/tree _splitter.pxd class Splitter
 
-with Ada.Strings.Unbounded;
 with IL_Types; use IL_Types;
 with Criterion;
 with Tree;
 with Weights;
 
 package Node_Splitter is
-   use Ada.Strings.Unbounded;
 
    type Split_Record is record
       Feature        : Positive := 1;
@@ -31,17 +29,17 @@ package Node_Splitter is
       Feature_Indices      : Natural_List;
       Constant_Features_I  : Natural_List;
       Num_Classes          : Natural_List;
-      Feature_Values       : IL_Types.Value_Data_List;
+      Feature_Values       : Float_List;
       Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
       --  encoded version of sample Y
-      Y_Encoded            : Natural_Lists_2D;
+      Y_Encoded            : Natural_List;
       Sample_Weight        : Weights.Weight_List;
       Node_Impurity        : Float := -Float'Last;
       Start_Row            : Positive := 1;
       Stop_Row             : Positive := 1;
       --  BaseDenseSplitter elements
-      X                    : IL_Types.Value_Data_Lists_2D;
+      X                    : Float_List_2D;
       Total_Samples        : Natural := 0;
    end record;
 
@@ -53,8 +51,8 @@ package Node_Splitter is
                      Min_Leaf_Weight  : Float := 0.0);
    procedure Initialize_Splitter
      (Self             : in out Splitter_Class;
-      Input_X          : IL_Types.Value_Data_Lists_2D;
-      Y_Encoded        : Natural_Lists_2D;
+      Input_X          : Float_List_2D;
+      Y_Encoded        : Natural_List;
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1);
    function Entropy_Node_Impurity (Self : Splitter_Class) return Float;
