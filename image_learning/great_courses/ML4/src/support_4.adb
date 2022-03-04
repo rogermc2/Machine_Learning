@@ -6,13 +6,15 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Support_4 is
 
    function Get_State
-     (Dataset_Name     : String; Return_X_Y : Boolean;
-      X                : out Classifier_Types.Float_List_2D
-      Y                : out Classifier_Types.Integer_List;
-      X_Indices        : out ML_Types.Integer_List;
-      Y_Indices        : out ML_Types.Integer_List;
-      Test_X, Test_Y,
-      Train_X, Train_Y : out Value_Data_Lists_2D;
+     (Dataset_Name : String; Return_X_Y : Boolean;
+      X            : out Float_List_2D;
+      Y            : out Integer_List;
+      X_Indices    : out Integer_List;
+      Y_Indices    : out Integer_List;
+      Train_X      : out Float_List_2D;
+      Train_Y      : out Integer_List;
+      Test_X       : out Float_List_2D;
+      Test_Y       : out Integer_List;
       Bunch            : out Openml_Ada.Bunch_Data)
       return Boolean is
       use Ada.Directories;
@@ -33,10 +35,10 @@ package body Support_4 is
 
          Open (File_ID, In_File, State_File);
          aStream := Stream (File_ID);
-         Value_Data_Lists_2D'Read (aStream, Test_X);
-         Value_Data_Lists_2D'Read (aStream, Test_Y);
-         Value_Data_Lists_2D'Read (aStream, Train_X);
-         Value_Data_Lists_2D'Read (aStream, Train_Y);
+         Float_List_2D'Read (aStream, Train_X);
+         Integer_List'Read (aStream, Train_Y);
+         Float_List_2D'Read (aStream, Test_X);
+         Integer_List'Read (aStream, Test_Y);
          Openml_Ada.Bunch_Data'Read (aStream, Bunch);
          Close (File_ID);
          pragma Unreferenced (File_ID);
@@ -91,9 +93,11 @@ package body Support_4 is
    --  -------------------------------------------------------------------------
 
    procedure Save_State
-     (Dataset_Name               : String;
-      Save_Test_X, Save_Test_Y,
-      Save_Train_X, Save_Train_Y : Value_Data_Lists_2D;
+     (Dataset_Name : String;
+      Train_X      : Float_List_2D;
+      Train_Y      : Integer_List;
+      Test_X       : Float_List_2D;
+      Test_Y       : Integer_List;
       Save_Bunch                 : Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
@@ -104,10 +108,10 @@ package body Support_4 is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      Value_Data_Lists_2D'Write (aStream, Save_Test_X);
-      Value_Data_Lists_2D'Write (aStream, Save_Test_Y);
-      Value_Data_Lists_2D'Write (aStream, Save_Train_X);
-      Value_Data_Lists_2D'Write (aStream, Save_Train_Y);
+      Float_List_2D'Write (aStream, Train_X);
+      Integer_List'Write (aStream, Train_Y);
+      Float_List_2D'Write (aStream, Test_X);
+      Integer_List'Write (aStream, Test_Y);
       Openml_Ada.Bunch_Data'Write (aStream, Save_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);

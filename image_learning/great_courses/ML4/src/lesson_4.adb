@@ -3,10 +3,9 @@ with Ada.Containers;
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with IL_Types;
+with IL_Types; use IL_Types;
 
 with Base_Decision_Tree;
-with Classifier_Types;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
@@ -22,7 +21,6 @@ with Support_4;
 
 procedure Lesson_4 is
    use Ada.Containers;
-   use ML_Types;
    use Support_4;
    use Decision_Tree_Classification;
    Routine_Name   : constant String := "Lesson_4 ";
@@ -34,26 +32,25 @@ procedure Lesson_4 is
    Test_Size      : constant Positive := 1000;
    Train_Size     : constant Positive := 5000;
    Bunch          : Openml_Ada.Bunch_Data;
-   X              : Value_Data_Lists_2D;  --  rows of columns of values
-   Y              : Value_Data_Lists_2D;
+   X              : Float_List_2D;  --  rows of columns of values
+   Y              : Integer_List;
    X_Indices      : Integer_List;
    Y_Indices      : Integer_List;
    Num_Samples    : Positive;
-   Test_X         : Value_Data_Lists_2D;
-   Test_Y         : Value_Data_Lists_2D;
-   Train_X        : Value_Data_Lists_2D;
-   Train_Y        : Value_Data_Lists_2D;
+   Train_X        : Float_List_2D;
+   Train_Y        : Integer_List;
+   Test_X         : Float_List_2D;
+   Test_Y         : Integer_List;
    aClassifier    : Base_Decision_Tree.Classifier
      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-   No_Weights     : Weights.Weight_List :=
-                      Classifier_Types.Float_Package.Empty_Vector;
+   No_Weights     : Weights.Weight_List := Float_Package.Empty_Vector;
    Correct        : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 
 begin
    Put_Line (Routine_Name);
    if not Get_State (Dataset_Name, Return_X_Y, X, Y, X_Indices, Y_Indices,
-                     Test_X, Test_Y, Train_X, Train_Y, Bunch) then
+                     Train_X, Train_Y, Test_X, Test_Y, Bunch) then
       Num_Samples := Positive (X.Length);
 
       Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
@@ -80,7 +77,7 @@ begin
       --     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
       X.Clear;
       Y.Clear;
-      Save_State (Dataset_Name, Test_X, Test_Y, Train_X, Train_Y,
+      Save_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y,
                   Bunch);
    end if;
 
