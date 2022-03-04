@@ -26,36 +26,34 @@ package body Openml_Ada is
 
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    procedure Get_OML (File_Name : String;
-                      X         : out Classifier_Types.Float_List_2D;
-                      Y         : out Classifier_Types.Integer_List;
-                      X_Indices : out IL_Types.Integer_List;
-                      Y_Indices : out IL_Types.Integer_List;
+                      X         : out Float_List_2D;
+                      Y         : out Integer_List;
+                      X_Indices : out Integer_List;
+                      Y_Indices : out Integer_List;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean);
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
-      Include_Columns : IL_Types.String_List)
+      Include_Columns : String_List)
       return AR_Types.Nominal_Data_List;
    procedure Process_Feature (Features_List : AR_Types.Attribute_List);
    procedure Save_OML
      (Save_File_Name        : String;
-      X                     : Classifier_Types.Float_List_2D;
-      Y                     : Classifier_Types.Integer_List;
-      X_Indices, Y_Indices  : IL_Types.Integer_List;
+      X                     : Float_List_2D;
+      Y                     : Integer_List;
+      X_Indices, Y_Indices  : Integer_List;
       Bunch                 : Bunch_Data; X_Y_Only : Boolean);
    procedure Set_Default_Target
      (Features_List  : in out AR_Types.Attribute_List;
-      Target_Columns : out IL_Types.String_List);
+      Target_Columns : out String_List);
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : IL_Types.Integer_DL_List)
-      return Classifier_Types.Float_List_2D;
+      Include_Columns : Integer_DL_List) return Float_List_2D;
    function Split_Columns
      (Arff_Target    : AR_Types.AR_Integer_List;
-      Include_Values : IL_Types.Integer_DL_List)
-      return Classifier_Types.Integer_List;
+      Include_Values : Integer_DL_List) return Integer_List;
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
-      Target_Columns : IL_Types.String_List);
+      Target_Columns : String_List);
 
    --  ------------------------------------------------------------------------
 
@@ -84,9 +82,9 @@ package body Openml_Ada is
    procedure Download_Data_To_Bunch
      (ARFF_Container               : AR_Types.ARFF_Record;
       Features_List                : AR_Types.Attribute_List;
-      Data_Columns, Target_Columns : IL_Types.String_List;
-      X                            : out Classifier_Types.Float_List_2D;
-      Y                            : out Classifier_Types.Integer_List;
+      Data_Columns, Target_Columns : String_List;
+      X                            : out Float_List_2D;
+      Y                            : out Integer_List;
       Bunch                        : out Bunch_Data;
       X_Y_Only                     : Boolean := False;
       --        Sparse                     : Boolean;
@@ -94,7 +92,6 @@ package body Openml_Ada is
       --                                       Shape            : Shape_Data) is
       use Ada.Containers;
       use AR_Types;
-      use IL_Types;
       use Integer_DLL_Package;
       use String_Package;
       use Attribute_Data_Package;
@@ -209,11 +206,11 @@ package body Openml_Ada is
    procedure Fetch_Openml
      (Dataset_File_Name : String;
       Save_File_Name    : String;
-      Target_Column     : IL_Types.String_List;
-      X                 : out Classifier_Types.Float_List_2D;
-      Y                 : out Classifier_Types.Integer_List;
-      X_Indices         : out IL_Types.Integer_List;
-      Y_Indices         : out IL_Types.Integer_List;
+      Target_Column     : String_List;
+      X                 : out Float_List_2D;
+      Y                 : out Integer_List;
+      X_Indices         : out Integer_List;
+      Y_Indices         : out Integer_List;
       Bunch             : out Bunch_Data;
       As_Frame          : in out As_Frame_State;
       Return_X_Y        : Boolean := False) is
@@ -222,7 +219,7 @@ package body Openml_Ada is
       use AR_Types;
       use Load_ARFF_Data;
       use ARFF_IO;
-      use IL_Types.String_Package;
+      use String_Package;
       Routine_Name    : constant String := "Openml_Ada.Fetch_Openml ";
       Pos             : constant Positive
         := Fixed.Index (Dataset_File_Name, ".",
@@ -235,8 +232,8 @@ package body Openml_Ada is
       Features_List   : Attribute_List;
       Curs            : Cursor;
       Target_Value    : Unbounded_String;
-      Target_Columns  : IL_Types.String_List;
-      Data_Columns    : IL_Types.String_List;
+      Target_Columns  : String_List;
+      Data_Columns    : String_List;
       --        Shape           : Shape_Data;
       --        Data_Qualities  : Qualities_Map;
    begin
@@ -408,14 +405,13 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Get_OML (File_Name : String;
-                      X         : out Classifier_Types.Float_List_2D;
-                      Y         : out Classifier_Types.Integer_List;
-                      X_Indices : out IL_Types.Integer_List;
-                      Y_Indices : out IL_Types.Integer_List;
+                      X         : out Float_List_2D;
+                      Y         : out Integer_List;
+                      X_Indices : out Integer_List;
+                      Y_Indices : out Integer_List;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
-      use Classifier_Types;
       Routine_Name : constant String := "Openml_Ada.Get_OML ";
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
@@ -425,8 +421,8 @@ package body Openml_Ada is
       aStream := Stream (File_ID);
       Float_List_2D'Read (aStream, X);
       Integer_List'Read (aStream, Y);
-      IL_Types.Integer_List'Read (aStream, X_Indices);
-      IL_Types.Integer_List'Read (aStream, Y_Indices);
+      Integer_List'Read (aStream, X_Indices);
+      Integer_List'Read (aStream, Y_Indices);
       if not X_Y_Only then
          Bunch_Data'Read (aStream, Bunch);
       end if;
@@ -439,11 +435,10 @@ package body Openml_Ada is
 
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
-      Include_Columns : IL_Types.String_List)
+      Include_Columns : String_List)
       return AR_Types.Nominal_Data_List is
       --        use Ada.Containers;
       use AR_Types;
-      use IL_Types;
       use String_Package;
       use Load_ARFF_Data;
       use Nominal_Data_Package;
@@ -519,7 +514,7 @@ package body Openml_Ada is
    --  L922
    procedure Set_Default_Target
      (Features_List  : in out AR_Types.Attribute_List;
-      Target_Columns : out IL_Types.String_List) is
+      Target_Columns : out String_List) is
       use AR_Types;
       use Attribute_Data_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
@@ -535,10 +530,10 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Save_OML (Save_File_Name : String;
-                       X              : Classifier_Types.Float_List_2D;
-                       Y              : Classifier_Types.Integer_List;
-                       X_Indices      : IL_Types.Integer_List;
-                       Y_Indices      : IL_Types.Integer_List;
+                       X              : Float_List_2D;
+                       Y              : Integer_List;
+                       X_Indices      : Integer_List;
+                       Y_Indices      : Integer_List;
                        Bunch          : Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
@@ -547,10 +542,10 @@ package body Openml_Ada is
    begin
       Create (File_ID, Out_File, Save_File_Name);
       aStream := Stream (File_ID);
-      Classifier_Types.Float_List_2D'Write (aStream, X);
-      Classifier_Types.Integer_List'Write (aStream, Y);
-      IL_Types.Integer_List'Write (aStream, X_Indices);
-      IL_Types.Integer_List'Write (aStream, Y_Indices);
+      Float_List_2D'Write (aStream, X);
+      Integer_List'Write (aStream, Y);
+      Integer_List'Write (aStream, X_Indices);
+      Integer_List'Write (aStream, Y_Indices);
       if not X_Y_Only then
          Bunch_Data'Write (aStream, Bunch);
       end if;
@@ -563,13 +558,11 @@ package body Openml_Ada is
    --  L184
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : IL_Types.Integer_DL_List)
-      return Classifier_Types.Float_List_2D is
-      use Classifier_Types;
-      use IL_Types.Integer_DLL_Package;
+      Include_Columns : Integer_DL_List) return Float_List_2D is
+      use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Float_List_2D;
-      Include_Curs  : IL_Types.Integer_DLL_Package.Cursor;
+      Include_Curs  : Integer_DLL_Package.Cursor;
       Arff_Data_Row : AR_Types.AR_Real_List;  --  list of columns
       New_Row       : Float_List;
    begin
@@ -592,13 +585,11 @@ package body Openml_Ada is
    --  L184
    function Split_Columns
      (Arff_Target    : AR_Types.AR_Integer_List;
-      Include_Values : IL_Types.Integer_DL_List)
-      return Classifier_Types.Integer_List is
-      use Classifier_Types;
-      use IL_Types.Integer_DLL_Package;
+      Include_Values : Integer_DL_List) return Integer_List is
+      use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Integer_List;
-      Include_Curs  : IL_Types.Integer_DLL_Package.Cursor;
+      Include_Curs  : Integer_DLL_Package.Cursor;
       New_Row       : Integer_List;
    begin
       for row in Arff_Target.First_Index .. Arff_Target.Last_Index loop
@@ -619,16 +610,15 @@ package body Openml_Ada is
    --  L699
    function Valid_Data_Column_Names
      (Features_List  : AR_Types.Attribute_List;
-      Target_Columns : IL_Types.String_List) return IL_Types.String_List is
+      Target_Columns : String_List) return String_List is
       --        use Ada.Text_IO.Unbounded_IO;
       use AR_Types;
       --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
       Feature       : Attribute_Record;
       Feature_Name  : Unbounded_String;
-      Valid_Names   : IL_Types.String_List;
+      Valid_Names   : String_List;
 
       function Is_A_Target return Boolean is
-         use IL_Types;
          use String_Package;
          Target_Curs  : String_Package.Cursor := Target_Columns.First;
          Target_Found : Boolean := False;
@@ -664,9 +654,9 @@ package body Openml_Ada is
 
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
-      Target_Columns : IL_Types.String_List) is
+      Target_Columns : String_List) is
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
-      use IL_Types.String_Package;
+      use String_Package;
       Curs          : Cursor := Target_Columns.First;
       Column        : Unbounded_String;
    begin

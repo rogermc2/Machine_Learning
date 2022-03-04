@@ -2,8 +2,7 @@
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Types;
-with IL_Types;
+with IL_Types; use IL_Types;
 --  with Printing;
 
 with Openml_Ada; use Openml_Ada;
@@ -110,11 +109,11 @@ package body OML_File_Tests is
       File_Name     : constant String := "../mnist_784.arff";
       Save_File     : constant String := "mnist_784.oml";
       As_Frame      : As_Frame_State := As_Frame_False;
-      Target_Column : IL_Types.String_List;
-      X             : Classifier_Types.Float_List_2D;
-      Y             : Classifier_Types.Integer_List;
-      X_Indices     : IL_Types.Integer_List;
-      Y_Indices     : IL_Types.Integer_List;
+      Target_Column : String_List;
+      X             : Float_List_2D;
+      Y             : Integer_List;
+      X_Indices     : Integer_List;
+      Y_Indices     : Integer_List;
       Bunch         : Bunch_Data;
    begin
       Put_Line (Routine_Name);
