@@ -13,12 +13,9 @@ package body Criterion is
    --  -------------------------------------------------------------------------
    --  L214 __cinit__
    procedure C_Init (Criteria    : in out Criterion_Class;
-                     Num_Outputs : Tree.Index_Range := 1;
-                     Num_Classes : Natural_List :=
-                       Natural_Package.Empty_Vector) is
+                     Num_Classes : Natural := 0) is
    begin
       --  L220
-      Criteria.Num_Outputs := Num_Outputs;
       Criteria.Num_Classes := Num_Classes;
       Criteria.Sum_Total.Clear;
       Criteria.Sum_Left.Clear;
@@ -32,48 +29,48 @@ package body Criterion is
    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float) is
---        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
-      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
-      Num_Classes    :  constant Natural_List := Criteria.Num_Classes;
-      Sum_Left_K     : Float_List;
-      Sum_Right_K    : Float_List;
+      --        Routine_Name   : constant String := "Criterion.Gini_Children_Impurity ";
+      --        Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
+      Num_Classes    : constant Positive := Positive (Criteria.Sum_Total.Length);
+      Sum_Left       : Float_List;
+      Sum_Right      : Float_List;
       Count_K        : Float;
       Sq_Count_Left  : Float;
       Sq_Count_Right : Float;
       Gini_Left      : Float := 0.0;
       Gini_Right     : Float := 0.0;
    begin
---        Assert (Criteria.Num_Weighted_Left > 0.0,
---                Routine_Name & "Criteria.Num_Weighted_Left " &
---                  Float'Image (Criteria.Num_Weighted_Left) &
---                  " should be > 0.0.");
---        Assert (Criteria.Num_Weighted_Right > 0.0,
---                Routine_Name & "Criteria.Num_Weighted_Right " &
---                  Float'Image (Criteria.Num_Weighted_Right) &
---                  " should be > 0.0.");
+      --        Assert (Criteria.Num_Weighted_Left > 0.0,
+      --                Routine_Name & "Criteria.Num_Weighted_Left " &
+      --                  Float'Image (Criteria.Num_Weighted_Left) &
+      --                  " should be > 0.0.");
+      --        Assert (Criteria.Num_Weighted_Right > 0.0,
+      --                Routine_Name & "Criteria.Num_Weighted_Right " &
+      --                  Float'Image (Criteria.Num_Weighted_Right) &
+      --                  " should be > 0.0.");
       --  L656
-      for k in 1 .. Num_Outputs loop
-         Sq_Count_Left := 0.0;
-         Sq_Count_Right := 0.0;
-         Sum_Left_K := Criteria.Sum_Left.Element (k);
-         Sum_Right_K := Criteria.Sum_Right.Element (k);
+      --        for k in 1 .. Num_Outputs loop
+      Sq_Count_Left := 0.0;
+      Sq_Count_Right := 0.0;
+      Sum_Left := Criteria.Sum_Left;
+      Sum_Right := Criteria.Sum_Right;
 
-         for c in 1 .. Num_Classes.Element (k) loop
-            Count_K := Sum_Left_K.Element (c);
-            Sq_Count_Left := Sq_Count_Left + Count_K ** 2;
+      for c in 1 .. Num_Classes loop
+         Count_K := Sum_Left (c);
+         Sq_Count_Left := Sq_Count_Left + Count_K ** 2;
 
-            Count_K := Sum_Right_K.Element (c);
-            Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
-         end loop;
-
-         Gini_Left := Gini_Left + 1.0 -
-           Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
-         Gini_Right := Gini_Right + 1.0 -
-           Sq_Count_Right / Criteria.Num_Weighted_Right ** 2;
+         Count_K := Sum_Right (c);
+         Sq_Count_Right := Sq_Count_Right + Count_K ** 2;
       end loop;
 
-      Impurity_Left := Gini_Left / Float (Num_Outputs);
-      Impurity_Right := Gini_Right / Float (Num_Outputs);
+      Gini_Left := Gini_Left + 1.0 -
+        Sq_Count_Left / Criteria.Num_Weighted_Left ** 2;
+      Gini_Right := Gini_Right + 1.0 -
+        Sq_Count_Right / Criteria.Num_Weighted_Right ** 2;
+      --        end loop;
+
+      Impurity_Left := Gini_Left;
+      Impurity_Right := Gini_Right;
 
    end Children_Impurity_Gini;
 
@@ -82,7 +79,7 @@ package body Criterion is
    function Impurity_Improvement (Criteria       : Criterion_Class;
                                   Impurity_Parent, Impurity_Left,
                                   Impurity_Right : Float) return float is
---        Routine_Name          : constant String := "Criterion.Impurity_Improvement";
+      --        Routine_Name          : constant String := "Criterion.Impurity_Improvement";
       Weighted_Node_Samples : constant Float :=
                                 Criteria.Num_Weighted_Node_Samples;
       Right_Component       : constant Float
@@ -90,13 +87,13 @@ package body Criterion is
       Left_Component        : constant Float
         := (Criteria.Num_Weighted_Left / Weighted_Node_Samples) * Impurity_Left;
    begin
---        Assert (Weighted_Node_Samples > 0.0,
---                Routine_Name & "Criteria.Weighted_Node_Samples " &
---                  Float'Image (Weighted_Node_Samples) & " should be > 0.0");
---        Assert (Criteria.Num_Weighted_Samples > 0.0,
---                Routine_Name & "Criteria.Num_Weighted_Samples " &
---                  Float'Image (Criteria.Num_Weighted_Samples) &
---                  " should be > 0.0");
+      --        Assert (Weighted_Node_Samples > 0.0,
+      --                Routine_Name & "Criteria.Weighted_Node_Samples " &
+      --                  Float'Image (Weighted_Node_Samples) & " should be > 0.0");
+      --        Assert (Criteria.Num_Weighted_Samples > 0.0,
+      --                Routine_Name & "Criteria.Num_Weighted_Samples " &
+      --                  Float'Image (Criteria.Num_Weighted_Samples) &
+      --                  " should be > 0.0");
       return (Weighted_Node_Samples / Criteria.Num_Weighted_Samples) *
         (Impurity_Parent - Right_Component - Left_Component);
 
@@ -106,19 +103,19 @@ package body Criterion is
    --  L59, L214, 280
    procedure Initialize_Node_Criterion
      (Criteria            : in out Criterion_Class;
-      Y                   : Natural_List;
+      Y                   : Integer_List;
       Sample_Indices      : Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
---        Routine_Name    : constant String :=
---                            "Criterion.Initialize_Node_Criterion ";
-      Sum_Total_K     : Float_List;
+      --        Routine_Name    : constant String :=
+      --                            "Criterion.Initialize_Node_Criterion ";
+      Sum_Total_K     : Float;
       Y_I_Index       : Positive;  --  Class index
-      Y_I             : Natural_List;  --  Class
-      Y_Ik            : Natural; --  Class.output
+      --        Y_I             : Natural_List;  --  Class
+      --        Y_Ik            : Natural; --  Class.output
       Weight          : Float := 1.0;
    begin
       --  L302
@@ -132,17 +129,19 @@ package body Criterion is
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
 
---        Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
---                  " Criteria.Num_Classes is empty");
+      --        Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
+      --                  " Criteria.Num_Classes is empty");
       --  L321 Initialize Sum_Total
       --  Sum_Total dimensions: num outputs x num classes
-      for row in 1 .. Num_Outputs loop
-         Sum_Total_K.Clear;
-         for c in 1 .. Criteria.Num_Classes.Element (row) loop
-            Sum_Total_K.Append (0.0);
-         end loop;
-         Criteria.Sum_Total.Append (Sum_Total_K);
-      end loop;
+      --        for row in 1 .. Num_Outputs loop
+      --           Sum_Total_K.Clear;
+      --        for c in 1 .. Criteria.Num_Classes.Element (row) loop
+      --        for c in Criteria.Num_Classes.First_Index ..
+      --          Criteria.Num_Classes.Last_Index loop
+      --           Sum_Total_K.Append (0.0);
+      --        end loop;
+      --        Criteria.Sum_Total.Append (Sum_Total_K);
+      --        end loop;
 
       --  L325
       for p in Start_Row .. Stop_Row loop
@@ -156,17 +155,19 @@ package body Criterion is
 
          --  L333 Count weighted class frequency for each target
          --  Y_I is Class
-         Y_I := Y.Element (Y_I_Index);
-         for k in 1 .. Num_Outputs loop
-            Sum_Total_K := Criteria.Sum_Total.Element (k);
-            --  L339 c = Y_Ik is an index into Y (output k) class i
-            Y_Ik := Y_I.Element (k);   --  output.class
-            --  sum_total[k * self.sum_stride + c] += w
-            --  Add Weight to Y (output k, class Y_I)
-            Sum_Total_K.Replace_Element
-              (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
-            Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
-         end loop;
+         --           Y_I := Y.Element (Y_I_Index);
+         --           for k in 1 .. Num_Outputs loop
+         Sum_Total_K := Criteria.Sum_Total;
+         --  L339 c = Y_Ik is an index into Y (output k) class i
+         --           Y_Ik := Y.Element (k);   --  output.class
+         --  sum_total[k * self.sum_stride + c] += w
+         --  Add Weight to Y (output k, class Y_I)
+         --           Sum_Total_K.Replace_Element
+         --             (Y_Ik, Sum_Total_K.Element (Y_Ik) + Weight);
+         --           Criteria.Sum_Total.Replace_Element (k, Sum_Total_K);
+         --           end loop;
+         Sum_Total_K :=  Sum_Total_K + Weight;
+         Criteria.Sum_Total := Sum_Total_K;
 
          Criteria.Num_Weighted_Node_Samples :=
            Criteria.Num_Weighted_Node_Samples + Weight;
@@ -183,26 +184,27 @@ package body Criterion is
    --  probabilities of each class from one
    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float is
       --        Routine_Name   : constant String := "Criterion.Node_Impurity_Gini ";
-      Num_Outputs    : constant Positive := Positive (Criteria.Num_Outputs);
       Num_Classes    : constant Natural_List := Criteria.Num_Classes;
-      Sum_Total_K    : Weights.Weight_List;
+--        Sum_Total_K    : Weights.Weight_List;
+      Sum_Total_K    : Float;
       Count_K        : Float;
       Gini           : Float := 0.0;
       Sq_Count       : Float := 0.0;
    begin
       --  L620
-      for index_k in 1 .. Criteria.Num_Outputs loop
-         Sq_Count := 0.0;
-         Sum_Total_K := Criteria.Sum_Total.Element (Integer (index_k));
+      --        for index_k in 1 .. Criteria.Num_Outputs loop
+      --           Sq_Count := 0.0;
+      Sum_Total_K := Criteria.Sum_Total;
 
-         for class_index in 1 .. Num_Classes.Element (Integer (index_k)) loop
-            Count_K := Float (Sum_Total_K.Element (class_index));
-            Sq_Count := Sq_Count + Count_K ** 2;
-         end loop;
-
-         Gini := Gini + 1.0 -
-           Sq_Count / Criteria.Num_Weighted_Node_Samples ** 2;
+      for class_index in Num_Classes.First_Index
+        .. Num_Classes.Last_Index loop
+         Count_K := Float (Sum_Total_K.Element (class_index));
+         Sq_Count := Sq_Count + Count_K ** 2;
       end loop;
+
+      Gini := Gini + 1.0 -
+        Sq_Count / Criteria.Num_Weighted_Node_Samples ** 2;
+      --        end loop;
 
       return Gini / Float (Num_Outputs);
 
@@ -219,8 +221,8 @@ package body Criterion is
       Count_K     : Float := 0.0;
       Entropy     : Float := 0.0;
    begin
---        Assert (not Self.Num_Classes.Is_Empty,
---                "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
+      --        Assert (not Self.Num_Classes.Is_Empty,
+      --                "Criterion.Entropy_Node_Impurity Criterion Num_Classes is empty");
 
       --  L535 Y structure samples (rows) x outputs (columns)
       --  k in range(self.n_outputs)
@@ -246,8 +248,8 @@ package body Criterion is
    procedure Node_Value (Self  : Criterion_Class;
                          Value : out Weights.Weight_Lists_2D) is
    begin
---        Assert (not Self.Sum_Total.Is_Empty,
---                "Criterion.Node_Value Self.Sum_Total is empty");
+      --        Assert (not Self.Sum_Total.Is_Empty,
+      --                "Criterion.Node_Value Self.Sum_Total is empty");
       --  Value dimensions: num outputs x num classes
       Value := Self.Sum_Total;
 
@@ -256,7 +258,7 @@ package body Criterion is
    --  -------------------------------------------------------------------------
 
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
-                                         return Float is
+                                        return Float is
       --          Routine_Name   : constant String :=
       --                             "Criterion.Proxy_Impurity_Improvement ";
       Impurity_Left  : Float;

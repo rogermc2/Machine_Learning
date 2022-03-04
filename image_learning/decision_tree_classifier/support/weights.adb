@@ -15,8 +15,7 @@ package body Weights is
    --  -------------------------------------------------------------------------
 
    function Compute_Balanced_Class_Weights
-     (Classes : IL_Types.Value_Data_List;  Y : IL_Types.Value_Data_List)
-      return Weight_List is
+     (Classes, Y : Integer_List) return Weight_List is
       use Label;
       use Natural_Package;
       Weights             : Weight_List;
@@ -58,8 +57,7 @@ package body Weights is
 
    function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                    Class_Weights : Weight_List;
-                                   Classes       : IL_Types.Value_Data_List;
-                                   Y             : IL_Types.Value_Data_List)
+                                   Classes, Y    : Integer_List)
                                    return Weight_List is
       Weights : Weight_List;
    begin
@@ -92,11 +90,11 @@ package body Weights is
 
    --  -------------------------------------------------------------------------
 
-   function Compute_Balanced_Sample_Weight
-     (Y : IL_Types.Value_Data_Lists_2D) return Weight_List is
-      Y_1                   : Value_Data_List;
-      Y_Full                : Value_Data_List;
-      Classes_Full          : Value_Data_List;
+   function Compute_Balanced_Sample_Weight (Y : Integer_List)
+                                            return Weight_List is
+      --        Y_1                   : Value_Data_List;
+      --        Y_Full                : Integer_List;
+      Classes               : Integer_List;
       Inverse               : Natural_List := Natural_Package.Empty_Vector;
       K_Indices             : Integer_List;
       Weight_K              : Weight_List;
@@ -104,26 +102,26 @@ package body Weights is
       Weights               : Weight_List;
       Expanded_Class_Weight : Weight_Lists_2D;
    begin
-      for index_2 in Y.Element (1).First_Index ..
-        Y.Element (1).Last_Index loop
-         Y_Full.Clear;
-         Weights.Clear;
-         for index in Y.First_Index .. Y.Last_Index loop
-            Y_1 := Y.Element (index);
-            Y_Full.Append (Y_1.Element (index_2));
-         end loop;
+      --        for index_2 in Y.Element (1).First_Index ..
+      --          Y.Element (1).Last_Index loop
+      --           Y_Full.Clear;
+      --           Weights.Clear;
+      --           for index in Y.First_Index .. Y.Last_Index loop
+      --              Y_1 := Y.Element (index);
+      --              Y_Full.Append (Y_1.Element (index_2));
+      --           end loop;
 
-         Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
-         Weight_K := Compute_Balanced_Class_Weights (Classes_Full, Y_Full);
-         --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
-         K_Indices := Classifier_Utilities.Search_Sorted_Value_List
-           (Classes_Full, Y_Full);
-         for y_index in Y_Full.First_Index .. Y_Full.Last_Index loop
-            aWeight := Weight_K.Element (K_Indices.Element (y_index));
-            Weights.Append (aWeight);
-         end loop;
-         Expanded_Class_Weight.Append (Weights);
+      Classes := Encode_Utils.Unique (Y, Inverse);
+      Weight_K := Compute_Balanced_Class_Weights (Classes, Y);
+      --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
+      K_Indices :=
+        Classifier_Utilities.Search_Sorted_Integer_List (Classes, Y);
+      for y_index in Y.First_Index .. Y.Last_Index loop
+         aWeight := Weight_K.Element (K_Indices.Element (y_index));
+         Weights.Append (aWeight);
       end loop;
+      Expanded_Class_Weight.Append (Weights);
+      --        end loop;
 
       return Reduce_Weight_Lists (Expanded_Class_Weight);
 
@@ -138,23 +136,23 @@ package body Weights is
    --     Weights associated with classes
    --  Indices : list of indices to be used in a subsample
    function Compute_Sample_Weight (Weight_Kind    : Weight_Type;
-                                   Y              : IL_Types.Value_Data_Lists_2D;
+                                   Y              : Integer_List;
                                    Class_Weights  : Weight_List :=
                                      Float_Package.Empty_Vector;
                                    Indices        : Integer_List :=
                                      Integer_Package.Empty_Vector)
                                    return Weight_List is
-      use Value_Data_Package;
-      Num_Outputs           : constant Integer := Integer (Y.Length);
-      Y_Full                : Value_Data_List;
-      Classes               : Value_Data_List;
-      Classes_Full          : Value_Data_List;
-      aClass                : Value_Record;
-      Classes_Missing       : Value_Data_List;
-      Class_Weight_K        : Float;
-      Class_Weight_K_List   : Weight_List;
-      Y_Subsample           : Value_Data_List;
-      Classes_Subsample     : Value_Data_List;
+      use Integer_Package;
+--        Num_Outputs           : constant Integer := Integer (Y.Length);
+--        Y_Full                : Value_Data_List;
+      Classes               : Integer_List;
+--        Classes_Full          : Value_Data_List;
+      aClass                : Integer;
+      Classes_Missing       : Integer_List;
+--        Class_Weight_K        : Float;
+--        Class_Weight_K_List   : Weight_List;
+      Y_Subsample           : Integer_List;
+      Classes_Subsample     : Integer_List;
       Weight_K              : Weight_List;
       aWeight               : Float;
       K_Indices             : Integer_List;
@@ -170,11 +168,9 @@ package body Weights is
 
          when No_Weight =>
             Put_Line ("Compute_Sample_Weight No_Weight");
-            for index_k in 1 .. Num_Outputs loop
-               for index in 1 .. Y.Element (1).Length loop
+               for index in Y.First_Index .. Y.Last_Index loop
                   Result.Append (1.0);
                end loop;
-            end loop;
 
          when Weight_Dict =>
             raise Weights_Error with
@@ -183,40 +179,33 @@ package body Weights is
          when Weights_List =>
             Put_Line ("Compute_Sample_Weight Weights_List");
             Inverse.Clear;
-            if Num_Outputs > 1 and then
-              Integer (Class_Weights.Length) /= Num_Outputs
-            then
-               raise Weights_Error with
-                 "Weights.Compute_Sample_Weight; For multi-output, number of " &
-                 "elements in class_weight should match number of outputs.";
-            end if;
 
-            for index_k in 1 .. Num_Outputs loop
-               --  y_full = y[:, k]
-               Put_Line ("Compute_Sample_Weight index_k: " &
-                           Integer'Image (index_k));
-               Y_Full := Y.Element (index_k);
-               Classes_Full := Encode_Utils.Unique (Y_Full, Inverse);
+--              for index_k in 1 .. Num_Outputs loop
+--                 --  y_full = y[:, k]
+--                 Put_Line ("Compute_Sample_Weight index_k: " &
+--                             Integer'Image (index_k));
+--                 Y_Full := Y.Element (index_k);
+               Classes := Encode_Utils.Unique (Y, Inverse);
                Classes_Missing.Clear;
-               Printing.Print_Value_Data_List
-                 ("Compute_Sample_Weight Y_Full", Y_Full);
-               Printing.Print_Value_Data_List
-                 ("Compute_Sample_Weight Classes_Full", Classes_Full);
+               Printing.Print_Integer_List ("Compute_Sample_Weight Y", Y);
+               Printing.Print_Integer_List
+                 ("Compute_Sample_Weight Classes", Classes);
 
-               if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
+--                 if Weight_Kind = Balanced_Weight or Num_Outputs = 1 then
                   --  Should be only one Class_Weight
-                  Class_Weight_K := Class_Weights.Element (1);
-               else
-                  Class_Weight_K := Class_Weights.Element (index_k);
-               end if;
+--                    Class_Weight_K := Class_Weights.Element (1);
+--                 else
+--                    Class_Weight_K := Class_Weights.Element (index_k);
+--                 end if;
 
                --  Compute_Class_Weights input parameter is a Weight_List
-               Class_Weight_K_List.Clear;
-               Class_Weight_K_List.Append (Class_Weight_K);
+--                 Class_Weight_K_List.Clear;
+--                 Class_Weight_K_List.Append (Class_Weight_K);
 
                if Indices.Is_Empty then
                   Weight_K := Compute_Class_Weights
-                    (Weight_Kind, Class_Weight_K_List, Classes_Full, Y_Full);
+                    (Weight_Kind, Class_Weights, Classes, Y);
+--                      (Weight_Kind, Class_Weight_K_List, Classes_Full, Y_Full);
                else
                   --  Get class weights for the subsample covering all classes in
                   --  case some labels present in the original data are missing
@@ -234,13 +223,14 @@ package body Weights is
                   --     np.searchsorted(classes_subsample, classes_full),
                   --     mode='clip')
                   Class_K_Weights := Compute_Class_Weights
-                    (Weight_Kind, Class_Weight_K_List, Y_Subsample, Classes_Subsample);
+                    (Weight_Kind, Class_Weights, Y_Subsample, Classes_Subsample);
+--                      (Weight_Kind, Class_Weight_K_List, Y_Subsample, Classes_Subsample);
                   --              K_Indices := Classifier_Utilities.Search_Sorted_Value_List
                   --                (Classes, Y_Full);
                   Printing.Print_Weights
                     ("Compute_Sample_Weight Indices Class_K_Weights", Class_K_Weights);
-                  K_Indices := Classifier_Utilities.Search_Sorted_Value_List
-                    (Classes, Y_Full);
+                  K_Indices := Classifier_Utilities.Search_Sorted_Integer_List
+                    (Classes, Y);
                   Printing.Print_Integer_List
                     ("Compute_Sample_Weight Indices K_Indices", K_Indices);
 
@@ -252,8 +242,8 @@ package body Weights is
 
                   for index in Classes.First_Index .. Classes.Last_Index loop
                      aClass := Classes (index);
-                     if Find (Classes_Subsample, aClass) =
-                       Value_Data_Package.No_Element
+                     if Integer_Package.Find (Classes_Subsample, aClass) =
+                       Integer_Package.No_Element
                      then
                         Classes_Missing.Append (aClass);
                      end if;
@@ -264,8 +254,8 @@ package body Weights is
                  ("Compute_Sample_Weight Indices Weight_K", Weight_K);
                --  weight_k = weight_k[np.searchsorted(classes_full, y_full)]
 
-               K_Indices := Classifier_Utilities.Search_Sorted_Value_List
-                 (Classes_Full, Y_Full);
+               K_Indices := Classifier_Utilities.Search_Sorted_Integer_List
+                 (Classes, Y);
                Printing.Print_Integer_List
                  ("Compute_Sample_Weight K_Indices", K_Indices);
                Class_K_Weights.Clear;
@@ -284,10 +274,9 @@ package body Weights is
 
                if not Classes_Missing.Is_Empty then
                   --  Make missing classes weights zero
-                  for index in Y_Full.First_Index .. Y_Full.Last_Index loop
-                     aClass := Y_Full (index);
-                     if not (Find (Classes_Missing, aClass) =
-                               Value_Data_Package.No_Element)
+                  for index in Y.First_Index .. Y.Last_Index loop
+                     if not (Find (Classes_Missing, Y (index)) =
+                               Integer_Package.No_Element)
                      then
                         aWeight := 0.0;
                         Weight_K.Replace_Element (index, aWeight);
@@ -296,7 +285,7 @@ package body Weights is
                end if;
 
                Expanded_Class_Weight.Append (Weight_K);
-            end loop;
+--              end loop;
             Result := Reduce_Weight_Lists (Expanded_Class_Weight);
 
       end case;

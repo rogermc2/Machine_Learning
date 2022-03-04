@@ -21,23 +21,19 @@ package Label is
       Estimator_Kind : Estimator.Estimator_Type :=
                          Estimator.Classifier_Estimator;
       case Encoder_Kind is
-         when Class_Unique => Uniques : Value_Data_List;
+         when Class_Unique => Uniques : Integer_List;
          when Class_Label => Classes  : Natural_List;
       end case;
    end record;
 
    Label_Error : Exception;
 
-   procedure Fit (Encoder : in out Label_Encoder;
-                  Y       : Value_Data_List);
+   procedure Fit (Encoder : in out Label_Encoder; Y : Integer_List);
    function Fit_Transform (Encoder : in out Label_Encoder;
-                           Y    : Value_Data_List)
-                            return Natural_List;
-   function Inverse_Transform  (Self : in out Label_Encoder;
-                                Labels : Natural_List)
-                                 return Value_Data_List;
-   function Transform (Self : in out Label_Encoder;
-                       Y    : Value_Data_List)
-                        return Natural_List;
+                           Y       : Integer_List) return Natural_List;
+   function Inverse_Transform  (Self   : in out Label_Encoder;
+                                Labels : Natural_List) return Integer_List;
+   function Transform (Self : in out Label_Encoder; Y : Integer_List)
+                       return Natural_List;
 
 end Label;

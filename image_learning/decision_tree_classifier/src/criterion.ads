@@ -1,6 +1,6 @@
 
 with IL_Types; use IL_Types;
-with Tree;
+--  with Tree;
 with Weights;
 
 package Criterion is
@@ -15,7 +15,6 @@ package Criterion is
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
       Samples                   : IL_Types.Float_List_2D;
-      Num_Outputs               : Tree.Index_Range := 1;
       Start_Row                 : Natural := 0;
       Stop_Row                  : Natural := 0;
       Split_Row                 : Natural := 0;
@@ -30,15 +29,16 @@ package Criterion is
       --  Sum_Total [k] is equal to
       --  sum_{i=start}^{end-1} w[samples[i]]*y[samples[i], k]
       --  where k is the output index.
-      Sum_Total                 : Weights.Weight_Lists_2D;
-      Sum_Left                  : Weights.Weight_Lists_2D;
-      Sum_Right                 : Weights.Weight_Lists_2D;
+      Sum_Total                 : Float_List;
+      Sum_Left                  : Float_List;
+      Sum_Right                 : Float_List;
       Sample_Indices            : Natural_List;
       Proxy_Improvement         : Float := -Float'Last;
       case Criterion_Type is
          when Criterion_Classification =>
             --  each output's number of classes for
-            Num_Classes  : Natural_List;
+--              Num_Classes  : Natural_List;
+            Num_Classes  : Natural := 0;
          when Criterion_Regression =>
             Sq_Sum_Total : Float := 0.0;
       end case;
@@ -47,9 +47,7 @@ package Criterion is
    Criterion_Error : Exception;
 
    procedure C_Init (Criteria    : in out Criterion_Class;
-                     Num_Outputs : Tree.Index_Range := 1;
-                     Num_Classes : Natural_List :=
-                       Natural_Package.Empty_Vector);
+                     Num_Classes : Natural := 0);
    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float);
@@ -58,7 +56,7 @@ package Criterion is
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Initialize_Node_Criterion
       (Criteria           : in out Criterion_Class;
-      Y                   : Natural_List;
+      Y                   : Integer_List;
       --  Samples:
       Sample_Indices      : Natural_List;
       --  Sample_Weight contains the weight of each sample

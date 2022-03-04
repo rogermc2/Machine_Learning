@@ -12,9 +12,9 @@ with Utilities;
 package body Classifier_Utilities is
 
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
---     use IL_Types.Value_Data_Package;
+--     use Value_Data_Package;
 --     package Value_Sets is new
---       Ada.Containers.Ordered_Sets (IL_Types.Value_Record);
+--       Ada.Containers.Ordered_Sets (Value_Record);
 --     use Weights.Weight_Lists_3D_Package;
 
 --     package Weight_Sets is new
@@ -22,7 +22,7 @@ package body Classifier_Utilities is
 
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
-   function Split_Raw_Data (Raw_Data    : IL_Types.Raw_Data_Vector;
+   function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
                             return Multi_Output_Data_Record;
 
@@ -132,7 +132,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Bin_Count (Numbers : IL_Types.Value_Data_List)
+   function Bin_Count (Numbers : Value_Data_List)
                        return Natural_List is
       use Ada.Containers;
       use Natural_Package;
@@ -169,7 +169,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Clear (anArray : in out IL_Types.Value_Data_Array) is
+   procedure Clear (anArray : in out Value_Data_Array) is
    begin
       for index in anArray'Range loop
          anArray (index).Float_Value := 0.0;
@@ -304,8 +304,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Init_Samples_Copy (Samples : IL_Types.Value_Data_Lists_2D)
-                               return IL_Types.Value_Data_Lists_2D is
+   function Init_Samples_Copy (Samples : Value_Data_Lists_2D)
+                               return Value_Data_Lists_2D is
       Num_Samples    : constant Positive := Positive (Samples.Length);
       Sample_1       : constant Value_Data_List := Samples.Element (1);
       Num_Features   : constant Positive := Positive (Sample_1.Length);
@@ -340,10 +340,10 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
-                       return IL_Types.Multi_Output_Data_Record is
+                       return Multi_Output_Data_Record is
       Data_File    : File_Type;
-      Raw_CSV_Data : IL_Types.Raw_Data_Vector;
-      Output_Data  : IL_Types.Multi_Output_Data_Record;
+      Raw_CSV_Data : Raw_Data_Vector;
+      Output_Data  : Multi_Output_Data_Record;
    begin
       Open (Data_File, In_File, File_Name);
       Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
@@ -357,7 +357,7 @@ package body Classifier_Utilities is
    --  ---------------------------------------------------------------------------
 
    procedure Parse_Header
-     (Header       : IL_Types.Unbounded_List; Num_Features : Positive;
+     (Header       : Unbounded_List; Num_Features : Positive;
       Data_Record  : in out Multi_Output_Data_Record) is
    begin
       for index in 1 .. Positive (Header.Length) loop
@@ -417,13 +417,13 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Search_Sorted_Value_List (List_A, List_B : IL_Types.Value_Data_List)
-                                      return IL_Types.Integer_List is
-      use IL_Types.Integer_Package;
-      use Value_Data_Sorting;
-      Item    : Value_Record;
+   function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
+                                        return Integer_List is
+      use Integer_Package;
+      use Integer_Sorting;
+      Item    : Integer;
       Index_A : Positive;
-      theList : IL_Types.Integer_List;
+      theList : Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -437,8 +437,10 @@ package body Classifier_Utilities is
             theList.Append (Index_A);
          end if;
       end loop;
+
       return theList;
-   end Search_Sorted_Value_List;
+
+   end Search_Sorted_Integer_List;
 
    --  -------------------------------------------------------------------------
 
@@ -474,7 +476,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_Raw_Data (Raw_Data    : IL_Types.Raw_Data_Vector;
+   function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
                             return Multi_Output_Data_Record is
       use Ada.Containers;
@@ -482,7 +484,7 @@ package body Classifier_Utilities is
       use Ada.Strings.Unbounded;
       --        Routine_Name   : constant String :=
       --                           "Classifier_Utilities.Split_Raw_Data ";
-      aRow           : IL_Types.Unbounded_List := Raw_Data.First_Element;
+      aRow           : Unbounded_List := Raw_Data.First_Element;
       Num_Items      : constant Positive := Positive (aRow.Length);
       Num_Features   : constant Positive := Num_Items - Num_Outputs;
       Feature_Types  : Feature_Type_Array (1 .. Num_Features);
@@ -595,9 +597,9 @@ package body Classifier_Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Sum_Cols (aList : IL_Types.Float_List_2D)
-                      return IL_Types.Float_List is
-      theSum : IL_Types.Float_List;
+   function Sum_Cols (aList : Float_List_2D)
+                      return Float_List is
+      theSum : Float_List;
       Value  : Float;
    begin
       for index in aList.First_Index .. aList.Last_Index loop
@@ -615,8 +617,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Sum_Cols (aList : IL_Types.Value_Data_Lists_2D)
-                      return IL_Types.Value_Data_List is
+   function Sum_Cols (aList : Value_Data_Lists_2D)
+                      return Value_Data_List is
       theSum     : Value_Data_List;
       Value_Type : constant Data_Type :=
                      aList.Element (1).Element (1).Value_Kind;
@@ -691,7 +693,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Array (L : IL_Types.Integer_List) return Integer_Array is
+   function To_Array (L : Integer_List) return Integer_Array is
       New_Array : Integer_Array (1 .. Integer (L.Length));
       A_Index   : Integer := 0;
    begin
@@ -715,7 +717,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (F : IL_Types.Value_Data_List)
+   function To_Float_List (F : Value_Data_List)
                            return Float_List is
       Item   : Value_Record;
       Floats : Float_List;
@@ -736,8 +738,8 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List (A : Classifier_Types.Integer_Array)
-                             return IL_Types.Integer_List is
-      A_List : IL_Types.Integer_List;
+                             return Integer_List is
+      A_List : Integer_List;
    begin
       for index in A'First .. A'Last loop
          A_List.Append (A (index));
@@ -748,10 +750,10 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_List (Ints : IL_Types.Value_Data_List)
-                             return IL_Types.Integer_List is
+   function To_Integer_List (Ints : Value_Data_List)
+                             return Integer_List is
       Item   : Value_Record;
-      Values : IL_Types.Integer_List;
+      Values : Integer_List;
    begin
       for index in Ints.First_Index .. Ints.Last_Index loop
          Item := Ints.Element (index);
@@ -769,7 +771,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : Integer_Array)
-                                   return IL_Types.Value_Data_List is
+                                   return Value_Data_List is
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
    begin
@@ -784,7 +786,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List_2D (A : Integer_Array)
-                                      return IL_Types.Value_Data_Lists_2D is
+                                      return Value_Data_Lists_2D is
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
       Multi_List : Value_Data_Lists_2D;
@@ -802,7 +804,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Multi_Value_List (A : Multi_Value_Array)
-                                 return IL_Types.Value_Data_Lists_2D is
+                                 return Value_Data_Lists_2D is
       Value    : Value_Record (Integer_Type);
       Row_List : Value_Data_Lists_2D;
       Col_List : Value_Data_List;
@@ -833,7 +835,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_List (Numbers : IL_Types.Value_Data_List)
+   function To_Natural_List (Numbers : Value_Data_List)
                              return Natural_List is
       Item   : Value_Record;
       Values : Natural_List;
@@ -857,7 +859,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_Value_List (A : Natural_Array)
-                                   return IL_Types.Value_Data_Lists_2D is
+                                   return Value_Data_Lists_2D is
       Int_Array : Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
@@ -868,7 +870,7 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   function To_PL_Array (List_1D : IL_Types.Value_Data_List; Num_Rows : Positive)
+   function To_PL_Array (List_1D : Value_Data_List; Num_Rows : Positive)
                          return PLplot_Auxiliary.Real_Matrix is
       use PLplot_Auxiliary;
       Routine_Name : constant String :=
@@ -897,8 +899,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Value_2D_List (A : IL_Types.Value_Data_List)
-                              return IL_Types.Value_Data_Lists_2D is
+   function To_Value_2D_List (A : Value_Data_List)
+                              return Value_Data_Lists_2D is
       Output_List : Value_Data_List;
       A2_List     : Value_Data_Lists_2D;
    begin
@@ -915,9 +917,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Value_2D_List (List_1D  : IL_Types.Value_Data_List;
+   function To_Value_2D_List (List_1D  : Value_Data_List;
                               Num_Rows : Positive)
-                              return IL_Types.Value_Data_Lists_2D is
+                              return Value_Data_Lists_2D is
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_Value_2D_List ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
@@ -946,8 +948,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Transpose (Values : IL_Types.Value_Data_Lists_2D)
-                       return  IL_Types.Value_Data_Lists_2D is
+   function Transpose (Values : Value_Data_Lists_2D)
+                       return  Value_Data_Lists_2D is
       use Ada.Containers;
       Num_Rows : constant Positive := Positive (Values.Length);
       Num_Cols : constant Count_Type := Values.Element (1).Length;
@@ -998,14 +1000,14 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Nums : IL_Types.Integer_List)
-                    return IL_Types.Integer_List is
+   function Unique (Nums : Integer_List)
+                    return Integer_List is
       use Int_Sets;
-      use IL_Types.Integer_Package;
+      use Integer_Package;
       Unique_Set : Int_Sets.Set;
-      Int_Curs   : IL_Types.Integer_Package.Cursor := Nums.First;
+      Int_Curs   : Integer_Package.Cursor := Nums.First;
       Set_Curs   : Int_Sets.Cursor;
-      Nums_List  : IL_Types.Integer_List;
+      Nums_List  : Integer_List;
    begin
       while Has_Element (Int_Curs) loop
          Unique_Set.Include (Element (Int_Curs));
@@ -1022,7 +1024,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Integer_Array (Nums : IL_Types.Value_Data_Array)
+   function Unique_Integer_Array (Nums : Value_Data_Array)
                                   return Integer_Array is
       use Int_Sets;
       Unique_Set : Int_Sets.Set;
@@ -1073,8 +1075,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Unique_Values (Values : IL_Types.Value_Data_List)
---                             return IL_Types.Value_Data_List is
+--     function Unique_Values (Values : Value_Data_List)
+--                             return Value_Data_List is
 --        use Value_Sets;
 --        Unique_Set  : Value_Sets.Set;
 --        Int_Curs    : Value_Data_Package.Cursor := Values.First;

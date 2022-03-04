@@ -24,28 +24,29 @@ procedure Lesson_4 is
    use Support_4;
    use Decision_Tree_Classification;
    Routine_Name   : constant String := "Lesson_4 ";
---     Dataset_Name   : constant String := "mnist_784";
---     Return_X_Y     : constant Boolean := True;
-      Dataset_Name   : constant String := "diabetes";
-      Return_X_Y    : constant Boolean := False;
-   Min_Split      : constant String := "2";
-   Test_Size      : constant Positive := 1000;
-   Train_Size     : constant Positive := 5000;
-   Bunch          : Openml_Ada.Bunch_Data;
-   X              : Float_List_2D;  --  rows of columns of values
-   Y              : Integer_List;
-   X_Indices      : Integer_List;
-   Y_Indices      : Integer_List;
-   Num_Samples    : Positive;
-   Train_X        : Float_List_2D;
-   Train_Y        : Integer_List;
-   Test_X         : Float_List_2D;
-   Test_Y         : Integer_List;
-   aClassifier    : Base_Decision_Tree.Classifier
-     (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
-   No_Weights     : Weights.Weight_List := Float_Package.Empty_Vector;
-   Prediction     : Float;
-   Correct        : Natural := 0;
+   Dataset_Name   : constant String := "mnist_784";
+   Return_X_Y     : constant Boolean := True;
+--        Dataset_Name   : constant String := "diabetes";
+--        Return_X_Y    : constant Boolean := False;
+   Min_Split       : constant String := "2";
+   Test_Size       : constant Positive := 1000;
+   Train_Size      : constant Positive := 5000;
+   Bunch           : Openml_Ada.Bunch_Data;
+   X               : Float_List_2D;  --  rows of columns of values
+   Y               : Integer_List;
+   X_Indices       : Integer_List;
+   Y_Indices       : Integer_List;
+   Num_Samples     : Positive;
+   Train_X         : Float_List_2D;
+   Train_Y         : Integer_List;
+   Test_X          : Float_List_2D;
+   Test_Y          : Integer_List;
+   aClassifier     : Base_Decision_Tree.Classifier
+      (Tree.Integer_Type, Tree.Integer_Type, Tree.Integer_Type);
+   No_Weights      : Weights.Weight_List := Float_Package.Empty_Vector;
+   Prediction_List : Integer_List;
+   Prediction      : Integer;
+   Correct         : Natural := 0;
    --     Exporter      : Graphviz_Exporter.DOT_Tree_Exporter;
 
 begin
@@ -112,11 +113,11 @@ begin
 
    Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
    Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
+   Prediction_List := Base_Decision_Tree.Predict (aClassifier, Train_X);
    for index in Train_X.First_Index .. Train_X.Last_Index loop
 --        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
-      Prediction := Base_Decision_Tree.Predict
-        (aClassifier, Train_X).Element (index).Element (1);
-      if Integer (Prediction) = Train_Y.Element (index) then
+      Prediction := Prediction_List.Element (index);
+      if Prediction = Train_Y.Element (index) then
          Correct := Correct + 1;
       end if;
    end loop;

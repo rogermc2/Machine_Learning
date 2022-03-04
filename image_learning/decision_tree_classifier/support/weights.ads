@@ -31,8 +31,7 @@ package Weights is
 
     function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                     Class_Weights : Weight_List;
-                                    Classes       : Natural_List;
-                                    Y             : Integer_List)
+                                    Classes, Y    : Integer_List)
                                     return Weight_List;
     function Compute_Sample_Weight
       (Weight_Kind    : Weight_Type;
