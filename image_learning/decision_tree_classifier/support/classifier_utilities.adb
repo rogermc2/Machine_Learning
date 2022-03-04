@@ -11,8 +11,6 @@ with Utilities;
 
 package body Classifier_Utilities is
 
-   use IL_Types;
-
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
 --     use IL_Types.Value_Data_Package;
 --     package Value_Sets is new
@@ -61,9 +59,9 @@ package body Classifier_Utilities is
    --  np.argmax(a, axis=1)
    --  returns array([2, 2]) -> [12, 15]
    function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
-                     return Classifier_Types.Natural_List is
+                     return Natural_List is
       Values       : Weights.Weight_List;
-      Max_Indices  : Classifier_Types.Natural_List;
+      Max_Indices  : Natural_List;
    begin
       Max_Indices.Clear;
       if Axis = 0 then
@@ -80,10 +78,10 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural := 0)
-                     return Classifier_Types.Natural_List is
+                     return Natural_List is
       Values_2K    : Weights.Weight_Lists_2D;
       Values       : Weights.Weight_List;
-      Max_Indices  : Classifier_Types.Natural_List;
+      Max_Indices  : Natural_List;
    begin
       Values_2K.Clear;
       Max_Indices.Clear;

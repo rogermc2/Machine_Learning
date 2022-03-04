@@ -52,6 +52,20 @@ package IL_Types is
       Ada.Containers.Doubly_Linked_Lists (Integer);
     subtype Integer_DL_List is Integer_DLL_Package.List;
 
+   package Boolean_Package is new Ada.Containers.Vectors
+     (Positive, Boolean);
+   subtype Boolean_List is Boolean_Package.Vector;
+
+   package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
+   subtype Natural_List is Natural_Package.Vector;
+   subtype Natural_Cursor is Natural_Package.Cursor;
+   package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");
+
+   use Natural_Package;
+   package Natural_List_Package is new
+      Ada.Containers.Vectors (Positive, Natural_List);
+   subtype Natural_Lists_2D is Natural_List_Package.Vector;
+
     package Character_Package is new Ada.Containers.Vectors
       (Positive, Character);
     subtype Character_List is Character_Package.Vector;

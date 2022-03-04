@@ -13,17 +13,15 @@ package body Encode_Utils is
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
 
    function Encode_Check_Unknown
-     (Values : IL_Types.Value_Data_List; Uniques : IL_Types.Value_Data_List)
-       return IL_Types.Value_Data_List;
+     (Values : Value_Data_List; Uniques : Value_Data_List)
+       return Value_Data_List;
 
    --  -------------------------------------------------------------------------
 
    function Encode_Check_Unknown
-     (Values : IL_Types.Value_Data_List; Uniques : IL_Types.Value_Data_List)
-       return IL_Types.Value_Data_List is
-      use IL_Types;
-      No_Inverse  : Natural_List :=
-                      Classifier_Types.Natural_Package.Empty_Vector;
+     (Values : Value_Data_List; Uniques : Value_Data_List)
+       return Value_Data_List is
+      No_Inverse  : Natural_List;
       Unique_Vals : constant Value_Data_List :=
                       Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Value_Record;
@@ -41,14 +39,14 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Encode (Values : IL_Types.Value_Data_List)
-                     return IL_Types.Value_Data_List is
-      Sorted_Values : IL_Types.Value_Data_List := Values;
-      Uniques       : IL_Types.Value_Data_List :=
-                        IL_Types.Value_Data_Package.Empty_Vector;
+   function Encode (Values : Value_Data_List)
+                     return Value_Data_List is
+      Sorted_Values : Value_Data_List := Values;
+      Uniques       : Value_Data_List :=
+                        Value_Data_Package.Empty_Vector;
    begin
 
-      IL_Types.Value_Data_Sorting.Sort (Sorted_Values);
+      Value_Data_Sorting.Sort (Sorted_Values);
 
       Printing.Print_Value_Data_List
         ("Encode_Utils.Encode Uniques", Uniques);
@@ -62,11 +60,11 @@ package body Encode_Utils is
    --  Uniques : unique values in Values; Uniques needs to be sorted.
    --  Check_Unknown : if True check Values for values that are not in Uniques
    --  and raise an error.
-   function Encode (Values        : IL_Types.Value_Data_List;
-                    Uniques       : IL_Types.Value_Data_List;
+   function Encode (Values        : Value_Data_List;
+                    Uniques       : Value_Data_List;
                     Check_Unknown : Boolean := True)
                      return Natural_List is
-      Diff          : IL_Types.Value_Data_List;
+      Diff          : Value_Data_List;
       Result        : Natural_List;
    begin
       Result := Map_To_Integer (Values, Uniques);
@@ -88,10 +86,9 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
    --  Map each value based on its position in uniques.
-   function Map_To_Integer (Values  : IL_Types.Value_Data_List;
-                            Uniques : IL_Types.Value_Data_List)
+   function Map_To_Integer (Values  : Value_Data_List;
+                            Uniques : Value_Data_List)
                              return Natural_List is
-      use IL_Types;
       use Value_Data_Package;
       Values_Curs  : Value_Data_Package.Cursor := Values.First;
       Uniques_Curs : Value_Data_Package.Cursor := Uniques.First;
@@ -145,9 +142,8 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : IL_Types.Value_Data_List)
-                     return IL_Types.Value_Data_List is
-      use IL_Types;
+   function Unique (Values : Value_Data_List)
+                     return Value_Data_List is
       use Int_Sets;
       use Value_Data_Package;
       use Value_Data_Sorting;
@@ -219,10 +215,8 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values         : IL_Types.Value_Data_List;
-                    Inverse        : out Natural_List)
-                     return IL_Types.Value_Data_List is
-      use IL_Types;
+   function Unique (Values : Value_Data_List; Inverse : out Natural_List)
+                     return Value_Data_List is
       use Int_Sets;
       use Value_Data_Package;
       use Value_Data_Sorting;

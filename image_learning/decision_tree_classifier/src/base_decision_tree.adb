@@ -16,22 +16,22 @@ package body Base_Decision_Tree is
 
    procedure Base_Fit_Checks
      (aClassifier       : in out Classifier;
-      X                 : IL_Types.Value_Data_Lists_2D;
-      Y                 : Classifier_Types.Natural_Lists_2D;
+      X                 : Value_Data_Lists_2D;
+      Y                 : Natural_Lists_2D;
       Min_Samples_Split : out Positive;
-      Sample_Weights    : in out IL_Types.Float_List);
+      Sample_Weights    : in out Float_List);
    procedure Classification_Part
      (aClassifier            : in out Classifier;
-      Y_Orig                 : IL_Types.Value_Data_Lists_2D;
-      Y_Encoded              : out Classifier_Types.Natural_Lists_2D;
-      Classes                : out IL_Types.Value_Data_Lists_2D;
-      Expanded_Class_Weights : in out IL_Types.Float_List);
+      Y_Orig                 : Value_Data_Lists_2D;
+      Y_Encoded              : out Natural_Lists_2D;
+      Classes                : out Value_Data_Lists_2D;
+      Expanded_Class_Weights : in out Float_List);
    procedure Prune_Tree (aClassifier : in out Classifier);
 
    --  -------------------------------------------------------------------------
 
-   function Apply (aClassifier : Classifier; X : IL_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List is
+   function Apply (aClassifier : Classifier; X : Value_Data_Lists_2D)
+                   return Natural_List is
    begin
 
       return Tree.Apply (aClassifier.Attributes.Decision_Tree, X);
@@ -42,8 +42,8 @@ package body Base_Decision_Tree is
    --  if is_classification: part of _classes.py BasesDecisionTree.Fit L150
    procedure Base_Fit
      (aClassifier    : in out Classifier;
-      X              : IL_Types.Value_Data_Lists_2D;
-      Y_Orig         : IL_Types.Value_Data_Lists_2D;
+      X              : Value_Data_Lists_2D;
+      Y_Orig         : Value_Data_Lists_2D;
       Sample_Weights : out Weights.Weight_List) is
       use Ada.Containers;
       use Estimator;
@@ -51,8 +51,8 @@ package body Base_Decision_Tree is
                                 "Base_Decision_Tree.Base_Fit ";
       Num_Samples           : constant Positive := Positive (X.Length);
       Builder               : Tree_Build.Tree_Builder;
-      Y_Encoded             : Classifier_Types.Natural_Lists_2D;
-      Classes               : IL_Types.Value_Data_Lists_2D;
+      Y_Encoded             : Natural_Lists_2D;
+      Classes               : Value_Data_Lists_2D;
       Min_Samples_Split     : Positive := 1;
       --  L205
       Expanded_Class_Weight : Weights.Weight_List;
@@ -158,10 +158,10 @@ package body Base_Decision_Tree is
 
    procedure Base_Fit_Checks
      (aClassifier       : in out Classifier;
-      X                 : IL_Types.Value_Data_Lists_2D;
-      Y                 : Classifier_Types.Natural_Lists_2D;
+      X                 : Value_Data_Lists_2D;
+      Y                 : Natural_Lists_2D;
       Min_Samples_Split : out Positive;
-      Sample_Weights    : in out IL_Types.Float_List) is
+      Sample_Weights    : in out Float_List) is
       --        use Maths.Float_Math_Functions;
       use Tree;
       Routine_Name      : constant String :=
@@ -324,13 +324,11 @@ package body Base_Decision_Tree is
    --  based on L200 of _classes.py BasesDecisionTree.Fit
    procedure Classification_Part
      (aClassifier             : in out Classifier;
-      Y_Orig                  : IL_Types.Value_Data_Lists_2D;
-      Y_Encoded               : out Classifier_Types.Natural_Lists_2D;
-      Classes                 : out IL_Types.Value_Data_Lists_2D;
+      Y_Orig                  : Value_Data_Lists_2D;
+      Y_Encoded               : out Natural_Lists_2D;
+      Classes                 : out Value_Data_Lists_2D;
       Expanded_Class_Weights  : in out Weights.Weight_List) is
       use Ada.Containers;
-      use Classifier_Types;
-      use IL_Types;
       use Weights;
       Routine_Name : constant String :=
                        "Base_Decision_Tree.Classification_Part ";
@@ -341,7 +339,7 @@ package body Base_Decision_Tree is
       OP_Row       : Value_Data_List := Value_Data_Package.Empty_Vector;
       Column       : Natural_List := Natural_Package.Empty_Vector;
       Inverse      : Natural_List := Natural_Package.Empty_Vector;
-      Class_List   : IL_Types.Value_Data_List;
+      Class_List   : Value_Data_List;
    begin
       aClassifier.Attributes.Classes.Clear;
       aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
@@ -401,8 +399,8 @@ package body Base_Decision_Tree is
    --  -------------------------------------------------------------------------
 
    function Decision_Path (aClassifier : Classifier;
-                           X           : IL_Types.Value_Data_Lists_2D)
-                           return Classifier_Types.Natural_Lists_2D is
+                           X           : Value_Data_Lists_2D)
+                           return Natural_Lists_2D is
    begin
       return Tree.Decision_Path (aClassifier.Attributes.Decision_Tree, X);
 
@@ -411,8 +409,8 @@ package body Base_Decision_Tree is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : in out Classifier;
-                     X    : IL_Types.Value_Data_Lists_2D)
-                     return IL_Types.Value_Data_Lists_2D is
+                     X    : Value_Data_Lists_2D)
+                     return Value_Data_Lists_2D is
       --  returns num samples x num outputs
       use Weights;
       --        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
@@ -421,16 +419,16 @@ package body Base_Decision_Tree is
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
       --  Prob_Ak: num_samples x num_classes
       Prob_Ak           : Weight_Lists_2D;
-      Class_Values      : IL_Types.Value_Data_List;
+      Class_Values      : Value_Data_List;
       Samples_2K        : Weight_Lists_2D;
       Samples           : Weight_Lists_2D;
       Classes           : Weight_List;
-      Selected_Class    : IL_Types.Value_Record;
+      Selected_Class    : Value_Record;
       --  Selected_Classes (prediction) 1 x num samples
-      Selected_Classes  : IL_Types.Value_Data_List;
-      Max_Indices       : Classifier_Types.Natural_List;  --  argmax
+      Selected_Classes  : Value_Data_List;
+      Max_Indices       : Natural_List;  --  argmax
       --  Predictions, num outputs x num samples
-      Predictions       : IL_Types.Value_Data_Lists_2D;
+      Predictions       : Value_Data_Lists_2D;
    begin
       --  L478
       for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop

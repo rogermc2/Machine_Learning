@@ -8,19 +8,19 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Tree is
 
-   function Apply_Dense (Self : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-                         return Classifier_Types.Natural_List;
+   function Apply_Dense (Self : Tree_Class; X : Value_Data_Lists_2D)
+                         return Natural_List;
    function Decision_Path_Dense (aTree : Tree_Class;
-                                 X     : IL_Types.Value_Data_Lists_2D)
-                                 return Classifier_Types.Natural_Lists_2D;
+                                 X     : Value_Data_Lists_2D)
+                                 return Natural_Lists_2D;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    --       That is, the set of relevant nodes containing the prediction values
    --       for each sample?
    --  Apply returns a list containing the Node ID associated with each sample.
-   function Apply (Self : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List is
+   function Apply (Self : Tree_Class; X : Value_Data_Lists_2D)
+                   return Natural_List is
    begin
       return Apply_Dense (Self, X);
    end Apply;
@@ -34,13 +34,12 @@ package body Tree is
    --  intermediate subsets are called internal nodes or split nodes.
    --  Apply_Dense returns a list containing the Node ID associated with each
    --  sample
-   function Apply_Dense (Self : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-                         return Classifier_Types.Natural_List is
+   function Apply_Dense (Self : Tree_Class; X : Value_Data_Lists_2D)
+                         return Natural_List is
       --                           return Tree_Cursor_List is
       --  X is a list of samples of features (num samples x num features)
       use Ada.Containers;
       use Ada.Strings.Unbounded;
-      use IL_Types;
       use Value_Data_Package;
       Routine_Name   : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
@@ -49,7 +48,7 @@ package body Tree is
       Node           : Tree_Node;
       Current_Sample : Value_Data_List;
       Feature_Value  : Value_Record;
-      Out_Data       : Classifier_Types.Natural_List;
+      Out_Data       : Natural_List;
       Continue       : Boolean;
       Use_Left       : Boolean;
    begin
@@ -131,8 +130,8 @@ package body Tree is
 
    procedure C_Init (aTree        : in out Tree_Class;
                      Num_Features : Natural := 0;
-                     Num_Classes  : Classifier_Types.Natural_List :=
-                       Classifier_Types.Natural_Package.Empty_Vector;
+                     Num_Classes  : Natural_List :=
+                       Natural_Package.Empty_Vector;
                      Num_Outputs  : Index_Range := 1) is
    begin
       aTree.Num_Features := Num_Features;
@@ -141,15 +140,15 @@ package body Tree is
       aTree.Max_Depth := 0;
       atree.Values := Weights.Weight_Lists_3D_Package.Empty_Vector;
       aTree.Nodes := Nodes_Package.Empty_Tree;
-      aTree.Classes := IL_Types.Value_Lists_Data_Package.Empty_Vector;
+      aTree.Classes := Value_Lists_Data_Package.Empty_Vector;
 
    end C_Init;
 
    --  ------------------------------------------------------------------------
 
    function Decision_Path
-     (aTree : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D is
+     (aTree : Tree_Class; X : Value_Data_Lists_2D)
+      return Natural_Lists_2D is
    begin
       return Decision_Path_Dense (aTree, X);
 
@@ -158,24 +157,23 @@ package body Tree is
    --  -------------------------------------------------------------------------
 
    function Decision_Path_Dense
-     (aTree : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D is
+     (aTree : Tree_Class; X : Value_Data_Lists_2D)
+      return Natural_Lists_2D is
       use Ada.Containers;
       use Ada.Strings.Unbounded;
-      use IL_Types;
       use Value_Data_Package;
       Routine_Name   : constant String := "Tree.Decision_Path_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (aTree.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
-      Node_ID_List   : Classifier_Types.Natural_List;
+      Node_ID_List   : Natural_List;
       Current_Sample : Value_Data_List;
       Feature_Value  : Value_Record;
       Use_Left       : Boolean;
       Continue       : Boolean := True;
       --  Out_Data: num samples x num nodes
-      Out_Data       : Classifier_Types.Natural_Lists_2D;
+      Out_Data       : Natural_Lists_2D;
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
                 "Top node has no children");
@@ -261,7 +259,7 @@ package body Tree is
    --  _tree L758
    --  Predict returns a 3D list, num_samples x num_outputs x num_classes
    function Predict (Self : in out Tree_Class;
-                     X    : IL_Types.Value_Data_Lists_2D)
+                     X    : Value_Data_Lists_2D)
                      return Weights.Weight_Lists_3D is
       use Ada.Containers;
       Routine_Name : constant String := "Tree.Predict ";
@@ -269,7 +267,7 @@ package body Tree is
       --  Each sample is a list of feature values, one value per feature
       --  Values: num_nodes x num_outputs x num_classes
       Values       : constant Weights.Weight_Lists_3D := Self.Values;
-      Samples      : Classifier_Types.Natural_List;
+      Samples      : Natural_List;
       --  Out_Data: num_samples x num_outputs x num_classes
       Out_Data     : Weights.Weight_Lists_3D;
    begin

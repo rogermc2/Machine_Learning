@@ -2,8 +2,7 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Classifier_Types; use Classifier_Types;
-with IL_Types;
+with IL_Types; use IL_Types;
 with Estimator;
 
 package Label is
@@ -22,7 +21,7 @@ package Label is
       Estimator_Kind : Estimator.Estimator_Type :=
                          Estimator.Classifier_Estimator;
       case Encoder_Kind is
-         when Class_Unique => Uniques : IL_Types.Value_Data_List;
+         when Class_Unique => Uniques : Value_Data_List;
          when Class_Label => Classes  : Natural_List;
       end case;
    end record;
@@ -30,15 +29,15 @@ package Label is
    Label_Error : Exception;
 
    procedure Fit (Encoder : in out Label_Encoder;
-                  Y       : IL_Types.Value_Data_List);
+                  Y       : Value_Data_List);
    function Fit_Transform (Encoder : in out Label_Encoder;
-                           Y    : IL_Types.Value_Data_List)
+                           Y    : Value_Data_List)
                             return Natural_List;
    function Inverse_Transform  (Self : in out Label_Encoder;
                                 Labels : Natural_List)
-                                 return IL_Types.Value_Data_List;
+                                 return Value_Data_List;
    function Transform (Self : in out Label_Encoder;
-                       Y    : IL_Types.Value_Data_List)
+                       Y    : Value_Data_List)
                         return Natural_List;
 
 end Label;

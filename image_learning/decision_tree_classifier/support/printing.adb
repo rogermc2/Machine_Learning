@@ -64,8 +64,8 @@ package body Printing is
    procedure Print_Criterion (Name : String;
                               Data : Criterion.Criterion_Class) is
       use Criterion;
-      use Classifier_Types.Natural_List_Package;
-      use IL_Types.Float_Package;
+      use Natural_List_Package;
+      use Float_Package;
    begin
       Put_Line (Name & ": ");
       Put_Line ("Criterion_Type: " &
@@ -198,7 +198,7 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_List (Name : String; theList : IL_Types.Float_List) is
+   procedure Print_Float_List (Name : String; theList : Float_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -270,8 +270,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Indefinite_List (Name    : String;
-                                    theList : IL_Types.Indef_String_List) is
-      use  IL_Types.Indefinite_String_Package;
+                                    theList : Indef_String_List) is
+      use  Indefinite_String_Package;
       Curs : Cursor := theList.First;
    begin
       Put_Line (Name & ": ");
@@ -286,7 +286,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List (Name    : String;
-                                 theList : IL_Types.Integer_List) is
+                                 theList : Integer_List) is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
@@ -305,8 +305,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_List (Name    : String;
-                                 theList : IL_Types.Integer_DL_List) is
-      use IL_Types.Integer_DLL_Package;
+                                 theList : Integer_DL_List) is
+      use Integer_DLL_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -327,7 +327,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Lists_2D (Name : String;
-                                   Data : IL_Types.Float_List_2D) is
+                                   Data : Float_List_2D) is
    begin
       Put_Line (Name & ": ");
       for index in Data.First_Index .. Data.Last_Index loop
@@ -528,8 +528,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Strings (Name : String; theList : IL_Types.String_List) is
-      use IL_Types.String_Package;
+   procedure Print_Strings (Name : String; theList : String_List) is
+      use String_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -553,8 +553,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Strings (Name    : String;
-                            theList : IL_Types.Indef_String_List) is
-      use IL_Types.Indefinite_String_Package;
+                            theList : Indef_String_List) is
+      use Indefinite_String_Package;
       Curs  : Cursor := theList.First;
       Count : Integer := 1;
    begin
@@ -639,7 +639,7 @@ package body Printing is
    --  -------------------------------------------------------------------------
 
    procedure Print_Unbounded_List (Name    : String;
-                                   theList : IL_Types.Unbounded_List) is
+                                   theList : Unbounded_List) is
       Count : Integer := 1;
    begin
       if Name'Length > 0 then
@@ -704,8 +704,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_List (Name    : String;
-                                    theList : IL_Types.Value_Data_List) is
-      use IL_Types;
+                                    theList : Value_Data_List) is
       Value : Value_Record;
       Count : Integer := 1;
    begin
@@ -731,7 +730,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_2D
-     (Name      : String; theList : IL_Types.Value_Data_Lists_2D;
+     (Name      : String; theList : Value_Data_Lists_2D;
       Num_Items : Positive := 1000) is
       Items : Positive;
    begin
@@ -762,7 +761,7 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Value_Data_Lists_3D
-     (Name : String; theList : IL_Types.Value_Data_Lists_3D) is
+     (Name : String; theList : Value_Data_Lists_3D) is
    begin
       if Name'Length > 0 then
          Put_Line (Name & ":");
@@ -783,8 +782,7 @@ package body Printing is
    --  -------------------------------------------------------------
 
    procedure Print_Value_Record
-     (Name : String; Value : IL_Types.Value_Record) is
-      use IL_Types;
+     (Name : String; Value : Value_Record) is
    begin
       if Name'Length > 0 then
          Put_Line (Name & ":");

@@ -15,10 +15,9 @@
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with IL_Types;
+with IL_Types; use IL_Types;
 with Tree;
 
-with Classifier_Types;
 with Criterion;
 with Estimator;
 with Node_Splitter;
@@ -85,7 +84,7 @@ package Base_Decision_Tree is
    type Attribute_Data is record
       --  The classes labels (single output problem)
       --  or a list of arrays of class labels (multi-output problem).
-      Classes             : IL_Types.Value_Data_Lists_2D;
+      Classes             : Value_Data_Lists_2D;
       --  The impurity-based feature importances.
       --  The higher, the more important the feature.
       Feature_Importances : Unbounded_List;
@@ -107,16 +106,16 @@ package Base_Decision_Tree is
    Classifier_Error : Exception;
    Value_Error      : Exception;
 
-   function Apply (aClassifier : Classifier; X : IL_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List;
+   function Apply (aClassifier : Classifier; X : Value_Data_Lists_2D)
+                   return Natural_List;
    --  BaseDecisionTree.Fit (super of class DecisionTreeClassifier)
    --  Fit builds a decision tree classifier from the training set (X, Y).
    --  X : training input samples; a (n_samples, n_features) matrix
    --  Y : values (class labels); a (n_samples, n_outputs) matrix
    procedure Base_Fit
      (aClassifier    : in out Classifier;
-      X              : IL_Types.Value_Data_Lists_2D;
-      Y_Orig         : IL_Types.Value_Data_Lists_2D;
+      X              : Value_Data_Lists_2D;
+      Y_Orig         : Value_Data_Lists_2D;
       Sample_Weights : out Weights.Weight_List);
    procedure C_Init
      (aClassifier              : in out Classifier;
@@ -134,10 +133,10 @@ package Base_Decision_Tree is
       CCP_Alpha                : Float := 0.0;
       Random_State             : Integer := 0);
    function Predict (Self : in out Classifier;
-                     X    : IL_Types.Value_Data_Lists_2D)
-                     return IL_Types.Value_Data_Lists_2D;
+                     X    : Value_Data_Lists_2D)
+                     return Value_Data_Lists_2D;
    function Decision_Path (aClassifier : Classifier;
-                           X           : IL_Types.Value_Data_Lists_2D)
-                           return Classifier_Types.Natural_Lists_2D;
+                           X           : Value_Data_Lists_2D)
+                           return Natural_Lists_2D;
 
 end Base_Decision_Tree;

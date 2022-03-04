@@ -47,7 +47,6 @@ package body Node_Splitter is
                        Num_Found_Constants : in out Natural;
                        F_I, F_J            : Natural)
                        return Boolean is
-      use IL_Types;
       Routine_Name : constant String := "Node_Splitter.Can_Split ";
       X_F_Start    : constant Value_Record
         := Self.Feature_Values.Element (Self.Feature_Values.First_Index);
@@ -110,7 +109,6 @@ package body Node_Splitter is
    procedure Evaluate_All_Splits (Splitter   : in out Splitter_Class;
                                   Current    : in out Split_Record;
                                   Best       : in out Split_Record) is
-      use IL_Types;
 --        Routine_Name              : constant String :=
 --                                      "Node_Splitter.Evaluate_All_Splits ";
       F_Values                  : constant IL_Types.Value_Data_List :=
@@ -361,7 +359,7 @@ package body Node_Splitter is
    procedure Initialize_Splitter
      (Self             : in out Splitter_Class;
       Input_X          : IL_Types.Value_Data_Lists_2D;
-      Y_Encoded        : Classifier_Types.Natural_Lists_2D;
+      Y_Encoded        : Natural_Lists_2D;
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1) is
       use Ada.Containers;
@@ -469,7 +467,6 @@ package body Node_Splitter is
       F_I                 : in out Natural;
       F_J                 : Natural;
       Best_Split          : in out Split_Record) is
-      use IL_Types;
       use Value_Data_Sorting;
 --        Routine_Name         : constant String :=
 --                                 "Node_Splitter.Process_Non_Constants ";
@@ -520,10 +517,9 @@ package body Node_Splitter is
 
    procedure Reorder_Rows (Self        : in out Splitter_Class;
                            Best_Split  : in out Split_Record;
-                           X_Samples   : in out
-                             Classifier_Types.Natural_List;
+                           X_Samples   : in out Natural_List;
                            Impurity    : Float) is
-      use Classifier_Types.Natural_Package;
+      use Natural_Package;
       Routine_Name  : constant String := "Node_Splitter.Reorder_Rows ";
       Partition_End : Natural;
       P_Index       : Positive;

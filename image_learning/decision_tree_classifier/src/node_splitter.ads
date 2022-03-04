@@ -2,8 +2,7 @@
 --  Based on scikit-learn/sklearn/tree _splitter.pxd class Splitter
 
 with Ada.Strings.Unbounded;
-with IL_Types;
-with Classifier_Types;
+with IL_Types; use IL_Types;
 with Criterion;
 with Tree;
 with Weights;
@@ -22,7 +21,6 @@ package Node_Splitter is
       Impurity_Right : Float := -Float'Last;
    end record;
 
-   use Classifier_Types;
    type Splitter_Class is record
       Criteria             : Criterion.Criterion_Class;
       Max_Features         : Tree.Index_Range := 1;  --  Number of features to test
@@ -56,7 +54,7 @@ package Node_Splitter is
    procedure Initialize_Splitter
      (Self             : in out Splitter_Class;
       Input_X          : IL_Types.Value_Data_Lists_2D;
-      Y_Encoded        : Classifier_Types.Natural_Lists_2D;
+      Y_Encoded        : Natural_Lists_2D;
       Sample_Weight    : Weights.Weight_List;
       Min_Leaf_Samples : Positive := 1);
    function Entropy_Node_Impurity (Self : Splitter_Class) return Float;

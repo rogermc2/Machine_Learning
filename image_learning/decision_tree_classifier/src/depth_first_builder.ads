@@ -1,5 +1,5 @@
 
-with Classifier_Types;
+with IL_Types; use IL_Types;
 with Node_Splitter;
 with Tree;
 with Tree_Build;
@@ -20,6 +20,6 @@ package Depth_First_Builder is
 
     procedure Build_Tree (theTree   : in out Tree.Tree_Class;
                           Builder   : in out Tree_Build.Tree_Builder;
-                          Y_Encoded : Classifier_Types.Natural_Lists_2D);
+                          Y_Encoded : Natural_Lists_2D);
 
 end Depth_First_Builder;

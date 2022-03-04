@@ -9,8 +9,7 @@
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Vectors;
 
-with Classifier_Types;
-with IL_Types;
+with IL_Types; use IL_Types;
 with Weights;
 
 package Tree is
@@ -31,9 +30,9 @@ package Tree is
       end case;
    end record;
 
-   subtype Values_List is IL_Types.Float_List;
-   subtype Values_List_2D is IL_Types.Float_List_2D;
-   subtype Values_List_3D is IL_Types.Float_List_3D;
+   subtype Values_List is Float_List;
+   subtype Values_List_2D is Float_List_2D;
+   subtype Values_List_3D is Float_List_3D;
 
    type Tree_Node (Leaf_Node : Boolean := False) is record
       Node_ID                   : Positive := 1;
@@ -44,7 +43,7 @@ package Tree is
       case Leaf_Node is
          when False =>
             --  from _Tree Node struct
-            Features               : IL_Types.Unbounded_List;
+            Features               : Unbounded_List;
             --  Feature used for splitting the node
             Best_Fit_Feature_Index : Natural := 0;
             Threshold              : Float := 0.0;
@@ -71,8 +70,8 @@ package Tree is
       --  _tree.pxd L43
       Num_Features : Natural := 0;
       --  Classes:  outputs x classes
-      Num_Classes  : Classifier_Types.Natural_List;
-      Classes      : IL_Types.Value_Data_Lists_2D;
+      Num_Classes  : Natural_List;
+      Classes      : Value_Data_Lists_2D;
       Num_Outputs  : Index_Range := 1;
       Max_Depth    : Integer := -1;
       Nodes        : Nodes_Package.Tree;  -- Ada Multiway Tree
@@ -84,15 +83,15 @@ package Tree is
 
    Value_Error : Exception;
 
-   function Apply (Self : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-                   return Classifier_Types.Natural_List;
+   function Apply (Self : Tree_Class; X : Value_Data_Lists_2D)
+                   return Natural_List;
    procedure C_Init (aTree        : in out Tree_Class; Num_Features : Natural := 0;
-                     Num_Classes  : Classifier_Types.Natural_List :=
-                       Classifier_Types.Natural_Package.Empty_Vector;
+                     Num_Classes  : Natural_List :=
+                       Natural_Package.Empty_Vector;
                      Num_Outputs  : Index_Range := 1);
    function Decision_Path
-     (aTree : Tree_Class; X : IL_Types.Value_Data_Lists_2D)
-      return Classifier_Types.Natural_Lists_2D;
+     (aTree : Tree_Class; X : Value_Data_Lists_2D)
+      return Natural_Lists_2D;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
@@ -100,7 +99,7 @@ package Tree is
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
    function Predict (Self : in out Tree_Class;
-                     X    : IL_Types.Value_Data_Lists_2D)
+                     X    : Value_Data_Lists_2D)
                      return Weights.Weight_Lists_3D;
 
 end Tree;
