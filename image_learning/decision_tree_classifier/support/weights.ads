@@ -31,14 +31,14 @@ package Weights is
 
     function Compute_Class_Weights (Weight_Kind   : Weight_Type;
                                     Class_Weights : Weight_List;
-                                    Classes       : IL_Types.Value_Data_List;
-                                    Y             : IL_Types.Value_Data_List)
+                                    Classes       : Natural_List;
+                                    Y             : Integer_List)
                                     return Weight_List;
     function Compute_Sample_Weight
       (Weight_Kind    : Weight_Type;
-       Y              : IL_Types.Value_Data_Lists_2D;
+       Y              : Integer_List;
        Class_Weights  : Weight_List := Float_Package.Empty_Vector;
-       Indices        : IL_Types.Integer_List := Integer_Package.Empty_Vector)
+       Indices        : Integer_List := Integer_Package.Empty_Vector)
        return Weight_List;
     function Get_Column (Weights  : Weight_Lists_2D; Data_Index : Positive)
                          return Weight_List;

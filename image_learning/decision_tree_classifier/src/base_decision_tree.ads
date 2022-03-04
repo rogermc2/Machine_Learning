@@ -132,7 +132,7 @@ package Base_Decision_Tree is
       CCP_Alpha                : Float := 0.0;
       Random_State             : Integer := 0);
    function Predict (Self : in out Classifier; X : Float_List_2D)
-                     return Float_List_2D;
+                     return Integer_List;
    function Decision_Path (aClassifier : Classifier; X : Float_List_2D)
                            return Natural_Lists_2D;
 
