@@ -106,7 +106,7 @@ package body Criterion is
    --  L59, L214, 280
    procedure Initialize_Node_Criterion
      (Criteria            : in out Criterion_Class;
-      Y                   : Natural_Lists_2D;
+      Y                   : Natural_List;
       Sample_Indices      : Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
@@ -115,14 +115,12 @@ package body Criterion is
       --  In Python a[start:stop] means items start through stop - 1
 --        Routine_Name    : constant String :=
 --                            "Criterion.Initialize_Node_Criterion ";
-      Num_Outputs     : Positive;
       Sum_Total_K     : Float_List;
       Y_I_Index       : Positive;  --  Class index
       Y_I             : Natural_List;  --  Class
       Y_Ik            : Natural; --  Class.output
       Weight          : Float := 1.0;
    begin
-      Num_Outputs := Positive (Y.Element (1).Length);
       --  L302
       Criteria.Y := Y;
       Criteria.Sample_Weight := Sample_Weight;

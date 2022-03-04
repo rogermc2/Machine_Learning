@@ -11,10 +11,10 @@ package Criterion is
                                     MAE_Criteria);
    type Criterion_Class
      (Criterion_Type : Criterion_Kind := Criterion_Classification) is record
-      Y                         : Natural_Lists_2D;
+      Y                         : Integer_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
-      Samples                   : IL_Types.Value_Data_Lists_2D;
+      Samples                   : IL_Types.Float_List_2D;
       Num_Outputs               : Tree.Index_Range := 1;
       Start_Row                 : Natural := 0;
       Stop_Row                  : Natural := 0;
