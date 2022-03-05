@@ -89,7 +89,7 @@ package Base_Decision_Tree is
       Feature_Importances : Unbounded_List;
       Max_Features        : Positive := 1;
       Num_Features        : Tree.Index_Range := 1;
-      Num_Outputs         : Tree.Index_Range := 1;
+--        Num_Outputs         : Tree.Index_Range := 1;
       Decision_Tree       : Tree.Tree_Class;
    end record;
 

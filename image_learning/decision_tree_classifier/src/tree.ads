@@ -70,15 +70,17 @@ package Tree is
       --  _tree.pxd L43
       Num_Features : Natural := 0;
       --  Classes:  outputs x classes
-      Num_Classes  : Natural_List;
+--        Num_Classes  : Natural_List;
+      Num_Classes  : Natural;
       Classes      : Integer_List;
-      Num_Outputs  : Index_Range := 1;
+--        Num_Outputs  : Index_Range := 1;
       Max_Depth    : Integer := -1;
       Nodes        : Nodes_Package.Tree;  -- Ada Multiway Tree
       --  From _Treenp.ndarray _get_value_ndarray generates a Values
       --  3D array, num_nodes x num_outputs x num_classes per node.
       --  Values corresponds to the first dimension of ndarray
-      Values       : Weights.Weight_Lists_3D;
+      Values       : Weights.Weight_Lists_2D;
+--        Values       : Weights.Weight_Lists_3D;
    end record;
 
    Value_Error : Exception;
@@ -87,7 +89,7 @@ package Tree is
                    return Natural_List;
    procedure C_Init
      (aTree        : in out Tree_Class; Num_Features : Natural := 0;
-      Num_Classes  : Natural_List := Natural_Package.Empty_Vector;
+      Num_Classes  : Natural;
       Num_Outputs  : Index_Range := 1);
    function Decision_Path
      (aTree : Tree_Class; X : Float_List_2D) return Natural_Lists_2D;
@@ -97,7 +99,9 @@ package Tree is
    --                    Sample_Weight : State := None;
    --                    Check_Input   : Boolean := True;
    --                    X_Idx_Sorted  : State := None);
+--     function Predict (Self : in out Tree_Class; X : Float_List_2D)
+--                       return Weights.Weight_Lists_3D;
    function Predict (Self : in out Tree_Class; X : Float_List_2D)
-                     return Weights.Weight_Lists_3D;
+                     return Weights.Weight_Lists_2D;
 
 end Tree;

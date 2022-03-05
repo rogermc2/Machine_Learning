@@ -36,9 +36,7 @@ package Criterion is
       Proxy_Improvement         : Float := -Float'Last;
       case Criterion_Type is
          when Criterion_Classification =>
-            --  each output's number of classes for
---              Num_Classes  : Natural_List;
-            Num_Classes  : Natural := 0;
+            Num_Classes  : Natural;
          when Criterion_Regression =>
             Sq_Sum_Total : Float := 0.0;
       end case;
@@ -47,7 +45,7 @@ package Criterion is
    Criterion_Error : Exception;
 
    procedure C_Init (Criteria    : in out Criterion_Class;
-                     Num_Classes : Natural := 0);
+                     Num_Classes : Natural);
    procedure Children_Impurity_Gini (Criteria       : Criterion_Class;
                                      Impurity_Left,
                                      Impurity_Right : out Float);
@@ -66,7 +64,8 @@ package Criterion is
    function Node_Impurity_Entropy (Self : Criterion_Class) return Float;
    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float;
    procedure Node_Value (Self  : Criterion_Class;
-                         Value : out Weights.Weight_Lists_2D);
+                         Value : out Weights.Weight_List);
+--                           Value : out Weights.Weight_Lists_2D);
    function Proxy_Impurity_Improvement (Criteria : Criterion_Class)
                                          return Float;
    procedure Reset (Criteria : in out Criterion_Class);

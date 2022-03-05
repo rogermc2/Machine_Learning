@@ -87,7 +87,7 @@ package body Base_Decision_Tree is
          Tree.Index_Range (aClassifier.Attributes.Max_Features),
          aClassifier.Parameters.Min_Samples_Leaf, Min_Weight_Leaf);
       Criterion.C_Init (aClassifier.Parameters.Splitter.Criteria,
-                        aClassifier.Attributes.Num_Outputs,
+                        --                          aClassifier.Attributes.Num_Outputs,
                         aClassifier.Attributes.Decision_Tree.Num_Classes);
       --  L323
       if not Expanded_Class_Weight.Is_Empty then
@@ -127,15 +127,14 @@ package body Base_Decision_Tree is
       --  L392
       Tree.C_Init (aClassifier.Attributes.Decision_Tree,
                    Positive (aClassifier.Attributes.Num_Features),
-                   aClassifier.Attributes.Decision_Tree.Num_Classes,
-                   aClassifier.Attributes.Num_Outputs);
+                   aClassifier.Attributes.Decision_Tree.Num_Classes);
 
       aClassifier.Attributes.Decision_Tree.Classes :=
         aClassifier.Attributes.Classes;
 
       --  L400
       Tree_Build.Init_Builder (Builder, aClassifier.Parameters.Max_Leaf_Nodes,
-                                 aClassifier.Parameters.Splitter);
+                               aClassifier.Parameters.Splitter);
 
       Put_Line (Routine_Name & "L420");
       --  L420
@@ -332,49 +331,50 @@ package body Base_Decision_Tree is
       use Weights;
       Routine_Name : constant String :=
                        "Base_Decision_Tree.Classification_Part ";
---        Num_Outputs  : constant Count_Type := 1;
---        Y_Row        : Integer;
---        Yk_Row       : Integer;
+      --        Num_Outputs  : constant Count_Type := 1;
+      --        Y_Row        : Integer;
+      --        Yk_Row       : Integer;
       YE_Row       : Natural;
---        Column       : Natural;
+      --        Column       : Natural;
       Inverse      : Natural_List;
       Class_List   : Integer_List;
    begin
       aClassifier.Attributes.Classes.Clear;
-      aClassifier.Attributes.Decision_Tree.Num_Classes.Clear;
       Y_Encoded.Clear;
       Classes.Clear;
---        Y_Encoded.Set_Length (Y_Orig.Length);
+      --        Y_Encoded.Set_Length (Y_Orig.Length);
       for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
          Y_Encoded.Append (class - Y_Orig.First_Index);
---           Column := op;
---           for op in Y_Orig.Element.First_Index
---             .. Y_Orig.Element.Last_Index loop
---              Column.Append (op);
---           end loop;
---           Y_Encoded.Replace_Element (class, Column);
+         --           Column := op;
+         --           for op in Y_Orig.Element.First_Index
+         --             .. Y_Orig.Element.Last_Index loop
+         --              Column.Append (op);
+         --           end loop;
+         --           Y_Encoded.Replace_Element (class, Column);
       end loop;
 
       --  Classes is a list of integers
---        OP_Row.Set_Lengt (Num_Outputs);
---        for op in Y_Orig.Element (1).First_Index
---          .. Y_Orig.Element (1).Last_Index loop
---           Yk_Row.Clear;
---           for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
---              Y_Row := Y_Orig.Element (class);
---              Yk_Row.Append (Y_Row.Element (op));
---           end loop;
+      --        OP_Row.Set_Lengt (Num_Outputs);
+      --        for op in Y_Orig.Element (1).First_Index
+      --          .. Y_Orig.Element (1).Last_Index loop
+      --           Yk_Row.Clear;
+      --           for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
+      --              Y_Row := Y_Orig.Element (class);
+      --              Yk_Row.Append (Y_Row.Element (op));
+      --           end loop;
 
-         Class_List := Encode_Utils.Unique (Y_Orig, Inverse);
-         aClassifier.Attributes.Decision_Tree.Num_Classes.Append
-           (Positive (Class_List.Length));
+      Class_List := Encode_Utils.Unique (Y_Orig, Inverse);
+      --           aClassifier.Attributes.Decision_Tree.Num_Classes.Append
+      --             (Positive (Class_List.Length));
+      aClassifier.Attributes.Decision_Tree.Num_Classes :=
+        Positive (Class_List.Length);
 
-         for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
-            YE_Row := Y_Encoded.Element (class);
---              YE_Row.Replace_Element (op, Inverse.Element (class));
-            Y_Encoded.Replace_Element (class, YE_Row);
-         end loop;
-         Classes.Append (Class_List);
+      for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
+         YE_Row := Y_Encoded.Element (class);
+         --              YE_Row.Replace_Element (op, Inverse.Element (class));
+         Y_Encoded.Replace_Element (class, YE_Row);
+      end loop;
+      Classes.Append (Class_List);
 
       aClassifier.Attributes.Classes := Classes;
 
@@ -410,12 +410,14 @@ package body Base_Decision_Tree is
       use Weights;
       --        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
       --  L468 Prob_A: num_samples x num_outputs x num_classes
-      Prob_A            : constant Weight_Lists_3D :=
+--        Prob_A            : constant Weight_Lists_3D :=
+--                              Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Prob_A            : constant Weight_Lists_2D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
       --  Prob_Ak: num_samples x num_classes
-      Prob_Ak           : Weight_Lists_2D;
+--        Prob_Ak           : Weight_Lists_2D;
       Class_Values      : Integer_List;
-      Samples_2K        : Weight_Lists_2D;
+--        Samples_2K        : Weight_Lists_2D;
       Samples           : Weight_Lists_2D;
       Classes           : Weight_List;
       Selected_Class    : Integer;
@@ -426,32 +428,33 @@ package body Base_Decision_Tree is
       Predictions       : Integer_List;
    begin
       --  L478
-      for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
-         Prob_Ak.Clear;
-         Selected_Classes.Clear;
-         --  Prob_A: num_samples x num_outputs x num_classes
-         for sample_index in Prob_A.First_Index .. Prob_A.Last_Index loop
-            Samples_2K := Prob_A (sample_index);
-            Classes := Samples_2K.Element (op);
-            Samples.Append (Classes);
-         end loop;
-
-         --  Samples: num_samples x num_classes
-         Max_Indices := Classifier_Utilities.Arg_Max (Samples);
-         Selected_Classes.Clear;
-         Class_Values := Self.Attributes.Classes;
-         for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
-            Classes := Samples.Element (index);
-            Selected_Class :=
-              Class_Values.Element (Max_Indices (index));
-            Selected_Classes.Append (Selected_Class);
-         end loop;
-
-         Predictions.Append (Selected_Classes);
+      --        for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
+      --           Prob_Ak.Clear;
+      Selected_Classes.Clear;
+      --  Prob_A: num_samples x num_outputs x num_classes
+      for sample_index in Prob_A.First_Index .. Prob_A.Last_Index loop
+--           Samples_2K := Prob_A (sample_index);
+--           Classes := Samples_2K.Element (op);
+         Classes := Prob_A (sample_index);
+         Samples.Append (Classes);
       end loop;
 
+      --  Samples: num_samples x num_classes
+      Max_Indices := Classifier_Utilities.Arg_Max (Samples);
+      Selected_Classes.Clear;
+      Class_Values := Self.Attributes.Classes;
+      for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
+         Classes := Samples.Element (index);
+         Selected_Class :=
+           Class_Values.Element (Max_Indices (index));
+         Selected_Classes.Append (Selected_Class);
+      end loop;
+
+      Predictions.Append (Selected_Classes);
+      --        end loop;
+
       --  Transposed Predictions, num samples x num outputs
---        return Classifier_Utilities.Transpose (Predictions);
+      --        return Classifier_Utilities.Transpose (Predictions);
       return Predictions;
 
    end Predict;
