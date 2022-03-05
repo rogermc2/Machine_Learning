@@ -85,10 +85,10 @@ package Decision_Tree_Classification is
       Y              : Integer_List;
       Sample_Weights : in out Weights.Weight_List);
    function Predict_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                 X    : Value_Data_Lists_2D)
-                                  return Weights.Weight_Lists_3D;
+                                 X    : Float_List_2D)
+                                  return Weights.Weight_Lists_2D;
    function Predict_Log_Probability (Self : in out Base_Decision_Tree.Classifier;
-                                     X    : Value_Data_Lists_2D)
-                                     return Weights.Weight_Lists_3D;
+                                     X    : Float_List_2D)
+                                     return Weights.Weight_Lists_2D;
 
 end Decision_Tree_Classification;

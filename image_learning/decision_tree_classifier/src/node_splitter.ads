@@ -28,7 +28,7 @@ package Node_Splitter is
       Sample_Indices       : Natural_List;
       Feature_Indices      : Natural_List;
       Constant_Features_I  : Natural_List;
-      Num_Classes          : Natural_List;
+      Num_Classes          : Natural;
       Feature_Values       : Float_List;
       Num_Samples          : Natural := 0;
       Weighted_Samples     : Float := 0.0;
