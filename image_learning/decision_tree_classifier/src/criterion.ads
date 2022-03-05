@@ -11,7 +11,7 @@ package Criterion is
                                     MAE_Criteria);
    type Criterion_Class
      (Criterion_Type : Criterion_Kind := Criterion_Classification) is record
-      Y                         : Integer_List;
+      Y                         : Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
       Samples                   : IL_Types.Float_List_2D;
@@ -54,7 +54,7 @@ package Criterion is
       Impurity_Parent, Impurity_Left, Impurity_Right : Float) return Float;
    procedure Initialize_Node_Criterion
       (Criteria           : in out Criterion_Class;
-      Y                   : Integer_List;
+      Y_Encoded           : Natural_List;
       --  Samples:
       Sample_Indices      : Natural_List;
       --  Sample_Weight contains the weight of each sample

@@ -395,9 +395,8 @@ package body Base_Decision_Tree is
 
    --  -------------------------------------------------------------------------
 
-   function Decision_Path (aClassifier : Classifier;
-                           X           : Float_List_2D)
-                           return Natural_Lists_2D is
+   function Decision_Path (aClassifier : Classifier; X : Float_List_2D)
+                           return Natural_List is
    begin
       return Tree.Decision_Path (aClassifier.Attributes.Decision_Tree, X);
 

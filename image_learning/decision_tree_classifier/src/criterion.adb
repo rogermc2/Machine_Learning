@@ -103,7 +103,7 @@ package body Criterion is
    --  L59, L214, 280
    procedure Initialize_Node_Criterion
      (Criteria            : in out Criterion_Class;
-      Y                   : Integer_List;
+      Y_Encoded           : Natural_List;
       Sample_Indices      : Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight       : Weights.Weight_List;
@@ -119,7 +119,7 @@ package body Criterion is
       Weight          : Float := 1.0;
    begin
       --  L302
-      Criteria.Y := Y;
+      Criteria.Y := Y_Encoded;
       Criteria.Sample_Weight := Sample_Weight;
       Criteria.Sample_Indices := Sample_Indices;
       Criteria.Start_Row := Start_Row;
@@ -155,7 +155,7 @@ package body Criterion is
 
          --  L333 Count weighted class frequency for each target
          --  Y_I is Class
-         Y_I := Y.Element (Y_I_Index);
+         Y_I := Y_Encoded.Element (Y_I_Index);
          --           for k in 1 .. Num_Outputs loop
          Sum_Total_K := Criteria.Sum_Total;
          --  L339 c = Y_Ik is an index into Y (output k) class i

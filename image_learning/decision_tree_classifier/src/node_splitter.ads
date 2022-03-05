@@ -58,7 +58,7 @@ package Node_Splitter is
    function Entropy_Node_Impurity (Self : Splitter_Class) return Float;
    function Gini_Node_Impurity (Self : Splitter_Class) return Float;
    procedure Node_Value (Self   : Splitter_Class;
-                         Values : out Weights.Weight_Lists_2D);
+                         Values : out Weights.Weight_List);
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
       Start_Row, Stop_Row   : Positive;

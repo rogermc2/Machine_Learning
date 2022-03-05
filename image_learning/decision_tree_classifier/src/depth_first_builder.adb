@@ -39,7 +39,7 @@ package body Depth_First_Builder is
       Num_Constant_Features : Natural := Data.Num_Constant_Features;
       Is_Leaf_Node          : Boolean := False;
       Weighted_Node_Samples : Float := 0.0;
-      Values                : Weights.Weight_Lists_2D;
+      Node_Weights          : Weights.Weight_List;
       Child_Cursor          : Tree.Tree_Cursor;
       Node_ID               : Positive := 1;
    begin
@@ -117,13 +117,12 @@ package body Depth_First_Builder is
       Node_ID := Element (Child_Cursor).Node_ID;
 
       --  238
-      --  Values dimensions: num outputs x num classes
-      Node_Splitter.Node_Value (Builder.Splitter, Values);
+      Node_Splitter.Node_Value (Builder.Splitter, Node_Weights);
 
       if Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node_ID));
       end if;
-      theTree.Values.Replace_Element (Node_ID, Values);
+      theTree.Values.Replace_Element (Node_ID, Node_Weights);
 
       --  L240
       if not Is_Leaf_Node then
@@ -150,7 +149,7 @@ package body Depth_First_Builder is
    procedure Build_Tree
      (theTree   : in out Tree.Tree_Class;
       Builder   : in out Tree_Build.Tree_Builder;
-      Y_Encoded : Natural_Lists_2D) is
+      Y_Encoded : Natural_List) is
       use Build_Utils;
       use Tree.Nodes_Package;
       Routine_Name      : constant String := "Depth_First_Builder.Build_Tree ";

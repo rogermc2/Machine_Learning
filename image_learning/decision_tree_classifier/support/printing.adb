@@ -64,7 +64,6 @@ package body Printing is
    procedure Print_Criterion (Name : String;
                               Data : Criterion.Criterion_Class) is
       use Criterion;
-      use Natural_List_Package;
       use Float_Package;
    begin
       Put_Line (Name & ": ");
@@ -72,8 +71,6 @@ package body Printing is
                   Criterion_Kind'Image (Data.Criterion_Type));
       Put_Line ("Y length:              " &
                   Integer'Image (Integer (Data.Y.Length)));
-      Put_Line ("Num_Outputs:           " &
-                  Integer'Image (Integer (Data.Num_Outputs)));
       Put_Line ("Sample_Weight length:  " &
                   Integer'Image (Integer (Data.Sample_Weight.Length)));
       Put_Line ("Samples length:        " &
@@ -93,13 +90,13 @@ package body Printing is
                   Float'Image (Data.Num_Weighted_Left));
       Put_Line ("Num_Weighted_Right:        " &
                   Float'Image (Data.Num_Weighted_Right));
-      Print_Weight_Lists_2D ("Sum_Total", Data.Sum_Total);
-      Print_Weight_Lists_2D ("Sum_Left", Data.Sum_Left);
-      Print_Weight_Lists_2D ("Sum_Right", Data.Sum_Right);
+      Print_Float_List ("Sum_Total", Data.Sum_Total);
+      Print_Float_List ("Sum_Left", Data.Sum_Left);
+      Print_Float_List ("Sum_Right", Data.Sum_Right);
       Put_Line ("Proxy_Improvement: " & Float'Image (Data.Proxy_Improvement));
       case Data.Criterion_Type is
          when Criterion_Classification =>
-            Print_Natural_List ("Num_Classes", Data.Num_Classes);
+            Put_Line ("Num_Classes: " & Integer'Image (Data.Num_Classes));
          when Criterion_Regression =>
             Put_Line ("Sq_Sum_Total: " & Float'Image (Data.Sq_Sum_Total));
       end case;

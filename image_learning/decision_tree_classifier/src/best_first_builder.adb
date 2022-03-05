@@ -122,7 +122,7 @@ package body Best_First_Builder is
       Num_Constant_Features : Natural := 0;
       Node_Cursor           : Tree.Tree_Cursor;
       Node                  : Tree.Tree_Node;
-      Values                : Weights.Weight_Lists_2D;
+      Node_Weights          : Weights.Weight_List;
    begin
       Assert (End_Row >= Start_Row,
               Routine_Name & "End_Row " & Integer'Image (End_Row) &
@@ -167,11 +167,11 @@ package body Best_First_Builder is
       Node := Element (Node_Cursor);
 
       --  L486
-      Node_Splitter.Node_Value (Splitter, Values);
+      Node_Splitter.Node_Value (Splitter, Node_Weights);
       if Node.Node_ID > Integer (theTree.Values.Length) then
          theTree.Values.Set_Length (Count_Type (Node.Node_ID));
       end if;
-      theTree.Values.Replace_Element (Node.Node_ID, Values);
+      theTree.Values.Replace_Element (Node.Node_ID, Node_Weights);
 
       --  L487
       Res.Node_Cursor := Node_Cursor;

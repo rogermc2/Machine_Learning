@@ -1,25 +1,23 @@
 --  Based on scikit-learn/sklearn/tree _tree.pyx class Tree
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 --  with Printing;
 
 package body Tree is
 
-   function Apply_Dense (Self : Tree_Class; X : Value_Data_Lists_2D)
+   function Apply_Dense (Self : Tree_Class; X : Float_List_2D)
                          return Natural_List;
-   function Decision_Path_Dense (aTree : Tree_Class;
-                                 X     : Value_Data_Lists_2D)
-                                 return Natural_Lists_2D;
+   function Decision_Path_Dense (aTree : Tree_Class; X : Float_List_2D)
+                                 return Natural_List;
 
    --  -------------------------------------------------------------------------
    --  L770 Apply finds the terminal region (=leaf node) for each sample in X.
    --       That is, the set of relevant nodes containing the prediction values
    --       for each sample?
    --  Apply returns a list containing the Node ID associated with each sample.
-   function Apply (Self : Tree_Class; X : Value_Data_Lists_2D)
+   function Apply (Self : Tree_Class; X : Float_List_2D)
                    return Natural_List is
    begin
       return Apply_Dense (Self, X);
@@ -34,20 +32,18 @@ package body Tree is
    --  intermediate subsets are called internal nodes or split nodes.
    --  Apply_Dense returns a list containing the Node ID associated with each
    --  sample
-   function Apply_Dense (Self : Tree_Class; X : Value_Data_Lists_2D)
+   function Apply_Dense (Self : Tree_Class; X : Float_List_2D)
                          return Natural_List is
       --                           return Tree_Cursor_List is
       --  X is a list of samples of features (num samples x num features)
       use Ada.Containers;
-      use Ada.Strings.Unbounded;
-      use Value_Data_Package;
       Routine_Name   : constant String := "Tree.Apply_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (Self.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
-      Current_Sample : Value_Data_List;
-      Feature_Value  : Value_Record;
+      Current_Sample : Float_List;
+      Feature_Value  : Float;
       Out_Data       : Natural_List;
       Continue       : Boolean;
       Use_Left       : Boolean;
@@ -75,35 +71,8 @@ package body Tree is
               Current_Sample.Element (Node.Best_Fit_Feature_Index);
             --                 Printing.Print_Value_Record (Routine_Name & "Feature_Value",
             --                                              Feature_Value);
-            Assert (Feature_Value.Value_Kind = Float_Type or
-                      Feature_Value.Value_Kind = Integer_Type,
-                    "Tree.Apply_Dense Self.Nodes invalid feature data type");
             --  Make tree traversal decision
-            case Feature_Value.Value_Kind is
-               when Boolean_Type =>
-                  if True then
-                     Use_Left := 1.0 <= Node.Threshold;
-                  else
-                     Use_Left := 0.0 <= Node.Threshold;
-                  end if;
-               when Float_Type =>
-                  Use_Left := Feature_Value.Float_Value <= Node.Threshold;
-               when Integer_Type =>
-                  Use_Left := Float (Feature_Value.Integer_Value) <=
-                    Node.Threshold;
-               when UB_String_Type =>
-                  declare
-                     Comp : Float := 0.0;
-                     Text : constant String :=
-                              To_String (Feature_Value.UB_String_Value);
-                  begin
-                     for pos in 1 .. Text'Length loop
-                        Comp := Comp +
-                          Float (Integer'Value (Text (pos .. pos)));
-                     end loop;
-                     Use_Left := Comp <= Node.Threshold;
-                  end;
-            end case;
+                  Use_Left := Feature_Value <= Node.Threshold;
 
             if Use_Left then
                --                    Put_Line (Routine_Name & "use left child Node_ID" &
@@ -130,25 +99,21 @@ package body Tree is
 
    procedure C_Init (aTree        : in out Tree_Class;
                      Num_Features : Natural := 0;
-                     Num_Classes  : Natural_List :=
-                       Natural_Package.Empty_Vector;
-                     Num_Outputs  : Index_Range := 1) is
+                     Num_Classes  : Natural := 0) is
    begin
       aTree.Num_Features := Num_Features;
       aTree.Num_Classes := Num_Classes;
-      aTree.Num_Outputs := Num_Outputs;
       aTree.Max_Depth := 0;
-      atree.Values := Weights.Weight_Lists_3D_Package.Empty_Vector;
+      atree.Values := Weights.Weight_Lists_2D_Package.Empty_Vector;
       aTree.Nodes := Nodes_Package.Empty_Tree;
-      aTree.Classes := Value_Lists_Data_Package.Empty_Vector;
+      aTree.Classes := Integer_Package.Empty_Vector;
 
    end C_Init;
 
    --  ------------------------------------------------------------------------
 
-   function Decision_Path
-     (aTree : Tree_Class; X : Value_Data_Lists_2D)
-      return Natural_Lists_2D is
+   function Decision_Path (aTree : Tree_Class; X : Float_List_2D)
+                           return Natural_List is
    begin
       return Decision_Path_Dense (aTree, X);
 
@@ -156,24 +121,21 @@ package body Tree is
 
    --  -------------------------------------------------------------------------
 
-   function Decision_Path_Dense
-     (aTree : Tree_Class; X : Value_Data_Lists_2D)
-      return Natural_Lists_2D is
+   function Decision_Path_Dense (aTree : Tree_Class; X : Float_List_2D)
+                                 return Natural_List is
       use Ada.Containers;
-      use Ada.Strings.Unbounded;
-      use Value_Data_Package;
       Routine_Name   : constant String := "Tree.Decision_Path_Dense ";
       Top_Cursor     : constant Tree_Cursor := First_Child (aTree.Nodes.Root);
       Num_Samples    : constant Positive := Positive (X.Length);
       Node_Cursor    : Tree_Cursor;
       Node           : Tree_Node;
       Node_ID_List   : Natural_List;
-      Current_Sample : Value_Data_List;
-      Feature_Value  : Value_Record;
+      Current_Sample : Float_List;
+      Feature_Value  : Float;
       Use_Left       : Boolean;
       Continue       : Boolean := True;
       --  Out_Data: num samples x num nodes
-      Out_Data       : Natural_Lists_2D;
+      Out_Data       : Natural_List;
    begin
       Assert (Integer (Child_Count (Top_Cursor)) > 0, Routine_Name &
                 "Top node has no children");
@@ -202,37 +164,8 @@ package body Tree is
             Feature_Value :=
               Current_Sample.Element (Node.Best_Fit_Feature_Index);
 --              Put_Line (Routine_Name & "Node_ID " & Integer'Image (Node.Node_ID));
---              Printing.Print_Value_Record (Routine_Name & "Feature_Value",
---                                           Feature_Value);
-            Assert (Feature_Value.Value_Kind = Float_Type or
-                      Feature_Value.Value_Kind = Integer_Type,
-                    "Tree.Apply_Dense Self.Nodes invalid feature data type");
             --  Make tree traversal decision
-            case Feature_Value.Value_Kind is
-               when Boolean_Type =>
-                  if True then
-                     Use_Left := 1.0 <= Node.Threshold;
-                  else
-                     Use_Left := 0.0 <= Node.Threshold;
-                  end if;
-               when Float_Type =>
-                  Use_Left := Feature_Value.Float_Value <= Node.Threshold;
-               when Integer_Type =>
-                  Use_Left := Float (Feature_Value.Integer_Value) <=
-                    Node.Threshold;
-               when UB_String_Type =>
-                  declare
-                     Comp : Float := 0.0;
-                     Text : constant String :=
-                              To_String (Feature_Value.UB_String_Value);
-                  begin
-                     for pos in 1 .. Text'Length loop
-                        Comp := Comp +
-                          Float (Integer'Value (Text (pos .. pos)));
-                     end loop;
-                     Use_Left := Comp <= Node.Threshold;
-                  end;
-            end case;
+            Use_Left := Feature_Value <= Node.Threshold;
 
             if Use_Left then
                Node_Cursor := First_Child (Node_Cursor);
@@ -259,17 +192,17 @@ package body Tree is
    --  _tree L758
    --  Predict returns a 3D list, num_samples x num_outputs x num_classes
    function Predict (Self : in out Tree_Class;
-                     X    : Value_Data_Lists_2D)
-                     return Weights.Weight_Lists_3D is
+                     X    : Float_List_2D)
+                     return Weights.Weight_Lists_2D is
       use Ada.Containers;
       Routine_Name : constant String := "Tree.Predict ";
       --  X is a list of samples
       --  Each sample is a list of feature values, one value per feature
-      --  Values: num_nodes x num_outputs x num_classes
-      Values       : constant Weights.Weight_Lists_3D := Self.Values;
+      --  Values: num_nodes x num_classes
+      Values       : constant Weights.Weight_Lists_2D := Self.Values;
       Samples      : Natural_List;
-      --  Out_Data: num_samples x num_outputs x num_classes
-      Out_Data     : Weights.Weight_Lists_3D;
+      --  Out_Data: num_samples x num_classes
+      Out_Data     : Weights.Weight_Lists_2D;
    begin
       --  Check for top node, child of root node
       Assert (Self.Nodes.Node_Count > 1, Routine_Name & " Tree is empty.");

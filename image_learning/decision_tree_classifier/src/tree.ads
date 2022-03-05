@@ -70,8 +70,7 @@ package Tree is
       --  _tree.pxd L43
       Num_Features : Natural := 0;
       --  Classes:  outputs x classes
---        Num_Classes  : Natural_List;
-      Num_Classes  : Natural;
+      Num_Classes  : Natural := 0;
       Classes      : Integer_List;
 --        Num_Outputs  : Index_Range := 1;
       Max_Depth    : Integer := -1;
@@ -87,12 +86,10 @@ package Tree is
 
    function Apply (Self : Tree_Class; X : Float_List_2D)
                    return Natural_List;
-   procedure C_Init
-     (aTree        : in out Tree_Class; Num_Features : Natural := 0;
-      Num_Classes  : Natural;
-      Num_Outputs  : Index_Range := 1);
-   function Decision_Path
-     (aTree : Tree_Class; X : Float_List_2D) return Natural_Lists_2D;
+   procedure C_Init (aTree : in out Tree_Class; Num_Features : Natural := 0;
+                     Num_Classes  : Natural:= 0);
+   function Decision_Path (aTree : Tree_Class; X : Float_List_2D)
+                           return Natural_List;
    --     procedure Fit moved to fit_functions
    --     procedure Fit (Self          : Validation.Attribute_List;
    --                    X, Y          : Sample_Matrix;
