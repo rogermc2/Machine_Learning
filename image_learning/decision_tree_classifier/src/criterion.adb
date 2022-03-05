@@ -2,11 +2,11 @@
 --  class ClassificationCriterion(Criterion)
 
 --  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
---  with Printing;
+with Printing;
 
 package body Criterion is
 
@@ -110,8 +110,8 @@ package body Criterion is
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
       --  In Python a[start:stop] means items start through stop - 1
-      --        Routine_Name    : constant String :=
-      --                            "Criterion.Initialize_Node_Criterion ";
+      Routine_Name    : constant String :=
+                            "Criterion.Initialize_Node_Criterion ";
       Sum_Total_K     : Float_List;
       Y_I_Index       : Positive;  --  Class index
       Y_I             : Natural;  --  Class
@@ -140,13 +140,19 @@ package body Criterion is
       for c in 1 .. Criteria.Num_Classes loop
          Sum_Total_K.Append (0.0);
       end loop;
-      Criteria.Sum_Total.Append (Sum_Total_K);
+      Criteria.Sum_Total := Sum_Total_K;
+--        Criteria.Sum_Total.Append (Sum_Total_K);
       --        end loop;
-
+        Put_Line (Routine_Name & "Num_Classes " &
+                    Integer'Image (Criteria.Num_Classes));
+        Printing.Print_Float_List (Routine_Name & "Sum_Total",
+                                     Criteria.Sum_Total);
+--          Printing.Print_Natural_List (Routine_Name & "Sample_Indices",
+--                                         Sample_Indices);
       --  L325
       for p in Start_Row .. Stop_Row loop
          Y_I_Index := Sample_Indices.Element (p);
-
+         Put_Line (Routine_Name & "Y_I_Index " & Integer'Image (Y_I_Index));
          --  Weight is originally set to be 1.0, meaning that if no
          --  sample weights are given the default weight of each sample is 1.0
          if not Sample_Weight.Is_Empty then
@@ -156,6 +162,7 @@ package body Criterion is
          --  L333 Count weighted class frequency for each target
          --  Y_I is Class
          Y_I := Y_Encoded.Element (Y_I_Index);
+         Put_Line (Routine_Name & "Y_I " & Integer'Image (Y_I));
          --           for k in 1 .. Num_Outputs loop
          Sum_Total_K := Criteria.Sum_Total;
          --  L339 c = Y_Ik is an index into Y (output k) class i
@@ -163,8 +170,10 @@ package body Criterion is
          --  sum_total[k * self.sum_stride + c] += w
          --  Add Weight to Y (output k, class Y_I)
          Sum_Total_K.Replace_Element
-                    (Y_I, Sum_Total_K.Element (Y_I) + Weight);
-         Criteria.Sum_Total.Replace_Element (p, Sum_Total_K.Element (Y_I));
+                    (Y_I_Index, Sum_Total_K.Element (Y_I_Index) + Weight);
+         Printing.Print_Float_List (Routine_Name & "Sum_Total_K", Sum_Total_K);
+         Criteria.Sum_Total.Replace_Element
+              (p, Sum_Total_K.Element (Y_I_Index));
          --           end loop;
 --           Criteria.Sum_Total := Sum_Total_K;
 
@@ -172,7 +181,9 @@ package body Criterion is
            Criteria.Num_Weighted_Node_Samples + Weight;
       end loop;
 
+      Put_Line (Routine_Name & "Reset");
       Reset (Criteria);
+      Put_Line (Routine_Name & "done");
 
    end Initialize_Node_Criterion;
 

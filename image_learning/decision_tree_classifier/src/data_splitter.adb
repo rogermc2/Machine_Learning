@@ -5,7 +5,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
-with Printing;
+--  with Printing;
 
 package body Data_Splitter is
 
@@ -103,14 +103,12 @@ package body Data_Splitter is
                     Integer'Image (Integer (X_Vec.Length)));
 
         Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
-        Put_Line (Routine_Name & "Base_Shuffle_Split done");
-        Printing.Print_Integer_List ("Test_Indices", Test_Indices);
+--          Printing.Print_Integer_List ("Test_Indices", Test_Indices);
 
         for index in Test_Indices.First_Index .. Test_Indices.Last_Index loop
             Test_X.Append (X_Vec.Element (Test_Indices (index)));
             Test_Y.Append (Y_Vec.Element (Test_Indices (index)));
         end loop;
-        Put_Line (Routine_Name & "Test_Indices done");
 
         for index in Train_Indices.First_Index .. Train_Indices.Last_Index loop
             Train_X.Append (X_Vec.Element (Train_Indices (index)));
