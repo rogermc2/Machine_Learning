@@ -38,6 +38,8 @@ package Printing is
                                   theList : Integer_List);
     procedure Print_Integer_List (Name : String;
                                   theList : Integer_DL_List);
+   procedure Print_Integer_Set (Name   : String;
+                                theSet : Encode_Utils.Int_Sets.Set);
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);
     procedure Print_Float_Lists_2D (Name : String; Data : Float_List_2D);

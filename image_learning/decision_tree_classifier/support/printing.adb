@@ -323,6 +323,28 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Integer_Set (Name   : String;
+                                theSet : Encode_Utils.Int_Sets.Set) is
+      use Encode_Utils.Int_Sets;
+      Curs  : Cursor := theSet.First;
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      while Has_Element (Curs) loop
+         Put (Integer'Image (Element (Curs)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Integer_Set;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Float_Lists_2D (Name : String;
                                    Data : Float_List_2D) is
    begin

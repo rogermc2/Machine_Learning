@@ -3,8 +3,6 @@ with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
 
-with IL_Types;
-
 package body Load_ARFF_Data.ARFF_Printing is
 
    --  -------------------------------------------------------------------------
@@ -15,6 +13,7 @@ package body Load_ARFF_Data.ARFF_Printing is
       Put_Line ("Relation: " & Data.Header.Relation);
       Print_Attributes (Data);
       Print_Data (Data);
+      Print_Target (Data);
       New_Line;
 
    end Print_ARFF;
@@ -130,13 +129,12 @@ package body Load_ARFF_Data.ARFF_Printing is
 
    procedure Print_Data (Data : ARFF_Record; Start : Positive := 1;
                          Last : Positive := 10) is
-      use Classifier_Types;
-      use Float_List_Package;
-      use Float_Package;
-      Data_List_2D : constant Float_List_2D := Data.Data;
-      List_Curs    : Float_List_Package.Cursor := Data_List_2D.First;
-      Data_List    : Float_List;
-      Data_Curs    : Float_Package.Cursor;
+      use AR_Real_Package_2D;
+      use AR_Real_Package;
+      Data_List_2D : constant AR_Real_List_2D := Data.Data;
+      List_Curs    : AR_Real_Package_2D.Cursor := Data_List_2D.First;
+      Data_List    : AR_Real_List;
+      Data_Curs    : AR_Real_Package.Cursor;
       Count        : Natural := Start - 1;
       Count2       : Natural := 0;
    begin
@@ -186,6 +184,31 @@ package body Load_ARFF_Data.ARFF_Printing is
       New_Line;
 
    end Print_Description;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Print_Target (Data : ARFF_Record; Start : Positive := 1;
+                           Last : Positive := 10) is
+      use AR_Integer_Package;
+      Target_List : constant AR_Integer_List := Data.Target;
+      Target_Curs : AR_Integer_Package.Cursor := Target_List.First;
+      Count       : Natural := Start - 1;
+   begin
+      New_Line;
+      Put_Line ("Dataset target:");
+      Put_Line ("Target length:" & Integer'Image (Integer (Target_List.Length)));
+
+      while Has_Element (Target_Curs) loop
+         Count := Count + 1;
+         Put (Integer'Image (Element (Target_Curs)));
+         if Count <= Last then
+            Put (" ");
+         end if;
+         Next (Target_Curs);
+      end loop;
+      New_Line;
+
+   end Print_Target;
 
    --  -------------------------------------------------------------------------
 

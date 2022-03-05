@@ -104,16 +104,14 @@ package body OML_File_Tests is
    procedure Test_Fetch_OML is
       use Ada.Containers;
       Routine_Name  : constant String := "Test_Fetch_OML ";
---        File_Name      : constant String := "../diabetes.arff";
---        Save_File     : constant String := "diabetes.oml";
       File_Name     : constant String := "../mnist_784.arff";
       Save_File     : constant String := "mnist_784.oml";
       As_Frame      : As_Frame_State := As_Frame_False;
       Target_Column : String_List;
       X             : Float_List_2D;
       Y             : Integer_List;
-      X_Indices     : Integer_List;
-      Y_Indices     : Integer_List;
+--        X_Indices     : Integer_List;
+--        Y_Indices     : Integer_List;
       Bunch         : Bunch_Data;
    begin
       Put_Line (Routine_Name);
@@ -122,8 +120,8 @@ package body OML_File_Tests is
                     Target_Column     => Target_Column,
                     X                 => X,
                     Y                 => Y,
-                    X_Indices         => X_Indices,
-                    Y_Indices         => Y_Indices,
+--                      X_Indices         => X_Indices,
+--                      Y_Indices         => Y_Indices,
                     Bunch             => Bunch,
                     As_Frame          => As_Frame,
                     Return_X_Y        => True);

@@ -72,6 +72,8 @@ package body Base_Decision_Tree is
          Classification_Part (aClassifier, Y_Orig, Y_Encoded,
                               Classes, Expanded_Class_Weight);
       end if;
+      Put_Line (Routine_Name & "L189 Classes length: " &
+                Integer'Image (Integer (Classes.Length)));
 
       --  L189
       aClassifier.Attributes.Num_Features :=
@@ -82,6 +84,8 @@ package body Base_Decision_Tree is
                        Sample_Weights);
       --  Base_Fit_Checks ends at L350
 
+      Put_Line (Routine_Name & "Num_Classes " &
+                Integer'Image (aClassifier.Attributes.Decision_Tree.Num_Classes));
       Node_Splitter.C_Init
         (aClassifier.Parameters.Splitter,
          Tree.Index_Range (aClassifier.Attributes.Max_Features),
@@ -337,7 +341,7 @@ package body Base_Decision_Tree is
       YE_Row       : Natural;
       --        Column       : Natural;
       Inverse      : Natural_List;
-      Class_List   : Integer_List;
+--        Class_List   : Integer_List;
    begin
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
@@ -363,18 +367,20 @@ package body Base_Decision_Tree is
       --              Yk_Row.Append (Y_Row.Element (op));
       --           end loop;
 
-      Class_List := Encode_Utils.Unique (Y_Orig, Inverse);
+      Classes := Encode_Utils.Unique (Y_Orig, Inverse);
       --           aClassifier.Attributes.Decision_Tree.Num_Classes.Append
       --             (Positive (Class_List.Length));
       aClassifier.Attributes.Decision_Tree.Num_Classes :=
-        Positive (Class_List.Length);
+        Positive (Classes.Length);
+      Put_Line (Routine_Name & "Classes length: " &
+                Integer'Image (Integer (Classes.Length)));
 
       for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
          YE_Row := Y_Encoded.Element (class);
          --              YE_Row.Replace_Element (op, Inverse.Element (class));
          Y_Encoded.Replace_Element (class, YE_Row);
       end loop;
-      Classes.Append (Class_List);
+--        Classes.Append (Class_List);
 
       aClassifier.Attributes.Classes := Classes;
 

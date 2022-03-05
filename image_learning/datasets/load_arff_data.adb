@@ -15,6 +15,8 @@ with Utilities;
 with Dataset_Utilities;
 with Regexep;
 
+with Load_ARFF_Data.ARFF_Printing;
+
 package body Load_ARFF_Data is
 
    package Escape_Sub_Map_Package is new
@@ -448,6 +450,8 @@ package body Load_ARFF_Data is
             Data.Target.Append (Target_Value);
          end if;
       end loop;
+
+      Load_ARFF_Data.ARFF_Printing.Print_Target (Data);
 
    end Load_Data;
 

@@ -37,8 +37,8 @@ package Openml_Ada is
        Target_Column     : String_List;
        X                 : out Float_List_2D;
        Y                 : out Integer_List;
-       X_Indices         : out Integer_List;
-       Y_Indices         : out Integer_List;
+--         X_Indices         : out Integer_List;
+--         Y_Indices         : out Integer_List;
        Bunch             : out Bunch_Data;
        As_Frame          : in out As_Frame_State;
        Return_X_Y        : Boolean := False);

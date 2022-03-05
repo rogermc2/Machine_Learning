@@ -10,7 +10,6 @@ package body Encode_Utils is
 
 --     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
 --     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
-   package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
 
    function Encode_Check_Unknown
      (Values : Integer_List; Uniques : Integer_List) return Integer_List;
@@ -37,8 +36,7 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Encode (Values : Integer_List)
-                     return Integer_List is
+   function Encode (Values : Integer_List) return Integer_List is
       Sorted_Values : Integer_List := Values;
       Uniques       : Integer_List;
    begin
@@ -167,22 +165,29 @@ package body Encode_Utils is
       use Int_Sets;
       use Integer_Package;
       use Integer_Sorting;
+
+      Routine_Name : constant String := "Encode_Utils.Unique ";
       Values_Curs       : Integer_Package.Cursor := Values.First;
       Unique_Integers   : Int_Sets.Set;
       Ints_Curs         : Int_Sets.Cursor;
       Uniq_List         : Integer_List;
    begin
+      Put_Line (Routine_Name & "Values length: " &
+                Integer'Image (Integer (Values.Length)));
       while Has_Element (Values_Curs) loop
          Unique_Integers.Include (Element (Values_Curs));
          Next (Values_Curs);
       end loop;
       New_Line;
+      Printing.Print_Integer_Set ("Unique_Integers", Unique_Integers);
 
       Ints_Curs := Unique_Integers.First;
       while Int_Sets.Has_Element (Ints_Curs) loop
          Uniq_List.Append (Int_Sets.Element (Ints_Curs));
          Int_Sets.Next (Ints_Curs);
       end loop;
+      Put_Line (Routine_Name & "Uniq_List length: " &
+                Integer'Image (Integer (Uniq_List.Length)));
 
       Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);
