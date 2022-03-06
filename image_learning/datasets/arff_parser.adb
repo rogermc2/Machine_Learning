@@ -26,9 +26,22 @@ package body ARFF_Parser is
       Col_Slice_Y    : IL_Types.Integer_DL_List;
       X              : out IL_Types.Float_List_2D;
       Y              : out IL_Types.Integer_List) is
+      use IL_Types;
       --           Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data";
+      Arff_Data_Row   : AR_Types.AR_Real_List;  --  list of columns
+      Data_Row        : Float_List;
    begin
-      null;
+      for row in ARFF_Container.Data.First_Index ..
+        ARFF_Container.Data.Last_Index loop
+         Arff_Data_Row := ARFF_Container.Data.Element (row);
+         for index in ARFF_Container.Data.First_Index ..
+           ARFF_Container.Data.Last_Index loop
+            Data_Row (index) := Arff_Data_Row (index);
+         end loop;
+         X.Append (Data_Row);
+         Y.Append (ARFF_Container.Target.Element (row));
+      end loop;
+
    end Arff_Parser;
 
    --  ------------------------------------------------------------------------

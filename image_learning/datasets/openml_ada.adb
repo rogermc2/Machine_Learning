@@ -48,29 +48,6 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
---     procedure ARFF_To_OML (ARFF_Container : AR_Types.ARFF_Record;
---                            X              : out IL_Types.Float_List_2D;
---                            Y              : out IL_Types.Integer_List) is
---        --        Routine_Name  : constant String := "Openml_Ada.ARFF_To_OML ";
---        Arff_Data_Row   : AR_Types.AR_Real_List;  --  list of columns
---
---        Data_Row        : Float_List;
---     begin
---        for row in ARFF_Container.Data.First_Index ..
---          ARFF_Container.Data.Last_Index loop
---           Arff_Data_Row := ARFF_Container.Data.Element (row);
---           for index in ARFF_Container.Data.First_Index ..
---             ARFF_Container.Data.Last_Index loop
---              Data_Row (index) := Arff_Data_Row (index);
---           end loop;
---           X.Append (Data_Row);
---           Y.Append (ARFF_Container.Target.Element (row));
---        end loop;
---
---     end ARFF_To_OML;
-
-   --  ------------------------------------------------------------------------
-
    --     function Convert_Arff_Data_Dataframe
    --       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value)
    --        return JSON_Value is
