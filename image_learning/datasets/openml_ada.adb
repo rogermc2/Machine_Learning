@@ -520,15 +520,20 @@ package body Openml_Ada is
       Target_Columns : out String_List) is
       use AR_Types;
       use Attribute_Data_Package;
-      --        Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
+      Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
       Feature          : Attribute_Record;
    begin
       for index in Features_List.First_Index .. Features_List.Last_Index loop
          Feature := Features_List.Element (index);
          if Feature.Is_Target then
             Target_Columns.Append (Feature.Name);
+         elsif To_String (Feature.Name) = "class" then
+            Target_Columns.Append (Feature.Name);
+            Feature.Is_Target := True;
+            Features_List.Replace_Element (index, Feature);
          end if;
       end loop;
+      Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
 
    end Set_Default_Target;
 
