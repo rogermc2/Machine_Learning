@@ -94,11 +94,9 @@ package body Openml_Ada is
       use Ada.Containers;
       use AR_Types;
       use Integer_DLL_Package;
-      use String_Package;
       use Attribute_Data_Package;
       Routine_Name       : constant String :=
                              "Openml_Ada.Download_Data_To_Bunch ";
-      Target_Curs        : String_Package.Cursor := Target_Columns.First;
       Feature_Index      : Positive;
       Features_Dict      : Attribute_Dictionary_Map;
       aFeature           : Attribute_Record;
@@ -107,7 +105,6 @@ package body Openml_Ada is
       Col_Slice_Y        : Integer_DL_List;
       --        Num_Missing        : Integer;
       --        Return_Type        : ARFF_Return_Type;
-      All_Columns        : String_List;
       Nominal_Attributes : Nominal_Data_List;
       --        Frame              : Boolean := False;
 
@@ -171,24 +168,15 @@ package body Openml_Ada is
          Col_Slice_X.Append (Feature_Index);
       end loop;
 
-      --  L582
-      --        if Sparse then
-      --           Return_Type := Arff_Coo;
+      --  L515
+      --        if As_Frame then
+      --           null;
+      --        elsif Sparse
+      --           null;
       --        else
-      --           Return_Type := Arff_Dense;
+      --           null;
       --        end if;
 
-      --  L601
-      if As_Frame = As_Frame_True then
-         All_Columns := Data_Columns;
-         Target_Curs := Target_Columns.First;
-         while Has_Element (Target_Curs) loop
-            All_Columns.Append (Element (Target_Curs));
-            Next (Target_Curs);
-         end loop;
-      end if;
-
-      --  L667
       --  L325
       --        Put_Line (Routine_Name & "Convert_Arff_Data");
       --  L278
@@ -196,13 +184,17 @@ package body Openml_Ada is
       Y := Split_Columns (ARFF_Container.Target, Col_Slice_Y);
       Printing.Print_Integer_List (Routine_Name & "Y", Y);
 
-      --        Printing.Print_Value_Data_List (Routine_Name & "X(1)", X.First_Element);
-      --  L672
+      --  L522
+--        Load_ARFF_Response (X, Y, Frame, Nominal_Attributes);
+--        Load_ARFF_Response (Output_Arrays_Type, Features_Dict, X, Y,
+--                            Col_Slice_X, Col_Slice_Y);
+
+      --  L539
       if not X_Y_Only then
          --           Put_Line (Routine_Name & "Parse_Nominal_Data");
          Nominal_Attributes :=
            Parse_Nominal_Data (ARFF_Container, Target_Columns);
-         Bunch.As_Frame := As_Frame_False;
+         Bunch.As_Frame := As_Frame;
          Bunch.Categories := Nominal_Attributes;
          Bunch.Feature_Names := Data_Columns;
          Bunch.Target_Names := Target_Columns;
@@ -442,6 +434,17 @@ package body Openml_Ada is
       pragma Unreferenced (File_ID);
 
    end Get_OML;
+
+   --  ------------------------------------------------------------------------
+
+   procedure  Load_ARFF_Response
+     (Output_Arrays_Type       : Unbounded_String;
+      Features_Dict            : Attribute_Dictionary_Map;
+      Data_Columns             : Float_List_2D; Target_Columns: Integer_List;
+      Col_Slice_X, Col_Slice_Y : Integer_DL_List) is
+   begin
+      null;
+   end Load_ARFF_Response;
 
    --  ------------------------------------------------------------------------
 
