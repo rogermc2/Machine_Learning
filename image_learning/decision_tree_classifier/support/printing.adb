@@ -282,12 +282,13 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List (Name    : String;
-                                 theList : Integer_List) is
+   procedure Print_Integer_List (Name  : String; theList : Integer_List;
+                                 Start : Positive := 1; Last : Positive := 10)
+   is
       Count : Integer := 1;
    begin
       Put_Line (Name & ": ");
-      for Index in theList.First_Index .. theList.Last_Index loop
+      for Index in Start .. Last loop
          Put (Integer'Image (theList.Element (Index)) & "   ");
          Count := Count + 1;
          if Count > 10 then

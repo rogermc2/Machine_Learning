@@ -34,8 +34,8 @@ package Printing is
     procedure Print_Float_List (Name  : String; theList : Float_List);
     procedure Print_Indefinite_List (Name   : String;
                                     theList : Indef_String_List);
-    procedure Print_Integer_List (Name : String;
-                                  theList : Integer_List);
+    procedure Print_Integer_List (Name : String; theList : Integer_List;
+                                  Start : Positive := 1; Last : Positive := 10);
     procedure Print_Integer_List (Name : String;
                                   theList : Integer_DL_List);
    procedure Print_Integer_Set (Name   : String;
