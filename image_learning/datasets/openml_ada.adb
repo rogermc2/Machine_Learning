@@ -2,7 +2,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Characters.Handling;
-with Ada.Containers.Ordered_Maps;
 with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
@@ -11,6 +10,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Printing;
 
+with ARFF_Parser;
 with Load_ARFF_Data.ARFF_IO;
 --  with Load_ARFF_Data.ARFF_Printing;
 
@@ -20,10 +20,6 @@ package body Openml_Ada is
 
    --     type ARFF_Return_Type is (Arff_Dense, Arff_Coo, Arff_Lod,
    --                               Arff_Dense_Gen, Arff_Lod_Gen);
-
-   package Attribute_Dictionary_Package is new
-     Ada.Containers.Ordered_Maps (Unbounded_String, Positive);
-   subtype Attribute_Dictionary_Map is Attribute_Dictionary_Package.Map;
 
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    procedure Get_OML (File_Name : String;
@@ -47,31 +43,31 @@ package body Openml_Ada is
      (Features_List  : in out AR_Types.Attribute_List;
       Target_Columns : out String_List);
    procedure Verify_Target_Data_Type
-     (Features_Dict  : Attribute_Dictionary_Map;
+     (Features_Dict  : AR_Types.Attribute_Dictionary_Map;
       Target_Columns : String_List);
 
    --  ------------------------------------------------------------------------
 
-   procedure ARFF_To_OML (ARFF_Container : AR_Types.ARFF_Record;
-                          X              : out IL_Types.Float_List_2D;
-                          Y              : out IL_Types.Integer_List) is
-      --        Routine_Name  : constant String := "Openml_Ada.ARFF_To_OML ";
-      Arff_Data_Row   : AR_Types.AR_Real_List;  --  list of columns
-
-      Data_Row        : Float_List;
-   begin
-      for row in ARFF_Container.Data.First_Index ..
-        ARFF_Container.Data.Last_Index loop
-         Arff_Data_Row := ARFF_Container.Data.Element (row);
-         for index in ARFF_Container.Data.First_Index ..
-           ARFF_Container.Data.Last_Index loop
-            Data_Row (index) := Arff_Data_Row (index);
-         end loop;
-         X.Append (Data_Row);
-         Y.Append (ARFF_Container.Target.Element (row));
-      end loop;
-
-   end ARFF_To_OML;
+--     procedure ARFF_To_OML (ARFF_Container : AR_Types.ARFF_Record;
+--                            X              : out IL_Types.Float_List_2D;
+--                            Y              : out IL_Types.Integer_List) is
+--        --        Routine_Name  : constant String := "Openml_Ada.ARFF_To_OML ";
+--        Arff_Data_Row   : AR_Types.AR_Real_List;  --  list of columns
+--
+--        Data_Row        : Float_List;
+--     begin
+--        for row in ARFF_Container.Data.First_Index ..
+--          ARFF_Container.Data.Last_Index loop
+--           Arff_Data_Row := ARFF_Container.Data.Element (row);
+--           for index in ARFF_Container.Data.First_Index ..
+--             ARFF_Container.Data.Last_Index loop
+--              Data_Row (index) := Arff_Data_Row (index);
+--           end loop;
+--           X.Append (Data_Row);
+--           Y.Append (ARFF_Container.Target.Element (row));
+--        end loop;
+--
+--     end ARFF_To_OML;
 
    --  ------------------------------------------------------------------------
 
@@ -109,7 +105,6 @@ package body Openml_Ada is
       --        Sparse       : Boolean;
       As_Frame       : As_Frame_State := As_Frame_False) is
       --        Shape        : Shape_Data) is
-      use Ada.Containers;
       use AR_Types;
       use Integer_DLL_Package;
       use Attribute_Data_Package;
@@ -211,7 +206,11 @@ package body Openml_Ada is
       --                            Col_Slice_X, Col_Slice_Y);
 
       --  L522
-      ARFF_To_OML (ARFF_Container, X , Y);
+
+      ARFF_Parser.Convert_Arff_Data (ARFF_Container, Col_Slice_X, Col_Slice_Y,
+                                     X , Y);
+--        ARFF_To_OML (ARFF_Container, X , Y);
+
       --        if not X_Y_Only then
       --           Put_Line (Routine_Name & "Parse_Nominal_Data");
       Nominal_Attributes :=
@@ -635,7 +634,7 @@ package body Openml_Ada is
    --  Verify_Target_Data_Type throws an error for any target that does not
    --  comply with sklearn support.
    procedure Verify_Target_Data_Type
-     (Features_Dict  : Attribute_Dictionary_Map;
+     (Features_Dict  : AR_Types.Attribute_Dictionary_Map;
       Target_Columns : String_List) is
       use Ada.Characters.Handling;
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";

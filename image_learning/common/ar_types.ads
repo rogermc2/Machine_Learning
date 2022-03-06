@@ -1,6 +1,7 @@
 
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Vectors;
+with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
@@ -14,6 +15,10 @@ package AR_Types is
                            ARFF_Real, ARFF_String);
    type Nominal_Data_Type is (Nominal_Integer, Nominal_Numeric, Nominal_Real,
                               Nominal_String);
+
+   package Attribute_Dictionary_Package is new
+     Ada.Containers.Ordered_Maps (Unbounded_String, Positive);
+   subtype Attribute_Dictionary_Map is Attribute_Dictionary_Package.Map;
 
    type Nominal_Data_Record (Data_Kind : Nominal_Data_Type) is record
       Data_String          : Unbounded_String;

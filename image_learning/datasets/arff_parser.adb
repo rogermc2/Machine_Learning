@@ -8,12 +8,51 @@ with Load_ARFF_Data;
 
 package body ARFF_Parser is
 
+   function Split_Columns
+     (Arff_Data       : AR_Types.AR_Real_List_2D;
+      Include_Columns : IL_Types.Integer_DL_List) return IL_Types.Float_List_2D;
+   function Split_Columns
+     (Arff_Target    : AR_Types.AR_Integer_List;
+      Include_Values : IL_Types.Integer_DL_List) return IL_Types.Integer_List;
+
+   --  ------------------------------------------------------------------------
+   --  L210
+   procedure Arff_Parser
+     (ARFF_Container : AR_Types.ARFF_Record;
+      Features_Dict  : AR_Types.Attribute_Dictionary_Map;
+      Dataa_Columns  : IL_Types.String_List;
+      Target_Columns : IL_Types.String_List;
+      Col_Slice_X    : IL_Types.Integer_DL_List;
+      Col_Slice_Y    : IL_Types.Integer_DL_List;
+      X              : out IL_Types.Float_List_2D;
+      Y              : out IL_Types.Integer_List) is
+      --           Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data";
+   begin
+      null;
+   end Arff_Parser;
+
+   --  ------------------------------------------------------------------------
+   --  L151
+   procedure Convert_Arff_Data
+     (ARFF_Container : AR_Types.ARFF_Record;
+      Col_Slice_X    : IL_Types.Integer_DL_List;
+      Col_Slice_Y    : IL_Types.Integer_DL_List;
+      X              : out IL_Types.Float_List_2D;
+      Y              : out IL_Types.Integer_List) is
+      --           Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data";
+   begin
+      X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
+      Y := Split_Columns (ARFF_Container.Target, Col_Slice_Y);
+
+   end Convert_Arff_Data;
+
    --  ------------------------------------------------------------------------
    --  L151
    --     function Convert_Arff_Data_Dataframe
    --       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value)
    --        return JSON_Value is
-   --        Routine_Name    : constant String := "Opemml.Convert_Arff_Data_Dataframe";
+   --        Routine_Name    : constant String :=
+   --                         "ARFF_Parser.Convert_Arff_Data_Dataframe";
    --        Description     : constant JSON_Array :=
    --                            Arff_Container.Get ("description");
    --        Relation        : constant String :=
