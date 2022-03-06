@@ -26,10 +26,10 @@ package Openml_Ada is
        Features_List  : AR_Types.Attribute_List;
        Data_Columns   : String_List;
        Target_Columns : in out String_List;
-       X              : out Float_List_2D;
-       Y              : out Integer_List;
+--         X              : out Float_List_2D;
+--         Y              : out Integer_List;
        Bunch          : out Bunch_Data;
-       X_Y_Only       : Boolean := False;
+--         X_Y_Only       : Boolean := False;
        --        Sparse       : Boolean;
        As_Frame       : As_Frame_State := As_Frame_False);
     procedure Fetch_Openml

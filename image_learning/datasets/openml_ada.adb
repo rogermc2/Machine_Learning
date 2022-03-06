@@ -46,15 +46,32 @@ package body Openml_Ada is
    procedure Set_Default_Target
      (Features_List  : in out AR_Types.Attribute_List;
       Target_Columns : out String_List);
-   function Split_Columns
-     (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : Integer_DL_List) return Float_List_2D;
-   function Split_Columns
-     (Arff_Target    : AR_Types.AR_Integer_List;
-      Include_Values : Integer_DL_List) return Integer_List;
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
       Target_Columns : String_List);
+
+   --  ------------------------------------------------------------------------
+
+   procedure ARFF_To_OML (ARFF_Container : AR_Types.ARFF_Record;
+                          X              : out IL_Types.Float_List_2D;
+                          Y              : out IL_Types.Integer_List) is
+      --        Routine_Name  : constant String := "Openml_Ada.ARFF_To_OML ";
+      Arff_Data_Row   : AR_Types.AR_Real_List;  --  list of columns
+
+      Data_Row        : Float_List;
+   begin
+      for row in ARFF_Container.Data.First_Index ..
+        ARFF_Container.Data.Last_Index loop
+         Arff_Data_Row := ARFF_Container.Data.Element (row);
+         for index in ARFF_Container.Data.First_Index ..
+           ARFF_Container.Data.Last_Index loop
+            Data_Row (index) := Arff_Data_Row (index);
+         end loop;
+         X.Append (Data_Row);
+         Y.Append (ARFF_Container.Target.Element (row));
+      end loop;
+
+   end ARFF_To_OML;
 
    --  ------------------------------------------------------------------------
 
@@ -85,10 +102,10 @@ package body Openml_Ada is
       Features_List  : AR_Types.Attribute_List;
       Data_Columns   : String_List;
       Target_Columns : in out String_List;
-      X              : out Float_List_2D;
-      Y              : out Integer_List;
+      --        X              : out Float_List_2D;
+      --        Y              : out Integer_List;
       Bunch          : out Bunch_Data;
-      X_Y_Only       : Boolean := False;
+      --        X_Y_Only       : Boolean := False;
       --        Sparse       : Boolean;
       As_Frame       : As_Frame_State := As_Frame_False) is
       --        Shape        : Shape_Data) is
@@ -106,6 +123,9 @@ package body Openml_Ada is
       Col_Slice_Y        : Integer_DL_List;
       --        Num_Missing        : Integer;
       --        Return_Type        : ARFF_Return_Type;
+      X                  : Float_List_2D;
+      Y                  : Integer_List;
+--        Attributes         : Attribute_List := ARFF_Container.Header.Attributes;
       Nominal_Attributes : Nominal_Data_List;
       --        Frame              : Boolean := False;
 
@@ -181,25 +201,26 @@ package body Openml_Ada is
       --  L325
       --        Put_Line (Routine_Name & "Convert_Arff_Data");
       --  L278
-      X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
-      Y := Split_Columns (ARFF_Container.Target, Col_Slice_Y);
-      Printing.Print_Integer_List (Routine_Name & "Y", Y);
+      --        X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
+      --        Y := Split_Columns (ARFF_Container.Target, Col_Slice_Y);
+      --        Printing.Print_Integer_List (Routine_Name & "Y", Y);
 
       --  L522
---        Load_ARFF_Response (X, Y, Frame, Nominal_Attributes);
---        Load_ARFF_Response (Output_Arrays_Type, Features_Dict, X, Y,
---                            Col_Slice_X, Col_Slice_Y);
+      --        Load_ARFF_Response (X, Y, Frame, Nominal_Attributes);
+      --        Load_ARFF_Response (Output_Arrays_Type, Features_Dict, X, Y,
+      --                            Col_Slice_X, Col_Slice_Y);
 
-      --  L539
-      if not X_Y_Only then
-         --           Put_Line (Routine_Name & "Parse_Nominal_Data");
-         Nominal_Attributes :=
-           Parse_Nominal_Data (ARFF_Container, Target_Columns);
-         Bunch.As_Frame := As_Frame;
-         Bunch.Categories := Nominal_Attributes;
-         Bunch.Feature_Names := Data_Columns;
-         Bunch.Target_Names := Target_Columns;
-      end if;
+      --  L522
+      ARFF_To_OML (ARFF_Container, X , Y);
+      --        if not X_Y_Only then
+      --           Put_Line (Routine_Name & "Parse_Nominal_Data");
+      Nominal_Attributes :=
+        Parse_Nominal_Data (ARFF_Container, Target_Columns);
+      Bunch.As_Frame := As_Frame;
+      Bunch.Categories := Nominal_Attributes;
+      Bunch.Feature_Names := Data_Columns;
+      Bunch.Target_Names := Target_Columns;
+      --        end if;
 
    end Download_Data_To_Bunch;
 
@@ -297,7 +318,7 @@ package body Openml_Ada is
 
          --  L955
          Download_Data_To_Bunch (ARFF_Data, Features_List, Data_Columns,
-                                 Target_Columns, X, Y, Bunch, Return_X_Y);
+                                 Target_Columns, Bunch);
          --           for index in X.First_Index .. X.Last_Index loop
          --              X_Indices.Append (index);
          --              Y_Indices.Append (index);
@@ -425,14 +446,14 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
---     procedure  Load_ARFF_Response
---       (Output_Arrays_Type       : Unbounded_String;
---        Features_Dict            : Attribute_Dictionary_Map;
---        Data_Columns             : Float_List_2D; Target_Columns: Integer_List;
---        Col_Slice_X, Col_Slice_Y : Integer_DL_List) is
---     begin
---        null;
---     end Load_ARFF_Response;
+   --     procedure  Load_ARFF_Response
+   --       (Output_Arrays_Type       : Unbounded_String;
+   --        Features_Dict            : Attribute_Dictionary_Map;
+   --        Data_Columns             : Float_List_2D; Target_Columns: Integer_List;
+   --        Col_Slice_X, Col_Slice_Y : Integer_DL_List) is
+   --     begin
+   --        null;
+   --     end Load_ARFF_Response;
 
    --  ------------------------------------------------------------------------
 
@@ -563,58 +584,6 @@ package body Openml_Ada is
       pragma Unreferenced (File_ID);
 
    end Save_OML;
-
-   --  ------------------------------------------------------------------------
-   --  L184
-   function Split_Columns
-     (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : Integer_DL_List) return Float_List_2D is
-      use Integer_DLL_Package;
-      --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
-      Data_New      : Float_List_2D;
-      Include_Curs  : Integer_DLL_Package.Cursor;
-      Arff_Data_Row : AR_Types.AR_Real_List;  --  list of columns
-      New_Row       : Float_List;
-   begin
-      for row in Arff_Data.First_Index .. Arff_Data.Last_Index loop
-         New_Row.Clear;
-         Arff_Data_Row := Arff_Data.Element (row);
-         Include_Curs := Include_Columns.First;
-         while Has_Element (Include_Curs) loop
-            New_Row.Append (Arff_Data_Row.Element (Element (Include_Curs)));
-            Next (Include_Curs);
-         end loop;
-         Data_New.Append (New_Row);
-      end loop;
-
-      return Data_New;
-
-   end Split_Columns;
-
-   --  ------------------------------------------------------------------------
-   --  L184
-   function Split_Columns
-     (Arff_Target    : AR_Types.AR_Integer_List;
-      Include_Values : Integer_DL_List) return Integer_List is
-      use Integer_DLL_Package;
-      --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
-      Data_New      : Integer_List;
-      Include_Curs  : Integer_DLL_Package.Cursor;
-      New_Row       : Integer_List;
-   begin
-      for row in Arff_Target.First_Index .. Arff_Target.Last_Index loop
-         New_Row.Clear;
-         Include_Curs := Include_Values.First;
-         while Has_Element (Include_Curs) loop
-            Data_New.Append (Arff_Target.Element (Element (Include_Curs)));
-            Next  (Include_Curs);
-         end loop;
-
-      end loop;
-
-      return Data_New;
-
-   end Split_Columns;
 
    --  ------------------------------------------------------------------------
    --  L699
