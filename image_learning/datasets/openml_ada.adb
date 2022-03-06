@@ -151,7 +151,7 @@ package body Openml_Ada is
          Col_Slice_Y.Append (Feature_Index);
          Next (Target_Curs);
       end loop;
-      --        Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
+      Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
 
       --  L566 continued
       for Col_ID in Features_List.First_Index ..

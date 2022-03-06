@@ -10,8 +10,8 @@ package Support_4 is
      (Dataset_Name : String; Return_X_Y : Boolean;
       X            : out Float_List_2D;
       Y            : out Integer_List;
-      X_Indices    : out Integer_List;
-      Y_Indices    : out Integer_List;
+--        X_Indices    : out Integer_List;
+--        Y_Indices    : out Integer_List;
       Train_X      : out Float_List_2D;
       Train_Y      : out Integer_List;
       Test_X       : out Float_List_2D;

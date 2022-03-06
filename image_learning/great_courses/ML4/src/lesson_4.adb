@@ -51,7 +51,7 @@ procedure Lesson_4 is
 
 begin
    Put_Line (Routine_Name);
-   if not Get_State (Dataset_Name, Return_X_Y, X, Y, X_Indices, Y_Indices,
+   if not Get_State (Dataset_Name, Return_X_Y, X, Y,
                      Train_X, Train_Y, Test_X, Test_Y, Bunch) then
       Num_Samples := Positive (X.Length);
 

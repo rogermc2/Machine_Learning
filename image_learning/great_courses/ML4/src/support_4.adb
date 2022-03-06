@@ -9,8 +9,8 @@ package body Support_4 is
      (Dataset_Name : String; Return_X_Y : Boolean;
       X            : out Float_List_2D;
       Y            : out Integer_List;
-      X_Indices    : out Integer_List;
-      Y_Indices    : out Integer_List;
+--        X_Indices    : out Integer_List;
+--        Y_Indices    : out Integer_List;
       Train_X      : out Float_List_2D;
       Train_Y      : out Integer_List;
       Test_X       : out Float_List_2D;
@@ -50,8 +50,8 @@ package body Support_4 is
                                   Target_Column     => Empty_List,
                                   X                 => X,
                                   Y                 => Y,
-                                  X_Indices         => X_Indices,
-                                  Y_Indices         => Y_Indices,
+--                                    X_Indices         => X_Indices,
+--                                    Y_Indices         => Y_Indices,
                                   Bunch             => Bunch,
                                   As_Frame          => As_Frame,
                                   Return_X_Y        => Return_X_Y);
