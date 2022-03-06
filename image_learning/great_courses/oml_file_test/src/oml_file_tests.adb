@@ -1,9 +1,10 @@
 
 with Ada.Containers;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with IL_Types; use IL_Types;
---  with Printing;
+with Printing;
 
 with Openml_Ada; use Openml_Ada;
 
@@ -103,21 +104,22 @@ package body OML_File_Tests is
 
    procedure Test_Fetch_OML is
       use Ada.Containers;
-      Routine_Name  : constant String := "Test_Fetch_OML ";
-      File_Name     : constant String := "../mnist_784.arff";
-      Save_File     : constant String := "mnist_784.oml";
-      As_Frame      : As_Frame_State := As_Frame_False;
-      Target_Column : String_List;
-      X             : Float_List_2D;
-      Y             : Integer_List;
---        X_Indices     : Integer_List;
---        Y_Indices     : Integer_List;
-      Bunch         : Bunch_Data;
+      Routine_Name   : constant String := "Test_Fetch_OML ";
+      File_Name      : constant String := "../mnist_784.arff";
+      Save_File      : constant String := "mnist_784.oml";
+      As_Frame       : As_Frame_State := As_Frame_False;
+      Target_Columns : String_List;
+      X              : Float_List_2D;
+      Y              : Integer_List;
+--        X_Indices      : Integer_List;
+--        Y_Indices      : Integer_List;
+      Bunch          : Bunch_Data;
    begin
       Put_Line (Routine_Name);
+      Target_Columns.Append (To_Unbounded_String ("class"));
       Fetch_Openml (Dataset_File_Name => File_Name,
                     Save_File_Name    => Save_File,
-                    Target_Column     => Target_Column,
+                    Target_Columns    => Target_Columns,
                     X                 => X,
                     Y                 => Y,
 --                      X_Indices         => X_Indices,
@@ -126,6 +128,7 @@ package body OML_File_Tests is
                     As_Frame          => As_Frame,
                     Return_X_Y        => True);
 
+      Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
       Put_Line (Routine_Name & "X length: " & Count_Type'Image (X.Length));
       Put_Line (Routine_Name & "Y length: " & Count_Type'Image (Y.Length));
 --        Printing.Print_Float_Lists_2D (Routine_Name & "X", X);

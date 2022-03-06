@@ -81,16 +81,17 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
    --  L475
    procedure Download_Data_To_Bunch
-     (ARFF_Container               : AR_Types.ARFF_Record;
-      Features_List                : AR_Types.Attribute_List;
-      Data_Columns, Target_Columns : String_List;
-      X                            : out Float_List_2D;
-      Y                            : out Integer_List;
-      Bunch                        : out Bunch_Data;
-      X_Y_Only                     : Boolean := False;
-      --        Sparse                     : Boolean;
-      As_Frame                     : As_Frame_State := As_Frame_False) is
-      --                                       Shape            : Shape_Data) is
+     (ARFF_Container : AR_Types.ARFF_Record;
+      Features_List  : AR_Types.Attribute_List;
+      Data_Columns   : String_List;
+      Target_Columns : in out String_List;
+      X              : out Float_List_2D;
+      Y              : out Integer_List;
+      Bunch          : out Bunch_Data;
+      X_Y_Only       : Boolean := False;
+      --        Sparse       : Boolean;
+      As_Frame       : As_Frame_State := As_Frame_False) is
+      --        Shape        : Shape_Data) is
       use Ada.Containers;
       use AR_Types;
       use Integer_DLL_Package;
@@ -211,7 +212,7 @@ package body Openml_Ada is
    procedure Fetch_Openml
      (Dataset_File_Name : String;
       Save_File_Name    : String;
-      Target_Column     : String_List;
+      Target_Columns    : in out String_List;
       X                 : out Float_List_2D;
       Y                 : out Integer_List;
       --        X_Indices         : out Integer_List;
@@ -235,14 +236,11 @@ package body Openml_Ada is
       ARFF_Data       : ARFF_Record;
       Return_Sparse   : constant Boolean := False;
       Features_List   : Attribute_List;
-      Curs            : Cursor;
-      Target_Value    : Unbounded_String;
-      Target_Columns  : String_List;
       Data_Columns    : String_List;
       --        Shape           : Shape_Data;
       --        Data_Qualities  : Qualities_Map;
    begin
-      Printing.Print_Strings (Routine_Name & "Target_Column", Target_Column);
+      Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
       if Exists (Save_File_Name) then
          Get_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
       else
@@ -278,18 +276,8 @@ package body Openml_Ada is
          end if;
 
          --  L929
-         if Target_Column.Is_Empty then
+         if Target_Columns.Is_Empty then
             Set_Default_Target (Features_List, Target_Columns);
-         else
-            Curs := Target_Column.First;
-            while Has_Element (Curs) loop
-               Target_Value := Element (Curs);
-               Target_Value := To_Unbounded_String
-                 (Slice (Target_Value, 2, Length (Target_Value)));
-               Trim (Target_Value, Both);
-               Target_Columns.Append (Target_Value);
-               Next (Curs);
-            end loop;
          end if;
 
          --  L944
@@ -437,14 +425,14 @@ package body Openml_Ada is
 
    --  ------------------------------------------------------------------------
 
-   procedure  Load_ARFF_Response
-     (Output_Arrays_Type       : Unbounded_String;
-      Features_Dict            : Attribute_Dictionary_Map;
-      Data_Columns             : Float_List_2D; Target_Columns: Integer_List;
-      Col_Slice_X, Col_Slice_Y : Integer_DL_List) is
-   begin
-      null;
-   end Load_ARFF_Response;
+--     procedure  Load_ARFF_Response
+--       (Output_Arrays_Type       : Unbounded_String;
+--        Features_Dict            : Attribute_Dictionary_Map;
+--        Data_Columns             : Float_List_2D; Target_Columns: Integer_List;
+--        Col_Slice_X, Col_Slice_Y : Integer_DL_List) is
+--     begin
+--        null;
+--     end Load_ARFF_Response;
 
    --  ------------------------------------------------------------------------
 
