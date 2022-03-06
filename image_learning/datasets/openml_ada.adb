@@ -206,20 +206,15 @@ package body Openml_Ada is
       --                            Col_Slice_X, Col_Slice_Y);
 
       --  L522
+      ARFF_Parser.Arff_Parser (ARFF_Container, Features_Dict, Data_Columns,
+                               Target_Columns, Col_Slice_X, Col_Slice_Y, X, Y);
 
-      ARFF_Parser.Convert_Arff_Data (ARFF_Container, Col_Slice_X, Col_Slice_Y,
-                                     X , Y);
---        ARFF_To_OML (ARFF_Container, X , Y);
-
-      --        if not X_Y_Only then
-      --           Put_Line (Routine_Name & "Parse_Nominal_Data");
       Nominal_Attributes :=
         Parse_Nominal_Data (ARFF_Container, Target_Columns);
       Bunch.As_Frame := As_Frame;
       Bunch.Categories := Nominal_Attributes;
       Bunch.Feature_Names := Data_Columns;
       Bunch.Target_Names := Target_Columns;
-      --        end if;
 
    end Download_Data_To_Bunch;
 
