@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets _openml.py
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Characters.Handling;
 with Ada.Containers.Ordered_Maps;
 with Ada.Directories;
 with Ada.Streams.Stream_IO;
@@ -28,8 +29,8 @@ package body Openml_Ada is
    procedure Get_OML (File_Name : String;
                       X         : out Float_List_2D;
                       Y         : out Integer_List;
---                        X_Indices : out Integer_List;
---                        Y_Indices : out Integer_List;
+                      --                        X_Indices : out Integer_List;
+                      --                        Y_Indices : out Integer_List;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean);
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
@@ -40,7 +41,7 @@ package body Openml_Ada is
      (Save_File_Name        : String;
       X                     : Float_List_2D;
       Y                     : Integer_List;
---        X_Indices, Y_Indices  : Integer_List;
+      --        X_Indices, Y_Indices  : Integer_List;
       Bunch                 : Bunch_Data; X_Y_Only : Boolean);
    procedure Set_Default_Target
      (Features_List  : in out AR_Types.Attribute_List;
@@ -96,12 +97,12 @@ package body Openml_Ada is
       use String_Package;
       use Attribute_Data_Package;
       Routine_Name       : constant String :=
-                            "Openml_Ada.Download_Data_To_Bunch ";
+                             "Openml_Ada.Download_Data_To_Bunch ";
       Target_Curs        : String_Package.Cursor := Target_Columns.First;
       Feature_Index      : Positive;
       Features_Dict      : Attribute_Dictionary_Map;
       aFeature           : Attribute_Record;
-      Col_Name           : Unbounded_String;
+      --        Col_Name           : Unbounded_String;
       Col_Slice_X        : Integer_DL_List;
       Col_Slice_Y        : Integer_DL_List;
       --        Num_Missing        : Integer;
@@ -137,6 +138,7 @@ package body Openml_Ada is
       end loop;
       --        Printing.Print_Strings (Routine_Name & "Data_Columns", Data_Columns);
       --        Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
+      --  col_slice_y should be all nominal or all numeric
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
       --  L499 col_slice_y =
@@ -144,14 +146,21 @@ package body Openml_Ada is
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
       --        ]
-      --  target_columns is a list of feature names
-      while Has_Element (Target_Curs) loop
-         Col_Name := Element (Target_Curs);
-         Feature_Index := Features_Dict.Element (Col_Name);
-         --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
+      --  target_columns is a list of attribute names
+      for Col_ID in Features_List.Last_Index -
+        Extended_Index (Col_Slice_Y.Length) .. Features_List.Last_Index loop
+         aFeature := Features_List.Element (Col_ID);
+         Feature_Index := Features_Dict.Element (aFeature.Name);
          Col_Slice_Y.Append (Feature_Index);
-         Next (Target_Curs);
       end loop;
+
+      --        while Has_Element (Target_Curs) loop
+      --           Col_Name := Element (Target_Curs);
+      --           Feature_Index := Features_Dict.Element (Col_Name);
+      --           --        Put_Line (Routine_Name & "aFeature Y " & aFeature.Write);
+      --           Col_Slice_Y.Append (Feature_Index);
+      --           Next (Target_Curs);
+      --        end loop;
       Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
 
       --  L501
@@ -213,8 +222,8 @@ package body Openml_Ada is
       Target_Column     : String_List;
       X                 : out Float_List_2D;
       Y                 : out Integer_List;
---        X_Indices         : out Integer_List;
---        Y_Indices         : out Integer_List;
+      --        X_Indices         : out Integer_List;
+      --        Y_Indices         : out Integer_List;
       Bunch             : out Bunch_Data;
       As_Frame          : in out As_Frame_State;
       Return_X_Y        : Boolean := False) is
@@ -309,10 +318,10 @@ package body Openml_Ada is
          --  L955
          Download_Data_To_Bunch (ARFF_Data, Features_List, Data_Columns,
                                  Target_Columns, X, Y, Bunch, Return_X_Y);
---           for index in X.First_Index .. X.Last_Index loop
---              X_Indices.Append (index);
---              Y_Indices.Append (index);
---           end loop;
+         --           for index in X.First_Index .. X.Last_Index loop
+         --              X_Indices.Append (index);
+         --              Y_Indices.Append (index);
+         --           end loop;
 
          if Save_File_Name'Length > 0 then
             Save_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
@@ -410,8 +419,8 @@ package body Openml_Ada is
    procedure Get_OML (File_Name : String;
                       X         : out Float_List_2D;
                       Y         : out Integer_List;
---                        X_Indices : out Integer_List;
---                        Y_Indices : out Integer_List;
+                      --                        X_Indices : out Integer_List;
+                      --                        Y_Indices : out Integer_List;
                       Bunch     : out Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
@@ -424,8 +433,8 @@ package body Openml_Ada is
       aStream := Stream (File_ID);
       Float_List_2D'Read (aStream, X);
       Integer_List'Read (aStream, Y);
---        Integer_List'Read (aStream, X_Indices);
---        Integer_List'Read (aStream, Y_Indices);
+      --        Integer_List'Read (aStream, X_Indices);
+      --        Integer_List'Read (aStream, Y_Indices);
       if not X_Y_Only then
          Bunch_Data'Read (aStream, Bunch);
       end if;
@@ -520,7 +529,7 @@ package body Openml_Ada is
       Target_Columns : out String_List) is
       use AR_Types;
       use Attribute_Data_Package;
-      Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
+      Routine_Name     : constant String := "Openml_Ada.Set_Default_Target ";
       Feature          : Attribute_Record;
    begin
       for index in Features_List.First_Index .. Features_List.Last_Index loop
@@ -542,8 +551,8 @@ package body Openml_Ada is
    procedure Save_OML (Save_File_Name : String;
                        X              : Float_List_2D;
                        Y              : Integer_List;
---                         X_Indices      : Integer_List;
---                         Y_Indices      : Integer_List;
+                       --                         X_Indices      : Integer_List;
+                       --                         Y_Indices      : Integer_List;
                        Bunch          : Bunch_Data; X_Y_Only : Boolean) is
       use Ada.Streams;
       use Stream_IO;
@@ -554,8 +563,8 @@ package body Openml_Ada is
       aStream := Stream (File_ID);
       Float_List_2D'Write (aStream, X);
       Integer_List'Write (aStream, Y);
---        Integer_List'Write (aStream, X_Indices);
---        Integer_List'Write (aStream, Y_Indices);
+      --        Integer_List'Write (aStream, X_Indices);
+      --        Integer_List'Write (aStream, Y_Indices);
       if not X_Y_Only then
          Bunch_Data'Write (aStream, Bunch);
       end if;
@@ -606,7 +615,7 @@ package body Openml_Ada is
          New_Row.Clear;
          Include_Curs := Include_Values.First;
          while Has_Element (Include_Curs) loop
-               Data_New.Append (Arff_Target.Element (Element (Include_Curs)));
+            Data_New.Append (Arff_Target.Element (Element (Include_Curs)));
             Next  (Include_Curs);
          end loop;
 
@@ -661,14 +670,19 @@ package body Openml_Ada is
    end Valid_Data_Column_Names;
 
    --  ------------------------------------------------------------------------
-
+   --  L549 Verify_Target_Data_Type verifies the data type of the y array in
+   --  case there are multiple targets.
+   --  Verify_Target_Data_Type throws an error for any target that does not
+   --  comply with sklearn support.
    procedure Verify_Target_Data_Type
      (Features_Dict  : Attribute_Dictionary_Map;
       Target_Columns : String_List) is
+      use Ada.Characters.Handling;
       Routine_Name  : constant String := "Openml_Ada.Verify_Target_Data_Type ";
       use String_Package;
       Curs          : Cursor := Target_Columns.First;
       Column        : Unbounded_String;
+      Found_Types   : Unbounded_List;
    begin
       --        Put_Line (Routine_Name & "Target_Columns length" &
       --                    Integer'Image (Length (Target_Columns)));
@@ -677,8 +691,20 @@ package body Openml_Ada is
          Assert (Features_Dict.Contains (Column),
                  Routine_Name & "Features_Dict does not contain " &
                    To_String (Column));
+         declare
+            UC_Column : constant String := To_Upper (To_String (Column));
+         begin
+            if UC_Column = "NUMERIC" or else UC_Column = "INTEGER" or else
+              UC_Column = "REAL" or else UC_Column = "NOMINAL" then
+               Found_Types.Append (Column);
+            end if;
+         end;
          Next (Curs);
       end loop;
+
+      Assert (Integer (Found_Types.Length) <= 1, Routine_Name &
+                "Can only handle homogeneous multi-target datasets, " &
+                "i.e., all targets are either numeric or categorical.");
 
    end Verify_Target_Data_Type;
 
