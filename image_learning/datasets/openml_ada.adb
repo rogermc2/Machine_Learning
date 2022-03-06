@@ -78,7 +78,7 @@ package body Openml_Ada is
    --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
-
+   --  L475
    procedure Download_Data_To_Bunch
      (ARFF_Container               : AR_Types.ARFF_Record;
       Features_List                : AR_Types.Attribute_List;
@@ -130,6 +130,7 @@ package body Openml_Ada is
       --        Load_ARFF_Data.ARFF_Printing.Print_Attributes
       --          (Routine_Name & "Features_List", Features_List);
 
+      --  L494
       for index in Features_List.First_Index .. Features_List.Last_Index loop
          aFeature := Features_List.Element (index);
          Features_Dict.Include (aFeature.Name, index);
@@ -138,7 +139,7 @@ package body Openml_Ada is
       --        Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
       Verify_Target_Data_Type (Features_Dict, Target_Columns);
 
-      --  L566 col_slice_y =
+      --  L499 col_slice_y =
       --        [
       --          int(features_dict[col_name]["index"])
       --          for col_name in target_columns
@@ -153,7 +154,7 @@ package body Openml_Ada is
       end loop;
       Printing.Print_Integer_List (Routine_Name & "Col_Slice_Y", Col_Slice_Y);
 
-      --  L566 continued
+      --  L501
       for Col_ID in Features_List.First_Index ..
         Features_List.Last_Index - Extended_Index (Col_Slice_Y.Length) loop
          aFeature := Features_List.Element (Col_ID);
@@ -205,6 +206,7 @@ package body Openml_Ada is
    --  to use as target. If empty, all columns are returned as data and the
    --  target is `None`. If a list of strings, all columns with these names
    --  are returned as a multi-target.
+   --  L592
    procedure Fetch_Openml
      (Dataset_File_Name : String;
       Save_File_Name    : String;
@@ -239,6 +241,7 @@ package body Openml_Ada is
       --        Shape           : Shape_Data;
       --        Data_Qualities  : Qualities_Map;
    begin
+      Printing.Print_Strings (Routine_Name & "Target_Column", Target_Column);
       if Exists (Save_File_Name) then
          Get_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
       else
@@ -254,7 +257,7 @@ package body Openml_Ada is
          end if;
          New_Line;
 
-         --  L903
+         --  L789
          if As_Frame = As_Frame_Auto then
             if not Return_Sparse then
                As_Frame := As_Frame_True;
@@ -266,7 +269,7 @@ package body Openml_Ada is
          Assert (not (As_Frame = As_Frame_True and Return_Sparse),
                  Routine_Name & "cannot return dataframe with sparse data");
 
-         --  L917
+         --  L796
          Features_List := Get_Attributes (ARFF_Data);
 
          if As_Frame = As_Frame_False then
@@ -520,10 +523,12 @@ package body Openml_Ada is
       --        Routine_Name  : constant String := "Openml_Ada.Set_Default_Target ";
       Feature          : Attribute_Record;
    begin
-      Feature := Features_List.Element (Features_List.Last_Index);
-      Feature.Is_Target := True;
-      Features_List.Replace_Element (Features_List.Last_Index, Feature);
-      Target_Columns.Append (Feature.Name);
+      for index in Features_List.First_Index .. Features_List.Last_Index loop
+         Feature := Features_List.Element (index);
+         if Feature.Is_Target then
+            Target_Columns.Append (Feature.Name);
+         end if;
+      end loop;
 
    end Set_Default_Target;
 
