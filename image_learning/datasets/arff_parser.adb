@@ -1,5 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets _arff_parser.py
 
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
@@ -23,24 +25,21 @@ package body ARFF_Parser is
       Include_Values : IL_Types.Integer_DL_List) return IL_Types.Integer_List;
 
    --  ------------------------------------------------------------------------
-   --  L210
+   --  L210 _liac_arff_parser
    procedure Arff_Parser
      (ARFF_Container : AR_Types.ARFF_Record;
-      Features_Dict  : AR_Types.Attribute_Dictionary_Map;
-      Data_Columns   : IL_Types.String_List;
       Target_Columns : IL_Types.String_List;
       Col_Slice_X    : IL_Types.Integer_DL_List;
       Col_Slice_Y    : IL_Types.Integer_DL_List;
       X              : out IL_Types.Float_List_2D;
       Y              : out IL_Types.Integer_List) is
+      use Ada.Containers;
       use AR_Types;
       use IL_Types;
       use Nominal_Data_2D_Package;
       use Nominal_Data_Package;
       use String_Package;
-      --           Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data";
-      Arff_Data_Row     : AR_Types.AR_Real_List;  --  list of columns
-      Data_Row          : Float_List;
+      Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data";
       Attributes        : constant Attribute_List :=
                             ARFF_Container.Header.Attributes;
       Attribute         : Attribute_Record;
@@ -81,6 +80,23 @@ package body ARFF_Parser is
          end loop;
          Next  (Target_Cursor);
       end loop;
+
+      if Is_Classification then
+         Assert (Nominal.Length = Target_Columns.Length, Routine_Name &
+                   "mix of nominal and non-nominal targets is not supported.");
+         Nominal :=  Nominal_Data.First_Element;
+         Nominal_Cursor := Nominal.First;
+         while Has_Element (Nominal_Cursor) loop
+            declare
+               Value : constant Nominal_Data_Record := Element (Nominal_Cursor);
+            begin
+               Assert (Value.Data_Kind = Nominal_Integer, Routine_Name &
+                         "only integer type is supported.");
+               Y.Append (Value.Integer_Data);
+            end;
+            Next (Nominal_Cursor);
+         end loop;
+      end if;
 
       --        for row in ARFF_Container.Data.First_Index ..
       --          ARFF_Container.Data.Last_Index loop
