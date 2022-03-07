@@ -23,11 +23,9 @@ package body Openml_Ada is
 
    --     function Get_Num_Samples (Qualities : Qualities_Map) return Integer;
    procedure Get_OML (File_Name : String;
-                      X         : out Float_List_2D;
-                      Y         : out Integer_List;
                       --                        X_Indices : out Integer_List;
                       --                        Y_Indices : out Integer_List;
-                      Bunch     : out Bunch_Data; X_Y_Only : Boolean);
+                      Bunch     : out Bunch_Data);
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
       Include_Columns : String_List)
@@ -35,10 +33,8 @@ package body Openml_Ada is
    procedure Process_Feature (Features_List : AR_Types.Attribute_List);
    procedure Save_OML
      (Save_File_Name        : String;
-      X                     : Float_List_2D;
-      Y                     : Integer_List;
       --        X_Indices, Y_Indices  : Integer_List;
-      Bunch                 : Bunch_Data; X_Y_Only : Boolean);
+      Bunch                 : Bunch_Data);
    procedure Set_Default_Target
      (Features_List  : in out AR_Types.Attribute_List;
       Target_Columns : out String_List);
@@ -75,10 +71,7 @@ package body Openml_Ada is
       Features_List  : AR_Types.Attribute_List;
       Data_Columns   : String_List;
       Target_Columns : in out String_List;
-      --        X              : out Float_List_2D;
-      --        Y              : out Integer_List;
       Bunch          : out Bunch_Data;
-      --        X_Y_Only       : Boolean := False;
       --        Sparse       : Boolean;
       As_Frame       : As_Frame_State := As_Frame_False) is
       --        Shape        : Shape_Data) is
@@ -195,13 +188,13 @@ package body Openml_Ada is
      (Dataset_File_Name : String;
       Save_File_Name    : String;
       Target_Columns    : in out String_List;
-      X                 : out Float_List_2D;
-      Y                 : out Integer_List;
+--        X                 : out Float_List_2D;
+--        Y                 : out Integer_List;
       --        X_Indices         : out Integer_List;
       --        Y_Indices         : out Integer_List;
       Bunch             : out Bunch_Data;
-      As_Frame          : in out As_Frame_State;
-      Return_X_Y        : Boolean := False) is
+      As_Frame          : in out As_Frame_State) is
+--        Return_X_Y        : Boolean := False) is
       use Ada.Directories;
       use Ada.Strings;
       use AR_Types;
@@ -224,7 +217,7 @@ package body Openml_Ada is
    begin
       Printing.Print_Strings (Routine_Name & "Target_Columns", Target_Columns);
       if Exists (Save_File_Name) then
-         Get_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
+         Get_OML (Save_File_Name, Bunch);
       else
          if Exists (Ada_File) then
             Put_Line (Routine_Name & "Reading data file " & Ada_File);
@@ -285,8 +278,11 @@ package body Openml_Ada is
          --              Y_Indices.Append (index);
          --           end loop;
 
+--           X := Bunch.Data;
+--           Y := Bunch.Target;
+
          if Save_File_Name'Length > 0 then
-            Save_OML (Save_File_Name, X, Y, Bunch, Return_X_Y);
+            Save_OML (Save_File_Name, Bunch);
          end if;
 
       end if;
@@ -379,11 +375,9 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Get_OML (File_Name : String;
-                      X         : out Float_List_2D;
-                      Y         : out Integer_List;
                       --                        X_Indices : out Integer_List;
                       --                        Y_Indices : out Integer_List;
-                      Bunch     : out Bunch_Data; X_Y_Only : Boolean) is
+                      Bunch     : out Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
       Routine_Name : constant String := "Openml_Ada.Get_OML ";
@@ -393,13 +387,9 @@ package body Openml_Ada is
       Put_Line (Routine_Name & "Reading OML file " & File_Name);
       Open (File_ID, In_File, File_Name);
       aStream := Stream (File_ID);
-      Float_List_2D'Read (aStream, X);
-      Integer_List'Read (aStream, Y);
       --        Integer_List'Read (aStream, X_Indices);
       --        Integer_List'Read (aStream, Y_Indices);
-      if not X_Y_Only then
-         Bunch_Data'Read (aStream, Bunch);
-      end if;
+      Bunch_Data'Read (aStream, Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
 
@@ -522,11 +512,9 @@ package body Openml_Ada is
    --  ------------------------------------------------------------------------
 
    procedure Save_OML (Save_File_Name : String;
-                       X              : Float_List_2D;
-                       Y              : Integer_List;
                        --                         X_Indices      : Integer_List;
                        --                         Y_Indices      : Integer_List;
-                       Bunch          : Bunch_Data; X_Y_Only : Boolean) is
+                       Bunch          : Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
       File_ID  : Stream_IO.File_Type;
@@ -534,13 +522,9 @@ package body Openml_Ada is
    begin
       Create (File_ID, Out_File, Save_File_Name);
       aStream := Stream (File_ID);
-      Float_List_2D'Write (aStream, X);
-      Integer_List'Write (aStream, Y);
       --        Integer_List'Write (aStream, X_Indices);
       --        Integer_List'Write (aStream, Y_Indices);
-      if not X_Y_Only then
-         Bunch_Data'Write (aStream, Bunch);
-      end if;
+      Bunch_Data'Write (aStream, Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
 

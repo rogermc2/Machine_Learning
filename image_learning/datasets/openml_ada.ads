@@ -35,13 +35,12 @@ package Openml_Ada is
       (Dataset_File_Name : String;
        Save_File_Name    : String;
        Target_Columns    : in out String_List;
-       X                 : out Float_List_2D;
-       Y                 : out Integer_List;
+--         X                 : out Float_List_2D;
+--         Y                 : out Integer_List;
 --         X_Indices         : out Integer_List;
 --         Y_Indices         : out Integer_List;
        Bunch             : out Bunch_Data;
-       As_Frame          : in out As_Frame_State;
-       Return_X_Y        : Boolean := False);
+       As_Frame          : in out As_Frame_State);
     function Valid_Data_Column_Names
       (Features_List  : AR_Types.Attribute_List;
        Target_Columns : String_List) return String_List;
