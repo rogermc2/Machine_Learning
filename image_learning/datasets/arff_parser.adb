@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/datasets _arff_parser.py
 
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Load_ARFF_Data;
@@ -8,6 +9,12 @@ with Load_ARFF_Data;
 
 package body ARFF_Parser is
 
+   procedure Convert_Arff_Data
+     (ARFF_Container : AR_Types.ARFF_Record;
+      Col_Slice_X    : IL_Types.Integer_DL_List;
+      Col_Slice_Y    : IL_Types.Integer_DL_List;
+      X              : out IL_Types.Float_List_2D;
+      Y              : out IL_Types.Integer_List);
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
       Include_Columns : IL_Types.Integer_DL_List) return IL_Types.Float_List_2D;
@@ -28,23 +35,63 @@ package body ARFF_Parser is
       Y              : out IL_Types.Integer_List) is
       use AR_Types;
       use IL_Types;
-      --           Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data";
-      Arff_Data_Row   : AR_Types.AR_Real_List;  --  list of columns
-      Data_Row        : Float_List;
-      Attributes      : constant Attribute_List :=
+      use Nominal_Data_2D_Package;
+      use Nominal_Data_Package;
+      use String_Package;
+      --           Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data";
+      Arff_Data_Row     : AR_Types.AR_Real_List;  --  list of columns
+      Data_Row          : Float_List;
+      Attributes        : constant Attribute_List :=
                             ARFF_Container.Header.Attributes;
+      Attribute         : Attribute_Record;
+      Nominal_Data      : Nominal_Data_2D_List;
+      Target_Cursor     : String_Package.Cursor := Target_Columns.First;
+      Col_Name          : Unbounded_String;
+      Nominal_2D_Cursor : Nominal_Data_2D_Package.Cursor;
+      Nominal           : Nominal_Data_List;
+      Nominal_Cursor    : Nominal_Data_Package.Cursor;
+      Is_Classification : Boolean := False;
    begin
-        Convert_Arff_Data (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y);
---        for row in ARFF_Container.Data.First_Index ..
---          ARFF_Container.Data.Last_Index loop
---           Arff_Data_Row := ARFF_Container.Data.Element (row);
---           for index in ARFF_Container.Data.First_Index ..
---             ARFF_Container.Data.Last_Index loop
---              Data_Row (index) := Arff_Data_Row (index);
---           end loop;
---           X.Append (Data_Row);
---           Y.Append (ARFF_Container.Target.Element (row));
---        end loop;
+      Convert_Arff_Data (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y);
+
+      for v in Attributes.First_Index .. Attributes.Last_Index loop
+         Attribute := Attributes.Element (v);
+         if not Attribute.Nominal_Data.Is_Empty then
+            Nominal_Data.Append (Attribute.Nominal_Data);
+         end if;
+      end loop;
+
+      while Has_Element (Target_Cursor) loop
+         Col_Name := Element (Target_Cursor);
+         Nominal_2D_Cursor := Nominal_Data.First;
+         while Has_Element (Nominal_2D_Cursor) loop
+            Nominal := Element (Nominal_2D_Cursor);
+            Nominal_Cursor := Nominal.First;
+            while Has_Element (Nominal_Cursor) loop
+               declare
+                  Nom_Record : constant Nominal_Data_Record :=
+                                 Element (Nominal_Cursor);
+               begin
+                  Is_Classification := Is_Classification or else
+                    Nom_Record.UB_String_Data = Col_Name;
+               end;
+               Next  (Nominal_Cursor);
+            end loop;
+            Next  (Nominal_2D_Cursor);
+         end loop;
+         Next  (Target_Cursor);
+      end loop;
+
+      --        for row in ARFF_Container.Data.First_Index ..
+      --          ARFF_Container.Data.Last_Index loop
+      --           Arff_Data_Row := ARFF_Container.Data.Element (row);
+      --           for index in ARFF_Container.Data.First_Index ..
+      --             ARFF_Container.Data.Last_Index loop
+      --              Data_Row (index) := Arff_Data_Row (index);
+      --           end loop;
+      --           X.Append (Data_Row);
+      --           Y.Append (ARFF_Container.Target.Element (row));
+      --        end loop;
 
    end Arff_Parser;
 

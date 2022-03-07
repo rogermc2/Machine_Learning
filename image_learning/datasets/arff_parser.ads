@@ -14,12 +14,6 @@ package ARFF_Parser is
       Col_Slice_Y    : IL_Types.Integer_DL_List;
       X              : out IL_Types.Float_List_2D;
       Y              : out IL_Types.Integer_List);
-   procedure Convert_Arff_Data
-     (ARFF_Container : AR_Types.ARFF_Record;
-      Col_Slice_X    : IL_Types.Integer_DL_List;
-      Col_Slice_Y    : IL_Types.Integer_DL_List;
-      X              : out IL_Types.Float_List_2D;
-      Y              : out IL_Types.Integer_List);
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
       Include_Columns : IL_Types.String_List) return AR_Types.Nominal_Data_List;

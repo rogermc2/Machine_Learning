@@ -36,6 +36,11 @@ package AR_Types is
      Ada.Containers.Indefinite_Doubly_Linked_Lists (Nominal_Data_Record);
    subtype Nominal_Data_List is Nominal_Data_Package.List;
 
+   use Nominal_Data_Package;
+   package Nominal_Data_2D_Package is new
+     Ada.Containers.Indefinite_Doubly_Linked_Lists (Nominal_Data_List);
+   subtype Nominal_Data_2D_List is Nominal_Data_2D_Package.List;
+
    type Attribute_Record is record
       Name          : Unbounded_String;
       Data_Kind     : ARFF_Data_Type;
