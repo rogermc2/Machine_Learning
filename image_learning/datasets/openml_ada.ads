@@ -9,11 +9,13 @@ package Openml_Ada is
     type As_Frame_State is (As_Frame_False, As_Frame_True, As_Frame_Auto);
     --     subtype Qualities_Map is JSON_Array;
 
-    type Bunch_Data is record
-        As_Frame      : As_Frame_State := As_Frame_False;
-        Categories    : AR_Types.Nominal_Data_List;
-        Feature_Names : String_List;
-        Target_Names  : String_List;
+   type Bunch_Data is record
+      Data          : IL_Types.Float_List_2D;
+      Target        : IL_Types.Integer_List;
+      As_Frame      : As_Frame_State := As_Frame_False;
+      Categories    : AR_Types.Nominal_Data_List;
+      Feature_Names : String_List;
+      Target_Names  : String_List;
     end record;
 
     type Shape_Data is record
@@ -26,10 +28,7 @@ package Openml_Ada is
        Features_List  : AR_Types.Attribute_List;
        Data_Columns   : String_List;
        Target_Columns : in out String_List;
---         X              : out Float_List_2D;
---         Y              : out Integer_List;
        Bunch          : out Bunch_Data;
---         X_Y_Only       : Boolean := False;
        --        Sparse       : Boolean;
        As_Frame       : As_Frame_State := As_Frame_False);
     procedure Fetch_Openml

@@ -7,8 +7,6 @@ package ARFF_Parser is
 
    procedure Arff_Parser
      (ARFF_Container : AR_Types.ARFF_Record;
-      Features_Dict  : AR_Types.Attribute_Dictionary_Map;
-      Data_Columns   : IL_Types.String_List;
       Target_Columns : IL_Types.String_List;
       Col_Slice_X    : IL_Types.Integer_DL_List;
       Col_Slice_Y    : IL_Types.Integer_DL_List;

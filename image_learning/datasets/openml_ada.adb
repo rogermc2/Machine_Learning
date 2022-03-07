@@ -171,11 +171,13 @@ package body Openml_Ada is
       --        end if;
 
       --  L522
-      ARFF_Parser.Arff_Parser (ARFF_Container, Features_Dict, Data_Columns,
-                               Target_Columns, Col_Slice_X, Col_Slice_Y, X, Y);
-
+      ARFF_Parser.Arff_Parser (ARFF_Container, Target_Columns, Col_Slice_X,
+                               Col_Slice_Y, X, Y);
       Nominal_Attributes :=
         Parse_Nominal_Data (ARFF_Container, Target_Columns);
+
+      Bunch.Data := X;
+      Bunch.Target := Y;
       Bunch.As_Frame := As_Frame;
       Bunch.Categories := Nominal_Attributes;
       Bunch.Feature_Names := Data_Columns;
