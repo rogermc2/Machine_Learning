@@ -36,18 +36,15 @@ package body ARFF_Parser is
       use Ada.Containers;
       use AR_Types;
       use IL_Types;
-      use Nominal_Data_2D_Package;
       use Nominal_Data_Package;
       use String_Package;
-      Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data";
+      Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data ";
       Attributes        : constant Attribute_List :=
                             ARFF_Container.Header.Attributes;
       Attribute         : Attribute_Record;
-      Nominal_Data      : Nominal_Data_2D_List;
+      Nom_Attributes    : Attribute_List;
       Target_Cursor     : String_Package.Cursor := Target_Columns.First;
       Col_Name          : Unbounded_String;
-      Nominal_2D_Cursor : Nominal_Data_2D_Package.Cursor;
-      Nominal           : Nominal_Data_List;
       Nominal_Cursor    : Nominal_Data_Package.Cursor;
       Is_Classification : Boolean := False;
    begin
@@ -56,45 +53,36 @@ package body ARFF_Parser is
       for v in Attributes.First_Index .. Attributes.Last_Index loop
          Attribute := Attributes.Element (v);
          if not Attribute.Nominal_Data.Is_Empty then
-            Nominal_Data.Append (Attribute.Nominal_Data);
+            Nom_Attributes.Append (Attribute);
          end if;
       end loop;
 
       while Has_Element (Target_Cursor) loop
          Col_Name := Element (Target_Cursor);
-         Nominal_2D_Cursor := Nominal_Data.First;
-         while Has_Element (Nominal_2D_Cursor) loop
-            Nominal := Element (Nominal_2D_Cursor);
-            Nominal_Cursor := Nominal.First;
-            while Has_Element (Nominal_Cursor) loop
-               declare
-                  Nom_Record : constant Nominal_Data_Record :=
-                                 Element (Nominal_Cursor);
-               begin
-                  Is_Classification := Is_Classification or else
-                    Nom_Record.UB_String_Data = Col_Name;
-               end;
-               Next  (Nominal_Cursor);
-            end loop;
-            Next  (Nominal_2D_Cursor);
+         for v in Nom_Attributes.First_Index .. Nom_Attributes.Last_Index loop
+            Attribute := Nom_Attributes.Element (v);
+            Is_Classification := Is_Classification or else
+              Attribute.Name = Col_Name;
          end loop;
          Next  (Target_Cursor);
       end loop;
 
       if Is_Classification then
-         Assert (Nominal.Length = Target_Columns.Length, Routine_Name &
+         Assert (Nom_Attributes.Length = Target_Columns.Length, Routine_Name &
                    "mix of nominal and non-nominal targets is not supported.");
-         Nominal :=  Nominal_Data.First_Element;
-         Nominal_Cursor := Nominal.First;
-         while Has_Element (Nominal_Cursor) loop
-            declare
-               Value : constant Nominal_Data_Record := Element (Nominal_Cursor);
-            begin
-               Assert (Value.Data_Kind = Nominal_Integer, Routine_Name &
-                         "only integer type is supported.");
-               Y.Append (Value.Integer_Data);
-            end;
-            Next (Nominal_Cursor);
+         for v in Nom_Attributes.First_Index .. Nom_Attributes.Last_Index loop
+            Attribute := Nom_Attributes.Element (v);
+            Nominal_Cursor := Attribute.Nominal_Data.First;
+            while Has_Element (Nominal_Cursor) loop
+               declare
+                  Value : constant Nominal_Data_Record := Element (Nominal_Cursor);
+               begin
+                  Assert (Value.Data_Kind = Nominal_Integer, Routine_Name &
+                            "only integer type is supported.");
+                  Y.Append (Value.Integer_Data);
+               end;
+               Next (Nominal_Cursor);
+            end loop;
          end loop;
       end if;
 
