@@ -170,18 +170,6 @@ package body Openml_Ada is
       --           null;
       --        end if;
 
-      --  L325
-      --        Put_Line (Routine_Name & "Convert_Arff_Data");
-      --  L278
-      --        X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
-      --        Y := Split_Columns (ARFF_Container.Target, Col_Slice_Y);
-      --        Printing.Print_Integer_List (Routine_Name & "Y", Y);
-
-      --  L522
-      --        Load_ARFF_Response (X, Y, Frame, Nominal_Attributes);
-      --        Load_ARFF_Response (Output_Arrays_Type, Features_Dict, X, Y,
-      --                            Col_Slice_X, Col_Slice_Y);
-
       --  L522
       ARFF_Parser.Arff_Parser (ARFF_Container, Features_Dict, Data_Columns,
                                Target_Columns, Col_Slice_X, Col_Slice_Y, X, Y);
