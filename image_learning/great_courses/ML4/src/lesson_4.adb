@@ -34,8 +34,8 @@ procedure Lesson_4 is
    Bunch           : Openml_Ada.Bunch_Data;
    X               : Float_List_2D;  --  rows of columns of values
    Y               : Integer_List;
-   X_Indices       : Integer_List;
-   Y_Indices       : Integer_List;
+--     X_Indices       : Integer_List;
+--     Y_Indices       : Integer_List;
    Num_Samples     : Positive;
    Train_X         : Float_List_2D;
    Train_Y         : Integer_List;
@@ -51,13 +51,13 @@ procedure Lesson_4 is
 
 begin
    Put_Line (Routine_Name);
-   if not Get_State (Dataset_Name, Return_X_Y, X, Y,
-                     Train_X, Train_Y, Test_X, Test_Y, Bunch) then
+   if not Get_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y, Bunch) then
+      X := Bunch.Data;
+      Y := Bunch.Target;
       Num_Samples := Positive (X.Length);
 
       Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
       Assert (X.Length > 0, Routine_Name & "X is empty.");
-      Assert (Y.Length > 0, Routine_Name & "Y is empty.");
 
       Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
                 "Y length" & Count_Type'Image (Y.Length) &

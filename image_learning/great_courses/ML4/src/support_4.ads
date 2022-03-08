@@ -7,9 +7,7 @@ with Tree;
 package Support_4 is
 
    function Get_State
-     (Dataset_Name : String; Return_X_Y : Boolean;
-      X            : out Float_List_2D;
-      Y            : out Integer_List;
+     (Dataset_Name : String;
 --        X_Indices    : out Integer_List;
 --        Y_Indices    : out Integer_List;
       Train_X      : out Float_List_2D;

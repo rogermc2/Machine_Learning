@@ -16,7 +16,7 @@ package Openml_Ada is
       Categories    : AR_Types.Nominal_Data_List;
       Feature_Names : String_List;
       Target_Names  : String_List;
-    end record;
+   end record;
 
     type Shape_Data is record
         Num_Samples     : Natural := 0;

@@ -6,9 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Support_4 is
 
    function Get_State
-     (Dataset_Name : String; Return_X_Y : Boolean;
-      X            : out Float_List_2D;
-      Y            : out Integer_List;
+     (Dataset_Name : String;
 --        X_Indices    : out Integer_List;
 --        Y_Indices    : out Integer_List;
       Train_X      : out Float_List_2D;
@@ -21,14 +19,15 @@ package body Support_4 is
       use Ada.Streams;
       use Stream_IO;
       use String_Package;
-      Routine_Name : constant String := "Support_4.Get_State ";
-      Dataset_File : constant String := "../" & Dataset_Name & ".arff";
-      Save_File    : constant String := Dataset_Name & ".oml";
-      State_File   : constant String := Dataset_Name & ".sta";
-      Has_Data     : constant Boolean := Exists (State_File);
-      File_ID      : Stream_IO.File_Type;
-      aStream      : Stream_Access;
-      As_Frame     : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
+      Routine_Name   : constant String := "Support_4.Get_State ";
+      Dataset_File   : constant String := "../" & Dataset_Name & ".arff";
+      Save_File      : constant String := Dataset_Name & ".oml";
+      State_File     : constant String := Dataset_Name & ".sta";
+      Has_Data       : constant Boolean := Exists (State_File);
+      Target_Columns : String_List;
+      File_ID        : Stream_IO.File_Type;
+      aStream        : Stream_Access;
+      As_Frame       : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
    begin
       if Has_Data then
          Put_Line (Routine_Name & "restoring state");
@@ -47,14 +46,11 @@ package body Support_4 is
       else
          Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
                                   Save_File_Name    => Save_File,
-                                  Target_Column     => Empty_List,
-                                  X                 => X,
-                                  Y                 => Y,
+                                  Target_Columns     => Target_Columns,
 --                                    X_Indices         => X_Indices,
 --                                    Y_Indices         => Y_Indices,
                                   Bunch             => Bunch,
-                                  As_Frame          => As_Frame,
-                                  Return_X_Y        => Return_X_Y);
+                                  As_Frame          => As_Frame);
       end if;
 
       return Has_Data;
