@@ -38,7 +38,7 @@ package body ARFF_Parser is
       use IL_Types;
       use Nominal_Data_Package;
       use String_Package;
-      Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data ";
+      Routine_Name      : constant String := "ARFF_Parser.Arff_Parser ";
       Attributes        : constant Attribute_List :=
                             ARFF_Container.Header.Attributes;
       Attribute         : Attribute_Record;
@@ -49,6 +49,8 @@ package body ARFF_Parser is
       Is_Classification : Boolean := False;
    begin
       Convert_Arff_Data (ARFF_Container, Col_Slice_X, Col_Slice_Y, X, Y);
+--        Put_Line (Routine_Name & "X length: " & Count_Type'Image (X.Length));
+--        Put_Line (Routine_Name & "Y length: " & Count_Type'Image (Y.Length));
 
       for v in Attributes.First_Index .. Attributes.Last_Index loop
          Attribute := Attributes.Element (v);
@@ -79,23 +81,12 @@ package body ARFF_Parser is
                begin
                   Assert (Value.Data_Kind = Nominal_Integer, Routine_Name &
                             "only integer type is supported.");
-                  Y.Append (Value.Integer_Data);
+--                    Y.Append (Value.Integer_Data);
                end;
                Next (Nominal_Cursor);
             end loop;
          end loop;
       end if;
-
-      --        for row in ARFF_Container.Data.First_Index ..
-      --          ARFF_Container.Data.Last_Index loop
-      --           Arff_Data_Row := ARFF_Container.Data.Element (row);
-      --           for index in ARFF_Container.Data.First_Index ..
-      --             ARFF_Container.Data.Last_Index loop
-      --              Data_Row (index) := Arff_Data_Row (index);
-      --           end loop;
-      --           X.Append (Data_Row);
-      --           Y.Append (ARFF_Container.Target.Element (row));
-      --        end loop;
 
    end Arff_Parser;
 
@@ -107,35 +98,12 @@ package body ARFF_Parser is
       Col_Slice_Y    : IL_Types.Integer_DL_List;
       X              : out IL_Types.Float_List_2D;
       Y              : out IL_Types.Integer_List) is
-      --           Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data";
+--        Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data ";
    begin
       X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
       Y := Split_Columns (ARFF_Container.Target, Col_Slice_Y);
 
    end Convert_Arff_Data;
-
-   --  ------------------------------------------------------------------------
-   --  L151
-   --     function Convert_Arff_Data_Dataframe
-   --       (ARFF_Container : ARFF.Arff_Container_Type; Features : JSON_Value)
-   --        return JSON_Value is
-   --        Routine_Name    : constant String :=
-   --                         "ARFF_Parser.Convert_Arff_Data_Dataframe";
-   --        Description     : constant JSON_Array :=
-   --                            Arff_Container.Get ("description");
-   --        Relation        : constant String :=
-   --                            Arff_Container.Get ("relation");
-   --        Attributes      : constant JSON_Array :=
-   --                            Arff_Container.Get ("attributes");
-   --        ARFF_Data       : constant JSON_Array :=
-   --                            Arff_Container.Get ("data");
-   --        First_Row       : constant JSON_Value :=
-   --                            Array_Element (ARFF_Data, Array_First (ARFF_Data));
-   --        Result          : JSON_Value;
-   --     begin
-   --        return Result;
-   --
-   --     end Convert_Arff_Data_Dataframe;
 
    --  ------------------------------------------------------------------------
 
@@ -220,17 +188,19 @@ package body ARFF_Parser is
       use IL_Types;
       use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
-      Data_New      : Integer_List;
-      Include_Curs  : Integer_DLL_Package.Cursor;
+      Data_New        : Integer_List;
+      Include_Curs    : Integer_DLL_Package.Cursor;
       Arff_Target_Row : AR_Types.AR_Integer_List;  --  list of columns
-      New_Row       : Integer_List;
+      New_Row         : Integer_List;
    begin
       for row in Arff_Target.First_Index .. Arff_Target.Last_Index loop
          New_Row.Clear;
          Arff_Target_Row := Arff_Target.Element (row);
          Include_Curs := Include_Columns.First;
          while Has_Element (Include_Curs) loop
-            New_Row.Append (Arff_Target_Row.Element (Element (Include_Curs)));
+            New_Row.Append
+              (Arff_Target_Row.Element
+                (Element (Include_Curs) - Include_Columns.First_Element + 1));
             Next (Include_Curs);
          end loop;
          Data_New.Append (New_Row);

@@ -133,7 +133,7 @@ package body OML_File_Tests is
       Put_Line (Routine_Name & "Y length: " &
                   Count_Type'Image (Bunch.Target.Length));
 --        Printing.Print_Float_Lists_2D (Routine_Name & "X", Bunch.Data);
---        Printing.Print_Integer_List (Routine_Name & "Y", Bunch.Target);
+      Printing.Print_Integer_List (Routine_Name & "Y", Bunch.Target, 1, 20);
       if Bunch.Data.Length = Bunch.Target.Length then
          Put_Line (Routine_Name & "completed");
       else

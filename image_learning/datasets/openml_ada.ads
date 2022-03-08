@@ -24,13 +24,13 @@ package Openml_Ada is
     end record;
 
     procedure Download_Data_To_Bunch
-      (ARFF_Container : AR_Types.ARFF_Record;
-       Features_List  : AR_Types.Attribute_List;
-       Data_Columns   : String_List;
-       Target_Columns : in out String_List;
-       Bunch          : out Bunch_Data;
+      (ARFF_Container      : AR_Types.ARFF_Record;
+       Features_List       : AR_Types.Attribute_List;
+       Data_Column_Names   : String_List;
+       Target_Column_Names : in out String_List;
+       Bunch               : out Bunch_Data;
        --        Sparse       : Boolean;
-       As_Frame       : As_Frame_State := As_Frame_False);
+       As_Frame            : As_Frame_State := As_Frame_False);
     procedure Fetch_Openml
       (Dataset_File_Name : String;
        Save_File_Name    : String;
