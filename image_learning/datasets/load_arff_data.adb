@@ -444,14 +444,15 @@ package body Load_ARFF_Data is
       --  L461 decode rows
       while not End_Of_File (File_ID) loop
          aLine := Get_Line (File_ID);
+         Target_List.Clear;
          if Length (aLine) > 0 and then Element (aLine, 1) /= '%' then
             Parse_Values (To_String (aLine), Values);
             Data.Data.Append (Decode_Dense_Values
                               (Values, Attributes, Target_Value));
             Target_List.Append (Target_Value);
+            Data.Target.Append (Target_List);
          end if;
       end loop;
-      Data.Target.Append (Target_List);
 
    end Load_Data;
 

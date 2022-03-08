@@ -190,24 +190,39 @@ package body Load_ARFF_Data.ARFF_Printing is
    procedure Print_Target (Data : ARFF_Record; Start : Positive := 1;
                            Last : Positive := 10) is
       use AR_Integer_Package;
-      Target_List : constant AR_Integer_List := Data.Target;
-      Target_Curs : AR_Integer_Package.Cursor := Target_List.First;
-      Count       : Natural := Start - 1;
+      use AR_Integer_Package_2D;
+      Target_List_2D : constant AR_Integer_List_2D := Data.Target;
+      List_Curs    : AR_Integer_Package_2D.Cursor := Target_List_2D.First;
+      Target_List    : AR_Integer_List;
+      Target_Curs    : AR_Integer_Package.Cursor;
+      Count        : Natural := Start - 1;
+      Count2       : Natural := 0;
    begin
       New_Line;
-      Put_Line ("Dataset target:");
-      Put_Line ("Target length:" & Integer'Image (Integer (Target_List.Length)));
-
-      while Has_Element (Target_Curs) loop
+      Put_Line ("Dataset data:");
+      Put_Line ("Target length:" &
+                  Integer'Image (Integer (Target_List_2D.Length)));
+      while Has_Element (List_Curs) and Count <= Last loop
          Count := Count + 1;
-         Put (Integer'Image (Element (Target_Curs)));
-         if Count <= Last then
-            Put (" ");
-         end if;
-         Next (Target_Curs);
-      end loop;
-      New_Line;
+         Target_List := Element (List_Curs);
 
+         if Count >= Start and then Count <= Last then
+            Put_Line ("Target row:" & Integer'Image (Count));
+            Count2 := 0;
+            Target_Curs := Target_List.First;
+            while Has_Element (Target_Curs) loop
+               Count2 := Count2 + 1;
+               Put (Integer'Image (Element (Target_Curs)));
+               if Count2 <= Last then
+                  Put (", ");
+               end if;
+               Next (Target_Curs);
+            end loop;
+            New_Line;
+         end if;
+         New_Line;
+         Next (List_Curs);
+      end loop;
    end Print_Target;
 
    --  -------------------------------------------------------------------------
