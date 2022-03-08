@@ -113,9 +113,10 @@ package body Criterion is
       Routine_Name    : constant String :=
                             "Criterion.Initialize_Node_Criterion ";
       Sum_Total_K     : Float_List;
-      Y_I_Index       : Positive;  --  Class index
-      Y_I             : Natural;  --  Class
-      --        Y_Ik            : Natural; --  Class.output
+      Sample_I        : Positive;
+--        Y_I_Index       : Positive;  --  Class index
+      Y_I             : Natural;   --  Class
+      C               : Positive;
       Weight          : Float := 1.0;
    begin
       --  L302
@@ -132,50 +133,38 @@ package body Criterion is
       --        Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
       --                  " Criteria.Num_Classes is empty");
       --  L321 Initialize Sum_Total
-      --  Sum_Total dimensions: num outputs x num classes
-      --        for row in 1 .. Num_Outputs loop
---        Sum_Total_K.Clear;
---        for c in Criteria.Num_Classes.First_Index ..
---          Criteria.Num_Classes.Last_Index loop
+      --  Sum_Total dimensions: num classes
       for c in 1 .. Criteria.Num_Classes loop
          Sum_Total_K.Append (0.0);
       end loop;
-      Criteria.Sum_Total := Sum_Total_K;
---        Criteria.Sum_Total.Append (Sum_Total_K);
-      --        end loop;
         Put_Line (Routine_Name & "Num_Classes " &
                     Integer'Image (Criteria.Num_Classes));
-        Printing.Print_Float_List (Routine_Name & "Sum_Total",
-                                     Criteria.Sum_Total);
 --          Printing.Print_Natural_List (Routine_Name & "Sample_Indices",
 --                                         Sample_Indices);
       --  L325
       for p in Start_Row .. Stop_Row loop
-         Y_I_Index := Sample_Indices.Element (p);
-         Put_Line (Routine_Name & "Y_I_Index " & Integer'Image (Y_I_Index));
+         Sample_I := Sample_Indices.Element (p);
+         Put_Line (Routine_Name & "Sample_I " & Integer'Image (Sample_I));
          --  Weight is originally set to be 1.0, meaning that if no
          --  sample weights are given the default weight of each sample is 1.0
          if not Sample_Weight.Is_Empty then
-            Weight := Sample_Weight.Element (Y_I_Index);
+            Weight := Sample_Weight.Element (Sample_I);
          end if;
 
-         --  L333 Count weighted class frequency for each target
+         --  L333 Count weighted class frequency
          --  Y_I is Class
-         Y_I := Y_Encoded.Element (Y_I_Index);
+         Y_I := Y_Encoded.Element (Sample_I);
          Put_Line (Routine_Name & "Y_I " & Integer'Image (Y_I));
-         --           for k in 1 .. Num_Outputs loop
+
          Sum_Total_K := Criteria.Sum_Total;
-         --  L339 c = Y_Ik is an index into Y (output k) class i
-         --           Y_Ik := Y.Element (k);   --  output.class
+         --  L335
+         C := Y_Encoded.Element (Sample_I);   --  class
          --  sum_total[k * self.sum_stride + c] += w
-         --  Add Weight to Y (output k, class Y_I)
-         Sum_Total_K.Replace_Element
-                    (Y_I_Index, Sum_Total_K.Element (Y_I_Index) + Weight);
+         --  Add Y (Sample_I) to Weight
+         Sum_Total_K.Replace_Element (C, Sum_Total_K.Element (C) + Weight);
          Printing.Print_Float_List (Routine_Name & "Sum_Total_K", Sum_Total_K);
          Criteria.Sum_Total.Replace_Element
-              (p, Sum_Total_K.Element (Y_I_Index));
-         --           end loop;
---           Criteria.Sum_Total := Sum_Total_K;
+              (p, Sum_Total_K.Element (Sample_I));
 
          Criteria.Num_Weighted_Node_Samples :=
            Criteria.Num_Weighted_Node_Samples + Weight;
