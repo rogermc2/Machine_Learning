@@ -64,6 +64,11 @@ package AR_Types is
      Ada.Containers.Vectors (Positive, Integer);
    subtype AR_Integer_List is AR_Integer_Package.Vector;
 
+   use AR_Integer_Package;
+   package AR_Integer_Package_2D is new
+     Ada.Containers.Vectors (Positive, AR_Integer_List);
+   subtype AR_Integer_List_2D is AR_Integer_Package_2D.Vector;
+
    package AR_Real_Package is new
      Ada.Containers.Vectors (Positive, Float);
    subtype AR_Real_List is AR_Real_Package.Vector;
@@ -97,7 +102,7 @@ package AR_Types is
    type ARFF_Record is record
       Header  : ARFF_Header_Record;
       Data    : AR_Real_List_2D;    --  'data': []
-      Target  : AR_Integer_List;
+      Target  : AR_Integer_List_2D;
    end record;
 
 end AR_Types;

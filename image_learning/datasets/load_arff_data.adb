@@ -431,6 +431,7 @@ package body Load_ARFF_Data is
       Routine_Name : constant String := "Load_ARFF_Data.Load_Data ";
       Attributes   : constant Attribute_List := Data.Header.Attributes;
       Values       : IL_Types.Indef_String_List;
+      Target_List  : AR_Integer_List;
       Target_Value : Integer;
    begin
       Put_Line (Routine_Name & "loading data");
@@ -447,9 +448,10 @@ package body Load_ARFF_Data is
             Parse_Values (To_String (aLine), Values);
             Data.Data.Append (Decode_Dense_Values
                               (Values, Attributes, Target_Value));
-            Data.Target.Append (Target_Value);
+            Target_List.Append (Target_Value);
          end if;
       end loop;
+      Data.Target.Append (Target_List);
 
    end Load_Data;
 
