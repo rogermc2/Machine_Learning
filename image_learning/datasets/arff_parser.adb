@@ -21,8 +21,8 @@ package body ARFF_Parser is
      (Arff_Data       : AR_Types.AR_Real_List_2D;
       Include_Columns : IL_Types.Integer_DL_List) return IL_Types.Float_List_2D;
    function Split_Columns
-     (Arff_Target    : AR_Types.AR_Integer_List;
-      Include_Values : IL_Types.Integer_DL_List) return IL_Types.Integer_List;
+     (Arff_Target     : AR_Types.AR_Integer_List_2D;
+      Include_Columns : IL_Types.Integer_DL_List) return IL_Types.Integer_List;
 
    --  ------------------------------------------------------------------------
    --  L210 _liac_arff_parser
@@ -214,24 +214,26 @@ package body ARFF_Parser is
    --  ------------------------------------------------------------------------
    --  L18
    function Split_Columns
-     (Arff_Target    : AR_Types.AR_Integer_List;
-      Include_Values : IL_Types.Integer_DL_List)
+     (Arff_Target     : AR_Types.AR_Integer_List_2D;
+      Include_Columns : IL_Types.Integer_DL_List)
       return IL_Types.Integer_List is
       use IL_Types;
       use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Integer_List;
       Include_Curs  : Integer_DLL_Package.Cursor;
+      Arff_Target_Row : AR_Types.AR_Integer_List;  --  list of columns
       New_Row       : Integer_List;
    begin
       for row in Arff_Target.First_Index .. Arff_Target.Last_Index loop
          New_Row.Clear;
-         Include_Curs := Include_Values.First;
+         Arff_Target_Row := Arff_Target.Element (row);
+         Include_Curs := Include_Columns.First;
          while Has_Element (Include_Curs) loop
-            Data_New.Append (Arff_Target.Element (Element (Include_Curs)));
-            Next  (Include_Curs);
+            New_Row.Append (Arff_Target_Row.Element (Element (Include_Curs)));
+            Next (Include_Curs);
          end loop;
-
+         Data_New.Append (New_Row);
       end loop;
 
       return Data_New;
