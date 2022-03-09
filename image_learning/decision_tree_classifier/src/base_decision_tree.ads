@@ -114,7 +114,7 @@ package Base_Decision_Tree is
    procedure Base_Fit
      (aClassifier    : in out Classifier;
       X              : Float_List_2D;
-      Y_Orig         : Integer_List;
+      Y              : Integer_List;
       Sample_Weights : out Weights.Weight_List);
    procedure C_Init
      (aClassifier              : in out Classifier;

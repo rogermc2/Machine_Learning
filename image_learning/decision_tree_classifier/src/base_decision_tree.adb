@@ -2,7 +2,7 @@
 --  DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Depth_First_Builder;
 with Best_First_Builder;
@@ -22,7 +22,7 @@ package body Base_Decision_Tree is
       Sample_Weights    : in out Float_List);
    procedure Classification_Part
      (aClassifier            : in out Classifier;
-      Y_Orig                 : Integer_List;
+      Y                      : Integer_List;
       Y_Encoded              : out Natural_List;
       Classes                : out Integer_List;
       Expanded_Class_Weights : in out Float_List);
@@ -43,7 +43,7 @@ package body Base_Decision_Tree is
    procedure Base_Fit
      (aClassifier    : in out Classifier;
       X              : Float_List_2D;
-      Y_Orig         : Integer_List;
+      Y              : Integer_List;
       Sample_Weights : out Weights.Weight_List) is
       use Ada.Containers;
       use Estimator;
@@ -60,20 +60,20 @@ package body Base_Decision_Tree is
       Sum_Sample_Weight     : Float := 0.0;
    begin
       Assert (not X.Is_Empty, Routine_Name & ", X is empty");
-      Assert (not Y_Orig.Is_Empty, Routine_Name & ", Y is empty");
+      Assert (not Y.Is_Empty, Routine_Name & ", Y is empty");
       if not Sample_Weights.Is_Empty then
          Assert (Sample_Weights.Length = X.Length, Routine_Name &
                    " Sample_Weights must be the same size as X.");
       end if;
 
-      --  X is 2D list num samples x num features Y_Orig is 2D list num classes
+      --  X is 2D list num samples x num features Y is 2D list num classes
       --  x num outputs L207 Generates Y_Encoded and Classes
       if aClassifier.Estimator_Kind = Classifier_Estimator then
-         Classification_Part (aClassifier, Y_Orig, Y_Encoded,
+         Classification_Part (aClassifier, Y, Y_Encoded,
                               Classes, Expanded_Class_Weight);
       end if;
-      Put_Line (Routine_Name & "L189 Classes length: " &
-                Integer'Image (Integer (Classes.Length)));
+--        Put_Line (Routine_Name & "L189 Classes length: " &
+--                  Integer'Image (Integer (Classes.Length)));
 
       --  L189
       aClassifier.Attributes.Num_Features :=
@@ -84,8 +84,8 @@ package body Base_Decision_Tree is
                        Sample_Weights);
       --  Base_Fit_Checks ends at L350
 
-      Put_Line (Routine_Name & "Num_Classes " &
-                Integer'Image (aClassifier.Attributes.Decision_Tree.Num_Classes));
+--        Put_Line (Routine_Name & "Num_Classes " &
+--                  Integer'Image (aClassifier.Attributes.Decision_Tree.Num_Classes));
       Node_Splitter.C_Init
         (aClassifier.Parameters.Splitter,
          Tree.Index_Range (aClassifier.Attributes.Max_Features),
@@ -140,7 +140,6 @@ package body Base_Decision_Tree is
       Tree_Build.Init_Builder (Builder, aClassifier.Parameters.Max_Leaf_Nodes,
                                aClassifier.Parameters.Splitter);
 
-      Put_Line (Routine_Name & "L420");
       --  L420
       case Builder.Tree_Kind is
          when Tree_Build.Depth_First_Tree =>
@@ -151,7 +150,6 @@ package body Base_Decision_Tree is
               (Builder, aClassifier.Attributes.Decision_Tree);
       end case;
 
-      Put_Line (Routine_Name & "L426");
       --  L426
       Prune_Tree (aClassifier);
 
@@ -327,62 +325,31 @@ package body Base_Decision_Tree is
    --  based on L200 of _classes.py BasesDecisionTree.Fit
    procedure Classification_Part
      (aClassifier             : in out Classifier;
-      Y_Orig                  : Integer_List;
+      Y                       : Integer_List;
       Y_Encoded               : out Natural_List;
       Classes                 : out Integer_List;
       Expanded_Class_Weights  : in out Weights.Weight_List) is
-      use Ada.Containers;
+--        use Ada.Containers;
       use Weights;
       Routine_Name : constant String :=
                        "Base_Decision_Tree.Classification_Part ";
-      --        Num_Outputs  : constant Count_Type := 1;
-      --        Y_Row        : Integer;
-      --        Yk_Row       : Integer;
-      YE_Row       : Natural;
-      --        Column       : Natural;
-      Inverse      : Natural_List;
---        Class_List   : Integer_List;
+      Y_Orig       : Integer_List;
    begin
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
-      Classes.Clear;
-      --        Y_Encoded.Set_Length (Y_Orig.Length);
-      for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
-         Y_Encoded.Append (class - Y_Orig.First_Index);
-         --           Column := op;
-         --           for op in Y_Orig.Element.First_Index
-         --             .. Y_Orig.Element.Last_Index loop
-         --              Column.Append (op);
-         --           end loop;
-         --           Y_Encoded.Replace_Element (class, Column);
-      end loop;
 
-      --  Classes is a list of integers
-      --        OP_Row.Set_Lengt (Num_Outputs);
-      --        for op in Y_Orig.Element (1).First_Index
-      --          .. Y_Orig.Element (1).Last_Index loop
-      --           Yk_Row.Clear;
-      --           for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
-      --              Y_Row := Y_Orig.Element (class);
-      --              Yk_Row.Append (Y_Row.Element (op));
-      --           end loop;
+      if aClassifier.Parameters.Class_Weight /= No_Weight then
+         Y_Orig := Y;
+      end if;
 
-      Classes := Encode_Utils.Unique (Y_Orig, Inverse);
-      --           aClassifier.Attributes.Decision_Tree.Num_Classes.Append
-      --             (Positive (Class_List.Length));
+      --  L217
+      Classes := Encode_Utils.Unique (Y, Y_Encoded);
+      aClassifier.Attributes.Classes := Classes;
       aClassifier.Attributes.Decision_Tree.Num_Classes :=
         Positive (Classes.Length);
-      Put_Line (Routine_Name & "Classes length: " &
-                Integer'Image (Integer (Classes.Length)));
 
-      for class in Y_Orig.First_Index .. Y_Orig.Last_Index loop
-         YE_Row := Y_Encoded.Element (class);
-         --              YE_Row.Replace_Element (op, Inverse.Element (class));
-         Y_Encoded.Replace_Element (class, YE_Row);
-      end loop;
---        Classes.Append (Class_List);
-
-      aClassifier.Attributes.Classes := Classes;
+--        Put_Line (Routine_Name & "Classes length: " &
+--                  Integer'Image (Integer (Classes.Length)));
 
       --  L222
       if aClassifier.Parameters.Class_Weight /= No_Weight then

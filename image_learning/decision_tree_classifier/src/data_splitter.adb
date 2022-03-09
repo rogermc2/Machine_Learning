@@ -2,7 +2,7 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
 --  with Printing;
@@ -78,8 +78,6 @@ package body Data_Splitter is
         Num_Samples       : constant Positive := Positive (X.Length);
         Default_Test_Size : constant Positive := Train_Size / 4;
         Shuffle_Data      : Base_Shuffle_Data;
---          X_Cursor          : Float_List_Package.Cursor := X.First;
---          Y_Cursor          : Integer_Package.Cursor := Y.First;
         X_Vec             : Float_List_2D;
         Y_Vec             : Integer_List;
         Train_Indices     : Integer_List;
@@ -92,15 +90,12 @@ package body Data_Splitter is
         Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size,
                                  Default_Test_Size);
 
---          while Has_Element (X_Cursor) loop
         for index in X.First_Index .. X.Last_Index loop
             X_Vec.Append (X.Element (index));
             Y_Vec.Append (Y.Element (index));
---              Next (X_Cursor);
---              Next (Y_Cursor);
         end loop;
-        Put_Line (Routine_Name & "X_Vec length" &
-                    Integer'Image (Integer (X_Vec.Length)));
+--          Put_Line (Routine_Name & "X_Vec length" &
+--                      Integer'Image (Integer (X_Vec.Length)));
 
         Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
 --          Printing.Print_Integer_List ("Test_Indices", Test_Indices);
@@ -114,7 +109,6 @@ package body Data_Splitter is
             Train_X.Append (X_Vec.Element (Train_Indices (index)));
             Train_Y.Append (Y_Vec.Element (Train_Indices (index)));
         end loop;
-        Put_Line (Routine_Name & "done");
 
     end Train_Test_Split;
 

@@ -2,12 +2,12 @@
 --  class ClassificationCriterion(Criterion)
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Containers;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Printing;
+--  with Printing;
 
 package body Criterion is
 
@@ -110,15 +110,12 @@ package body Criterion is
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
-      use Ada.Containers;
+--        use Ada.Containers;
       --  In Python a[start:stop] means items start through stop - 1
       Routine_Name    : constant String :=
                             "Criterion.Initialize_Node_Criterion ";
-      Sum_Total_K     : Float_List;  --  Sum_Total for each class
       Sample_I        : Positive;
---        Y_I_Index       : Positive;  --  Class index
-      Y_I             : Natural;   --  Class
-      C               : Positive;
+      Y_I             : Natural;   -- c  Class
       Weight          : Float := 1.0;
    begin
       --  L302
@@ -137,20 +134,22 @@ package body Criterion is
       --  L321 Initialize Sum_Total
       --  Sum_Total dimensions: num classes
       for c in 1 .. Criteria.Num_Classes loop
-         Sum_Total_K.Append (0.0);
+         Criteria.Sum_Total.Append (0.0);
       end loop;
 
-      Put_Line (Routine_Name & "Num_Classes " &
-                    Integer'Image (Criteria.Num_Classes));
-      Put_Line (Routine_Name & "Y_Encoded length: " &
-                    Count_Type'Image (Y_Encoded.Length));
+--        Put_Line (Routine_Name & "Num_Classes " &
+--                      Integer'Image (Criteria.Num_Classes));
+--        Put_Line (Routine_Name & "Y_Encoded length: " &
+--                      Count_Type'Image (Y_Encoded.Length));
+--        Put_Line (Routine_Name & "Sample_Indices length: " &
+--                      Count_Type'Image (Sample_Indices.Length));
 --          Printing.Print_Natural_List (Routine_Name & "Sample_Indices",
 --                                         Sample_Indices);
 --        Printing.Print_Natural_List (Routine_Name & "Y_Encoded", Y_Encoded);
       --  L325
       for p in Start_Row .. Stop_Row loop
          Sample_I := Sample_Indices.Element (p);
-         Put_Line (Routine_Name & "Sample_I " & Integer'Image (Sample_I));
+--           Put_Line (Routine_Name & "Sample_I " & Integer'Image (Sample_I));
          --  Weight is originally set to be 1.0, meaning that if no
          --  sample weights are given the default weight of each sample is 1.0
          if not Sample_Weight.Is_Empty then
@@ -159,27 +158,20 @@ package body Criterion is
 
          --  L333 Count weighted class frequency
          --  Y_I is Class
-         Y_I := Y_Encoded.Element (Sample_I);
-         Put_Line (Routine_Name & "Y_I " & Integer'Image (Y_I));
+         Y_I := Y_Encoded.Element (Sample_I);   --  c class
+--           Put_Line (Routine_Name & "Y_I " & Integer'Image (Y_I));
 
-         Sum_Total_K := Criteria.Sum_Total;
          --  L335
-         Put_Line (Routine_Name & "Y_I " & Integer'Image (Y_I));
-         C := Y_Encoded.Element (Sample_I);   --  class
          --  sum_total[k * self.sum_stride + c] += w
          --  Add Y (Sample_I) to Weight
-         Sum_Total_K.Replace_Element (C, Sum_Total_K.Element (C) + Weight);
-         Printing.Print_Float_List (Routine_Name & "Sum_Total_K", Sum_Total_K);
-         Criteria.Sum_Total.Replace_Element
-              (p, Sum_Total_K.Element (Sample_I));
+         Criteria.Sum_Total.Replace_Element (Y_I, Criteria.Sum_Total.Element (Y_I) + Weight);
+--           Printing.Print_Float_List (Routine_Name & "Sum_Total", Criteria.Sum_Total);
 
          Criteria.Num_Weighted_Node_Samples :=
            Criteria.Num_Weighted_Node_Samples + Weight;
       end loop;
 
-      Put_Line (Routine_Name & "Reset");
       Reset (Criteria);
-      Put_Line (Routine_Name & "done");
 
    end Initialize_Node_Criterion;
 
@@ -190,9 +182,7 @@ package body Criterion is
    --  probabilities of each class from one
    function Node_Impurity_Gini (Criteria : Criterion_Class) return Float is
       --        Routine_Name   : constant String := "Criterion.Node_Impurity_Gini ";
---        Num_Classes    : constant Natural_List := Criteria.Num_Classes;
       Num_Classes    : constant Natural := Criteria.Num_Classes;
-      --        Sum_Total_K    : Weights.Weight_List;
       Sum_Total_K    : Float_List;
       Count_K        : Float;
       Gini           : Float := 0.0;

@@ -2,7 +2,7 @@
 
 --  with Ada.Assertions;  use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO;
 
 with Maths;
 
@@ -503,7 +503,7 @@ package body Node_Splitter is
    end Reorder_Rows;
 
    --  -------------------------------------------------------------------------
-   --  L179 Reset_Node resets the splitter Split based on node Split.Samples[start:end].
+   --  L179 Reset_Node resets the splitter
    procedure Reset_Node
      (Splitter              : in out Splitter_Class;
       Start_Row, Stop_Row   : Positive;
@@ -533,7 +533,7 @@ package body Node_Splitter is
                         Impurity              : Float;
                         Num_Constant_Features : in out Natural)
                         return Split_Record is
-      Routine_Name         : constant String := "Node_Splitter.Split_Node ";
+--        Routine_Name         : constant String := "Node_Splitter.Split_Node ";
       Num_Known_Constants  : constant Natural := Num_Constant_Features;
       Num_Total_Constants  : Natural := Num_Known_Constants;
       Num_Found_Constants  : Natural := 0;
@@ -547,9 +547,9 @@ package body Node_Splitter is
       --                  " called with empty Sample_Indices");
       --  L308
       Init_Split (Best_Split, Self.Stop_Row);
-      Put_Line (Routine_Name & "Num_Constant_Features, Num_Found_Constants: " &
-                  Integer'Image (Num_Constant_Features) & ", " &
-                  Integer'Image (Num_Found_Constants));
+--        Put_Line (Routine_Name & "Num_Constant_Features, Num_Found_Constants: " &
+--                    Integer'Image (Num_Constant_Features) & ", " &
+--                    Integer'Image (Num_Found_Constants));
       --  L319
       Find_Best_Split (Self, Num_Constant_Features, Num_Found_Constants,
                        Num_Total_Constants, Best_Split);

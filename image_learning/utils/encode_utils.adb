@@ -16,26 +16,6 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Encode_Check_Unknown
-     (Values : Integer_List; Uniques : Integer_List) return Integer_List is
-      No_Inverse  : Natural_List;
-      Unique_Vals : constant Integer_List :=
-                      Encode_Utils.Unique (Values, No_Inverse);
-      aVal        : Integer;
-      Diff        : Integer_List;
-   begin
-      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
-         aVal := Unique_Vals.Element (index);
-         if not Uniques.Contains (aVal) then
-            Diff.Append (aVal);
-         end if;
-      end loop;
-
-      return Diff;
-   end Encode_Check_Unknown;
-
-   --  -------------------------------------------------------------------------
-
    function Encode (Values : Integer_List) return Integer_List is
       Sorted_Values : Integer_List := Values;
       Uniques       : Integer_List;
@@ -75,6 +55,26 @@ package body Encode_Utils is
       return Result;
 
    end Encode;
+
+   --  -------------------------------------------------------------------------
+
+   function Encode_Check_Unknown
+     (Values : Integer_List; Uniques : Integer_List) return Integer_List is
+      No_Inverse  : Natural_List;
+      Unique_Vals : constant Integer_List :=
+                      Encode_Utils.Unique (Values, No_Inverse);
+      aVal        : Integer;
+      Diff        : Integer_List;
+   begin
+      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+         aVal := Unique_Vals.Element (index);
+         if not Uniques.Contains (aVal) then
+            Diff.Append (aVal);
+         end if;
+      end loop;
+
+      return Diff;
+   end Encode_Check_Unknown;
 
    --  -------------------------------------------------------------------------
    --  Map each value based on its position in uniques.
@@ -166,28 +166,22 @@ package body Encode_Utils is
       use Integer_Package;
       use Integer_Sorting;
 
-      Routine_Name : constant String := "Encode_Utils.Unique ";
+--        Routine_Name : constant String := "Encode_Utils.Unique ";
       Values_Curs       : Integer_Package.Cursor := Values.First;
       Unique_Integers   : Int_Sets.Set;
       Ints_Curs         : Int_Sets.Cursor;
       Uniq_List         : Integer_List;
    begin
-      Put_Line (Routine_Name & "Values length: " &
-                Integer'Image (Integer (Values.Length)));
       while Has_Element (Values_Curs) loop
          Unique_Integers.Include (Element (Values_Curs));
          Next (Values_Curs);
       end loop;
-      New_Line;
-      Printing.Print_Integer_Set ("Unique_Integers", Unique_Integers);
 
       Ints_Curs := Unique_Integers.First;
       while Int_Sets.Has_Element (Ints_Curs) loop
          Uniq_List.Append (Int_Sets.Element (Ints_Curs));
          Int_Sets.Next (Ints_Curs);
       end loop;
-      Put_Line (Routine_Name & "Uniq_List length: " &
-                Integer'Image (Integer (Uniq_List.Length)));
 
       Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);

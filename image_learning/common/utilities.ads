@@ -36,12 +36,15 @@ package Utilities is
    function Number_Of_Features (Rows : Value_Data_List)
                                  return Class_Range;
    procedure Permute (aList : in out Integer_List);
+   pragma Inline (Permute);
    procedure Permute (aList : in out String_List);
+   pragma Inline (Permute);
    function Permute (aList : Float_List_2D)
                      return Float_List_2D;
    pragma Inline (Permute);
    function Permute (aList : Float_List_2D)
                      return Float_List_3D;
+   pragma Inline (Permute);
    function Predictions (Node : Tree_Node_Type)
                           return Predictions_List;
    function Prediction_String (Label_Counts : Predictions_List)
@@ -75,6 +78,7 @@ package Utilities is
    function Split_String (aString, Pattern : String)
                            return String_List;
    procedure Swap (Data : in out Float_List_2D; L, R : Positive);
+   pragma Inline (Swap);
    procedure Swap (Data : in out Integer_List; L, R : Positive);
    pragma Inline (Swap);
    function XY_To_Rows (X, Y : Value_Data_Lists_2D)
