@@ -11,7 +11,7 @@ with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter; with Load_ARFF_Data;
 with Openml_Ada;
---  with Plotting;
+with Plotting;
 with Printing;
 with Tree;
 with Utilities;
@@ -62,21 +62,19 @@ begin
       Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
                 "Y length" & Count_Type'Image (Y.Length) &
                 " is different to X length" & Natural'Image (Num_Samples));
-      --        Printing.Print_Value_Data_List ("Features row 16", X.Element (16));
+      --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
       Put_Line (Routine_Name & "permuting");
       X := Utilities.Permute (X);
       Put_Line (Routine_Name & "X permuted");
       Utilities.Permute (Y);
       Put_Line (Routine_Name & "Y permuted");
---        Printing.Print_Value_Data_List ("permuted features row 16", X.Element (16));
+--        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
       Put_Line (Routine_Name & "splitting data");
       Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                       Test_X, Test_Y, Train_X, Train_Y);
       Put_Line ("Requested train size: " & Integer'Image (Train_Size));
       Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
-      --     ARFF_Printing.Print_Data (Routine_Name & "X", X, 1, 4);
-      --     ARFF_Printing.Print_Data (Routine_Name & "Train_Data", Train_Data);
       X.Clear;
       Y.Clear;
       Save_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y,
@@ -87,15 +85,15 @@ begin
       if not Return_X_Y then
          Printing.Print_Strings ("Features", Bunch.Feature_Names);
       end if;
-      --      Printing.Print_Value_Data_List ("Train features row 16", Train_X.Element (16));
-      --      Printing.Print_Value_Data_List ("Test features row 16", Test_X.Element (16));
+      Printing.Print_Float_List ("Train features row 16", Train_X.Element (16));
+      Printing.Print_Float_List ("Test features row 16", Test_X.Element (16));
 
-      --     Printing.Print_Value_Data_List ("Train features row 417",
-      --                                     Train_X.Element (417));
+      Printing.Print_Float_List ("Train features row 417",
+                                         Train_X.Element (417));
 
-      --        Put_Line (Routine_Name & "Plotting");
-      --      Plotting.Display_Image (Train_X.Element (4));
-      --      Plotting.Display_Image (Test_X.Element (4));
+      Put_Line (Routine_Name & "Plotting");
+      Plotting.Display_Image (Train_X.Element (4));
+      Plotting.Display_Image (Test_X.Element (4));
 
       C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
               Max_Leaf_Nodes => 170);

@@ -870,7 +870,7 @@ package body Classifier_Utilities is
 
    --  ------------------------------------------------------------------------
 
-   function To_PL_Array (List_1D : Value_Data_List; Num_Rows : Positive)
+   function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
                          return PLplot_Auxiliary.Real_Matrix is
       use PLplot_Auxiliary;
       Routine_Name : constant String :=
@@ -888,7 +888,7 @@ package body Classifier_Utilities is
       for row in reverse 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
             Result (col - Start + 1, row) :=
-              Long_Float (List_1D.Element (col).Float_Value);
+              Long_Float (List_1D.Element (col));
          end loop;
          Start := Start + Num_Cols;
       end loop;

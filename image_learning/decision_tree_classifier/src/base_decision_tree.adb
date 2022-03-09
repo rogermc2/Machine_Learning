@@ -2,13 +2,13 @@
 --  DecisionTreeClassifier(ClassifierMixin, BaseDecisionTree)
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Depth_First_Builder;
 with Best_First_Builder;
 with Classifier_Utilities;
 with Encode_Utils;
---  with Printing;
+with Printing;
 with Tree_Build;
 with Utilities;
 
@@ -333,14 +333,9 @@ package body Base_Decision_Tree is
       use Weights;
       Routine_Name : constant String :=
                        "Base_Decision_Tree.Classification_Part ";
-      Y_Orig       : Integer_List;
    begin
       aClassifier.Attributes.Classes.Clear;
       Y_Encoded.Clear;
-
-      if aClassifier.Parameters.Class_Weight /= No_Weight then
-         Y_Orig := Y;
-      end if;
 
       --  L217
       Classes := Encode_Utils.Unique (Y, Y_Encoded);
@@ -354,7 +349,7 @@ package body Base_Decision_Tree is
       --  L222
       if aClassifier.Parameters.Class_Weight /= No_Weight then
          Expanded_Class_Weights :=
-           Weights.Compute_Sample_Weight (No_Weight, Y_Orig);
+           Weights.Compute_Sample_Weight (No_Weight, Y);
       end if;
       --  L227
       Classes := aClassifier.Attributes.Classes;
@@ -380,53 +375,43 @@ package body Base_Decision_Tree is
    function Predict (Self : in out Classifier; X : Float_List_2D)
                      return Integer_List is
       use Weights;
-      --        Routine_Name      : constant String := "Base_Decision_Tree.Predict";
-      --  L468 Prob_A: num_samples x num_outputs x num_classes
---        Prob_A            : constant Weight_Lists_3D :=
---                              Tree.Predict (Self.Attributes.Decision_Tree, X);
+      Routine_Name      : constant String := "Base_Decision_Tree.Predict ";
       Prob_A            : constant Weight_Lists_2D :=
                             Tree.Predict (Self.Attributes.Decision_Tree, X);
-      --  Prob_Ak: num_samples x num_classes
---        Prob_Ak           : Weight_Lists_2D;
       Class_Values      : Integer_List;
---        Samples_2K        : Weight_Lists_2D;
       Samples           : Weight_Lists_2D;
       Classes           : Weight_List;
       Selected_Class    : Integer;
       --  Selected_Classes (prediction) 1 x num samples
       Selected_Classes  : Integer_List;
       Max_Indices       : Natural_List;  --  argmax
-      --  Predictions, num outputs x num samples
       Predictions       : Integer_List;
    begin
       --  L478
-      --        for op in 1 .. Positive (Self.Attributes.Num_Outputs) loop
-      --           Prob_Ak.Clear;
       Selected_Classes.Clear;
-      --  Prob_A: num_samples x num_outputs x num_classes
+      --  Prob_A: num_samples x num_classes
       for sample_index in Prob_A.First_Index .. Prob_A.Last_Index loop
---           Samples_2K := Prob_A (sample_index);
---           Classes := Samples_2K.Element (op);
          Classes := Prob_A (sample_index);
          Samples.Append (Classes);
       end loop;
 
+      Put_Line (Routine_Name & "Samples length" &
+                  Integer'Image (Integer (Samples.Length)));
       --  Samples: num_samples x num_classes
       Max_Indices := Classifier_Utilities.Arg_Max (Samples);
       Selected_Classes.Clear;
       Class_Values := Self.Attributes.Classes;
+      Printing.Print_Integer_List (Routine_Name & "Class_Values", Class_Values);
       for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
          Classes := Samples.Element (index);
          Selected_Class :=
            Class_Values.Element (Max_Indices (index));
          Selected_Classes.Append (Selected_Class);
       end loop;
+      Put_Line (Routine_Name & "loop done");
 
       Predictions.Append (Selected_Classes);
-      --        end loop;
 
-      --  Transposed Predictions, num samples x num outputs
-      --        return Classifier_Utilities.Transpose (Predictions);
       return Predictions;
 
    end Predict;

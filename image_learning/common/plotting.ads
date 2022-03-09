@@ -5,7 +5,7 @@ with IL_Types;
 
 package Plotting is
    
-   procedure Display_Image (Data : IL_Types.Value_Data_List);
+   procedure Display_Image (Data : IL_Types.Float_List);
    procedure Plot (Bitmap : Real_Matrix);
    
 end Plotting;

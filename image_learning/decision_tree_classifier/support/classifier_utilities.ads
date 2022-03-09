@@ -60,7 +60,7 @@ package Classifier_Utilities is
                                  return Value_Data_Lists_2D;
     function To_Natural_Value_List (A : Natural_Array)
                                    return Value_Data_Lists_2D;
-    function To_PL_Array (List_1D  : Value_Data_List; Num_Rows : Positive)
+    function To_PL_Array (List_1D  : Float_List; Num_Rows : Positive)
                          return PLplot_Auxiliary.Real_Matrix;
     function To_Value_2D_List (A : Value_Data_List)
                               return Value_Data_Lists_2D;

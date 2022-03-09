@@ -9,7 +9,7 @@ with Classifier_Utilities;
 
 package body Plotting is
 
-    procedure Display_Image (Data : IL_Types.Value_Data_List) is
+    procedure Display_Image (Data : IL_Types.Float_List) is
       use Maths.Float_Math_Functions;
       Routine_Name   : constant String := "Plotting.Display_Image";
       Num_Image_Rows : constant Positive := Positive (Sqrt (Float (Data.Length)));
