@@ -1,7 +1,8 @@
 --  Based on scikit-learn/sklearn/tree _criterion.pyx
 --  class ClassificationCriterion(Criterion)
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -109,10 +110,11 @@ package body Criterion is
       Sample_Weight       : Weights.Weight_List;
       Weighted_Samples    : Float;
       Start_Row, Stop_Row : Natural) is
+      use Ada.Containers;
       --  In Python a[start:stop] means items start through stop - 1
       Routine_Name    : constant String :=
                             "Criterion.Initialize_Node_Criterion ";
-      Sum_Total_K     : Float_List;
+      Sum_Total_K     : Float_List;  --  Sum_Total for each class
       Sample_I        : Positive;
 --        Y_I_Index       : Positive;  --  Class index
       Y_I             : Natural;   --  Class
@@ -130,17 +132,21 @@ package body Criterion is
       Criteria.Num_Weighted_Node_Samples := 0.0;
       Criteria.Sum_Total.Clear;
 
-      --        Assert (not Criteria.Num_Classes.Is_Empty, Routine_Name &
-      --                  " Criteria.Num_Classes is empty");
+      Assert (Criteria.Num_Classes > 0, Routine_Name &
+                " Criteria.Num_Classes 0.");
       --  L321 Initialize Sum_Total
       --  Sum_Total dimensions: num classes
       for c in 1 .. Criteria.Num_Classes loop
          Sum_Total_K.Append (0.0);
       end loop;
-        Put_Line (Routine_Name & "Num_Classes " &
+
+      Put_Line (Routine_Name & "Num_Classes " &
                     Integer'Image (Criteria.Num_Classes));
+      Put_Line (Routine_Name & "Y_Encoded length: " &
+                    Count_Type'Image (Y_Encoded.Length));
 --          Printing.Print_Natural_List (Routine_Name & "Sample_Indices",
 --                                         Sample_Indices);
+--        Printing.Print_Natural_List (Routine_Name & "Y_Encoded", Y_Encoded);
       --  L325
       for p in Start_Row .. Stop_Row loop
          Sample_I := Sample_Indices.Element (p);
@@ -158,6 +164,7 @@ package body Criterion is
 
          Sum_Total_K := Criteria.Sum_Total;
          --  L335
+         Put_Line (Routine_Name & "Y_I " & Integer'Image (Y_I));
          C := Y_Encoded.Element (Sample_I);   --  class
          --  sum_total[k * self.sum_stride + c] += w
          --  Add Y (Sample_I) to Weight
