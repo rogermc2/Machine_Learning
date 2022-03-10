@@ -1,3 +1,4 @@
+--  Based on scikit-learn/sklearn/tree/_export.py
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
@@ -171,55 +172,42 @@ package body Node_Strings is
       Value_First     : Boolean := True;
       Value_Text      : Unbounded_String := To_Unbounded_String ("");
       --  Values 2D array, num_nodes x num_classes per node.
-      --  Node_Classes, dimension num_classes
-      Node_Classes     : Weights.Weight_List :=
+      --  Values: dimension num_classes
+      Values          : Weights.Weight_List :=
                           Exporter.theTree.Values.Element (Node_ID);
    begin
       Assert (not Classes.Is_Empty, Routine_Name &
                 "Exporter.theTree.Classes is empty");
 
       --  L331 Write distribution / regression value
-            if Exporter.Proportion and Classes.Length /= 1 then
---                 for output_index in Value.First_Index .. Value.Last_Index loop
---                    Output_Data := Value.Element (output_index);
-                  for class_index in Node_Classes.First_Index ..
-                    Node_Classes.Last_Index loop
-                     Class_Value := Node_Classes.Element (class_index);
-                     --  L334
-                     Node_Classes.Replace_Element
-                       (class_index, Class_Value /
-                          Float (Node_Data.Num_Node_Samples));
-                  end loop;
---                    Value.Replace_Element (output_index, Output_Data);
---                 end loop;
-            end if;
+      if Exporter.Proportion and Classes.Length /= 1 then
+         for class_index in Values.First_Index ..
+           Values.Last_Index loop
+            Class_Value := Values.Element (class_index);
+            --  L334
+            Values.Replace_Element
+              (class_index, Class_Value /
+                 Float (Node_Data.Num_Node_Samples));
+         end loop;
+      end if;
 
       --  L335
       if Show_Labels then
          Node_String := Node_String & "value = ";
       end if;
 
-      --        if Exporter.theTree.Num_Classes.Element (1) = 1 then
       if Exporter.theTree.Num_Classes = 1 then
          --  L339 Regression--
          Value_Text :=
            To_Unbounded_String
              (Classifier_Utilities.Float_Precision
-              --                  (Output_Data.Element (1), Exporter.Precision)
-                (Float (Classes.Element (1)), Exporter.Precision)  & ", " &
-                Classifier_Utilities.Float_Precision
-                (Float (Classes.Element (2)), Exporter.Precision));
-         --                  (Output_Data.Element (2), Exporter.Precision));
-      elsif Exporter.Proportion then
-         --   L342 Classification
-         Value_Text :=
-           To_Unbounded_String
-             (Classifier_Utilities.Float_Precision
-              --                  (Output_Data.Element (1), Exporter.Precision) & ", " &
-                (Float (Classes.Element (1)), Exporter.Precision)  & ", " &
-                Classifier_Utilities.Float_Precision
-                (Float (Classes.Element (2)), Exporter.Precision));
-         --                  (Output_Data.Element (2), Exporter.Precision));
+                (Values.Element (1), Exporter.Precision));
+         --        elsif Exporter.Proportion then
+         --           --   L342 Classification
+         --           Value_Text :=
+         --             To_Unbounded_String
+         --               (Classifier_Utilities.Float_Precision & ", " &
+         --                (Values.Element (1), Exporter.Precision));
       else
          --  L346
          --           for output_index in Value.First_Index .. Value.Last_Index loop
@@ -228,25 +216,25 @@ package body Node_Strings is
          Value_Text := Value_Text & "[";
          --           for class_index in Output_Data.First_Index ..
          --             Output_Data.Last_Index loop
-         for class_index in Classes.First_Index ..
-           Classes.Last_Index loop
-            if Value_First then
-               Value_First := False;
-            else
-               Value_Text := Value_Text & ", ";
+         for class_index in Values.First_Index ..
+           Values.Last_Index loop
+            if Values.Element (class_index) >
+              10.0 ** (-Exporter.Precision) then
+               if Value_First then
+                  Value_First := False;
+               else
+                  Value_Text := Value_Text & ", ";
+               end if;
+               Value_Text := Value_Text &
+               (To_Unbounded_String (Classifier_Utilities.Float_Precision
+                (Values.Element (class_index), Exporter.Precision)));
             end if;
-            Value_Text := Value_Text &
-            (To_Unbounded_String (Classifier_Utilities.Float_Precision
-             (Float (Classes.Element (class_index)), Exporter.Precision)));
---               (Output_Data.Element (class_index), Exporter.Precision)));
          end loop;
          Value_Text := Value_Text & "]";
 
---           if output_index /= Value.Last_Index then
---           if output_index /= Value.Last_Index then
---              Value_Text := Value_Text & "\n";
---           end if;
-         --           end loop;
+         --           if output_index /= Value.Last_Index then
+         --              Value_Text := Value_Text & "\n";
+         --           end if;
       end if;
 
       Node_String := Node_String & "[" & Value_Text & "]" & "\n ";
@@ -260,12 +248,12 @@ package body Node_Strings is
       Node_ID     : Positive; Show_Labels : Boolean;
       Node_String : in out Unbounded_String) is
       use Ada.Characters.Handling;
---        Routine_Name    : constant String :=
---                            "Node_Strings.Write_Node_Majority_Class ";
+      --        Routine_Name    : constant String :=
+      --                            "Node_Strings.Write_Node_Majority_Class ";
       --  Value: num_outputs x num_classes
       Value           : constant Weights.Weight_List :=
                           Exporter.theTree.Values.Element (Node_ID);
---        Output_Data     : Weights.Weight_List;
+      --        Output_Data     : Weights.Weight_List;
       Arg_Max         : Positive;
       Class_Name      : Unbounded_String;
    begin
@@ -275,12 +263,12 @@ package body Node_Strings is
       end if;
 
       --  Calculate Arg_Max
---        if Integer (Exporter.theTree.Num_Outputs) = 1 then
---           Output_Data := Value.Element (1);
---        else
---           Put_Line (Routine_Name & "Num_Outputs > 1 not implemented");
---        end if;
---        Arg_Max := Weights.Max (Output_Data);
+      --        if Integer (Exporter.theTree.Num_Outputs) = 1 then
+      --           Output_Data := Value.Element (1);
+      --        else
+      --           Put_Line (Routine_Name & "Num_Outputs > 1 not implemented");
+      --        end if;
+      --        Arg_Max := Weights.Max (Output_Data);
       Arg_Max := Weights.Max (Value);
 
       --  L366
