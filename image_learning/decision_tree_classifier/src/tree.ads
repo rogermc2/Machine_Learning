@@ -76,10 +76,8 @@ package Tree is
       Max_Depth    : Integer := -1;
       Nodes        : Nodes_Package.Tree;  -- Ada Multiway Tree
       --  From _Treenp.ndarray _get_value_ndarray generates a Values
-      --  3D array, num_nodes x num_outputs x num_classes per node.
-      --  Values corresponds to the first dimension of ndarray
+      --  2D array, num_nodes x num_classes per node.
       Values       : Weights.Weight_Lists_2D;
---        Values       : Weights.Weight_Lists_3D;
    end record;
 
    Value_Error : Exception;

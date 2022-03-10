@@ -3,7 +3,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Characters.Handling;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with IL_Types;
@@ -171,10 +171,9 @@ package body Node_Strings is
       Value_First     : Boolean := True;
       Value_Text      : Unbounded_String := To_Unbounded_String ("");
       --  Values 2D array, num_nodes x num_classes per node.
-      --  Value: dimension num_classes
-      Value           : Weights.Weight_List :=
+      --  Node_Classes, dimension num_classes
+      Node_Classes     : Weights.Weight_List :=
                           Exporter.theTree.Values.Element (Node_ID);
-      --        Output_Data     : Weights.Weight_List;
    begin
       Assert (not Classes.Is_Empty, Routine_Name &
                 "Exporter.theTree.Classes is empty");
@@ -182,17 +181,16 @@ package body Node_Strings is
       --  L331 Write distribution / regression value
             if Exporter.Proportion and Classes.Length /= 1 then
 --                 for output_index in Value.First_Index .. Value.Last_Index loop
-                  Output_Data := Value.Element (output_index);
-                  Output_Data := Value.Element (output_index);
-                  for class_index in Output_Data.First_Index ..
-                    Output_Data.Last_Index loop
-                     Class_Value := Output_Data.Element (class_index);
+--                    Output_Data := Value.Element (output_index);
+                  for class_index in Node_Classes.First_Index ..
+                    Node_Classes.Last_Index loop
+                     Class_Value := Node_Classes.Element (class_index);
                      --  L334
-                     Output_Data.Replace_Element
+                     Node_Classes.Replace_Element
                        (class_index, Class_Value /
                           Float (Node_Data.Num_Node_Samples));
                   end loop;
-                  Value.Replace_Element (output_index, Output_Data);
+--                    Value.Replace_Element (output_index, Output_Data);
 --                 end loop;
             end if;
 
@@ -262,12 +260,12 @@ package body Node_Strings is
       Node_ID     : Positive; Show_Labels : Boolean;
       Node_String : in out Unbounded_String) is
       use Ada.Characters.Handling;
-      Routine_Name    : constant String :=
-                          "Node_Strings.Write_Node_Majority_Class ";
+--        Routine_Name    : constant String :=
+--                            "Node_Strings.Write_Node_Majority_Class ";
       --  Value: num_outputs x num_classes
-      Value           : constant Weights.Weight_Lists_2D :=
+      Value           : constant Weights.Weight_List :=
                           Exporter.theTree.Values.Element (Node_ID);
-      Output_Data     : Weights.Weight_List;
+--        Output_Data     : Weights.Weight_List;
       Arg_Max         : Positive;
       Class_Name      : Unbounded_String;
    begin
@@ -277,12 +275,13 @@ package body Node_Strings is
       end if;
 
       --  Calculate Arg_Max
-      if Integer (Exporter.theTree.Num_Outputs) = 1 then
-         Output_Data := Value.Element (1);
-      else
-         Put_Line (Routine_Name & "Num_Outputs > 1 not implemented");
-      end if;
-      Arg_Max := Weights.Max (Output_Data);
+--        if Integer (Exporter.theTree.Num_Outputs) = 1 then
+--           Output_Data := Value.Element (1);
+--        else
+--           Put_Line (Routine_Name & "Num_Outputs > 1 not implemented");
+--        end if;
+--        Arg_Max := Weights.Max (Output_Data);
+      Arg_Max := Weights.Max (Value);
 
       --  L366
       if Integer (Exporter.Class_Names.Length) = 1 and then
