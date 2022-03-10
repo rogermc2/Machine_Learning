@@ -7,7 +7,6 @@ with Ada.Integer_Text_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Classifier_Types;
 with Classifier_Utilities;
 with Criterion;
 with Export_Types; use Export_Types;
@@ -17,8 +16,8 @@ with Weights;
 
 package body Graphviz_Exporter is
 
-   function Get_Impurities (Exporter : DOT_Tree_Exporter)
-                            return Classifier_Types.Float_List;
+--     function Get_Impurities (Exporter : DOT_Tree_Exporter)
+--                              return IL_Types.Float_List;
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
@@ -33,8 +32,8 @@ package body Graphviz_Exporter is
                      Output_File_Name   : Unbounded_String :=
                        To_Unbounded_String ("tree.dot");
                      Max_Depth          : Positive := Integer'Last;
-                     Feature_Names      : Feature_Names_List :=
-                       Unbounded_Package.Empty_Vector;
+                     Feature_Names      : String_List :=
+                       String_Package.Empty_List;
                      Class_Names        : Class_Names_List :=
                        Unbounded_Package.Empty_Vector;
                      Label              : Unbounded_String :=
@@ -161,8 +160,8 @@ package body Graphviz_Exporter is
                               Output_File_Name   : Unbounded_String :=
                                 To_Unbounded_String ("tree.dot");
                               Max_Depth          : Natural := Integer'Last;
-                              Feature_Names      : Feature_Names_List :=
-                                Unbounded_Package.Empty_Vector;
+                              Feature_Names      : String_List :=
+                                String_Package.Empty_List;
                               Class_Names        : Class_Names_List :=
                                 Unbounded_Package.Empty_Vector;
                               Label              : Unbounded_String :=
@@ -210,7 +209,6 @@ package body Graphviz_Exporter is
                         Value    : Weights.Weight_List) return String is
       use Ada.Characters.Handling;
       use Ada.Integer_Text_IO;
-      use Classifier_Types;
       Routine_Name  : constant String :=
                         "Graphviz_Exporter.Get_Colour ";
       Colour_Index  : constant Positive :=
@@ -236,10 +234,10 @@ package body Graphviz_Exporter is
          Dec_Colour    : Natural;
          Hex_Colour_UB : Unbounded_String;
       begin
---           Put_Line (Routine_Name & ".Set_Colour Colour: " &
---                       Integer'Image (Colour));
---           Put_Line (Routine_Name & ".Set_Colour Alpha: " &
---                       Float'Image (Alpha));
+         --           Put_Line (Routine_Name & ".Set_Colour Colour: " &
+         --                       Integer'Image (Colour));
+         --           Put_Line (Routine_Name & ".Set_Colour Alpha: " &
+         --                       Float'Image (Alpha));
          Dec_Colour := Integer (Float'Rounding (Alpha * Float (Colour) +
                                   Alpha_1));
          Put (Hex_Colour, Dec_Colour, Base => 16);
@@ -305,39 +303,40 @@ package body Graphviz_Exporter is
                            "Graphviz_Exporter.Get_Fill_Colour ";
       Weighted_Samples : constant Float
         := Float (Element (Node_Curs).Weighted_Num_Node_Samples);
-      Output_Values    : Weight_Lists_2D;
       Class_Values     : Weight_List;
       Class            : Float;
-      Impurities       : Classifier_Types.Float_List;
+--        Impurities       : IL_Types.Float_List;
    begin
       if Exporter.Colours.Is_Empty then
          --  L251
          Exporter.Colours := Colour_Brew
-           (Integer (Exporter.theTree.Classes.Element (1).Length));
+           (Integer (Exporter.theTree.Classes.Length));
 
          --  L253
-         if Integer (Exporter.theTree.Num_Outputs) /= 1 then
-            --  Find max and min impurities for multi-output
-            Impurities := Get_Impurities (Exporter);
-            Exporter.Bounds.Append ((Min (Impurities), Max (Impurities)));
+         --           if Integer (Exporter.theTree.Num_Outputs) /= 1 then
+         --              --  Find max and min impurities for multi-output
+         --              Impurities := Get_Impurities (Exporter);
+         --              Exporter.Bounds.Append ((Min (Impurities), Max (Impurities)));
 
-         elsif Exporter.theTree.Num_Classes.Element (1) = 1 and
-           Integer (Classifier_Utilities.Unique_Weights
-                    (Exporter.theTree.Values).Length) > 1 then
+         --           elsif Exporter.theTree.Num_Classes.Element (1) = 1 and
+         if Integer (Classifier_Utilities.Unique_Weights
+                     (Exporter.theTree.Values).Length) > 1 then
             --  L258 Find max and min values in leaf nodes for regression
-            Exporter.Bounds.Append ((Weights.Min (Exporter.theTree.Values),
-                                    Weights.Max (Exporter.theTree.Values)));
+            Exporter.Bounds.Append ((Weights.Min (Exporter.theTree.Values.Element (1)),
+                                    Weights.Max (Exporter.theTree.Values.Element (1))));
          end if;
       end if;
 
-      --  L259
-      if Integer (Exporter.theTree.Num_Outputs) = 1 then
+      --  L25
+--        if Integer (Exporter.theTree.Num_Outputs) = 1 then
          Assert (not Exporter.theTree.Values.Is_Empty, Routine_Name &
                    "Exporter.theTree.Values is empty.");
-         Output_Values := Exporter.theTree.Values.Element (Node_ID);
-         for index in Output_Values.First_Index ..
-           Output_Values.Last_Index loop
-            Class_Values.Append (Output_Values.Element (index));
+     --  theTree.Values: num_nodes x num_classes per node
+      Class_Values := Exporter.theTree.Values.Element (Node_ID);
+--        Output_Values := Exporter.theTree.Values.Element (Node_ID);
+--           for index in Output_Values.First_Index ..
+--             Output_Values.Last_Index loop
+--              Class_Values.Append (Output_Values.Element (index));
 
             for class_index in Class_Values.First_Index ..
               Class_Values.Last_Index loop
@@ -345,10 +344,10 @@ package body Graphviz_Exporter is
                Class_Values.Replace_Element
                  (class_index, Class / Weighted_Samples);
             end loop;
-         end loop;
-      else
-         Class_Values.Append (-Element (Node_Curs).Impurity);
-      end if;
+--           end loop;
+--        else
+--           Class_Values.Append (-Element (Node_Curs).Impurity);
+--        end if;
 
       return Get_Colour (Exporter, Class_Values);
 
@@ -356,21 +355,21 @@ package body Graphviz_Exporter is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Impurities (Exporter : DOT_Tree_Exporter)
-                            return Classifier_Types.Float_List is
-      use Tree.Nodes_Package;
-      Impurities : Classifier_Types.Float_List;
-
-      procedure Add_Impurity (Node_Curs : Tree.Tree_Cursor) is
-      begin
-         Impurities.Append (-Element (Node_Curs).Impurity);
-      end Add_Impurity;
-
-   begin
-      Exporter.theTree.Nodes.Iterate (Add_Impurity'Access);
-      return Impurities;
-
-   end Get_Impurities;
+--     function Get_Impurities (Exporter : DOT_Tree_Exporter)
+--                              return IL_Types.Float_List is
+--        use Tree.Nodes_Package;
+--        Impurities : IL_Types.Float_List;
+--
+--        procedure Add_Impurity (Node_Curs : Tree.Tree_Cursor) is
+--        begin
+--           Impurities.Append (-Element (Node_Curs).Impurity);
+--        end Add_Impurity;
+--
+--     begin
+--        Exporter.theTree.Nodes.Iterate (Add_Impurity'Access);
+--        return Impurities;
+--
+--     end Get_Impurities;
 
    --  -------------------------------------------------------------------------
 

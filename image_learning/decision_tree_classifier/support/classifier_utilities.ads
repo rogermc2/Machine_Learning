@@ -71,8 +71,11 @@ package Classifier_Utilities is
                        return  Value_Data_Lists_2D;
     function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
                            return Tree.Tree_Cursor;
-    function Unique_Integer_Array (Nums : Value_Data_Array) return Integer_Array;
-    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
     function Unique (Nums : Integer_List) return Integer_List;
+    function Unique_Integer_Array (Nums : Value_Data_Array)
+                                   return Integer_Array;
+    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
+    function Unique_Weights (Values : Weights.Weight_Lists_2D)
+                             return Weights.Weight_List;
 
 end Classifier_Utilities;

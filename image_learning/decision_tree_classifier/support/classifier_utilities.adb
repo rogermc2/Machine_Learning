@@ -17,8 +17,8 @@ package body Classifier_Utilities is
 --       Ada.Containers.Ordered_Sets (Value_Record);
 --     use Weights.Weight_Lists_3D_Package;
 
---     package Weight_Sets is new
---       Ada.Containers.Ordered_Sets (Float);
+   package Weight_Sets is new
+     Ada.Containers.Ordered_Sets (Float);
 
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
@@ -1099,44 +1099,37 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Unique_Weights (Values : Weights.Weight_Lists_3D)
---                              return Weights.Weight_List is
---        use Weight_Sets;
---        use Weights;
---        use Float_Package;
---        use Weight_Lists_2D_Package;
---        Unique_Set     : Weight_Sets.Set;
---        Weight_3D_Curs : Weight_Lists_3D_Package.Cursor := Values.First;
---        Weight_2D_Curs : Weight_Lists_2D_Package.Cursor;
---        Weights_Curs   : Float_Package.Cursor;
---        Set_Curs       : Weight_Sets.Cursor;
---        Weight_2D_List : Weight_Lists_2D;
---        Weights        : Weight_List;
---        Unique_List    : Weight_List;
---     begin
---        while Has_Element (Weight_3D_Curs) loop
---           Weight_2D_List := Element (Weight_3D_Curs);
---           Weight_2D_Curs := Weight_2D_List.First;
---           while Has_Element (Weight_2D_Curs) loop
---              Weights := Element (Weight_2D_Curs);
---              Weights_Curs := Weights.First;
---              while Has_Element (Weights_Curs) loop
---                 Unique_Set.Include (Element (Weights_Curs));
---                 Next (Weights_Curs);
---              end loop;
---              Next (Weight_2D_Curs);
---           end loop;
---           Next (Weight_3D_Curs);
---        end loop;
---
---        Set_Curs := Unique_Set.First;
---        while Has_Element (Set_Curs) loop
---           Unique_List.Append (Element (Set_Curs));
---           Next (Set_Curs);
---        end loop;
---        return Unique_List;
+   function Unique_Weights (Values : Weights.Weight_Lists_2D)
+                            return Weights.Weight_List is
+      use Weight_Sets;
+      use Weights;
+      use Float_Package;
+      use Weight_Lists_2D_Package;
+      Unique_Set     : Weight_Sets.Set;
+      Weight_2D_Curs : Weight_Lists_2D_Package.Cursor := Values.First;
+      Weights_Curs   : Float_Package.Cursor;
+      Set_Curs       : Weight_Sets.Cursor;
+      Weights        : Weight_List;
+      Unique_List    : Weight_List;
+   begin
+         while Has_Element (Weight_2D_Curs) loop
+            Weights := Element (Weight_2D_Curs);
+            Weights_Curs := Weights.First;
+            while Has_Element (Weights_Curs) loop
+               Unique_Set.Include (Element (Weights_Curs));
+               Next (Weights_Curs);
+            end loop;
+            Next (Weight_2D_Curs);
+         end loop;
 
---     end Unique_Weights;
+      Set_Curs := Unique_Set.First;
+      while Has_Element (Set_Curs) loop
+         Unique_List.Append (Element (Set_Curs));
+         Next (Set_Curs);
+      end loop;
+      return Unique_List;
+
+   end Unique_Weights;
 
    --  -------------------------------------------------------------------------
 
