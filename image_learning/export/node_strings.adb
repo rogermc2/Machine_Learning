@@ -84,8 +84,6 @@ package body Node_Strings is
 
       --  L357
       if not Exporter.Class_Names.Is_Empty then
-         --          Integer (Exporter.theTree.Num_Outputs) = 1 and then
-         --          Exporter.theTree.Num_Classes.Element (1) /= 1 then
          Write_Node_Majority_Class (Exporter, Node_ID, Show_Labels,
                                     Node_String);
       end if;
@@ -134,10 +132,6 @@ package body Node_Strings is
       Criteria_String : Unbounded_String := To_Unbounded_String ("");
    begin
       --  308  Write impurity
-      --           if Show_Labels then
-      --              Node_String := Node_String & "impurity = ";
-      --           end if;
-
       if Show_Labels then
          case Criteria is
             when Gini_Criteria =>
@@ -210,12 +204,8 @@ package body Node_Strings is
          --                (Values.Element (1), Exporter.Precision));
       else
          --  L346
-         --           for output_index in Value.First_Index .. Value.Last_Index loop
-         --              Output_Data := Value.Element (output_index);
          Value_First := True;
          Value_Text := Value_Text & "[";
-         --           for class_index in Output_Data.First_Index ..
-         --             Output_Data.Last_Index loop
          for class_index in Values.First_Index ..
            Values.Last_Index loop
             if Values.Element (class_index) >
@@ -250,10 +240,8 @@ package body Node_Strings is
       use Ada.Characters.Handling;
       --        Routine_Name    : constant String :=
       --                            "Node_Strings.Write_Node_Majority_Class ";
-      --  Value: num_outputs x num_classes
       Value           : constant Weights.Weight_List :=
                           Exporter.theTree.Values.Element (Node_ID);
-      --        Output_Data     : Weights.Weight_List;
       Arg_Max         : Positive;
       Class_Name      : Unbounded_String;
    begin
@@ -262,13 +250,6 @@ package body Node_Strings is
          Node_String := Node_String & "class = ";
       end if;
 
-      --  Calculate Arg_Max
-      --        if Integer (Exporter.theTree.Num_Outputs) = 1 then
-      --           Output_Data := Value.Element (1);
-      --        else
-      --           Put_Line (Routine_Name & "Num_Outputs > 1 not implemented");
-      --        end if;
-      --        Arg_Max := Weights.Max (Output_Data);
       Arg_Max := Weights.Max (Value);
 
       --  L366
