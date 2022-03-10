@@ -42,8 +42,8 @@ package Graphviz_Exporter is
                       Output_File_Name   : Unbounded_String :=
                         To_Unbounded_String ("tree.dot");
                       Max_Depth          : Positive := Integer'Last;
-                      Feature_Names      : String_List :=
-                        String_Package.Empty_List;
+                      Feature_Names      : String_Vector :=
+                        String_Vector_Package.Empty_Vector;
                       Class_Names        : Class_Names_List :=
                         Unbounded_Package.Empty_Vector;
                       Label              : Unbounded_String :=
@@ -64,8 +64,8 @@ package Graphviz_Exporter is
                                Output_File_Name   : Unbounded_String :=
                                  To_Unbounded_String ("tree.dot");
                                Max_Depth          : Natural := Integer'Last;
-                               Feature_Names      : String_List :=
-                                 String_Package.Empty_List;
+                               Feature_Names      : String_Vector :=
+                                 String_Vector_Package.Empty_Vector;
                                Class_Names        : Class_Names_List :=
                                  Unbounded_Package.Empty_Vector;
                                Label              : Unbounded_String :=

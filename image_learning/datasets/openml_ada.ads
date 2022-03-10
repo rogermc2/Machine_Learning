@@ -14,7 +14,7 @@ package Openml_Ada is
       Target        : IL_Types.Integer_List;
       As_Frame      : As_Frame_State := As_Frame_False;
       Categories    : AR_Types.Nominal_Data_List;
-      Feature_Names : String_List;
+      Feature_Names : String_Vector;
       Target_Names  : String_List;
    end record;
 
@@ -26,7 +26,7 @@ package Openml_Ada is
     procedure Download_Data_To_Bunch
       (ARFF_Container      : AR_Types.ARFF_Record;
        Features_List       : AR_Types.Attribute_List;
-       Data_Column_Names   : String_List;
+       Data_Column_Names   : String_Vector;
        Target_Column_Names : in out String_List;
        Bunch               : out Bunch_Data;
        --        Sparse       : Boolean;
@@ -43,6 +43,6 @@ package Openml_Ada is
        As_Frame          : in out As_Frame_State);
     function Valid_Data_Column_Names
       (Features_List  : AR_Types.Attribute_List;
-       Target_Columns : String_List) return String_List;
+       Target_Columns : String_List) return String_Vector;
 
 end Openml_Ada;

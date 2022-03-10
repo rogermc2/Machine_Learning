@@ -48,7 +48,7 @@ package body Openml_Ada is
    procedure Download_Data_To_Bunch
      (ARFF_Container      : AR_Types.ARFF_Record;
       Features_List       : AR_Types.Attribute_List;
-      Data_Column_Names   : String_List;
+      Data_Column_Names   : String_Vector;
       Target_Column_Names : in out String_List;
       Bunch               : out Bunch_Data;
       --        Sparse       : Boolean;
@@ -64,7 +64,7 @@ package body Openml_Ada is
       Feature_Index      : Positive;
       Features_Dict      : Attribute_Dictionary_Map;
       aFeature           : Attribute_Record;
-      Data_Cursor        : String_Package.Cursor := Data_Column_Names.First;
+--        Data_Cursor        : String_Package.Cursor := Data_Column_Names.First;
       Target_Cursor      : String_Package.Cursor := Target_Column_Names.First;
       Col_Name           : Unbounded_String;
       Col_Slice_X        : Integer_DL_List;
@@ -121,11 +121,10 @@ package body Openml_Ada is
       end loop;
 
       --  L501
-      while Has_Element (Data_Cursor) loop
-         Col_Name := Element (Data_Cursor);
+      for index in Data_Column_Names.First_Index .. Data_Column_Names.Last_Index loop
+         Col_Name := Data_Column_Names.Element (index);
          Feature_Index := Features_Dict.Element (Col_Name);
          Col_Slice_X.Append (Feature_Index);
-         Next (Data_Cursor);
       end loop;
 
       --  L515
@@ -183,7 +182,7 @@ package body Openml_Ada is
       ARFF_Data       : ARFF_Record;
       Return_Sparse   : constant Boolean := False;
       Features_List   : Attribute_List;
-      Data_Columns    : String_List;
+      Data_Columns    : String_Vector;
       --        Shape           : Shape_Data;
       --        Data_Qualities  : Qualities_Map;
    begin
@@ -486,13 +485,13 @@ package body Openml_Ada is
    --  L699
    function Valid_Data_Column_Names
      (Features_List  : AR_Types.Attribute_List;
-      Target_Columns : String_List) return String_List is
+      Target_Columns : String_List) return String_Vector is
       --        use Ada.Text_IO.Unbounded_IO;
       use AR_Types;
       --        Routine_Name  : constant String := "Openml_Ada.Valid_Data_Column_Names ";
       Feature       : Attribute_Record;
       Feature_Name  : Unbounded_String;
-      Valid_Names   : String_List;
+      Valid_Names   : String_Vector;
 
       function Is_A_Target return Boolean is
          use String_Package;

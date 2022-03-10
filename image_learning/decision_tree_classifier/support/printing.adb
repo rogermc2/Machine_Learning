@@ -598,6 +598,27 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Strings (Name : String; theList : String_Vector) is
+      Count : Integer := 1;
+   begin
+      if Name'Length > 0 then
+         Put (Name & ": ");
+      end if;
+
+      for index in theList.First_Index .. theList.Last_Index loop
+         Put (To_String (theList.Element (index)) & "   ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Strings;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Tree (Name  : String;
                          aTree : Base_Decision_Tree.Classifier) is
       Tree_Nodes  : constant Tree.Tree_Class :=

@@ -82,9 +82,9 @@ package body Node_Strings is
                               Node_String);
 
       --  L357
-      if not Exporter.Class_Names.Is_Empty and then
-        Integer (Exporter.theTree.Num_Outputs) = 1 and then
-        Exporter.theTree.Num_Classes.Element (1) /= 1 then
+      if not Exporter.Class_Names.Is_Empty then
+         --          Integer (Exporter.theTree.Num_Outputs) = 1 and then
+         --          Exporter.theTree.Num_Classes.Element (1) /= 1 then
          Write_Node_Majority_Class (Exporter, Node_ID, Show_Labels,
                                     Node_String);
       end if;
@@ -99,11 +99,12 @@ package body Node_Strings is
      (Exporter    : Graphviz_Exporter.DOT_Tree_Exporter;
       Node_Data   : Tree.Tree_Node;
       Node_String : in out Unbounded_String) is
---        Routine_Name     : constant String :=
---                             "Node_Strings.Write_Decision_Criteria ";
+      use IL_Types;
+      use String_Vector_Package;
+      --        Routine_Name     : constant String :=
+      --                             "Node_Strings.Write_Decision_Criteria ";
       Feature_ID       : constant Positive := Node_Data.Best_Fit_Feature_Index;
-      Feature_Names    : constant IL_Types.Feature_Names_List :=
-                           Exporter.Feature_Names;
+      Feature_Names    : constant String_Vector := Exporter.Feature_Names;
       Feature          : Unbounded_String;
    begin
       if not Exporter.Feature_Names.Is_Empty then
@@ -164,79 +165,90 @@ package body Node_Strings is
       Routine_Name    : constant String :=
                           "Node_Strings.Write_Node_Class_Value ";
       Node_Data       : constant Tree.Tree_Node := Element (Node_Curs);
-      Classes         : constant IL_Types.Value_Data_Lists_2D :=
+      Classes         : constant IL_Types.Integer_List :=
                           Exporter.theTree.Classes;
       Class_Value     : Float;
       Value_First     : Boolean := True;
       Value_Text      : Unbounded_String := To_Unbounded_String ("");
-      --  Value: num_outputs x num_classes
-      Value           : Weights.Weight_Lists_2D :=
+      --  Values 2D array, num_nodes x num_classes per node.
+      --  Value: dimension num_classes
+      Value           : Weights.Weight_List :=
                           Exporter.theTree.Values.Element (Node_ID);
-      Output_Data     : Weights.Weight_List;
+      --        Output_Data     : Weights.Weight_List;
    begin
       Assert (not Classes.Is_Empty, Routine_Name &
                 "Exporter.theTree.Classes is empty");
 
       --  L331 Write distribution / regression value
-      if Exporter.Proportion and Classes.Element (1).Length /= 1 then
-         for output_index in Value.First_Index .. Value.Last_Index loop
-            Output_Data := Value.Element (output_index);
-            for class_index in Output_Data.First_Index ..
-              Output_Data.Last_Index loop
-               Class_Value := Output_Data.Element (class_index);
-               --  L334
-               Output_Data.Replace_Element
-                 (class_index, Class_Value /
-                    Float (Node_Data.Num_Node_Samples));
-            end loop;
-            Value.Replace_Element (output_index, Output_Data);
-         end loop;
-      end if;
+            if Exporter.Proportion and Classes.Length /= 1 then
+--                 for output_index in Value.First_Index .. Value.Last_Index loop
+                  Output_Data := Value.Element (output_index);
+                  Output_Data := Value.Element (output_index);
+                  for class_index in Output_Data.First_Index ..
+                    Output_Data.Last_Index loop
+                     Class_Value := Output_Data.Element (class_index);
+                     --  L334
+                     Output_Data.Replace_Element
+                       (class_index, Class_Value /
+                          Float (Node_Data.Num_Node_Samples));
+                  end loop;
+                  Value.Replace_Element (output_index, Output_Data);
+--                 end loop;
+            end if;
 
       --  L335
       if Show_Labels then
          Node_String := Node_String & "value = ";
       end if;
 
-      if Exporter.theTree.Num_Classes.Element (1) = 1 then
+      --        if Exporter.theTree.Num_Classes.Element (1) = 1 then
+      if Exporter.theTree.Num_Classes = 1 then
          --  L339 Regression--
          Value_Text :=
            To_Unbounded_String
              (Classifier_Utilities.Float_Precision
-                (Output_Data.Element (1), Exporter.Precision) & ", " &
+              --                  (Output_Data.Element (1), Exporter.Precision)
+                (Float (Classes.Element (1)), Exporter.Precision)  & ", " &
                 Classifier_Utilities.Float_Precision
-                (Output_Data.Element (2), Exporter.Precision));
+                (Float (Classes.Element (2)), Exporter.Precision));
+         --                  (Output_Data.Element (2), Exporter.Precision));
       elsif Exporter.Proportion then
          --   L342 Classification
          Value_Text :=
            To_Unbounded_String
              (Classifier_Utilities.Float_Precision
-                (Output_Data.Element (1), Exporter.Precision) & ", " &
+              --                  (Output_Data.Element (1), Exporter.Precision) & ", " &
+                (Float (Classes.Element (1)), Exporter.Precision)  & ", " &
                 Classifier_Utilities.Float_Precision
-                (Output_Data.Element (2), Exporter.Precision));
+                (Float (Classes.Element (2)), Exporter.Precision));
+         --                  (Output_Data.Element (2), Exporter.Precision));
       else
          --  L346
-         for output_index in Value.First_Index .. Value.Last_Index loop
-            Output_Data := Value.Element (output_index);
-            Value_First := True;
-            Value_Text := Value_Text & "[";
-            for class_index in Output_Data.First_Index ..
-              Output_Data.Last_Index loop
-               if Value_First then
-                  Value_First := False;
-               else
-                  Value_Text := Value_Text & ", ";
-               end if;
-               Value_Text := Value_Text &
-               (To_Unbounded_String (Classifier_Utilities.Float_Precision
-                (Output_Data.Element (class_index), Exporter.Precision)));
-            end loop;
-            Value_Text := Value_Text & "]";
-
-            if output_index /= Value.Last_Index then
-               Value_Text := Value_Text & "\n";
+         --           for output_index in Value.First_Index .. Value.Last_Index loop
+         --              Output_Data := Value.Element (output_index);
+         Value_First := True;
+         Value_Text := Value_Text & "[";
+         --           for class_index in Output_Data.First_Index ..
+         --             Output_Data.Last_Index loop
+         for class_index in Classes.First_Index ..
+           Classes.Last_Index loop
+            if Value_First then
+               Value_First := False;
+            else
+               Value_Text := Value_Text & ", ";
             end if;
+            Value_Text := Value_Text &
+            (To_Unbounded_String (Classifier_Utilities.Float_Precision
+             (Float (Classes.Element (class_index)), Exporter.Precision)));
+--               (Output_Data.Element (class_index), Exporter.Precision)));
          end loop;
+         Value_Text := Value_Text & "]";
+
+--           if output_index /= Value.Last_Index then
+--           if output_index /= Value.Last_Index then
+--              Value_Text := Value_Text & "\n";
+--           end if;
+         --           end loop;
       end if;
 
       Node_String := Node_String & "[" & Value_Text & "]" & "\n ";
@@ -274,7 +286,7 @@ package body Node_Strings is
 
       --  L366
       if Integer (Exporter.Class_Names.Length) = 1 and then
-      To_Upper (To_String (Exporter.Class_Names.Element (1))) = "TRUE" then
+        To_Upper (To_String (Exporter.Class_Names.Element (1))) = "TRUE" then
          Class_Name := "y[" &
            To_Unbounded_String (Integer'Image (Arg_Max)) & "]";
       else

@@ -62,6 +62,7 @@ package Printing is
     procedure Print_Stack_Record (Name : String;
                                   Data : Build_Utils.Stack_Record);
     procedure Print_Strings (Name : String; theList : String_List);
+    procedure Print_Strings (Name : String; theList : String_Vector);
     procedure Print_Strings (Name    : String;
                              theList : Indef_String_List);
     procedure Print_Tree (Name : String; aTree : Base_Decision_Tree.Classifier);
