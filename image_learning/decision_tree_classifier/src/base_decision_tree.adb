@@ -399,8 +399,13 @@ package body Base_Decision_Tree is
                   Integer'Image (Integer (Samples.Length)));
       --  Samples: num_samples x num_classes
       Max_Indices := Classifier_Utilities.Arg_Max (Samples);
+      Put_Line (Routine_Name & "Max_Indices length" &
+                  Integer'Image (Integer (Max_Indices.Length)));
       Selected_Classes.Clear;
       Class_Values := Self.Attributes.Classes;
+      Max_Indices := Classifier_Utilities.Arg_Max (Samples);
+      Put_Line (Routine_Name & "Class_Values length" &
+                  Integer'Image (Integer (Class_Values.Length)));
       Printing.Print_Integer_List (Routine_Name & "Class_Values", Class_Values);
       for index in Max_Indices.First_Index .. Max_Indices.Last_Index loop
          Classes := Samples.Element (index);

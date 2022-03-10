@@ -11,7 +11,7 @@ with Data_Splitter;
 with Decision_Tree_Classification;
 --  with Graphviz_Exporter; with Load_ARFF_Data;
 with Openml_Ada;
-with Plotting;
+--  with Plotting;
 with Printing;
 with Tree;
 with Utilities;
@@ -79,19 +79,19 @@ begin
                   Bunch);
    end if;
 
-   if not Get_Tree (Dataset_Name, aClassifier.Attributes.Decision_Tree) then
+   if not Get_Classifier (Dataset_Name, aClassifier) then
       if not Return_X_Y then
          Printing.Print_Strings ("Features", Bunch.Feature_Names);
       end if;
-      Printing.Print_Float_List ("Train features row 16", Train_X.Element (16));
-      Printing.Print_Float_List ("Test features row 16", Test_X.Element (16));
+--        Printing.Print_Float_List ("Train features row 16", Train_X.Element (16));
+--        Printing.Print_Float_List ("Test features row 16", Test_X.Element (16));
 
-      Printing.Print_Float_List ("Train features row 417",
-                                         Train_X.Element (417));
+--        Printing.Print_Float_List ("Train features row 417",
+--                                           Train_X.Element (417));
 
-      Put_Line (Routine_Name & "Plotting");
-      Plotting.Display_Image (Train_X.Element (4));
-      Plotting.Display_Image (Test_X.Element (4));
+--        Put_Line (Routine_Name & "Plotting");
+--        Plotting.Display_Image (Train_X.Element (4));
+--        Plotting.Display_Image (Test_X.Element (4));
 
       C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
               Max_Leaf_Nodes => 170);
@@ -100,7 +100,7 @@ begin
       --  accuracy can be achieved
       Put_Line ("Classification_Fit");
       Classification_Fit (aClassifier, Train_X, Train_Y, No_Weights);
-      Support_4.Save_Tree (Dataset_Name, aClassifier);
+      Support_4.Save_Classifier (Dataset_Name, aClassifier);
    end if;
 
    Put_Line ("----------------------------------------------");

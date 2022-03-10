@@ -18,7 +18,6 @@ package body Support_4 is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
-      use String_Package;
       Routine_Name   : constant String := "Support_4.Get_State ";
       Dataset_File   : constant String := "../" & Dataset_Name & ".arff";
       Save_File      : constant String := Dataset_Name & ".oml";
@@ -59,32 +58,33 @@ package body Support_4 is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Tree (Dataset_Name : String; theTree : out Tree.Tree_Class)
+   function Get_Classifier (Dataset_Name : String;
+                      Classifier   : out Base_Decision_Tree.Classifier)
                       return Boolean is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
-      Routine_Name : constant String := "Support_4.Get_Tree ";
+      Routine_Name : constant String := "Support_4.Get_Classifier ";
       Tree_File    : constant String := Dataset_Name & ".tre";
       Has_Tree     : constant Boolean := Exists (Tree_File);
       File_ID      : Stream_IO.File_Type;
       aStream      : Stream_Access;
    begin
       if Has_Tree then
-         Put_Line (Routine_Name & "restoring tree");
+         Put_Line (Routine_Name & "restoring classifier");
 
          Open (File_ID, In_File, Tree_File);
          aStream := Stream (File_ID);
-         Tree.Tree_Class'Read (aStream, theTree);
+         Base_Decision_Tree.Classifier'Read (aStream, Classifier);
          Close (File_ID);
          pragma Unreferenced (File_ID);
 
-         Put_Line (Routine_Name & "tree restored");
+         Put_Line (Routine_Name & "classifier restored");
       end if;
 
       return Has_Tree;
 
-   end Get_Tree;
+   end Get_Classifier;
 
    --  -------------------------------------------------------------------------
 
@@ -115,7 +115,7 @@ package body Support_4 is
 
    --  -------------------------------------------------------------------------
 
-   procedure Save_Tree
+   procedure Save_Classifier
      (Dataset_Name : String; Classifier : Base_Decision_Tree.Classifier) is
       use Ada.Streams;
       use Stream_IO;
@@ -126,10 +126,9 @@ package body Support_4 is
    begin
       Create (File_ID, Out_File, Tree_File);
       aStream := Stream (File_ID);
-      Tree.Tree_Class'Write
-        (aStream, Classifier.Attributes.Decision_Tree);
+      Base_Decision_Tree.Classifier'Write (aStream, Classifier);
       Close (File_ID);
       pragma Unreferenced (File_ID);
-   end Save_Tree;
+   end Save_Classifier;
 
 end Support_4;
