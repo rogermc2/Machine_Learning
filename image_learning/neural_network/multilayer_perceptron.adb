@@ -1,11 +1,20 @@
-
+--  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 
+with Encode_Utils;
+
 package body Multilayer_Perceptron is
 
-   function C_Init (Hidden_Layer_Sizes  : ML_Types.Integer_List :=
-                      ML_Types.Integer_Package.Empty_Vector;
+   procedure Validate_Input (Self               : in out MLP_Classifier;
+--                               X                  : IL_Types.Float_List_2D;
+                             Y                  : IL_Types.Integer_List);
+--                               Incremental, Reset : Boolean);
+
+   --  -------------------------------------------------------------------------
+
+   function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
+                      IL_Types.Integer_Package.Empty_Vector;
                     Activation          : Activation_Type := Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
@@ -13,9 +22,9 @@ package body Multilayer_Perceptron is
                     Learning_Rate       : Learning_Rate_Type := Constant_Rate;
                     Learning_Rate_Init  : Float := 0.001;
                     Power_T             : Float := 0.5;
-                    Max_Iter            : Integer := 200;
+                    Max_Iter            : Natural := 200;
                     Shuffle             : Boolean := True;
-                    Random_State        : Integer := 0;
+                    Random_State        : Natural := 0;
                     Tol                 : Float := 10.0 ** (-4);
                     Verbose             : Boolean := False;
                     Warm_Start          : Boolean := False;
@@ -26,8 +35,8 @@ package body Multilayer_Perceptron is
                     Beta_1              : Float := 0.9;
                     Beta_2              : Float := 0.999;
                     Epsilon             : Float := 10.0 ** (-8);
-                    N_Iter_No_Change    : Integer := 10;
-                    Max_Fun             : Integer := 15000) return MLP_Classifier is
+                    N_Iter_No_Change    : Natural := 10;
+                    Max_Fun             : Natural := 15000) return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
       Classifier.Parameters.Hidden_Layer_Sizes  := Hidden_Layer_Sizes;
@@ -57,18 +66,37 @@ package body Multilayer_Perceptron is
    end;
 
    --  -------------------------------------------------------------------------
-
-   procedure Fit (Self : in out MLP_Classifier;
-                  X, Y : ML_Types.Value_Data_Lists_2D;
+   --  L377
+   procedure Fit (Self        : in out MLP_Classifier;
+                  X           : IL_Types.Float_List_2D;
+                  Y           : IL_Types.Integer_List;
                   Incremental : Boolean := False) is
       use Ada.Containers;
---        use Classifier_Types;
-      use ML_Types.Integer_Package;
+      use IL_Types.Integer_Package;
       Routine_Name : constant String := "Multilayer_Perceptron.Fit ";
    begin
       Assert (Self.Parameters.Hidden_Layer_Sizes.Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
+      Validate_Input (Self, Y);
+
    end Fit;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Validate_Input (Self               : in out MLP_Classifier;
+--                               X                  : IL_Types.Float_List_2D;
+                             Y                  : IL_Types.Integer_List) is
+--                               Incremental, Reset : Boolean) is
+--        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
+   begin
+      if Self.Attributes.Classes.Is_Empty and then
+        Self.Parameters.Warm_Start then
+         Self.Attributes.Classes := Encode_Utils.Unique (Y);
+      else
+         null;
+      end if;
+
+   end Validate_Input;
 
    --  -------------------------------------------------------------------------
 
