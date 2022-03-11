@@ -18,6 +18,8 @@ package body Multilayer_Perceptron is
                          Fan_In, Fan_Out : Positive;
                          Coef_Init       : out Weights.Weight_Lists_2D;
                          Intercept_Init  : out IL_Types.Float_List);
+   procedure Init_Coeff_Grads (Layer_Units : IL_Types.Integer_List;
+                               Coef_Grads  : out IL_Types.Float_List_3D);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List);
@@ -96,45 +98,9 @@ package body Multilayer_Perceptron is
       Activations               : Float_List_2D := X;
       Hidden_Layer_Sizes        : Integer_List;
       Layer_Units               : Integer_List;
-      Fan_In_Units              : Integer_List;
-      Fan_Out_Units             : Integer_List;
       Deltas                    : Float_List;
       Coef_Grads                : Float_List_3D;
 
-      type Integer_Zip_Item is record
-         Integer_1 : Integer;
-         Integer_2 : Integer;
-      end record;
-
-      package Integer_Zip_Package is new
-        Ada.Containers.Vectors (Positive, Integer_Zip_Item);
-      subtype Integer_Zip_List is Integer_Zip_Package.Vector;
-
-      function Zip (a, b : Integer_List) return Integer_Zip_List is
-         Item   : Integer_Zip_Item;
-         Result : Integer_Zip_List;
-      begin
-         for index in a.First_Index .. a.Last_Index loop
-            Item := (a.Element (index), b.Element (index));
-            Result.Append (Item);
-         end loop;
-         return Result;
-      end Zip;
-
-      function Build_List (Dims : Integer_Zip_Item) return Float_List_2D is
-         Inner   : Float_List;
-         theList : Float_List_2D;
-      begin
-         Inner.Set_Length (Count_Type (Dims.Integer_2));
-         for index in 1 .. Dims.Integer_1 loop
-            theList.Append (Inner);
-         end loop;
-
-         return theList;
-
-      end Build_List;
-
-      Zip_Layer_Units           : Integer_Zip_List;
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
@@ -159,17 +125,7 @@ package body Multilayer_Perceptron is
       Activations.Set_Length (X.Length + Layer_Units.Length);
       Deltas.Set_Length (Activations.Length);
 
-      Fan_In_Units := Layer_Units;
-      Integer_Package.Delete_Last (Fan_In_Units);
-      Fan_Out_Units := Layer_Units;
-      Integer_Package.Delete_First (Fan_In_Units);
-      Zip_Layer_Units := Zip (Fan_In_Units, Fan_Out_Units);
-
-      --  Coef_Grads is a 3D list of fan_in x fan_out lists
-      for index in Zip_Layer_Units.First_Index ..
-        Zip_Layer_Units.Last_Index loop
-         Coef_Grads.Append (Build_List (Zip_Layer_Units.Element (index)));
-      end loop;
+      Init_Coeff_Grads (Layer_Units, Coef_Grads);
 
    end Fit;
 
@@ -207,6 +163,65 @@ package body Multilayer_Perceptron is
       end loop;
 
    end Init_Coeff;
+
+   --  -------------------------------------------------------------------------
+ --  L417
+   procedure Init_Coeff_Grads (Layer_Units : IL_Types.Integer_List;
+                               Coef_Grads  : out IL_Types.Float_List_3D) is
+      use Ada.Containers;
+      use IL_Types;
+      use Integer_Package;
+      Fan_In_Units              : Integer_List;
+      Fan_Out_Units             : Integer_List;
+
+      type Integer_Zip_Item is record
+         Integer_1 : Integer;
+         Integer_2 : Integer;
+      end record;
+
+      package Integer_Zip_Package is new
+        Ada.Containers.Vectors (Positive, Integer_Zip_Item);
+      subtype Integer_Zip_List is Integer_Zip_Package.Vector;
+
+      function Zip (a, b : Integer_List) return Integer_Zip_List is
+         Item   : Integer_Zip_Item;
+         Result : Integer_Zip_List;
+      begin
+         for index in a.First_Index .. a.Last_Index loop
+            Item := (a.Element (index), b.Element (index));
+            Result.Append (Item);
+         end loop;
+         return Result;
+      end Zip;
+
+      function Build_List (Dims : Integer_Zip_Item) return Float_List_2D is
+         Inner   : Float_List;
+         theList : Float_List_2D;
+      begin
+         Inner.Set_Length (Count_Type (Dims.Integer_2));
+         for index in 1 .. Dims.Integer_1 loop
+            theList.Append (Inner);
+         end loop;
+
+         return theList;
+
+      end Build_List;
+
+      Zip_Layer_Units           : Integer_Zip_List;
+   begin
+      Fan_In_Units := Layer_Units;
+      Integer_Package.Delete_Last (Fan_In_Units);
+      Fan_Out_Units := Layer_Units;
+      Integer_Package.Delete_First (Fan_In_Units);
+      Zip_Layer_Units := Zip (Fan_In_Units, Fan_Out_Units);
+
+      --  Coef_Grads is a 3D list of fan_in x fan_out lists
+      for index in Zip_Layer_Units.First_Index ..
+        Zip_Layer_Units.Last_Index loop
+         Coef_Grads.Append (Build_List (Zip_Layer_Units.Element (index)));
+      end loop;
+
+   end Init_Coeff_Grads;
 
    --  -------------------------------------------------------------------------
 
