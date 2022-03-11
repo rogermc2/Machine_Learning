@@ -1,7 +1,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with IL_Types; use IL_Types;
@@ -10,10 +10,9 @@ with Base_Decision_Tree;
 with Criterion;
 with Data_Splitter;
 with Decision_Tree_Classification;
-with Graphviz_Exporter;
+--  with Graphviz_Exporter;
 --  with Load_ARFF_Data;
 with Openml_Ada;
---  with Plotting;
 with Printing;
 with Tree;
 with Utilities;
@@ -47,7 +46,7 @@ procedure Lesson_4 is
    Prediction_List : Integer_List;
    Prediction      : Integer;
    Correct         : Natural := 0;
-   Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
+--     Exporter        : Graphviz_Exporter.DOT_Tree_Exporter;
 
 begin
    Put_Line (Routine_Name);
@@ -123,11 +122,11 @@ begin
                Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
    New_Line;
 
-   Graphviz_Exporter.C_Init
-     (Exporter, aClassifier.Attributes.Decision_Tree);
-   Graphviz_Exporter.Export_Graphviz
-     (Exporter, aClassifier.Attributes.Decision_Tree,
-      Feature_Names => Bunch.Feature_Names,
-      Output_File_Name => To_Unbounded_String (Dataset_Name & ".dot"));
+--     Graphviz_Exporter.C_Init
+--       (Exporter, aClassifier.Attributes.Decision_Tree);
+--     Graphviz_Exporter.Export_Graphviz
+--       (Exporter, aClassifier.Attributes.Decision_Tree,
+--        Feature_Names => Bunch.Feature_Names,
+--        Output_File_Name => To_Unbounded_String (Dataset_Name & ".dot"));
 
 end Lesson_4;
