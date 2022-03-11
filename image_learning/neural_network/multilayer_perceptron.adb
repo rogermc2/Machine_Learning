@@ -12,7 +12,6 @@ package body Multilayer_Perceptron is
 
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Y           : IL_Types.Integer_List;
                          Layer_Units : IL_Types.Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
@@ -86,7 +85,11 @@ package body Multilayer_Perceptron is
                   Incremental : Boolean := False) is
       use Ada.Containers;
       use IL_Types;
-      Routine_Name              : constant String := "Multilayer_Perceptron.Fit ";
+      Routine_Name              : constant String :=
+                                    "Multilayer_Perceptron.Fit ";
+--        Num_Samples               : constant Positive := Positive (X.Length);
+      Num_Features              : constant Positive :=
+                                    Positive (X.Element (1).Length);
       Hidden_Layer_Sizes_Length : constant Count_Type :=
                                     Self.Parameters.Hidden_Layer_Sizes.Length;
       Hidden_Layer_Sizes        : Integer_List;
@@ -100,11 +103,15 @@ package body Multilayer_Perceptron is
         Self.Attributes.Coefs.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
 
-      Layer_Units.Set_Length (Count_Type (Self.Attributes.N_Features));
+      Layer_Units.Set_Length (Count_Type (Num_Features));
+      for index in Hidden_Layer_Sizes.First_Index ..
+        Hidden_Layer_Sizes.Last_Index loop
+         Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
+      end loop;
       Validate_Input (Self, Y);
 
       if First_Pass then
-         Initialize (Self, Y, Layer_Units);
+         Initialize (Self, Layer_Units);
       end if;
 
    end Fit;
@@ -148,7 +155,6 @@ package body Multilayer_Perceptron is
 
    --  L320  BaseMultilayerPerceptron._Initialize
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Y           : IL_Types.Integer_List;
                          Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
 --        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
