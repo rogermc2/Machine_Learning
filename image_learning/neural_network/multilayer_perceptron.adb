@@ -18,8 +18,9 @@ package body Multilayer_Perceptron is
                          Fan_In, Fan_Out : Positive;
                          Coef_Init       : out Weights.Weight_Lists_2D;
                          Intercept_Init  : out IL_Types.Float_List);
-   procedure Init_Coeff_Grads (Layer_Units : IL_Types.Integer_List;
-                               Coef_Grads  : out IL_Types.Float_List_3D);
+   procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
+                               Coef_Grads      : out IL_Types.Float_List_3D;
+                               Intercept_Grads : out IL_Types.Float_List_2D);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List);
@@ -100,6 +101,7 @@ package body Multilayer_Perceptron is
       Layer_Units               : Integer_List;
       Deltas                    : Float_List;
       Coef_Grads                : Float_List_3D;
+      Intercept_Grads           : Float_List_2D;
 
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
@@ -125,7 +127,7 @@ package body Multilayer_Perceptron is
       Activations.Set_Length (X.Length + Layer_Units.Length);
       Deltas.Set_Length (Activations.Length);
 
-      Init_Coeff_Grads (Layer_Units, Coef_Grads);
+      Init_Coeff_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
    end Fit;
 
@@ -166,13 +168,15 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
  --  L417
-   procedure Init_Coeff_Grads (Layer_Units : IL_Types.Integer_List;
-                               Coef_Grads  : out IL_Types.Float_List_3D) is
+   procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
+                               Coef_Grads      : out IL_Types.Float_List_3D;
+                               Intercept_Grads : out IL_Types.Float_List_2D) is
       use Ada.Containers;
       use IL_Types;
       use Integer_Package;
-      Fan_In_Units              : Integer_List;
-      Fan_Out_Units             : Integer_List;
+      Fan_In_Units  : Integer_List;
+      Fan_Out_Units : Integer_List;
+      Intercept     : Float_List;
 
       type Integer_Zip_Item is record
          Integer_1 : Integer;
@@ -219,6 +223,12 @@ package body Multilayer_Perceptron is
       for index in Zip_Layer_Units.First_Index ..
         Zip_Layer_Units.Last_Index loop
          Coef_Grads.Append (Build_List (Zip_Layer_Units.Element (index)));
+      end loop;
+
+      for index in Fan_Out_Units.First_Index ..
+           Fan_Out_Units.Last_Index loop
+         Intercept.Set_Length (Count_Type (Fan_Out_Units.Element (index)));
+         Intercept_Grads.Append (Intercept);
       end loop;
 
    end Init_Coeff_Grads;
