@@ -2,6 +2,8 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 
+with Maths;
+
 with Encode_Utils;
 
 package body Multilayer_Perceptron is
@@ -11,7 +13,11 @@ package body Multilayer_Perceptron is
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Y           : IL_Types.Integer_List;
-                         Layer_Units : IL_Types.String_Vector);
+                         Layer_Units : IL_Types.Integer_List);
+   procedure Init_Coeff (Self            : in out MLP_Classifier;
+                         Fan_In, Fan_Out : Positive;
+                         Coef_Init       : out Weights.Weight_Lists_2D;
+                         Intercept_Init  : out IL_Types.Float_List);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List);
@@ -84,7 +90,7 @@ package body Multilayer_Perceptron is
       Hidden_Layer_Sizes_Length : constant Count_Type :=
                                     Self.Parameters.Hidden_Layer_Sizes.Length;
       Hidden_Layer_Sizes        : Integer_List;
-      Layer_Units               : String_Vector;
+      Layer_Units               : Integer_List;
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
@@ -105,28 +111,86 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L320  BaseMultilayerPerceptron._Initialize
+   procedure Init_Coeff (Self            : in out MLP_Classifier;
+                         Fan_In, Fan_Out : Positive;
+                         Coef_Init       : out Weights.Weight_Lists_2D;
+                         Intercept_Init  : out IL_Types.Float_List) is
+      use Maths;
+      use Float_Math_Functions;
+      Factor         : Float;
+      Init_Bound     : Float;
+      Coef_Init_1    : Weights.Weight_List;
+   begin
+      if Self.Parameters.Activation = Logistic_Activation then
+         Factor := 2.0;
+      else
+         Factor := 6.0;
+      end if;
+
+      Init_Bound := Sqrt (Factor / Float (Fan_In + Fan_Out));
+      --  Generate weights and bias
+      Coef_Init.Clear;
+      for f_in in 1 .. Fan_In loop
+         Coef_Init_1.Clear;
+         for f_out in 1 .. Fan_Out loop
+            Coef_Init_1.Append (Init_Bound * Random_Float);
+         end loop;
+         Coef_Init.Append (Coef_Init_1);
+      end loop;
+
+      for index in 1 .. Fan_Out loop
+         Intercept_Init.Append (Init_Bound * Random_Float);
+      end loop;
+
+   end Init_Coeff;
+
+   --  -------------------------------------------------------------------------
+
+   --  L320  BaseMultilayerPerceptron._Initialize
    procedure Initialize (Self        : in out MLP_Classifier;
                          Y           : IL_Types.Integer_List;
-                         Layer_Units : IL_Types.String_Vector) is
+                         Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
-      use Weights;
-      Routine_Name : constant String := "Multilayer_Perceptron.Fit ";
+--        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
+      Coef_Init      : Weights.Weight_Lists_2D;
+      Intercept_Init : Float_List;
    begin
       Self.Attributes.N_Iter := 0;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
       Self.Attributes.Out_Activation := Logistic_Activation;
       Self.Attributes.Coefs.Clear;
+      Self.Attributes.Intercepts.Clear;
+
+      for index in 1 .. Self.Attributes.N_Layers - 1 loop
+         Init_Coeff
+           (Self, Layer_Units.Element (index), Layer_Units.Element (index + 1),
+            Coef_Init, Intercept_Init);
+         Self.Attributes.Coefs.Append (Coef_Init);
+         Self.Attributes.Intercepts.Append (Intercept_Init);
+      end loop;
+
+      if Self.Parameters.Solver = Sgd_Solver or else
+        Self.Parameters.Solver = Adam_Solver then
+         Self.Attributes.Loss_Curve.Clear;
+         Self.Attributes.No_Improvement_Count := 0;
+         if Self.Parameters.Early_Stopping then
+            Self.Parameters.Validation_Scores.Clear;
+            Self.Parameters.Best_Validation_Score := Float'Safe_First;
+         else
+            Self.Attributes.Best_Loss := Float'Safe_Last;
+         end if;
+      end if;
 
    end Initialize;
 
    --  -------------------------------------------------------------------------
-   -- L455
+   --  L455
    procedure Validate_Hyperparameters (Self : MLP_Classifier) is
       --                               Incremental, Reset : Boolean) is
       --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Hyperparameters ";
    begin
-         null;
+      null;
 
    end Validate_Hyperparameters;
 
