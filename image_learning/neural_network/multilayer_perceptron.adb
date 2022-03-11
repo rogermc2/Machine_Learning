@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Containers.Vectors;
+with Ada.Containers.Vectors;
 
 with Maths;
 
@@ -96,34 +96,45 @@ package body Multilayer_Perceptron is
       Activations               : Float_List_2D := X;
       Hidden_Layer_Sizes        : Integer_List;
       Layer_Units               : Integer_List;
-      Layer                     : Float;
---        Fan_In_Units              : Integer_List;
---        Fan_Out_Units             : Integer_List;
+      Fan_In_Units              : Integer_List;
+      Fan_Out_Units             : Integer_List;
       Deltas                    : Float_List;
-      Coef_Grads                : Float_List_2D;
-      Coef_Grads_1              : Float_List;
+      Coef_Grads                : Float_List_3D;
 
---        type Integer_Zip_Item is record
---           Integer_1 : Integer;
---           Integer_2 : Integer;
---        end record;
+      type Integer_Zip_Item is record
+         Integer_1 : Integer;
+         Integer_2 : Integer;
+      end record;
 
---        package Integer_Zip_Package is new
---          Ada.Containers.Vectors (Positive, Integer_Zip_Item);
---        subtype Integer_Zip_List is Integer_Zip_Package.Vector;
---
---        function Zip (a, b : Integer_List) return Integer_Zip_List is
---           Item   : Integer_Zip_Item;
---           Result : Integer_Zip_List;
---        begin
---           for index in a.First_Index .. a.Last_Index loop
---              Item := (a.Element (index), b.Element (index));
---              Result.Append (Item);
---           end loop;
---           return Result;
---        end Zip;
---
---        Zip_Layer_Units           : Integer_Zip_List;
+      package Integer_Zip_Package is new
+        Ada.Containers.Vectors (Positive, Integer_Zip_Item);
+      subtype Integer_Zip_List is Integer_Zip_Package.Vector;
+
+      function Zip (a, b : Integer_List) return Integer_Zip_List is
+         Item   : Integer_Zip_Item;
+         Result : Integer_Zip_List;
+      begin
+         for index in a.First_Index .. a.Last_Index loop
+            Item := (a.Element (index), b.Element (index));
+            Result.Append (Item);
+         end loop;
+         return Result;
+      end Zip;
+
+      function Build_List (Dims : Integer_Zip_Item) return Float_List_2D is
+         Inner   : Float_List;
+         theList : Float_List_2D;
+      begin
+         Inner.Set_Length (Count_Type (Dims.Integer_2));
+         for index in 1 .. Dims.Integer_1 loop
+            theList.Append (Inner);
+         end loop;
+
+         return theList;
+
+      end Build_List;
+
+      Zip_Layer_Units           : Integer_Zip_List;
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
@@ -148,21 +159,16 @@ package body Multilayer_Perceptron is
       Activations.Set_Length (X.Length + Layer_Units.Length);
       Deltas.Set_Length (Activations.Length);
 
---        Fan_In_Units := Layer_Units;
---        Integer_Package.Delete_Last (Fan_In_Units);
---        Fan_Out_Units := Layer_Units;
---        Integer_Package.Delete_First (Fan_In_Units);
+      Fan_In_Units := Layer_Units;
+      Integer_Package.Delete_Last (Fan_In_Units);
+      Fan_Out_Units := Layer_Units;
+      Integer_Package.Delete_First (Fan_In_Units);
+      Zip_Layer_Units := Zip (Fan_In_Units, Fan_Out_Units);
 
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
-      for fan_in in Layer_Units.First_Index .. Layer_Units.Last_Index - 1 loop
-         Coef_Grads_1.Clear;
-         Layer := Float (Layer_Units.Element (fan_in));
-         for fan_out in Layer_Units.First_Index + 1 ..
-           Layer_Units.Last_Index loop
-            Coef_Grads_1.Set_Length
-              (Count_Type (Layer_Units.Element (fan_out)));
-         end loop;
-         Coef_Grads.Append (Coef_Grads_1);
+      for index in Zip_Layer_Units.First_Index ..
+        Zip_Layer_Units.Last_Index loop
+         Coef_Grads.Append (Build_List (Zip_Layer_Units.Element (index)));
       end loop;
 
    end Fit;
