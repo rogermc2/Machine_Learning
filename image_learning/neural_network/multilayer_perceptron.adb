@@ -1,17 +1,13 @@
 --  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Containers.Vectors;
+--  with Ada.Containers.Vectors;
 
 with Maths;
 
 with Encode_Utils;
 
 package body Multilayer_Perceptron is
-
-   type Integer_Array_1D is array (Integer range <>) of Integer;
-   type Integer_Array_2D is array (Integer range <>, Integer range <>) of
-      Integer;
 
    First_Pass : Boolean := True;
 
@@ -100,30 +96,34 @@ package body Multilayer_Perceptron is
       Activations               : Float_List_2D := X;
       Hidden_Layer_Sizes        : Integer_List;
       Layer_Units               : Integer_List;
+      Layer                     : Float;
+--        Fan_In_Units              : Integer_List;
+--        Fan_Out_Units             : Integer_List;
       Deltas                    : Float_List;
       Coef_Grads                : Float_List_2D;
       Coef_Grads_1              : Float_List;
 
-      type Zip_Item is record
-         Value_1 : Integer;
-         Value_2 : Integer;
-      end record;
+--        type Integer_Zip_Item is record
+--           Integer_1 : Integer;
+--           Integer_2 : Integer;
+--        end record;
 
-      package Zip_Package is new Ada.Containers.Vectors (Positive, Zip_Item);
-      subtype Zip_List is Zip_Package.Vector;
-
-      function Zip (a, b : Integer_List) return Zip_List is
-         Item   : Zip_Item;
-         Result : Zip_List;
-      begin
-         for index in a.First_Index .. a.Last_Index loop
-            Item := (a.Element (index), b.Element (index));
-            Result.Append (Item);
-         end loop;
-         return Result;
-      end Zip;
-
-      Zip_Layer_Units           : Zip_List;
+--        package Integer_Zip_Package is new
+--          Ada.Containers.Vectors (Positive, Integer_Zip_Item);
+--        subtype Integer_Zip_List is Integer_Zip_Package.Vector;
+--
+--        function Zip (a, b : Integer_List) return Integer_Zip_List is
+--           Item   : Integer_Zip_Item;
+--           Result : Integer_Zip_List;
+--        begin
+--           for index in a.First_Index .. a.Last_Index loop
+--              Item := (a.Element (index), b.Element (index));
+--              Result.Append (Item);
+--           end loop;
+--           return Result;
+--        end Zip;
+--
+--        Zip_Layer_Units           : Integer_Zip_List;
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
@@ -133,11 +133,12 @@ package body Multilayer_Perceptron is
         Self.Attributes.Coefs.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
 
-      Layer_Units.Set_Length (Count_Type (Num_Features));
+      Layer_Units.Append (Num_Features);
       for index in Hidden_Layer_Sizes.First_Index ..
         Hidden_Layer_Sizes.Last_Index loop
          Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
       end loop;
+
       Validate_Input (Self, Y);
 
       if First_Pass then
@@ -147,12 +148,17 @@ package body Multilayer_Perceptron is
       Activations.Set_Length (X.Length + Layer_Units.Length);
       Deltas.Set_Length (Activations.Length);
 
-      Zip_Layer_Units := Zip (Layer_Units, Layer_Units);
+--        Fan_In_Units := Layer_Units;
+--        Integer_Package.Delete_Last (Fan_In_Units);
+--        Fan_Out_Units := Layer_Units;
+--        Integer_Package.Delete_First (Fan_In_Units);
 
-      for fan_in in 1 .. Layer_Units.Length loop
-         Layer := Layer_Units.Element (f_in);
-         for f_out in 1 .. Fan_Out loop
-            Coef_Grads_1.Append (Layer.Element (f_out));
+      for fan_in in Layer_Units.First_Index .. Layer_Units.Last_Index - 1 loop
+         Coef_Grads_1.Clear;
+         Layer := Float (Layer_Units.Element (fan_in));
+         for fan_out in Layer_Units.First_Index + 1 ..
+           Layer_Units.Last_Index loop
+            Coef_Grads_1.Append (Layer);
          end loop;
          Coef_Grads.Append (Coef_Grads_1);
       end loop;
