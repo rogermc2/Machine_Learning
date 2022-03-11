@@ -103,19 +103,6 @@ package body Multilayer_Perceptron is
       Deltas                    : Float_List;
       Coef_Grads                : Float_List_2D;
       Coef_Grads_1              : Float_List;
-      Zip_Layer_Units           : Integer_Array_2D
-          (1 .. Integer (Layer_Units.Length), 1 .. 2);
-
-      function Zip (a, b : Integer_Array_1D) return Integer_Array_2D is
-         Result : Integer_Array_2D (1 .. a'Length, 1 .. 2);
-      begin
-         for index in a'First .. a'Last loop
-            Result (index, 1) := a (index);
-            Result (index, 2) := b (index);
-         end loop;
-         return Result;
-
-      end Zip;
 
       type Zip_Item is record
          Value_1 : Integer;
@@ -136,6 +123,7 @@ package body Multilayer_Perceptron is
          return Result;
       end Zip;
 
+      Zip_Layer_Units           : Zip_List;
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
@@ -158,6 +146,8 @@ package body Multilayer_Perceptron is
 
       Activations.Set_Length (X.Length + Layer_Units.Length);
       Deltas.Set_Length (Activations.Length);
+
+      Zip_Layer_Units := Zip (Layer_Units, Layer_Units);
 
       for fan_in in 1 .. Layer_Units.Length loop
          Layer := Layer_Units.Element (f_in);
