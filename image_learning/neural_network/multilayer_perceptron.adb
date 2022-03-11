@@ -1,9 +1,9 @@
 --  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Containers.Vectors;
 
 with Maths;
+with Utilities;
 
 with Encode_Utils;
 
@@ -172,31 +172,12 @@ package body Multilayer_Perceptron is
                                Coef_Grads      : out IL_Types.Float_List_3D;
                                Intercept_Grads : out IL_Types.Float_List_2D) is
       use Ada.Containers;
+      use Utilities;
       use IL_Types;
       use Integer_Package;
       Fan_In_Units  : Integer_List;
       Fan_Out_Units : Integer_List;
       Intercept     : Float_List;
-
-      type Integer_Zip_Item is record
-         Integer_1 : Integer;
-         Integer_2 : Integer;
-      end record;
-
-      package Integer_Zip_Package is new
-        Ada.Containers.Vectors (Positive, Integer_Zip_Item);
-      subtype Integer_Zip_List is Integer_Zip_Package.Vector;
-
-      function Zip (a, b : Integer_List) return Integer_Zip_List is
-         Item   : Integer_Zip_Item;
-         Result : Integer_Zip_List;
-      begin
-         for index in a.First_Index .. a.Last_Index loop
-            Item := (a.Element (index), b.Element (index));
-            Result.Append (Item);
-         end loop;
-         return Result;
-      end Zip;
 
       function Build_List (Dims : Integer_Zip_Item) return Float_List_2D is
          Inner   : Float_List;
