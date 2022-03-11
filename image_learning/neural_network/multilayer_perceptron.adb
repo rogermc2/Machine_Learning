@@ -1,12 +1,17 @@
 --  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Containers.Vectors;
 
 with Maths;
 
 with Encode_Utils;
 
 package body Multilayer_Perceptron is
+
+   type Integer_Array_1D is array (Integer range <>) of Integer;
+   type Integer_Array_2D is array (Integer range <>, Integer range <>) of
+      Integer;
 
    First_Pass : Boolean := True;
 
@@ -92,8 +97,45 @@ package body Multilayer_Perceptron is
                                     Positive (X.Element (1).Length);
       Hidden_Layer_Sizes_Length : constant Count_Type :=
                                     Self.Parameters.Hidden_Layer_Sizes.Length;
+      Activations               : Float_List_2D := X;
       Hidden_Layer_Sizes        : Integer_List;
       Layer_Units               : Integer_List;
+      Deltas                    : Float_List;
+      Coef_Grads                : Float_List_2D;
+      Coef_Grads_1              : Float_List;
+      Zip_Layer_Units           : Integer_Array_2D
+          (1 .. Integer (Layer_Units.Length), 1 .. 2);
+
+      function Zip (a, b : Integer_Array_1D) return Integer_Array_2D is
+         Result : Integer_Array_2D (1 .. a'Length, 1 .. 2);
+      begin
+         for index in a'First .. a'Last loop
+            Result (index, 1) := a (index);
+            Result (index, 2) := b (index);
+         end loop;
+         return Result;
+
+      end Zip;
+
+      type Zip_Item is record
+         Value_1 : Integer;
+         Value_2 : Integer;
+      end record;
+
+      package Zip_Package is new Ada.Containers.Vectors (Positive, Zip_Item);
+      subtype Zip_List is Zip_Package.Vector;
+
+      function Zip (a, b : Integer_List) return Zip_List is
+         Item   : Zip_Item;
+         Result : Zip_List;
+      begin
+         for index in a.First_Index .. a.Last_Index loop
+            Item := (a.Element (index), b.Element (index));
+            Result.Append (Item);
+         end loop;
+         return Result;
+      end Zip;
+
    begin
       Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
@@ -113,6 +155,17 @@ package body Multilayer_Perceptron is
       if First_Pass then
          Initialize (Self, Layer_Units);
       end if;
+
+      Activations.Set_Length (X.Length + Layer_Units.Length);
+      Deltas.Set_Length (Activations.Length);
+
+      for fan_in in 1 .. Layer_Units.Length loop
+         Layer := Layer_Units.Element (f_in);
+         for f_out in 1 .. Fan_Out loop
+            Coef_Grads_1.Append (Layer.Element (f_out));
+         end loop;
+         Coef_Grads.Append (Coef_Grads_1);
+      end loop;
 
    end Fit;
 
