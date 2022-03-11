@@ -11,16 +11,25 @@ package body Multilayer_Perceptron is
 
    First_Pass : Boolean := True;
 
-   procedure Validate_Hyperparameters (Self : MLP_Classifier);
+   procedure Fit_Stochastic (Self            : in out MLP_Classifier;
+                             X               : IL_Types.Float_List_2D;
+                             Y               : IL_Types.Integer_List;
+                             Activations     : IL_Types.Float_List_2D;
+                             Deltas          : IL_Types.Float_List;
+                             Coef_Grads      : IL_Types.Float_List_3D;
+                             Intercept_Grads : IL_Types.Float_List_2D;
+                             Layer_Units     : IL_Types.Integer_List;
+                             Incremental     : Boolean := False);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : IL_Types.Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
-                         Coef_Init       : out Weights.Weight_Lists_2D;
+                         Coef_Init       : out IL_Types.Float_List_2D;
                          Intercept_Init  : out IL_Types.Float_List);
    procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
                                Coef_Grads      : out IL_Types.Float_List_3D;
                                Intercept_Grads : out IL_Types.Float_List_2D);
+   procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List);
@@ -129,19 +138,47 @@ package body Multilayer_Perceptron is
 
       Init_Coeff_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
+      if Self.Parameters.Solver = Sgd_Solver or else
+          Self.Parameters.Solver = Adam_Solver then
+          null;
+      else
+            null;
+      end if;
+
    end Fit;
+
+   --  -------------------------------------------------------------------------
+
+   --  L563
+   procedure Fit_Stochastic (Self            : in out MLP_Classifier;
+                             X               : IL_Types.Float_List_2D;
+                             Y               : IL_Types.Integer_List;
+                             Activations     : IL_Types.Float_List_2D;
+                             Deltas          : IL_Types.Float_List;
+                             Coef_Grads      : IL_Types.Float_List_3D;
+                             Intercept_Grads : IL_Types.Float_List_2D;
+                             Layer_Units     : IL_Types.Integer_List;
+                             Incremental     : Boolean := False) is
+
+        use IL_Types;
+        use List_Of_Float_Lists_Package;
+        Params    : Float_List_3D :=
+                      Self.Attributes.Coefs & Self.Attributes.Intercepts;
+   begin
+        null;
+   end Fit_Stochastic;
 
    --  -------------------------------------------------------------------------
    --  L320  BaseMultilayerPerceptron._Initialize
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
-                         Coef_Init       : out Weights.Weight_Lists_2D;
+                         Coef_Init       : out IL_Types.Float_List_2D;
                          Intercept_Init  : out IL_Types.Float_List) is
       use Maths;
       use Float_Math_Functions;
       Factor         : Float;
       Init_Bound     : Float;
-      Coef_Init_1    : Weights.Weight_List;
+      Coef_Init_1    : IL_Types.Float_List;
    begin
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
@@ -221,7 +258,7 @@ package body Multilayer_Perceptron is
                          Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
 --        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
-      Coef_Init      : Weights.Weight_Lists_2D;
+      Coef_Init      : Float_List_2D;
       Intercept_Init : Float_List;
    begin
       Self.Attributes.N_Iter := 0;
