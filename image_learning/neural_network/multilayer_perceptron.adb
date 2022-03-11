@@ -6,10 +6,16 @@ with Encode_Utils;
 
 package body Multilayer_Perceptron is
 
+   First_Pass : Boolean := True;
+
+   procedure Validate_Hyperparameters (Self : MLP_Classifier);
+   procedure Initialize (Self        : in out MLP_Classifier;
+                         Y           : IL_Types.Integer_List;
+                         Layer_Units : IL_Types.String_Vector);
    procedure Validate_Input (Self               : in out MLP_Classifier;
---                               X                  : IL_Types.Float_List_2D;
+                             --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List);
---                               Incremental, Reset : Boolean);
+   --                               Incremental, Reset : Boolean);
 
    --  -------------------------------------------------------------------------
 
@@ -62,32 +68,75 @@ package body Multilayer_Perceptron is
       Classifier.Parameters.Epsilon             := Epsilon;
       Classifier.Parameters.N_Iter_No_Change    := N_Iter_No_Change;
       Classifier.Parameters.Max_Fun             := Max_Fun;
+      First_Pass                                := True;
       return Classifier;
-   end;
+   end C_Init;
 
    --  -------------------------------------------------------------------------
-   --  L377
+   --  L377  BaseMultilayerPerceptron._Fit
    procedure Fit (Self        : in out MLP_Classifier;
                   X           : IL_Types.Float_List_2D;
                   Y           : IL_Types.Integer_List;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      use IL_Types.Integer_Package;
-      Routine_Name : constant String := "Multilayer_Perceptron.Fit ";
+      use IL_Types;
+      Routine_Name              : constant String := "Multilayer_Perceptron.Fit ";
+      Hidden_Layer_Sizes_Length : constant Count_Type :=
+                                    Self.Parameters.Hidden_Layer_Sizes.Length;
+      Hidden_Layer_Sizes        : Integer_List;
+      Layer_Units               : String_Vector;
    begin
-      Assert (Self.Parameters.Hidden_Layer_Sizes.Length > 0,
+      Assert (Hidden_Layer_Sizes_Length > 0,
               Routine_Name & "Hidden_Layer_Sizes vector is empty");
+      Hidden_Layer_Sizes.Set_Length (Hidden_Layer_Sizes_Length);
+      Validate_Hyperparameters (Self);
+      First_Pass :=
+        Self.Attributes.Coefs.Is_Empty or else
+        (not Self.Parameters.Warm_Start and then not Incremental);
+
+      Layer_Units.Set_Length (Count_Type (Self.Attributes.N_Features));
       Validate_Input (Self, Y);
+
+      if First_Pass then
+         Initialize (Self, Y, Layer_Units);
+      end if;
 
    end Fit;
 
    --  -------------------------------------------------------------------------
+   --  L320  BaseMultilayerPerceptron._Initialize
+   procedure Initialize (Self        : in out MLP_Classifier;
+                         Y           : IL_Types.Integer_List;
+                         Layer_Units : IL_Types.String_Vector) is
+      use IL_Types;
+      use Weights;
+      Routine_Name : constant String := "Multilayer_Perceptron.Fit ";
+   begin
+      Self.Attributes.N_Iter := 0;
+      Self.Attributes.T := 0;
+      Self.Attributes.N_Layers := Natural (Layer_Units.Length);
+      Self.Attributes.Out_Activation := Logistic_Activation;
+      Self.Attributes.Coefs.Clear;
+
+   end Initialize;
+
+   --  -------------------------------------------------------------------------
+   -- L455
+   procedure Validate_Hyperparameters (Self : MLP_Classifier) is
+      --                               Incremental, Reset : Boolean) is
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Hyperparameters ";
+   begin
+         null;
+
+   end Validate_Hyperparameters;
+
+   --  -------------------------------------------------------------------------
 
    procedure Validate_Input (Self               : in out MLP_Classifier;
---                               X                  : IL_Types.Float_List_2D;
+                             --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List) is
---                               Incremental, Reset : Boolean) is
---        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
+      --                               Incremental, Reset : Boolean) is
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
    begin
       if Self.Attributes.Classes.Is_Empty and then
         Self.Parameters.Warm_Start then

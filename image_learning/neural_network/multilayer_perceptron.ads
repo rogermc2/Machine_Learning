@@ -24,7 +24,7 @@ package Multilayer_Perceptron is
       N_Iter           : Natural;
       N_Layers         : Positive;
       N_Outputs        : Positive;
-      Out_Activation   : Unbounded_String := To_Unbounded_String ("");
+      Out_Activation   : Activation_Type := Logistic_Activation;
    end record;
 
    type MLP_Classifier_Parameters is record
