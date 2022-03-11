@@ -153,12 +153,14 @@ package body Multilayer_Perceptron is
 --        Fan_Out_Units := Layer_Units;
 --        Integer_Package.Delete_First (Fan_In_Units);
 
+      --  Coef_Grads is a 3D list of fan_in x fan_out lists
       for fan_in in Layer_Units.First_Index .. Layer_Units.Last_Index - 1 loop
          Coef_Grads_1.Clear;
          Layer := Float (Layer_Units.Element (fan_in));
          for fan_out in Layer_Units.First_Index + 1 ..
            Layer_Units.Last_Index loop
-            Coef_Grads_1.Append (Layer);
+            Coef_Grads_1.Set_Length
+              (Count_Type (Layer_Units.Element (fan_out)));
          end loop;
          Coef_Grads.Append (Coef_Grads_1);
       end loop;
