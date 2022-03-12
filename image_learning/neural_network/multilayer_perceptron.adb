@@ -165,7 +165,13 @@ package body Multilayer_Perceptron is
         Params    : Float_List_3D :=
                       Self.Attributes.Coefs & Self.Attributes.Intercepts;
    begin
-        null;
+      if not Incremental then
+         case Self.Parameters.Solver is
+            when Sgd_Solver => null;
+            when Adam_Solver => null;
+            when Lbfgs_Solver => null;
+         end case;
+      end if;
    end Fit_Stochastic;
 
    --  -------------------------------------------------------------------------
