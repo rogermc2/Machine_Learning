@@ -161,15 +161,17 @@ package body Multilayer_Perceptron is
                              Incremental     : Boolean := False) is
 
         use IL_Types;
+        use Stochastic_Optimizers;
         use List_Of_Float_Lists_Package;
         Params    : Float_List_3D :=
                       Self.Attributes.Coefs & Self.Attributes.Intercepts;
    begin
-      if not Incremental then
+      if not Incremental or else
+          Self.Attributes.Has_Optimizer = No_Optimizer then
          case Self.Parameters.Solver is
-            when Sgd_Solver => null;
             when Adam_Solver => null;
             when Lbfgs_Solver => null;
+            when Sgd_Solver => null;
          end case;
       end if;
    end Fit_Stochastic;

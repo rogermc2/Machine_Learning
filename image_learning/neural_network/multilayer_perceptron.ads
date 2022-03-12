@@ -1,5 +1,6 @@
 
 with IL_Types;
+with Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
@@ -23,6 +24,8 @@ package Multilayer_Perceptron is
       N_Layers            : Positive;
       N_Outputs           : Positive;
       Out_Activation      : Activation_Type := Logistic_Activation;
+      Has_Optimizer       : Stochastic_Optimizers.Optimizer_Type :=
+                                Stochastic_Optimizers.No_Optimizer;
    end record;
 
    type MLP_Classifier_Parameters is record

@@ -16,6 +16,8 @@ package Stochastic_Optimizers is
    --  tol or fail to increase the validation score by tol if 'early_stopping'
    --  is on, the current learning rate is divided by five.
 
+   type Optimizer_Type is (No_Optimizer, Optimizer_Adam, Optimizer_SGD);
+
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
