@@ -31,8 +31,10 @@ package Label is
    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_List);
    function Fit_Transform (Encoder : in out Label_Encoder;
                            Y       : Integer_List) return Natural_List;
-   function Inverse_Transform  (Self   : in out Label_Encoder;
-                                Labels : Natural_List) return Integer_List;
+   function Inverse_Transform (Self   : in out Label_Encoder;
+                               Labels : Natural_List) return Integer_List;
+   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_List)
+                               return Integer_List;
    function Transform (Self : in out Label_Encoder; Y : Integer_List)
                        return Natural_List;
 

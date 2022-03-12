@@ -7,6 +7,7 @@ with Utilities;
 
 with Data_Splitter;
 with Encode_Utils;
+with Label;
 
 package body Multilayer_Perceptron is
 
@@ -164,6 +165,7 @@ package body Multilayer_Perceptron is
       use IL_Types;
       use List_Of_Float_Lists_Package;
       Num_Samples      : constant Positive := Positive (X.Length);
+      LE_U             : Label.Label_Encoder (Label.Class_Unique);
       Params           : constant Float_List_3D :=
                            Self.Attributes.Coefs & Self.Attributes.Intercepts;
       Early_Stopping   : constant Boolean
@@ -217,11 +219,15 @@ package body Multilayer_Perceptron is
          if Should_Stratify then
             Stratify := Y;
          end if;
+
          Data_Splitter.Train_Test_Split
            (X => X, Y => Y,
             Train_Size => Train_Size, Test_Size  => Test_Size,
             Train_X => Train_X, Train_Y => Train_Y,
             Test_X  => Test_X, Test_Y => Test_Y);
+         if Self.Parameters.Is_Classifier then
+            Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
+         end if;
       end if;
 
    end Fit_Stochastic;

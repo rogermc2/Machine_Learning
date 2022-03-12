@@ -444,6 +444,25 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Set_Diff (Values : Integer_List; Uniques : Natural_List)
+                      return Natural_List is
+      use Natural_Package;
+      Unique_Vals : constant Integer_List := Encode_Utils.Unique (Values);
+      aVal        : Integer;
+      Diff        : Natural_List;
+   begin
+      for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
+         aVal := Unique_Vals.Element (index);
+         if not Uniques.Contains (aVal) then
+            Diff.Append (aVal);
+         end if;
+      end loop;
+
+      return Diff;
+   end Set_Diff;
+
+   --  -------------------------------------------------------------------------
+
    function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
       use Natural_Package;
       Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
