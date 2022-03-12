@@ -5,6 +5,7 @@ with Ada.Containers;
 with Maths;
 with Utilities;
 
+with Data_Splitter;
 with Encode_Utils;
 
 package body Multilayer_Perceptron is
@@ -100,7 +101,7 @@ package body Multilayer_Perceptron is
       use IL_Types;
       Routine_Name              : constant String :=
                                     "Multilayer_Perceptron.Fit ";
---        Num_Samples               : constant Positive := Positive (X.Length);
+      --        Num_Samples               : constant Positive := Positive (X.Length);
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
       Hidden_Layer_Sizes_Length : constant Count_Type :=
@@ -139,10 +140,10 @@ package body Multilayer_Perceptron is
       Init_Coeff_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
       if Self.Parameters.Solver = Sgd_Solver or else
-          Self.Parameters.Solver = Adam_Solver then
-          null;
+        Self.Parameters.Solver = Adam_Solver then
+         null;
       else
-            null;
+         null;
       end if;
 
    end Fit;
@@ -160,13 +161,25 @@ package body Multilayer_Perceptron is
                              Layer_Units     : IL_Types.Integer_List;
                              Incremental     : Boolean := False) is
 
-        use IL_Types;
-        use List_Of_Float_Lists_Package;
-        Params    : constant Float_List_3D :=
-                      Self.Attributes.Coefs & Self.Attributes.Intercepts;
+      use IL_Types;
+      use List_Of_Float_Lists_Package;
+      Num_Samples      : constant Positive := Positive (X.Length);
+      Params           : constant Float_List_3D :=
+                           Self.Attributes.Coefs & Self.Attributes.Intercepts;
+      Early_Stopping   : constant Boolean
+        := Self.Parameters.Early_Stopping and then not Incremental;
+      Test_Size        : constant Positive
+        := Positive (Self.Parameters.Validation_Fraction * Float (Num_Samples));
+      Train_Size       : constant Positive := Num_Samples - Test_Size;
+      Stratify         : Integer_List;
+      Should_Stratify  : Boolean;
+      Train_X          : Float_List_2D;
+      Train_Y          : Integer_List;
+      Test_X           : Float_List_2D;
+      Test_Y           : Integer_List;
    begin
       if not Incremental or else
-          Self.Attributes.Has_Optimizer = No_Optimizer then
+        Self.Attributes.Has_Optimizer = No_Optimizer then
          case Self.Parameters.Solver is
             when Adam_Solver =>
                declare
@@ -198,6 +211,19 @@ package body Multilayer_Perceptron is
             when Sgd_Solver => null;
          end case;
       end if;
+
+      if Early_Stopping then
+         Should_Stratify := Self.Parameters.Is_Classifier;
+         if Should_Stratify then
+            Stratify := Y;
+         end if;
+         Data_Splitter.Train_Test_Split
+           (X => X, Y => Y,
+            Train_Size => Train_Size, Test_Size  => Test_Size,
+            Train_X => Train_X, Train_Y => Train_Y,
+            Test_X  => Test_X, Test_Y => Test_Y);
+      end if;
+
    end Fit_Stochastic;
 
    --  -------------------------------------------------------------------------
@@ -236,7 +262,7 @@ package body Multilayer_Perceptron is
    end Init_Coeff;
 
    --  -------------------------------------------------------------------------
- --  L417
+   --  L417
    procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
                                Coef_Grads      : out IL_Types.Float_List_3D;
                                Intercept_Grads : out IL_Types.Float_List_2D) is
@@ -276,7 +302,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       for index in Fan_Out_Units.First_Index ..
-           Fan_Out_Units.Last_Index loop
+        Fan_Out_Units.Last_Index loop
          Intercept.Set_Length (Count_Type (Fan_Out_Units.Element (index)));
          Intercept_Grads.Append (Intercept);
       end loop;
@@ -289,7 +315,7 @@ package body Multilayer_Perceptron is
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
---        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
       Intercept_Init : Float_List;
    begin

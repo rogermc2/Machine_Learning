@@ -29,6 +29,7 @@ package Multilayer_Perceptron is
    type MLP_Classifier_Parameters is record
       Hidden_Layer_Sizes    : IL_Types.Integer_List;
       Activation            : Activation_Type := Relu_Activation;
+      Is_Classifier         : Boolean := True;
       Solver                : Solver_Type := Adam_Solver;
       Alpha                 : Float := 0.0001;
       Batch_Size            : Positive;
