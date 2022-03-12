@@ -181,7 +181,7 @@ package body Multilayer_Perceptron is
       Test_Y           : Integer_List;
    begin
       if not Incremental or else
-        Self.Attributes.Has_Optimizer = No_Optimizer then
+        Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
             when Adam_Solver =>
                declare

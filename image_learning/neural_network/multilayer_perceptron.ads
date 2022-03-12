@@ -22,7 +22,6 @@ package Multilayer_Perceptron is
       N_Layers             : Positive;
       N_Outputs            : Positive;
       Out_Activation       : Activation_Type := Logistic_Activation;
-      Has_Optimizer        : Optimizer_Type := No_Optimizer;
       Optimizer            : Optimizer_Record;
    end record;
 
