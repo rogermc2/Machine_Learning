@@ -1,31 +1,29 @@
 
 with IL_Types;
-with Stochastic_Optimizers;
+with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
    type Activation_Type is (Identity_Activation, Logistic_Activation,
                             Tanh_Activation, Relu_Activation);
-   type Solver_Type is (Lbfgs_Solver, Sgd_Solver, Adam_Solver);
-   type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type MLP_Classifier_Attributes is record
-      Classes             : IL_Types.Integer_List;
-      Loss                : Float;
-      Best_Loss           : Float;
+      Classes              : IL_Types.Integer_List;
+      Loss                 : Float;
+      Best_Loss            : Float;
       Loss_Curve           : IL_Types.Float_List;
       No_Improvement_Count : Natural := 0;
-      T                   : Natural;
-      Coefs               : IL_Types.Float_List_3D;
-      Intercepts          : IL_Types.Float_List_2D;
-      N_Features          : Positive;
-      Feature_Names_In    : IL_Types.String_List;
-      N_Iter              : Natural;
-      N_Layers            : Positive;
-      N_Outputs           : Positive;
-      Out_Activation      : Activation_Type := Logistic_Activation;
-      Has_Optimizer       : Stochastic_Optimizers.Optimizer_Type :=
-                                Stochastic_Optimizers.No_Optimizer;
+      T                    : Natural;
+      Coefs                : IL_Types.Float_List_3D;
+      Intercepts           : IL_Types.Float_List_2D;
+      N_Features           : Positive;
+      Feature_Names_In     : IL_Types.String_List;
+      N_Iter                : Natural;
+      N_Layers             : Positive;
+      N_Outputs            : Positive;
+      Out_Activation       : Activation_Type := Logistic_Activation;
+      Has_Optimizer        : Optimizer_Type := No_Optimizer;
+      Optimizer            : Optimizer_Record;
    end record;
 
    type MLP_Classifier_Parameters is record
@@ -34,8 +32,9 @@ package Multilayer_Perceptron is
       Solver                : Solver_Type := Adam_Solver;
       Alpha                 : Float := 0.0001;
       Batch_Size            : Positive;
-      Learning_Rate         : Learning_Rate_Type := Constant_Rate;
+      Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
       Learning_Rate_Init    : Float := 0.001;
+      Learning_Rate         : Float := 0.001;
       Power_T               : Float := 0.5;
       Max_Iter              : Natural := 200;
       Shuffle               : Boolean := True;
@@ -67,7 +66,7 @@ package Multilayer_Perceptron is
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
                     Batch_Size          : Positive := 200;
-                    Learning_Rate       : Learning_Rate_Type := Constant_Rate;
+                    Learning_Rate       : Float := 0.001;
                     Learning_Rate_Init  : Float := 0.001;
                     Power_T             : Float := 0.5;
                     Max_Iter            : Natural := 200;

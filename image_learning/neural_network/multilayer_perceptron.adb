@@ -43,7 +43,7 @@ package body Multilayer_Perceptron is
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
                     Batch_Size          : Positive := 200;
-                    Learning_Rate       : Learning_Rate_Type := Constant_Rate;
+                    Learning_Rate       : Float := 0.001;
                     Learning_Rate_Init  : Float := 0.001;
                     Power_T             : Float := 0.5;
                     Max_Iter            : Natural := 200;
@@ -161,16 +161,40 @@ package body Multilayer_Perceptron is
                              Incremental     : Boolean := False) is
 
         use IL_Types;
-        use Stochastic_Optimizers;
         use List_Of_Float_Lists_Package;
-        Params    : Float_List_3D :=
+        Params    : constant Float_List_3D :=
                       Self.Attributes.Coefs & Self.Attributes.Intercepts;
    begin
       if not Incremental or else
           Self.Attributes.Has_Optimizer = No_Optimizer then
          case Self.Parameters.Solver is
-            when Adam_Solver => null;
-            when Lbfgs_Solver => null;
+            when Adam_Solver =>
+               declare
+                  Optimizer : Optimizer_Record (Optimizer_Adam);
+               begin
+                  Optimizer.Adam.Params := Params;
+                  Optimizer.Adam.Initial_Learning_Rate :=
+                    Self.Parameters.Learning_Rate_Init;
+                  Optimizer.Adam.Beta_1 := Self.Parameters.Beta_1;
+                  Optimizer.Adam.Beta_2 := Self.Parameters.Beta_2;
+                  Optimizer.Adam.Epsilon := Self.Parameters.Epsilon;
+                  Self.Attributes.Optimizer := Optimizer;
+               end;
+
+            when Lbfgs_Solver =>
+               declare
+                  Optimizer : Optimizer_Record (Optimizer_SGD);
+               begin
+                  Optimizer.SGD.Params := Params;
+                  Optimizer.SGD.Initial_Learning_Rate :=
+                    Self.Parameters.Learning_Rate_Init;
+                  Optimizer.SGD.Learning_Rate := Self.Parameters.Learning_Rate;
+                  Optimizer.SGD.Momentum := Self.Parameters.Momentum;
+                  Optimizer.SGD.Use_Nesterov :=
+                    Self.Parameters.Nesterovs_Momentum;
+                  Optimizer.SGD.Power_T := Self.Parameters.Power_T;
+                  Self.Attributes.Optimizer := Optimizer;
+               end;
             when Sgd_Solver => null;
          end case;
       end if;

@@ -17,6 +17,8 @@ package Stochastic_Optimizers is
    --  is on, the current learning rate is divided by five.
 
    type Optimizer_Type is (No_Optimizer, Optimizer_Adam, Optimizer_SGD);
+   type Solver_Type is (Lbfgs_Solver, Sgd_Solver, Adam_Solver);
+   type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
@@ -24,7 +26,7 @@ package Stochastic_Optimizers is
    end record;
 
    type Adam_Optimizer is record
-      Params                : Float_List;  --  coefs + intercepts
+      Params                : Float_List_3D;  --  coefs + intercepts
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
       Beta_1                : Float := 0.9;
@@ -36,9 +38,10 @@ package Stochastic_Optimizers is
    end record;
 
    type SGD_Optimizer is record
-      Params                : Float_List; --  coefs + intercepts
+      Params                : Float_List_3D; --  coefs + intercepts
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
+      Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
       LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
       Momentum              : Float := 0.9;
       Use_Nesterov          : Boolean := True;
@@ -46,14 +49,22 @@ package Stochastic_Optimizers is
       Velocities            : Float_List;
    end record;
 
+   type Optimizer_Record (Kind : Optimizer_Type := No_Optimizer) is record
+      case Kind is
+         when No_Optimizer => null;
+         when Optimizer_Adam => Adam : Adam_Optimizer;
+         when Optimizer_SGD => SGD : SGD_Optimizer;
+      end case;
+   end record;
+
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Params                : Float_List;
+                     Params                : Float_List_3D;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float);
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Params                : Float_List;
+                     Params                : Float_List_3D;
                      Initial_Learning_Rate : Float := 0.1;
                      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
                      Momentum              : Float := 0.9;

@@ -6,7 +6,7 @@ with Utilities;
 package body Stochastic_Optimizers is
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Params                : Float_List;
+                     Params                : Float_List_3D;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
@@ -22,7 +22,7 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Params                : Float_List;
+                     Params                : Float_List_3D;
                      Initial_Learning_Rate : Float := 0.1;
                      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
                      Momentum              : Float := 0.9;
