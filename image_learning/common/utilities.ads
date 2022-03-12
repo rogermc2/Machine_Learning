@@ -19,6 +19,15 @@ package Utilities is
       Ada.Containers.Vectors (Positive, Integer_Zip_Item);
     subtype Integer_Zip_List is Integer_Zip_Package.Vector;
 
+    type Float_Zip_Item is record
+        Float_1 : Float;
+        Float_2 : Float;
+    end record;
+
+    package Float_Zip_Package is new
+      Ada.Containers.Vectors (Positive, Float_Zip_Item);
+    subtype Float_Zip_List is Float_Zip_Package.Vector;
+
     Utilities_Exception : exception;
 
     procedure Check_Rows (Rows : in out Rows_Vector);
@@ -93,6 +102,7 @@ package Utilities is
     pragma Inline (Swap);
     function XY_To_Rows (X, Y : Value_Data_Lists_2D)
                         return Rows_Vector;
-    function Zip (a, b : Integer_List) return Integer_Zip_List;
+    function Zip (A, B : Float_List) return Float_Zip_List;
+    function Zip (A, B : Integer_List) return Integer_Zip_List;
 
 end Utilities;

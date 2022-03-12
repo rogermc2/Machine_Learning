@@ -57,5 +57,9 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
+   function Get_Updates (Self  : in out Adam_Optimizer;
+                         Grads : Float_List) return Float_List;
+   function Get_Updates (Self  : in out SGD_Optimizer;
+                         Grads : Float_List) return Float_List;
 
 end Stochastic_Optimizers;
