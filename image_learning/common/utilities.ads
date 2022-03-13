@@ -50,6 +50,7 @@ package Utilities is
       return Rows_Vector;
     function Load_Raw_CSV_Data (Data_File : File_Type)
                                return Raw_Data_Vector;
+    function Mean (A : Float_List) return Float;
     function Number_Of_Features (Rows : Rows_Vector)
                                 return Class_Range;
     function Number_Of_Features (Rows : Value_Data_List)

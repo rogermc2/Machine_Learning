@@ -29,6 +29,7 @@ package IL_Types is
     package Float_Sorting is new Float_Package.Generic_Sorting ("<");
     function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
     function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
+    procedure Check_Lengths (Routine_Name : String; L, R : Float_List);
 
     use Float_Package;
     package Float_List_Package is new
