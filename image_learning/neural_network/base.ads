@@ -12,6 +12,8 @@ package Base is
    pragma Inline (Identity);
    function Logistic (Activation : Float_List) return Float_List;
    pragma Inline (Logistic);
+   function Logistic_Sigmoid (X : Float) return Float;
+   pragma Inline (Logistic_Sigmoid);
    function Tanh (Activation : Float_List) return Float_List;
    pragma Inline (Tanh);
    function Relu (Activation : Float_List) return Float_List;

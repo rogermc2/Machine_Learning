@@ -12,9 +12,23 @@ package body Base is
    --  -------------------------------------------------------------------------
 
    function Logistic (Activation : Float_List) return Float_List is
+      use Maths.Float_Math_Functions;
+      Result : Float_List;
    begin
-      return Activation;
+      for index in Activation.First_Index .. Activation.Last_Index loop
+         Result.Append (1.0 / (1.0 + Exp (Activation.Element (index))));
+      end loop;
+
+      return Result;
    end Logistic;
+
+   --  -------------------------------------------------------------------------
+
+   function Logistic_Sigmoid (X : Float) return Float is
+      use Maths.Float_Math_Functions;
+   begin
+      return 1.0 / (1.0 + Exp (X));
+   end Logistic_Sigmoid;
 
    --  -------------------------------------------------------------------------
 
@@ -22,9 +36,9 @@ package body Base is
       use Maths.Float_Math_Functions;
       Result : Float_List;
    begin
-         for index in Activation.First_Index .. Activation.Last_Index loop
-               Result.Append (Tanh (Activation.Element (index)));
-         end loop;
+      for index in Activation.First_Index .. Activation.Last_Index loop
+         Result.Append (Tanh (Activation.Element (index)));
+      end loop;
 
       return Result;
    end Tanh;
@@ -34,9 +48,9 @@ package body Base is
    function Relu (Activation : Float_List) return Float_List is
       Result : Float_List;
    begin
-         for index in Activation.First_Index .. Activation.Last_Index loop
-            Result.Append (Float'Max (0.0, Activation.Element (index)));
-         end loop;
+      for index in Activation.First_Index .. Activation.Last_Index loop
+         Result.Append (Float'Max (0.0, Activation.Element (index)));
+      end loop;
 
       return Result;
    end Relu;
@@ -48,12 +62,12 @@ package body Base is
       Exp_Sum : Float := 0.0;
       Result  : Float_List;
    begin
-         for index in Activation.First_Index .. Activation.Last_Index loop
-           Exp_Sum := Exp_Sum + Exp (Activation.Element (index));
-         end loop;
-         for index in Activation.First_Index .. Activation.Last_Index loop
-            Result.Append  (Exp (Activation.Element (index) / Exp_Sum));
-         end loop;
+      for index in Activation.First_Index .. Activation.Last_Index loop
+         Exp_Sum := Exp_Sum + Exp (Activation.Element (index));
+      end loop;
+      for index in Activation.First_Index .. Activation.Last_Index loop
+         Result.Append  (Exp (Activation.Element (index) / Exp_Sum));
+      end loop;
 
       return Result;
    end Softmax;
