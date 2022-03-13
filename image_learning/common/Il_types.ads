@@ -34,6 +34,7 @@ package IL_Types is
     package Float_List_Package is new
       Ada.Containers.Vectors (Positive, Float_List);
     subtype Float_List_2D is Float_List_Package.Vector;
+    function Dot (L : Float_List; R : Float_List_2D) return Float_List;
 
     use Float_List_Package;
     package List_Of_Float_Lists_Package is new

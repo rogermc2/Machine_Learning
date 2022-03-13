@@ -169,7 +169,7 @@ package body Multilayer_Perceptron is
       Hidden_Layer_Sizes.Set_Length (Hidden_Layer_Sizes_Length);
       Validate_Hyperparameters (Self);
       First_Pass :=
-        Self.Attributes.Coefs.Is_Empty or else
+        Self.Attributes.Neuron_Coef_Layers.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
 
       Layer_Units.Append (Num_Features);
@@ -218,7 +218,8 @@ package body Multilayer_Perceptron is
       Num_Samples      : constant Positive := Positive (X.Length);
       LE_U             : Label.Label_Encoder (Label.Class_Unique);
       Params           : constant Float_List_3D :=
-                           Self.Attributes.Coefs & Self.Attributes.Intercepts;
+                           Self.Attributes.Neuron_Coef_Layers &
+                           Self.Attributes.Intercepts;
       Early_Stopping   : constant Boolean
         := Self.Parameters.Early_Stopping and then not Incremental;
       Test_Size        : constant Positive
@@ -333,17 +334,26 @@ package body Multilayer_Perceptron is
       use IL_Types;
       use Float_Package;
       use Float_List_Package;
-      Hidden_Activation : Activation_Type := Self.Parameters.Activation;
-      Activation_List   : Float_List;
-      Activation        : Float;
+      Hidden_Activation  : Activation_Type := Self.Parameters.Activation;
+      Output_Activation  : Activation_Type := Self.Attributes.Out_Activation;
+      Coefficient_Matrix : Float_List_2D;
    begin
+      --  Iterate over the hidden layers
       for index in 1 .. Self.Attributes.N_Layers - 1 loop
-         Activation_List := Activations (index);
-         Activation := Dot (Activation_List, Self.Attributes.Coefs (index));
-         Activations (index + 1) := Activation;
+         Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
+         Activations (index + 1) := Dot
+           (Activations (index), Coefficient_Matrix);
          Activations (index + 1) := Activations (index + 1) &
            Self.Attributes.Intercepts (index);
+
+         --  For the hidden layers
+         if index + 1 /= Self.Attributes.N_Layers - 1 then
+
+         end if;
       end loop;
+
+      --  For the last layer
+
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
@@ -444,14 +454,14 @@ package body Multilayer_Perceptron is
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
       Self.Attributes.Out_Activation := Logistic_Activation;
-      Self.Attributes.Coefs.Clear;
+      Self.Attributes.Neuron_Coef_Layers.Clear;
       Self.Attributes.Intercepts.Clear;
 
       for index in 1 .. Self.Attributes.N_Layers - 1 loop
          Init_Coeff
            (Self, Layer_Units.Element (index), Layer_Units.Element (index + 1),
             Coef_Init, Intercept_Init);
-         Self.Attributes.Coefs.Append (Coef_Init);
+         Self.Attributes.Neuron_Coef_Layers.Append (Coef_Init);
          Self.Attributes.Intercepts.Append (Intercept_Init);
       end loop;
 

@@ -4,9 +4,6 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
-   type Activation_Type is (Identity_Activation, Logistic_Activation,
-                            Tanh_Activation, Relu_Activation);
-
    type MLP_Classifier_Attributes is record
       Classes              : IL_Types.Integer_List;
       Loss                 : Float;
@@ -14,7 +11,7 @@ package Multilayer_Perceptron is
       Loss_Curve           : IL_Types.Float_List;
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
-      Coefs                : IL_Types.Float_List_2D;
+      Neuron_Coef_Layers   : IL_Types.Float_List_3D;
       Intercepts           : IL_Types.Float_List_2D;
       N_Features           : Positive;
       Feature_Names_In     : IL_Types.String_List;

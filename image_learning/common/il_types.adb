@@ -35,7 +35,38 @@ package body IL_Types is
    --  ----------------------------------------------------------------------------
 
    procedure Check_Length (Routine_Name : String; L : Float_List;
-                           R            : IL_Types.Value_Data_List) is
+                           R            : Float_List_2D) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+   end Check_Length;
+
+   --  ----------------------------------------------------------------------------
+
+   function Dot (L : Float_List; R : Float_List_2D) return Float_List is
+      R_List : Float_List;
+      Result : Float_List;
+   begin
+      Check_Length ("Dot", L, R);
+      for index in R.First_Index .. R.Last_Index loop
+         R_List := R.Element (index);
+         for index_2 in R.First_Index .. R.Last_Index loop
+            Result (index) := Result (index) + L.Element (index_2) *
+              R_List.Element (index_2);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
+   procedure Check_Length (Routine_Name : String; L : Float_List;
+                           R            : Value_Data_List) is
       use Ada.Containers;
    begin
       Assert (R.Length = L.Length, Routine_Name &
@@ -346,12 +377,12 @@ package body IL_Types is
    --  ----------------------------------------------------------------------------
 
    procedure Check_Lengths (Routine_Name : String;
-                           L, R         : Value_Data_Lists_2D) is
+                            L, R         : Value_Data_Lists_2D) is
       use Ada.Containers;
    begin
       Assert (R.Length = L.Length and then
-                R.Element (1).Length = L.Element (1).Length, "IL_Types."
-                & Routine_Name &
+              R.Element (1).Length = L.Element (1).Length, "IL_Types."
+              & Routine_Name &
                 " right lengths (" & Count_Type'Image (R.Length) & ", " &
                 Count_Type'Image (R.Element (1).Length) &
                 ") should be the same as left lengths (" &
