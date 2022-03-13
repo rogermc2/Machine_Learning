@@ -12,8 +12,8 @@ package Utils is
    package Bunch_Package is new
       Ada.Containers.Formal_Ordered_Maps (Integer, Bunch_Data);
 
-   function Gen_Batches (Num_Slices, Batch_Size : Natural;
+   function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
                          Min_Batch_Size : Natural := 0)
-                         return IL_Types.Integer_List;
+                         return IL_Types.Integer_List_2D;
 
 end Utils;

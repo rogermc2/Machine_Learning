@@ -1,13 +1,32 @@
 
 package body Utils is
 
-   function Gen_Batches (Num_Slices, Batch_Size : Natural;
+   function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
                          Min_Batch_Size : Natural := 0)
-                         return IL_Types.Integer_List is
-        use IL_Types;
-        Slices : Integer_List;
+                         return IL_Types.Integer_List_2D is
+      use IL_Types;
+      Start       : Natural := 0;
+      Last        : Positive;
+      aSlice      : Integer_List;
+      Slices      : Integer_List_2D;
    begin
-        return Slices;
+      for index in 1 .. Num_To_Slice / Batch_Size loop
+         Last := Start + Batch_Size;
+         aSlice.Clear;
+         if Last + Min_Batch_Size <= Num_To_Slice then
+            for item in Start .. Last loop
+               aSlice (item - Start + 1) := item;
+            end loop;
+            Start := Last + 1;
+         else
+            for item in Start .. Num_To_Slice loop
+               aSlice (item - Start + 1) := item;
+            end loop;
+         end if;
+         Slices.Append (aSlice);
+      end loop;
+
+      return Slices;
 
    end Gen_Batches;
 
