@@ -24,6 +24,8 @@ package body Multilayer_Perceptron is
                              Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
                              Incremental     : Boolean := False);
+   procedure Forward_Pass (Self        : in out MLP_Classifier;
+                           Activations : in out IL_Types.Float_List_2D);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : IL_Types.Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
@@ -49,6 +51,7 @@ package body Multilayer_Perceptron is
                        Loss            : out Float;
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
+      Num_Samples      : constant Positive := Positive (X.Length);
    begin
       null;
    end Backprop;
@@ -293,6 +296,15 @@ package body Multilayer_Perceptron is
    end Fit_Stochastic;
 
    --  -------------------------------------------------------------------------
+
+   procedure Forward_Pass (Self        : in out MLP_Classifier;
+                           Activations : in out IL_Types.Float_List_2D) is
+   begin
+      null;
+   end Forward_Pass;
+
+   --  -------------------------------------------------------------------------
+
    --  L320  BaseMultilayerPerceptron._Initialize
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
