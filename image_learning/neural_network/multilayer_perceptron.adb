@@ -1,4 +1,33 @@
 --  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
+
+--  The simplest representation of a neural network is a Multilayer Perceptron.
+--  In its simplest form a MLP is just three layers.
+--  An input layer represented by a real matrix X (N×d) where N is the number
+--  of training examples and d is the number of features.
+--  A hidden layer which is usually a ReLU or a logistic sigmoid function.
+--  Hidden layer i could be a ReLU function represented by
+--  h_i(x) = ReLU (x) = max (x, 0)
+--  In other words, if the input to the ReLU function is negative, the function
+--  outputs a 0.
+--  If the inputs x are positive, the ReLU function will output x.
+--  The hidden layer feeds into the output layer which is just another function.
+--  This function could be squared error function (in the context of regression)
+--  or softmax (in the case of multiclass classification).
+--  The MLP is complete when you consider the weight and bias matrices but
+--  we don't need them for now.
+--  The activation function is just what the name suggests; a function.
+--  In the example above, the activation function for the hidden layer is the
+--  ReLU function.
+--  The activation function for the output layer was squared error or softmax.
+--  the word "activations" in Machine Learning almost always refers to the
+--- output of the activation function.
+--  The possible activations in the hidden layer in the example above could
+--  only be either 0 or 1.
+--  Note that the hidden activations (output from the hidden layer) could
+--  become input to other activation functions (in this case, the output layer
+--  activation functions).
+--  Pre-activation means the input to an activation function.
+
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
