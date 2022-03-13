@@ -81,9 +81,22 @@ package body Multilayer_Perceptron is
                        Loss            : out Float;
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
-      Num_Samples      : constant Positive := Positive (X.Length);
+      use Base;
+      Num_Samples        : constant Positive := Positive (X.Length);
+      Loss_Function_Name : Loss_Function := Self.Attributes.Loss;
    begin
-      null;
+      Forward_Pass (Self, Activations);
+      if Self.Attributes.Loss = Log_Loss_Function and then
+        Self.Attributes.Out_Activation = Logistic_Activation then
+         Loss_Function_Name := Binary_Log_Loss_Function;
+      end if;
+
+      case Loss_Function_Name is
+         when Log_Loss_Function => null;
+         when Binary_Log_Loss_Function => null;
+         when Squared_Error_Function => null;
+      end case;
+
    end Backprop;
 
    --  -------------------------------------------------------------------------

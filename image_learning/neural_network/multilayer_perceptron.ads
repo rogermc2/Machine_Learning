@@ -5,9 +5,12 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
+   type Loss_Function is (Log_Loss_Function, Binary_Log_Loss_Function,
+                          Squared_Error_Function);
+
    type MLP_Classifier_Attributes is record
       Classes              : IL_Types.Integer_List;
-      Loss                 : Float;
+      Loss                 : Loss_Function;
       Best_Loss            : Float;
       Loss_Curve           : IL_Types.Float_List;
       No_Improvement_Count : Natural := 0;
