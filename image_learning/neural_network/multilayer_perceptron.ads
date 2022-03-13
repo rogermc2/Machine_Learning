@@ -31,7 +31,7 @@ package Multilayer_Perceptron is
       Is_Classifier         : Boolean := True;
       Solver                : Solver_Type := Adam_Solver;
       Alpha                 : Float := 0.0001;
-      Batch_Size            : Positive;
+      Batch_Size            : Natural := 0;  --  0 -> "auto"
       Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
       Learning_Rate_Init    : Float := 0.001;
       Learning_Rate         : Float := 0.001;

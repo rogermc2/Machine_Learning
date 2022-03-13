@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_multilayer_perceptron.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 with Utilities;
@@ -164,6 +165,8 @@ package body Multilayer_Perceptron is
 
       use IL_Types;
       use List_Of_Float_Lists_Package;
+      Routine_Name     : constant String :=
+                                    "Multilayer_Perceptron.Fit_Stochastic ";
       Num_Samples      : constant Positive := Positive (X.Length);
       LE_U             : Label.Label_Encoder (Label.Class_Unique);
       Params           : constant Float_List_3D :=
@@ -179,6 +182,10 @@ package body Multilayer_Perceptron is
       Train_Y          : Integer_List;
       Test_X           : Float_List_2D;
       Test_Y           : Integer_List;
+      Batch_Size       : Positive;
+      Sample_Index     : Positive;
+      Max_Sample_Index : Positive;
+      Accumulated_Loss : Float := 0.0;
    begin
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
@@ -229,6 +236,25 @@ package body Multilayer_Perceptron is
             Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
          end if;
       end if;
+
+      if Self.Parameters.Batch_Size = 0 then
+            Batch_Size := Integer'Min (200, Num_Samples);
+      else
+            Put_Line (Routine_Name & "WARNING: Batch size " &
+                        Integer'Image (Self.Parameters.Batch_Size)  &
+                        "clipped to " & Integer'Image (Num_Samples));
+            Batch_Size := Num_Samples;
+      end if;
+
+      Max_Sample_Index := Num_Samples;
+      Sample_Index := 1;
+      while Sample_Index <= Max_Sample_Index loop
+            --  if Self.Parameters.Shuffle then
+            --      Sample_Index := Shuffle (Sample_Index, Random_State);
+            --  end if;
+
+            Sample_Index := Sample_Index + 1;
+      end loop;
 
    end Fit_Stochastic;
 
