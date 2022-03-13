@@ -14,7 +14,7 @@ package Multilayer_Perceptron is
       Loss_Curve           : IL_Types.Float_List;
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
-      Coefs                : IL_Types.Float_List_3D;
+      Coefs                : IL_Types.Float_List_2D;
       Intercepts           : IL_Types.Float_List_2D;
       N_Features           : Positive;
       Feature_Names_In     : IL_Types.String_List;

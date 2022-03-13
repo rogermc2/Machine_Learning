@@ -12,6 +12,7 @@ with Label;
 with Utils;
 
 package body Multilayer_Perceptron is
+   pragma Warnings (Off);
 
    First_Pass : Boolean := True;
 
@@ -296,11 +297,24 @@ package body Multilayer_Perceptron is
    end Fit_Stochastic;
 
    --  -------------------------------------------------------------------------
-
+   --  L119
    procedure Forward_Pass (Self        : in out MLP_Classifier;
                            Activations : in out IL_Types.Float_List_2D) is
+      --  The ith element of Activations holds the values of the ith layer.
+      use IL_Types;
+      use Float_Package;
+      use Float_List_Package;
+      Hidden_Activation : Activation_Type := Self.Parameters.Activation;
+      Activation_List   : Float_List;
+      Activation        : Float;
    begin
-      null;
+      for index in 1 .. Self.Attributes.N_Layers - 1 loop
+         Activation_List := Activations (index);
+         Activation := Dot (Activation_List, Self.Attributes.Coefs (index));
+         Activations (index + 1) := Activation;
+         Activations (index + 1) := Activations (index + 1) &
+           Self.Attributes.Intercepts (index);
+      end loop;
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
