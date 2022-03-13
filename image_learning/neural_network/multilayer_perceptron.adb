@@ -90,7 +90,8 @@ package body Multilayer_Perceptron is
 
    function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
                       IL_Types.Integer_Package.Empty_Vector;
-                    Activation          : Activation_Type := Relu_Activation;
+                    Activation          : Base.Activation_Type :=
+                      Base.Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
                     Batch_Size          : Positive := 200;
@@ -331,6 +332,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self        : in out MLP_Classifier;
                            Activations : in out IL_Types.Float_List_2D) is
       --  The ith element of Activations holds the values of the ith layer.
+      use Base;
       use IL_Types;
       use Float_Package;
       use Float_List_Package;
@@ -348,7 +350,18 @@ package body Multilayer_Perceptron is
 
          --  For the hidden layers
          if index + 1 /= Self.Attributes.N_Layers - 1 then
-
+            case Hidden_Activation is
+               when Identity_Activation =>
+                  Activations (index + 1) := Activations (index);
+               when Logistic_Activation =>
+                  Activations (index + 1) := Logistic (Activations (index));
+               when Tanh_Activation =>
+                  Activations (index + 1) := Tanh (Activations (index));
+               when Relu_Activation =>
+                  Activations (index + 1) := Relu (Activations (index));
+               when Softmax_Activation =>
+                  Activations (index + 1) := Softmax (Activations (index));
+            end case;
          end if;
       end loop;
 
@@ -365,6 +378,7 @@ package body Multilayer_Perceptron is
                          Intercept_Init  : out IL_Types.Float_List) is
       use Maths;
       use Float_Math_Functions;
+      use Base;
       Factor         : Float;
       Init_Bound     : Float;
       Coef_Init_1    : IL_Types.Float_List;
@@ -446,6 +460,7 @@ package body Multilayer_Perceptron is
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
+      use Base;
       --        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
       Intercept_Init : Float_List;

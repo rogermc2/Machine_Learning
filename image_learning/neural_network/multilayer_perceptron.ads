@@ -1,5 +1,6 @@
 
 with IL_Types;
+with Base;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
@@ -15,16 +16,16 @@ package Multilayer_Perceptron is
       Intercepts           : IL_Types.Float_List_2D;
       N_Features           : Positive;
       Feature_Names_In     : IL_Types.String_List;
-      N_Iter                : Natural;
+      N_Iter               : Natural;
       N_Layers             : Positive;
       N_Outputs            : Positive;
-      Out_Activation       : Activation_Type := Logistic_Activation;
+      Out_Activation       : Base.Activation_Type := Base.Logistic_Activation;
       Optimizer            : Optimizer_Record;
    end record;
 
    type MLP_Classifier_Parameters is record
       Hidden_Layer_Sizes    : IL_Types.Integer_List;
-      Activation            : Activation_Type := Relu_Activation;
+      Activation            : Base.Activation_Type := Base.Relu_Activation;
       Is_Classifier         : Boolean := True;
       Solver                : Solver_Type := Adam_Solver;
       Alpha                 : Float := 0.0001;
@@ -59,7 +60,8 @@ package Multilayer_Perceptron is
 
    function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
                       IL_Types.Integer_Package.Empty_Vector;
-                    Activation          : Activation_Type := Relu_Activation;
+                    Activation          : Base.Activation_Type :=
+                      Base.Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
                     Batch_Size          : Positive := 200;

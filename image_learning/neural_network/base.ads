@@ -8,15 +8,15 @@ package Base is
                             Tanh_Activation, Relu_Activation,
                             Softmax_Activation);
 
-   function Identity (X : Float_List_2D) return Float_List_2D;
+   function Identity (Activation : Float_List) return Float_List;
    pragma Inline (Identity);
-   function Logistic (X : Float_List_2D) return Float_List_2D;
+   function Logistic (Activation : Float_List) return Float_List;
    pragma Inline (Logistic);
-   function Tanh (X : Float_List_2D) return Float_List_2D;
+   function Tanh (Activation : Float_List) return Float_List;
    pragma Inline (Tanh);
-   function Relu (X : Float_List_2D) return Float_List_2D;
+   function Relu (Activation : Float_List) return Float_List;
    pragma Inline (Relu);
-   function Softmax (X : Float_List_2D) return Float_List_2D;
+   function Softmax (Activation : Float_List) return Float_List;
    pragma Inline (Softmax);
 
 end Base;

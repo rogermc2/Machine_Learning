@@ -4,69 +4,56 @@ with Maths;
 
 package body Base is
 
-   function Identity (X : Float_List_2D) return Float_List_2D is
+   function Identity (Activation : Float_List) return Float_List is
    begin
-      return X;
+      return Activation;
    end Identity;
 
    --  -------------------------------------------------------------------------
 
-   function Logistic (X : Float_List_2D) return Float_List_2D is
+   function Logistic (Activation : Float_List) return Float_List is
    begin
-      return X;
+      return Activation;
    end Logistic;
 
    --  -------------------------------------------------------------------------
 
-   function Tanh (X : Float_List_2D) return Float_List_2D is
+   function Tanh (Activation : Float_List) return Float_List is
       use Maths.Float_Math_Functions;
-      X_Col  : Float_List;
-      Result : Float_List_2D;
+      Result : Float_List;
    begin
-      for row in X.First_Index .. X.Last_Index loop
-         X_Col := X.Element (row);
-         for index in X_Col.First_Index .. X_Col.Last_Index loop
-               X_Col.Replace_Element (index, Tanh (X_Col.Element (index)));
+         for index in Activation.First_Index .. Activation.Last_Index loop
+               Result.Append (Tanh (Activation.Element (index)));
          end loop;
-         Result.Append (X_Col);
-      end loop;
 
       return Result;
    end Tanh;
 
    --  -------------------------------------------------------------------------
 
-   function Relu (X : Float_List_2D) return Float_List_2D is
-      X_Col  : Float_List;
-      Result : Float_List_2D;
+   function Relu (Activation : Float_List) return Float_List is
+      Result : Float_List;
    begin
-      for row in X.First_Index .. X.Last_Index loop
-         X_Col := X.Element (row);
-         for index in X_Col.First_Index .. X_Col.Last_Index loop
-            X_Col.Replace_Element
-              (index, Float'Max (0.0, X_Col.Element (index)));
+         for index in Activation.First_Index .. Activation.Last_Index loop
+            Result.Append (Float'Max (0.0, Activation.Element (index)));
          end loop;
-         Result.Append (X_Col);
-      end loop;
 
       return Result;
    end Relu;
 
    --  -------------------------------------------------------------------------
 
-   function Softmax (X : Float_List_2D) return Float_List_2D is
-      X_Col  : Float_List;
-
-      Result : Float_List_2D;
+   function Softmax (Activation : Float_List) return Float_List is
+      use Maths.Float_Math_Functions;
+      Exp_Sum : Float := 0.0;
+      Result  : Float_List;
    begin
-      for row in X.First_Index .. X.Last_Index loop
-         X_Col := X.Element (row);
-         for index in X_Col.First_Index .. X_Col.Last_Index loop
-            X_Col.Replace_Element
-              (index, Float'Max (0.0, X_Col.Element (index)));
+         for index in Activation.First_Index .. Activation.Last_Index loop
+           Exp_Sum := Exp_Sum + Exp (Activation.Element (index));
          end loop;
-         Result.Append (X_Col);
-      end loop;
+         for index in Activation.First_Index .. Activation.Last_Index loop
+            Result.Append  (Exp (Activation.Element (index) / Exp_Sum));
+         end loop;
 
       return Result;
    end Softmax;
