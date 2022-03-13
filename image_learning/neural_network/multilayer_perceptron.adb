@@ -336,12 +336,15 @@ package body Multilayer_Perceptron is
       use IL_Types;
       use Float_Package;
       use Float_List_Package;
-      Hidden_Activation  : Activation_Type := Self.Parameters.Activation;
-      Output_Activation  : Activation_Type := Self.Attributes.Out_Activation;
+      Hidden_Activation  : constant Activation_Type :=
+                             Self.Parameters.Activation;
+      Output_Activation  : constant Activation_Type :=
+                             Self.Attributes.Out_Activation;
+      Last_Hidden_Index  : constant Positive := Self.Attributes.N_Layers - 1;
       Coefficient_Matrix : Float_List_2D;
    begin
       --  Iterate over the hidden layers
-      for index in 1 .. Self.Attributes.N_Layers - 1 loop
+      for index in 1 .. Last_Hidden_Index loop
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
          Activations (index + 1) := Dot
            (Activations (index), Coefficient_Matrix);
@@ -349,7 +352,7 @@ package body Multilayer_Perceptron is
            Self.Attributes.Intercepts (index);
 
          --  For the hidden layers
-         if index + 1 /= Self.Attributes.N_Layers - 1 then
+         if index + 1 /= Last_Hidden_Index then
             case Hidden_Activation is
                when Identity_Activation =>
                   Activations (index + 1) := Activations (index);
@@ -366,6 +369,21 @@ package body Multilayer_Perceptron is
       end loop;
 
       --  For the last layer
+      case Output_Activation is
+         when Identity_Activation =>
+            Activations.Replace_Element
+              (Activations.Last_Index, Activations.Element (Last_Hidden_Index));
+         when Logistic_Activation => Activations.Replace_Element
+              (Activations.Last_Index,
+               Logistic (Activations (Last_Hidden_Index)));
+         when Tanh_Activation => Activations.Replace_Element
+              (Activations.Last_Index, Tanh (Activations (Last_Hidden_Index)));
+         when Relu_Activation =>Activations.Replace_Element
+              (Activations.Last_Index, Relu (Activations (Last_Hidden_Index)));
+         when Softmax_Activation =>Activations.Replace_Element
+              (Activations.Last_Index,
+               Softmax (Activations (Last_Hidden_Index)));
+      end case;
 
    end Forward_Pass;
 
