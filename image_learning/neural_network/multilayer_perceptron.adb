@@ -9,6 +9,7 @@ with Utilities;
 with Data_Splitter;
 with Encode_Utils;
 with Label;
+with Utils;
 
 package body Multilayer_Perceptron is
 
@@ -17,10 +18,10 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List;
-                             Activations     : IL_Types.Float_List_2D;
+                             Activations     : in out IL_Types.Float_List_2D;
                              Deltas          : IL_Types.Float_List;
-                             Coef_Grads      : IL_Types.Float_List_3D;
-                             Intercept_Grads : IL_Types.Float_List_2D;
+                             Coef_Grads      : in out IL_Types.Float_List_3D;
+                             Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
                              Incremental     : Boolean := False);
    procedure Initialize (Self        : in out MLP_Classifier;
@@ -37,6 +38,20 @@ package body Multilayer_Perceptron is
                              --                               X                  : IL_Types.Float_List_2D;
                              Y                  : IL_Types.Integer_List);
    --                               Incremental, Reset : Boolean);
+
+   --  -------------------------------------------------------------------------
+
+   procedure Backprop (Self            : in out MLP_Classifier;
+                       X               : IL_Types.Float_List_2D;
+                       Y               : IL_Types.Integer_List;
+                       Activations     : in out IL_Types.Float_List_2D;
+                       Deltas          : IL_Types.Float_List;
+                       Loss            : out Float;
+                       Coef_Grads      : out IL_Types.Float_List_3D;
+                       Intercept_Grads : out IL_Types.Float_List_2D) is
+   begin
+      null;
+   end Backprop;
 
    --  -------------------------------------------------------------------------
 
@@ -156,17 +171,17 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List;
-                             Activations     : IL_Types.Float_List_2D;
+                             Activations     : in out IL_Types.Float_List_2D;
                              Deltas          : IL_Types.Float_List;
-                             Coef_Grads      : IL_Types.Float_List_3D;
-                             Intercept_Grads : IL_Types.Float_List_2D;
+                             Coef_Grads      : in out IL_Types.Float_List_3D;
+                             Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
                              Incremental     : Boolean := False) is
 
       use IL_Types;
       use List_Of_Float_Lists_Package;
       Routine_Name     : constant String :=
-                                    "Multilayer_Perceptron.Fit_Stochastic ";
+                           "Multilayer_Perceptron.Fit_Stochastic ";
       Num_Samples      : constant Positive := Positive (X.Length);
       LE_U             : Label.Label_Encoder (Label.Class_Unique);
       Params           : constant Float_List_3D :=
@@ -186,6 +201,11 @@ package body Multilayer_Perceptron is
       Sample_Index     : Positive;
       Max_Sample_Index : Positive;
       Accumulated_Loss : Float := 0.0;
+      Batches          : Integer_List_2D;
+      Batch_Slice      : Integer_List;
+      X_Batch          : Float_List_2D;
+      Y_Batch          : Integer_List;
+      Loss             : Float;
    begin
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
@@ -238,22 +258,36 @@ package body Multilayer_Perceptron is
       end if;
 
       if Self.Parameters.Batch_Size = 0 then
-            Batch_Size := Integer'Min (200, Num_Samples);
+         Batch_Size := Integer'Min (200, Num_Samples);
       else
-            Put_Line (Routine_Name & "WARNING: Batch size " &
-                        Integer'Image (Self.Parameters.Batch_Size)  &
-                        "clipped to " & Integer'Image (Num_Samples));
-            Batch_Size := Num_Samples;
+         Put_Line (Routine_Name & "WARNING: Batch size " &
+                     Integer'Image (Self.Parameters.Batch_Size)  &
+                     "clipped to " & Integer'Image (Num_Samples));
+         Batch_Size := Num_Samples;
       end if;
 
       Max_Sample_Index := Num_Samples;
+      Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
+      Activations.Clear;
       Sample_Index := 1;
       while Sample_Index <= Max_Sample_Index loop
-            --  if Self.Parameters.Shuffle then
-            --      Sample_Index := Shuffle (Sample_Index, Random_State);
-            --  end if;
+         --  if Self.Parameters.Shuffle then
+         --      Sample_Index := Shuffle (Sample_Index, Random_State);
+         --  end if;
+         Accumulated_Loss := 0.0;
+         for batch_index in Batches.First_Index .. Batches.Last_Index loop
+            Batch_Slice := Batches (batch_index);
+            for index in Batch_Slice.First_Index .. Batch_Slice.Last_Index loop
+               X_Batch (index) := X (Batch_Slice (index));
+               Y_Batch (index) := Y_Batch (Batch_Slice (index));
+            end loop;
+            Activations.Append (X_Batch);
+            Backprop (Self, X, Y, Activations, Deltas, Loss,
+                      Coef_Grads, Intercept_Grads);
 
-            Sample_Index := Sample_Index + 1;
+         end loop;
+
+         Sample_Index := Sample_Index + 1;
       end loop;
 
    end Fit_Stochastic;
