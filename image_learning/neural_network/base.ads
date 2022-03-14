@@ -8,7 +8,7 @@ package Base is
                             Tanh_Activation, Relu_Activation,
                             Softmax_Activation);
 
-   function Binary_Log_Loss (Y_True, Y_Prob : Float_List) return Float;
+   function Binary_Log_Loss (Y_True : Integer_List; Y_Prob : Float_List) return Float;
    pragma Inline (Binary_Log_Loss);
    function Identity (Activation : Float_List) return Float_List;
    pragma Inline (Identity);
@@ -16,7 +16,7 @@ package Base is
    pragma Inline (Logistic);
    function Logistic_Sigmoid (X : Float) return Float;
    pragma Inline (Logistic_Sigmoid);
-   function Log_Loss (Y_True, Y_Prob : Float_List) return Float;
+   function Log_Loss (Y_True : Integer_List; Y_Prob : Float_List) return Float;
    pragma Inline (Log_Loss);
    function Tanh (Activation : Float_List) return Float_List;
    pragma Inline (Tanh);
@@ -24,7 +24,8 @@ package Base is
    pragma Inline (Relu);
    function Softmax (Activation : Float_List) return Float_List;
    pragma Inline (Softmax);
-   function Squared_Loss (Y_True, Y_Pred : Float_List) return Float;
-   pragma Inline (Squared_Loss);
+   function Squared_Error (Y_True : Integer_List; Y_Pred : Float_List)
+                           return Float;
+   pragma Inline (Squared_Error);
 
 end Base;

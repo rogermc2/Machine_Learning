@@ -84,6 +84,7 @@ package body Multilayer_Perceptron is
       use Base;
       Num_Samples        : constant Positive := Positive (X.Length);
       Loss_Function_Name : Loss_Function := Self.Attributes.Loss;
+      Values             : Float := 0.0;
    begin
       Forward_Pass (Self, Activations);
       if Self.Attributes.Loss = Log_Loss_Function and then
@@ -92,9 +93,12 @@ package body Multilayer_Perceptron is
       end if;
 
       case Loss_Function_Name is
-         when Log_Loss_Function => null;
-         when Binary_Log_Loss_Function => null;
-         when Squared_Error_Function => null;
+         when Binary_Log_Loss_Function =>
+            Loss := Binary_Log_Loss (Y, Activations.Last_Element);
+         when Log_Loss_Function =>
+            Loss := Log_Loss (Y, Activations.Last_Element);
+         when Squared_Error_Function =>
+            Loss := Squared_Error (Y, Activations.Last_Element);
       end case;
 
    end Backprop;

@@ -5,11 +5,14 @@ with Utilities;
 
 package body Base is
 
-   function Binary_Log_Loss (Y_True, Y_Prob : Float_List) return Float is
+   function Binary_Log_Loss (Y_True : Integer_List; Y_Prob : Float_List)
+                             return Float is
       use Maths.Float_Math_Functions;
       use Float_Package;
       Y_P      : Float_List;
       Y_T      : Float_List;
+      YT_Float : Float_List;
+      YT_Int   : Integer;
       X_Log_Y1 : Float_List;
       X_Log_Y2 : Float_List;
       Sum1     : Float := 0.0;
@@ -18,12 +21,14 @@ package body Base is
       Check_Lengths ("Base.Log_Loss", Y_True, Y_Prob);
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
          Y_P.Append (1.0 - Y_Prob (index));
-         Y_T.Append (1.0 - Y_True (index));
+         YT_Int := Y_True (index);
+         Y_T.Append (Float (1 - YT_Int));
+         YT_Float.Append (Float (YT_Int));
       end loop;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         X_Log_Y1.Append (Y_True (index) * Log (Y_Prob (index)));
+         X_Log_Y1.Append (YT_Float (index) * Log (Y_Prob (index)));
          X_Log_Y2.Append (Y_T (index) * Log (Y_P (index)));
       end loop;
 
@@ -67,25 +72,31 @@ package body Base is
    --  -------------------------------------------------------------------------
    --  Log Loss is the negative average of the log of corrected predicted
    --  probabilities for each instance.
-   function Log_Loss (Y_True, Y_Prob : Float_List) return Float is
+   function Log_Loss (Y_True : Integer_List; Y_Prob : Float_List)
+                      return Float is
       use Maths.Float_Math_Functions;
       use Float_Package;
       Y_P     : Float_List;
       Y_T     : Float_List;
+      YT_Float : Float_List;
+      YT_Int   : Integer;
       X_Log_Y : Float_List;
       Result  : Float := 0.0;
    begin
       Check_Lengths ("Base.Log_Loss", Y_True, Y_Prob);
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
          Y_P.Append (1.0 - Y_Prob (index));
-         Y_T.Append (1.0 - Y_True (index));
+         YT_Int := Y_True (index);
+         Y_T.Append (Float (1 - YT_Int));
+         YT_Float.Append (Float (YT_Int));
       end loop;
+
       Y_P := Y_P & Y_Prob;
-      Y_T := Y_T & Y_True;
+      Y_T := Y_T & YT_Float;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         X_Log_Y.Append (-Y_True (index) * Log (Y_Prob (index)));
+         X_Log_Y.Append (-YT_Float (index) * Log (Y_Prob (index)));
       end loop;
 
       for index in X_Log_Y.First_Index .. X_Log_Y.Last_Index loop
@@ -140,11 +151,20 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   function Squared_Loss (Y_True, Y_Pred : Float_List) return Float is
+   function Squared_Error (Y_True : Integer_List; Y_Pred : Float_List)
+                          return Float is
+      YT_Int   : Integer;
+      YT_Float : Float_List;
    begin
-      return Utilities.Mean (Y_True - Y_Pred) / 2.0;
+      Check_Lengths ("Base.Squared_Error", Y_True, Y_Pred);
+      for index in Y_Pred.First_Index .. Y_Pred.Last_Index loop
+         YT_Int := Y_True (index);
+         YT_Float.Append (Float (YT_Int));
+      end loop;
 
-   end Squared_Loss;
+      return Utilities.Mean (YT_Float - Y_Pred) / 2.0;
+
+   end Squared_Error;
 
    --  -------------------------------------------------------------------------
 
