@@ -157,7 +157,7 @@ package body Multilayer_Perceptron is
         Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                                Coef_Grads, Intercept_Grads);
 
-      --  L308
+      --  L308, L309
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Deltas (index - 1) :=
            Dot (Deltas (index),
@@ -173,9 +173,10 @@ package body Multilayer_Perceptron is
                Relu_Derivative (Activations (index), Deltas (index - 1));
             when Softmax_Activation => null;
          end case;
-      end loop;
 
-        --  L309 Iterate over the hidden layers
+         Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
+                                Deltas, Coef_Grads, Intercept_Grads);
+      end loop;
 
     end Backprop;
 
