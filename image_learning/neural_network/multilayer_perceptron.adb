@@ -157,12 +157,20 @@ package body Multilayer_Perceptron is
         Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                                Coef_Grads, Intercept_Grads);
 
-        case Derivative_Kind is
-            when Identity_Derivative => null;
-            when Logistic_Derivative => null;
-            when Tanh_Derivative => null;
-            when Relu_Derivative => null;
-        end case;
+      --  L308
+      for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+         Deltas (index - 1) :=
+           Dot (Deltas (index),
+                Transpose (Self.Attributes.Neuron_Coef_Layers (index)));
+         case Self.Parameters.Activation is
+            when Identity_Activation =>
+               Identity_Derivative (Activations (index), Deltas (index - 1));
+            when Logistic_Activation => null;
+            when Tanh_Activation => null;
+            when Relu_Activation => null;
+            when Softmax_Activation => null;
+         end case;
+      end loop;
 
         --  L309 Iterate over the hidden layers
 

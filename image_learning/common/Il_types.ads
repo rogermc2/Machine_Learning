@@ -40,6 +40,7 @@ package IL_Types is
      Ada.Containers.Vectors (Positive, Float_List);
    subtype Float_List_2D is Float_List_Package.Vector;
    function "*" (L : Float; R : Float_List_2D) return Float_List_2D;
+   function "*" (L, R : Float_List_2D) return Float_List_2D;
    function "/" (L : Float_List_2D; R : Float) return Float_List_2D;
    function Dot (L : Float_List; R : Float_List_2D) return Float_List;
    function Transpose (Values : Float_List_2D) return  Float_List_2D;

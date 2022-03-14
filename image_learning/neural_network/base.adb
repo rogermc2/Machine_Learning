@@ -50,6 +50,14 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
+   procedure Identity_Derivative (Z   : Float_List_2D;
+                                  Del : in out Float_List_2D) is
+   begin
+      null;
+   end Identity_Derivative;
+
+   --  -------------------------------------------------------------------------
+
    function Logistic (Activation : Float_List) return Float_List is
       use Maths.Float_Math_Functions;
       Result : Float_List;
@@ -60,6 +68,27 @@ package body Base is
 
       return Result;
    end Logistic;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Logistic_Derivative (Z   : Float_List_2D;
+                                  Del : in out Float_List_2D) is
+      use Float_List_Package;
+      List_Z : Float_List;
+      List_Z2 : Float_List_2D;
+   begin
+      Del := Del * Z;
+      --  List_Z = 1 - Z
+      for row in Z.First_Index .. Z.Last_Index loop
+         List_Z := Z (row);
+         for col in List_Z.First_Index .. List_Z.Last_Index loop
+            List_Z (col) := 1.0 - List_Z (col);
+         end loop;
+         List_Z2.Append (List_Z);
+      end loop;
+      Del := Del * List_Z2;
+
+   end Logistic_Derivative;
 
    --  -------------------------------------------------------------------------
 
@@ -122,6 +151,26 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
+   procedure Tanh_Derivative (Z   : Float_List_2D;
+                              Del : in out Float_List_2D) is
+      use Float_List_Package;
+      List_Z : Float_List;
+      List_Z2 : Float_List_2D;
+   begin
+      --  List_Z = 1 - Z ** 2
+      for row in Z.First_Index .. Z.Last_Index loop
+         List_Z := Z (row);
+         for col in List_Z.First_Index .. List_Z.Last_Index loop
+            List_Z (col) := 1.0 - List_Z (col) ** 2;
+         end loop;
+         List_Z2.Append (List_Z);
+      end loop;
+      Del := Del * List_Z2;
+
+   end Tanh_Derivative;
+
+   --  -------------------------------------------------------------------------
+
    function Relu (Activation : Float_List) return Float_List is
       Result : Float_List;
    begin
@@ -131,6 +180,26 @@ package body Base is
 
       return Result;
    end Relu;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Relu_Derivative (Z : Float_List_2D; Del : in out Float_List_2D) is
+      use Float_List_Package;
+      List_Z   : Float_List;
+      List_Del : Float_List;
+   begin
+      for row in Z.First_Index .. Z.Last_Index loop
+         List_Z := Z (row);
+         List_Del := Del (row);
+         for col in List_Z.First_Index .. List_Z.Last_Index loop
+            if List_Z (col) = 0.0 then
+               List_Del (col) := 0.0;
+            end if;
+         end loop;
+         Del (row) := List_Del;
+      end loop;
+
+   end Relu_Derivative;
 
    --  -------------------------------------------------------------------------
 
