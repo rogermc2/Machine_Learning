@@ -82,9 +82,14 @@ package body Multilayer_Perceptron is
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
       use Base;
+      use IL_Types;
+      use Float_Package;
       Num_Samples        : constant Positive := Positive (X.Length);
       Loss_Function_Name : Loss_Function := Self.Attributes.Loss;
+      S_List             : Float_List_2D;
+      Ravel              : Float_List;
       Values             : Float := 0.0;
+      Last               : Positive;
    begin
       Forward_Pass (Self, Activations);
       if Self.Attributes.Loss = Log_Loss_Function and then
@@ -100,6 +105,26 @@ package body Multilayer_Perceptron is
          when Squared_Error_Function =>
             Loss := Squared_Error (Y, Activations.Last_Element);
       end case;
+
+      for s in Self.Attributes.Neuron_Coef_Layers.First_Index ..
+        Self.Attributes.Neuron_Coef_Layers.Last_Index loop
+         S_List := Self.Attributes.Neuron_Coef_Layers.Element (s);
+         for s_index in S_List.First_Index .. S_List.Last_Index loop
+            Ravel := Ravel & S_List.Element (s_index);
+         end loop;
+         Values := Values + Dot (Ravel, Ravel);
+      end loop;
+
+      --  Add L2 regularization term to loss
+      Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
+
+      --  Backward propagate
+      Last := Num_Samples - 2;
+
+      --  The calculation of delta[last]  works with following combinations
+      --  of output activation and loss function:
+      --  sigmoid and binary cross entropy, softmax and categorical cross
+      --  entropy and identity with squared loss.
 
    end Backprop;
 
