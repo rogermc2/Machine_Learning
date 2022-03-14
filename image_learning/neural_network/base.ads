@@ -8,6 +8,8 @@ package Base is
                             Tanh_Activation, Relu_Activation,
                             Softmax_Activation);
 
+   function Binary_Log_Loss (Y_True, Y_Prob : Float_List) return Float;
+   pragma Inline (Binary_Log_Loss);
    function Identity (Activation : Float_List) return Float_List;
    pragma Inline (Identity);
    function Logistic (Activation : Float_List) return Float_List;
