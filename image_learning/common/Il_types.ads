@@ -28,6 +28,10 @@ package IL_Types is
    subtype Float_List is Float_Package.Vector;
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   function "*" (L : Float; R : Float_Package.Vector)
+                 return Float_Package.Vector;
+   function "/" (L : Float_Package.Vector; R : Float)
+                 return Float_Package.Vector;
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
    procedure Check_Lengths (Routine_Name : String; L, R : Float_List);
 
@@ -35,7 +39,10 @@ package IL_Types is
    package Float_List_Package is new
      Ada.Containers.Vectors (Positive, Float_List);
    subtype Float_List_2D is Float_List_Package.Vector;
+   function "*" (L : Float; R : Float_List_2D) return Float_List_2D;
+   function "/" (L : Float_List_2D; R : Float) return Float_List_2D;
    function Dot (L : Float_List; R : Float_List_2D) return Float_List;
+   function Transpose (Values : Float_List_2D) return  Float_List_2D;
 
    use Float_List_Package;
    package List_Of_Float_Lists_Package is new

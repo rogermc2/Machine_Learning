@@ -49,7 +49,7 @@ package body Multilayer_Perceptron is
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List;
                              Activations     : in out IL_Types.Float_List_2D;
-                             Deltas          : IL_Types.Float_List;
+                             Deltas          : in out IL_Types.Float_List;
                              Coef_Grads      : in out IL_Types.Float_List_3D;
                              Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
@@ -72,24 +72,27 @@ package body Multilayer_Perceptron is
    --                               Incremental, Reset : Boolean);
 
    --  -------------------------------------------------------------------------
-
+   --  L241
    procedure Backprop (Self            : in out MLP_Classifier;
                        X               : IL_Types.Float_List_2D;
                        Y               : IL_Types.Integer_List;
                        Activations     : in out IL_Types.Float_List_2D;
-                       Deltas          : IL_Types.Float_List;
+                       Deltas          : in out IL_Types.Float_List;
                        Loss            : out Float;
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
       use Base;
       use IL_Types;
+      use Float_List_Package;
       use Float_Package;
       Num_Samples        : constant Positive := Positive (X.Length);
       Loss_Function_Name : Loss_Function := Self.Attributes.Loss;
       S_List             : Float_List_2D;
       Ravel              : Float_List;
       Values             : Float := 0.0;
+      F_I                : Positive;
       Last               : Positive;
+      Activation         : Float_List;
    begin
       Forward_Pass (Self, Activations);
       if Self.Attributes.Loss = Log_Loss_Function and then
@@ -118,13 +121,27 @@ package body Multilayer_Perceptron is
       --  Add L2 regularization term to loss
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
 
-      --  Backward propagate
-      Last := Num_Samples - 2;
-
+      --  L294 Backward propagate
       --  The calculation of delta[last]  works with following combinations
       --  of output activation and loss function:
       --  sigmoid and binary cross entropy, softmax and categorical cross
       --  entropy and identity with squared loss.
+      --  deltas : list, length = n_layers - 1
+      --  The ith element of deltas holds the difference between the activations
+      --  of the i + 1 layer and the backpropagated error.
+      --  deltas are gradients of loss with respect to z in each layer
+      --  where z = wx + b is the value of a particular layer before passing
+      --  through the activation function.
+
+      Last := Num_Samples - 2;
+      for index in Activations.Last_Element.First_Index ..
+        Activations.Last_Element.Last_Index loop
+         Activation := Activations.Element (index);
+         F_I := Y (index);
+         Deltas.Append (Activation (index) - Float (F_I));
+      end loop;
+
+      --  L303  Compute gradient for the last layer
 
    end Backprop;
 
@@ -183,6 +200,31 @@ package body Multilayer_Perceptron is
       First_Pass                                := True;
       return Classifier;
    end C_Init;
+
+   --  -------------------------------------------------------------------------
+   --  L177 Compute_Loss_Gradient does back-propagation for a specified layer
+   --  by computing the gradient of loss with respect to the coefs and
+   --  intercept for the layer.
+   procedure Compute_Loss_Gradient
+     (Self            : in out MLP_Classifier;
+      Layer           : Positive;
+      Num_Samples     : Positive;
+      Activations     : IL_Types.Float_List_2D;
+      Deltas          : IL_Types.Float_List;
+      Coef_Grads      : in out IL_Types.Float_List_3D;
+      Intercept_Grads : in out IL_Types.Float_List_2D) is
+      use IL_Types;
+      use Float_List_Package;
+      use Float_Package;
+      Activation_List : constant Float_List := Activations (Layer);
+      Delta_Act       : constant Float_List_2D :=
+                          Deltas (Layer) * Transpose (Activations);
+   begin
+      Coef_Grads (Layer) :=
+        (1.0 + Self.Parameters.Alpha) * Delta_Act / Float (Num_Samples);
+      Intercept_Grads (Layer) := Utilities.Mean (Deltas);
+
+   end  Compute_Loss_Gradient;
 
    --  -------------------------------------------------------------------------
    --  L377  BaseMultilayerPerceptron._Fit
@@ -248,7 +290,7 @@ package body Multilayer_Perceptron is
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List;
                              Activations     : in out IL_Types.Float_List_2D;
-                             Deltas          : IL_Types.Float_List;
+                             Deltas          : in out IL_Types.Float_List;
                              Coef_Grads      : in out IL_Types.Float_List_3D;
                              Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
