@@ -30,6 +30,7 @@ package IL_Types is
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "*" (L : Float; R : Float_Package.Vector)
                  return Float_Package.Vector;
+   function "*" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "/" (L : Float_Package.Vector; R : Float)
                  return Float_Package.Vector;
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;

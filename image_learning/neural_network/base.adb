@@ -50,8 +50,7 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   procedure Identity_Derivative (Z   : Float_List_2D;
-                                  Del : in out Float_List_2D) is
+   procedure Identity_Derivative (Z : Float_List; Del : in out Float_List) is
    begin
       null;
    end Identity_Derivative;
@@ -71,8 +70,7 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   procedure Logistic_Derivative (Z   : Float_List_2D;
-                                  Del : in out Float_List_2D) is
+   procedure Logistic_Derivative (Z : Float_List; Del : in out Float_List) is
       use Float_List_Package;
       List_Z : Float_List;
       List_Z2 : Float_List_2D;
@@ -151,8 +149,7 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   procedure Tanh_Derivative (Z   : Float_List_2D;
-                              Del : in out Float_List_2D) is
+   procedure Tanh_Derivative (Z : Float_List; Del : in out Float_List) is
       use Float_List_Package;
       List_Z : Float_List;
       List_Z2 : Float_List_2D;
@@ -183,7 +180,7 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu_Derivative (Z : Float_List_2D; Del : in out Float_List_2D) is
+   procedure Relu_Derivative (Z : Float_List; Del : in out Float_List) is
       use Float_List_Package;
       List_Z   : Float_List;
       List_Del : Float_List;

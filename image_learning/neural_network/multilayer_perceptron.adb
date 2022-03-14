@@ -165,9 +165,12 @@ package body Multilayer_Perceptron is
          case Self.Parameters.Activation is
             when Identity_Activation =>
                Identity_Derivative (Activations (index), Deltas (index - 1));
-            when Logistic_Activation => null;
-            when Tanh_Activation => null;
-            when Relu_Activation => null;
+            when Logistic_Activation =>
+               Logistic_Derivative (Activations (index), Deltas (index - 1));
+            when Tanh_Activation =>
+               Tanh_Derivative (Activations (index), Deltas (index - 1));
+            when Relu_Activation =>
+               Relu_Derivative (Activations (index), Deltas (index - 1));
             when Softmax_Activation => null;
          end case;
       end loop;

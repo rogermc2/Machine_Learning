@@ -33,6 +33,19 @@ package body IL_Types is
 
    end "*";
 
+   --  -------------------------------------------------------------------------
+
+   function "*" (L, R : Float_Package.Vector) return Float_Package.Vector is
+      Result : Float_Package.Vector;
+   begin
+      for index in R.First_Index .. R.Last_Index loop
+         Result.Append (L.Element (index) * R.Element (index));
+      end loop;
+
+      return Result;
+
+   end "*";
+
    --  ----------------------------------------------------------------------------
 
    function "/" (L : Float_Package.Vector; R : Float)
