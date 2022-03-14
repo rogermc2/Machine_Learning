@@ -8,6 +8,9 @@ package Base is
                             Tanh_Activation, Relu_Activation,
                             Softmax_Activation);
 
+   type Derivative_Type is (Identity_Derivative, Logistic_Derivative,
+                            Tanh_Derivative, Relu_Derivative);
+
    function Binary_Log_Loss (Y_True : Integer_List; Y_Prob : Float_List) return Float;
    pragma Inline (Binary_Log_Loss);
    function Identity (Activation : Float_List) return Float_List;
