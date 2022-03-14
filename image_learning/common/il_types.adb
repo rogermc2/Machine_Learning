@@ -21,6 +21,34 @@ package body IL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function "*" (L : Float; R : Float_Package.Vector)
+                 return Float_Package.Vector is
+      Result : Float_Package.Vector;
+   begin
+      for index in R.First_Index .. R.Last_Index loop
+         Result.Append (L * R.Element (index));
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ----------------------------------------------------------------------------
+
+   function "/" (L : Float_Package.Vector; R : Float)
+                 return Float_Package.Vector is
+      Result : Float_Package.Vector;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result.Append (L.Element (index) / R);
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ----------------------------------------------------------------------------
+
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector is
       Result : Float_Package.Vector;
    begin
@@ -57,6 +85,42 @@ package body IL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function "*" (L : Float; R : Float_List_2D) return Float_List_2D is
+      List_1D : Float_List;
+      Result  : Float_List_2D;
+   begin
+      for row in R.First_Index .. R.Last_Index loop
+         List_1D := R (row);
+         for col in List_1D.First_Index .. List_1D.Last_Index loop
+            List_1D (col) := L * List_1D (col);
+         end loop;
+         Result.Append (List_1D);
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ----------------------------------------------------------------------------
+
+   function "/" (L : Float_List_2D; R : Float) return Float_List_2D is
+      List_1D : Float_List;
+      Result  : Float_List_2D;
+   begin
+      for row in L.First_Index .. L.Last_Index loop
+         List_1D := L (row);
+         for col in List_1D.First_Index .. List_1D.Last_Index loop
+            List_1D (col) := List_1D (col) / R;
+         end loop;
+         Result.Append (List_1D);
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ----------------------------------------------------------------------------
+
    function Dot (L : Float_List; R : Float_List_2D) return Float_List is
       R_List : Float_List;
       Result : Float_List;
@@ -75,6 +139,30 @@ package body IL_Types is
    end Dot;
 
    --  ----------------------------------------------------------------------------
+
+   function Transpose (Values : Float_List_2D) return  Float_List_2D is
+      use Ada.Containers;
+      Num_Rows : constant Positive := Positive (Values.Length);
+      Num_Cols : constant Count_Type := Values.Element (1).Length;
+      In_Row   : Float_List;
+      Out_Row  : Float_List;
+      Result   : Float_List_2D;
+   begin
+      Result.Set_Length (Num_Cols);
+      for row in 1 .. Num_Rows loop
+         In_Row := Values.Element (row);
+         for index in In_Row.First_Index ..  In_Row.Last_Index loop
+            Out_Row := Result.Element (index);
+            Out_Row.Append (In_Row.Element (index));
+            Result.Replace_Element (index, Out_Row);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Transpose;
+
+   --  -------------------------------------------------------------------------
 
    procedure Check_Lengths (Routine_Name : String; L : Integer_List;
                             R            : Float_List) is
