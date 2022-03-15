@@ -28,7 +28,7 @@
 --  activation functions).
 --  Pre-activation means the input to an activation function.
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -51,7 +51,7 @@ package body Multilayer_Perceptron is
       Layer           : Positive;
       Num_Samples     : Positive;
       Activations     : IL_Types.Float_List_2D;
-      Deltas          : IL_Types.Float_List_3D;
+      Deltas          : IL_Types.Float_List_2D;
       Coef_Grads      : in out IL_Types.Float_List_3D;
       Intercept_Grads : in out IL_Types.Float_List_2D);
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
@@ -86,7 +86,7 @@ package body Multilayer_Perceptron is
                        X               : IL_Types.Float_List_2D;
                        Y               : IL_Types.Integer_List;
                        Activations     : in out IL_Types.Float_List_2D;
-                       Deltas          : in out IL_Types.Float_List_3D;
+                       Deltas          : in out IL_Types.Float_List_2D;
                        Loss            : out Float;
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
@@ -94,6 +94,7 @@ package body Multilayer_Perceptron is
       use IL_Types;
       use Float_List_Package;
       use Float_Package;
+      Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X.Length);
       Loss_Function_Name : Loss_Function := Self.Attributes.Loss;
       S_List             : Float_List_2D;
@@ -102,7 +103,6 @@ package body Multilayer_Perceptron is
       F_I                : Positive;
       Last               : Positive;
       Activation         : Float_List;
-      Act_Y              : Float_List;
       Diff               : Float_List;
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
@@ -147,15 +147,11 @@ package body Multilayer_Perceptron is
       --  of the ith layer.
 
       Last := Num_Samples - 1;
---        for index in Activations.Last_Element.First_Index ..
---          Activations.Last_Element.Last_Index loop
---           Activation := Activations.Element (index);
---           F_I := Y (index);
---           Act_Y.Append (Activation (index) - Float (F_I));
---        end loop;
       Activation := Activations.Element (Activations.Last_Index - 1);
       Diff := Activation - Classifier_Utilities.To_Float_List (Y);
-      Deltas.Append (Diff);
+      Put_Line (Routine_Name & "Last" & Integer'Image (Last));
+      Put_Line (Routine_Name & "Deltas Last_Index" & Integer'Image (Deltas.Last_Index));
+--        Deltas.Replace_Element (Last, Diff);
 
       --  L303  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
@@ -249,7 +245,7 @@ package body Multilayer_Perceptron is
       Layer           : Positive;
       Num_Samples     : Positive;
       Activations     : IL_Types.Float_List_2D;
-      Deltas          : IL_Types.Float_List_3D;
+      Deltas          : IL_Types.Float_List_2D;
       Coef_Grads      : in out IL_Types.Float_List_3D;
       Intercept_Grads : in out IL_Types.Float_List_2D) is
       use IL_Types;
@@ -281,19 +277,15 @@ package body Multilayer_Perceptron is
       --        Num_Samples               : constant Positive := Positive (X.Length);
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
-      Hidden_Layer_Sizes_Length : constant Count_Type :=
-                                    Self.Parameters.Hidden_Layer_Sizes.Length;
       Activations               : Float_List_2D := X;
-      Hidden_Layer_Sizes        : Integer_List;
+      Hidden_Layer_Sizes        : Integer_List :=
+                                    Self.Parameters.Hidden_Layer_Sizes;
+      Hidden_Layer_Sizes_Length : Count_Type := Hidden_Layer_Sizes.Length;
       Layer_Units               : Integer_List;
       Deltas                    : Float_List_2D;
       Coef_Grads                : Float_List_3D;
       Intercept_Grads           : Float_List_2D;
-
    begin
-      Assert (Hidden_Layer_Sizes_Length > 0,
-              Routine_Name & "Hidden_Layer_Sizes vector is empty");
-      Hidden_Layer_Sizes.Set_Length (Hidden_Layer_Sizes_Length);
       Validate_Hyperparameters (Self);
       First_Pass :=
         Self.Attributes.Neuron_Coef_Layers.Is_Empty or else

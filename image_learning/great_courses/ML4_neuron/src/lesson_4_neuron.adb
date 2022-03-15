@@ -10,7 +10,7 @@ with Base;
 with Data_Splitter;
 with Multilayer_Perceptron;
 with Openml_Ada;
-with Printing;
+--  with Printing;
 with Utilities;
 
 with Support_4;
@@ -34,9 +34,9 @@ procedure Lesson_4_Neuron is
    Train_Y         : Integer_List;
    Test_X          : Float_List_2D;
    Test_Y          : Integer_List;
-   Prediction_List : Integer_List;
-   Prediction      : Integer;
-   Correct         : Natural := 0;
+--     Prediction_List : Integer_List;
+--     Prediction      : Integer;
+--     Correct         : Natural := 0;
 begin
    Put_Line (Routine_Name);
    if not Get_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y, Bunch) then
@@ -96,16 +96,16 @@ begin
    Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
    Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
 --     Prediction_List := Base_Decision_Tree.Predict (aClassifier, Train_X);
-   for index in Train_X.First_Index .. Train_X.Last_Index loop
-      --        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
-      Prediction := Prediction_List.Element (index);
-      if Prediction = Train_Y.Element (index) then
-         Correct := Correct + 1;
-      end if;
-   end loop;
-
-   Put_Line ("Prediction: " &
-               Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
+--     for index in Train_X.First_Index .. Train_X.Last_Index loop
+--        --        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));
+--        Prediction := Prediction_List.Element (index);
+--        if Prediction = Train_Y.Element (index) then
+--           Correct := Correct + 1;
+--        end if;
+--     end loop;
+--
+--     Put_Line ("Prediction: " &
+--                 Float'Image (100.0 * Float (Correct) / Float (Train_X.Length)));
    New_Line;
 
 end Lesson_4_Neuron;
