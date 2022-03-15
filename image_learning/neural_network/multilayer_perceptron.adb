@@ -251,13 +251,16 @@ package body Multilayer_Perceptron is
         use IL_Types;
         use Float_List_Package;
         use Float_Package;
-        Activation_List : constant Float_List := Activations (Layer);
-        Delta_Act       : constant Float_List_2D :=
-                            Deltas (Layer) * Transpose (Activations);
+        Delta_Act : constant Float_List_2D := Dot (Deltas (Layer), Activations (Layer));
     begin
+        --  Coef_Grads is a 3D list of fan_in x fan_out lists
         Coef_Grads (Layer) :=
-          (1.0 + Self.Parameters.Alpha) * Delta_Act / Float (Num_Samples);
-        Intercept_Grads (Layer) := Utilities.Mean (Deltas);
+        (Delta_Act + Self.Parameters.Alpha *
+           Self.Attributes.Neuron_Coef_Layers (Layer)) / Float (Num_Samples);
+        --  Intercept_Grads is a 2D list of fan_out lists
+        --  The ith element of Deltas holds the difference between the
+        --  activations of the i + 1 layer and the backpropagated error.
+        Intercept_Grads (Layer) := Utilities.Mean (Deltas (Layer));
 
     end  Compute_Loss_Gradient;
 
@@ -306,6 +309,9 @@ package body Multilayer_Perceptron is
         end if;
 
         Activations.Set_Length (X.Length + Layer_Units.Length);
+      --  Deltas is a 2D list initialized by Backprop
+      --  The ith element of Deltas holds the difference between the
+      --  activations of the i + 1 layer and the backpropagated error.
         Deltas.Set_Length (Activations.Length - 1);
 
         Init_Coeff_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
@@ -584,6 +590,7 @@ package body Multilayer_Perceptron is
             Coef_Grads.Append (Build_List (Zip_Layer_Units.Element (index)));
         end loop;
 
+        --  Intercept_Grads is a 2D list of fan_out lists
         for index in Fan_Out_Units.First_Index ..
           Fan_Out_Units.Last_Index loop
             Intercept.Set_Length (Count_Type (Fan_Out_Units.Element (index)));
