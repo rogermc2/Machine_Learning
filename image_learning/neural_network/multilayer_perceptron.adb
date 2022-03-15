@@ -110,7 +110,7 @@ package body Multilayer_Perceptron is
       use Float_Package;
       Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X.Length);
-      Loss_Function_Name : Loss_Function := Self.Attributes.Loss;
+      Loss_Function_Name : Loss_Function;
       S_List             : Float_List_2D;
       Ravel              : Float_List;
       Values             : Float := 0.0;
@@ -122,7 +122,7 @@ package body Multilayer_Perceptron is
       Inplace_Derivative : Float_List;
    begin
       Forward_Pass (Self, Activations);
-      if Self.Attributes.Loss = Log_Loss_Function and then
+      if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
       end if;
@@ -435,7 +435,7 @@ package body Multilayer_Perceptron is
       Batch_Slice      : Integer_List;
       X_Batch          : Float_List_2D;
       Y_Batch          : Integer_List;
-      Loss             : Float;
+      Batch_Loss       : Float;
    begin
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
@@ -471,6 +471,7 @@ package body Multilayer_Perceptron is
          end case;
       end if;
 
+      --  L597
       if Early_Stopping then
          Should_Stratify := Self.Parameters.Is_Classifier;
          if Should_Stratify then
@@ -487,45 +488,71 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
+      --  L617
       if Self.Parameters.Batch_Size = 0 then
          Batch_Size := Integer'Min (200, Num_Samples);
       else
-         Put_Line (Routine_Name & "WARNING: Batch size" &
-                     Integer'Image (Self.Parameters.Batch_Size)  &
-                     " clipped to" & Integer'Image (Num_Samples));
+         if Self.Parameters.Batch_Size > Num_Samples then
+            Put_Line (Routine_Name & "WARNING: Batch size" &
+                        Integer'Image (Self.Parameters.Batch_Size)  &
+                        " clipped to" & Integer'Image (Num_Samples));
+         end if;
          Batch_Size := Num_Samples;
       end if;
 
-      Max_Sample_Index := Num_Samples;
-      Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
-      Put_Line (Routine_Name & "batches generated");
-      Activations.Clear;
-      Sample_Index := 1;
-      while Sample_Index <= Max_Sample_Index loop
+      --        Max_Sample_Index := Num_Samples;
+      --  L628
+      for iter in 1 .. Self.Parameters.Max_Iter loop
+         Accumulated_Loss := 0.0;
+         Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
+         Put_Line (Routine_Name & "batches generated");
+         Activations.Clear;
+         --           Sample_Index := 1;
+         --        while Sample_Index <= Max_Sample_Index loop
          --  if Self.Parameters.Shuffle then
          --      Sample_Index := Shuffle (Sample_Index, Random_State);
          --  end if;
-         Accumulated_Loss := 0.0;
+         --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
             Batch_Slice := Batches (batch_index);
+            X_Batch.Clear;
+            Y_Batch.Clear;
             Put_Line (Routine_Name & "batch_index:" &
-                     Integer'Image (batch_index));
+                        Integer'Image (batch_index));
+            Put_Line (Routine_Name & "X_Batch size:" &
+                        Integer'Image (Integer (X_Batch.Length)));
             for index in Batch_Slice.First_Index .. Batch_Slice.Last_Index loop
                Put_Line (Routine_Name & "Batch_Slice index:" &
-                     Integer'Image (index));
-               X_Batch (index) := X (Batch_Slice (index));
-               Y_Batch (index) := Y_Batch (Batch_Slice (index));
-            end loop;
-            Activations.Append (X_Batch);
+                           Integer'Image (index));
+               X_Batch.Append (X (Batch_Slice (index)));
+               Y_Batch.Append (Y_Batch (Batch_Slice (index)));
+               Activations.Append (X_Batch);
 
-            Backprop (Self, X, Y, Activations, Deltas, Loss,
+               --  L645
+               Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
                       Coef_Grads, Intercept_Grads);
+               Accumulated_Loss := Accumulated_Loss + Batch_Loss *
+                 Float (Batch_Slice.Last_Index - Batch_Slice.First_Index + 1);
+
+               --  L657 update weights
+
+            end loop;
+
+            --  L661
+            Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
+            --           Sample_Index := Sample_Index + 1;
+            Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
+            Self.Attributes.T := Self.Attributes.T + Num_Samples;
+            Self.Attributes.Loss_Curve.Append (Self.Attributes.Loss);
+            if Self.Parameters.Verbose then
+               Put_Line (Routine_Name & "Iteration" &
+                           Integer'Image (Self.Attributes.N_Iter) &
+                           "loss = " & Float'Image (Self.Attributes.Loss));
+            end if;
+
+            --  L671
 
          end loop;
-         Put_Line (Routine_Name & "Sample_Index:" &
-                     Integer'Image (Sample_Index));
-
-         Sample_Index := Sample_Index + 1;
       end loop;
 
    end Fit_Stochastic;

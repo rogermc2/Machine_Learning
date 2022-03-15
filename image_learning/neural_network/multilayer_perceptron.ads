@@ -32,7 +32,8 @@ package Multilayer_Perceptron is
 
    type MLP_Classifier_Attributes is record
       Classes              : IL_Types.Integer_List;
-      Loss                 : Loss_Function;
+      Loss_Function_Name   : Loss_Function;
+      Loss                 : Float;
       Best_Loss            : Float;
       Loss_Curve           : IL_Types.Float_List;
       No_Improvement_Count : Natural := 0;

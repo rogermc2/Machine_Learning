@@ -71,15 +71,6 @@ begin
 
 --     if not Get_Classifier (Dataset_Name, aClassifier) then
 --        Printing.Print_Strings ("Features", Bunch.Feature_Names);
-      --        Printing.Print_Float_List ("Train features row 16", Train_X.Element (16));
-      --        Printing.Print_Float_List ("Test features row 16", Test_X.Element (16));
-
-      --        Printing.Print_Float_List ("Train features row 417",
-      --                                           Train_X.Element (417));
-
-      --        Put_Line (Routine_Name & "Plotting");
-      --        Plotting.Display_Image (Train_X.Element (4));
-      --        Plotting.Display_Image (Test_X.Element (4));
 
       aClassifier := C_Init (Max_Iter => 10000, Activation => Base.Identity_Activation);
 
