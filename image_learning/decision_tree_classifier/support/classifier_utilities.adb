@@ -12,10 +12,10 @@ with Utilities;
 package body Classifier_Utilities is
 
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
---     use Value_Data_Package;
---     package Value_Sets is new
---       Ada.Containers.Ordered_Sets (Value_Record);
---     use Weights.Weight_Lists_3D_Package;
+   --     use Value_Data_Package;
+   --     package Value_Sets is new
+   --       Ada.Containers.Ordered_Sets (Value_Record);
+   --     use Weights.Weight_Lists_3D_Package;
 
    package Weight_Sets is new
      Ada.Containers.Ordered_Sets (Float);
@@ -756,6 +756,21 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function To_Float_List (I : Integer_List) return Float_List is
+      Value  : Integer;
+      F_List : Float_List;
+   begin
+      for index in I.First_Index .. I.Last_Index loop
+         Value := I (index);
+         F_List.Append (Float (Value));
+      end loop;
+
+      return F_List;
+
+   end To_Float_List;
+
+   --  -------------------------------------------------------------------------
+
    function To_Integer_List (A : Classifier_Types.Integer_Array)
                              return Integer_List is
       A_List : Integer_List;
@@ -1094,27 +1109,27 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Unique_Values (Values : Value_Data_List)
---                             return Value_Data_List is
---        use Value_Sets;
---        Unique_Set  : Value_Sets.Set;
---        Int_Curs    : Value_Data_Package.Cursor := Values.First;
---        Set_Curs    : Value_Sets.Cursor;
---        Values_List : Value_Data_List;
---     begin
---        while Has_Element (Int_Curs) loop
---           Unique_Set.Include (Element (Int_Curs));
---           Next (Int_Curs);
---        end loop;
---
---        Set_Curs := Unique_Set.First;
---        while Has_Element (Set_Curs) loop
---           Values_List.Append (Element (Set_Curs));
---           Next (Set_Curs);
---        end loop;
---        return Values_List;
---
---     end Unique_Values;
+   --     function Unique_Values (Values : Value_Data_List)
+   --                             return Value_Data_List is
+   --        use Value_Sets;
+   --        Unique_Set  : Value_Sets.Set;
+   --        Int_Curs    : Value_Data_Package.Cursor := Values.First;
+   --        Set_Curs    : Value_Sets.Cursor;
+   --        Values_List : Value_Data_List;
+   --     begin
+   --        while Has_Element (Int_Curs) loop
+   --           Unique_Set.Include (Element (Int_Curs));
+   --           Next (Int_Curs);
+   --        end loop;
+   --
+   --        Set_Curs := Unique_Set.First;
+   --        while Has_Element (Set_Curs) loop
+   --           Values_List.Append (Element (Set_Curs));
+   --           Next (Set_Curs);
+   --        end loop;
+   --        return Values_List;
+   --
+   --     end Unique_Values;
 
    --  -------------------------------------------------------------------------
 
@@ -1131,15 +1146,15 @@ package body Classifier_Utilities is
       Weights        : Weight_List;
       Unique_List    : Weight_List;
    begin
-         while Has_Element (Weight_2D_Curs) loop
-            Weights := Element (Weight_2D_Curs);
-            Weights_Curs := Weights.First;
-            while Has_Element (Weights_Curs) loop
-               Unique_Set.Include (Element (Weights_Curs));
-               Next (Weights_Curs);
-            end loop;
-            Next (Weight_2D_Curs);
+      while Has_Element (Weight_2D_Curs) loop
+         Weights := Element (Weight_2D_Curs);
+         Weights_Curs := Weights.First;
+         while Has_Element (Weights_Curs) loop
+            Unique_Set.Include (Element (Weights_Curs));
+            Next (Weights_Curs);
          end loop;
+         Next (Weight_2D_Curs);
+      end loop;
 
       Set_Curs := Unique_Set.First;
       while Has_Element (Set_Curs) loop

@@ -155,6 +155,27 @@ package body IL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function "+" (L, R : Float_List_2D) return Float_List_2D is
+      List_1D : Float_List;
+      List_2D : Float_List;
+      List_3D : Float_List;
+      Result  : Float_List_2D;
+   begin
+      for row in L.First_Index .. L.Last_Index loop
+         List_1D := L (row);
+         List_2D := R (row);
+         for col in List_1D.First_Index .. List_1D.Last_Index loop
+            List_3D (col) := List_1D (col) + List_2D (col);
+         end loop;
+         Result.Append (List_3D);
+      end loop;
+
+      return Result;
+
+   end "+";
+
+   --  ----------------------------------------------------------------------------
+
    function Dot (L : Float_List; R : Float_List_2D) return Float_List is
       R_List : Float_List;
       Result : Float_List;
@@ -166,6 +187,24 @@ package body IL_Types is
             Result (index) := Result (index) + L.Element (index_2) *
               R_List.Element (index_2);
          end loop;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
+   function Dot (L, R : Float_List) return Float_List_2D is
+      R_List : Float_List;
+      Result : Float_List_2D;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         R_List.Clear;
+         for index_2 in R.First_Index .. R.Last_Index loop
+            R_List (index_2) := L.Element (index_2) * R.Element (index_2);
+         end loop;
+         Result.Append (R_List);
       end loop;
 
       return Result;
