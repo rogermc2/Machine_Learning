@@ -28,6 +28,12 @@
 --  activation functions).
 --  Pre-activation means the input to an activation function.
 
+--  A Multilayer_Perceptron contains the attributes Coefs and Intercepts.
+--  Coefs is a 3D list of weight matrices where the weight matrix at index i
+--  represents the weights between layer i and layer i + 1.
+--  Intercepts is a 2D list of bias vectors where the vector at index
+--  the bias values added to layer i + 1.
+
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -240,6 +246,11 @@ package body Multilayer_Perceptron is
    --  L177 Compute_Loss_Gradient does back-propagation for a specified layer
    --  by computing the gradient of loss with respect to the coefs and
    --  intercept for the layer.
+
+   --  Coef_Grads is a 3D list of weight matrices where the weight matrix at index i
+   --  represents the weights between layer i and layer i + 1.
+   --  Intercept_Grads is a 2D list of bias vectors where the vector at index
+   --  the bias values added to layer i + 1.
    procedure Compute_Loss_Gradient
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
@@ -257,7 +268,8 @@ package body Multilayer_Perceptron is
       Coef_Grads (Layer) :=
         (Delta_Act + Self.Parameters.Alpha *
            Self.Attributes.Neuron_Coef_Layers (Layer)) / Float (Num_Samples);
-      --  Intercept_Grads is a 2D list of fan_out lists
+
+      --  Intercept_Grads is 2D layer x fan_out
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       Intercept_Grads (Layer) := Utilities.Mean (Deltas (Layer));
