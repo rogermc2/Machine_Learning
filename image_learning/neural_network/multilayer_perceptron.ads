@@ -1,4 +1,6 @@
 
+with Ada.Containers.Vectors;
+
 with IL_Types;
 with Base;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
@@ -8,6 +10,26 @@ package Multilayer_Perceptron is
    type Loss_Function is (Log_Loss_Function, Binary_Log_Loss_Function,
                           Squared_Error_Function);
 
+   type Coef_Indptr_Record is record
+      Start   : Positive := 1;
+      Last    : Positive := 1;
+      Fan_In  : Positive := 1;
+      Fan_Out : Positive := 1;
+   end record;
+
+   package Coef_Indptr_Package is new
+     Ada.Containers.Vectors (Positive, Coef_Indptr_Record);
+   subtype Coef_Indptr_List is Coef_Indptr_Package.Vector;
+
+   type Intercept_Indptr_Record is record
+      Start   : Positive := 1;
+      Last    : Positive := 1;
+   end record;
+
+   package Intercept_Indptr_Package is new
+     Ada.Containers.Vectors (Positive, Intercept_Indptr_Record);
+   subtype Intercept_Indptr_List is Intercept_Indptr_Package.Vector;
+
    type MLP_Classifier_Attributes is record
       Classes              : IL_Types.Integer_List;
       Loss                 : Loss_Function;
@@ -16,7 +38,9 @@ package Multilayer_Perceptron is
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
       Neuron_Coef_Layers   : IL_Types.Float_List_3D;
+      Coef_Indptr          : Coef_Indptr_List;
       Intercepts           : IL_Types.Float_List_2D;
+      Intercept_Indptr     : Intercept_Indptr_List;
       N_Features           : Positive;
       Feature_Names_In     : IL_Types.String_List;
       N_Iter               : Natural;

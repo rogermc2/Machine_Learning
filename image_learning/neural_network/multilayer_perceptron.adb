@@ -34,7 +34,7 @@
 --  Intercepts is a 2D list of bias vectors where the vector at index
 --  the bias values added to layer i + 1.
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -60,6 +60,14 @@ package body Multilayer_Perceptron is
       Deltas          : IL_Types.Float_List_2D;
       Coef_Grads      : in out IL_Types.Float_List_3D;
       Intercept_Grads : in out IL_Types.Float_List_2D);
+   procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
+                        X               : IL_Types.Float_List_2D;
+                        Y               : IL_Types.Integer_List;
+                        Activations     : in out IL_Types.Float_List_2D;
+                        Deltas          : in out IL_Types.Float_List_2D;
+                        Coef_Grads      : in out IL_Types.Float_List_3D;
+                        Intercept_Grads : in out IL_Types.Float_List_2D;
+                        Layer_Units     : IL_Types.Integer_List);
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List;
@@ -157,7 +165,7 @@ package body Multilayer_Perceptron is
       Diff := Activation - Classifier_Utilities.To_Float_List (Y);
       Put_Line (Routine_Name & "Last" & Integer'Image (Last));
       Put_Line (Routine_Name & "Deltas Last_Index" & Integer'Image (Deltas.Last_Index));
---        Deltas.Replace_Element (Last, Diff);
+      --        Deltas.Replace_Element (Last, Diff);
 
       --  L303  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
@@ -262,7 +270,9 @@ package body Multilayer_Perceptron is
       use IL_Types;
       use Float_List_Package;
       use Float_Package;
-      Delta_Act : constant Float_List_2D := Dot (Deltas (Layer), Activations (Layer));
+      Delta_Act  : constant Float_List_2D :=
+                     Dot (Deltas (Layer), Activations (Layer));
+      Delta_Mean : constant Float := Utilities.Mean (Deltas (Layer));
    begin
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
       Coef_Grads (Layer) :=
@@ -272,7 +282,11 @@ package body Multilayer_Perceptron is
       --  Intercept_Grads is 2D layer x fan_out
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Intercept_Grads (Layer) := Utilities.Mean (Deltas (Layer));
+
+      for index in Intercept_Grads (Layer).First_Index ..
+        Intercept_Grads (Layer).Last_Index loop
+         Intercept_Grads (Layer) (index) := Delta_Mean;
+      end loop;
 
    end  Compute_Loss_Gradient;
 
@@ -321,17 +335,64 @@ package body Multilayer_Perceptron is
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       Deltas.Set_Length (Activations.Length - 1);
-
+      --  L417
       Init_Coeff_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
+      --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
-         null;
-      else
-         null;
+         Fit_Stochastic (Self, X, Y, Activations, Deltas, Coef_Grads,
+                         Intercept_Grads, Layer_Units, Incremental);
+      elsif Self.Parameters.Solver = Lbfgs_Solver then
+         Fit_Lbfgs (Self, X, Y, Activations, Deltas, Coef_Grads,
+                    Intercept_Grads, Layer_Units);
       end if;
 
    end Fit;
+
+   --  -------------------------------------------------------------------------
+   --  L516
+   procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
+                        X               : IL_Types.Float_List_2D;
+                        Y               : IL_Types.Integer_List;
+                        Activations     : in out IL_Types.Float_List_2D;
+                        Deltas          : in out IL_Types.Float_List_2D;
+                        Coef_Grads      : in out IL_Types.Float_List_3D;
+                        Intercept_Grads : in out IL_Types.Float_List_2D;
+                        Layer_Units     : IL_Types.Integer_List) is
+      use IL_Types;
+      use List_Of_Float_Lists_Package;
+      Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
+      Num_Samples  : constant Positive := Positive (X.Length);
+      Start        : Positive := 1;
+      Last         : Positive;
+      N_Fan_In     : Positive;
+      N_Fan_Out    : Positive;
+   begin
+      Self.Attributes.Coef_Indptr.Clear;
+      Self.Attributes.Intercept_Indptr.Clear;
+
+      --  L524  Save sizes and indices of coefficients for faster unpacking
+      for index in 1 .. Self.Attributes.N_Layers - 1 loop
+         N_Fan_In := Layer_Units (index);
+         N_Fan_Out := Layer_Units (index + 1);
+         Last := Start + N_Fan_In * N_Fan_Out;
+         Self.Attributes.Coef_Indptr.Append ((Start, Last,
+                                             N_Fan_In, N_Fan_Out));
+         Start := Last + 1;
+      end loop;
+
+      --  L532  Save sizes and indices of intercepts for faster unpacking
+      Start := 1;
+      for index in 1 .. Self.Attributes.N_Layers - 1 loop
+         Last := Start + N_Fan_In * N_Fan_Out;
+         Self.Attributes.Intercept_Indptr.Append ((Start, Last));
+         Start := Last + 1;
+      end loop;
+
+      Assert (False, Routine_Name & "coding incomplete.");
+
+   end Fit_Lbfgs;
 
    --  -------------------------------------------------------------------------
 
@@ -429,14 +490,15 @@ package body Multilayer_Perceptron is
       if Self.Parameters.Batch_Size = 0 then
          Batch_Size := Integer'Min (200, Num_Samples);
       else
-         Put_Line (Routine_Name & "WARNING: Batch size " &
+         Put_Line (Routine_Name & "WARNING: Batch size" &
                      Integer'Image (Self.Parameters.Batch_Size)  &
-                     "clipped to " & Integer'Image (Num_Samples));
+                     " clipped to" & Integer'Image (Num_Samples));
          Batch_Size := Num_Samples;
       end if;
 
       Max_Sample_Index := Num_Samples;
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
+      Put_Line (Routine_Name & "batches generated");
       Activations.Clear;
       Sample_Index := 1;
       while Sample_Index <= Max_Sample_Index loop
@@ -446,15 +508,22 @@ package body Multilayer_Perceptron is
          Accumulated_Loss := 0.0;
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
             Batch_Slice := Batches (batch_index);
+            Put_Line (Routine_Name & "batch_index:" &
+                     Integer'Image (batch_index));
             for index in Batch_Slice.First_Index .. Batch_Slice.Last_Index loop
+               Put_Line (Routine_Name & "Batch_Slice index:" &
+                     Integer'Image (index));
                X_Batch (index) := X (Batch_Slice (index));
                Y_Batch (index) := Y_Batch (Batch_Slice (index));
             end loop;
             Activations.Append (X_Batch);
+
             Backprop (Self, X, Y, Activations, Deltas, Loss,
                       Coef_Grads, Intercept_Grads);
 
          end loop;
+         Put_Line (Routine_Name & "Sample_Index:" &
+                     Integer'Image (Sample_Index));
 
          Sample_Index := Sample_Index + 1;
       end loop;
