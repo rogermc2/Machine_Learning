@@ -31,7 +31,6 @@ package Utilities is
    Utilities_Exception : exception;
 
    procedure Check_Rows (Rows : in out Rows_Vector);
-   function Digamma (Z : Float) return float;
    function Feature_Array (Data    : Rows_Vector;
                            Col_Num : Class_Range)
                             return Value_Data_Array;
@@ -44,7 +43,6 @@ package Utilities is
    function Is_Integer (Item : Unbounded_String) return Boolean;
    function Label_Array (Data : Rows_Vector)
                           return  Value_Data_Array;
-   function Log_Sum_Exponent (Log_Prob : Float_List) return Float;
    procedure Load_CSV_Data (Data_File : File_Type;
                             Data      : out Rows_Vector);
    function Load_CSV_Data
@@ -52,7 +50,6 @@ package Utilities is
        return Rows_Vector;
    function Load_Raw_CSV_Data (Data_File : File_Type)
                                 return Raw_Data_Vector;
-   function Mean (A : Float_List) return Float;
    function Number_Of_Features (Rows : Rows_Vector)
                                  return Class_Range;
    function Number_Of_Features (Rows : Value_Data_List)
