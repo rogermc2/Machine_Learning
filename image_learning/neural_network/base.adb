@@ -5,10 +5,6 @@ with Utilities;
 
 package body Base is
 
-   function Score (X    : IL_Types.Float_List_2D;
-                   Y    : IL_Types.Integer_List) return Float;
-   function Score_Samples (X : IL_Types.Float_List_2D) return Float;
-
    --  -------------------------------------------------------------------------
 
    function Binary_Log_Loss (Y_True : Integer_List; Y_Prob : Float_List)
@@ -61,7 +57,20 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   function Estimate_Weighted_Log_Prob (X : IL_Types.Float_List_2D) return Float is
+   --  L513 _estimate_log_prob_resp computes the log-probabilities per
+   --   component for each sample.
+   function Estimate_Log_Prob_Resp (X : IL_Types.Float_List_2D) return Float is
+      Result : Float;
+   begin
+
+      return Result;
+
+   end Estimate_Log_Prob_Resp;
+
+   --  -------------------------------------------------------------------------
+
+   function Estimate_Weighted_Log_Prob (X : IL_Types.Float_List_2D)
+                                        return Float is
       Result : Float;
    begin
 
@@ -181,7 +190,8 @@ package body Base is
    end Relu_Derivative;
 
    --  -------------------------------------------------------------------------
-
+   --  scikit-learn/sklearn/mixture/_base.py/score
+   --  L356
    function Score (X    : IL_Types.Float_List_2D;
                    Y    : IL_Types.Integer_List) return Float is
    begin
@@ -191,12 +201,13 @@ package body Base is
    end Score;
 
    --  -------------------------------------------------------------------------
-
+   --  scikit-learn/sklearn/mixture/_base.py/score_samples
+   --  L337
    function Score_Samples (X : IL_Types.Float_List_2D) return Float is
       Result : Float;
    begin
 
-      return Utilities.Log_Sum_Exponent (X);
+      return Estimate_Weighted_Log_Prob (X);
 
    end Score_Samples;
 
