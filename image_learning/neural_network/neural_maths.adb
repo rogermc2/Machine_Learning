@@ -9,17 +9,18 @@ package body Neural_Maths is
 
    --  Based on github.com/scipy/scipy/blob/main/scipy/special/_digamma.pxd
 
-   Small_Abs    : constant Integer := 16;
-   Small_Imag   : constant Integer := 6;
+--     Small_Abs    : constant Integer := 16;
+--     Small_Imag   : constant Integer := 6;
    Tol          : constant Float := 2.220446092504131 * 10.0 ** (-16);
    --  The following constants were computed with mpmath
    --  Location and value of the positive root
-   Pos_Root     : constant Float := 1.4616321449683623;
-   Pos_Root_Val : constant Float := -9.2412655217294275 * 10.0 ** (-17);
+--     Pos_Root     : constant Float := 1.4616321449683623;
+--     Pos_Root_Val : constant Float := -9.2412655217294275 * 10.0 ** (-17);
    --  Location and value of the negative root
    Neg_Root     : constant Float := -0.504083008264455409;
    Neg_Root_Val : constant Float := 7.2897639029768949 * 10.0 ** (-17);
 
+   function Psi (X : Float) return Float;
    function Zeta_Series (Z, Root, Root_Val : Float) return Float;
 
    --  -------------------------------------------------------------------------
@@ -28,9 +29,9 @@ package body Neural_Maths is
       Result : Float;
    begin
       if abs (Z - Neg_Root) < 0.3 then
-         null;
+         Result := Zeta_Series (Z, Neg_Root, Neg_Root_Val);
       else
-         null;
+         Result := Psi (Z);
       end if;
 
       return Result;
