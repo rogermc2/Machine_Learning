@@ -7,8 +7,6 @@ with Weights;
 
 package body Neural_Maths is
 
-   --  Based on github.com/scipy/scipy/blob/main/scipy/special/_digamma.pxd
-
 --     Small_Abs    : constant Integer := 16;
 --     Small_Imag   : constant Integer := 6;
    Tol          : constant Float := 2.220446092504131 * 10.0 ** (-16);
@@ -24,7 +22,7 @@ package body Neural_Maths is
    function Zeta_Series (Z, Root, Root_Val : Float) return Float;
 
    --  -------------------------------------------------------------------------
-
+   --  Based on github.com/scipy/scipy/blob/main/scipy/special/_digamma.pxd
    function Digamma (Z : Float) return Float is
       Result : Float;
    begin
