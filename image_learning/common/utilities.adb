@@ -7,6 +7,7 @@ with Ada.Strings.Fixed;
 with Maths;
 
 --  with Printing;
+with Weights;
 
 package body Utilities is
 
@@ -342,6 +343,33 @@ package body Utilities is
         return Data;
 
     end Load_Raw_CSV_Data;
+
+    --  -------------------------------------------------------------------------
+    --  Based on github.com/scipy/scipy/blob/main/scipy/special/_logsumexp.py
+    --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
+    function Log_Sum_Exponent (Log_Prob : Float_List) return Float is
+        use Maths.Float_Math_Functions;
+        Log_Prob_Max : constant Float := Weights.Max (Log_Prob);
+        Diff      : Float;
+        Exp_Delta : Float_List;
+        Sum       : Float := 0.0;
+    begin
+        for index in Log_Prob.First_Index .. Log_Prob.Last_Index loop
+            Diff := Log_Prob.Element (index) - Log_Prob_Max;
+            if Diff = 0.0 then
+                Exp_Delta.Append (1.0);
+            else
+                Exp_Delta.Append (Exp (Diff));
+            end if;
+        end loop;
+
+        for index in Exp_Delta.First_Index .. Exp_Delta.Last_Index loop
+           Sum := Sum + Exp_Delta.Element (index);
+        end loop;
+
+        return Log (Sum);
+
+    end Log_Sum_Exponent;
 
     --  -------------------------------------------------------------------------
 

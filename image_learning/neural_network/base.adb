@@ -5,6 +5,12 @@ with Utilities;
 
 package body Base is
 
+   function Score (X    : IL_Types.Float_List_2D;
+                   Y    : IL_Types.Integer_List) return Float;
+   function Score_Samples (X : IL_Types.Float_List_2D) return Float;
+
+   --  -------------------------------------------------------------------------
+
    function Binary_Log_Loss (Y_True : Integer_List; Y_Prob : Float_List)
                              return Float is
       use Maths.Float_Math_Functions;
@@ -40,6 +46,27 @@ package body Base is
       return - (Sum1 + Sum2) / Float (Y_Prob.Length);
 
    end Binary_Log_Loss;
+
+   --  -------------------------------------------------------------------------
+   --  L498 Estimate_Log_Prob computes the log-probabilities per component for
+   --  each sample.
+   function Estimate_Log_Prob (X : IL_Types.Float_List_2D) return Float is
+      Result : Float;
+   begin
+
+      return Utilities.Log_Sum_Exponent (X);
+
+   end Estimate_Weighted_Log_Prob;
+
+   --  -------------------------------------------------------------------------
+
+   function Estimate_Weighted_Log_Prob (X : IL_Types.Float_List_2D) return Float is
+      Result : Float;
+   begin
+
+      return Utilities.Log_Sum_Exponent (X);
+
+   end Estimate_Weighted_Log_Prob;
 
    --  -------------------------------------------------------------------------
 
@@ -130,33 +157,6 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-   function Tanh (Activation : Float_List) return Float_List is
-      use Maths.Float_Math_Functions;
-      Result : Float_List;
-   begin
-      for index in Activation.First_Index .. Activation.Last_Index loop
-         Result.Append (Tanh (Activation.Element (index)));
-      end loop;
-
-      return Result;
-   end Tanh;
-
-   --  -------------------------------------------------------------------------
-
-   procedure Tanh_Derivative (Z : Float_List; Del : in out Float_List) is
-      List_Z : Float_List;
-   begin
-      --  List_Z = 1 - Z ** 2
-      for index in Z.First_Index .. Z.Last_Index loop
-         List_Z (index) := 1.0 - Z (index) ** 2;
-      end loop;
-
-      Del := Del * List_Z;
-
-   end Tanh_Derivative;
-
-   --  -------------------------------------------------------------------------
-
    function Relu (Activation : Float_List) return Float_List is
       Result : Float_List;
    begin
@@ -178,6 +178,26 @@ package body Base is
          end loop;
 
    end Relu_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function Score (X    : IL_Types.Float_List_2D;
+                   Y    : IL_Types.Integer_List) return Float is
+   begin
+      pragma Unreferenced (Y);
+      return Score_Samples (X);
+
+   end Score;
+
+   --  -------------------------------------------------------------------------
+
+   function Score_Samples (X : IL_Types.Float_List_2D) return Float is
+      Result : Float;
+   begin
+
+      return Utilities.Log_Sum_Exponent (X);
+
+   end Score_Samples;
 
    --  -------------------------------------------------------------------------
 
@@ -212,6 +232,33 @@ package body Base is
       return Utilities.Mean (YT_Float - Y_Pred) / 2.0;
 
    end Squared_Error;
+
+   --  -------------------------------------------------------------------------
+
+   function Tanh (Activation : Float_List) return Float_List is
+      use Maths.Float_Math_Functions;
+      Result : Float_List;
+   begin
+      for index in Activation.First_Index .. Activation.Last_Index loop
+         Result.Append (Tanh (Activation.Element (index)));
+      end loop;
+
+      return Result;
+   end Tanh;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Tanh_Derivative (Z : Float_List; Del : in out Float_List) is
+      List_Z : Float_List;
+   begin
+      --  List_Z = 1 - Z ** 2
+      for index in Z.First_Index .. Z.Last_Index loop
+         List_Z (index) := 1.0 - Z (index) ** 2;
+      end loop;
+
+      Del := Del * List_Z;
+
+   end Tanh_Derivative;
 
    --  -------------------------------------------------------------------------
 

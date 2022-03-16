@@ -88,6 +88,9 @@ package body Multilayer_Perceptron is
    procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
                                Coef_Grads      : out IL_Types.Float_List_3D;
                                Intercept_Grads : out IL_Types.Float_List_2D);
+   procedure Update_No_Improvement_Count (Self : in out MLP_Classifier;
+                                          Early_Stoppimg : Boolean;
+                                          X_Val, Y_Val : Float);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
@@ -742,6 +745,18 @@ package body Multilayer_Perceptron is
       end if;
 
    end Initialize;
+
+   --  -------------------------------------------------------------------------
+   --  L716
+   procedure Update_No_Improvement_Count
+      (Self : in out MLP_Classifier; Early_Stoppimg : Boolean;
+       X_Val, Y_Val : Float) is
+
+   begin
+        Self.Parameters.Validation_Scores.Append
+          (Self.Attributes.s);
+
+   end Update_No_Improvement_Count;
 
    --  -------------------------------------------------------------------------
    --  L455

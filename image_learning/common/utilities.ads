@@ -43,6 +43,7 @@ package Utilities is
     function Is_Integer (Item : Unbounded_String) return Boolean;
     function Label_Array (Data : Rows_Vector)
                          return  Value_Data_Array;
+    function Log_Sum_Exponent (Log_Prob : Float_List) return Float;
     procedure Load_CSV_Data (Data_File : File_Type;
                              Data      : out Rows_Vector);
     function Load_CSV_Data
