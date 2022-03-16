@@ -48,15 +48,16 @@ package body Base is
    end Binary_Log_Loss;
 
    --  -------------------------------------------------------------------------
-   --  L498 Estimate_Log_Prob computes the log-probabilities per component for
-   --  each sample.
+   --  L498  abstract _estimate_log_prob;
+   --  L513 _estimate_log_prob_resp computes the log-probabilities per
+   --   component for each sample.
    function Estimate_Log_Prob (X : IL_Types.Float_List_2D) return Float is
       Result : Float;
    begin
 
       return Utilities.Log_Sum_Exponent (X);
 
-   end Estimate_Weighted_Log_Prob;
+   end Estimate_Log_Prob;
 
    --  -------------------------------------------------------------------------
 
