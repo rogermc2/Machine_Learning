@@ -15,9 +15,6 @@ package Base is
                              return Float;
    pragma Inline (Binary_Log_Loss);
    function Identity (Activation : Float_List) return Float_List;
-
-   function Estimate_Weighted_Log_Prob (X : IL_Types.Float_List_2D)
-                                        return Float;
    pragma Inline (Identity);
    procedure Identity_Derivative (Z : Float_List; Del : in out Float_List);
    pragma Inline (Identity_Derivative);

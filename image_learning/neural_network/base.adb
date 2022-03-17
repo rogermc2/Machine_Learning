@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
 with Maths;
-with Utilities;
+with Neural_Maths;
 
 package body Base is
 
@@ -42,41 +42,6 @@ package body Base is
       return - (Sum1 + Sum2) / Float (Y_Prob.Length);
 
    end Binary_Log_Loss;
-
-   --  -------------------------------------------------------------------------
-   --  L498  abstract _estimate_log_prob;
-   --  L513 _estimate_log_prob_resp computes the log-probabilities per
-   --   component for each sample.
-   function Estimate_Log_Prob (X : IL_Types.Float_List_2D) return Float is
-      Result : Float;
-   begin
-
-      return Utilities.Log_Sum_Exponent (X);
-
-   end Estimate_Log_Prob;
-
-   --  -------------------------------------------------------------------------
-
-   --  L513 _estimate_log_prob_resp computes the log-probabilities per
-   --   component for each sample.
-   function Estimate_Log_Prob_Resp (X : IL_Types.Float_List_2D) return Float is
-      Result : Float;
-   begin
-
-      return Result;
-
-   end Estimate_Log_Prob_Resp;
-
-   --  -------------------------------------------------------------------------
-
-   function Estimate_Weighted_Log_Prob (X : IL_Types.Float_List_2D)
-                                        return Float is
-      Result : Float;
-   begin
-
-      return Utilities.Log_Sum_Exponent (X);
-
-   end Estimate_Weighted_Log_Prob;
 
    --  -------------------------------------------------------------------------
 
@@ -190,28 +155,6 @@ package body Base is
    end Relu_Derivative;
 
    --  -------------------------------------------------------------------------
-   --  scikit-learn/sklearn/mixture/_base.py/score
-   --  L356
-   function Score (X    : IL_Types.Float_List_2D;
-                   Y    : IL_Types.Integer_List) return Float is
-   begin
-      pragma Unreferenced (Y);
-      return Score_Samples (X);
-
-   end Score;
-
-   --  -------------------------------------------------------------------------
-   --  scikit-learn/sklearn/mixture/_base.py/score_samples
-   --  L337
-   function Score_Samples (X : IL_Types.Float_List_2D) return Float is
-      Result : Float;
-   begin
-
-      return Estimate_Weighted_Log_Prob (X);
-
-   end Score_Samples;
-
-   --  -------------------------------------------------------------------------
 
    function Softmax (Activation : Float_List) return Float_List is
       use Maths.Float_Math_Functions;
@@ -241,7 +184,7 @@ package body Base is
          YT_Float.Append (Float (YT_Int));
       end loop;
 
-      return Utilities.Mean (YT_Float - Y_Pred) / 2.0;
+      return Neural_Maths.Mean (YT_Float - Y_Pred) / 2.0;
 
    end Squared_Error;
 
