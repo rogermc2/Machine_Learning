@@ -1,5 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Numerics;
 
 with Maths;
 
@@ -18,7 +19,8 @@ package body Neural_Maths is
    Neg_Root     : constant Float := -0.504083008264455409;
    Neg_Root_Val : constant Float := 7.2897639029768949 * 10.0 ** (-17);
 
-   function Psi (X : Float) return Float;
+   function Psi_AS103 (X : Float) return Float;  --  Digamma AS103
+   function Psi_Cephes (X : Float) return Float;
    function Zeta_Series (Z, Root, Root_Val : Float) return Float;
 
    --  -------------------------------------------------------------------------
@@ -29,7 +31,7 @@ package body Neural_Maths is
       if abs (Z - Neg_Root) < 0.3 then
          Result := Zeta_Series (Z, Neg_Root, Neg_Root_Val);
       else
-         Result := Psi (Z);
+         Result := Psi_AS103 (Z);
       end if;
 
       return Result;
@@ -78,9 +80,9 @@ package body Neural_Maths is
    --  -------------------------------------------------------------------------
    --  Based on https://people.sc.fsu.edu/~jburkardt/f77_src/asa103/asa103.f
    --  Applied Statistics, Volume 25, Number 3, 1976, pages 315-317
-   function Psi (X : Float) return Float is
+   function Psi_AS103 (X : Float) return Float is
       use Maths.Float_Math_Functions;
-      Routine_Name : constant String := "Neural_Maths.Psi ";
+      Routine_Name : constant String := "Neural_Maths.Psi_103 ";
       Euler_Mascheroni : constant Float := 0.5772156649015328606;
       R                : Float;
       X2               : Float := X;
@@ -107,7 +109,57 @@ package body Neural_Maths is
 
       return Digamma;
 
-   end Psi;
+   end Psi_AS103;
+
+   --  ------------------------------------------------------------------------
+   --  Based on github.com/poliastro/cephes/blob/master/src/psi.c
+   --  Psi (X) function
+   --  Wikipedia digamma function:
+   --  Psi (X) = d ln (gamma (X)) / dx ~ ln (X) - 1 / 2x
+   function Psi_Cephes (X : Float) return Float is
+      use Ada.Numerics;
+      use Maths.Float_Math_Functions;
+      Routine_Name : constant String := "Neural_Maths.Psi_Cephes ";
+      Euler    : constant Float := 0.57721566490153286061;
+      X2       : Float := X;
+      Q        : Float := X;
+      P        : Float := Float'Floor (Q);
+      NZ       : Float := 0.0;
+      N        : Positive;
+      W        : Positive;
+      Negative : Boolean := X <= 0.0;
+      Y        : Float := 0.0;
+   begin
+      if Negative then
+            Assert (P /= Q, Routine_Name & "X should be > Floor (X).");
+            --  Remove the zeros of Tan (PI x) by subtracting the nearest
+            --  integer from x
+            NZ := Q - P;
+            if NZ = 0.5 then
+                NZ := 0.0;
+            elsif NZ > 0.5 then
+                P := P + 1.0;
+                NZ := Q - P;
+            elsif NZ < 0.5 then
+                NZ := Pi / Tan (Pi / NZ);
+            end if;
+            X2 := 1.0 - X2;
+      end if;
+
+      --  check for positive integer up to 10
+      if X2 <= 10.0 and then X2 = Float'Floor (X2) then
+            N := Positive (X2);
+            for index in 1 .. N loop
+                Y := Y + 1.0 / Float (index);
+            end loop;
+            Y := Y - Euler;
+      else
+            null;
+      end if;
+
+      return Y;
+
+   end Psi_Cephes;
 
    --  ------------------------------------------------------------------------
   --  Riemann zeta function of two arguments
