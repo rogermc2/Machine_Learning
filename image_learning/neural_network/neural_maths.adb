@@ -44,12 +44,14 @@ package body Neural_Maths is
    --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
    function Log_Sum_Exponent (Log_Prob : Float_List_2D) return Float_List is
       use Maths.Float_Math_Functions;
+      use Float_List_Package;
       Log_Prob_Max : constant Float_List := Max (Log_Prob);
       Diff         : Float;
       Exp_Delta    : Float_List;
       Sum          : Float := 0.0;
    begin
       for index in Log_Prob.First_Index .. Log_Prob.Last_Index loop
+         --  tmp = np.exp(a - a_max)
          Diff := Log_Prob.Element (index) - Log_Prob_Max;
          if Diff = 0.0 then
             Exp_Delta.Append (1.0);
