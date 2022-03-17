@@ -3,7 +3,7 @@
 with Maths;
 with Neural_Maths;
 
-package body Base is
+package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
@@ -106,7 +106,7 @@ package body Base is
       X_Log_Y  : Float_List;
       Result   : Float := 0.0;
    begin
-      Check_Lengths ("Base.Log_Loss", Y_True, Y_Prob);
+      Check_Lengths ("Base_Neural.Log_Loss", Y_True, Y_Prob);
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
          Y_P.Append (1.0 - Y_Prob (index));
          YT_Int := Y_True (index);
@@ -178,7 +178,7 @@ package body Base is
       YT_Int   : Integer;
       YT_Float : Float_List;
    begin
-      Check_Lengths ("Base.Squared_Error", Y_True, Y_Pred);
+      Check_Lengths ("Base_Neural.Squared_Error", Y_True, Y_Pred);
       for index in Y_Pred.First_Index .. Y_Pred.Last_Index loop
          YT_Int := Y_True (index);
          YT_Float.Append (Float (YT_Int));
@@ -217,4 +217,4 @@ package body Base is
 
    --  -------------------------------------------------------------------------
 
-end Base;
+end Base_Neural;

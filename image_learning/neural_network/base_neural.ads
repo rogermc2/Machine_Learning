@@ -2,7 +2,7 @@
 
 with IL_Types; use IL_Types;
 
-package Base is
+package Base_Neural is
 
    type Activation_Type is (Identity_Activation, Logistic_Activation,
                             Tanh_Activation, Relu_Activation,
@@ -40,4 +40,4 @@ package Base is
                            return Float;
    pragma Inline (Squared_Error);
 
-end Base;
+end Base_Neural;

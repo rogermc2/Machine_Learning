@@ -18,11 +18,12 @@ package body Base_Mix is
    --  -------------------------------------------------------------------------
    --  L513 _estimate_log_prob_resp computes the log-probabilities per
    --   component for each sample.
+   --  Log_Prob_Norm for num_samples
+   --  Log_Responsibil for num_samples x num_components
    procedure Estimate_Log_Prob_Resp
       (X : Float_List_2D; Log_Prob_Norm : out Float_List;
        Log_Responsibil : out Float_List_2D ) is
       Weighted_Log_Prob : Float_List_2D := Estimate_Weighted_Log_Prob (X);
-      Result : Float;
    begin
       Log_Prob_Norm := Neural_Maths.Log_Sum_Exponent (Weighted_Log_Prob);
 
@@ -40,7 +41,8 @@ package body Base_Mix is
    end Estimate_Weighted_Log_Prob;
 
    --  -------------------------------------------------------------------------
-    --  L356
+   --  L356 Score returns the Log-likelihood of X (Float) under the Gaussian
+   --  mixture model.
    function Score (X    : IL_Types.Float_List_2D;
                    Y    : IL_Types.Integer_List) return Float is
    begin
@@ -50,7 +52,7 @@ package body Base_Mix is
    end Score;
 
    --  -------------------------------------------------------------------------
-   --  L337
+   --  L337 returns Float_List num_samples
    function Score_Samples (X : IL_Types.Float_List_2D) return Float_List is
    begin
 

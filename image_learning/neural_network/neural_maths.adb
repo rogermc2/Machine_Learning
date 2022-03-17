@@ -4,24 +4,23 @@ with Ada.Numerics;
 
 with Maths;
 
-with Weights;
-
 package body Neural_Maths is
 
    type Float_Array is array (Integer range <>) of Float;
 
---     Small_Abs    : constant Integer := 16;
---     Small_Imag   : constant Integer := 6;
+   --     Small_Abs    : constant Integer := 16;
+   --     Small_Imag   : constant Integer := 6;
    Tol          : constant Float := 2.220446092504131 * 10.0 ** (-16);
    --  The following constants were computed with mpmath
    --  Location and value of the positive root
---     Pos_Root     : constant Float := 1.4616321449683623;
---     Pos_Root_Val : constant Float := -9.2412655217294275 * 10.0 ** (-17);
+   --     Pos_Root     : constant Float := 1.4616321449683623;
+   --     Pos_Root_Val : constant Float := -9.2412655217294275 * 10.0 ** (-17);
    --  Location and value of the negative root
    Neg_Root     : constant Float := -0.504083008264455409;
    Neg_Root_Val : constant Float := 7.2897639029768949 * 10.0 ** (-17);
 
---     function Psi_AS103 (X : Float) return Float;  --  Digamma AS103
+   function Max (X : Float_List_2D) return Float_List;
+   --     function Psi_AS103 (X : Float) return Float;  --  Digamma AS103
    function Psi_Cephes (X : Float) return Float;
    function Zeta_Series (Z, Root, Root_Val : Float) return Float;
 
@@ -43,9 +42,9 @@ package body Neural_Maths is
    --  --------------------------------------------------------------------------
    --  Based on github.com/scipy/scipy/blob/main/scipy/special/_logsumexp.py
    --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
-   function Log_Sum_Exponent (Log_Prob : Float_List) return Float is
+   function Log_Sum_Exponent (Log_Prob : Float_List_2D) return Float_List is
       use Maths.Float_Math_Functions;
-      Log_Prob_Max : constant Float := Weights.Max (Log_Prob);
+      Log_Prob_Max : constant Float_List := Max (Log_Prob);
       Diff         : Float;
       Exp_Delta    : Float_List;
       Sum          : Float := 0.0;
@@ -66,6 +65,31 @@ package body Neural_Maths is
       return Log (Sum);
 
    end Log_Sum_Exponent;
+
+   --  -------------------------------------------------------------------------
+
+   function Max (X : Float_List_2D) return Float_List is
+      XT        : constant Float_List_2D := Transpose (X);
+      Col_Data  : Float_List;
+      Value     : Float;
+      Max_Value : Float;
+      Max_Vals  : Float_List;
+   begin
+      for ct in XT.First_Index .. XT.Last_Index loop
+         Col_Data := X.Element (ct);
+         Max_Value := -Float'Last;
+         for index in Col_Data.First_Index .. Col_Data.Last_Index loop
+            Value := Col_Data.Element (index);
+            if Value > Max_Value then
+               Max_Vals := Value;
+            end if;
+         end loop;
+         Max_Vals.Append (Max_Vals);
+      end loop;
+
+      return Max_Vals;
+
+   end Max;
 
    --  -------------------------------------------------------------------------
 
@@ -103,36 +127,36 @@ package body Neural_Maths is
    --  -------------------------------------------------------------------------
    --  Based on https://people.sc.fsu.edu/~jburkardt/f77_src/asa103/asa103.f
    --  Applied Statistics, Volume 25, Number 3, 1976, pages 315-317
---     function Psi_AS103 (X : Float) return Float is
---        use Maths.Float_Math_Functions;
---        Routine_Name : constant String := "Neural_Maths.Psi_103 ";
---        Euler_Mascheroni : constant Float := 0.5772156649015328606;
---        R                : Float;
---        X2               : Float := X;
---        Digamma          : Float := 0.0;
---     begin
---        Assert (X > 0.0, Routine_Name & "X," & Float'Image (X) &
---                  " should be greater than zero.");
---
---        if X <= 0.00001 then
---           Digamma := -Euler_Mascheroni - 1.0 / X2;
---        else
---           --  Reduce to Digamma (X + N).
---           while X2 < 8.5 loop
---              Digamma := Digamma - 1.0 / X2;
---              X2 := X2 + 1.0;
---           end loop;
---
---           --  Use Stirling's (actually de Moivre's) expansion.
---           R := 1.0 / X2;
---           Digamma := Digamma + Log (X2) - 0.5 * R;
---           R := R ** 2;
---           Digamma := Digamma - R / 12.0  - R / 120.0 - R / 252.0;
---        end if;
---
---        return Digamma;
---
---     end Psi_AS103;
+   --     function Psi_AS103 (X : Float) return Float is
+   --        use Maths.Float_Math_Functions;
+   --        Routine_Name : constant String := "Neural_Maths.Psi_103 ";
+   --        Euler_Mascheroni : constant Float := 0.5772156649015328606;
+   --        R                : Float;
+   --        X2               : Float := X;
+   --        Digamma          : Float := 0.0;
+   --     begin
+   --        Assert (X > 0.0, Routine_Name & "X," & Float'Image (X) &
+   --                  " should be greater than zero.");
+   --
+   --        if X <= 0.00001 then
+   --           Digamma := -Euler_Mascheroni - 1.0 / X2;
+   --        else
+   --           --  Reduce to Digamma (X + N).
+   --           while X2 < 8.5 loop
+   --              Digamma := Digamma - 1.0 / X2;
+   --              X2 := X2 + 1.0;
+   --           end loop;
+   --
+   --           --  Use Stirling's (actually de Moivre's) expansion.
+   --           R := 1.0 / X2;
+   --           Digamma := Digamma + Log (X2) - 0.5 * R;
+   --           R := R ** 2;
+   --           Digamma := Digamma - R / 12.0  - R / 120.0 - R / 252.0;
+   --        end if;
+   --
+   --        return Digamma;
+   --
+   --     end Psi_AS103;
 
    --  ------------------------------------------------------------------------
    --  Based on github.com/poliastro/cephes/blob/master/src/psi.c
@@ -152,39 +176,39 @@ package body Neural_Maths is
                          0.000396825396825396825397,
                          -0.000833333333333333333333,
                          0.00833333333333333333333);
-      Negative : constant Boolean := X <= 0.0;
-      X2       : Float := X;
-      P        : Float := Float'Floor (X);
-      NZ       : Float := 0.0;
-      N        : Positive;
-      W        : Float;
-      S        : Float;
-      Z        : Float;
-      Result   : Float := 0.0;
+      Negative     : constant Boolean := X <= 0.0;
+      X2           : Float := X;
+      P            : Float := Float'Floor (X);
+      NZ           : Float := 0.0;
+      N            : Positive;
+      W            : Float;
+      S            : Float;
+      Z            : Float;
+      Result       : Float := 0.0;
    begin
       if Negative then
-            Assert (P /= X, Routine_Name & "X should be > Floor (X).");
-            --  Remove the zeros of Tan (PI x) by subtracting the nearest
-            --  integer from x
+         Assert (P /= X, Routine_Name & "X should be > Floor (X).");
+         --  Remove the zeros of Tan (PI x) by subtracting the nearest
+         --  integer from x
+         NZ := X - P;
+         if NZ = 0.5 then
+            NZ := 0.0;
+         elsif NZ > 0.5 then
+            P := P + 1.0;
             NZ := X - P;
-            if NZ = 0.5 then
-                NZ := 0.0;
-            elsif NZ > 0.5 then
-                P := P + 1.0;
-                NZ := X - P;
-            elsif NZ < 0.5 then
-                NZ := Pi / Tan (Pi / NZ);
-            end if;
-            X2 := 1.0 - X2;
+         elsif NZ < 0.5 then
+            NZ := Pi / Tan (Pi / NZ);
+         end if;
+         X2 := 1.0 - X2;
       end if;
 
       --  check for positive integer up to 10
       if X2 <= 10.0 and then X2 = Float'Floor (X2) then
-            N := Positive (X2);
-            for index in 1 .. N loop
-                Result := Result + 1.0 / Float (index);
-            end loop;
-            Result := Result - Euler;
+         N := Positive (X2);
+         for index in 1 .. N loop
+            Result := Result + 1.0 / Float (index);
+         end loop;
+         Result := Result - Euler;
       else
          S := X2;
          W := 0.0;
@@ -207,7 +231,7 @@ package body Neural_Maths is
    end Psi_Cephes;
 
    --  ------------------------------------------------------------------------
-  --  Riemann zeta function of two arguments
+   --  Riemann zeta function of two arguments
    function Zeta (X : Natural; Q : Float) return Float is
       Routine_Name : constant String := "Neural_Maths.Zeta ";
       k            : Natural := 0;

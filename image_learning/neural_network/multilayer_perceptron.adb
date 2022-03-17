@@ -41,10 +41,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 with Utilities;
 
+with Base_Mix;
 with Classifier_Utilities;
 with Data_Splitter;
 with Encode_Utils;
 with Label;
+with Neural_Maths;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -107,7 +109,7 @@ package body Multilayer_Perceptron is
                        Loss            : out Float;
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
-      use Base;
+      use Base_Neural;
       use IL_Types;
       use Float_List_Package;
       use Float_Package;
@@ -201,8 +203,8 @@ package body Multilayer_Perceptron is
 
    function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
                       IL_Types.Integer_Package.Empty_Vector;
-                    Activation          : Base.Activation_Type :=
-                      Base.Relu_Activation;
+                    Activation          : Base_Neural.Activation_Type :=
+                      Base_Neural.Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
                     Batch_Size          : Positive := 200;
@@ -275,7 +277,7 @@ package body Multilayer_Perceptron is
       use Float_Package;
       Delta_Act  : constant Float_List_2D :=
                      Dot (Deltas (Layer), Activations (Layer));
-      Delta_Mean : constant Float := Utilities.Mean (Deltas (Layer));
+      Delta_Mean : constant Float := Neural_Maths.Mean (Deltas (Layer));
    begin
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
       Coef_Grads (Layer) :=
@@ -565,7 +567,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self        : in out MLP_Classifier;
                            Activations : in out IL_Types.Float_List_2D) is
       --  The ith element of Activations holds the values of the ith layer.
-      use Base;
+      use Base_Neural;
       use IL_Types;
       use Float_Package;
       use Float_List_Package;
@@ -629,7 +631,7 @@ package body Multilayer_Perceptron is
                          Intercept_Init  : out IL_Types.Float_List) is
       use Maths;
       use Float_Math_Functions;
-      use Base;
+      use Base_Neural;
       Factor         : Float;
       Init_Bound     : Float;
       Coef_Init_1    : IL_Types.Float_List;
@@ -712,7 +714,7 @@ package body Multilayer_Perceptron is
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
-      use Base;
+      use Base_Neural;
       --        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
       Intercept_Init : Float_List;
@@ -751,12 +753,12 @@ package body Multilayer_Perceptron is
    procedure Update_No_Improvement_Count
       (Self : in out MLP_Classifier; Early_Stopping : Boolean;
        X_Val, Y_Val : Float) is
-      Score : Float;
+      Score_Val : Float;
    begin
       if Early_Stopping then
-         Score := Base.Score (X_Val, Y_Val);
+         Score_Val := Base_Mix.Score (X_Val, Y_Val);
         Self.Parameters.Validation_Scores.Append
-           (Score);
+           (Score_Val);
       else
          null;
       end if;
