@@ -8,8 +8,7 @@ package Base_Mix is
                                      Log_Prob_Norm : out Float_List;
                                      Log_Responsibil : out Float_List_2D);
     function Estimate_Weighted_Log_Prob (X : Float_List_2D) return Float_List_2D;
-    function Score (X    : Float_List_2D;
-                    Y    : Integer_List) return Float;
+    function Score (X : Float_List_2D) return Float;
     function Score_Samples (X : Float_List_2D) return Float_List;
 
 end Base_Mix;

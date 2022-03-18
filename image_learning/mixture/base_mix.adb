@@ -48,10 +48,8 @@ package body Base_Mix is
    --  -------------------------------------------------------------------------
    --  L356 Score returns the Log-likelihood of X (Float) under the Gaussian
    --  mixture model.
-   function Score (X    : IL_Types.Float_List_2D;
-                   Y    : IL_Types.Integer_List) return Float is
+   function Score (X    : IL_Types.Float_List_2D) return Float is
    begin
-      pragma Unreferenced (Y);
       return Neural_Maths.Mean (Score_Samples (X));
 
    end Score;

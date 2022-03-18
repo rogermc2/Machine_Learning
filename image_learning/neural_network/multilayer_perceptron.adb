@@ -92,7 +92,7 @@ package body Multilayer_Perceptron is
                                Intercept_Grads : out IL_Types.Float_List_2D);
    procedure Update_No_Improvement_Count (Self : in out MLP_Classifier;
                                           Early_Stopping : Boolean;
-                                          X_Val, Y_Val : Float);
+                                          X_Val : IL_Types.Float_List_2D);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
@@ -752,13 +752,12 @@ package body Multilayer_Perceptron is
    --  L716
    procedure Update_No_Improvement_Count
       (Self : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val, Y_Val : Float) is
+       X_Val : IL_Types.Float_List_2D) is
       Score_Val : Float;
    begin
       if Early_Stopping then
-         Score_Val := Base_Mix.Score (X_Val, Y_Val);
-        Self.Parameters.Validation_Scores.Append
-           (Score_Val);
+         Score_Val := Base_Mix.Score (X_Val);
+        Self.Parameters.Validation_Scores.Append (Score_Val);
       else
          null;
       end if;
