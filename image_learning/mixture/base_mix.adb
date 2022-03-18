@@ -23,9 +23,14 @@ package body Base_Mix is
    procedure Estimate_Log_Prob_Resp
       (X : Float_List_2D; Log_Prob_Norm : out Float_List;
        Log_Responsibil : out Float_List_2D ) is
-      Weighted_Log_Prob : Float_List_2D := Estimate_Weighted_Log_Prob (X);
+      use Float_List_Package;
+      Weighted_Log_Prob : constant Float_List_2D :=
+                              Estimate_Weighted_Log_Prob (X);
+      Log_Prob_Norm_2D  : Float_List_2D;
    begin
       Log_Prob_Norm := Neural_Maths.Log_Sum_Exponent (Weighted_Log_Prob);
+      Log_Prob_Norm_2D.Append (Log_Prob_Norm);
+      Log_Responsibil := Weighted_Log_Prob - Log_Prob_Norm_2D;
 
    end Estimate_Log_Prob_Resp;
 
@@ -54,9 +59,10 @@ package body Base_Mix is
    --  -------------------------------------------------------------------------
    --  L337 returns Float_List num_samples
    function Score_Samples (X : IL_Types.Float_List_2D) return Float_List is
+        use Neural_Maths;
    begin
 
-      return Estimate_Weighted_Log_Prob (X);
+      return Log_Sum_Exponent (Estimate_Weighted_Log_Prob (X));
 
    end Score_Samples;
 
