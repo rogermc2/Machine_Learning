@@ -91,8 +91,8 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Updates (Self  : in out SGD_Optimizer;
-                         Grads : Float_List) return Float_List is
+   function Get_Updates (Self  : in out SGD_Optimizer; Grads : Float_List)
+                         return Float_List is
       use Utilities;
       Zip_Velocities_Grads : constant Float_Zip_List :=
                                Zip (Self.Velocities, Grads);
@@ -114,6 +114,17 @@ package body Stochastic_Optimizers is
       return Updates;
 
    end Get_Updates;
+
+   --  -------------------------------------------------------------------------
+   --  L29
+   procedure Update_Params (Self         : in out SGD_Optimizer;
+                            Coeff_Params : Float_List_3D;
+                            Intercept_Params : Float_List_2D;
+                            Grads : Float_List) is
+      Updates : Float_List := Get_Updates (Self, Grads);
+   begin
+      null;
+   end Update_Params;
 
    --  -------------------------------------------------------------------------
 

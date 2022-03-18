@@ -74,5 +74,9 @@ package Stochastic_Optimizers is
                          Grads : Float_List) return Float_List;
    function Get_Updates (Self  : in out SGD_Optimizer;
                          Grads : Float_List) return Float_List;
+   procedure Update_Params (Self         : in out SGD_Optimizer;
+                            Coeff_Params : Float_List_3D;
+                            Intercept_Params : Float_List_2D;
+                            Grads : Float_List);
 
 end Stochastic_Optimizers;

@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with IL_Types; use IL_Types;
 
-with Base;
+with Base_Neural;
 with Data_Splitter;
 with Multilayer_Perceptron;
 with Openml_Ada;
@@ -72,11 +72,12 @@ begin
 --     if not Get_Classifier (Dataset_Name, aClassifier) then
 --        Printing.Print_Strings ("Features", Bunch.Feature_Names);
 
-      aClassifier := C_Init (Max_Iter => 10000, Activation => Base.Identity_Activation);
+   aClassifier := C_Init (Max_Iter => 10000,
+                          Activation => Base_Neural.Identity_Activation);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
-      Put_Line ("Classification_Fit");
+      Put_Line ("Neural_Fit");
       Fit (aClassifier, Train_X, Train_Y);
 --        Support_4.Save_Classifier (Dataset_Name, aClassifier);
 --     end if;

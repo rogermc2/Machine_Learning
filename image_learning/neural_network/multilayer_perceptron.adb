@@ -541,6 +541,8 @@ package body Multilayer_Perceptron is
 
                --  L657 update weights
 
+               Stochastic_Optimizers.
+
             end loop;
 
             --  L661
