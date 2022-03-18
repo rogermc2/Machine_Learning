@@ -70,6 +70,7 @@ package body Stochastic_Optimizers is
                    (1.0 - Self.Beta_2) * Coeff_Updates_1D.Element (m) ** 2);
          end loop;
 
+         --  Process Intercept_Param
          Self.First_Moments.Append
               (Float (m) * Self.Beta_1 +
                (1.0 - Self.Beta_1) * Intercept_Params.Element (m));
