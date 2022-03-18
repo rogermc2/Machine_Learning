@@ -39,25 +39,43 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Updates (Self  : in out Adam_Optimizer;
-                         Grads : Float_List) return Float_List is
-      use Utilities;
+   procedure Get_Updates
+      (Self             : in out Adam_Optimizer; Coeff_Params : Float_List_2D;
+      Intercept_Params  : Float_List; Coeff_Updates : out Float_List_2D;
+      Intercept_Updates : out Float_List) is
       use Maths.Float_Math_Functions;
-      Zip_Moments_Grads  : Float_Zip_List :=
-                             Zip (Self.First_Moments, Grads);
-      Grad_Items         : Float_Zip_Item;
-      Learning_Rate      : Float;
-      Updates            : Float_List;
+      Learning_Rate    : Float;
+      Coeff_Params_1D  : Float_List;
+      Coeff_M_V        : Float;
+      Coeff_Updates_1D : Float_List;
+      Updates          : Float_List;
    begin
       Self.Time_Step := Self.Time_Step + 1;
+      Self.First_Moments.Clear;
+      Self.Second_Moments.Clear;
+      Coeff_Updates.Clear;
+      Intercept_Updates.Clear;
 
-      for m in Zip_Moments_Grads.First_Index ..
-        Zip_Moments_Grads.Last_Index loop
-         Grad_Items := Zip_Moments_Grads.Element (m);
+      for m in Self.First_Moments.First_Index ..
+        Self.First_Moments.Last_Index loop
+         Coeff_Params_1D := Coeff_Params.Element (m);
+         Coeff_Updates_1D.Clear;
+         for coeff in Coeff_Params_1D.First_Index ..
+              Coeff_Params_1D.Last_Index loop
+                Self.First_Moments.Append
+                  (Float (m) * Self.Beta_1 +
+                   (1.0 - Self.Beta_1) * Coeff_Updates_1D.Element (m));
+                Self.Second_Moments.Append
+                  (Float (m) * Self.Beta_2 +
+                   (1.0 - Self.Beta_2) * Coeff_Updates_1D.Element (m) ** 2);
+         end loop;
+
          Self.First_Moments.Append
-           (Float (m) * Self.Beta_1 + Grad_Items.Float_1 * (1.0 - Self.Beta_1));
-         Self.First_Moments.Append
-           (Float (m) * Self.Beta_1 + Grad_Items.Float_2 * (1.0 - Self.Beta_1));
+              (Float (m) * Self.Beta_1 +
+               (1.0 - Self.Beta_1) * Intercept_Params.Element (m));
+         Self.Second_Moments.Append
+           (Float (m) * Self.Beta_2 +
+            (1.0 - Self.Beta_2) * Intercept_Params.Element (m) ** 2);
       end loop;
 
       Zip_Moments_Grads := Zip (Self.Second_Moments, Grads);
@@ -85,38 +103,41 @@ package body Stochastic_Optimizers is
            (Learning_Rate / (Sqrt (Grad_Items.Float_2) + Self.Epsilon));
       end loop;
 
-      return Updates;
-
    end Get_Updates;
 
    --  -------------------------------------------------------------------------
-
+   --  L169
    procedure Get_Updates
      (Self              : in out SGD_Optimizer; Coeff_Params : Float_List_2D;
       Intercept_Params  : Float_List; Coeff_Updates : out Float_List_2D;
       Intercept_Updates : out Float_List) is
---        use Utilities;
       use Float_List_Package;
---        Zip_Velocities_Grads : constant Float_Zip_List :=
---                                 Zip (Self.Velocities, Grads);
---        Velocities        : Float_Zip_Item;
-      M_V                  : Float;
-      Coeff_Updates_1D     : Float_List;
+      M_V              : Float;
+      Coeff_Params_1D  : Float_List;
+      Coeff_M_V        : Float;
+      Coeff_Updates_1D : Float_List;
    begin
       Coeff_Updates.Clear;
       Intercept_Updates.Clear;
       Self.Velocities.Clear;
-      for index in Self.Velocities.First_Index .. Self.Velocities.Last_Index loop
---           Velocities (index) := Zip_Velocities_Grads.Element (velocity);
+      for index in Self.Velocities.First_Index ..
+          Self.Velocities.Last_Index loop
          M_V := Self.Momentum * Self.Velocities (index);
+
+         Coeff_Params_1D := Coeff_Params.Element (index);
+         Coeff_Updates_1D.Clear;
+         for coeff in Coeff_Params_1D.First_Index ..
+              Coeff_Params_1D.Last_Index loop
+                Coeff_M_V :=
+                  M_V -  Self.Learning_Rate * Coeff_Params_1D (coeff);
+                Coeff_Updates_1D.Append (Coeff_M_V);
+         end loop;
+         Coeff_Updates.Append (Coeff_Updates_1D);
+
          M_V := M_V -  Self.Learning_Rate * Intercept_Params (index);
          Intercept_Updates.Append (M_V);
          Self.Velocities.Append (M_V);
       end loop;
-
---        Self.Velocities := Updates;
-
---        return Updates;
 
    end Get_Updates;
 
@@ -126,8 +147,10 @@ package body Stochastic_Optimizers is
                             Coeff_Params : Float_List_3D;
                             Intercept_Params : Float_List_2D;
                             Grads : Float_List) is
-      Updates : Float_List := Get_Updates (Self, Grads);
+      Updates : Float_List;
    begin
+      Get_Updates (Self, Coeff_Params, Intercept_Params, Coeff_Updates,
+                   Intercept_Updates);
       for index in Updates.First_Index .. Updates.Last_Index loop
          null;
       end loop;
