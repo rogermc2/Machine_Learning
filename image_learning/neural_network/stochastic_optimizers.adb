@@ -91,27 +91,32 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Updates (Self  : in out SGD_Optimizer; Grads : Float_List)
-                         return Float_List is
-      use Utilities;
-      Zip_Velocities_Grads : constant Float_Zip_List :=
-                               Zip (Self.Velocities, Grads);
-      Velocities           : Float_Zip_Item;
+   procedure Get_Updates
+     (Self              : in out SGD_Optimizer; Coeff_Params : Float_List_2D;
+      Intercept_Params  : Float_List; Coeff_Updates : out Float_List_2D;
+      Intercept_Updates : out Float_List) is
+--        use Utilities;
+      use Float_List_Package;
+--        Zip_Velocities_Grads : constant Float_Zip_List :=
+--                                 Zip (Self.Velocities, Grads);
+--        Velocities        : Float_Zip_Item;
       M_V                  : Float;
-      Updates              : Float_List;
+      Coeff_Updates_1D     : Float_List;
    begin
-
-      for velocity in Zip_Velocities_Grads.First_Index ..
-        Zip_Velocities_Grads.Last_Index loop
-         Velocities := Zip_Velocities_Grads.Element (velocity);
-         M_V := Self.Momentum * Float (velocity);
-         Updates.Append (M_V - Velocities.Float_1 * Self.Learning_Rate);
-         Updates.Append (M_V - Velocities.Float_2 * Self.Learning_Rate);
+      Coeff_Updates.Clear;
+      Intercept_Updates.Clear;
+      Self.Velocities.Clear;
+      for index in Self.Velocities.First_Index .. Self.Velocities.Last_Index loop
+--           Velocities (index) := Zip_Velocities_Grads.Element (velocity);
+         M_V := Self.Momentum * Self.Velocities (index);
+         M_V := M_V -  Self.Learning_Rate * Intercept_Params (index);
+         Intercept_Updates.Append (M_V);
+         Self.Velocities.Append (M_V);
       end loop;
 
-      Self.Velocities := Updates;
+--        Self.Velocities := Updates;
 
-      return Updates;
+--        return Updates;
 
    end Get_Updates;
 
@@ -123,7 +128,10 @@ package body Stochastic_Optimizers is
                             Grads : Float_List) is
       Updates : Float_List := Get_Updates (Self, Grads);
    begin
-      null;
+      for index in Updates.First_Index .. Updates.Last_Index loop
+         null;
+      end loop;
+
    end Update_Params;
 
    --  -------------------------------------------------------------------------
