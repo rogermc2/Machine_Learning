@@ -557,7 +557,8 @@ package body Multilayer_Perceptron is
                --  L657 update weights
                Parameters.Coeff_Params := Coeff_Params;
                Parameters.Intercept_Params := Intercept_Params;
-               Grads :=  (Coef_Grads, Intercept_Grads);
+               Grads.Coeff_Params := Coef_Grads;
+               Grads.Intercept_Params := Intercept_Grads;
                Stochastic_Optimizers.Update_Params
                  (Self.Attributes.Optimizer, Parameters, Grads);
             end loop;
