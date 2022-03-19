@@ -418,9 +418,11 @@ package body Multilayer_Perceptron is
                            "Multilayer_Perceptron.Fit_Stochastic ";
       Num_Samples      : constant Positive := Positive (X.Length);
       LE_U             : Label.Label_Encoder (Label.Class_Unique);
-      Params           : constant Float_List_3D :=
-                           Self.Attributes.Neuron_Coef_Layers &
-                           Self.Attributes.Intercepts;
+      --  Coeff_Params: Layers x rows x values
+      Coeff_Params     : constant Float_List_3D :=
+                           Self.Attributes.Neuron_Coef_Layers;
+      --  Intercept_Params: Layers x values
+      Intercept_Params  : constant Float_List_2D := Self.Attributes.Intercepts;
       Early_Stopping   : constant Boolean
         := Self.Parameters.Early_Stopping and then not Incremental;
       Test_Size        : constant Positive
@@ -449,7 +451,7 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_Adam);
                begin
-                  Optimizer.Adam.Params := Params;
+                  Optimizer.Adam.Coeff_Params := Coeff_Params;
                   Optimizer.Adam.Initial_Learning_Rate :=
                     Self.Parameters.Learning_Rate_Init;
                   Optimizer.Adam.Beta_1 := Self.Parameters.Beta_1;
@@ -462,7 +464,7 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
-                  Optimizer.SGD.Params := Params;
+                  Optimizer.SGD.Coeff_Params := Coeff_Params;
                   Optimizer.SGD.Initial_Learning_Rate :=
                     Self.Parameters.Learning_Rate_Init;
                   Optimizer.SGD.Learning_Rate := Self.Parameters.Learning_Rate;
