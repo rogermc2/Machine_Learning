@@ -85,12 +85,10 @@ package body Stochastic_Optimizers is
       Updates          : Parameters_Record;
    begin
       Self.Time_Step := Self.Time_Step + 1;
-      Coeff_Updates.Clear;
-      Intercept_Updates.Clear;
 
       for m in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
-         Coeff_Params_1D := Coeff_Params.Element (m);
+         Coeff_Params_1D := Params.Coeff_Params.Element (m);
          Coeff_Updates_1D.Clear;
          for coeff in Coeff_Params_1D.First_Index ..
               Coeff_Params_1D.Last_Index loop
@@ -105,7 +103,7 @@ package body Stochastic_Optimizers is
          --  Process Intercept_Param
          Self.Intercept_First_Moments.Append
               (Float (m) * Self.Beta_1 +
-               (1.0 - Self.Beta_1) * Intercept_Params.Element (m));
+               (1.0 - Self.Beta_1) * Params.Intercept_Params.Element (m));
          Self.Intercept_First_Moments.Append
            (Float (m) * Self.Beta_2 +
             (1.0 - Self.Beta_2) * Params.Intercept_Params.Element (m) ** 2);
@@ -152,8 +150,6 @@ package body Stochastic_Optimizers is
       Coeff_Updates_1D : Float_List;
       Updates          : Parameters_Record;
    begin
-      Coeff_Updates.Clear;
-      Intercept_Updates.Clear;
       for index in Self.Intercept_Velocities.First_Index ..
           Self.Intercept_Velocities.Last_Index loop
          M_V := Self.Momentum * Self.Intercept_Velocities (index);
@@ -168,8 +164,8 @@ package body Stochastic_Optimizers is
          end loop;
          Updates.Coeff_Params.Append (Coeff_Updates_1D);
 
-         M_V := M_V -  Self.Learning_Rate * Intercept_Params (index);
-         Intercept_Updates.Append (M_V);
+         M_V := M_V -  Self.Learning_Rate * Params.Intercept_Params (index);
+         Updates.Intercept_Params .Append (M_V);
          Self.Intercept_Velocities.Append (M_V);
       end loop;
 
@@ -179,11 +175,10 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
    --  L29
-   procedure Update_Params (Self         : in out SGD_Optimizer;
-                            Coeff_Params : Float_List_2D;
-                            Intercept_Params : Float_List;
-                            Grads : Float_List) is
-      Updates : Float_List;
+   procedure Update_Params (Self   : in out SGD_Optimizer;
+                            Params : Parameters_Record;
+                            Grads  : Float_List) is
+      Updates : Parameters_Record;
    begin
       Updates := Get_Updates (Self, Params);
       for index in Updates.Coeff_Params.First_Index ..
