@@ -28,7 +28,11 @@ package body Base_Mix is
                               Estimate_Weighted_Log_Prob (X);
       Log_Prob_Norm_2D  : Float_List_2D;
    begin
-      Log_Prob_Norm := Neural_Maths.Log_Sum_Exponent (Weighted_Log_Prob);
+        for index in Log_Prob_Norm.First_Index .. Log_Prob_Norm.Last_Index loop
+            Log_Prob_Norm (index) :=
+              Neural_Maths.Log_Sum_Exponent (Weighted_Log_Prob (index));
+        end loop;
+
       Log_Prob_Norm_2D.Append (Log_Prob_Norm);
       Log_Responsibil := Weighted_Log_Prob - Log_Prob_Norm_2D;
 
