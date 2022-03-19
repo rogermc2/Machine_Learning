@@ -76,15 +76,15 @@ package Stochastic_Optimizers is
    end record;
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Coeff_Params          : Float_List_2D;
-                     Intercept_Params      : Float_List;
+                     Coeff_Params          : Float_List_3D;
+                     Intercept_Params      : Float_List_2D;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float);
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Coeff_Params          : Float_List_2D;
-                     Intercept_Params      : Float_List;
+                     Coeff_Params          : Float_List_3D;
+                     Intercept_Params      : Float_List_2D;
                      Initial_Learning_Rate : Float := 0.1;
                      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
                      Momentum              : Float := 0.9;
