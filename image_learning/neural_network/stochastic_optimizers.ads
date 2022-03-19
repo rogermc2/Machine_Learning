@@ -94,12 +94,12 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
-   function Get_Adam_Updates
-     (Self : in out Adam_Optimizer; Params : Parameters_Record)
-      return Parameters_Record;
-   function Get_SGD_Updates
-     (Self : in out SGD_Optimizer; Params : Parameters_Record)
-      return Parameters_Record;
+--     function Get_Adam_Updates
+--       (Self : in out Adam_Optimizer; Params : Parameters_Record)
+--        return Parameters_Record;
+--     function Get_SGD_Updates
+--       (Self : in out SGD_Optimizer; Params : Parameters_Record)
+--        return Parameters_Record;
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_Record;
                             Grads  : Parameters_Record);
