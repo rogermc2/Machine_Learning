@@ -88,11 +88,11 @@ package body Multilayer_Perceptron is
                          Coef_Init       : out IL_Types.Float_List_2D;
                          Intercept_Init  : out IL_Types.Float_List);
    procedure Init_Grads (Layer_Units     : IL_Types.Integer_List;
-                               Coef_Grads      : out IL_Types.Float_List_3D;
-                               Intercept_Grads : out IL_Types.Float_List_2D);
-   procedure Update_No_Improvement_Count (Self : in out MLP_Classifier;
+                         Coef_Grads      : out IL_Types.Float_List_3D;
+                         Intercept_Grads : out IL_Types.Float_List_2D);
+   procedure Update_No_Improvement_Count (Self           : in out MLP_Classifier;
                                           Early_Stopping : Boolean;
-                                          X_Val : IL_Types.Float_List_2D);
+                                          X_Val          : IL_Types.Float_List_2D);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : IL_Types.Float_List_2D;
@@ -417,39 +417,41 @@ package body Multilayer_Perceptron is
                              Incremental     : Boolean := False) is
       use IL_Types;
       use List_Of_Float_Lists_Package;
-      Routine_Name     : constant String :=
-                           "Multilayer_Perceptron.Fit_Stochastic ";
-      Num_Samples      : constant Positive := Positive (X.Length);
-      LE_U             : Label.Label_Encoder (Label.Class_Unique);
+      Routine_Name      : constant String :=
+                            "Multilayer_Perceptron.Fit_Stochastic ";
+      Num_Samples       : constant Positive := Positive (X.Length);
+      LE_U              : Label.Label_Encoder (Label.Class_Unique);
       --  Coeff_Params: Layers x features x values
       --  The ith element of Coeff_Params represents the weight matrix
       --  corresponding to layer i.
-      Coeff_Params     : constant Float_List_3D :=
-                           Self.Attributes.Neuron_Coef_Layers;
+      Coeff_Params      : constant Float_List_3D :=
+                            Self.Attributes.Neuron_Coef_Layers;
       --  Intercept_Params: Layers x y values
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
       Intercept_Params  : constant Float_List_2D := Self.Attributes.Intercepts;
-      Early_Stopping   : constant Boolean
+      Early_Stopping    : constant Boolean
         := Self.Parameters.Early_Stopping and then not Incremental;
-      Test_Size        : constant Positive
+      Test_Size         : constant Positive
         := Positive (Self.Parameters.Validation_Fraction * Float (Num_Samples));
-      Train_Size       : constant Positive := Num_Samples - Test_Size;
-      Stratify         : Integer_List;
-      Should_Stratify  : Boolean;
-      Train_X          : Float_List_2D;
-      Train_Y          : Integer_List;
-      Test_X           : Float_List_2D;
-      Test_Y           : Integer_List;
-      Batch_Size       : Positive;
-      Sample_Index     : Positive;
-      Max_Sample_Index : Positive;
-      Accumulated_Loss : Float := 0.0;
-      Batches          : Integer_List_2D;
-      Batch_Slice      : Integer_List;
-      X_Batch          : Float_List_2D;
-      Y_Batch          : Integer_List;
-      Batch_Loss       : Float;
+      Train_Size        : constant Positive := Num_Samples - Test_Size;
+      Stratify          : Integer_List;
+      Should_Stratify   : Boolean;
+      Train_X           : Float_List_2D;
+      Train_Y           : Integer_List;
+      Test_X            : Float_List_2D;
+      Test_Y            : Integer_List;
+      Batch_Size        : Positive;
+      Sample_Index      : Positive;
+      Max_Sample_Index  : Positive;
+      Accumulated_Loss  : Float := 0.0;
+      Batches           : Integer_List_2D;
+      Batch_Slice       : Integer_List;
+      X_Batch           : Float_List_2D;
+      Y_Batch           : Integer_List;
+      Batch_Loss        : Float;
+      Parameters        : Parameters_Record;
+      Grads             : Parameters_Record;
    begin
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
@@ -458,12 +460,14 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_Adam);
                begin
-                  Optimizer.Adam.Coeff_Params := Coeff_Params;
-                  Optimizer.Adam.Initial_Learning_Rate :=
-                    Self.Parameters.Learning_Rate_Init;
-                  Optimizer.Adam.Beta_1 := Self.Parameters.Beta_1;
-                  Optimizer.Adam.Beta_2 := Self.Parameters.Beta_2;
-                  Optimizer.Adam.Epsilon := Self.Parameters.Epsilon;
+                  Stochastic_Optimizers.C_Init
+                    (Optimizer.Adam, Coeff_Params => Coeff_Params,
+                     Intercept_Params => Intercept_Params,
+                     Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
+                     Beta_1 => Self.Parameters.Beta_1,
+                     Beta_2 => Self.Parameters.Beta_2,
+                     Epsilon => Self.Parameters.Epsilon);
+
                   Self.Attributes.Optimizer := Optimizer;
                end;
 
@@ -471,16 +475,19 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
---                    Optimizer.SGD.Coeff_Params := Coeff_Params;
-                  Optimizer.SGD.Initial_Learning_Rate :=
-                    Self.Parameters.Learning_Rate_Init;
-                  Optimizer.SGD.Learning_Rate := Self.Parameters.Learning_Rate;
-                  Optimizer.SGD.Momentum := Self.Parameters.Momentum;
-                  Optimizer.SGD.Use_Nesterov :=
-                    Self.Parameters.Nesterovs_Momentum;
-                  Optimizer.SGD.Power_T := Self.Parameters.Power_T;
+                  Stochastic_Optimizers.C_Init
+                    (Optimizer.SGD, Coeff_Params => Coeff_Params,
+                     Intercept_Params => Intercept_Params,
+                     Initial_Learning_Rate =>
+                       Self.Parameters.Learning_Rate_Init,
+                     Learning_Rate => Self.Parameters.Learning_Rate,
+                     Momentum => Self.Parameters.Momentum,
+                     Use_Nesterov => Self.Parameters.Nesterovs_Momentum,
+                     Power_T => Self.Parameters.Power_T);
+
                   Self.Attributes.Optimizer := Optimizer;
                end;
+
             when Sgd_Solver => null;
          end case;
       end if;
@@ -544,14 +551,15 @@ package body Multilayer_Perceptron is
 
                --  L645
                Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
-                      Coef_Grads, Intercept_Grads);
+                         Coef_Grads, Intercept_Grads);
                Accumulated_Loss := Accumulated_Loss + Batch_Loss *
                  Float (Batch_Slice.Last_Index - Batch_Slice.First_Index + 1);
-
                --  L657 update weights
-
---                 Stochastic_Optimizers.Update_Params;
-
+               Parameters.Coeff_Params := Coeff_Params;
+               Parameters.Intercept_Params := Intercept_Params;
+               Grads :=  (Coef_Grads, Intercept_Grads);
+               Stochastic_Optimizers.Update_Params
+                 (Self.Attributes.Optimizer, Parameters, Grads);
             end loop;
 
             --  L661
@@ -762,13 +770,13 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L716
    procedure Update_No_Improvement_Count
-      (Self : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val : IL_Types.Float_List_2D) is
+     (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
+      X_Val : IL_Types.Float_List_2D) is
       Score_Val : Float;
    begin
       if Early_Stopping then
          Score_Val := Base_Mix.Score (X_Val);
-        Self.Parameters.Validation_Scores.Append (Score_Val);
+         Self.Parameters.Validation_Scores.Append (Score_Val);
       else
          null;
       end if;

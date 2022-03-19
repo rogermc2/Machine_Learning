@@ -55,23 +55,23 @@ package Stochastic_Optimizers is
       Coeff_Params             : Float_List_3D;
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
-      Intercept_Params      : Float_List_2D;
-      Initial_Learning_Rate : Float := 0.1;
-      Learning_Rate         : Float := 0.1;
-      Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
-      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
-      Momentum              : Float := 0.9;
-      Use_Nesterov          : Boolean := True;
-      Power_T               : Float := 0.5;
-      Coeff_Velocities      : Float_List;
-      Intercept_Velocities  : Float_List;
+      Intercept_Params         : Float_List_2D;
+      Initial_Learning_Rate    : Float := 0.1;
+      Learning_Rate            : Float := 0.1;
+      Learning_Rate_Kind       : Learning_Rate_Type := Constant_Rate;
+      LR_Schedule              : LR_Schedule_Type := Constant_LR_Schedule;
+      Momentum                 : Float := 0.9;
+      Use_Nesterov             : Boolean := True;
+      Power_T                  : Float := 0.5;
+      Coeff_Velocities         : Float_List;
+      Intercept_Velocities     : Float_List;
    end record;
 
    type Optimizer_Record (Kind : Optimizer_Type := No_Optimizer) is record
       case Kind is
          when No_Optimizer => null;
          when Optimizer_Adam => Adam : Adam_Optimizer;
-         when Optimizer_SGD => SGD : SGD_Optimizer;
+         when Optimizer_SGD => SGD   : SGD_Optimizer;
       end case;
    end record;
 
@@ -86,18 +86,25 @@ package Stochastic_Optimizers is
                      Coeff_Params          : Float_List_3D;
                      Intercept_Params      : Float_List_2D;
                      Initial_Learning_Rate : Float := 0.1;
-                     LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
+                     Learning_Rate         : Float := 0.1;
+                     Learning_Rate_Kind    : Learning_Rate_Type :=
+                       Constant_Rate;
+                     LR_Schedule           : LR_Schedule_Type :=
+                       Constant_LR_Schedule;
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
-   function Get_Updates
+   function Get_Adam_Updates
      (Self : in out Adam_Optimizer; Params : Parameters_Record)
       return Parameters_Record;
-   function Get_Updates
+   function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Params : Parameters_Record)
       return Parameters_Record;
-   procedure Update_Params (Self   : in out SGD_Optimizer;
+   procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_Record;
                             Grads  : Parameters_Record);
+--     procedure Update_Params (Self   : in out SGD_Optimizer;
+--                              Params : in out Parameters_Record;
+--                              Grads  : Parameters_Record);
 
 end Stochastic_Optimizers;
