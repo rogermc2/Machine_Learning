@@ -90,7 +90,7 @@ package body Stochastic_Optimizers is
                               return Parameters_Record is
       use Maths.Float_Math_Functions;
       Learning_Rate    : Float;
-      Coeff_Params_1D  : Float_List;
+      Coeff_Params_2D  : Float_List_2D;
       Coeff_Updates_1D : Float_List;
       Updates          : Parameters_Record;
    begin
@@ -99,10 +99,10 @@ package body Stochastic_Optimizers is
       --  Update first and second coeff moments
       for m in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
-         Coeff_Params_1D := Params.Coeff_Params.Element (m);
+         Coeff_Params_2D := Params.Coeff_Params.Element (m);
          Coeff_Updates_1D.Clear;
-         for coeff in Coeff_Params_1D.First_Index ..
-           Coeff_Params_1D.Last_Index loop
+         for coeff in Coeff_Params_2D.First_Index ..
+           Coeff_Params_2D.Last_Index loop
             Self.Coeff_First_Moments.Append
               (Float (m) * Self.Beta_1 +
                (1.0 - Self.Beta_1) * Coeff_Updates_1D.Element (m));
@@ -127,15 +127,15 @@ package body Stochastic_Optimizers is
 
       for m in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
-         Coeff_Params_1D.Clear;
+         Coeff_Params_2D.Clear;
          for m2 in Self.Coeff_First_Moments.First_Index ..
            Self.Coeff_First_Moments.Last_Index loop
             Learning_Rate := -Float (m) * Self.Learning_Rate;
-            Coeff_Params_1D.Append
+            Coeff_Params_2D.Append
               (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (m)) +
                    Self.Epsilon));
          end loop;
-         Updates.Coeff_Params.Append (Coeff_Params_1D);
+         Updates.Coeff_Params.Append (Coeff_Params_2D);
       end loop;
 
       for m in Self.Intercept_First_Moments.First_Index ..
