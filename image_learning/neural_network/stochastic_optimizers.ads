@@ -20,6 +20,11 @@ package Stochastic_Optimizers is
    type Solver_Type is (Lbfgs_Solver, Sgd_Solver, Adam_Solver);
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
+   type Parameters_Record is record
+      Coeff_Params     : Float_List_2D;
+      Intercept_Params : Float_List;
+   end record;
+
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
@@ -70,17 +75,14 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
-   procedure Get_Updates
-     (Self              : in out Adam_Optimizer; Coeff_Params : Float_List_2D;
-      Intercept_Params  : Float_List; Coeff_Updates : out Float_List_2D;
-      Intercept_Updates : out Float_List);
-   procedure Get_Updates
-     (Self              : in out SGD_Optimizer; Coeff_Params : Float_List_2D;
-      Intercept_Params  : Float_List; Coeff_Updates : out Float_List_2D;
-      Intercept_Updates : out Float_List);
-   procedure Update_Params (Self         : in out SGD_Optimizer;
-                            Coeff_Params : Float_List_3D;
-                            Intercept_Params : Float_List_2D;
-                            Grads : Float_List);
+   function Get_Updates
+     (Self : in out Adam_Optimizer; Params : Parameters_Record)
+      return Parameters_Record;
+   function Get_Updates
+     (Self : in out SGD_Optimizer; Params : Parameters_Record)
+      return Parameters_Record;
+   procedure Update_Params (Self   : in out SGD_Optimizer;
+                            Params : Parameters_Record;
+                            Grads  : Float_List);
 
 end Stochastic_Optimizers;
