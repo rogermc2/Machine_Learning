@@ -31,9 +31,12 @@ package Stochastic_Optimizers is
    end record;
 
    type Adam_Optimizer is record
---        Params                : Float_List_3D;  --  coefs + intercepts
-      Coeff_Params             : Float_List_2D;
-      Intercept_Params         : Float_List;
+      --  The ith element of Coeff_Params represents the weight matrix
+      --  corresponding to layer i.
+      Coeff_Params             : Float_List_3D;
+      --  The ith element of Intercept_Params represents the bias vector
+      --  corresponding to layer i + 1.
+      Intercept_Params         : Float_List_2D;
       Initial_Learning_Rate    : Float := 0.1;
       Learning_Rate            : Float := 0.1;
       Beta_1                   : Float := 0.9;
@@ -47,9 +50,12 @@ package Stochastic_Optimizers is
    end record;
 
    type SGD_Optimizer is record
---        Params                : Float_List_3D; --  coefs + intercepts
-      Coeff_Params          : Float_List_2D;
-      Intercept_Params      : Float_List;
+      --  The ith element of Coeff_Params represents the weight matrix
+      --  corresponding to layer i.
+      Coeff_Params             : Float_List_3D;
+      --  The ith element of Intercept_Params represents the bias vector
+      --  corresponding to layer i + 1.
+      Intercept_Params      : Float_List_2D;
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
       Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;

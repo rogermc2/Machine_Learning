@@ -87,7 +87,7 @@ package body Multilayer_Perceptron is
                          Fan_In, Fan_Out : Positive;
                          Coef_Init       : out IL_Types.Float_List_2D;
                          Intercept_Init  : out IL_Types.Float_List);
-   procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
+   procedure Init_Grads (Layer_Units     : IL_Types.Integer_List;
                                Coef_Grads      : out IL_Types.Float_List_3D;
                                Intercept_Grads : out IL_Types.Float_List_2D);
    procedure Update_No_Improvement_Count (Self : in out MLP_Classifier;
@@ -309,18 +309,22 @@ package body Multilayer_Perceptron is
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
       Activations               : Float_List_2D := X;
+      Y_2D                      : Integer_List_2D;
       Hidden_Layer_Sizes        : Integer_List :=
                                     Self.Parameters.Hidden_Layer_Sizes;
       Hidden_Layer_Sizes_Length : Count_Type := Hidden_Layer_Sizes.Length;
       Layer_Units               : Integer_List;
       Deltas                    : Float_List_2D;
+      --  Coef_Grads layers * features * values
       Coef_Grads                : Float_List_3D;
+      --  Coef_Grads layers * y values
       Intercept_Grads           : Float_List_2D;
    begin
       Validate_Hyperparameters (Self);
       First_Pass :=
         Self.Attributes.Neuron_Coef_Layers.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
+      Y_2D.Append (Y);
 
       Layer_Units.Append (Num_Features);
       for index in Hidden_Layer_Sizes.First_Index ..
@@ -341,7 +345,7 @@ package body Multilayer_Perceptron is
       --  activations of the i + 1 layer and the backpropagated error.
       Deltas.Set_Length (Activations.Length - 1);
       --  L417
-      Init_Coeff_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
+      Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
@@ -411,17 +415,20 @@ package body Multilayer_Perceptron is
                              Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
                              Incremental     : Boolean := False) is
-
       use IL_Types;
       use List_Of_Float_Lists_Package;
       Routine_Name     : constant String :=
                            "Multilayer_Perceptron.Fit_Stochastic ";
       Num_Samples      : constant Positive := Positive (X.Length);
       LE_U             : Label.Label_Encoder (Label.Class_Unique);
-      --  Coeff_Params: Layers x rows x values
+      --  Coeff_Params: Layers x features x values
+      --  The ith element of Coeff_Params represents the weight matrix
+      --  corresponding to layer i.
       Coeff_Params     : constant Float_List_3D :=
                            Self.Attributes.Neuron_Coef_Layers;
-      --  Intercept_Params: Layers x values
+      --  Intercept_Params: Layers x y values
+      --  The ith element of Intercept_Params represents the bias vector
+      --  corresponding to layer i + 1.
       Intercept_Params  : constant Float_List_2D := Self.Attributes.Intercepts;
       Early_Stopping   : constant Boolean
         := Self.Parameters.Early_Stopping and then not Incremental;
@@ -464,7 +471,7 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
-                  Optimizer.SGD.Coeff_Params := Coeff_Params;
+--                    Optimizer.SGD.Coeff_Params := Coeff_Params;
                   Optimizer.SGD.Initial_Learning_Rate :=
                     Self.Parameters.Learning_Rate_Init;
                   Optimizer.SGD.Learning_Rate := Self.Parameters.Learning_Rate;
@@ -665,9 +672,9 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L417
-   procedure Init_Coeff_Grads (Layer_Units     : IL_Types.Integer_List;
-                               Coef_Grads      : out IL_Types.Float_List_3D;
-                               Intercept_Grads : out IL_Types.Float_List_2D) is
+   procedure Init_Grads (Layer_Units     : IL_Types.Integer_List;
+                         Coef_Grads      : out IL_Types.Float_List_3D;
+                         Intercept_Grads : out IL_Types.Float_List_2D) is
       use Ada.Containers;
       use Utilities;
       use IL_Types;
@@ -710,7 +717,7 @@ package body Multilayer_Perceptron is
          Intercept_Grads.Append (Intercept);
       end loop;
 
-   end Init_Coeff_Grads;
+   end Init_Grads;
 
    --  -------------------------------------------------------------------------
 
