@@ -17,7 +17,7 @@ package body Base_Mix is
 
    --  -------------------------------------------------------------------------
    --  L513 _estimate_log_prob_resp computes the log-probabilities per
-   --   component for each sample.
+   --       component for each sample.
    --  Log_Prob_Norm for num_samples
    --  Log_Responsibil for num_samples x num_components
    procedure Estimate_Log_Prob_Resp
@@ -28,11 +28,7 @@ package body Base_Mix is
                               Estimate_Weighted_Log_Prob (X);
       Log_Prob_Norm_2D  : Float_List_2D;
    begin
---          for index in Log_Prob_Norm.First_Index .. Log_Prob_Norm.Last_Index loop
-            Log_Prob_Norm :=
-              Neural_Maths.Log_Sum_Exponent (Weighted_Log_Prob);
---          end loop;
-
+      Log_Prob_Norm := Neural_Maths.Log_Sum_Exponent (Weighted_Log_Prob);
       Log_Prob_Norm_2D.Append (Log_Prob_Norm);
       Log_Responsibil := Weighted_Log_Prob - Log_Prob_Norm_2D;
 
