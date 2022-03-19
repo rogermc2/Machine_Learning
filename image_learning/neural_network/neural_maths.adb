@@ -42,7 +42,7 @@ package body Neural_Maths is
    --  --------------------------------------------------------------------------
    --  Based on github.com/scipy/scipy/blob/main/scipy/special/_logsumexp.py
    --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
-   function Log_Sum_Exponent (Log_Prob : Float_List_2D) return Float is
+   function Log_Sum_Exponent (Log_Prob : Float_List_2D) return Float_List is
       use Maths.Float_Math_Functions;
       use Float_List_Package;
       Log_Prob_Max : constant Float_List := Max (Log_Prob);
@@ -50,11 +50,13 @@ package body Neural_Maths is
       Max          : Float;
       Diff         : Float;
       Exp_Delta    : Float_List;
-      Sum          : Float := 0.0;
+      Sum          : Float;
+      Log_Sum_List : Float_List;
    begin
       for index in Log_Prob.First_Index .. Log_Prob.Last_Index loop
          Log_Prob_1D := Log_Prob (index);
          Max := Log_Prob_Max (index);
+         Sum := 0.0;
          for index2 in Log_Prob_1D.First_Index .. Log_Prob_1D.Last_Index loop
             --  tmp = np.exp(a - a_max)
             Diff := Log_Prob_1D (index2) - Max;
@@ -64,13 +66,15 @@ package body Neural_Maths is
                Exp_Delta.Append (Exp (Diff));
             end if;
          end loop;
+
+         for index3 in Exp_Delta.First_Index .. Exp_Delta.Last_Index loop
+            Sum := Sum + Exp_Delta (index3);
+         end loop;
+
+         Log_Sum_List.Append (Log (Sum));
       end loop;
 
-      for index in Exp_Delta.First_Index .. Exp_Delta.Last_Index loop
-         Sum := Sum + Exp_Delta.Element (index);
-      end loop;
-
-      return Log (Sum);
+      return Log_Sum_List;
 
    end Log_Sum_Exponent;
 
