@@ -3,7 +3,6 @@
 with Ada.Containers;
 
 with Maths;
-with Utilities;
 
 package body Stochastic_Optimizers is
 
@@ -24,6 +23,7 @@ package body Stochastic_Optimizers is
       Self.Beta_2 := Beta_2;
       Self.Epsilon := Epsilon;
 
+      Self.Time_Step := 0;
       for index in 1 .. Intercept_Params.Length loop
             Self.Intercept_First_Moments.Append (0.0);
             Self.Intercept_Second_Moments.Append (0.0);
@@ -80,12 +80,12 @@ package body Stochastic_Optimizers is
       use Maths.Float_Math_Functions;
       Learning_Rate    : Float;
       Coeff_Params_1D  : Float_List;
-      Coeff_M_V        : Float;
       Coeff_Updates_1D : Float_List;
       Updates          : Parameters_Record;
    begin
       Self.Time_Step := Self.Time_Step + 1;
 
+      --  Update first and second coeff moments
       for m in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
          Coeff_Params_1D := Params.Coeff_Params.Element (m);
@@ -100,38 +100,38 @@ package body Stochastic_Optimizers is
                    (1.0 - Self.Beta_2) * Coeff_Updates_1D.Element (m) ** 2);
          end loop;
 
-         --  Process Intercept_Param
+         --  Update first and second intercept moments
          Self.Intercept_First_Moments.Append
               (Float (m) * Self.Beta_1 +
                (1.0 - Self.Beta_1) * Params.Intercept_Params.Element (m));
-         Self.Intercept_First_Moments.Append
+         Self.Intercept_Second_Moments.Append
            (Float (m) * Self.Beta_2 +
             (1.0 - Self.Beta_2) * Params.Intercept_Params.Element (m) ** 2);
       end loop;
 
-      Zip_Moments_Grads := Zip (Self.Second_Moments, Grads);
-      for v in Zip_Moments_Grads.First_Index ..
-        Zip_Moments_Grads.Last_Index loop
-         Grad_Items := Zip_Moments_Grads.Element (v);
-         Self.First_Moments.Append
-           (Float (v) * Self.Beta_2 + Grad_Items.Float_1 ** 2 * (1.0 - Self.Beta_1));
-         Self.First_Moments.Append
-           (Float (v) * Self.Beta_2 + Grad_Items.Float_2 ** 2 * (1.0 - Self.Beta_1));
-      end loop;
-
+      --  Update learning rate
       Self.Learning_Rate := Sqrt
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
 
-      Zip_Moments_Grads := Zip (Self.First_Moments, Self.Second_Moments);
-      for m in Zip_Moments_Grads.First_Index ..
-        Zip_Moments_Grads.Last_Index loop
+      for m in Self.Coeff_First_Moments.First_Index ..
+        Self.Coeff_First_Moments.Last_Index loop
+         Coeff_Params_1D.Clear;
+         for m2 in Self.Coeff_First_Moments.First_Index ..
+           Self.Coeff_First_Moments.Last_Index loop
+            Learning_Rate := -Float (m) * Self.Learning_Rate;
+            Coeff_Params_1D.Append
+              (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (m)) +
+                   Self.Epsilon));
+         end loop;
+            Updates.Coeff_Params.Append (Coeff_Params_1D);
+      end loop;
+
+      for m in Self.Intercept_First_Moments.First_Index ..
+        Self.Intercept_First_Moments.Last_Index loop
          Learning_Rate := -Float (m) * Self.Learning_Rate;
-         Grad_Items := Zip_Moments_Grads.Element (m);
-         Updates.Append
-           (Learning_Rate / (Sqrt (Grad_Items.Float_1) + Self.Epsilon));
-         Updates.Append
-           (Learning_Rate / (Sqrt (Grad_Items.Float_2) + Self.Epsilon));
+         Updates.Intercept_Params.Append
+           (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (m)) + Self.Epsilon));
       end loop;
 
       return Updates;

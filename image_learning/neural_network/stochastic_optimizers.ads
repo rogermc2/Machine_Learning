@@ -41,8 +41,8 @@ package Stochastic_Optimizers is
       Epsilon                  : Float := 10.0 ** (-8);
       Time_Step                : Integer;
       Coeff_First_Moments      : Float_List;  --  ms
-      Intercept_First_Moments  : Float_List;  --  ms
       Coeff_Second_Moments     : Float_List;  --  vs
+      Intercept_First_Moments  : Float_List;  --  ms
       Intercept_Second_Moments : Float_List;  --  vs
    end record;
 
