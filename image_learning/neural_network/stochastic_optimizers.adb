@@ -1,40 +1,76 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
+with Ada.Containers;
+
 with Maths;
 with Utilities;
 
 package body Stochastic_Optimizers is
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Params                : Float_List_3D;
+                     Coeff_Params          : Float_List_2D;
+                     Intercept_Params      : Float_List;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float) is
+      use Ada.Containers;
+      Zeros : Float_List;
    begin
-      Self.Params := Params;
+      Self.Coeff_Params := Coeff_Params;
+      Self.Intercept_Params := Intercept_Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
       Self.Beta_1 := Beta_1;
       Self.Beta_2 := Beta_2;
       Self.Epsilon := Epsilon;
+
+      for index in 1 .. Intercept_Params.Length loop
+            Self.Intercept_First_Moments.Append (0.0);
+            Self.Intercept_Second_Moments.Append (0.0);
+      end loop;
+
+      for index in 1 .. Coeff_Params.Length loop
+            Zeros.Append (0.0);
+      end loop;
+      for index in 1 .. Coeff_Params.Length loop
+            Self.Coeff_First_Moments .Append (Zeros);
+            Self.Coeff_Second_Moments.Append (Zeros);
+      end loop;
+
    end C_Init;
 
    --  -------------------------------------------------------------------------
 
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Params                : Float_List_3D;
+                     Coeff_Params          : Float_List_2D;
+                     Intercept_Params      : Float_List;
                      Initial_Learning_Rate : Float := 0.1;
                      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5) is
+      use Ada.Containers;
+      Zeros : Float_List;
    begin
-      Self.Params := Params;
+      Self.Coeff_Params := Coeff_Params;
+      Self.Intercept_Params := Intercept_Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
       Self.LR_Schedule := LR_Schedule;
       Self.Momentum := Momentum;
       Self.Use_Nesterov := Use_Nesterov;
       Self.Power_T := Power_T;
+
+      for index in 1 .. Intercept_Params.Length loop
+            Self.Intercept_Velocities.Append (0.0);
+      end loop;
+
+      for index in 1 .. Coeff_Params.Length loop
+            Zeros.Append (0.0);
+      end loop;
+      for index in 1 .. Coeff_Params.Length loop
+            Self.Coeff_Velocities.Append (Zeros);
+      end loop;
+
    end C_Init;
 
    --  -------------------------------------------------------------------------
@@ -51,30 +87,28 @@ package body Stochastic_Optimizers is
       Updates          : Float_List;
    begin
       Self.Time_Step := Self.Time_Step + 1;
-      Self.First_Moments.Clear;
-      Self.Second_Moments.Clear;
       Coeff_Updates.Clear;
       Intercept_Updates.Clear;
 
-      for m in Self.First_Moments.First_Index ..
-        Self.First_Moments.Last_Index loop
+      for m in Self.Coeff_First_Moments.First_Index ..
+        Self.Coeff_First_Moments.Last_Index loop
          Coeff_Params_1D := Coeff_Params.Element (m);
          Coeff_Updates_1D.Clear;
          for coeff in Coeff_Params_1D.First_Index ..
               Coeff_Params_1D.Last_Index loop
-                Self.First_Moments.Append
+                Self.Coeff_First_Moments.Append
                   (Float (m) * Self.Beta_1 +
                    (1.0 - Self.Beta_1) * Coeff_Updates_1D.Element (m));
-                Self.Second_Moments.Append
+                Self.Coeff_Second_Moments.Append
                   (Float (m) * Self.Beta_2 +
                    (1.0 - Self.Beta_2) * Coeff_Updates_1D.Element (m) ** 2);
          end loop;
 
          --  Process Intercept_Param
-         Self.First_Moments.Append
+         Self.Intercept_First_Moments.Append
               (Float (m) * Self.Beta_1 +
                (1.0 - Self.Beta_1) * Intercept_Params.Element (m));
-         Self.Second_Moments.Append
+         Self.Intercept_First_Moments.Append
            (Float (m) * Self.Beta_2 +
             (1.0 - Self.Beta_2) * Intercept_Params.Element (m) ** 2);
       end loop;
@@ -120,10 +154,9 @@ package body Stochastic_Optimizers is
    begin
       Coeff_Updates.Clear;
       Intercept_Updates.Clear;
-      Self.Velocities.Clear;
-      for index in Self.Velocities.First_Index ..
-          Self.Velocities.Last_Index loop
-         M_V := Self.Momentum * Self.Velocities (index);
+      for index in Self.Intercept_Velocities.First_Index ..
+          Self.Intercept_Velocities.Last_Index loop
+         M_V := Self.Momentum * Self.Intercept_Velocities (index);
 
          Coeff_Params_1D := Coeff_Params.Element (index);
          Coeff_Updates_1D.Clear;
@@ -137,7 +170,7 @@ package body Stochastic_Optimizers is
 
          M_V := M_V -  Self.Learning_Rate * Intercept_Params (index);
          Intercept_Updates.Append (M_V);
-         Self.Velocities.Append (M_V);
+         Self.Intercept_Velocities.Append (M_V);
       end loop;
 
    end Get_Updates;
@@ -145,8 +178,8 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
    --  L29
    procedure Update_Params (Self         : in out SGD_Optimizer;
-                            Coeff_Params : Float_List_3D;
-                            Intercept_Params : Float_List_2D;
+                            Coeff_Params : Float_List_2D;
+                            Intercept_Params : Float_List;
                             Grads : Float_List) is
       Updates : Float_List;
    begin

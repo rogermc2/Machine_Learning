@@ -26,19 +26,25 @@ package Stochastic_Optimizers is
    end record;
 
    type Adam_Optimizer is record
-      Params                : Float_List_3D;  --  coefs + intercepts
-      Initial_Learning_Rate : Float := 0.1;
-      Learning_Rate         : Float := 0.1;
-      Beta_1                : Float := 0.9;
-      Beta_2                : Float := 0.999;
-      Epsilon               : Float := 10.0 ** (-8);
-      Time_Step             : Integer;
-      First_Moments         : Float_List;  --  ms
-      Second_Moments        : Float_List;  --  vs
+--        Params                : Float_List_3D;  --  coefs + intercepts
+      Coeff_Params             : Float_List_2D;
+      Intercept_Params         : Float_List;
+      Initial_Learning_Rate    : Float := 0.1;
+      Learning_Rate            : Float := 0.1;
+      Beta_1                   : Float := 0.9;
+      Beta_2                   : Float := 0.999;
+      Epsilon                  : Float := 10.0 ** (-8);
+      Time_Step                : Integer;
+      Coeff_First_Moments      : Float_List;  --  ms
+      Intercept_First_Moments  : Float_List;  --  ms
+      Coeff_Second_Moments     : Float_List;  --  vs
+      Intercept_Second_Moments : Float_List;  --  vs
    end record;
 
    type SGD_Optimizer is record
-      Params                : Float_List_3D; --  coefs + intercepts
+--        Params                : Float_List_3D; --  coefs + intercepts
+      Coeff_Params          : Float_List_2D;
+      Intercept_Params      : Float_List;
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
       Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
@@ -46,7 +52,8 @@ package Stochastic_Optimizers is
       Momentum              : Float := 0.9;
       Use_Nesterov          : Boolean := True;
       Power_T               : Float := 0.5;
-      Velocities            : Float_List;
+      Coeff_Velocities      : Float_List;
+      Intercept_Velocities  : Float_List;
    end record;
 
    type Optimizer_Record (Kind : Optimizer_Type := No_Optimizer) is record
@@ -58,13 +65,15 @@ package Stochastic_Optimizers is
    end record;
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Params                : Float_List_3D;
+                     Coeff_Params          : Float_List_2D;
+                     Intercept_Params      : Float_List;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float);
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Params                : Float_List_3D;
+                     Coeff_Params          : Float_List_2D;
+                     Intercept_Params      : Float_List;
                      Initial_Learning_Rate : Float := 0.1;
                      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
                      Momentum              : Float := 0.9;
@@ -79,8 +88,8 @@ package Stochastic_Optimizers is
       Intercept_Params  : Float_List; Coeff_Updates : out Float_List_2D;
       Intercept_Updates : out Float_List);
    procedure Update_Params (Self         : in out SGD_Optimizer;
-                            Coeff_Params : Float_List_3D;
-                            Intercept_Params : Float_List_2D;
+                            Coeff_Params : Float_List_2D;
+                            Intercept_Params : Float_List;
                             Grads : Float_List);
 
 end Stochastic_Optimizers;
