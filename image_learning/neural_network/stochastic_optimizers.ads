@@ -91,6 +91,7 @@ package Stochastic_Optimizers is
      (Self : in out SGD_Optimizer; Params : Parameters_Record)
       return Parameters_Record;
    procedure Update_Params (Self   : in out SGD_Optimizer;
-                            Params : Parameters_Record; Grads : Float_List);
+                            Params : in out Parameters_Record;
+                            Grads  : Parameters_Record);
 
 end Stochastic_Optimizers;

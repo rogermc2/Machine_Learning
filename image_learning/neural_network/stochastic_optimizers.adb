@@ -176,14 +176,27 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
    --  L29
    procedure Update_Params (Self   : in out SGD_Optimizer;
-                            Params : Parameters_Record;
-                            Grads  : Float_List) is
-      Updates : Parameters_Record;
+                            Params : in out Parameters_Record;
+                            Grads  : Parameters_Record) is
+      Coef_1D         : Float_List;
+      Coef_Updates_1D : Float_List;
+      Updates         : Parameters_Record;
    begin
-      Updates := Get_Updates (Self, Params);
+      Updates := Get_Updates (Self, Grads);
       for index in Updates.Coeff_Params.First_Index ..
         Updates.Coeff_Params.Last_Index loop
-         null;
+         Coef_1D := Params.Coeff_Params (index);
+         Coef_Updates_1D.Clear;
+         for index in Coef_1D.First_Index .. Coef_1D.Last_Index loop
+            Coef_Updates_1D.Append (Coef_1D (index) + Coef_Updates_1D (index));
+         end loop;
+         Params.Coeff_Params (index) := Coef_Updates_1D;
+      end loop;
+
+      for index in Updates.Intercept_Params.First_Index ..
+        Updates.Intercept_Params.Last_Index loop
+         Params.Intercept_Params (index) :=
+         Params.Intercept_Params (index) + Updates.Intercept_Params (index);
       end loop;
 
    end Update_Params;
