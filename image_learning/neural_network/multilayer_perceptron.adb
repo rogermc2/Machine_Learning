@@ -200,7 +200,7 @@ package body Multilayer_Perceptron is
    end Backprop;
 
    --  -------------------------------------------------------------------------
-
+   --  L1054
    function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
                       IL_Types.Integer_Package.Empty_Vector;
                     Activation          : Base_Neural.Activation_Type :=
@@ -326,7 +326,7 @@ package body Multilayer_Perceptron is
         (not Self.Parameters.Warm_Start and then not Incremental);
       Y_2D.Append (Y);
 
-      Layer_Units.Append (Num_Features);
+      Layer_Units.Set_Length (Count_Type (Num_Features));
       for index in Hidden_Layer_Sizes.First_Index ..
         Hidden_Layer_Sizes.Last_Index loop
          Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
