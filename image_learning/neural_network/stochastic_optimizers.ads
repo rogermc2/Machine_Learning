@@ -52,19 +52,18 @@ package Stochastic_Optimizers is
    type SGD_Optimizer is record
       --  The ith element of Coeff_Params represents the weight matrix
       --  corresponding to layer i.
-      Coeff_Params             : Float_List_3D;
+      Coeff_Params          : Float_List_3D;
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
-      Intercept_Params         : Float_List_2D;
-      Initial_Learning_Rate    : Float := 0.1;
-      Learning_Rate            : Float := 0.1;
-      Learning_Rate_Kind       : Learning_Rate_Type := Constant_Rate;
-      LR_Schedule              : LR_Schedule_Type := Constant_LR_Schedule;
-      Momentum                 : Float := 0.9;
-      Use_Nesterov             : Boolean := True;
-      Power_T                  : Float := 0.5;
-      Coeff_Velocities         : Float_List;
-      Intercept_Velocities     : Float_List;
+      Intercept_Params      : Float_List_2D;
+      Initial_Learning_Rate : Float := 0.1;
+      Learning_Rate         : Float := 0.1;
+      Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
+      LR_Schedule           : LR_Schedule_Type := Constant_LR_Schedule;
+      Momentum              : Float := 0.9;
+      Use_Nesterov          : Boolean := True;
+      Power_T               : Float := 0.5;
+      Velocities            : Parameters_Record;
    end record;
 
    type Optimizer_Record (Kind : Optimizer_Type := No_Optimizer) is record

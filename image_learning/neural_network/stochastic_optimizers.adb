@@ -58,7 +58,7 @@ package body Stochastic_Optimizers is
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5) is
       use Ada.Containers;
-      Zeros : Float_List;
+      Zeros    : Float_List;
    begin
       Self.Coeff_Params := Coeff_Params;
       Self.Intercept_Params := Intercept_Params;
@@ -70,15 +70,16 @@ package body Stochastic_Optimizers is
       Self.Use_Nesterov := Use_Nesterov;
       Self.Power_T := Power_T;
 
-      for index in 1 .. Intercept_Params.Length loop
-         Self.Intercept_Velocities.Append (0.0);
-      end loop;
-
-      for index in 1 .. Coeff_Params.Length loop
+      for index in 1 .. Self.Velocities.Intercept_Params.Length loop
          Zeros.Append (0.0);
       end loop;
-      for index in 1 .. Coeff_Params.Length loop
-         Self.Coeff_Velocities.Append (Zeros);
+
+      for index in 1 .. Self.Velocities.Intercept_Params.Length loop
+         Self.Velocities.Intercept_Params.Append (Zeros);
+      end loop;
+
+      for index in 1 .. Integer (Self.Velocities.Coeff_Params.Length) loop
+         Self.Velocities.Coeff_Params (index).Append (Zeros);
       end loop;
 
    end C_Init;
@@ -148,7 +149,7 @@ package body Stochastic_Optimizers is
         Self.Intercept_First_Moments.Last_Index loop
          Learning_Rate := -Float (m) * Self.Learning_Rate;
          Intercept_Params_1D.Append (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (m)) +
-                Self.Epsilon));
+                                       Self.Epsilon));
          Updates.Intercept_Params.Append (Intercept_Params_1D);
       end loop;
 
@@ -162,39 +163,46 @@ package body Stochastic_Optimizers is
      (Self : in out SGD_Optimizer; Params : Parameters_Record)
       return Parameters_Record is
       use Float_List_Package;
-      M_V                 : Float;
-      Coeff_Params_2D     : Float_List_2D;
-      Coeff_Params_1D     : Float_List;
-      Intercept_Params_1D : Float_List;
-      Coeff_M_V           : Float;
-      Coeff_Updates_1D    : Float_List;
-      Coeff_Updates_2D    : Float_List_2D;
-      Updates             : Parameters_Record;
+      M_V                  : Float;
+      Coeff_Params_2D      : Float_List_2D;
+      Coeff_Params_1D      : Float_List;
+      Intercept_Params_1D  : Float_List;
+      Coeff_Updates_1D     : Float_List;
+      Coeff_Updates_2D     : Float_List_2D;
+      Intercept_Updates_1D : Float_List;
+      Updates              : Parameters_Record;
    begin
-      for layer in Self.Intercept_Velocities.First_Index ..
-        Self.Intercept_Velocities.Last_Index loop
-         M_V := Self.Momentum * Self.Intercept_Velocities (layer);
+
+      for layer in Self.Velocities.Coeff_Params.First_Index ..
+        Self.Velocities.Coeff_Params.Last_Index loop
 
          Coeff_Params_2D := Params.Coeff_Params.Element (layer);
          Intercept_Params_1D := Params.Intercept_Params (layer);
+
          Coeff_Updates_1D.Clear;
+         M_V := 0.0;
          for coeff in Coeff_Params_2D.First_Index ..
            Coeff_Params_2D.Last_Index loop
             Coeff_Params_1D := Coeff_Params_2D (coeff);
             for index in Coeff_Params_1D.First_Index ..
               Coeff_Params_1D.Last_Index loop
-               Coeff_M_V :=
-                 M_V - Self.Learning_Rate * Coeff_Params_1D (index);
-               Coeff_Updates_1D.Append (Coeff_M_V);
+               M_V := M_V - Self.Learning_Rate * Coeff_Params_1D (index);
+               Coeff_Updates_1D.Append (M_V);
             end loop;
             Coeff_Updates_2D.Append (Coeff_Updates_1D);
          end loop;
-         Updates.Coeff_Params.Append (Coeff_Updates_2D);
+         Updates.Coeff_Params.Replace_Element (layer, Coeff_Updates_2D);
 
-         M_V := M_V -  Self.Learning_Rate * Intercept_Params_1D (layer);
-         Updates.Intercept_Params.Append (M_V);
-         Self.Intercept_Velocities.Append (M_V);
+         M_V := 0.0;
+         for index in Intercept_Params_1D.First_Index ..
+           Intercept_Params_1D.Last_Index loop
+            M_V := M_V - Self.Learning_Rate * Intercept_Params_1D (index);
+            Intercept_Updates_1D.Append (M_V);
+         end loop;
+         Updates.Intercept_Params.Replace_Element (layer, Intercept_Updates_1D);
       end loop;
+
+      Self.Velocities := Updates;
 
       return Updates;
 
@@ -205,9 +213,13 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_Record;
                             Grads  : Parameters_Record) is
-      Coef_1D         : Float_List;
-      Coef_Updates_1D : Float_List;
-      Updates         : Parameters_Record;
+      Coef_1D           : Float_List;
+      Coef_2D           : Float_List_2D;
+      Intercept_1D      : Float_List;
+      Coef_Updates_1D   : Float_List;
+      Coef_Updates_2D   : Float_List_2D;
+      Intercept_Updates : Float_List;
+      Updates           : Parameters_Record;
    begin
       --  L42
       case Self.Kind is
@@ -219,20 +231,28 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L43 for each layer p:
-      for p in Updates.Coeff_Params.First_Index ..
+      for layer in Updates.Coeff_Params.First_Index ..
         Updates.Coeff_Params.Last_Index loop
-         Coef_1D := Params.Coeff_Params (p);
-         Coef_Updates_1D.Clear;
-         for index in Coef_1D.First_Index .. Coef_1D.Last_Index loop
-            Coef_Updates_1D.Append (Coef_1D (index) + Coef_Updates_1D (index));
+         Coef_2D := Params.Coeff_Params (layer);
+         Coef_Updates_2D.Clear;
+         for index in Coef_2D.First_Index .. Coef_2D.Last_Index loop
+            Coef_Updates_1D.Clear;
+            for index in Coef_1D.First_Index .. Coef_1D.Last_Index loop
+               Coef_Updates_1D.Append (Coef_1D (index) + Coef_Updates_1D (index));
+            end loop;
+            Coef_Updates_2D.Append (Coef_Updates_1D);
          end loop;
-         Params.Coeff_Params (index) := Coef_Updates_1D;
+         Params.Coeff_Params (layer) := Coef_Updates_2D;
       end loop;
 
-      for p in Updates.Intercept_Params.First_Index ..
+      for layer in Updates.Intercept_Params.First_Index ..
         Updates.Intercept_Params.Last_Index loop
-         Params.Intercept_Params (p) :=
-           Params.Intercept_Params (p) + Updates.Intercept_Params (p);
+         Intercept_1D := Params.Intercept_Params (layer);
+         Intercept_Updates.Clear;
+         for index in Intercept_1D.First_Index .. Intercept_1D.Last_Index loop
+            Intercept_Updates.Append (Intercept_1D (index) + Intercept_Updates (index));
+         end loop;
+         Params.Intercept_Params (layer) := Intercept_Updates;
       end loop;
 
    end Update_Params;
