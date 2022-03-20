@@ -467,6 +467,7 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_Adam);
                begin
+                  Put_Line (Routine_Name & "Adam");
                   Stochastic_Optimizers.C_Init
                     (Optimizer.Adam, Coeff_Params => Coeff_Params,
                      Intercept_Params => Intercept_Params,
@@ -479,6 +480,7 @@ package body Multilayer_Perceptron is
                end;
 
             when Lbfgs_Solver =>
+               Put_Line (Routine_Name & "Lbfgs");
                declare
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
@@ -496,6 +498,7 @@ package body Multilayer_Perceptron is
                end;
 
             when Sgd_Solver =>
+               Put_Line (Routine_Name & "SGD");
                declare
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
@@ -544,10 +547,12 @@ package body Multilayer_Perceptron is
 
       --        Max_Sample_Index := Num_Samples;
       --  L628
+      Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
       for iter in 1 .. Self.Parameters.Max_Iter loop
          Accumulated_Loss := 0.0;
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
-         Put_Line (Routine_Name & "batches generated");
+         Put_Line (Routine_Name & "Batches size: " &
+                     Integer'Image (Integer (Batches.Length)));
          Activations.Clear;
          --           Sample_Index := 1;
          --        while Sample_Index <= Max_Sample_Index loop
