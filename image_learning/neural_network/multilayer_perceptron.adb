@@ -686,6 +686,7 @@ package body Multilayer_Perceptron is
       Init_Bound := Sqrt (Factor / Float (Fan_In + Fan_Out));
       --  Generate weights and bias
       Coef_Init.Clear;
+      Intercept_Init.Clear;
       for f_in in 1 .. Fan_In loop
          Coef_Init_1.Clear;
          for f_out in 1 .. Fan_Out loop
