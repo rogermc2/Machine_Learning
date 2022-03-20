@@ -488,7 +488,21 @@ package body Multilayer_Perceptron is
                   Self.Attributes.Optimizer := Optimizer;
                end;
 
-            when Sgd_Solver => null;
+            when Sgd_Solver =>
+               declare
+                  Optimizer : Optimizer_Record (Optimizer_SGD);
+               begin
+                  Stochastic_Optimizers.C_Init
+                    (Optimizer.SGD, Coeff_Params => Coeff_Params,
+                     Intercept_Params => Intercept_Params,
+                     Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
+                     Learning_Rate => Self.Parameters.Learning_Rate,
+                     Momentum => Self.Parameters.Momentum,
+                     Use_Nesterov => Self.Parameters.Nesterovs_Momentum,
+                     Power_T => Self.Parameters.Power_T);
+
+                  Self.Attributes.Optimizer := Optimizer;
+               end;
          end case;
       end if;
 
