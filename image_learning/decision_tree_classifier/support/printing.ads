@@ -43,6 +43,7 @@ package Printing is
     procedure Print_Natural_Lists_2D (Name : String;
                                       Data : Natural_Lists_2D);
     procedure Print_Float_Lists_2D (Name : String; Data : Float_List_2D);
+    procedure Print_Float_Lists_3D (Name : String; Data : Float_List_3D);
     procedure Print_Multi_Value_Array (Name    : String;
                                        anArray : Multi_Value_Array);
     procedure Print_Value_Lists_2D

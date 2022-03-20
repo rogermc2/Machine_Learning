@@ -360,6 +360,19 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Float_Lists_3D (Name : String;
+                                   Data : Float_List_3D) is
+   begin
+      Put_Line (Name & ": ");
+      for index in Data.First_Index .. Data.Last_Index loop
+         Print_Float_Lists_2D ("2D list:", Data.Element (index));
+      end loop;
+      New_Line;
+
+   end Print_Float_Lists_3D;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Natural_Lists_2D (Name : String; Data : Natural_Lists_2D) is
    begin
       Put_Line (Name & ": ");

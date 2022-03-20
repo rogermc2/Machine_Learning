@@ -47,6 +47,7 @@ with Data_Splitter;
 with Encode_Utils;
 with Label;
 with Neural_Maths;
+with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -309,7 +310,7 @@ package body Multilayer_Perceptron is
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
       Activations               : Float_List_2D := X;
-      Y_2D                      : Integer_List_2D;
+--        Y_2D                      : Integer_List_2D;
       Hidden_Layer_Sizes        : Integer_List :=
                                     Self.Parameters.Hidden_Layer_Sizes;
       Hidden_Layer_Sizes_Length : Count_Type := Hidden_Layer_Sizes.Length;
@@ -324,13 +325,17 @@ package body Multilayer_Perceptron is
       First_Pass :=
         Self.Attributes.Neuron_Coef_Layers.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
-      Y_2D.Append (Y);
+--        Y_2D.Append (Y);
 
-      Layer_Units.Set_Length (Count_Type (Num_Features));
-      for index in Hidden_Layer_Sizes.First_Index ..
-        Hidden_Layer_Sizes.Last_Index loop
-         Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
-      end loop;
+      --  L404 layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
+      Layer_Units.Append (Num_Features);
+      if Hidden_Layer_Sizes.Length > 0 then
+         for index in Hidden_Layer_Sizes.First_Index ..
+           Hidden_Layer_Sizes.Last_Index loop
+            Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
+         end loop;
+      end if;
+      Layer_Units.Append (1);
 
       Validate_Input (Self, Y);
 
@@ -453,6 +458,8 @@ package body Multilayer_Perceptron is
       Parameters        : Parameters_Record;
       Grads             : Parameters_Record;
    begin
+      Printing.Print_Float_Lists_2D (Routine_Name &
+                                       "Intercept Params", Intercept_Params);
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
@@ -658,7 +665,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   --  L320  BaseMultilayerPerceptron._Initialize
+   --  L360  BaseMultilayerPerceptron._init_coef
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
                          Coef_Init       : out IL_Types.Float_List_2D;
@@ -749,7 +756,7 @@ package body Multilayer_Perceptron is
                          Layer_Units : IL_Types.Integer_List) is
       use IL_Types;
       use Base_Neural;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Initialize ";
+      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
       Intercept_Init : Float_List;
    begin
@@ -760,7 +767,15 @@ package body Multilayer_Perceptron is
       Self.Attributes.Neuron_Coef_Layers.Clear;
       Self.Attributes.Intercepts.Clear;
 
+      --  L344
+      Put_Line (Routine_Name & "N_Layers" &
+                  Integer'Image (Self.Attributes.N_Layers));
       for index in 1 .. Self.Attributes.N_Layers - 1 loop
+         Put_Line (Routine_Name & "index" & Integer'Image (index));
+         Put_Line (Routine_Name & "Layer_Units (index)" &
+                     Integer'Image (Layer_Units.Element (index)));
+         Put_Line (Routine_Name & "Layer_Units (index + 1)" &
+                     Integer'Image (Layer_Units.Element (index + 1)));
          Init_Coeff
            (Self, Layer_Units.Element (index), Layer_Units.Element (index + 1),
             Coef_Init, Intercept_Init);
