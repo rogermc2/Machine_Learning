@@ -3,6 +3,7 @@ with Ada.Containers.Vectors;
 
 with IL_Types;
 with Base_Neural;
+with Estimator;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
@@ -58,7 +59,6 @@ package Multilayer_Perceptron is
       Hidden_Layer_Sizes    : IL_Types.Integer_List;
       Activation            : Base_Neural.Activation_Type :=
                                 Base_Neural.Relu_Activation;
-      Is_Classifier         : Boolean := True;
       Solver                : Solver_Type := Adam_Solver;
       Alpha                 : Float := 0.0001;
       Batch_Size            : Natural := 0;  --  0 -> "auto"
@@ -86,8 +86,10 @@ package Multilayer_Perceptron is
    end record;
 
    type MLP_Classifier is record
-      Attributes : MLP_Classifier_Attributes;
-      Parameters : MLP_Classifier_Parameters;
+      Estimator_Kind : Estimator.Estimator_Type :=
+                         Estimator.Classifier_Estimator;
+      Attributes     : MLP_Classifier_Attributes;
+      Parameters     : MLP_Classifier_Parameters;
    end record;
 
    function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=

@@ -7,31 +7,34 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Binary_Log_Loss (Y_True : Integer_List; Y_Prob : Float_List)
+   function Binary_Log_Loss (Y_True : Integer_List_2D; Y_Prob : Float_List_2D)
                              return Float is
       use Maths.Float_Math_Functions;
       use Float_Package;
       Y_P      : Float_List;
-      Y_T      : Float_List;
+      Y_T      : Integer_List;
+      YP_Float : Float_List;
       YT_Float : Float_List;
-      YT_Int   : Integer;
       X_Log_Y1 : Float_List;
       X_Log_Y2 : Float_List;
       Sum1     : Float := 0.0;
       Sum2     : Float := 0.0;
    begin
-      Check_Lengths ("Base.Log_Loss", Y_True, Y_Prob);
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         Y_P.Append (1.0 - Y_Prob (index));
-         YT_Int := Y_True (index);
-         Y_T.Append (Float (1 - YT_Int));
-         YT_Float.Append (Float (YT_Int));
+         Y_P := Y_Prob (index);
+         Y_P.Replace_Element (1, 1.0 - Y_P (1));
+         YP_Float.Append (Float (Y_P.Element (1)));
+         Y_T := Y_True (index);
+         Y_T.Replace_Element (1, 1 - Y_T (1));
+         YT_Float.Append (Float (Y_T.Element (1)));
       end loop;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         X_Log_Y1.Append (YT_Float (index) * Log (Y_Prob (index)));
-         X_Log_Y2.Append (Y_T (index) * Log (Y_P (index)));
+         Y_P := Y_Prob (index);
+         Y_T := Y_True (index);
+         X_Log_Y1.Append (YT_Float (index) * Log (Y_P (1)));
+         X_Log_Y2.Append (Float (Y_T.Element (1)) * Log (YP_Float (index)));
       end loop;
 
       for index in X_Log_Y1.First_Index .. X_Log_Y1.Last_Index loop
@@ -95,31 +98,34 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
    --  Log Loss is the negative average of the log of corrected predicted
    --  probabilities for each instance.
-   function Log_Loss (Y_True : Integer_List; Y_Prob : Float_List)
+   function Log_Loss (Y_True : Integer_List_2D; Y_Prob : Float_List_2D)
                       return Float is
       use Maths.Float_Math_Functions;
       use Float_Package;
       Y_P      : Float_List;
-      Y_T      : Float_List;
+      Y_T      : Integer_List;
+      YP_Float : Float_List;
       YT_Float : Float_List;
-      YT_Int   : Integer;
       X_Log_Y  : Float_List;
       Result   : Float := 0.0;
    begin
-      Check_Lengths ("Base_Neural.Log_Loss", Y_True, Y_Prob);
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         Y_P.Append (1.0 - Y_Prob (index));
-         YT_Int := Y_True (index);
-         Y_T.Append (Float (1 - YT_Int));
-         YT_Float.Append (Float (YT_Int));
+         Y_P := Y_Prob (index);
+         Y_P.Replace_Element (1, 1.0 - Y_P (1));
+         YP_Float.Append (Float (Y_P.Element (1)));
+         Y_T := Y_True (index);
+         Y_T.Replace_Element (1, 1 - Y_T (1));
+         YT_Float.Append (Float (Y_T.Element (1)));
       end loop;
 
-      Y_P := Y_P & Y_Prob;
-      Y_T := Y_T & YT_Float;
+      for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
+         YP_Float := YP_Float & Y_Prob (index).Element (1);
+         YT_Float := YT_Float & Float (Y_True.Element (index).Element (1));
+      end loop;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         X_Log_Y.Append (-YT_Float (index) * Log (Y_Prob (index)));
+         X_Log_Y.Append (-YT_Float (index) * Log (Y_Prob (index).Element (1)));
       end loop;
 
       for index in X_Log_Y.First_Index .. X_Log_Y.Last_Index loop
@@ -173,7 +179,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Squared_Error (Y_True : Integer_List; Y_Pred : Float_List)
+   function Squared_Error (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
                            return Float is
       YT_Int   : Integer;
       YT_Float : Float_List;

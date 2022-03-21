@@ -1,8 +1,11 @@
 
+--  Based on scikit-learn/sklearn/utils/__init__.py
+
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 package body Utils is
 
+   --  L695
    function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
                          Min_Batch_Size : Natural := 0)
                          return IL_Types.Integer_List_2D is
