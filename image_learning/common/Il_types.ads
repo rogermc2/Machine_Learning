@@ -9,6 +9,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 package IL_Types is
 
    Max_Features : constant Integer := 100;
+
    type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
    pragma Ordered (Data_Type);
 
@@ -67,6 +68,7 @@ package IL_Types is
    package Integer_Package_2D is new
      Ada.Containers.Vectors (Positive, Integer_List);
    subtype Integer_List_2D is Integer_Package_2D.Vector;
+   function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
 
    package Integer_DLL_Package is new
      Ada.Containers.Doubly_Linked_Lists (Integer);

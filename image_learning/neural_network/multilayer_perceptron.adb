@@ -454,9 +454,9 @@ package body Multilayer_Perceptron is
       Stratify           : Integer_List_2D;
       Should_Stratify    : Boolean;
       Train_X            : Float_List_2D;
-      Train_Y            : Integer_List;
+      Train_Y            : Integer_List_2D;
       Test_X             : Float_List_2D;
-      Test_Y             : Integer_List;
+      Test_Y             : Integer_List_2D;
       Batch_Size         : Positive;
       Sample_Index       : Positive;
       Max_Sample_Index   : Positive;
@@ -537,7 +537,7 @@ package body Multilayer_Perceptron is
             Stratify := Y;
          end if;
 
-         Data_Splitter.Train_Test_Split
+         Data_Splitter2.Train_Test_Split
            (X => X, Y => Y,
             Train_Size => Train_Size, Test_Size  => Test_Size,
             Train_X => Train_X, Train_Y => Train_Y,

@@ -35,6 +35,8 @@ package Label is
                                Labels : Natural_List) return Integer_List;
    function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_List)
                                return Integer_List;
+   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_List_2D)
+                               return Integer_List_2D;
    function Transform (Self : in out Label_Encoder; Y : Integer_List)
                        return Natural_List;
 

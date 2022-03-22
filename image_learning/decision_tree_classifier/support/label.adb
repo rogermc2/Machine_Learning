@@ -122,6 +122,40 @@ package body Label is
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
+
+   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_List_2D)
+                               return Integer_List_2D is
+      YT        : constant Integer_List_2D := Transpose (Y);
+      aRange    : Natural_List;
+      Diff      : Natural_List;
+      Y_List    : Integer_List;
+      Transform : Integer_List;
+      Result    : Integer_List_2D;
+   begin
+      if not Y.Is_Empty then
+         for index in 1 .. Positive (Self.Classes.Length) loop
+            aRange.Append (index);
+         end loop;
+
+         for index in YT.First_Index .. YT.Last_Index loop
+            Y_List := YT (index);
+            Diff := Classifier_Utilities.Set_Diff (Y_List, aRange);
+            Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
+
+            Transform.Clear;
+            for index in 1 .. Positive (Y_List.Length) loop
+               Transform.Append (Self.Classes.Element (Y_List.Element (index)));
+            end loop;
+            Result.Append (Transform);
+         end loop;
+      end if;
+
+      return Transpose (Result);
+
+   end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
    --  Transform returns labels as normalized encodings
    function Transform (Self : in out Label_Encoder; Y : Integer_List)
                         return Natural_List is
