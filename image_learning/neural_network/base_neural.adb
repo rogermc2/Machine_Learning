@@ -179,14 +179,12 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Squared_Error (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
-                           return Float_List is
+   function Squared_Loss (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
+                           return Float is
       Y_P      : Float_List;
-      Y_T      : Integer_List;
       YT_Int   : Integer;
       YT_Float : Float_List;
       YP_Float : Float_List;
-      Mean     : Float_List;
    begin
       for index in Y_Pred.First_Index .. Y_Pred.Last_Index loop
          YT_Int := Y_True (index).Element (1);
@@ -196,14 +194,9 @@ package body Base_Neural is
          YP_Float.Append (Y_P.Element (1));
       end loop;
 
---        for index in Y_Pred.First_Index .. Y_Pred.Last_Index loop
-            Mean :=
-            Neural_Maths.Mean ((YT_Float.Element - YP_Float.Element) / 2.0;
---        end loop;
+      return Neural_Maths.Mean ((YT_Float - YP_Float)) / 2.0;
 
-      return Mean;
-
-   end Squared_Error;
+   end Squared_Loss;
 
    --  -------------------------------------------------------------------------
 

@@ -36,8 +36,8 @@ package Base_Neural is
    pragma Inline (Relu_Derivative);
    function Softmax (Activation : Float_List) return Float_List;
    pragma Inline (Softmax);
-   function Squared_Error (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
-                           return Float_List;
-   pragma Inline (Squared_Error);
+   function Squared_Loss (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
+                           return Float;
+   pragma Inline (Squared_Loss);
 
 end Base_Neural;
