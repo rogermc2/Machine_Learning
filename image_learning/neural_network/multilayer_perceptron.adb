@@ -43,7 +43,7 @@ with Utilities;
 
 with Base_Mix;
 with Classifier_Utilities;
-with Data_Splitter;
+with Data_Splitter2;
 with Encode_Utils;
 with Label;
 with Neural_Maths;
