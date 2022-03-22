@@ -37,7 +37,7 @@ package Base_Neural is
    function Softmax (Activation : Float_List) return Float_List;
    pragma Inline (Softmax);
    function Squared_Error (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
-                           return Float;
+                           return Float_List;
    pragma Inline (Squared_Error);
 
 end Base_Neural;
