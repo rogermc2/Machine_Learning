@@ -105,13 +105,30 @@ package body Neural_Maths is
 
    --  -------------------------------------------------------------------------
 
-   function Mean (A : Float_List) return Float is
-      Result : Float := 0.0;
+   function Mean (A : Float_List_2D; Axis : Positive) return Float_List is
+      A_List  : Float_List;
+      A2_List : Float_List_2D;
+      Sum     : Float;
+      Length  : Float;
+      Result  : Float_List;
    begin
-      for index in A.First_Index .. A.Last_Index loop
-         Result := Result + A (index);
+      if Axis = 1 then
+         A2_List := A;
+      else
+         A2_List := Transpose (A);
+      end if;
+      Length := Float (A2_List (1).Length);
+
+      for row in A2_List.First_Index .. A2_List.Last_Index loop
+         A_List := A2_List (row);
+         Sum := 0.0;
+         for item in A_List.First_Index .. A_List.Last_Index loop
+            Sum := Sum + A_List (item);
+         end loop;
+         Result.Append (Sum / Length);
       end loop;
-      return Result / Float (A.Length);
+
+      return Result;
 
    end Mean;
 

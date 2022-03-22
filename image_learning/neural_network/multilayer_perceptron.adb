@@ -65,7 +65,7 @@ package body Multilayer_Perceptron is
       Intercept_Grads : in out IL_Types.Float_List_2D);
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
                         X               : IL_Types.Float_List_2D;
-                        Y               : IL_Types.Integer_List;
+                        Y               : IL_Types.Integer_List_2D;
                         Activations     : in out IL_Types.Float_List_3D;
                         Deltas          : in out IL_Types.Float_List_2D;
                         Coef_Grads      : in out IL_Types.Float_List_3D;
@@ -280,7 +280,7 @@ package body Multilayer_Perceptron is
       use Float_Package;
       Delta_Act  : constant Float_List_2D :=
                      Dot (Deltas (Layer), Activations (Layer));
-      Delta_Mean : constant Float := Neural_Maths.Mean (Deltas (Layer));
+      Delta_Mean : constant Float_List := Neural_Maths.Mean (Deltas (Layer), 1);
    begin
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
       Coef_Grads (Layer) :=
@@ -293,7 +293,7 @@ package body Multilayer_Perceptron is
 
       for index in Intercept_Grads (Layer).First_Index ..
         Intercept_Grads (Layer).Last_Index loop
-         Intercept_Grads (Layer) (index) := Delta_Mean;
+         Intercept_Grads (Layer) := Delta_Mean;
       end loop;
 
    end  Compute_Loss_Gradient;
@@ -376,7 +376,7 @@ package body Multilayer_Perceptron is
    --  L516
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
                         X               : IL_Types.Float_List_2D;
-                        Y               : IL_Types.Integer_List;
+                        Y               : IL_Types.Integer_List_2D;
                         Activations     : in out IL_Types.Float_List_3D;
                         Deltas          : in out IL_Types.Float_List_2D;
                         Coef_Grads      : in out IL_Types.Float_List_3D;
@@ -451,7 +451,7 @@ package body Multilayer_Perceptron is
       Test_Size          : constant Positive
         := Positive (Self.Parameters.Validation_Fraction * Float (Num_Samples));
       Train_Size         : constant Positive := Num_Samples - Test_Size;
-      Stratify           : Integer_List;
+      Stratify           : Integer_List_2D;
       Should_Stratify    : Boolean;
       Train_X            : Float_List_2D;
       Train_Y            : Integer_List;
