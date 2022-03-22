@@ -141,7 +141,7 @@ package body Multilayer_Perceptron is
          when Log_Loss_Function =>
             Loss := Log_Loss (Y, Activations.Last_Element);
          when Squared_Error_Function =>
-            Loss := Squared_Error (Y, Activations.Last_Element);
+            Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
 
       for s in Self.Attributes.Neuron_Coef_Layers.First_Index ..
