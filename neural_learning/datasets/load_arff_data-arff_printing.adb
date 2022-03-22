@@ -168,7 +168,6 @@ package body Load_ARFF_Data.ARFF_Printing is
    --  -------------------------------------------------------------------------
 
    procedure Print_Description (Data : ARFF_Record) is
-      use IL_Types;
       use Indefinite_String_Package;
       Header : constant ARFF_Header_Record := Data.Header;
       Info   : constant ARFF_Header := Header.Info;

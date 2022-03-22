@@ -11,14 +11,14 @@ package body Data_Splitter2 is
 
     procedure Iterate_Indices
       (Self                        : in out Base_Shuffle_Data;
-       Train_Indices, Test_Indices : out IL_Types.Integer_List);
+       Train_Indices, Test_Indices : out Integer_List);
 
     --  -------------------------------------------------------------------------
     --  L1569 Shuffle_Split generates indices to split data rows into training
     --  and test sets
     procedure Base_Shuffle_Split
       (Self                        : in out Base_Shuffle_Data;
-       Train_Indices, Test_Indices : out IL_Types.Integer_List) is
+       Train_Indices, Test_Indices : out Integer_List) is
     begin
         Iterate_Indices (Self, Train_Indices, Test_Indices);
 
@@ -41,7 +41,7 @@ package body Data_Splitter2 is
     --  L1706
     procedure Iterate_Indices
       (Self                        : in out Base_Shuffle_Data;
-       Train_Indices, Test_Indices : out IL_Types.Integer_List) is
+       Train_Indices, Test_Indices : out Integer_List) is
         use Integer_Package;
         --        Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
         Num_Train     : constant Natural := Self.Train_Size;

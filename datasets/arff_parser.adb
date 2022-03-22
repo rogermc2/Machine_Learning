@@ -13,29 +13,29 @@ package body ARFF_Parser is
 
    procedure Convert_Arff_Data
      (ARFF_Container : AR_Types.ARFF_Record;
-      Col_Slice_X    : IL_Types.Integer_DL_List;
-      Col_Slice_Y    : IL_Types.Integer_DL_List;
-      X              : out IL_Types.Float_List_2D;
-      Y              : out IL_Types.Integer_List);
+      Col_Slice_X    : NL_Types.Integer_DL_List;
+      Col_Slice_Y    : NL_Types.Integer_DL_List;
+      X              : out NL_Types.Float_List_2D;
+      Y              : out NL_Types.Integer_List);
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : IL_Types.Integer_DL_List) return IL_Types.Float_List_2D;
+      Include_Columns : NL_Types.Integer_DL_List) return NL_Types.Float_List_2D;
    function Split_Columns
      (Arff_Target     : AR_Types.AR_Integer_List_2D;
-      Include_Columns : IL_Types.Integer_DL_List) return IL_Types.Integer_List;
+      Include_Columns : NL_Types.Integer_DL_List) return NL_Types.Integer_List;
 
    --  ------------------------------------------------------------------------
    --  L210 _liac_arff_parser
    procedure Arff_Parser
      (ARFF_Container : AR_Types.ARFF_Record;
-      Target_Columns : IL_Types.String_List;
-      Col_Slice_X    : IL_Types.Integer_DL_List;
-      Col_Slice_Y    : IL_Types.Integer_DL_List;
-      X              : out IL_Types.Float_List_2D;
-      Y              : out IL_Types.Integer_List) is
+      Target_Columns : NL_Types.String_List;
+      Col_Slice_X    : NL_Types.Integer_DL_List;
+      Col_Slice_Y    : NL_Types.Integer_DL_List;
+      X              : out NL_Types.Float_List_2D;
+      Y              : out NL_Types.Integer_List) is
       use Ada.Containers;
       use AR_Types;
-      use IL_Types;
+      use NL_Types;
       use Nominal_Data_Package;
       use String_Package;
       Routine_Name      : constant String := "ARFF_Parser.Convert_Arff_Data ";
@@ -94,10 +94,10 @@ package body ARFF_Parser is
    --  L151
    procedure Convert_Arff_Data
      (ARFF_Container : AR_Types.ARFF_Record;
-      Col_Slice_X    : IL_Types.Integer_DL_List;
-      Col_Slice_Y    : IL_Types.Integer_DL_List;
-      X              : out IL_Types.Float_List_2D;
-      Y              : out IL_Types.Integer_List) is
+      Col_Slice_X    : NL_Types.Integer_DL_List;
+      Col_Slice_Y    : NL_Types.Integer_DL_List;
+      X              : out NL_Types.Float_List_2D;
+      Y              : out NL_Types.Integer_List) is
       Routine_Name    : constant String := "ARFF_Parser.Convert_Arff_Data ";
    begin
       X := Split_Columns (ARFF_Container.Data, Col_Slice_X);
@@ -134,10 +134,10 @@ package body ARFF_Parser is
 
    function Parse_Nominal_Data
      (Arff_Data       : AR_Types.ARFF_Record;
-      Include_Columns : IL_Types.String_List)
+      Include_Columns : NL_Types.String_List)
       return AR_Types.Nominal_Data_List is
       use AR_Types;
-      use IL_Types;
+      use NL_Types;
       use String_Package;
       use Load_ARFF_Data;
       use Nominal_Data_Package;
@@ -179,9 +179,9 @@ package body ARFF_Parser is
    --  L18
    function Split_Columns
      (Arff_Data       : AR_Types.AR_Real_List_2D;
-      Include_Columns : IL_Types.Integer_DL_List)
-      return IL_Types.Float_List_2D is
-      use IL_Types;
+      Include_Columns : NL_Types.Integer_DL_List)
+      return NL_Types.Float_List_2D is
+      use NL_Types;
       use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New      : Float_List_2D;
@@ -208,9 +208,9 @@ package body ARFF_Parser is
    --  L18
    function Split_Columns
      (Arff_Target     : AR_Types.AR_Integer_List_2D;
-      Include_Columns : IL_Types.Integer_DL_List)
-      return IL_Types.Integer_List is
-      use IL_Types;
+      Include_Columns : NL_Types.Integer_DL_List)
+      return NL_Types.Integer_List is
+      use NL_Types;
       use Integer_DLL_Package;
       --        Routine_Name  : constant String := "Openml_Ada.Split_Columns ";
       Data_New        : Integer_List;

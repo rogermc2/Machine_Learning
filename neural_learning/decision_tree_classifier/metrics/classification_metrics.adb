@@ -5,7 +5,7 @@ with Ada.Assertions; use Ada.Assertions;
 package body Classification_Metrics is
 
    function Weighted_Sum
-     (Sample_Score   : IL_Types.Value_Data_Lists_2D;
+     (Sample_Score   : NL_Types.Value_Data_Lists_2D;
       Sample_Weights : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
       Normalize      : Boolean := False) return float;
@@ -13,12 +13,12 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Accuracy_Score
-     (Y_True, Y_Prediction : IL_Types.Value_Data_Lists_2D;
+     (Y_True, Y_Prediction : NL_Types.Value_Data_Lists_2D;
       Normalize            : Boolean := True;
       Sample_Weight        : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector)
        return float is
-      use IL_Types;
+      use NL_Types;
       Routine_Name : constant String :=
                        "Classification_Metrics.Accuracy_Score, ";
       Score        : Value_Data_Lists_2D;
@@ -39,9 +39,9 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Average (Weight     : Classifier_Types.Float_List;
-                     Boolean_2D : IL_Types.Value_Data_Lists_2D)
+                     Boolean_2D : NL_Types.Value_Data_Lists_2D)
                       return Float is
-      use IL_Types;
+      use NL_Types;
       Weights     : Classifier_Types.Float_List := Weight;
       Values      : Value_Data_List;
       Value       : Value_Record;
@@ -75,8 +75,8 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   function Sum (Sample_Score : IL_Types.Value_Data_Lists_2D) return float is
-      use IL_Types;
+   function Sum (Sample_Score : NL_Types.Value_Data_Lists_2D) return float is
+      use NL_Types;
       Values : Value_Data_List;
       Value  : Value_Record;
       Result : Float := 0.0;
@@ -106,7 +106,7 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Weighted_Sum
-     (Sample_Score   : IL_Types.Value_Data_Lists_2D;
+     (Sample_Score   : NL_Types.Value_Data_Lists_2D;
       Sample_Weights : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
       Normalize      : Boolean := False) return float is

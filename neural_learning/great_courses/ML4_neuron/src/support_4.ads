@@ -1,6 +1,6 @@
 
 with Base_Decision_Tree;
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 with Openml_Ada;
 
 package Support_4 is

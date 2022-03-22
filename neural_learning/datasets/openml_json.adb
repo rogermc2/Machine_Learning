@@ -1125,9 +1125,9 @@ package body Openml_Json is
     --  If the passed iterators have different lengths then the iterator with
     --  the least number of items decides the length of the new iterator.
 
-    --     function Zip (List_1, List_2, List_3 : IL_Types.String_Vector)
+    --     function Zip (List_1, List_2, List_3 : NL_Types.String_Vector)
     --                   return Zip_Vector is
-    --        use IL_Types;
+    --        use NL_Types;
     --        Zip_Length : Positive := Positive (List_1.Length);
     --        Tuple      : Tupple_Vector;
     --        Result     : Zip_Vector;

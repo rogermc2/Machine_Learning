@@ -7,7 +7,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
-with IL_Types;
+with NL_Types;
 --  with Printing;
 with Weights;
 
@@ -98,7 +98,7 @@ package body Node_Strings is
      (Exporter    : Graphviz_Exporter.DOT_Tree_Exporter;
       Node_Data   : Tree.Tree_Node;
       Node_String : in out Unbounded_String) is
-      use IL_Types;
+      use NL_Types;
       use String_Vector_Package;
       --        Routine_Name     : constant String :=
       --                             "Node_Strings.Write_Decision_Criteria ";
@@ -154,13 +154,13 @@ package body Node_Strings is
       Node_ID     : Positive; Show_Labels : Boolean;
       Node_String : in out Unbounded_String) is
       use Ada.Containers;
-      use IL_Types;
+      use NL_Types;
       use Tree;
       use Tree.Nodes_Package;
       Routine_Name    : constant String :=
                           "Node_Strings.Write_Node_Class_Value ";
       Node_Data       : constant Tree.Tree_Node := Element (Node_Curs);
-      Classes         : constant IL_Types.Integer_List :=
+      Classes         : constant NL_Types.Integer_List :=
                           Exporter.theTree.Classes;
       Class_Value     : Float;
       Value_First     : Boolean := True;

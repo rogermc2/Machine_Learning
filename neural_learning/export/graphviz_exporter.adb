@@ -17,7 +17,7 @@ with Weights;
 package body Graphviz_Exporter is
 
 --     function Get_Impurities (Exporter : DOT_Tree_Exporter)
---                              return IL_Types.Float_List;
+--                              return Float_List;
    procedure Head (Exporter    : DOT_Tree_Exporter;
                    Output_File : File_Type);
    procedure Recurse (Exporter    : in out DOT_Tree_Exporter;
@@ -305,7 +305,7 @@ package body Graphviz_Exporter is
         := Float (Element (Node_Curs).Weighted_Num_Node_Samples);
       Class_Values     : Weight_List;
       Class            : Float;
---        Impurities       : IL_Types.Float_List;
+--        Impurities       : Float_List;
    begin
       if Exporter.Colours.Is_Empty then
          --  L251
@@ -356,9 +356,9 @@ package body Graphviz_Exporter is
    --  -------------------------------------------------------------------------
 
 --     function Get_Impurities (Exporter : DOT_Tree_Exporter)
---                              return IL_Types.Float_List is
+--                              return Float_List is
 --        use Tree.Nodes_Package;
---        Impurities : IL_Types.Float_List;
+--        Impurities : Float_List;
 --
 --        procedure Add_Impurity (Node_Curs : Tree.Tree_Cursor) is
 --        begin

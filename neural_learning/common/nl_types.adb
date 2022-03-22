@@ -633,7 +633,7 @@ package body NL_Types is
    procedure Check_Length (Routine_Name : String; L, R : Value_Data_List) is
       use Ada.Containers;
    begin
-      Assert (R.Length = L.Length, "IL_Types." & Routine_Name &
+      Assert (R.Length = L.Length, "NL_Types." & Routine_Name &
                 " right length" & Count_Type'Image (R.Length) &
                 " should be the same as left length" &
                 Count_Type'Image (L.Length));
@@ -646,7 +646,7 @@ package body NL_Types is
       use Ada.Containers;
    begin
       Assert (R.Length = L.Length and then
-              R.Element (1).Length = L.Element (1).Length, "IL_Types."
+              R.Element (1).Length = L.Element (1).Length, "NL_Types."
               & Routine_Name &
                 " right lengths (" & Count_Type'Image (R.Length) & ", " &
                 Count_Type'Image (R.Element (1).Length) &

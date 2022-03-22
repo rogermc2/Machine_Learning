@@ -6,15 +6,15 @@ with Maths;
 
 package body Regression_Metrics is
 
-   procedure Square (Values : in out IL_Types.Value_Data_List);
+   procedure Square (Values : in out NL_Types.Value_Data_List);
 
    --  ------------------------------------------------------------------------
 
    function Average (Weight               : Classifier_Types.Float_List;
-                     Y_True, Y_Prediction : IL_Types.Value_Data_Lists_2D)
+                     Y_True, Y_Prediction : NL_Types.Value_Data_Lists_2D)
                      return Float is
-      use IL_Types;
-      Diff        : constant IL_Types.Value_Data_Lists_2D :=
+      use NL_Types;
+      Diff        : constant NL_Types.Value_Data_Lists_2D :=
                       Y_Prediction - Y_True;
       Weights     : Classifier_Types.Float_List := Weight;
       Values      : Value_Data_List;
@@ -52,14 +52,14 @@ package body Regression_Metrics is
    --  uniform_average returns errors of all outputs averaged
    --  with uniform weight.
    function Mean_Squared_Error
-     (Y_True, Y_Prediction : IL_Types.Value_Data_Lists_2D;
+     (Y_True, Y_Prediction : NL_Types.Value_Data_Lists_2D;
       Sample_Weight        : Weights.Weight_List :=
         Classifier_Types.Float_Package.Empty_Vector;
       Multioutput          : Multioutput_Type := MO_Uniform_Average;
       Squared              : Boolean := True)
       return Classifier_Types.Float_List is
       use Maths.Float_Math_Functions;
-      use IL_Types;
+      use NL_Types;
       Routine_Name  : constant String :=
                         "Regression_Metrics.Mean_Squared_Error, ";
       Output_Errors : Float;
@@ -88,8 +88,8 @@ package body Regression_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   procedure Square (Values : in out IL_Types.Value_Data_List) is
-      use IL_Types;
+   procedure Square (Values : in out NL_Types.Value_Data_List) is
+      use NL_Types;
       Value  : Value_Record;
    begin
       for index in Values.First_Index .. Values.Last_Index loop

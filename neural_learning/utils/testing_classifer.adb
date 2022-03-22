@@ -3,7 +3,7 @@
 package body Testing_Classifer is
 
    procedure Predict (Self : Tree.Tree_Class;
-                      X    : IL_Types.Value_Data_Lists_2D) is
+                      X    : NL_Types.Value_Data_Lists_2D) is
    begin
       null;
    end Predict;
