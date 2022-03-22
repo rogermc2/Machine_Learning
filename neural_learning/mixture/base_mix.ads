@@ -1,5 +1,6 @@
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
+
 package Base_Mix is
 
     type Probability_Type is (Bayesian_Prob, Gaussian_Prob);

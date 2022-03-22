@@ -1,7 +1,7 @@
 
 --  Based on scikit-learn/sklearn/tree _splitter.pxd class Splitter
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 with Criterion;
 with Tree;
 with Weights;

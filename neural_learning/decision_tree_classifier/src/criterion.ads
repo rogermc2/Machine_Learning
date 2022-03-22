@@ -1,6 +1,5 @@
 
-with IL_Types; use IL_Types;
---  with Tree;
+with NL_Types; use NL_Types;
 with Weights;
 
 package Criterion is
@@ -14,7 +13,7 @@ package Criterion is
       Y                         : Natural_List;
       --  Sample_Weight contains the weight of each sample
       Sample_Weight             : Weights.Weight_List;
-      Samples                   : IL_Types.Float_List_2D;
+      Samples                   : Float_List_2D;
       Start_Row                 : Natural := 0;
       Stop_Row                  : Natural := 0;
       Split_Row                 : Natural := 0;

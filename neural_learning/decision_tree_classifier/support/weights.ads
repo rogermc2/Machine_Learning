@@ -3,7 +3,7 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 with Classifier_Types;
 
 package Weights is

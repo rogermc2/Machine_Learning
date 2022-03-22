@@ -322,13 +322,13 @@ package body Openml_Json is
                            --                            Features_File_Name : String := "";
                            Data_Id            : in out Integer;
                            --                            Target_Column      : String := "default-target";
-                           Target_Column      : IL_Types.String_List;
+                           Target_Column      : String_List;
                            Return_X_Y         : Boolean := False;
                            As_Frame           : in out Unbounded_String)
                            return Bunch_Data is
         use Ada.Strings;
         use Dataset_Utilities;
-        use IL_Types.String_Package;
+        use String_Package;
         Routine_Name    : constant String := "Openml.Fetch_Openml ";
         Dataset_Name_LC : constant String := To_Lower_Case (Dataset_Name);
         JSON_Data_Set   : JSON_Value;
@@ -726,7 +726,7 @@ package body Openml_Json is
       (File_Name : String; Return_Type : ARFF_Json.ARFF_Return_Type)
        return JSON_Value is
         File_ID  : File_Type;
-        Data     : IL_Types.String_List;
+        Data     : String_List;
         Count    : Natural := 0;
     begin
         --        Put_Line ("Openml.Load_Arff_From_File");
@@ -989,9 +989,7 @@ package body Openml_Json is
 
     --  ------------------------------------------------------------------------
 
-    function J_Array_To_String_List (J_Array : JSON_Array)
-                                     return IL_Types.String_List is
-        use IL_Types;
+    function J_Array_To_String_List (J_Array : JSON_Array) return String_List is
         --        Routine_Name  : constant String := "Openml.J_Array_To_String_List ";
         theList       : String_List;
         Index         : Positive := Array_First (J_Array);

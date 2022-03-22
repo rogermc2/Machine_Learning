@@ -5,7 +5,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with GNATCOLL.JSON;
 with GNATCOLL.Strings;
 
-with IL_Types;
+with NL_Types; use NL_Types;
 
 package Dataset_Utilities is
 
@@ -20,17 +20,16 @@ package Dataset_Utilities is
    subtype Raw_Data_Vector is Raw_Data_Package.Vector;
 
    procedure CSV_Reader (CSV_File_Name : String;
-                         Data          : out IL_Types.String_List);
-   function Get_CSV_Data (CSV_Data : String) return IL_Types.Indef_String_List;
+                         Data          : out String_List);
+   function Get_CSV_Data (CSV_Data : String) return Indef_String_List;
    procedure Read_JSON_Array (File_Name : String;
                               theArray  : in out GNATCOLL.JSON.JSON_Array);
    function Split (Line : String; Sep : String) return String_Array;
    function Split (Line : String; Sep : String) return
      GNATCOLL.Strings.XString_Array;
+   function Split_String (aString, Pattern : String) return String_List;
    function Split_String (aString, Pattern : String)
-                          return IL_Types.String_List;
-   function Split_String (aString, Pattern : String)
-                          return IL_Types.Indef_String_List;
+                          return Indef_String_List;
    function To_Lower_Case (Text : String) return String;
    function To_Upper_Case (Text : String) return String;
    function To_Upper_Case (Text : Unbounded_String) return Unbounded_String;

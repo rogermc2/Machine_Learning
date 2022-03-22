@@ -3,7 +3,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
-with IL_Types;
+with NL_Types; use NL_Types;
 
 package Openml_Json is
 
@@ -36,7 +36,7 @@ package Openml_Json is
    function Fetch_Openml (Dataset_Name  : String;  Version : String := "";
                           Use_Files     : Boolean := True;
                           Data_Id       : in out Integer;
-                          Target_Column : IL_Types.String_List;
+                          Target_Column : String_List;
 --                            Target_Column : String := "default-target";
                           Return_X_Y    : Boolean := False;
                           As_Frame      : in out Unbounded_String)
@@ -54,7 +54,7 @@ package Openml_Json is
                                 Use_Files : Boolean := True)
                                 return Qualities_Map;
    function J_Array_To_String_List (J_Array : JSON_Array)
-                                    return IL_Types.String_List;
+                                    return String_List;
    function Valid_Data_Column_Names
      (Features_List, Target_Columns : JSON_Array) return JSON_Array;
 

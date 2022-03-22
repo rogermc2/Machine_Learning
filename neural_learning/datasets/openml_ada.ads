@@ -2,7 +2,7 @@
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with AR_Types;
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 
 package Openml_Ada is
 
@@ -10,8 +10,8 @@ package Openml_Ada is
     --     subtype Qualities_Map is JSON_Array;
 
    type Bunch_Data is record
-      Data          : IL_Types.Float_List_2D;
-      Target        : IL_Types.Integer_List;
+      Data          : Float_List_2D;
+      Target        : Integer_List;
       As_Frame      : As_Frame_State := As_Frame_False;
       Categories    : AR_Types.Nominal_Data_List;
       Feature_Names : String_Vector;

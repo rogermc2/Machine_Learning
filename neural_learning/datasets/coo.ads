@@ -1,5 +1,5 @@
 
-with IL_Types;
+with NL_Types;
 
 package Coo is
 
@@ -15,9 +15,9 @@ package Coo is
       Shape   : Shape_Dimensions;
       case Data_Type is
          when Coo_Data =>
-            Data           : IL_Types.Integer_List;
-            Row_Indices    :  IL_Types.Integer_List;
-            Column_Indices :  IL_Types.Integer_List;
+            Data           : NL_Types.Integer_List;
+            Row_Indices    :  NL_Types.Integer_List;
+            Column_Indices :  NL_Types.Integer_List;
          when others => null;
       end case;
    end record;

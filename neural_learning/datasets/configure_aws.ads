@@ -2,10 +2,8 @@
 --       http_req.php
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Strings.Fixed;
 with Ada.Containers.Hashed_Maps;
 with Ada.Strings.Unbounded.Hash;
-with Ada.Strings.Fixed.Hash;
 
 package Configure_AWS is
    use Ada.Strings;

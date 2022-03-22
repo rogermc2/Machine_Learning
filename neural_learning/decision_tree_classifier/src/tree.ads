@@ -9,7 +9,7 @@
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Vectors;
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 with Weights;
 
 package Tree is

@@ -1,6 +1,7 @@
 --  From https://franckbehaghel.eu/programming/ada/ada-web-server-example/
 --       http_req.php
 
+with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Characters.Latin_1;
 
@@ -37,7 +38,7 @@ package body Html_Processor is
 
    function Min (A, B : Natural) return Natural is
    begin
-      if (A < B) then
+      if A < B then
          return A;
       else
          return B;
@@ -73,10 +74,11 @@ package body Html_Processor is
       Index_Tag_Sort := Fixed.Index (S (I .. S'Last), ">");
       Index_Tag_Full := Fixed.Index (S (I .. S'Last), " ");
 
-      if (Index_Tag_Sort = 0) then
+      if Index_Tag_Sort = 0 then
          Index_Tag_Sort := S'Last;
       end if;
-      if (Index_Tag_Full = 0) then
+
+      if Index_Tag_Full = 0 then
          Index_Tag_Full := S'Last;
       end if;
 
@@ -87,16 +89,16 @@ package body Html_Processor is
 
    end Get_Tag_Name;
 
-   function Get_Full_Tag_Name (S : String; I : Natural) return Unbounded_String is
-      Full_Tag_Name : Unbounded_String;
-      Index_Tag     : Natural := 0;
-   begin
-      Index_Tag := Fixed.Index (S (I .. S'Last), ">");
-      Full_Tag_Name := To_Unbounded_String (S (I + 1 .. Index_Tag));
-
-      return Full_Tag_Name;
-
-   end Get_Full_Tag_Name;
+--     function Get_Full_Tag_Name (S : String; I : Natural) return Unbounded_String is
+--        Full_Tag_Name : Unbounded_String;
+--        Index_Tag     : Natural := 0;
+--     begin
+--        Index_Tag := Fixed.Index (S (I .. S'Last), ">");
+--        Full_Tag_Name := To_Unbounded_String (S (I + 1 .. Index_Tag));
+--
+--        return Full_Tag_Name;
+--
+--     end Get_Full_Tag_Name;
 
    function Get_End_Tag_Name (Tag : Unbounded_String) return Unbounded_String is
    begin
@@ -107,7 +109,7 @@ package body Html_Processor is
    function Is_Tag_Open (S : String; I : Natural; Tag : Unbounded_String)
                          return Boolean is
       use type Unbounded_String;
-      Index_Tag   : Natural := Fixed.Index (S (I .. S'Last), ">");
+      Index_Tag   : constant Natural := Fixed.Index (S (I .. S'Last), ">");
       Is_Tag_Open : Boolean := S (Index_Tag - 1) /= '/';
    begin
       Is_Tag_Open := Is_Tag_Open and Head (Tag, 1) /= "!";
@@ -123,7 +125,7 @@ package body Html_Processor is
 
    function Is_End_Tag (Tag : Unbounded_String) return Boolean is
       use type Unbounded_String;
-      Is_End_Tag : Boolean := Head (Tag, 1) = "/";
+      Is_End_Tag : constant Boolean := Head (Tag, 1) = "/";
    begin
       return Is_End_Tag;
 
@@ -131,7 +133,7 @@ package body Html_Processor is
 
    function Is_Script_Tag (Tag : Unbounded_String) return Boolean is
       use type Unbounded_String;
-      Is_Script_Tag : Boolean := Tag = "script" or Tag = "/script";
+      Is_Script_Tag : constant Boolean := Tag = "script" or Tag = "/script";
    begin
       return Is_Script_Tag;
 
@@ -139,7 +141,7 @@ package body Html_Processor is
 
    function Is_Comment_Tag (Tag : Unbounded_String) return Boolean is
       use type Unbounded_String;
-      Is_Comment_Tag : Boolean := Head (Tag, 3) = "!--";
+      Is_Comment_Tag : constant Boolean := Head (Tag, 3) = "!--";
    begin
       return Is_Comment_Tag;
 
@@ -148,14 +150,15 @@ package body Html_Processor is
    procedure Display_Content (S : in String; I : in Integer;
                               C : in out Parsing_Context) is
    begin
-      if ((Configuration.Contains (Script_Str) and C.Is_Inside_Script) or  (not C.Is_Inside_Script)) then
+      if (Configuration.Contains (Script_Str) and C.Is_Inside_Script) or  (not C.Is_Inside_Script) then
          if (not C.Is_Inside_Comment and (I > 2))
            and then (not Is_Empty (S (C.Last_Content_Index .. I - 1)))
          then
-            if (Configuration.Contains (Stack_Str)) then
+            if Configuration.Contains (Stack_Str) then
                Tag_Stack.Print_All (C.Stack);
             end if;
-            if (Configuration.Contains (Address_Str)) then
+
+            if Configuration.Contains (Address_Str) then
                Put (" [" & C.Last_Content_Index'Img & " .." & Natural'Image (I) & " ]");
             end if;
             Put_Line (S (C.Last_Content_Index .. I - 1));
@@ -166,16 +169,16 @@ package body Html_Processor is
    procedure Display_Tag (S : in String; I : in Integer;
                           C : in out Parsing_Context) is
    begin
-      if ((Configuration.Contains (Tag_Str) and not C.Is_Inside_Comment) or
-          (Configuration.Contains (Comment_Str) and C.Is_Inside_Comment))
+      if (Configuration.Contains (Tag_Str) and not C.Is_Inside_Comment) or
+          (Configuration.Contains (Comment_Str) and C.Is_Inside_Comment)
       then
          if ((I > 2)) and then (not Is_Empty (S (C.Last_Tag_Index .. I - 1))) then
-            if (C.Is_Inside_Comment) then
+            if C.Is_Inside_Comment then
                Put ("Comment ");
             else
                Put ("Tag ");
             end if;
-            if (Configuration.Contains (Address_Str)) then
+            if Configuration.Contains (Address_Str) then
                Put (" [" & C.Last_Tag_Index'Img & " .." & Natural'Image (I) & " ]");
             end if;
             Put_Line (S (C.Last_Tag_Index .. I - 1));
@@ -187,9 +190,8 @@ package body Html_Processor is
    procedure Process_Request_Script (S : in String; I : in Integer;
                                      C : in out Parsing_Context) is
       End_Tag_Name : Unbounded_String;
-      use type Unbounded_String;
    begin
-      if (Is_Script_Tag (C.Tag_Name) and C.Is_Endding_Tag) then
+      if Is_Script_Tag (C.Tag_Name) and C.Is_Endding_Tag then
          End_Tag_Name := Get_End_Tag_Name (C.Tag_Name);
          Tag_Stack.Pop_Until (C.Stack, End_Tag_Name);
          Display_Content (S, I, C);
@@ -202,16 +204,15 @@ package body Html_Processor is
    procedure Process_Request_All_Tag (S : in String; I : in Integer;
                                       C : in out Parsing_Context) is
       End_Tag_Name : Unbounded_String;
-      use type Unbounded_String;
    begin
       C.Is_Inside_Script := Is_Script_Tag (C.Tag_Name) and not C.Is_Endding_Tag;
-      if (C.Is_Endding_Tag) then
+      if C.Is_Endding_Tag then
 
          End_Tag_Name := Get_End_Tag_Name (C.Tag_Name);
 
          Tag_Stack.Pop_Until (C.Stack, End_Tag_Name);
       else
-         if (Is_Tag_Open (S, I, C.Tag_Name)) then
+         if Is_Tag_Open (S, I, C.Tag_Name) then
             Tag_Stack.Push (C.Stack, C.Tag_Name);
          end if;
       end if;
@@ -222,12 +223,11 @@ package body Html_Processor is
    procedure Process_Request_Internal (S : String) is
       Char : Character := ' ';
       C    : Parsing_Context (S'First);
-      use type Unbounded_String;
    begin
       for I in S'Range loop
          Char := S (I);
 
-         -- Update Comment meta info
+         --  Update Comment meta info
          if (Char = '>' and C.Is_Inside_Comment and I > 2)
            and then (S (I - 1) = '-' and S (I - 2) = '-')
          then
@@ -239,14 +239,14 @@ package body Html_Processor is
          if (Char = '<') and not C.Is_Inside_Comment then
             C.Tag_Name          := Get_Tag_Name (S, I);
             C.Is_Inside_Comment := Is_Comment_Tag (C.Tag_Name);
-            if (C.Is_Inside_Comment) then
+            if C.Is_Inside_Comment then
                C.Last_Tag_Index := I + 1;
                Display_Content (S, I, C);
             end if;
          end if;
 
-         -- Update Html meta info
-         if (Char = '>' and C.Is_Inside_Tag) then
+         --  Update Html meta info
+         if Char = '>' and C.Is_Inside_Tag then
             Display_Tag (S, I, C);
             C.Is_Inside_Tag      := False;
             C.Last_Content_Index := I + 1;
@@ -257,7 +257,7 @@ package body Html_Processor is
             C.Tag_Name       := Get_Tag_Name (S, I);
             C.Is_Endding_Tag := Is_End_Tag (C.Tag_Name);
 
-            if (C.Is_Inside_Script) then
+            if C.Is_Inside_Script then
                Process_Request_Script (S, I, C);
             else
                Display_Content (S, I, C);
@@ -269,7 +269,7 @@ package body Html_Processor is
 
       end loop;
 
-      Put_Line ("Result :");
+      Put_Line ("Result:");
       Tag_Stack.Print_All (C.Stack);
 
    end Process_Request_Internal;

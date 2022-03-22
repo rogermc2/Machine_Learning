@@ -14,7 +14,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with GNAT.Regpat;
 
 with Dataset_Utilities; use Dataset_Utilities;
-with IL_Types; use IL_Types;
 --  with Printing;
 with Regexep;
 
@@ -33,9 +32,9 @@ package body ARFF_Json is
    --      is record
    --          case Encoded is
    --              when Conversor_Unencoded =>
-   --                  Values         : IL_Types.String_List;
+   --                  Values         : String_List;
    --              when Conversor_Encoded =>
-   --                  Encoded_Values : IL_Types.String_List;
+   --                  Encoded_Values : String_List;
    --                  Zero_Value     : Unbounded_String := To_Unbounded_String ("");
    --              when Conversor_Map =>
    --                  Mapping        : Unbounded_String := To_Unbounded_String ("");
@@ -158,11 +157,11 @@ package body ARFF_Json is
    --  -------------------------------------------------------------------------
    --  L771  and, by reference, L879
    function Decode_ARFF (Decoder        : in Out Arff_Decoder;
-                         Text           : IL_Types.String_List;
+                         Text           : String_List;
                          --                           Encode_Nominal : Boolean := False;
                          Matrix_Type    : ARFF_Return_Type := Arff_Dense)
                          return JSON_Value is
-      use IL_Types.String_Package;
+      use String_Package;
       Routine_Name    : constant String := "ARFF_Json.Decode_ARFF ";
       Bad_Layout      : constant String := " layout of ARFF file is bad.";
       --        Text_Length     : constant Integer := Text'Length;
@@ -768,7 +767,7 @@ package body ARFF_Json is
 
    --  -------------------------------------------------------------------------
 
-   function Load (File_Data   : IL_Types.String_List;
+   function Load (File_Data   : String_List;
                   Return_Type : ARFF_Return_Type := Arff_Dense)
                   return JSON_Value is
       Decoder   : Arff_Decoder;

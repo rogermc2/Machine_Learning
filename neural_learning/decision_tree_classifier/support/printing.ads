@@ -5,7 +5,7 @@ with Build_Utils;
 with Classifier_Types; use Classifier_Types;
 with Criterion;
 with Estimator;
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 with Base_Decision_Tree;
 with Encode_Utils;
 with Export_Types;

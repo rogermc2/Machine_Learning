@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 
 package Base_Neural is
 

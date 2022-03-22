@@ -3,7 +3,7 @@ package body Encoders is
 
    --  -------------------------------------------------------------------------
 
-   function Encode (Values : ML_Types.Value_Data_List) return Integer_List is
+   function Encode (Values : Value_Data_List) return Integer_List is
       Codes : Integer_List;
       Code  : Natural:= 0;
    begin
@@ -16,7 +16,7 @@ package body Encoders is
 
    --  -------------------------------------------------------------------------
 
-   function Fit (Self : One_Hot_Encoder; Y : ML_Types.Value_Data_List)
+   function Fit (Self : One_Hot_Encoder; Y : Value_Data_List)
                  return One_Hot_Encoder is
       pragma Unreferenced (Self);
       theEncoder : One_Hot_Encoder;
@@ -42,8 +42,8 @@ package body Encoders is
    --  Y ignored
 --     function Fit_Transform (Self : in out One_Hot_Encoder;
 --                             X    : Sample_Matrix;  --   [n_samples, n_features]
---                             Y    : ML_Types.Value_Data_List :=
---                               ML_Types.Value_Data_Package.Empty_Vector)
+--                             Y    : Value_Data_List :=
+--                               Value_Data_Package.Empty_Vector)
 --                             return Sample_Matrix is
 --        X_Out : Sample_Matrix;
 --     begin
@@ -53,11 +53,11 @@ package body Encoders is
    --  -------------------------------------------------------------------------
 
    procedure Init (Self                 : in out One_Hot_Encoder;
-                   Categories           : ML_Types.Value_Data_List;
-                   Drop                 : ML_Types.Value_Data_List;
-                   Data_Kind            : ML_Types.Data_Type;
+                   Categories           : Value_Data_List;
+                   Drop                 : Value_Data_List;
+                   Data_Kind            : Data_Type;
                    Num_Values           : Integer_List;
-                   Categorical_Features : ML_Types.Value_Data_List;
+                   Categorical_Features : Value_Data_List;
                    Auto_Category        : Boolean := False;
                    Drop_First           : Boolean := False;
                    Num_Values_Auto      : Boolean := True;

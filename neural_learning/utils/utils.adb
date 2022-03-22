@@ -8,8 +8,7 @@ package body Utils is
    --  L695
    function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
                          Min_Batch_Size : Natural := 0)
-                         return IL_Types.Integer_List_2D is
-      use IL_Types;
+                         return Integer_List_2D is
 --        Routine_Name : constant String := "Utils.Gen_Batches ";
       Start       : Positive := 1;
       Last        : Positive;

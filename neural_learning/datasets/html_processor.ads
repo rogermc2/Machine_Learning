@@ -1,6 +1,6 @@
 --  From https://franckbehaghel.eu/programming/ada/ada-web-server-example/
 --       http_req.php
-with Ada.Strings.Fixed;
+
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Configure_AWS;

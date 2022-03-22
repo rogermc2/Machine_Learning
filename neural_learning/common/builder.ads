@@ -1,7 +1,7 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 
 package Builder is
 

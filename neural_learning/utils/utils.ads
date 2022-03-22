@@ -1,7 +1,7 @@
 
 with Ada.Containers.Formal_Ordered_Maps;
 
-with IL_Types;
+with NL_Types; use NL_Types;
 
 package Utils is
 
@@ -14,6 +14,6 @@ package Utils is
 
    function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
                          Min_Batch_Size : Natural := 0)
-                         return IL_Types.Integer_List_2D;
+                         return Integer_List_2D;
 
 end Utils;

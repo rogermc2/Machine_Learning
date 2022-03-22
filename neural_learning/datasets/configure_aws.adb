@@ -1,6 +1,7 @@
 --  From https://franckbehaghel.eu/programming/ada/ada-web-server-example/
 --       http_req.php
 
+with Ada.Strings.Fixed;
 with Ada.Text_IO;
 
 package body Configure_AWS is
@@ -9,7 +10,7 @@ package body Configure_AWS is
       Index : Natural;
    begin
       Index := Fixed.Index (S, "=");
-      if (Index = 0) then
+      if Index = 0 then
          key   := To_Unbounded_String (S);
          value := To_Unbounded_String ("");
       else

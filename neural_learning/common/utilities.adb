@@ -1012,7 +1012,7 @@ package body Utilities is
     function Split_Row_Data (Row_Data : Rows_Vector)
                          return Data_Record is
         use Rows_Package;
-        aRow           : IL_Types.Row_Data := Row_Data.First_Element;
+        aRow           : NL_Types.Row_Data := Row_Data.First_Element;
         Features_List  : Value_Data_Lists_2D;
         Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
         Label_Type     : Data_Type;

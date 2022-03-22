@@ -6,7 +6,7 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-package IL_Types is
+package NL_Types is
 
    Max_Features : constant Integer := 100;
 
@@ -327,4 +327,4 @@ package IL_Types is
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
 
-end IL_Types;
+end NL_Types;

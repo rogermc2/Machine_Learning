@@ -5,11 +5,11 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with IL_Types;
+with NL_Types;
 
 package AR_Types is
 
-   subtype ARFF_Header is IL_Types.Indef_String_List;
+   subtype ARFF_Header is NL_Types.Indef_String_List;
 
    type ARFF_Data_Type is (ARFF_Date, ARFF_Integer, ARFF_Numeric, ARFF_Nominal,
                            ARFF_Real, ARFF_String);

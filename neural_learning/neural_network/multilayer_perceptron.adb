@@ -59,59 +59,58 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : IL_Types.Float_List_3D;
-      Deltas          : IL_Types.Float_List_3D;
-      Coef_Grads      : in out IL_Types.Float_List_3D;
-      Intercept_Grads : in out IL_Types.Float_List_2D);
+      Activations     : Float_List_3D;
+      Deltas          : Float_List_3D;
+      Coef_Grads      : in out Float_List_3D;
+      Intercept_Grads : in out Float_List_2D);
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
-                        X               : IL_Types.Float_List_2D;
-                        Y               : IL_Types.Integer_List_2D;
-                        Activations     : in out IL_Types.Float_List_3D;
-                        Deltas          : in out IL_Types.Float_List_3D;
-                        Coef_Grads      : in out IL_Types.Float_List_3D;
-                        Intercept_Grads : in out IL_Types.Float_List_2D;
-                        Layer_Units     : IL_Types.Integer_List);
+                        X               : Float_List_2D;
+                        Y               : Integer_List_2D;
+                        Activations     : in out Float_List_3D;
+                        Deltas          : in out Float_List_3D;
+                        Coef_Grads      : in out Float_List_3D;
+                        Intercept_Grads : in out Float_List_2D;
+                        Layer_Units     : Integer_List);
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
-                             X               : IL_Types.Float_List_2D;
-                             Y               : IL_Types.Integer_List_2D;
-                             Activations     : in out IL_Types.Float_List_3D;
-                             Deltas          : in out IL_Types.Float_List_3D;
-                             Coef_Grads      : in out IL_Types.Float_List_3D;
-                             Intercept_Grads : in out IL_Types.Float_List_2D;
-                             Layer_Units     : IL_Types.Integer_List;
+                             X               : Float_List_2D;
+                             Y               : Integer_List_2D;
+                             Activations     : in out Float_List_3D;
+                             Deltas          : in out Float_List_3D;
+                             Coef_Grads      : in out Float_List_3D;
+                             Intercept_Grads : in out Float_List_2D;
+                             Layer_Units     : Integer_List;
                              Incremental     : Boolean := False);
    procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out IL_Types.Float_List_3D);
+                           Activations : in out Float_List_3D);
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : IL_Types.Integer_List);
+                         Layer_Units : Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
-                         Coef_Init       : out IL_Types.Float_List_2D;
-                         Intercept_Init  : out IL_Types.Float_List);
-   procedure Init_Grads (Layer_Units     : IL_Types.Integer_List;
-                         Coef_Grads      : out IL_Types.Float_List_3D;
-                         Intercept_Grads : out IL_Types.Float_List_2D);
+                         Coef_Init       : out Float_List_2D;
+                         Intercept_Init  : out Float_List);
+   procedure Init_Grads (Layer_Units     : Integer_List;
+                         Coef_Grads      : out Float_List_3D;
+                         Intercept_Grads : out Float_List_2D);
    procedure Update_No_Improvement_Count (Self           : in out MLP_Classifier;
                                           Early_Stopping : Boolean;
-                                          X_Val          : IL_Types.Float_List_2D);
+                                          X_Val          : Float_List_2D);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
-                             --                               X                  : IL_Types.Float_List_2D;
-                             Y                  : IL_Types.Integer_List);
+                             --                               X                  : Float_List_2D;
+                             Y                  : Integer_List);
    --                               Incremental, Reset : Boolean);
 
    --  -------------------------------------------------------------------------
    --  L241
    procedure Backprop (Self            : in out MLP_Classifier;
-                       X               : IL_Types.Float_List_2D;
-                       Y               : IL_Types.Integer_List_2D;
-                       Activations     : in out IL_Types.Float_List_3D;
-                       Deltas          : in out IL_Types.Float_List_3D;
+                       X               : Float_List_2D;
+                       Y               : Integer_List_2D;
+                       Activations     : in out Float_List_3D;
+                       Deltas          : in out Float_List_3D;
                        Loss            : out Float;
-                       Coef_Grads      : out IL_Types.Float_List_3D;
-                       Intercept_Grads : out IL_Types.Float_List_2D) is
+                       Coef_Grads      : out Float_List_3D;
+                       Intercept_Grads : out Float_List_2D) is
       use Base_Neural;
-      use IL_Types;
       use Float_List_Package;
       use Float_Package;
       Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
@@ -204,8 +203,8 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1054
-   function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
-                      IL_Types.Integer_Package.Empty_Vector;
+   function C_Init (Hidden_Layer_Sizes  : Integer_List :=
+                      Integer_Package.Empty_Vector;
                     Activation          : Base_Neural.Activation_Type :=
                       Base_Neural.Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
@@ -271,11 +270,10 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : IL_Types.Float_List_3D;
-      Deltas          : IL_Types.Float_List_3D;
-      Coef_Grads      : in out IL_Types.Float_List_3D;
-      Intercept_Grads : in out IL_Types.Float_List_2D) is
-      use IL_Types;
+      Activations     : Float_List_3D;
+      Deltas          : Float_List_3D;
+      Coef_Grads      : in out Float_List_3D;
+      Intercept_Grads : in out Float_List_2D) is
       use Float_List_Package;
       use Float_Package;
       Delta_Act  : constant Float_List_2D :=
@@ -301,11 +299,10 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L377  BaseMultilayerPerceptron._Fit
    procedure Fit (Self        : in out MLP_Classifier;
-                  X           : IL_Types.Float_List_2D;
-                  Y           : IL_Types.Integer_List;
+                  X           : Float_List_2D;
+                  Y           : Integer_List;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      use IL_Types;
       Routine_Name              : constant String :=
                                     "Multilayer_Perceptron.Fit ";
       --        Num_Samples               : constant Positive := Positive (X.Length);
@@ -375,14 +372,13 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L516
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
-                        X               : IL_Types.Float_List_2D;
-                        Y               : IL_Types.Integer_List_2D;
-                        Activations     : in out IL_Types.Float_List_3D;
-                        Deltas          : in out IL_Types.Float_List_3D;
-                        Coef_Grads      : in out IL_Types.Float_List_3D;
-                        Intercept_Grads : in out IL_Types.Float_List_2D;
-                        Layer_Units     : IL_Types.Integer_List) is
-      use IL_Types;
+                        X               : Float_List_2D;
+                        Y               : Integer_List_2D;
+                        Activations     : in out Float_List_3D;
+                        Deltas          : in out Float_List_3D;
+                        Coef_Grads      : in out Float_List_3D;
+                        Intercept_Grads : in out Float_List_2D;
+                        Layer_Units     : Integer_List) is
       use List_Of_Float_Lists_Package;
       Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
       Num_Samples  : constant Positive := Positive (X.Length);
@@ -420,15 +416,14 @@ package body Multilayer_Perceptron is
 
    --  L563
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
-                             X               : IL_Types.Float_List_2D;
-                             Y               : IL_Types.Integer_List_2D;
-                             Activations     : in out IL_Types.Float_List_3D;
-                             Deltas          : in out IL_Types.Float_List_3D;
-                             Coef_Grads      : in out IL_Types.Float_List_3D;
-                             Intercept_Grads : in out IL_Types.Float_List_2D;
-                             Layer_Units     : IL_Types.Integer_List;
+                             X               : Float_List_2D;
+                             Y               : Integer_List_2D;
+                             Activations     : in out Float_List_3D;
+                             Deltas          : in out Float_List_3D;
+                             Coef_Grads      : in out Float_List_3D;
+                             Intercept_Grads : in out Float_List_2D;
+                             Layer_Units     : Integer_List;
                              Incremental     : Boolean := False) is
-      use IL_Types;
       use Estimator;
       use List_Of_Float_Lists_Package;
       Routine_Name       : constant String :=
@@ -633,10 +628,9 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L119
    procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out IL_Types.Float_List_3D) is
+                           Activations : in out Float_List_3D) is
       --  The ith element of Activations holds the values of the ith layer.
       use Base_Neural;
-      use IL_Types;
       use Float_Package;
       use Float_List_Package;
       Routine_Name       : constant String :=
@@ -703,14 +697,14 @@ package body Multilayer_Perceptron is
    --  L360  BaseMultilayerPerceptron._init_coef
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
-                         Coef_Init       : out IL_Types.Float_List_2D;
-                         Intercept_Init  : out IL_Types.Float_List) is
+                         Coef_Init       : out Float_List_2D;
+                         Intercept_Init  : out Float_List) is
       use Maths;
       use Float_Math_Functions;
       use Base_Neural;
       Factor         : Float;
       Init_Bound     : Float;
-      Coef_Init_1    : IL_Types.Float_List;
+      Coef_Init_1    : Float_List;
    begin
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
@@ -738,12 +732,11 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L417
-   procedure Init_Grads (Layer_Units     : IL_Types.Integer_List;
-                         Coef_Grads      : out IL_Types.Float_List_3D;
-                         Intercept_Grads : out IL_Types.Float_List_2D) is
+   procedure Init_Grads (Layer_Units     : Integer_List;
+                         Coef_Grads      : out Float_List_3D;
+                         Intercept_Grads : out Float_List_2D) is
       use Ada.Containers;
       use Utilities;
-      use IL_Types;
       use Integer_Package;
       Fan_In_Units  : Integer_List;
       Fan_Out_Units : Integer_List;
@@ -789,8 +782,7 @@ package body Multilayer_Perceptron is
 
    --  L320  BaseMultilayerPerceptron._Initialize
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : IL_Types.Integer_List) is
-      use IL_Types;
+                         Layer_Units : Integer_List) is
       use Base_Neural;
       Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
@@ -837,7 +829,7 @@ package body Multilayer_Perceptron is
    --  L716
    procedure Update_No_Improvement_Count
      (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val : IL_Types.Float_List_2D) is
+      X_Val : Float_List_2D) is
       Score_Val : Float;
    begin
       if Early_Stopping then
@@ -862,8 +854,8 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    procedure Validate_Input (Self               : in out MLP_Classifier;
-                             --                               X                  : IL_Types.Float_List_2D;
-                             Y                  : IL_Types.Integer_List) is
+                             --                               X                  : Float_List_2D;
+                             Y                  : Integer_List) is
       --                               Incremental, Reset : Boolean) is
       --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
    begin

@@ -1,5 +1,5 @@
 
-with IL_Types; use  IL_Types;
+with NL_Types; use NL_Types;
 
 package Neural_Maths is
 

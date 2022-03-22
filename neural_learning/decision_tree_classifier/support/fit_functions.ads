@@ -2,7 +2,7 @@
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Vectors;
 
-with Classifier_Types; use Classifier_Types;
+with NL_Types; use NL_Types;
 
 package Fit_Functions is
 

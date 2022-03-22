@@ -26,7 +26,7 @@ package body Dataset_Utilities is
    --  ------------------------------------------------------------------------
 
    procedure CSV_Reader (CSV_File_Name : String;
-                         Data          : out IL_Types.String_List) is
+                         Data          : out String_List) is
       use Util.Serialize.IO.CSV;
       type CSV_Parser is new Util.Serialize.IO.CSV.Parser with null record;
 
@@ -123,8 +123,7 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Get_CSV_Data (CSV_Data : String) return IL_Types.Indef_String_List is
-      use IL_Types;
+   function Get_CSV_Data (CSV_Data : String) return Indef_String_List is
       use GNAT.Regpat;
       use Regexep;
       --        Routine_Name        : constant String := "Dataset_Utilities.Get_CSV_Data";
@@ -196,8 +195,7 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_String (aString, Pattern : String)
-                          return IL_Types.String_List is
+   function Split_String (aString, Pattern : String) return String_List is
       use Ada.Strings;
       --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Patt_Length  : constant Integer := Pattern'Length;
@@ -205,7 +203,7 @@ package body Dataset_Utilities is
       Last_Char    : constant Character := aString (Last);
       A_Index      : Integer := 1;
       B_Index      : Integer := aString'First;
-      Split_List   : IL_Types.String_List;
+      Split_List   : String_List;
    begin
       if Character'Pos (Last_Char) < 32 then
          Last := Last - 1;
@@ -229,8 +227,7 @@ package body Dataset_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Split_String (aString, Pattern : String)
-                          return IL_Types.Indef_String_List is
+   function Split_String (aString, Pattern : String) return Indef_String_List is
       use Ada.Strings;
       --        Routine_Name : constant String := "Dataset_Utilities.Split_String ";
       Patt_Length  : constant Integer := Pattern'Length;
@@ -238,7 +235,7 @@ package body Dataset_Utilities is
       Last_Char    : constant Character := aString (Last);
       A_Index      : Integer := 1;
       B_Index      : Integer := aString'First;
-      Split_List   : IL_Types.Indef_String_List;
+      Split_List   : Indef_String_List;
    begin
       if Character'Pos (Last_Char) < 32 then
          Last := Last - 1;

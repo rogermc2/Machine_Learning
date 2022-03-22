@@ -1,7 +1,7 @@
 
 with GNATCOLL.JSON; use GNATCOLL.JSON;
 
-with IL_Types;
+with NL_Types; use NL_Types;
 
 package ARFF_Json is
 
@@ -17,7 +17,7 @@ package ARFF_Json is
 --       (File_Data : String; Return_Type : ARFF_Return_Type := Arff_Dense)
 --        return JSON_Value;
    function Load
-     (File_Data : IL_Types.String_List; Return_Type : ARFF_Return_Type := Arff_Dense)
+     (File_Data : String_List; Return_Type : ARFF_Return_Type := Arff_Dense)
       return JSON_Value;
 
 end ARFF_Json;

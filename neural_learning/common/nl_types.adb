@@ -2,7 +2,7 @@
 --  with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Assertions; use Ada.Assertions;
 
-package body IL_Types is
+package body NL_Types is
 
    Precision : constant Float := 10.0 ** (-6);
 
@@ -702,4 +702,4 @@ package body IL_Types is
 
    --  -------------------------------------------------------------------------
 
-end IL_Types;
+end NL_Types;

@@ -1,7 +1,7 @@
 
 with Ada.Containers.Vectors;
 
-with IL_Types;
+with NL_Types; use NL_Types;
 with Base_Neural;
 with Estimator;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
@@ -32,21 +32,21 @@ package Multilayer_Perceptron is
    subtype Intercept_Indptr_List is Intercept_Indptr_Package.Vector;
 
    type MLP_Classifier_Attributes is record
-      Classes              : IL_Types.Integer_List;
+      Classes              : Integer_List;
       Loss_Function_Name   : Loss_Function;
       Loss                 : Float;
       Best_Loss            : Float;
-      Loss_Curve           : IL_Types.Float_List;
+      Loss_Curve           : Float_List;
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
       --  Neuron_Coef_Layers layers x rows x values
-      Neuron_Coef_Layers   : IL_Types.Float_List_3D;
+      Neuron_Coef_Layers   : Float_List_3D;
       Coef_Indptr          : Coef_Indptr_List;
       --  Intercepts: layers x values
-      Intercepts           : IL_Types.Float_List_2D;
+      Intercepts           : Float_List_2D;
       Intercept_Indptr     : Intercept_Indptr_List;
       N_Features           : Positive;
-      Feature_Names_In     : IL_Types.String_List;
+      Feature_Names_In     : String_List;
       N_Iter               : Natural;
       N_Layers             : Positive;
       N_Outputs            : Positive;
@@ -56,7 +56,7 @@ package Multilayer_Perceptron is
    end record;
 
    type MLP_Classifier_Parameters is record
-      Hidden_Layer_Sizes    : IL_Types.Integer_List;
+      Hidden_Layer_Sizes    : Integer_List;
       Activation            : Base_Neural.Activation_Type :=
                                 Base_Neural.Relu_Activation;
       Solver                : Solver_Type := Adam_Solver;
@@ -75,7 +75,7 @@ package Multilayer_Perceptron is
       Momentum              : Float := 0.9;
       Nesterovs_Momentum    : Boolean := True;
       Early_Stopping        : Boolean := False;
-      Validation_Scores     : IL_Types.Float_List;
+      Validation_Scores     : Float_List;
       Validation_Fraction   : Float := 0.1;
       Best_Validation_Score : Float := Float'Safe_First;
       Beta_1                : Float := 0.9;
@@ -92,8 +92,8 @@ package Multilayer_Perceptron is
       Parameters     : MLP_Classifier_Parameters;
    end record;
 
-   function C_Init (Hidden_Layer_Sizes  : IL_Types.Integer_List :=
-                      IL_Types.Integer_Package.Empty_Vector;
+   function C_Init (Hidden_Layer_Sizes  : Integer_List :=
+                      Integer_Package.Empty_Vector;
                     Activation          : Base_Neural.Activation_Type :=
                       Base_Neural.Relu_Activation;
                     Solver              : Solver_Type := Adam_Solver;
@@ -119,8 +119,8 @@ package Multilayer_Perceptron is
                     Max_Fun             : Natural := 15000)
                     return MLP_Classifier;
    procedure Fit (Self : in out MLP_Classifier;
-                  X    : IL_Types.Float_List_2D;
-                  Y    : IL_Types.Integer_List;
+                  X    : Float_List_2D;
+                  Y    : Integer_List;
                   Incremental : Boolean := False);
 
 end Multilayer_Perceptron;

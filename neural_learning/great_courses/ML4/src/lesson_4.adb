@@ -4,11 +4,10 @@ with Ada.Containers;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 
 with Base_Neural;
 with Data_Splitter;
---  with Load_ARFF_Data;
 with Multilayer_Perceptron;
 with Openml_Ada;
 --  with Printing;

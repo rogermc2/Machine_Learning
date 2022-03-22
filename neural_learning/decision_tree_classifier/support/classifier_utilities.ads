@@ -3,7 +3,7 @@ with PLplot_Auxiliary;
 
 with Base_Decision_Tree;
 with Classifier_Types; use Classifier_Types;
-with IL_Types; use IL_Types;
+with NL_Types; use NL_Types;
 with Tree;
 with Weights;
 
