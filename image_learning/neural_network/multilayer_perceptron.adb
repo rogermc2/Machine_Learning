@@ -59,8 +59,8 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : IL_Types.Float_List_2D;
-      Deltas          : IL_Types.Float_List_2D;
+      Activations     : IL_Types.Float_List_3D;
+      Deltas          : IL_Types.Float_List_3D;
       Coef_Grads      : in out IL_Types.Float_List_3D;
       Intercept_Grads : in out IL_Types.Float_List_2D);
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
@@ -106,7 +106,7 @@ package body Multilayer_Perceptron is
                        X               : IL_Types.Float_List_2D;
                        Y               : IL_Types.Integer_List_2D;
                        Activations     : in out IL_Types.Float_List_3D;
-                       Deltas          : in out IL_Types.Float_List_2D;
+                       Deltas          : in out IL_Types.Float_List_3D;
                        Loss            : out Float;
                        Coef_Grads      : out IL_Types.Float_List_3D;
                        Intercept_Grads : out IL_Types.Float_List_2D) is
@@ -123,7 +123,7 @@ package body Multilayer_Perceptron is
       F_I                : Positive;
       Last               : Positive;
       Activation         : Float_List_2D;
-      Diff               : Float_List;
+      Diff               : Float_List_2D;
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
    begin
@@ -170,16 +170,16 @@ package body Multilayer_Perceptron is
 
       Last := Num_Samples - 1;
       Activation := Activations.Element (Activations.Last_Index - 1);
-      Diff := Activation - Classifier_Utilities.To_Float_List (Y);
+      Diff := Activation - Classifier_Utilities.To_Float_List_2D (Y);
       Put_Line (Routine_Name & "Last" & Integer'Image (Last));
       Put_Line (Routine_Name & "Deltas Last_Index" & Integer'Image (Deltas.Last_Index));
       --        Deltas.Replace_Element (Last, Diff);
 
-      --  L303  Compute gradient for the last layer
+      --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Coef_Grads, Intercept_Grads);
 
-      --  L308, L309
+      --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Deltas (index - 1) :=
            Dot (Deltas (index),
@@ -271,8 +271,8 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : IL_Types.Float_List_2D;
-      Deltas          : IL_Types.Float_List_2D;
+      Activations     : IL_Types.Float_List_3D;
+      Deltas          : IL_Types.Float_List_3D;
       Coef_Grads      : in out IL_Types.Float_List_3D;
       Intercept_Grads : in out IL_Types.Float_List_2D) is
       use IL_Types;

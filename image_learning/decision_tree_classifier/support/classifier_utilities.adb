@@ -757,17 +757,28 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Float_List (I : Integer_List) return Float_List is
-      Value  : Integer;
       F_List : Float_List;
    begin
       for index in I.First_Index .. I.Last_Index loop
-         Value := I (index);
-         F_List.Append (Float (Value));
+         F_List.Append (Float (I.Element (index)));
       end loop;
 
       return F_List;
 
    end To_Float_List;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D is
+      F2_List : Float_List_2D;
+   begin
+      for index in I.First_Index .. I.Last_Index loop
+         F2_List.Append (To_Float_List (I (index)));
+      end loop;
+
+      return F2_List;
+
+   end To_Float_List_2D;
 
    --  -------------------------------------------------------------------------
 

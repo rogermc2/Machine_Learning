@@ -248,6 +248,34 @@ package body IL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function Dot (L, R : Float_List_2D) return Float_List_2D is
+      RT      : constant Float_List_2D := Transpose (R);
+      L_List  : Float_List;
+      RT_List : Float_List;
+      LR_List : Float_List;
+      LR      : Float;
+      Result  : Float_List_2D;
+   begin
+      for l_index in L.First_Index .. L.Last_Index loop
+         L_List := L (l_index);
+         LR := 0.0;
+         LR_List.Clear;
+         for r_index in RT.First_Index .. RT.Last_Index loop
+           RT_List := RT (r_index);
+            for index_2 in L.First_Index .. L.Last_Index loop
+               LR := LR + L_List (index_2) * RT_List (index_2);
+            end loop;
+            LR_List.Append (LR);
+         end loop;
+         Result.Append (LR_List);
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
    function Transpose (Values : Float_List_2D) return  Float_List_2D is
       use Ada.Containers;
       Num_Rows : constant Positive := Positive (Values.Length);

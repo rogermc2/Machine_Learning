@@ -49,6 +49,7 @@ package IL_Types is
    function "-" (L, R : Float_List_2D) return Float_List_2D;
    function Dot (L : Float_List; R : Float_List_2D) return Float_List;
    function Dot (L, R : Float_List) return Float_List_2D;
+   function Dot (L, R : Float_List_2D) return Float_List_2D;
    function Transpose (Values : Float_List_2D) return  Float_List_2D;
 
    use Float_List_Package;

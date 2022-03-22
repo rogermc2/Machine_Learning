@@ -55,7 +55,8 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Identity_Derivative (Z : Float_List; Del : in out Float_List) is
+   procedure Identity_Derivative (Z   : Float_List_2D;
+                                  Del : in out Float_List_2D) is
    begin
       null;
    end Identity_Derivative;
@@ -75,15 +76,21 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Logistic_Derivative (Z : Float_List; Del : in out Float_List) is
+   procedure Logistic_Derivative (Z   : Float_List_2D;
+                                  Del : in out Float_List_2D) is
       List_Z : Float_List;
+      List_Z2 : Float_List_2D;
    begin
       Del := Del * Z;
       --  List_Z = 1 - Z
       for index in Z.First_Index .. Z.Last_Index loop
-         List_Z (index) := 1.0 - Z (index);
+         List_Z := Z (index);
+         for index2 in List_Z.First_Index .. List_Z.Last_Index loop
+            List_Z (index) := 1.0 - List_Z (index);
+         end loop;
+         List_Z2.Append (List_Z);
       end loop;
-      Del := Del * List_Z;
+      Del := Del * List_Z2;
 
    end Logistic_Derivative;
 
@@ -150,13 +157,20 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu_Derivative (Z : Float_List; Del : in out Float_List) is
+   procedure Relu_Derivative (Z : Float_List_2D; Del : in out Float_List_2D) is
+      List_Z    : Float_List;
+      List_Del  : Float_List;
    begin
-         for index in Z.First_Index .. Z.Last_Index loop
-            if Z (index) = 0.0 then
-               Del (index) := 0.0;
+      for index in Z.First_Index .. Z.Last_Index loop
+         List_Z := Z (index);
+         List_Del := Del (index);
+         for index2 in Z.First_Index .. Z.Last_Index loop
+            if List_Z (index2) = 0.0 then
+               List_Del (index) := 0.0;
             end if;
          end loop;
+         Del (index) := List_Del;
+      end loop;
 
    end Relu_Derivative;
 
@@ -213,15 +227,21 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Tanh_Derivative (Z : Float_List; Del : in out Float_List) is
+   procedure Tanh_Derivative (Z : Float_List_2D; Del : in out Float_List_2D) is
       List_Z : Float_List;
+      List_Z2 : Float_List_2D;
    begin
+      Del := Del * Z;
       --  List_Z = 1 - Z ** 2
       for index in Z.First_Index .. Z.Last_Index loop
-         List_Z (index) := 1.0 - Z (index) ** 2;
+         List_Z := Z (index);
+         for index2 in List_Z.First_Index .. List_Z.Last_Index loop
+            List_Z (index) := 1.0 - List_Z (index) ** 2;
+         end loop;
+         List_Z2.Append (List_Z);
       end loop;
 
-      Del := Del * List_Z;
+      Del := Del * List_Z2;
 
    end Tanh_Derivative;
 
