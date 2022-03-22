@@ -194,7 +194,7 @@ package body Base_Neural is
          YP_Float.Append (Y_P.Element (1));
       end loop;
 
-      return Neural_Maths.Mean ((YT_Float - YP_Float)) / 2.0;
+      return Neural_Maths.Mean ((YT_Float - YP_Float) ** 2) / 2.0;
 
    end Squared_Loss;
 
