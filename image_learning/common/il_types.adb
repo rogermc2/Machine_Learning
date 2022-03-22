@@ -151,6 +151,24 @@ package body IL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function "**" (L : Float_List_2D; P : Integer) return Float_List_2D is
+      List_1D : Float_List;
+      Result  : Float_List_2D;
+   begin
+      for row in L.First_Index .. L.Last_Index loop
+         List_1D := L (row);
+         for col in List_1D.First_Index .. List_1D.Last_Index loop
+            List_1D (col) := List_1D (col) ** P;
+         end loop;
+         Result.Append (List_1D);
+      end loop;
+
+      return Result;
+
+   end "**";
+
+   --  ----------------------------------------------------------------------------
+
    function "/" (L : Float_List_2D; R : Float) return Float_List_2D is
       List_1D : Float_List;
       Result  : Float_List_2D;

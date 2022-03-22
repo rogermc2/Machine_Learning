@@ -45,6 +45,7 @@ package IL_Types is
    subtype Float_List_2D is Float_List_Package.Vector;
    function "*" (L : Float; R : Float_List_2D) return Float_List_2D;
    function "*" (L, R : Float_List_2D) return Float_List_2D;
+   function "**" (L : Float_List_2D; P : Integer) return Float_List_2D;
    function "/" (L : Float_List_2D; R : Float) return Float_List_2D;
    function "+" (L, R : Float_List_2D) return Float_List_2D;
    function "-" (L, R : Float_List_2D) return Float_List_2D;

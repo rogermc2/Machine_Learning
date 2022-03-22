@@ -1,6 +1,8 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
 with Maths;
+
+with Classifier_Utilities;
 with Neural_Maths;
 
 package body Base_Neural is
@@ -63,15 +65,23 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Logistic (Activation : Float_List) return Float_List is
+   function Logistic (Activation : Float_List_2D) return Float_List_2D is
       use Maths.Float_Math_Functions;
-      Result : Float_List;
+      Act_List : Float_List;
+      Sigmoid  : Float_List;
+      Result   : Float_List_2D;
    begin
-      for index in Activation.First_Index .. Activation.Last_Index loop
-         Result.Append (1.0 / (1.0 + Exp (Activation.Element (index))));
+      for row in Activation.First_Index .. Activation.Last_Index loop
+            Act_List := Activation (row);
+            Sigmoid.Clear;
+            for index in Act_List.First_Index .. Act_List.Last_Index loop
+                Sigmoid.Append (1.0 / (1.0 + Exp (Act_List (index))));
+            end loop;
+            Result.Append (Sigmoid);
       end loop;
 
       return Result;
+
    end Logistic;
 
    --  -------------------------------------------------------------------------
@@ -145,11 +155,16 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Relu (Activation : Float_List) return Float_List is
-      Result : Float_List;
+   function Relu (Activation : Float_List_2D) return Float_List_2D is
+      Act_List : Float_List;
+      Result   : Float_List_2D;
    begin
-      for index in Activation.First_Index .. Activation.Last_Index loop
-         Result.Append (Float'Max (0.0, Activation.Element (index)));
+      for row in Activation.First_Index .. Activation.Last_Index loop
+            Act_List := Activation (row);
+            for index in Act_List.First_Index .. Act_List.Last_Index loop
+                Act_List.Append (Float'Max (0.0, Act_List (index)));
+            end loop;
+            Result.Append (Act_List);
       end loop;
 
       return Result;
@@ -176,53 +191,63 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Softmax (Activation : Float_List) return Float_List is
+   function Softmax (Activation : Float_List_2D) return Float_List_2D is
       use Maths.Float_Math_Functions;
-      Exp_Sum : Float := 0.0;
-      Result  : Float_List;
+      Act_List : Float_List;
+      Exp_Sum  : Float;
+      Exp_List : Float_List;
+      R_List   : Float_List;
+      Result   : Float_List_2D;
    begin
-      for index in Activation.First_Index .. Activation.Last_Index loop
-         Exp_Sum := Exp_Sum + Exp (Activation.Element (index));
+      for row in Activation.First_Index .. Activation.Last_Index loop
+            Act_List := Activation (row);
+            Exp_Sum := 0.0;
+            for index in Act_List.First_Index .. Act_List.Last_Index loop
+                Exp_Sum := Exp_Sum + Exp (Act_List (index));
+            end loop;
+            Exp_List.Append (Exp_Sum);
       end loop;
-      for index in Activation.First_Index .. Activation.Last_Index loop
-         Result.Append  (Exp (Activation.Element (index) / Exp_Sum));
+
+      for row in Activation.First_Index .. Activation.Last_Index loop
+            Act_List := Activation (row);
+            R_List.Clear;
+            for index in Act_List.First_Index .. Act_List.Last_Index loop
+                R_List.Append (Exp (Act_List (index) / Exp_List (index)));
+            end loop;
+            Result.Append (R_List);
       end loop;
 
       return Result;
    end Softmax;
 
    --  -------------------------------------------------------------------------
-
+   --  L158
    function Squared_Loss (Y_True : Integer_List_2D; Y_Pred : Float_List_2D)
                            return Float is
-      Y_P      : Float_List;
-      YT_Int   : Integer;
-      YT_Float : Float_List;
-      YP_Float : Float_List;
+                           use Classifier_Utilities;
    begin
-      for index in Y_Pred.First_Index .. Y_Pred.Last_Index loop
-         YT_Int := Y_True (index).Element (1);
-         YT_Float.Append (Float (YT_Int));
-
-         Y_P := Y_Pred (index);
-         YP_Float.Append (Y_P.Element (1));
-      end loop;
-
-      return Neural_Maths.Mean ((YT_Float - YP_Float) ** 2) / 2.0;
+      return Neural_Maths.Mean
+          ((To_Float_List_2D (Y_True) - Y_Pred) ** 2) / 2.0;
 
    end Squared_Loss;
 
    --  -------------------------------------------------------------------------
 
-   function Tanh (Activation : Float_List) return Float_List is
+   function Tanh (Activation : Float_List_2D) return Float_List_2D is
       use Maths.Float_Math_Functions;
-      Result : Float_List;
+      Act_List : Float_List;
+      Result   : Float_List_2D;
    begin
-      for index in Activation.First_Index .. Activation.Last_Index loop
-         Result.Append (Tanh (Activation.Element (index)));
+      for row in Activation.First_Index .. Activation.Last_Index loop
+            Act_List := Activation (row);
+            for index in Act_List.First_Index .. Act_List.Last_Index loop
+                Act_List (index) :=  Tanh (Act_List (index));
+            end loop;
+            Result.Append (Act_List);
       end loop;
 
       return Result;
+
    end Tanh;
 
    --  -------------------------------------------------------------------------

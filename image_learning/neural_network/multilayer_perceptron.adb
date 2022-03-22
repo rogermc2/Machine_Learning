@@ -67,7 +67,7 @@ package body Multilayer_Perceptron is
                         X               : IL_Types.Float_List_2D;
                         Y               : IL_Types.Integer_List_2D;
                         Activations     : in out IL_Types.Float_List_3D;
-                        Deltas          : in out IL_Types.Float_List_2D;
+                        Deltas          : in out IL_Types.Float_List_3D;
                         Coef_Grads      : in out IL_Types.Float_List_3D;
                         Intercept_Grads : in out IL_Types.Float_List_2D;
                         Layer_Units     : IL_Types.Integer_List);
@@ -75,7 +75,7 @@ package body Multilayer_Perceptron is
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List_2D;
                              Activations     : in out IL_Types.Float_List_3D;
-                             Deltas          : in out IL_Types.Float_List_2D;
+                             Deltas          : in out IL_Types.Float_List_3D;
                              Coef_Grads      : in out IL_Types.Float_List_3D;
                              Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;
@@ -318,7 +318,7 @@ package body Multilayer_Perceptron is
                                     Self.Parameters.Hidden_Layer_Sizes;
       Hidden_Layer_Sizes_Length : Count_Type := Hidden_Layer_Sizes.Length;
       Layer_Units               : Integer_List;
-      Deltas                    : Float_List_2D;
+      Deltas                    : Float_List_3D;
       --  Coef_Grads layers * features * values
       Coef_Grads                : Float_List_3D;
       --  Coef_Grads layers * y values
@@ -378,7 +378,7 @@ package body Multilayer_Perceptron is
                         X               : IL_Types.Float_List_2D;
                         Y               : IL_Types.Integer_List_2D;
                         Activations     : in out IL_Types.Float_List_3D;
-                        Deltas          : in out IL_Types.Float_List_2D;
+                        Deltas          : in out IL_Types.Float_List_3D;
                         Coef_Grads      : in out IL_Types.Float_List_3D;
                         Intercept_Grads : in out IL_Types.Float_List_2D;
                         Layer_Units     : IL_Types.Integer_List) is
@@ -423,7 +423,7 @@ package body Multilayer_Perceptron is
                              X               : IL_Types.Float_List_2D;
                              Y               : IL_Types.Integer_List_2D;
                              Activations     : in out IL_Types.Float_List_3D;
-                             Deltas          : in out IL_Types.Float_List_2D;
+                             Deltas          : in out IL_Types.Float_List_3D;
                              Coef_Grads      : in out IL_Types.Float_List_3D;
                              Intercept_Grads : in out IL_Types.Float_List_2D;
                              Layer_Units     : IL_Types.Integer_List;

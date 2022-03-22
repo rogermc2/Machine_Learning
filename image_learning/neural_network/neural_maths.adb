@@ -1,5 +1,6 @@
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers;
 with Ada.Numerics;
 
 with Maths;
@@ -104,6 +105,46 @@ package body Neural_Maths is
    end Max;
 
    --  -------------------------------------------------------------------------
+
+   function Mean (A : Integer_List_2D) return Float is
+      use Ada.Containers;
+      Length  : constant Float:= Float (A.Length * A (1).Length);
+      A_List  : Integer_List;
+      Sum     : Integer := 0;
+   begin
+
+      for row in A.First_Index .. A.Last_Index loop
+         A_List := A (row);
+         for item in A_List.First_Index .. A_List.Last_Index loop
+            Sum := Sum + A_List (item);
+         end loop;
+      end loop;
+
+      return Float (Sum) / Length;
+
+   end Mean;
+
+   --  ------------------------------------------------------------------------
+
+   function Mean (A : Float_List_2D) return Float is
+      use Ada.Containers;
+      Length  : constant Float:= Float (A.Length * A (1).Length);
+      A_List  : Float_List;
+      Sum     : Float := 0.0;
+   begin
+
+      for row in A.First_Index .. A.Last_Index loop
+         A_List := A (row);
+         for item in A_List.First_Index .. A_List.Last_Index loop
+            Sum := Sum + A_List (item);
+         end loop;
+      end loop;
+
+      return Sum / Length;
+
+   end Mean;
+
+   --  ------------------------------------------------------------------------
 
    function Mean (A : Float_List_2D; Axis : Positive) return Float_List is
       A_List  : Float_List;
