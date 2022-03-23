@@ -127,7 +127,7 @@ package body Multilayer_Perceptron is
       Inplace_Derivative : Float_List;
    begin
       Forward_Pass (Self, Activations);
-      Put_Line (Routine_Name & " Forward_Pass done");
+      Put_Line (Routine_Name & " L284 Forward_Pass done");
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -152,8 +152,9 @@ package body Multilayer_Perceptron is
          Values := Values + Dot (Ravel, Ravel);
       end loop;
 
-      --  Add L2 regularization term to loss
+      --  L288  Add L2 regularization term to loss
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
+      Put_Line (Routine_Name & "loss + L2 regularization : " & Float'Image (Loss));
 
       --  L294 Backward propagate
       --  The calculation of delta[last]  works with following combinations
@@ -167,8 +168,16 @@ package body Multilayer_Perceptron is
       --  The ith element of Activations (layers x values) is a list of values
       --  of the ith layer.
 
+     Put_Line (Routine_Name & "Activations size:" &
+                      Integer'Image (Integer (Activations.Length)));
+     Put_Line (Routine_Name & "Y size:" &
+                      Integer'Image (Integer (Y.Length)));
       Last := Num_Samples - 1;
       Activation := Activations.Element (Activations.Last_Index - 1);
+      Put_Line (Routine_Name & "Activation size:" &
+                  Integer'Image (Integer (Activation.Length)));
+      Put_Line (Routine_Name & "Activation dim 2 size:" &
+               Integer'Image (Integer (Activation (1).Length)));
       Diff := Activation - Classifier_Utilities.To_Float_List_2D (Y);
       Put_Line (Routine_Name & "Last" & Integer'Image (Last));
       Put_Line (Routine_Name & "Deltas Last_Index" & Integer'Image (Deltas.Last_Index));
@@ -177,6 +186,7 @@ package body Multilayer_Perceptron is
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Coef_Grads, Intercept_Grads);
+      Put_Line (Routine_Name & " L308 loss_Gradient computed");
 
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
@@ -635,7 +645,9 @@ package body Multilayer_Perceptron is
    end Fit_Stochastic;
 
    --  -------------------------------------------------------------------------
-   --  L119
+   --  L119  Forward_Pass performs a forward pass on the neural network by
+   --  computing the values of the neurons in the hidden layers and the
+   --  output layer.
    procedure Forward_Pass (Self        : in out MLP_Classifier;
                            Activations : in out Float_List_3D) is
       --  The ith element of Activations holds the values of the ith layer.
@@ -653,32 +665,32 @@ package body Multilayer_Perceptron is
       Acts_Dot_Coeffs    : Float_List_2D;
       Acts_Intercepts    : Float_List_2D;
    begin
-      Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
+--        Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
       --  Iterate over the hidden layers
-      for index in 1 .. Num_Layers loop
+      for index in 1 .. Num_Layers - 1 loop
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
-         Put_Line (Routine_Name & "index:" & Integer'Image (index));
+--           Put_Line (Routine_Name & "index:" & Integer'Image (index));
          Acts_Dot_Coeffs := Dot (Activations (index), Coefficient_Matrix);
-         Put_Line (Routine_Name & "Activations length:" &
-                     Integer'Image (Integer (Activations.Length)));
+--           Put_Line (Routine_Name & "Activations length:" &
+--                       Integer'Image (Integer (Activations.Length)));
          if Integer (Activations.Length) > index then
             Activations (index + 1) := Acts_Dot_Coeffs;
          else
-            Put_Line (Routine_Name & "Activations Append");
+--              Put_Line (Routine_Name & "Activations Append");
             Activations.Append (Acts_Dot_Coeffs);
          end if;
-         Put_Line (Routine_Name & "Activations length2:" &
-                     Integer'Image (Integer (Activations.Length)));
-         Put_Line (Routine_Name & "Intercepts length:" &
-                     Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
+--           Put_Line (Routine_Name & "Activations length2:" &
+--                       Integer'Image (Integer (Activations.Length)));
+--           Put_Line (Routine_Name & "Intercepts length:" &
+--                       Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
          Acts_Intercepts := Activations (index + 1) &
            Self.Attributes.Intercepts (index);
          Activations.Replace_Element (index + 1, Acts_Intercepts);
 
          --  For the hidden layers
-         if index + 1 /= Num_Layers then
-            Put_Line (Routine_Name & "index + 1:" &
-                        Integer'Image (index + 1));
+         if index + 1 /= Num_Layers - 1 then
+--              Put_Line (Routine_Name & "index + 1:" &
+--                          Integer'Image (index + 1));
             case Hidden_Activation is
                when Identity_Activation =>
                   Activations (index + 1) := Activations (index);
