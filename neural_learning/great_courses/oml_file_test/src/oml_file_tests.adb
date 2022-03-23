@@ -3,7 +3,7 @@ with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with NL_TypesL_Types; use NL_Types;
+with NL_Types; use NL_Types;
 with Printing;
 
 with Openml_Ada; use Openml_Ada;
