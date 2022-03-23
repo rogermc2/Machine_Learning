@@ -5,7 +5,7 @@
 
 package body Utils is
 
-   --  L695
+   --  L695 Gen_Batches returns a list of slice lists
    function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
                          Min_Batch_Size : Natural := 0)
                          return Integer_List_2D is
