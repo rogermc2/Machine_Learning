@@ -556,8 +556,8 @@ package body Multilayer_Perceptron is
 
       --        Max_Sample_Index := Num_Samples;
       --  L628
-      Put_Line (Routine_Name & "Num_Samples: " & Integer'Image(Batch_Size));
-      Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
+--        Put_Line (Routine_Name & "Num_Samples: " & Integer'Image(Batch_Size));
+--        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
       for iter in 1 .. Self.Parameters.Max_Iter loop
          Accumulated_Loss := 0.0;
          --  Batches is a list of slice lists
@@ -573,11 +573,13 @@ package body Multilayer_Perceptron is
          --  end if;
          --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
+            Put_Line (Routine_Name & "L636 Batch index:" &
+                        Integer'Image (batch_index));
             Batch_Slice := Batches (batch_index);
-            Printing.Print_Integer_List (Routine_Name & "Batch index:" &
-                     Integer'Image (batch_index) & " Batch_Slice", Batch_Slice);
-               Put_Line (Routine_Name & "Batch_Slice size:" &
-                           Integer'Image (Integer (Batch_Slice.Length)));
+            Printing.Print_Integer_List (Routine_Name & " Batch_Slice",
+                                         Batch_Slice);
+            Put_Line (Routine_Name & "Batch_Slice size:" &
+                      Integer'Image (Integer (Batch_Slice.Length)));
             X_Batch.Clear;
             Y_Batch.Clear;
 
@@ -590,9 +592,13 @@ package body Multilayer_Perceptron is
                Y_Batch.Append (Y (Batch_Slice (index)));
                Put_Line (Routine_Name & "X_Batch size:" &
                            Integer'Image (Integer (X_Batch.Length)));
-               Activations.Replace_Element (1, X_Batch);
 
-               Put_Line (Routine_Name & "Activations set");
+               if Activations.Is_Empty then
+                  Activations.Append (X_Batch);
+               else
+                  Activations.Replace_Element (1, X_Batch);
+               end if;
+               Put_Line (Routine_Name & "L645 Activations set");
 
                --  L645
                Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
@@ -644,18 +650,30 @@ package body Multilayer_Perceptron is
                              Self.Attributes.Out_Activation;
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Coefficient_Matrix : Float_List_2D;
+      Acts_Dot_Coeffs    : Float_List_2D;
+      Acts_Intercepts    : Float_List_2D;
    begin
       Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
       --  Iterate over the hidden layers
       for index in 1 .. Num_Layers loop
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
          Put_Line (Routine_Name & "index:" & Integer'Image (index));
+         Acts_Dot_Coeffs := Dot (Activations (index), Coefficient_Matrix);
          Put_Line (Routine_Name & "Activations length:" &
                      Integer'Image (Integer (Activations.Length)));
-         Activations (index + 1) := Dot
-           (Activations (index), Coefficient_Matrix);
-         Activations (index + 1) := Activations (index + 1) &
+         if Integer (Activations.Length) > index then
+            Activations (index + 1) := Acts_Dot_Coeffs;
+         else
+            Put_Line (Routine_Name & "Activations Append");
+            Activations.Append (Acts_Dot_Coeffs);
+         end if;
+         Put_Line (Routine_Name & "Activations length2:" &
+                     Integer'Image (Integer (Activations.Length)));
+         Put_Line (Routine_Name & "Intercepts length:" &
+                     Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
+         Acts_Intercepts := Activations (index + 1) &
            Self.Attributes.Intercepts (index);
+         Activations.Replace_Element (index + 1, Acts_Intercepts);
 
          --  For the hidden layers
          if index + 1 /= Num_Layers then
