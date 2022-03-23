@@ -110,6 +110,7 @@ package body Multilayer_Perceptron is
                        Loss            : out Float;
                        Coef_Grads      : out Float_List_3D;
                        Intercept_Grads : out Float_List_2D) is
+      use Ada.Containers;
       use Base_Neural;
       use Float_List_Package;
       use Float_Package;
@@ -172,15 +173,24 @@ package body Multilayer_Perceptron is
                       Integer'Image (Integer (Activations.Length)));
      Put_Line (Routine_Name & "Y size:" &
                       Integer'Image (Integer (Y.Length)));
+      Put_Line (Routine_Name & "Y dim 2 size:" &
+               Integer'Image (Integer (Y (1).Length)));
       Last := Num_Samples - 1;
-      Activation := Activations.Element (Activations.Last_Index - 1);
+      --  L301
+      Activation := Activations.Last_Element;
       Put_Line (Routine_Name & "Activation size:" &
                   Integer'Image (Integer (Activation.Length)));
       Put_Line (Routine_Name & "Activation dim 2 size:" &
                Integer'Image (Integer (Activation (1).Length)));
-      Diff := Activation - Classifier_Utilities.To_Float_List_2D (Y);
+      Put_Line (Routine_Name & "Deltas Last_Index" &
+                  Integer'Image (Deltas.Last_Index));
+      if Integer (Deltas.Length) < Last then
+         Deltas.Set_Length (Count_Type (Last));
+      end if;
+      Deltas.Replace_Element
+        (Deltas.Last_Index,
+         Activation - Classifier_Utilities.To_Float_List_2D (Y));
       Put_Line (Routine_Name & "Last" & Integer'Image (Last));
-      Put_Line (Routine_Name & "Deltas Last_Index" & Integer'Image (Deltas.Last_Index));
       --        Deltas.Replace_Element (Last, Diff);
 
       --  L304  Compute gradient for the last layer
