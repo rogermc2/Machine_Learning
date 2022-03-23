@@ -7,6 +7,7 @@ package Neural_Maths is
    function Log_Sum_Exponent (Log_Prob : Float_List_2D) return Float_List;
    function Mean (A : Integer_List_2D) return Float;
    function Mean (A : Float_List_2D) return Float;
+   function Mean (A : Float_List) return Float;
    function Mean (A : Float_List_2D; Axis : Positive) return Float_List;
 
 end Neural_Maths;
