@@ -127,7 +127,8 @@ package body Multilayer_Perceptron is
       Inplace_Derivative : Float_List;
    begin
       Forward_Pass (Self, Activations);
-      Put_Line (Routine_Name & " L284 Forward_Pass done");
+      Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
+                  Integer'Image (Integer (Activations.Length)));
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -182,12 +183,13 @@ package body Multilayer_Perceptron is
                   Integer'Image (Integer (Activation.Length)));
       Put_Line (Routine_Name & "Activation dim 2 size:" &
                   Integer'Image (Integer (Activation (1).Length)));
-      Put_Line (Routine_Name & "Deltas Last_Index" &
-                  Integer'Image (Deltas.Last_Index));
+
       if Integer (Deltas.Length) < Last then
          Deltas.Set_Length (Count_Type (Last));
       end if;
 
+      Put_Line (Routine_Name & "Deltas length" &
+                  Count_Type'Image (Deltas.Length));
       Deltas.Replace_Element
         (Deltas.Last_Index,
          Activation - Classifier_Utilities.To_Float_List_2D (Y));
@@ -348,6 +350,8 @@ package body Multilayer_Perceptron is
       First_Pass :=
         Self.Attributes.Neuron_Coef_Layers.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
+
+      --  L398  Ensure y is 2D
       for row in Y.First_Index .. Y.Last_Index loop
          Y_Col.Clear;
          Y_Col.Append (Y (row));
@@ -367,7 +371,10 @@ package body Multilayer_Perceptron is
 
       --  L409
       if First_Pass then
+         Put_Line (Routine_Name & "L411 Initialising.");
          Initialize (Self, Layer_Units);
+         Put_Line (Routine_Name & "Initialised.");
+         New_Line;
       end if;
 
       --  Set the Activation values of the first layer
@@ -375,7 +382,8 @@ package body Multilayer_Perceptron is
       --  Deltas is a 2D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Deltas.Set_Length (Activations.Length - 1);
+      --  Deltas length set in Backprop
+--        Deltas.Set_Length (Activations.Length - 1);
       --  L417
       Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
@@ -490,10 +498,6 @@ package body Multilayer_Perceptron is
    begin
       Printing.Print_Float_Lists_2D (Routine_Name &
                                        "Intercept Params", Intercept_Params);
-      --        if Activations.Is_Empty then
-      --          Activations.Set_Length (1);
-      --        end if;
-
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
@@ -829,7 +833,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   --  L320  BaseMultilayerPerceptron._Initialize
+   --  L320
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : Integer_List) is
       use Base_Neural;
