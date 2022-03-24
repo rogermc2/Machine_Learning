@@ -377,6 +377,7 @@ package body Multilayer_Perceptron is
          end loop;
       end if;
       Layer_Units.Append (Layer_Data);
+      Layer_Units.Set_Length (2 + Hidden_Layer_Sizes.Length);
 
 --        Validate_Input (Self, Y);
 

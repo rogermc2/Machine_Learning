@@ -49,7 +49,7 @@ package Multilayer_Perceptron is
       Feature_Names_In     : String_List;
       N_Iter               : Natural;
       N_Layers             : Positive;
-      N_Outputs            : Positive;
+      N_Outputs            : Positive := 1;
       Out_Activation       : Base_Neural.Activation_Type :=
                                Base_Neural.Logistic_Activation;
       Optimizer            : Optimizer_Record;
