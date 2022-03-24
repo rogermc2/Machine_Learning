@@ -1,5 +1,5 @@
 
-with Base_Decision_Tree;
+with Multilayer_Perceptron;
 with NL_Types; use NL_Types;
 with Openml_Ada;
 
@@ -14,9 +14,10 @@ package Support_4 is
       Test_X       : out Float_List_2D;
       Test_Y       : out Integer_List;
       Bunch        : out Openml_Ada.Bunch_Data) return Boolean;
-   function Get_Classifier (Dataset_Name : String;
-                            Classifier   : out Base_Decision_Tree.Classifier)
-                            return Boolean;
+   function Get_Classifier
+     (Dataset_Name : String;
+      Classifier   : out Multilayer_Perceptron.MLP_Classifier)
+      return Boolean;
    procedure Save_State
      (Dataset_Name : String;
       Train_X      : Float_List_2D;
@@ -25,6 +26,6 @@ package Support_4 is
       Test_Y       : Integer_List;
       Save_Bunch   : Openml_Ada.Bunch_Data);
    procedure Save_Classifier
-     (Dataset_Name : String; Classifier : Base_Decision_Tree.Classifier);
+     (Dataset_Name : String; Classifier : Multilayer_Perceptron.MLP_Classifier);
 
 end Support_4;

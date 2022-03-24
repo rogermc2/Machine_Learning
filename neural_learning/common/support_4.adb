@@ -13,7 +13,7 @@ package body Support_4 is
       Train_Y      : out Integer_List;
       Test_X       : out Float_List_2D;
       Test_Y       : out Integer_List;
-      Bunch            : out Openml_Ada.Bunch_Data)
+      Bunch        : out Openml_Ada.Bunch_Data)
       return Boolean is
       use Ada.Directories;
       use Ada.Streams;
@@ -58,9 +58,10 @@ package body Support_4 is
 
    --  -------------------------------------------------------------------------
 
-   function Get_Classifier (Dataset_Name : String;
-                      Classifier   : out Base_Decision_Tree.Classifier)
-                      return Boolean is
+   function Get_Classifier
+     (Dataset_Name : String;
+      Classifier   : out Multilayer_Perceptron.MLP_Classifier)
+      return Boolean is
       use Ada.Directories;
       use Ada.Streams;
       use Stream_IO;
@@ -75,7 +76,7 @@ package body Support_4 is
 
          Open (File_ID, In_File, Tree_File);
          aStream := Stream (File_ID);
-         Base_Decision_Tree.Classifier'Read (aStream, Classifier);
+         Multilayer_Perceptron.MLP_Classifier'Read (aStream, Classifier);
          Close (File_ID);
          pragma Unreferenced (File_ID);
 
@@ -94,7 +95,7 @@ package body Support_4 is
       Train_Y      : Integer_List;
       Test_X       : Float_List_2D;
       Test_Y       : Integer_List;
-      Save_Bunch                 : Openml_Ada.Bunch_Data) is
+      Save_Bunch   : Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "Support_4.Save_State ";
@@ -116,7 +117,8 @@ package body Support_4 is
    --  -------------------------------------------------------------------------
 
    procedure Save_Classifier
-     (Dataset_Name : String; Classifier : Base_Decision_Tree.Classifier) is
+     (Dataset_Name : String;
+      Classifier   : Multilayer_Perceptron.MLP_Classifier) is
       use Ada.Streams;
       use Stream_IO;
       --        Routine_Name : constant String := "Support_4.Save_Tree ";
@@ -126,7 +128,7 @@ package body Support_4 is
    begin
       Create (File_ID, Out_File, Tree_File);
       aStream := Stream (File_ID);
-      Base_Decision_Tree.Classifier'Write (aStream, Classifier);
+      Multilayer_Perceptron.MLP_Classifier'Write (aStream, Classifier);
       Close (File_ID);
       pragma Unreferenced (File_ID);
    end Save_Classifier;

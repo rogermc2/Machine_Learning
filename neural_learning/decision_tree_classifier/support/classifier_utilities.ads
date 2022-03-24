@@ -1,10 +1,10 @@
 
 with PLplot_Auxiliary;
 
-with Base_Decision_Tree;
+--  with Base_Decision_Tree;
 with Classifier_Types; use Classifier_Types;
 with NL_Types; use NL_Types;
-with Tree;
+--  with Tree;
 with Weights;
 
 package Classifier_Utilities is
@@ -23,8 +23,8 @@ package Classifier_Utilities is
     function Bin_Count (Numbers : Value_Data_List) return Natural_List;
     procedure Clear (anArray : in out Value_Data_Array);
     function Compare_Float_Lists (L, R : Float_List) return Boolean;
-    function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
-                           return Natural;
+--      function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
+--                             return Natural;
     function Dot (L : Weights.Weight_List; R : Natural_List) return Float;
     function Get_Column (List_2D      : Float_List_2D;
                          Column_Index : Positive) return Float_List;
@@ -73,8 +73,8 @@ package Classifier_Utilities is
                               return Value_Data_Lists_2D;
     function Transpose (Values : Value_Data_Lists_2D)
                        return  Value_Data_Lists_2D;
-    function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
-                           return Tree.Tree_Cursor;
+--      function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
+--                             return Tree.Tree_Cursor;
     function Unique (Nums : Integer_List) return Integer_List;
     function Unique_Integer_Array (Nums : Value_Data_Array)
                                    return Integer_Array;
