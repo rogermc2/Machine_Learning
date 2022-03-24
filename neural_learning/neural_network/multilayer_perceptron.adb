@@ -42,7 +42,7 @@ with Maths;
 with Utilities;
 
 with Base_Mix;
---  with Classifier_Utilities;
+with Classifier_Utilities;
 with Data_Splitter2;
 with Encode_Utils;
 with Label;
@@ -59,14 +59,14 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : Activation_List;
+      Activations     : Float_List_3D;
       Deltas          : Float_List_3D;
       Coef_Grads      : in out Float_List_3D;
       Intercept_Grads : in out Float_List_2D);
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
                         X               : Float_List_2D;
                         Y               : Integer_List_2D;
-                        Activations     : in out Activation_List;
+                        Activations     : in out Float_List_3D;
                         Deltas          : in out Float_List_3D;
                         Coef_Grads      : in out Float_List_3D;
                         Intercept_Grads : in out Float_List_2D;
@@ -74,14 +74,14 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : Float_List_2D;
                              Y               : Integer_List_2D;
-                             Activations     : in out Activation_List;
+                             Activations     : in out Float_List_3D;
                              Deltas          : in out Float_List_3D;
                              Coef_Grads      : in out Float_List_3D;
                              Intercept_Grads : in out Float_List_2D;
                              Layer_Units     : Integer_List;
                              Incremental     : Boolean := False);
-   procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out Activation_List);
+   procedure Forward_Pass (Self            : in out MLP_Classifier;
+                           Activations     : in out Float_List_3D);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
@@ -92,11 +92,10 @@ package body Multilayer_Perceptron is
                          Coef_Grads      : out Float_List_3D;
                          Intercept_Grads : out Float_List_2D);
    procedure Update_No_Improvement_Count
-      (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val : Float_List_2D);
+     (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
+      X_Val : Float_List_2D);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
-                             --                               X                  : Float_List_2D;
                              Y                  : Integer_List);
    --                               Incremental, Reset : Boolean);
 
@@ -105,7 +104,7 @@ package body Multilayer_Perceptron is
    procedure Backprop (Self            : in out MLP_Classifier;
                        X               : Float_List_2D;
                        Y               : Integer_List_2D;
-                       Activations     : in out Activation_List;
+                       Activations     : in out Float_List_3D;
                        Deltas          : in out Float_List_3D;
                        Loss            : out Float;
                        Coef_Grads      : out Float_List_3D;
@@ -122,7 +121,7 @@ package body Multilayer_Perceptron is
       Values             : Float := 0.0;
       F_I                : Positive;
       Last               : Positive;
-      Activation         : Activation_Record;
+      Activation         : Float_List_2D;
       Diff               : Float_List_2D;
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
@@ -136,12 +135,12 @@ package body Multilayer_Perceptron is
       end if;
 
       case Loss_Function_Name is
-         when Binary_Log_Loss_Function => null;
---              Loss := Binary_Log_Loss (Y, Activations.Last_Element);
-         when Log_Loss_Function => null;
---              Loss := Log_Loss (Y, Activations.Last_Element);
-         when Squared_Error_Function => null;
---              Loss := Squared_Loss (Y, Activations.Last_Element);
+         when Binary_Log_Loss_Function =>
+            Loss := Binary_Log_Loss (Y, Activations.Last_Element);
+         when Log_Loss_Function =>
+            Loss := Log_Loss (Y, Activations.Last_Element);
+         when Squared_Error_Function =>
+            Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
 
       for s in Self.Attributes.Neuron_Coef_Layers.First_Index ..
@@ -170,30 +169,30 @@ package body Multilayer_Perceptron is
       --  The ith element of Activations (layers x values) is a list of values
       --  of the ith layer.
 
-     Put_Line (Routine_Name & "Activations size:" &
-                      Integer'Image (Integer (Activations.Length)));
-     Put_Line (Routine_Name & "Y size:" &
-                      Integer'Image (Integer (Y.Length)));
+      Put_Line (Routine_Name & "Activations size:" &
+                  Integer'Image (Integer (Activations.Length)));
+      Put_Line (Routine_Name & "Y size:" &
+                  Integer'Image (Integer (Y.Length)));
       Put_Line (Routine_Name & "Y dim 2 size:" &
-               Integer'Image (Integer (Y (1).Length)));
+                  Integer'Image (Integer (Y (1).Length)));
       Last := Num_Samples - 1;
       --  L301
       Activation := Activations.Last_Element;
       Put_Line (Routine_Name & "Activation size:" &
-                  Integer'Image (Integer (Activation.X.Length)));
+                  Integer'Image (Integer (Activation.Length)));
       Put_Line (Routine_Name & "Activation dim 2 size:" &
-               Integer'Image (Integer (Activation.X (1).Length)));
+                  Integer'Image (Integer (Activation (1).Length)));
       Put_Line (Routine_Name & "Deltas Last_Index" &
                   Integer'Image (Deltas.Last_Index));
       if Integer (Deltas.Length) < Last then
          Deltas.Set_Length (Count_Type (Last));
       end if;
 
---        Deltas.Replace_Element
---          (Deltas.Last_Index,
---           Activation - Classifier_Utilities.To_Float_List_2D (Y));
---        Put_Line (Routine_Name & "Last" & Integer'Image (Last));
-      --        Deltas.Replace_Element (Last, Diff);
+      Deltas.Replace_Element
+        (Deltas.Last_Index,
+         Activation - Classifier_Utilities.To_Float_List_2D (Y));
+      --        Put_Line (Routine_Name & "Last" & Integer'Image (Last));
+      Deltas.Replace_Element (Last, Diff);
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
@@ -206,14 +205,14 @@ package body Multilayer_Perceptron is
            Dot (Deltas (index),
                 Transpose (Self.Attributes.Neuron_Coef_Layers (index)));
          case Self.Parameters.Activation is
-            when Identity_Activation => null;
---                 Identity_Derivative (Activations (index), Deltas (index - 1));
-            when Logistic_Activation => null;
---                 Logistic_Derivative (Activations (index), Deltas (index - 1));
-            when Tanh_Activation => null;
---                 Tanh_Derivative (Activations (index), Deltas (index - 1));
-            when Relu_Activation => null;
---                 Relu_Derivative (Activations (index), Deltas (index - 1));
+            when Identity_Activation =>
+               Identity_Derivative (Activations (index), Deltas (index - 1));
+            when Logistic_Activation =>
+               Logistic_Derivative (Activations (index), Deltas (index - 1));
+            when Tanh_Activation =>
+               Tanh_Derivative (Activations (index), Deltas (index - 1));
+            when Relu_Activation =>
+               Relu_Derivative (Activations (index), Deltas (index - 1));
             when Softmax_Activation => null;
          end case;
 
@@ -292,20 +291,21 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : Activation_List;
+      --        Activations     : Activation_List;
+      Activations     : Float_List_3D;
       Deltas          : Float_List_3D;
       Coef_Grads      : in out Float_List_3D;
       Intercept_Grads : in out Float_List_2D) is
       use Float_List_Package;
       use Float_Package;
---        Delta_Act  : constant Float_List_2D :=
---                       Dot (Deltas (Layer), Activations (Layer));
+      Delta_Act  : constant Float_List_2D :=
+                     Dot (Deltas (Layer), Activations (Layer));
       Delta_Mean : constant Float_List := Neural_Maths.Mean (Deltas (Layer), 1);
    begin
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
---        Coef_Grads (Layer) :=
---          (Delta_Act + Self.Parameters.Alpha *
---             Self.Attributes.Neuron_Coef_Layers (Layer)) / Float (Num_Samples);
+      Coef_Grads (Layer) :=
+        (Delta_Act + Self.Parameters.Alpha *
+           Self.Attributes.Neuron_Coef_Layers (Layer)) / Float (Num_Samples);
 
       --  Intercept_Grads is 2D layer x fan_out
       --  The ith element of Deltas holds the difference between the
@@ -330,9 +330,8 @@ package body Multilayer_Perceptron is
       --        Num_Samples               : constant Positive := Positive (X.Length);
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
-      Activation                : Activation_Record;
       --  The ith element of Activations holds the values of the ith layer.
-      Activations               : Activation_List;
+      Activations               : Float_List_3D;
       Y_2D                      : Integer_List_2D;
       Y_Col                     : Integer_List;
       Hidden_Layer_Sizes        : Integer_List :=
@@ -372,13 +371,11 @@ package body Multilayer_Perceptron is
       end if;
 
       --  Set the Activation values of the first layer
-      Activation.X := X;
---        Activation.Layer_Units.Set_Length (Layer_Units.Length - 1);
-      Activations.Append (Activation);
+      Activations.Append (X);
       --  Deltas is a 2D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Deltas.Set_Length (Activations.Length);
+      Deltas.Set_Length (Activations.Length - 1);
       --  L417
       Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
 
@@ -399,7 +396,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
                         X               : Float_List_2D;
                         Y               : Integer_List_2D;
-                        Activations     : in out Activation_List;
+                        Activations     : in out Float_List_3D;
                         Deltas          : in out Float_List_3D;
                         Coef_Grads      : in out Float_List_3D;
                         Intercept_Grads : in out Float_List_2D;
@@ -443,7 +440,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : Float_List_2D;
                              Y               : Integer_List_2D;
-                             Activations     : in out Activation_List;
+                             Activations     : in out Float_List_3D;
                              Deltas          : in out Float_List_3D;
                              Coef_Grads      : in out Float_List_3D;
                              Intercept_Grads : in out Float_List_2D;
@@ -485,16 +482,17 @@ package body Multilayer_Perceptron is
       Batch_Slice        : Integer_List;
       X_Batch            : Float_List_2D;
       Y_Batch            : Integer_List;
-      Activation         : Activation_Record;
+      --        Activation         : Activation_Record;
+      Activation         : Float_List_2D;
       Batch_Loss         : Float;
       Parameters         : Parameters_Record;
       Grads              : Parameters_Record;
    begin
       Printing.Print_Float_Lists_2D (Routine_Name &
                                        "Intercept Params", Intercept_Params);
-      if Activations.Is_Empty then
-        Activations.Set_Length (1);
-      end if;
+      --        if Activations.Is_Empty then
+      --          Activations.Set_Length (1);
+      --        end if;
 
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
@@ -583,15 +581,15 @@ package body Multilayer_Perceptron is
 
       --        Max_Sample_Index := Num_Samples;
       --  L628
---        Put_Line (Routine_Name & "Num_Samples: " & Integer'Image(Batch_Size));
---        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
+      --        Put_Line (Routine_Name & "Num_Samples: " & Integer'Image(Batch_Size));
+      --        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
       for iter in 1 .. Self.Parameters.Max_Iter loop
          Accumulated_Loss := 0.0;
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          Put_Line (Routine_Name & "iter:" &  Integer'Image(iter) & "  Batches size: " &
                      Integer'Image (Integer (Batches.Length)) & " x" &
-                  Integer'Image (Integer (Batches (1).Length)));
+                     Integer'Image (Integer (Batches (1).Length)));
          --           Sample_Index := 1;
          --        while Sample_Index <= Max_Sample_Index loop
          --  if Self.Parameters.Shuffle then
@@ -605,7 +603,7 @@ package body Multilayer_Perceptron is
             Printing.Print_Integer_List (Routine_Name & " Batch_Slice",
                                          Batch_Slice);
             Put_Line (Routine_Name & "Batch_Slice size:" &
-                      Integer'Image (Integer (Batch_Slice.Length)));
+                        Integer'Image (Integer (Batch_Slice.Length)));
             X_Batch.Clear;
             Y_Batch.Clear;
 
@@ -619,7 +617,7 @@ package body Multilayer_Perceptron is
                Put_Line (Routine_Name & "X_Batch size:" &
                            Integer'Image (Integer (X_Batch.Length)));
 
-               Activation.X := X_Batch;
+               Activation := X_Batch;
                Activations.Append (Activation);
                Put_Line (Routine_Name & "L645 X_Batch Activation set");
 
@@ -662,7 +660,7 @@ package body Multilayer_Perceptron is
    --  computing the values of the neurons in the hidden layers and the
    --  output layer.
    procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out Activation_List) is
+                           Activations : in out Float_List_3D) is
       --  The ith element of Activations (length n_layers - 1) holds the values
       --  of the ith layer.
       use Base_Neural;
@@ -679,43 +677,43 @@ package body Multilayer_Perceptron is
       Acts_Dot_Coeffs    : Float_List_2D;
       Acts_Intercepts    : Float_List_2D;
    begin
---        Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
+      --        Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
       --  Iterate over the hidden layers
       for index in 1 .. Num_Layers - 1 loop
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
---           Put_Line (Routine_Name & "index:" & Integer'Image (index));
---           Acts_Dot_Coeffs := Dot (Activations (index), Coefficient_Matrix);
---           Put_Line (Routine_Name & "Activations length:" &
---                       Integer'Image (Integer (Activations.Length)));
---           if Integer (Activations.Length) > index then
---              Activations (index + 1) := Acts_Dot_Coeffs;
---           else
---              Put_Line (Routine_Name & "Activations Append");
---              Activations.Append (Acts_Dot_Coeffs);
---           end if;
---           Put_Line (Routine_Name & "Activations length2:" &
---                       Integer'Image (Integer (Activations.Length)));
---           Put_Line (Routine_Name & "Intercepts length:" &
---                       Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
---           Acts_Intercepts := Activations (index + 1) &
---             Self.Attributes.Intercepts (index);
---           Activations.Replace_Element (index + 1, Acts_Intercepts);
+         --           Put_Line (Routine_Name & "index:" & Integer'Image (index));
+         Acts_Dot_Coeffs := Dot (Activations (index), Coefficient_Matrix);
+         --           Put_Line (Routine_Name & "Activations length:" &
+         --                       Integer'Image (Integer (Activations.Length)));
+         if Integer (Activations.Length) > index then
+            Activations (index + 1) := Acts_Dot_Coeffs;
+         else
+            --              Put_Line (Routine_Name & "Activations Append");
+            Activations.Append (Acts_Dot_Coeffs);
+         end if;
+         --           Put_Line (Routine_Name & "Activations length2:" &
+         --                       Integer'Image (Integer (Activations.Length)));
+         --           Put_Line (Routine_Name & "Intercepts length:" &
+         --                       Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
+         Acts_Intercepts := Activations (index + 1) &
+           Self.Attributes.Intercepts (index);
+         Activations.Replace_Element (index + 1, Acts_Intercepts);
 
          --  For the hidden layers
          if index + 1 /= Num_Layers - 1 then
---              Put_Line (Routine_Name & "index + 1:" &
---                          Integer'Image (index + 1));
+            --              Put_Line (Routine_Name & "index + 1:" &
+            --                          Integer'Image (index + 1));
             case Hidden_Activation is
                when Identity_Activation =>
                   Activations (index + 1) := Activations (index);
-               when Logistic_Activation => null;
---                    Activations (index + 1) := Logistic (Activations (index));
-               when Tanh_Activation => null;
---                    Activations (index + 1) := Tanh (Activations (index));
-               when Relu_Activation => null;
---                    Activations (index + 1) := Relu (Activations (index));
-               when Softmax_Activation => null;
---                    Activations (index + 1) := Softmax (Activations (index));
+               when Logistic_Activation =>
+                  Activations (index + 1) := Logistic (Activations (index));
+               when Tanh_Activation =>
+                  Activations (index + 1) := Tanh (Activations (index));
+               when Relu_Activation =>
+                  Activations (index + 1) := Relu (Activations (index));
+               when Softmax_Activation =>
+                  Activations (index + 1) := Softmax (Activations (index));
             end case;
          end if;
       end loop;
@@ -725,20 +723,20 @@ package body Multilayer_Perceptron is
          when Identity_Activation =>
             Activations.Replace_Element
               (Activations.Last_Index, Activations.Element (Num_Layers));
-         when Logistic_Activation => null;
---           Activations.Replace_Element
---                (Activations.Last_Index,
---                 Logistic (Activations (Num_Layers)));
-         when Tanh_Activation => null;
---           Activations.Replace_Element
---                (Activations.Last_Index, Tanh (Activations (Num_Layers)));
-         when Relu_Activation => null;
---           Activations.Replace_Element
---                (Activations.Last_Index, Relu (Activations (Num_Layers)));
-         when Softmax_Activation => null;
---           Activations.Replace_Element
---                (Activations.Last_Index,
---                 Softmax (Activations (Num_Layers)));
+         when Logistic_Activation =>
+            Activations.Replace_Element
+              (Activations.Last_Index,
+               Logistic (Activations (Num_Layers)));
+         when Tanh_Activation =>
+            Activations.Replace_Element
+              (Activations.Last_Index, Tanh (Activations (Num_Layers)));
+         when Relu_Activation =>
+            Activations.Replace_Element
+              (Activations.Last_Index, Relu (Activations (Num_Layers)));
+         when Softmax_Activation =>
+            Activations.Replace_Element
+              (Activations.Last_Index,
+               Softmax (Activations (Num_Layers)));
       end case;
 
    end Forward_Pass;
