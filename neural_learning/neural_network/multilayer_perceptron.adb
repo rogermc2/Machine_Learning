@@ -53,6 +53,16 @@ with Utils;
 package body Multilayer_Perceptron is
    pragma Warnings (Off);
 
+   type Layer_Unit_Record is record
+      Num_Features       : Positive;
+      Hidden_Layer_Sizes : Integer_List;
+      Num_Outputs        : Positive := 1;
+   end record;
+
+   package Layer_Units_Package is new
+     Ada.Containers.Vectors (Positive, Layer_Unit_Record);
+   subtype Layer_Units_List is Layer_Units_Package.Vector;
+
    First_Pass : Boolean := True;
 
    procedure Compute_Loss_Gradient
@@ -70,7 +80,7 @@ package body Multilayer_Perceptron is
                         Deltas          : in out Float_List_3D;
                         Coef_Grads      : in out Float_List_3D;
                         Intercept_Grads : in out Float_List_2D;
-                        Layer_Units     : Integer_List);
+                        Layer_Units     : Layer_Units_List);
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : Float_List_2D;
                              Y               : Integer_List_2D;
@@ -78,17 +88,17 @@ package body Multilayer_Perceptron is
                              Deltas          : in out Float_List_3D;
                              Coef_Grads      : in out Float_List_3D;
                              Intercept_Grads : in out Float_List_2D;
-                             Layer_Units     : Integer_List;
+                             Layer_Units     : Layer_Units_List;
                              Incremental     : Boolean := False);
    procedure Forward_Pass (Self        : in out MLP_Classifier;
                            Activations : in out Activation_List);
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : Integer_List);
+                         Layer_Units : Layer_Units_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
                          Coef_Init       : out Float_List_2D;
                          Intercept_Init  : out Float_List);
-   procedure Init_Grads (Layer_Units     : Integer_List;
+   procedure Init_Grads (Layer_Units     : Layer_Units_List;
                          Coef_Grads      : out Float_List_3D;
                          Intercept_Grads : out Float_List_2D);
    procedure Update_No_Improvement_Count
@@ -331,13 +341,15 @@ package body Multilayer_Perceptron is
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
       Activation                : Activation_Record;
+      --  The ith element of Activations holds the values of the ith layer.
       Activations               : Activation_List;
       Y_2D                      : Integer_List_2D;
       Y_Col                     : Integer_List;
       Hidden_Layer_Sizes        : Integer_List :=
                                     Self.Parameters.Hidden_Layer_Sizes;
       Hidden_Layer_Sizes_Length : Count_Type := Hidden_Layer_Sizes.Length;
-      Layer_Units               : Integer_List;
+      Layer_Data                : Layer_Unit_Record;
+      Layer_Units               : Layer_Units_List;
       Deltas                    : Float_List_3D;
       --  Coef_Grads layers * features * values
       Coef_Grads                : Float_List_3D;
@@ -356,14 +368,15 @@ package body Multilayer_Perceptron is
 
       --  L404
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
-      Layer_Units.Append (Num_Features);
+      Layer_Data.Num_Features := Num_Features;
       if Hidden_Layer_Sizes.Length > 0 then
          for index in Hidden_Layer_Sizes.First_Index ..
            Hidden_Layer_Sizes.Last_Index loop
-            Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
+            Layer_Data.Hidden_Layer_Sizes.Append
+              (Hidden_Layer_Sizes.Element (index));
          end loop;
       end if;
-      Layer_Units.Append (1);
+      Layer_Units.Append (Layer_Data);
 
 --        Validate_Input (Self, Y);
 
@@ -372,8 +385,9 @@ package body Multilayer_Perceptron is
          Initialize (Self, Layer_Units);
       end if;
 
+      --  Set the Activation values of the first layer
       Activation.X := X;
-      Activation.Layer_Units.Set_Length (Layer_Units.Length - 1);
+--        Activation.Layer_Units.Set_Length (Layer_Units.Length - 1);
       Activations.Append (Activation);
       --  Deltas is a 2D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
@@ -403,7 +417,7 @@ package body Multilayer_Perceptron is
                         Deltas          : in out Float_List_3D;
                         Coef_Grads      : in out Float_List_3D;
                         Intercept_Grads : in out Float_List_2D;
-                        Layer_Units     : Integer_List) is
+                        Layer_Units     : Layer_Units_List) is
       use List_Of_Float_Lists_Package;
       Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
       Num_Samples  : constant Positive := Positive (X.Length);
@@ -417,8 +431,8 @@ package body Multilayer_Perceptron is
 
       --  L524  Save sizes and indices of coefficients for faster unpacking
       for index in 1 .. Self.Attributes.N_Layers - 1 loop
-         N_Fan_In := Layer_Units (index);
-         N_Fan_Out := Layer_Units (index + 1);
+         N_Fan_In := Layer_Units.Element (index).Num_Features;
+         N_Fan_Out := Layer_Units.Element (index + 1).Num_Features;
          Last := Start + N_Fan_In * N_Fan_Out;
          Self.Attributes.Coef_Indptr.Append ((Start, Last,
                                              N_Fan_In, N_Fan_Out));
@@ -447,7 +461,7 @@ package body Multilayer_Perceptron is
                              Deltas          : in out Float_List_3D;
                              Coef_Grads      : in out Float_List_3D;
                              Intercept_Grads : in out Float_List_2D;
-                             Layer_Units     : Integer_List;
+                             Layer_Units     : Layer_Units_List;
                              Incremental     : Boolean := False) is
       use Estimator;
       use List_Of_Float_Lists_Package;
@@ -485,6 +499,7 @@ package body Multilayer_Perceptron is
       Batch_Slice        : Integer_List;
       X_Batch            : Float_List_2D;
       Y_Batch            : Integer_List;
+      Activation         : Activation_Record;
       Batch_Loss         : Float;
       Parameters         : Parameters_Record;
       Grads              : Parameters_Record;
@@ -591,7 +606,6 @@ package body Multilayer_Perceptron is
          Put_Line (Routine_Name & "iter:" &  Integer'Image(iter) & "  Batches size: " &
                      Integer'Image (Integer (Batches.Length)) & " x" &
                   Integer'Image (Integer (Batches (1).Length)));
-         Activations.Clear;
          --           Sample_Index := 1;
          --        while Sample_Index <= Max_Sample_Index loop
          --  if Self.Parameters.Shuffle then
@@ -619,13 +633,9 @@ package body Multilayer_Perceptron is
                Put_Line (Routine_Name & "X_Batch size:" &
                            Integer'Image (Integer (X_Batch.Length)));
 
-               if Activations.Is_Empty then
-                  Activations.Append ((X_Batch, Integer_Package.Empty_Vector));
-               else
-                  Activations.Replace_Element
-                          (1, (X_Batch, Activations.Element (1).Layer_Units));
-               end if;
-               Put_Line (Routine_Name & "L645 Activations set");
+               Activation.X := X_Batch;
+               Activations.Append (Activation);
+               Put_Line (Routine_Name & "L645 X_Batch Activation set");
 
                --  L645
                Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
@@ -786,7 +796,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L417
-   procedure Init_Grads (Layer_Units     : Integer_List;
+   procedure Init_Grads (Layer_Units     : Layer_Units_List;
                          Coef_Grads      : out Float_List_3D;
                          Intercept_Grads : out Float_List_2D) is
       use Ada.Containers;
@@ -811,9 +821,9 @@ package body Multilayer_Perceptron is
 
       Zip_Layer_Units           : Integer_Zip_List;
    begin
-      Fan_In_Units := Layer_Units;
+      Fan_In_Units.Append (Layer_Units.Element (1).Num_Features);
       Integer_Package.Delete_Last (Fan_In_Units);
-      Fan_Out_Units := Layer_Units;
+      Fan_Out_Units.Append (Layer_Units.Element (2).Num_Features);
       Integer_Package.Delete_First (Fan_In_Units);
       Zip_Layer_Units := Zip (Fan_In_Units, Fan_Out_Units);
 
@@ -836,7 +846,7 @@ package body Multilayer_Perceptron is
 
    --  L320  BaseMultilayerPerceptron._Initialize
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : Integer_List) is
+                         Layer_Units : Layer_Units_List) is
       use Base_Neural;
       Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
@@ -854,13 +864,9 @@ package body Multilayer_Perceptron is
                   Integer'Image (Self.Attributes.N_Layers));
       for index in 1 .. Self.Attributes.N_Layers - 1 loop
          Put_Line (Routine_Name & "index" & Integer'Image (index));
-         Put_Line (Routine_Name & "Layer_Units (index)" &
-                     Integer'Image (Layer_Units.Element (index)));
-         Put_Line (Routine_Name & "Layer_Units (index + 1)" &
-                     Integer'Image (Layer_Units.Element (index + 1)));
-         Init_Coeff
-           (Self, Layer_Units.Element (index), Layer_Units.Element (index + 1),
-            Coef_Init, Intercept_Init);
+         Init_Coeff (Self, Layer_Units.Element (index).Num_Features,
+                     Layer_Units.Element (index + 1).Num_Features,
+                     Coef_Init, Intercept_Init);
          Self.Attributes.Neuron_Coef_Layers.Append (Coef_Init);
          Self.Attributes.Intercepts.Append (Intercept_Init);
       end loop;

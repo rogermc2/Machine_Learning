@@ -86,14 +86,12 @@ package Utilities is
    procedure Print_Row (Message    : String; Rows : Rows_Vector;
                         Row_Number : Positive);
    procedure Print_Rows (Message : String; Rows : Rows_Vector);
---     procedure Print_Tree (aTree : Tree_Package.Tree);
---     procedure Print_UB_Label_Counts (Rows : Rows_Vector);
    procedure Print_Unique_Values (Rows    : Rows_Vector;
                                   Feature : Feature_Name_Type);
    procedure Print_Value_Record (Message : String;
                                  Value   : Value_Record);
-   function Split_Row_Data (Row_Data : Rows_Vector)
-                             return Data_Record;
+--     function Split_Row_Data (Row_Data : Rows_Vector)
+--                               return Data_Record;
    function Split_String (aString, Pattern : String)
                            return String_List;
    procedure Swap (Data : in out Float_List_2D; L, R : Positive);

@@ -1009,89 +1009,89 @@ package body Utilities is
 
     --  -----------------------------------------------------------------------
 
-    function Split_Row_Data (Row_Data : Rows_Vector)
-                         return Data_Record is
-        use Rows_Package;
-        aRow           : NL_Types.Row_Data := Row_Data.First_Element;
-        Features_List  : Value_Data_Lists_2D;
-        Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
-        Label_Type     : Data_Type;
-        Label_Values   : Value_Data_List;
-        Labels_List    : Value_Data_Lists_2D;
-        Data           : Data_Record;
-    begin
-        Data.Label_Name := aRow.Label;
-
-        for row_index in Row_Data.First_Index .. Row_Data.Last_Index loop
-            aRow := Row_Data.Element (row_index);
-            Label_Values.Clear;
-            declare
-                Features                : constant Feature_Data_Array
-                  (1 .. aRow.Class_Count) := aRow.Features;
-                Feature_Values          : Value_Data_List :=
-                                            Value_Data_Package.Empty_Vector;
-                Label                   : constant Unbounded_String :=
-                                            aRow.Label;
-            begin
-                if row_index = Row_Data.First_Index then
-                    Label_Type := Get_Data_Type (aRow.Label);
-                end if;
-
-                for f_index in Features'First .. Features'Last loop
-                    if row_index = Row_Data.First_Index then
-                        Feature_Types (f_index) :=
-                          Get_Data_Type (aRow.Features (f_index));
-                    end if;
-
-                    declare
-                        Feat_String : constant Unbounded_String := Features (f_index);
-                        Value       : Value_Record (Feature_Types (f_index));
-                    begin
-                        case Feature_Types (f_index) is
-                        when Boolean_Type =>
-                            Value.Boolean_Value :=
-                              Boolean'Value (To_String (Feat_String));
-                        when Integer_Type =>
-                            Value.Integer_Value :=
-                              Integer'Value (To_String (Feat_String));
-                        when Float_Type =>
-                            Value.Float_Value :=
-                              Float'Value (To_String (Feat_String));
-                        when UB_String_Type =>
-                            Value.UB_String_Value := Feat_String;
-                        end case;
-                        Feature_Values.Append (Value);
-                    end;  --  declare block
-                end loop;
-                Features_List.Append (Feature_Values);
-
-                declare
-                    Label_Value : Value_Record (Label_Type);
-                begin
-                    case Label_Type is
-                    when Boolean_Type =>
-                        Label_Value.Boolean_Value :=
-                          Boolean'Value (To_String (Label));
-                    when Integer_Type =>
-                        Label_Value.Integer_Value :=
-                          Integer'Value (To_String (Label));
-                    when Float_Type =>
-                        Label_Value.Float_Value :=
-                          Float'Value (To_String (Label));
-                    when UB_String_Type =>
-                        Label_Value.UB_String_Value := Label;
-                    end case;
-                    Label_Values.Append (Label_Value);
-                end;  --  declare block;
-                Labels_List.Append (Label_Values);
-            end;
-        end loop;
-
-        Data.Feature_Values := Features_List;
-        Data.Label_Values := Labels_List;
-        return Data;
-
-    end Split_Row_Data;
+--      function Split_Row_Data (Row_Data : Rows_Vector)
+--                           return Data_Record is
+--          use Rows_Package;
+--          aRow           : NL_Types.Row_Data := Row_Data.First_Element;
+--          Features_List  : Value_Data_Lists_2D;
+--          Feature_Types  : array  (1 .. aRow.Class_Count) of Data_Type;
+--          Label_Type     : Data_Type;
+--          Label_Values   : Value_Data_List;
+--          Labels_List    : Value_Data_Lists_2D;
+--          Data           : Data_Record;
+--      begin
+--          Data.Label_Name := aRow.Label;
+--
+--          for row_index in Row_Data.First_Index .. Row_Data.Last_Index loop
+--              aRow := Row_Data.Element (row_index);
+--              Label_Values.Clear;
+--              declare
+--                  Features                : constant Feature_Data_Array
+--                    (1 .. aRow.Class_Count) := aRow.Features;
+--                  Feature_Values          : Value_Data_List :=
+--                                              Value_Data_Package.Empty_Vector;
+--                  Label                   : constant Unbounded_String :=
+--                                              aRow.Label;
+--              begin
+--                  if row_index = Row_Data.First_Index then
+--                      Label_Type := Get_Data_Type (aRow.Label);
+--                  end if;
+--
+--                  for f_index in Features'First .. Features'Last loop
+--                      if row_index = Row_Data.First_Index then
+--                          Feature_Types (f_index) :=
+--                            Get_Data_Type (aRow.Features (f_index));
+--                      end if;
+--
+--                      declare
+--                          Feat_String : constant Unbounded_String := Features (f_index);
+--                          Value       : Value_Record (Feature_Types (f_index));
+--                      begin
+--                          case Feature_Types (f_index) is
+--                          when Boolean_Type =>
+--                              Value.Boolean_Value :=
+--                                Boolean'Value (To_String (Feat_String));
+--                          when Integer_Type =>
+--                              Value.Integer_Value :=
+--                                Integer'Value (To_String (Feat_String));
+--                          when Float_Type =>
+--                              Value.Float_Value :=
+--                                Float'Value (To_String (Feat_String));
+--                          when UB_String_Type =>
+--                              Value.UB_String_Value := Feat_String;
+--                          end case;
+--                          Feature_Values.Append (Value);
+--                      end;  --  declare block
+--                  end loop;
+--                  Features_List.Append (Feature_Values);
+--
+--                  declare
+--                      Label_Value : Value_Record (Label_Type);
+--                  begin
+--                      case Label_Type is
+--                      when Boolean_Type =>
+--                          Label_Value.Boolean_Value :=
+--                            Boolean'Value (To_String (Label));
+--                      when Integer_Type =>
+--                          Label_Value.Integer_Value :=
+--                            Integer'Value (To_String (Label));
+--                      when Float_Type =>
+--                          Label_Value.Float_Value :=
+--                            Float'Value (To_String (Label));
+--                      when UB_String_Type =>
+--                          Label_Value.UB_String_Value := Label;
+--                      end case;
+--                      Label_Values.Append (Label_Value);
+--                  end;  --  declare block;
+--                  Labels_List.Append (Label_Values);
+--              end;
+--          end loop;
+--
+--          Data.Feature_Values := Features_List;
+--          Data.Label_Values := Labels_List;
+--          return Data;
+--
+--      end Split_Row_Data;
 
     --  -----------------------------------------------------------------------
 

@@ -18,7 +18,7 @@ package NL_Types is
      of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Array is array (Class_Range range <>) of Unbounded_String;
-   type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
+--     type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
@@ -98,18 +98,14 @@ package NL_Types is
 
    type Activation_Record is record
       X           : Float_List_2D;
-      Layer_Units : Integer_List;
+--        Layer_Units : Integer_List;
    end record;
 
    package Activation_Package is new
      Ada.Containers.Vectors (Positive, Activation_Record);
-   subtype Activation_List is Activation_Package.Vector;
 
-   type Header_Data_Type (Class_Count : Class_Range := 2) is record
-      Features      : Feature_Data_Array (1 .. Class_Count);
-      Feature_Types : Data_Type_Array (1 .. Class_Count);
-      Label         : Unbounded_String;
-   end record;
+   --  The ith element of Activations holds the values of the ith layer.
+   subtype Activation_List is Activation_Package.Vector;
 
    type Row_Data (Class_Count : Class_Range := 2) is record
       Features : Feature_Data_Array (1 .. Class_Count);
@@ -232,7 +228,7 @@ package NL_Types is
       UB_String_Map : UB_Label_Map;
    end record;
 
-   subtype Raw_Label is Unbounded_String;
+--     subtype Raw_Label is Unbounded_String;
 
    type Prediction_Data is record
       Label      : Unbounded_String;
