@@ -91,9 +91,9 @@ package body Multilayer_Perceptron is
    procedure Init_Grads (Layer_Units     : Integer_List;
                          Coef_Grads      : out Float_List_3D;
                          Intercept_Grads : out Float_List_2D);
-   procedure Update_No_Improvement_Count (Self           : in out MLP_Classifier;
-                                          Early_Stopping : Boolean;
-                                          X_Val          : Float_List_2D);
+   procedure Update_No_Improvement_Count
+      (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
+       X_Val : Float_List_2D);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    procedure Validate_Input (Self               : in out MLP_Classifier;
                              --                               X                  : Float_List_2D;
@@ -155,10 +155,11 @@ package body Multilayer_Perceptron is
 
       --  L288  Add L2 regularization term to loss
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
-      Put_Line (Routine_Name & "loss + L2 regularization : " & Float'Image (Loss));
+      Put_Line (Routine_Name & "loss + L2 regularization : " &
+                  Float'Image (Loss));
 
       --  L294 Backward propagate
-      --  The calculation of delta[last]  works with following combinations
+      --  The calculation of delta[last]  works with the following combinations
       --  of output activation and loss function:
       --  sigmoid and binary cross entropy, softmax and categorical cross
       --  entropy and identity with squared loss.
@@ -352,7 +353,8 @@ package body Multilayer_Perceptron is
          Y_2D.Append (Y_Col);
       end loop;
 
-      --  L404 layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
+      --  L404
+      --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
       if Hidden_Layer_Sizes.Length > 0 then
          for index in Hidden_Layer_Sizes.First_Index ..
@@ -369,7 +371,8 @@ package body Multilayer_Perceptron is
          Initialize (Self, Layer_Units);
       end if;
 
-      Activations.Set_Length (X.Length + Layer_Units.Length);
+      Activations.Append (X);
+      Activations.Set_Length (Activations.Length + Layer_Units.Length - 1);
       --  Deltas is a 2D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
