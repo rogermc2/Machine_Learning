@@ -494,6 +494,7 @@ package body Multilayer_Perceptron is
       if Activations.Is_Empty then
         Activations.Set_Length (1);
       end if;
+
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
@@ -618,12 +619,13 @@ package body Multilayer_Perceptron is
                Put_Line (Routine_Name & "X_Batch size:" &
                            Integer'Image (Integer (X_Batch.Length)));
 
---                 if Activations.Is_Empty then
---                    Activations.Append (X_Batch);
---                 else
---                    Activations.Replace_Element (1, X_Batch);
---                 end if;
---                 Put_Line (Routine_Name & "L645 Activations set");
+               if Activations.Is_Empty then
+                  Activations.Append ((X_Batch, Integer_Package.Empty_Vector));
+               else
+                  Activations.Replace_Element
+                          (1, (X_Batch, Activations.Element (1).Layer_Units));
+               end if;
+               Put_Line (Routine_Name & "L645 Activations set");
 
                --  L645
                Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
