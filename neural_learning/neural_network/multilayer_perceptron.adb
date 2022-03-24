@@ -53,16 +53,6 @@ with Utils;
 package body Multilayer_Perceptron is
    pragma Warnings (Off);
 
---     type Layer_Unit_Record is record
---        Num_Features       : Positive;
---        Hidden_Layer_Sizes : Integer_List;
---        Num_Outputs        : Positive := 1;
---     end record;
---
---     package Layer_Units_Package is new
---       Ada.Containers.Vectors (Positive, Layer_Unit_Record);
---     subtype Integer_List is Layer_Units_Package.Vector;
-
    First_Pass : Boolean := True;
 
    procedure Compute_Loss_Gradient
