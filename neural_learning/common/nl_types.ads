@@ -22,7 +22,7 @@ package NL_Types is
 --     type Features_ID_Array is array (Class_Range range <>) of Positive;
    type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
-   subtype Feature_Class is Class_Range;
+--     subtype Feature_Class is Class_Range;
 --     subtype Question_Type is Class_Range;
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
@@ -103,8 +103,8 @@ package NL_Types is
 --     type Node_Kind is (Undefined_Node, Decision_Node, Prediction_Node);
 
    type Activation_Record is record
-      X            : Float_List_2D;
-      Layer_Unit   : Integer;
+      X           : Float_List_2D;
+      Layer_Units : Integer_List;
    end record;
 
    package Activation_Package is new
