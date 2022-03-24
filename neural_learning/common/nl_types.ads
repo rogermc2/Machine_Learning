@@ -19,7 +19,7 @@ package NL_Types is
      of Feature_Name_Type;
    type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Array is array (Class_Range range <>) of Unbounded_String;
-   type Features_ID_Array is array (Class_Range range <>) of Positive;
+--     type Features_ID_Array is array (Class_Range range <>) of Positive;
    type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
    subtype Feature_Class is Class_Range;
@@ -132,9 +132,9 @@ package NL_Types is
 
    type Data_Rows is array (Integer range <>) of Unbounded_String;
 
-   type Features_Data (Class_Count : Class_Range := 2) is record
-      Features   : Features_ID_Array (1 .. Class_Count);
-   end record;
+--     type Features_Data (Class_Count : Class_Range := 2) is record
+--        Features   : Features_ID_Array (1 .. Class_Count);
+--     end record;
 
    package Label_Type_Package is new Ada.Containers.Ordered_Maps
      (Class_Range, Data_Type);
