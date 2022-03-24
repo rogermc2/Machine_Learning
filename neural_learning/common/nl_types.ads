@@ -1,7 +1,7 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
-with Ada.Containers.Indefinite_Multiway_Trees;
+--  with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -23,7 +23,7 @@ package NL_Types is
    type Class_Names_Array is array (Class_Range range <>) of Unbounded_String;
    type Data_Type_Array is array (Class_Range range <>) of Data_Type;
    subtype Feature_Class is Class_Range;
-   subtype Question_Type is Class_Range;
+--     subtype Question_Type is Class_Range;
 
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
@@ -100,7 +100,16 @@ package NL_Types is
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
 
-   type Node_Kind is (Undefined_Node, Decision_Node, Prediction_Node);
+--     type Node_Kind is (Undefined_Node, Decision_Node, Prediction_Node);
+
+   type Activation_Record is record
+      X            : Float_List_2D;
+      Layer_Unit   : Integer;
+   end record;
+
+   package Activation_Package is new
+     Ada.Containers.Vectors (Positive, Activation_Record);
+   subtype Activation_List is Activation_Package.Vector;
 
    type Header_Data_Type (Class_Count : Class_Range := 2) is record
       Features      : Feature_Data_Array (1 .. Class_Count);
@@ -297,31 +306,31 @@ package NL_Types is
       end case;
    end record;
 
-   type Tree_Node_Type (Node_Type : Node_Kind := Undefined_Node) is record
-      Decision_Branch : Boolean := True;
-      case Node_Type is
-         when Decision_Node =>
-            Question        : Question_Data;
-            Gini            : Float := 0.0;
-            True_Branch     : Rows_Vector := Rows_Package.Empty_Vector;
-            False_Branch    : Rows_Vector := Rows_Package.Empty_Vector;
-         when Prediction_Node =>
-            Rows            : Rows_Vector := Rows_Package.Empty_Vector;
-            Prediction      : Row_Data;
-            Prediction_List : Predictions_List;
-         when Undefined_Node => null;
-      end case;
-   end record;
+--     type Tree_Node_Type (Node_Type : Node_Kind := Undefined_Node) is record
+--        Decision_Branch : Boolean := True;
+--        case Node_Type is
+--           when Decision_Node =>
+--              Question        : Question_Data;
+--              Gini            : Float := 0.0;
+--              True_Branch     : Rows_Vector := Rows_Package.Empty_Vector;
+--              False_Branch    : Rows_Vector := Rows_Package.Empty_Vector;
+--           when Prediction_Node =>
+--              Rows            : Rows_Vector := Rows_Package.Empty_Vector;
+--              Prediction      : Row_Data;
+--              Prediction_List : Predictions_List;
+--           when Undefined_Node => null;
+--        end case;
+--     end record;
 
    type Partitioned_Rows is record
       True_Rows  : Rows_Vector;
       False_Rows : Rows_Vector;
    end record;
 
-   package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
-     (Tree_Node_Type);
-   subtype Tree_Type is Tree_Package.Tree;
-   subtype Tree_Cursor is Tree_Package.Cursor;
+--     package Tree_Package is new Ada.Containers.Indefinite_Multiway_Trees
+--       (Tree_Node_Type);
+--     subtype Tree_Type is Tree_Package.Tree;
+--     subtype Tree_Cursor is Tree_Package.Cursor;
 
    package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
      (Unbounded_String);

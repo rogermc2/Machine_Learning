@@ -10,7 +10,7 @@ with Maths;
 
 package body Utilities is
 
-    procedure Print_Results_Question (Question : Question_Data);
+--      procedure Print_Results_Question (Question : Question_Data);
     function Unique_Values (Rows    : Rows_Vector;
                             Feature : Feature_Name_Type) return Value_List;
 
@@ -221,100 +221,100 @@ package body Utilities is
 
     --  ---------------------------------------------------------------------------
 
-    procedure Load_CSV_Data (Data_File : File_Type;
-                             Data      : out Rows_Vector) is
-        use String_Package;
-        --          Routine_Name : constant String := "Utilities.Load_CSV_Data 1 ";
-        Data_Line    : Unbounded_String :=
-                         To_Unbounded_String (Get_Line (Data_File));
-        Num_Features : Class_Range;
-        CSV_Line     : String_List;
-        Curs         : String_Package.Cursor;
-    begin
-        Num_Features :=
-          Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
-        Builder.Set_Header_Data (To_String (Data_Line));
-
-        declare
-            Values : Feature_Data_Array (1 .. Num_Features);
-        begin
-            while not End_Of_File (Data_File) loop
-                declare
-                    Value_Index  : Class_Range := 1;
-                    Row          : Row_Data (Num_Features);
-                    aLine        : constant String := Get_Line (Data_File);
-                begin
-                    if aLine'Length > 1 then
-                        Data_Line := To_Unbounded_String (aLine);
-                        CSV_Line := Utilities.Split_String
-                          (To_String (Data_Line), ",");
-                        Curs := CSV_Line.First;
-                        while Has_Element (Curs) loop
-                            if Curs /= CSV_Line.Last then
-                                Values (Value_Index) := Element (Curs);
-                                Value_Index := Value_Index + 1;
-                            else
-                                Row.Label := Element (Curs);
-                            end if;
-                            Next (Curs);
-                        end loop;
-                        Row.Features := Values;
-                        Data.Append (Row);
-                    end if;
-                end;  --  declare block
-            end loop;
-        end;  --  declare block
-
-    end Load_CSV_Data;
+--      procedure Load_CSV_Data (Data_File : File_Type;
+--                               Data      : out Rows_Vector) is
+--          use String_Package;
+--          --          Routine_Name : constant String := "Utilities.Load_CSV_Data 1 ";
+--          Data_Line    : Unbounded_String :=
+--                           To_Unbounded_String (Get_Line (Data_File));
+--          Num_Features : Class_Range;
+--          CSV_Line     : String_List;
+--          Curs         : String_Package.Cursor;
+--      begin
+--          Num_Features :=
+--            Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
+--          Builder.Set_Header_Data (To_String (Data_Line));
+--
+--          declare
+--              Values : Feature_Data_Array (1 .. Num_Features);
+--          begin
+--              while not End_Of_File (Data_File) loop
+--                  declare
+--                      Value_Index  : Class_Range := 1;
+--                      Row          : Row_Data (Num_Features);
+--                      aLine        : constant String := Get_Line (Data_File);
+--                  begin
+--                      if aLine'Length > 1 then
+--                          Data_Line := To_Unbounded_String (aLine);
+--                          CSV_Line := Utilities.Split_String
+--                            (To_String (Data_Line), ",");
+--                          Curs := CSV_Line.First;
+--                          while Has_Element (Curs) loop
+--                              if Curs /= CSV_Line.Last then
+--                                  Values (Value_Index) := Element (Curs);
+--                                  Value_Index := Value_Index + 1;
+--                              else
+--                                  Row.Label := Element (Curs);
+--                              end if;
+--                              Next (Curs);
+--                          end loop;
+--                          Row.Features := Values;
+--                          Data.Append (Row);
+--                      end if;
+--                  end;  --  declare block
+--              end loop;
+--          end;  --  declare block
+--
+--      end Load_CSV_Data;
 
     --  -------------------------------------------------------------------------
 
-    function Load_CSV_Data
-      (Data_File : File_Type; Header_Line : out Header_Data_Type)
-   return Rows_Vector is
-        use String_Package;
-        --        Routine_Name : constant String := "Utilities.Load_CSV_Data 2 ";
-        Data_Line    : Unbounded_String :=
-                         To_Unbounded_String (Get_Line (Data_File));
-        Num_Features : Class_Range;
-        CSV_Line     : String_List;
-        Curs         : String_Package.Cursor;
-        Data         : Rows_Vector;
-    begin
-        Num_Features :=
-          Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
-        Header_Line := Builder.Parse_Header (To_String (Data_Line));
-
-        declare
-            Values : Feature_Data_Array (1 .. Num_Features);
-        begin
-            while not End_Of_File (Data_File) loop
-                declare
-                    Value_Index  : Class_Range := 1;
-                    Row          : Row_Data (Num_Features);
-                begin
-                    Data_Line := To_Unbounded_String (Get_Line (Data_File));
-                    CSV_Line := Utilities.Split_String
-                      (To_String (Data_Line), ",");
-                    Curs := CSV_Line.First;
-                    while Has_Element (Curs) loop
-                        if Curs /= CSV_Line.Last then
-                            Values (Value_Index) := Element (Curs);
-                            Value_Index := Value_Index + 1;
-                        else
-                            Row.Label := Element (Curs);
-                        end if;
-                        Next (Curs);
-                    end loop;
-                    Row.Features := Values;
-                    Data.Append (Row);
-                end;  --  declare block
-            end loop;
-        end;  --  declare block
-
-        return Data;
-
-    end Load_CSV_Data;
+--      function Load_CSV_Data
+--        (Data_File : File_Type; Header_Line : out Header_Data_Type)
+--     return Rows_Vector is
+--          use String_Package;
+--          --        Routine_Name : constant String := "Utilities.Load_CSV_Data 2 ";
+--          Data_Line    : Unbounded_String :=
+--                           To_Unbounded_String (Get_Line (Data_File));
+--          Num_Features : Class_Range;
+--          CSV_Line     : String_List;
+--          Curs         : String_Package.Cursor;
+--          Data         : Rows_Vector;
+--      begin
+--          Num_Features :=
+--            Class_Range (Ada.Strings.Fixed.Count (To_String (Data_Line), ","));
+--          Header_Line := Builder.Parse_Header (To_String (Data_Line));
+--
+--          declare
+--              Values : Feature_Data_Array (1 .. Num_Features);
+--          begin
+--              while not End_Of_File (Data_File) loop
+--                  declare
+--                      Value_Index  : Class_Range := 1;
+--                      Row          : Row_Data (Num_Features);
+--                  begin
+--                      Data_Line := To_Unbounded_String (Get_Line (Data_File));
+--                      CSV_Line := Utilities.Split_String
+--                        (To_String (Data_Line), ",");
+--                      Curs := CSV_Line.First;
+--                      while Has_Element (Curs) loop
+--                          if Curs /= CSV_Line.Last then
+--                              Values (Value_Index) := Element (Curs);
+--                              Value_Index := Value_Index + 1;
+--                          else
+--                              Row.Label := Element (Curs);
+--                          end if;
+--                          Next (Curs);
+--                      end loop;
+--                      Row.Features := Values;
+--                      Data.Append (Row);
+--                  end;  --  declare block
+--              end loop;
+--          end;  --  declare block
+--
+--          return Data;
+--
+--      end Load_CSV_Data;
 
     --  -------------------------------------------------------------------------
 
@@ -484,61 +484,61 @@ package body Utilities is
 
     --  -------------------------------------------------------------------------
 
-    function Predictions (Node : Tree_Node_Type) return Predictions_List is
-        use Prediction_Data_Package;
-        Num_Rows        : constant Positive := Positive (Node.Rows.Length);
-        Curs            : Cursor;
-        Label           : Unbounded_String;
-        Data            : Prediction_Data;
-        thePredictions  : Predictions_List;
-        Found           : Boolean := False;
-    begin
-        for index in 1 .. Num_Rows loop
-            Label := Node.Rows.Element (index).Label;
-            Curs := thePredictions.First;
-            Found := False;
-            while Has_Element (Curs) and then not Found loop
-                Data := Element (Curs);
-                Found := Element (Curs).Label = Label;
-                if Found then
-                    Data.Num_Copies := Data.Num_Copies + 1;
-                    thePredictions.Replace_Element (Curs, Data);
-                end if;
-                Next (Curs);
-            end loop;
-
-            if not Found then
-                Data.Label := Label;
-                thePredictions.Append (Data);
-            end if;
-        end loop;
-        return thePredictions;
-
-    end Predictions;
-
-    --  ------------------------------------------------------------------------
-
-    procedure Print_Best (Message : String; Best_Split : Builder.Best_Data) is
-        Question     : constant Question_Data :=
-                         Builder.Best_Question (Best_Split);
-        Feature      : constant String := To_String (Question.Feature_Name);
-        Feature_Kind : constant Data_Type := Question.Feature_Kind;
-    begin
-        New_Line;
-        Put_Line (Message & " best question:");
-        Put (Feature & " = ");
-        case Feature_Kind is
-        when Integer_Type =>
-            Put_Line (Integer'Image (Question.Integer_Value));
-        when Float_Type =>
-            Put_Line (Float'Image (Question.Float_Value));
-        when Boolean_Type =>
-            Put_Line (Boolean'Image (Question.Boolean_Value));
-        when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
-        end case;
-        Put_Line ("Gain = " & Float'Image (Builder.Gain (Best_Split)));
-
-    end Print_Best;
+--      function Predictions (Node : Tree_Node_Type) return Predictions_List is
+--          use Prediction_Data_Package;
+--          Num_Rows        : constant Positive := Positive (Node.Rows.Length);
+--          Curs            : Cursor;
+--          Label           : Unbounded_String;
+--          Data            : Prediction_Data;
+--          thePredictions  : Predictions_List;
+--          Found           : Boolean := False;
+--      begin
+--          for index in 1 .. Num_Rows loop
+--              Label := Node.Rows.Element (index).Label;
+--              Curs := thePredictions.First;
+--              Found := False;
+--              while Has_Element (Curs) and then not Found loop
+--                  Data := Element (Curs);
+--                  Found := Element (Curs).Label = Label;
+--                  if Found then
+--                      Data.Num_Copies := Data.Num_Copies + 1;
+--                      thePredictions.Replace_Element (Curs, Data);
+--                  end if;
+--                  Next (Curs);
+--              end loop;
+--
+--              if not Found then
+--                  Data.Label := Label;
+--                  thePredictions.Append (Data);
+--              end if;
+--          end loop;
+--          return thePredictions;
+--
+--      end Predictions;
+--
+--      --  ------------------------------------------------------------------------
+--
+--      procedure Print_Best (Message : String; Best_Split : Builder.Best_Data) is
+--          Question     : constant Question_Data :=
+--                           Builder.Best_Question (Best_Split);
+--          Feature      : constant String := To_String (Question.Feature_Name);
+--          Feature_Kind : constant Data_Type := Question.Feature_Kind;
+--      begin
+--          New_Line;
+--          Put_Line (Message & " best question:");
+--          Put (Feature & " = ");
+--          case Feature_Kind is
+--          when Integer_Type =>
+--              Put_Line (Integer'Image (Question.Integer_Value));
+--          when Float_Type =>
+--              Put_Line (Float'Image (Question.Float_Value));
+--          when Boolean_Type =>
+--              Put_Line (Boolean'Image (Question.Boolean_Value));
+--          when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
+--          end case;
+--          Put_Line ("Gain = " & Float'Image (Builder.Gain (Best_Split)));
+--
+--      end Print_Best;
 
     --  ------------------------------------------------------------------------
 
@@ -712,139 +712,139 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Node (Node : Tree_Node_Type) is
-
-    begin
-        Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
-        Print_Question ("    Question", Node.Question);
-        case Node.Node_Type is
-        when Prediction_Node =>
-            Print_Rows ("        Rows:", Node.Rows);
-            Print_Row ("    Prediction:", Node.Prediction);
-        when Decision_Node =>
-            Print_Rows ("    True Rows:", Node.True_Branch);
-            Print_Rows ("    False Rows:", Node.False_Branch);
-        when Undefined_Node =>
-            Put_Line (" is not defined.");
-        end case;
-
-    end Print_Node;
+--      procedure Print_Node (Node : Tree_Node_Type) is
+--
+--      begin
+--          Put_Line ("    Node type " &  Node_Kind'Image (Node.Node_Type));
+--          Print_Question ("    Question", Node.Question);
+--          case Node.Node_Type is
+--          when Prediction_Node =>
+--              Print_Rows ("        Rows:", Node.Rows);
+--              Print_Row ("    Prediction:", Node.Prediction);
+--          when Decision_Node =>
+--              Print_Rows ("    True Rows:", Node.True_Branch);
+--              Print_Rows ("    False Rows:", Node.False_Branch);
+--          when Undefined_Node =>
+--              Put_Line (" is not defined.");
+--          end case;
+--
+--      end Print_Node;
+--
+--      --  -------------------------------------------------------------------------
+--
+--      procedure Print_Node_Data (Node : Tree_Node_Type; Offset : String) is
+--
+--      begin
+--          Put_Line (Offset & "    gini = " & Float'Image (Node.Gini));
+--          case Node.Node_Type is
+--          when Prediction_Node =>
+--              Print_Row ("    Prediction:", Node.Prediction);
+--          when Decision_Node =>
+--              Put_Line (Offset & "    samples = " &
+--                          Integer'Image (Integer (Node.True_Branch.Length) +
+--                            Integer (Node.False_Branch.Length)));
+--              Put_Line (Offset & "    value = [" &
+--                          Integer'Image (Integer (Node.True_Branch.Length)) & ","
+--                        & Integer'Image (Integer (Node.False_Branch.Length))
+--                        & "]");
+--          when Undefined_Node =>
+--              Put_Line (" is not defined.");
+--          end case;
+--
+--      end Print_Node_Data;
 
     --  -------------------------------------------------------------------------
 
-    procedure Print_Node_Data (Node : Tree_Node_Type; Offset : String) is
-
-    begin
-        Put_Line (Offset & "    gini = " & Float'Image (Node.Gini));
-        case Node.Node_Type is
-        when Prediction_Node =>
-            Print_Row ("    Prediction:", Node.Prediction);
-        when Decision_Node =>
-            Put_Line (Offset & "    samples = " &
-                        Integer'Image (Integer (Node.True_Branch.Length) +
-                          Integer (Node.False_Branch.Length)));
-            Put_Line (Offset & "    value = [" &
-                        Integer'Image (Integer (Node.True_Branch.Length)) & ","
-                      & Integer'Image (Integer (Node.False_Branch.Length))
-                      & "]");
-        when Undefined_Node =>
-            Put_Line (" is not defined.");
-        end case;
-
-    end Print_Node_Data;
-
-    --  -------------------------------------------------------------------------
-
-    procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
-        use Prediction_Data_Package;
-        Curs             : Cursor;
-        Data             : Prediction_Data;
-        Prediction_List  : constant Predictions_List := Node.Prediction_List;
-        Prediction       : Unbounded_String;
-    begin
-        Prediction := To_Unbounded_String (Offset  & "    Predict {");
-        Curs := Prediction_List.First;
-        while Has_Element (Curs) loop
-            Data := Element (Curs);
-            Prediction := Prediction & "'" & To_String (Data.Label) &
-              "':" & Natural'Image (Data.Num_Copies);
-            if not (Curs = Prediction_List.Last) then
-                Prediction := Prediction & ", ";
-            end if;
-            Next (Curs);
-        end loop;
-        Prediction := Prediction & "}";
-        Put_Line (To_String (Prediction));
-
-    end Print_Prediction;
+--      procedure Print_Prediction (Node : Tree_Node_Type; Offset : String) is
+--          use Prediction_Data_Package;
+--          Curs             : Cursor;
+--          Data             : Prediction_Data;
+--          Prediction_List  : constant Predictions_List := Node.Prediction_List;
+--          Prediction       : Unbounded_String;
+--      begin
+--          Prediction := To_Unbounded_String (Offset  & "    Predict {");
+--          Curs := Prediction_List.First;
+--          while Has_Element (Curs) loop
+--              Data := Element (Curs);
+--              Prediction := Prediction & "'" & To_String (Data.Label) &
+--                "':" & Natural'Image (Data.Num_Copies);
+--              if not (Curs = Prediction_List.Last) then
+--                  Prediction := Prediction & ", ";
+--              end if;
+--              Next (Curs);
+--          end loop;
+--          Prediction := Prediction & "}";
+--          Put_Line (To_String (Prediction));
+--
+--      end Print_Prediction;
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Question (Message  : String;
-                              Question : Question_Data) is
-        Col          : constant String := To_String (Question.Feature_Name);
-        Feature_Kind : constant Data_Type := Question.Feature_Kind;
-    begin
-        Put_Line (Message & " question:");
-        Put ("  Feature " & "'" & Col & "'" & " = ");
-        case Feature_Kind is
-        when Integer_Type =>
-            Put_Line (Integer'Image (Question.Integer_Value));
-        when Float_Type =>
-            Put_Line (Float'Image (Question.Float_Value));
-        when Boolean_Type =>
-            Put_Line (Boolean'Image (Question.Boolean_Value));
-        when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
-        end case;
-        Put_Line ("  Gain " & Float'Image (Question.Gain));
-
-    end Print_Question;
+--      procedure Print_Question (Message  : String;
+--                                Question : Question_Data) is
+--          Col          : constant String := To_String (Question.Feature_Name);
+--          Feature_Kind : constant Data_Type := Question.Feature_Kind;
+--      begin
+--          Put_Line (Message & " question:");
+--          Put ("  Feature " & "'" & Col & "'" & " = ");
+--          case Feature_Kind is
+--          when Integer_Type =>
+--              Put_Line (Integer'Image (Question.Integer_Value));
+--          when Float_Type =>
+--              Put_Line (Float'Image (Question.Float_Value));
+--          when Boolean_Type =>
+--              Put_Line (Boolean'Image (Question.Boolean_Value));
+--          when UB_String_Type => Put_Line (To_String (Question.UB_String_Value));
+--          end case;
+--          Put_Line ("  Gain " & Float'Image (Question.Gain));
+--
+--      end Print_Question;
 
     --  --------------------------------------------------------------------------
 
-    procedure Print_Raw_Question (Message : String; Question : Raw_Question) is
-    --  Example" Self = ("Colour", "Green"));
-        Col       : constant String := To_String (Question.Feature_Name);
-        Value     : constant String := To_String (Question.Feature_Value);
-        Data_Kind : constant Data_Type := Get_Data_Type (Question.Feature_Value);
-    begin
-        Put (Message);
-        Put (" raw question: Is " & Col);
-        case Data_Kind is
-        when Integer_Type | Float_Type => Put (" >= ");
-        when others => Put (" = ");
-        end case;
-        Put_Line (" " & Value);
-    end Print_Raw_Question;
+--      procedure Print_Raw_Question (Message : String; Question : Raw_Question) is
+--      --  Example" Self = ("Colour", "Green"));
+--          Col       : constant String := To_String (Question.Feature_Name);
+--          Value     : constant String := To_String (Question.Feature_Value);
+--          Data_Kind : constant Data_Type := Get_Data_Type (Question.Feature_Value);
+--      begin
+--          Put (Message);
+--          Put (" raw question: Is " & Col);
+--          case Data_Kind is
+--          when Integer_Type | Float_Type => Put (" >= ");
+--          when others => Put (" = ");
+--          end case;
+--          Put_Line (" " & Value);
+--      end Print_Raw_Question;
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Results_Question (Question : Question_Data) is
-        UB_String : Unbounded_String;
-    begin
-        Put ("Is " & To_String (Question.Feature_Name));
-        case Question.Feature_Kind is
-        when Integer_Type =>
-            Put (" >= " & Integer'Image
-                 (Question.Integer_Value));
-        when Float_Type =>
-            Put (" >= " & Float'Image
-                 (Question.Float_Value));
-        when Boolean_Type =>
-            Put (" = " & Boolean'Image
-                 (Question.Boolean_Value));
-        when UB_String_Type =>
-            UB_String := Question.UB_String_Value;
-            if Is_Integer (UB_String) or else
-              Is_Float (UB_String) then
-                Put (" >= " & To_String (UB_String));
-            else
-                Put (" = " & To_String (UB_String));
-            end if;
-        end case;
-        Put_Line ("?");
-
-    end Print_Results_Question;
+--      procedure Print_Results_Question (Question : Question_Data) is
+--          UB_String : Unbounded_String;
+--      begin
+--          Put ("Is " & To_String (Question.Feature_Name));
+--          case Question.Feature_Kind is
+--          when Integer_Type =>
+--              Put (" >= " & Integer'Image
+--                   (Question.Integer_Value));
+--          when Float_Type =>
+--              Put (" >= " & Float'Image
+--                   (Question.Float_Value));
+--          when Boolean_Type =>
+--              Put (" = " & Boolean'Image
+--                   (Question.Boolean_Value));
+--          when UB_String_Type =>
+--              UB_String := Question.UB_String_Value;
+--              if Is_Integer (UB_String) or else
+--                Is_Float (UB_String) then
+--                  Put (" >= " & To_String (UB_String));
+--              else
+--                  Put (" = " & To_String (UB_String));
+--              end if;
+--          end case;
+--          Put_Line ("?");
+--
+--      end Print_Results_Question;
 
     --  ------------------------------------------------------------------------
 
@@ -904,81 +904,81 @@ package body Utilities is
 
     --  ------------------------------------------------------------------------
 
-    procedure Print_Tree (aTree : Tree_Type) is
-        use Tree_Package;
-        This_Indent : Natural := 0;
-        Last_Offset : Unbounded_String;
-
-        procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
-            use Ada.Containers;
-            Node         : Tree_Node_Type;
-            True_Child   : Cursor;
-            False_Child  : Cursor;
-        begin
-            This_Indent := Indent + 1;
-            if This_Indent > 10 then
-                This_Indent := 1;
-            end if;
-            Node := Element (Curs);
-            if Is_Leaf  (Curs) then
-                Print_Prediction (Node, To_String (Last_Offset));
-            else
-                declare
-                    Offset    : String (1 .. This_Indent + 1) := (others => ' ');
-                    pos       : Natural := 1;
-                begin
-                    while pos < This_Indent - 1 loop
-                        Offset (pos .. pos + 2) := "   ";
-                        pos := pos + 2;
-                    end loop;
-                    if This_Indent > 1 and then pos < This_Indent + 1 then
-                        Offset (Indent) := ' ';
-                    end if;
-                    Put (Offset);
-                    Last_Offset := To_Unbounded_String (Offset);
-
-                    if Node.Node_Type = Prediction_Node then
-                        Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
-                        Print_Prediction (Node, Offset);
-                    else
-                        Print_Results_Question (Node.Question);
-                        Put_Line (Offset & "--> True:");
-                        Print_Node_Data (Node, Offset);
-                        True_Child := First_Child (Curs);
-                        Print_Tree_Node (True_Child, This_Indent + 1);
-
-                        if Child_Count (Curs) > 1 then
-                            False_Child := Next_Sibling (True_Child);
-                            Put_Line (Offset & "--> False:");
-                            Print_Node_Data (Node, Offset);
-                            Print_Tree_Node (False_Child, This_Indent + 1);
-                        end if;
-                    end if;
-                end; --  declare block
-            end if;
-        end Print_Tree_Node;
-
-    begin
-        Print_Tree_Node (First_Child (aTree.Root));
-    end Print_Tree;
+--      procedure Print_Tree (aTree : Tree_Type) is
+--          use Tree_Package;
+--          This_Indent : Natural := 0;
+--          Last_Offset : Unbounded_String;
+--
+--          procedure Print_Tree_Node (Curs : Cursor; Indent : Natural := 0) is
+--              use Ada.Containers;
+--              Node         : Tree_Node_Type;
+--              True_Child   : Cursor;
+--              False_Child  : Cursor;
+--          begin
+--              This_Indent := Indent + 1;
+--              if This_Indent > 10 then
+--                  This_Indent := 1;
+--              end if;
+--              Node := Element (Curs);
+--              if Is_Leaf  (Curs) then
+--                  Print_Prediction (Node, To_String (Last_Offset));
+--              else
+--                  declare
+--                      Offset    : String (1 .. This_Indent + 1) := (others => ' ');
+--                      pos       : Natural := 1;
+--                  begin
+--                      while pos < This_Indent - 1 loop
+--                          Offset (pos .. pos + 2) := "   ";
+--                          pos := pos + 2;
+--                      end loop;
+--                      if This_Indent > 1 and then pos < This_Indent + 1 then
+--                          Offset (Indent) := ' ';
+--                      end if;
+--                      Put (Offset);
+--                      Last_Offset := To_Unbounded_String (Offset);
+--
+--                      if Node.Node_Type = Prediction_Node then
+--                          Put_Line ("Print_Tree_Node non-leaf prediction encountered! ");
+--                          Print_Prediction (Node, Offset);
+--                      else
+--                          Print_Results_Question (Node.Question);
+--                          Put_Line (Offset & "--> True:");
+--                          Print_Node_Data (Node, Offset);
+--                          True_Child := First_Child (Curs);
+--                          Print_Tree_Node (True_Child, This_Indent + 1);
+--
+--                          if Child_Count (Curs) > 1 then
+--                              False_Child := Next_Sibling (True_Child);
+--                              Put_Line (Offset & "--> False:");
+--                              Print_Node_Data (Node, Offset);
+--                              Print_Tree_Node (False_Child, This_Indent + 1);
+--                          end if;
+--                      end if;
+--                  end; --  declare block
+--              end if;
+--          end Print_Tree_Node;
+--
+--      begin
+--          Print_Tree_Node (First_Child (aTree.Root));
+--      end Print_Tree;
 
     --  -------------------------------------------------------------------------
 
-    procedure Print_UB_Label_Counts (Rows : Rows_Vector) is
-        use UB_Label_Map_Package;
-        Label_Counts : constant UB_Label_Map :=
-                         Builder.UB_Label_Counts (Rows);
-        Count_Cursor : UB_Label_Map_Package.Cursor := Label_Counts.First;
-        aCount       : Natural;
-    begin
-        Put_Line ("Label Counts:");
-        while Has_Element (Count_Cursor) loop
-            aCount := Element (Count_Cursor);
-            Put_Line (To_String ((Key (Count_Cursor))) &  ": " &
-                        Natural'Image (aCount));
-            next (Count_Cursor);
-        end loop;
-    end Print_UB_Label_Counts;
+--      procedure Print_UB_Label_Counts (Rows : Rows_Vector) is
+--          use UB_Label_Map_Package;
+--          Label_Counts : constant UB_Label_Map :=
+--                           Builder.UB_Label_Counts (Rows);
+--          Count_Cursor : UB_Label_Map_Package.Cursor := Label_Counts.First;
+--          aCount       : Natural;
+--      begin
+--          Put_Line ("Label Counts:");
+--          while Has_Element (Count_Cursor) loop
+--              aCount := Element (Count_Cursor);
+--              Put_Line (To_String ((Key (Count_Cursor))) &  ": " &
+--                          Natural'Image (aCount));
+--              next (Count_Cursor);
+--          end loop;
+--      end Print_UB_Label_Counts;
 
     --  -------------------------------------------------------------------------
 

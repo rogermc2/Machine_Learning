@@ -59,14 +59,14 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : Base_Neural.Activation_List;
+      Activations     : Activation_List;
       Deltas          : Float_List_3D;
       Coef_Grads      : in out Float_List_3D;
       Intercept_Grads : in out Float_List_2D);
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
                         X               : Float_List_2D;
                         Y               : Integer_List_2D;
-                        Activations     : in out Base_Neural.Activation_List;
+                        Activations     : in out Activation_List;
                         Deltas          : in out Float_List_3D;
                         Coef_Grads      : in out Float_List_3D;
                         Intercept_Grads : in out Float_List_2D;
@@ -74,14 +74,14 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : Float_List_2D;
                              Y               : Integer_List_2D;
-                             Activations     : in out Base_Neural.Activation_List;
+                             Activations     : in out Activation_List;
                              Deltas          : in out Float_List_3D;
                              Coef_Grads      : in out Float_List_3D;
                              Intercept_Grads : in out Float_List_2D;
                              Layer_Units     : Integer_List;
                              Incremental     : Boolean := False);
    procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out Base_Neural.Activation_List);
+                           Activations : in out Activation_List);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
@@ -105,7 +105,7 @@ package body Multilayer_Perceptron is
    procedure Backprop (Self            : in out MLP_Classifier;
                        X               : Float_List_2D;
                        Y               : Integer_List_2D;
-                       Activations     : in out Base_Neural.Activation_List;
+                       Activations     : in out Activation_List;
                        Deltas          : in out Float_List_3D;
                        Loss            : out Float;
                        Coef_Grads      : out Float_List_3D;
@@ -122,7 +122,7 @@ package body Multilayer_Perceptron is
       Values             : Float := 0.0;
       F_I                : Positive;
       Last               : Positive;
-      Activation         : Base_Neural.Activation_Record;
+      Activation         : Float_List_2D;
       Diff               : Float_List_2D;
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
@@ -291,7 +291,7 @@ package body Multilayer_Perceptron is
      (Self            : in out MLP_Classifier;
       Layer           : Positive;
       Num_Samples     : Positive;
-      Activations     : Base_Neural.Activation_List;
+      Activations     : Activation_List;
       Deltas          : Float_List_3D;
       Coef_Grads      : in out Float_List_3D;
       Intercept_Grads : in out Float_List_2D) is
@@ -329,7 +329,7 @@ package body Multilayer_Perceptron is
       --        Num_Samples               : constant Positive := Positive (X.Length);
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
-      Activations               : Base_Neural.Activation_List;
+      Activations               : Activation_List;
       Y_2D                      : Integer_List_2D;
       Y_Col                     : Integer_List;
       Hidden_Layer_Sizes        : Integer_List :=
@@ -396,7 +396,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
                         X               : Float_List_2D;
                         Y               : Integer_List_2D;
-                        Activations     : in out Base_Neural.Activation_List;
+                        Activations     : in out Float_List_3D;
                         Deltas          : in out Float_List_3D;
                         Coef_Grads      : in out Float_List_3D;
                         Intercept_Grads : in out Float_List_2D;
@@ -661,7 +661,7 @@ package body Multilayer_Perceptron is
    --  computing the values of the neurons in the hidden layers and the
    --  output layer.
    procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out Base_Neural.Activation_List) is
+                           Activations : in out Activation_List) is
       --  The ith element of Activations holds the values of the ith layer.
       use Base_Neural;
       use Float_Package;
