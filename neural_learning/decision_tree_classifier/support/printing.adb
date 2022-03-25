@@ -286,9 +286,13 @@ package body Printing is
                                  Start : Positive := 1; Last : Positive := 10)
    is
       Count : Integer := 1;
+      Stop  : Integer := Last;
    begin
+      if Stop > Integer (theList.Length) then
+         Stop := Integer (theList.Length);
+      end if;
       Put_Line (Name & ": ");
-      for Index in Start .. Last loop
+      for Index in Start .. Stop loop
          Put (Integer'Image (theList.Element (Index)) & "   ");
          Count := Count + 1;
          if Count > 10 then

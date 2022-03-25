@@ -383,7 +383,7 @@ package body Multilayer_Perceptron is
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  Deltas length set in Backprop
---        Deltas.Set_Length (Activations.Length - 1);
+      --        Deltas.Set_Length (Activations.Length - 1);
       --  L417
       Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
       Put_Line (Routine_Name & "Gradients initialised.");
@@ -455,6 +455,7 @@ package body Multilayer_Perceptron is
                              Intercept_Grads : in out Float_List_2D;
                              Layer_Units     : Integer_List;
                              Incremental     : Boolean := False) is
+      use Ada.Containers;
       use Estimator;
       use List_Of_Float_Lists_Package;
       Routine_Name       : constant String :=
@@ -491,14 +492,11 @@ package body Multilayer_Perceptron is
       Batch_Slice        : Integer_List;
       X_Batch            : Float_List_2D;
       Y_Batch            : Integer_List;
-      --        Activation         : Activation_Record;
       Activation         : Float_List_2D;
       Batch_Loss         : Float;
       Parameters         : Parameters_Record;
       Grads              : Parameters_Record;
    begin
-      Printing.Print_Float_Lists_2D (Routine_Name &
-                                       "Intercept Params", Intercept_Params);
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
@@ -578,10 +576,10 @@ package body Multilayer_Perceptron is
       if Batch_Size = 0 then
          Batch_Size := Integer'Min (200, Num_Samples);
       elsif Batch_Size > Num_Samples then
-            Put_Line (Routine_Name & "WARNING: Batch size" &
-                        Integer'Image (Self.Parameters.Batch_Size)  &
-                        " clipped to" & Integer'Image (Num_Samples));
-            Batch_Size := Num_Samples;
+         Put_Line (Routine_Name & "WARNING: Batch size" &
+                     Integer'Image (Self.Parameters.Batch_Size)  &
+                     " clipped to" & Integer'Image (Num_Samples));
+         Batch_Size := Num_Samples;
       end if;
 
       --        Max_Sample_Index := Num_Samples;
@@ -610,9 +608,9 @@ package body Multilayer_Perceptron is
                         Integer'Image (batch_index));
             Batch_Slice := Batches (batch_index);
             Printing.Print_Integer_List (Routine_Name & " Batch_Slice",
-                                         Batch_Slice);
+                                         Batch_Slice, 195, 203);
             Put_Line (Routine_Name & "Batch_Slice size:" &
-                        Integer'Image (Integer (Batch_Slice.Length)));
+                        Count_Type'Image (Batch_Slice.Length));
             X_Batch.Clear;
             Y_Batch.Clear;
 
@@ -841,6 +839,7 @@ package body Multilayer_Perceptron is
    --  L320
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : Integer_List) is
+      use Ada.Containers;
       use Base_Neural;
       Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Coef_Init      : Float_List_2D;
@@ -856,14 +855,24 @@ package body Multilayer_Perceptron is
       --  L344
       Put_Line (Routine_Name & "N_Layers" &
                   Integer'Image (Self.Attributes.N_Layers));
-      for index in 1 .. Self.Attributes.N_Layers - 1 loop
-         Put_Line (Routine_Name & "index" & Integer'Image (index));
-         Init_Coeff (Self, Layer_Units.Element (index),
-                     Layer_Units.Element (index + 1),
+      for layer in 1 .. Self.Attributes.N_Layers - 1 loop
+         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
+         Init_Coeff (Self, Layer_Units.Element (layer),
+                     Layer_Units.Element (layer + 1),
                      Coef_Init, Intercept_Init);
+         --  Add coefficent matrices and intercept vectors for layer.
          Self.Attributes.Neuron_Coef_Layers.Append (Coef_Init);
          Self.Attributes.Intercepts.Append (Intercept_Init);
       end loop;
+      Put_Line (Routine_Name & "Neuron_Coef_Layers size" &
+                  Count_Type'Image (Self.Attributes.Neuron_Coef_Layers.Length) &
+                  Count_Type'Image (Self.Attributes.Neuron_Coef_Layers (1).Length) &
+                  Count_Type'Image (Self.Attributes.Neuron_Coef_Layers (1) (1).Length));
+      Put_Line (Routine_Name & "Intercepts size" &
+                  Count_Type'Image (Self.Attributes.Intercepts.Length) &
+                  Count_Type'Image (Self.Attributes.Intercepts (1).Length));
+      --        Printing.Print_Float_Lists_3D ("Neuron_Coef_Layers", Self.Attributes.Neuron_Coef_Layers);
+      --        Printing.Print_Float_Lists_2D ("Intercepts", Self.Attributes.Intercepts);
 
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
