@@ -389,27 +389,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Value_Lists_2D
---       (Name : String; Multi_List : Tree.Values_List_2D) is
---     begin
---        Print_Float_Lists_2D (Name, Multi_List);
---     end Print_Value_Lists_2D;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Value_Lists_3D (Name    : String;
---                                     theList : Tree.Values_List_3D) is
---     begin
---        Put_Line (Name & ": ");
---        for index in theList.First_Index .. theList.Last_Index loop
---           Print_Value_Lists_2D ("List" & Integer'Image (index),
---                                 theList.Element (index));
---        end loop;
---        New_Line;
---     end Print_Value_Lists_3D;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_Natural_List (Name : String; theList : Natural_List) is
       Count : Integer := 1;
    begin
@@ -430,88 +409,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Node (Node : Tree.Tree_Node; Offset : String := "") is
---        UB_Offset   : constant Unbounded_String :=
---                        To_Unbounded_String (Offset);
---     begin
---        Put_Line ("Node" & Integer'Image (Node.Node_ID));
---        Put_Line (To_String (UB_Offset) & "Number of samples" &
---                    Integer'Image (Node.Num_Node_Samples));
---        Put (To_String (UB_Offset & "Type of node: "));
---
---        if Node.Leaf_Node then
---           Put_Line ("Leaf");
---        else
---           Put_Line ("Decision");
---        end if;
---
---        Put_Line (To_String (UB_Offset & "Number of weighted samples:" &
---                    Integer'Image (Node.Weighted_Num_Node_Samples)));
---        Put_Line (To_String (UB_Offset & "Impurity: " &
---                    Float'Image (Node.Impurity)));
---
---        if not Node.Leaf_Node then
---           Put_Line (To_String (UB_Offset & "Feature index: " &
---                       Integer'Image (Node.Best_Fit_Feature_Index)));
---           Put_Line (To_String (UB_Offset & "Threshold: " &
---                       Float'Image (Node.Threshold)));
---        end if;
---
---     end Print_Node;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Node (Message : String; Node : Tree.Tree_Node) is
---     begin
---        if Message'Length > 0 then
---           Put_Line (Message);
---        end if;
---        Print_Node (Node);
---        New_Line;
---
---     end Print_Node;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Node (Message : String; Node : Tree.Tree_Cursor) is
---        use Tree.Nodes_Package;
---     begin
---        if Message'Length > 0 then
---           Put_Line (Message);
---        end if;
---        Print_Node (Element (Node));
---        New_Line;
---
---     end Print_Node;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Node_Cursor_Array (Name    : String;
---                                        Cursors : Tree.Leaf_Cursor_Array) is
---        use Tree.Nodes_Package;
---     begin
---        Put_Line (Name & ": ");
---        for Index in Cursors'First .. Cursors'Last loop
---           Print_Node ("", Element (Cursors (index)));
---        end loop;
---
---     end Print_Node_Cursor_Array;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Node_Cursor_List (Name    : String;
---                                       Cursors : Tree.Tree_Cursor_List) is
---        use Tree.Nodes_Package;
---     begin
---        Put_Line (Name & ": ");
---        for Index in Cursors.First_Index .. Cursors.Last_Index loop
---           Print_Node ("", Element (Cursors.Element (index)));
---        end loop;
---
---     end Print_Node_Cursor_List;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_RGB_Array (Name    : String;
                               anArray : Export_Types.RGB_Array) is
       use Export_Types;
@@ -529,39 +426,38 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Split_Record (Name : String;
---                                   Data : Node_Splitter.Split_Record) is
---     begin
---        Put_Line (Name & ": ");
---        Put_Line ("Feature_Index:  " & Integer'image (Data.Feature));
---        Put_Line ("Split Row:      " & Integer'image (Data.Split_Row));
---        Put_Line ("Threshold:      " & Float'image (Data.Threshold));
---        Put_Line ("Improvement:    " & Float'image (Data.Improvement));
---        Put_Line ("Impurity Left:  " & Float'image (Data.Impurity_Left));
---        Put_Line ("Impurity Right: " & Float'image (Data.Impurity_Right));
---        New_Line;
---
---     end Print_Split_Record;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Stack_Record (Name : String;
---                                   Data : Build_Utils.Stack_Record) is
---        use Tree.Nodes_Package;
---     begin
---        Put_Line (Name & ": ");
---        Put_Line ("Parent Node ID: " &
---                    Integer'image (Element (Data.Parent_Cursor).Node_ID));
---        Put_Line ("Start Row:      " & Integer'Image (Data.Start));
---        Put_Line ("Stop Row:       " & Integer'Image (Data.Stop));
---        Put_Line ("Depth:          " & Integer'Image (Data.Depth));
---        Put_Line ("Branch:         " & Tree.Node_Type'Image (Data.Branch));
---        Put_Line ("Impurity:       " & Float'Image (Data.Impurity));
---        Put_Line ("Num Constant Features: " &
---                    Integer'Image (Data.Num_Constant_Features));
---        New_Line;
---
---     end Print_Stack_Record;
+   procedure Print_Slice (Name : String; theSlice : Slice_Record) is
+   begin
+      Put_Line (Name & ": (" &Integer'Image (theSlice.First) & " ," &
+                Integer'Image (theSlice.Last) & ")");
+
+   end Print_Slice;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Slices (Name  : String; theList : Slices_List;
+                           Start : Positive := 1; Last : Positive := 10) is
+      Slice : Slice_Record;
+      Count : Integer := 1;
+      Stop  : Integer := Last;
+   begin
+      if Stop > Integer (theList.Length) then
+         Stop := Integer (theList.Length);
+      end if;
+      Put_Line (Name & ": ");
+      for Index in Start .. Stop loop
+         Slice := theList.Element (Index);
+         Put ("(" &Integer'Image (Slice.First) & " ," &
+                Integer'Image (Slice.Last) & ")");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Slices;
 
    --  ------------------------------------------------------------------------
 
@@ -636,63 +532,63 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Tree (Name  : String;
---                           aTree : Base_Decision_Tree.Classifier) is
---        Tree_Nodes  : constant Tree.Tree_Class :=
---                        aTree.Attributes.Decision_Tree;
---     begin
---        Print_Tree (Name, Tree_Nodes);
---     end Print_Tree;
---
---     --  -------------------------------------------------------------------------
---
---     procedure Print_Tree (Name  : String;
---                           aTree : Tree.Tree_Class) is
---        use Tree;
---        use Nodes_Package;
---        Nodes       : constant Tree_Nodes := aTree.Nodes;
---        This_Indent : Natural := 0;
---        --  Print_Tree_Node is recursive
---        procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
---                                   Indent : Natural := 0) is
---           use Ada.Containers;
---           Node   : constant Tree_Node := Element (Curs);
---        begin
---           This_Indent := Indent + 1;
---           if This_Indent > 10 then
---              This_Indent := 1;
---           end if;
---
---           declare
---              Offset : String (1 .. This_Indent + 1) := (others => ' ');
---              pos    : Natural := 1;
---           begin
---              while pos < This_Indent - 1 loop
---                 Offset (pos .. pos + 2) := "   ";
---                 pos := pos + 2;
---              end loop;
---
---              if This_Indent > 1 and then pos < This_Indent + 1 then
---                 Offset (Indent) := ' ';
---              end if;
---
---              Print_Node (Node, Offset);
---
---              if not Is_Leaf (Curs) then
---                 Print_Tree_Node (First_Child (Curs));
---                 if Child_Count (Curs) > 1 then
---                    Print_Tree_Node (Next_Sibling (First_Child (Curs)));
---                 end if;
---              end if;
---           end; --  declare block
---
---        end Print_Tree_Node;
---
---     begin
---        Put_Line (Name);
---        Print_Tree_Node (First_Child (Nodes.Root));
---
---     end Print_Tree;
+   --     procedure Print_Tree (Name  : String;
+   --                           aTree : Base_Decision_Tree.Classifier) is
+   --        Tree_Nodes  : constant Tree.Tree_Class :=
+   --                        aTree.Attributes.Decision_Tree;
+   --     begin
+   --        Print_Tree (Name, Tree_Nodes);
+   --     end Print_Tree;
+   --
+   --     --  -------------------------------------------------------------------------
+   --
+   --     procedure Print_Tree (Name  : String;
+   --                           aTree : Tree.Tree_Class) is
+   --        use Tree;
+   --        use Nodes_Package;
+   --        Nodes       : constant Tree_Nodes := aTree.Nodes;
+   --        This_Indent : Natural := 0;
+   --        --  Print_Tree_Node is recursive
+   --        procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
+   --                                   Indent : Natural := 0) is
+   --           use Ada.Containers;
+   --           Node   : constant Tree_Node := Element (Curs);
+   --        begin
+   --           This_Indent := Indent + 1;
+   --           if This_Indent > 10 then
+   --              This_Indent := 1;
+   --           end if;
+   --
+   --           declare
+   --              Offset : String (1 .. This_Indent + 1) := (others => ' ');
+   --              pos    : Natural := 1;
+   --           begin
+   --              while pos < This_Indent - 1 loop
+   --                 Offset (pos .. pos + 2) := "   ";
+   --                 pos := pos + 2;
+   --              end loop;
+   --
+   --              if This_Indent > 1 and then pos < This_Indent + 1 then
+   --                 Offset (Indent) := ' ';
+   --              end if;
+   --
+   --              Print_Node (Node, Offset);
+   --
+   --              if not Is_Leaf (Curs) then
+   --                 Print_Tree_Node (First_Child (Curs));
+   --                 if Child_Count (Curs) > 1 then
+   --                    Print_Tree_Node (Next_Sibling (First_Child (Curs)));
+   --                 end if;
+   --              end if;
+   --           end; --  declare block
+   --
+   --        end Print_Tree_Node;
+   --
+   --     begin
+   --        Put_Line (Name);
+   --        Print_Tree_Node (First_Child (Nodes.Root));
+   --
+   --     end Print_Tree;
 
    --  -------------------------------------------------------------------------
 
@@ -743,21 +639,21 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Value_List (Name    : String;
---                                 theList : Tree.Values_List) is
---        Count : Integer := 1;
---     begin
---        Put_Line (Name & ": ");
---        for Index in theList.First_Index .. theList.Last_Index loop
---           Put ("   " & Float'Image (theList.Element (Index)));
---           Count := Count + 1;
---           if Count > 5 then
---              New_Line;
---              Count := 1;
---           end if;
---        end loop;
---        New_Line;
---     end Print_Value_List;
+   --     procedure Print_Value_List (Name    : String;
+   --                                 theList : Tree.Values_List) is
+   --        Count : Integer := 1;
+   --     begin
+   --        Put_Line (Name & ": ");
+   --        for Index in theList.First_Index .. theList.Last_Index loop
+   --           Put ("   " & Float'Image (theList.Element (Index)));
+   --           Count := Count + 1;
+   --           if Count > 5 then
+   --              New_Line;
+   --              Count := 1;
+   --           end if;
+   --        end loop;
+   --        New_Line;
+   --     end Print_Value_List;
 
    --  ------------------------------------------------------------------------
 

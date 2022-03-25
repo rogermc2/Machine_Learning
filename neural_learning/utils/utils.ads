@@ -14,7 +14,6 @@ package Utils is
       Ada.Containers.Formal_Ordered_Maps (Integer, Bunch_Data);
 
    function Gen_Batches (Num_To_Slice, Batch_Size : Positive;
-                         Min_Batch_Size : Natural := 0)
-                         return Integer_List_2D;
+                         Min_Batch_Size : Natural := 0) return Slices_List;
 
 end Utils;

@@ -488,8 +488,8 @@ package body Multilayer_Perceptron is
       Sample_Index       : Positive;
       Max_Sample_Index   : Positive;
       Accumulated_Loss   : Float := 0.0;
-      Batches            : Integer_List_2D;
-      Batch_Slice        : Integer_List;
+      Batches            : Slices_List;
+      Batch_Slice        : Slice_Record;
       X_Batch            : Float_List_2D;
       Y_Batch            : Integer_List;
       Activation         : Float_List_2D;
@@ -595,32 +595,28 @@ package body Multilayer_Perceptron is
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          Put_Line (Routine_Name & "iter:" &  Integer'Image(iter) & "  Batches size: " &
-                     Integer'Image (Integer (Batches.Length)) & " x" &
-                     Integer'Image (Integer (Batches (1).Length)));
+                     Integer'Image (Integer (Batches.Length)));
          --           Sample_Index := 1;
          --        while Sample_Index <= Max_Sample_Index loop
          --  if Self.Parameters.Shuffle then
          --      Sample_Index := Shuffle (Sample_Index, Random_State);
          --  end if;
+         Printing.Print_Slices (Routine_Name & " Batches", Batches);
+--                                           Batch_Slice, 195, 203);
          --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
             Put_Line (Routine_Name & "L636 Batch index:" &
                         Integer'Image (batch_index));
             Batch_Slice := Batches (batch_index);
-            Printing.Print_Integer_List (Routine_Name & " Batch_Slice",
-                                         Batch_Slice, 195, 203);
-            Put_Line (Routine_Name & "Batch_Slice size:" &
-                        Count_Type'Image (Batch_Slice.Length));
+            Printing.Print_Slice (Routine_Name & "Slice", Batch_Slice);
             X_Batch.Clear;
             Y_Batch.Clear;
 
-            for index in Batch_Slice.First_Index .. Batch_Slice.Last_Index loop
-               Put_Line (Routine_Name & "Batch_Slice (index):" &
-                           Integer'Image (Batch_Slice (index)));
+            for index in Batch_Slice.First .. Batch_Slice.Last loop
                Put_Line (Routine_Name & "X size:" &
                            Integer'Image (Integer (X.Length)));
-               X_Batch.Append (X (Batch_Slice (index)));
-               Y_Batch.Append (Y (Batch_Slice (index)));
+               X_Batch.Append (X (index));
+               Y_Batch.Append (Y (index));
                Put_Line (Routine_Name & "X_Batch size:" &
                            Integer'Image (Integer (X_Batch.Length)));
 
@@ -633,7 +629,7 @@ package body Multilayer_Perceptron is
                          Coef_Grads, Intercept_Grads);
                Put_Line (Routine_Name & "Backprop done");
                Accumulated_Loss := Accumulated_Loss + Batch_Loss *
-                 Float (Batch_Slice.Last_Index - Batch_Slice.First_Index + 1);
+                 Float (Batch_Slice.Last - Batch_Slice.First + 1);
                --  L657 update weights
                Parameters.Coeff_Params := Coeff_Params;
                Parameters.Intercept_Params := Intercept_Params;

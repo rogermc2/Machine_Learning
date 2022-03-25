@@ -287,4 +287,13 @@ package NL_Types is
      (Unbounded_String);
    subtype Strings_List is Strings_Package.List;
 
+   type Slice_Record is record
+      First : Positive;
+      Last  : Positive;
+   end record;
+
+   package Slices_Package is new Ada.Containers.Vectors
+     (Positive, Slice_Record);
+   subtype Slices_List is Slices_Package.Vector;
+
 end NL_Types;
