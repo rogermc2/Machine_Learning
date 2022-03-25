@@ -1,9 +1,12 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Maths;
 
 with Classifier_Utilities;
 with Neural_Maths;
+with Printing;
 
 package body Base_Neural is
 
@@ -13,6 +16,8 @@ package body Base_Neural is
                              return Float is
       use Maths.Float_Math_Functions;
       use Float_Package;
+      Routine_Name : constant String :=
+                       "Base_Neural.Binary_Log_Loss_Function ";
       Y_P      : Float_List;
       Y_T      : Integer_List;
       YP_Float : Float_List;
@@ -30,14 +35,19 @@ package body Base_Neural is
          Y_T.Replace_Element (1, 1 - Y_T (1));
          YT_Float.Append (Float (Y_T.Element (1)));
       end loop;
+      Put_Line (Routine_Name & "YT_Float set");
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
+         Put_Line (Routine_Name & "index:" & Integer'Image (index));
          Y_P := Y_Prob (index);
          Y_T := Y_True (index);
+         Printing.Print_Float_List (Routine_Name & "Y_P", Y_P);
+         Printing.Print_Integer_List (Routine_Name & "Y_T", Y_T);
          X_Log_Y1.Append (YT_Float (index) * Log (Y_P (1)));
          X_Log_Y2.Append (Float (Y_T.Element (1)) * Log (YP_Float (index)));
       end loop;
+      Put_Line (Routine_Name & "X_Log_Y2 set");
 
       for index in X_Log_Y1.First_Index .. X_Log_Y1.Last_Index loop
          Sum1 := Sum1 + X_Log_Y1 (index);

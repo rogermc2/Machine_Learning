@@ -143,12 +143,16 @@ package body Multilayer_Perceptron is
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
+            Put_Line (Routine_Name & "Binary_Log_Loss_Function");
             Loss := Binary_Log_Loss (Y, Activations.Last_Element);
          when Log_Loss_Function =>
+            Put_Line (Routine_Name & "Log_Loss_Function");
             Loss := Log_Loss (Y, Activations.Last_Element);
          when Squared_Error_Function =>
+            Put_Line (Routine_Name & "Squared_Loss_Function");
             Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
+      Put_Line (Routine_Name & "Loss_Function done");
 
       for s in Self.Attributes.Neuron_Coef_Layers.First_Index ..
         Self.Attributes.Neuron_Coef_Layers.Last_Index loop
