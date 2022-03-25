@@ -33,10 +33,9 @@ package Stochastic_Optimizers is
    type Adam_Optimizer is record
       --  The ith element of Coeff_Params represents the weight matrix
       --  corresponding to layer i.
-      Coeff_Params             : Float_List_3D;
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
-      Intercept_Params         : Float_List_2D;
+      Params                   : Parameters_Record;
       Initial_Learning_Rate    : Float := 0.1;
       Learning_Rate            : Float := 0.1;
       Beta_1                   : Float := 0.9;
@@ -52,10 +51,9 @@ package Stochastic_Optimizers is
    type SGD_Optimizer is record
       --  The ith element of Coeff_Params represents the weight matrix
       --  corresponding to layer i.
-      Coeff_Params          : Float_List_3D;
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
-      Intercept_Params      : Float_List_2D;
+      Params                : Parameters_Record;
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
       Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
@@ -75,15 +73,13 @@ package Stochastic_Optimizers is
    end record;
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Coeff_Params          : Float_List_3D;
-                     Intercept_Params      : Float_List_2D;
+                     Params                : Parameters_Record;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float);
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Coeff_Params          : Float_List_3D;
-                     Intercept_Params      : Float_List_2D;
+                     Params                : Parameters_Record;
                      Initial_Learning_Rate : Float := 0.1;
                      Learning_Rate         : Float := 0.1;
                      Learning_Rate_Kind    : Learning_Rate_Type :=

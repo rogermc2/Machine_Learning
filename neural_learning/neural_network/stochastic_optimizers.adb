@@ -7,10 +7,9 @@ with Maths;
 package body Stochastic_Optimizers is
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     --  Coeff_Params: laysers x features x values
-                     Coeff_Params          : Float_List_3D;
+                     --  Coeff_Params: layers x features x values
                      --  Intercept_Params: laysers x values
-                     Intercept_Params      : Float_List_2D;
+                     Params                : Parameters_Record;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
@@ -18,23 +17,23 @@ package body Stochastic_Optimizers is
       use Ada.Containers;
       Zeros : Float_List;
    begin
-      Self.Coeff_Params := Coeff_Params;
-      Self.Intercept_Params := Intercept_Params;
+      Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
       Self.Beta_1 := Beta_1;
       Self.Beta_2 := Beta_2;
       Self.Epsilon := Epsilon;
 
       Self.Time_Step := 0;
-      for index in 1 .. Intercept_Params.Length loop
+      for index in 1 .. Params.Intercept_Params.Length loop
          Self.Intercept_First_Moments.Append (0.0);
          Self.Intercept_Second_Moments.Append (0.0);
       end loop;
 
-      for index in 1 .. Coeff_Params.Length loop
+      for index in 1 .. Params.Coeff_Params.Length loop
          Zeros.Append (0.0);
       end loop;
-      for index in 1 .. Coeff_Params.Length loop
+
+      for index in 1 .. Params.Coeff_Params.Length loop
          Self.Coeff_First_Moments .Append (Zeros);
          Self.Coeff_Second_Moments.Append (Zeros);
       end loop;
@@ -45,9 +44,8 @@ package body Stochastic_Optimizers is
 
    procedure C_Init (Self                  : out SGD_Optimizer;
                      --  Coeff_Params: laysers x features x values
-                     Coeff_Params          : Float_List_3D;
                      --  Intercept_Params: laysers x values
-                     Intercept_Params      : Float_List_2D;
+                     Params                : Parameters_Record;
                      Initial_Learning_Rate : Float := 0.1;
                      Learning_Rate         : Float := 0.1;
                      Learning_Rate_Kind    : Learning_Rate_Type :=
@@ -60,8 +58,7 @@ package body Stochastic_Optimizers is
       use Ada.Containers;
       Zeros    : Float_List;
    begin
-      Self.Coeff_Params := Coeff_Params;
-      Self.Intercept_Params := Intercept_Params;
+      Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
       Self.Learning_Rate := Learning_Rate;
       Self.Learning_Rate_Kind := Learning_Rate_Kind;

@@ -100,7 +100,8 @@ package body Multilayer_Perceptron is
    --                               Incremental, Reset : Boolean);
 
    --  -------------------------------------------------------------------------
-   --  L241
+   --  L241  Backprop computes the MLP loss function and its derivatives
+   --       with respect to each parameter: weights and bias vectors.
    procedure Backprop (Self            : in out MLP_Classifier;
                        X               : Float_List_2D;
                        Y               : Integer_List_2D;
@@ -379,15 +380,14 @@ package body Multilayer_Perceptron is
 
       --  L414 Set the Activation values of the first layer
       Activations.Append (X);
-      --  Deltas is a 2D list initialized by Backprop
+      --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      --  Deltas length set in Backprop
-      --        Deltas.Set_Length (Activations.Length - 1);
+      Deltas.Set_Length (Layer_Units.Length - 1);
+
       --  L417
       Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
       Put_Line (Routine_Name & "Gradients initialised.");
-
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -496,6 +496,7 @@ package body Multilayer_Perceptron is
       Parameters         : Parameters_Record;
       Grads              : Parameters_Record;
    begin
+      Parameters := (Coeff_Params, Intercept_Params);
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
@@ -505,8 +506,7 @@ package body Multilayer_Perceptron is
                begin
                   Put_Line (Routine_Name & "Adam");
                   Stochastic_Optimizers.C_Init
-                    (Optimizer.Adam, Coeff_Params => Coeff_Params,
-                     Intercept_Params => Intercept_Params,
+                    (Optimizer.Adam, Params => Parameters,
                      Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
                      Beta_1 => Self.Parameters.Beta_1,
                      Beta_2 => Self.Parameters.Beta_2,
@@ -521,8 +521,7 @@ package body Multilayer_Perceptron is
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
                   Stochastic_Optimizers.C_Init
-                    (Optimizer.SGD, Coeff_Params => Coeff_Params,
-                     Intercept_Params => Intercept_Params,
+                    (Optimizer.SGD, Params => Parameters,
                      Initial_Learning_Rate =>
                        Self.Parameters.Learning_Rate_Init,
                      Learning_Rate => Self.Parameters.Learning_Rate,
@@ -539,8 +538,7 @@ package body Multilayer_Perceptron is
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
                   Stochastic_Optimizers.C_Init
-                    (Optimizer.SGD, Coeff_Params => Coeff_Params,
-                     Intercept_Params => Intercept_Params,
+                    (Optimizer.SGD, Params => Parameters,
                      Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
                      Learning_Rate => Self.Parameters.Learning_Rate,
                      Momentum => Self.Parameters.Momentum,
@@ -618,7 +616,7 @@ package body Multilayer_Perceptron is
                         Integer'Image (Integer (X_Batch.Length)));
 
             Activations.Replace_Element (1, X_Batch);
-            Put_Line (Routine_Name & "L645 X_Batch Activation set");
+            Put_Line (Routine_Name & "L645 X_Batch Activation 1 set");
 
             --  L645
             Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
