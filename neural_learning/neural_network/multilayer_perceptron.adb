@@ -711,14 +711,14 @@ package body Multilayer_Perceptron is
            Self.Attributes.Intercepts (index);
          Activations.Replace_Element (index + 1, Act_With_Intercept);
 
-         --  For the hidden layers
+         --  L134 For the hidden layers
          if index + 1 /= Num_Layers - 1 then
             case Hidden_Activation is
                when Identity_Activation => null;
-               when Logistic_Activation => Logistic (Activations (index));
-               when Tanh_Activation => Tanh (Activations (index));
-               when Relu_Activation => Relu (Activations (index));
-               when Softmax_Activation => Softmax (Activations (index));
+               when Logistic_Activation => Logistic (Activations (index + 1));
+               when Tanh_Activation => Tanh (Activations (index + 1));
+               when Relu_Activation => Relu (Activations (index + 1));
+               when Softmax_Activation => Softmax (Activations (index + 1));
             end case;
          end if;
       end loop;
