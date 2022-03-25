@@ -50,9 +50,9 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Identity (Activation : Float_List) return Float_List is
+   procedure Identity (Activation : Float_List) is
    begin
-      return Activation;
+      null;
    end Identity;
 
    --  -------------------------------------------------------------------------
@@ -65,7 +65,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Logistic (Activation : Float_List_2D) return Float_List_2D is
+   procedure Logistic (Activation : in out Float_List_2D) is
       use Maths.Float_Math_Functions;
       Act_List : Float_List;
       Sigmoid  : Float_List;
@@ -80,7 +80,7 @@ package body Base_Neural is
             Result.Append (Sigmoid);
       end loop;
 
-      return Result;
+      Activation := Result;
 
    end Logistic;
 
@@ -155,7 +155,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Relu (Activation : Float_List_2D) return Float_List_2D is
+   procedure Relu (Activation : in out Float_List_2D) is
       Act_List : Float_List;
       Result   : Float_List_2D;
    begin
@@ -167,7 +167,8 @@ package body Base_Neural is
             Result.Append (Act_List);
       end loop;
 
-      return Result;
+      Activation := Result;
+
    end Relu;
 
    --  -------------------------------------------------------------------------
@@ -191,7 +192,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Softmax (Activation : Float_List_2D) return Float_List_2D is
+   procedure Softmax (Activation : in out Float_List_2D) is
       use Maths.Float_Math_Functions;
       Act_List : Float_List;
       Exp_Sum  : Float;
@@ -217,7 +218,8 @@ package body Base_Neural is
             Result.Append (R_List);
       end loop;
 
-      return Result;
+      Activation := Result;
+
    end Softmax;
 
    --  -------------------------------------------------------------------------
@@ -233,7 +235,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   function Tanh (Activation : Float_List_2D) return Float_List_2D is
+   procedure Tanh (Activation : in out Float_List_2D) is
       use Maths.Float_Math_Functions;
       Act_List : Float_List;
       Result   : Float_List_2D;
@@ -246,7 +248,7 @@ package body Base_Neural is
             Result.Append (Act_List);
       end loop;
 
-      return Result;
+      Activation := Result;
 
    end Tanh;
 

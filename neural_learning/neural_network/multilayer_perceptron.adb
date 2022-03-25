@@ -128,6 +128,8 @@ package body Multilayer_Perceptron is
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
    begin
+      Put_Line (Routine_Name & "Forward_Pass, Activations size:" &
+                  Count_Type'Image (Activations.Length));
       Forward_Pass (Self, Activations);
       Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
                   Count_Type'Image (Activations.Length) & " x" &
@@ -208,7 +210,7 @@ package body Multilayer_Perceptron is
                   Count_Type'Image (Activations.Last_Element.Element (1).Length));
       Deltas.Replace_Element
         (Last, Activations.Last_Element - Classifier_Utilities.To_Float_List_2D (Y));
---          (Last, Activation - Classifier_Utilities.To_Float_List_2D (Y));
+      --          (Last, Activation - Classifier_Utilities.To_Float_List_2D (Y));
       Put_Line (Routine_Name & "L301 Deltas Element replaced");
 
       --  L304  Compute gradient for the last layer
@@ -685,68 +687,45 @@ package body Multilayer_Perceptron is
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Coefficient_Matrix : Float_List_2D;
       Acts_Dot_Coeffs    : Float_List_2D;
-      Acts_Intercepts    : Float_List_2D;
+      Act_With_Intercept : Float_List_2D;
    begin
-      --        Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
+      Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
       --  Iterate over the hidden layers
       for index in 1 .. Num_Layers - 1 loop
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
-         --           Put_Line (Routine_Name & "index:" & Integer'Image (index));
          Acts_Dot_Coeffs := Dot (Activations (index), Coefficient_Matrix);
-         --           Put_Line (Routine_Name & "Activations length:" &
-         --                       Integer'Image (Integer (Activations.Length)));
          if Integer (Activations.Length) > index then
             Activations (index + 1) := Acts_Dot_Coeffs;
          else
-            --              Put_Line (Routine_Name & "Activations Append");
             Activations.Append (Acts_Dot_Coeffs);
          end if;
          --           Put_Line (Routine_Name & "Activations length2:" &
          --                       Integer'Image (Integer (Activations.Length)));
          --           Put_Line (Routine_Name & "Intercepts length:" &
          --                       Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
-         Acts_Intercepts := Activations (index + 1) &
+         Act_With_Intercept := Activations (index + 1) &
            Self.Attributes.Intercepts (index);
-         Activations.Replace_Element (index + 1, Acts_Intercepts);
+         Activations.Replace_Element (index + 1, Act_With_Intercept);
 
          --  For the hidden layers
          if index + 1 /= Num_Layers - 1 then
-            --              Put_Line (Routine_Name & "index + 1:" &
-            --                          Integer'Image (index + 1));
             case Hidden_Activation is
-               when Identity_Activation =>
-                  Activations (index + 1) := Activations (index);
-               when Logistic_Activation =>
-                  Activations (index + 1) := Logistic (Activations (index));
-               when Tanh_Activation =>
-                  Activations (index + 1) := Tanh (Activations (index));
-               when Relu_Activation =>
-                  Activations (index + 1) := Relu (Activations (index));
-               when Softmax_Activation =>
-                  Activations (index + 1) := Softmax (Activations (index));
+               when Identity_Activation => null;
+               when Logistic_Activation => Logistic (Activations (index));
+               when Tanh_Activation => Tanh (Activations (index));
+               when Relu_Activation => Relu (Activations (index));
+               when Softmax_Activation => Softmax (Activations (index));
             end case;
          end if;
       end loop;
 
       --  L138 For the last layer
       case Output_Activation is
-         when Identity_Activation =>
-            Activations.Replace_Element
-              (Activations.Last_Index, Activations.Element (Num_Layers));
-         when Logistic_Activation =>
-            Activations.Replace_Element
-              (Activations.Last_Index,
-               Logistic (Activations (Num_Layers)));
-         when Tanh_Activation =>
-            Activations.Replace_Element
-              (Activations.Last_Index, Tanh (Activations (Num_Layers)));
-         when Relu_Activation =>
-            Activations.Replace_Element
-              (Activations.Last_Index, Relu (Activations (Num_Layers)));
-         when Softmax_Activation =>
-            Activations.Replace_Element
-              (Activations.Last_Index,
-               Softmax (Activations (Num_Layers)));
+         when Identity_Activation => null;
+         when Logistic_Activation => Logistic (Activations (Num_Layers));
+         when Tanh_Activation => Tanh (Activations (Num_Layers));
+         when Relu_Activation => Relu (Activations (Num_Layers));
+         when Softmax_Activation => Softmax (Activations (Num_Layers));
       end case;
 
    end Forward_Pass;
