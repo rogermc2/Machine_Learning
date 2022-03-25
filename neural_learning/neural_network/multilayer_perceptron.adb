@@ -377,7 +377,7 @@ package body Multilayer_Perceptron is
          New_Line;
       end if;
 
-      --  Set the Activation values of the first layer
+      --  L414 Set the Activation values of the first layer
       Activations.Append (X);
       --  Deltas is a 2D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
@@ -386,6 +386,7 @@ package body Multilayer_Perceptron is
 --        Deltas.Set_Length (Activations.Length - 1);
       --  L417
       Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
+      Put_Line (Routine_Name & "Gradients initialised.");
 
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
@@ -556,6 +557,7 @@ package body Multilayer_Perceptron is
 
       --  L597
       if Early_Stopping then
+         Put_Line (Routine_Name & "L599 Early_Stopping");
          Should_Stratify := Is_Classifier;
          if Should_Stratify then
             Stratify := Y;
@@ -572,15 +574,14 @@ package body Multilayer_Perceptron is
       end if;
 
       --  L617
-      if Self.Parameters.Batch_Size = 0 then
+      Batch_Size := Self.Parameters.Batch_Size;
+      if Batch_Size = 0 then
          Batch_Size := Integer'Min (200, Num_Samples);
-      else
-         if Self.Parameters.Batch_Size > Num_Samples then
+      elsif Batch_Size > Num_Samples then
             Put_Line (Routine_Name & "WARNING: Batch size" &
                         Integer'Image (Self.Parameters.Batch_Size)  &
                         " clipped to" & Integer'Image (Num_Samples));
-         end if;
-         Batch_Size := Num_Samples;
+            Batch_Size := Num_Samples;
       end if;
 
       --        Max_Sample_Index := Num_Samples;
@@ -588,6 +589,10 @@ package body Multilayer_Perceptron is
       --        Put_Line (Routine_Name & "Num_Samples: " & Integer'Image(Batch_Size));
       --        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
       for iter in 1 .. Self.Parameters.Max_Iter loop
+         if Self.Parameters.Shuffle then
+            null;
+         end if;
+
          Accumulated_Loss := 0.0;
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
