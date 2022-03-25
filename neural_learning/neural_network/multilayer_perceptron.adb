@@ -492,7 +492,6 @@ package body Multilayer_Perceptron is
       Batch_Slice        : Slice_Record;
       X_Batch            : Float_List_2D;
       Y_Batch            : Integer_List;
-      Activation         : Float_List_2D;
       Batch_Loss         : Float;
       Parameters         : Parameters_Record;
       Grads              : Parameters_Record;
@@ -601,8 +600,7 @@ package body Multilayer_Perceptron is
          --  if Self.Parameters.Shuffle then
          --      Sample_Index := Shuffle (Sample_Index, Random_State);
          --  end if;
-         Printing.Print_Slices (Routine_Name & " Batches", Batches);
---                                           Batch_Slice, 195, 203);
+--           Printing.Print_Slices (Routine_Name & " Batches", Batches);
          --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
             Put_Line (Routine_Name & "L636 Batch index:" &
@@ -613,31 +611,28 @@ package body Multilayer_Perceptron is
             Y_Batch.Clear;
 
             for index in Batch_Slice.First .. Batch_Slice.Last loop
-               Put_Line (Routine_Name & "X size:" &
-                           Integer'Image (Integer (X.Length)));
                X_Batch.Append (X (index));
                Y_Batch.Append (Y (index));
-               Put_Line (Routine_Name & "X_Batch size:" &
-                           Integer'Image (Integer (X_Batch.Length)));
-
-               Activation := X_Batch;
-               Activations.Append (Activation);
-               Put_Line (Routine_Name & "L645 X_Batch Activation set");
-
-               --  L645
-               Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
-                         Coef_Grads, Intercept_Grads);
-               Put_Line (Routine_Name & "Backprop done");
-               Accumulated_Loss := Accumulated_Loss + Batch_Loss *
-                 Float (Batch_Slice.Last - Batch_Slice.First + 1);
-               --  L657 update weights
-               Parameters.Coeff_Params := Coeff_Params;
-               Parameters.Intercept_Params := Intercept_Params;
-               Grads.Coeff_Params := Coef_Grads;
-               Grads.Intercept_Params := Intercept_Grads;
-               Stochastic_Optimizers.Update_Params
-                 (Self.Attributes.Optimizer, Parameters, Grads);
             end loop;
+            Put_Line (Routine_Name & "X_Batch size:" &
+                        Integer'Image (Integer (X_Batch.Length)));
+
+            Activations.Replace_Element (1, X_Batch);
+            Put_Line (Routine_Name & "L645 X_Batch Activation set");
+
+            --  L645
+            Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
+                      Coef_Grads, Intercept_Grads);
+            Put_Line (Routine_Name & "Backprop done");
+            Accumulated_Loss := Accumulated_Loss + Batch_Loss *
+              Float (Batch_Slice.Last - Batch_Slice.First + 1);
+            --  L657 update weights
+            Parameters.Coeff_Params := Coeff_Params;
+            Parameters.Intercept_Params := Intercept_Params;
+            Grads.Coeff_Params := Coef_Grads;
+            Grads.Intercept_Params := Intercept_Grads;
+            Stochastic_Optimizers.Update_Params
+              (Self.Attributes.Optimizer, Parameters, Grads);
 
             --  L661
             Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
