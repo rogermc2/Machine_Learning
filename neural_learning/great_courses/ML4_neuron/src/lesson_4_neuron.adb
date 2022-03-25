@@ -72,6 +72,10 @@ begin
     --     if not Get_Classifier (Dataset_Name, aClassifier) then
     --        Printing.Print_Strings ("Features", Bunch.Feature_Names);
 
+    Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
+    Put_Line ("Train Y length: " & Count_Type'Image (Train_Y.Length));
+    Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
+
     aClassifier := C_Init (Max_Iter => 10000,
                            Activation => Base_Neural.Identity_Activation);
 
@@ -84,8 +88,6 @@ begin
     Put_Line ("----------------------------------------------");
     New_Line;
 
-    Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
-    Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
     --     Prediction_List := Base_Decision_Tree.Predict (aClassifier, Train_X);
     --     for index in Train_X.First_Index .. Train_X.Last_Index loop
     --        --        Put_Line (Routine_Name & "Train_X index" & Integer'Image (index));

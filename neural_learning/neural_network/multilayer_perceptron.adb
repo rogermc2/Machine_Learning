@@ -130,7 +130,9 @@ package body Multilayer_Perceptron is
    begin
       Forward_Pass (Self, Activations);
       Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
-                  Count_Type'Image (Activations.Length));
+                  Count_Type'Image (Activations.Length) & " x" &
+                  Count_Type'Image (Activations (1).Length) & " x" &
+                  Count_Type'Image (Activations (1) (1).Length));
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -192,12 +194,20 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "Deltas.Replace_Element, Last:" &
                   Integer'Image (Last));
       Y_Float := Classifier_Utilities.To_Float_List_2D (Y);
-      Put_Line (Routine_Name & "Y_Float length:" &
-                  Count_Type'Image (Y_Float.Length));
-      Put_Line (Routine_Name & "Activation length:" &
-                  Count_Type'Image (Activation.Length));
+      Put_Line (Routine_Name & "Y_Float size:" &
+                  Count_Type'Image (Y_Float.Length) & " x" &
+                  Count_Type'Image (Y_Float (1).Length));
+      Put_Line (Routine_Name & "L301 Activations (1) size:" &
+                  Count_Type'Image (Activations (1).Length) & " x" &
+                  Count_Type'Image (Activations (1) (1).Length));
+      Put_Line (Routine_Name & "Activations (2) size:" &
+                  Count_Type'Image (Activations (2).Length) & " x" &
+                  Count_Type'Image (Activations (2) (1).Length));
+      Put_Line (Routine_Name & "Activations (last) size:" &
+                  Count_Type'Image (Activations.Last_Element.Length) & " x" &
+                  Count_Type'Image (Activations.Last_Element.Element (1).Length));
       Deltas.Replace_Element
-        (Last, Activation - Classifier_Utilities.To_Float_List_2D (Y));
+        (Last, Activations.Last_Element - Classifier_Utilities.To_Float_List_2D (Y));
 --          (Last, Activation - Classifier_Utilities.To_Float_List_2D (Y));
       Put_Line (Routine_Name & "L301 Deltas Element replaced");
 
