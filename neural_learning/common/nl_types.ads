@@ -23,6 +23,7 @@ package NL_Types is
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
+   function "+" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "*" (L : Float; R : Float_Package.Vector)
                  return Float_Package.Vector;

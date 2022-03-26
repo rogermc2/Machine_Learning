@@ -25,6 +25,7 @@ procedure Lesson_4_Neuron is
     Train_Size      : constant Positive := 5000;
     Bunch           : Openml_Ada.Bunch_Data;
     X               : Float_List_2D;  --  rows of columns of values
+                                      --  samples x features
     Y               : Integer_List;
     --     X_Indices       : Integer_List;
     --     Y_Indices       : Integer_List;
