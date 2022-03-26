@@ -141,6 +141,8 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Binary_Log_Loss_Function;
       end if;
 
+      Printing.Print_Float_Lists_2D
+      (Routine_Name & "Activations last layer", Activations.Last_Element);
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Put_Line (Routine_Name & "Binary_Log_Loss_Function");
@@ -695,6 +697,11 @@ package body Multilayer_Perceptron is
    begin
       Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
       --  Iterate over the hidden layers
+      --  The Python range(stop) function returns a sequence of numbers,
+      --   starting from 0 by default, incrementing by 1 (by default) and
+      --   stopping BEFORE "stop". That is, at "stop" - 1.
+      --  Therefore range(self.n_layers_ - 1): range is
+      --            first (0) .. last (n_layers_ - 2)
       for index in 1 .. Num_Layers - 1 loop
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
          Acts_Dot_Coeffs := Dot (Activations (index), Coefficient_Matrix);
@@ -712,7 +719,8 @@ package body Multilayer_Perceptron is
          Activations.Replace_Element (index + 1, Act_With_Intercept);
 
          --  L134 For the hidden layers
-         if index + 1 /= Num_Layers - 1 then
+--           if index + 1 /= Num_Layers - 1 then
+         if index + 1 /= Num_Layers then
             case Hidden_Activation is
                when Identity_Activation => null;
                when Logistic_Activation => Logistic (Activations (index + 1));
@@ -731,8 +739,8 @@ package body Multilayer_Perceptron is
          when Relu_Activation => Relu (Activations (Num_Layers));
          when Softmax_Activation => Softmax (Activations (Num_Layers));
       end case;
-      Printing.Print_Float_Lists_2D
-      (Routine_Name & "processed last layer", Activations (Num_Layers));
+--        Printing.Print_Float_Lists_2D
+--        (Routine_Name & "processed last layer", Activations (Num_Layers));
 
    end Forward_Pass;
 

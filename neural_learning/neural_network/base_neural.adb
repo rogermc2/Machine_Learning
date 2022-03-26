@@ -10,12 +10,15 @@ with Printing;
 
 package body Base_Neural is
 
+  EPS : constant Float := Float'Small;
+
    --  -------------------------------------------------------------------------
 
    function Binary_Log_Loss (Y_True : Integer_List_2D; Y_Prob : Float_List_2D)
                              return Float is
       use Maths.Float_Math_Functions;
       use Float_Package;
+      use Integer_Package;
       Routine_Name : constant String :=
                        "Base_Neural.Binary_Log_Loss_Function ";
       Y_P      : Float_List;
@@ -29,8 +32,17 @@ package body Base_Neural is
    begin
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
          Y_P := Y_Prob (index);
+         for ep in Y_P.First_Index .. Y_P.Last_Index loop
+            if Y_P (ep) < EPS then
+               Y_P (ep) := EPS;
+            elsif Y_P (ep) > 1.0 - EPS then
+               Y_P (ep) := 1.0 - EPS;
+            end if;
+         end loop;
+
          Y_P.Replace_Element (1, 1.0 - Y_P (1));
          YP_Float.Append (Float (Y_P.Element (1)));
+
          Y_T := Y_True (index);
          Y_T.Replace_Element (1, 1 - Y_T (1));
          YT_Float.Append (Float (Y_T.Element (1)));
@@ -44,7 +56,11 @@ package body Base_Neural is
          Y_T := Y_True (index);
          Printing.Print_Float_List (Routine_Name & "Y_P", Y_P);
          Printing.Print_Integer_List (Routine_Name & "Y_T", Y_T);
-         X_Log_Y1.Append (YT_Float (index) * Log (Y_P (1)));
+         if Y_T (index) = 0 then
+            X_Log_Y1.Append (0.0);
+         else
+            X_Log_Y1.Append (YT_Float (index) * Log (Y_P (1)));
+         end if;
          X_Log_Y2.Append (Float (Y_T.Element (1)) * Log (YP_Float (index)));
       end loop;
       Put_Line (Routine_Name & "X_Log_Y2 set");
@@ -138,6 +154,14 @@ package body Base_Neural is
    begin
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
          Y_P := Y_Prob (index);
+         for ep in Y_P.First_Index .. Y_P.Last_Index loop
+            if Y_P (ep) < EPS then
+               Y_P (ep) := EPS;
+            elsif Y_P (ep) > 1.0 - EPS then
+               Y_P (ep) := 1.0 - EPS;
+            end if;
+         end loop;
+
          Y_P.Replace_Element (1, 1.0 - Y_P (1));
          YP_Float.Append (Float (Y_P.Element (1)));
          Y_T := Y_True (index);
@@ -152,7 +176,11 @@ package body Base_Neural is
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         X_Log_Y.Append (-YT_Float (index) * Log (Y_Prob (index).Element (1)));
+         if Y_T (index) = 0 then
+            X_Log_Y.Append (0.0);
+         else
+            X_Log_Y.Append (-YT_Float (index) * Log (Y_Prob (index).Element (1)));
+         end if;
       end loop;
 
       for index in X_Log_Y.First_Index .. X_Log_Y.Last_Index loop
