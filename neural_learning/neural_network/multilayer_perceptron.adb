@@ -128,33 +128,32 @@ package body Multilayer_Perceptron is
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
    begin
-      Put_Line (Routine_Name & "Forward_Pass, Activations size:" &
-                  Count_Type'Image (Activations.Length));
+--        Put_Line (Routine_Name & "Forward_Pass, Activations size:" &
+--                    Count_Type'Image (Activations.Length));
       Forward_Pass (Self, Activations);
-      Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
-                  Count_Type'Image (Activations.Length) & " x" &
-                  Count_Type'Image (Activations (1).Length) & " x" &
-                  Count_Type'Image (Activations (1) (1).Length));
+--        Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
+--                    Count_Type'Image (Activations.Length) & " x" &
+--                    Count_Type'Image (Activations (1).Length) & " x" &
+--                    Count_Type'Image (Activations (1) (1).Length));
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
       end if;
 
-      Printing.Print_Float_Lists_2D
-      (Routine_Name & "Activations last layer", Activations.Last_Element);
+--        Printing.Print_Float_Lists_2D
+--        (Routine_Name & "Activations last layer", Activations.Last_Element);
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
-            Put_Line (Routine_Name & "Binary_Log_Loss_Function");
+--              Put_Line (Routine_Name & "Binary_Log_Loss_Function");
             Loss := Binary_Log_Loss (Y, Activations.Last_Element);
          when Log_Loss_Function =>
-            Put_Line (Routine_Name & "Log_Loss_Function");
+--              Put_Line (Routine_Name & "Log_Loss_Function");
             Loss := Log_Loss (Y, Activations.Last_Element);
          when Squared_Error_Function =>
-            Put_Line (Routine_Name & "Squared_Loss_Function");
+--              Put_Line (Routine_Name & "Squared_Loss_Function");
             Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
-      Put_Line (Routine_Name & "Loss_Function done");
 
       for s in Self.Attributes.Neuron_Coef_Layers.First_Index ..
         Self.Attributes.Neuron_Coef_Layers.Last_Index loop
@@ -167,8 +166,8 @@ package body Multilayer_Perceptron is
 
       --  L288  Add L2 regularization term to loss
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
-      Put_Line (Routine_Name & "loss + L2 regularization : " &
-                  Float'Image (Loss));
+--        Put_Line (Routine_Name & "loss + L2 regularization : " &
+--                    Float'Image (Loss));
 
       --  L294 Backward propagate
       --  The calculation of delta[last]  works with the following combinations
@@ -182,25 +181,24 @@ package body Multilayer_Perceptron is
       --  The ith element of Activations (layers x values) is a list of values
       --  of the ith layer.
 
-      Put_Line (Routine_Name & "Activations size:" &
-                  Integer'Image (Integer (Activations.Length)));
-      Put_Line (Routine_Name & "Y size:" &
-                  Integer'Image (Integer (Y.Length)));
-      Put_Line (Routine_Name & "Y dim 2 size:" &
-                  Integer'Image (Integer (Y (1).Length)));
+--        Put_Line (Routine_Name & "Activations size:" &
+--                    Integer'Image (Integer (Activations.Length)));
+--        Put_Line (Routine_Name & "Y size:" &
+--                    Integer'Image (Integer (Y.Length)));
+--        Put_Line (Routine_Name & "Y dim 2 size:" &
+--                    Integer'Image (Integer (Y (1).Length)));
+      --  Backward propagate python last = self.n_layers_ - 2
       Last := Self.Attributes.N_Layers - 1;
       --  L301
       Activation := Activations.Last_Element;
-      Put_Line (Routine_Name & "Activation size:" &
-                  Integer'Image (Integer (Activation.Length)));
-      Put_Line (Routine_Name & "Activation dim 2 size:" &
-                  Integer'Image (Integer (Activation (1).Length)));
+--        Put_Line (Routine_Name & "Activation size:" &
+--                    Integer'Image (Integer (Activation.Length)));
+--        Put_Line (Routine_Name & "Activation dim 2 size:" &
+--                    Integer'Image (Integer (Activation (1).Length)));
       Assert (Last = Natural (Deltas.Length), Routine_Name & "Last" &
                 Integer'Image (Last) & " should equal Deltas length" &
                 Count_Type'Image (Deltas.Length));
 
-      Put_Line (Routine_Name & "Deltas.Replace_Element, Last:" &
-                  Integer'Image (Last));
       Y_Float := Classifier_Utilities.To_Float_List_2D (Y);
       Put_Line (Routine_Name & "Y_Float size:" &
                   Count_Type'Image (Y_Float.Length) & " x" &
@@ -214,9 +212,16 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "Activations (last) size:" &
                   Count_Type'Image (Activations.Last_Element.Length) & " x" &
                   Count_Type'Image (Activations.Last_Element.Element (1).Length));
+      Put_Line (Routine_Name & "Deltas size:" &
+                  Count_Type'Image (Deltas.Length) & " x" &
+               Count_Type'Image (Deltas (1).Length));
+      Put_Line (Routine_Name & "Deltas size:" &
+               Count_Type'Image (Deltas (1) (1).Length));
+      Put_Line (Routine_Name & "Deltas (Last, 1, 1):" &
+                  Float'Image (Deltas (Last) (1) (1)));
       Deltas.Replace_Element
-        (Last, Activations.Last_Element - Classifier_Utilities.To_Float_List_2D (Y));
-      --          (Last, Activation - Classifier_Utilities.To_Float_List_2D (Y));
+        (Last, Activations.Last_Element -
+           Classifier_Utilities.To_Float_List_2D (Y));
       Put_Line (Routine_Name & "L301 Deltas Element replaced");
 
       --  L304  Compute gradient for the last layer
@@ -394,10 +399,7 @@ package body Multilayer_Perceptron is
 
       --  L409
       if First_Pass then
-         Put_Line (Routine_Name & "L411 Initialising.");
          Initialize (Self, Layer_Units);
-         Put_Line (Routine_Name & "Initialised.");
-         New_Line;
       end if;
 
       --  L414 Set the Activation values of the first layer
@@ -409,7 +411,6 @@ package body Multilayer_Perceptron is
 
       --  L417
       Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
-      Put_Line (Routine_Name & "Gradients initialised.");
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -574,7 +575,6 @@ package body Multilayer_Perceptron is
 
       --  L597
       if Early_Stopping then
-         Put_Line (Routine_Name & "L599 Early_Stopping");
          Should_Stratify := Is_Classifier;
          if Should_Stratify then
             Stratify := Y;
@@ -613,8 +613,8 @@ package body Multilayer_Perceptron is
          Accumulated_Loss := 0.0;
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
-         Put_Line (Routine_Name & "iter:" &  Integer'Image(iter) & "  Batches size: " &
-                     Integer'Image (Integer (Batches.Length)));
+--           Put_Line (Routine_Name & "iter:" &  Integer'Image(iter) & "  Batches size: " &
+--                       Integer'Image (Integer (Batches.Length)));
          --           Sample_Index := 1;
          --        while Sample_Index <= Max_Sample_Index loop
          --  if Self.Parameters.Shuffle then
@@ -623,8 +623,8 @@ package body Multilayer_Perceptron is
          --           Printing.Print_Slices (Routine_Name & " Batches", Batches);
          --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
-            Put_Line (Routine_Name & "L636 Batch index:" &
-                        Integer'Image (batch_index));
+--              Put_Line (Routine_Name & "L636 Batch index:" &
+--                          Integer'Image (batch_index));
             Batch_Slice := Batches (batch_index);
             Printing.Print_Slice (Routine_Name & "Slice", Batch_Slice);
             X_Batch.Clear;
@@ -634,11 +634,10 @@ package body Multilayer_Perceptron is
                X_Batch.Append (X (index));
                Y_Batch.Append (Y (index));
             end loop;
-            Put_Line (Routine_Name & "X_Batch size:" &
-                        Integer'Image (Integer (X_Batch.Length)));
+--              Put_Line (Routine_Name & "X_Batch size:" &
+--                          Integer'Image (Integer (X_Batch.Length)));
 
             Activations.Replace_Element (1, X_Batch);
-            Put_Line (Routine_Name & "L645 X_Batch Activation 1 set");
 
             --  L645
             Backprop (Self, X, Y, Activations, Deltas, Batch_Loss,
