@@ -350,11 +350,16 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_Lists_2D (Name : String;
-                                   Data : Float_List_2D) is
+   procedure Print_Float_Lists_2D (Name : String; Data : Float_List_2D;
+                                   Start : Positive := 1;
+                                   Last : Positive := 10) is
+      Stop  : Integer := Last;
    begin
+      if Stop > Integer (Data.Length) then
+         Stop := Integer (Data.Length);
+      end if;
       Put_Line (Name & ": ");
-      for index in Data.First_Index .. Data.Last_Index loop
+      for index in Start .. Stop loop
          Print_Float_List ("List" & Integer'Image (index),
                            Data.Element (index));
       end loop;

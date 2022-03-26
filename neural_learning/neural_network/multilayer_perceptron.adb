@@ -731,6 +731,8 @@ package body Multilayer_Perceptron is
          when Relu_Activation => Relu (Activations (Num_Layers));
          when Softmax_Activation => Softmax (Activations (Num_Layers));
       end case;
+      Printing.Print_Float_Lists_2D
+      (Routine_Name & "processed last layer", Activations (Num_Layers));
 
    end Forward_Pass;
 
