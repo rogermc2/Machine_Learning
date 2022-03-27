@@ -39,7 +39,7 @@ with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
-with Utilities;
+--  with Utilities;
 
 with Base_Mix;
 with Classifier_Utilities;
@@ -88,9 +88,6 @@ package body Multilayer_Perceptron is
                          Fan_In, Fan_Out : Positive;
                          Coef_Init       : out Float_List_2D;
                          Intercept_Init  : out Float_List);
-   procedure Init_Grads (Layer_Units     : Integer_List;
-                         Coef_Grads      : out Float_List_3D;
-                         Intercept_Grads : out Float_List_2D);
    procedure Update_No_Improvement_Count
      (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
       X_Val : Float_List_2D);
@@ -154,7 +151,7 @@ package body Multilayer_Perceptron is
       --        Printing.Print_Float_Lists_2D
       --        (Routine_Name & "Activations last layer", Activations.Last_Element);
       Assert (Y.Length = Activations.Last_Element.Length, Routine_Name &
-                "Y Length" & Count_Type'Image (Y.Length) &
+                "L284 Y Length" & Count_Type'Image (Y.Length) &
                 " should be the same as last activation length" &
                 Count_Type'Image (Activations.Last_Element.Length));
       Put_Line (Routine_Name & "Loss_Function_Name");
@@ -201,7 +198,7 @@ package body Multilayer_Perceptron is
                   Integer'Image (Integer (Activation.Length)));
       Put_Line (Routine_Name & "Activation dim 2 size:" &
                   Integer'Image (Integer (Activation (1).Length)));
-      Assert (Last = Natural (Deltas.Length), Routine_Name & "Last" &
+      Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
                 Integer'Image (Last) & " should equal Deltas length" &
                 Count_Type'Image (Deltas.Length));
 
@@ -404,8 +401,8 @@ package body Multilayer_Perceptron is
       --  activations of the i + 1 layer and the backpropagated error.
       Deltas.Set_Length (Layer_Units.Length - 1);
 
-      --  L417
-      Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
+      --  L417 Initialized grads are empty vectors
+--        Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -714,8 +711,12 @@ package body Multilayer_Perceptron is
          --           Put_Line (Routine_Name & "Intercepts length:" &
          --                       Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
          --  Intercepts: layers x intercept values
-         Act_With_Intercept := Activations (index + 1) &
-           Self.Attributes.Intercepts (index);
+         for intercept in Activations (index + 1).First_Index ..
+           Activations (index + 1).Last_Index loop
+            Act_With_Intercept (intercept) :=
+              Activations (index + 1)  (intercept) +
+              Self.Attributes.Intercepts (intercept);
+         end loop;
          Activations.Replace_Element (index + 1, Act_With_Intercept);
 
          --  L134 For the hidden layers
@@ -779,65 +780,6 @@ package body Multilayer_Perceptron is
       end loop;
 
    end Init_Coeff;
-
-   --  -------------------------------------------------------------------------
-   --  L417
-   procedure Init_Grads (Layer_Units     : Integer_List;
-                         Coef_Grads      : out Float_List_3D;
-                         Intercept_Grads : out Float_List_2D) is
-      use Ada.Containers;
-      use Utilities;
-      use Integer_Package;
-      Routine_Name  : constant String := "Multilayer_Perceptron.Init_Grads ";
-      Fan_In_Units  : Integer_List;
-      Fan_Out_Units : Integer_List;
-      Intercept     : Float_List;
-
-      function Build_List (Dims : Integer_Pair) return Float_List_2D is
-         Inner   : Float_List;
-         theList : Float_List_2D;
-      begin
-         Inner.Set_Length (Count_Type (Dims.Integer_2));
-         for index in 1 .. Dims.Integer_1 loop
-            theList.Append (Inner);
-         end loop;
-
-         return theList;
-
-      end Build_List;
-
-      --  a Pair_List corresponds to python zip list
-      Fan_In_Out : Integer_Pair_List;
-   begin
-      for index in Layer_Units.First_Index .. Layer_Units.Last_Index loop
-         if index /= Layer_Units.Last_Index then
-            Fan_In_Units.Append (Layer_Units (index));
-         end if;
-
-         if index /= Layer_Units.First_Index then
-            Fan_Out_Units.Append (Layer_Units (index));
-         end if;
-      end loop;
-
-      Fan_In_Out := Pair_Items (Fan_In_Units, Fan_Out_Units);
-
-      --  Coef_Grads is a 3D list of fan_in x fan_out lists
-      for index in Fan_In_Out.First_Index ..
-        Fan_In_Out.Last_Index loop
-         Coef_Grads.Append (Build_List (Fan_In_Out.Element (index)));
-      end loop;
-
-      --  Intercept_Grads is a 2D list of fan_out lists
-      for index in Fan_Out_Units.First_Index ..
-        Fan_Out_Units.Last_Index loop
-         Intercept.Set_Length (Count_Type (Fan_Out_Units.Element (index)));
-         Intercept_Grads.Append (Intercept);
-      end loop;
-      Printing.Print_Float_Lists_3D (Routine_Name & "Coef_Grads", Coef_Grads);
-      Printing.Print_Float_Lists_2D (Routine_Name & "Intercept_Grads",
-                                     Intercept_Grads);
-      Utilities.Print_Integer_Pairs (Routine_Name & "Fan_In_Out", Fan_In_Out);
-   end Init_Grads;
 
    --  -------------------------------------------------------------------------
 
