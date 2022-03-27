@@ -67,6 +67,8 @@ package Utilities is
                                    Column  : Class_Range);
    procedure Print_Feature_Types
      (Message : String; theTypes : Classifier_Utilities.Feature_Type_Array);
+   procedure Print_Float_Pairs (Message : String; Pairs : Float_Pair_List);
+   procedure Print_Integer_Pairs (Message : String; Pairs : Integer_Pair_List);
    procedure Print_Label_Types
      (Message : String; theTypes : Classifier_Utilities.Label_Type_Array);
    procedure Print_Leaf (Label_Counts : Predictions_List);

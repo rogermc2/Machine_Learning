@@ -788,6 +788,7 @@ package body Multilayer_Perceptron is
       use Ada.Containers;
       use Utilities;
       use Integer_Package;
+      Routine_Name  : constant String := "Multilayer_Perceptron.Init_Grads ";
       Fan_In_Units  : Integer_List;
       Fan_Out_Units : Integer_List;
       Intercept     : Float_List;
@@ -805,13 +806,19 @@ package body Multilayer_Perceptron is
 
       end Build_List;
 
-      --  a zip list is a list of paired item records
+      --  a Pair_List corresponds to python zip list
       Fan_In_Out : Integer_Pair_List;
    begin
-      Fan_In_Units.Append (Layer_Units (1));
-      Integer_Package.Delete_Last (Fan_In_Units);
-      Fan_Out_Units.Append (Layer_Units (2));
-      Integer_Package.Delete_First (Fan_In_Units);
+      for index in Layer_Units.First_Index .. Layer_Units.Last_Index loop
+         if index /= Layer_Units.Last_Index then
+            Fan_In_Units.Append (Layer_Units (index));
+         end if;
+
+         if index /= Layer_Units.First_Index then
+            Fan_Out_Units.Append (Layer_Units (index));
+         end if;
+      end loop;
+
       Fan_In_Out := Pair_Items (Fan_In_Units, Fan_Out_Units);
 
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
@@ -826,7 +833,10 @@ package body Multilayer_Perceptron is
          Intercept.Set_Length (Count_Type (Fan_Out_Units.Element (index)));
          Intercept_Grads.Append (Intercept);
       end loop;
-
+      Printing.Print_Float_Lists_3D (Routine_Name & "Coef_Grads", Coef_Grads);
+      Printing.Print_Float_Lists_2D (Routine_Name & "Intercept_Grads",
+                                     Intercept_Grads);
+      Utilities.Print_Integer_Pairs (Routine_Name & "Fan_In_Out", Fan_In_Out);
    end Init_Grads;
 
    --  -------------------------------------------------------------------------
