@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
 with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -82,11 +83,13 @@ package body Stochastic_Optimizers is
    end C_Init;
 
    --  -------------------------------------------------------------------------
-
+   --  L256
    function Get_Adam_Updates (Self   : in out Adam_Optimizer;
                               Params : Parameters_Record)
                               return Parameters_Record is
       use Maths.Float_Math_Functions;
+      Routine_Name         : constant String :=
+                             "Stochastic_Optimizers.Get_Adam_Updates ";
       Learning_Rate        : Float;
       Coeff_Params_2D      : Float_List_2D;
       Coeff_Params_1D      : Float_List;
@@ -97,21 +100,27 @@ package body Stochastic_Optimizers is
    begin
       Self.Time_Step := Self.Time_Step + 1;
 
-      --  Update first and second coeff moments
+      --  L271  Update first and second coeff moments
       for m in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
+         Put_Line (Routine_Name & "m:" & Integer'Image (m));
          Coeff_Params_2D := Params.Coeff_Params.Element (m);
          Intercept_Updates_1D := Params.Intercept_Params.Element (m);
+
          Coeff_Updates_1D.Clear;
          for coeff in Coeff_Params_2D.First_Index ..
            Coeff_Params_2D.Last_Index loop
+            Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
             Coeff_Params_1D := Coeff_Params_2D (coeff);
+            Put_Line (Routine_Name & "Coeff_Params_1D set");
             Self.Coeff_First_Moments.Append
               (Float (m) * Self.Beta_1 +
-               (1.0 - Self.Beta_1) * Coeff_Updates_1D.Element (m));
+               (1.0 - Self.Beta_1) * Coeff_Params_1D.Element (m));
+            Put_Line (Routine_Name & "Coeff_First_Moments set");
             Self.Coeff_Second_Moments.Append
               (Float (m) * Self.Beta_2 +
                (1.0 - Self.Beta_2) * Coeff_Updates_1D.Element (m) ** 2);
+            Put_Line (Routine_Name & "Coeff_Second_Moments set");
          end loop;
 
          --  Update first and second intercept moments
@@ -210,6 +219,8 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_Record;
                             Grads  : Parameters_Record) is
+      Routine_Name       : constant String :=
+                             "Stochastic_Optimizers.Update_Params ";
       Coef_1D           : Float_List;
       Coef_2D           : Float_List_2D;
       Intercept_1D      : Float_List;
@@ -218,6 +229,7 @@ package body Stochastic_Optimizers is
       Intercept_Updates : Float_List;
       Updates           : Parameters_Record;
    begin
+      Put_Line (Routine_Name);
       --  L42
       case Self.Kind is
          when Optimizer_Adam =>
@@ -227,6 +239,7 @@ package body Stochastic_Optimizers is
          when No_Optimizer => null;
       end case;
 
+      Put_Line (Routine_Name & "L43");
       --  L43 for each layer p:
       for layer in Updates.Coeff_Params.First_Index ..
         Updates.Coeff_Params.Last_Index loop
@@ -241,13 +254,17 @@ package body Stochastic_Optimizers is
          end loop;
          Params.Coeff_Params (layer) := Coef_Updates_2D;
       end loop;
+      Put_Line (Routine_Name & "Coeff_Params set");
 
       for layer in Updates.Intercept_Params.First_Index ..
         Updates.Intercept_Params.Last_Index loop
+         Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
          Intercept_1D := Params.Intercept_Params (layer);
          Intercept_Updates.Clear;
          for index in Intercept_1D.First_Index .. Intercept_1D.Last_Index loop
-            Intercept_Updates.Append (Intercept_1D (index) + Intercept_Updates (index));
+            Put_Line (Routine_Name & "index:" & Integer'Image (index));
+            Intercept_Updates.Append (Intercept_1D (index) +
+                                        Intercept_Updates (index));
          end loop;
          Params.Intercept_Params (layer) := Intercept_Updates;
       end loop;

@@ -628,16 +628,19 @@ package body Multilayer_Perceptron is
             --  L645
             Backprop (Self, X_Batch, Y_Batch, Activations, Deltas, Batch_Loss,
                       Coef_Grads, Intercept_Grads);
-            Put_Line (Routine_Name & "Backprop done");
             Accumulated_Loss := Accumulated_Loss + Batch_Loss *
               Float (Batch_Slice.Last - Batch_Slice.First + 1);
+            Put_Line (Routine_Name & "Accumulated_Loss: " &
+                        Float'Image (Accumulated_Loss));
             --  L657 update weights
             Parameters.Coeff_Params := Coeff_Params;
             Parameters.Intercept_Params := Intercept_Params;
             Grads.Coeff_Params := Coef_Grads;
             Grads.Intercept_Params := Intercept_Grads;
+            Put_Line (Routine_Name & "Intercept_Params set");
             Stochastic_Optimizers.Update_Params
               (Self.Attributes.Optimizer, Parameters, Grads);
+            Put_Line (Routine_Name & "Update_Params set");
 
             --  L661
             Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
