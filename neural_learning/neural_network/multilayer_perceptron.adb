@@ -190,14 +190,10 @@ package body Multilayer_Perceptron is
       --  The ith element of Activations (layers x values) is a list of values
       --  of the ith layer.
 
-      --  Backward propagate python last = self.n_layers_ - 2
+      --  L295  Backward propagate python last = self.n_layers_ - 2
       Last := Self.Attributes.N_Layers - 1;
       --  L301
       Activation := Activations.Last_Element;
-      Put_Line (Routine_Name & "Activation size:" &
-                  Integer'Image (Integer (Activation.Length)));
-      Put_Line (Routine_Name & "Activation dim 2 size:" &
-                  Integer'Image (Integer (Activation (1).Length)));
       Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
                 Integer'Image (Last) & " should equal Deltas length" &
                 Count_Type'Image (Deltas.Length));
@@ -212,9 +208,14 @@ package body Multilayer_Perceptron is
                   Count_Type'Image (Activations.Last_Element.Length) & " x" &
                   Count_Type'Image (Activations.Last_Element.Element (1).Length));
 
-      Put_Line (Routine_Name & "Last: " & Integer'Image (Last));
+      Put_Line (Routine_Name & "L301  Last: " & Integer'Image (Last));
+      if Positive (Deltas.Length) < Last then
+         Deltas.Set_Length (Count_Type (Last));
+      end if;
       Deltas (Last) := Activations.Last_Element;
+      Put_Line (Routine_Name & " L302 Deltas (Last) set 1");
       Deltas (Last) := Activations.Last_Element - Y_Float;
+      Put_Line (Routine_Name & " L302 Deltas (Last) set 2");
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
@@ -401,8 +402,8 @@ package body Multilayer_Perceptron is
       --  activations of the i + 1 layer and the backpropagated error.
       Deltas.Set_Length (Layer_Units.Length - 1);
 
-      --  L417 Initialized grads are empty vectors
---        Init_Grads (Layer_Units, Coef_Grads, Intercept_Grads);
+      --  L417 Initialized grads are empty vectors, no initialization required.
+
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -689,7 +690,6 @@ package body Multilayer_Perceptron is
       Acts_Dot_Coeffs    : Float_List_2D;
       Act_With_Intercept : Float_List_2D;
    begin
-      Put_Line (Routine_Name & "Num_Layers :" & Integer'Image (Num_Layers));
       --  Iterate over the hidden layers
       --  The Python range(stop) function returns a sequence of numbers,
       --   starting from 0 by default, incrementing by 1 (by default) and
@@ -697,7 +697,7 @@ package body Multilayer_Perceptron is
       --  Therefore range(self.n_layers_ - 1): range is
       --            first (0) .. last (n_layers_ - 2)
       for index in 1 .. Num_Layers - 1 loop
-         Put_Line (Routine_Name & "index:" & Integer'Image (index));
+--           Put_Line (Routine_Name & "index:" & Integer'Image (index));
          Coefficient_Matrix := Self.Attributes.Neuron_Coef_Layers (index);
          --  Dot (samples x features, samples x coefficients (weights))
          --  => samples x (coefficient * feature)
@@ -706,17 +706,21 @@ package body Multilayer_Perceptron is
             Activations.Set_Length (Count_Type (index + 1));
          end if;
          Activations (index + 1) := Acts_Dot_Coeffs;
-         Put_Line (Routine_Name & "Activations length:" &
-                    Integer'Image (Integer (Activations.Length)));
-         --           Put_Line (Routine_Name & "Intercepts length:" &
-         --                       Integer'Image (Integer (Self.Attributes.Intercepts (index).Length)));
+--           Put_Line (Routine_Name & "Activations length:" &
+--                      Count_Type'Image (Activations.Length));
+--           Put_Line (Routine_Name & "Activations length (index + 1):" &
+--                      Count_Type'Image (Activations (index + 1).Length));
+         Act_With_Intercept := Activations (index + 1);
          --  Intercepts: layers x intercept values
-         for intercept in Activations (index + 1).First_Index ..
-           Activations (index + 1).Last_Index loop
-            Act_With_Intercept (intercept) :=
-              Activations (index + 1)  (intercept) +
-              Self.Attributes.Intercepts (intercept);
+         for intercept in Self.Attributes.Intercepts.First_Index ..
+           Self.Attributes.Intercepts.Last_Index loop
+--              Put_Line (Routine_Name & "intercept:" & Integer'Image (intercept));
+            Act_With_Intercept.Replace_Element
+              (intercept, Act_With_Intercept (intercept) +
+               Self.Attributes.Intercepts (intercept));
          end loop;
+--           Put_Line (Routine_Name & "Activations length:" &
+--                      Count_Type'Image (Activations.Length));
          Activations.Replace_Element (index + 1, Act_With_Intercept);
 
          --  L134 For the hidden layers
@@ -741,6 +745,12 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activations (Num_Layers));
       end case;
 
+      Put_Line (Routine_Name & "Activations length:" &
+                    Count_Type'Image (Activations.Length));
+      Put_Line (Routine_Name & "Activations length (1):" &
+                    Count_Type'Image (Activations (1).Length));
+      Put_Line (Routine_Name & "Activations length (2):" &
+                    Count_Type'Image (Activations (2).Length));
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
