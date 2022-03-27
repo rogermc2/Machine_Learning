@@ -109,7 +109,6 @@ package body Multilayer_Perceptron is
                        Intercept_Grads : out Float_List_2D) is
       use Ada.Containers;
       use Base_Neural;
-      use Float_List_Package;
       use Float_Package;
       Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Y_Float            : constant Float_List_2D :=
@@ -122,7 +121,6 @@ package body Multilayer_Perceptron is
       F_I                : Positive;
       Last               : Positive;
       Activation         : Float_List_2D;
-      Diff               : Float_List_2D;
       Derivative_Kind    : Derivative_Type;
       Inplace_Derivative : Float_List;
    begin
@@ -208,25 +206,19 @@ package body Multilayer_Perceptron is
                   Count_Type'Image (Activations.Last_Element.Length) & " x" &
                   Count_Type'Image (Activations.Last_Element.Element (1).Length));
 
-      if Positive (Deltas.Length) < Last then
-         Deltas.Set_Length (Count_Type (Last));
-      end if;
-
       Assert (Y_Float.Length = Activations.Last_Element.Length, Routine_Name &
                 "L301 Y_Float length" &
                 Count_Type'Image (Y_Float.Length) &
                 " should equal Activations.Last_Element length" &
                 Count_Type'Image (Activations.Last_Element.Length));
-      Put_Line (Routine_Name & "L301  Last:" & Integer'Image (Last));
+      Deltas (Last) := Activations.Last_Element - Y_Float;
+      Put_Line (Routine_Name & " L302 Deltas set");
       Put_Line (Routine_Name & "Deltas size:" &
-                  Count_Type'Image (Deltas.Length) & " x" &
-                  Count_Type'Image (Deltas.Last_Element.Length));
+                  Count_Type'Image (Deltas.Length));
       Put_Line (Routine_Name & "Deltas (first) size:" &
                   Count_Type'Image (Deltas.First_Element.Length));
       Put_Line (Routine_Name & "Deltas (last) size:" &
                   Count_Type'Image (Deltas.Last_Element.Length));
-      Deltas (Last) := Activations.Last_Element - Y_Float;
-      Put_Line (Routine_Name & " L302 Deltas (Last) set 2");
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,

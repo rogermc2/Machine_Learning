@@ -209,8 +209,9 @@ package body NL_Types is
       for row in L.First_Index .. L.Last_Index loop
          List_1D := L (row);
          List_2D := R (row);
+         List_3D.Clear;
          for col in List_1D.First_Index .. List_1D.Last_Index loop
-            List_3D (col) := List_1D (col) + List_2D (col);
+            List_3D.Append (List_1D (col) + List_2D (col));
          end loop;
          Result.Append (List_3D);
       end loop;
@@ -230,8 +231,9 @@ package body NL_Types is
       for row in L.First_Index .. L.Last_Index loop
          List_1D := L (row);
          List_2D := R (row);
+         List_3D.Clear;
          for col in List_1D.First_Index .. List_1D.Last_Index loop
-            List_3D (col) := List_1D (col) - List_2D (col);
+            List_3D.Append (List_1D (col) - List_2D (col));
          end loop;
          Result.Append (List_3D);
       end loop;
