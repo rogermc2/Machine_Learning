@@ -208,12 +208,16 @@ package body Multilayer_Perceptron is
                   Count_Type'Image (Activations.Last_Element.Length) & " x" &
                   Count_Type'Image (Activations.Last_Element.Element (1).Length));
 
-      Put_Line (Routine_Name & "L301  Last: " & Integer'Image (Last));
       if Positive (Deltas.Length) < Last then
          Deltas.Set_Length (Count_Type (Last));
       end if;
-      Deltas (Last) := Activations.Last_Element;
-      Put_Line (Routine_Name & " L302 Deltas (Last) set 1");
+
+      Assert (Y_Float.Length = Activations.Last_Element.Length, Routine_Name &
+                "L301 Y_Float length" &
+                Count_Type'Image (Y_Float.Length) &
+                " should equal Activations.Last_Element length" &
+                Count_Type'Image (Activations.Last_Element.Length));
+      Put_Line (Routine_Name & "L301  Last:" & Integer'Image (Last));
       Deltas (Last) := Activations.Last_Element - Y_Float;
       Put_Line (Routine_Name & " L302 Deltas (Last) set 2");
 
