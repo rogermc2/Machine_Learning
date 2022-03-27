@@ -792,7 +792,7 @@ package body Multilayer_Perceptron is
       Fan_Out_Units : Integer_List;
       Intercept     : Float_List;
 
-      function Build_List (Dims : Integer_Zip_Item) return Float_List_2D is
+      function Build_List (Dims : Integer_Pair) return Float_List_2D is
          Inner   : Float_List;
          theList : Float_List_2D;
       begin
@@ -805,18 +805,19 @@ package body Multilayer_Perceptron is
 
       end Build_List;
 
-      Zip_Layer_Units           : Integer_Zip_List;
+      --  a zip list is a list of paired item records
+      Fan_In_Out : Integer_Pair_List;
    begin
-      Fan_In_Units.Append (Layer_Units.Element (1));
+      Fan_In_Units.Append (Layer_Units (1));
       Integer_Package.Delete_Last (Fan_In_Units);
-      Fan_Out_Units.Append (Layer_Units.Element (2));
+      Fan_Out_Units.Append (Layer_Units (2));
       Integer_Package.Delete_First (Fan_In_Units);
-      Zip_Layer_Units := Zip (Fan_In_Units, Fan_Out_Units);
+      Fan_In_Out := Pair_Items (Fan_In_Units, Fan_Out_Units);
 
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
-      for index in Zip_Layer_Units.First_Index ..
-        Zip_Layer_Units.Last_Index loop
-         Coef_Grads.Append (Build_List (Zip_Layer_Units.Element (index)));
+      for index in Fan_In_Out.First_Index ..
+        Fan_In_Out.Last_Index loop
+         Coef_Grads.Append (Build_List (Fan_In_Out.Element (index)));
       end loop;
 
       --  Intercept_Grads is a 2D list of fan_out lists
