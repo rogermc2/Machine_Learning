@@ -131,15 +131,6 @@ package body Multilayer_Perceptron is
 --                    Count_Type'Image (Activations (1) (1).Length));
 
       Forward_Pass (Self, Activations);
-      --        Put_Line (Routine_Name & "Forward_Pass done");
---        Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
---                    Count_Type'Image (Activations.Length));
---        Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
---                    Count_Type'Image (Activations (1).Length) & " x" &
---                    Count_Type'Image (Activations (1) (1).Length));
---        Put_Line (Routine_Name & "L284 Forward_Pass done, Activations size:" &
---                    Count_Type'Image (Activations (2).Length) & " x" &
---                    Count_Type'Image (Activations (2) (1).Length));
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -195,34 +186,16 @@ package body Multilayer_Perceptron is
                 Integer'Image (Last) & " should equal Deltas length" &
                 Count_Type'Image (Deltas.Length));
 
---        Put_Line (Routine_Name & "L301 Activations (1) size:" &
---                    Count_Type'Image (Activations (1).Length) & " x" &
---                    Count_Type'Image (Activations (1) (1).Length));
---        Put_Line (Routine_Name & "Activations (2) size:" &
---                    Count_Type'Image (Activations (2).Length) & " x" &
---                    Count_Type'Image (Activations (2) (1).Length));
---        Put_Line (Routine_Name & "Activations (last) size:" &
---                    Count_Type'Image (Activations.Last_Element.Length) & " x" &
---                    Count_Type'Image (Activations.Last_Element.Element (1).Length));
-
       Assert (Y_Float.Length = Activations.Last_Element.Length, Routine_Name &
                 "L301 Y_Float length" &
                 Count_Type'Image (Y_Float.Length) &
                 " should equal Activations.Last_Element length" &
                 Count_Type'Image (Activations.Last_Element.Length));
       Deltas (Last) := Activations.Last_Element - Y_Float;
-      Put_Line (Routine_Name & " L302 Deltas set");
---        Put_Line (Routine_Name & "Deltas size:" &
---                    Count_Type'Image (Deltas.Length));
---        Put_Line (Routine_Name & "Deltas (first) size:" &
---                    Count_Type'Image (Deltas.First_Element.Length));
---        Put_Line (Routine_Name & "Deltas (last) size:" &
---                    Count_Type'Image (Deltas.Last_Element.Length));
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Coef_Grads, Intercept_Grads);
-      Put_Line (Routine_Name & " L308 loss_Gradient computed");
 
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
@@ -321,31 +294,37 @@ package body Multilayer_Perceptron is
       Deltas          : Float_List_3D;
       Coef_Grads      : in out Float_List_3D;
       Intercept_Grads : in out Float_List_2D) is
+      use Ada.Containers;
       use Float_List_Package;
       use Float_Package;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Compute_Loss_Gradient ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_Act    : Float_List_2D;
       Delta_Mean   : Float_List;
    begin
-      Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
-      Put_Line (Routine_Name & "Deltas (Layer) length" &
-                  Integer'Image (Integer (Deltas (Layer).Length)));
-      Put_Line (Routine_Name & "Activations (Layer) length" &
-                  Integer'Image (Integer (Activations (Layer).Length)));
+--        Put_Line (Routine_Name & "Deltas (Layer) length" &
+--                    Integer'Image (Integer (Deltas (Layer).Length)));
+--        Put_Line (Routine_Name & "Activations (Layer) length" &
+--                    Integer'Image (Integer (Activations (Layer).Length)));
       Delta_Act := Dot (Deltas (Layer), Activations (Layer));
-      Put_Line (Routine_Name & "Delta_Act computed");
       Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 1);
-      Put_Line (Routine_Name & "Delta_Mean computed");
+
       --  Coef_Grads is a 3D list of fan_in x fan_out lists
-      Coef_Grads (Layer) :=
-        (Delta_Act + Self.Parameters.Alpha *
-           Self.Attributes.Neuron_Coef_Layers (Layer)) / Float (Num_Samples);
-      Put_Line (Routine_Name & "Coef_Grads computed");
+      if Coef_Grads.Is_Empty or else Positive (Coef_Grads.Length) < Layer then
+         Coef_Grads.Set_Length (Count_Type (Layer));
+      end if;
+      Coef_Grads (Layer) := (Delta_Act +
+        Self.Parameters.Alpha * Self.Attributes.Neuron_Coef_Layers (Layer));
+      Coef_Grads (Layer) := Coef_Grads (Layer) / Float (Num_Samples);
 
       --  Intercept_Grads is 2D layer x fan_out
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
+
+      if Intercept_Grads.Is_Empty or else
+        Positive (Intercept_Grads.Length) < Layer then
+         Intercept_Grads.Set_Length (Count_Type (Layer));
+      end if;
 
       for index in Intercept_Grads (Layer).First_Index ..
         Intercept_Grads (Layer).Last_Index loop

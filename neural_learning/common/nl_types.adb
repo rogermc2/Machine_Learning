@@ -283,27 +283,27 @@ package body NL_Types is
 
    function Dot (L, R : Float_List_2D) return Float_List_2D is
       RT      : constant Float_List_2D := Transpose (R);
-      L_List  : Float_List;
-      RT_List : Float_List;
-      LR_List : Float_List;
+      L_Row   : Float_List;
+      R_Col   : Float_List;
+      LR_Row  : Float_List;
       LR      : Float;
-      Result  : Float_List_2D;
+      Product : Float_List_2D;
    begin
-      for l_index in L.First_Index .. L.Last_Index loop
-         L_List := L (l_index);
-         LR := 0.0;
-         LR_List.Clear;
-         for r_index in RT.First_Index .. RT.Last_Index loop
-           RT_List := RT (r_index);
-            for index_2 in L.First_Index .. L.Last_Index loop
-               LR := LR + L_List (index_2) * RT_List (index_2);
+      for index in L.First_Index .. L.Last_Index loop
+         L_Row := L (index);
+         for col_index in RT.First_Index .. RT.Last_Index loop
+            R_Col := RT (col_index);
+            LR := 0.0;
+            LR_Row.Clear;
+            for lr_index in L_Row.First_Index .. L_Row.Last_Index loop
+               LR := LR + L_Row (lr_index) * R_Col (lr_index);
             end loop;
-            LR_List.Append (LR);
+            LR_Row.Append (LR);
          end loop;
-         Result.Append (LR_List);
+         Product.Append (LR_Row);
       end loop;
 
-      return Result;
+      return Product;
 
    end Dot;
 
