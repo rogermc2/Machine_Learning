@@ -89,56 +89,58 @@ package body Stochastic_Optimizers is
                               return Parameters_Record is
       use Maths.Float_Math_Functions;
       Routine_Name         : constant String :=
-                             "Stochastic_Optimizers.Get_Adam_Updates ";
+                               "Stochastic_Optimizers.Get_Adam_Updates ";
       Learning_Rate        : Float;
       Coeff_Params_2D      : Float_List_2D;
       Coeff_Params_1D      : Float_List;
       Intercept_Params_1D  : Float_List;
-      Intercept_Updates_1D : Float_List;
       Updates              : Parameters_Record;
    begin
       Self.Time_Step := Self.Time_Step + 1;
 
-      --  L271  Update first and second coeff moments
+      --  L271, L274  Update first and second coeff moments
       for m in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
          Put_Line (Routine_Name & "m:" & Integer'Image (m));
          Coeff_Params_2D := Params.Coeff_Params.Element (m);
-         Intercept_Updates_1D := Params.Intercept_Params.Element (m);
 
          for coeff in Coeff_Params_2D.First_Index ..
            Coeff_Params_2D.Last_Index loop
             Coeff_Params_1D := Coeff_Params_2D (coeff);
+            --  L272
             Self.Coeff_First_Moments.Append
               (Float (m) * Self.Beta_1 +
                (1.0 - Self.Beta_1) * Coeff_Params_1D.Element (m));
+            --  L276
             Self.Coeff_Second_Moments.Append
               (Float (m) * Self.Beta_2 +
                (1.0 - Self.Beta_2) * Coeff_Params_1D.Element (m) ** 2);
          end loop;
-         Put_Line (Routine_Name & "Coeff Moments set");
 
          --  Update first and second intercept moments
-         Self.Intercept_First_Moments.Append
-           (Float (m) * Self.Beta_1 +
-            (1.0 - Self.Beta_1) * Intercept_Updates_1D.Element (m));
-         Self.Intercept_Second_Moments.Append
-           (Float (m) * Self.Beta_2 +
-            (1.0 - Self.Beta_2) * Intercept_Updates_1D.Element (m) ** 2);
+         --           Intercept_Updates_1D := Params.Intercept_Params.Element (m);
+         --           Self.Intercept_First_Moments.Append
+         --             (Float (m) * Self.Beta_1 +
+         --              (1.0 - Self.Beta_1) * Intercept_Updates_1D.Element (m));
+         --           Self.Intercept_Second_Moments.Append
+         --             (Float (m) * Self.Beta_2 +
+         --              (1.0 - Self.Beta_2) * Intercept_Updates_1D.Element (m) ** 2);
       end loop;
-      Put_Line (Routine_Name & "intercept Moments set");
+      Put_Line (Routine_Name & "Coeff Moments set");
 
-      --  Update learning rate
+      --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
 
+      --  L284
       for layer in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
          Coeff_Params_2D.Clear;
          for row in Self.Coeff_First_Moments.First_Index ..
            Self.Coeff_First_Moments.Last_Index loop
+            Put_Line (Routine_Name & "row:" & Integer'Image (row));
             Learning_Rate := -Float (layer) * Self.Learning_Rate;
             Coeff_Params_1D.Append
               (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (row)) +
@@ -218,13 +220,13 @@ package body Stochastic_Optimizers is
                             Grads  : Parameters_Record) is
       Routine_Name       : constant String :=
                              "Stochastic_Optimizers.Update_Params ";
-      Coef_1D           : Float_List;
-      Coef_2D           : Float_List_2D;
-      Intercept_1D      : Float_List;
-      Coef_Updates_1D   : Float_List;
-      Coef_Updates_2D   : Float_List_2D;
-      Intercept_Updates : Float_List;
-      Updates           : Parameters_Record;
+      Coef_1D            : Float_List;
+      Coef_2D            : Float_List_2D;
+      Intercept_1D       : Float_List;
+      Coef_Updates_1D    : Float_List;
+      Coef_Updates_2D    : Float_List_2D;
+      Intercept_Updates  : Float_List;
+      Updates            : Parameters_Record;
    begin
       Put_Line (Routine_Name);
       --  L42
