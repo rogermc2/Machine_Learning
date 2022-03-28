@@ -93,7 +93,6 @@ package body Stochastic_Optimizers is
       Learning_Rate        : Float;
       Coeff_Params_2D      : Float_List_2D;
       Coeff_Params_1D      : Float_List;
-      Coeff_Updates_1D     : Float_List;
       Intercept_Params_1D  : Float_List;
       Intercept_Updates_1D : Float_List;
       Updates              : Parameters_Record;
@@ -107,21 +106,17 @@ package body Stochastic_Optimizers is
          Coeff_Params_2D := Params.Coeff_Params.Element (m);
          Intercept_Updates_1D := Params.Intercept_Params.Element (m);
 
-         Coeff_Updates_1D.Clear;
          for coeff in Coeff_Params_2D.First_Index ..
            Coeff_Params_2D.Last_Index loop
-            Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
             Coeff_Params_1D := Coeff_Params_2D (coeff);
-            Put_Line (Routine_Name & "Coeff_Params_1D set");
             Self.Coeff_First_Moments.Append
               (Float (m) * Self.Beta_1 +
                (1.0 - Self.Beta_1) * Coeff_Params_1D.Element (m));
-            Put_Line (Routine_Name & "Coeff_First_Moments set");
             Self.Coeff_Second_Moments.Append
               (Float (m) * Self.Beta_2 +
-               (1.0 - Self.Beta_2) * Coeff_Updates_1D.Element (m) ** 2);
-            Put_Line (Routine_Name & "Coeff_Second_Moments set");
+               (1.0 - Self.Beta_2) * Coeff_Params_1D.Element (m) ** 2);
          end loop;
+         Put_Line (Routine_Name & "Coeff Moments set");
 
          --  Update first and second intercept moments
          Self.Intercept_First_Moments.Append
@@ -131,6 +126,7 @@ package body Stochastic_Optimizers is
            (Float (m) * Self.Beta_2 +
             (1.0 - Self.Beta_2) * Intercept_Updates_1D.Element (m) ** 2);
       end loop;
+      Put_Line (Routine_Name & "intercept Moments set");
 
       --  Update learning rate
       Self.Learning_Rate := Sqrt
@@ -139,6 +135,7 @@ package body Stochastic_Optimizers is
 
       for layer in Self.Coeff_First_Moments.First_Index ..
         Self.Coeff_First_Moments.Last_Index loop
+         Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
          Coeff_Params_2D.Clear;
          for row in Self.Coeff_First_Moments.First_Index ..
            Self.Coeff_First_Moments.Last_Index loop
