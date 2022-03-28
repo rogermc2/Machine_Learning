@@ -15,8 +15,8 @@ package body Stochastic_Optimizers is
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float) is
-      use Ada.Containers;
-      Zeros : Float_List;
+      --        use Ada.Containers;
+      --        Zeros : Float_List;
    begin
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
@@ -26,16 +26,16 @@ package body Stochastic_Optimizers is
 
       Self.Time_Step := 0;
 
-      for index in 1 .. Params.Coeff_Params.Length loop
-         Zeros.Append (0.0);
-      end loop;
-
-      for index in 1 .. Params.Coeff_Params.Length loop
-         Self.First_Moments.Coeff_Moments.Append (Zeros);
-         Self.First_Moments.Intercept_Moments.Append (Zeros);
-         Self.Second_Moments.Coeff_Moments.Append (Zeros);
-         Self.Second_Moments.Intercept_Moments.Append (Zeros);
-      end loop;
+      --        for index in 1 .. Params.Coeff_Params.Length loop
+      --           Zeros.Append (0.0);
+      --        end loop;
+      --
+      --        for index in 1 .. Params.Coeff_Params.Length loop
+      Self.First_Moments.Coeff_Moments.Clear;
+      Self.First_Moments.Intercept_Moments.Clear;
+      Self.Second_Moments.Coeff_Moments.Clear;
+      Self.Second_Moments.Intercept_Moments.Clear;
+      --        end loop;
 
    end C_Init;
 
@@ -55,7 +55,7 @@ package body Stochastic_Optimizers is
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5) is
       use Ada.Containers;
-      Zeros    : Float_List;
+      --        Zeros    : Float_List;
    begin
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
@@ -66,16 +66,17 @@ package body Stochastic_Optimizers is
       Self.Use_Nesterov := Use_Nesterov;
       Self.Power_T := Power_T;
 
-      for index in 1 .. Self.Velocities.Intercept_Params.Length loop
-         Zeros.Append (0.0);
-      end loop;
+      --        for index in 1 .. Self.Velocities.Intercept_Params.Length loop
+      --           Zeros.Append (0.0);
+      --        end loop;
 
       for index in 1 .. Self.Velocities.Intercept_Params.Length loop
-         Self.Velocities.Intercept_Params.Append (Zeros);
+         Self.Velocities.Intercept_Params.Clear;
       end loop;
 
       for index in 1 .. Integer (Self.Velocities.Coeff_Params.Length) loop
-         Self.Velocities.Coeff_Params (index).Append (Zeros);
+         Self.Velocities.Coeff_Params (index).Clear;
+         --           Self.Velocities.Coeff_Params (index).Append (Zeros);
       end loop;
 
    end C_Init;
@@ -95,36 +96,43 @@ package body Stochastic_Optimizers is
       Updates              : Parameters_Record;
    begin
       Self.Time_Step := Self.Time_Step + 1;
+      Self.First_Moments.Coeff_Moments.Clear;
+      Self.Second_Moments.Coeff_Moments.Clear;
+      Self.First_Moments.Intercept_Moments.Clear;
+      Self.Second_Moments.Intercept_Moments.Clear;
 
       --  L271, L274  Update first and second coeff moments
       for m in Params.Coeff_Params.First_Index ..
         Params.Coeff_Params.Last_Index loop
          Put_Line (Routine_Name & "m:" & Integer'Image (m));
          Coeff_Params_2D := Params.Coeff_Params.Element (m);
-         Intercept_Params_1D := Params.Intercept_Params.Element (m);
 
          for coeff in Coeff_Params_2D.First_Index ..
            Coeff_Params_2D.Last_Index loop
-            Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
+            --              Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
             Coeff_Params_1D := Coeff_Params_2D (coeff);
             --  L272
-            Self.First_Moments.Coeff_Moments (coeff) :=
-              Float (m) * Self.Beta_1 +
-               (1.0 - Self.Beta_1) * Coeff_Params_1D.Element (m);
+            Self.First_Moments.Coeff_Moments.Append
+              (Float (m) * Self.Beta_1 +
+               (1.0 - Self.Beta_1) * Coeff_Params_1D (m));
+
             --  L276
-            Self.First_Moments.Coeff_Moments (coeff) :=
-              Float (m) * Self.Beta_2 +
-               (1.0 - Self.Beta_2) * Coeff_Params_1D.Element (m) ** 2;
+            Self.Second_Moments.Coeff_Moments.Append
+              (Float (m) * Self.Beta_2 +
+               (1.0 - Self.Beta_2) * Coeff_Params_1D (m) ** 2);
          end loop;
-         Put_Line (Routine_Name & "Coeff_Moments set");
 
          --  Update first and second intercept moments
-         Self.First_Moments.Intercept_Moments (m) :=
-           Float (m) * Self.Beta_1 +
-            (1.0 - Self.Beta_1) * Intercept_Params_1D.Element (m);
-         Self.Second_Moments.Intercept_Moments (m) :=
-           Float (m) * Self.Beta_2 +
-            (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (m) ** 2;
+         Intercept_Params_1D := Params.Intercept_Params (m);
+         for interc in Intercept_Params_1D.First_Index ..
+           Intercept_Params_1D.Last_Index loop
+            Self.First_Moments.Intercept_Moments.Append
+              (Float (m) * Self.Beta_1 +
+               (1.0 - Self.Beta_1) * Intercept_Params_1D (interc));
+            Self.Second_Moments.Intercept_Moments.Append
+              (Float (m) * Self.Beta_2 +
+               (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (interc) ** 2);
+         end loop;
       end loop;
       Put_Line (Routine_Name & "Moments set");
 
@@ -157,7 +165,7 @@ package body Stochastic_Optimizers is
          Learning_Rate := -Float (m) * Self.Learning_Rate;
          Intercept_Params_1D.Append
            (Learning_Rate / (Sqrt (Self.Second_Moments.Intercept_Moments (m)) +
-            Self.Epsilon));
+                Self.Epsilon));
          Updates.Intercept_Params.Append (Intercept_Params_1D);
       end loop;
 
