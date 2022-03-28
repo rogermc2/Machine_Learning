@@ -134,26 +134,27 @@ package body Stochastic_Optimizers is
                (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (interc) ** 2);
          end loop;
       end loop;
-      Put_Line (Routine_Name & "Moments set");
 
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
+      Put_Line (Routine_Name & "Self.Learning_Rate set");
 
       --  L284
       for layer in Params.Coeff_Params.First_Index ..
         Params.Coeff_Params.Last_Index loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
-         Coeff_Params_2D.Clear;
+         Coeff_Params_1D.Clear;
          for row in Self.First_Moments.Coeff_Moments.First_Index ..
            Self.First_Moments.Coeff_Moments.Last_Index loop
             Put_Line (Routine_Name & "row:" & Integer'Image (row));
             Learning_Rate := -Float (layer) * Self.Learning_Rate;
-            Put_Line (Routine_Name & "Learning_Rate");
+            Put_Line (Routine_Name & "Learning_Rate set");
             Coeff_Params_1D.Append
               (Learning_Rate / (Sqrt (Self.Second_Moments.Intercept_Moments (row)) +
                    Self.Epsilon));
+            Put_Line (Routine_Name & "Coeff_Params_1D appended");
          end loop;
 
          Coeff_Params_2D.Append (Coeff_Params_1D);
