@@ -1,5 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
+with Ada.Containers.Vectors;
+
 with NL_Types; use NL_Types;
 
 package Stochastic_Optimizers is
@@ -21,14 +23,20 @@ package Stochastic_Optimizers is
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type Parameters_Record is record
-      Coeff_Params     : Float_List_3D;
-      Intercept_Params : Float_List_2D;
+      Coeff_Params     : Float_List_2D;
+      Intercept_Params : Float_List;
    end record;
+   package Parameters_Package is new
+     Ada.Containers.Vectors (Positive, Parameters_Record);
+   subtype Parameters_List is Parameters_Package.Vector;
 
    type Moments_Record is record
       Coeff_Moments     : Float_List;
       Intercept_Moments : Float_List;
    end record;
+   package Moments_Package is new
+     Ada.Containers.Vectors (Positive, Moments_Record);
+   subtype Moments_List is Moments_Package.Vector;
 
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
@@ -40,15 +48,15 @@ package Stochastic_Optimizers is
       --  corresponding to layer i.
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
-      Params                   : Parameters_Record;
+      Params                   : Parameters_List;
       Initial_Learning_Rate    : Float := 0.1;
       Learning_Rate            : Float := 0.1;
       Beta_1                   : Float := 0.9;
       Beta_2                   : Float := 0.999;
       Epsilon                  : Float := 10.0 ** (-8);
       Time_Step                : Integer;
-      First_Moments            : Moments_Record;  --  ms
-      Second_Moments           : Moments_Record;  --  vs
+      First_Moments            : Moments_List;  --  ms
+      Second_Moments           : Moments_List;  --  vs
    end record;
 
    type SGD_Optimizer is record
@@ -56,7 +64,7 @@ package Stochastic_Optimizers is
       --  corresponding to layer i.
       --  The ith element of Intercept_Params represents the bias vector
       --  corresponding to layer i + 1.
-      Params                : Parameters_Record;
+      Params                : Parameters_List;
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
       Learning_Rate_Kind    : Learning_Rate_Type := Constant_Rate;
@@ -64,7 +72,7 @@ package Stochastic_Optimizers is
       Momentum              : Float := 0.9;
       Use_Nesterov          : Boolean := True;
       Power_T               : Float := 0.5;
-      Velocities            : Parameters_Record;
+      Velocities            : Parameters_List;
    end record;
 
    type Optimizer_Record (Kind : Optimizer_Type := No_Optimizer) is record
@@ -76,13 +84,13 @@ package Stochastic_Optimizers is
    end record;
 
    procedure C_Init (Self                  : out Adam_Optimizer;
-                     Params                : Parameters_Record;
+                     Params                : Parameters_List;
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float);
    procedure C_Init (Self                  : out SGD_Optimizer;
-                     Params                : Parameters_Record;
+                     Params                : Parameters_List;
                      Initial_Learning_Rate : Float := 0.1;
                      Learning_Rate         : Float := 0.1;
                      Learning_Rate_Kind    : Learning_Rate_Type :=
@@ -93,7 +101,7 @@ package Stochastic_Optimizers is
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
    procedure Update_Params (Self   : in out Optimizer_Record;
-                            Params : in out Parameters_Record;
-                            Grads  : Parameters_Record);
+                            Params : in out Parameters_List;
+                            Grads  : Parameters_List);
 
 end Stochastic_Optimizers;
