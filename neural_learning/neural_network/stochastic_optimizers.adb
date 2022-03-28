@@ -25,18 +25,16 @@ package body Stochastic_Optimizers is
       Self.Epsilon := Epsilon;
 
       Self.Time_Step := 0;
-      for index in 1 .. Params.Intercept_Params.Length loop
-         Self.Intercept_First_Moments.Append (0.0);
-         Self.Intercept_Second_Moments.Append (0.0);
-      end loop;
 
       for index in 1 .. Params.Coeff_Params.Length loop
          Zeros.Append (0.0);
       end loop;
 
       for index in 1 .. Params.Coeff_Params.Length loop
-         Self.Coeff_First_Moments .Append (Zeros);
-         Self.Coeff_Second_Moments.Append (Zeros);
+         Self.First_Moments.Coeff_Moments.Append (Zeros);
+         Self.First_Moments.Intercept_Moments.Append (Zeros);
+         Self.Second_Moments.Coeff_Moments.Append (Zeros);
+         Self.Second_Moments.Intercept_Moments.Append (Zeros);
       end loop;
 
    end C_Init;
@@ -99,34 +97,36 @@ package body Stochastic_Optimizers is
       Self.Time_Step := Self.Time_Step + 1;
 
       --  L271, L274  Update first and second coeff moments
-      for m in Self.Coeff_First_Moments.First_Index ..
-        Self.Coeff_First_Moments.Last_Index loop
+      for m in Params.Coeff_Params.First_Index ..
+        Params.Coeff_Params.Last_Index loop
          Put_Line (Routine_Name & "m:" & Integer'Image (m));
          Coeff_Params_2D := Params.Coeff_Params.Element (m);
+         Intercept_Params_1D := Params.Intercept_Params.Element (m);
 
          for coeff in Coeff_Params_2D.First_Index ..
            Coeff_Params_2D.Last_Index loop
+            Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
             Coeff_Params_1D := Coeff_Params_2D (coeff);
             --  L272
-            Self.Coeff_First_Moments.Append
-              (Float (m) * Self.Beta_1 +
-               (1.0 - Self.Beta_1) * Coeff_Params_1D.Element (m));
+            Self.First_Moments.Coeff_Moments (coeff) :=
+              Float (m) * Self.Beta_1 +
+               (1.0 - Self.Beta_1) * Coeff_Params_1D.Element (m);
             --  L276
-            Self.Coeff_Second_Moments.Append
-              (Float (m) * Self.Beta_2 +
-               (1.0 - Self.Beta_2) * Coeff_Params_1D.Element (m) ** 2);
+            Self.First_Moments.Coeff_Moments (coeff) :=
+              Float (m) * Self.Beta_2 +
+               (1.0 - Self.Beta_2) * Coeff_Params_1D.Element (m) ** 2;
          end loop;
+         Put_Line (Routine_Name & "Coeff_Moments set");
 
          --  Update first and second intercept moments
-         --           Intercept_Updates_1D := Params.Intercept_Params.Element (m);
-         --           Self.Intercept_First_Moments.Append
-         --             (Float (m) * Self.Beta_1 +
-         --              (1.0 - Self.Beta_1) * Intercept_Updates_1D.Element (m));
-         --           Self.Intercept_Second_Moments.Append
-         --             (Float (m) * Self.Beta_2 +
-         --              (1.0 - Self.Beta_2) * Intercept_Updates_1D.Element (m) ** 2);
+         Self.First_Moments.Intercept_Moments (m) :=
+           Float (m) * Self.Beta_1 +
+            (1.0 - Self.Beta_1) * Intercept_Params_1D.Element (m);
+         Self.Second_Moments.Intercept_Moments (m) :=
+           Float (m) * Self.Beta_2 +
+            (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (m) ** 2;
       end loop;
-      Put_Line (Routine_Name & "Coeff Moments set");
+      Put_Line (Routine_Name & "Moments set");
 
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
@@ -134,27 +134,30 @@ package body Stochastic_Optimizers is
         (1.0 - Self.Beta_1 ** Self.Time_Step);
 
       --  L284
-      for layer in Self.Coeff_First_Moments.First_Index ..
-        Self.Coeff_First_Moments.Last_Index loop
+      for layer in Params.Coeff_Params.First_Index ..
+        Params.Coeff_Params.Last_Index loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
          Coeff_Params_2D.Clear;
-         for row in Self.Coeff_First_Moments.First_Index ..
-           Self.Coeff_First_Moments.Last_Index loop
+         for row in Self.First_Moments.Coeff_Moments.First_Index ..
+           Self.First_Moments.Coeff_Moments.Last_Index loop
             Put_Line (Routine_Name & "row:" & Integer'Image (row));
             Learning_Rate := -Float (layer) * Self.Learning_Rate;
+            Put_Line (Routine_Name & "Learning_Rate");
             Coeff_Params_1D.Append
-              (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (row)) +
+              (Learning_Rate / (Sqrt (Self.Second_Moments.Intercept_Moments (row)) +
                    Self.Epsilon));
          end loop;
+
          Coeff_Params_2D.Append (Coeff_Params_1D);
          Updates.Coeff_Params.Append (Coeff_Params_2D);
       end loop;
 
-      for m in Self.Intercept_First_Moments.First_Index ..
-        Self.Intercept_First_Moments.Last_Index loop
+      for m in Self.First_Moments.Intercept_Moments.First_Index ..
+        Self.First_Moments.Intercept_Moments.Last_Index loop
          Learning_Rate := -Float (m) * Self.Learning_Rate;
-         Intercept_Params_1D.Append (Learning_Rate / (Sqrt (Self.Intercept_Second_Moments (m)) +
-                                       Self.Epsilon));
+         Intercept_Params_1D.Append
+           (Learning_Rate / (Sqrt (Self.Second_Moments.Intercept_Moments (m)) +
+            Self.Epsilon));
          Updates.Intercept_Params.Append (Intercept_Params_1D);
       end loop;
 

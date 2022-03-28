@@ -25,6 +25,11 @@ package Stochastic_Optimizers is
       Intercept_Params : Float_List_2D;
    end record;
 
+   type Moments_Record is record
+      Coeff_Moments     : Float_List;
+      Intercept_Moments : Float_List;
+   end record;
+
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
       Learning_Rate         : Float := 0.1;
@@ -42,10 +47,8 @@ package Stochastic_Optimizers is
       Beta_2                   : Float := 0.999;
       Epsilon                  : Float := 10.0 ** (-8);
       Time_Step                : Integer;
-      Coeff_First_Moments      : Float_List;  --  ms
-      Coeff_Second_Moments     : Float_List;  --  vs
-      Intercept_First_Moments  : Float_List;  --  ms
-      Intercept_Second_Moments : Float_List;  --  vs
+      First_Moments            : Moments_Record;  --  ms
+      Second_Moments           : Moments_Record;  --  vs
    end record;
 
    type SGD_Optimizer is record
