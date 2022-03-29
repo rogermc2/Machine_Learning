@@ -217,6 +217,7 @@ package body Stochastic_Optimizers is
                              Grads  : Parameters_List) is
         Routine_Name       : constant String :=
                                "Stochastic_Optimizers.Update_Params ";
+        Param_Rec          : Parameters_Record;
         Coefs              : Float_List;
         Intercepts         : Float_List;
         Coef_Updates       : Float_List;
@@ -236,7 +237,9 @@ package body Stochastic_Optimizers is
         Put_Line (Routine_Name & "L43");
         --  L43 for each layer p:
         for layer in Updates.First_Index .. Updates.Last_Index loop
+            Param_Rec := Params (layer);
             Coefs := Updates.Element (layer).Coeff_Moments;
+            Param_Rec.Coeff_Params := Param_Rec + Updates (layer);
             Coef_Updates.Clear;
             for index in Coefs.First_Index .. Coefs.Last_Index loop
                 Coef_Updates.Append (Coefs (index) + Coef_Updates (index));
