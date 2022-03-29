@@ -166,7 +166,8 @@ package body Stochastic_Optimizers is
       Intercept_Params_1D  : Float_List;
       Coeff_Updates_1D     : Float_List;
       Coeff_Updates_2D     : Float_List_2D;
-      Intercept_Updates_1D : Float_List;
+      Intercept_Updates    : Float_List;
+      Moments              : Moments_Record;
       Updates              : Moments_List;
    begin
       for layer in Self.Velocities.First_Index ..
@@ -188,20 +189,22 @@ package body Stochastic_Optimizers is
                   Coeff_Updates_1D.Append (M_V);
                end loop;
                Coeff_Updates_2D.Append (Coeff_Updates_1D);
+               Moments.Coeff_Moments := Coeff_Updates_1D;
             end loop;
-            Updates.Append (Coeff_Updates_2D);
+            Layer_Velocities.Coeff_Params := Coeff_Updates_2D;
 
             M_V := 0.0;
             for index in Intercept_Params_1D.First_Index ..
               Intercept_Params_1D.Last_Index loop
                M_V := M_V - Self.Learning_Rate * Intercept_Params_1D (index);
-               Intercept_Updates_1D.Append (M_V);
+               Intercept_Updates.Append (M_V);
             end loop;
-            Updates.Intercept_Params.Replace_Element (layer, Intercept_Updates_1D);
+            Layer_Velocities.Intercept_Params := Intercept_Updates;
+            Self.Velocities.Append (Layer_Velocities);
+            Moments.Intercept_Moments := Intercept_Updates;
          end loop;
+         Updates.Append (Moments);
       end loop;
-
-      Self.Velocities := Updates;
 
       return Updates;
 
@@ -234,8 +237,8 @@ package body Stochastic_Optimizers is
 
       Put_Line (Routine_Name & "L43");
       --  L43 for each layer p:
-      for layer in Updates.Coeff_Params.First_Index ..
-        Updates.Coeff_Params.Last_Index loop
+      for layer in Updates.Element (layer).Coeff_Moments.First_Index ..
+        Updates.Element (layer).Coeff_Moments.Last_Index loop
          Coef_2D := Params.Coeff_Params (layer);
          Coef_Updates_2D.Clear;
          for index in Coef_2D.First_Index .. Coef_2D.Last_Index loop
