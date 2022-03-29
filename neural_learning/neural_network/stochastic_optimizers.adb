@@ -89,6 +89,8 @@ package body Stochastic_Optimizers is
                                "Stochastic_Optimizers.Get_Adam_Updates ";
       Learning_Rate        : Float;
       Layer_Params         : Parameters_Record;
+      First_Coeff_Moments  : Float_List;
+      Second_Coeff_Moments : Float_List;
       Coeff_Params_2D      : Float_List_2D;
       Coeff_Params_1D      : Float_List;
       Intercept_Params_1D  : Float_List;
@@ -107,20 +109,24 @@ package body Stochastic_Optimizers is
          for m in Layer_Params.Coeff_Params.First_Index ..
            Layer_Params.Coeff_Params.Last_Index loop
             Put_Line (Routine_Name & "m:" & Integer'Image (m));
+            First_Coeff_Moments := Self.First_Moments (m).Coeff_Moments;
+            Second_Coeff_Moments := Self.Second_Moments (m).Coeff_Moments;
             Coeff_Params_2D := Layer_Params.Coeff_Params;
 
             for coeff in Coeff_Params_2D.First_Index ..
               Coeff_Params_2D.Last_Index loop
-               --              Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
+               Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
                Coeff_Params_1D := Coeff_Params_2D (coeff);
+               Put_Line (Routine_Name & "L272");
                --  L272
-               Self.First_Moments (layer).Coeff_Moments.Append
-                 (Float (m) * Self.Beta_1 +
+               First_Coeff_Moments.Append
+                 (First_Coeff_Moments (m) * Self.Beta_1 +
                   (1.0 - Self.Beta_1) * Coeff_Params_1D (m));
 
+               Put_Line (Routine_Name & "L276");
                --  L276
-               Self.Second_Moments (layer).Coeff_Moments.Append
-                 (Float (m) * Self.Beta_2 +
+               Second_Coeff_Moments.Append
+                 (Second_Coeff_Moments (m) * Self.Beta_2 +
                   (1.0 - Self.Beta_2) * Coeff_Params_1D (m) ** 2);
             end loop;
 
