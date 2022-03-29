@@ -39,11 +39,10 @@ package Multilayer_Perceptron is
       Loss_Curve           : Float_List;
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
+      Params               : Parameters_List;
       --  Neuron_Coef_Layers layers x rows x values
-      Neuron_Coef_Layers   : Float_List_3D;
       Coef_Indptr          : Coef_Indptr_List;
       --  Intercepts: layers x values
-      Intercepts           : Float_List_2D;
       Intercept_Indptr     : Intercept_Indptr_List;
       N_Features           : Positive;
       Feature_Names_In     : String_List;

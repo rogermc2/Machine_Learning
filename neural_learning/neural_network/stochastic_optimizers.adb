@@ -189,7 +189,7 @@ package body Stochastic_Optimizers is
                end loop;
                Coeff_Updates_2D.Append (Coeff_Updates_1D);
             end loop;
-            Updates (Layer).Coeff_Moments.Append (Coeff_Updates_2D);
+            Updates.Append (Coeff_Updates_2D);
 
             M_V := 0.0;
             for index in Intercept_Params_1D.First_Index ..
@@ -197,7 +197,7 @@ package body Stochastic_Optimizers is
                M_V := M_V - Self.Learning_Rate * Intercept_Params_1D (index);
                Intercept_Updates_1D.Append (M_V);
             end loop;
-            Updates (Layer).Intercept_Params.Replace_Element (layer, Intercept_Updates_1D);
+            Updates.Intercept_Params.Replace_Element (layer, Intercept_Updates_1D);
          end loop;
       end loop;
 
