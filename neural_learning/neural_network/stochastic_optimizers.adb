@@ -82,20 +82,23 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
    --  L256
    function Get_Adam_Updates (Self   : in out Adam_Optimizer;
-                              Params : Parameters_List)
-                               return Parameters_List is
+                              Grads  : Parameters_List)
+                              return Parameters_List is
       use Maths.Float_Math_Functions;
       Routine_Name         : constant String :=
                                "Stochastic_Optimizers.Get_Adam_Updates ";
       Learning_Rate        : Float;
-      Layer_Params         : Parameters_Record;
+      Layer_Grads          : Parameters_Record;
       First_Coeff_Moments  : Float_List;
       Second_Coeff_Moments : Float_List;
       Coeff_Params_2D      : Float_List_2D;
-      Coeff_Params_1D      : Float_List;
-      Intercept_Params_1D  : Float_List;
-      Update_Params        : Parameters_Record;
-      Updates              : Parameters_List;
+      Coeff_Params         : Float_List;
+      Intercept_Params      : Float_List;
+      Update_First_Moments  : Moments_Record;
+      Update_Second_Moments : Moments_Record;
+      First_Moment_Updates : Moments_List;
+      Second_Moment_Updates : Moments_List;
+      Updates               : Parameters_List;
    begin
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
@@ -103,37 +106,32 @@ package body Stochastic_Optimizers is
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
 
-      for layer in Params.First_Index .. Params.Last_Index loop
-         Layer_Params := Params (layer);
+      for layer in Grads.First_Index .. Grads.Last_Index loop
+         Layer_Grads := Grads (layer);
          --  L271, L274  Update first and second coeff moments
-         for m in Layer_Params.Coeff_Params.First_Index ..
-           Layer_Params.Coeff_Params.Last_Index loop
-            Put_Line (Routine_Name & "m:" & Integer'Image (m));
-            First_Coeff_Moments := Self.First_Moments (m).Coeff_Moments;
-            Second_Coeff_Moments := Self.Second_Moments (m).Coeff_Moments;
-            Coeff_Params_2D := Layer_Params.Coeff_Params;
+         for grad in Layer_Grads.Coeff_Params.First_Index ..
+           Layer_Grads.Coeff_Params.Last_Index loop
+            Put_Line (Routine_Name & "grad:" & Integer'Image (grad));
+            First_Coeff_Moments := Self.First_Moments (grad).Coeff_Moments;
+            Second_Coeff_Moments := Self.Second_Moments (grad).Coeff_Moments;
+            Coeff_Params := Layer_Grads.Coeff_Params (grad);
 
-            for coeff in Coeff_Params_2D.First_Index ..
-              Coeff_Params_2D.Last_Index loop
-               Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
-               Coeff_Params_1D := Coeff_Params_2D (coeff);
-               Put_Line (Routine_Name & "L272");
-               --  L272
-               First_Coeff_Moments.Append
-                 (First_Coeff_Moments (m) * Self.Beta_1 +
-                  (1.0 - Self.Beta_1) * Coeff_Params_1D (m));
+            Put_Line (Routine_Name & "L272");
+            --  L272
+            Update_First_Moments.Coeff_Moments.Append
+              (Self.Beta_1 * First_Coeff_Moments +
+                 (1.0 - Self.Beta_1) * Coeff_Params);
 
-               Put_Line (Routine_Name & "L276");
-               --  L276
-               Second_Coeff_Moments.Append
-                 (Second_Coeff_Moments (m) * Self.Beta_2 +
-                  (1.0 - Self.Beta_2) * Coeff_Params_1D (m) ** 2);
-            end loop;
+            Put_Line (Routine_Name & "L276");
+            --  L276
+            Update_Second_Moments.Coeff_Moments.Append
+              (Self.Beta_2 * Second_Coeff_Moments +
+               (1.0 - Self.Beta_2) * Coeff_Params ** 2);
 
             --  Update first and second intercept moments
-            Intercept_Params_1D := Layer_Params.Intercept_Params;
+            Intercept_Params := Layer_Grads.Intercept_Params;
             for interc in Intercept_Params_1D.First_Index ..
-              Intercept_Params_1D.Last_Index loop
+              Intercept_Params.Last_Index loop
                Self.First_Moments (layer).Intercept_Moments.Append
                  (Float (m) * Self.Beta_1 +
                   (1.0 - Self.Beta_1) * Intercept_Params_1D (interc));
@@ -142,9 +140,10 @@ package body Stochastic_Optimizers is
                   (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (interc) ** 2);
             end loop;
          end loop;
-
+         First_Moment_Updates.Append (Update_First_Moments);
+         Second_Moment_Updates.Append (Update_Second_Moments);
          --  L284
-         Coeff_Params_1D.Clear;
+         Coeff_Params.Clear;
          for index in Self.First_Moments (layer).Coeff_Moments.First_Index ..
            Self.First_Moments (layer).Coeff_Moments.Last_Index loop
             --              Put_Line (Routine_Name & "index:" & Integer'Image (row));
@@ -152,14 +151,14 @@ package body Stochastic_Optimizers is
               -Self.Learning_Rate *
               Self.First_Moments (layer).Coeff_Moments (index);
             --              Put_Line (Routine_Name & "Learning_Rate set");
-            Coeff_Params_1D.Append
+            Coeff_Params.Append
               (Learning_Rate
                / (Sqrt (Self.Second_Moments (layer).Coeff_Moments (index)) +
                      Self.Epsilon));
-            --              Put_Line (Routine_Name & "Coeff_Params_1D appended");
+            --              Put_Line (Routine_Name & "Coeff_Params appended");
          end loop;
 
-         Update_Params.Coeff_Params.Append (Coeff_Params_1D);
+         Update_Params.Coeff_Params.Append (Coeff_Params);
 
          Intercept_Params_1D.Clear;
          for index in Self.First_Moments (layer).Intercept_Moments.First_Index ..
@@ -178,6 +177,9 @@ package body Stochastic_Optimizers is
          Update_Params.Intercept_Params.Append (Intercept_Params_1D);
       end loop;
 
+      Self.First_Moments := First_Moment_Updates;
+      Self.Second_Moments := Second_Moment_Updates;
+
       return Updates;
 
    end Get_Adam_Updates;
@@ -186,7 +188,7 @@ package body Stochastic_Optimizers is
    --  L169
    function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Params : Parameters_List)
-       return Parameters_List is
+      return Parameters_List is
       use Float_List_Package;
       Layer_Velocities     : Parameters_Record;
       M_V                  : Float;
@@ -246,7 +248,7 @@ package body Stochastic_Optimizers is
                             Params : in out Parameters_List;
                             Grads  : Parameters_List) is
       Routine_Name : constant String :=
-                             "Stochastic_Optimizers.Update_Params ";
+                       "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
       Put_Line (Routine_Name);
