@@ -7,258 +7,259 @@ with Maths;
 
 package body Stochastic_Optimizers is
 
-    procedure C_Init (Self                  : out Adam_Optimizer;
-                      --  Coeff_Params: layers x features x values
-                      --  Intercept_Params: laysers x values
-                      Params                : Parameters_List;
-                      Initial_Learning_Rate : Float := 0.1;
-                      Beta_1                : Float := 0.9;
-                      Beta_2                : Float := 0.999;
-                      Epsilon               : Float) is
-    begin
-        Self.Params := Params;
-        Self.Initial_Learning_Rate := Initial_Learning_Rate;
-        Self.Beta_1 := Beta_1;
-        Self.Beta_2 := Beta_2;
-        Self.Epsilon := Epsilon;
+   function "+" (L, R : Parameters_List) return Parameters_List is
+      use Parameters_Package;
+      L_Item  : Parameters_Record;
+      R_Item  : Parameters_Record;
+      Sum_Rec : Parameters_Record;
+      Sum     : Parameters_List;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         L_Item := L (index);
+         R_Item := R (index);
+         Sum_Rec.Coeff_Params := L_Item.Coeff_Params + R_Item.Coeff_Params;
+         Sum_Rec.Intercept_Params := L_Item.Intercept_Params +
+           R_Item.Intercept_Params;
+         Sum.Append (Sum_Rec);
+      end loop;
 
-        Self.Time_Step := 0;
-        Self.First_Moments.Clear;
-        Self.Second_Moments.Clear;
+      return Sum;
 
-    end C_Init;
+   end "+";
 
-    --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-    procedure C_Init (Self                  : out SGD_Optimizer;
-                      --  Coeff_Params: laysers x features x values
-                      --  Intercept_Params: laysers x values
-                      Params                : Parameters_List;
-                      Initial_Learning_Rate : Float := 0.1;
-                      Learning_Rate         : Float := 0.1;
-                      Learning_Rate_Kind    : Learning_Rate_Type :=
-                        Constant_Rate;
-                      LR_Schedule           : LR_Schedule_Type :=
-                        Constant_LR_Schedule;
-                      Momentum              : Float := 0.9;
-                      Use_Nesterov          : Boolean := True;
-                      Power_T               : Float := 0.5) is
-    begin
-        Self.Params := Params;
-        Self.Initial_Learning_Rate := Initial_Learning_Rate;
-        Self.Learning_Rate := Learning_Rate;
-        Self.Learning_Rate_Kind := Learning_Rate_Kind;
-        Self.LR_Schedule := LR_Schedule;
-        Self.Momentum := Momentum;
-        Self.Use_Nesterov := Use_Nesterov;
-        Self.Power_T := Power_T;
+   procedure C_Init (Self                  : out Adam_Optimizer;
+                     --  Coeff_Params: layers x features x values
+                     --  Intercept_Params: laysers x values
+                     Params                : Parameters_List;
+                     Initial_Learning_Rate : Float := 0.1;
+                     Beta_1                : Float := 0.9;
+                     Beta_2                : Float := 0.999;
+                     Epsilon               : Float) is
+   begin
+      Self.Params := Params;
+      Self.Initial_Learning_Rate := Initial_Learning_Rate;
+      Self.Beta_1 := Beta_1;
+      Self.Beta_2 := Beta_2;
+      Self.Epsilon := Epsilon;
 
-        Self.Velocities.Clear;
+      Self.Time_Step := 0;
+      Self.First_Moments.Clear;
+      Self.Second_Moments.Clear;
 
-    end C_Init;
+   end C_Init;
 
-    --  -------------------------------------------------------------------------
-    --  L256
-    function Get_Adam_Updates (Self   : in out Adam_Optimizer;
-                               Params : Parameters_List)
-                              return Moments_List is
-        use Maths.Float_Math_Functions;
-        Routine_Name         : constant String :=
-                                 "Stochastic_Optimizers.Get_Adam_Updates ";
-        Learning_Rate        : Float;
-        Layer_Params         : Parameters_Record;
-        Coeff_Params_2D      : Float_List_2D;
-        Coeff_Params_1D      : Float_List;
-        Intercept_Params_1D  : Float_List;
-        Updates              : Moments_List;
-    begin
-        Self.Time_Step := Self.Time_Step + 1;
-        --  L279 Update learning rate
-        Self.Learning_Rate := Sqrt
-          (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
-          (1.0 - Self.Beta_1 ** Self.Time_Step);
+   --  -------------------------------------------------------------------------
 
-        for layer in Params.First_Index .. Params.Last_Index loop
-            Layer_Params := Params (layer);
-            --  L271, L274  Update first and second coeff moments
-            for m in Layer_Params.Coeff_Params.First_Index ..
-              Layer_Params.Coeff_Params.Last_Index loop
-                Put_Line (Routine_Name & "m:" & Integer'Image (m));
-                Coeff_Params_2D := Layer_Params.Coeff_Params;
+   procedure C_Init (Self                  : out SGD_Optimizer;
+                     --  Coeff_Params: laysers x features x values
+                     --  Intercept_Params: laysers x values
+                     Params                : Parameters_List;
+                     Initial_Learning_Rate : Float := 0.1;
+                     Learning_Rate         : Float := 0.1;
+                     Learning_Rate_Kind    : Learning_Rate_Type :=
+                       Constant_Rate;
+                     LR_Schedule           : LR_Schedule_Type :=
+                       Constant_LR_Schedule;
+                     Momentum              : Float := 0.9;
+                     Use_Nesterov          : Boolean := True;
+                     Power_T               : Float := 0.5) is
+   begin
+      Self.Params := Params;
+      Self.Initial_Learning_Rate := Initial_Learning_Rate;
+      Self.Learning_Rate := Learning_Rate;
+      Self.Learning_Rate_Kind := Learning_Rate_Kind;
+      Self.LR_Schedule := LR_Schedule;
+      Self.Momentum := Momentum;
+      Self.Use_Nesterov := Use_Nesterov;
+      Self.Power_T := Power_T;
 
-                for coeff in Coeff_Params_2D.First_Index ..
-                  Coeff_Params_2D.Last_Index loop
-                    --              Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
-                    Coeff_Params_1D := Coeff_Params_2D (coeff);
-                    --  L272
-                    Self.First_Moments (layer).Coeff_Moments.Append
-                      (Float (m) * Self.Beta_1 +
-                       (1.0 - Self.Beta_1) * Coeff_Params_1D (m));
+      Self.Velocities.Clear;
 
-                    --  L276
-                    Self.Second_Moments (layer).Coeff_Moments.Append
-                      (Float (m) * Self.Beta_2 +
-                       (1.0 - Self.Beta_2) * Coeff_Params_1D (m) ** 2);
-                end loop;
+   end C_Init;
 
-                --  Update first and second intercept moments
-                Intercept_Params_1D := Layer_Params.Intercept_Params;
-                for interc in Intercept_Params_1D.First_Index ..
-                  Intercept_Params_1D.Last_Index loop
-                    Self.First_Moments (layer).Intercept_Moments.Append
-                      (Float (m) * Self.Beta_1 +
-                       (1.0 - Self.Beta_1) * Intercept_Params_1D (interc));
-                    Self.Second_Moments (layer).Intercept_Moments.Append
-                      (Float (m) * Self.Beta_2 +
-                       (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (interc) ** 2);
-                end loop;
+   --  -------------------------------------------------------------------------
+   --  L256
+   function Get_Adam_Updates (Self   : in out Adam_Optimizer;
+                              Params : Parameters_List)
+                               return Parameters_List is
+      use Maths.Float_Math_Functions;
+      Routine_Name         : constant String :=
+                               "Stochastic_Optimizers.Get_Adam_Updates ";
+      Learning_Rate        : Float;
+      Layer_Params         : Parameters_Record;
+      Coeff_Params_2D      : Float_List_2D;
+      Coeff_Params_1D      : Float_List;
+      Intercept_Params_1D  : Float_List;
+      Update_Params        : Parameters_Record;
+      Updates              : Parameters_List;
+   begin
+      Self.Time_Step := Self.Time_Step + 1;
+      --  L279 Update learning rate
+      Self.Learning_Rate := Sqrt
+        (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
+        (1.0 - Self.Beta_1 ** Self.Time_Step);
+
+      for layer in Params.First_Index .. Params.Last_Index loop
+         Layer_Params := Params (layer);
+         --  L271, L274  Update first and second coeff moments
+         for m in Layer_Params.Coeff_Params.First_Index ..
+           Layer_Params.Coeff_Params.Last_Index loop
+            Put_Line (Routine_Name & "m:" & Integer'Image (m));
+            Coeff_Params_2D := Layer_Params.Coeff_Params;
+
+            for coeff in Coeff_Params_2D.First_Index ..
+              Coeff_Params_2D.Last_Index loop
+               --              Put_Line (Routine_Name & "coeff:" & Integer'Image (coeff));
+               Coeff_Params_1D := Coeff_Params_2D (coeff);
+               --  L272
+               Self.First_Moments (layer).Coeff_Moments.Append
+                 (Float (m) * Self.Beta_1 +
+                  (1.0 - Self.Beta_1) * Coeff_Params_1D (m));
+
+               --  L276
+               Self.Second_Moments (layer).Coeff_Moments.Append
+                 (Float (m) * Self.Beta_2 +
+                  (1.0 - Self.Beta_2) * Coeff_Params_1D (m) ** 2);
             end loop;
 
-            --  L284
-            Coeff_Params_1D.Clear;
-            for index in Self.First_Moments (layer).Coeff_Moments.First_Index ..
-              Self.First_Moments (layer).Coeff_Moments.Last_Index loop
-                --              Put_Line (Routine_Name & "index:" & Integer'Image (row));
-                Learning_Rate :=
-                  -Self.Learning_Rate *
-                  Self.First_Moments (layer).Coeff_Moments (index);
-                --              Put_Line (Routine_Name & "Learning_Rate set");
-                Coeff_Params_1D.Append
-                  (Learning_Rate
-                   / (Sqrt (Self.Second_Moments (layer).Coeff_Moments (index)) +
-                         Self.Epsilon));
-                --              Put_Line (Routine_Name & "Coeff_Params_1D appended");
+            --  Update first and second intercept moments
+            Intercept_Params_1D := Layer_Params.Intercept_Params;
+            for interc in Intercept_Params_1D.First_Index ..
+              Intercept_Params_1D.Last_Index loop
+               Self.First_Moments (layer).Intercept_Moments.Append
+                 (Float (m) * Self.Beta_1 +
+                  (1.0 - Self.Beta_1) * Intercept_Params_1D (interc));
+               Self.Second_Moments (layer).Intercept_Moments.Append
+                 (Float (m) * Self.Beta_2 +
+                  (1.0 - Self.Beta_2) * Intercept_Params_1D.Element (interc) ** 2);
             end loop;
+         end loop;
 
-            Updates (layer).Coeff_Moments.Append (Coeff_Params_1D);
+         --  L284
+         Coeff_Params_1D.Clear;
+         for index in Self.First_Moments (layer).Coeff_Moments.First_Index ..
+           Self.First_Moments (layer).Coeff_Moments.Last_Index loop
+            --              Put_Line (Routine_Name & "index:" & Integer'Image (row));
+            Learning_Rate :=
+              -Self.Learning_Rate *
+              Self.First_Moments (layer).Coeff_Moments (index);
+            --              Put_Line (Routine_Name & "Learning_Rate set");
+            Coeff_Params_1D.Append
+              (Learning_Rate
+               / (Sqrt (Self.Second_Moments (layer).Coeff_Moments (index)) +
+                     Self.Epsilon));
+            --              Put_Line (Routine_Name & "Coeff_Params_1D appended");
+         end loop;
 
-            Intercept_Params_1D.Clear;
-            for index in Self.First_Moments (layer).Intercept_Moments.First_Index ..
-              Self.First_Moments (layer).Intercept_Moments.Last_Index loop
-                --              Put_Line (Routine_Name & "index:" & Integer'Image (row));
-                Learning_Rate :=
-                  -Self.Learning_Rate * Self.First_Moments (layer).Intercept_Moments (index);
-                --              Put_Line (Routine_Name & "Learning_Rate set");
-                Intercept_Params_1D.Append
-                  (Learning_Rate /
-                     (Sqrt (Self.Second_Moments (layer).Intercept_Moments (index)) +
-                          Self.Epsilon));
-                --              Put_Line (Routine_Name & "Intercept_Params_1D appended");
+         Update_Params.Coeff_Params.Append (Coeff_Params_1D);
+
+         Intercept_Params_1D.Clear;
+         for index in Self.First_Moments (layer).Intercept_Moments.First_Index ..
+           Self.First_Moments (layer).Intercept_Moments.Last_Index loop
+            --              Put_Line (Routine_Name & "index:" & Integer'Image (row));
+            Learning_Rate :=
+              -Self.Learning_Rate * Self.First_Moments (layer).Intercept_Moments (index);
+            --              Put_Line (Routine_Name & "Learning_Rate set");
+            Intercept_Params_1D.Append
+              (Learning_Rate /
+                 (Sqrt (Self.Second_Moments (layer).Intercept_Moments (index)) +
+                      Self.Epsilon));
+            --              Put_Line (Routine_Name & "Intercept_Params_1D appended");
+         end loop;
+
+         Update_Params.Intercept_Params.Append (Intercept_Params_1D);
+      end loop;
+
+      return Updates;
+
+   end Get_Adam_Updates;
+
+   --  -------------------------------------------------------------------------
+   --  L169
+   function Get_SGD_Updates
+     (Self : in out SGD_Optimizer; Params : Parameters_List)
+       return Parameters_List is
+      use Float_List_Package;
+      Layer_Velocities     : Parameters_Record;
+      M_V                  : Float;
+      Coeff_Params_2D      : Float_List_2D;
+      Coeff_Params_1D      : Float_List;
+      Intercept_Params_1D  : Float_List;
+      Coeff_Updates_1D     : Float_List;
+      Coeff_Updates_2D     : Float_List_2D;
+      Intercept_Updates    : Float_List;
+      Update_Params        : Parameters_Record;
+      Updates              : Parameters_List;
+   begin
+      for layer in Self.Velocities.First_Index ..
+        Self.Velocities.Last_Index loop
+         Layer_Velocities := Self.Velocities (layer);
+         for index in Layer_Velocities.Coeff_Params.First_Index ..
+           Layer_Velocities.Coeff_Params.Last_Index loop
+            Coeff_Params_2D := Params (layer).Coeff_Params;
+            Intercept_Params_1D := Params (layer).Intercept_Params;
+
+            Coeff_Updates_1D.Clear;
+            M_V := 0.0;
+            for coeff in Coeff_Params_2D.First_Index ..
+              Coeff_Params_2D.Last_Index loop
+               Coeff_Params_1D := Coeff_Params_2D (coeff);
+               for index in Coeff_Params_1D.First_Index ..
+                 Coeff_Params_1D.Last_Index loop
+                  M_V := M_V - Self.Learning_Rate * Coeff_Params_1D (index);
+                  Coeff_Updates_1D.Append (M_V);
+               end loop;
+               --                      Coeff_Updates_2D.Append (Coeff_Updates_1D);
+               Update_Params.Coeff_Params.Append (Coeff_Params_1D);
+               --                      Moments.Coeff_Moments := Coeff_Updates_1D;
             end loop;
+            Layer_Velocities.Coeff_Params := Coeff_Updates_2D;
 
-            Updates (layer).Intercept_Moments.Append (Intercept_Params_1D);
-        end loop;
-
-        return Updates;
-
-    end Get_Adam_Updates;
-
-    --  -------------------------------------------------------------------------
-    --  L169
-    function Get_SGD_Updates
-      (Self : in out SGD_Optimizer; Params : Parameters_List)
-      return Moments_List is
-        use Float_List_Package;
-        Layer_Velocities     : Parameters_Record;
-        M_V                  : Float;
-        Coeff_Params_2D      : Float_List_2D;
-        Coeff_Params_1D      : Float_List;
-        Intercept_Params_1D  : Float_List;
-        Coeff_Updates_1D     : Float_List;
-        Coeff_Updates_2D     : Float_List_2D;
-        Intercept_Updates    : Float_List;
-        Moments              : Moments_Record;
-        Updates              : Moments_List;
-    begin
-        for layer in Self.Velocities.First_Index ..
-          Self.Velocities.Last_Index loop
-            Layer_Velocities := Self.Velocities (layer);
-            for index in Layer_Velocities.Coeff_Params.First_Index ..
-              Layer_Velocities.Coeff_Params.Last_Index loop
-                Coeff_Params_2D := Params (layer).Coeff_Params;
-                Intercept_Params_1D := Params (layer).Intercept_Params;
-
-                Coeff_Updates_1D.Clear;
-                M_V := 0.0;
-                for coeff in Coeff_Params_2D.First_Index ..
-                  Coeff_Params_2D.Last_Index loop
-                    Coeff_Params_1D := Coeff_Params_2D (coeff);
-                    for index in Coeff_Params_1D.First_Index ..
-                      Coeff_Params_1D.Last_Index loop
-                        M_V := M_V - Self.Learning_Rate * Coeff_Params_1D (index);
-                        Coeff_Updates_1D.Append (M_V);
-                    end loop;
-                    Coeff_Updates_2D.Append (Coeff_Updates_1D);
-                    Moments.Coeff_Moments := Coeff_Updates_1D;
-                end loop;
-                Layer_Velocities.Coeff_Params := Coeff_Updates_2D;
-
-                M_V := 0.0;
-                for index in Intercept_Params_1D.First_Index ..
-                  Intercept_Params_1D.Last_Index loop
-                    M_V := M_V - Self.Learning_Rate * Intercept_Params_1D (index);
-                    Intercept_Updates.Append (M_V);
-                end loop;
-                Layer_Velocities.Intercept_Params := Intercept_Updates;
-                Self.Velocities.Append (Layer_Velocities);
-                Moments.Intercept_Moments := Intercept_Updates;
+            M_V := 0.0;
+            for index in Intercept_Params_1D.First_Index ..
+              Intercept_Params_1D.Last_Index loop
+               M_V := M_V - Self.Learning_Rate * Intercept_Params_1D (index);
+               Intercept_Updates.Append (M_V);
             end loop;
-            Updates.Append (Moments);
-        end loop;
+            Update_Params.Intercept_Params.Append (Intercept_Updates);
+            Layer_Velocities.Intercept_Params := Intercept_Updates;
+            Self.Velocities.Append (Layer_Velocities);
+         end loop;
+         Updates.Append (Update_Params);
+      end loop;
 
-        return Updates;
+      return Updates;
 
-    end Get_SGD_Updates;
+   end Get_SGD_Updates;
 
-    --  -------------------------------------------------------------------------
-    --  L29
-    procedure Update_Params (Self   : in out Optimizer_Record;
-                             Params : in out Parameters_List;
-                             Grads  : Parameters_List) is
-        Routine_Name       : constant String :=
-                               "Stochastic_Optimizers.Update_Params ";
-        Param_Rec          : Parameters_Record;
-        Coefs              : Float_List;
-        Intercepts         : Float_List;
-        Coef_Updates       : Float_List;
-        Intercept_Updates  : Float_List;
-        Updates            : Moments_List;
-    begin
-        Put_Line (Routine_Name);
-        --  L42
-        case Self.Kind is
-            when Optimizer_Adam =>
-                Updates := Get_Adam_Updates (Self.Adam, Grads);
-            when Optimizer_SGD =>
-                Updates := Get_SGD_Updates (Self.SGD, Grads);
-            when No_Optimizer => null;
-        end case;
+   --  -------------------------------------------------------------------------
+   --  L29
+   procedure Update_Params (Self   : in out Optimizer_Record;
+                            Params : in out Parameters_List;
+                            Grads  : Parameters_List) is
+      Routine_Name : constant String :=
+                             "Stochastic_Optimizers.Update_Params ";
+      Updates      : Parameters_List;
+   begin
+      Put_Line (Routine_Name);
+      --  L42
+      case Self.Kind is
+         when Optimizer_Adam =>
+            Updates := Get_Adam_Updates (Self.Adam, Grads);
+         when Optimizer_SGD =>
+            Updates := Get_SGD_Updates (Self.SGD, Grads);
+         when No_Optimizer => null;
+      end case;
 
-        Put_Line (Routine_Name & "L43");
-        --  L43 for each layer p:
-        for layer in Updates.First_Index .. Updates.Last_Index loop
-            Param_Rec := Params (layer);
-            Coefs := Updates.Element (layer).Coeff_Moments;
-            Param_Rec.Coeff_Params := Param_Rec + Updates (layer);
-            Coef_Updates.Clear;
-            for index in Coefs.First_Index .. Coefs.Last_Index loop
-                Coef_Updates.Append (Coefs (index) + Coef_Updates (index));
-            end loop;
-            Updates (layer).Coeff_Moments := Coef_Updates;
-            Put_Line (Routine_Name & "Coeff_Params set");
+      Put_Line (Routine_Name & "L44");
+      --  L44
+      Params := Params + Updates;
+      Put_Line (Routine_Name & "Params updated");
 
-            Intercepts := Updates.Element (layer).Intercept_Moments;
-            Intercept_Updates.Clear;
-            for index in Intercepts.First_Index .. Intercepts.Last_Index loop
-                Put_Line (Routine_Name & "index:" & Integer'Image (index));
-                Intercept_Updates.Append (Intercepts (index) +
-                                            Intercept_Updates (index));
-            end loop;
-            Updates (layer).Intercept_Moments := Intercept_Updates;
-        end loop;
+   end Update_Params;
 
-    end Update_Params;
-
-    --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
 end Stochastic_Optimizers;

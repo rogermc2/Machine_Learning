@@ -132,8 +132,8 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Binary_Log_Loss_Function;
       end if;
 
-      --        Printing.Print_Float_Lists_2D
-      --        (Routine_Name & "Activations last layer", Activations.Last_Element);
+--        Printing.Print_Float_Lists_2D
+--              (Routine_Name & "Activations last layer", Activations.Last_Element);
       Assert (Y.Length = Activations.Last_Element.Length, Routine_Name &
                 "L284 Y Length" & Count_Type'Image (Y.Length) &
                 " should be the same as last activation length" &
@@ -161,8 +161,8 @@ package body Multilayer_Perceptron is
          Values := Values + Dot (Ravel, Ravel);
       end loop;
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
-      --        Put_Line (Routine_Name & "loss + L2 regularization : " &
-      --                    Float'Image (Loss));
+      Put_Line (Routine_Name & "loss + L2 regularization : " &
+                        Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following combinations
@@ -191,10 +191,12 @@ package body Multilayer_Perceptron is
                 Count_Type'Image (Activations.Last_Element.Length));
       Deltas (Last) := Activations.Last_Element - Y_Float;
 
+      Put_Line (Routine_Name & "L304");
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
 
+      Put_Line (Routine_Name & "L310");
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Deltas (index - 1) :=
@@ -294,39 +296,36 @@ package body Multilayer_Perceptron is
       use Ada.Containers;
       use Float_List_Package;
       use Float_Package;
-      --        Routine_Name : constant String :=
-      --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
-      Grad         : Parameters_Record := Grads (Layer);
-      Coefs        : Float_List_2D;
-      Intercepts   : Float_List;
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_Act    : Float_List_2D;
       Delta_Mean   : Float_List;
    begin
-      --        Put_Line (Routine_Name & "Deltas (Layer) length" &
-      --                    Integer'Image (Integer (Deltas (Layer).Length)));
-      --        Put_Line (Routine_Name & "Activations (Layer) length" &
-      --                    Integer'Image (Integer (Activations (Layer).Length)));
+--        Put_Line (Routine_Name & "Deltas (Layer) length" &
+--                   Integer'Image (Integer (Deltas (Layer).Length)));
+--        Put_Line (Routine_Name & "Activations (Layer) length" &
+--                   Integer'Image (Integer (Activations (Layer).Length)));
 
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       Delta_Act := Dot (Deltas (Layer), Activations (Layer));
       Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 1);
 
-      if Grads.Is_Empty then
+      if Grads.Is_Empty or else Grads.Length < Count_Type (Layer) then
          Grads.Set_Length (Count_Type (Layer));
       end if;
+
       --  Grad.Coeff_Params is a 2D list of fan_in x fan_out lists
-      Coefs := Grad.Coeff_Params;
-      Grad.Coeff_Params :=
+      Grads (layer).Coeff_Params :=
         (Delta_Act + Self.Parameters.Alpha *
            Self.Attributes.Params.Element (Layer).Coeff_Params);
-      Grad.Coeff_Params := Grad.Coeff_Params / Float (Num_Samples);
+      Grads (layer).Coeff_Params :=
+        Grads (layer).Coeff_Params / Float (Num_Samples);
 
       --  Intercept_Grads is size fan_out
-      Intercepts := Grad.Intercept_Params;
-
-      for index in Intercepts.First_Index .. Intercepts.Last_Index loop
-         Intercepts := Delta_Mean;
+      for index in Grads (layer).Intercept_Params.First_Index ..
+        Grads (layer).Intercept_Params.Last_Index loop
+         Grads (layer).Intercept_Params := Delta_Mean;
       end loop;
 
    end  Compute_Loss_Gradient;

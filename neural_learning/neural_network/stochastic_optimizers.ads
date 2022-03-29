@@ -29,6 +29,7 @@ package Stochastic_Optimizers is
    package Parameters_Package is new
      Ada.Containers.Vectors (Positive, Parameters_Record);
    subtype Parameters_List is Parameters_Package.Vector;
+   function "+" (L, R : Parameters_List) return Parameters_List;
 
    type Moments_Record is record
       Coeff_Moments     : Float_List;
