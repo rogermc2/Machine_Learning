@@ -23,8 +23,8 @@ package Stochastic_Optimizers is
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type Parameters_Record is record
-      Coeff_Params     : Float_List_2D;
-      Intercept_Params : Float_List;
+      Coeff_Params     : Float_List_2D;  --  features * Coeff values
+      Intercept_Params : Float_List;     --  Intercept values
    end record;
    package Parameters_Package is new
      Ada.Containers.Vectors (Positive, Parameters_Record);
