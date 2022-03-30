@@ -191,12 +191,10 @@ package body Multilayer_Perceptron is
                 Count_Type'Image (Activations.Last_Element.Length));
       Deltas (Last) := Activations.Last_Element - Y_Float;
 
-      Put_Line (Routine_Name & "L304");
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
 
-      Put_Line (Routine_Name & "L310");
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Deltas (index - 1) :=

@@ -8,8 +8,9 @@ with Maths;
 
 package body Stochastic_Optimizers is
 
-   function Moments_Sqrt (M : Moments_Record; Epsilon : Float := 0.0)
-                          return Moments_Record;
+   function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
+                          return Parameters_Record;
+   procedure Zero_Init (Params : in out Parameters_List);
 
    --  -------------------------------------------------------------------------
 
@@ -90,25 +91,6 @@ package body Stochastic_Optimizers is
 
    --  ------------------------------------------------------------------------
 
-   function "*" (L : Float; R : Moments_Record) return Parameters_Record is
-      use Float_List_Package;
-      Product : Parameters_Record;
-   begin
-      for index in R.Coeff_Moments.First_Index ..
-        R.Coeff_Moments.Last_Index loop
-         for index_2 in Product.Coeff_Params (index).First_Index ..
-           Product.Coeff_Params (index).Last_Index loop
-            Product.Coeff_Params (index) (index_2) := L * R.Coeff_Moments (index);
-         end loop;
-         Product.Intercept_Params (index) := L * R.Intercept_Moments (index);
-      end loop;
-
-      return Product;
-
-   end "*";
-
-   --  -------------------------------------------------------------------------
-
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record is
       use Float_List_Package;
       Product : Parameters_Record;
@@ -129,16 +111,18 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-   function "/" (L : Parameters_Record; R : Moments_Record)
-                 return Parameters_Record is
+   function "/" (L, R : Parameters_Record) return Parameters_Record is
+      use Float_List_Package;
       Result  : Parameters_Record;
    begin
-      for index in L.Coeff_Params.First_Index ..
-        L.Coeff_Params.Last_Index loop
-         Result.Coeff_Params (index) :=
-           L.Coeff_Params (index) / R.Coeff_Moments (index);
+      for index in L.Coeff_Params.First_Index .. L.Coeff_Params.Last_Index loop
+         for index2 in L.Coeff_Params (index).First_Index ..
+           L.Coeff_Params (index).Last_Index loop
+            Result.Coeff_Params (index) (index2) :=
+              L.Coeff_Params (index) (index2) / R.Coeff_Params (index) (index2);
+         end loop;
          Result.Intercept_Params (index) :=
-           L.Intercept_Params (index) / R.Intercept_Moments (index);
+           L.Intercept_Params (index) / R.Intercept_Params (index);
       end loop;
 
       return Result;
@@ -155,22 +139,18 @@ package body Stochastic_Optimizers is
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float) is
-      Zero_Record : Moments_Record;
    begin
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
+      Self.Learning_Rate := Initial_Learning_Rate;
       Self.Beta_1 := Beta_1;
       Self.Beta_2 := Beta_2;
       Self.Epsilon := Epsilon;
 
       Self.Time_Step := 0;
-      for index in Params.First_Index .. Params.Last_Index loop
-         Zero_Record.Coeff_Moments.Append (0.0);
-         Zero_Record.Intercept_Moments.Append (0.0);
-      end loop;
-
-      Self.First_Moments.Append (Zero_Record);
-      Self.Second_Moments.Append (Zero_Record);
+      Self.First_Moments := Params;
+      Zero_Init (Self.First_Moments);
+      Self.Second_Moments := Self.First_Moments;
 
    end C_Init;
 
@@ -189,9 +169,6 @@ package body Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5) is
-      Velocity    : Parameters_Record;
-      Coeffs_2D   : Float_List_2D;
-      Coeffs      : Float_List;
    begin
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
@@ -203,21 +180,7 @@ package body Stochastic_Optimizers is
       Self.Power_T := Power_T;
 
       Self.Velocities := Params;
-      for index in Self.Velocities.First_Index .. Self.Velocities.Last_Index loop
-         Velocity := Self.Velocities (index);
-         Coeffs_2D := Velocity.Coeff_Params;
-         for index2 in Coeffs_2D.First_Index .. Coeffs_2D.Last_Index loop
-            Coeffs := Coeffs_2D (index2);
-            for index3 in Coeffs.First_Index .. Coeffs.Last_Index loop
-               Coeffs.Replace_Element (index3, 0.0);
-            end loop;
-            Coeffs_2D.Replace_Element (index2, Coeffs);
-         end loop;
-
-         Velocity.Coeff_Params := Coeffs_2D;
-         Velocity.Intercept_Params.Replace_Element (index, 0.0);
-         Self.Velocities.Replace_Element (index, Velocity);
-      end loop;
+      Zero_Init (Self.Velocities);
 
    end C_Init;
 
@@ -235,8 +198,8 @@ package body Stochastic_Optimizers is
       Second_Coeff_Moments  : Float_List;
       Coeff_Params          : Float_List;
       Updated_Coeff_Params  : Float_List;
-      Update_First_Moments  : Moments_Record;
-      Update_Second_Moments : Moments_Record;
+      Update_First_Moments  : Parameters_Record;
+      Update_Second_Moments : Parameters_Record;
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       Coef_Update           : Parameters_Record;
@@ -258,17 +221,21 @@ package body Stochastic_Optimizers is
            Layer_Grads.Coeff_Params.Last_Index loop
             Put_Line (Routine_Name & "grad:" & Integer'Image (grad));
             Put_Line (Routine_Name &
-                        "Self.First_Moments (grad).Coeff_Moments length:" &
+                        "Self.First_Moments length:" &
                         Count_Type'Image
-                        (Self.First_Moments (grad).Coeff_Moments.Length));
-            First_Coeff_Moments := Self.First_Moments (grad).Coeff_Moments;
-            Put_Line (Routine_Name & "First_Coeff_Moments set");
-            Second_Coeff_Moments :=
-              Self.Second_Moments (grad).Coeff_Moments;
-            Put_Line (Routine_Name & "Second_Coeff_Moments set");
+                        (Self.First_Moments.Length));
+--              First_Coeff_Moments := Layer_Grads.Coeff_Params (grad);
+            for index in Layer_Grads.Coeff_Params (grad).First_Index ..
+              Layer_Grads.Coeff_Params (grad).Last_Index loop
+               First_Coeff_Moments :=
+                 Layer_Grads.Coeff_Params (grad).Element (index).c;
+               Put_Line (Routine_Name & "First_Coeff_Moments set");
+               Second_Coeff_Moments :=
+                 Layer_Grads.Coeff_Params (grad).Element (index);
+               Put_Line (Routine_Name & "Second_Coeff_Moments set");
+            end loop;
             Coeff_Params := Layer_Grads.Coeff_Params (grad);
 
-            Put_Line (Routine_Name & "L272");
             --  L272
             Update_First_Moments.Coeff_Moments.Append
               (Self.Beta_1 * First_Coeff_Moments +
@@ -281,6 +248,7 @@ package body Stochastic_Optimizers is
             Update_Second_Moments.Coeff_Moments.Append
               (Self.Beta_2 * Second_Coeff_Moments +
                  (1.0 - Self.Beta_2) * Coeff_Params ** 2);
+            Put_Line (Routine_Name & "loop end");
          end loop;
 
          First_Moment_Updates.Append (Update_First_Moments);
@@ -311,11 +279,11 @@ package body Stochastic_Optimizers is
      (Self : in out SGD_Optimizer; Grads : Parameters_List)
       return Parameters_List is
       Routine_Name : constant String :=
-                      "Stochastic_Optimizers. ";
-      Velocity    : Parameters_Record;
-      M_V         : Parameters_Record;
-      Layer_Grads : Parameters_Record;
-      Updates     : Parameters_List;
+                       "Stochastic_Optimizers. ";
+      Velocity     : Parameters_Record;
+      M_V          : Parameters_Record;
+      Layer_Grads  : Parameters_Record;
+      Updates      : Parameters_List;
 
       procedure Do_Update is
       begin
@@ -388,6 +356,31 @@ package body Stochastic_Optimizers is
       Put_Line (Routine_Name & "Params updated");
 
    end Update_Params;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Zero_Init (Params : in out Parameters_List) is
+      Data      : Parameters_Record;
+      Coeffs_2D : Float_List_2D;
+      Coeffs    : Float_List;
+   begin
+      for index in Params.First_Index .. Params.Last_Index loop
+         Data := Params (index);
+         Coeffs_2D := Data.Coeff_Params;
+         for index2 in Coeffs_2D.First_Index .. Coeffs_2D.Last_Index loop
+            Coeffs := Coeffs_2D (index2);
+            for index3 in Coeffs.First_Index .. Coeffs.Last_Index loop
+               Coeffs.Replace_Element (index3, 0.0);
+            end loop;
+            Coeffs_2D.Replace_Element (index2, Coeffs);
+         end loop;
+
+         Data.Coeff_Params := Coeffs_2D;
+         Data.Intercept_Params.Replace_Element (index, 0.0);
+         Params.Replace_Element (index, Data);
+      end loop;
+
+   end Zero_Init;
 
    --  -------------------------------------------------------------------------
 
