@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -154,6 +155,7 @@ package body Stochastic_Optimizers is
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float) is
+      Zero_Record : Moments_Record;
    begin
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
@@ -162,8 +164,13 @@ package body Stochastic_Optimizers is
       Self.Epsilon := Epsilon;
 
       Self.Time_Step := 0;
-      Self.First_Moments.Clear;
-      Self.Second_Moments.Clear;
+      for index in Params.First_Index .. Params.Last_Index loop
+         Zero_Record.Coeff_Moments.Append (0.0);
+         Zero_Record.Intercept_Moments.Append (0.0);
+      end loop;
+
+      Self.First_Moments.Append (Zero_Record);
+      Self.Second_Moments.Append (Zero_Record);
 
    end C_Init;
 
@@ -182,6 +189,9 @@ package body Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5) is
+      Velocity    : Parameters_Record;
+      Coeffs_2D   : Float_List_2D;
+      Coeffs      : Float_List;
    begin
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
@@ -192,7 +202,22 @@ package body Stochastic_Optimizers is
       Self.Use_Nesterov := Use_Nesterov;
       Self.Power_T := Power_T;
 
-      Self.Velocities.Clear;
+      Self.Velocities := Params;
+      for index in Self.Velocities.First_Index .. Self.Velocities.Last_Index loop
+         Velocity := Self.Velocities (index);
+         Coeffs_2D := Velocity.Coeff_Params;
+         for index2 in Coeffs_2D.First_Index .. Coeffs_2D.Last_Index loop
+            Coeffs := Coeffs_2D (index2);
+            for index3 in Coeffs.First_Index .. Coeffs.Last_Index loop
+               Coeffs.Replace_Element (index3, 0.0);
+            end loop;
+            Coeffs_2D.Replace_Element (index2, Coeffs);
+         end loop;
+
+         Velocity.Coeff_Params := Coeffs_2D;
+         Velocity.Intercept_Params.Replace_Element (index, 0.0);
+         Self.Velocities.Replace_Element (index, Velocity);
+      end loop;
 
    end C_Init;
 
@@ -201,6 +226,7 @@ package body Stochastic_Optimizers is
    function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                               Grads : Parameters_List)
                               return Parameters_List is
+      use Ada.Containers;
       use Maths.Float_Math_Functions;
       Routine_Name          : constant String :=
                                 "Stochastic_Optimizers.Get_Adam_Updates ";
@@ -216,6 +242,8 @@ package body Stochastic_Optimizers is
       Coef_Update           : Parameters_Record;
       Updates               : Parameters_List;
    begin
+      Assert (not Self.First_Moments.Is_Empty, Routine_Name &
+                "Self.First_Moments Is_Empty");
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
@@ -229,9 +257,15 @@ package body Stochastic_Optimizers is
          for grad in Layer_Grads.Coeff_Params.First_Index ..
            Layer_Grads.Coeff_Params.Last_Index loop
             Put_Line (Routine_Name & "grad:" & Integer'Image (grad));
+            Put_Line (Routine_Name &
+                        "Self.First_Moments (grad).Coeff_Moments length:" &
+                        Count_Type'Image
+                        (Self.First_Moments (grad).Coeff_Moments.Length));
             First_Coeff_Moments := Self.First_Moments (grad).Coeff_Moments;
+            Put_Line (Routine_Name & "First_Coeff_Moments set");
             Second_Coeff_Moments :=
               Self.Second_Moments (grad).Coeff_Moments;
+            Put_Line (Routine_Name & "Second_Coeff_Moments set");
             Coeff_Params := Layer_Grads.Coeff_Params (grad);
 
             Put_Line (Routine_Name & "L272");
@@ -276,6 +310,8 @@ package body Stochastic_Optimizers is
    function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Grads : Parameters_List)
       return Parameters_List is
+      Routine_Name : constant String :=
+                      "Stochastic_Optimizers. ";
       Velocity    : Parameters_Record;
       M_V         : Parameters_Record;
       Layer_Grads : Parameters_Record;
@@ -293,6 +329,8 @@ package body Stochastic_Optimizers is
       end Do_Update;
 
    begin
+      Assert (not Self.Velocities.Is_Empty, Routine_Name &
+                "Self.Velocities Is_Empty");
       Do_Update;
 
       Self.Velocities := Updates;
