@@ -202,6 +202,7 @@ package body Stochastic_Optimizers is
    function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                               Grads : Parameters_List)
                               return Parameters_List is
+      use Ada.Containers;
       use Maths.Float_Math_Functions;
       use Parameters_Package;
       Routine_Name          : constant String :=
@@ -218,6 +219,8 @@ package body Stochastic_Optimizers is
    begin
       Assert (not Self.First_Moments.Is_Empty, Routine_Name &
                 "Self.First_Moments Is_Empty");
+      Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
+                "Self.Second_Moments Is_Empty");
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
@@ -228,10 +231,16 @@ package body Stochastic_Optimizers is
          Layer_Grads := Grads (layer);
          First_Moments := Self.First_Moments (layer);
          Second_Moments := Self.Second_Moments (layer);
+         Put_Line (Routine_Name & "First_Moments Coeff_Params length" &
+                     Count_Type'Image (First_Moments.Coeff_Params.Length));
+         Put_Line (Routine_Name & "First_Moments Coeff_Params (1) length" &
+                     Count_Type'Image (First_Moments.Coeff_Params (1).Length));
+         Put_Line (Routine_Name & "First_Moments Intercept_Params length" &
+                     Count_Type'Image (First_Moments.Intercept_Params.Length));
 
          --  L272
-         Update_First_Moments := Self.Beta_1 * First_Moments +
-           (1.0 - Self.Beta_1) * Layer_Grads;
+         Update_First_Moments := Self.Beta_1 * First_Moments; --  +
+--             (1.0 - Self.Beta_1) * Layer_Grads;
 
          Put_Line (Routine_Name & "L276");
          --  L276

@@ -492,9 +492,8 @@ package body Multilayer_Perceptron is
       X_Batch            : Float_List_2D;
       Y_Batch            : Integer_List_2D;
       Batch_Loss         : Float;
-      --        Parameters         : Parameters_Record;
-      --        Grads_List         : Parameters_List;
    begin
+      --  L576
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
          case Self.Parameters.Solver is
@@ -504,7 +503,7 @@ package body Multilayer_Perceptron is
                begin
                   Put_Line (Routine_Name & "Adam");
                   Stochastic_Optimizers.C_Init
-                    (Optimizer.Adam, Params => Grads,
+                    (Optimizer.Adam, Params => Self.Attributes.Params,
                      Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
                      Beta_1 => Self.Parameters.Beta_1,
                      Beta_2 => Self.Parameters.Beta_2,
@@ -519,7 +518,7 @@ package body Multilayer_Perceptron is
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
                   Stochastic_Optimizers.C_Init
-                    (Optimizer.SGD, Params => Grads,
+                    (Optimizer.SGD, Params => Self.Attributes.Params,
                      Initial_Learning_Rate =>
                        Self.Parameters.Learning_Rate_Init,
                      Learning_Rate => Self.Parameters.Learning_Rate,
@@ -536,7 +535,7 @@ package body Multilayer_Perceptron is
                   Optimizer : Optimizer_Record (Optimizer_SGD);
                begin
                   Stochastic_Optimizers.C_Init
-                    (Optimizer.SGD, Params => Grads,
+                    (Optimizer.SGD, Params => Self.Attributes.Params,
                      Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
                      Learning_Rate => Self.Parameters.Learning_Rate,
                      Momentum => Self.Parameters.Momentum,
