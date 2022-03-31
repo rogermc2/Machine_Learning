@@ -356,7 +356,6 @@ package body Stochastic_Optimizers is
                        "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
-      Put_Line (Routine_Name);
       --  L42
       case Self.Kind is
          when Optimizer_Adam =>

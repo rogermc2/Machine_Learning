@@ -41,17 +41,17 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 --  with Utilities;
 
-with Base_Mix;
+--  with Base_Mix;
 with Classifier_Utilities;
 with Data_Splitter2;
-with Encode_Utils;
+--  with Encode_Utils;
 with Label;
 with Neural_Maths;
 with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
-   pragma Warnings (Off);
+   --     pragma Warnings (Off);
 
    First_Pass : Boolean := True;
 
@@ -62,20 +62,19 @@ package body Multilayer_Perceptron is
       Activations : Float_List_3D;
       Deltas      : Float_List_3D;
       Grads       : in out Parameters_List);
-   procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
-                        X               : Float_List_2D;
-                        Y               : Integer_List_2D;
-                        Activations     : in out Float_List_3D;
-                        Deltas          : in out Float_List_3D;
-                        Grads           : in out Parameters_List;
-                        Layer_Units     : Integer_List);
+   --     procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
+   --                          X               : Float_List_2D;
+   --                          Y               : Integer_List_2D;
+   --                          Activations     : in out Float_List_3D;
+   --                          Deltas          : in out Float_List_3D;
+   --                          Grads           : in out Parameters_List;
+   --                          Layer_Units     : Integer_List);
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : Float_List_2D;
                              Y               : Integer_List_2D;
                              Activations     : in out Float_List_3D;
                              Deltas          : in out Float_List_3D;
                              Grads           : in out Parameters_List;
-                             Layer_Units     : Integer_List;
                              Incremental     : Boolean := False);
    procedure Forward_Pass (Self            : in out MLP_Classifier;
                            Activations     : in out Float_List_3D);
@@ -84,12 +83,12 @@ package body Multilayer_Perceptron is
    procedure Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive;
                          Param_Init      : out Parameters_Record);
-   procedure Update_No_Improvement_Count
-     (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val : Float_List_2D);
+   --     procedure Update_No_Improvement_Count
+   --       (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
+   --        X_Val : Float_List_2D);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
-   procedure Validate_Input (Self               : in out MLP_Classifier;
-                             Y                  : Integer_List);
+   --     procedure Validate_Input (Self               : in out MLP_Classifier;
+   --                               Y                  : Integer_List);
    --                               Incremental, Reset : Boolean);
 
    --  -------------------------------------------------------------------------
@@ -113,11 +112,9 @@ package body Multilayer_Perceptron is
       S_List             : Parameters_Record;
       Ravel              : Float_List;
       Values             : Float := 0.0;
-      F_I                : Positive;
       Last               : Positive;
-      Activation         : Float_List_2D;
-      Derivative_Kind    : Derivative_Type;
-      Inplace_Derivative : Float_List;
+      --        Derivative_Kind    : Derivative_Type;
+      --        Inplace_Derivative : Float_List;
    begin
       --        Put_Line (Routine_Name & "Pre Forward_Pass, Activations size:" &
       --                    Count_Type'Image (Activations.Length));
@@ -132,8 +129,8 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Binary_Log_Loss_Function;
       end if;
 
---        Printing.Print_Float_Lists_2D
---              (Routine_Name & "Activations last layer", Activations.Last_Element);
+      --        Printing.Print_Float_Lists_2D
+      --              (Routine_Name & "Activations last layer", Activations.Last_Element);
       Assert (Y.Length = Activations.Last_Element.Length, Routine_Name &
                 "L284 Y Length" & Count_Type'Image (Y.Length) &
                 " should be the same as last activation length" &
@@ -160,9 +157,10 @@ package body Multilayer_Perceptron is
          end loop;
          Values := Values + Dot (Ravel, Ravel);
       end loop;
+
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
       Put_Line (Routine_Name & "loss + L2 regularization : " &
-                        Float'Image (Loss));
+                  Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following combinations
@@ -179,7 +177,6 @@ package body Multilayer_Perceptron is
       --  L295  Backward propagate python last = self.n_layers_ - 2
       Last := Self.Attributes.N_Layers - 1;
       --  L301
-      Activation := Activations.Last_Element;
       Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
                 Integer'Image (Last) & " should equal Deltas length" &
                 Count_Type'Image (Deltas.Length));
@@ -293,16 +290,16 @@ package body Multilayer_Perceptron is
       Grads           : in out Parameters_List) is
       use Ada.Containers;
       use Float_List_Package;
-      use Float_Package;
 --        Routine_Name : constant String :=
 --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_Act    : Float_List_2D;
       Delta_Mean   : Float_List;
    begin
---        Put_Line (Routine_Name & "Deltas (Layer) length" &
---                   Integer'Image (Integer (Deltas (Layer).Length)));
---        Put_Line (Routine_Name & "Activations (Layer) length" &
---                   Integer'Image (Integer (Activations (Layer).Length)));
+--        Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
+      --        Put_Line (Routine_Name & "Deltas (Layer) length" &
+      --                   Count_Type'Image (Deltas (Layer).Length));
+      --        Put_Line (Routine_Name & "Activations (Layer) length" &
+      --                   Count_Type'Image (Activations (Layer).Length));
 
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
@@ -320,11 +317,7 @@ package body Multilayer_Perceptron is
       Grads (layer).Coeff_Params :=
         Grads (layer).Coeff_Params / Float (Num_Samples);
 
-      --  Intercept_Grads is size fan_out
-      for index in Grads (layer).Intercept_Params.First_Index ..
-        Grads (layer).Intercept_Params.Last_Index loop
-         Grads (layer).Intercept_Params := Delta_Mean;
-      end loop;
+      Grads (layer).Intercept_Params := Delta_Mean;
 
    end  Compute_Loss_Gradient;
 
@@ -335,8 +328,8 @@ package body Multilayer_Perceptron is
                   Y           : Integer_List;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      Routine_Name              : constant String :=
-                                    "Multilayer_Perceptron.Fit ";
+      --        Routine_Name              : constant String :=
+      --                                      "Multilayer_Perceptron.Fit ";
       --        Num_Samples               : constant Positive := Positive (X.Length);
       Num_Features              : constant Positive :=
                                     Positive (X.Element (1).Length);
@@ -344,9 +337,8 @@ package body Multilayer_Perceptron is
       Activations               : Float_List_3D;
       Y_2D                      : Integer_List_2D;
       Y_Col                     : Integer_List;
-      Hidden_Layer_Sizes        : Integer_List :=
+      Hidden_Layer_Sizes        : constant Integer_List :=
                                     Self.Parameters.Hidden_Layer_Sizes;
-      Hidden_Layer_Sizes_Length : Count_Type := Hidden_Layer_Sizes.Length;
       Layer_Units               : Integer_List;
       Deltas                    : Float_List_3D;
       --  Coef_Grads layers * features * values
@@ -393,55 +385,55 @@ package body Multilayer_Perceptron is
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
-         Fit_Stochastic (Self, X, Y_2D, Activations, Deltas, Grads,
-                         Layer_Units, Incremental);
+         Fit_Stochastic
+           (Self, X, Y_2D, Activations, Deltas, Grads, Incremental);
       elsif Self.Parameters.Solver = Lbfgs_Solver then
-         Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
+         null;
+         --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
       end if;
 
    end Fit;
 
    --  -------------------------------------------------------------------------
    --  L516
-   procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
-                        X               : Float_List_2D;
-                        Y               : Integer_List_2D;
-                        Activations     : in out Float_List_3D;
-                        Deltas          : in out Float_List_3D;
-                        Grads           : in out Parameters_List;
-                        Layer_Units     : Integer_List) is
-      use List_Of_Float_Lists_Package;
-      Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
-      Num_Samples  : constant Positive := Positive (X.Length);
-      Start        : Positive := 1;
-      Last         : Positive;
-      N_Fan_In     : Positive;
-      N_Fan_Out    : Positive;
-   begin
-      Self.Attributes.Coef_Indptr.Clear;
-      Self.Attributes.Intercept_Indptr.Clear;
+   --     procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
+   --                          X               : Float_List_2D;
+   --                          Y               : Integer_List_2D;
+   --                          Activations     : in out Float_List_3D;
+   --                          Deltas          : in out Float_List_3D;
+   --                          Grads           : in out Parameters_List;
+   --                          Layer_Units     : Integer_List) is
+   --        Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
+   --        Num_Samples  : constant Positive := Positive (X.Length);
+   --        Start        : Positive := 1;
+   --        Last         : Positive;
+   --        N_Fan_In     : Positive;
+   --        N_Fan_Out    : Positive;
+   --     begin
+   --        Self.Attributes.Coef_Indptr.Clear;
+   --        Self.Attributes.Intercept_Indptr.Clear;
 
-      --  L524  Save sizes and indices of coefficients for faster unpacking
-      for index in 1 .. Self.Attributes.N_Layers - 1 loop
-         N_Fan_In := Layer_Units.Element (index);
-         N_Fan_Out := Layer_Units.Element (index + 1);
-         Last := Start + N_Fan_In * N_Fan_Out;
-         Self.Attributes.Coef_Indptr.Append ((Start, Last,
-                                             N_Fan_In, N_Fan_Out));
-         Start := Last + 1;
-      end loop;
+   --  L524  Save sizes and indices of coefficients for faster unpacking
+   --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
+   --           N_Fan_In := Layer_Units.Element (index);
+   --           N_Fan_Out := Layer_Units.Element (index + 1);
+   --           Last := Start + N_Fan_In * N_Fan_Out;
+   --           Self.Attributes.Coef_Indptr.Append ((Start, Last,
+   --                                               N_Fan_In, N_Fan_Out));
+   --           Start := Last + 1;
+   --        end loop;
 
-      --  L532  Save sizes and indices of intercepts for faster unpacking
-      Start := 1;
-      for index in 1 .. Self.Attributes.N_Layers - 1 loop
-         Last := Start + N_Fan_In * N_Fan_Out;
-         Self.Attributes.Intercept_Indptr.Append ((Start, Last));
-         Start := Last + 1;
-      end loop;
-
-      Assert (False, Routine_Name & "coding incomplete.");
-
-   end Fit_Lbfgs;
+   --  L532  Save sizes and indices of intercepts for faster unpacking
+   --        Start := 1;
+   --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
+   --           Last := Start + N_Fan_In * N_Fan_Out;
+   --           Self.Attributes.Intercept_Indptr.Append ((Start, Last));
+   --           Start := Last + 1;
+   --        end loop;
+   --
+   --        Assert (False, Routine_Name & "coding incomplete.");
+   --
+   --     end Fit_Lbfgs;
 
    --  -------------------------------------------------------------------------
 
@@ -452,7 +444,6 @@ package body Multilayer_Perceptron is
                              Activations     : in out Float_List_3D;
                              Deltas          : in out Float_List_3D;
                              Grads           : in out Parameters_List;
-                             Layer_Units     : Integer_List;
                              Incremental     : Boolean := False) is
       use Ada.Containers;
       use Estimator;
@@ -464,28 +455,18 @@ package body Multilayer_Perceptron is
       Num_Samples        : constant Positive := Positive (X.Length);
       LE_U               : Label.Label_Encoder (Label.Class_Unique);
       --  Activations: layers x samples x features
-      --  Coeff_Params: layers x features x values
-      --  The ith element of Coeff_Params represents the weight matrix
-      --  corresponding to layer i.
-      Coeff_Params       : Float_List_2D;
-      --  Intercept_Params: Layers x y values
-      --  The ith element of Intercept_Params represents the bias vector
-      --  corresponding to layer i + 1.
-      Intercept_Params   : Float_List;
       Early_Stopping     : constant Boolean
         := Self.Parameters.Early_Stopping and then not Incremental;
       Test_Size          : constant Positive
         := Positive (Self.Parameters.Validation_Fraction * Float (Num_Samples));
       Train_Size         : constant Positive := Num_Samples - Test_Size;
-      Stratify           : Integer_List_2D;
-      Should_Stratify    : Boolean;
+      --        Stratify           : Integer_List_2D;
+      --        Should_Stratify    : Boolean;
       Train_X            : Float_List_2D;
       Train_Y            : Integer_List_2D;
       Test_X             : Float_List_2D;
       Test_Y             : Integer_List_2D;
       Batch_Size         : Positive;
-      Sample_Index       : Positive;
-      Max_Sample_Index   : Positive;
       Accumulated_Loss   : Float := 0.0;
       Batches            : Slices_List;
       Batch_Slice        : Slice_Record;
@@ -549,16 +530,17 @@ package body Multilayer_Perceptron is
 
       --  L597
       if Early_Stopping then
-         Should_Stratify := Is_Classifier;
-         if Should_Stratify then
-            Stratify := Y;
-         end if;
+         --           Should_Stratify := Is_Classifier;
+         --           if Should_Stratify then
+         --              Stratify := Y;
+         --           end if;
 
          Data_Splitter2.Train_Test_Split
            (X => X, Y => Y,
             Train_Size => Train_Size, Test_Size  => Test_Size,
             Train_X => Train_X, Train_Y => Train_Y,
             Test_X  => Test_X, Test_Y => Test_Y);
+
          if Is_Classifier then
             Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
          end if;
@@ -651,7 +633,7 @@ package body Multilayer_Perceptron is
       Output_Activation  : constant Activation_Type :=
                              Self.Attributes.Out_Activation;
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
-      Params             : Parameters_List := Self.Attributes.Params;
+      Params             : constant Parameters_List := Self.Attributes.Params;
       Coefficient_Matrix : Float_List_2D;  --  layer x X
       Intercepts         : Float_List;
       Acts_Dot_Coeffs    : Float_List_2D;
@@ -761,11 +743,9 @@ package body Multilayer_Perceptron is
    --  L320
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : Integer_List) is
-      use Ada.Containers;
+      --        use Ada.Containers;
       use Base_Neural;
       Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
-      Coef_Init      : Float_List_2D;
-      Intercept_Init : Float_List;
       Params_Init    : Parameters_Record;
    begin
       Self.Attributes.N_Iter := 0;
@@ -801,19 +781,19 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L716
-   procedure Update_No_Improvement_Count
-     (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val : Float_List_2D) is
-      Score_Val : Float;
-   begin
-      if Early_Stopping then
-         Score_Val := Base_Mix.Score (X_Val);
-         Self.Parameters.Validation_Scores.Append (Score_Val);
-      else
-         null;
-      end if;
-
-   end Update_No_Improvement_Count;
+   --     procedure Update_No_Improvement_Count
+   --       (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
+   --        X_Val : Float_List_2D) is
+   --        Score_Val : Float;
+   --     begin
+   --        if Early_Stopping then
+   --           Score_Val := Base_Mix.Score (X_Val);
+   --           Self.Parameters.Validation_Scores.Append (Score_Val);
+   --        else
+   --           null;
+   --        end if;
+   --
+   --     end Update_No_Improvement_Count;
 
    --  -------------------------------------------------------------------------
    --  L455
@@ -827,20 +807,20 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   procedure Validate_Input (Self               : in out MLP_Classifier;
-                             --                               X                  : Float_List_2D;
-                             Y                  : Integer_List) is
-      --                               Incremental, Reset : Boolean) is
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
-   begin
-      if Self.Attributes.Classes.Is_Empty and then
-        Self.Parameters.Warm_Start then
-         Self.Attributes.Classes := Encode_Utils.Unique (Y);
-      else
-         null;
-      end if;
-
-   end Validate_Input;
+   --     procedure Validate_Input (Self               : in out MLP_Classifier;
+   --                               --                               X                  : Float_List_2D;
+   --                               Y                  : Integer_List) is
+   --                               Incremental, Reset : Boolean) is
+   --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
+   --     begin
+   --        if Self.Attributes.Classes.Is_Empty and then
+   --          Self.Parameters.Warm_Start then
+   --           Self.Attributes.Classes := Encode_Utils.Unique (Y);
+   --        else
+   --           null;
+   --        end if;
+   --
+   --     end Validate_Input;
 
    --  -------------------------------------------------------------------------
 
