@@ -148,7 +148,11 @@ package body Stochastic_Optimizers is
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
                      Epsilon               : Float) is
+      Routine_Name          : constant String :=
+                                "Stochastic_Optimizers.C_Init Adam ";
    begin
+      Put_Line (Routine_Name & "Params length" &
+                  Integer'Image (Integer (Params.Length)));
       Self.Params := Params;
       Self.Initial_Learning_Rate := Initial_Learning_Rate;
       Self.Learning_Rate := Initial_Learning_Rate;
@@ -346,6 +350,8 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    procedure Zero_Init (Params : in out Parameters_List) is
+      Routine_Name : constant String :=
+                       "Stochastic_Optimizers.Zero_Init ";
       Data      : Parameters_Record;
       Coeffs_2D : Float_List_2D;
       Coeffs    : Float_List;
@@ -365,6 +371,8 @@ package body Stochastic_Optimizers is
          Data.Intercept_Params.Replace_Element (index, 0.0);
          Params.Replace_Element (index, Data);
       end loop;
+      Put_Line (Routine_Name & "Params length" &
+                  Integer'Image (Integer (Params.Length)));
 
    end Zero_Init;
 
