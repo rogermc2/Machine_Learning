@@ -188,10 +188,12 @@ package body Multilayer_Perceptron is
                 Count_Type'Image (Activations.Last_Element.Length));
       Deltas (Last) := Activations.Last_Element - Y_Float;
 
+      Put_Line (Routine_Name & "L304");
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
 
+      Put_Line (Routine_Name & "L310");
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Deltas (index - 1) :=
@@ -290,8 +292,8 @@ package body Multilayer_Perceptron is
       Grads           : in out Parameters_List) is
       use Ada.Containers;
       use Float_List_Package;
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_Act    : Float_List_2D;
       Delta_Mean   : Float_List;
    begin
@@ -310,10 +312,19 @@ package body Multilayer_Perceptron is
          Grads.Set_Length (Count_Type (Layer));
       end if;
 
+      Assert (Delta_Act.Length =
+                Self.Attributes.Params (Layer).Coeff_Params.Length,
+              Routine_Name & "Delta_Act Length" &
+                Count_Type'Image (Delta_Act.Length) & " should equal " &
+                "Coeff_Params length" &
+                Count_Type'Image
+                (Self.Attributes.Params (Layer).Coeff_Params.Length));
+      Put_Line (Routine_Name & "L186");
       --  Grad.Coeff_Params is a 2D list of fan_in x fan_out lists
       Grads (layer).Coeff_Params :=
         (Delta_Act + Self.Parameters.Alpha *
-           Self.Attributes.Params.Element (Layer).Coeff_Params);
+           Self.Attributes.Params (Layer).Coeff_Params);
+      Put_Line (Routine_Name & "L187");
       Grads (layer).Coeff_Params :=
         Grads (layer).Coeff_Params / Float (Num_Samples);
 
