@@ -8,6 +8,22 @@ package body NL_Types is
 
    --  ------------------------------------------------------------------------
 
+   procedure Check_Length
+     (Routine_Name : String; L, R : Float_List_2D) is
+      use Ada.Containers;
+   begin
+      Assert (R.Length = L.Length, Routine_Name &
+                " R length" & Count_Type'Image (R.Length) &
+                " should be the same as L length" &
+                Count_Type'Image (L.Length));
+      Assert (R (1).Length = L (1).Length, Routine_Name &
+                " R (1) length" & Count_Type'Image (R (1).Length) &
+                " should be the same as L (1) length" &
+                Count_Type'Image (L (1).Length));
+   end Check_Length;
+
+   --  ----------------------------------------------------------------------------
+
    function "+" (L, R : Float_Package.Vector) return Float_Package.Vector is
       Result : Float_Package.Vector;
    begin
@@ -206,6 +222,7 @@ package body NL_Types is
       List_3D : Float_List;
       Result  : Float_List_2D;
    begin
+      Check_Length ("Float_List_2D + ", L, R);
       for row in L.First_Index .. L.Last_Index loop
          List_1D := L (row);
          List_2D := R (row);

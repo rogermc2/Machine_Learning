@@ -15,6 +15,7 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    function "+" (L, R : Parameters_Record) return Parameters_Record is
+      use Float_List_Package;
       Sum_Rec : Parameters_Record;
    begin
       Sum_Rec.Coeff_Params := L.Coeff_Params + R.Coeff_Params;
@@ -252,6 +253,8 @@ package body Stochastic_Optimizers is
                      Count_Type'Image (First_Moments.Intercept_Params.Length));
          Put_Line (Routine_Name & "Layer_Grads Coeff_Params length" &
                      Count_Type'Image (Layer_Grads.Coeff_Params.Length));
+         Put_Line (Routine_Name & "Layer_Grads Coeff_Params (1) length" &
+                     Count_Type'Image (Layer_Grads.Coeff_Params (1).Length));
          Put_Line (Routine_Name & "Layer_Grads Intercept_Params length" &
                      Count_Type'Image (Layer_Grads.Intercept_Params.Length));
 
