@@ -40,9 +40,12 @@ package Multilayer_Perceptron is
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
       Params               : Parameters_List;
-      --  Neuron_Coef_Layers layers x rows x values
+      --  Params list of n_layers of Parameter records each record comprising:
+      --  a coefs_list of rows x coeff values representing the weight matrix
+      --  corresponding to layer i.
+      --  an intercepts_list of intercept values representing the bias vector
+      --  corresponding to layer i + 1.
       Coef_Indptr          : Coef_Indptr_List;
-      --  Intercepts: layers x values
       Intercept_Indptr     : Intercept_Indptr_List;
       N_Features           : Positive;
       Feature_Names_In     : String_List;

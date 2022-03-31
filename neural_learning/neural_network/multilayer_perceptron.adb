@@ -740,7 +740,7 @@ package body Multilayer_Perceptron is
       end if;
 
       Init_Bound := Sqrt (Factor / Float (Fan_In + Fan_Out));
-      --  Generate weights and bias
+      --  Generate weights
       for f_in in 1 .. Fan_In loop
          Coef_Init_1.Clear;
          for f_out in 1 .. Fan_Out loop
@@ -749,6 +749,7 @@ package body Multilayer_Perceptron is
          Param_Init.Coeff_Params.Append (Coef_Init_1);
       end loop;
 
+      --  Generate bias
       for index in 1 .. Fan_Out loop
          Param_Init.Intercept_Params.Append (Init_Bound * Random_Float);
       end loop;

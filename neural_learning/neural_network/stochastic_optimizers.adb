@@ -28,18 +28,10 @@ package body Stochastic_Optimizers is
 
    function "+" (L, R : Parameters_List) return Parameters_List is
       use Parameters_Package;
-      L_Item  : Parameters_Record;
-      R_Item  : Parameters_Record;
-      Sum_Rec : Parameters_Record;
-      Sum     : Parameters_List;
+      Sum : Parameters_List;
    begin
       for index in L.First_Index .. L.Last_Index loop
-         L_Item := L (index);
-         R_Item := R (index);
-         Sum_Rec.Coeff_Params := L_Item.Coeff_Params + R_Item.Coeff_Params;
-         Sum_Rec.Intercept_Params := L_Item.Intercept_Params +
-           R_Item.Intercept_Params;
-         Sum.Append (Sum_Rec);
+         Sum.Append (L (index) + R (index));
       end loop;
 
       return Sum;
@@ -58,6 +50,10 @@ package body Stochastic_Optimizers is
             Minus.Coeff_Params (index) (index_2) :=
               - Minus.Coeff_Params (index) (index_2);
          end loop;
+      end loop;
+
+      for index in M.Intercept_Params.First_Index ..
+              M.Intercept_Params.Last_Index loop
          Minus.Intercept_Params (index) := - Minus.Intercept_Params (index);
       end loop;
 
@@ -78,6 +74,10 @@ package body Stochastic_Optimizers is
               L.Coeff_Params (index) (index_2)
               - R.Coeff_Params (index) (index_2);
          end loop;
+      end loop;
+
+      for index in L.Intercept_Params.First_Index ..
+        L.Intercept_Params.Last_Index loop
          Minus.Intercept_Params (index) :=
            L.Intercept_Params (index) - R.Intercept_Params (index);
       end loop;
@@ -90,16 +90,22 @@ package body Stochastic_Optimizers is
 
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record is
       use Float_List_Package;
+      Coeffs  : Float_List;
       Product : Parameters_Record;
    begin
       for index in R.Coeff_Params.First_Index ..
         R.Coeff_Params.Last_Index loop
-         for index_2 in Product.Coeff_Params (index).First_Index ..
-           Product.Coeff_Params (index).Last_Index loop
-            Product.Coeff_Params (index) (index_2) :=
-              L * R.Coeff_Params (index) (index_2);
+         Coeffs.Clear;
+         for index_2 in R.Coeff_Params (index).First_Index ..
+           R.Coeff_Params (index).Last_Index loop
+            Coeffs.Append (L * R.Coeff_Params (index) (index_2));
          end loop;
-         Product.Intercept_Params (index) := L * R.Intercept_Params (index);
+         Product.Coeff_Params.Append (Coeffs);
+      end loop;
+
+      for index in R.Intercept_Params.First_Index ..
+        R.Intercept_Params.Last_Index loop
+         Product.Intercept_Params.Append (L * R.Intercept_Params (index));
       end loop;
 
       return Product;
@@ -108,7 +114,8 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-   function "**" (Rec : Parameters_Record; P : Integer) return Parameters_Record is
+   function "**" (Rec : Parameters_Record; P : Integer)
+                  return Parameters_Record is
       Result : Parameters_Record;
    begin
       Result.Coeff_Params := Rec.Coeff_Params ** P;
@@ -130,6 +137,10 @@ package body Stochastic_Optimizers is
             Result.Coeff_Params (index) (index2) :=
               L.Coeff_Params (index) (index2) / R.Coeff_Params (index) (index2);
          end loop;
+      end loop;
+
+      for index in L.Intercept_Params.First_Index ..
+          L.Intercept_Params.Last_Index loop
          Result.Intercept_Params (index) :=
            L.Intercept_Params (index) / R.Intercept_Params (index);
       end loop;
@@ -218,9 +229,11 @@ package body Stochastic_Optimizers is
       Updates               : Parameters_List;
    begin
       Assert (not Self.First_Moments.Is_Empty, Routine_Name &
-                "Self.First_Moments Is_Empty");
+                "Self.First_Moments Is_Empty.");
       Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
-                "Self.Second_Moments Is_Empty");
+                "Self.Second_Moments Is_Empty.");
+      Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
+
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
@@ -237,10 +250,14 @@ package body Stochastic_Optimizers is
                      Count_Type'Image (First_Moments.Coeff_Params (1).Length));
          Put_Line (Routine_Name & "First_Moments Intercept_Params length" &
                      Count_Type'Image (First_Moments.Intercept_Params.Length));
+         Put_Line (Routine_Name & "Layer_Grads Coeff_Params length" &
+                     Count_Type'Image (Layer_Grads.Coeff_Params.Length));
+         Put_Line (Routine_Name & "Layer_Grads Intercept_Params length" &
+                     Count_Type'Image (Layer_Grads.Intercept_Params.Length));
 
          --  L272
-         Update_First_Moments := Self.Beta_1 * First_Moments; --  +
---             (1.0 - Self.Beta_1) * Layer_Grads;
+         Update_First_Moments := Self.Beta_1 * First_Moments  +
+             (1.0 - Self.Beta_1) * Layer_Grads;
 
          Put_Line (Routine_Name & "L276");
          --  L276
