@@ -494,7 +494,8 @@ package body Multilayer_Perceptron is
                   Put_Line (Routine_Name & "Adam");
                   Stochastic_Optimizers.C_Init
                     (Optimizer.Adam, Params => Self.Attributes.Params,
-                     Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
+                     Initial_Learning_Rate =>
+                       Self.Parameters.Learning_Rate_Init,
                      Beta_1 => Self.Parameters.Beta_1,
                      Beta_2 => Self.Parameters.Beta_2,
                      Epsilon => Self.Parameters.Epsilon);
