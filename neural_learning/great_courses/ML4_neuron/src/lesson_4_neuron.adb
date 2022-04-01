@@ -30,7 +30,7 @@ procedure Lesson_4_Neuron is
     --     X_Indices       : Integer_List;
     --     Y_Indices       : Integer_List;
     aClassifier     : Multilayer_Perceptron.MLP_Classifier;
-    Num_Samples     : Positive;
+--      Num_Samples     : Positive;
     Train_X         : Float_List_2D;
     Train_Y         : Integer_List;
     Test_X          : Float_List_2D;
@@ -40,17 +40,18 @@ procedure Lesson_4_Neuron is
     --     Correct         : Natural := 0;
 begin
     Put_Line (Routine_Name);
-    if not Get_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y, Bunch) then
+    if not Get_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y, Bunch)
+    then
         X := Bunch.Data;
         Y := Bunch.Target;
-        Num_Samples := Positive (X.Length);
+--          Num_Samples := Positive (X.Length);
 
-        Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
+        Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Positive (X.Length)));
         Assert (X.Length > 0, Routine_Name & "X is empty.");
 
-        Assert (Natural (Y.Length) = Num_Samples, Routine_Name &
+        Assert (Natural (Y.Length) = Positive (X.Length), Routine_Name &
                   "Y length" & Count_Type'Image (Y.Length) &
-                  " is different to X length" & Natural'Image (Num_Samples));
+                  " is different to X length" & Natural'Image (Positive (X.Length)));
         --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
         Put_Line (Routine_Name & "permuting");
