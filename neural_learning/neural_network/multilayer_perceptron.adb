@@ -112,6 +112,7 @@ package body Multilayer_Perceptron is
       --        Derivative_Kind    : Derivative_Type;
       --        Inplace_Derivative : Float_List;
    begin
+      Put_Line (Routine_Name);
       --        Put_Line (Routine_Name & "Pre Forward_Pass, Activations size:" &
       --                    Count_Type'Image (Activations.Length));
       --        Put_Line (Routine_Name & "Pre Forward_Pass, Activations size:" &
@@ -119,6 +120,7 @@ package body Multilayer_Perceptron is
       --                    Count_Type'Image (Activations (1) (1).Length));
 
       Forward_Pass (Self, Delta_Activ);
+      Put_Line (Routine_Name & "L284");
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -578,7 +580,7 @@ package body Multilayer_Perceptron is
          --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
             Batch_Slice := Batches (batch_index);
-            Printing.Print_Slice (Routine_Name & "Slice", Batch_Slice);
+            Printing.Print_Slice (Routine_Name & "L636 Slice", Batch_Slice);
             X_Batch.Clear;
             Y_Batch.Clear;
 
@@ -587,13 +589,19 @@ package body Multilayer_Perceptron is
                Y_Batch.Append (Y (index));
             end loop;
 
+            Put_Line (Routine_Name & "Delta_Activs length: " &
+                        Count_Type'Image (Delta_Activs.Length));
+            Put_Line (Routine_Name & "Activations length: " &
+                        Count_Type'Image (Delta_Activs (1).Activations.Length));
             Delta_Activs (1).Activations := X_Batch;
 
+            Put_Line (Routine_Name & "L645");
             --  L645
             Backprop (Self, X_Batch, Y_Batch, Delta_Activs, Batch_Loss, Grads);
+            Put_Line (Routine_Name & "Backprop returned");
             Accumulated_Loss := Accumulated_Loss + Batch_Loss *
               Float (Batch_Slice.Last - Batch_Slice.First + 1);
-            Put_Line (Routine_Name & "Accumulated_Loss: " &
+            Put_Line (Routine_Name & "L657 Accumulated_Loss: " &
                         Float'Image (Accumulated_Loss));
             --  L657 update weights
             Stochastic_Optimizers.Update_Params
@@ -645,6 +653,7 @@ package body Multilayer_Perceptron is
       Acts_Dot_Coeffs    : Float_List_2D;
       Act_With_Intercept : Float_List_2D;
    begin
+      Put_Line (Routine_Name);
       --  Iterate over the hidden layers
       --  The Python range(stop) function returns a sequence of numbers,
       --   starting from 0 by default, incrementing by 1 (by default) and
@@ -663,11 +672,15 @@ package body Multilayer_Perceptron is
             Delta_Activs (layer).Activations.Set_Length
                   (Count_Type (layer + 1));
          end if;
+         Put_Line (Routine_Name & "L131");
+         --  L131
          Delta_Activs (layer + 1).Activations := Acts_Dot_Coeffs;
          --           Put_Line (Routine_Name & "Activations length:" &
          --                      Count_Type'Image (Activations.Length));
          --           Put_Line (Routine_Name & "Activations length (index + 1):" &
          --                      Count_Type'Image (Activations (index + 1).Length));
+         Put_Line (Routine_Name & "L132");
+         --  L132
          Act_With_Intercept := Delta_Activs (layer + 1).Activations;
          --  Intercepts: layers x intercept values
          Intercepts := Params (layer).Intercept_Params;
@@ -679,6 +692,8 @@ package body Multilayer_Perceptron is
          --           Put_Line (Routine_Name & "Activations length:" &
          --                      Count_Type'Image (Activations.Length));
          Delta_Activs (layer + 1).Activations := Act_With_Intercept;
+
+         Put_Line (Routine_Name & "L134");
 
          --  L134 For the hidden layers
          --           if layer + 1 /= Num_Layers - 1 then
