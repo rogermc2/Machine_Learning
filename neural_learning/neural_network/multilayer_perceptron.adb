@@ -387,12 +387,11 @@ package body Multilayer_Perceptron is
       end if;
 
       --  L414 Set the Activation values of the first layer
-      Deltas.Set_Length (1);
-      Activations (1).Append (X);  -- layer x samples x features
+      Activations.Append (X);  -- layer x samples x features
       --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Deltas (1).Set_Length (Layer_Units.Length - 1);
+      Deltas.Set_Length (Layer_Units.Length - 1);
 
       --  L417 Initialized grads are empty vectors, no initialization required.
 
@@ -734,9 +733,10 @@ package body Multilayer_Perceptron is
       use Maths;
       use Float_Math_Functions;
       use Base_Neural;
-      Factor      : Float;
-      Init_Bound  : Float;
-      Coef_Init_1 : Float_List;
+--        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      Factor       : Float;
+      Init_Bound   : Float;
+      Coef_Init_1  : Float_List;
    begin
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
@@ -755,7 +755,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       --  Generate bias
-      for index in 1 .. Fan_Out loop
+      for f_out in 1 .. Fan_Out loop
          Param_Init.Intercept_Params.Append (Init_Bound * Random_Float);
       end loop;
 
@@ -781,7 +781,7 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "N_Layers" &
                   Integer'Image (Self.Attributes.N_Layers));
       for layer in 1 .. Self.Attributes.N_Layers - 1 loop
-         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
+--           Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          Init_Coeff (Self, Layer_Units.Element (layer),
                      Layer_Units.Element (layer + 1), Params_Init);
          --  Add coefficent matrices and intercept vectors for layer.
