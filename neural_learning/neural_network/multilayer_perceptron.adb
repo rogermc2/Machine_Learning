@@ -178,12 +178,9 @@ package body Multilayer_Perceptron is
 
       --  L295  Backward propagate python last = self.n_layers_ - 2
       Last := Self.Attributes.N_Layers - 1;
---        Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
---                  Integer'Image (Last) & " should equal Deltas length" &
---                  Count_Type'Image (Deltas.Length));
-      if Positive (Deltas.Length) < Last then
-         Deltas.Set_Length (Count_Type (Last));
-      end if;
+      Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
+                Integer'Image (Last) & " should equal Deltas length" &
+                Count_Type'Image (Deltas.Length));
       Assert (Y_Float.Length = Activations.Last_Element.Length,
               Routine_Name &  "L301 Y_Float length" &
                 Count_Type'Image (Y_Float.Length) &
@@ -390,7 +387,7 @@ package body Multilayer_Perceptron is
       --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Deltas.Set_Length (Activations.Length - 1);
+      Deltas.Set_Length (Layer_Units.Length - 1);
 
       --  L417 Initialized grads are empty vectors, no initialization required.
 
