@@ -22,6 +22,15 @@ package Multilayer_Perceptron is
      Ada.Containers.Vectors (Positive, Coef_Indptr_Record);
    subtype Coef_Indptr_List is Coef_Indptr_Package.Vector;
 
+   type Delta_Activation_Record is record
+      Activations : Float_List_2D;
+      Deltas      : Float_List_2D;
+   end record;
+
+   package Delta_Activation_Package is new
+     Ada.Containers.Vectors (Positive, Delta_Activation_Record);
+   subtype Delta_Activation_List is Delta_Activation_Package.Vector;
+
    type Intercept_Indptr_Record is record
       Start   : Positive := 1;
       Last    : Positive := 1;

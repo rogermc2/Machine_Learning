@@ -59,8 +59,7 @@ package body Multilayer_Perceptron is
      (Self        : in out MLP_Classifier;
       Layer       : Positive;
       Num_Samples : Positive;
-      Activations : Float_List_3D;
-      Deltas      : Float_List_3D;
+      Delta_Activ : Delta_Activation_List;
       Grads       : in out Parameters_List);
    --     procedure Fit_Lbfgs (Self            : in out MLP_Classifier;
    --                          X               : Float_List_2D;
@@ -72,12 +71,11 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self            : in out MLP_Classifier;
                              X               : Float_List_2D;
                              Y               : Integer_List_2D;
-                             Activations     : in out Float_List_3D;
-                             Deltas          : in out Float_List_3D;
+      Delta_Activ : Delta_Activation_List;
                              Grads           : in out Parameters_List;
                              Incremental     : Boolean := False);
-   procedure Forward_Pass (Self            : in out MLP_Classifier;
-                           Activations     : in out Float_List_3D);
+   procedure Forward_Pass (Self         : in out MLP_Classifier;
+                           Delta_Activs : Delta_Activation_List);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
@@ -97,8 +95,7 @@ package body Multilayer_Perceptron is
    procedure Backprop (Self        : in out MLP_Classifier;
                        X           : Float_List_2D;
                        Y           : Integer_List_2D;
-                       Activations : in out Float_List_3D;
-                       Deltas      : in out Float_List_3D;
+                       Delta_Activ : Delta_Activation_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
       use Ada.Containers;
@@ -122,7 +119,7 @@ package body Multilayer_Perceptron is
       --                    Count_Type'Image (Activations (1).Length) & " x" &
       --                    Count_Type'Image (Activations (1) (1).Length));
 
-      Forward_Pass (Self, Activations);
+      Forward_Pass (Self, Delta_Activ);
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -131,18 +128,18 @@ package body Multilayer_Perceptron is
 
       --        Printing.Print_Float_Lists_2D
       --              (Routine_Name & "Activations last layer", Activations.Last_Element);
-      Assert (Y.Length = Activations.Last_Element.Length, Routine_Name &
+      Assert (Y.Length = Delta_Activ.Last_Element.Activations.Length, Routine_Name &
                 "L284 Y Length" & Count_Type'Image (Y.Length) &
                 " should be the same as last activation length" &
-                Count_Type'Image (Activations.Last_Element.Length));
+                Count_Type'Image (Delta_Activ.Last_Element.Activations.Length));
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
-            Loss := Binary_Log_Loss (Y, Activations.Last_Element);
+            Loss := Binary_Log_Loss (Y, Delta_Activ.Last_Element.Activations);
          when Log_Loss_Function =>
-            Loss := Log_Loss (Y, Activations.Last_Element);
+            Loss := Log_Loss (Y, Delta_Activ.Last_Element.Activations);
          when Squared_Error_Function =>
-            Loss := Squared_Loss (Y, Activations.Last_Element);
+            Loss := Squared_Loss (Y, Delta_Activ.Last_Element.Activations);
       end case;
 
       --  L289  Add L2 regularization term to loss
@@ -283,13 +280,11 @@ package body Multilayer_Perceptron is
    --  Intercept_Grads is a 2D list of bias vectors where the vector at index
    --  the bias values added to layer i + 1.
    procedure Compute_Loss_Gradient
-     (Self            : in out MLP_Classifier;
-      Layer           : Positive;
-      Num_Samples     : Positive;
-      --        Activations     : Activation_List;
-      Activations     : Float_List_3D;
-      Deltas          : Float_List_3D;
-      Grads           : in out Parameters_List) is
+     (Self         : in out MLP_Classifier;
+      Layer        : Positive;
+      Num_Samples  : Positive;
+      Delta_Activs : Delta_Activation_List;
+      Grads        : in out Parameters_List) is
       use Ada.Containers;
       use Float_List_Package;
       Routine_Name : constant String :=
@@ -629,7 +624,7 @@ package body Multilayer_Perceptron is
    --  computing the values of the neurons in the hidden layers and the
    --  output layer.
    procedure Forward_Pass (Self        : in out MLP_Classifier;
-                           Activations : in out Float_List_3D) is
+                           Delta_Activ : Delta_Activation_List) is
       --  The ith element of Activations (length n_layers - 1) holds the values
       --  of the ith layer.
       --  Activations: layers x samples x features
