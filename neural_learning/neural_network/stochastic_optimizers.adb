@@ -282,9 +282,10 @@ package body Stochastic_Optimizers is
          --  L284
          Update_First_Moments := First_Moment_Updates (layer);
          Update_Second_Moments := Second_Moment_Updates (layer);
-         Put_Line (Routine_Name & "Moments set");
+         Put_Line (Routine_Name & "Update_Second_Moments set");
          Coef_Update := - Self.Learning_Rate * Update_First_Moments /
            Moments_Sqrt (Update_Second_Moments, Self.Epsilon);
+         Put_Line (Routine_Name & "Coef_Update set");
          Updates.Append (Coef_Update);
          Put_Line (Routine_Name & "loop end");
       end loop;

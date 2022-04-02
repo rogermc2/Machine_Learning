@@ -387,7 +387,7 @@ package body Multilayer_Perceptron is
       --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Deltas.Set_Length (Layer_Units.Length - 1);
+      Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
 
       --  L417 Initialized grads are empty vectors, no initialization required.
 
