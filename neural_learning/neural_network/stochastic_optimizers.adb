@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -170,11 +170,8 @@ package body Stochastic_Optimizers is
                       Beta_1                : Float := 0.9;
                       Beta_2                : Float := 0.999;
                       Epsilon               : Float) is
-        Routine_Name          : constant String :=
-                                  "Stochastic_Optimizers.C_Init Adam ";
+--          Routine_Name : constant String := "Stochastic_Optimizers.C_Init Adam ";
     begin
-        Put_Line (Routine_Name & "Params length" &
-                    Integer'Image (Integer (Params.Length)));
         Self.Params := Params;
         Self.Initial_Learning_Rate := Initial_Learning_Rate;
         Self.Learning_Rate := Initial_Learning_Rate;
