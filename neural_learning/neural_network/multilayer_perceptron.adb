@@ -47,7 +47,7 @@ with Data_Splitter2;
 --  with Encode_Utils;
 with Label;
 with Neural_Maths;
-with Printing;
+--  with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -178,14 +178,14 @@ package body Multilayer_Perceptron is
 
       --  L295  Backward propagate python last = self.n_layers_ - 2
       Last := Self.Attributes.N_Layers - 1;
-      Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
-                Integer'Image (Last) & " should equal Deltas length" &
-                Count_Type'Image (Deltas.Length));
-      Assert (Y_Float.Length = Activations.Last_Element.Length,
-              Routine_Name &  "L301 Y_Float length" &
-                Count_Type'Image (Y_Float.Length) &
-                " should equal Activations.Last_Element length" &
-                Count_Type'Image (Activations.Last_Element.Length));
+--        Assert (Last = Natural (Deltas.Length), Routine_Name & "L301 Last" &
+--                  Integer'Image (Last) & " should equal Deltas length" &
+--                  Count_Type'Image (Deltas.Length));
+--        Assert (Y_Float.Length = Activations.Last_Element.Length,
+--                Routine_Name &  "L301 Y_Float length" &
+--                  Count_Type'Image (Y_Float.Length) &
+--                  " should equal Activations.Last_Element length" &
+--                  Count_Type'Image (Activations.Last_Element.Length));
       --  L301
       Deltas.Replace_Element (Deltas.Last_Index, Activations.Last_Element - Y_Float);
 
@@ -295,10 +295,10 @@ package body Multilayer_Perceptron is
       Delta_Mean   : Float_List;
    begin
 --        Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
-      Put_Line (Routine_Name & "Deltas (Layer) length" &
-                  Count_Type'Image (Deltas (Layer).Length));
-      Put_Line (Routine_Name & "Activations (Layer) length" &
-                  Count_Type'Image (Activations (Layer).Length));
+--        Put_Line (Routine_Name & "Deltas (Layer) length" &
+--                    Count_Type'Image (Deltas (Layer).Length));
+--        Put_Line (Routine_Name & "Activations (Layer) length" &
+--                    Count_Type'Image (Activations (Layer).Length));
 
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
@@ -310,13 +310,13 @@ package body Multilayer_Perceptron is
          Grads.Set_Length (Count_Type (Layer));
       end if;
 
-      Assert (Delta_Act.Length =
-                Self.Attributes.Params (Layer).Coeff_Params.Length,
-              Routine_Name & "Delta_Act Length" &
-                Count_Type'Image (Delta_Act.Length) & " should equal " &
-                "Coeff_Params length" &
-                Count_Type'Image
-                (Self.Attributes.Params (Layer).Coeff_Params.Length));
+--        Assert (Delta_Act.Length =
+--                  Self.Attributes.Params (Layer).Coeff_Params.Length,
+--                Routine_Name & "Delta_Act Length" &
+--                  Count_Type'Image (Delta_Act.Length) & " should equal " &
+--                  "Coeff_Params length" &
+--                  Count_Type'Image
+--                  (Self.Attributes.Params (Layer).Coeff_Params.Length));
 
       --  Grad.Coeff_Params is a 2D list of fan_in x fan_out lists
       Grads (layer).Coeff_Params :=
@@ -339,7 +339,6 @@ package body Multilayer_Perceptron is
       use Ada.Containers;
       --        Routine_Name              : constant String :=
       --                                      "Multilayer_Perceptron.Fit ";
-      --        Num_Samples               : constant Positive := Positive (X.Length);
       Num_Features       : constant Positive :=
                              Positive (X.Element (1).Length);
       --  The ith element of Activations holds the values of the ith layer.
@@ -490,7 +489,6 @@ package body Multilayer_Perceptron is
                declare
                   Optimizer : Optimizer_Record (Optimizer_Adam);
                begin
-                  Put_Line (Routine_Name & "Adam");
                   Stochastic_Optimizers.C_Init
                     (Optimizer.Adam, Params => Self.Attributes.Params,
                      Initial_Learning_Rate =>
@@ -579,9 +577,7 @@ package body Multilayer_Perceptron is
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          --  L636
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
-            Batch_Slice := Batches (batch_index);
-            Printing.Print_Slice (Routine_Name & "L636 Slice", Batch_Slice);
-            X_Batch.Clear;
+            Batch_Slice := Batches (batch_index);            X_Batch.Clear;
             Y_Batch.Clear;
 
             for index in Batch_Slice.First .. Batch_Slice.Last loop
@@ -589,10 +585,10 @@ package body Multilayer_Perceptron is
                Y_Batch.Append (Y (index));
             end loop;
 
-            Put_Line (Routine_Name & "Deltas length: " &
-                        Count_Type'Image (Deltas.Length));
-            Put_Line (Routine_Name & "Activations length: " &
-                        Count_Type'Image (Activations (1).Length));
+--              Put_Line (Routine_Name & "Deltas length: " &
+--                          Count_Type'Image (Deltas.Length));
+--              Put_Line (Routine_Name & "Activations length: " &
+--                          Count_Type'Image (Activations (1).Length));
             Activations.Replace_Element (Activations.First_Index, X_Batch);
 
             --  L645
@@ -606,7 +602,6 @@ package body Multilayer_Perceptron is
             --  L657 update weights
             Stochastic_Optimizers.Update_Params
               (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
-            Put_Line (Routine_Name & "Update_Params set");
 
             --  L661
             Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
@@ -764,7 +759,7 @@ package body Multilayer_Perceptron is
                          Layer_Units : Integer_List) is
       --        use Ada.Containers;
       use Base_Neural;
-      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Params_Init    : Parameters_Record;
    begin
       Self.Attributes.N_Iter := 0;
@@ -774,10 +769,9 @@ package body Multilayer_Perceptron is
       Self.Attributes.Params.Clear;
 
       --  L344
-      Put_Line (Routine_Name & "N_Layers" &
-                  Integer'Image (Self.Attributes.N_Layers));
+--        Put_Line (Routine_Name & "N_Layers" &
+--                    Integer'Image (Self.Attributes.N_Layers));
       for layer in 1 .. Self.Attributes.N_Layers - 1 loop
---           Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          Init_Coeff (Self, Layer_Units.Element (layer),
                      Layer_Units.Element (layer + 1), Params_Init);
          --  Add coefficent matrices and intercept vectors for layer.
