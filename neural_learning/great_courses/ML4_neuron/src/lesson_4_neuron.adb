@@ -78,7 +78,8 @@ begin
     Put_Line ("Train Y length: " & Count_Type'Image (Train_Y.Length));
     Put_Line ("Test data length: " & Count_Type'Image (Test_X.Length));
 
-    aClassifier := C_Init (Max_Iter => 10000,
+--      aClassifier := C_Init (Max_Iter => 10000,
+    aClassifier := C_Init (Max_Iter => 4,
                            Activation => Base_Neural.Identity_Activation);
 
     --  Fit function adjusts weights according to data values so that better

@@ -289,8 +289,8 @@ package body Multilayer_Perceptron is
       Grads       : in out Parameters_List) is
       use Ada.Containers;
       use Float_List_Package;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Compute_Loss_Gradient ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_Act    : Float_List_2D;
       Delta_Mean   : Float_List;
    begin
