@@ -102,6 +102,8 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
+   function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
+                              Verbose : Boolean) return Boolean;
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_List;
                             Grads  : Parameters_List);

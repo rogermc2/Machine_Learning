@@ -36,6 +36,7 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -479,6 +480,8 @@ package body Multilayer_Perceptron is
       X_Batch          : Float_List_2D;
       Y_Batch          : Integer_List_2D;
       Batch_Loss       : Float;
+      Msg              : Unbounded_String;
+      Is_Stopping      : Boolean := False;
    begin
       --  L576
       if not Incremental or else
@@ -602,7 +605,7 @@ package body Multilayer_Perceptron is
               (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
 
          end loop;
-         --  L660
+
          --  L661
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
@@ -618,6 +621,31 @@ package body Multilayer_Perceptron is
          --  L669 Update no_improvement_count based on training loss or
          --       validation score according to early_stopping
          Update_No_Improvement_Count (Self, Early_Stopping, Test_X);
+         --  for learning rate that needs to be updated at iteration end;
+         if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
+            null;
+         end if;
+
+         --  676
+         if Self.Attributes.No_Improvement_Count >
+           Self.Parameters.N_Iter_No_Change then
+            if Early_Stopping then
+               Msg := Msg & To_Unbounded_String (Routine_Name & "Validation score");
+            else
+               Msg := Msg & To_Unbounded_String (Routine_Name & "Training loss");
+            end if;
+            Msg := Msg & To_Unbounded_String (" did not improve more than tol =" &
+                         Float'Image (Self.Parameters.Tol) & " for" &
+                         Integer'Image (Self.Parameters.N_Iter_No_Change) &
+                         " consecutive epochs.");
+            Is_Stopping :=
+              Trigger_Stopping (Self.Attributes.Optimizer, To_String (Msg),
+                                Self.Parameters.Verbose);
+            if Is_Stopping then
+               null;
+            end if;
+         end if;
+
          Put_Line (Routine_Name & "L668 Accumulated_Loss: " &
                      Float'Image (Accumulated_Loss));
       end loop;
