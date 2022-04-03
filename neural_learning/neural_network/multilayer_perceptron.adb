@@ -829,6 +829,7 @@ package body Multilayer_Perceptron is
             Self.Attributes.Params.Append (Params_Init);
         end loop;
 
+        --  L351
         if Self.Parameters.Solver = Sgd_Solver or else
           Self.Parameters.Solver = Adam_Solver then
             Self.Attributes.Loss_Curve.Clear;
@@ -850,43 +851,46 @@ package body Multilayer_Perceptron is
        X_Val : Float_List_2D) is
         Routine_Name : constant String :=
                          "Multilayer_Perceptron.Update_No_Improvement_Count ";
-        Last_Valid_Score : constant Float :=
-                             Self.Parameters.Validation_Scores.Last_Element;
+        Last_Valid_Score : Float;
         Score_Val        : Float;
     begin
+        Put_Line (Routine_Name);
         if Early_Stopping then
             Score_Val := Base_Mix.Score (X_Val);
             Self.Parameters.Validation_Scores.Append (Score_Val);
+            Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
             if Self.Parameters.Verbose then
                 Put_Line (Routine_Name & "Validation score: " &
                             Float'Image (Last_Valid_Score));
             end if;
 
+            --  L728
+            Put_Line (Routine_Name & "L728");
             if Last_Valid_Score <
               Self.Parameters.Best_Validation_Score + Self.Parameters.Tol then
-              Self.Attributes.No_Improvement_Count :=
+                Self.Attributes.No_Improvement_Count :=
                   Self.Attributes.No_Improvement_Count + 1;
             else
                 Self.Attributes.No_Improvement_Count := 0;
             end if;
 
             if Last_Valid_Score > Self.Parameters.Best_Validation_Score then
-                 Self.Parameters.Best_Validation_Score := Last_Valid_Score;
-                 Self.Parameters.Best_Params := Self.Attributes.Params;
+                Self.Parameters.Best_Validation_Score := Last_Valid_Score;
+                Self.Parameters.Best_Params := Self.Attributes.Params;
             end if;
 
         else
             if Self.Attributes.Loss_Curve.Last_Element >
               Self.Attributes.Best_Loss then
-              Self.Attributes.No_Improvement_Count :=
+                Self.Attributes.No_Improvement_Count :=
                   Self.Attributes.No_Improvement_Count + 1;
             else
-              Self.Attributes.No_Improvement_Count := 0;
+                Self.Attributes.No_Improvement_Count := 0;
             end if;
 
             if Self.Attributes.Loss_Curve.Last_Element <
               Self.Attributes.Best_Loss then
-              Self.Attributes.Best_Loss :=
+                Self.Attributes.Best_Loss :=
                   Self.Attributes.Loss_Curve.Last_Element;
             end if;
         end if;
