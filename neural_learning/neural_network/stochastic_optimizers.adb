@@ -10,6 +10,7 @@ package body Stochastic_Optimizers is
 
     function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
                            return Parameters_Record;
+    pragma Inline (Moments_Sqrt);
     procedure Zero_Init (Params : in out Parameters_List);
 
     --  -------------------------------------------------------------------------
@@ -24,6 +25,7 @@ package body Stochastic_Optimizers is
         return Sum_Rec;
 
     end "+";
+    pragma Inline ("+");
 
     --  ------------------------------------------------------------------------
 
@@ -63,6 +65,7 @@ package body Stochastic_Optimizers is
         return Minus;
 
     end "-";
+    pragma Inline ("-");
 
     --  ------------------------------------------------------------------------
 
@@ -89,6 +92,7 @@ package body Stochastic_Optimizers is
         return Minus;
 
     end "-";
+    pragma Inline ("-");
 
     --  ------------------------------------------------------------------------
 
@@ -115,6 +119,7 @@ package body Stochastic_Optimizers is
         return Product;
 
     end "*";
+    pragma Inline ("*");
 
     --  ------------------------------------------------------------------------
 
@@ -159,6 +164,7 @@ package body Stochastic_Optimizers is
         return Result;
 
     end "/";
+    pragma Inline ("/");
 
     --  -------------------------------------------------------------------------
 
