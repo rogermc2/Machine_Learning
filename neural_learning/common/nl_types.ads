@@ -24,14 +24,19 @@ package NL_Types is
    subtype Float_List is Float_Package.Vector;
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
    function "+" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("+");
    function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("-");
    function "*" (L : Float; R : Float_Package.Vector)
                  return Float_Package.Vector;
+   pragma Inline ("*");
    function "*" (L, R : Float_Package.Vector) return Float_Package.Vector;
    function "**" (L : Float_Package.Vector; P : Integer)
                   return Float_Package.Vector;
+   pragma Inline ("**");
    function "/" (L : Float_Package.Vector; R : Float)
                  return Float_Package.Vector;
+   pragma Inline ("/");
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
    procedure Check_Lengths (Routine_Name : String; L, R : Float_List);
 
