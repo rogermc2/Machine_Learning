@@ -38,7 +38,9 @@ package NL_Types is
                  return Float_Package.Vector;
    pragma Inline ("/");
    function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("abs");
    procedure Check_Lengths (Routine_Name : String; L, R : Float_List);
+   pragma Inline (Check_Lengths);
 
    use Float_Package;
    package Float_List_Package is new
@@ -51,6 +53,7 @@ package NL_Types is
    function "+" (L, R : Float_List_2D) return Float_List_2D;
    function "-" (L, R : Float_List_2D) return Float_List_2D;
    function Dot (L : Float_List; R : Float_List_2D) return Float_List;
+   pragma Inline (Dot);
    function Dot (L, R : Float_List) return Float_List_2D;
    function Dot (L, R : Float_List_2D) return Float_List_2D;
    function Transpose (Values : Float_List_2D) return  Float_List_2D;
@@ -71,6 +74,7 @@ package NL_Types is
      Ada.Containers.Vectors (Positive, Integer_List);
    subtype Integer_List_2D is Integer_Package_2D.Vector;
    function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
+   pragma Inline (Transpose);
 
    package Integer_DLL_Package is new
      Ada.Containers.Doubly_Linked_Lists (Integer);
@@ -149,9 +153,12 @@ package NL_Types is
    subtype Value_Data_List is Value_Data_Package.Vector;
 
    function "<" (L, R : Value_Record) return Boolean;
+   pragma Inline ("<");
    function "<=" (L, R : Value_Record) return Boolean;
+   pragma Inline ("<=");
 
    function "=" (L, R : Value_Record) return Value_Record;
+   pragma Inline ("=");
    function "+" (L, R : Value_Record) return Value_Record;
    function "-" (L, R : Value_Record) return Value_Record;
    function "abs" (Value : Value_Record) return Value_Record;
@@ -267,22 +274,22 @@ package NL_Types is
       Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
    end record;
 
-   type Raw_Question is record
-      Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
-      Feature_Value : Unbounded_String;  --  e.g. "Green"
-   end record;
-
-   type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
-      Feature_Name : Feature_Name_Type := To_Unbounded_String ("");
-      Gain         : Float := 0.0;
-      case Feature_Kind is
-         when Integer_Type => Integer_Value     : Integer := 0;
-         when Float_Type => Float_Value         : Float := 0.0;
-         when Boolean_Type => Boolean_Value     : Boolean := False;
-         when UB_String_Type => UB_String_Value : Unbounded_String :=
-                                                       To_Unbounded_String ("");
-      end case;
-   end record;
+--     type Raw_Question is record
+--        Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
+--        Feature_Value : Unbounded_String;  --  e.g. "Green"
+--     end record;
+--
+--     type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
+--        Feature_Name : Feature_Name_Type := To_Unbounded_String ("");
+--        Gain         : Float := 0.0;
+--        case Feature_Kind is
+--           when Integer_Type => Integer_Value     : Integer := 0;
+--           when Float_Type => Float_Value         : Float := 0.0;
+--           when Boolean_Type => Boolean_Value     : Boolean := False;
+--           when UB_String_Type => UB_String_Value : Unbounded_String :=
+--                                                         To_Unbounded_String ("");
+--        end case;
+--     end record;
 
    type Partitioned_Rows is record
       True_Rows  : Rows_Vector;
