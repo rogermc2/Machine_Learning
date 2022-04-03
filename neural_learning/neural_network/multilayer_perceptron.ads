@@ -48,7 +48,7 @@ package Multilayer_Perceptron is
       Loss_Curve           : Float_List;
       No_Improvement_Count : Natural := 0;
       T                    : Natural;
-      Params               : Parameters_List;
+      Params               : Parameters_List;  --  Layers
       --  Params list of n_layers of Parameter records each record comprising:
       --  a coefs_list of rows x coeff values representing the weight matrix
       --  corresponding to layer i.
@@ -89,6 +89,7 @@ package Multilayer_Perceptron is
       Validation_Scores     : Float_List;
       Validation_Fraction   : Float := 0.1;
       Best_Validation_Score : Float := Float'Safe_First;
+      Best_Params           : Parameters_List;
       Beta_1                : Float := 0.9;
       Beta_2                : Float := 0.999;
       Epsilon               : Float := 10.0 ** (-8);
