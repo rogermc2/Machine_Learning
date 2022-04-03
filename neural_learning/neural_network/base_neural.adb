@@ -165,7 +165,7 @@ package body Base_Neural is
       end loop;
 
       for index in Y_Prob.First_Index .. Y_Prob.Last_Index loop
-         YP_Float := YP_Float & Y_Prob (index).Element (1);
+         YP_Float := YP_Float & Y_Prob (index) (1);
          YT_Float := YT_Float & Float (Y_True.Element (index).Element (1));
       end loop;
 

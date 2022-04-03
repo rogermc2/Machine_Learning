@@ -35,6 +35,7 @@
 --  the bias values added to layer i + 1.
 
 --  with Ada.Assertions; use Ada.Assertions;
+with Ada.Calendar; use Ada.Calendar;
 with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -484,6 +485,8 @@ package body Multilayer_Perceptron is
         Batch_Loss       : Float;
         Msg              : Unbounded_String;
         Is_Stopping      : Boolean := False;
+        Start_Time       : Time;
+        End_Time         : Time;
     begin
         --  L576
         if not Incremental or else
@@ -571,7 +574,8 @@ package body Multilayer_Perceptron is
         --  L628
         --        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
         while Continue and then iter < Self.Parameters.Max_Iter loop
-            iter := iter + 1;
+            Start_Time := Clock;
+         iter := iter + 1;
             if Self.Parameters.Shuffle then
                 null;
             end if;
@@ -662,6 +666,9 @@ package body Multilayer_Perceptron is
                 New_Line;
             end if;
 
+            End_Time := Clock;
+            Put_Line (Routine_Name & "Iter loop time: " &
+                        Duration'Image ((Start_Time - End_Time) * 1000) & "mS");
             Put_Line (Routine_Name & "L710 Accumulated_Loss: " &
                         Float'Image (Accumulated_Loss));
         end loop;
@@ -854,7 +861,6 @@ package body Multilayer_Perceptron is
         Last_Valid_Score : Float;
         Score_Val        : Float;
     begin
-        Put_Line (Routine_Name);
         if Early_Stopping then
             Score_Val := Base_Mix.Score (X_Val);
             Self.Parameters.Validation_Scores.Append (Score_Val);
