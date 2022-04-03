@@ -461,6 +461,8 @@ package body Multilayer_Perceptron is
                            Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples      : constant Positive := Positive (X.Length);
       LE_U             : Label.Label_Encoder (Label.Class_Unique);
+      Iter             : Natural := 0;
+      Continue         : Boolean := True;
       --  Activations: layers x samples x features
       Early_Stopping   : constant Boolean
         := Self.Parameters.Early_Stopping and then not Incremental;
@@ -568,7 +570,8 @@ package body Multilayer_Perceptron is
 
       --  L628
       --        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
-      for iter in 1 .. Self.Parameters.Max_Iter loop
+      while Continue and then iter < Self.Parameters.Max_Iter loop
+         iter := iter + 1;
          if Self.Parameters.Shuffle then
             null;
          end if;
@@ -641,8 +644,9 @@ package body Multilayer_Perceptron is
             Is_Stopping :=
               Trigger_Stopping (Self.Attributes.Optimizer, To_String (Msg),
                                 Self.Parameters.Verbose);
-            if Is_Stopping then
-               null;
+            Continue := not Is_Stopping;
+            if Continue then
+               Self.Attributes.No_Improvement_Count := 0;
             end if;
          end if;
 
