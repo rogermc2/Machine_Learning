@@ -10,7 +10,7 @@ project Lesson_04_Neuron is
    for Exec_Dir use ".";
 
    package Compiler is
-      for Default_Switches ("ada") use ("-O2", "-gnatn", "-funroll-loops", "-gnatwkmru", "-gnatyclux");
+      for Default_Switches ("ada") use ("-O2", "-gnatwkmru", "-gnatyclux");
    end Compiler;
 
    package Linker is
