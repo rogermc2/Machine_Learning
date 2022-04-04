@@ -58,7 +58,7 @@ package body Multilayer_Perceptron is
     First_Pass : Boolean := True;
 
     procedure Compute_Loss_Gradient
-      (Self        : in out MLP_Classifier;
+      (Self        : MLP_Classifier;
        Layer       : Positive;
        Num_Samples : Positive;
        Activations : Float_List_3D;
@@ -78,7 +78,7 @@ package body Multilayer_Perceptron is
                               Deltas       : in out Float_List_3D;
                               Grads        : in out Parameters_List;
                               Incremental  : Boolean := False);
-    procedure Forward_Pass (Self         : in out MLP_Classifier;
+    procedure Forward_Pass (Self         : MLP_Classifier;
                             Activations  : in out Float_List_3D);
     procedure Initialize (Self        : in out MLP_Classifier;
                           Layer_Units : Integer_List);
@@ -189,20 +189,24 @@ package body Multilayer_Perceptron is
         --                  " should equal Activations.Last_Element length" &
         --                  Count_Type'Image (Activations.Last_Element.Length));
         --  L301
-        Deltas.Replace_Element (Deltas.Last_Index, Activations.Last_Element - Y_Float);
+        Deltas.Replace_Element (Deltas.Last_Index,
+                                Activations.Last_Element - Y_Float);
 
         --  L304  Compute gradient for the last layer
-        Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas, Grads);
+        Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
+                               Grads);
 
         --  L310, L308
         for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
             Deltas (index - 1) :=
               Dot (Deltas (index),
                    Transpose (Self.Attributes.Params (index).Coeff_Params));
+
             case Self.Parameters.Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>
-                Logistic_Derivative (Z => Activations (index), Del => Deltas (index - 1));
+                Logistic_Derivative (Z => Activations (index),
+                                     Del => Deltas (index - 1));
             when Tanh_Activation =>
                 Tanh_Derivative (Activations (index), Deltas (index - 1));
             when Relu_Activation =>
@@ -282,7 +286,7 @@ package body Multilayer_Perceptron is
     --  Intercept_Grads is a 2D list of bias vectors where the vector at index
     --  the bias values added to layer i + 1.
     procedure Compute_Loss_Gradient
-      (Self        : in out MLP_Classifier;
+      (Self        : MLP_Classifier;
        Layer       : Positive;
        Num_Samples : Positive;
        Activations : Float_List_3D;
@@ -684,7 +688,7 @@ package body Multilayer_Perceptron is
     --  L119  Forward_Pass performs a forward pass on the neural network by
     --  computing the values of the neurons in the hidden layers and the
     --  output layer.
-    procedure Forward_Pass (Self         : in out MLP_Classifier;
+    procedure Forward_Pass (Self         : MLP_Classifier;
                             Activations  : in out Float_List_3D) is
     --  The ith element of Activations (length n_layers - 1) holds the values
     --  of the ith layer.
