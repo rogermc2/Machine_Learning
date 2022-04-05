@@ -169,12 +169,12 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Clear (anArray : in out Value_Data_Array) is
-   begin
-      for index in anArray'Range loop
-         anArray (index).Float_Value := 0.0;
-      end loop;
-   end Clear;
+--     procedure Clear (anArray : in out Value_Data_Array) is
+--     begin
+--        for index in anArray'Range loop
+--           anArray (index).Float_Value := 0.0;
+--        end loop;
+--     end Clear;
 
    --  -------------------------------------------------------------------------
 
@@ -1069,54 +1069,54 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Integer_Array (Nums : Value_Data_Array)
-                                  return Integer_Array is
-      use Int_Sets;
-      Unique_Set : Int_Sets.Set;
-      Set_Curs   : Int_Sets.Cursor;
-   begin
-      for index in Nums'Range loop
-         Unique_Set.Include (Nums (index).Integer_Value);
-      end loop;
-
-      declare
-         Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
-         Unique_Index : Integer := 0;
-      begin
-         Set_Curs := Unique_Set.First;
-         while Has_Element (Set_Curs) loop
-            Unique_Index := Unique_Index + 1;
-            Unique_Array (Unique_Index) := Element (Set_Curs);
-            Next (Set_Curs);
-         end loop;
-         return Unique_Array;
-      end; --  declare block
-   end Unique_Integer_Array;
+--     function Unique_Integer_Array (Nums : Value_Data_Array)
+--                                    return Integer_Array is
+--        use Int_Sets;
+--        Unique_Set : Int_Sets.Set;
+--        Set_Curs   : Int_Sets.Cursor;
+--     begin
+--        for index in Nums'Range loop
+--           Unique_Set.Include (Nums (index).Integer_Value);
+--        end loop;
+--
+--        declare
+--           Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
+--           Unique_Index : Integer := 0;
+--        begin
+--           Set_Curs := Unique_Set.First;
+--           while Has_Element (Set_Curs) loop
+--              Unique_Index := Unique_Index + 1;
+--              Unique_Array (Unique_Index) := Element (Set_Curs);
+--              Next (Set_Curs);
+--           end loop;
+--           return Unique_Array;
+--        end; --  declare block
+--     end Unique_Integer_Array;
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array is
-      use Int_Sets;
-      Unique_Set : Int_Sets.Set;
-      Set_Curs   : Int_Sets.Cursor;
-   begin
-      for index in Nums'Range loop
-         Unique_Set.Include (Nums (index));
-      end loop;
-
-      declare
-         Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
-         Unique_Index : Integer := 0;
-      begin
-         Set_Curs := Unique_Set.First;
-         while Has_Element (Set_Curs) loop
-            Unique_Index := Unique_Index + 1;
-            Unique_Array (Unique_Index) := Element (Set_Curs);
-            Next (Set_Curs);
-         end loop;
-         return Unique_Array;
-      end;
-   end Unique_Integer_Array;
+--     function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array is
+--        use Int_Sets;
+--        Unique_Set : Int_Sets.Set;
+--        Set_Curs   : Int_Sets.Cursor;
+--     begin
+--        for index in Nums'Range loop
+--           Unique_Set.Include (Nums (index));
+--        end loop;
+--
+--        declare
+--           Unique_Array : Integer_Array (1 .. Integer (Unique_Set.Length));
+--           Unique_Index : Integer := 0;
+--        begin
+--           Set_Curs := Unique_Set.First;
+--           while Has_Element (Set_Curs) loop
+--              Unique_Index := Unique_Index + 1;
+--              Unique_Array (Unique_Index) := Element (Set_Curs);
+--              Next (Set_Curs);
+--           end loop;
+--           return Unique_Array;
+--        end;
+--     end Unique_Integer_Array;
 
    --  -------------------------------------------------------------------------
 

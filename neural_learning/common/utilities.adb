@@ -83,35 +83,35 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Feature_Array (Data    : Rows_Vector;
-                           Col_Num : Class_Range) return Value_Data_Array is
-      Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
-      UB_Feature : Unbounded_String;
-      Data_Kind  : Data_Type;
-   begin
-      for index in Data.First_Index .. Data.Last_Index loop
-         UB_Feature := Data.Element (index).Features (Col_Num);
-         Data_Kind := Get_Data_Type (UB_Feature);
-         declare
-            Feature   : Value_Record (Data_Kind);
-            Feature_S : constant String :=
-                          To_String (Data.Element (index).Features (Col_Num));
-         begin
-            case Feature.Value_Kind is
-               when Boolean_Type =>
-                  Feature.Boolean_Value := Boolean'Value (Feature_S);
-               when Float_Type =>
-                  Feature.Float_Value := Float'Value (Feature_S);
-               when Integer_Type =>
-                  Feature.Integer_Value := Integer'Value (Feature_S);
-               when UB_String_Type =>
-                  Feature.UB_String_Value := To_Unbounded_String (Feature_S);
-            end case;
-            Data_Array (index) := Feature;
-         end; --  declare block
-      end loop;
-      return Data_Array;
-   end Feature_Array;
+--     function Feature_Array (Data    : Rows_Vector;
+--                             Col_Num : Class_Range) return Value_Data_Array is
+--        Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
+--        UB_Feature : Unbounded_String;
+--        Data_Kind  : Data_Type;
+--     begin
+--        for index in Data.First_Index .. Data.Last_Index loop
+--           UB_Feature := Data.Element (index).Features (Col_Num);
+--           Data_Kind := Get_Data_Type (UB_Feature);
+--           declare
+--              Feature   : Value_Record (Data_Kind);
+--              Feature_S : constant String :=
+--                            To_String (Data.Element (index).Features (Col_Num));
+--           begin
+--              case Feature.Value_Kind is
+--                 when Boolean_Type =>
+--                    Feature.Boolean_Value := Boolean'Value (Feature_S);
+--                 when Float_Type =>
+--                    Feature.Float_Value := Float'Value (Feature_S);
+--                 when Integer_Type =>
+--                    Feature.Integer_Value := Integer'Value (Feature_S);
+--                 when UB_String_Type =>
+--                    Feature.UB_String_Value := To_Unbounded_String (Feature_S);
+--              end case;
+--              Data_Array (index) := Feature;
+--           end; --  declare block
+--        end loop;
+--        return Data_Array;
+--     end Feature_Array;
 
    --  ---------------------------------------------------------------------------
 
@@ -187,33 +187,33 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
-   function Label_Array (Data : Rows_Vector) return Value_Data_Array is
-      Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
-      UB_Label   : Unbounded_String;
-      Data_Kind  : Data_Type;
-   begin
-      for index in Data.First_Index .. Data.Last_Index loop
-         UB_Label := Data.Element (index).Label;
-         Data_Kind := Get_Data_Type (UB_Label);
-         declare
-            Label   : Value_Record (Data_Kind);
-            Label_S : constant String := To_String (Data.Element (index).Label);
-         begin
-            case Label.Value_Kind is
-               when Boolean_Type =>
-                  Label.Boolean_Value := Boolean'Value (Label_S);
-               when Float_Type =>
-                  Label.Float_Value := Float'Value (Label_S);
-               when Integer_Type =>
-                  Label.Integer_Value := Integer'Value (Label_S);
-               when UB_String_Type =>
-                  Label.UB_String_Value := Data.Element (index).Label;
-            end case;
-            Data_Array (index) := Label;
-         end; --  declare block
-      end loop;
-      return Data_Array;
-   end Label_Array;
+--     function Label_Array (Data : Rows_Vector) return Value_Data_Array is
+--        Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
+--        UB_Label   : Unbounded_String;
+--        Data_Kind  : Data_Type;
+--     begin
+--        for index in Data.First_Index .. Data.Last_Index loop
+--           UB_Label := Data.Element (index).Label;
+--           Data_Kind := Get_Data_Type (UB_Label);
+--           declare
+--              Label   : Value_Record (Data_Kind);
+--              Label_S : constant String := To_String (Data.Element (index).Label);
+--           begin
+--              case Label.Value_Kind is
+--                 when Boolean_Type =>
+--                    Label.Boolean_Value := Boolean'Value (Label_S);
+--                 when Float_Type =>
+--                    Label.Float_Value := Float'Value (Label_S);
+--                 when Integer_Type =>
+--                    Label.Integer_Value := Integer'Value (Label_S);
+--                 when UB_String_Type =>
+--                    Label.UB_String_Value := Data.Element (index).Label;
+--              end case;
+--              Data_Array (index) := Label;
+--           end; --  declare block
+--        end loop;
+--        return Data_Array;
+--     end Label_Array;
 
    --  ---------------------------------------------------------------------------
 
@@ -411,54 +411,54 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Print_Classification (Classification : Predictions_List) is
-      use Prediction_Data_Package;
-      Curs        : Cursor := Classification.First;
-      Data        : Prediction_Data;
-      Predictions : Unbounded_String;
-   begin
-      Put ("Classification:  {");
-      while Has_Element (Curs) loop
-         Data := Element (Curs);
-         Predictions := Predictions & "'" & To_String (Data.Label) &
-           "':" & Natural'Image (Data.Num_Copies);
-         if not (Curs = Classification.Last) then
-            Predictions := Predictions & ", ";
-         end if;
-         Next (Curs);
-      end loop;
-      Predictions := Predictions & "}";
-      Put_Line (To_String (Predictions));
-
-   exception
-      when others =>
-         Put_Line ("Print_Classification exception");
-         raise;
-   end Print_Classification;
+--     procedure Print_Classification (Classification : Predictions_List) is
+--        use Prediction_Data_Package;
+--        Curs        : Cursor := Classification.First;
+--        Data        : Prediction_Data;
+--        Predictions : Unbounded_String;
+--     begin
+--        Put ("Classification:  {");
+--        while Has_Element (Curs) loop
+--           Data := Element (Curs);
+--           Predictions := Predictions & "'" & To_String (Data.Label) &
+--             "':" & Natural'Image (Data.Num_Copies);
+--           if not (Curs = Classification.Last) then
+--              Predictions := Predictions & ", ";
+--           end if;
+--           Next (Curs);
+--        end loop;
+--        Predictions := Predictions & "}";
+--        Put_Line (To_String (Predictions));
+--
+--     exception
+--        when others =>
+--           Put_Line ("Print_Classification exception");
+--           raise;
+--     end Print_Classification;
 
    --  --------------------------------------------------------------------------
 
-   procedure Print_Leaf (Label_Counts : Predictions_List) is
-      use Prediction_Data_Package;
-      Count_Cursor : Cursor := Label_Counts.First;
-      Prediction   : Prediction_Data;
-      Total        : Natural := 0;
-   begin
-      Put_Line ("Predictions:");
-      while Has_Element (Count_Cursor) loop
-         Total := Total + Element (Count_Cursor).Num_Copies;
-         Next (Count_Cursor);
-      end loop;
-
-      Count_Cursor := Label_Counts.First;
-      while Has_Element (Count_Cursor) loop
-         Prediction := Element (Count_Cursor);
-         Put_Line  ("{'" & To_String (Prediction.Label) & "': '" &
-                      Integer'Image ((100 * Prediction.Num_Copies) / Total) &
-                      "%'}");
-         Next (Count_Cursor);
-      end loop;
-   end Print_Leaf;
+--     procedure Print_Leaf (Label_Counts : Predictions_List) is
+--        use Prediction_Data_Package;
+--        Count_Cursor : Cursor := Label_Counts.First;
+--        Prediction   : Prediction_Data;
+--        Total        : Natural := 0;
+--     begin
+--        Put_Line ("Predictions:");
+--        while Has_Element (Count_Cursor) loop
+--           Total := Total + Element (Count_Cursor).Num_Copies;
+--           Next (Count_Cursor);
+--        end loop;
+--
+--        Count_Cursor := Label_Counts.First;
+--        while Has_Element (Count_Cursor) loop
+--           Prediction := Element (Count_Cursor);
+--           Put_Line  ("{'" & To_String (Prediction.Label) & "': '" &
+--                        Integer'Image ((100 * Prediction.Num_Copies) / Total) &
+--                        "%'}");
+--           Next (Count_Cursor);
+--        end loop;
+--     end Print_Leaf;
 
    --  -------------------------------------------------------------------------
 
@@ -483,33 +483,33 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
-   function Prediction_String (Label_Counts : Predictions_List)
-                               return String is
-      use Prediction_Data_Package;
-      Count_Cursor : Cursor := Label_Counts.First;
-      Prediction   : Prediction_Data;
-      Total        : Natural := 0;
-      Leaf_Data    : Unbounded_String := To_Unbounded_String
-        ("{'");
-   begin
-      while Has_Element (Count_Cursor) loop
-         Total := Total + Element (Count_Cursor).Num_Copies;
-         Next (Count_Cursor);
-      end loop;
-      Count_Cursor := Label_Counts.First;
-      while Has_Element (Count_Cursor) loop
-         Prediction := Element (Count_Cursor);
-         Leaf_Data := Leaf_Data & To_Unbounded_String
-           (To_String (Prediction.Label) & "': '" &
-              Integer'Image ((100 * Prediction.Num_Copies) / Total) &
-              "%'");
-         if Count_Cursor /= Label_Counts.Last then
-            Leaf_Data := Leaf_Data & ", ";
-         end if;
-         Next (Count_Cursor);
-      end loop;
-      return To_String (Leaf_Data) & "}";
-   end Prediction_String;
+--     function Prediction_String (Label_Counts : Predictions_List)
+--                                 return String is
+--        use Prediction_Data_Package;
+--        Count_Cursor : Cursor := Label_Counts.First;
+--        Prediction   : Prediction_Data;
+--        Total        : Natural := 0;
+--        Leaf_Data    : Unbounded_String := To_Unbounded_String
+--          ("{'");
+--     begin
+--        while Has_Element (Count_Cursor) loop
+--           Total := Total + Element (Count_Cursor).Num_Copies;
+--           Next (Count_Cursor);
+--        end loop;
+--        Count_Cursor := Label_Counts.First;
+--        while Has_Element (Count_Cursor) loop
+--           Prediction := Element (Count_Cursor);
+--           Leaf_Data := Leaf_Data & To_Unbounded_String
+--             (To_String (Prediction.Label) & "': '" &
+--                Integer'Image ((100 * Prediction.Num_Copies) / Total) &
+--                "%'");
+--           if Count_Cursor /= Label_Counts.Last then
+--              Leaf_Data := Leaf_Data & ", ";
+--           end if;
+--           Next (Count_Cursor);
+--        end loop;
+--        return To_String (Leaf_Data) & "}";
+--     end Prediction_String;
 
    --  -------------------------------------------------------------------------
 

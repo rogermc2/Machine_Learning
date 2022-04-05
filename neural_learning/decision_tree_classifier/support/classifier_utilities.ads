@@ -21,7 +21,7 @@ package Classifier_Utilities is
                      return Natural_List;
     function Bin_Count (Numbers : Natural_List) return Natural_List;
     function Bin_Count (Numbers : Value_Data_List) return Natural_List;
-    procedure Clear (anArray : in out Value_Data_Array);
+--      procedure Clear (anArray : in out Value_Data_Array);
     function Compare_Float_Lists (L, R : Float_List) return Boolean;
 --      function Count_Samples (aClassifier : Base_Decision_Tree.Classifier)
 --                             return Natural;
@@ -76,9 +76,9 @@ package Classifier_Utilities is
 --      function Traverse_Tree (Current_Node : Tree.Tree_Cursor)
 --                             return Tree.Tree_Cursor;
     function Unique (Nums : Integer_List) return Integer_List;
-    function Unique_Integer_Array (Nums : Value_Data_Array)
-                                   return Integer_Array;
-    function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
+--      function Unique_Integer_Array (Nums : Value_Data_Array)
+--                                     return Integer_Array;
+--      function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
     function Unique_Weights (Values : Weights.Weight_Lists_2D)
                              return Weights.Weight_List;
 

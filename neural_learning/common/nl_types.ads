@@ -195,16 +195,16 @@ package NL_Types is
      Ada.Containers.Vectors (Positive, Value_Data_Lists_2D);
    subtype Value_Data_Lists_3D is Value_Lists_3D_Package.Vector;
 
-   type Value_Data_Array is array (Positive range <>) of Value_Record;
-   type Value_Data_Array_2D is array (Positive range <>, Positive range <>)
-     of Value_Record;
-   type Value_Data_Array_3D is array
-     (Positive range <>, Positive range <>, Positive range <>)
-     of Value_Record;
-
-   package Count_Package is new Ada.Containers.Ordered_Maps
-     (Data_Type, Natural);
-   subtype Count_Map is Count_Package.Map;
+--     type Value_Data_Array is array (Positive range <>) of Value_Record;
+--     type Value_Data_Array_2D is array (Positive range <>, Positive range <>)
+--       of Value_Record;
+--     type Value_Data_Array_3D is array
+--       (Positive range <>, Positive range <>, Positive range <>)
+--       of Value_Record;
+--
+--     package Count_Package is new Ada.Containers.Ordered_Maps
+--       (Data_Type, Natural);
+--     subtype Count_Map is Count_Package.Map;
 
    package Boolean_Label_Map_Package is new Ada.Containers.Ordered_Maps
      (Boolean, Natural);
@@ -229,14 +229,14 @@ package NL_Types is
       UB_String_Map : UB_Label_Map;
    end record;
 
-   type Prediction_Data is record
-      Label      : Unbounded_String;
-      Num_Copies : Natural := 1;
-   end record;
-
-   package Prediction_Data_Package is new
-     Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
-   subtype Predictions_List is Prediction_Data_Package.List;
+--     type Prediction_Data is record
+--        Label      : Unbounded_String;
+--        Num_Copies : Natural := 1;
+--     end record;
+--
+--     package Prediction_Data_Package is new
+--       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
+--     subtype Predictions_List is Prediction_Data_Package.List;
 
    package Indefinite_String_Package is new
      Ada.Containers.Indefinite_Doubly_Linked_Lists (String);
@@ -273,23 +273,6 @@ package NL_Types is
       Feature_Values : Value_Data_Lists_2D;
       Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
    end record;
-
---     type Raw_Question is record
---        Feature_Name  : Feature_Name_Type;  --  e.g. "Colour"
---        Feature_Value : Unbounded_String;  --  e.g. "Green"
---     end record;
---
---     type Question_Data (Feature_Kind : Data_Type := Integer_Type) is record
---        Feature_Name : Feature_Name_Type := To_Unbounded_String ("");
---        Gain         : Float := 0.0;
---        case Feature_Kind is
---           when Integer_Type => Integer_Value     : Integer := 0;
---           when Float_Type => Float_Value         : Float := 0.0;
---           when Boolean_Type => Boolean_Value     : Boolean := False;
---           when UB_String_Type => UB_String_Value : Unbounded_String :=
---                                                         To_Unbounded_String ("");
---        end case;
---     end record;
 
    type Partitioned_Rows is record
       True_Rows  : Rows_Vector;

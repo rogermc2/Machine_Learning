@@ -30,9 +30,9 @@ package Utilities is
    Utilities_Exception : exception;
 
    procedure Check_Rows (Rows : in out Rows_Vector);
-   function Feature_Array (Data    : Rows_Vector;
-                           Col_Num : Class_Range)
-                            return Value_Data_Array;
+--     function Feature_Array (Data    : Rows_Vector;
+--                             Col_Num : Class_Range)
+--                              return Value_Data_Array;
    function Get_Column (List_2D      : Value_Data_Lists_2D;
                         Column_Index : Positive)
                          return Value_Data_List;
@@ -40,8 +40,8 @@ package Utilities is
    function Is_Boolean (Item : Unbounded_String) return Boolean;
    function Is_Float (Item : Unbounded_String) return Boolean;
    function Is_Integer (Item : Unbounded_String) return Boolean;
-   function Label_Array (Data : Rows_Vector)
-                          return  Value_Data_Array;
+--     function Label_Array (Data : Rows_Vector)
+--                            return  Value_Data_Array;
    function Load_Raw_CSV_Data (Data_File : File_Type)
                                 return Raw_Data_Vector;
    function Number_Of_Features (Rows : Rows_Vector)
@@ -60,9 +60,9 @@ package Utilities is
    function Permute (aList : Float_List_2D)
                       return Float_List_3D;
    pragma Inline (Permute);
-   function Prediction_String (Label_Counts : Predictions_List)
-                                return String;
-   procedure Print_Classification (Classification : Predictions_List);
+--     function Prediction_String (Label_Counts : Predictions_List)
+--                                  return String;
+--     procedure Print_Classification (Classification : Predictions_List);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range);
    procedure Print_Feature_Types
@@ -71,7 +71,7 @@ package Utilities is
    procedure Print_Integer_Pairs (Message : String; Pairs : Integer_Pair_List);
    procedure Print_Label_Types
      (Message : String; theTypes : Classifier_Utilities.Label_Type_Array);
-   procedure Print_Leaf (Label_Counts : Predictions_List);
+--     procedure Print_Leaf (Label_Counts : Predictions_List);
    procedure Print_Row (Message : String; aRow : Row_Data);
    procedure Print_Row (Message    : String; Rows : Rows_Vector;
                         Row_Number : Positive);

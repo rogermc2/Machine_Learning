@@ -7,8 +7,6 @@ package Support_4 is
 
    function Get_State
      (Dataset_Name : String;
-      --        X_Indices    : out Integer_List;
-      --        Y_Indices    : out Integer_List;
       Train_X      : out Float_List_2D;
       Train_Y      : out Integer_List;
       Test_X       : out Float_List_2D;
