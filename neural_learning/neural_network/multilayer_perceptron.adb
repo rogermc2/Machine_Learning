@@ -584,6 +584,7 @@ package body Multilayer_Perceptron is
                      " clipped to" & Integer'Image (Num_Samples));
          Batch_Size := Num_Samples;
       end if;
+      Put_Line (Routine_Name & "Batch size" & Integer'Image (Batch_Size));
 
       --  L628
       --        Put_Line (Routine_Name & "Batch_Size: " & Integer'Image(Batch_Size));
@@ -601,6 +602,8 @@ package body Multilayer_Perceptron is
          --  L636
          --  Batch loop time 5.5 sec
          Batch_Start_Time := Clock;
+         Put_Line (Routine_Name & "Batches size" &
+                     Count_Type'Image (Batches.Length));
          for batch_index in Batches.First_Index .. Batches.Last_Index loop
             --  Time per batch loop iteration 200ms
             Batch_Slice := Batches (batch_index);            X_Batch.Clear;
@@ -611,10 +614,6 @@ package body Multilayer_Perceptron is
                Y_Batch.Append (Y (index));
             end loop;
 
-            --              Put_Line (Routine_Name & "Deltas length: " &
-            --                          Count_Type'Image (Deltas.Length));
-            --              Put_Line (Routine_Name & "Activations length: " &
-            --                          Count_Type'Image (Activations (1).Length));
             Activations.Replace_Element (Activations.First_Index, X_Batch);
 
             --  L645

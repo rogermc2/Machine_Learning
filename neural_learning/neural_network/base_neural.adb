@@ -13,6 +13,7 @@ package body Base_Neural is
    EPS : constant Float := Float'Small;
 
    function X_Log_Y (X, Y : Float) return Float;
+   pragma Inline (X_Log_Y);
 
    --  -------------------------------------------------------------------------
 
