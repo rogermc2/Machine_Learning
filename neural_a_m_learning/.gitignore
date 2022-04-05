@@ -1,0 +1,24 @@
+*.adb1
+*.ads1
+*.orig
+*.pdf
+*.csv
+*.o
+*.obj
+*.a
+*.ali
+*.dot
+*.json
+*.stderr
+*.stdout
+*.cswi
+*.bexch
+*.xml
+*.db
+*.db*
+*.cgpr
+*.DS_Store
+b__*
+.#*
+sklearn
+access token.txt
