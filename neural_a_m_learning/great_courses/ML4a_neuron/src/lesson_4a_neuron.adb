@@ -39,16 +39,18 @@ begin
     Put_Line (Routine_Name);
     if not Get_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y, Bunch)
     then
-        X := Bunch.Data;
-        Y := Bunch.Target;
+      declare
+         X : Float_Matrix := To_Float_Matrix (Bunch.Data);
+         Y : Integer_Array := To_Integer_Array (Bunch.Target);
+      begin
 --          Num_Samples := Positive (X.Length);
 
-        Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Positive (X.Length)));
-        Assert (X.Length > 0, Routine_Name & "X is empty.");
+        Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Positive (X'Length)));
+        Assert (X'Length > 0, Routine_Name & "X is empty.");
 
-        Assert (Natural (Y.Length) = Positive (X.Length), Routine_Name &
-                  "Y length" & Count_Type'Image (Y.Length) &
-                  " is different to X length" & Natural'Image (Positive (X.Length)));
+        Assert (Natural (Y'Length) = Positive (X'Length), Routine_Name &
+                  "Y length" & Count_Type'Image (Y'Length) &
+                  " is different to X length" & Natural'Image (Positive (X'Length)));
         --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
         Put_Line (Routine_Name & "permuting");
@@ -61,11 +63,12 @@ begin
         Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                         Test_X, Test_Y, Train_X, Train_Y);
         Put_Line ("Requested train size: " & Integer'Image (Train_Size));
-        Put_Line ("Train data length: " & Count_Type'Image (Train_X.Length));
+        Put_Line ("Train data length: " & Count_Type'Image (Train_X'Length));
         X.Clear;
         Y.Clear;
         Save_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y,
                     Bunch);
+        end;  --  declare
     end if;
 
     --     if not Get_Classifier (Dataset_Name, aClassifier) then

@@ -3,14 +3,16 @@ with Ada.Directories;
 with Ada.Streams.Stream_IO;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with NL_Types;
+
 package body Support_4 is
 
    function Get_State
      (Dataset_Name : String;
-      Train_X      : out Float_List_2D;
-      Train_Y      : out Integer_List;
-      Test_X       : out Float_List_2D;
-      Test_Y       : out Integer_List;
+      Train_X      : out Float_Matrix;
+      Train_Y      : out Integer_Array;
+      Test_X       : out Float_Matrix;
+      Test_Y       : out Integer_Array;
       Bunch        : out Openml_Ada.Bunch_Data)
       return Boolean is
       use Ada.Directories;
@@ -21,7 +23,7 @@ package body Support_4 is
       Save_File      : constant String := Dataset_Name & ".oml";
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
-      Target_Columns : String_List;
+      Target_Columns : NL_Types.String_List;
       File_ID        : Stream_IO.File_Type;
       aStream        : Stream_Access;
       As_Frame       : Openml_Ada.As_Frame_State := Openml_Ada.As_Frame_False;
@@ -31,10 +33,10 @@ package body Support_4 is
 
          Open (File_ID, In_File, State_File);
          aStream := Stream (File_ID);
-         Float_List_2D'Read (aStream, Train_X);
-         Integer_List'Read (aStream, Train_Y);
-         Float_List_2D'Read (aStream, Test_X);
-         Integer_List'Read (aStream, Test_Y);
+         Float_Matrix'Read (aStream, Train_X);
+         Integer_Array'Read (aStream, Train_Y);
+         Float_Matrix'Read (aStream, Test_X);
+         Integer_Array'Read (aStream, Test_Y);
          Openml_Ada.Bunch_Data'Read (aStream, Bunch);
          Close (File_ID);
          pragma Unreferenced (File_ID);
@@ -44,8 +46,6 @@ package body Support_4 is
          Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
                                   Save_File_Name    => Save_File,
                                   Target_Columns     => Target_Columns,
---                                    X_Indices         => X_Indices,
---                                    Y_Indices         => Y_Indices,
                                   Bunch             => Bunch,
                                   As_Frame          => As_Frame);
       end if;
@@ -89,10 +89,10 @@ package body Support_4 is
 
    procedure Save_State
      (Dataset_Name : String;
-      Train_X      : Float_List_2D;
-      Train_Y      : Integer_List;
-      Test_X       : Float_List_2D;
-      Test_Y       : Integer_List;
+      Train_X      : Float_Matrix;
+      Train_Y      : Integer_Array;
+      Test_X       : Float_Matrix;
+      Test_Y       : Integer_Array;
       Save_Bunch   : Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
@@ -103,13 +103,14 @@ package body Support_4 is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      Float_List_2D'Write (aStream, Train_X);
-      Integer_List'Write (aStream, Train_Y);
-      Float_List_2D'Write (aStream, Test_X);
-      Integer_List'Write (aStream, Test_Y);
+      Float_Matrix'Write (aStream, Train_X);
+      Integer_Array'Write (aStream, Train_Y);
+      Float_Matrix'Write (aStream, Test_X);
+      Integer_Array'Write (aStream, Test_Y);
       Openml_Ada.Bunch_Data'Write (aStream, Save_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);
+
    end Save_State;
 
    --  -------------------------------------------------------------------------
@@ -129,6 +130,7 @@ package body Support_4 is
       Multilayer_Perceptron.MLP_Classifier'Write (aStream, Classifier);
       Close (File_ID);
       pragma Unreferenced (File_ID);
+
    end Save_Classifier;
 
 end Support_4;
