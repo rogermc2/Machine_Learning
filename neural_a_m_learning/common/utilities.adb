@@ -83,38 +83,6 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Feature_Array (Data    : Rows_Vector;
---                             Col_Num : Class_Range) return Value_Data_Array is
---        Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
---        UB_Feature : Unbounded_String;
---        Data_Kind  : Data_Type;
---     begin
---        for index in Data.First_Index .. Data.Last_Index loop
---           UB_Feature := Data.Element (index).Features (Col_Num);
---           Data_Kind := Get_Data_Type (UB_Feature);
---           declare
---              Feature   : Value_Record (Data_Kind);
---              Feature_S : constant String :=
---                            To_String (Data.Element (index).Features (Col_Num));
---           begin
---              case Feature.Value_Kind is
---                 when Boolean_Type =>
---                    Feature.Boolean_Value := Boolean'Value (Feature_S);
---                 when Float_Type =>
---                    Feature.Float_Value := Float'Value (Feature_S);
---                 when Integer_Type =>
---                    Feature.Integer_Value := Integer'Value (Feature_S);
---                 when UB_String_Type =>
---                    Feature.UB_String_Value := To_Unbounded_String (Feature_S);
---              end case;
---              Data_Array (index) := Feature;
---           end; --  declare block
---        end loop;
---        return Data_Array;
---     end Feature_Array;
-
-   --  ---------------------------------------------------------------------------
-
    function Get_Data_Type (Data : Unbounded_String) return Data_Type is
       theType   : Data_Type;
       aString   : constant String := To_String (Data);
@@ -187,36 +155,6 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
---     function Label_Array (Data : Rows_Vector) return Value_Data_Array is
---        Data_Array : Value_Data_Array (Data.First_Index .. Data.Last_Index);
---        UB_Label   : Unbounded_String;
---        Data_Kind  : Data_Type;
---     begin
---        for index in Data.First_Index .. Data.Last_Index loop
---           UB_Label := Data.Element (index).Label;
---           Data_Kind := Get_Data_Type (UB_Label);
---           declare
---              Label   : Value_Record (Data_Kind);
---              Label_S : constant String := To_String (Data.Element (index).Label);
---           begin
---              case Label.Value_Kind is
---                 when Boolean_Type =>
---                    Label.Boolean_Value := Boolean'Value (Label_S);
---                 when Float_Type =>
---                    Label.Float_Value := Float'Value (Label_S);
---                 when Integer_Type =>
---                    Label.Integer_Value := Integer'Value (Label_S);
---                 when UB_String_Type =>
---                    Label.UB_String_Value := Data.Element (index).Label;
---              end case;
---              Data_Array (index) := Label;
---           end; --  declare block
---        end loop;
---        return Data_Array;
---     end Label_Array;
-
-   --  ---------------------------------------------------------------------------
-
    function Load_Raw_CSV_Data (Data_File : File_Type)
                                return Raw_Data_Vector is
       use String_Package;
@@ -260,59 +198,54 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Pair_Items (A, B : Float_List) return Float_Pair_List is
+   function Pair_Items (A, B : Float_Array) return Float_Pair_List is
       Item   : Float_Pair;
       Result : Float_Pair_List;
    begin
-      for index in A.First_Index .. A.Last_Index loop
-         Item := (A.Element (index), B.Element (index));
+      for index in A'First .. A'Last loop
+         Item := (A (index), B (index));
          Result.Append (Item);
       end loop;
+
       return Result;
 
    end Pair_Items;
 
    --  --------------------------------------------------------------------------
 
-   function Pair_Items (a, b : Integer_List) return Integer_Pair_List is
+   function Pair_Items (a, b : Integer_Array) return Integer_Pair_List is
       Item   : Integer_Pair;
       Result : Integer_Pair_List;
    begin
-      for index in a.First_Index .. a.Last_Index loop
-         Item := (a.Element (index), b.Element (index));
+      for index in a'First .. a'Last loop
+         Item := (a (index), b (index));
          Result.Append (Item);
       end loop;
+
       return Result;
 
    end Pair_Items;
 
    --  --------------------------------------------------------------------------
 
-   procedure Permute (aList : in out Integer_List) is
-      use Integer_Package;
-      List_Length  : constant Positive := Positive (aList.Length);
-      Curs_1       : Cursor := aList.First;
-      Curs_2       : Cursor := aList.First;
+   procedure Permute (aList : in out Integer_Array) is
+      List_Length  : constant Positive := Positive (aList'Length);
+      Index_2      : Natural;
       Rand         : Positive;
-      Index        : Natural := 0;
-      Index_2      : Natural := 0;
    begin
       if List_Length > 1 then
-         while Has_Element (Curs_1) loop
-            Index := Index + 1;
-            Rand := index +
-              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
-            Curs_2 := Next (Curs_1);
+         for row in aList'First .. aList'Last loop
+            Rand := row +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - row));
             Index_2 := 0;
-            while Has_Element (Curs_2) and then Index_2 < Rand loop
+            while Index_2 <= aList'Last and then Index_2 < Rand loop
                Index_2 := Index_2 + 1;
-               Curs_2 := Next (Curs_2);
             end loop;
 
-            if Has_Element (Curs_2) then
-               Swap (aList, Curs_1, Curs_2);
+            if Index_2 <= aList'Last then
+               Swap (aList, row, Index_2);
             end if;
-            Next (Curs_1);
+
          end loop;
       end if;
 
@@ -352,10 +285,10 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Float_List_2D) return Float_List_2D is
-      List_Length  : constant Positive := Positive (aList.Length);
+   function Permute (aList : Float_Matrix) return Float_Matrix is
+      List_Length  : constant Positive := Positive (aList'Length);
       Rand         : Positive;
-      Permutation  : Float_List_2D := aList;
+      Permutation  : Float_Matrix := aList;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -371,94 +304,43 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Float_List_2D) return Float_List_3D is
-      List_Length  : constant Positive := Positive (aList.Length);
-      Permutation  : Float_List_2D := aList;
-      Permutations : Float_List_3D;
-
-      procedure Recurse (K : Positive; A : in out Float_List_2D) is
-      begin
-         if K > 1 then
-            --  Generate permutations with k-th element unaltered
-            Recurse (K - 1, A);
-            --  Generate permutations for k-th element swapped with each
-            --  k-1 first element
-            for index in 1 .. K - 1 loop
-               if K mod 2 = 0 then
-                  Swap (A, index, K);
-               else
-                  Swap (A, A.First_Index, K);
-               end if;
-
-               Recurse (K - 1, A);
-            end loop;
-         else
-            Permutations.Append (A);
-         end if;
-
-      end Recurse;
-      pragma Inline (Recurse);
-
-   begin
-      if List_Length > 1 then
-         Recurse (List_Length, Permutation);
-      else
-         Permutations.Append (Permutation);
-      end if;
-
-      return Permutations;
-   end Permute;
-
-   --  -------------------------------------------------------------------------
-
---     procedure Print_Classification (Classification : Predictions_List) is
---        use Prediction_Data_Package;
---        Curs        : Cursor := Classification.First;
---        Data        : Prediction_Data;
---        Predictions : Unbounded_String;
---     begin
---        Put ("Classification:  {");
---        while Has_Element (Curs) loop
---           Data := Element (Curs);
---           Predictions := Predictions & "'" & To_String (Data.Label) &
---             "':" & Natural'Image (Data.Num_Copies);
---           if not (Curs = Classification.Last) then
---              Predictions := Predictions & ", ";
+--     function Permute (aList : Float_List_2D) return Float_List_3D is
+--        List_Length  : constant Positive := Positive (aList.Length);
+--        Permutation  : Float_List_2D := aList;
+--        Permutations : Float_List_3D;
+--
+--        procedure Recurse (K : Positive; A : in out Float_List_2D) is
+--        begin
+--           if K > 1 then
+--              --  Generate permutations with k-th element unaltered
+--              Recurse (K - 1, A);
+--              --  Generate permutations for k-th element swapped with each
+--              --  k-1 first element
+--              for index in 1 .. K - 1 loop
+--                 if K mod 2 = 0 then
+--                    Swap (A, index, K);
+--                 else
+--                    Swap (A, A.First_Index, K);
+--                 end if;
+--
+--                 Recurse (K - 1, A);
+--              end loop;
+--           else
+--              Permutations.Append (A);
 --           end if;
---           Next (Curs);
---        end loop;
---        Predictions := Predictions & "}";
---        Put_Line (To_String (Predictions));
 --
---     exception
---        when others =>
---           Put_Line ("Print_Classification exception");
---           raise;
---     end Print_Classification;
-
-   --  --------------------------------------------------------------------------
-
---     procedure Print_Leaf (Label_Counts : Predictions_List) is
---        use Prediction_Data_Package;
---        Count_Cursor : Cursor := Label_Counts.First;
---        Prediction   : Prediction_Data;
---        Total        : Natural := 0;
+--        end Recurse;
+--        pragma Inline (Recurse);
+--
 --     begin
---        Put_Line ("Predictions:");
---        while Has_Element (Count_Cursor) loop
---           Total := Total + Element (Count_Cursor).Num_Copies;
---           Next (Count_Cursor);
---        end loop;
+--        if List_Length > 1 then
+--           Recurse (List_Length, Permutation);
+--        else
+--           Permutations.Append (Permutation);
+--        end if;
 --
---        Count_Cursor := Label_Counts.First;
---        while Has_Element (Count_Cursor) loop
---           Prediction := Element (Count_Cursor);
---           Put_Line  ("{'" & To_String (Prediction.Label) & "': '" &
---                        Integer'Image ((100 * Prediction.Num_Copies) / Total) &
---                        "%'}");
---           Next (Count_Cursor);
---        end loop;
---     end Print_Leaf;
+--        return Permutations;
+--     end Permute;
 
    --  -------------------------------------------------------------------------
 
@@ -738,24 +620,25 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out Float_List_2D;
+   procedure Swap (Data : in out Float_Matrix;
                    L, R : Positive) is
-      Item : Float_List;
+      Item : Float_Array;
    begin
-      Item := Data.Element (L);
-      Data.Replace_Element (L, Data.Element (R));
-      Data.Replace_Element (R, Item);
+      Item := Data (L);
+      Data (L) := Data (R);
+      Data (R) := Item;
    end Swap;
 
    --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out Integer_List;
+   procedure Swap (Data : in out Integer_Array;
                    L, R : Positive) is
       Item : Integer;
    begin
-      Item := Data.Element (L);
-      Data.Replace_Element (L, Data.Element (R));
-      Data.Replace_Element (R, Item);
+      Item := Data (L);
+      Data (L) := Data (R);
+      Data (R) := Item;
+
    end Swap;
 
    --  -------------------------------------------------------------------------
