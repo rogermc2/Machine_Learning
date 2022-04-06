@@ -619,14 +619,16 @@ package body Utilities is
    end Split_String;
 
    --  -------------------------------------------------------------------------
-
-   procedure Swap (Data : in out Float_Matrix;
-                   L, R : Positive) is
-      Item : Float_Array;
+   --  Swap swaps matrix rows
+   procedure Swap (Data : in out Float_Matrix; L, R : Positive) is
+      Val : Float;
    begin
-      Item := Data (L);
-      Data (L) := Data (R);
-      Data (R) := Item;
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
+
    end Swap;
 
    --  -------------------------------------------------------------------------
