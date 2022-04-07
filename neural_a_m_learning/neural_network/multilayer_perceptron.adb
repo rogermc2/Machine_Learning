@@ -44,7 +44,6 @@ with Maths;
 --  with Utilities;
 
 with Base_Mix;
-with Classifier_Utilities;
 with Data_Splitter2;
 --  with Encode_Utils;
 with Label;
@@ -103,13 +102,11 @@ package body Multilayer_Perceptron is
                        Deltas      : in out Matrix_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
-      use Ada.Containers;
       use Base_Neural;
       use NL_Types.Float_Package;
-      use Classifier_Utilities;
       --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
-      Y_Float            : Float_Matrix := To_Float_Matrix (Y);
+      Y_Float            : constant Float_Matrix := To_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function;
       S_List             : Parameters_Record;
       Ravel              : NL_Types.Float_List;
@@ -207,13 +204,13 @@ package body Multilayer_Perceptron is
       --  L310 loop elapsed time insignificant
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          declare
-            Dot_L : Float_Matrix := Deltas (index);
-            Dot_R : Float_Matrix :=
+            Dot_L : constant Float_Matrix := Deltas (index);
+            Dot_R : constant Float_Matrix :=
                       To_Float_Matrix
                         (Self.Attributes.Params (index).Coeff_Params);
          begin
             Deltas (index - 1) :=
-              Dot (Dot_L, Transpose (Dot_R);
+              Dot (Dot_L, Transpose (Dot_R));
 
             case Self.Parameters.Activation is
             when Identity_Activation => null;
@@ -310,10 +307,13 @@ package body Multilayer_Perceptron is
       use NL_Types.Float_List_Package;
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      Delta_M      : Float_Matrix := Deltas (Layer);
       Delta_Act    : Float_Matrix
-        (Deltas (Layer)'First .. Deltas (Layer)'Last,
-         Deltas (Layer)'First (2) .. Deltas (Layer)'Last (2));
-      Delta_Mean   : Float_Array (Deltas (Layer)'First .. Deltas (Layer)'Last);
+        (Delta_M'First .. Delta_M'Last,
+         Delta_M'First (2) .. Delta_M'Last (2));
+      Delta_Mean   : Float_Array (Delta_M'First .. Delta_M'Last);
+      Coeffs       : Float_Matrix := To_Float_Matrix
+                        (Self.Attributes.Params (Layer).Coeff_Params);
    begin
       --        Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
       --        Put_Line (Routine_Name & "Deltas (Layer) length" &
@@ -341,8 +341,7 @@ package body Multilayer_Perceptron is
 
       --  Grad.Coeff_Params is a 2D list of fan_in x fan_out lists
       Grads (layer).Coeff_Params :=
-        (Delta_Act + Self.Parameters.Alpha *
-           Self.Attributes.Params (Layer).Coeff_Params);
+        (Delta_Act + Self.Parameters.Alpha * Coeffs);
 
       Grads (layer).Coeff_Params :=
         Grads (layer).Coeff_Params / Float (Num_Samples);
@@ -366,7 +365,7 @@ package body Multilayer_Perceptron is
       Activations        : Matrix_List;
       Deltas             : Matrix_List;
       Y_2D               : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
-      Y_Col              : Integer_Array;
+      Y_Col              : Integer_Array (1 .. Num_Samples);
       Hidden_Layer_Sizes : constant Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
       Layer_Units        : Integer_List;
