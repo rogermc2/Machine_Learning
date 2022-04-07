@@ -1,7 +1,11 @@
 
+with Ada.Containers.Indefinite_Vectors;
+
 with NL_Types; use NL_Types;
 
 package NL_Arrays_And_Matrices is
+
+   subtype Safe_Float is Float range Float'Range;
 
    type Float_Array is array (Integer range <>) of Float;
    type Integer_Array is array (Integer range <>) of Integer;
@@ -9,7 +13,9 @@ package NL_Arrays_And_Matrices is
    type Float_Matrix is array (Integer range <>, Integer range <>) of Float;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
 
-   subtype Safe_Float is Float range Float'Range;
+   package Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Float_Matrix);
+   subtype Matrix_List is Matrix_List_Package.Vector;
 
    function "*" (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline ("*");

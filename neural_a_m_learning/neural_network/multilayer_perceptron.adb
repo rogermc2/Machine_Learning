@@ -74,12 +74,12 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
-                             Activations  : in out NL_Types.Float_List_3D;
-                             Deltas       : in out NL_Types.Float_List_3D;
+                             Activations  : in out Matrix_List;
+                             Deltas       : in out Matrix_List;
                              Grads        : in out Parameters_List;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
-                           Activations  : in out NL_Types.Float_List_3D);
+                           Activations  : in out Matrix_List);
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    procedure Init_Coeff (Self            : in out MLP_Classifier;
@@ -99,8 +99,8 @@ package body Multilayer_Perceptron is
    procedure Backprop (Self        : in out MLP_Classifier;
                        X           : Float_Matrix;
                        Y           : Integer_Matrix;
-                       Activations : in out NL_Types.Float_List_3D;
-                       Deltas      : in out NL_Types.Float_List_3D;
+                       Activations : in out Matrix_List;
+                       Deltas      : in out NL_Arrays_And_Matrices.Matrix_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
       use Ada.Containers;
@@ -295,8 +295,8 @@ package body Multilayer_Perceptron is
      (Self        : MLP_Classifier;
       Layer       : Positive;
       Num_Samples : Positive;
-      Activations : NL_Types.Float_List_3D;
-      Deltas      : NL_Types.Float_List_3D;
+      Activations : Matrix_List;
+      Deltas      : Matrix_List;
       Grads       : in out Parameters_List) is
       use Ada.Containers;
       use NL_Types.Float_List_Package;
@@ -353,8 +353,8 @@ package body Multilayer_Perceptron is
       Num_Samples        : constant Positive := Positive (X'Length);
       Num_Features       : constant Positive := Positive (X'Length (2));
       --  The ith element of Activations holds the values of the ith layer.
-      Activations        : Float_List_3D;
-      Deltas             : Float_List_3D;
+      Activations        : Matrix_List;
+      Deltas             : Matrix_List;
       Y_2D               : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
       Y_Col              : Integer_Array;
       Hidden_Layer_Sizes : constant Integer_List :=
@@ -458,10 +458,10 @@ package body Multilayer_Perceptron is
 
    --  L563
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
-                             X            : Float_List_2D;
-                             Y            : Integer_List_2D;
-                             Activations  : in out Float_List_3D;
-                             Deltas       : in out Float_List_3D;
+                             X            : Float_Matrix;
+                             Y            : Integer_Array;
+                             Activations  : in out Matrix_List;
+                             Deltas       : in out Matrix_List;
                              Grads        : in out Parameters_List;
                              Incremental  : Boolean := False) is
       use Ada.Containers;
@@ -470,7 +470,7 @@ package body Multilayer_Perceptron is
                                  "Multilayer_Perceptron.Fit_Stochastic ";
       Is_Classifier          : constant Boolean :=
                                  Self.Estimator_Kind = Classifier_Estimator;
-      Num_Samples            : constant Positive := Positive (X.Length);
+      Num_Samples            : constant Positive := Positive (X'Length);
       LE_U                   : Label.Label_Encoder (Label.Class_Unique);
       Iter                   : Natural := 0;
       Continue               : Boolean := True;
@@ -482,16 +482,16 @@ package body Multilayer_Perceptron is
       Train_Size             : constant Positive := Num_Samples - Test_Size;
       --  Stratify         : Integer_List_2D;
       --  Should_Stratify  : Boolean;
-      Train_X                : Float_List_2D;
-      Train_Y                : Integer_List_2D;
-      Test_X                 : Float_List_2D;
-      Test_Y                 : Integer_List_2D;
+      Train_X                : Float_Matrix;
+      Train_Y                : Integer_Matrix;
+      Test_X                 : Float_Matrix;
+      Test_Y                 : Integer_Matrix;
       Batch_Size             : Positive;
       Accumulated_Loss       : Float := 0.0;
       Batches                : Slices_List;
       Batch_Slice            : Slice_Record;
-      X_Batch                : Float_List_2D;
-      Y_Batch                : Integer_List_2D;
+      X_Batch                : Float_Matrix;
+      Y_Batch                : Integer_Matrix;
       Batch_Loss             : Float;
       Msg                    : Unbounded_String;
       Is_Stopping            : Boolean := False;
@@ -704,14 +704,12 @@ package body Multilayer_Perceptron is
    --  computing the values of the neurons in the hidden layers and the
    --  output layer.
    procedure Forward_Pass (Self         : MLP_Classifier;
-                           Activations  : in out Float_List_3D) is
+                           Activations  : in out Matrix_List) is
       --  The ith element of Activations (length n_layers - 1) holds the values
       --  of the ith layer.
       --  Activations: layers x samples x features
       use Ada.Containers;
       use Base_Neural;
-      use Float_Package;
-      use Float_List_Package;
       --        Routine_Name       : constant String :=
       --                                "Multilayer_Perceptron.Forward_Pass ";
       Hidden_Activation  : constant Activation_Type :=
@@ -720,10 +718,10 @@ package body Multilayer_Perceptron is
                              Self.Attributes.Out_Activation;
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params             : constant Parameters_List := Self.Attributes.Params;
-      Coefficient_Matrix : Float_List_2D;  --  layer x X
-      Intercepts         : Float_List;
-      Acts_Dot_Coeffs    : Float_List_2D;
-      Act_With_Intercept : Float_List_2D;
+      Coefficient_Matrix : Float_Matrix;  --  layer x X
+      Intercepts         : Float_Array;
+      Acts_Dot_Coeffs    : Float_Matrix;
+      Act_With_Intercept : Float_Matrix;
       --        Start_Time         : constant Time := Clock;
       --        End_Time           : Time;
       --  Elapsed time approx. 24 ms.
@@ -742,7 +740,7 @@ package body Multilayer_Perceptron is
          --  => samples x (coefficient * feature)
          Acts_Dot_Coeffs :=
            Dot (Activations (layer), Coefficient_Matrix);
-         if Integer (Activations.Length) <= layer then
+         if Integer (Activations'Length) <= layer then
             Activations.Set_Length (Count_Type (layer + 1));
          end if;
 
@@ -811,7 +809,7 @@ package body Multilayer_Perceptron is
       --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Factor       : Float;
       Init_Bound   : Float;
-      Coef_Init_1  : Float_List;
+      Coef_Init_1  : Float_Array;
    begin
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
@@ -840,7 +838,7 @@ package body Multilayer_Perceptron is
 
    --  L320
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : Integer_List) is
+                         Layer_Units : Integer_Array) is
       --        use Ada.Containers;
       use Base_Neural;
       --        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
@@ -881,7 +879,7 @@ package body Multilayer_Perceptron is
    --  L716
    procedure Update_No_Improvement_Count
      (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val : Float_List_2D) is
+      X_Val : Float_Matrix) is
       Routine_Name     : constant String :=
                            "Multilayer_Perceptron.Update_No_Improvement_Count ";
       Last_Valid_Score : Float;
@@ -943,7 +941,7 @@ package body Multilayer_Perceptron is
 
    --     procedure Validate_Input (Self               : in out MLP_Classifier;
    --                               --                               X                  : Float_List_2D;
-   --                               Y                  : Integer_List) is
+   --                               Y                  : Integer_Array) is
    --                               Incremental, Reset : Boolean) is
    --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
    --     begin
