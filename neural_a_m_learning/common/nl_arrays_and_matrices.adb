@@ -1,6 +1,22 @@
 
 package body NL_Arrays_And_Matrices is
 
+   function "*" (L, R : Float_Matrix) return Float_Matrix is
+      Result : Float_Matrix (L'First .. L'Last,
+                             L'First (2) .. L'Last (2));
+   begin
+      for row in L'First .. L'Last loop
+         for col in L'First (2) .. L'Last (2) loop
+            Result (row, col) := L (row, col) * R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ------------------------------------------------------------------------
+
    function To_Integer_Array (List : Integer_List) return Integer_Array is
       Result : Integer_Array (1 .. Positive (List.Length));
    begin
