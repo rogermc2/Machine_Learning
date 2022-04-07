@@ -61,8 +61,8 @@ package body Multilayer_Perceptron is
      (Self        : MLP_Classifier;
       Layer       : Positive;
       Num_Samples : Positive;
-      Activations : NL_Types.Float_List_3D;
-      Deltas      : NL_Types.Float_List_3D;
+      Activations : Matrix_List;
+      Deltas      : Matrix_List;
       Grads       : in out Parameters_List);
    --     procedure Fit_Lbfgs (Self        : in out MLP_Classifier;
    --                          X           : Float_List_2D;
@@ -100,21 +100,23 @@ package body Multilayer_Perceptron is
                        X           : Float_Matrix;
                        Y           : Integer_Matrix;
                        Activations : in out Matrix_List;
-                       Deltas      : in out NL_Arrays_And_Matrices.Matrix_List;
+                       Deltas      : in out Matrix_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
       use NL_Types.Float_Package;
---        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+      use Classifier_Utilities;
+      --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
+      Y_Float            : Float_Matrix := To_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function;
       S_List             : Parameters_Record;
-      Ravel              : Float_Array (1 .. Num_Samples);
+      Ravel              : NL_Types.Float_List;
       Values             : Float := 0.0;
       Last               : Positive;
---        Start_Time         : Time;
---        End_Time           : Time;
+      --        Start_Time         : Time;
+      --        End_Time           : Time;
       --        Derivative_Kind    : Derivative_Type;
       --        Inplace_Derivative : Float_List;
    begin
@@ -128,7 +130,7 @@ package body Multilayer_Perceptron is
       Forward_Pass (Self, Activations);
 
       --  L284
---        Start_Time := Clock;
+      --        Start_Time := Clock;
       --  Loss computation elapsed time 400 ms
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -150,9 +152,9 @@ package body Multilayer_Perceptron is
          when Squared_Error_Function =>
             Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
---        End_Time := Clock;
---        Put_Line (Routine_Name & "Loss computation elapsed time: " &
---                    Duration'Image ((End_Time -Start_Time) * 1000) & "mS");
+      --        End_Time := Clock;
+      --        Put_Line (Routine_Name & "Loss computation elapsed time: " &
+      --                    Duration'Image ((End_Time -Start_Time) * 1000) & "mS");
 
       --  L289  Add L2 regularization term to loss
       --  L310 loop elapsed time 650 ms.
@@ -163,7 +165,7 @@ package body Multilayer_Perceptron is
            S_List.Coeff_Params.Last_Index loop
             Ravel := Ravel & S_List.Coeff_Params (s_index);
          end loop;
-         Values := Values + Dot (Ravel, Ravel);
+         Values := Values + NL_Types.Dot (Ravel, Ravel);
       end loop;
 
       --  L292
@@ -204,11 +206,16 @@ package body Multilayer_Perceptron is
       --  L310, L308
       --  L310 loop elapsed time insignificant
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
-         Deltas (index - 1) :=
-           Dot (Deltas (index),
-                Transpose (Self.Attributes.Params (index).Coeff_Params));
+         declare
+            Dot_L : Float_Matrix := Deltas (index);
+            Dot_R : Float_Matrix :=
+                      To_Float_Matrix
+                        (Self.Attributes.Params (index).Coeff_Params);
+         begin
+            Deltas (index - 1) :=
+              Dot (Dot_L, Transpose (Dot_R);
 
-         case Self.Parameters.Activation is
+            case Self.Parameters.Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>
                Logistic_Derivative (Z => Activations (index),
@@ -218,10 +225,11 @@ package body Multilayer_Perceptron is
             when Relu_Activation =>
                Relu_Derivative (Activations (index), Deltas (index - 1));
             when Softmax_Activation => null;
-         end case;
+            end case;
 
-         Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
-                                Deltas, Grads);
+            Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
+                                   Deltas, Grads);
+         end;  --  declare
       end loop;
 
    end Backprop;
@@ -302,8 +310,10 @@ package body Multilayer_Perceptron is
       use NL_Types.Float_List_Package;
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
-      Delta_Act    : Float_Matrix;
-      Delta_Mean   : Float_Array;
+      Delta_Act    : Float_Matrix
+        (Deltas (Layer)'First .. Deltas (Layer)'Last,
+         Deltas (Layer)'First (2) .. Deltas (Layer)'Last (2));
+      Delta_Mean   : Float_Array (Deltas (Layer)'First .. Deltas (Layer)'Last);
    begin
       --        Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
       --        Put_Line (Routine_Name & "Deltas (Layer) length" &

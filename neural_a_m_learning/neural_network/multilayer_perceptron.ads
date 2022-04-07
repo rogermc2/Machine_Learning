@@ -32,12 +32,12 @@ package Multilayer_Perceptron is
       Ada.Containers.Vectors (Positive, Intercept_Indptr_Record);
     subtype Intercept_Indptr_List is Intercept_Indptr_Package.Vector;
 
-    type MLP_Classifier_Attributes (Num_Classes, Num_Curves : Positive) is record
-        Classes              : Integer_Array (1 .. Num_Classes);
+    type MLP_Classifier_Attributes is record
+        Classes              : NL_Types.Integer_List;
         Loss_Function_Name   : Loss_Function;
         Loss                 : Float;
         Best_Loss            : Float;
-        Loss_Curve           : Float_Array (1 .. Num_Curves);
+        Loss_Curve           : NL_Types.Float_List;
         No_Improvement_Count : Natural := 0;
         T                    : Natural;
         Params               : Parameters_List;  --  Layers
@@ -58,9 +58,9 @@ package Multilayer_Perceptron is
         Optimizer            : Optimizer_Record;
     end record;
 
-    type MLP_Classifier_Parameters (HLS_Length, Num_Valid_Scores : Positive) is
+    type MLP_Classifier_Parameters is
        record
-           Hidden_Layer_Sizes    : Integer_Array (1 .. HLS_Length);
+           Hidden_Layer_Sizes    : NL_Types.Integer_List;
            Activation            : Base_Neural.Activation_Type :=
                                      Base_Neural.Relu_Activation;
            Solver                : Solver_Type := Adam_Solver;
@@ -79,7 +79,7 @@ package Multilayer_Perceptron is
            Momentum              : Float := 0.9;
            Nesterovs_Momentum    : Boolean := True;
            Early_Stopping        : Boolean := False;
-           Validation_Scores     : Float_Array (1 .. Num_Valid_Scores);
+           Validation_Scores     : NL_Types.Float_List;
            Validation_Fraction   : Float := 0.1;
            Best_Validation_Score : Float := Float'Safe_First;
            Best_Params           : Parameters_List;
@@ -90,17 +90,16 @@ package Multilayer_Perceptron is
            Max_Fun               : Natural := 15000;
        end record;
 
-    type MLP_Classifier (Num_Classes, Num_Curves, HLS_Length,
-                         Num_Valid_Scores : Positive) is
+    type MLP_Classifier is
        record
            Estimator_Kind : Estimator.Estimator_Type :=
                               Estimator.Classifier_Estimator;
-           Attributes     : MLP_Classifier_Attributes (Num_Classes, Num_Curves);
-           Parameters     : MLP_Classifier_Parameters
-             (HLS_Length, Num_Valid_Scores);
+           Attributes     : MLP_Classifier_Attributes;
+           Parameters     : MLP_Classifier_Parameters;
        end record;
 
-    function C_Init (Hidden_Layer_Sizes  : Integer_Array;
+    function C_Init (Hidden_Layer_Sizes  : NL_Types.Integer_List :=
+                      NL_Types.Integer_Package.Empty_Vector;
                      Activation          : Base_Neural.Activation_Type :=
                        Base_Neural.Relu_Activation;
                      Solver              : Solver_Type := Adam_Solver;

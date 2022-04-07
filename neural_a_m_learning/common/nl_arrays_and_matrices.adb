@@ -76,6 +76,31 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Dot (L, R : Float_Matrix) return Float_Matrix is
+      Num_Rows : constant Positive := L'Length;
+      Num_Cols : constant Positive := L'Length (2);
+      RT      : constant Float_Matrix := Transpose (R);
+      L_Row   : Float_Array (1 .. Num_Cols);
+      LR      : Float;
+      Product : Float_Matrix  (1 .. Num_Rows, 1 .. Num_Cols);
+   begin
+      for row in Product'First .. Product'Last loop
+         for col in Product'First (2) .. Product'Last (2) loop
+            L_Row (col) := L (row, col);
+            LR := 0.0;
+            for lr_index in L_Row'First .. L_Row'Last loop
+               LR := LR + L_Row (lr_index) * RT (row, lr_index);
+            end loop;
+            Product (row, col) := LR;
+         end loop;
+      end loop;
+
+      return Product;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
    function To_Float_Array (List : Float_List) return Float_Array is
       Result : Float_Array (1 .. Positive (List.Length));
    begin
@@ -134,5 +159,20 @@ package body NL_Arrays_And_Matrices is
    end To_Integer_Array;
 
    --  ------------------------------------------------------------------------
+
+   function Transpose (Values : Float_Matrix) return  Float_Matrix is
+      Result   : Float_Matrix (1 .. Values'Length (2), 1 .. Values'Length);
+   begin
+      for row in Values'First .. Values'Last loop
+         for col in Values'First (2) .. Values'Last (2) loop
+            Result (col, row) := Values (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Transpose;
+
+   --  -------------------------------------------------------------------------
 
 end NL_Arrays_And_Matrices;
