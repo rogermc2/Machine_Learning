@@ -4,7 +4,6 @@
 
 with Maths;
 
-with Classifier_Utilities;
 with Neural_Maths;
 --  with Printing;
 
@@ -221,10 +220,10 @@ package body Base_Neural is
     --  -------------------------------------------------------------------------
     --  L158
     function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Float_Matrix)
-                       return Float is
-        use Classifier_Utilities;
+                           return Float is
+        YT_Float : constant Float_Matrix := To_Float_Matrix (Y_True);
     begin
-        return Neural_Maths.Mean ((Y_True - Y_Pred) ** 2) / 2.0;
+        return Neural_Maths.Mean ((YT_Float - Y_Pred) ** 2) / 2.0;
 
     end Squared_Loss;
 
@@ -232,20 +231,17 @@ package body Base_Neural is
 
     procedure Tanh (Activation : in out Float_Matrix) is
         use Maths.Float_Math_Functions;
-        type Matrix_Float is new Float_Matrix (1 .. Y_Prob'Length,
-                                               1 .. Y_Prob'Length (2));
-        Act_List : Float_Array;
-        Result   : Float_Matrix;
+        type Matrix_Float is new Float_Matrix (1 .. Activation'Length,
+                                               1 .. Activation'Length (2));
+        Result   : Matrix_Float;
     begin
-        for row in Activation.First_Index .. Activation.Last_Index loop
-            Act_List := Activation (row);
-            for index in Act_List.First_Index .. Act_List.Last_Index loop
-                Act_List (index) :=  Tanh (Act_List (index));
+        for row in Activation'First .. Activation'Last loop
+            for col in Activation'First (2) .. Activation'Last (2) loop
+                Result (row, col) := Tanh (Activation (row, col));
             end loop;
-            Result.Append (Act_List);
         end loop;
 
-        Activation := Result;
+        Activation := Float_Matrix (Result);
 
     end Tanh;
 

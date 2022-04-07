@@ -7,8 +7,6 @@ with Maths;
 
 package body Neural_Maths is
 
-    type Float_Array is array (Integer range <>) of Float;
-
     --     Small_Abs    : constant Integer := 16;
     --     Small_Imag   : constant Integer := 6;
     Tol          : constant Float := 2.220446092504131 * 10.0 ** (-16);
@@ -20,7 +18,7 @@ package body Neural_Maths is
     Neg_Root     : constant Float := -0.504083008264455409;
     Neg_Root_Val : constant Float := 7.2897639029768949 * 10.0 ** (-17);
 
-    function Max (X : Float_List_2D) return Float_List;
+    function Max (X : Float_Matrix) return Float_Array;
     --     function Psi_AS103 (X : Float) return Float;  --  Digamma AS103
     function Psi_Cephes (X : Float) return Float;
     function Zeta_Series (Z, Root, Root_Val : Float) return Float;
@@ -43,50 +41,47 @@ package body Neural_Maths is
     --  --------------------------------------------------------------------------
     --  Based on github.com/scipy/scipy/blob/main/scipy/special/_logsumexp.py
     --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
-    function Log_Sum_Exponent (Log_Prob : Float_List_2D) return Float_List is
+    --  Computes the log of the sum of exponentials of the input elements.
+    function Log_Sum_Exponent (Log_Prob : Float_Matrix) return Float_Array is
         use Maths.Float_Math_Functions;
-        use Float_List_Package;
-        Log_Prob_Max : constant Float_List := Max (Log_Prob);
-        Log_Prob_1D  : Float_List;
+        Log_Prob_Max : constant Float_Array := Max (Log_Prob);
         Max          : Float;
         Diff         : Float;
-        Exp_Delta    : Float_List;
-        Sum          : Float;
-        Log_Sum_List : Float_List;
+        Exp_Delta    : Float_Array (1 .. Log_Prob'Length);
+        Sum          : Float := 0.0;
+        Log_Sum      : Float_Array (1 .. Log_Prob'Length);
     begin
-        for index in Log_Prob.First_Index .. Log_Prob.Last_Index loop
-            Log_Prob_1D := Log_Prob (index);
-            Max := Log_Prob_Max (index);
-            Sum := 0.0;
-            for index2 in Log_Prob_1D.First_Index .. Log_Prob_1D.Last_Index loop
+        for row in Log_Prob'First .. Log_Prob'Last loop
+            Max := Log_Prob_Max (row);
+            for col in Log_Prob'First (2) .. Log_Prob'Last (2) loop
                 --  tmp = np.exp(a - a_max)
-                Diff := Log_Prob_1D (index2) - Max;
+                Diff := Log_Prob (row, col) - Max;
                 if Diff = 0.0 then
-                    Exp_Delta.Append (1.0);
+                    Exp_Delta (col) := 1.0;
                 else
-                    Exp_Delta.Append (Exp (Diff));
+                    Exp_Delta (col) := Exp (Diff);
                 end if;
             end loop;
 
-            for index3 in Exp_Delta.First_Index .. Exp_Delta.Last_Index loop
+            for index3 in Exp_Delta'First .. Exp_Delta'Last loop
                 Sum := Sum + Exp_Delta (index3);
             end loop;
 
-            Log_Sum_List.Append (Log (Sum));
+            Log_Sum (row) := Log (Sum);
         end loop;
 
-        return Log_Sum_List;
+        return Log_Sum;
 
     end Log_Sum_Exponent;
 
     --  -------------------------------------------------------------------------
 
-    function Max (X : Float_List_2D) return Float_List is
-        XT        : constant Float_List_2D := Transpose (X);
-        Col_Data  : Float_List;
+    function Max (X : Float_Matrix) return Float_Array is
+        XT        : constant Float_Matrix := Transpose (X);
+        Col_Data  : Float_Array;
         Value     : Float;
         Max_Value : Float;
-        Max_Vals  : Float_List;
+        Max_Vals  : Float_Array;
     begin
         for ct in XT.First_Index .. XT.Last_Index loop
             Col_Data := X.Element (ct);
@@ -126,10 +121,10 @@ package body Neural_Maths is
 
     --  ------------------------------------------------------------------------
 
-    function Mean (A : Float_List_2D) return Float is
+    function Mean (A : Float_Matrix) return Float is
         use Ada.Containers;
         Length  : constant Float := Float (A.Length * A (1).Length);
-        A_List  : Float_List;
+        A_List  : Float_Array;
         Sum     : Float := 0.0;
     begin
 
@@ -146,7 +141,7 @@ package body Neural_Maths is
 
     --  ------------------------------------------------------------------------
 
-    function Mean (A : Float_List) return Float is
+    function Mean (A : Float_Array) return Float is
         Sum     : Float := 0.0;
     begin
         for item in A.First_Index .. A.Last_Index loop
@@ -159,12 +154,12 @@ package body Neural_Maths is
 
     --  ------------------------------------------------------------------------
 
-    function Mean (A : Float_List_2D; Axis : Positive) return Float_List is
-        A_List  : Float_List;
-        A2_List : Float_List_2D;
+    function Mean (A : Float_Matrix; Axis : Positive) return Float_Array is
+        A_List  : Float_Array;
+        A2_List : Float_Matrix;
         Sum     : Float;
         Length  : Float;
-        Result  : Float_List;
+        Result  : Float_Array;
     begin
         if Axis = 1 then
             A2_List := A;
