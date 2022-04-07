@@ -107,8 +107,6 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use NL_Types.Float_Package;
 --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
-      Y_Float            : constant Float_Matrix :=
-                             Classifier_Utilities.To_Float_List_2D (Y);
       Num_Samples        : constant Positive := Positive (X'Length);
       Loss_Function_Name : Loss_Function;
       S_List             : Parameters_Record;

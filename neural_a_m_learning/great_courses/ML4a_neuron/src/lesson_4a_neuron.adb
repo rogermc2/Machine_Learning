@@ -4,8 +4,6 @@ with Ada.Containers;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with NL_Types; use NL_Types;
-
 with Base_Neural;
 with Data_Splitter;
 with Multilayer_Perceptron;
@@ -25,10 +23,6 @@ procedure Lesson_4A_Neuron is
    Test_Size       : constant Positive := 1000;
    Train_Size      : constant Positive := 5000;
    Bunch           : Openml_Ada.Bunch_Data;
-   X               : Float_Matrix (1 .. Test_Size + Train_Size,
-                                   1 .. Test_Size + Train_Size);  --  rows of columns of values
-   --  samples x features
-   Y               : Integer_List;
    aClassifier     : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name);
