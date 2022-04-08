@@ -1,4 +1,5 @@
 
+with Ada.Containers.Generic_Array_Sort;
 with Ada.Containers.Indefinite_Vectors;
 
 with NL_Types;
@@ -10,6 +11,8 @@ package NL_Arrays_And_Matrices is
    type Float_Array is array (Integer range <>) of Float;
    type Integer_Array is array (Integer range <>) of Integer;
    type Natural_Array is array (Integer range <>) of Natural;
+   procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort
+     (Integer, Integer, Integer_Array);
 
    type Float_Matrix is array (Integer range <>, Integer range <>) of Float;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;

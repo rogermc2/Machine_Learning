@@ -12,19 +12,15 @@ package body Encode_Utils is
 --     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
 
    function Encode_Check_Unknown
-     (Values : Integer_List; Uniques : Integer_List) return Integer_List;
+     (Values : Integer_Array; Uniques : Integer_Array) return Integer_Array;
 
    --  -------------------------------------------------------------------------
 
-   function Encode (Values : Integer_List) return Integer_List is
-      Sorted_Values : Integer_List := Values;
-      Uniques       : Integer_List;
+   function Encode (Values : Integer_Array) return Integer_Array is
+      Sorted_Values : Integer_Array := Values;
    begin
-      Integer_Sorting.Sort (Sorted_Values);
-
-      Printing.Print_Integer_List ("Encode_Utils.Encode Uniques", Uniques);
-      Uniques := Unique (Values);
-      return Uniques;
+      Integer_Array_Sort (Sorted_Values);
+      return Unique (Sorted_Values);
 
    end Encode;
 
@@ -33,11 +29,10 @@ package body Encode_Utils is
    --  Uniques : unique values in Values; Uniques needs to be sorted.
    --  Check_Unknown : if True check Values for values that are not in Uniques
    --  and raise an error.
-   function Encode (Values        : Integer_List; Uniques : Integer_List;
-                    Check_Unknown : Boolean := True)
-                     return Natural_List is
-      Diff   : Integer_List;
-      Result : Natural_List;
+   function Encode (Values        : Integer_Array; Uniques : Integer_Array;
+                    Check_Unknown : Boolean := True) return Natural_Array is
+      Diff   : Integer_Array := Values;
+      Result : Natural_Array (1 .. Values'Length);
    begin
       Result := Map_To_Integer (Values, Uniques);
       if Check_Unknown then
@@ -46,8 +41,8 @@ package body Encode_Utils is
             New_Line;
             Put ("Encode_Error: Encode_Utils.Encode Values contains ");
             Put_Line ("previously unseen labels.");
-            Printing.Print_Integer_List ("Unique list", Uniques);
-            Printing.Print_Integer_List ("Unseen labels", Diff);
+            Printing.Print_Integer_Array ("Unique list", Uniques);
+            Printing.Print_Integer_Array ("Unseen labels", Diff);
             raise Encode_Error;
          end if;
       end if;
@@ -59,12 +54,12 @@ package body Encode_Utils is
    --  -------------------------------------------------------------------------
 
    function Encode_Check_Unknown
-     (Values : Integer_List; Uniques : Integer_List) return Integer_List is
-      No_Inverse  : Natural_List;
-      Unique_Vals : constant Integer_List :=
+     (Values : Integer_Array; Uniques : Integer_Array) return Integer_Array is
+      No_Inverse  : Natural_Array;
+      Unique_Vals : constant Integer_Array :=
                       Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Integer;
-      Diff        : Integer_List;
+      Diff        : Integer_Array;
    begin
       for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
          aVal := Unique_Vals.Element (index);
@@ -78,12 +73,12 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
    --  Map each value based on its position in uniques.
-   function Map_To_Integer (Values, Uniques : Integer_List)
-                             return Natural_List is
+   function Map_To_Integer (Values, Uniques : Integer_Array)
+                             return Natural_Array is
       use Integer_Package;
       Values_Curs  : Integer_Package.Cursor := Values.First;
       Uniques_Curs : Integer_Package.Cursor := Uniques.First;
-      Result       : Natural_List;
+      Result       : Natural_Array;
       aValue       : Integer;
    begin
       Result.Set_Length (Values.Length);
@@ -109,12 +104,12 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Values : Natural_List) return Natural_List is
+   function Unique (Values : Natural_Array) return Natural_Array is
       use Natural_Package;
       use Natural_Sorting;
       Values_Curs : Natural_Package.Cursor := Values.First;
       aValue      : Natural;
-      Uniq_List   : Natural_List;
+      Uniq_List   : Natural_Array;
    begin
       while Has_Element (Values_Curs) loop
          aValue := Element (Values_Curs);
@@ -131,7 +126,7 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : Integer_List) return Integer_List is
+   function Unique (Values : Integer_Array) return Integer_Array is
       use Int_Sets;
       use Integer_Package;
       use Integer_Sorting;
@@ -139,7 +134,7 @@ package body Encode_Utils is
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : Integer_List;
+      Uniq_List       : Integer_Array;
    begin
       while Has_Element (Values_Curs) loop
          Unique_Integers.Include (Element (Values_Curs));
@@ -160,8 +155,8 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : Integer_List; Inverse : out Natural_List)
-                     return Integer_List is
+   function Unique (Values : Integer_Array; Inverse : out Natural_Array)
+                     return Integer_Array is
       use Int_Sets;
       use Integer_Package;
       use Integer_Sorting;
@@ -170,7 +165,7 @@ package body Encode_Utils is
       Values_Curs       : Integer_Package.Cursor := Values.First;
       Unique_Integers   : Int_Sets.Set;
       Ints_Curs         : Int_Sets.Cursor;
-      Uniq_List         : Integer_List;
+      Uniq_List         : Integer_Array;
    begin
       while Has_Element (Values_Curs) loop
          Unique_Integers.Include (Element (Values_Curs));
