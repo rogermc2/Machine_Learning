@@ -3,7 +3,6 @@ with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types; use NL_Types;
 with Estimator;
 
 package Label is
@@ -30,7 +29,7 @@ package Label is
 
     Label_Error : Exception;
 
-    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_List);
+    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y       : Integer_Array) return Natural_Array;
     function Inverse_Transform (Self   : in out Label_Encoder;

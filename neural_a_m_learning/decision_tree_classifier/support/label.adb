@@ -40,7 +40,7 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  Fit fits label encoder
-   procedure Fit (Encoder : in out Label_Encoder; Y : Integer_List) is
+   procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
    begin
       if Encoder.Encoder_Kind = Class_Unique then
          Encoder.Uniques := Encode_Utils.Unique (Y);
@@ -54,9 +54,9 @@ package body Label is
    --  Fit_Transform fits label encoder and returns encoded labels
    --  Balanced class weights should be given by
    --  n_samples / (n_classes * np.bincount(y))
-   function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_List)
-                            return Natural_List is
-      Encoded_Labels : Natural_List;
+   function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_Array)
+                            return Natural_Array is
+      Encoded_Labels : Natural_Array;
    begin
       if Encoder.Encoder_Kind = Class_Unique then
          Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
@@ -72,11 +72,11 @@ package body Label is
    --  -------------------------------------------------------------------------
    --   Inverse_Transform transforms labels back to original encoding
    function Inverse_Transform (Self    : in out Label_Encoder;
-                               Labels  : Natural_List)
-                                return Integer_List is
-      aRange  : Natural_List;
-      Diff    : Natural_List;
-      Result  : Integer_List;
+                               Labels  : Natural_Array)
+                                return Integer_Array is
+      aRange  : Natural_Array;
+      Diff    : Natural_Array;
+      Result  : Integer_Array;
    begin
       if not Labels.Is_Empty then
          for index in 1 .. Positive (Self.Uniques.Length) loop
@@ -98,11 +98,11 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_List)
-                               return Integer_List is
-      aRange  : Natural_List;
-      Diff    : Natural_List;
-      Result  : Integer_List;
+   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_Array)
+                               return Integer_Array is
+      aRange  : Natural_Array;
+      Diff    : Natural_Array;
+      Result  : Integer_Array;
    begin
       if not Y.Is_Empty then
          for index in 1 .. Positive (Self.Classes.Length) loop
@@ -123,14 +123,14 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_List_2D)
-                               return Integer_List_2D is
-      YT        : constant Integer_List_2D := Transpose (Y);
-      aRange    : Natural_List;
-      Diff      : Natural_List;
-      Y_List    : Integer_List;
-      Transform : Integer_List;
-      Result    : Integer_List_2D;
+   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_Matrix)
+                               return Integer_Matrix is
+      YT        : constant Integer_Matrix := Transpose (Y);
+      aRange    : Natural_Array;
+      Diff      : Natural_Array;
+      Y_List    : Natural_Array;
+      Transform : Natural_Array;
+      Result    : Integer_Matrix;
    begin
       if not Y.Is_Empty then
          for index in 1 .. Positive (Self.Classes.Length) loop
@@ -157,9 +157,9 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    --  Transform returns labels as normalized encodings
-   function Transform (Self : in out Label_Encoder; Y : Integer_List)
-                        return Natural_List is
-      Labels  : Natural_List;
+   function Transform (Self : in out Label_Encoder; Y : Integer_Array)
+                        return Natural_Array is
+      Labels  : Natural_Array;
    begin
       if not Y.Is_Empty then
          if Self.Encoder_Kind = Class_Unique then
