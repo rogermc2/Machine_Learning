@@ -33,11 +33,13 @@ begin
       Num_Features : constant Positive := Positive (X'Length (2));
       Train_X      : Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
       Train_Y      : Integer_Array (1 .. Train_Size);
+      Train_Y2     : Integer_Matrix (1 .. 1, 1 .. Train_Size);
       Test_X       : Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
       Test_Y       : Integer_Array (1 .. Test_Size);
+      Test_Y2      : Integer_Matrix (1 .. 1, 1 .. Test_Size);
    begin
       if not Get_State (Dataset_Name, Train_X,
-                        Train_Y, Test_X, Test_Y, Bunch) then
+                        Train_Y2, Test_X, Test_Y2, Bunch) then
          --           Put_Line (Routine_Name & "Num_Samples" &
          --                       Integer'Image (Positive (X'Length)));
          Assert (X'Length > 0, Routine_Name & "X is empty.");
@@ -58,7 +60,13 @@ begin
                                          Test_X, Test_Y, Train_X, Train_Y);
          Put_Line ("Requested train size: " & Integer'Image (Train_Size));
          Put_Line ("Train data length: " & Count_Type'Image (Train_X'Length));
-         Save_State (Dataset_Name, Train_X, Train_Y, Test_X, Test_Y,
+         for row in Train_Y2'First .. Train_Y2'Last loop
+                Train_Y2 (row, 1) := Train_Y (row);
+         end loop;
+         for row in Test_Y2'First .. Test_Y2'Last loop
+                Test_Y2 (row, 1) := Test_Y (row);
+         end loop;
+         Save_State (Dataset_Name, Train_X, Train_Y2, Test_X, Test_Y2,
                      Bunch);
       end if;
 
@@ -76,7 +84,7 @@ begin
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
       Put_Line ("Neural_Fit");
-      Fit (aClassifier, Train_X, Train_Y);
+      Fit (aClassifier, Train_X, Train_Y2);
       Support_4.Save_Classifier (Dataset_Name, aClassifier);
    end;  --  declare
 

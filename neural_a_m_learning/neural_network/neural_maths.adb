@@ -1,6 +1,5 @@
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Containers;
 with Ada.Numerics;
 
 with Maths;
@@ -78,21 +77,19 @@ package body Neural_Maths is
 
     function Max (X : Float_Matrix) return Float_Array is
         XT        : constant Float_Matrix := Transpose (X);
-        Col_Data  : Float_Array;
         Value     : Float;
         Max_Value : Float;
-        Max_Vals  : Float_Array;
+        Max_Vals  : Float_Array (1 .. XT'Length);
     begin
-        for ct in XT.First_Index .. XT.Last_Index loop
-            Col_Data := X.Element (ct);
+        for row in XT'First .. XT'Last loop
             Max_Value := -Float'Last;
-            for index in Col_Data.First_Index .. Col_Data.Last_Index loop
-                Value := Col_Data.Element (index);
+            for col in XT'First (2) .. XT'Last (2) loop
+                Value := XT (row, col);
                 if Value > Max_Value then
-                    Max_Vals (index) := Value;
+                    Max_Vals (col) := Value;
                 end if;
             end loop;
-            Max_Vals.Append (Max_Vals);
+            Max_Vals (row) := Max_Value;
         end loop;
 
         return Max_Vals;
@@ -101,17 +98,13 @@ package body Neural_Maths is
 
     --  -------------------------------------------------------------------------
 
-    function Mean (A : Integer_List_2D) return Float is
-        use Ada.Containers;
-        Length  : constant Float := Float (A.Length * A (1).Length);
-        A_List  : Integer_List;
+    function Mean (A : Integer_Matrix) return Float is
+        Length  : constant Float := Float (A'Length * A'Length (2));
         Sum     : Integer := 0;
     begin
-
-        for row in A.First_Index .. A.Last_Index loop
-            A_List := A (row);
-            for item in A_List.First_Index .. A_List.Last_Index loop
-                Sum := Sum + A_List (item);
+        for row in A'First .. A'Last loop
+            for col in A'First (2) .. A'Last (2) loop
+                Sum := Sum + A (row, col);
             end loop;
         end loop;
 
@@ -122,16 +115,12 @@ package body Neural_Maths is
     --  ------------------------------------------------------------------------
 
     function Mean (A : Float_Matrix) return Float is
-        use Ada.Containers;
-        Length  : constant Float := Float (A.Length * A (1).Length);
-        A_List  : Float_Array;
+        Length  : constant Float := Float (A'Length * A'Length (2));
         Sum     : Float := 0.0;
     begin
-
-        for row in A.First_Index .. A.Last_Index loop
-            A_List := A (row);
-            for item in A_List.First_Index .. A_List.Last_Index loop
-                Sum := Sum + A_List (item);
+        for row in A'First .. A'Last loop
+            for col in A'First (2) .. A'Last (2) loop
+                Sum := Sum + A (row, col);
             end loop;
         end loop;
 
@@ -144,11 +133,11 @@ package body Neural_Maths is
     function Mean (A : Float_Array) return Float is
         Sum     : Float := 0.0;
     begin
-        for item in A.First_Index .. A.Last_Index loop
+        for item in A'First .. A'Last loop
             Sum := Sum + A (item);
         end loop;
 
-        return Sum / Float (A.Length);
+        return Sum / Float (A'Length);
 
     end Mean;
 

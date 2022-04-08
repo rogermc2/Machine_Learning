@@ -126,7 +126,7 @@ package Multilayer_Perceptron is
                      return MLP_Classifier;
     procedure Fit (Self : in out MLP_Classifier;
                    X    : Float_Matrix;
-                   Y    : Integer_Array;
+                   Y    : Integer_Matrix;
                    Incremental : Boolean := False);
 
 end Multilayer_Perceptron;

@@ -10,9 +10,9 @@ package body Support_4 is
    function Get_State
      (Dataset_Name : String;
       Train_X      : out Float_Matrix;
-      Train_Y      : out Integer_Array;
+      Train_Y      : out Integer_Matrix;
       Test_X       : out Float_Matrix;
-      Test_Y       : out Integer_Array;
+      Test_Y       : out Integer_Matrix;
       Bunch        : out Openml_Ada.Bunch_Data)
       return Boolean is
       use Ada.Directories;
@@ -34,9 +34,9 @@ package body Support_4 is
          Open (File_ID, In_File, State_File);
          aStream := Stream (File_ID);
          Float_Matrix'Read (aStream, Train_X);
-         Integer_Array'Read (aStream, Train_Y);
+         Integer_Matrix'Read (aStream, Train_Y);
          Float_Matrix'Read (aStream, Test_X);
-         Integer_Array'Read (aStream, Test_Y);
+         Integer_Matrix'Read (aStream, Test_Y);
          Openml_Ada.Bunch_Data'Read (aStream, Bunch);
          Close (File_ID);
          pragma Unreferenced (File_ID);
@@ -90,9 +90,9 @@ package body Support_4 is
    procedure Save_State
      (Dataset_Name : String;
       Train_X      : Float_Matrix;
-      Train_Y      : Integer_Array;
+      Train_Y      : Integer_Matrix;
       Test_X       : Float_Matrix;
-      Test_Y       : Integer_Array;
+      Test_Y       : Integer_Matrix;
       Save_Bunch   : Openml_Ada.Bunch_Data) is
       use Ada.Streams;
       use Stream_IO;
@@ -104,9 +104,9 @@ package body Support_4 is
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
       Float_Matrix'Write (aStream, Train_X);
-      Integer_Array'Write (aStream, Train_Y);
+      Integer_Matrix'Write (aStream, Train_Y);
       Float_Matrix'Write (aStream, Test_X);
-      Integer_Array'Write (aStream, Test_Y);
+      Integer_Matrix'Write (aStream, Test_Y);
       Openml_Ada.Bunch_Data'Write (aStream, Save_Bunch);
       Close (File_ID);
       pragma Unreferenced (File_ID);

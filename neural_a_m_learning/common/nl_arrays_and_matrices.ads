@@ -9,6 +9,7 @@ package NL_Arrays_And_Matrices is
 
    type Float_Array is array (Integer range <>) of Float;
    type Integer_Array is array (Integer range <>) of Integer;
+   type Natural_Array is array (Integer range <>) of Natural;
 
    type Float_Matrix is array (Integer range <>, Integer range <>) of Float;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
