@@ -20,11 +20,13 @@ package NL_Arrays_And_Matrices is
    function "*" (L, R : Float_Matrix) return Float_Matrix;
    function "*" (L : Float; R : Float_Matrix) return Float_Matrix;
    pragma Inline ("*");
+   function "**" (L : Float_Array; P : Integer) return Float_Array;
    function "**" (L : Float_Matrix; P : Integer) return Float_Matrix;
    pragma Inline ("**");
    function "/" (L, R : Float_Matrix) return Float_Matrix;
    function "/" (L : Float_Matrix; R : Float) return Float_Matrix;
    pragma Inline ("/");
+   function "+" (L, R : Float_Array) return Float_Array;
    function "+" (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline ("+");
    function "-" (L, R : Float_Matrix) return Float_Matrix;

@@ -1,8 +1,8 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
-with Ada.Containers.Vectors;
+with Ada.Containers.Indefinite_Vectors;
 
-with NL_Types; use NL_Types;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Stochastic_Optimizers is
 
@@ -22,12 +22,13 @@ package Stochastic_Optimizers is
    type Solver_Type is (Lbfgs_Solver, Sgd_Solver, Adam_Solver);
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
-   type Parameters_Record is record
-      Coeff_Params     : Float_List_2D;
-      Intercept_Params : Float_List;
+   type Parameters_Record (Num_Rows, Num_Cols : Positive) is record
+      Coeff_Params     : Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+      Intercept_Params : Float_Array (1 .. Num_Rows);
    end record;
+
    package Parameters_Package is new
-     Ada.Containers.Vectors (Positive, Parameters_Record);
+     Ada.Containers.Indefinite_Vectors (Positive, Parameters_Record);
    subtype Parameters_List is Parameters_Package.Vector;
    subtype Moments_List is Parameters_Package.Vector;
    function "+" (L, R : Parameters_List) return Parameters_List;

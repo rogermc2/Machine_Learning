@@ -303,7 +303,7 @@ package body Multilayer_Perceptron is
       Activations : Matrix_List;
       Deltas      : Matrix_List;
       Grads       : in out Parameters_List) is
---        use Ada.Containers;
+      use Ada.Containers;
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : Float_Matrix := Deltas (Layer);
@@ -365,7 +365,7 @@ package body Multilayer_Perceptron is
       Deltas             : Matrix_List;
       Y_2D               : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
       Y_Col              : Integer_Array (1 .. Num_Samples);
-      Hidden_Layer_Sizes : constant Integer_List :=
+      Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
       Layer_Units        : Integer_List;
       --  Coef_Grads      layers * features * values
