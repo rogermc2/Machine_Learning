@@ -1,7 +1,7 @@
 
 with Ada.Containers.Indefinite_Vectors;
 
-with NL_Types; use NL_Types;
+with NL_Types;
 
 package NL_Arrays_And_Matrices is
 
@@ -18,21 +18,24 @@ package NL_Arrays_And_Matrices is
    subtype Matrix_List is Matrix_List_Package.Vector;
 
    function "*" (L, R : Float_Matrix) return Float_Matrix;
+   function "*" (L : Float; R : Float_Matrix) return Float_Matrix;
    pragma Inline ("*");
    function "**" (L : Float_Matrix; P : Integer) return Float_Matrix;
    pragma Inline ("**");
    function "/" (L, R : Float_Matrix) return Float_Matrix;
    function "/" (L : Float_Matrix; R : Float) return Float_Matrix;
    pragma Inline ("/");
+   function "+" (L, R : Float_Matrix) return Float_Matrix;
+   pragma Inline ("+");
    function "-" (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline ("-");
    function Dot (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline (Dot);
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix;
    pragma Inline (To_Float_Matrix);
-   function To_Float_Array (List : Float_List) return Float_Array;
-   function To_Float_Matrix (List : Float_List_2D) return Float_Matrix;
-   function To_Integer_Array (List : Integer_List) return Integer_Array;
+   function To_Float_Array (List : NL_Types.Float_List) return Float_Array;
+   function To_Float_Matrix (List : NL_Types.Float_List_2D) return Float_Matrix;
+   function To_Integer_Array (List : NL_Types.Integer_List) return Integer_Array;
    function Transpose (Values : Float_Matrix) return Float_Matrix;
    pragma Inline (Transpose);
 

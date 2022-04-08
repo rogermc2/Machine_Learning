@@ -303,8 +303,7 @@ package body Multilayer_Perceptron is
       Activations : Matrix_List;
       Deltas      : Matrix_List;
       Grads       : in out Parameters_List) is
-      use Ada.Containers;
-      use NL_Types.Float_List_Package;
+--        use Ada.Containers;
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : Float_Matrix := Deltas (Layer);
@@ -341,7 +340,7 @@ package body Multilayer_Perceptron is
 
       --  Grad.Coeff_Params is a 2D list of fan_in x fan_out lists
       Grads (layer).Coeff_Params :=
-        (Delta_Act + Self.Parameters.Alpha * Coeffs);
+        (Delta_Act + (Self.Parameters.Alpha * Coeffs));
 
       Grads (layer).Coeff_Params :=
         Grads (layer).Coeff_Params / Float (Num_Samples);

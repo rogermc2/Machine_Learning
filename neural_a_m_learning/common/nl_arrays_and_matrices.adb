@@ -1,6 +1,21 @@
 
 package body NL_Arrays_And_Matrices is
 
+   function "*" (L : Float; R : Float_Matrix) return Float_Matrix is
+      Result : Float_Matrix (R'First .. R'Last, R'First (2) .. R'Last (2));
+   begin
+      for row in R'First .. R'Last loop
+         for col in R'First (2) .. R'Last (2) loop
+            Result (row, col) := L * R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ------------------------------------------------------------------------
+
    function "*" (L, R : Float_Matrix) return Float_Matrix is
       Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
    begin
@@ -61,6 +76,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "+" (L, R : Float_Matrix) return Float_Matrix is
+      Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
+   begin
+      for row in L'First .. L'Last loop
+         for col in L'First (2) .. L'Last (2) loop
+            Result (row, col) := L (row, col) + R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "+";
+
+   --  ------------------------------------------------------------------------
+
    function "-" (L, R : Float_Matrix) return Float_Matrix is
       Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
    begin
@@ -101,7 +131,7 @@ package body NL_Arrays_And_Matrices is
 
    --  ----------------------------------------------------------------------------
 
-   function To_Float_Array (List : Float_List) return Float_Array is
+   function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
       Result : Float_Array (1 .. Positive (List.Length));
    begin
       for row in List.First_Index .. List.Last_Index loop
@@ -129,8 +159,8 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Float_Matrix (List : Float_List_2D) return Float_Matrix is
-      List_Row : Float_List;
+   function To_Float_Matrix (List : NL_Types.Float_List_2D) return Float_Matrix is
+      List_Row : NL_Types.Float_List;
       Result   : Float_Matrix (1 .. Positive (List.Length),
                                1 .. Positive (List (1).Length));
    begin
@@ -147,7 +177,8 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Integer_Array (List : Integer_List) return Integer_Array is
+   function To_Integer_Array (List : NL_Types.Integer_List)
+                              return Integer_Array is
       Result : Integer_Array (1 .. Positive (List.Length));
    begin
       for row in List.First_Index .. List.Last_Index loop
