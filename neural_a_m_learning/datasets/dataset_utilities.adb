@@ -1,7 +1,6 @@
 
 with Ada.Characters.Handling;
 with Ada.Directories;
-with Ada.Streams.Stream_IO;
 with Ada.Strings.Fixed;
 with Ada.Text_IO; use Ada.Text_IO;
 --  with Ada.Text_IO.Unbounded_IO;

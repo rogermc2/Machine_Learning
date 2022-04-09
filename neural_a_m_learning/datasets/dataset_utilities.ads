@@ -20,7 +20,7 @@ package Dataset_Utilities is
 
    procedure CSV_Reader (CSV_File_Name : String;
                          Data          : out String_List);
-   function Get_CSV_Data (CSV_Data : String) return Indef_String_List;;
+   function Get_CSV_Data (CSV_Data : String) return Indef_String_List;
    function Split (Line : String; Sep : String) return String_Array;
    function Split (Line : String; Sep : String) return
      GNATCOLL.Strings.XString_Array;
