@@ -4,21 +4,20 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with NL_Types;
 with Printing;
 
 package body Encode_Utils is
 
---     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
---     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
+   --     package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
+   --     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
 
    function Encode_Check_Unknown
-     (Values : Integer_Array; Uniques : Integer_Array)
+     (Values : Integer_Array; Uniques : NL_Types.Integer_List)
       return NL_Types.Integer_List;
 
    --  -------------------------------------------------------------------------
 
-   function Encode (Values : Integer_Array) return Integer_Array is
+   function Encode (Values : Integer_Array) return NL_Types.Integer_List is
       Sorted_Values : Integer_Array := Values;
    begin
       Integer_Array_Sort (Sorted_Values);
@@ -31,7 +30,8 @@ package body Encode_Utils is
    --  Uniques : unique values in Values; Uniques needs to be sorted.
    --  Check_Unknown : if True check Values for values that are not in Uniques
    --  and raise an error.
-   function Encode (Values        : Integer_Array; Uniques : Integer_Array;
+   function Encode (Values        : Integer_Array;
+                    Uniques       : NL_Types.Integer_List;
                     Check_Unknown : Boolean := True) return Natural_Array is
       Diff   : NL_Types.Integer_List;
       Result : Natural_Array (1 .. Values'Length);
@@ -43,7 +43,7 @@ package body Encode_Utils is
             New_Line;
             Put ("Encode_Error: Encode_Utils.Encode Values contains ");
             Put_Line ("previously unseen labels.");
-            Printing.Print_Integer_Array ("Unique list", Uniques);
+            Printing.Print_Integer_List ("Unique list", Uniques);
             Printing.Print_Integer_List ("Unseen labels", Diff);
             raise Encode_Error;
          end if;
@@ -56,18 +56,23 @@ package body Encode_Utils is
    --  -------------------------------------------------------------------------
 
    function Encode_Check_Unknown
-     (Values : Integer_Array; Uniques : Integer_Array) return Integer_List is
-      No_Inverse  : Natural_Array;
-      Unique_Vals : constant Integer_Array :=
+     (Values : Integer_Array; Uniques : NL_Types.Integer_List)
+      return NL_Types.Integer_List is
+      No_Inverse  : Natural_Array (1 .. Values'Length);
+      Unique_Vals : constant NL_Types.Integer_List :=
                       Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Integer;
-      Diff        : Integer_List;
+      Found       : Boolean;
+      Diff        : NL_Types.Integer_List;
    begin
       for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
-         aVal := Unique_Vals.Element (index);
-         if not Uniques.Contains (aVal) then
-            Diff.Append (aVal);
-         end if;
+         aVal := Unique_Vals (index);
+         for u in Uniques.First_Index .. Uniques.Last_Index loop
+            Found := Uniques (u) = aVal;
+            if Found then
+               Diff.Append (aVal);
+            end if;
+         end loop;
       end loop;
 
       return Diff;
@@ -75,29 +80,26 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
    --  Map each value based on its position in uniques.
-   function Map_To_Integer (Values, Uniques : Integer_Array)
-                             return Natural_Array is
-      use Integer_Package;
-      Values_Curs  : Integer_Package.Cursor := Values.First;
-      Uniques_Curs : Integer_Package.Cursor := Uniques.First;
-      Result       : Natural_Array;
-      aValue       : Integer;
+   function Map_To_Integer (Values  : Integer_Array;
+                            Uniques : NL_Types.Integer_List)
+                            return Natural_Array is
+      Routine_Name  : constant String := "Encode_Utils.Map_To_Integer ";
+      Result        : Natural_Array (1 .. Values'Length) := (others => 0);
+      aValue        : Integer;
+      Found         : Boolean;
+      Uniques_Index : Positive;
    begin
-      Result.Set_Length (Values.Length);
-      for index in Result.First_Index .. Result.Last_Index loop
-         Result (index) := 0;
-      end loop;
-
-      while Has_Element (Values_Curs) loop
-         aValue := Element (Values_Curs);
-         Uniques_Curs := Uniques.Find (aValue);
-         Assert (Uniques_Curs /= No_Element,
-            "Encode_Utils.Map_To_Integer error, Value not found in Uniques" &
-            Integer'Image (aValue));
-
-         Result (To_Index (Values_Curs)) := To_Index (Uniques_Curs);
-
-         Next (Values_Curs);
+      for index in Values'Range loop
+         aValue := Values (index);
+         Found := False;
+         Uniques_Index := Uniques.First_Index;
+         while Uniques_Index <= Uniques.Last_Index and not Found loop
+            Found := aValue = Uniques (Uniques_Index);
+            Uniques_Index := Uniques_Index + 1;
+         end loop;
+         Assert (Found, Routine_Name & "error, Value not found in Uniques" &
+                   Integer'Image (aValue));
+         Result (index) := aValue;
       end loop;
 
       return Result;
@@ -106,37 +108,35 @@ package body Encode_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Unique (Values : Natural_Array) return Natural_Array is
-      Values_Curs : Natural_Package.Cursor := Values.First;
-      aValue      : Natural;
-      Uniq_List   : Natural_Array;
+   function Unique (Values : Natural_Array) return NL_Types.Natural_List is
+      use NL_Types.Natural_Sorting;
+      aValue    : Natural;
+      Uniq_List : NL_Types.Natural_List;
    begin
-      while Has_Element (Values_Curs) loop
-         aValue := Element (Values_Curs);
+      for index in Values'Range loop
+         aValue := Values (index);
          if not Uniq_List.Contains (aValue) then
             Uniq_List.Append (aValue);
          end if;
-         Next (Values_Curs);
       end loop;
 
-      Integer_Array_Sort (Uniq_List);
+      Sort (Uniq_List);
       return Uniq_List;
 
    end Unique;
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : Integer_Array) return Integer_Array is
+   function Unique (Values : Integer_Array) return NL_Types.Integer_List is
       use Int_Sets;
-      Values_Curs     : Integer_Package.Cursor := Values.First;
+      use NL_Types.Integer_Sorting;
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
-      Uniq_List       : Integer_Array;
+      Uniq_List       : NL_Types.Integer_List;
    begin
-      while Has_Element (Values_Curs) loop
-         Unique_Integers.Include (Element (Values_Curs));
-         Next (Values_Curs);
+      for index in Values'Range loop
+         Unique_Integers.Include (Values (index));
       end loop;
 
       Ints_Curs := Unique_Integers.First;
@@ -146,7 +146,7 @@ package body Encode_Utils is
          Int_Sets.Next (Ints_Curs);
       end loop;
 
-      Integer_Array_Sort (Uniq_List);
+      Sort (Uniq_List);
       return Uniq_List;
 
    end Unique;
@@ -154,18 +154,16 @@ package body Encode_Utils is
    -------------------------------------------------------------------------
 
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
-                     return Integer_Array is
+                    return NL_Types.Integer_List is
       use Int_Sets;
-
---        Routine_Name : constant String := "Encode_Utils.Unique ";
-      Values_Curs       : Integer_Package.Cursor := Values.First;
-      Unique_Integers   : Int_Sets.Set;
-      Ints_Curs         : Int_Sets.Cursor;
-      Uniq_List         : Integer_Array;
+      use NL_Types.Integer_Sorting;
+      --        Routine_Name : constant String := "Encode_Utils.Unique ";
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
    begin
-      while Has_Element (Values_Curs) loop
-         Unique_Integers.Include (Element (Values_Curs));
-         Next (Values_Curs);
+      for index in Values'Range loop
+         Unique_Integers.Include (index);
       end loop;
 
       Ints_Curs := Unique_Integers.First;
@@ -174,7 +172,7 @@ package body Encode_Utils is
          Int_Sets.Next (Ints_Curs);
       end loop;
 
-      Integer_Array_Sort (Uniq_List);
+      Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);
 
       return Uniq_List;

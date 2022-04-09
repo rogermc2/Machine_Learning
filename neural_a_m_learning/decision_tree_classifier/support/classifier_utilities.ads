@@ -1,7 +1,7 @@
 
 with PLplot_Auxiliary;
 
-with NL_Arrays_And_Matrices;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 with Weights;
 
@@ -34,9 +34,10 @@ package Classifier_Utilities is
    function Ones (List_Length : Positive) return Weights.Weight_List;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List;
-   function Set_Diff (Values : Integer_List; Uniques : Natural_List)
+   function Set_Diff (Values : Integer_Array; Uniques : Integer_List)
                       return Natural_List;
-   function Set_Diff (Values, Uniques : Natural_List) return Natural_List;
+   function Set_Diff (Values : Integer_Array; Uniques : Natural_List)
+                      return Natural_List;
    function Set_Value (List_Length : Positive; Value : Float)
                        return Weights.Weight_List;
    function Sum_Cols (aList : Float_List_2D) return Float_List;
@@ -70,7 +71,6 @@ package Classifier_Utilities is
    function Transpose (Values : Value_Data_Lists_2D)
                        return  Value_Data_Lists_2D;
    function Unique (Nums : Integer_List) return Integer_List;
-   --      function Unique_Integer_Array (Nums : Integer_Array) return Integer_Array;
    function Unique_Weights (Values : Weights.Weight_Lists_2D)
                             return Weights.Weight_List;
 

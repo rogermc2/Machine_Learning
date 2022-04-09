@@ -444,7 +444,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Set_Diff (Values : Integer_List; Uniques : Natural_List)
+   function Set_Diff (Values : Integer_Array; Uniques : Integer_List)
                       return Natural_List is
       use Natural_Package;
       Unique_Vals : constant Integer_List := Encode_Utils.Unique (Values);
@@ -463,9 +463,10 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Set_Diff (Values, Uniques : Natural_List) return Natural_List is
+   function Set_Diff (Values : Integer_Array; Uniques : Natural_List)
+                      return Natural_List is
       use Natural_Package;
-      Unique_Vals : constant Natural_List := Encode_Utils.Unique (Values);
+      Unique_Vals : constant Integer_List := Encode_Utils.Unique (Values);
       aVal        : Natural;
       Diff        : Natural_List;
    begin
@@ -770,16 +771,16 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_List (A : NL_Arrays_And_Matrices.Integer_Array)
-                             return Integer_List is
-      A_List : Integer_List;
-   begin
-      for index in A'First .. A'Last loop
-         A_List.Append (A (index));
-      end loop;
-      return A_List;
-
-   end To_Integer_List;
+--     function To_Integer_List (A : NL_Arrays_And_Matrices.Integer_Array)
+--                               return Integer_List is
+--        A_List : Integer_List;
+--     begin
+--        for index in A'First .. A'Last loop
+--           A_List.Append (A (index));
+--        end loop;
+--        return A_List;
+--
+--     end To_Integer_List;
 
    --  -------------------------------------------------------------------------
 

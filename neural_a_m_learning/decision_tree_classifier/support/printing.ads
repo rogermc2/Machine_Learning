@@ -1,9 +1,9 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Classifier_Types;
 with Criterion;
 with Estimator;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 with Encode_Utils;
 with Export_Types;
