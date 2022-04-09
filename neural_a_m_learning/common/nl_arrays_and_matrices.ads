@@ -44,14 +44,19 @@ package NL_Arrays_And_Matrices is
    pragma Inline ("-");
    function Dot (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline (Dot);
-    function To_Array (L : NL_Types.Integer_List) return Integer_Array;
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix;
-   pragma Inline (To_Float_Matrix);
    function To_Float_Array (List : NL_Types.Float_List) return Float_Array;
+   pragma Inline (To_Float_Array);
    function To_Float_Matrix (List : NL_Types.Float_List_2D) return Float_Matrix;
+   pragma Inline (To_Float_Matrix);
    function To_Integer_Array (List : NL_Types.Integer_List)
                               return Integer_Array;
+   pragma Inline (To_Integer_Array);
+   function To_Natural_Array (List : NL_Types.Natural_List)
+                              return Natural_Array;
+   pragma Inline (To_Natural_Array);
    function Transpose (Values : Float_Matrix) return Float_Matrix;
+   function Transpose (Values : Integer_Matrix) return Integer_Matrix;
    pragma Inline (Transpose);
 
 end NL_Arrays_And_Matrices;

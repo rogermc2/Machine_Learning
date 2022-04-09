@@ -35,6 +35,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Classifier_Utilities;
 with Encode_Utils;
+with NL_Types;
 
 package body Label is
 
@@ -55,8 +56,8 @@ package body Label is
    --  Balanced class weights should be given by
    --  n_samples / (n_classes * np.bincount(y))
    function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_Array)
-                            return Natural_Array is
-      Encoded_Labels : Natural_Array;
+                           return Natural_Array is
+      Encoded_Labels : Natural_Array (1 .. Y'Length);
    begin
       if Encoder.Encoder_Kind = Class_Unique then
          Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
@@ -71,104 +72,99 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --   Inverse_Transform transforms labels back to original encoding
-   function Inverse_Transform (Self    : in out Label_Encoder;
-                               Labels  : Natural_Array)
-                                return Integer_Array is
-      aRange  : Natural_Array;
-      Diff    : Natural_Array;
-      Result  : Integer_Array;
+   function Inverse_Transform (Self   : Label_Encoder;
+                               Labels : Natural_Array)
+                               return Integer_Array is
+      use NL_Types;
+      aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
+      Diff    : Natural_List;
+      Result  : Integer_Array (1 .. Positive (Labels'Length));
    begin
-      if not Labels.Is_Empty then
-         for index in 1 .. Positive (Self.Uniques.Length) loop
-            aRange.Append (index);
-         end loop;
+      for index in aRange'Range loop
+         aRange (index) := index;
+      end loop;
 
-         Diff := Classifier_Utilities.Set_Diff (Labels, aRange);
-         Assert (Diff.Is_Empty,
-                 "Label.Inverse_Transform Labels vector contains " &
-                   "previously unseen labels.");
+      Diff := Classifier_Utilities.Set_Diff (Labels, aRange);
+      Assert (Diff.Is_Empty,
+              "Label.Inverse_Transform Labels vector contains " &
+                "previously unseen labels.");
 
-         for index in 1 .. Positive (Labels.Length) loop
-            Result.Append (Self.Uniques.Element (Labels.Element (index)));
-         end loop;
-      end if;
+      for index in Result'Range loop
+         Result (index) := Self.Uniques (Labels (index));
+      end loop;
+
       return Result;
 
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
 
-   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_Array)
+   function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
                                return Integer_Array is
-      aRange  : Natural_Array;
-      Diff    : Natural_Array;
-      Result  : Integer_Array;
+      aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
+      Diff    : NL_Types.Natural_List;
+      Result  : Integer_Array (1 .. Positive (Y'Length));
    begin
-      if not Y.Is_Empty then
-         for index in 1 .. Positive (Self.Classes.Length) loop
-            aRange.Append (index);
-         end loop;
+      for index in Self.Classes'Range loop
+         aRange (index) := index;
+      end loop;
 
-         Diff := Classifier_Utilities.Set_Diff (Y, aRange);
+      Diff := Classifier_Utilities.Set_Diff (Y, aRange);
+      Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
+
+      for index in Y'Range loop
+         Result (index) := Self.Classes (Y (index));
+      end loop;
+
+      return Result;
+
+   end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
+                               return Integer_Matrix is
+      use NL_Types;
+      YT        : constant Integer_Matrix := Transpose (Y);
+      aRange    : Integer_Array (1 .. Y'Length);
+      Diff      : Natural_List;
+      Transform : Integer_Matrix (1 .. YT'Length, 1 .. YT'Length (2));
+      YT_Row    : Integer_Array (1 .. YT'Length);
+   begin
+      for r in Self.Classes'Range loop
+         aRange (r) := r;
+      end loop;
+
+      for Y_index in YT'Range loop
+         for index2 in YT'Range (2) loop
+            YT_Row (Y_index) := YT (Y_index, index2);
+         end loop;
+         Diff := Classifier_Utilities.Set_Diff (YT_Row, aRange);
          Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
 
-         for index in 1 .. Positive (Y.Length) loop
-            Result.Append (Self.Classes.Element (Y.Element (index)));
+         for index2 in YT_Row'Range loop
+            Transform (Y_index, index2) := Self.Classes (YT_Row (index2));
          end loop;
-      end if;
+      end loop;
 
-      return Result;
-
-   end Inverse_Transform;
-
-   --  -------------------------------------------------------------------------
-
-   function Inverse_Transform (Self : in out Label_Encoder; Y : Integer_Matrix)
-                               return Integer_Matrix is
-      YT        : constant Integer_Matrix := Transpose (Y);
-      aRange    : Natural_Array;
-      Diff      : Natural_Array;
-      Y_List    : Natural_Array;
-      Transform : Natural_Array;
-      Result    : Integer_Matrix;
-   begin
-      if not Y.Is_Empty then
-         for index in 1 .. Positive (Self.Classes.Length) loop
-            aRange.Append (index);
-         end loop;
-
-         for index in YT.First_Index .. YT.Last_Index loop
-            Y_List := YT (index);
-            Diff := Classifier_Utilities.Set_Diff (Y_List, aRange);
-            Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
-
-            Transform.Clear;
-            for index in 1 .. Positive (Y_List.Length) loop
-               Transform.Append (Self.Classes.Element (Y_List.Element (index)));
-            end loop;
-            Result.Append (Transform);
-         end loop;
-      end if;
-
-      return Transpose (Result);
+      return Transpose (Transform);
 
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
 
    --  Transform returns labels as normalized encodings
-   function Transform (Self : in out Label_Encoder; Y : Integer_Array)
-                        return Natural_Array is
-      Labels  : Natural_Array;
+   function Transform (Self : Label_Encoder; Y : Integer_Array)
+                       return Natural_Array is
+      Labels : Natural_Array (1 .. Y'Length);
    begin
-      if not Y.Is_Empty then
-         if Self.Encoder_Kind = Class_Unique then
-            Labels := Encode_Utils.Encode (Y, Self.Uniques);
-         else
-            raise Label_Error with
-              "Label.Transform called with invalid encoder type.";
-         end if;
+      if Self.Encoder_Kind = Class_Unique then
+         Labels := Encode_Utils.Encode (Y, Self.Uniques);
+      else
+         raise Label_Error with
+           "Label.Transform called with invalid encoder type.";
       end if;
+
       return Labels;
 
    end Transform;

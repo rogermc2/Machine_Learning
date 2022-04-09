@@ -34,9 +34,11 @@ package Classifier_Utilities is
    function Ones (List_Length : Positive) return Weights.Weight_List;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List;
-   function Set_Diff (Values : Integer_Array; Uniques : Integer_List)
+   function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)
                       return Natural_List;
-   function Set_Diff (Values : Integer_Array; Uniques : Natural_List)
+   function Set_Diff (Values : Integer_Array; Uniques : Natural_Array)
+                      return Natural_List;
+   function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
                       return Natural_List;
    function Set_Value (List_Length : Positive; Value : Float)
                        return Weights.Weight_List;
