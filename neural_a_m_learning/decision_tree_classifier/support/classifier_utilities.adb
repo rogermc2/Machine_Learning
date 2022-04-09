@@ -712,20 +712,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Array (L : Integer_List) return Integer_Array is
-      New_Array : Integer_Array (1 .. Integer (L.Length));
-      A_Index   : Integer := 0;
-   begin
-      for index in L.First_Index .. L.Last_Index loop
-         A_Index := A_Index + 1;
-         New_Array (A_Index) := L.Element (index);
-      end loop;
-      return New_Array;
-   end To_Array;
-
-   --  -------------------------------------------------------------------------
-
-   function To_Float_List (A : Float_Array) return Float_List is
+   function To_Float_List (A : NL_Arrays_And_Matrices.Float_Array)
+                           return Float_List is
       A_List : Float_List;
    begin
       for index in A'First .. A'Last loop
@@ -782,7 +770,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_List (A : Classifier_Types.Integer_Array)
+   function To_Integer_List (A : NL_Arrays_And_Matrices.Integer_Array)
                              return Integer_List is
       A_List : Integer_List;
    begin
@@ -815,7 +803,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Value_List (A : Integer_Array)
+   function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
                                    return Value_Data_List is
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
@@ -830,7 +818,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Integer_Value_List_2D (A : Integer_Array)
+   function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
                                       return Value_Data_Lists_2D is
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
@@ -848,7 +836,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Multi_Value_List (A : Multi_Value_Array)
+   function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
                                  return Value_Data_Lists_2D is
       Value    : Value_Record (Integer_Type);
       Row_List : Value_Data_Lists_2D;
@@ -868,7 +856,8 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_List (A : Natural_Array) return Natural_List is
+   function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
+                             return Natural_List is
       A_List : Natural_List;
    begin
       for index in A'First .. A'Last loop
@@ -903,9 +892,9 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Natural_Value_List (A : Natural_Array)
+   function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
                                    return Value_Data_Lists_2D is
-      Int_Array : Integer_Array (1 .. A'Length);
+      Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
          Int_Array (index) := A (index);

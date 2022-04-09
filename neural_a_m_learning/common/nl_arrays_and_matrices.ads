@@ -14,6 +14,13 @@ package NL_Arrays_And_Matrices is
    procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort
      (Integer, Integer, Integer_Array);
 
+   type Multi_Value_Array is array (Integer range <>, Integer range <>)
+     of Integer;
+--
+--     package Integer_Array_Package is new Ada.Containers.Indefinite_Vectors
+--       (Positive, Integer_Array);
+--     subtype Integer_Array_List is Integer_Array_Package.Vector;
+
    type Float_Matrix is array (Integer range <>, Integer range <>) of Float;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
 
@@ -37,11 +44,13 @@ package NL_Arrays_And_Matrices is
    pragma Inline ("-");
    function Dot (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline (Dot);
+    function To_Array (L : NL_Types.Integer_List) return Integer_Array;
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix;
    pragma Inline (To_Float_Matrix);
    function To_Float_Array (List : NL_Types.Float_List) return Float_Array;
    function To_Float_Matrix (List : NL_Types.Float_List_2D) return Float_Matrix;
-   function To_Integer_Array (List : NL_Types.Integer_List) return Integer_Array;
+   function To_Integer_Array (List : NL_Types.Integer_List)
+                              return Integer_Array;
    function Transpose (Values : Float_Matrix) return Float_Matrix;
    pragma Inline (Transpose);
 

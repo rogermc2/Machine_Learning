@@ -157,6 +157,19 @@ package body NL_Arrays_And_Matrices is
 
     --  ----------------------------------------------------------------------------
 
+   function To_Array (L : NL_Types.Integer_List) return Integer_Array is
+      New_Array : Integer_Array (1 .. Integer (L.Length));
+      A_Index   : Integer := 0;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         A_Index := A_Index + 1;
+         New_Array (A_Index) := L.Element (index);
+      end loop;
+      return New_Array;
+   end To_Array;
+
+   --  -------------------------------------------------------------------------
+
     function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
         Result : Float_Array (1 .. Positive (List.Length));
     begin

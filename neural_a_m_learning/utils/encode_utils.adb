@@ -4,6 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with NL_Types;
 with Printing;
 
 package body Encode_Utils is
@@ -12,7 +13,8 @@ package body Encode_Utils is
 --     package Float_Sets is new Ada.Containers.Ordered_Sets (Float);
 
    function Encode_Check_Unknown
-     (Values : Integer_Array; Uniques : Integer_Array) return Integer_Array;
+     (Values : Integer_Array; Uniques : Integer_Array)
+      return NL_Types.Integer_List;
 
    --  -------------------------------------------------------------------------
 
@@ -31,7 +33,7 @@ package body Encode_Utils is
    --  and raise an error.
    function Encode (Values        : Integer_Array; Uniques : Integer_Array;
                     Check_Unknown : Boolean := True) return Natural_Array is
-      Diff   : Integer_Array := Values;
+      Diff   : NL_Types.Integer_List;
       Result : Natural_Array (1 .. Values'Length);
    begin
       Result := Map_To_Integer (Values, Uniques);
@@ -42,7 +44,7 @@ package body Encode_Utils is
             Put ("Encode_Error: Encode_Utils.Encode Values contains ");
             Put_Line ("previously unseen labels.");
             Printing.Print_Integer_Array ("Unique list", Uniques);
-            Printing.Print_Integer_Array ("Unseen labels", Diff);
+            Printing.Print_Integer_List ("Unseen labels", Diff);
             raise Encode_Error;
          end if;
       end if;
@@ -54,12 +56,12 @@ package body Encode_Utils is
    --  -------------------------------------------------------------------------
 
    function Encode_Check_Unknown
-     (Values : Integer_Array; Uniques : Integer_Array) return Integer_Array is
+     (Values : Integer_Array; Uniques : Integer_Array) return Integer_List is
       No_Inverse  : Natural_Array;
       Unique_Vals : constant Integer_Array :=
                       Encode_Utils.Unique (Values, No_Inverse);
       aVal        : Integer;
-      Diff        : Integer_Array;
+      Diff        : Integer_List;
    begin
       for index in Unique_Vals.First_Index .. Unique_Vals.Last_Index loop
          aVal := Unique_Vals.Element (index);
@@ -105,8 +107,6 @@ package body Encode_Utils is
    --  -------------------------------------------------------------------------
 
    function Unique (Values : Natural_Array) return Natural_Array is
-      use Natural_Package;
-      use Natural_Sorting;
       Values_Curs : Natural_Package.Cursor := Values.First;
       aValue      : Natural;
       Uniq_List   : Natural_Array;
@@ -119,7 +119,7 @@ package body Encode_Utils is
          Next (Values_Curs);
       end loop;
 
-      Sort (Uniq_List);
+      Integer_Array_Sort (Uniq_List);
       return Uniq_List;
 
    end Unique;
@@ -128,8 +128,6 @@ package body Encode_Utils is
 
    function Unique (Values : Integer_Array) return Integer_Array is
       use Int_Sets;
-      use Integer_Package;
-      use Integer_Sorting;
       Values_Curs     : Integer_Package.Cursor := Values.First;
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
@@ -148,7 +146,7 @@ package body Encode_Utils is
          Int_Sets.Next (Ints_Curs);
       end loop;
 
-      Sort (Uniq_List);
+      Integer_Array_Sort (Uniq_List);
       return Uniq_List;
 
    end Unique;
@@ -158,8 +156,6 @@ package body Encode_Utils is
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                      return Integer_Array is
       use Int_Sets;
-      use Integer_Package;
-      use Integer_Sorting;
 
 --        Routine_Name : constant String := "Encode_Utils.Unique ";
       Values_Curs       : Integer_Package.Cursor := Values.First;
@@ -178,7 +174,7 @@ package body Encode_Utils is
          Int_Sets.Next (Ints_Curs);
       end loop;
 
-      Sort (Uniq_List);
+      Integer_Array_Sort (Uniq_List);
       Inverse := Map_To_Integer (Values, Uniq_List);
 
       return Uniq_List;

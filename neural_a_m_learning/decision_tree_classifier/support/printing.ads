@@ -1,16 +1,12 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
---  with Build_Utils;
-with Classifier_Types; use Classifier_Types;
+with Classifier_Types;
 with Criterion;
 with Estimator;
 with NL_Types; use NL_Types;
---  with Base_Decision_Tree;
 with Encode_Utils;
 with Export_Types;
---  with Node_Splitter;
---  with Tree;
 with Weights;
 
 package Printing is
