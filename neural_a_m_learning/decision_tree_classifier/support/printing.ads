@@ -1,13 +1,13 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with Criterion;
+--  with Criterion;
 with Estimator;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 with Encode_Utils;
 with Export_Types;
-with Weights;
+--  with Weights;
 
 package Printing is
 
@@ -18,8 +18,8 @@ package Printing is
    procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);
    procedure Print_Colours_List (Name    : String;
                                  Colours : Export_Types.Colours_List);
-   procedure Print_Criterion (Name : String;
-                              Data : Criterion.Criterion_Class);
+--     procedure Print_Criterion (Name : String;
+--                                Data : Criterion.Criterion_Class);
    procedure Print_Integer_Colours_List
      (Name : String; Colours : Export_Types.Integer_Colours_List);
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
@@ -65,10 +65,10 @@ package Printing is
    procedure Print_Value_Data_Lists_3D (Name    : String;
                                         theList : Value_Data_Lists_3D);
    procedure Print_Value_Record (Name : String; Value : Value_Record);
-   procedure Print_Weights (Name : String; Data : Weights.Weight_List);
-   procedure Print_Weight_Lists_2D (Name : String;
-                                    Data : Weights.Weight_Lists_2D);
-   procedure Print_Weight_Lists_3D (Name : String;
-                                    Data : Weights.Weight_Lists_3D);
+--     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
+--     procedure Print_Weight_Lists_2D (Name : String;
+--                                      Data : Weights.Weight_Lists_2D);
+--     procedure Print_Weight_Lists_3D (Name : String;
+--                                      Data : Weights.Weight_Lists_3D);
 
 end Printing;
