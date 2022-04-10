@@ -185,33 +185,55 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Float_Matrix (List : NL_Types.Float_List_2D) return Float_Matrix is
-      List_Row : NL_Types.Float_List;
-      Result   : Float_Matrix (1 .. Positive (List.Length),
-                               1 .. Positive (List (1).Length));
+   function To_Float_Matrix (List : NL_Types.Float_List_2D)
+                             return Float_Matrix is
    begin
-      for row in List.First_Index .. List.Last_Index loop
-         List_Row := List (row);
-         for col in List_Row.First_Index .. List_Row.Last_Index loop
-            Result (row, col) := List_Row (col);
-         end loop;
-      end loop;
-
-      return Result;
+      if not List.Is_Empty then
+         declare
+            List_Row : NL_Types.Float_List;
+            Result   : Float_Matrix (List.First_Index .. List.Last_Index,
+                                     List (1).First_Index ..
+                                       List (1).Last_Index);
+         begin
+            for row in Result'Range loop
+               List_Row := List (row);
+               for col in Result'Range (2) loop
+                  Result (row, col) := List_Row (col);
+               end loop;
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Float_Matrix (1 .. 0, 1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
 
    end To_Float_Matrix;
 
    --  ------------------------------------------------------------------------
 
    function To_Integer_Array (List : NL_Types.Integer_List)
-                               return Integer_Array is
-      Result : Integer_Array (1 .. Positive (List.Length));
+                              return Integer_Array is
    begin
-      for row in List.First_Index .. List.Last_Index loop
-         Result (row) := List (row);
-      end loop;
-
-      return Result;
+      if not List.Is_Empty then
+         declare
+            Result : Integer_Array (List.First_Index .. List.Last_Index);
+         begin
+            for row in Result'Range loop
+               Result (row) := List (row);
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Integer_Array (1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
 
    end To_Integer_Array;
 
@@ -219,20 +241,29 @@ package body NL_Arrays_And_Matrices is
 
    function To_Natural_Array (List : NL_Types.Natural_List)
                               return Natural_Array is
-      Result : Natural_Array (1 .. Positive (List.Length));
    begin
-      for row in List.First_Index .. List.Last_Index loop
-         Result (row) := List (row);
-      end loop;
-
-      return Result;
-
+      if not List.Is_Empty then
+         declare
+            Result : Natural_Array (List.First_Index .. List.Last_Index);
+         begin
+            for row in Result'Range loop
+               Result (row) := List (row);
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Natural_Array (1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
    end To_Natural_Array;
 
    --  ------------------------------------------------------------------------
 
    function Transpose (Values : Float_Matrix) return  Float_Matrix is
-      Result   : Float_Matrix (1 .. Values'Length (2), 1 .. Values'Length);
+      Result : Float_Matrix (1 .. Values'Length (2), 1 .. Values'Length);
    begin
       for row in Values'First .. Values'Last loop
          for col in Values'First (2) .. Values'Last (2) loop
