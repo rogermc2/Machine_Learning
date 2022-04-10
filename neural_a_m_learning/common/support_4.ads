@@ -6,9 +6,9 @@ package Support_4 is
 
    type Base_State (Num_Train, Num_Test, Num_Features : Positive) is record
       Train_X : Float_Matrix (1 .. Num_Train, 1 .. Num_Features);
-      Train_Y : Integer_Matrix (1 .. Num_Test, 1 .. Num_Features);
+      Train_Y : Integer_Matrix (1 .. Num_Train, 1 .. 1);
       Test_X  : Float_Matrix (1 .. Num_Test, 1 .. Num_Features);
-      Test_Y  : Integer_Matrix (1 .. Num_Test, 1 .. Num_Features);
+      Test_Y  : Integer_Matrix (1 .. Num_Test, 1 .. 1);
    end record;
 
    function Get_State

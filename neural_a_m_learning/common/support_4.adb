@@ -15,7 +15,6 @@ package body Support_4 is
 
    procedure Save_State
      (Dataset_Name        : String;
-      Num_Train, Num_Test : Positive;
       Num_Features        : Positive;
       State               : Base_State;
       Save_Bunch          : Openml_Ada.Bunch_Data);
@@ -34,8 +33,6 @@ package body Support_4 is
       Save_File      : constant String := Dataset_Name & ".oml";
       State_File     : constant String := Dataset_Name & ".sta";
       Has_Data       : constant Boolean := Exists (State_File);
-      Num_Train      : Positive;
-      Num_Test       : Positive;
       Num_Features   : Positive;
       Target_Columns : NL_Types.String_List;
       Bunch          : Openml_Ada.Bunch_Data;
@@ -47,12 +44,10 @@ package body Support_4 is
          Put_Line (Routine_Name & "restoring state");
          Open (File_ID, In_File, State_File);
          aStream := Stream (File_ID);
-         Positive'Read (aStream, Num_Train);
-         Positive'Read (aStream, Num_Test);
          Positive'Read (aStream, Num_Features);
 
          declare
-            Data : Base_State (Num_Train, Num_Test, Num_Features);
+            Data : Base_State (Train_Size, Test_Size, Num_Features);
          begin
             Base_State'Read (aStream, Data);
             Openml_Ada.Bunch_Data'Read (aStream, Bunch);
@@ -72,15 +67,14 @@ package body Support_4 is
          declare
             X            : Float_Matrix := To_Float_Matrix (Bunch.Data);
             Y            : Integer_Array := To_Integer_Array (Bunch.Target);
-            --          Num_Samples := constant Positive (X'Length);
             Num_Features : constant Positive := Positive (X'Length (2));
             Train_X      : Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
             Train_Y      : Integer_Array (1 .. Train_Size);
-            Train_Y2     : Integer_Matrix (1 .. 1, 1 .. Train_Size);
+            Train_Y2     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
             Test_X       : Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
             Test_Y       : Integer_Array (1 .. Test_Size);
-            Test_Y2      : Integer_Matrix (1 .. 1, 1 .. Test_Size);
-            Data         : Base_State (Num_Train, Num_Test, Num_Features);
+            Test_Y2      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
+            Data         : Base_State (Train_Size, Test_Size, Num_Features);
          begin
             Put_Line (Routine_Name & "oml loaded");
             Assert (X'Last > X'First, Routine_Name & "X is empty.");
@@ -100,20 +94,23 @@ package body Support_4 is
             Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
                                             Test_X, Test_Y, Train_X, Train_Y);
             Put_Line ("Requested train size: " & Integer'Image (Train_Size));
-            Put_Line ("Train data length: " & Count_Type'Image (Train_X'Length));
+            Put_Line ("Train data length: " &
+                        Count_Type'Image (Train_X'Length));
+
             for row in Train_Y2'First .. Train_Y2'Last loop
                Train_Y2 (row, 1) := Train_Y (row);
             end loop;
+
             for row in Test_Y2'First .. Test_Y2'Last loop
                Test_Y2 (row, 1) := Test_Y (row);
             end loop;
+
             Data.Train_X := Train_X;
             Data.Train_Y := Train_Y2;
             Data.Test_X := Test_X;
             Data.Test_Y := Test_Y2;
 
-            Save_State (Dataset_Name, Test_Size, Train_Size, Num_Features,
-                        Data, Bunch);
+--              Save_State (Dataset_Name, Num_Features, Data, Bunch);
             return Data;
          end;
       end if;
@@ -155,7 +152,6 @@ package body Support_4 is
 
    procedure Save_State
      (Dataset_Name        : String;
-      Num_Train, Num_Test : Positive;
       Num_Features        : Positive;
       State               : Base_State;
       Save_Bunch          : Openml_Ada.Bunch_Data) is
@@ -168,8 +164,6 @@ package body Support_4 is
    begin
       Create (File_ID, Out_File, State_File);
       aStream := Stream (File_ID);
-      Positive'Write (aStream, Num_Train);
-      Positive'Write (aStream, Num_Test);
       Positive'Write (aStream, Num_Features);
       Base_State'Write (aStream, State);
       Openml_Ada.Bunch_Data'Write (aStream, Save_Bunch);
