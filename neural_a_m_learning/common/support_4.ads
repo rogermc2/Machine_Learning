@@ -1,28 +1,23 @@
 
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Openml_Ada;
 
 package Support_4 is
 
+   type Base_State (Num_Train, Num_Test, Num_Features : Positive) is record
+      Train_X : Float_Matrix (1 .. Num_Train, 1 .. Num_Features);
+      Train_Y : Integer_Matrix (1 .. Num_Test, 1 .. Num_Features);
+      Test_X  : Float_Matrix (1 .. Num_Test, 1 .. Num_Features);
+      Test_Y  : Integer_Matrix (1 .. Num_Test, 1 .. Num_Features);
+   end record;
+
    function Get_State
      (Dataset_Name : String;
-      Train_X      : out Float_Matrix;
-      Train_Y      : out Integer_Matrix;
-      Test_X       : out Float_Matrix;
-      Test_Y       : out Integer_Matrix;
-      Bunch        : out Openml_Ada.Bunch_Data) return Boolean;
+      Test_Size, Train_Size : Positive) return Base_State;
    function Get_Classifier
      (Dataset_Name : String;
       Classifier   : out Multilayer_Perceptron.MLP_Classifier)
       return Boolean;
-   procedure Save_State
-     (Dataset_Name : String;
-      Train_X      : Float_Matrix;
-      Train_Y      : Integer_Matrix;
-      Test_X       : Float_Matrix;
-      Test_Y       : Integer_Matrix;
-      Save_Bunch   : Openml_Ada.Bunch_Data);
    procedure Save_Classifier
      (Dataset_Name : String; Classifier : Multilayer_Perceptron.MLP_Classifier);
 
