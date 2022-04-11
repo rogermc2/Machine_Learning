@@ -1,4 +1,6 @@
 
+with Ada.Assertions; use Ada.Assertions;
+
 package body NL_Arrays_And_Matrices is
 
    function "*" (L : Float; R : Float_Matrix) return Float_Matrix is
@@ -133,6 +135,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function Dot (L, R : Float_Matrix) return Float_Matrix is
+      Routine_Name : constant String := "NL_Arrays_And_Matrices.Dot ";
       Num_Rows : constant Positive := L'Length;
       Num_Cols : constant Positive := L'Length (2);
       RT       : constant Float_Matrix := Transpose (R);
@@ -140,12 +143,15 @@ package body NL_Arrays_And_Matrices is
       LR       : Float;
       Product  : Float_Matrix  (1 .. Num_Rows, 1 .. Num_Cols);
    begin
-      for row in Product'First .. Product'Last loop
-         for col in Product'First (2) .. Product'Last (2) loop
+      Assert (R'Length (2) = Num_Rows, Routine_Name &
+      "Num columns" & Integer'Image (R'Length (2)) & " of right matrix " &
+      "don't equal num rows" & Integer'Image (Num_Rows) & " of left matrix");
+      for row in Product'Range loop
+         for col in Product'Range (2)loop
             L_Row (col) := L (row, col);
             LR := 0.0;
-            for lr_index in L_Row'First .. L_Row'Last loop
-               LR := LR + L_Row (lr_index) * RT (row, lr_index);
+            for lr_index in L_Row'Range loop
+               LR := LR + L_Row (lr_index) * RT (lr_index, row);
             end loop;
             Product (row, col) := LR;
          end loop;
