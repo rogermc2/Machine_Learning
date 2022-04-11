@@ -44,7 +44,7 @@ with Maths;
 --  with Utilities;
 
 with Base_Mix;
-with Data_Splitter2;
+with Data_Splitter;
 --  with Encode_Utils;
 with Label;
 with Neural_Maths;
@@ -566,7 +566,7 @@ package body Multilayer_Perceptron is
          --              Stratify := Y;
          --           end if;
 
-         Data_Splitter2.Train_Test_Split
+         Data_Splitter.Train_Test_Split
            (X => X, Y => Y,
             Train_Size => Train_Size, Test_Size  => Test_Size,
             Train_X => Train_X, Train_Y => Train_Y,
