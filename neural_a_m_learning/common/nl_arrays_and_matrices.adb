@@ -137,15 +137,16 @@ package body NL_Arrays_And_Matrices is
     function Dot (L, R : Float_Matrix) return Float_Matrix is
 --          Routine_Name : constant String := "NL_Arrays_And_Matrices.Dot ";
         Num_Rows : constant Positive := L'Length;
-        Num_Cols : constant Positive := L'Length (2);
+        Num_Cols : constant Positive := R'Length (2);
         LT       : constant Float_Matrix := Transpose (L);
         R_Row    : Float_Array (1 .. Num_Cols);
         LR       : Float;
         Product  : Float_Matrix  (1 .. Num_Rows, 1 .. Num_Cols);
     begin
---          Assert (R'Length = Num_Cols, Routine_Name &
+--          Assert (R'Length = L'Length (2), Routine_Name &
 --                    "Num rows" & Integer'Image (R'Length) & " of right matrix " &
---                    "doesn't equal num colums" & Integer'Image (Num_Cols) & " of left matrix");
+--                    "doesn't equal num colums" & Integer'Image (L'Length (2)) &
+--                    " of left matrix");
         for row in Product'Range loop
             for col in Product'Range (2)loop
                 for col_r in R'Range (2)loop
