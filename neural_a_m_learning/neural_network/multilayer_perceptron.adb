@@ -139,9 +139,19 @@ package body Multilayer_Perceptron is
                 "L284 Y Length" & Count_Type'Image (Y'Length) &
                 " should be the same as last activation length" &
                 Count_Type'Image (Activations.Last_Element'Length));
-      Put_Line (Routine_Name & "Pre Forward_Pass, Activations size:" &
+      Put_Line (Routine_Name & "L284, Activations size:" &
                   Count_Type'Image (Y'Length) & " x" &
                   Count_Type'Image (Y'Length (2)));
+
+      Assert (Y'Length = Activations.Last_Element'Length and
+                Y'Length (2) = Activations.Last_Element'Length (2),
+              Routine_Name &
+                "L284 Activations.Last_Element size" &
+                Integer'Image (Integer (Activations.Last_Element'Length)) & " x" &
+                Integer'Image (Integer (Activations.Last_Element'Length (2))) &
+                " should be the same as Y size" &
+                Integer'Image (Integer (Y'Length)) & " x" &
+                Integer'Image (Integer (Y'Length(2))));
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
@@ -155,6 +165,7 @@ package body Multilayer_Perceptron is
       --        Put_Line (Routine_Name & "Loss computation elapsed time: " &
       --                    Duration'Image ((End_Time -Start_Time) * 1000) & "mS");
 
+      Put_Line (Routine_Name & "L289");
       --  L289  Add L2 regularization term to loss
       --  L310 loop elapsed time 650 ms.
       for s in Self.Attributes.Params.First_Index ..
@@ -745,7 +756,6 @@ package body Multilayer_Perceptron is
       --   stopping BEFORE "stop". That is, at "stop" - 1.
       --  Therefore range(self.n_layers_ - 1): range is
       --            first (0) .. last (n_layers_ - 2)
-      Put_Line (Routine_Name);
       for layer in 1 .. Num_Layers - 1 loop
          declare
             Activation : constant Float_Matrix := Activations (layer);
@@ -777,8 +787,6 @@ package body Multilayer_Perceptron is
             if Integer (Activations.Length) <= layer then
                Activations.Set_Length (Count_Type (layer + 1));
             end if;
-
-            Put_Line (Routine_Name & "L131");
 
             --  L131
 

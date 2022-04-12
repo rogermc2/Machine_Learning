@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -18,27 +19,34 @@ package body Base_Neural is
 
     function Binary_Log_Loss (Y_True : Integer_Matrix; Y_Prob : Float_Matrix)
                               return Float is
-    --        Routine_Name : constant String :=
-    --                         "Base_Neural.Binary_Log_Loss_Function ";
-        type Matrix_Float is new Float_Matrix (1 .. Y_Prob'Length,
+        Routine_Name : constant String :=
+                           "Base_Neural.Binary_Log_Loss_Function ";
+        type Matrix_Prob is new Float_Matrix (1 .. Y_Prob'Length,
                                                1 .. Y_Prob'Length (2));
         Y_P      : Float;
-        YP_Float : Matrix_Float := Matrix_Float (Y_Prob);
-        YT_Float : Matrix_Float;
-        X_Log_Y1 : Matrix_Float;
-        X_Log_Y2 : Matrix_Float;
+        YP_Clip  : Matrix_Prob := Matrix_Prob (Y_Prob);
+        X_Log_Y1 : Matrix_Prob;
+        X_Log_Y2 : Matrix_Prob;
         Sum1     : Float := 0.0;
         Sum2     : Float := 0.0;
     begin
+      Assert (Y_Prob'Length = Y_True'Length and
+                Y_Prob'Length (2) = Y_True'Length (2), Routine_Name &
+                "Y_Prob size" &
+                Integer'Image (Integer (Y_Prob'Length)) & " x" &
+                Integer'Image (Integer (Y_Prob'Length (2))) &
+                " should be the same as Y_True size" &
+                Integer'Image (Integer (Y_True'Length)) & " x" &
+                Integer'Image (Integer (Y_True'Length(2))));
+
         --  L226 Clip Y_Prob
         for row in Y_Prob'First .. Y_Prob'Last loop
             for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
-                YT_Float (row, col) := Float (Y_True (row, col));
                 Y_P := Y_Prob (row, col);
                 if Y_P < EPS then
-                    YP_Float (row, col) := EPS;
+                    YP_Clip (row, col) := EPS;
                 elsif Y_P > 1.0 - EPS then
-                    YP_Float (row, col) := 1.0 - EPS;
+                    YP_Clip (row, col) := 1.0 - EPS;
                 end if;
             end loop;
         end loop;
@@ -47,10 +55,10 @@ package body Base_Neural is
         for row in Y_Prob'First .. Y_Prob'Last loop
             for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
                 X_Log_Y1 (row, col) :=
-                  X_Log_Y (YT_Float (row, col), YP_Float (row, col));
+                  X_Log_Y (Float (Y_True (row, col)), YP_Clip (row, col));
                 X_Log_Y2 (row, col) :=
-                  X_Log_Y (1.0 - YT_Float (row, col),
-                           1.0 - YP_Float (row, col));
+                  X_Log_Y (1.0 - Float (Y_True (row, col)),
+                           1.0 - YP_Clip (row, col));
             end loop;
         end loop;
 
