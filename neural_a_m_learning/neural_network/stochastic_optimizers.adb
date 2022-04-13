@@ -18,8 +18,8 @@ package body Stochastic_Optimizers is
     function "+" (L, R : Parameters_Record) return Parameters_Record is
         Sum_Rec : Parameters_Record := L;
     begin
-        Sum_Rec.Coeff_Params := L.Coeff_Params + R.Coeff_Params;
-        Sum_Rec.Intercept_Params := L.Intercept_Params + R.Intercept_Params;
+        Sum_Rec.Coeff_Grads := L.Coeff_Grads + R.Coeff_Grads;
+        Sum_Rec.Intercept_Grads := L.Intercept_Grads + R.Intercept_Grads;
 
         return Sum_Rec;
 
@@ -45,12 +45,11 @@ package body Stochastic_Optimizers is
     function "-" (M : Parameters_Record) return Parameters_Record is
         Minus : Parameters_Record := M;
     begin
-        for row in Minus.Coeff_Params'First .. Minus.Coeff_Params'Last loop
-            for col in Minus.Coeff_Params'First (2) ..
-              Minus.Coeff_Params'Last (2) loop
-                Minus.Coeff_Params (row, col) := - Minus.Coeff_Params  (row, col);
+        for row in Minus.Coeff_Grads'Range loop
+            for col in Minus.Coeff_Grads'Range (2) loop
+                Minus.Coeff_Grads (row, col) := - Minus.Coeff_Grads (row, col);
             end loop;
-            Minus.Intercept_Params (row) := - Minus.Intercept_Params  (row);
+            Minus.Intercept_Grads (row) := - Minus.Intercept_Grads (row);
 
         end loop;
 
@@ -64,14 +63,13 @@ package body Stochastic_Optimizers is
     function "-" (L, R : Parameters_Record) return Parameters_Record is
         Minus : Parameters_Record := L;
     begin
-        for row in Minus.Coeff_Params'First .. Minus.Coeff_Params'Last loop
-            for col in Minus.Coeff_Params'First (2) ..
-              Minus.Coeff_Params'Last (2) loop
-                Minus.Coeff_Params (row, col) :=
-                  Minus.Coeff_Params (row, col) - R.Coeff_Params  (row, col);
+        for row in Minus.Coeff_Grads'Range loop
+            for col in Minus.Coeff_Grads'Range (2) loop
+                Minus.Coeff_Grads (row, col) :=
+                  Minus.Coeff_Grads (row, col) - R.Coeff_Grads (row, col);
             end loop;
-            Minus.Intercept_Params (row) :=
-              Minus.Intercept_Params (row) - R.Intercept_Params  (row);
+            Minus.Intercept_Grads (row) :=
+              Minus.Intercept_Grads (row) - R.Intercept_Grads (row);
         end loop;
 
         return Minus;
@@ -84,14 +82,13 @@ package body Stochastic_Optimizers is
     function "*" (L : Float; R : Parameters_Record) return Parameters_Record is
         Product : Parameters_Record := R;
     begin
-        for row in Product.Coeff_Params'First .. Product.Coeff_Params'Last loop
-            for col in Product.Coeff_Params'First (2) ..
-              Product.Coeff_Params'Last (2) loop
-                Product.Coeff_Params (row, col) :=
-                  L * Product.Coeff_Params (row, col);
+        for row in Product.Coeff_Grads'Range loop
+            for col in Product.Coeff_Grads'Range (2) loop
+                Product.Coeff_Grads (row, col) :=
+                  L * Product.Coeff_Grads (row, col);
             end loop;
-            Product.Intercept_Params (row) :=
-              L * Product.Intercept_Params (row);
+            Product.Intercept_Grads (row) :=
+              L * Product.Intercept_Grads (row);
         end loop;
 
         return Product;
@@ -105,8 +102,8 @@ package body Stochastic_Optimizers is
                   return Parameters_Record is
         Result : Parameters_Record := Rec;
     begin
-        Result.Coeff_Params := Rec.Coeff_Params ** P;
-        Result.Intercept_Params := Rec.Intercept_Params ** P;
+        Result.Coeff_Grads := Rec.Coeff_Grads ** P;
+        Result.Intercept_Grads := Rec.Intercept_Grads ** P;
 
         return Result;
 
@@ -117,14 +114,13 @@ package body Stochastic_Optimizers is
     function "/" (L, R : Parameters_Record) return Parameters_Record is
         Result  : Parameters_Record := L;
     begin
-        for row in Result.Coeff_Params'First .. Result.Coeff_Params'Last loop
-            for col in Result.Coeff_Params'First (2) ..
-              Result.Coeff_Params'Last (2) loop
-                Result.Coeff_Params (row, col) :=
-                  Result.Coeff_Params (row, col) / R.Coeff_Params  (row, col);
+        for row in Result.Coeff_Grads'Range loop
+            for col in Result.Coeff_Grads'Range (2) loop
+                Result.Coeff_Grads (row, col) :=
+                  Result.Coeff_Grads (row, col) / R.Coeff_Grads  (row, col);
             end loop;
-            Result.Intercept_Params (row) :=
-              Result.Intercept_Params (row) / R.Intercept_Params  (row);
+            Result.Intercept_Grads (row) :=
+              Result.Intercept_Grads (row) / R.Intercept_Grads  (row);
         end loop;
 
         return Result;
@@ -322,14 +318,13 @@ package body Stochastic_Optimizers is
         use Maths.Float_Math_Functions;
         Result : Parameters_Record := M;
     begin
-        for row in Result.Coeff_Params'First .. Result.Coeff_Params'Last loop
-            for col in Result.Coeff_Params'First (2) ..
-              Result.Coeff_Params'Last (2) loop
-                Result.Coeff_Params (row, col) :=
-                  Sqrt (Result.Coeff_Params (row, col)) + Epsilon;
+        for row in Result.Coeff_Grads'Range loop
+            for col in Result.Coeff_Grads'Range (2) loop
+                Result.Coeff_Grads (row, col) :=
+                  Sqrt (Result.Coeff_Grads (row, col)) + Epsilon;
             end loop;
-            Result.Intercept_Params (row) :=
-              Sqrt (Result.Intercept_Params (row)) + Epsilon;
+            Result.Intercept_Grads (row) :=
+              Sqrt (Result.Intercept_Grads (row)) + Epsilon;
         end loop;
 
         return Result;
@@ -411,14 +406,14 @@ package body Stochastic_Optimizers is
             declare
                 Data    : constant Parameters_Record := Params (index);
                 Coeffs  : constant Float_Matrix
-                  (1 .. Data.Coeff_Params'Length,
-                   1 .. Data.Coeff_Params'Length (2)) :=
+                  (1 .. Data.Coeff_Grads'Length,
+                   1 .. Data.Coeff_Grads'Length (2)) :=
                             (others => (others => 0.0));
                 Intercepts  : constant Float_Array
-                  (1 .. Data.Intercept_Params'Length) := (others => 0.0);
+                  (1 .. Data.Intercept_Grads'Length) := (others => 0.0);
             begin
-                Params (index).Coeff_Params := Coeffs;
-                Params (index).Intercept_Params := Intercepts;
+                Params (index).Coeff_Grads := Coeffs;
+                Params (index).Intercept_Grads := Intercepts;
             end;
         end loop;
 

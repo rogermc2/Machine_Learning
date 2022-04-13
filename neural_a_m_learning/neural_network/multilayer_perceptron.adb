@@ -167,11 +167,9 @@ package body Multilayer_Perceptron is
                        Self.Attributes.Params (s);
             Ravel  : NL_Types.Float_List;
          begin
-            for row in S_List.Coeff_Params'First ..
-              S_List.Coeff_Params'Last loop
-               for col in S_List.Coeff_Params'First (2) ..
-                 S_List.Coeff_Params'Last (2) loop
-                  Ravel := Ravel & S_List.Coeff_Params (row, col);
+            for row in S_List.Coeff_Grads'Range loop
+               for col in S_List.Coeff_Grads'Range (2) loop
+                  Ravel := Ravel & S_List.Coeff_Grads (row, col);
                end loop;
             end loop;
             Values := Values + NL_Types.Dot (Ravel, Ravel);
@@ -220,7 +218,7 @@ package body Multilayer_Perceptron is
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
             Dot_L  : constant Float_Matrix := Deltas (index);
-            Dot_R  : constant Float_Matrix := S_List.Coeff_Params;
+            Dot_R  : constant Float_Matrix := S_List.Coeff_Grads;
          begin
             Deltas (index - 1) :=
               Dot (Dot_L, Transpose (Dot_R));
@@ -321,7 +319,7 @@ package body Multilayer_Perceptron is
       --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : constant Float_Matrix := Deltas (Layer);
       Coeffs       : constant Float_Matrix :=
-                       Self.Attributes.Params (Layer).Coeff_Params;
+                       Self.Attributes.Params (Layer).Coeff_Grads;
       Delta_Act    : Float_Matrix
         (Delta_M'First .. Delta_M'Last,
          Delta_M'First (2) .. Delta_M'Last (2));
@@ -344,21 +342,21 @@ package body Multilayer_Perceptron is
       end if;
 
       --        Assert (Delta_Act.Length =
-      --                  Self.Attributes.Params (Layer).Coeff_Params.Length,
+      --                  Self.Attributes.Params (Layer).Coeff_Grads.Length,
       --                Routine_Name & "Delta_Act Length" &
       --                  Count_Type'Image (Delta_Act.Length) & " should equal " &
-      --                  "Coeff_Params length" &
+      --                  "Coeff_Grads length" &
       --                  Count_Type'Image
-      --                  (Self.Attributes.Params (Layer).Coeff_Params.Length));
+      --                  (Self.Attributes.Params (Layer).Coeff_Grads.Length));
 
-      --  Grad.Coeff_Params is a 2D list of fan_in x fan_out lists
-      Grads (layer).Coeff_Params :=
+      --  Grad.Coeff_Grads is a 2D list of fan_in x fan_out lists
+      Grads (layer).Coeff_Grads :=
         (Delta_Act + (Self.Parameters.Alpha * Coeffs));
 
-      Grads (layer).Coeff_Params :=
-        Grads (layer).Coeff_Params / Float (Num_Samples);
+      Grads (layer).Coeff_Grads :=
+        Grads (layer).Coeff_Grads / Float (Num_Samples);
 
-      Grads (layer).Intercept_Params := Delta_Mean;
+      Grads (layer).Intercept_Grads := Delta_Mean;
 
    end  Compute_Loss_Gradient;
 
@@ -758,14 +756,14 @@ package body Multilayer_Perceptron is
          end;
          Put_Line (Routine_Name & "Coefficient_Matrix size:" &
                      Count_Type'Image
-                     (Params.Element (layer).Coeff_Params'Length) & " x" &
+                     (Params.Element (layer).Coeff_Grads'Length) & " x" &
                      Count_Type'Image
-                     (Params.Element (layer).Coeff_Params'Length (2)));
+                     (Params.Element (layer).Coeff_Grads'Length (2)));
          declare
             Coefficient_Matrix : constant Float_Matrix :=
-                                   Params (layer).Coeff_Params;
+                                   Params (layer).Coeff_Grads;
             Intercepts         : Float_Array :=
-                                   Params (layer).Intercept_Params;
+                                   Params (layer).Intercept_Grads;
             Acts_Dot_Coeffs    : constant Float_Matrix
               := Dot (Activations (layer), Coefficient_Matrix);
             Act_With_Intercept : Float_Matrix
@@ -781,7 +779,6 @@ package body Multilayer_Perceptron is
             end if;
 
             --  L131
-
             Activations.Replace_Element (layer + 1, Acts_Dot_Coeffs);
             Put_Line (Routine_Name & "L131 Activations length:" &
                         Count_Type'Image (Activations.Length));
@@ -804,7 +801,9 @@ package body Multilayer_Perceptron is
             --  L132
             Act_With_Intercept := Activations (layer + 1);
             --  Intercepts: layers x intercept values
-            Intercepts := Params (layer).Intercept_Params;
+            Intercepts := Params (layer).Intercept_Grads;
+--              Activations.Replace_Element (layer + 1, Activations (layer + 1) +
+--                                             Intercepts (layer));
             for intercept in Intercepts'First .. Intercepts'Last loop
                --   Put_Line (Routine_Name & "intercept:" & Integer'Image (intercept));
                Act_With_Intercept (layer, intercept) :=
@@ -873,14 +872,14 @@ package body Multilayer_Perceptron is
       --  Generate random weights
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Param_Init.Coeff_Params (f_in, f_out) :=
+            Param_Init.Coeff_Grads (f_in, f_out) :=
               Init_Bound * Random_Float;
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Param_Init.Intercept_Params (f_out) :=
+         Param_Init.Intercept_Grads (f_out) :=
            Init_Bound * Random_Float;
       end loop;
 

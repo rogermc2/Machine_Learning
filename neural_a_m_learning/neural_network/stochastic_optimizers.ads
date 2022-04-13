@@ -23,8 +23,8 @@ package Stochastic_Optimizers is
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type Parameters_Record (Num_Rows, Num_Cols : Positive) is record
-      Coeff_Params     : Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
-      Intercept_Params : Float_Array (1 .. Num_Rows);
+      Coeff_Grads     : Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+      Intercept_Grads : Float_Array (1 .. Num_Rows);
    end record;
 
    package Parameters_Package is new
