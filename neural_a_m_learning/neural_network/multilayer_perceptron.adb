@@ -326,12 +326,13 @@ package body Multilayer_Perceptron is
         (Activ_M'First (2) .. Activ_M'Last (2),
          Delta_M'First (2) .. Delta_M'Last (2));
       Delta_Mean   : Float_Array (Delta_M'First .. Delta_M'Last);
+      New_Grad     : Parameters_Record (Coeffs'Length, Coeffs'Length (2));
    begin
       Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
-      Put_Line (Routine_Name & "Deltas (Layer) length" &
-                  Count_Type'Image (Delta_M'Length));
-      Put_Line (Routine_Name & "Activations (Layer) length" &
-                  Count_Type'Image (Activ_M'Length));
+--        Put_Line (Routine_Name & "Deltas (Layer) length" &
+--                    Count_Type'Image (Delta_M'Length));
+--        Put_Line (Routine_Name & "Activations (Layer) length" &
+--                    Count_Type'Image (Activ_M'Length));
 
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
@@ -347,14 +348,11 @@ package body Multilayer_Perceptron is
 --                    Count_Type'Image (Activations.Element (Layer)'Length (2)));
 --        Put_Line (Routine_Name & "Deltas (Layer) cols" &
 --                    Count_Type'Image (Deltas.Element (Layer)'Length (2)));
-      Put_Line (Routine_Name & "Delta_Act rows" &
-                  Count_Type'Image (Delta_Act'Length));
-      Put_Line (Routine_Name & "Delta_Act  cols" &
-                  Count_Type'Image (Delta_Act'Length (2)));
       Delta_Act := Dot (Transpose (Activations (Layer)), Deltas (Layer));
       Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 1);
 
       if Grads.Is_Empty or else Grads.Length < Count_Type (Layer) then
+         Put_Line (Routine_Name & "setting Grads length");
          Grads.Set_Length (Count_Type (Layer));
       end if;
 
@@ -363,18 +361,26 @@ package body Multilayer_Perceptron is
                 " should equal Coeff_Grads length" &
                 Count_Type'Image (Coeffs'Length));
 
-      Put_Line (Routine_Name & "L185");
+--        Put_Line (Routine_Name & "Delta_Act rows" &
+--                    Count_Type'Image (Delta_Act'Length));
+--        Put_Line (Routine_Name & "Delta_Act cols" &
+--                    Count_Type'Image (Delta_Act'Length (2)));
+--        Put_Line (Routine_Name & "Coeffs rows" &
+--                    Count_Type'Image (Coeffs'Length));
+--        Put_Line (Routine_Name & "Coeffs  cols" &
+--                    Count_Type'Image (Coeffs'Length (2)));
       --  L185
       --  Grad.Coeff_Grads is a 2D list of fan_in x fan_out lists
-      Grads (layer).Coeff_Grads :=
-        Delta_Act + (Self.Parameters.Alpha * Coeffs);
+      New_Grad.Coeff_Grads :=
+        Delta_Act + Self.Parameters.Alpha * Coeffs;
 
-      Grads (layer).Coeff_Grads :=
-        Grads (layer).Coeff_Grads / Float (Num_Samples);
+      New_Grad.Coeff_Grads :=
+        New_Grad.Coeff_Grads / Float (Num_Samples);
 
       Put_Line (Routine_Name & "L189");
       --  L189
-      Grads (layer).Intercept_Grads := Delta_Mean;
+      New_Grad.Intercept_Grads := Delta_Mean;
+      Grads (layer) := New_Grad;
 
    end  Compute_Loss_Gradient;
 
