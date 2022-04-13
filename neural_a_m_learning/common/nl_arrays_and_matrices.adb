@@ -1,5 +1,5 @@
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 
 package body NL_Arrays_And_Matrices is
 
@@ -137,15 +137,15 @@ package body NL_Arrays_And_Matrices is
     --  A.B = [c(i,j)] where
     --  c(i,j) = a(i,1)*b(1,j) + ... a(i,n)*b(n,j)
     function Dot (L, R : Float_Matrix) return Float_Matrix is
-        Routine_Name : constant String := "NL_Arrays_And_Matrices.Dot ";
+--          Routine_Name : constant String := "NL_Arrays_And_Matrices.Dot ";
         Num_Rows : constant Positive := L'Length;
         Num_Cols : constant Positive := R'Length (2);
         Product  : Float_Matrix  (1 .. Num_Rows, 1 .. Num_Cols);
     begin
-        Assert (R'Length = L'Length (2), Routine_Name &
-                  "Num rows" & Integer'Image (R'Length) & " of right matrix " &
-                  "doesn't equal num colums" & Integer'Image (L'Length (2)) &
-                  " of left matrix");
+--          Assert (R'Length = L'Length (2), Routine_Name &
+--                    "Num rows" & Integer'Image (R'Length) & " of right matrix " &
+--                    "doesn't equal num colums" & Integer'Image (L'Length (2)) &
+--                    " of left matrix");
         for row in Product'Range loop
             for col in Product'Range (2) loop
                 Product (row, col) := 0.0;
