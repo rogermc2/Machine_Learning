@@ -132,15 +132,14 @@ package body NL_Arrays_And_Matrices is
 
     end "-";
 
-    --  ------------------------------------------------------------------------
-
+    --  ----------------------------------------------------------------------------
+    --  For A = [a(1,1) ... a(m,n)] and B = [b(1,1) ... b(n,p)]
+    --  A.B = [c(i,j)] where
+    --  c(i,j) = a(i,1)*b(1,j) + ... a(i,n)*b(n,j)
     function Dot (L, R : Float_Matrix) return Float_Matrix is
         Routine_Name : constant String := "NL_Arrays_And_Matrices.Dot ";
         Num_Rows : constant Positive := L'Length;
         Num_Cols : constant Positive := R'Length (2);
-        LT       : constant Float_Matrix := Transpose (L);
-        R_Row    : Float_Array (1 .. Num_Cols);
-        LR       : Float;
         Product  : Float_Matrix  (1 .. Num_Rows, 1 .. Num_Cols);
     begin
         Assert (R'Length = L'Length (2), Routine_Name &
@@ -148,15 +147,12 @@ package body NL_Arrays_And_Matrices is
                   "doesn't equal num colums" & Integer'Image (L'Length (2)) &
                   " of left matrix");
         for row in Product'Range loop
-            for col in Product'Range (2)loop
-                for col_r in R'Range (2)loop
-                    R_Row (col_r) := R (row, col_r);
+            for col in Product'Range (2) loop
+                Product (row, col) := 0.0;
+                for index in R'Range loop
+                    Product (row, col) := Product (row, col) +
+                      L (row, index) * R (index, col);
                 end loop;
-                LR := 0.0;
-                for lr_index in R_Row'Range loop
-                    LR := LR + R_Row (lr_index) * LT (lr_index, row);
-                end loop;
-                Product (row, col) := LR;
             end loop;
         end loop;
 
@@ -164,8 +160,7 @@ package body NL_Arrays_And_Matrices is
 
     end Dot;
 
-    --  ----------------------------------------------------------------------------
-
+    --  ----------------------------------
     function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
         Result : Float_Array (1 .. Positive (List.Length));
     begin
@@ -195,7 +190,7 @@ package body NL_Arrays_And_Matrices is
     --  ------------------------------------------------------------------------
 
     function To_Float_Matrix (List : NL_Types.Float_List_2D)
-                             return Float_Matrix is
+                              return Float_Matrix is
     begin
         if not List.Is_Empty then
             declare
@@ -225,7 +220,7 @@ package body NL_Arrays_And_Matrices is
     --  ------------------------------------------------------------------------
 
     function To_Integer_Array (List : NL_Types.Integer_List)
-                              return Integer_Array is
+                               return Integer_Array is
     begin
         if not List.Is_Empty then
             declare
@@ -249,7 +244,7 @@ package body NL_Arrays_And_Matrices is
     --  ------------------------------------------------------------------------
 
     function To_Natural_Array (List : NL_Types.Natural_List)
-                              return Natural_Array is
+                               return Natural_Array is
     begin
         if not List.Is_Empty then
             declare
