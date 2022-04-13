@@ -157,7 +157,6 @@ package body Multilayer_Perceptron is
       --        Put_Line (Routine_Name & "Loss computation elapsed time: " &
       --                    Duration'Image ((End_Time -Start_Time) * 1000) & "mS");
 
-      Put_Line (Routine_Name & "L289");
       --  L289  Add L2 regularization term to loss
       --  L310 loop elapsed time 650 ms.
       for s in Self.Attributes.Params.First_Index ..
@@ -207,9 +206,11 @@ package body Multilayer_Perceptron is
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
 
+      Put_Line (Routine_Name & "L304");
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
+      Put_Line (Routine_Name & "L310");
 
       --  L310, L308
       --  L310 loop elapsed time insignificant
@@ -315,9 +316,10 @@ package body Multilayer_Perceptron is
       Deltas      : Matrix_List;
       Grads       : in out Parameters_List) is
       use Ada.Containers;
-      --        Routine_Name : constant String :=
-      --                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : constant Float_Matrix := Deltas (Layer);
+      Activ_M      : constant Float_Matrix := Activations (Layer);
       Coeffs       : constant Float_Matrix :=
                        Self.Attributes.Params (Layer).Coeff_Grads;
       Delta_Act    : Float_Matrix
@@ -325,29 +327,38 @@ package body Multilayer_Perceptron is
          Delta_M'First (2) .. Delta_M'Last (2));
       Delta_Mean   : Float_Array (Delta_M'First .. Delta_M'Last);
    begin
-      --        Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
-      --        Put_Line (Routine_Name & "Deltas (Layer) length" &
-      --                    Count_Type'Image (Deltas (Layer).Length));
-      --        Put_Line (Routine_Name & "Activations (Layer) length" &
-      --                    Count_Type'Image (Activations (Layer).Length));
+      Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
+      Put_Line (Routine_Name & "Deltas (Layer) length" &
+                  Count_Type'Image (Delta_M'Length));
+      Put_Line (Routine_Name & "Activations (Layer) length" &
+                  Count_Type'Image (Activ_M'Length));
 
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  L185
-      Delta_Act := Dot (Transpose (Activations.Element (Layer)), Deltas.Element (Layer));
+      Assert (Deltas.Element (Layer)'Length =
+                Transpose (Activations.Element (Layer))'Length (2),
+              Routine_Name & "Num rows" &
+                Integer'Image (Deltas.Element (Layer)'Length) &
+                " of right matrix doesn't equal num colums" &
+                Integer'Image
+                (Transpose (Activations.Element (Layer))'Length (2)) &
+                " of left matrix");
+      Put_Line (Routine_Name & "set Delta_Act");
+      Delta_Act := Dot (Transpose (Activations.Element (Layer)),
+                        Deltas.Element (Layer));
+      Put_Line (Routine_Name & "Delta_Act length" &
+                  Count_Type'Image (Delta_Act'Length));
       Delta_Mean := Neural_Maths.Mean (Deltas.Element (Layer), 1);
 
       if Grads.Is_Empty or else Grads.Length < Count_Type (Layer) then
          Grads.Set_Length (Count_Type (Layer));
       end if;
 
-      --        Assert (Delta_Act.Length =
-      --                  Self.Attributes.Params (Layer).Coeff_Grads.Length,
-      --                Routine_Name & "Delta_Act Length" &
-      --                  Count_Type'Image (Delta_Act.Length) & " should equal " &
-      --                  "Coeff_Grads length" &
-      --                  Count_Type'Image
-      --                  (Self.Attributes.Params (Layer).Coeff_Grads.Length));
+      Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
+                "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
+                " should equal Coeff_Grads length" &
+                Count_Type'Image (Coeffs'Length));
 
       --  Grad.Coeff_Grads is a 2D list of fan_in x fan_out lists
       Grads (layer).Coeff_Grads :=
@@ -760,18 +771,18 @@ package body Multilayer_Perceptron is
                      Count_Type'Image
                      (Params.Element (layer).Coeff_Grads'Length (2)));
          declare
-            Coefficient_Matrix : constant Float_Matrix :=
-                                   Params (layer).Coeff_Grads;
-            Intercepts         : Float_Array :=
-                                   Params (layer).Intercept_Grads;
-            Acts_Dot_Coeffs    : constant Float_Matrix
+            Coefficient_Matrix   : constant Float_Matrix :=
+                                     Params (layer).Coeff_Grads;
+            Intercepts           : Float_Array :=
+                                     Params (layer).Intercept_Grads;
+            Activs_Dot_Coeffs    : constant Float_Matrix
               := Dot (Activations (layer), Coefficient_Matrix);
-            Act_With_Intercept : Float_Matrix
-              (1 .. Acts_Dot_Coeffs'Length, 1 .. Acts_Dot_Coeffs'Length (2));
+            Activ_With_Intercept : Float_Matrix
+              (1 .. Activs_Dot_Coeffs'Length, 1 .. Activs_Dot_Coeffs'Length (2));
          begin
             Put_Line (Routine_Name & "Acts_Dot_Coeffs:" &
-                        Count_Type'Image (Acts_Dot_Coeffs'Length) & " x" &
-                        Count_Type'Image (Acts_Dot_Coeffs'Length (2)));
+                        Count_Type'Image (Activs_Dot_Coeffs'Length) & " x" &
+                        Count_Type'Image (Activs_Dot_Coeffs'Length (2)));
             --  Dot (samples x features, samples x coefficients (weights))
             --  => samples x (coefficient * feature)
             if Integer (Activations.Length) <= layer then
@@ -779,7 +790,7 @@ package body Multilayer_Perceptron is
             end if;
 
             --  L131
-            Activations.Replace_Element (layer + 1, Acts_Dot_Coeffs);
+            Activations.Replace_Element (layer + 1, Activs_Dot_Coeffs);
             Put_Line (Routine_Name & "L131 Activations length:" &
                         Count_Type'Image (Activations.Length));
             declare
@@ -796,23 +807,27 @@ package body Multilayer_Perceptron is
                            Count_Type'Image (Activ2'Length (2)));
             end;
             Put_Line (Routine_Name & "Act_With_Intercept:" &
-                        Count_Type'Image (Act_With_Intercept'Length));
+                        Count_Type'Image (Activ_With_Intercept'Length));
 
             --  L132
-            Act_With_Intercept := Activations (layer + 1);
+            Activ_With_Intercept := Activations (layer + 1);
             --  Intercepts: layers x intercept values
             Intercepts := Params (layer).Intercept_Grads;
---              Activations.Replace_Element (layer + 1, Activations (layer + 1) +
---                                             Intercepts (layer));
-            for intercept in Intercepts'First .. Intercepts'Last loop
-               --   Put_Line (Routine_Name & "intercept:" & Integer'Image (intercept));
-               Act_With_Intercept (layer, intercept) :=
-                 Act_With_Intercept (layer, intercept) +
-                 Intercepts (intercept);
+            --              Activations.Replace_Element (layer + 1, Activations (layer + 1) +
+            --                                             Intercepts (layer));
+            --              for intercept in Intercepts'Range loop
+            --   Put_Line (Routine_Name & "intercept:" & Integer'Image (intercept));
+            for row in Activ_With_Intercept'Range loop
+               for col in Activ_With_Intercept'Range (2) loop
+                  Activ_With_Intercept (row, col) :=
+                    Activ_With_Intercept (row, col) +
+                    Intercepts (row);
+               end loop;
             end loop;
-            --           Put_Line (Routine_Name & "Activations length:" &
-            --                      Count_Type'Image (Activations.Length));
-            Activations (layer + 1) := Act_With_Intercept;
+            --              end loop;
+            Put_Line (Routine_Name & "L134 Activations length:" &
+                        Count_Type'Image (Activations.Length));
+            Activations (layer + 1) := Activ_With_Intercept;
 
             --  L134 For the hidden layers
             --           if layer + 1 /= Num_Layers - 1 then
