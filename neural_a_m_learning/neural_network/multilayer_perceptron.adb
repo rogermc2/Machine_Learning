@@ -325,7 +325,7 @@ package body Multilayer_Perceptron is
       Delta_Act    : Float_Matrix
         (Activ_M'First (2) .. Activ_M'Last (2),
          Delta_M'First (2) .. Delta_M'Last (2));
-      Delta_Mean   : Float_Array (Delta_M'First .. Delta_M'Last);
+      Delta_Mean   : Float_Array (Delta_M'First (2) .. Delta_M'Last (2));
       New_Grad     : Parameters_Record (Coeffs'Length, Coeffs'Length (2));
    begin
       Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
@@ -345,10 +345,15 @@ package body Multilayer_Perceptron is
                 (Transpose (Activations.Element (Layer))'Length (2)) &
                 " of left matrix");
 --        Put_Line (Routine_Name & "Activations (Layer) cols" &
---                    Count_Type'Image (Activations.Element (Layer)'Length (2)));
---        Put_Line (Routine_Name & "Deltas (Layer) cols" &
---                    Count_Type'Image (Deltas.Element (Layer)'Length (2)));
+--                    Count_Type'Image (Activations.Element (Layer)'Length (2));
+      Put_Line (Routine_Name & "Deltas (Layer) length" &
+                  Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
+                  Count_Type'Image (Deltas.Element (Layer)'Length (2)));
       Delta_Act := Dot (Transpose (Activations (Layer)), Deltas (Layer));
+      Put_Line (Routine_Name & "Delta_Mean length" &
+                  Count_Type'Image (Delta_Mean'Length));
+      Put_Line (Routine_Name & "Mean length" &
+                  Count_Type'Image (Neural_Maths.Mean (Deltas (Layer), 1)'Length));
       Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 1);
 
       if Grads.Is_Empty or else Grads.Length < Count_Type (Layer) then
@@ -378,6 +383,10 @@ package body Multilayer_Perceptron is
         New_Grad.Coeff_Grads / Float (Num_Samples);
 
       Put_Line (Routine_Name & "L189");
+      Put_Line (Routine_Name & "New_Grad.Intercept_Grads length" &
+                  Count_Type'Image (New_Grad.Intercept_Grads'Length));
+      Put_Line (Routine_Name & "Delta_Mean length" &
+                  Count_Type'Image (Delta_Mean'Length));
       --  L189
       New_Grad.Intercept_Grads := Delta_Mean;
       Grads (layer) := New_Grad;

@@ -142,29 +142,34 @@ package body Neural_Maths is
    end Mean;
 
    --  ------------------------------------------------------------------------
-
+   --  Mean computes means axes along the specified axis.
+   --  For a matrix A = ((1, 2, 3),
+   --                    (4, 5, 6))
+   --  Mean (A, 1) returns (2.5, 3.5, 4.5)
+   --  Mean (A, 2) returns (2, 5)
    function Mean (A : Float_Matrix; Axis : Positive) return Float_Array is
-      A2  : Float_Matrix := A;
-   begin
-      if Axis /= 1 then
-         A2 := Transpose (A);
-      end if;
 
-      declare
-         Length : constant Positive := A2'Length;
+      function Do_Mean (FM : Float_Matrix) return Float_Array is
+         Length : constant Positive := FM'Length (2);
          Sum    : Float;
          Result : Float_Array (1 .. Length);
       begin
-         for row in A2'First .. A2'Last loop
+         for col in FM'Range (2) loop
             Sum := 0.0;
-            for col in A2'First (2) .. A2'Last (2) loop
-               Sum := Sum + A2 (row, col);
+            for row in FM'Range loop
+               Sum := Sum + FM (row, col);
             end loop;
-            Result (row) := Sum / Float (Length);
+            Result (col) := Sum / Float (Length);
          end loop;
-
          return Result;
-      end; --  declare
+      end Do_Mean;
+
+   begin
+      if Axis = 1 then
+         return Do_Mean (A);
+      else
+         return Do_Mean (Transpose (A));
+      end if;
 
    end Mean;
 
