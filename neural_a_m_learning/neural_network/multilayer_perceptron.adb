@@ -346,10 +346,13 @@ package body Multilayer_Perceptron is
                   Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
                   Count_Type'Image (Deltas.Element (Layer)'Length (2)));
       Delta_Act := Dot (Transpose (Activations (Layer)), Deltas (Layer));
-      Put_Line (Routine_Name & "Delta_Mean length" &
+      Put_Line (Routine_Name & "Delta_Mean initial length" &
                   Count_Type'Image (Delta_Mean'Length));
-      Put_Line (Routine_Name & "Mean length" &
+      Put_Line (Routine_Name & "Mean 1 length" &
                   Count_Type'Image (Neural_Maths.Mean (Deltas (Layer), 1)'Length));
+      Put_Line (Routine_Name & "Mean 2 length" &
+                  Count_Type'Image (Neural_Maths.Mean (Deltas (Layer), 2)'Length));
+      --  L188
       Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 2);
 
       if Grads.Is_Empty or else Grads.Length < Count_Type (Layer) then
