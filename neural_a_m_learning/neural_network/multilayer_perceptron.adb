@@ -955,15 +955,17 @@ package body Multilayer_Perceptron is
                             Accumulated_Loss         : in out Float) is
 --        use Ada.Containers;
       Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
-      Batch_Loss   : Float;
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
       Y_Batch      : Integer_Matrix (1 .. Batch_Size, 1 .. 1);
+      Batch_Row    : Positive;
+      Batch_Loss   : Float;
    begin
       for row in Batch_Slice.First .. Batch_Slice.Last loop
+         Batch_Row := row - Batch_Slice.First + 1;
          for col in 1 .. Num_Features loop
-            X_Batch (row - Batch_Slice.First + 1, col) := X (row, col);
+            X_Batch (Batch_Row, col) := X (row, col);
          end loop;
-         Y_Batch (row - Batch_Slice.First + 1, 1) := Y (row, 1);
+         Y_Batch (Batch_Row, 1) := Y (row, 1);
       end loop;
 
       --  L645
