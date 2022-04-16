@@ -542,7 +542,6 @@ package body Multilayer_Perceptron is
       Test_Y                 : Integer_Matrix (1 .. Test_Size, 1 .. 1);
       Batch_Size             : Positive;
       Batches                : NL_Types.Slices_List;
-      Batch_Slice            : NL_Types.Slice_Record;
       Accumulated_Loss       : Float := 0.0;
       Msg                    : Unbounded_String;
       Is_Stopping            : Boolean := False;
@@ -656,9 +655,8 @@ package body Multilayer_Perceptron is
                      Count_Type'Image (Batches.Length));
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
-            Batch_Slice := Batches (Batch_Index);
             --  Time per batch loop iteration 200ms
-            Process_Batch (Self, X, Y, Batch_Slice, Batch_Size,
+            Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
                            Num_Features, Activations, Deltas, Grads,
                            Accumulated_Loss);
          end loop;
