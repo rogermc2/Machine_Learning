@@ -92,6 +92,11 @@ package body Multilayer_Perceptron is
                             Deltas                   : in out Matrix_List;
                             Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float);
+   procedure Update_Activations
+     (Params             : Parameters_Record;
+      Activations        : in out Matrix_List;
+      Hidden_Activation  : Base_Neural.Activation_Type;
+      Num_Layers, Layer  : Positive);
    procedure Update_No_Improvement_Count
      (Self  : in out MLP_Classifier; Early_Stopping : Boolean;
       X_Val : Float_Matrix);
@@ -761,90 +766,24 @@ package body Multilayer_Perceptron is
       --   stopping BEFORE "stop". That is, at "stop" - 1.
       --  Therefore range(self.n_layers_ - 1): range is
       --            first (0) .. last (n_layers_ - 2)
+      Put_Line (Routine_Name & "L119 Activations length:" &
+                  Count_Type'Image (Activations.Length));
+      --  L119
       for layer in 1 .. Num_Layers - 1 loop
---           declare
---              Activation : constant Float_Matrix := Activations (layer);
---           begin
---              Put_Line (Routine_Name & "Activations (" & Integer'Image (layer) &
---                          ") length:" & Count_Type'Image (Activation'Length) &
---                          " x" & Count_Type'Image (Activation'Length (2)));
---           end;
---           Put_Line (Routine_Name & "Coefficient_Matrix size:" &
---                       Count_Type'Image
---                       (Params.Element (layer).Coeff_Grads'Length) & " x" &
---                       Count_Type'Image
---                       (Params.Element (layer).Coeff_Grads'Length (2)));
          declare
-            Coefficient_Matrix   : constant Float_Matrix :=
-                                     Params (layer).Coeff_Grads;
-            Intercepts           : Float_Array :=
-                                     Params (layer).Intercept_Grads;
-            Activs_Dot_Coeffs    : constant Float_Matrix
-              := Dot (Activations (layer), Coefficient_Matrix);
-            Activ_With_Intercept : Float_Matrix
-              (1 .. Activs_Dot_Coeffs'Length, 1 .. Activs_Dot_Coeffs'Length (2));
+            Activation : constant Float_Matrix := Activations (layer);
          begin
---              Put_Line (Routine_Name & "Acts_Dot_Coeffs:" &
---                          Count_Type'Image (Activs_Dot_Coeffs'Length) & " x" &
---                          Count_Type'Image (Activs_Dot_Coeffs'Length (2)));
-            --  Dot (samples x features, samples x coefficients (weights))
-            --  => samples x (coefficient * feature)
-            if Integer (Activations.Length) <= layer then
-               Activations.Set_Length (Count_Type (layer + 1));
-            end if;
-
-            --  L131
-            Activations.Replace_Element (layer + 1, Activs_Dot_Coeffs);
-            Put_Line (Routine_Name & "L131 Activations length:" &
-                        Count_Type'Image (Activations.Length));
-            declare
-               Activ1 : constant Float_Matrix := Activations (layer);
-               Activ2 : constant Float_Matrix := Activations (layer + 1);
-            begin
-               Put_Line (Routine_Name & "Activations" &
-                           Integer'Image (layer) & " length:" &
-                           Count_Type'Image (Activ1'Length) & " x" &
-                           Count_Type'Image (Activ1'Length (2)));
-               Put_Line (Routine_Name & "Activations" &
-                           Integer'Image (layer + 1) & " length:" &
-                           Count_Type'Image (Activ2'Length) & " x" &
-                           Count_Type'Image (Activ2'Length (2)));
-            end;
-            Put_Line (Routine_Name & "Act_With_Intercept:" &
-                        Count_Type'Image (Activ_With_Intercept'Length));
-
-            --  L132
-            Activ_With_Intercept := Activations (layer + 1);
-            --  Intercepts: layers x intercept values
-            Intercepts := Params (layer).Intercept_Grads;
-            --              Activations.Replace_Element (layer + 1, Activations (layer + 1) +
-            --                                             Intercepts (layer));
-            --              for intercept in Intercepts'Range loop
-            --   Put_Line (Routine_Name & "intercept:" & Integer'Image (intercept));
-            for row in Activ_With_Intercept'Range loop
-               for col in Activ_With_Intercept'Range (2) loop
-                  Activ_With_Intercept (row, col) :=
-                    Activ_With_Intercept (row, col) +
-                    Intercepts (row);
-               end loop;
-            end loop;
-            --              end loop;
-            Activations (layer + 1) := Activ_With_Intercept;
-
-            --  L134 For the hidden layers
-            --           if layer + 1 /= Num_Layers - 1 then
-            if layer + 1 /= Num_Layers then
-               case Hidden_Activation is
-                  when Identity_Activation => null;
-                  when Logistic_Activation =>
-                     Logistic (Activations (layer + 1));
-                  when Tanh_Activation => Tanh (Activations (layer + 1));
-                  when Relu_Activation => Relu (Activations (layer + 1));
-                  when Softmax_Activation =>
-                     Softmax (Activations (layer + 1));
-               end case;
-            end if;
-         end;  --  declare
+            Put_Line (Routine_Name & "Activations (" & Integer'Image (layer) &
+                        ") length:" & Count_Type'Image (Activation'Length) &
+                        " x" & Count_Type'Image (Activation'Length (2)));
+         end;
+         Put_Line (Routine_Name & "Coefficient_Matrix size:" &
+                     Count_Type'Image
+                     (Params.Element (layer).Coeff_Grads'Length) & " x" &
+                     Count_Type'Image
+                     (Params.Element (layer).Coeff_Grads'Length (2)));
+         Update_Activations (Params (layer), Activations, Hidden_Activation,
+                             Num_Layers, layer);
       end loop;
 
       --  L138 For the last layer
@@ -951,7 +890,7 @@ package body Multilayer_Perceptron is
                             Deltas                   : in out Matrix_List;
                             Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float) is
---        use Ada.Containers;
+      --        use Ada.Containers;
       Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
       Y_Batch      : Integer_Matrix (1 .. Batch_Size, 1 .. 1);
@@ -980,6 +919,91 @@ package body Multilayer_Perceptron is
                                            Self.Attributes.Params, Grads);
 
    end Process_Batch;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Update_Activations
+     (Params             : Parameters_Record;
+      Activations        : in out Matrix_List;
+      Hidden_Activation  : Base_Neural.Activation_Type;
+      Num_Layers, Layer  : Positive) is
+      use Ada.Containers;
+      use Base_Neural;
+      Routine_Name         : constant String :=
+                               "Multilayer_Perceptron.Update_Activations ";
+      Activ_Layer          : constant Float_Matrix := Activations (layer);
+      Coefficient_Matrix   : constant Float_Matrix := Params.Coeff_Grads;
+      Intercepts           : Float_Array := Params.Intercept_Grads;
+      Activs_Dot_Coeffs    : constant Float_Matrix
+        := Dot (Activ_Layer, Coefficient_Matrix);
+      Activ_With_Intercept : Float_Matrix
+        (1 .. Activ_Layer'Length, 1 .. Activs_Dot_Coeffs'Length (2));
+   begin
+      --              Put_Line (Routine_Name & "Acts_Dot_Coeffs:" &
+      --                          Count_Type'Image (Activs_Dot_Coeffs'Length) & " x" &
+      --                          Count_Type'Image (Activs_Dot_Coeffs'Length (2)));
+      --  Dot (samples x features, samples x coefficients (weights))
+      --  => samples x (coefficient * feature)
+      if Integer (Activations.Length) <= layer then
+         Activations.Set_Length (Count_Type (layer + 1));
+      end if;
+
+      --  L131
+      Activations.Replace_Element (layer + 1, Activs_Dot_Coeffs);
+      Put_Line (Routine_Name & "L131 Activations length:" &
+                  Count_Type'Image (Activations.Length));
+      declare
+         Activ2 : constant Float_Matrix := Activations (layer + 1);
+      begin
+         Put_Line (Routine_Name & "Activations" &
+                     Integer'Image (layer) & " length:" &
+                     Count_Type'Image (Activ_Layer'Length) & " x" &
+                     Count_Type'Image (Activ_Layer'Length (2)));
+         Put_Line (Routine_Name & "Activations" &
+                     Integer'Image (layer + 1) & " length:" &
+                     Count_Type'Image (Activ2'Length) & " x" &
+                     Count_Type'Image (Activ2'Length (2)));
+      end;
+      Put_Line (Routine_Name & "Activs_Dot_Coeffs length" &
+                  Count_Type'Image (Activs_Dot_Coeffs'Length) & " x" &
+                  Count_Type'Image (Activs_Dot_Coeffs'Length (2)));
+      Put_Line (Routine_Name & "Act_With_Intercept length:" &
+                  Count_Type'Image (Activ_With_Intercept'Length) & " x" &
+                  Count_Type'Image (Activ_With_Intercept'Length (2)));
+
+      --  L132
+      Activ_With_Intercept := Activations (layer + 1);
+      --  Intercepts: layers x intercept values
+      Intercepts := Params.Intercept_Grads;
+      --              Activations.Replace_Element (layer + 1, Activations (layer + 1) +
+      --                                             Intercepts (layer));
+      --              for intercept in Intercepts'Range loop
+      for row in Activ_With_Intercept'Range loop
+         --                 Put_Line (Routine_Name & "Activ_With_Intercept row:" &
+         --                             Integer'Image (row));
+         for col in Activ_With_Intercept'Range (2) loop
+            Activ_With_Intercept (row, col) :=
+              Activ_With_Intercept (row, col) +
+              Intercepts (row);
+         end loop;
+      end loop;
+      --              end loop;
+      Activations (layer + 1) := Activ_With_Intercept;
+
+      --  L134 For the hidden layers
+      --           if layer + 1 /= Num_Layers - 1 then
+      if layer + 1 /= Num_Layers then
+         case Hidden_Activation is
+            when Identity_Activation => null;
+            when Logistic_Activation =>
+               Logistic (Activations (layer + 1));
+            when Tanh_Activation => Tanh (Activations (layer + 1));
+            when Relu_Activation => Relu (Activations (layer + 1));
+            when Softmax_Activation =>
+               Softmax (Activations (layer + 1));
+         end case;
+      end if;
+   end Update_Activations;
 
    --  -------------------------------------------------------------------------
    --  L716
