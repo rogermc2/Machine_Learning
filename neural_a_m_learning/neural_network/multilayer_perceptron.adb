@@ -339,6 +339,7 @@ package body Multilayer_Perceptron is
       New_Grad     : Parameters_Record (Params.Num_Rows, Params.Num_Cols);
    begin
       Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
+      Put_Line (Routine_Name & "Num_Samples:" & Integer'Image (Num_Samples));
       --        Put_Line (Routine_Name & "Deltas (Layer) length" &
       --                    Count_Type'Image (Delta_M'Length));
       --        Put_Line (Routine_Name & "Activations (Layer) length" &
@@ -446,8 +447,10 @@ package body Multilayer_Perceptron is
          Initialize (Self, Layer_Units);
       end if;
 
+      --  if ? then
       --  L414 Set the Activation values of the first layer
---        Activations.Append (X);  -- layer x samples x features
+      --        Activations.Append (X);  -- layer x samples x features
+      --  end if;
       --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
