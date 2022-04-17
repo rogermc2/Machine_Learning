@@ -73,7 +73,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
-                             Activations  : in out Matrix_List;
+--                               Activations  : in out Matrix_List;
                              Deltas       : out Matrix_List;
                              Grads        : in out Parameters_List;
                              Incremental  : Boolean := False);
@@ -88,7 +88,7 @@ package body Multilayer_Perceptron is
                             Y                        : Integer_Matrix;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
-                            Activations              : in out Matrix_List;
+--                              Activations              : in out Matrix_List;
                             Deltas                   : in out Matrix_List;
                             Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float);
@@ -416,7 +416,7 @@ package body Multilayer_Perceptron is
                              "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       --  The ith element of Activations holds the values of the ith layer.
-      Activations        : Matrix_List;
+--        Activations        : Matrix_List;
       Deltas             : Matrix_List;
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -447,7 +447,7 @@ package body Multilayer_Perceptron is
       end if;
 
       --  L414 Set the Activation values of the first layer
-      Activations.Append (X);  -- layer x samples x features
+--        Activations.Append (X);  -- layer x samples x features
       --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
@@ -460,7 +460,8 @@ package body Multilayer_Perceptron is
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
          Fit_Stochastic
-           (Self, X, Y, Activations, Deltas, Grads, Incremental);
+           (Self, X, Y, Deltas, Grads, Incremental);
+--             (Self, X, Y, Activations, Deltas, Grads, Incremental);
       elsif Self.Parameters.Solver = Lbfgs_Solver then
          null;
          --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
@@ -515,7 +516,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
-                             Activations  : in out Matrix_List;
+--                               Activations  : in out Matrix_List;
                              Deltas       : out Matrix_List;
                              Grads        : in out Parameters_List;
                              Incremental  : Boolean := False) is
@@ -662,8 +663,7 @@ package body Multilayer_Perceptron is
            Batches.Last_Index loop
             --  Time per batch loop iteration 200ms
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
-                           Num_Features, Activations, Deltas, Grads,
-                           Accumulated_Loss);
+                           Num_Features, Deltas, Grads, Accumulated_Loss);
          end loop;
          --                  Batch_End_Time := Clock;
          --                  Put_Line (Routine_Name & "Batch loop time: " &
@@ -886,7 +886,7 @@ package body Multilayer_Perceptron is
                             Y                        : Integer_Matrix;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
-                            Activations              : in out Matrix_List;
+--                              Activations              : in out Matrix_List;
                             Deltas                   : in out Matrix_List;
                             Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float) is
@@ -894,6 +894,7 @@ package body Multilayer_Perceptron is
       Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
       Y_Batch      : Integer_Matrix (1 .. Batch_Size, 1 .. 1);
+      Activations  : Matrix_List;
       Batch_Row    : Positive;
       Batch_Loss   : Float;
    begin
@@ -905,8 +906,10 @@ package body Multilayer_Perceptron is
          Y_Batch (Batch_Row, 1) := Y (row, 1);
       end loop;
 
+      Activations.Clear;
       --  L645
       --  Time per Backprop loop iteration 170ms
+      Activations.Append (X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Deltas, Batch_Loss,
                 Grads);
 
@@ -944,12 +947,14 @@ package body Multilayer_Perceptron is
       --                          Count_Type'Image (Activs_Dot_Coeffs'Length (2)));
       --  Dot (samples x features, samples x coefficients (weights))
       --  => samples x (coefficient * feature)
-      if Integer (Activations.Length) <= layer then
-         Activations.Set_Length (Count_Type (layer + 1));
-      end if;
+--        if Integer (Activations.Length) <= layer then
+--           Activations.Set_Length (Count_Type (layer + 1));
+--        end if;
 
       --  L131
-      Activations.Replace_Element (layer + 1, Activs_Dot_Coeffs);
+      --        Activations.Replace_Element (layer + 1, Activs_Dot_Coeffs);
+      --  Add layer + 1
+      Activations.Append (Activs_Dot_Coeffs);
       Put_Line (Routine_Name & "L131 Activations length:" &
                   Count_Type'Image (Activations.Length));
       declare
