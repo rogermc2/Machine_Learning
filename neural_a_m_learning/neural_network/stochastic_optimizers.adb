@@ -189,7 +189,7 @@ package body Stochastic_Optimizers is
     function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                                Grads : Parameters_List)
                               return Parameters_List is
-    --        use Ada.Containers;
+        use Ada.Containers;
         use Maths.Float_Math_Functions;
         use Parameters_Package;
         Routine_Name          : constant String :=
@@ -205,6 +205,11 @@ package body Stochastic_Optimizers is
         Updates               : Parameters_List;
     begin
         Put_Line (Routine_Name);
+        Layer_Grads := Grads (1);
+        Update_First_Moments := Self.First_Moments (1);
+        Update_Second_Moments := Self.Second_Moments (1);
+        First_Moments := Self.First_Moments (1);
+        Second_Moments := Self.Second_Moments (1);
         Assert (not Self.First_Moments.Is_Empty, Routine_Name &
                   "Self.First_Moments Is_Empty.");
         Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
@@ -231,8 +236,8 @@ package body Stochastic_Optimizers is
             --                       Count_Type'Image (Layer_Grads.Coeff_Params.Length));
             --           Put_Line (Routine_Name & "Layer_Grads Coeff_Params (1) length" &
             --                       Count_Type'Image (Layer_Grads.Coeff_Params (1).Length));
-            --           Put_Line (Routine_Name & "Layer_Grads Intercept_Params length" &
-            --                       Count_Type'Image (Layer_Grads.Intercept_Params.Length));
+            Put_Line (Routine_Name & "L272 Layer_Grads Intercept_Params length" &
+                      Count_Type'Image (Layer_Grads.Intercept_Grads'Length));
 
             --  L272
             Update_First_Moments := Self.Beta_1 * First_Moments  +
@@ -378,21 +383,25 @@ package body Stochastic_Optimizers is
     procedure Update_Params (Self   : in out Optimizer_Record;
                              Params : in out Parameters_List;
                              Grads  : Parameters_List) is
-    --          Routine_Name : constant String :=
-    --                           "Stochastic_Optimizers.Update_Params ";
+        Routine_Name : constant String :=
+                           "Stochastic_Optimizers.Update_Params ";
         Updates      : Parameters_List;
     begin
+        Put_Line (Routine_Name);
         --  L42
         case Self.Kind is
             when Optimizer_Adam =>
+                Put_Line (Routine_Name & "Get_Adam_Updates");
                 Updates := Get_Adam_Updates (Self.Adam, Grads);
             when Optimizer_SGD =>
                 Updates := Get_SGD_Updates (Self.SGD, Grads);
             when No_Optimizer => null;
         end case;
 
+        Put_Line (Routine_Name & "L44");
         --  L44
         Params := Params + Updates;
+        Put_Line (Routine_Name & "done");
 
     end Update_Params;
 
