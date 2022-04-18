@@ -337,7 +337,8 @@ package body Multilayer_Perceptron is
       Delta_Act    : Float_Matrix
         (Activ_M'First (2) .. Activ_M'Last (2),
          Delta_M'First (2) .. Delta_M'Last (2));
-      Delta_Mean   : Float_Array (1 .. Params.Num_Rows);
+      Delta_Mean   : Float_Array (1 .. Coeffs'Length);
+--        Delta_Mean   : Float_Array (1 .. Params.Num_Rows);
       New_Grad     : Parameters_Record (Params.Num_Rows, Params.Num_Cols);
    begin
       Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
@@ -370,7 +371,7 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "Mean 2 length" &
                   Count_Type'Image (Neural_Maths.Mean (Deltas (Layer), 2)'Length));
       --  L188
-      Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 2);
+      Delta_Mean := Neural_Maths.Mean (Deltas (Layer), 1);
 
       if Grads.Is_Empty or else Grads.Length < Count_Type (Layer) then
          Put_Line (Routine_Name & "setting Grads length");
