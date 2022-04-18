@@ -337,7 +337,7 @@ package body Multilayer_Perceptron is
       Delta_Act    : Float_Matrix
         (Activ_M'First (2) .. Activ_M'Last (2),
          Delta_M'First (2) .. Delta_M'Last (2));
-      Delta_Mean   : Float_Array (1 .. Coeffs'Length);
+      Delta_Mean   : Float_Array (1 .. Coeffs'Length (2));
 --        Delta_Mean   : Float_Array (1 .. Params.Num_Rows);
       New_Grad     : Parameters_Record (Params.Num_Rows, Params.Num_Cols);
    begin
@@ -360,6 +360,9 @@ package body Multilayer_Perceptron is
                 " of left matrix");
       --        Put_Line (Routine_Name & "Activations (Layer) cols" &
       --                    Count_Type'Image (Activations.Element (Layer)'Length (2));
+      Put_Line (Routine_Name & "Coeffs length" &
+                  Count_Type'Image (Coeffs'Length) & " x" &
+                  Count_Type'Image (Coeffs'Length (2)));
       Put_Line (Routine_Name & "Deltas (Layer) length" &
                   Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
                   Count_Type'Image (Deltas.Element (Layer)'Length (2)));
