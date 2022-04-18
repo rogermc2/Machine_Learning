@@ -74,7 +74,7 @@ package body Multilayer_Perceptron is
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
 --                               Activations  : in out Matrix_List;
-                             Deltas       : out Matrix_List;
+--                               Deltas       : out Matrix_List;
                              Grads        : in out Parameters_List;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
@@ -89,7 +89,7 @@ package body Multilayer_Perceptron is
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
 --                              Activations              : in out Matrix_List;
-                            Deltas                   : in out Matrix_List;
+--                              Deltas                   : in out Matrix_List;
                             Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float);
    procedure Update_Activations
@@ -112,7 +112,7 @@ package body Multilayer_Perceptron is
                        X           : Float_Matrix;
                        Y           : Integer_Matrix;
                        Activations : in out Matrix_List;
-                       Deltas      : out Matrix_List;
+--                         Deltas      : out Matrix_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
       use Ada.Containers;
@@ -122,6 +122,7 @@ package body Multilayer_Perceptron is
       Num_Samples        : constant Positive := Positive (X'Length);
       Y_Float            : constant Float_Matrix := To_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function;
+      Deltas             : Matrix_List;
       Values             : Float := 0.0;
       Last               : Positive;
       --        Start_Time         : Time;
@@ -418,7 +419,7 @@ package body Multilayer_Perceptron is
       Num_Features       : constant Positive := Positive (X'Length (2));
       --  The ith element of Activations holds the values of the ith layer.
 --        Activations        : Matrix_List;
-      Deltas             : Matrix_List;
+--        Deltas             : Matrix_List;
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
       Layer_Units        : NL_Types.Integer_List;
@@ -454,7 +455,7 @@ package body Multilayer_Perceptron is
       --  Deltas is a 3D list initialized by Backprop
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
+--        Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
 
       --  L417 Initialized grads are empty vectors, no initialization required.
 
@@ -463,8 +464,8 @@ package body Multilayer_Perceptron is
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
          Fit_Stochastic
-           (Self, X, Y, Deltas, Grads, Incremental);
---             (Self, X, Y, Activations, Deltas, Grads, Incremental);
+           (Self, X, Y, Grads, Incremental);
+--             (Self, X, Y, Deltas, Grads, Incremental);
       elsif Self.Parameters.Solver = Lbfgs_Solver then
          null;
          --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
@@ -520,7 +521,7 @@ package body Multilayer_Perceptron is
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
 --                               Activations  : in out Matrix_List;
-                             Deltas       : out Matrix_List;
+--                               Deltas       : out Matrix_List;
                              Grads        : in out Parameters_List;
                              Incremental  : Boolean := False) is
       use Ada.Containers;
@@ -666,7 +667,8 @@ package body Multilayer_Perceptron is
            Batches.Last_Index loop
             --  Time per batch loop iteration 200ms
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
-                           Num_Features, Deltas, Grads, Accumulated_Loss);
+                           Num_Features, Grads, Accumulated_Loss);
+--                             Num_Features, Deltas, Grads, Accumulated_Loss);
          end loop;
          --                  Batch_End_Time := Clock;
          --                  Put_Line (Routine_Name & "Batch loop time: " &
@@ -890,7 +892,7 @@ package body Multilayer_Perceptron is
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
 --                              Activations              : in out Matrix_List;
-                            Deltas                   : in out Matrix_List;
+--                              Deltas                   : in out Matrix_List;
                             Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float) is
       --        use Ada.Containers;
@@ -913,8 +915,9 @@ package body Multilayer_Perceptron is
       --  L645
       --  Time per Backprop loop iteration 170ms
       Activations.Append (X_Batch);
-      Backprop (Self, X_Batch, Y_Batch, Activations, Deltas, Batch_Loss,
-                Grads);
+      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
+--        Backprop (Self, X_Batch, Y_Batch, Activations, Deltas, Batch_Loss,
+--                  Grads);
 
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
