@@ -113,8 +113,8 @@ package body Multilayer_Perceptron is
                        Y           : Integer_Matrix;
                        Activations : in out Matrix_List;
                        --                         Deltas      : out Matrix_List;
-                       Loss        : out Float) is --;
-      --                         Grads       : out Parameters_List) is
+                       Loss        : out Float;
+                       Grads       : out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
       use NL_Types.Float_Package;
@@ -123,7 +123,6 @@ package body Multilayer_Perceptron is
       Y_Float            : constant Float_Matrix := To_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function;
       Deltas             : Matrix_List;
-      Grads              : Parameters_List;
       Values             : Float := 0.0;
       Last               : Positive;
       --        Start_Time         : Time;
@@ -894,9 +893,7 @@ package body Multilayer_Perceptron is
                             Y                        : Integer_Matrix;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
-                            --                              Activations              : in out Matrix_List;
-                            --                              Deltas                   : in out Matrix_List;
-                            --                              Grads                    : in out Parameters_List;
+                            --    Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float) is
       --        use Ada.Containers;
       Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
@@ -919,9 +916,7 @@ package body Multilayer_Perceptron is
       --  L645
       --  Time per Backprop loop iteration 170ms
       Activations.Append (X_Batch);
-      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
-      --        Backprop (Self, X_Batch, Y_Batch, Activations, Deltas, Batch_Loss,
-      --                  Grads);
+      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
 
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
