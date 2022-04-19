@@ -3,7 +3,7 @@ with Ada.Containers;
 --  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Base_Mix;
+with Base;
 with Base_Neural;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -47,7 +47,7 @@ begin
       Put_Line ("Neural_Fit");
       Fit (aClassifier, Train_X, Train_Y);
       Support_4.Save_Classifier (Dataset_Name, aClassifier);
-       Put_Line ("Score" & Float'Image (aClassifier.Parameters.Validation_Scores.));
+       Put_Line ("Score" & Float'Image (Base.Score (Train_X, Train_Y)));
    end;  --  declare
 
    Put_Line ("----------------------------------------------");
