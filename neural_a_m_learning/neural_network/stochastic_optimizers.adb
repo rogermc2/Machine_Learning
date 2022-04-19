@@ -211,6 +211,8 @@ package body Stochastic_Optimizers is
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
 
+      Put_Line (Routine_Name & "L272");
+      --  L272
       for layer in Grads.First_Index .. Grads.Last_Index loop
          declare
             Layer_Grads            : constant Parameters_Record :=
@@ -219,7 +221,6 @@ package body Stochastic_Optimizers is
                                        Self.First_Moments (layer);
             Second_Moments         : constant Parameters_Record :=
                                        Self.Second_Moments (layer);
-            --  L272
             Update_First_Moments   : constant Parameters_Record :=
                                        Self.Beta_1 * First_Moments  +
                                          (1.0 - Self.Beta_1) * Layer_Grads;
