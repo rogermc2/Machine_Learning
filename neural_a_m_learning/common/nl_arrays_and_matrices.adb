@@ -6,8 +6,8 @@ package body NL_Arrays_And_Matrices is
     function "*" (L : Float; R : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (R'First .. R'Last, R'First (2) .. R'Last (2));
     begin
-        for row in R'First .. R'Last loop
-            for col in R'First (2) .. R'Last (2) loop
+        for row in R'Range loop
+            for col in R'Range (2) loop
                 Result (row, col) := L * R (row, col);
             end loop;
         end loop;
@@ -21,8 +21,8 @@ package body NL_Arrays_And_Matrices is
     function "*" (L, R : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
     begin
-        for row in L'First .. L'Last loop
-            for col in L'First (2) .. L'Last (2) loop
+        for row in L'Range loop
+            for col in L'Range (2) loop
                 Result (row, col) := L (row, col) * R (row, col);
             end loop;
         end loop;
@@ -36,7 +36,7 @@ package body NL_Arrays_And_Matrices is
     function "**" (L : Float_Array; P : Integer) return Float_Array is
         Result : Float_Array := L;
     begin
-        for row in Result'First .. Result'Last loop
+        for row in Result'Range loop
             Result (row) := Result (row) ** P;
         end loop;
 
@@ -49,8 +49,8 @@ package body NL_Arrays_And_Matrices is
     function "**" (L : Float_Matrix; P : Integer) return Float_Matrix is
         Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
     begin
-        for row in L'First .. L'Last loop
-            for col in L'First (2) .. L'Last (2) loop
+        for row in L'Range loop
+            for col in L'Range (2) loop
                 Result (row, col) := L (row, col) ** P;
             end loop;
         end loop;
@@ -64,8 +64,8 @@ package body NL_Arrays_And_Matrices is
     function "/" (L : Float_Matrix; R : Float) return Float_Matrix is
         Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
     begin
-        for row in L'First .. L'Last loop
-            for col in L'First (2) .. L'Last (2) loop
+        for row in L'Range loop
+            for col in L'Range (2) loop
                 Result (row, col) := L (row, col) / R;
             end loop;
         end loop;
@@ -79,8 +79,8 @@ package body NL_Arrays_And_Matrices is
     function "/" (L, R : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
     begin
-        for row in L'First .. L'Last loop
-            for col in L'First (2) .. L'Last (2) loop
+        for row in L'Range loop
+            for col in L'Range (2) loop
                 Result (row, col) := L (row, col) / R (row, col);
             end loop;
         end loop;
@@ -94,7 +94,7 @@ package body NL_Arrays_And_Matrices is
     function "+" (L, R : Float_Array) return Float_Array is
         Result : Float_Array (L'First .. L'Last);
     begin
-        for row in L'First .. L'Last loop
+        for row in L'Range loop
             Result (row) := L (row) + R (row);
         end loop;
 
@@ -107,8 +107,8 @@ package body NL_Arrays_And_Matrices is
     function "+" (L, R : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
     begin
-        for row in L'First .. L'Last loop
-            for col in L'First (2) .. L'Last (2) loop
+        for row in L'Range loop
+            for col in L'Range (2) loop
                 Result (row, col) := L (row, col) + R (row, col);
             end loop;
         end loop;
@@ -122,8 +122,8 @@ package body NL_Arrays_And_Matrices is
     function "-" (L, R : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
     begin
-        for row in L'First .. L'Last loop
-            for col in L'First (2) .. L'Last (2) loop
+        for row in L'Range loop
+            for col in L'Range (2) loop
                 Result (row, col) := L (row, col) - R (row, col);
             end loop;
         end loop;
@@ -133,7 +133,22 @@ package body NL_Arrays_And_Matrices is
     end "-";
 
     --  ----------------------------------------------------------------------------
-    --  For A = [a(1,1) ... a(m,n)] and B = [b(1,1) ... b(n,p)]
+
+    function "-" (L, R : Integer_Matrix) return Integer_Matrix is
+        Result : Integer_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
+    begin
+        for row in L'Range loop
+            for col in L'Range (2) loop
+                Result (row, col) := L (row, col) - R (row, col);
+            end loop;
+        end loop;
+
+        return Result;
+
+    end "-";
+
+    --  ----------------------------------------------------------------------------
+   --  For A = [a(1,1) ... a(m,n)] and B = [b(1,1) ... b(n,p)]
     --  A.B = [c(i,j)] where
     --  c(i,j) = a(i,1)*b(1,j) + ... a(i,n)*b(n,j)
     function Dot (L, R : Float_Matrix) return Float_Matrix is

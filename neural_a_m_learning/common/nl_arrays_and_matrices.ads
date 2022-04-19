@@ -41,6 +41,7 @@ package NL_Arrays_And_Matrices is
    function "+" (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline ("+");
    function "-" (L, R : Float_Matrix) return Float_Matrix;
+   function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    pragma Inline ("-");
    function Dot (L, R : Float_Matrix) return Float_Matrix;
    pragma Inline (Dot);
