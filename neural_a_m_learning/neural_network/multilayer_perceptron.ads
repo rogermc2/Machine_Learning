@@ -99,7 +99,7 @@ package Multilayer_Perceptron is
        end record;
 
     function C_Init (Hidden_Layer_Sizes  : NL_Types.Integer_List :=
-                      NL_Types.Integer_Package.Empty_Vector;
+                       NL_Types.Integer_Package.Empty_Vector;
                      Activation          : Base_Neural.Activation_Type :=
                        Base_Neural.Relu_Activation;
                      Solver              : Solver_Type := Adam_Solver;
@@ -128,5 +128,6 @@ package Multilayer_Perceptron is
                    X    : Float_Matrix;
                    Y    : Integer_Matrix;
                    Incremental : Boolean := False);
+    function Predict (Self : MLP_Classifier; X : Float_Matrix) return Float;
 
 end Multilayer_Perceptron;
