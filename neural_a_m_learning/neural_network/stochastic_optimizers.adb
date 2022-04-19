@@ -208,7 +208,6 @@ package body Stochastic_Optimizers is
         Second_Moment_Updates : Moments_List;
         Updates               : Parameters_List;
     begin
-        Put_Line (Routine_Name);
         Assert (not Self.First_Moments.Is_Empty, Routine_Name &
                   "Self.First_Moments Is_Empty.");
         Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
@@ -221,7 +220,6 @@ package body Stochastic_Optimizers is
           (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
           (1.0 - Self.Beta_1 ** Self.Time_Step);
 
-        Put_Line (Routine_Name & "L272");
         --          Put_Line (Routine_Name & "First_Moments Coeff_Grads length" &
         --                      Count_Type'Image (Self.First_Moments (1).Coeff_Grads'Length)
         --                    & " x" & Count_Type'Image
@@ -394,25 +392,21 @@ package body Stochastic_Optimizers is
     procedure Update_Params (Self   : in out Optimizer_Record;
                              Params : in out Parameters_List;
                              Grads  : Parameters_List) is
-        Routine_Name : constant String :=
-                         "Stochastic_Optimizers.Update_Params ";
+--          Routine_Name : constant String :=
+--                           "Stochastic_Optimizers.Update_Params ";
         Updates      : Parameters_List;
     begin
-        Put_Line (Routine_Name);
         --  L42
         case Self.Kind is
             when Optimizer_Adam =>
-                Put_Line (Routine_Name & "Get_Adam_Updates");
                 Updates := Get_Adam_Updates (Self.Adam, Grads);
             when Optimizer_SGD =>
                 Updates := Get_SGD_Updates (Self.SGD, Grads);
             when No_Optimizer => null;
         end case;
 
-        Put_Line (Routine_Name & "L44");
         --  L44
         Params := Params + Updates;
-        Put_Line (Routine_Name & "done");
 
     end Update_Params;
 
