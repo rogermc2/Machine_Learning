@@ -1,3 +1,4 @@
+--  Based on scikit-learn/sklearn/mixture/_base.py
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
