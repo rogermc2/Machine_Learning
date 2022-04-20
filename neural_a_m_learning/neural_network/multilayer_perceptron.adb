@@ -77,7 +77,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix;
+                               return Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -719,7 +719,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix is
+                               return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       --        Routine_Name       : constant String :=
@@ -845,15 +845,20 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   function Predict (Self : MLP_Classifier; X : Float_Matrix) return Float is
-      Result : Float;
+   function Predict (Self : MLP_Classifier; X : Float_Matrix)
+                     return Float_Matrix is
    begin
-      declare
-         Y_Predict : Float_Matrix := Forward_Pass_Fast (Self, X);
-      begin
+--        declare
+--           Y_Predict : Float_Matrix := Forward_Pass_Fast (Self, X);
+--        begin
+--           --           if Self.Attributes.N_Outputs = 1 then
+--           --              Y_Predict := Ravel (Y_Predict);
+--           --           end if;
+--           --  return self._label_binarizer.inverse_transform(y_pred)
+--           return Y_Predict;
+--        end;
+      return Forward_Pass_Fast (Self, X);
 
-         return Result;
-      end;
    end Predict;
 
    --  -------------------------------------------------------------------------

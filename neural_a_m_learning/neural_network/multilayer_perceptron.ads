@@ -128,6 +128,7 @@ package Multilayer_Perceptron is
                    X    : Float_Matrix;
                    Y    : Integer_Matrix;
                    Incremental : Boolean := False);
-    function Predict (Self : MLP_Classifier; X : Float_Matrix) return Float;
+   function Predict (Self : MLP_Classifier; X : Float_Matrix)
+                     return Float_Matrix;
 
 end Multilayer_Perceptron;
