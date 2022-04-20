@@ -1,27 +1,25 @@
 --  Based on scikit-learn/sklearn/metrics/_classification.py
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 package body Classification_Metrics is
 
    function Weighted_Sum
-     (Sample_Score   : Integer_Matrix;
-      Sample_Weights : NL_Types.Float_List :=
-        NL_Types.Float_Package.Empty_Vector;
+     (Sample_Score   : Float_Matrix;
+      Sample_Weights : Float_Array;
       Normalize      : Boolean := False) return float;
 
    --  ------------------------------------------------------------------------
 
    function Accuracy_Score
-     (Y_True, Y_Prediction : Integer_Matrix;
+     (Y_True, Y_Prediction : Float_Matrix;
       Normalize            : Boolean := True;
-      Sample_Weight        : NL_Types.Float_List :=
-        NL_Types.Float_Package.Empty_Vector)
-       return float is
---        Routine_Name : constant String :=
---                         "Classification_Metrics.Accuracy_Score, ";
-      Result : constant Integer_Matrix := Y_Prediction - Y_True;
+      Sample_Weight        : Float_Array)
+      return float is
+      --        Routine_Name : constant String :=
+      --                         "Classification_Metrics.Accuracy_Score, ";
+      Result : constant Float_Matrix := Y_Prediction - Y_True;
    begin
 
       return Weighted_Sum (Result, Sample_Weight, Normalize);
@@ -30,25 +28,23 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
    --  Numpy Average: avg = sum(a * weights) / sum(weights)
-   function Average (Sample_Score   : Integer_Matrix;
-                     Sample_Weights : NL_Types.Float_List :=
-                       NL_Types.Float_Package.Empty_Vector)
-                      return Float is
-      use NL_Types;
-      Weights     : Float_List := Sample_Weights;
+   function Average (Sample_Score   : Float_Matrix;
+                     Sample_Weights : Float_Array)
+                     return Float is
+      Weights     : Float_Array (Sample_Score'Range (2));
       Sum_Weights : Float := 0.0;
       Result      : Float := 0.0;
    begin
-      if Weights.Is_Empty then
+      if Sample_Weights'Length /= Sample_Score'Length (2) then
          for index in Sample_Score'Range loop
-            Weights.Append (1.0);
+            Weights (index) := 1.0;
          end loop;
       end if;
 
       for row in Sample_Score'Range loop
          for col in Sample_Score'Range (2) loop
-            Result := Weights.Element (col) * Float (Sample_Score (row, col));
-            Sum_Weights := Sum_Weights + Weights.Element (col);
+            Result := Weights (col) * Sample_Score (row, col);
+            Sum_Weights := Sum_Weights + Weights (col);
          end loop;
       end loop;
 
@@ -73,20 +69,31 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
+   function Sum (Sample_Score : Float_Array) return float is
+      Result : Float := 0.0;
+   begin
+      for row in Sample_Score'Range loop
+         Result := Result + Sample_Score (row);
+      end loop;
+
+      return Result;
+
+   end Sum;
+
+   --  ------------------------------------------------------------------------
+
    function Weighted_Sum
-     (Sample_Score   : Integer_Matrix;
-      Sample_Weights : NL_Types.Float_List :=
-        NL_Types.Float_Package.Empty_Vector;
+     (Sample_Score   : Float_Matrix; Sample_Weights : Float_Array;
       Normalize      : Boolean := False) return Float is
-      Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
-      Result       : Float := 0.0;
+--        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
+      Result       : Float;
    begin
       if Normalize then
          Result := Average (Sample_Score, Sample_Weights);
-      elsif not Sample_Weights.Is_Empty then
-         Result := Dot (Sample_Weights, To_Float_Matrix (Sample_Score));
+      elsif Sample_Weights'Last >= Sample_Weights'First then
+         Result := Sum (Dot (Sample_Score, Sample_Weights));
       else
-         Result := Sum (To_Float_Matrix (Sample_Score));
+         Result := Sum (Sample_Score);
       end if;
 
       return Result;

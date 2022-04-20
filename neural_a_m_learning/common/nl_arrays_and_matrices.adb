@@ -172,10 +172,6 @@ package body NL_Arrays_And_Matrices is
       Num_Cols : constant Positive := R'Length (2);
       Product  : Float_Matrix  (1 .. Num_Rows, 1 .. Num_Cols);
    begin
-      --          Assert (R'Length = L'Length (2), Routine_Name &
-      --                    "Num rows" & Integer'Image (R'Length) & " of right matrix " &
-      --                    "doesn't equal num colums" & Integer'Image (L'Length (2)) &
-      --                    " of left matrix");
       for row in Product'Range loop
          for col in Product'Range (2) loop
             Product (row, col) := 0.0;
@@ -190,7 +186,26 @@ package body NL_Arrays_And_Matrices is
 
    end Dot;
 
-   --  ----------------------------------
+   --  ------------------------------------------------------------------
+
+   function Dot (L : Float_Matrix; R : Float_Array) return Float_Array is
+      Sum    : Float;
+      Result : Float_Array (L'Range);
+   begin
+      for row in L'Range loop
+         Sum := 0.0;
+         for col in L'Range (2) loop
+            Sum := Sum + L (row, col) * R (col);
+         end loop;
+         Result (row) := Sum;
+      end loop;
+
+      return Result;
+
+   end Dot;
+
+   --  ----------------------------------------------------------------------------
+
    function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
       Result : Float_Array (1 .. Positive (List.Length));
    begin

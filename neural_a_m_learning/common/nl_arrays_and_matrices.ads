@@ -16,11 +16,6 @@ package NL_Arrays_And_Matrices is
 
    type Multi_Value_Array is array (Integer range <>, Integer range <>)
      of Integer;
---
---     package Integer_Array_Package is new Ada.Containers.Indefinite_Vectors
---       (Positive, Integer_Array);
---     subtype Integer_Array_List is Integer_Array_Package.Vector;
-
    type Float_Matrix is array (Integer range <>, Integer range <>) of Float;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
 
@@ -45,6 +40,8 @@ package NL_Arrays_And_Matrices is
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    pragma Inline ("-");
    function Dot (L, R : Float_Matrix) return Float_Matrix;
+   function Dot (L : Float_Matrix; R : Float_Array)
+                 return Float_Array;
    pragma Inline (Dot);
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix;
    function To_Float_Array (List : NL_Types.Float_List) return Float_Array;
