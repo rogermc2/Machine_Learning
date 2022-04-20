@@ -722,8 +722,8 @@ package body Multilayer_Perceptron is
                                return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Forward_Pass_Fast ";
+      Routine_Name       : constant String :=
+                               "Multilayer_Perceptron.Forward_Pass_Fast ";
       Activations        : Matrix_List;
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
@@ -731,15 +731,31 @@ package body Multilayer_Perceptron is
                              Self.Attributes.Out_Activation;
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params_List        : constant Parameters_List := Self.Attributes.Params;
-      Activation         : Float_Matrix := X;
+      --  Initialize first layer
+      Activation         : constant Float_Matrix := X;
    begin
-      --  L144
-      for layer in 1 .. Num_Layers - 1 loop
+      --  L167 Forward propagate
+      for layer in reverse 1 .. Num_Layers - 1 loop
          declare
-            Params : constant Parameters_Record := Params_List (layer);
+            Params      : constant Parameters_Record := Params_List (layer);
+            Activ_Coeff : Float_Matrix := Dot (Activation, Params.Coeff_Grads);
          begin
-            Activation := Dot (Activation, Params.Coeff_Grads);
-            Activation := Activation + Params.Intercept_Grads;
+            Put_Line (Routine_Name & "Activation size:" &
+                        Integer'Image (Activation'Length) & " x" &
+                        Integer'Image (Activation'Length (2)));
+            Put_Line (Routine_Name & "Coeff_Grads size:" &
+                        Integer'Image (Params.Coeff_Grads'Length) & " x" &
+                        Integer'Image (Params.Coeff_Grads'Length (2)));
+            Put_Line (Routine_Name & "Activ_Coeff size:" &
+                        Integer'Image (Activ_Coeff'Length) & " x" &
+                        Integer'Image (Activ_Coeff'Length (2)));
+            Put_Line (Routine_Name & "Intercept_Grads size:" &
+                        Integer'Image (Activ_Coeff'Length));
+            Activ_Coeff := Activ_Coeff + Params.Intercept_Grads;
+            Put_Line (Routine_Name & "Activ_Coeff size:" &
+                        Integer'Image (Activ_Coeff'Length) & " x" &
+                        Integer'Image (Activ_Coeff'Length (2)));
+
             if layer /= Num_Layers - 2 then
                case Hidden_Activation is
                when Identity_Activation => null;
@@ -754,6 +770,7 @@ package body Multilayer_Perceptron is
          end;
       end loop;
 
+     Put_Line (Routine_Name & "L172");
       --  L172
       case Output_Activation is
          when Identity_Activation => null;
@@ -762,6 +779,7 @@ package body Multilayer_Perceptron is
          when Relu_Activation => Relu (Activations (Num_Layers));
          when Softmax_Activation => Softmax (Activations (Num_Layers));
       end case;
+      Put_Line (Routine_Name & "done");
 
       return Activation;
 
