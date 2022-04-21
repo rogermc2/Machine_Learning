@@ -45,14 +45,12 @@ with Maths;
 
 with Base;
 with Data_Splitter;
---  with Encode_Utils;
 with Label;
 with Neural_Maths;
 --  with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
-   --     pragma Warnings (Off);
 
    First_Pass : Boolean := True;
 
@@ -123,12 +121,10 @@ package body Multilayer_Perceptron is
       --        Start_Time         : Time;
       --        End_Time           : Time;
    begin
-      --  Forward_Pass elapsed time approx. 24 ms.
       Forward_Pass (Self, Activations);
 
       --  L284
       --        Start_Time := Clock;
-      --  Loss computation elapsed time 400 ms
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
@@ -682,7 +678,6 @@ package body Multilayer_Perceptron is
       Params             : constant Parameters_List := Self.Attributes.Params;
       --        Start_Time         : constant Time := Clock;
       --        End_Time           : Time;
-      --  Elapsed time approx. 24 ms.
    begin
       --  Iterate over the hidden layers
       --  The Python range(stop) function returns a sequence of numbers,
@@ -692,13 +687,6 @@ package body Multilayer_Perceptron is
       --            first (0) .. last (n_layers_ - 2)
       --  L119
       for layer in 1 .. Num_Layers - 1 loop
-         --           declare
-         --              Activation : constant Float_Matrix := Activations (layer);
-         --           begin
-         --              Put_Line (Routine_Name & "Activations (" & Integer'Image (layer) &
-         --                          ") length:" & Count_Type'Image (Activation'Length) &
-         --                          " x" & Count_Type'Image (Activation'Length (2)));
-         --           end;
          Update_Activations (Params (layer), Activations, Hidden_Activation,
                              Num_Layers, layer);
       end loop;
@@ -743,21 +731,7 @@ package body Multilayer_Perceptron is
             Params      : constant Parameters_Record := Params_List (layer);
             Activ_Coeff : Float_Matrix := Dot (Activation, Params.Coeff_Grads);
          begin
-            --                  Put_Line (Routine_Name & "Activation size:" &
-            --                              Integer'Image (Activation'Length) & " x" &
-            --                              Integer'Image (Activation'Length (2)));
-            --                  Put_Line (Routine_Name & "Coeff_Grads size:" &
-            --                              Integer'Image (Params.Coeff_Grads'Length) & " x" &
-            --                              Integer'Image (Params.Coeff_Grads'Length (2)));
-            --                  Put_Line (Routine_Name & "Activ_Coeff size:" &
-            --                              Integer'Image (Activ_Coeff'Length) & " x" &
-            --                              Integer'Image (Activ_Coeff'Length (2)));
-            --                  Put_Line (Routine_Name & "Intercept_Grads size:" &
-            --                              Integer'Image (Activ_Coeff'Length));
             Activ_Coeff := Activ_Coeff + Params.Intercept_Grads;
-            --                  Put_Line (Routine_Name & "Activ_Coeff size:" &
-            --                              Integer'Image (Activ_Coeff'Length) & " x" &
-            --                              Integer'Image (Activ_Coeff'Length (2)));
 
             if layer /= Num_Layers - 2 then
                case Hidden_Activation is
@@ -771,9 +745,6 @@ package body Multilayer_Perceptron is
 
             if layer = 1 then
                Activ_Out := Activ_Coeff;
-               --                      for row in Activ_Out'Range loop
-               --                          Activ_Out (row) := Activ_Coeff (row, Activ_Coeff'First);
-               --                      end loop;
             end if;
          end;
       end loop;
@@ -872,15 +843,6 @@ package body Multilayer_Perceptron is
    function Predict (Self : MLP_Classifier; X : Float_Matrix)
                       return Float_Matrix is
    begin
-      --        declare
-      --           Y_Predict : Float_Matrix := Forward_Pass_Fast (Self, X);
-      --        begin
-      --           --           if Self.Attributes.N_Outputs = 1 then
-      --           --              Y_Predict := Ravel (Y_Predict);
-      --           --           end if;
-      --           --  return self._label_binarizer.inverse_transform(y_pred)
-      --           return Y_Predict;
-      --        end;
       return Forward_Pass_Fast (Self, X);
 
    end Predict;
@@ -913,7 +875,6 @@ package body Multilayer_Perceptron is
 
       Activations.Clear;
       --  L645
-      --  Time per Backprop loop iteration 170ms
       Activations.Append (X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
 

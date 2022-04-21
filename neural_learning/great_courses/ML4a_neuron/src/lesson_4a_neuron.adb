@@ -19,7 +19,6 @@ procedure Lesson_4A_Neuron is
    Dataset_Name    : constant String := "mnist_784";
    Test_Size       : constant Positive := 1000;
    Train_Size      : constant Positive := 5000;
-   --     Bunch           : Openml_Ada.Bunch_Data;
    aClassifier     : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name);
@@ -32,9 +31,6 @@ begin
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
       Sample_Weight : Float_Array (1 .. 0);
    begin
-      --     if not Get_Classifier (Dataset_Name, aClassifier) then
-      --        Printing.Print_Strings ("Features", Bunch.Feature_Names);
-
       Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length));
       Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length));
       Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
