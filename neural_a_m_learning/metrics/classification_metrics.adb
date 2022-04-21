@@ -36,7 +36,7 @@ package body Classification_Metrics is
       Result      : Float := 0.0;
    begin
       if Sample_Weights'Length /= Sample_Score'Length (2) then
-         for index in Sample_Score'Range loop
+         for index in Weights'Range loop
             Weights (index) := 1.0;
          end loop;
       end if;
