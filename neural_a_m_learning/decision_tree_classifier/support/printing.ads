@@ -28,6 +28,8 @@ package Printing is
                                 Start  : Integer := 1;
                                 Finish : Integer := 0);
    procedure Print_Float_List (Name  : String; theList : Float_List);
+   procedure Print_Float_Matrix (Name  : String; aMatrix : Float_Matrix;
+                                 Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Indefinite_List (Name    : String;
                                     theList : Indef_String_List);
    procedure Print_Integer_List (Name  : String; theList : Integer_List;

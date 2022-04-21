@@ -61,48 +61,48 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Criterion (Name : String;
---                                Data : Criterion.Criterion_Class) is
---        use Criterion;
---        use Float_Package;
---     begin
---        Put_Line (Name & ": ");
---        Put_Line ("Criterion_Type: " &
---                    Criterion_Kind'Image (Data.Criterion_Type));
---        Put_Line ("Y length:              " &
---                    Integer'Image (Integer (Data.Y.Length)));
---        Put_Line ("Sample_Weight length:  " &
---                    Integer'Image (Integer (Data.Sample_Weight.Length)));
---        Put_Line ("Samples length:        " &
---                    Integer'Image (Integer (Data.Samples.Length)));
---        Put_Line ("Sample_Indices length: " &
---                    Integer'Image (Integer (Data.Sample_Indices.Length)));
---        Put_Line ("Start_Row: " & Natural'Image (Data.Start_Row));
---        Put_Line ("Stop_Row:  " & Natural'Image (Data.Stop_Row));
---        Put_Line ("Split_Row: " & Natural'Image (Data.Split_Row));
---        Put_Line ("Num_Node_Samples:          " &
---                    Natural'Image (Data.Num_Node_Samples));
---        Put_Line ("Num_Weighted_Samples:      " &
---                    Float'Image (Data.Num_Weighted_Samples));
---        Put_Line ("Num_Weighted_Node_Samples: " &
---                    Float'Image (Data.Num_Weighted_Node_Samples));
---        Put_Line ("Num_Weighted_Left:         " &
---                    Float'Image (Data.Num_Weighted_Left));
---        Put_Line ("Num_Weighted_Right:        " &
---                    Float'Image (Data.Num_Weighted_Right));
---        Print_Float_List ("Sum_Total", Data.Sum_Total);
---        Print_Float_List ("Sum_Left", Data.Sum_Left);
---        Print_Float_List ("Sum_Right", Data.Sum_Right);
---        Put_Line ("Proxy_Improvement: " & Float'Image (Data.Proxy_Improvement));
---        case Data.Criterion_Type is
---           when Criterion_Classification =>
---              Put_Line ("Num_Classes: " & Integer'Image (Data.Num_Classes));
---           when Criterion_Regression =>
---              Put_Line ("Sq_Sum_Total: " & Float'Image (Data.Sq_Sum_Total));
---        end case;
---        New_Line;
---
---     end Print_Criterion;
+   --     procedure Print_Criterion (Name : String;
+   --                                Data : Criterion.Criterion_Class) is
+   --        use Criterion;
+   --        use Float_Package;
+   --     begin
+   --        Put_Line (Name & ": ");
+   --        Put_Line ("Criterion_Type: " &
+   --                    Criterion_Kind'Image (Data.Criterion_Type));
+   --        Put_Line ("Y length:              " &
+   --                    Integer'Image (Integer (Data.Y.Length)));
+   --        Put_Line ("Sample_Weight length:  " &
+   --                    Integer'Image (Integer (Data.Sample_Weight.Length)));
+   --        Put_Line ("Samples length:        " &
+   --                    Integer'Image (Integer (Data.Samples.Length)));
+   --        Put_Line ("Sample_Indices length: " &
+   --                    Integer'Image (Integer (Data.Sample_Indices.Length)));
+   --        Put_Line ("Start_Row: " & Natural'Image (Data.Start_Row));
+   --        Put_Line ("Stop_Row:  " & Natural'Image (Data.Stop_Row));
+   --        Put_Line ("Split_Row: " & Natural'Image (Data.Split_Row));
+   --        Put_Line ("Num_Node_Samples:          " &
+   --                    Natural'Image (Data.Num_Node_Samples));
+   --        Put_Line ("Num_Weighted_Samples:      " &
+   --                    Float'Image (Data.Num_Weighted_Samples));
+   --        Put_Line ("Num_Weighted_Node_Samples: " &
+   --                    Float'Image (Data.Num_Weighted_Node_Samples));
+   --        Put_Line ("Num_Weighted_Left:         " &
+   --                    Float'Image (Data.Num_Weighted_Left));
+   --        Put_Line ("Num_Weighted_Right:        " &
+   --                    Float'Image (Data.Num_Weighted_Right));
+   --        Print_Float_List ("Sum_Total", Data.Sum_Total);
+   --        Print_Float_List ("Sum_Left", Data.Sum_Left);
+   --        Print_Float_List ("Sum_Right", Data.Sum_Right);
+   --        Put_Line ("Proxy_Improvement: " & Float'Image (Data.Proxy_Improvement));
+   --        case Data.Criterion_Type is
+   --           when Criterion_Classification =>
+   --              Put_Line ("Num_Classes: " & Integer'Image (Data.Num_Classes));
+   --           when Criterion_Regression =>
+   --              Put_Line ("Sq_Sum_Total: " & Float'Image (Data.Sq_Sum_Total));
+   --        end case;
+   --        New_Line;
+   --
+   --     end Print_Criterion;
 
    --  ------------------------------------------------------------------------
 
@@ -210,6 +210,33 @@ package body Printing is
       end loop;
       New_Line;
    end Print_Float_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Float_Matrix (Name  : String; aMatrix : Float_Matrix;
+                                 Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aMatrix'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+         for row in Start .. Last loop
+            for col in aMatrix'Range (2) loop
+               Put (Float'Image (aMatrix (row, col)) & "  ");
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line
+           ("Print_Float_Matrix called with invalid start or finish index.");
+      end if;
+
+   end Print_Float_Matrix;
 
    --  ------------------------------------------------------------------------
 
@@ -350,9 +377,9 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_Lists_2D (Name : String; Data : Float_List_2D;
+   procedure Print_Float_Lists_2D (Name  : String; Data : Float_List_2D;
                                    Start : Positive := 1;
-                                   Last : Positive := 10) is
+                                   Last  : Positive := 10) is
       Stop  : Integer := Last;
    begin
       if Stop > Integer (Data.Length) then
@@ -434,7 +461,7 @@ package body Printing is
    procedure Print_Slice (Name : String; theSlice : Slice_Record) is
    begin
       Put_Line (Name & ": (" &Integer'Image (theSlice.First) & " ," &
-                Integer'Image (theSlice.Last) & ")");
+                  Integer'Image (theSlice.Last) & ")");
 
    end Print_Slice;
 
@@ -762,52 +789,52 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
---        aWeight : Float;
---        Count   : Integer := 1;
---     begin
---        if Name'Length > 0 then
---           Put_Line (Name & ": ");
---        end if;
---
---        for Index in Data.First_Index .. Data.Last_Index loop
---           aWeight := Data.Element (Index);
---           Put (Float'Image (aWeight) & "   ");
---           Count := Count + 1;
---           if Count > 10 then
---              New_Line;
---              Count := 1;
---           end if;
---        end loop;
---        New_Line;
---     end Print_Weights;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Weight_Lists_2D (Name : String;
---                                      Data : Weights.Weight_Lists_2D) is
---     begin
---        Put_Line (Name & ": ");
---        for Index in Data.First_Index .. Data.Last_Index loop
---           Print_Weights ("", Data.Element (Index));
---        end loop;
---        New_Line;
---
---     end Print_Weight_Lists_2D;
---
---     --  ------------------------------------------------------------------------
---
---     procedure Print_Weight_Lists_3D (Name : String;
---                                      Data : Weights.Weight_Lists_3D) is
---     begin
---        Put_Line (Name & ": ");
---        for Index in Data.First_Index .. Data.Last_Index loop
---           Print_Weight_Lists_2D ("Output list" & Integer'Image (index),
---                                  Data.Element (Index));
---        end loop;
---        New_Line;
---
---     end Print_Weight_Lists_3D;
+   --     procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
+   --        aWeight : Float;
+   --        Count   : Integer := 1;
+   --     begin
+   --        if Name'Length > 0 then
+   --           Put_Line (Name & ": ");
+   --        end if;
+   --
+   --        for Index in Data.First_Index .. Data.Last_Index loop
+   --           aWeight := Data.Element (Index);
+   --           Put (Float'Image (aWeight) & "   ");
+   --           Count := Count + 1;
+   --           if Count > 10 then
+   --              New_Line;
+   --              Count := 1;
+   --           end if;
+   --        end loop;
+   --        New_Line;
+   --     end Print_Weights;
+   --
+   --     --  ------------------------------------------------------------------------
+   --
+   --     procedure Print_Weight_Lists_2D (Name : String;
+   --                                      Data : Weights.Weight_Lists_2D) is
+   --     begin
+   --        Put_Line (Name & ": ");
+   --        for Index in Data.First_Index .. Data.Last_Index loop
+   --           Print_Weights ("", Data.Element (Index));
+   --        end loop;
+   --        New_Line;
+   --
+   --     end Print_Weight_Lists_2D;
+   --
+   --     --  ------------------------------------------------------------------------
+   --
+   --     procedure Print_Weight_Lists_3D (Name : String;
+   --                                      Data : Weights.Weight_Lists_3D) is
+   --     begin
+   --        Put_Line (Name & ": ");
+   --        for Index in Data.First_Index .. Data.Last_Index loop
+   --           Print_Weight_Lists_2D ("Output list" & Integer'Image (index),
+   --                                  Data.Element (Index));
+   --        end loop;
+   --        New_Line;
+   --
+   --     end Print_Weight_Lists_3D;
 
    --  ------------------------------------------------------------------------
 

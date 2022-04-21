@@ -48,7 +48,7 @@ begin
       Put_Line ("Neural_Fit");
       Fit (aClassifier, Train_X, Train_Y);
       Support_4.Save_Classifier (Dataset_Name, aClassifier);
-      Put_Line ("Score" & Float'Image (Base.Score
+      Put_Line ("Score: " & Float'Image (Base.Score
                 (Self => aClassifier, X => Train_X,
                  Y => To_Float_Matrix (Train_Y),
                  Sample_Weight => Sample_Weight)));

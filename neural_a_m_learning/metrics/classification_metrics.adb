@@ -3,6 +3,8 @@
 --  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
+--  with Printing;
+
 package body Classification_Metrics is
 
    function Weighted_Sum
@@ -17,12 +19,12 @@ package body Classification_Metrics is
       Normalize            : Boolean := True;
       Sample_Weight        : Float_Array)
       return float is
-      --        Routine_Name : constant String :=
-      --                         "Classification_Metrics.Accuracy_Score, ";
-      Result : constant Float_Matrix := Y_Prediction - Y_True;
+--        Routine_Name : constant String :=
+--                         "Classification_Metrics.Accuracy_Score, ";
+      Score        : constant Float_Matrix := Y_Prediction - Y_True;
    begin
 
-      return Weighted_Sum (Result, Sample_Weight, Normalize);
+      return Weighted_Sum (Score, Sample_Weight, Normalize);
 
    end Accuracy_Score;
 
@@ -31,24 +33,28 @@ package body Classification_Metrics is
    function Average (Sample_Score   : Float_Matrix;
                      Sample_Weights : Float_Array)
                      return Float is
+      --       Routine_Name : constant String :=
+      --                        "Classification_Metrics.Average ";
       Weights     : Float_Array (Sample_Score'Range (2));
       Sum_Weights : Float := 0.0;
-      Result      : Float := 0.0;
+      Sum         : Float := 0.0;
    begin
-      if Sample_Weights'Length /= Sample_Score'Length (2) then
+      if Sample_Weights'Last < Sample_Weights'First then
          for index in Weights'Range loop
             Weights (index) := 1.0;
          end loop;
+      else
+         Weights := Sample_Weights;
       end if;
 
       for row in Sample_Score'Range loop
          for col in Sample_Score'Range (2) loop
-            Result := Weights (col) * Sample_Score (row, col);
+            Sum := Sum + Weights (col) * Sample_Score (row, col);
             Sum_Weights := Sum_Weights + Weights (col);
          end loop;
       end loop;
 
-      return Result / Sum_Weights;
+      return Sum / Sum_Weights;
 
    end Average;
 
@@ -85,18 +91,18 @@ package body Classification_Metrics is
    function Weighted_Sum
      (Sample_Score   : Float_Matrix; Sample_Weights : Float_Array;
       Normalize      : Boolean := False) return Float is
---        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
-      Result       : Float;
+      --        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
+      W_Sum       : Float;
    begin
       if Normalize then
-         Result := Average (Sample_Score, Sample_Weights);
+         W_Sum := Average (Sample_Score, Sample_Weights);
       elsif Sample_Weights'Last >= Sample_Weights'First then
-         Result := Sum (Dot (Sample_Score, Sample_Weights));
+         W_Sum := Sum (Dot (Sample_Score, Sample_Weights));
       else
-         Result := Sum (Sample_Score);
+         W_Sum := Sum (Sample_Score);
       end if;
 
-      return Result;
+      return W_Sum;
 
    end Weighted_Sum;
 
