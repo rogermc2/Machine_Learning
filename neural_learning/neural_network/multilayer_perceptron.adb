@@ -128,7 +128,11 @@ package body Multilayer_Perceptron is
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
+      else
+         Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
+      Put_Line (Routine_Name & "Loss_Function_Name " &
+                  Loss_Function'Image (Loss_Function_Name));
 
       Assert (Y'Length = Activations.Last_Element'Length and
                 Y'Length (2) = Activations.Last_Element'Length (2),
@@ -244,6 +248,7 @@ package body Multilayer_Perceptron is
                     Learning_Rate_Init  : Float := 0.001;
                     Power_T             : Float := 0.5;
                     Max_Iter            : Natural := 200;
+                    Loss_Function_Name  : Loss_Function := Log_Loss_Function;
                     Shuffle             : Boolean := True;
                     Random_State        : Natural := 0;
                     Tol                 : Float := 10.0 ** (-4);
@@ -269,6 +274,7 @@ package body Multilayer_Perceptron is
       Classifier.Parameters.Learning_Rate_Init  := Learning_Rate_Init;
       Classifier.Parameters.Power_T             := Power_T;
       Classifier.Parameters.Max_Iter            := Max_Iter;
+      Classifier.Attributes.Loss_Function_Name  := Loss_Function_Name;
       Classifier.Parameters.Shuffle             := Shuffle;
       Classifier.Parameters.Random_State        := Random_State;
       Classifier.Parameters.Tol                 := Tol;
@@ -594,11 +600,11 @@ package body Multilayer_Perceptron is
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
          Self.Attributes.T := Self.Attributes.T + Num_Samples;
          Self.Attributes.Loss_Curve.Append (Self.Attributes.Loss);
-         --  L666
+         --  L668
          if Self.Parameters.Verbose then
-            Put_Line (Routine_Name & "Iteration" &
+            Put_Line (Routine_Name & "L668 Iteration" &
                         Integer'Image (Self.Attributes.N_Iter) &
-                        "loss = " & Float'Image (Self.Attributes.Loss));
+                        ", loss = " & Float'Image (Self.Attributes.Loss));
          end if;
 
          --  L669 Update no_improvement_count based on training loss or
@@ -618,6 +624,7 @@ package body Multilayer_Perceptron is
             else
                Msg := Msg & To_Unbounded_String (Routine_Name & "Training loss");
             end if;
+
             Msg := Msg & To_Unbounded_String (" did not improve more than tol =" &
                                                 Float'Image (Self.Parameters.Tol) & " for" &
                                                 Integer'Image (Self.Parameters.N_Iter_No_Change) &
@@ -812,7 +819,7 @@ package body Multilayer_Perceptron is
       Self.Attributes.N_Iter := 0;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
-      Self.Attributes.Out_Activation := Logistic_Activation;
+      Self.Attributes.Out_Activation := Softmax_Activation;
       Self.Attributes.Params.Clear;
 
       --  L344
@@ -857,7 +864,7 @@ package body Multilayer_Perceptron is
                             --    Grads                    : in out Parameters_List;
                             Accumulated_Loss         : in out Float) is
       --        use Ada.Containers;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
       Y_Batch      : Integer_Matrix (1 .. Batch_Size, 1 .. 1);
       Activations  : Matrix_List;
@@ -877,7 +884,9 @@ package body Multilayer_Perceptron is
       --  L645
       Activations.Append (X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
+      Put_Line (Routine_Name & "Batch_Loss" & Float'Image (Batch_Loss));
 
+      --  L655
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
       --  L657 update weights

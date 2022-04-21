@@ -40,8 +40,8 @@ package body Base_Neural is
                 Integer'Image (Integer (Y_True'Length(2))));
 
         --  L226 Clip Y_Prob
-        for row in Y_Prob'First .. Y_Prob'Last loop
-            for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
+        for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
                 Y_P := Y_Prob (row, col);
                 if Y_P < EPS then
                     YP_Clip (row, col) := EPS;
@@ -52,8 +52,8 @@ package body Base_Neural is
         end loop;
 
         --  xlogy = x*log(y) so that the result is 0 if x = 0
-        for row in Y_Prob'First .. Y_Prob'Last loop
-            for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
+        for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
                 X_Log_Y1 (row, col) :=
                   X_Log_Y (Float (Y_True (row, col)), YP_Clip (row, col));
                 X_Log_Y2 (row, col) :=
@@ -62,8 +62,8 @@ package body Base_Neural is
             end loop;
         end loop;
 
-        for row in Y_Prob'First .. Y_Prob'Last loop
-            for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
+        for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
                 Sum1 := Sum1 + X_Log_Y1 (row, col);
                 Sum2 := Sum2 + X_Log_Y2 (row, col);
             end loop;
@@ -96,8 +96,8 @@ package body Base_Neural is
                                                1 .. Activation'Length (2));
         Sigmoid  : Matrix_Float;
     begin
-        for row in Activation'First .. Activation'Last loop
-            for col in Activation'First (2) .. Activation'Last (2) loop
+        for row in Activation'Range loop
+            for col in Activation'Range (2) loop
                 Sigmoid (row, col) :=
                   (1.0 / (1.0 + Exp (Activation (row, col))));
             end loop;
@@ -116,8 +116,8 @@ package body Base_Neural is
         Prod  : Matrix_Float;
     begin
         Del := Del * Z;
-        for row in Z'First .. Z'Last loop
-            for col in Z'First (2) .. Z'Last (2) loop
+        for row in Z'Range loop
+            for col in Z'Range (2) loop
                 Prod (row,col) := 1.0 - Z (row,col);
             end loop;
         end loop;
@@ -141,6 +141,7 @@ package body Base_Neural is
                    return Float is
         type Matrix_Float is new Float_Matrix (1 .. Y_Prob'Length,
                                                1 .. Y_Prob'Length (2));
+--          Routine_Name : constant String := "Base_Neural.Log_Loss ";
         Y_P      : Float;
         YP_Float : Matrix_Float := Matrix_Float (Y_Prob);
         YT_Float : Matrix_Float;
@@ -148,8 +149,8 @@ package body Base_Neural is
         Sum      : Float := 0.0;
     begin
         --  L194 Clip Y_Prob
-        for row in Y_Prob'First .. Y_Prob'Last loop
-            for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
+        for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
                 YT_Float (row, col) := Float (Y_True (row, col));
                 Y_P := Y_Prob (row, col);
                 if Y_P < EPS then
@@ -161,15 +162,15 @@ package body Base_Neural is
         end loop;
 
         --  xlogy = x*log(y) so that the result is 0 if x = 0
-        for row in Y_Prob'First .. Y_Prob'Last loop
-            for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
+        for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
                 X_Y (row, col) :=
                   X_Log_Y (YT_Float (row, col), YP_Float (row, col));
             end loop;
         end loop;
 
-        for row in Y_Prob'First .. Y_Prob'Last loop
-            for col in Y_Prob'First (2) .. Y_Prob'Last (2) loop
+        for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
                 Sum := Sum + X_Y (row, col);
             end loop;
         end loop;
@@ -185,8 +186,8 @@ package body Base_Neural is
                                                1 .. Activation'Length (2));
         Result : Matrix_Float;
     begin
-        for row in Activation'First .. Activation'Last loop
-            for col in Activation'First (2) .. Activation'Last (2) loop
+        for row in Activation'Range loop
+            for col in Activation'Range (2) loop
                 Result (row, col) := Float'Max (0.0, Activation (row, col));
             end loop;
         end loop;
@@ -199,8 +200,8 @@ package body Base_Neural is
 
     procedure Relu_Derivative (Z : Float_Matrix; Del : in out Float_Matrix) is
     begin
-        for row in Z'First .. Z'Last loop
-            for col in Z'First (2) .. Z'Last (2) loop
+        for row in Z'Range loop
+            for col in Z'Range (2) loop
                 if Z (row, col) = 0.0 then
                     Del (row, col) := 0.0;
                 end if;
@@ -215,8 +216,8 @@ package body Base_Neural is
         use Maths.Float_Math_Functions;
         Exp_Sum  : Float := 0.0;
     begin
-        for row in Activation'First .. Activation'Last loop
-            for col in Activation'First (2) .. Activation'Last (2) loop
+        for row in Activation'Range loop
+            for col in Activation'Range (2) loop
                 Exp_Sum := Exp_Sum + Exp (Activation (row, col));
             end loop;
         end loop;
@@ -243,8 +244,8 @@ package body Base_Neural is
                                                1 .. Activation'Length (2));
         Result   : Matrix_Float;
     begin
-        for row in Activation'First .. Activation'Last loop
-            for col in Activation'First (2) .. Activation'Last (2) loop
+        for row in Activation'Range loop
+            for col in Activation'Range (2) loop
                 Result (row, col) := Tanh (Activation (row, col));
             end loop;
         end loop;
@@ -261,8 +262,8 @@ package body Base_Neural is
                                                1 .. Z'Length (2));
         Del_2  : Matrix_Float;
     begin
-        for row in Z'First .. Z'Last loop
-            for col in Z'First (2) .. Z'Last (2) loop
+        for row in Z'Range loop
+            for col in Z'Range (2) loop
                 Del_2 (row,col) := 1.0 - Z (row, col) ** 2;
             end loop;
         end loop;

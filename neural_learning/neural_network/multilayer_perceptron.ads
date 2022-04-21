@@ -34,12 +34,12 @@ package Multilayer_Perceptron is
 
     type MLP_Classifier_Attributes is record
         Classes              : NL_Types.Integer_List;
-        Loss_Function_Name   : Loss_Function;
-        Loss                 : Float;
-        Best_Loss            : Float;
+        Loss_Function_Name   : Loss_Function := Log_Loss_Function;
+        Loss                 : Float := 0.0;
+        Best_Loss            : Float := 0.0;
         Loss_Curve           : NL_Types.Float_List;
         No_Improvement_Count : Natural := 0;
-        T                    : Natural;
+        T                    : Natural := 0;
         Params               : Parameters_List;  --  Layers
         --  Params list of n_layers of Parameter records each record comprising:
         --  a coefs_list of rows x coeff values representing the weight matrix
@@ -48,13 +48,13 @@ package Multilayer_Perceptron is
         --  corresponding to layer i + 1.
         Coef_Indptr          : Coef_Indptr_List;
         Intercept_Indptr     : Intercept_Indptr_List;
-        N_Features           : Positive;
+        N_Features           : Positive := 1;
         Feature_Names_In     : NL_Types.String_List;
-        N_Iter               : Natural;
-        N_Layers             : Positive;
+        N_Iter               : Natural := 0;
+        N_Layers             : Positive := 1;
         N_Outputs            : Positive := 1;
         Out_Activation       : Base_Neural.Activation_Type :=
-                                 Base_Neural.Logistic_Activation;
+                                 Base_Neural.Softmax_Activation;
         Optimizer            : Optimizer_Record;
     end record;
 
@@ -109,6 +109,7 @@ package Multilayer_Perceptron is
                      Learning_Rate_Init  : Float := 0.001;
                      Power_T             : Float := 0.5;
                      Max_Iter            : Natural := 200;
+                     Loss_Function_Name  : Loss_Function := Log_Loss_Function;
                      Shuffle             : Boolean := True;
                      Random_State        : Natural := 0;
                      Tol                 : Float := 10.0 ** (-4);
