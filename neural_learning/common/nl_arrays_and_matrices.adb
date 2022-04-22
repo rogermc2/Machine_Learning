@@ -163,6 +163,22 @@ package body NL_Arrays_And_Matrices is
    end "-";
 
    --  ----------------------------------------------------------------------------
+
+   function "-" (L : Float; R : Float_Matrix) return Float_Matrix is
+      Result : Float_Matrix (R'Range, R'Range (2));
+   begin
+      for row in R'Range loop
+         for col in R'Range (2) loop
+            Result (row, col) := L - R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ----------------------------------------------------------------------------
+
    --  For A = [a(1,1) ... a(m,n)] and B = [b(1,1) ... b(n,p)]
    --  A.B = [c(i,j)] where
    --  c(i,j) = a(i,1)*b(1,j) + ... a(i,n)*b(n,j)
