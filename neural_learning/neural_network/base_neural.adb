@@ -222,18 +222,19 @@ package body Base_Neural is
       Routine_Name : constant String := "Base_Neural.Softmax ";
       Tmp   : Float_Matrix := Activation;
       X_Max : Float_Array (Activation'Range);
-      X_M   : Float_Matrix (Activation'Range, 1 .. 1);
+--        X_M   : Float_Matrix (Activation'Range, 1 .. 1);
       aRow  : Float_Array (Activation'Range (2));
    begin
       Put_Line (Routine_Name);
       X_Max := Max (Activation);
-      for row in Activation'Range loop
-         X_M (row, 1) :=  X_Max (row);
-      end loop;
+--        for row in Activation'Range loop
+--           X_M (row, 1) :=  X_Max (row);
+--        end loop;
 
       for row in Activation'Range loop
          for col in Activation'Range (2) loop
-            Tmp (row, col) := Activation (row, col) - X_M (row, col);
+            Tmp (row, col) := Activation (row, col) - X_Max (row);
+--              Tmp (row, col) := Activation (row, col) - X_M (row, col);
          end loop;
       end loop;
 
