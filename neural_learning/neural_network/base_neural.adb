@@ -19,8 +19,8 @@ package body Base_Neural is
 
    function Binary_Log_Loss (Y_True : Integer_Matrix; Y_Prob : Float_Matrix)
                              return Float is
---        Routine_Name : constant String :=
---                         "Base_Neural.Binary_Log_Loss_Function ";
+      --        Routine_Name : constant String :=
+      --                         "Base_Neural.Binary_Log_Loss_Function ";
       YT       : constant Float_Matrix := To_Float_Matrix (Y_True);
       YP       : Float_Matrix := Y_Prob;
       X_Log_Y1 : Float_Matrix (YP'Range, YP'Range (2));
@@ -28,14 +28,14 @@ package body Base_Neural is
       Sum1     : Float := 0.0;
       Sum2     : Float := 0.0;
    begin
---        Assert (Y_Prob'Length = Y_True'Length and
---                  Y_Prob'Length (2) = Y_True'Length (2), Routine_Name &
---                  "Y_Prob size" &
---                  Integer'Image (Integer (Y_Prob'Length)) & " x" &
---                  Integer'Image (Integer (Y_Prob'Length (2))) &
---                  " should be the same as Y_True size" &
---                  Integer'Image (Integer (Y_True'Length)) & " x" &
---                  Integer'Image (Integer (Y_True'Length(2))));
+      --        Assert (Y_Prob'Length = Y_True'Length and
+      --                  Y_Prob'Length (2) = Y_True'Length (2), Routine_Name &
+      --                  "Y_Prob size" &
+      --                  Integer'Image (Integer (Y_Prob'Length)) & " x" &
+      --                  Integer'Image (Integer (Y_Prob'Length (2))) &
+      --                  " should be the same as Y_True size" &
+      --                  Integer'Image (Integer (Y_True'Length)) & " x" &
+      --                  Integer'Image (Integer (Y_True'Length(2))));
 
       --  L226 Clip Y_Prob
       for row in YP'Range loop
@@ -193,17 +193,43 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Softmax (Activation : in out Float_Matrix) is
+   function Softmax (A : Float_Array) return Float_Array is
       use Maths.Float_Math_Functions;
-      Exp_Sum  : Float := 0.0;
+      Sum_Exp : Float := 0.0;
+      Exp_A   : Float_Array (A'Range);
+      Result  : Float_Array (A'Range);
    begin
-      for row in Activation'Range loop
-         for col in Activation'Range (2) loop
-            Exp_Sum := Exp_Sum + Exp (Activation (row, col));
-         end loop;
+      for col in Result'Range loop
+         Exp_A (col) := Exp (A (col));
+         Sum_Exp := Sum_Exp + Exp_A (col);
       end loop;
 
-      Activation := Activation / Exp_Sum;
+      if Sum_Exp = 0.0 then
+         Sum_Exp := 1.0;
+      end if;
+
+      for col in Result'Range loop
+         Result (col) := Exp (A (col)) / Sum_Exp;
+      end loop;
+
+      return Result;
+
+   end Softmax;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Softmax (Activation : in out Float_Matrix) is
+      Routine_Name : constant String := "Base_Neural.Softmax ";
+      aRow : Float_Array (Activation'Range (2));
+   begin
+      Put_Line (Routine_Name);
+      for row in Activation'Range loop
+--           aRow := Get_Row (Activation, row);
+         aRow := Softmax (Get_Row (Activation, row));
+         for col in aRow'Range loop
+            Activation (row, col) := aRow (col);
+         end loop;
+      end loop;
 
    end Softmax;
 

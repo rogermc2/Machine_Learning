@@ -235,6 +235,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Get_Row (M : Float_Matrix; R : Integer) return Float_Array is
+      theRow : Float_Array (M'Range (2));
+   begin
+      for col in theRow'Range loop
+         theRow (col) := M (R, col);
+      end loop;
+
+      return theRow;
+
+   end Get_Row;
+
+   --  ------------------------------------------------------------------------
+
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix is
       Result : Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
    begin

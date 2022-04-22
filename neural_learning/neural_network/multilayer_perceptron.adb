@@ -47,7 +47,7 @@ with Base;
 with Data_Splitter;
 with Label;
 with Neural_Maths;
---  with Printing;
+with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -75,7 +75,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix;
+                               return Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -131,8 +131,8 @@ package body Multilayer_Perceptron is
       else
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
-      Put_Line (Routine_Name & "Loss_Function_Name " &
-                  Loss_Function'Image (Loss_Function_Name));
+      --        Put_Line (Routine_Name & "Loss_Function_Name " &
+      --                    Loss_Function'Image (Loss_Function_Name));
 
       Assert (Y'Length = Activations.Last_Element'Length and
                 Y'Length (2) = Activations.Last_Element'Length (2),
@@ -144,6 +144,12 @@ package body Multilayer_Perceptron is
                 " should be the same as Y size" & Integer'Image (Y'Length) &
                 " x" & Integer'Image (Y'Length (2)));
 
+      Put_Line (Routine_Name & "L284 Y (1, 1): " & Integer'Image (Y (1, 1)));
+      Put_Line (Routine_Name & "L284 Activations.Last_Element (1, 1): " &
+                  Float'Image (Activations.Last_Element (1, 1)));
+      Printing.Print_Float_Matrix (Routine_Name &
+                                     "L284 Activations.Last_Element",
+                                   Activations.Last_Element, 1, 5);
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y, Activations.Last_Element);
@@ -155,6 +161,9 @@ package body Multilayer_Perceptron is
       --        End_Time := Clock;
       --        Put_Line (Routine_Name & "Loss computation elapsed time: " &
       --                    Duration'Image ((End_Time -Start_Time) * 1000) & "mS");
+
+      Assert (Loss'Valid, Routine_Name & "L289 invalid Loss " & Float'Image (Loss));
+      Put_Line (Routine_Name & "L289 Loss: " & Float'Image (Loss));
 
       --  L289  Add L2 regularization term to loss
       for s in Self.Attributes.Params.First_Index ..
@@ -176,6 +185,7 @@ package body Multilayer_Perceptron is
       --  L292
       Loss := Loss + 0.5 * Self.Parameters.Alpha * Values / Float (Num_Samples);
 
+      Put_Line (Routine_Name & "L292 Loss: " & Float'Image (Loss));
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following combinations
       --  of output activation and loss function:
@@ -595,6 +605,8 @@ package body Multilayer_Perceptron is
                            Num_Features, Accumulated_Loss);
          end loop;
 
+         Assert (Accumulated_Loss'Valid, Routine_Name &
+                   "invalid Accumulated_Loss" & Float'Image (Accumulated_Loss));
          --  L661
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
@@ -675,8 +687,8 @@ package body Multilayer_Perceptron is
       --  Activations: layers x samples x features
       --        use Ada.Containers;
       use Base_Neural;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Forward_Pass ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Forward_Pass ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -697,15 +709,25 @@ package body Multilayer_Perceptron is
          Update_Activations (Params (layer), Activations, Hidden_Activation,
                              Num_Layers, layer);
       end loop;
+      Printing.Print_Float_Matrix (Routine_Name &
+                                     "L138 Activations.Last_Element",
+                                   Activations.Last_Element, 1, 5);
+      Put_Line (Routine_Name & "Output_Activation: " &
+                 Activation_Type'Image (Output_Activation));
 
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
-         when Logistic_Activation => Logistic (Activations (Num_Layers));
-         when Tanh_Activation => Tanh (Activations (Num_Layers));
-         when Relu_Activation => Relu (Activations (Num_Layers));
-         when Softmax_Activation => Softmax (Activations (Num_Layers));
+         when Logistic_Activation =>
+            Logistic (Activations (Activations.Last_Index));
+         when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
+         when Relu_Activation => Relu (Activations (Activations.Last_Index));
+         when Softmax_Activation =>
+            Softmax (Activations (Activations.Last_Index));
       end case;
+      Printing.Print_Float_Matrix (Routine_Name &
+                                     "final Activations.Last_Element",
+                                   Activations.Last_Element, 1, 5);
 
       --        End_Time := Clock;
       --        Put_Line (Routine_Name & "elapsed time: " &
@@ -715,7 +737,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix is
+                               return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       --          Routine_Name       : constant String :=
@@ -848,7 +870,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : MLP_Classifier; X : Float_Matrix)
-                      return Float_Matrix is
+                     return Float_Matrix is
    begin
       return Forward_Pass_Fast (Self, X);
 
@@ -884,7 +906,7 @@ package body Multilayer_Perceptron is
       --  L645
       Activations.Append (X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
-      Put_Line (Routine_Name & "Batch_Loss" & Float'Image (Batch_Loss));
+      Put_Line (Routine_Name & "Batch_Loss: " & Float'Image (Batch_Loss));
 
       --  L655
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
