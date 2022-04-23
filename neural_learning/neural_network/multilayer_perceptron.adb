@@ -704,7 +704,7 @@ package body Multilayer_Perceptron is
       --   stopping BEFORE "stop". That is, at "stop" - 1.
       --  Therefore range(self.n_layers_ - 1): range is
       --            first (0) .. last (n_layers_ - 2)
-      --  L119
+      --  L130
       for layer in 1 .. Num_Layers - 1 loop
          Update_Activations (Params (layer), Activations, Hidden_Activation,
                              Num_Layers, layer);
@@ -712,6 +712,14 @@ package body Multilayer_Perceptron is
       Printing.Print_Float_Matrix (Routine_Name &
                                      "L138 Activations.Last_Element",
                                    Activations.Last_Element, 1, 5);
+      Put_Line (Routine_Name & "L138 Activations Num_Layers - 1 length" &
+                 Integer'Image (Activations.Element (Num_Layers - 1)'Length) & " x" &
+                 Integer'Image (Activations.Element (Num_Layers - 1)'Length (2)));
+      Put_Line (Routine_Name & "L138 Activations.Last_Element length" &
+                 Integer'Image (Activations.Last_Element'Length) & " x" &
+                 Integer'Image (Activations.Last_Element'Length (2)));
+      Put_Line (Routine_Name & "Hidden_Activation: " &
+                 Activation_Type'Image (Hidden_Activation));
       Put_Line (Routine_Name & "Output_Activation: " &
                  Activation_Type'Image (Output_Activation));
 
@@ -926,8 +934,8 @@ package body Multilayer_Perceptron is
       Num_Layers, Layer  : Positive) is
       --        use Ada.Containers;
       use Base_Neural;
-      --        Routine_Name         : constant String :=
-      --                                 "Multilayer_Perceptron.Update_Activations ";
+      Routine_Name         : constant String :=
+                               "Multilayer_Perceptron.Update_Activations ";
       Activ_Layer          : constant Float_Matrix := Activations (layer);
       Coefficient_Matrix   : constant Float_Matrix := Params.Coeff_Grads;
       --  Intercepts: layers x intercept values
@@ -937,6 +945,12 @@ package body Multilayer_Perceptron is
       Activ_With_Intercept : Float_Matrix
         (1 .. Activ_Layer'Length, 1 .. Activs_Dot_Coeffs'Length (2));
    begin
+      Put_Line (Routine_Name & "L131 Activ_Layer length" &
+                 Integer'Image (Activ_Layer'Length) & " x" &
+                 Integer'Image (Activ_Layer'Length (2)));
+      Put_Line (Routine_Name & "L131 Activs_Dot_Coeffs length" &
+                 Integer'Image (Activs_Dot_Coeffs'Length) & " x" &
+                 Integer'Image (Activs_Dot_Coeffs'Length (2)));
       --  L131 Add layer + 1
       Activations.Append (Activs_Dot_Coeffs);
 
@@ -946,7 +960,7 @@ package body Multilayer_Perceptron is
       Activations (layer + 1) := Activ_With_Intercept;
 
       --  L134 For the hidden layers
-      if layer + 1 /= Num_Layers then
+      if layer + 1 /= Num_Layers - 1 then
          case Hidden_Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>

@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Neural_Maths;
---  with Printing;
+with Printing;
 
 package body Base_Neural is
 
@@ -252,10 +252,15 @@ package body Base_Neural is
         aRow  : Float_Array (Activation'Range (2));
     begin
         Put_Line (Routine_Name);
+      Put_Line (Routine_Name & "Activation length" &
+                 Integer'Image (Activation'Length) & " x" &
+                 Integer'Image (Activation'Length (2)));
         X_Max := Max (Activation);
         --        for row in Activation'Range loop
         --           X_M (row, 1) :=  X_Max (row);
         --        end loop;
+        Printing.Print_Float_Array ("X_Max", X_Max, 1, 5);
+      Put_Line (Routine_Name & "X_Max length" & Integer'Image (X_Max'Length));
 
         for row in Activation'Range loop
             for col in Activation'Range (2) loop
@@ -263,6 +268,10 @@ package body Base_Neural is
                 --              Tmp (row, col) := Activation (row, col) - X_M (row, col);
             end loop;
         end loop;
+--          Printing.Print_Float_Matrix ("Tmp", Tmp, 1, 5);
+      Put_Line (Routine_Name & "Tmp length" &
+                 Integer'Image (Tmp'Length) & " x" &
+                 Integer'Image (Tmp'Length (2)));
 
         for row in Activation'Range loop
             aRow := Softmax (Get_Row (Tmp, row));
