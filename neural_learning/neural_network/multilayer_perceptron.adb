@@ -940,21 +940,21 @@ package body Multilayer_Perceptron is
       Coefficient_Matrix   : constant Float_Matrix := Params.Coeff_Grads;
       --  Intercepts: layers x intercept values
       Intercepts           : constant Float_Array := Params.Intercept_Grads;
-      Activs_Dot_Coeffs    : constant Float_Matrix
+      Activ_Dot_Coeff      : constant Float_Matrix
         := Dot (Activ_Layer, Coefficient_Matrix);
       Activ_With_Intercept : Float_Matrix
-        (1 .. Activ_Layer'Length, 1 .. Activs_Dot_Coeffs'Length (2));
+        (1 .. Activ_Layer'Length, 1 .. Activ_Dot_Coeff'Length (2));
    begin
       Put_Line (Routine_Name & "L131 Activ_Layer length" &
                  Integer'Image (Activ_Layer'Length) & " x" &
                  Integer'Image (Activ_Layer'Length (2)));
-      Put_Line (Routine_Name & "L131 Activs_Dot_Coeffs length" &
-                 Integer'Image (Activs_Dot_Coeffs'Length) & " x" &
-                 Integer'Image (Activs_Dot_Coeffs'Length (2)));
+      Put_Line (Routine_Name & "L131 Activ_Dot_Coeff length" &
+                 Integer'Image (Activ_Dot_Coeff'Length) & " x" &
+                 Integer'Image (Activ_Dot_Coeff'Length (2)));
       --  L131 Add layer + 1
-      Activations.Append (Activs_Dot_Coeffs);
+      Activations.Append (Activ_Dot_Coeff);
 
-      --  L132
+      --  L132 Add Intercept to layer + 1
       Activ_With_Intercept := Activations (layer + 1);
       Activ_With_Intercept := Activ_With_Intercept + Intercepts;
       Activations (layer + 1) := Activ_With_Intercept;
