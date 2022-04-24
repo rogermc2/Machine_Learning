@@ -380,8 +380,8 @@ package body Multilayer_Perceptron is
                    Y           : Integer_Matrix;
                    Incremental : Boolean := False) is
         use Ada.Containers;
-        --        Routine_Name       : constant String :=
-        --                               "Multilayer_Perceptron.Fit ";
+        Routine_Name       : constant String :=
+                                     "Multilayer_Perceptron.Fit ";
         Num_Features       : constant Positive := Positive (X'Length (2));
         Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                                Self.Parameters.Hidden_Layer_Sizes;
@@ -403,6 +403,7 @@ package body Multilayer_Perceptron is
             end loop;
         end if;
         Layer_Units.Append (Self.Attributes.N_Outputs);
+        Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
 
         --  L409
         if First_Pass then
