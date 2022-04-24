@@ -2,7 +2,7 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -245,18 +245,18 @@ package body Base_Neural is
     --  -------------------------------------------------------------------------
 
     procedure Softmax (Activation : in out Float_Matrix) is
-        Routine_Name : constant String := "Base_Neural.Softmax ";
+--          Routine_Name : constant String := "Base_Neural.Softmax ";
         Tmp   : Float_Matrix := Activation;
         aRow  : Float_Array (Activation'Range (2));
     begin
-        Put_Line (Routine_Name);
-      Put_Line (Routine_Name & "Activation length" &
-                 Integer'Image (Activation'Length) & " x" &
-                 Integer'Image (Activation'Length (2)));
+--          Put_Line (Routine_Name);
+--        Put_Line (Routine_Name & "Activation length" &
+--                   Integer'Image (Activation'Length) & " x" &
+--                   Integer'Image (Activation'Length (2)));
       Tmp := Diff_Max (Activation);
-      Put_Line (Routine_Name & "Tmp length" &
-                 Integer'Image (Tmp'Length) & " x" &
-                 Integer'Image (Tmp'Length (2)));
+--        Put_Line (Routine_Name & "Tmp length" &
+--                   Integer'Image (Tmp'Length) & " x" &
+--                   Integer'Image (Tmp'Length (2)));
 
         for row in Activation'Range loop
             aRow := Softmax (Get_Row (Tmp, row));
