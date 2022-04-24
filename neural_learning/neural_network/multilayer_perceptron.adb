@@ -45,6 +45,7 @@ with Maths;
 
 with Base;
 with Data_Splitter;
+with Encode_Utils;
 with Label;
 with Neural_Maths;
 with Printing;
@@ -98,9 +99,9 @@ package body Multilayer_Perceptron is
       (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
        X_Val, Y_Val : Float_Matrix);
     procedure Validate_Hyperparameters (Self : MLP_Classifier);
-    --     procedure Validate_Input (Self               : in out MLP_Classifier;
-    --                               Y                  : Integer_List);
-    --                               Incremental, Reset : Boolean);
+       procedure Validate_Input (Self               : in out MLP_Classifier;
+                                 Y                  : Integer_Matrix;
+                                 Incremental, Reset : Boolean);
 
     --  -------------------------------------------------------------------------
     --  L241  Backprop computes the MLP loss function and its derivatives
@@ -1052,21 +1053,22 @@ package body Multilayer_Perceptron is
     end Validate_Hyperparameters;
 
     --  -------------------------------------------------------------------------
+    --  L1125
+       procedure Validate_Input (Self               : in out MLP_Classifier;
+                                 --                               X                  : Float_List_2D;
+                                 Y                  : Integer_Matrix;
+                                 Incremental, Reset : Boolean) is
+         Routine_Name : constant String :=
+                          "Multilayer_Perceptron.Validate_Input ";
+       begin
+          if Self.Attributes.Classes.Is_Empty and then
+            Self.Parameters.Warm_Start then
+             Self.Attributes.Classes := Encode_Utils.Unique (Y);
+          else
+             null;
+          end if;
 
-    --     procedure Validate_Input (Self               : in out MLP_Classifier;
-    --                               --                               X                  : Float_List_2D;
-    --                               Y                  : Integer_Array) is
-    --                               Incremental, Reset : Boolean) is
-    --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Input ";
-    --     begin
-    --        if Self.Attributes.Classes.Is_Empty and then
-    --          Self.Parameters.Warm_Start then
-    --           Self.Attributes.Classes := Encode_Utils.Unique (Y);
-    --        else
-    --           null;
-    --        end if;
-    --
-    --     end Validate_Input;
+       end Validate_Input;
 
     --  -------------------------------------------------------------------------
 

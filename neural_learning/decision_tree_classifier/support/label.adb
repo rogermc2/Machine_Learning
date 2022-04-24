@@ -35,20 +35,30 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with NL_Types;
 
 package body Label is
 
-   --  -------------------------------------------------------------------------
-   --  Fit fits label encoder
-   procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
+   procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
+      use Multiclass_Utils;
+      Routine_Name : constant String := "Label.Binarizer Fit ";
+      Label_Type : Unique_Label := Type_Of_Target (Y);
    begin
-      if Encoder.Encoder_Kind = Class_Unique then
-         Encoder.Uniques := Encode_Utils.Unique (Y);
-      else
-         raise Label_Error with
-           "Label.Fit called with label encoder instead of unique encode";
-      end if;
+      Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
+                "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
+                " must be less than Binarizer.Pos_Label"
+              & Integer'Image (Binarizer.Pos_Label));
+      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+
+   end Fit;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
+      Routine_Name : constant String := "Label.Encoder Fit ";
+   begin
+      Assert (Encoder.Encoder_Kind = Class_Unique, Routine_Name &
+                "Label.Fit called with label encoder instead of unique encode");
+      Encoder.Uniques := Encode_Utils.Unique (Y);
    end Fit;
 
    --  -------------------------------------------------------------------------

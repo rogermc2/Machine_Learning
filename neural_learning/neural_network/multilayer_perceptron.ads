@@ -1,6 +1,7 @@
 
 with Ada.Containers.Vectors;
 
+with Label;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Base_Neural;
@@ -56,6 +57,7 @@ package Multilayer_Perceptron is
         Out_Activation       : Base_Neural.Activation_Type :=
                                  Base_Neural.Softmax_Activation;
         Optimizer            : Optimizer_Record;
+        Binarizer            : Label.Label_Binarizer;
     end record;
 
     type MLP_Classifier_Parameters is
