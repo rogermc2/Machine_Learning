@@ -71,6 +71,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
+                             Activations  : in out Matrix_List;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List);
@@ -83,6 +84,7 @@ package body Multilayer_Perceptron is
    procedure Process_Batch (Self                     : in out MLP_Classifier;
                             X                        : Float_Matrix;
                             Y                        : Integer_Matrix;
+                            Activations              : in out Matrix_List;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
                             Accumulated_Loss         : in out Float);
@@ -385,6 +387,7 @@ package body Multilayer_Perceptron is
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
       Layer_Units        : NL_Types.Integer_List;
+      Activations        : Matrix_List;
    begin
       Validate_Hyperparameters (Self);
       First_Pass :=
@@ -407,10 +410,9 @@ package body Multilayer_Perceptron is
          Initialize (Self, Layer_Units);
       end if;
 
-      --  if ? then
       --  L414 Set the Activation values of the first layer
-      --        Activations.Append (X);  -- layer x samples x features
-      --  end if;
+      Activations.Append (X);  -- layer x samples x features
+      Activations.Set_Length (Activations.Length + Layer_Units.Length - 1);
       --  Deltas is a 3D list initialized by Backprop
 
       --  L417 Initialized grads are empty vectors, no initialization required.
@@ -418,7 +420,7 @@ package body Multilayer_Perceptron is
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
-         Fit_Stochastic (Self, X, Y, Incremental);
+         Fit_Stochastic (Self, X, Y, Activations, Incremental);
 
       elsif Self.Parameters.Solver = Lbfgs_Solver then
          null;
@@ -474,6 +476,7 @@ package body Multilayer_Perceptron is
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
                              Y            : Integer_Matrix;
+                             Activations  : in out Matrix_List;
                              Incremental  : Boolean := False) is
       --        use Ada.Containers;
       use Estimator;
@@ -601,8 +604,8 @@ package body Multilayer_Perceptron is
          --  L636
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
-            Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
-                           Num_Features, Accumulated_Loss);
+            Process_Batch (Self, X, Y, Activations, Batches (Batch_Index),
+                           Batch_Size, Num_Features, Accumulated_Loss);
          end loop;
 
          Assert (Accumulated_Loss'Valid, Routine_Name &
@@ -682,9 +685,9 @@ package body Multilayer_Perceptron is
    --  output layer.
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List) is
-      --  The ith element of Activations (length n_layers - 1) holds the values
-      --  of the ith layer.
-      --  Activations: layers x samples x features
+      --  The ith element of Activations (length n_layers - 1) holds
+      --  the activation values of the ith layer.
+      --  Activations: layers x matrix (samples x features)
       --        use Ada.Containers;
       use Base_Neural;
       Routine_Name       : constant String :=
@@ -713,8 +716,9 @@ package body Multilayer_Perceptron is
                                      "L138 Activations.Last_Element",
                                    Activations.Last_Element, 1, 5);
       Put_Line (Routine_Name & "L138 Activations Num_Layers - 1 length" &
-                 Integer'Image (Activations.Element (Num_Layers - 1)'Length) & " x" &
-                 Integer'Image (Activations.Element (Num_Layers - 1)'Length (2)));
+                  Integer'Image (Activations.Element (Num_Layers - 1)'Length) &
+                  " x" & Integer'Image (Activations.Element
+                  (Num_Layers - 1)'Length (2)));
       Put_Line (Routine_Name & "L138 Activations.Last_Element length" &
                  Integer'Image (Activations.Last_Element'Length) & " x" &
                  Integer'Image (Activations.Last_Element'Length (2)));
@@ -733,6 +737,8 @@ package body Multilayer_Perceptron is
          when Softmax_Activation =>
             Softmax (Activations (Activations.Last_Index));
       end case;
+      Put_Line (Routine_Name & "final Activations length" &
+                 Integer'Image (Integer (Activations.Length)));
       Printing.Print_Float_Matrix (Routine_Name &
                                      "final Activations.Last_Element",
                                    Activations.Last_Element, 1, 5);
@@ -889,6 +895,7 @@ package body Multilayer_Perceptron is
    procedure Process_Batch (Self                     : in out MLP_Classifier;
                             X                        : Float_Matrix;
                             Y                        : Integer_Matrix;
+                            Activations              : in out Matrix_List;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
                             --    Grads                    : in out Parameters_List;
@@ -897,7 +904,6 @@ package body Multilayer_Perceptron is
       Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
       Y_Batch      : Integer_Matrix (1 .. Batch_Size, 1 .. 1);
-      Activations  : Matrix_List;
       Grads        : Parameters_List;
       Batch_Row    : Positive;
       Batch_Loss   : Float;
@@ -910,16 +916,15 @@ package body Multilayer_Perceptron is
          Y_Batch (Batch_Row, 1) := Y (row, 1);
       end loop;
 
-      Activations.Clear;
-      --  L645
-      Activations.Append (X_Batch);
+      --  L655
+      Activations.Replace_Element (Activations.First_Index, X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
       Put_Line (Routine_Name & "Batch_Loss: " & Float'Image (Batch_Loss));
 
-      --  L655
+      --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
-      --  L657 update weights
+      --  L667 update weights
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
 
@@ -942,8 +947,6 @@ package body Multilayer_Perceptron is
       Intercepts           : constant Float_Array := Params.Intercept_Grads;
       Activ_Dot_Coeff      : constant Float_Matrix
         := Dot (Activ_Layer, Coefficient_Matrix);
-      Activ_With_Intercept : Float_Matrix
-        (1 .. Activ_Layer'Length, 1 .. Activ_Dot_Coeff'Length (2));
    begin
       Put_Line (Routine_Name & "L131 Activ_Layer length" &
                  Integer'Image (Activ_Layer'Length) & " x" &
@@ -952,15 +955,10 @@ package body Multilayer_Perceptron is
                  Integer'Image (Activ_Dot_Coeff'Length) & " x" &
                  Integer'Image (Activ_Dot_Coeff'Length (2)));
       --  L131 Add layer + 1
-      Activations.Append (Activ_Dot_Coeff);
-
-      --  L132 Add Intercept to layer + 1
-      Activ_With_Intercept := Activations (layer + 1);
-      Activ_With_Intercept := Activ_With_Intercept + Intercepts;
-      Activations (layer + 1) := Activ_With_Intercept;
+      Activations.Replace_Element (layer + 1, Activ_Dot_Coeff + Intercepts);
 
       --  L134 For the hidden layers
-      if layer + 1 /= Num_Layers - 1 then
+      if layer + 1 /= Num_Layers then
          case Hidden_Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>
@@ -971,6 +969,7 @@ package body Multilayer_Perceptron is
                Softmax (Activations (layer + 1));
          end case;
       end if;
+
    end Update_Activations;
 
    --  -------------------------------------------------------------------------

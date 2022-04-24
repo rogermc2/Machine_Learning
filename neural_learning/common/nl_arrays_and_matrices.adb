@@ -178,7 +178,35 @@ package body NL_Arrays_And_Matrices is
    end "-";
 
    --  ----------------------------------------------------------------------------
+   --  Diff_Max returns the maximum value of each row
+   function Diff_Max (Data : Float_Matrix) return Float_Matrix is
+        aRow      : Float_Array (Data'Range (2));
+        Max_Value : Float;
+        Max_Vals  : Float_Array (Data'Range);
+        Diff      : Float_Matrix := Data;
+   begin
+        for row in Data'Range loop
+            aRow := Get_Row (Data, row);
+            Max_Value := Float'Safe_First;
+            for col in aRow'Range loop
+                if aRow (col) > Max_Value then
+                    Max_Value := aRow (col);
+                end if;
+            end loop;
+            Max_Vals (row) := Max_Value;
+        end loop;
 
+        for row in Data'Range loop
+            for col in aRow'Range loop
+                Diff (row, col) := Diff (row, col) - Max_Vals (row);
+            end loop;
+        end loop;
+
+      return Diff;
+
+   end Diff_Max;
+
+   --  ------------------------------------------------------------------------
    --  For A = [a(1,1) ... a(m,n)] and B = [b(1,1) ... b(n,p)]
    --  A.B = [c(i,j)] where
    --  c(i,j) = a(i,1)*b(1,j) + ... a(i,n)*b(n,j)
@@ -245,28 +273,6 @@ package body NL_Arrays_And_Matrices is
       return theRow;
 
    end Get_Row;
-
-   --  ------------------------------------------------------------------------
-   --  Max returns the maximum value of each row
-   function Max (Data : Float_Matrix) return Float_Array is
-        aRow      : Float_Array (Data'Range (2));
-        Max_Value : Float;
-        Max_Vals  : Float_Array (Data'Range);
-   begin
-        for row in Data'Range loop
-            aRow := Get_Row (Data, row);
-            Max_Value := Float'Safe_First;
-            for col in aRow'Range loop
-                if aRow (col) > Max_Value then
-                    Max_Value := aRow (col);
-                end if;
-            end loop;
-            Max_Vals (row) := Max_Value;
-        end loop;
-
-      return Max_Vals;
-
-   end Max;
 
    --  ------------------------------------------------------------------------
 
