@@ -1,5 +1,6 @@
 
 --  Adapted from scikit-learn/scikit-learn.git sklearn/preprocessing/_label.py
+
 --  A LabelEncoder encodes labels with a value between 0 and n_classes-1 where
 --  n is the number of distinct labels. If a label repeats it assigns the same
 --  value to as assigned earlier. The categorical values have been converted
@@ -38,201 +39,223 @@ with Encode_Utils;
 
 package body Label is
 
-   procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
-      --        use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Binarizer Fit ";
-      --        Label_Type   : Y_Type := Type_Of_Target (Y);
-   begin
-      Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
-                "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
-                " must be less than Binarizer.Pos_Label"
-              & Integer'Image (Binarizer.Pos_Label));
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
+    --        use Multiclass_Utils;
+        Routine_Name : constant String := "Label.Binarizer Fit ";
+        --        Label_Type   : Y_Type := Type_Of_Target (Y);
+    begin
+        Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
+                  "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
+                  " must be less than Binarizer.Pos_Label"
+                & Integer'Image (Binarizer.Pos_Label));
+        Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
 
-   end Fit;
+    end Fit;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
-   procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
-      Routine_Name : constant String := "Label.Encoder Fit ";
-   begin
-      Assert (Encoder.Encoder_Kind = Class_Unique, Routine_Name &
-                "Label.Fit called with label encoder instead of unique encode");
-      Encoder.Uniques := Encode_Utils.Unique (Y);
-   end Fit;
+    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
+        Routine_Name : constant String := "Label.Encoder Fit ";
+    begin
+        Assert (Encoder.Encoder_Kind = Class_Unique, Routine_Name &
+                  "Label.Fit called with label encoder instead of unique encode");
+        Encoder.Uniques := Encode_Utils.Unique (Y);
+    end Fit;
 
-   --  -------------------------------------------------------------------------
-   --  Fit_Transform fits label encoder and returns encoded labels
-   --  Balanced class weights should be given by
-   --  n_samples / (n_classes * np.bincount(y))
-   function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_Array)
-                           return Natural_Array is
-      Encoded_Labels : Natural_Array (1 .. Y'Length);
-   begin
-      if Encoder.Encoder_Kind = Class_Unique then
-         Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
-      else
-         raise Label_Error with
-           "Label.Fit_Transform called with label encoder instead of unique encoder";
-      end if;
+    --  -------------------------------------------------------------------------
+    --  Fit_Transform fits label encoder and returns encoded labels
+    --  Balanced class weights should be given by
+    --  n_samples / (n_classes * np.bincount(y))
+    function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_Array)
+                            return Natural_Array is
+        Encoded_Labels : Natural_Array (1 .. Y'Length);
+    begin
+        if Encoder.Encoder_Kind = Class_Unique then
+            Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
+        else
+            raise Label_Error with
+              "Label.Fit_Transform called with label encoder instead of unique encoder";
+        end if;
 
-      return Encoded_Labels;
+        return Encoded_Labels;
 
-   end Fit_Transform;
+    end Fit_Transform;
 
-   --  -------------------------------------------------------------------------
-   --   Inverse_Transform transforms labels back to original encoding
-   function Inverse_Transform (Self   : Label_Encoder;
-                               Labels : Natural_Array)
-                               return Integer_Array is
-      use NL_Types;
-      aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
-      Diff    : Natural_List;
-      Result  : Integer_Array (1 .. Positive (Labels'Length));
-   begin
-      for index in aRange'Range loop
-         aRange (index) := index;
-      end loop;
+    --  -------------------------------------------------------------------------
+    --   Inverse_Transform transforms labels back to original encoding
+    function Inverse_Transform (Self   : Label_Encoder;
+                                Labels : Natural_Array)
+                                return Integer_Array is
+        use NL_Types;
+        aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
+        Diff    : Natural_List;
+        Result  : Integer_Array (1 .. Positive (Labels'Length));
+    begin
+        for index in aRange'Range loop
+            aRange (index) := index;
+        end loop;
 
-      Diff := Classifier_Utilities.Set_Diff (Labels, aRange);
-      Assert (Diff.Is_Empty,
-              "Label.Inverse_Transform Labels vector contains " &
-                "previously unseen labels.");
+        Diff := Classifier_Utilities.Set_Diff (Labels, aRange);
+        Assert (Diff.Is_Empty,
+                "Label.Inverse_Transform Labels vector contains " &
+                  "previously unseen labels.");
 
-      for index in Result'Range loop
-         Result (index) := Self.Uniques (Labels (index));
-      end loop;
+        for index in Result'Range loop
+            Result (index) := Self.Uniques (Labels (index));
+        end loop;
 
-      return Result;
+        return Result;
 
-   end Inverse_Transform;
+    end Inverse_Transform;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
-   function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
-                               return Integer_Array is
-      aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
-      Diff    : NL_Types.Natural_List;
-      Result  : Integer_Array (1 .. Positive (Y'Length));
-   begin
-      for index in Self.Classes'Range loop
-         aRange (index) := index;
-      end loop;
+    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
+                                return Integer_Array is
+        aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
+        Diff    : NL_Types.Natural_List;
+        Result  : Integer_Array (1 .. Positive (Y'Length));
+    begin
+        for index in Self.Classes'Range loop
+            aRange (index) := index;
+        end loop;
 
-      Diff := Classifier_Utilities.Set_Diff (Y, aRange);
-      Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
+        Diff := Classifier_Utilities.Set_Diff (Y, aRange);
+        Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
 
-      for index in Y'Range loop
-         Result (index) := Self.Classes (Y (index));
-      end loop;
+        for index in Y'Range loop
+            Result (index) := Self.Classes (Y (index));
+        end loop;
 
-      return Result;
+        return Result;
 
-   end Inverse_Transform;
+    end Inverse_Transform;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
-   function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
-                               return Integer_Matrix is
-      use NL_Types;
-      YT        : constant Integer_Matrix := Transpose (Y);
-      aRange    : Integer_Array (1 .. Y'Length);
-      Diff      : Natural_List;
-      Transform : Integer_Matrix (1 .. YT'Length, 1 .. YT'Length (2));
-      YT_Row    : Integer_Array (1 .. YT'Length);
-   begin
-      for r in Self.Classes'Range loop
-         aRange (r) := r;
-      end loop;
+    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
+                                return Integer_Matrix is
+        use NL_Types;
+        YT        : constant Integer_Matrix := Transpose (Y);
+        aRange    : Integer_Array (1 .. Y'Length);
+        Diff      : Natural_List;
+        Transform : Integer_Matrix (1 .. YT'Length, 1 .. YT'Length (2));
+        YT_Row    : Integer_Array (1 .. YT'Length);
+    begin
+        for r in Self.Classes'Range loop
+            aRange (r) := r;
+        end loop;
 
-      for Y_index in YT'Range loop
-         for index2 in YT'Range (2) loop
-            YT_Row (Y_index) := YT (Y_index, index2);
-         end loop;
-         Diff := Classifier_Utilities.Set_Diff (YT_Row, aRange);
-         Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
+        for Y_index in YT'Range loop
+            for index2 in YT'Range (2) loop
+                YT_Row (Y_index) := YT (Y_index, index2);
+            end loop;
+            Diff := Classifier_Utilities.Set_Diff (YT_Row, aRange);
+            Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
 
-         for index2 in YT_Row'Range loop
-            Transform (Y_index, index2) := Self.Classes (YT_Row (index2));
-         end loop;
-      end loop;
+            for index2 in YT_Row'Range loop
+                Transform (Y_index, index2) := Self.Classes (YT_Row (index2));
+            end loop;
+        end loop;
 
-      return Transpose (Transform);
+        return Transpose (Transform);
 
-   end Inverse_Transform;
+    end Inverse_Transform;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
+    --  L416
+    function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
+                             Classes   : NL_Types.Integer_List;
+                             Neg_Label : Integer := 0; Pos_Label : Integer := 1)
+                             return Boolean_Array is
+        use NL_Types;
+        use Integer_Sorting;
+        Routine_Name   : constant String := "Label.Label_Binarize ";
+        Num_Samples    : constant Positive := Y'Length;
+        Num_Classes    : constant Positive := Positive (Classes.Length);
+        Sorted_Classes : Integer_List := Classes;
+        Pos_Switch     : constant Boolean := Pos_Label = 0;
+        Pos            : Integer := Pos_Label;
+        Y_In_Classes   : Boolean_Array  (Y'Range) := (others => False);
+        Y_Seen         : Integer_List;
+        Indices        : Integer_List;
+        Y_Bin          : Boolean_Array (Y'Range);
+    begin
+        Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
+                  Integer'Image (Neg_Label) & " must be less than pos_label" &
+                  Integer'Image (Pos_Label));
+        if Pos_Switch then
+            Pos := -Neg_Label;
+        end if;
 
-   function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
-                            Classes   : NL_Types.Integer_List;
-                            Neg_Label : Integer := 0; Pos_Label : Integer := 1)
-                            return Boolean_Array is
-      use NL_Types;
-      use Integer_Sorting;
-      Routine_Name   : constant String := "Label.Label_Binarize ";
-      Num_Samples    : constant Positive := Y'Length;
-      Num_Classes    : constant Positive := Positive (Classes.Length);
-      Sorted_Classes : Integer_List := Classes;
-      Pos_Switch     : constant Boolean := Pos_Label = 0;
-      Pos            : Integer := Pos_Label;
-      Y_In_Classes   : Integer_List;
-      Y_Bin          : Boolean_Array (Y'Range);
-   begin
-      Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
-                Integer'Image (Neg_Label) & " must be less than pos_label" &
-                Integer'Image (Pos_Label));
-      if Pos_Switch then
-         Pos := -Neg_Label;
-      end if;
-      Sort (Sorted_Classes);
+        --  528
+        Sort (Sorted_Classes);
 
-      for index in Y'Range loop
-         if Sorted_Classes.Contains (Y (index)) and then
-           not Y_In_Classes.Contains (Y (index)) then
-            Y_In_Classes.Append (Y (index));
-         end if;
-      end loop;
+        --  L542 y_in_classes = np.in1d(y, classes)
+        for index in Y'Range loop
+            Y_In_Classes (index) := Sorted_Classes.Contains (Y (index));
+        end loop;
 
-      return Y_Bin;
+        for index in Y'Range loop
+            if Y_In_Classes (index) then
+                Y_Seen.Append (Y (index));
+            end if;
+        end loop;
 
-   end Label_Binarize;
+        for index in Sorted_Classes.First_Index ..
+          Sorted_Classes.Last_Index loop
+            if Y_Seen.Contains (Sorted_Classes (index)) then
+                Indices.Append (index);
+            end if;
+        end loop;
 
-   --  -------------------------------------------------------------------------
+        declare
+            Data : Integer_Array (1 .. Positive (Indices.Length)) :=
+                     (others => Pos);
+        begin
+            null;
+        end;
 
-   function Transform (Self : Label_Binarizer; Y : Integer_Array)
-                       return Boolean_Array is
-      use Multiclass_Utils;
-      Labels : Boolean_Array (Y'Range);
-   begin
-      if Self.Y_Kind = Y_Multiclass then
-         Labels := Label_Binarize (Self, Y, Self.Classes);
-      else
-         raise Label_Error with
-           "Label.Transform called with invalid encoder type.";
-      end if;
+        return Y_Bin;
 
-      return Labels;
+    end Label_Binarize;
 
-   end Transform;
+    --  -------------------------------------------------------------------------
 
-   --  -------------------------------------------------------------------------
+    function Transform (Self : Label_Binarizer; Y : Integer_Array)
+                        return Boolean_Array is
+        use Multiclass_Utils;
+        Labels : Boolean_Array (Y'Range);
+    begin
+        if Self.Y_Kind = Y_Multiclass then
+            Labels := Label_Binarize (Self, Y, Self.Classes);
+        else
+            raise Label_Error with
+              "Label.Transform called with invalid encoder type.";
+        end if;
 
-   --  Transform returns labels as normalized encodings
-   function Transform (Self : Label_Encoder; Y : Integer_Array)
-                       return Natural_Array is
-      Labels : Natural_Array (1 .. Y'Length);
-   begin
-      if Self.Encoder_Kind = Class_Unique then
-         Labels := Encode_Utils.Encode (Y, Self.Uniques);
-      else
-         raise Label_Error with
-           "Label.Transform called with invalid encoder type.";
-      end if;
+        return Labels;
 
-      return Labels;
+    end Transform;
 
-   end Transform;
+    --  -------------------------------------------------------------------------
 
-   --  -------------------------------------------------------------------------
+    --  Transform returns labels as normalized encodings
+    function Transform (Self : Label_Encoder; Y : Integer_Array)
+                        return Natural_Array is
+        Labels : Natural_Array (1 .. Y'Length);
+    begin
+        if Self.Encoder_Kind = Class_Unique then
+            Labels := Encode_Utils.Encode (Y, Self.Uniques);
+        else
+            raise Label_Error with
+              "Label.Transform called with invalid encoder type.";
+        end if;
+
+        return Labels;
+
+    end Transform;
+
+    --  -------------------------------------------------------------------------
 
 end Label;
