@@ -101,7 +101,7 @@ package body Multilayer_Perceptron is
    function Validate_Input (Self               : in out MLP_Classifier;
                             Y                  : Integer_Matrix;
                             Incremental, Reset : Boolean)
-                            return Boolean_Matrix;
+                            return Boolean_Array;
 
    --  -------------------------------------------------------------------------
    --  L241  Backprop computes the MLP loss function and its derivatives
@@ -1057,7 +1057,7 @@ package body Multilayer_Perceptron is
    function Validate_Input (Self               : in out MLP_Classifier;
                             Y                  : Integer_Matrix;
                             Incremental, Reset : Boolean )
-                            return Boolean_Matrix is
+                            return Boolean_Array is
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Validate_Input ";
 
@@ -1067,7 +1067,7 @@ package body Multilayer_Perceptron is
          declare
             Classes     : Integer_Array := Multiclass_Utils.Unique_Labels (Y);
             Num_Classes : Positive := Classes'Length;
-            Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
+            Y_Bin       : Boolean_Array ( 1 .. Y'Length * Num_Classes);
          begin
 
             return Y_Bin;
@@ -1075,13 +1075,15 @@ package body Multilayer_Perceptron is
       else
          declare
             Num_Classes : Positive := 10;
-            Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
+            Y_Bin       : Boolean_Array (1 .. Y'Length * Num_Classes);
             Binarizer   : Label.Label_Binarizer;
          begin
             Label.Fit (Binarizer, Y);
             Self.Attributes.Binarizer := Binarizer;
             Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
-            Label.Transform (Self.Attributes.Binarizer, Y);
+            Y_Bin :=
+                  Label.Label_Binarize (Self.Attributes.Binarizer,
+                                        Flatten (Y), Self.Attributes.Classes);
             return Y_Bin;
          end;
       end if;
