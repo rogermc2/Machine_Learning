@@ -3,7 +3,6 @@ with PLplot_Auxiliary;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
---  with Weights;
 
 package Classifier_Utilities is
 

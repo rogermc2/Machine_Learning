@@ -191,4 +191,49 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (Values : Integer_Matrix) return Integer_Array is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Int_Value       : Integer;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_Integers.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return To_Integer_Array (Uniq_List);
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Integer_Matrix) return Int_Sets.Set is
+      use Int_Sets;
+      Unique_Integers : Int_Sets.Set;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_Integers.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      return Unique_Integers;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
 end Encode_Utils;

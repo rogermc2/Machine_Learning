@@ -20,5 +20,7 @@ package Encode_Utils is
    function Unique (Values : Integer_Array) return Integer_Array;
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                     return Integer_Array;
+   function Unique (Values : Integer_Matrix) return Integer_Array;
+   function Unique (Values : Integer_Matrix) return Int_Sets.Set;
 
 end Encode_Utils;
