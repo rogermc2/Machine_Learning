@@ -48,6 +48,8 @@ package Label is
                                 return Integer_Array;
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                 return Integer_Matrix;
+   function Transform (Self : Label_Binarizer; Y : Integer_Array)
+                        return Integer_Array;
    function Transform (Self : Label_Encoder; Y : Integer_Array)
                         return Natural_Array;
 

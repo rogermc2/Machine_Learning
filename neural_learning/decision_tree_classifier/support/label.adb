@@ -39,9 +39,9 @@ with Encode_Utils;
 package body Label is
 
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
-      use Multiclass_Utils;
+--        use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
-      Label_Type : Unique_Label := Type_Of_Target (Y);
+--        Label_Type   : Y_Type := Type_Of_Target (Y);
    begin
       Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
                 "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
@@ -160,6 +160,35 @@ package body Label is
       return Transpose (Transform);
 
    end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Label_Binarize (Self : Label_Binarizer; Y : Integer_Array)
+                            return Integer_Array is
+
+      Y_Bin : Integer_Array (Y'Range);
+   begin
+      return Y_Bin;
+
+   end Label_Binarize;
+
+   --  -------------------------------------------------------------------------
+
+   function Transform (Self : Label_Binarizer; Y : Integer_Array)
+                        return Integer_Array is
+      use Multiclass_Utils;
+      Labels : Integer_Array (Y'Range);
+   begin
+      if Self.Y_Kind = Y_Multiclass then
+         Labels := Label_Binarize (Self, Y);
+      else
+         raise Label_Error with
+           "Label.Transform called with invalid encoder type.";
+      end if;
+
+      return Labels;
+
+   end Transform;
 
    --  -------------------------------------------------------------------------
 

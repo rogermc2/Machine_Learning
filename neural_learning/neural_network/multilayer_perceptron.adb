@@ -45,6 +45,7 @@ with Maths;
 
 with Base;
 with Data_Splitter;
+with Multiclass_Utils;
 with Neural_Maths;
 with Printing;
 with Utils;
@@ -75,7 +76,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix;
+                               return Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -98,9 +99,9 @@ package body Multilayer_Perceptron is
       X_Val, Y_Val : Float_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    function Validate_Input (Self               : in out MLP_Classifier;
-                             Y                  : Integer_Matrix;
-                             Incremental, Reset : Boolean)
-                                 return Boolean_Matrix;
+                            Y                  : Integer_Matrix;
+                            Incremental, Reset : Boolean)
+                            return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
    --  L241  Backprop computes the MLP loss function and its derivatives
@@ -696,7 +697,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix is
+                               return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       --          Routine_Name       : constant String :=
@@ -900,7 +901,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : MLP_Classifier; X : Float_Matrix)
-                      return Float_Matrix is
+                     return Float_Matrix is
    begin
       return Forward_Pass_Fast (Self, X);
 
@@ -1055,20 +1056,35 @@ package body Multilayer_Perceptron is
    --  L1125  MLPClassifier._validate_input
    function Validate_Input (Self               : in out MLP_Classifier;
                             Y                  : Integer_Matrix;
-                            Incremental, Reset : Boolean)
-                                return Boolean_Matrix is
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Validate_Input ";
-        Num_Classes : Positive := 10;
-        Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
+                            Incremental, Reset : Boolean )
+                            return Boolean_Matrix is
+      --        Routine_Name : constant String :=
+      --                         "Multilayer_Perceptron.Validate_Input ";
+
    begin
       if Self.Attributes.Classes.Is_Empty and then
         Self.Parameters.Warm_Start then
-         null;
+         declare
+            Classes     : Integer_Array := Multiclass_Utils.Unique_Labels (Y);
+            Num_Classes : Positive := Classes'Length;
+            Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
+         begin
+
+            return Y_Bin;
+         end;
       else
-         null;
+         declare
+            Num_Classes : Positive := 10;
+            Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
+            Binarizer   : Label.Label_Binarizer;
+         begin
+            Label.Fit (Binarizer, Y);
+            Self.Attributes.Binarizer := Binarizer;
+            Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+            Label.Transform (Self.Attributes.Binarizer, Y);
+            return Y_Bin;
+         end;
       end if;
-      return Y_Bin;
 
    end Validate_Input;
 
