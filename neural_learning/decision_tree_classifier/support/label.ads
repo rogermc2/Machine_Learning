@@ -51,7 +51,7 @@ package Label is
    function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
                             Classes   : NL_Types.Integer_List;
                             Neg_Label : Integer := 0; Pos_Label : Integer := 1)
-                            return Boolean_Array;
+                            return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
                         return Boolean_Array;
    function Transform (Self : Label_Encoder; Y : Integer_Array)

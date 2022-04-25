@@ -192,7 +192,7 @@ package body Label is
    function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
                             Classes   : NL_Types.Integer_List;
                             Neg_Label : Integer := 0; Pos_Label : Integer := 1)
-                             return Boolean_Array is
+                             return Boolean_Matrix is
       use NL_Types;
       use Integer_Sorting;
       Routine_Name   : constant String := "Label.Label_Binarize ";
@@ -204,7 +204,7 @@ package body Label is
       Y_In_Classes   : Boolean_Array  (Y'Range) := (others => False);
       Y_Seen         : Integer_List;
       Indices        : Integer_List;
-      Y_Bin          : Boolean_Array (Y'Range);
+      Y_Bin          : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
    begin
       Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
                 Integer'Image (Neg_Label) & " must be less than pos_label" &
