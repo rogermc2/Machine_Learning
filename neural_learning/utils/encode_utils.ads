@@ -2,6 +2,7 @@
 with Ada.Containers.Ordered_Sets;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Encode_Utils is
@@ -21,6 +22,7 @@ package Encode_Utils is
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                     return Integer_Array;
    function Unique (Values : Integer_Matrix) return Integer_Array;
+   function Unique (Values : Integer_Matrix) return NL_Types.Integer_List;
    function Unique (Values : Integer_Matrix) return Int_Sets.Set;
 
 end Encode_Utils;

@@ -30,7 +30,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : Integer_Matrix) return Integer_Array is
+   function Unique_Labels (Y : Integer_Matrix) return NL_Types.Integer_List is
 --        --  L84
 --        Label_Kind   : Label_Type := Unique_Binary;
 --        Label_Set    : Encode_Utils.Int_Sets.Set;

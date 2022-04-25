@@ -278,6 +278,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Flatten (M : Integer_Matrix) return Integer_Array is
+      Flat : Integer_Array (1 .. M'Length * M'Length (2));
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Flat ((row - 1) * M'Length (2) + col) := M (row, col);
+         end loop;
+      end loop;
+
+      return Flat;
+
+   end Flatten;
+
+   --  ------------------------------------------------------------------------
+
    function Get_Row (M : Float_Matrix; R : Integer) return Float_Array is
       theRow : Float_Array (M'Range (2));
    begin

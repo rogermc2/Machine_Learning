@@ -4,7 +4,6 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with NL_Types;
 with Printing;
 
 package body Encode_Utils is
@@ -191,7 +190,7 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : Integer_Matrix) return Integer_Array is
+   function Unique (Values : Integer_Matrix) return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;
       Int_Value       : Integer;
@@ -214,7 +213,16 @@ package body Encode_Utils is
 
       Sort (Uniq_List);
 
-      return To_Integer_Array (Uniq_List);
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Integer_Matrix) return Integer_Array is
+   begin
+
+      return To_Integer_Array (Unique (Values));
 
    end Unique;
 

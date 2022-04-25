@@ -1,4 +1,5 @@
 
+with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Multiclass_Utils is
@@ -9,6 +10,6 @@ package Multiclass_Utils is
                        Unique_Mutilabel_Indicator);
 
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
-   function Unique_Labels (Y : Integer_Matrix) return Integer_Array;
+   function Unique_Labels (Y : Integer_Matrix) return NL_Types.Integer_List;
 
 end Multiclass_Utils;
