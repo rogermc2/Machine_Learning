@@ -9,6 +9,6 @@ package Multiclass_Utils is
                        Unique_Mutilabel_Indicator);
 
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
-   function Unique_Labels (Y : Integer_Matrix) return Boolean_Matrix;
+   function Unique_Labels (Y : Integer_Matrix) return Integer_Array;
 
 end Multiclass_Utils;

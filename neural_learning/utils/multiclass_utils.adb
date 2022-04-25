@@ -30,51 +30,47 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : Integer_Matrix) return Boolean_Matrix is
-      Num_Classes  : Positive := 10;
-      Labels       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
-      --  L84
-      Label_Kind   : Label_Type := Unique_Binary;
-      Label_Set    : Encode_Utils.Int_Sets.Set;
+   function Unique_Labels (Y : Integer_Matrix) return Integer_Array is
+--        --  L84
+--        Label_Kind   : Label_Type := Unique_Binary;
+--        Label_Set    : Encode_Utils.Int_Sets.Set;
    begin
       --  L101
-      case Label_Kind is
-         --  L35
-         when Unique_Binary | Unique_Multiclass =>
-            --  L22
-            Label_Set := Unique_Multiclass_Set (Y);
-            --  L29
-         when Unique_Mutilabel_Indicator => Null;
+--        case Label_Kind is
+--           --  L35
+--           when Unique_Binary | Unique_Multiclass =>
+--              --  L22
+--              Label_Set := Unique_Multiclass_Set (Y);
+--              --  L29
+--           when Unique_Mutilabel_Indicator => Null;
 --              Labels := Unique_Indicator (Y);
-      end case;
-
-      return Labels;
+--        end case;
+      --  L111
+      return Encode_Utils.Unique (Y);
 
    end Unique_Labels;
 
    --  -------------------------------------------------------------------------
-
-   function Unique_Label_Set (Y : Integer_Matrix)
-                              return Encode_Utils.Int_Sets.Set is
-      Labels       : Encode_Utils.Int_Sets.Set;
---        Labels       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
-      --  L84
-      Label_Kind   : Label_Type := Unique_Binary;
-   begin
-      --  L101
-      case Label_Kind is
-         --  L35
-         when Unique_Binary | Unique_Multiclass =>
-            --  L22
-            Labels := Unique_Multiclass_Set (Y);
-            --  L29
-         when Unique_Mutilabel_Indicator => Null;
---              Labels := Unique_Indicator (Y);
-      end case;
-
-      return Labels;
-
-   end Unique_Label_Set;
+   --  L101
+--     function Unique_Label_Set (Y : Integer_Matrix)
+--                                return Encode_Utils.Int_Sets.Set is
+--        Labels       : Encode_Utils.Int_Sets.Set;
+--        --  L84
+--        Label_Kind   : Label_Type := Unique_Binary;
+--     begin
+--        case Label_Kind is
+--           --  L35
+--           when Unique_Binary | Unique_Multiclass =>
+--              --  L22
+--              Labels := Unique_Multiclass_Set (Y);
+--              --  L29
+--           when Unique_Mutilabel_Indicator => Null;
+--  --              Labels := Unique_Indicator (Y);
+--        end case;
+--
+--        return Labels;
+--
+--     end Unique_Label_Set;
 
    --  -------------------------------------------------------------------------
 
