@@ -164,9 +164,9 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Label_Binarize (Self : Label_Binarizer; Y : Integer_Array)
-                            return Integer_Array is
+                            return Boolean_Array is
 
-      Y_Bin : Integer_Array (Y'Range);
+      Y_Bin : Boolean_Array (Y'Range);
    begin
       return Y_Bin;
 
@@ -175,9 +175,9 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
-                        return Integer_Array is
+                        return Boolean_Array is
       use Multiclass_Utils;
-      Labels : Integer_Array (Y'Range);
+      Labels : Boolean_Array (Y'Range);
    begin
       if Self.Y_Kind = Y_Multiclass then
          Labels := Label_Binarize (Self, Y);

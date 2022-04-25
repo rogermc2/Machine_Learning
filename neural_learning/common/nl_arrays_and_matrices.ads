@@ -8,6 +8,7 @@ package NL_Arrays_And_Matrices is
 
    subtype Safe_Float is Float range Float'Range;
 
+   type Boolean_Array is array (Integer range <>) of Boolean;
    type Float_Array is array (Integer range <>) of Float;
    type Integer_Array is array (Integer range <>) of Integer;
    type Natural_Array is array (Integer range <>) of Natural;
