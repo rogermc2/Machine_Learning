@@ -1,32 +1,32 @@
 
-with Ada.Containers.Ordered_Maps;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+--  with Ada.Containers.Ordered_Maps;
+--  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Encode_Utils;
 
 package body Multiclass_Utils is
 
-   pragma Warnings (Off);
+--     pragma Warnings (Off);
 
-   package Label_Package is new
-     Ada.Containers.Ordered_Maps (Label_Type, Unbounded_String);
+--     package Label_Package is new
+--       Ada.Containers.Ordered_Maps (Label_Type, Unbounded_String);
 
-   Unique_Labels_Map : Label_Package.Map;
+--     Unique_Labels_Map : Label_Package.Map;
 
-   function Type_Of_Target (Y : Integer_Matrix) return Y_Type is
-   begin
-      return Y_Continuous;
-   end Type_Of_Target;
+--     function Type_Of_Target (Y : Integer_Matrix) return Y_Type is
+--     begin
+--        return Y_Continuous;
+--     end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
    --  unique_labels L101
-   function Unique_Multiclass_Set (Y : Integer_Matrix)
-                                   return Encode_Utils.Int_Sets.Set is
-   begin
-      --  L22 _unique_multiclass, return np.unique
-      return Encode_Utils.Unique (Y);
-
-   end Unique_Multiclass_Set;
+--     function Unique_Multiclass_Set (Y : Integer_Matrix)
+--                                     return Encode_Utils.Int_Sets.Set is
+--     begin
+--        --  L22 _unique_multiclass, return np.unique
+--        return Encode_Utils.Unique (Y);
+--
+--     end Unique_Multiclass_Set;
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels

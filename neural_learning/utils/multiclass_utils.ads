@@ -8,7 +8,7 @@ package Multiclass_Utils is
    type Label_Type is (Unique_Binary, Unique_Multiclass,
                        Unique_Mutilabel_Indicator);
 
-   function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
+--     function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
    function Unique_Labels (Y : Integer_Matrix) return Integer_Array;
 
 end Multiclass_Utils;
