@@ -45,7 +45,6 @@ with Maths;
 
 with Base;
 with Data_Splitter;
-with Encode_Utils;
 with Neural_Maths;
 with Printing;
 with Utils;
@@ -1062,7 +1061,7 @@ package body Multilayer_Perceptron is
        begin
           if Self.Attributes.Classes.Is_Empty and then
             Self.Parameters.Warm_Start then
-             Self.Attributes.Classes := Encode_Utils.Unique (Y);
+             null;
           else
              null;
           end if;
