@@ -204,7 +204,8 @@ package body Label is
       Y_In_Classes   : Boolean_Array  (Y'Range) := (others => False);
       Y_Seen         : Integer_List;
       Indices        : Integer_List;
-      Y_Bin          : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
+      Y_Bin          : Boolean_Matrix (Y'Range, 1 .. Num_Classes) :=
+                         (others => (others => False));
    begin
       Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
                 Integer'Image (Neg_Label) & " must be less than pos_label" &
@@ -243,7 +244,6 @@ package body Label is
            := (others => Pos);
          Bool_Sum   : constant Integer_Array (1 .. Ind_Length) :=
                         Cum_Sum (Y_In_Classes);
-         Ind_Ptr    : Integer_Array (1 .. Ind_Length + 1);
          CSR        : CSR_Matrix (Ind_Length, Ind_Length + 1);
       begin
          CSR.Data := Data;
