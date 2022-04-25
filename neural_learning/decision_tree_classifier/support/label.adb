@@ -36,6 +36,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Classifier_Utilities;
 with Encode_Utils;
+with Multiclass_Utils;
 
 package body Label is
 
@@ -65,15 +66,13 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
-      --        use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Binarizer Fit ";
-      --        Label_Type   : Y_Type := Type_Of_Target (Y);
+--        Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
-      Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
-                "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
-                " must be less than Binarizer.Pos_Label"
-              & Integer'Image (Binarizer.Pos_Label));
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+--        Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
+--                  "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
+--                  " must be less than Binarizer.Pos_Label"
+--                & Integer'Image (Binarizer.Pos_Label));
+--        Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
    end Fit;
 
@@ -281,16 +280,15 @@ package body Label is
 
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
                         return Boolean_Matrix is
-      use Multiclass_Utils;
       Labels : Boolean_Matrix
         (Y'Range, Self.Classes.First_Index .. Self.Classes.Last_Index);
    begin
-      if Self.Y_Kind = Y_Multiclass then
-         Labels := Label_Binarize (Y, Self.Classes);
-      else
-         raise Label_Error with
-           "Label.Transform called with invalid encoder type.";
-      end if;
+--        if Self.Y_Kind = Y_Multiclass then
+      Labels := Label_Binarize (Y, Self.Classes);
+--        else
+--           raise Label_Error with
+--             "Label.Transform called with invalid encoder type.";
+--        end if;
 
       return Labels;
 
