@@ -46,7 +46,6 @@ with Maths;
 with Base;
 with Data_Splitter;
 with Encode_Utils;
-with Label;
 with Neural_Maths;
 with Printing;
 with Utils;

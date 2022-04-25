@@ -16,6 +16,7 @@ package NL_Arrays_And_Matrices is
 
    type Multi_Value_Array is array (Integer range <>, Integer range <>)
      of Integer;
+   type Boolean_Matrix is array (Integer range <>, Integer range <>) of Boolean;
    type Float_Matrix is array (Integer range <>, Integer range <>) of Float;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
 

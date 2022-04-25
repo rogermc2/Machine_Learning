@@ -18,19 +18,14 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Unique_Labels (Y : Integer_Matrix) return Y_Type is
+   function Unique_Labels (Y : Integer_Matrix) return Boolean_Matrix is
+        Num_Classes : Positive := 10;
+        Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
    begin
-      return Y_Continuous;
+      return Y_Bin;
+
    end Unique_Labels;
 
    --  -------------------------------------------------------------------------
-
-begin
-   Unique_Labels_Map.Include (Unique_Binary,
-                              To_Unbounded_String ("Unique_Multiclass"));
-   Unique_Labels_Map.Include (Unique_Multiclass,
-                              To_Unbounded_String ("Unique_Multiclass"));
-   Unique_Labels_Map.Include (Unique_Mutilabel_Indicator,
-                              To_Unbounded_String ("Unique_Indicator"));
 
 end Multiclass_Utils;
