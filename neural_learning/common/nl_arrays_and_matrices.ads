@@ -47,6 +47,7 @@ package NL_Arrays_And_Matrices is
    function Dot (L : Float_Matrix; R : Float_Array)
                  return Float_Array;
    pragma Inline (Dot);
+   function Flatten (M : Float_Matrix) return Float_Array;
    function Get_Row (M : Float_Matrix; R : Integer) return Float_Array;
    pragma Inline (Get_Row);
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix;

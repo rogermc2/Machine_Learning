@@ -39,9 +39,9 @@ with Encode_Utils;
 package body Label is
 
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
---        use Multiclass_Utils;
+      --        use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
---        Label_Type   : Y_Type := Type_Of_Target (Y);
+      --        Label_Type   : Y_Type := Type_Of_Target (Y);
    begin
       Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
                 "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
@@ -163,11 +163,36 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Label_Binarize (Self : Label_Binarizer; Y : Integer_Array)
+   function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
+                            Classes   : NL_Types.Integer_List;
+                            Neg_Label : Integer := 0; Pos_Label : Integer := 1)
                             return Boolean_Array is
-
-      Y_Bin : Boolean_Array (Y'Range);
+      use NL_Types;
+      use Integer_Sorting;
+      Routine_Name   : constant String := "Label.Label_Binarize ";
+      Num_Samples    : constant Positive := Y'Length;
+      Num_Classes    : constant Positive := Positive (Classes.Length);
+      Sorted_Classes : Integer_List := Classes;
+      Pos_Switch     : constant Boolean := Pos_Label = 0;
+      Pos            : Integer := Pos_Label;
+      Y_In_Classes   : Integer_List;
+      Y_Bin          : Boolean_Array (Y'Range);
    begin
+      Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
+                Integer'Image (Neg_Label) & " must be less than pos_label" &
+                Integer'Image (Pos_Label));
+      if Pos_Switch then
+         Pos := -Neg_Label;
+      end if;
+      Sort (Sorted_Classes);
+
+      for index in Y'Range loop
+         if Sorted_Classes.Contains (Y (index)) and then
+           not Y_In_Classes.Contains (Y (index)) then
+            Y_In_Classes.Append (Y (index));
+         end if;
+      end loop;
+
       return Y_Bin;
 
    end Label_Binarize;
@@ -175,12 +200,12 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
-                        return Boolean_Array is
+                       return Boolean_Array is
       use Multiclass_Utils;
       Labels : Boolean_Array (Y'Range);
    begin
       if Self.Y_Kind = Y_Multiclass then
-         Labels := Label_Binarize (Self, Y);
+         Labels := Label_Binarize (Self, Y, Self.Classes);
       else
          raise Label_Error with
            "Label.Transform called with invalid encoder type.";
