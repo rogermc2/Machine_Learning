@@ -70,7 +70,7 @@ package body Multilayer_Perceptron is
    --                          Layer_Units : Integer_List);
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
-                             Y            : Integer_Matrix;
+                             Y            : Boolean_Matrix;
                              Activations  : in out Matrix_List;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
@@ -98,7 +98,8 @@ package body Multilayer_Perceptron is
      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
       X_Val, Y_Val : Float_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
-   function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix)
+   function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix;
+                            Classes : NL_Types.Integer_List)
                             return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -382,8 +383,12 @@ package body Multilayer_Perceptron is
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
+      Classes            : constant NL_Types.Integer_List :=
+                             Multiclass_Utils.Unique_Labels (Y);
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
+      Y_Bin              : Boolean_Matrix (Y'Range,
+                                           1 .. Positive (Classes.Length));
       Layer_Units        : NL_Types.Integer_List;
       Activations        : Matrix_List;
    begin
@@ -391,7 +396,7 @@ package body Multilayer_Perceptron is
       First_Pass :=
         Self.Attributes.Params.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
-
+      Y_Bin := Validate_Input (Self, Y, Classes);
       --  L404
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
@@ -419,7 +424,7 @@ package body Multilayer_Perceptron is
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
-         Fit_Stochastic (Self, X, Y, Activations, Incremental);
+         Fit_Stochastic (Self, X, Y_Bin, Activations, Incremental);
 
       elsif Self.Parameters.Solver = Lbfgs_Solver then
          null;
@@ -474,7 +479,7 @@ package body Multilayer_Perceptron is
    --  L563
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Float_Matrix;
-                             Y            : Integer_Matrix;
+                             Y            : Boolean_Matrix;
                              Activations  : in out Matrix_List;
                              Incremental  : Boolean := False) is
       --        use Ada.Containers;
@@ -1052,13 +1057,12 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1125  MLPClassifier._validate_input
-   function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix)
+   function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix;
+                           Classes : NL_Types.Integer_List)
 --                              Incremental, Reset : Boolean)
                             return Boolean_Matrix is
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Validate_Input ";
-      Classes     : constant NL_Types.Integer_List :=
-                      Multiclass_Utils.Unique_Labels (Y);
       Num_Classes : constant Positive := Positive (Classes.Length);
       Binarizer   : Label.Label_Binarizer;
       Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
