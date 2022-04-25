@@ -39,28 +39,28 @@ with Encode_Utils;
 
 package body Label is
 
-   type CSR_Matrix (Num_NZ, IP_Length : Positive) is record
-      Data    : Integer_Array (1 .. Num_NZ);
-      Indices : Integer_Array (1 .. Num_NZ);
-      Ind_Ptr : Integer_Array (1 .. IP_Length);
-   end record;
+--     type CSR_Matrix (Num_NZ, IP_Length : Positive) is record
+--        Data    : Integer_Array (1 .. Num_NZ);
+--        Indices : Integer_Array (1 .. Num_NZ);
+--        Ind_Ptr : Integer_Array (1 .. IP_Length);
+--     end record;
 
    --  -------------------------------------------------------------------------
 
-   function Cum_Sum (A : Boolean_Array) return Integer_Array is
-      Result : Integer_Array (A'Range);
-      Sum    : Natural := 0;
-   begin
-      for index in A'Range loop
-         if A (index) then
-            Sum := Sum + 1;
-         end if;
-         Result (index) := Sum;
-      end loop;
-
-      return Result;
-
-   end Cum_Sum;
+--     function Cum_Sum (A : Boolean_Array) return Integer_Array is
+--        Result : Integer_Array (A'Range);
+--        Sum    : Natural := 0;
+--     begin
+--        for index in A'Range loop
+--           if A (index) then
+--              Sum := Sum + 1;
+--           end if;
+--           Result (index) := Sum;
+--        end loop;
+--
+--        return Result;
+--
+--     end Cum_Sum;
 
    --  -------------------------------------------------------------------------
 
@@ -189,84 +189,104 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  L416
-   function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
-                            Classes   : NL_Types.Integer_List;
-                            Neg_Label : Integer := 0; Pos_Label : Integer := 1)
-                             return Boolean_Matrix is
-      use NL_Types;
-      use Integer_Sorting;
-      Routine_Name   : constant String := "Label.Label_Binarize ";
-      Num_Samples    : constant Positive := Y'Length;
-      Num_Classes    : constant Positive := Positive (Classes.Length);
-      Sorted_Classes : Integer_List := Classes;
-      Pos_Switch     : constant Boolean := Pos_Label = 0;
-      Pos            : Integer := Pos_Label;
-      Y_In_Classes   : Boolean_Array  (Y'Range) := (others => False);
-      Y_Seen         : Integer_List;
-      Indices        : Integer_List;
-      Y_Bin          : Boolean_Matrix (Y'Range, 1 .. Num_Classes) :=
+   function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
+                            return Boolean_Matrix is
+      Y_Bin : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
                          (others => (others => False));
    begin
-      Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
-                Integer'Image (Neg_Label) & " must be less than pos_label" &
-                Integer'Image (Pos_Label));
-      if Pos_Switch then
-         Pos := -Neg_Label;
-      end if;
-
-      --  528
-      Sort (Sorted_Classes);
-
-      --  L542 y_in_classes = np.in1d(y, classes)
-      for index in Y'Range loop
-         Y_In_Classes (index) := Sorted_Classes.Contains (Y (index));
-      end loop;
-
-      --  L543
-      for index in Y'Range loop
-         if Y_In_Classes (index) then
-            Y_Seen.Append (Y (index));
-         end if;
-      end loop;
-
-      --  L544
-      for index in Sorted_Classes.First_Index ..
-        Sorted_Classes.Last_Index loop
-         if Y_Seen.Contains (Sorted_Classes (index)) then
-            Indices.Append (index);
-         end if;
-      end loop;
-
-      declare
-         --  Data is an array of the non-zero values
-         Ind_Length : constant Positive := Positive (Indices.Length);
-         Data       : constant Integer_Array (1 .. Ind_Length)
-           := (others => Pos);
-         Bool_Sum   : constant Integer_Array (1 .. Ind_Length) :=
-                        Cum_Sum (Y_In_Classes);
-         CSR        : CSR_Matrix (Ind_Length, Ind_Length + 1);
-      begin
-         CSR.Data := Data;
-         CSR.Indices := To_Integer_Array (Indices);
-         CSR.Ind_Ptr (1) := 0;
-         for index in Bool_Sum'Range loop
-            CSR.Ind_Ptr (index + 1) := Bool_Sum  (index);
+      for row in Y'Range loop
+         for col in Classes.First_Index .. Classes.Last_Index loop
+            if Y (row) = Classes (col) then
+               Y_Bin (row, col) := True;
+            end if;
          end loop;
-      end;
+      end loop;
 
       return Y_Bin;
 
    end Label_Binarize;
 
    --  -------------------------------------------------------------------------
+--  L416
+--     function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
+--                              Classes   : NL_Types.Integer_List;
+--                              Neg_Label : Integer := 0; Pos_Label : Integer := 1)
+--                               return Boolean_Matrix is
+--        use NL_Types;
+--        use Integer_Sorting;
+--        Routine_Name   : constant String := "Label.Label_Binarize ";
+--        Num_Samples    : constant Positive := Y'Length;
+--        Num_Classes    : constant Positive := Positive (Classes.Length);
+--        Sorted_Classes : Integer_List := Classes;
+--        Pos_Switch     : constant Boolean := Pos_Label = 0;
+--        Pos            : Integer := Pos_Label;
+--        Y_In_Classes   : Boolean_Array  (Y'Range) := (others => False);
+--        Y_Seen         : Integer_List;
+--        Indices        : Integer_List;
+--        Y_Bin          : Boolean_Matrix (Y'Range, 1 .. Num_Classes) :=
+--                           (others => (others => False));
+--     begin
+--        Assert (Neg_Label < Pos_Label, Routine_Name & "Neg_label" &
+--                  Integer'Image (Neg_Label) & " must be less than pos_label" &
+--                  Integer'Image (Pos_Label));
+--        if Pos_Switch then
+--           Pos := -Neg_Label;
+--        end if;
+--
+--        --  528
+--        Sort (Sorted_Classes);
+--
+--        --  L542 y_in_classes = np.in1d(y, classes)
+--        for index in Y'Range loop
+--           Y_In_Classes (index) := Sorted_Classes.Contains (Y (index));
+--        end loop;
+--
+--        --  L543
+--        for index in Y'Range loop
+--           if Y_In_Classes (index) then
+--              Y_Seen.Append (Y (index));
+--           end if;
+--        end loop;
+--
+--        --  L544
+--        for index in Sorted_Classes.First_Index ..
+--          Sorted_Classes.Last_Index loop
+--           if Y_Seen.Contains (Sorted_Classes (index)) then
+--              Indices.Append (index);
+--           end if;
+--        end loop;
+--
+--        declare
+--           --  Data is an array of the non-zero values
+--           Ind_Length : constant Positive := Positive (Indices.Length);
+--           Data       : constant Integer_Array (1 .. Ind_Length)
+--             := (others => Pos);
+--           Bool_Sum   : constant Integer_Array (1 .. Ind_Length) :=
+--                          Cum_Sum (Y_In_Classes);
+--           CSR        : CSR_Matrix (Ind_Length, Ind_Length + 1);
+--        begin
+--           CSR.Data := Data;
+--           CSR.Indices := To_Integer_Array (Indices);
+--           CSR.Ind_Ptr (1) := 0;
+--           for index in Bool_Sum'Range loop
+--              CSR.Ind_Ptr (index + 1) := Bool_Sum  (index);
+--           end loop;
+--        end;
+
+--        return Y_Bin;
+--
+--     end Label_Binarize;
+
+   --  -------------------------------------------------------------------------
 
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
-                        return Boolean_Array is
+                        return Boolean_Matrix is
       use Multiclass_Utils;
-      Labels : Boolean_Array (Y'Range);
+      Labels : Boolean_Matrix
+        (Y'Range, Self.Classes.First_Index .. Self.Classes.Last_Index);
    begin
       if Self.Y_Kind = Y_Multiclass then
-         Labels := Label_Binarize (Self, Y, Self.Classes);
+         Labels := Label_Binarize (Y, Self.Classes);
       else
          raise Label_Error with
            "Label.Transform called with invalid encoder type.";

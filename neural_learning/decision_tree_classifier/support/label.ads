@@ -48,12 +48,10 @@ package Label is
                                 return Integer_Array;
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                 return Integer_Matrix;
-   function Label_Binarize (Self      : Label_Binarizer; Y : Integer_Array;
-                            Classes   : NL_Types.Integer_List;
-                            Neg_Label : Integer := 0; Pos_Label : Integer := 1)
+   function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
-                        return Boolean_Array;
+                        return Boolean_Matrix;
    function Transform (Self : Label_Encoder; Y : Integer_Array)
                         return Natural_Array;
 

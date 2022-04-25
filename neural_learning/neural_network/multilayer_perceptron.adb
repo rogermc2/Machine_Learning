@@ -98,10 +98,8 @@ package body Multilayer_Perceptron is
      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
       X_Val, Y_Val : Float_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
-   function Validate_Input (Self               : in out MLP_Classifier;
-                            Y                  : Integer_Matrix;
-                            Incremental, Reset : Boolean)
-                            return Boolean_Array;
+   function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix)
+                            return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
    --  L241  Backprop computes the MLP loss function and its derivatives
@@ -1054,39 +1052,29 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1125  MLPClassifier._validate_input
-   function Validate_Input (Self               : in out MLP_Classifier;
-                            Y                  : Integer_Matrix;
-                            Incremental, Reset : Boolean )
-                            return Boolean_Array is
+   function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix)
+--                              Incremental, Reset : Boolean)
+                            return Boolean_Matrix is
       --        Routine_Name : constant String :=
       --                         "Multilayer_Perceptron.Validate_Input ";
+      Classes     : constant NL_Types.Integer_List :=
+                      Multiclass_Utils.Unique_Labels (Y);
+      Num_Classes : constant Positive := Positive (Classes.Length);
+      Binarizer   : Label.Label_Binarizer;
+      Y_Bin       : Boolean_Matrix (Y'Range, 1 .. Num_Classes);
 
    begin
       if Self.Attributes.Classes.Is_Empty and then
         Self.Parameters.Warm_Start then
-         declare
-            Classes     : Integer_Array := Multiclass_Utils.Unique_Labels (Y);
-            Num_Classes : Positive := Classes'Length;
-            Y_Bin       : Boolean_Array ( 1 .. Y'Length * Num_Classes);
-         begin
-
-            return Y_Bin;
-         end;
+         null;
       else
-         declare
-            Num_Classes : Positive := 10;
-            Y_Bin       : Boolean_Array (1 .. Y'Length * Num_Classes);
-            Binarizer   : Label.Label_Binarizer;
-         begin
-            Label.Fit (Binarizer, Y);
-            Self.Attributes.Binarizer := Binarizer;
-            Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
-            Y_Bin :=
-                  Label.Label_Binarize (Self.Attributes.Binarizer,
-                                        Flatten (Y), Self.Attributes.Classes);
-            return Y_Bin;
-         end;
+         Label.Fit (Binarizer, Y);
+         Self.Attributes.Binarizer := Binarizer;
+         Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+         Y_Bin :=
+           Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
       end if;
+      return Y_Bin;
 
    end Validate_Input;
 
