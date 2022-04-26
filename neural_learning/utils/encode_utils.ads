@@ -7,9 +7,11 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Encode_Utils is
 
+   package Bool_Sets is new Ada.Containers.Ordered_Sets (Boolean);
    package Int_Sets is new Ada.Containers.Ordered_Sets (Integer);
    package UB_String_Sets is new
      Ada.Containers.Ordered_Sets (Unbounded_String);
+
    Encode_Error : exception;
 
    function Encode (Values : Integer_Array) return Integer_Array;
@@ -19,6 +21,7 @@ package Encode_Utils is
                             Uniques : Integer_Array) return Natural_Array;
    function Unique (Values : Natural_Array) return Natural_Array;
    function Unique (Values : Integer_Array) return Integer_Array;
+   function Unique (Values : Boolean_Array) return Boolean_Array;
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                     return Integer_Array;
    function Unique (Values : Integer_Matrix) return Integer_Array;

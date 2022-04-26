@@ -39,6 +39,7 @@ package Classifier_Utilities is
                       return Natural_List;
    function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
                       return Natural_List;
+   function Set_Diff (Values, Uniques : Boolean_Array) return Boolean_List;
 --     function Set_Value (List_Length : Positive; Value : Float)
 --                         return Weights.Weight_List;
    function Sum_Cols (aList : Float_List_2D) return Float_List;

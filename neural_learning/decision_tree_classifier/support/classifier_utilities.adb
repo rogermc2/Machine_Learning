@@ -527,6 +527,32 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+--     function Set_Diff (Values : Boolean_Array; Uniques : Integer_Array)
+   function Set_Diff (Values, Uniques : Boolean_Array) return Boolean_List is
+      Unique_Vals : constant Boolean_Array := Encode_Utils.Unique (Values);
+      aVal        : Boolean;
+      U_Index     : Positive;
+      Found       : Boolean;
+      Diff        : Boolean_List;
+   begin
+      for index in Unique_Vals'Range loop
+         aVal := Unique_Vals (index);
+         Found := False;
+         U_Index := Uniques'First;
+         while U_Index <= Uniques'Last and not Found loop
+            Found := Uniques (U_Index) = aVal;
+            U_Index := U_Index + 1;
+         end loop;
+         if Found then
+            Diff.Append (aVal);
+         end if;
+      end loop;
+
+      return Diff;
+   end Set_Diff;
+
+   --  -------------------------------------------------------------------------
+
 --     function Set_Value (List_Length : Positive; Value : Float)
 --                      return Weights.Weight_List is
 --        List_Of_Ones : Weights.Weight_List;

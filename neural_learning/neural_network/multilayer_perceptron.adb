@@ -84,7 +84,7 @@ package body Multilayer_Perceptron is
    procedure Init_Optimizer (Self : in out MLP_Classifier);
    procedure Process_Batch (Self                     : in out MLP_Classifier;
                             X                        : Float_Matrix;
-                            Y                        : Integer_Matrix;
+                            Y                        : Boolean_Matrix;
                             Activations              : in out Matrix_List;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
@@ -96,7 +96,7 @@ package body Multilayer_Perceptron is
       Num_Layers, Layer  : Positive);
    procedure Update_No_Improvement_Count
      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val, Y_Val : Float_Matrix);
+      X_Val : Float_Matrix; Y_Val : Boolean_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    function Validate_Input (Self : in out MLP_Classifier; Y : Integer_Matrix;
                             Classes : NL_Types.Integer_List)
@@ -107,7 +107,7 @@ package body Multilayer_Perceptron is
    --       with respect to each parameter: weights and bias vectors.
    procedure Backprop (Self        : in out MLP_Classifier;
                        X           : Float_Matrix;
-                       Y           : Integer_Matrix;
+                       Y           : Boolean_Matrix;
                        Activations : in out Matrix_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
@@ -116,7 +116,6 @@ package body Multilayer_Perceptron is
       use NL_Types.Float_Package;
       Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
-      Y_Float            : constant Float_Matrix := To_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function;
       Deltas             : Matrix_List;
       Values             : Float := 0.0;
@@ -146,7 +145,7 @@ package body Multilayer_Perceptron is
                 " should be the same as Y size" & Integer'Image (Y'Length) &
                 " x" & Integer'Image (Y'Length (2)));
 
-      Put_Line (Routine_Name & "L284 Y (1, 1): " & Integer'Image (Y (1, 1)));
+      Put_Line (Routine_Name & "L284 Y (1, 1): " & Boolean'Image (Y (1, 1)));
       Put_Line (Routine_Name & "L284 Activations.Last_Element (1, 1): " &
                   Float'Image (Activations.Last_Element (1, 1)));
       --          Printing.Print_Float_Matrix (Routine_Name &
@@ -586,8 +585,7 @@ package body Multilayer_Perceptron is
 
          --  L669 Update no_improvement_count based on training loss or
          --       validation score according to early_stopping
-         Update_No_Improvement_Count (Self, Early_Stopping, Test_X,
-                                      To_Float_Matrix (Test_Y));
+         Update_No_Improvement_Count (Self, Early_Stopping, Test_X, Test_Y);
          --  for learning rate that needs to be updated at iteration end;
          if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
             null;
@@ -918,7 +916,7 @@ package body Multilayer_Perceptron is
 
    procedure Process_Batch (Self                     : in out MLP_Classifier;
                             X                        : Float_Matrix;
-                            Y                        : Integer_Matrix;
+                            Y                        : Boolean_Matrix;
                             Activations              : in out Matrix_List;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size, Num_Features : Positive;
@@ -927,7 +925,7 @@ package body Multilayer_Perceptron is
       --        use Ada.Containers;
       Routine_Name : constant String := "Multilayer_Perceptron.Process_Batch ";
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
-      Y_Batch      : Integer_Matrix (1 .. Batch_Size, 1 .. 1);
+      Y_Batch      : Boolean_Matrix (1 .. Batch_Size, 1 .. 1);
       Grads        : Parameters_List;
       Batch_Row    : Positive;
       Batch_Loss   : Float;

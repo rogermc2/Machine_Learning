@@ -193,7 +193,7 @@ package body Label is
       use NL_Types;
       YT        : constant Boolean_Matrix := Transpose (Y);
       aRange    : Integer_Array (1 .. Y'Length);
-      Diff      : Natural_List;
+      Diff      : Boolean_List;
       Transform : Boolean_Matrix (1 .. YT'Length, 1 .. YT'Length (2));
       YT_Row    : Boolean_Array (1 .. YT'Length);
    begin

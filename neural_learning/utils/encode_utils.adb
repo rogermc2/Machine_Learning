@@ -159,6 +159,33 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (Values : Boolean_Array) return Boolean_Array is
+      use Bool_Sets;
+      use NL_Types.Boolean_Sorting;
+      Value        : Boolean;
+      Unique_Bools : Bool_Sets.Set;
+      Curs         : Bool_Sets.Cursor;
+      Uniq_List    : NL_Types.Boolean_List;
+   begin
+      for index in Values'Range loop
+         Unique_Bools.Include (Values (index));
+      end loop;
+
+      Curs := Unique_Bools.First;
+      while Bool_Sets.Has_Element (Curs) loop
+         Value := Bool_Sets.Element (Curs);
+         Uniq_List.Append (Value);
+         Bool_Sets.Next (Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return To_Boolean_Array (Uniq_List);
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                     return Integer_Array is
       use Int_Sets;

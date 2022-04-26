@@ -83,6 +83,7 @@ package NL_Types is
    package Boolean_Package is new Ada.Containers.Vectors
      (Positive, Boolean);
    subtype Boolean_List is Boolean_Package.Vector;
+   package Boolean_Sorting is new Boolean_Package.Generic_Sorting ("<");
 
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;

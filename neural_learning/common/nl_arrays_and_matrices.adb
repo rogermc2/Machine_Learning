@@ -306,6 +306,30 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Boolean_Array (List : NL_Types.Boolean_List)
+                              return Boolean_Array is
+   begin
+      if not List.Is_Empty then
+         declare
+            Result : Boolean_Array (List.First_Index .. List.Last_Index);
+         begin
+            for row in Result'Range loop
+               Result (row) := List (row);
+            end loop;
+            return Result;
+         end;
+      else
+         declare
+            Result : Boolean_Array (1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Boolean_Array;
+
+   --  ------------------------------------------------------------------------
+
    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix is
       Result : Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
    begin
