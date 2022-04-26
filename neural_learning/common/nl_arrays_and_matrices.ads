@@ -62,6 +62,7 @@ package NL_Arrays_And_Matrices is
    function To_Natural_Array (List : NL_Types.Natural_List)
                               return Natural_Array;
    pragma Inline (To_Natural_Array);
+   function Transpose (Values : Boolean_Matrix) return Boolean_Matrix;
    function Transpose (Values : Float_Matrix) return Float_Matrix;
    function Transpose (Values : Integer_Matrix) return Integer_Matrix;
    pragma Inline (Transpose);

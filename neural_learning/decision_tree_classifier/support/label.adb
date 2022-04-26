@@ -187,6 +187,39 @@ package body Label is
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
+
+   function Inverse_Transform (Self : Label_Encoder; Y : Boolean_Matrix)
+                                return Boolean_Matrix is
+      use NL_Types;
+      YT        : constant Boolean_Matrix := Transpose (Y);
+      aRange    : Integer_Array (1 .. Y'Length);
+      Diff      : Natural_List;
+      Transform : Boolean_Matrix (1 .. YT'Length, 1 .. YT'Length (2));
+      YT_Row    : Boolean_Array (1 .. YT'Length);
+   begin
+      for r in Self.Classes_List.First_Index ..
+          Self.Classes_List.Last_Index loop
+         aRange (r) := r;
+      end loop;
+
+      for Y_index in YT'Range loop
+         for index2 in YT'Range (2) loop
+            YT_Row (Y_index) := YT (Y_index, index2);
+         end loop;
+         Diff := Classifier_Utilities.Set_Diff (YT_Row, aRange);
+         Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
+
+         for index2 in YT_Row'Range loop
+            Transform (Y_index, index2) := Self.Classes (YT_Row (index2));
+         end loop;
+      end loop;
+
+      return Transpose (Transform);
+
+   end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
    --  L416
    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix is

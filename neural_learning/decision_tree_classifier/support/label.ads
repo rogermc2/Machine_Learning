@@ -8,7 +8,7 @@ with Estimator;
 
 package Label is
 
-   type Class_Type is (Class_Unique, Class_Label);
+   type Class_Type is (Class_Unique, Class_Label, Class_Label_List);
    subtype Param_Label is Unbounded_String;
 
    package Params_Dictionary is new Ada.Containers.Ordered_Maps
@@ -30,8 +30,9 @@ package Label is
          Estimator_Kind : Estimator.Estimator_Type :=
                             Estimator.Classifier_Estimator;
          case Encoder_Kind is
-            when Class_Unique => Uniques : Integer_Array (1 .. Num_Items);
-            when Class_Label => Classes  : Natural_Array (1 .. Num_Items);
+            when Class_Unique => Uniques          : Integer_Array (1 .. Num_Items);
+            when Class_Label => Classes           : Natural_Array (1 .. Num_Items);
+            when Class_Label_List => Classes_List : NL_Types.Integer_List;
          end case;
       end record;
 
@@ -47,6 +48,8 @@ package Label is
                                 return Integer_Array;
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                 return Integer_Matrix;
+   function Inverse_Transform (Self : Label_Encoder; Y : Boolean_Matrix)
+                                return Boolean_Matrix;
    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Array)

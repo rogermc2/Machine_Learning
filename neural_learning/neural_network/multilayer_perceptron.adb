@@ -490,6 +490,8 @@ package body Multilayer_Perceptron is
                                  Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples            : constant Positive := Positive (X'Length);
       Num_Features           : constant Positive := Positive (X'Length (2));
+      Num_Classes            : constant Positive :=
+                                   Positive (Self.Attributes.Classes.Length);
       LE_U                   : Label.Label_Encoder (Label.Class_Unique,
                                                     Num_Samples);
       Iter                   : Natural := 0;
@@ -504,10 +506,12 @@ package body Multilayer_Perceptron is
       --  Should_Stratify  : Boolean;
       Train_X                : Float_Matrix
         (1 .. Train_Size, 1 .. Num_Features);
-      Train_Y                : Integer_Matrix (1 .. Train_Size, 1 .. 1);
+      Train_Y                : NL_Arrays_And_Matrices.Boolean_Matrix
+          (1 .. Train_Size, 1 .. Num_Classes);
       Test_X                 : Float_Matrix
         (1 .. Test_Size, 1 .. Num_Features);
-      Test_Y                 : Integer_Matrix (1 .. Test_Size, 1 .. 1);
+      Test_Y                 : NL_Arrays_And_Matrices.Boolean_Matrix
+          (1 .. Test_Size, 1 .. Num_Classes);
       Batch_Size             : Positive;
       Batches                : NL_Types.Slices_List;
       Accumulated_Loss       : Float := 0.0;

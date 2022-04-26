@@ -398,6 +398,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Transpose (Values : Boolean_Matrix) return Boolean_Matrix is
+      Result : Boolean_Matrix (1 .. Values'Length (2), 1 .. Values'Length);
+   begin
+      for row in Values'First .. Values'Last loop
+         for col in Values'First (2) .. Values'Last (2) loop
+            Result (col, row) := Values (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Transpose;
+
+   --  -------------------------------------------------------------------------
+
    function Transpose (Values : Float_Matrix) return  Float_Matrix is
       Result : Float_Matrix (1 .. Values'Length (2), 1 .. Values'Length);
    begin
