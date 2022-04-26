@@ -110,16 +110,11 @@ package body Label is
                                          Classes : NL_Types.Integer_List)
                                          return Boolean_Matrix is
       use Classifier_Utilities;
-      Y_Cols  : Boolean_Array (Y'First (2) .. Y'Last (2));
       Inverse : Boolean_Matrix := Y;
-      Max_Index : Positive;
+      Max_Indices : Natural_Array (Y'First (2) .. Y'Last (2));
    begin
-      for col in Y'Range (2) loop
-         for row in Y'Range loop
-            Y_Cols (col) := Y (row, col);
-         end loop;
-      end loop;
-      Max_Index := Arg_Max (Y_Cols);
+      --  L627
+      Max_Indices := Arg_Max (Y, 2);
       return Inverse;
 
    end Inverse_Binarize_Multiclass;
