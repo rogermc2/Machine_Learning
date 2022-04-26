@@ -159,9 +159,6 @@ package body Multilayer_Perceptron is
          when Squared_Error_Function =>
             Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
-      --        End_Time := Clock;
-      --        Put_Line (Routine_Name & "Loss computation elapsed time: " &
-      --                    Duration'Image ((End_Time -Start_Time) * 1000) & "mS");
 
       Assert (Loss'Valid, Routine_Name & "L289 invalid Loss " &
                 Float'Image (Loss));
@@ -208,8 +205,8 @@ package body Multilayer_Perceptron is
       --                  " should equal Activations.Last_Element length" &
       --                  Count_Type'Image (Activations.Last_Element.Length));
       --  L301
-      Deltas.Replace_Element (Deltas.Last_Index,
-                              Activations.Last_Element - Y_Float);
+--        Deltas.Replace_Element (Deltas.Last_Index,
+--                                Activations.Last_Element - Y_Float);
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
@@ -373,7 +370,7 @@ package body Multilayer_Perceptron is
    end  Compute_Loss_Gradient;
 
    --  -------------------------------------------------------------------------
-   --  L377  BaseMultilayerPerceptron._Fit
+   --  L377  MultilayerPerceptron._Fit
    procedure Fit (Self        : in out MLP_Classifier;
                   X           : Float_Matrix;
                   Y           : Integer_Matrix;
@@ -536,9 +533,9 @@ package body Multilayer_Perceptron is
             Train_X => Train_X, Train_Y => Train_Y,
             Test_X  => Test_X, Test_Y => Test_Y);
 
-         if Is_Classifier then
-            Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
-         end if;
+--           if Is_Classifier then
+--              Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
+--           end if;
       end if;
 
       --  L617
@@ -758,7 +755,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   --  L360  BaseMultilayerPerceptron._init_coef
+   --  L360  MultilayerPerceptron._init_coef
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record is
       use Maths;
@@ -998,12 +995,12 @@ package body Multilayer_Perceptron is
    --  L716
    procedure Update_No_Improvement_Count
      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val, Y_Val : Float_Matrix) is
+      X_Val : Float_Matrix; Y_Val : Boolean_Matrix) is
       Routine_Name     : constant String :=
                            "Multilayer_Perceptron.Update_No_Improvement_Count ";
       Sample_Weight    : constant Float_Array (1 .. 0) := (others => 0.0);
       Last_Valid_Score : Float;
-      Score_Val        : Float;
+      Score_Val        : Float ;
    begin
       if Early_Stopping then
          Score_Val := Base.Score (Self, X_Val, Y_Val, Sample_Weight);

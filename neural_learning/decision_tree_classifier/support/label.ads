@@ -49,9 +49,9 @@ package Label is
                                 return Integer_Array;
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                 return Integer_Matrix;
-   function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
-                               Use_Threshold : Boolean := False;
-                               Threshold : Float := 0.0) return Boolean_Matrix;
+--     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
+--                                 Use_Threshold : Boolean := False;
+--                                 Threshold : Float := 0.0) return Boolean_Matrix;
    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Array)

@@ -32,7 +32,7 @@
 --      ['tokyo', 'tokyo', 'paris']
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
@@ -106,31 +106,39 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  L593 Multiclass uses the maximal score instead of a threshold.
-   function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
-                                         Classes : NL_Types.Integer_List)
-                                         return Boolean_Matrix is
-      use Classifier_Utilities;
-      Inverse : Boolean_Matrix := Y;
-      Max_Indices : Natural_Array (Y'First (2) .. Y'Last (2));
-   begin
-      --  L627
-      Max_Indices := Arg_Max (Y, 2);
-      return Inverse;
-
-   end Inverse_Binarize_Multiclass;
+--     function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
+--                                           Classes : NL_Types.Integer_List)
+--                                           return Boolean_Array is
+--        use Classifier_Utilities;
+--        Routine_Name :  constant String := "Label.Inverse_Binarize_Multiclass ";
+--        Inverse      : Boolean_Array  (Y'First (2) .. Y'Last (2));
+--        Max_Indices  : Natural_Array (Y'First (2) .. Y'Last (2));
+--     begin
+--        --  L627
+--        Put_Line (Routine_Name);
+--        Max_Indices := Arg_Max (Y, 2);
+--        for index in Max_Indices'Range loop
+--           null;
+--  --           Inverse (index) := Classes.Element (Max_Indices (index));
+--        end loop;
+--        return Inverse;
+--
+--     end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
 
-   function Inverse_Binarize_Thresholding (Y         : Boolean_Matrix;
-                                           Classes   : NL_Types.Integer_List;
-                                           Threshold : Float)
-                                         return Boolean_Matrix is
-      Inverse : Boolean_Matrix := Y;
-   begin
-
-      return Inverse;
-
-   end Inverse_Binarize_Thresholding;
+--     function Inverse_Binarize_Thresholding (Y         : Boolean_Matrix;
+--                                             Classes   : NL_Types.Integer_List;
+--                                             Threshold : Float)
+--                                           return Boolean_Matrix is
+--        Routine_Name :  constant String := "Label.Inverse_Binarize_Thresholding ";
+--        Inverse      : Boolean_Matrix := Y;
+--     begin
+--        Put_Line (Routine_Name);
+--
+--        return Inverse;
+--
+--     end Inverse_Binarize_Thresholding;
 
    --  -------------------------------------------------------------------------
 
@@ -138,10 +146,12 @@ package body Label is
    function Inverse_Transform (Self : Label_Encoder; Labels : Natural_Array)
                                 return Integer_Array is
       use NL_Types;
+      Routine_Name :  constant String := "Label.Inverse_Transform ";
       aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
       Diff    : Natural_List;
       Result  : Integer_Array (1 .. Positive (Labels'Length));
    begin
+      Put_Line (Routine_Name);
       for index in aRange'Range loop
          aRange (index) := index;
       end loop;
@@ -216,39 +226,43 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L361 Inverse_Transform transforms binary labels back to
    --       multi-class labels
-   function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
-                               Use_Threshold : Boolean := False;
-                               Threshold     : Float := 0.0)
-                                return Boolean_Matrix is
-      use Multiclass_Utils;
-      Y_Inv  : Boolean_Matrix (Y'First (2) .. Y'Last (2), Y'First .. Y'Last);
-      Thresh : Float;
-   begin
-      if Self.Y_Kind = Y_Multiclass then
-         Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
-
-      else
-         if Use_Threshold then
-            Thresh := Threshold;
-         else
-            Thresh := 0.5 * (Self.Neg_Label + Self.Pos_Label);
-         end if;
-
-         Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Thresh);
-      end if;
-
-      return Y_Inv;
-
-   end Inverse_Transform;
+--     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
+--                                 Use_Threshold : Boolean := False;
+--                                 Threshold     : Float := 0.0)
+--                                  return Boolean_Matrix is
+--        Routine_Name :  constant String := "Label.Inverse_Transform Binarizer ";
+--        use Multiclass_Utils;
+--        Y_Inv  : Boolean_Matrix (Y'First (2) .. Y'Last (2), Y'First .. Y'Last);
+--        Thresh : Float;
+--     begin
+--        Put_Line (Routine_Name);
+--        if Self.Y_Kind = Y_Multiclass then
+--  --           Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
+--           null;
+--        else
+--           if Use_Threshold then
+--              Thresh := Threshold;
+--           else
+--              Thresh := 0.5 * (Self.Neg_Label + Self.Pos_Label);
+--           end if;
+--
+--           Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Thresh);
+--        end if;
+--
+--        return Y_Inv;
+--
+--     end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
 
    --  L416
    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix is
+      Routine_Name :  constant String := "Label.Label_Binarize ";
       Y_Bin : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
                          (others => (others => False));
    begin
+      Put_Line (Routine_Name);
       for row in Y'Range loop
          for col in Classes.First_Index .. Classes.Last_Index loop
             if Y (row) = Classes (col) then
@@ -336,9 +350,11 @@ package body Label is
 
    function Transform (Self : Label_Binarizer; Y : Integer_Array)
                         return Boolean_Matrix is
+      Routine_Name : constant String := "Label.Transform Binarize ";
       Labels : Boolean_Matrix
         (Y'Range, Self.Classes.First_Index .. Self.Classes.Last_Index);
    begin
+      Put_Line (Routine_Name);
 --        if Self.Y_Kind = Y_Multiclass then
       Labels := Label_Binarize (Y, Self.Classes);
 --        else
