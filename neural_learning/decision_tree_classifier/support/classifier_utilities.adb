@@ -61,37 +61,33 @@ package body Classifier_Utilities is
     --  returns array([2, 2]) -> [12, 15]
     function Arg_Max (Values : Boolean_Matrix; Axis : Positive)
                       return Natural_Array is
+        Mat         : Boolean_Matrix := Values;
         Max_Value   : Boolean := False;
         Max_Index   : Positive;
-        Value       : Boolean;
+        Col         : Natural;
     begin
         if Axis = 1 then
-            declare
-                Indices : Natural_Array (1 .. Values'Length);
-            begin
-                for row in Values'Range loop
-                    Max_Value := False;
-                    Max_Index := 1;
-                    for col in Values'Range (2) loop
-                        Value := Values (row, col);
-                        if Value > Max_Value then
-                            Max_Index := row;
-                            Max_Value := Value;
-                        end if;
-                    end loop;
-                    Indices (row) := Max_Index;
-                end loop;
-                return Indices;
-            end;  --  declare
-
-        else  --  Axis = 2
-            declare
-                T_Values : constant Boolean_Matrix := Transpose (Values);
-                Indices  : Natural_Array (1 .. T_Values'Length);
-            begin
-                return Indices;
-            end;  --  declare
+            Mat := Transpose (Mat);
         end if;
+
+        declare
+            Indices : Natural_Array (1 .. Mat'Length);
+        begin
+            for row in Values'Range loop
+                Max_Value := False;
+                Max_Index := 1;
+                Col := 0;
+                while Col < Values'Last (2) and not Max_Value loop
+                    Col := Col + 1;
+                    if Values (row, Col) then
+                        Max_Index := Col;
+                        Max_Value := Values (row, col);
+                    end if;
+                end loop;
+                Indices (row) := Max_Index;
+            end loop;
+            return Indices;
+        end;  --  declare
 
     end Arg_Max;
 
@@ -187,7 +183,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Bin_Count (Numbers : Value_Data_List)
-                        return Natural_List is
+                    return Natural_List is
         use Ada.Containers;
         use Natural_Package;
         aNumber    : Natural := 0;
@@ -309,7 +305,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Float_Precision (Number : Float; Precision : Natural)
-                              return String is
+                          return String is
         use Ada.Numerics.Elementary_Functions;
         Integer_Length : Positive;
         String_Length  : Positive;
@@ -359,7 +355,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Init_Samples_Copy (Samples : Value_Data_Lists_2D)
-                                return Value_Data_Lists_2D is
+                            return Value_Data_Lists_2D is
         Num_Samples    : constant Positive := Positive (Samples.Length);
         Sample_1       : constant Value_Data_List := Samples.Element (1);
         Num_Features   : constant Positive := Positive (Sample_1.Length);
@@ -394,7 +390,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
-                        return Multi_Output_Data_Record is
+                    return Multi_Output_Data_Record is
         Data_File    : File_Type;
         Raw_CSV_Data : Raw_Data_Vector;
         Output_Data  : Multi_Output_Data_Record;
@@ -472,7 +468,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
-                                         return Integer_List is
+                                     return Integer_List is
         use Integer_Package;
         use Integer_Sorting;
         Item    : Integer;
@@ -499,7 +495,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)
-                       return Natural_List is
+                   return Natural_List is
         use Natural_Package;
         Unique_Vals : constant Integer_Array := Encode_Utils.Unique (Values);
         aVal        : Integer;
@@ -528,7 +524,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Set_Diff (Values : Integer_Array; Uniques : Natural_Array)
-                       return Natural_List is
+                   return Natural_List is
         use Natural_Package;
         Unique_Vals : constant Integer_Array := Encode_Utils.Unique (Values);
         aVal        : Natural;
@@ -555,7 +551,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
-                       return Natural_List is
+                   return Natural_List is
         use Natural_Package;
         Unique_Vals : constant Natural_Array := Encode_Utils.Unique (Values);
         aVal        : Natural;
@@ -623,7 +619,7 @@ package body Classifier_Utilities is
 
     function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
                              Num_Outputs : Positive := 1)
-                             return Multi_Output_Data_Record is
+                         return Multi_Output_Data_Record is
         use Ada.Containers;
         use Ada.Strings;
         use Ada.Strings.Unbounded;
@@ -743,7 +739,7 @@ package body Classifier_Utilities is
     --  -----------------------------------------------------------------------
 
     function Sum_Cols (aList : Float_List_2D)
-                       return Float_List is
+                   return Float_List is
         theSum : Float_List;
         Value  : Float;
     begin
@@ -763,7 +759,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Sum_Cols (aList : Value_Data_Lists_2D)
-                       return Value_Data_List is
+                   return Value_Data_List is
         theSum     : Value_Data_List;
         Value_Type : constant Data_Type :=
                        aList.Element (1).Element (1).Value_Kind;
@@ -839,7 +835,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Float_List (A : NL_Arrays_And_Matrices.Float_Array)
-                            return Float_List is
+                        return Float_List is
         A_List : Float_List;
     begin
         for index in A'First .. A'Last loop
@@ -851,7 +847,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Float_List (F : Value_Data_List)
-                            return Float_List is
+                        return Float_List is
         Item   : Value_Record;
         Floats : Float_List;
     begin
@@ -910,7 +906,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Integer_List (Ints : Value_Data_List)
-                              return Integer_List is
+                          return Integer_List is
         Item   : Value_Record;
         Values : Integer_List;
     begin
@@ -930,7 +926,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
-                                    return Value_Data_List is
+                                return Value_Data_List is
         Data       : Value_Record (Integer_Type);
         A_List     : Value_Data_List;
     begin
@@ -945,7 +941,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
-                                       return Value_Data_Lists_2D is
+                                   return Value_Data_Lists_2D is
         Data       : Value_Record (Integer_Type);
         B_List     : Value_Data_List;
         Multi_List : Value_Data_Lists_2D;
@@ -963,7 +959,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
-                                  return Value_Data_Lists_2D is
+                              return Value_Data_Lists_2D is
         Value    : Value_Record (Integer_Type);
         Row_List : Value_Data_Lists_2D;
         Col_List : Value_Data_List;
@@ -983,7 +979,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                              return Natural_List is
+                          return Natural_List is
         A_List : Natural_List;
     begin
         for index in A'First .. A'Last loop
@@ -996,7 +992,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Natural_List (Numbers : Value_Data_List)
-                              return Natural_List is
+                          return Natural_List is
         Item   : Value_Record;
         Values : Natural_List;
     begin
@@ -1019,7 +1015,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                                    return Value_Data_Lists_2D is
+                                return Value_Data_Lists_2D is
         Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
     begin
         for index in A'First .. A'Last loop
@@ -1031,7 +1027,7 @@ package body Classifier_Utilities is
     --  ------------------------------------------------------------------------
 
     function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
-                          return PLplot_Auxiliary.Real_Matrix is
+                      return PLplot_Auxiliary.Real_Matrix is
         use PLplot_Auxiliary;
         Routine_Name : constant String :=
                          "Classifier_Utilities.To_PL_Array ";
@@ -1060,7 +1056,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function To_Value_2D_List (A : Value_Data_List)
-                               return Value_Data_Lists_2D is
+                           return Value_Data_Lists_2D is
         Output_List : Value_Data_List;
         A2_List     : Value_Data_Lists_2D;
     begin
@@ -1079,7 +1075,7 @@ package body Classifier_Utilities is
 
     function To_Value_2D_List (List_1D  : Value_Data_List;
                                Num_Rows : Positive)
-                               return Value_Data_Lists_2D is
+                           return Value_Data_Lists_2D is
         Routine_Name : constant String :=
                          "Classifier_Utilities.To_Value_2D_List ";
         Length_1D    : constant Positive := Positive (List_1D.Length);
@@ -1109,7 +1105,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Transpose (Values : Value_Data_Lists_2D)
-                        return  Value_Data_Lists_2D is
+                    return  Value_Data_Lists_2D is
         use Ada.Containers;
         Num_Rows : constant Positive := Positive (Values.Length);
         Num_Cols : constant Count_Type := Values.Element (1).Length;
@@ -1161,7 +1157,7 @@ package body Classifier_Utilities is
     --  -------------------------------------------------------------------------
 
     function Unique (Nums : Integer_List)
-                     return Integer_List is
+                 return Integer_List is
         use Int_Sets;
         use Integer_Package;
         Unique_Set : Int_Sets.Set;
