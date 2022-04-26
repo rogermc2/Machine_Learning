@@ -17,33 +17,52 @@ package body Classifier_Utilities is
    --       Ada.Containers.Ordered_Sets (Value_Record);
    --     use Weights.Weight_Lists_3D_Package;
 
---     package Weight_Sets is new
---       Ada.Containers.Ordered_Sets (Float);
+   --     package Weight_Sets is new
+   --       Ada.Containers.Ordered_Sets (Float);
 
    package Float_IO is new Ada.Text_IO.Float_IO (Num => Float);
 
    function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
                             return Multi_Output_Data_Record;
+   --  -------------------------------------------------------------------------
+
+   --  Arg_Max returns the index of the true values along an axis.
+   function Arg_Max (Values : Boolean_Array) return Positive is
+      Max_Value  : Boolean := False;
+      Max_Index  : Positive := 1;
+      Value      : Boolean;
+   begin
+      for index in Values'Range loop
+         Value := Values (index);
+         if Value and not Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
 
    --  -------------------------------------------------------------------------
-   --  Arg_Max returns the indices of the maximum values along an axis.
---     function Arg_Max (Values : Weights.Weight_List) return Positive is
---        Max_Value  : Float := Float'Safe_First;
---        Max_Index  : Positive := 1;
---        Value      : Float;
---     begin
---        for index in Values.First_Index .. Values.Last_Index loop
---           Value := Values.Element (index);
---           if Value > Max_Value then
---              Max_Index := index;
---              Max_Value := Value;
---           end if;
---        end loop;
---
---        return Max_Index;
---
---     end Arg_Max;
+   --  Arg_Max returns the index of the true values along an axis.
+   function Arg_Max (Values : Boolean_List) return Positive is
+      Max_Value  : Boolean := False;
+      Max_Index  : Positive := 1;
+      Value      : Boolean;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Value := Values.Element (index);
+         if Value and not Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
 
    --  -------------------------------------------------------------------------
    --  Arg_Max returns the indices of the maximum values along an axis.
@@ -58,48 +77,44 @@ package body Classifier_Utilities is
    --  2 rows (axis 0) x 3 columns  (axis 1)
    --  np.argmax(a, axis=1)
    --  returns array([2, 2]) -> [12, 15]
---     function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
---                       return Natural_List is
---        Values       : Weights.Weight_List;
---        Max_Indices  : Natural_List;
---     begin
---        Max_Indices.Clear;
---        if Axis = 0 then
---           for index in Values_2D.First_Index .. Values_2D.Last_Index loop
---              Values := Values_2D.Element (index);
---              Max_Indices.Append (Weights.Max (Values));
---           end loop;
---        end if;
---
---        return Max_Indices;
---
---     end Arg_Max;
+   function Arg_Max (Values : Float_List) return Positive is
+      Max_Value  : Float := Float'Safe_First;
+      Max_Index  : Positive := 1;
+      Value      : Float;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Value := Values.Element (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
 
    --  -------------------------------------------------------------------------
 
---     function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural := 0)
---                       return Natural_List is
---        Values_2K    : Weights.Weight_Lists_2D;
---        Values       : Weights.Weight_List;
---        Max_Indices  : Natural_List;
---     begin
---        Values_2K.Clear;
---        Max_Indices.Clear;
---        if Axis = 0 then
---           for index_1 in Values_3D.First_Index .. Values_3D.Last_Index loop
---              Values_2K := Values_3D (index_1);
---              for index_2 in Values_2K.First_Index .. Values_2K.Last_Index loop
---                 Values := Values_2K.Element (index_2);
---                 Max_Indices.Append (Weights.Max (Values));
---              end loop;
---           end loop;
---        end if;
---
---        return Max_Indices;
---
---     end Arg_Max;
+   function Arg_Max (Values : Integer_List) return Positive is
+      Max_Value  : Integer := Integer'First;
+      Max_Index  : Positive := 1;
+      Value      : Integer;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Value := Values.Element (index);
+         if Value > Max_Value then
+            Max_Index := index;
+            Max_Value := Value;
+         end if;
+      end loop;
+
+      return Max_Index;
+
+   end Arg_Max;
 
    --  -------------------------------------------------------------------------
+
    --  Bin_Count counts the number of occurrences of each value in Numbers.
    --  Each bin gives the number of occurrences of its index value in Numbers.
    function Bin_Count (Numbers : Natural_List) return Natural_List is
@@ -239,18 +254,18 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Dot (L : Weights.Weight_List;
---                   R : Natural_List) return Float is
---        use Float_Package;
---        Result : Float := 0.0;
---     begin
---        for index in L.First_Index .. L.Last_Index loop
---           Result := Result + L.Element (index) * Float (R.Element (index));
---        end loop;
---
---        return Result;
---
---     end Dot;
+   --     function Dot (L : Weights.Weight_List;
+   --                   R : Natural_List) return Float is
+   --        use Float_Package;
+   --        Result : Float := 0.0;
+   --     begin
+   --        for index in L.First_Index .. L.Last_Index loop
+   --           Result := Result + L.Element (index) * Float (R.Element (index));
+   --        end loop;
+   --
+   --        return Result;
+   --
+   --     end Dot;
 
    --  -------------------------------------------------------------------------
 
@@ -373,47 +388,47 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
    --  Samples_3D_To_Outputs_3D num samples x num outputs x num classes to
    --                           num outputs x num samples x num classes
---     function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
---                                        Num_Outputs : Positive)
---                                        return Weights.Weight_Lists_3D is
---        use Weights;
---        Sample_List    : Weight_Lists_2D;
---        Classes        : Weight_List;
---        Sample_Classes : Weight_Lists_2D;  --  num samples x num classes
---        --  Outputs: num_outputs x num samples x num classes
---        Outputs        : Weight_Lists_3D;
---     begin
---        for index in 1 .. Num_Outputs loop
---           Sample_Classes.Clear;
---           for index_2 in Samples.First_Index .. Samples.Last_Index loop
---              --  Sample_List: num outputs x num classes
---              Sample_List := Samples.Element (index_2);
---              for index_3 in Sample_List.First_Index
---                .. Sample_List.Last_Index loop
---                 --  Classes: num classes
---                 Classes := Sample_List.Element (index_3);
---              end loop;
---              Sample_Classes.Append (Classes);
---           end loop;
---           Outputs.Append (Sample_Classes);
---        end loop;
---
---        return Outputs;
---
---     end Samples_3D_To_Outputs_3D;
+   --     function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
+   --                                        Num_Outputs : Positive)
+   --                                        return Weights.Weight_Lists_3D is
+   --        use Weights;
+   --        Sample_List    : Weight_Lists_2D;
+   --        Classes        : Weight_List;
+   --        Sample_Classes : Weight_Lists_2D;  --  num samples x num classes
+   --        --  Outputs: num_outputs x num samples x num classes
+   --        Outputs        : Weight_Lists_3D;
+   --     begin
+   --        for index in 1 .. Num_Outputs loop
+   --           Sample_Classes.Clear;
+   --           for index_2 in Samples.First_Index .. Samples.Last_Index loop
+   --              --  Sample_List: num outputs x num classes
+   --              Sample_List := Samples.Element (index_2);
+   --              for index_3 in Sample_List.First_Index
+   --                .. Sample_List.Last_Index loop
+   --                 --  Classes: num classes
+   --                 Classes := Sample_List.Element (index_3);
+   --              end loop;
+   --              Sample_Classes.Append (Classes);
+   --           end loop;
+   --           Outputs.Append (Sample_Classes);
+   --        end loop;
+   --
+   --        return Outputs;
+   --
+   --     end Samples_3D_To_Outputs_3D;
 
    --  -------------------------------------------------------------------------
 
---     function Ones (List_Length : Positive) return Weights.Weight_List is
---        List_Of_Ones : Weights.Weight_List;
---     begin
---        for index in 1 .. List_Length loop
---           List_Of_Ones.Append (1.0);
---        end loop;
---
---        return List_Of_Ones;
---
---     end Ones;
+   --     function Ones (List_Length : Positive) return Weights.Weight_List is
+   --        List_Of_Ones : Weights.Weight_List;
+   --     begin
+   --        for index in 1 .. List_Length loop
+   --           List_Of_Ones.Append (1.0);
+   --        end loop;
+   --
+   --        return List_Of_Ones;
+   --
+   --     end Ones;
 
    --  -------------------------------------------------------------------------
 
@@ -527,7 +542,7 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Set_Diff (Values : Boolean_Array; Uniques : Integer_Array)
+   --     function Set_Diff (Values : Boolean_Array; Uniques : Integer_Array)
    function Set_Diff (Values, Uniques : Boolean_Array) return Boolean_List is
       Unique_Vals : constant Boolean_Array := Encode_Utils.Unique (Values);
       aVal        : Boolean;
@@ -553,23 +568,23 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Set_Value (List_Length : Positive; Value : Float)
---                      return Weights.Weight_List is
---        List_Of_Ones : Weights.Weight_List;
---     begin
---        for index in 1 .. List_Length loop
---           List_Of_Ones.Append (Value);
---        end loop;
---
---        return List_Of_Ones;
---
---     end Set_Value;
+   --     function Set_Value (List_Length : Positive; Value : Float)
+   --                      return Weights.Weight_List is
+   --        List_Of_Ones : Weights.Weight_List;
+   --     begin
+   --        for index in 1 .. List_Length loop
+   --           List_Of_Ones.Append (Value);
+   --        end loop;
+   --
+   --        return List_Of_Ones;
+   --
+   --     end Set_Value;
 
    --  -------------------------------------------------------------------------
 
    function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
-                         return Multi_Output_Data_Record is
+                            return Multi_Output_Data_Record is
       use Ada.Containers;
       use Ada.Strings;
       use Ada.Strings.Unbounded;
@@ -689,7 +704,7 @@ package body Classifier_Utilities is
    --  -----------------------------------------------------------------------
 
    function Sum_Cols (aList : Float_List_2D)
-                   return Float_List is
+                      return Float_List is
       theSum : Float_List;
       Value  : Float;
    begin
@@ -709,7 +724,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Sum_Cols (aList : Value_Data_Lists_2D)
-                   return Value_Data_List is
+                      return Value_Data_List is
       theSum     : Value_Data_List;
       Value_Type : constant Data_Type :=
                      aList.Element (1).Element (1).Value_Kind;
@@ -750,42 +765,42 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
    --  aList: num outputs x num samples x num classes
    --  Sum_Cols sums each class
---     function Sum_Cols (aList : Weights.Weight_Lists_3D)
---                     return Weights.Weight_List is
---        Samples : Weights.Weight_Lists_2D;
---        Classes : Weights.Weight_List;
---        Sums    : Weights.Weight_List;
---        Value   : Float := 0.0;
---     begin
---        for index in 1 .. aList.Element (1).Length loop
---           Sums.Append (0.0);
---        end loop;
---
---        for output_index in aList.First_Index .. aList.Last_Index loop
---           Samples := aList.Element (output_index);
---           for sample_index in Samples.First_Index .. Samples.Last_Index loop
---              Value := 0.0;
---              Classes := Samples.Element (sample_index);
---              for class_index in Classes.First_Index ..
---                Classes.Last_Index loop
---                 Value := Value + Classes.Element (class_index);
---                 if abs (Value) < 10.0 ** (-6) then
---                    Value := 0.0;
---                 end if;
---              end loop;
---              Sums.Replace_Element
---                (sample_index, Sums.Element (sample_index) + Value);
---           end loop;
---        end loop;
---
---        return Sums;
---
---     end Sum_Cols;
+   --     function Sum_Cols (aList : Weights.Weight_Lists_3D)
+   --                     return Weights.Weight_List is
+   --        Samples : Weights.Weight_Lists_2D;
+   --        Classes : Weights.Weight_List;
+   --        Sums    : Weights.Weight_List;
+   --        Value   : Float := 0.0;
+   --     begin
+   --        for index in 1 .. aList.Element (1).Length loop
+   --           Sums.Append (0.0);
+   --        end loop;
+   --
+   --        for output_index in aList.First_Index .. aList.Last_Index loop
+   --           Samples := aList.Element (output_index);
+   --           for sample_index in Samples.First_Index .. Samples.Last_Index loop
+   --              Value := 0.0;
+   --              Classes := Samples.Element (sample_index);
+   --              for class_index in Classes.First_Index ..
+   --                Classes.Last_Index loop
+   --                 Value := Value + Classes.Element (class_index);
+   --                 if abs (Value) < 10.0 ** (-6) then
+   --                    Value := 0.0;
+   --                 end if;
+   --              end loop;
+   --              Sums.Replace_Element
+   --                (sample_index, Sums.Element (sample_index) + Value);
+   --           end loop;
+   --        end loop;
+   --
+   --        return Sums;
+   --
+   --     end Sum_Cols;
 
    --  -------------------------------------------------------------------------
 
    function To_Float_List (A : NL_Arrays_And_Matrices.Float_Array)
-                        return Float_List is
+                           return Float_List is
       A_List : Float_List;
    begin
       for index in A'First .. A'Last loop
@@ -797,7 +812,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Float_List (F : Value_Data_List)
-                        return Float_List is
+                           return Float_List is
       Item   : Value_Record;
       Floats : Float_List;
    begin
@@ -856,7 +871,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List (Ints : Value_Data_List)
-                          return Integer_List is
+                             return Integer_List is
       Item   : Value_Record;
       Values : Integer_List;
    begin
@@ -876,7 +891,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
-                                return Value_Data_List is
+                                   return Value_Data_List is
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
    begin
@@ -891,7 +906,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
-                                   return Value_Data_Lists_2D is
+                                      return Value_Data_Lists_2D is
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
       Multi_List : Value_Data_Lists_2D;
@@ -909,7 +924,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
-                              return Value_Data_Lists_2D is
+                                 return Value_Data_Lists_2D is
       Value    : Value_Record (Integer_Type);
       Row_List : Value_Data_Lists_2D;
       Col_List : Value_Data_List;
@@ -929,7 +944,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                          return Natural_List is
+                             return Natural_List is
       A_List : Natural_List;
    begin
       for index in A'First .. A'Last loop
@@ -942,7 +957,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_List (Numbers : Value_Data_List)
-                          return Natural_List is
+                             return Natural_List is
       Item   : Value_Record;
       Values : Natural_List;
    begin
@@ -965,7 +980,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                                return Value_Data_Lists_2D is
+                                   return Value_Data_Lists_2D is
       Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
@@ -977,7 +992,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
-                      return PLplot_Auxiliary.Real_Matrix is
+                         return PLplot_Auxiliary.Real_Matrix is
       use PLplot_Auxiliary;
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_PL_Array ";
@@ -1006,7 +1021,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Value_2D_List (A : Value_Data_List)
-                           return Value_Data_Lists_2D is
+                              return Value_Data_Lists_2D is
       Output_List : Value_Data_List;
       A2_List     : Value_Data_Lists_2D;
    begin
@@ -1025,7 +1040,7 @@ package body Classifier_Utilities is
 
    function To_Value_2D_List (List_1D  : Value_Data_List;
                               Num_Rows : Positive)
-                           return Value_Data_Lists_2D is
+                              return Value_Data_Lists_2D is
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_Value_2D_List ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
@@ -1055,7 +1070,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Transpose (Values : Value_Data_Lists_2D)
-                    return  Value_Data_Lists_2D is
+                       return  Value_Data_Lists_2D is
       use Ada.Containers;
       Num_Rows : constant Positive := Positive (Values.Length);
       Num_Cols : constant Count_Type := Values.Element (1).Length;
@@ -1107,7 +1122,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique (Nums : Integer_List)
-                 return Integer_List is
+                    return Integer_List is
       use Int_Sets;
       use Integer_Package;
       Unique_Set : Int_Sets.Set;
@@ -1205,37 +1220,37 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Unique_Weights (Values : Weights.Weight_Lists_2D)
---                           return Weights.Weight_List is
---        use Weight_Sets;
---        use Weights;
---        use Float_Package;
---        use Weight_Lists_2D_Package;
---        Unique_Set     : Weight_Sets.Set;
---        Weight_2D_Curs : Weight_Lists_2D_Package.Cursor := Values.First;
---        Weights_Curs   : Float_Package.Cursor;
---        Set_Curs       : Weight_Sets.Cursor;
---        Weights        : Weight_List;
---        Unique_List    : Weight_List;
---     begin
---        while Has_Element (Weight_2D_Curs) loop
---           Weights := Element (Weight_2D_Curs);
---           Weights_Curs := Weights.First;
---           while Has_Element (Weights_Curs) loop
---              Unique_Set.Include (Element (Weights_Curs));
---              Next (Weights_Curs);
---           end loop;
---           Next (Weight_2D_Curs);
---        end loop;
---
---        Set_Curs := Unique_Set.First;
---        while Has_Element (Set_Curs) loop
---           Unique_List.Append (Element (Set_Curs));
---           Next (Set_Curs);
---        end loop;
---        return Unique_List;
---
---     end Unique_Weights;
+   --     function Unique_Weights (Values : Weights.Weight_Lists_2D)
+   --                           return Weights.Weight_List is
+   --        use Weight_Sets;
+   --        use Weights;
+   --        use Float_Package;
+   --        use Weight_Lists_2D_Package;
+   --        Unique_Set     : Weight_Sets.Set;
+   --        Weight_2D_Curs : Weight_Lists_2D_Package.Cursor := Values.First;
+   --        Weights_Curs   : Float_Package.Cursor;
+   --        Set_Curs       : Weight_Sets.Cursor;
+   --        Weights        : Weight_List;
+   --        Unique_List    : Weight_List;
+   --     begin
+   --        while Has_Element (Weight_2D_Curs) loop
+   --           Weights := Element (Weight_2D_Curs);
+   --           Weights_Curs := Weights.First;
+   --           while Has_Element (Weights_Curs) loop
+   --              Unique_Set.Include (Element (Weights_Curs));
+   --              Next (Weights_Curs);
+   --           end loop;
+   --           Next (Weight_2D_Curs);
+   --        end loop;
+   --
+   --        Set_Curs := Unique_Set.First;
+   --        while Has_Element (Set_Curs) loop
+   --           Unique_List.Append (Element (Set_Curs));
+   --           Next (Set_Curs);
+   --        end loop;
+   --        return Unique_List;
+   --
+   --     end Unique_Weights;
 
    --  -------------------------------------------------------------------------
 

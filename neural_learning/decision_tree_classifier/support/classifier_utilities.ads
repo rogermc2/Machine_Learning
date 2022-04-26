@@ -11,11 +11,10 @@ package Classifier_Utilities is
 
    Value_Error : exception;
 
---     function Arg_Max (Values : Weights.Weight_List) return Positive;
---     function Arg_Max (Values_2D : Weights.Weight_Lists_2D; Axis : Natural := 0)
---                       return Natural_List;
---     function Arg_Max (Values_3D : Weights.Weight_Lists_3D; Axis : Natural := 0)
---                       return Natural_List;
+   function Arg_Max (Values : Boolean_Array) return Positive;
+   function Arg_Max (Values : Boolean_List) return Positive;
+   function Arg_Max (Values : Float_List) return Positive;
+   function Arg_Max (Values : Integer_List) return Positive;
    function Bin_Count (Numbers : Natural_List) return Natural_List;
    function Bin_Count (Numbers : Value_Data_List) return Natural_List;
    function Compare_Float_Lists (L, R : Float_List) return Boolean;

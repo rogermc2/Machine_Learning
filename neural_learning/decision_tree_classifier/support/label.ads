@@ -2,9 +2,10 @@
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
+with Estimator;
+with Multiclass_Utils;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Estimator;
 
 package Label is
 
@@ -16,10 +17,10 @@ package Label is
    subtype Params_Map is Params_Dictionary.Map;
 
    type Label_Binarizer is record
---        Neg_Label : Integer := 0;
---        Pos_Label : Integer := 1;
+      Neg_Label : Float := 0.0;
+      Pos_Label : Float := 1.0;
       Classes   : NL_Types.Integer_List;
---        Y_Kind    : Multiclass_Utils.Y_Type := Multiclass_Utils.Y_Unknown;
+      Y_Kind    : Multiclass_Utils.Y_Type := Multiclass_Utils.Y_Unknown;
    end record;
 
    --  Label_Encoder should be used to encode target values,
@@ -48,8 +49,9 @@ package Label is
                                 return Integer_Array;
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                 return Integer_Matrix;
-   function Inverse_Transform (Self : Label_Encoder; Y : Boolean_Matrix)
-                                return Boolean_Matrix;
+   function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
+                               Use_Threshold : Boolean := False;
+                               Threshold : Float := 0.0) return Boolean_Matrix;
    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Array)

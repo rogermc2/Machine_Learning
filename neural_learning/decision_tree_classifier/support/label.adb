@@ -36,7 +36,6 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Multiclass_Utils;
 
 package body Label is
 
@@ -106,9 +105,42 @@ package body Label is
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
+   --  L593 Multiclass uses the maximal score instead of a threshold.
+   function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
+                                         Classes : NL_Types.Integer_List)
+                                         return Boolean_Matrix is
+      use Classifier_Utilities;
+      Y_Cols  : Boolean_Array (Y'First (2) .. Y'Last (2));
+      Inverse : Boolean_Matrix := Y;
+      Max_Index : Positive;
+   begin
+      for col in Y'Range (2) loop
+         for row in Y'Range loop
+            Y_Cols (col) := Y (row, col);
+         end loop;
+      end loop;
+      Max_Index := Arg_Max (Y_Cols);
+      return Inverse;
+
+   end Inverse_Binarize_Multiclass;
+
+   --  -------------------------------------------------------------------------
+
+   function Inverse_Binarize_Thresholding (Y         : Boolean_Matrix;
+                                           Classes   : NL_Types.Integer_List;
+                                           Threshold : Float)
+                                         return Boolean_Matrix is
+      Inverse : Boolean_Matrix := Y;
+   begin
+
+      return Inverse;
+
+   end Inverse_Binarize_Thresholding;
+
+   --  -------------------------------------------------------------------------
+
    --   Inverse_Transform transforms labels back to original encoding
-   function Inverse_Transform (Self   : Label_Encoder;
-                               Labels : Natural_Array)
+   function Inverse_Transform (Self : Label_Encoder; Labels : Natural_Array)
                                 return Integer_Array is
       use NL_Types;
       aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
@@ -187,34 +219,30 @@ package body Label is
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
-
-   function Inverse_Transform (Self : Label_Encoder; Y : Boolean_Matrix)
+   --  L361 Inverse_Transform transforms binary labels back to
+   --       multi-class labels
+   function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
+                               Use_Threshold : Boolean := False;
+                               Threshold     : Float := 0.0)
                                 return Boolean_Matrix is
-      use NL_Types;
-      YT        : constant Boolean_Matrix := Transpose (Y);
-      aRange    : Integer_Array (1 .. Y'Length);
-      Diff      : Boolean_List;
-      Transform : Boolean_Matrix (1 .. YT'Length, 1 .. YT'Length (2));
-      YT_Row    : Boolean_Array (1 .. YT'Length);
+      use Multiclass_Utils;
+      Y_Inv  : Boolean_Matrix (Y'First (2) .. Y'Last (2), Y'First .. Y'Last);
+      Thresh : Float;
    begin
-      for r in Self.Classes_List.First_Index ..
-          Self.Classes_List.Last_Index loop
-         aRange (r) := r;
-      end loop;
+      if Self.Y_Kind = Y_Multiclass then
+         Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
 
-      for Y_index in YT'Range loop
-         for index2 in YT'Range (2) loop
-            YT_Row (Y_index) := YT (Y_index, index2);
-         end loop;
-         Diff := Classifier_Utilities.Set_Diff (YT_Row, aRange);
-         Assert (Diff.Is_Empty, "Y contains previously unseen labels.");
+      else
+         if Use_Threshold then
+            Thresh := Threshold;
+         else
+            Thresh := 0.5 * (Self.Neg_Label + Self.Pos_Label);
+         end if;
 
-         for index2 in YT_Row'Range loop
-            Transform (Y_index, index2) := Self.Classes (YT_Row (index2));
-         end loop;
-      end loop;
+         Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Thresh);
+      end if;
 
-      return Transpose (Transform);
+      return Y_Inv;
 
    end Inverse_Transform;
 
