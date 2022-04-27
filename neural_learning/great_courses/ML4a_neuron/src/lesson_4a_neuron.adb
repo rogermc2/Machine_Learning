@@ -38,7 +38,8 @@ begin
       Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
       Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
-      aClassifier := C_Init (Max_Iter => 10000,
+--        aClassifier := C_Init (Max_Iter => 10000,
+      aClassifier := C_Init (Max_Iter => 10,
                              Activation => Base_Neural.Identity_Activation,
                              Verbose => True);
 

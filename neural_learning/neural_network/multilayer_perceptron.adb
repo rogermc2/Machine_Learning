@@ -153,7 +153,7 @@ package body Multilayer_Perceptron is
             when Log_Loss_Function =>
                 Loss := Log_Loss (Y, Activations.Last_Element);
             when Squared_Error_Function => null;
-                --  Loss := Squared_Loss (Y, Activations.Last_Element);
+                Loss := Squared_Loss (Y, Activations.Last_Element);
         end case;
 
         Assert (Loss'Valid, Routine_Name & "L289 invalid Loss " &
@@ -425,7 +425,6 @@ package body Multilayer_Perceptron is
 
         --  L417 Initialized grads are empty vectors, no initialization required.
 
-        Put_Line (Routine_Name & "L427");
         --  L427
         if Self.Parameters.Solver = Sgd_Solver or else
           Self.Parameters.Solver = Adam_Solver then
@@ -435,7 +434,6 @@ package body Multilayer_Perceptron is
             null;
             --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
         end if;
-        Put_Line (Routine_Name & "done");
 
     end Fit;
 
@@ -949,7 +947,6 @@ package body Multilayer_Perceptron is
 
         --  L655
         Activations.Replace_Element (Activations.First_Index, X_Batch);
-        Put_Line (Routine_Name & "Backprop");
         Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
         Put_Line (Routine_Name & "Batch_Loss: " & Float'Image (Batch_Loss));
 
@@ -969,10 +966,9 @@ package body Multilayer_Perceptron is
        Activations        : in out Matrix_List;
        Hidden_Activation  : Base_Neural.Activation_Type;
        Num_Layers, Layer  : Positive) is
-    --        use Ada.Containers;
         use Base_Neural;
-        Routine_Name         : constant String :=
-                                 "Multilayer_Perceptron.Update_Activations ";
+--          Routine_Name         : constant String :=
+--                                   "Multilayer_Perceptron.Update_Activations ";
         Activ_Layer          : constant Float_Matrix := Activations (layer);
         Coefficient_Matrix   : constant Float_Matrix := Params.Coeff_Grads;
         --  Intercepts: layers x intercept values
@@ -980,12 +976,12 @@ package body Multilayer_Perceptron is
         Activ_Dot_Coeff      : constant Float_Matrix
           := Dot (Activ_Layer, Coefficient_Matrix);
     begin
-        Put_Line (Routine_Name & "L131 Activ_Layer length" &
-                    Integer'Image (Activ_Layer'Length) & " x" &
-                    Integer'Image (Activ_Layer'Length (2)));
-        Put_Line (Routine_Name & "L131 Activ_Dot_Coeff length" &
-                    Integer'Image (Activ_Dot_Coeff'Length) & " x" &
-                    Integer'Image (Activ_Dot_Coeff'Length (2)));
+--          Put_Line (Routine_Name & "L131 Activ_Layer length" &
+--                      Integer'Image (Activ_Layer'Length) & " x" &
+--                      Integer'Image (Activ_Layer'Length (2)));
+--          Put_Line (Routine_Name & "L131 Activ_Dot_Coeff length" &
+--                      Integer'Image (Activ_Dot_Coeff'Length) & " x" &
+--                      Integer'Image (Activ_Dot_Coeff'Length (2)));
         --  L131 Add layer + 1
         Activations.Replace_Element (layer + 1, Activ_Dot_Coeff + Intercepts);
 

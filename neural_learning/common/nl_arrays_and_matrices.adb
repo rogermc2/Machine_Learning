@@ -134,6 +134,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "-" (M : Float_Matrix) return Float_Matrix is
+      Result : Float_Matrix (M'Range, M'Range (2));
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Result (row, col) := - M (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  ----------------------------------------------------------------------------
+
    function "-" (L, R : Float_Matrix) return Float_Matrix is
       Result : Float_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
    begin
