@@ -36,6 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
+with Printing;
 
 package body Label is
 
@@ -262,7 +263,6 @@ package body Label is
       Y_Bin : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
                          (others => (others => False));
    begin
-      Put_Line (Routine_Name);
       for row in Y'Range loop
          for col in Classes.First_Index .. Classes.Last_Index loop
             if Y (row) = Classes (col) then
@@ -271,6 +271,7 @@ package body Label is
          end loop;
       end loop;
 
+      Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
       return Y_Bin;
 
    end Label_Binarize;
