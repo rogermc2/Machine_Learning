@@ -11,7 +11,7 @@ package Base_Neural is
    type Derivative_Type is (Identity_Derivative, Logistic_Derivative,
                             Tanh_Derivative, Relu_Derivative);
 
-   function Binary_Log_Loss (Y_True : Integer_Matrix; Y_Prob : Float_Matrix)
+   function Binary_Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
                              return Float;
    pragma Inline (Binary_Log_Loss);
    procedure Identity (Activation : Float_Matrix);
@@ -26,7 +26,7 @@ package Base_Neural is
    pragma Inline (Logistic_Derivative);
    function Logistic_Sigmoid (X : Float) return Float;
    pragma Inline (Logistic_Sigmoid);
-   function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Float_Matrix)
+   function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
                       return Float;
    pragma Inline (Log_Loss);
    procedure Tanh (Activation : in out Float_Matrix);

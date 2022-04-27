@@ -51,6 +51,8 @@ package NL_Arrays_And_Matrices is
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Get_Row (M : Float_Matrix; R : Integer) return Float_Array;
    pragma Inline (Get_Row);
+   function "not" (M : Boolean_Matrix) return Boolean_Matrix;
+   pragma Inline ("not");
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                               return Boolean_Array;
    pragma Inline (To_Boolean_Array);

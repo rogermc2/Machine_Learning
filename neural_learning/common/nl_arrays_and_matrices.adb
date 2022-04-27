@@ -306,6 +306,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "not" (M : Boolean_Matrix) return Boolean_Matrix is
+      Result : Boolean_Matrix := M;
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Result (row, col) := not Result (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "not";
+
+   --  ------------------------------------------------------------------------
+
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                               return Boolean_Array is
    begin

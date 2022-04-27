@@ -156,8 +156,8 @@ package body Multilayer_Perceptron is
             Loss := Binary_Log_Loss (Y, Activations.Last_Element);
          when Log_Loss_Function =>
             Loss := Log_Loss (Y, Activations.Last_Element);
-         when Squared_Error_Function =>
-            Loss := Squared_Loss (Y, Activations.Last_Element);
+         when Squared_Error_Function => null;
+--              Loss := Squared_Loss (Y, Activations.Last_Element);
       end case;
 
       Assert (Loss'Valid, Routine_Name & "L289 invalid Loss " &
@@ -482,8 +482,8 @@ package body Multilayer_Perceptron is
       use Estimator;
       Routine_Name           : constant String :=
                                  "Multilayer_Perceptron.Fit_Stochastic ";
-      Is_Classifier          : constant Boolean :=
-                                 Self.Estimator_Kind = Classifier_Estimator;
+--        Is_Classifier          : constant Boolean :=
+--                                   Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples            : constant Positive := Positive (X'Length);
       Num_Features           : constant Positive := Positive (X'Length (2));
       Num_Classes            : constant Positive :=
