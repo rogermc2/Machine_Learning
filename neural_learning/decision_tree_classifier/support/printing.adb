@@ -6,6 +6,34 @@ package body Printing is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
+                                   Start : Integer := 1; Finish : Integer := 0)
+   is
+      Last  : Integer;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aMatrix'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+         for row in Start .. Last loop
+            for col in aMatrix'Range (2) loop
+               Put (Boolean'Image (aMatrix (row, col)) & "  ");
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line
+           ("Print_Boolean_Matrix called with invalid start or finish index.");
+      end if;
+
+   end Print_Boolean_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Boolean_Matrix (Name    : String;
                                    aMatrix : Estimator.Boolean_Matrix) is
    begin

@@ -13,6 +13,8 @@ package Printing is
 
    Print_Error : Exception;
 
+   procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
+                                   Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Boolean_Matrix (Name    : String;
                                    aMatrix : Estimator.Boolean_Matrix);
    procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);

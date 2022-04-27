@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Label is
 
@@ -259,7 +259,7 @@ package body Label is
    --  L416
    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
                             return Boolean_Matrix is
-      Routine_Name :  constant String := "Label.Label_Binarize ";
+--        Routine_Name :  constant String := "Label.Label_Binarize ";
       Y_Bin : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
                          (others => (others => False));
    begin
@@ -271,7 +271,6 @@ package body Label is
          end loop;
       end loop;
 
-      Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
       return Y_Bin;
 
    end Label_Binarize;
