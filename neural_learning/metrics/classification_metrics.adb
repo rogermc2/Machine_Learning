@@ -15,14 +15,19 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Accuracy_Score
-     (Y_True, Y_Prediction : Float_Matrix;
-      Normalize            : Boolean := True;
-      Sample_Weight        : Float_Array)
-      return float is
+     (Y_True    : Boolean_Matrix; Y_Prediction   : Float_Matrix;
+      Normalize : Boolean := True; Sample_Weight : Float_Array) return float is
 --        Routine_Name : constant String :=
 --                         "Classification_Metrics.Accuracy_Score, ";
-      Score        : constant Float_Matrix := Y_Prediction - Y_True;
+      Score        :  Float_Matrix := Y_Prediction;
    begin
+      for row in Score'Range loop
+            for col in Score'Range (2) loop
+                if Y_True (row, col) then
+                    Score (row, col) := Score (row, col) - 1.0;
+                end if;
+            end loop;
+      end loop;
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
