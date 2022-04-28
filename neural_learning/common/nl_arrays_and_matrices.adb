@@ -181,6 +181,21 @@ package body NL_Arrays_And_Matrices is
 
     --  ----------------------------------------------------------------------------
 
+    function "-" (L : Float_Matrix; R : Float_Array) return Float_Matrix is
+        Result : Float_Matrix := L;
+    begin
+        for row in L'Range loop
+            for col in L'Range (2) loop
+                Result (row, col) := Result (row, col) - R (row);
+            end loop;
+        end loop;
+
+        return Result;
+
+    end "-";
+
+    --  ----------------------------------------------------------------------------
+
     function "-" (L : Float; R : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (R'Range, R'Range (2));
     begin
@@ -223,9 +238,10 @@ package body NL_Arrays_And_Matrices is
 
     end Diff_Max;
 
-    --  ----------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
     --  Diff_Max returns the maximum value of each row
-    function Diff_Max (Data : Float_Matrix; Axis : Positive) return Float_Matrix is
+    function Diff_Max (Data : Float_Matrix; Axis : Positive)
+                       return Float_Matrix is
     begin
         if Axis = 1 then
             return Diff_Max (Data);
@@ -366,27 +382,61 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function Sum (Data : Float_Matrix; Axis : Positive) return Float_Array is
-        Val : Float;
-        Mat : Float_Matrix := Data;
+    function Max (Data : Float_Matrix; Axis : Positive) return Float_Array is
+
+        function Max_Vals (Data : Float_Matrix) return Float_Array is
+            Result  : Float_Array (Data'Range (2));
+            Max_Val : Float := Float'First;
+        begin
+            for row in Data'Range loop
+                Max_Val := Float'First;
+                for col in Data'Range (2) loop
+                    if Data (row, col) > Max_Val then
+                        Max_Val := Data (row, Col);
+                    end if;
+                end loop;
+                Result (row) := Max_Val;
+            end loop;
+
+            return Result;
+
+        end Max_Vals;
+
     begin
-        if Axis = 2 then
-            Mat := Transpose (Mat);
+        if Axis = 1 then
+            return Max_Vals (Data);
+        else
+            return Max_Vals (Transpose (Data));
         end if;
 
-        declare
-            Result : Float_Array (Mat'Range);
+    end Max;
+
+    --  ------------------------------------------------------------------------
+
+    function Sum (Data : Float_Matrix; Axis : Positive) return Float_Array is
+
+        function Vals (Data : Float_Matrix) return Float_Array is
+            Result : Float_Array (Data'Range (2));
+            Val    : Float;
         begin
-            for row in Mat'Range loop
+            for row in Data'Range loop
                 Val := 0.0;
-                for col in Mat'Range (2) loop
-                    Val := Val + Mat (row, Col);
+                for col in Data'Range (2) loop
+                    Val := Val + Data (row, Col);
                 end loop;
                 Result (row) := Val;
             end loop;
 
             return Result;
-        end;
+
+        end Vals;
+
+    begin
+        if Axis = 1 then
+            return Vals (Data);
+        else
+            return Vals (Transpose (Data));
+        end if;
 
     end Sum;
 

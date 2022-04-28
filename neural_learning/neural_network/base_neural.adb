@@ -221,9 +221,9 @@ package body Base_Neural is
 
     procedure Softmax (Activation : in out Float_Matrix) is
     --          Routine_Name : constant String := "Base_Neural.Softmax ";
-        Tmp   : Float_Matrix := Activation;
+        Tmp   : Float_Matrix := Activation - Max (Activation, 2);
     begin
-        Tmp := Exp (Diff_Max (Activation, 2));
+        Tmp := Exp (Tmp);
         Activation := Tmp / Sum (Tmp, 2);
 
     end Softmax;
