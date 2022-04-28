@@ -228,16 +228,16 @@ package body Base_Neural is
 
     end Softmax;
 
-    --  -------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
     --  L158
     function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Float_Matrix)
                            return Float is
-        Diff : Float_Matrix := Y_Pred;
+        Diff : Float_Matrix := -Y_Pred;
     begin
         for row in Diff'Range loop
             for col in Diff'Range (2) loop
                 if Y_True (row, col) then
-                    Diff (row, col) := Diff (row, col) - 1.0;
+                    Diff (row, col) := 1.0 + Diff (row, col);
                 end if;
             end loop;
         end loop;
