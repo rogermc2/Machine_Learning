@@ -43,7 +43,7 @@ package NL_Arrays_And_Matrices is
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    function "-" (L : Float; R : Float_Matrix) return Float_Matrix;
    pragma Inline ("-");
-   function Diff_Max (Data : Float_Matrix) return Float_Matrix;
+   function Diff_Max (Data : Float_Matrix; Axis : Positive) return Float_Matrix;
    function Dot (L, R : Float_Matrix) return Float_Matrix;
    function Dot (L : Float_Matrix; R : Float_Array)
                  return Float_Array;
@@ -56,6 +56,8 @@ package NL_Arrays_And_Matrices is
    pragma Inline (Get_Row);
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline ("not");
+   function Sum (Data : Float_Matrix; Axis : Positive) return Float_Matrix;
+   pragma Inline (Sum);
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                               return Boolean_Array;
    pragma Inline (To_Boolean_Array);

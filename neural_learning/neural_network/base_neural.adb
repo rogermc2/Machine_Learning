@@ -19,7 +19,7 @@ package body Base_Neural is
     --  -------------------------------------------------------------------------
 
     function Binary_Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
-                             return Float is
+                              return Float is
     --        Routine_Name : constant String :=
     --                         "Base_Neural.Binary_Log_Loss_Function ";
         YP       : Float_Matrix := Y_Prob;
@@ -128,7 +128,7 @@ package body Base_Neural is
     --  L177 Log Loss is the negative average of the log of corrected predicted
     --  probabilities for each instance.
     function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
-                      return Float is
+                       return Float is
     --          use Ada.Containers;
     --          Routine_Name : constant String := "Base_Neural.Log_Loss ";
         YP           : Float_Matrix := Y_Prob;
@@ -137,7 +137,7 @@ package body Base_Neural is
         YP2          : Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
 
         function Do_XlogY (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
-                         return Float is
+                           return Float is
             X_Y : Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
             Sum : Float := 0.0;
         begin
@@ -219,55 +219,19 @@ package body Base_Neural is
 
     --  -------------------------------------------------------------------------
 
-    function Softmax (A : Float_Array) return Float_Array is
-        use Maths.Float_Math_Functions;
-        Sum_Exp : Float := 0.0;
-        Exp_A   : Float_Array (A'Range);
-        Result  : Float_Array (A'Range);
-    begin
-        for col in Result'Range loop
-            Exp_A (col) := Exp (A (col));
-            Sum_Exp := Sum_Exp + Exp_A (col);
-        end loop;
-
-        if Sum_Exp = 0.0 then
-            Sum_Exp := 1.0;
-        end if;
-
-        for col in Result'Range loop
-            Result (col) := Exp (A (col)) / Sum_Exp;
-        end loop;
-
-        return Result;
-
-    end Softmax;
-
-    --  -------------------------------------------------------------------------
-
     procedure Softmax (Activation : in out Float_Matrix) is
     --          Routine_Name : constant String := "Base_Neural.Softmax ";
         Tmp   : Float_Matrix := Activation;
-        aRow  : Float_Array (Activation'Range (2));
     begin
-        --          Put_Line (Routine_Name);
-        Tmp := Exp (Diff_Max (Activation));
-        --        Put_Line (Routine_Name & "Tmp length" &
-        --                   Integer'Image (Tmp'Length) & " x" &
-        --                   Integer'Image (Tmp'Length (2)));
-
-        for row in Activation'Range loop
-            aRow := Softmax (Get_Row (Tmp, row));
-            for col in aRow'Range loop
-                Activation (row, col) := aRow (col);
-            end loop;
-        end loop;
+        Tmp := Exp (Diff_Max (Activation, 2));
+        Activation := Tmp / Sum (Tmp, 2);
 
     end Softmax;
 
     --  -------------------------------------------------------------------------
     --  L158
     function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Float_Matrix)
-                          return Float is
+                           return Float is
         Diff : Float_Matrix := Y_Pred;
     begin
         for row in Diff'Range loop
@@ -322,7 +286,7 @@ package body Base_Neural is
     --  scipy/special/_xlogy.pxd
     --  xlogy = x*log(y) so that the result is 0 if x = 0
     function X_Log_Y (X : Boolean_Matrix; Y : Float_Matrix)
-                     return Float_Matrix is
+                      return Float_Matrix is
         use Maths.Float_Math_Functions;
         Y1     : Float_Matrix := Y;
         Result : Float_Matrix (X'Range, X'Range (2));
