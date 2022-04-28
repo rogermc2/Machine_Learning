@@ -661,7 +661,7 @@ package body Multilayer_Perceptron is
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params             : constant Parameters_List := Self.Attributes.Params;
    begin
-      --  Iterate over the hidden layers
+      --  129  Iterate over the hidden layers
       --  The Python range(stop) function returns a sequence of numbers,
       --   starting from 0 by default, incrementing by 1 (by default) and
       --   stopping BEFORE "stop". That is, at "stop" - 1.

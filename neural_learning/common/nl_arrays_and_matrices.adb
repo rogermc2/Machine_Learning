@@ -1,6 +1,8 @@
 
 --  with Ada.Assertions; use Ada.Assertions;
 
+with Maths;
+
 package body NL_Arrays_And_Matrices is
 
    function "*" (L : Float; R : Float_Matrix) return Float_Matrix is
@@ -264,6 +266,22 @@ package body NL_Arrays_And_Matrices is
    end Dot;
 
    --  ----------------------------------------------------------------------------
+
+   function Exp (M : Float_Matrix) return Float_Matrix is
+      use Maths.Float_Math_Functions;
+      Result : Float_Matrix (M'Range, M'Range (2));
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Result (row, col) := Exp (M (row, col));
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Exp;
+
+   --  ------------------------------------------------------------------------
 
    function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
       Result : Float_Array (1 .. Positive (List.Length));

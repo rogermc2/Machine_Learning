@@ -250,10 +250,7 @@ package body Base_Neural is
         aRow  : Float_Array (Activation'Range (2));
     begin
         --          Put_Line (Routine_Name);
-        --        Put_Line (Routine_Name & "Activation length" &
-        --                   Integer'Image (Activation'Length) & " x" &
-        --                   Integer'Image (Activation'Length (2)));
-        Tmp := Diff_Max (Activation);
+        Tmp := Exp (Diff_Max (Activation));
         --        Put_Line (Routine_Name & "Tmp length" &
         --                   Integer'Image (Tmp'Length) & " x" &
         --                   Integer'Image (Tmp'Length (2)));
