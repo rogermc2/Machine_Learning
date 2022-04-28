@@ -93,6 +93,21 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
+    function "/" (L : Float_Matrix; R : Float_Array) return Float_Matrix is
+        Result : Float_Matrix  := L;
+    begin
+        for row in L'Range loop
+            for col in L'Range (2) loop
+                Result (row, col) := Result (row, col) / R (col);
+            end loop;
+        end loop;
+
+        return Result;
+
+    end "/";
+
+    --  ------------------------------------------------------------------------
+
     function "+" (L, R : Float_Array) return Float_Array is
         Result : Float_Array (L'First .. L'Last);
     begin
@@ -437,22 +452,6 @@ package body NL_Arrays_And_Matrices is
         else
             return Vals (Transpose (Data));
         end if;
-
-    end Sum;
-
-    --  ------------------------------------------------------------------------
-
-    function Sum (Data : Float_Matrix; Axis : Positive) return Float_Matrix is
-        Sum_Array : constant Float_Array := Sum (Data, Axis);
-    begin
-        declare
-            Result : Float_Matrix (1 .. 1, Sum_Array'Range);
-        begin
-            for col in Result'Range (2) loop
-                Result (1, Col) := Sum_Array (col) ;
-            end loop;
-            return Result;
-        end;
 
     end Sum;
 

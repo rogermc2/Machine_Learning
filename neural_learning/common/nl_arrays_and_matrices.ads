@@ -33,6 +33,7 @@ package NL_Arrays_And_Matrices is
    pragma Inline ("**");
    function "/" (L, R : Float_Matrix) return Float_Matrix;
    function "/" (L : Float_Matrix; R : Float) return Float_Matrix;
+   function "/" (L : Float_Matrix; R : Float_Array) return Float_Matrix;
    pragma Inline ("/");
    function "+" (L, R : Float_Array) return Float_Array;
    function "+" (L, R : Float_Matrix) return Float_Matrix;
@@ -57,7 +58,7 @@ package NL_Arrays_And_Matrices is
    pragma Inline (Get_Row);
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline ("not");
-   function Sum (Data : Float_Matrix; Axis : Positive) return Float_Matrix;
+   function Sum (Data : Float_Matrix; Axis : Positive) return Float_Array;
    pragma Inline (Sum);
    function Max (Data : Float_Matrix; Axis : Positive) return Float_Array;
    pragma Inline (Max);
