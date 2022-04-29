@@ -39,7 +39,7 @@ begin
       Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
 --        aClassifier := C_Init (Max_Iter => 10000,
-      aClassifier := C_Init (Max_Iter => 3,
+      aClassifier := C_Init (Max_Iter => 200,
                              Activation => Base_Neural.Identity_Activation,
                              Verbose => True);
 
@@ -49,8 +49,8 @@ begin
       Fit (aClassifier, Train_X, Train_Y);
       Support_4.Save_Classifier (Dataset_Name, aClassifier);
 --        Put_Line ("Score: " & Float'Image (Base.Score
---                  (Self => aClassifier, X => Train_X,
---                   Y => To_Float_Matrix (Train_Y),
+--                  (Self => aClassifier, X => Test_X,
+--                   Y => To_Float_Matrix (Test_Y),
 --                   Sample_Weight => Sample_Weight)));
    end;  --  declare
 
