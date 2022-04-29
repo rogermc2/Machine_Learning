@@ -145,7 +145,7 @@ package body Multilayer_Perceptron is
 
       Printing.Print_Float_Matrix (Routine_Name &
                                      "L284 Activations.Last_Element: ",
-                                   Activations.Last_Element, 1, 12);
+                                   Activations.Last_Element, 1, 2);
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
