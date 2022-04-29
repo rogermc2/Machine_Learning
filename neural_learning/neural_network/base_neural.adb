@@ -294,7 +294,7 @@ package body Base_Neural is
                       return Float_Matrix is
       use Maths.Float_Math_Functions;
       Y1     : Float_Matrix := Y;
-      Result : Float_Matrix (X'Range, X'Range (2));
+      Result : Float_Matrix (Y'Range, Y'Range (2));
    begin
       for row in X'Range loop
          for col in X'Range (2) loop
