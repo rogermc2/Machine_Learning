@@ -58,9 +58,9 @@ package NL_Arrays_And_Matrices is
    pragma Inline (Get_Row);
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline ("not");
-   function Sum (Data : Float_Matrix; Axis : Positive) return Float_Array;
+   function Sum (Data : Float_Matrix) return Float_Array;
    pragma Inline (Sum);
-   function Max (Data : Float_Matrix; Axis : Positive) return Float_Array;
+   function Max (Data : Float_Matrix) return Float_Array;
    pragma Inline (Max);
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                               return Boolean_Array;
