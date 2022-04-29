@@ -431,7 +431,7 @@ package body NL_Arrays_And_Matrices is
     function Sum (Data : Float_Matrix; Axis : Positive) return Float_Array is
 
         function Vals (Data : Float_Matrix) return Float_Array is
-            Result : Float_Array (Data'Range (2));
+            Result : Float_Array (Data'Range);
             Val    : Float;
         begin
             for row in Data'Range loop
