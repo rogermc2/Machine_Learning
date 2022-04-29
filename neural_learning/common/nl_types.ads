@@ -1,0 +1,285 @@
+
+with Ada.Containers.Doubly_Linked_Lists;
+with Ada.Containers.Indefinite_Doubly_Linked_Lists;
+with Ada.Containers.Ordered_Maps;
+with Ada.Containers.Vectors;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+
+package NL_Types is
+
+   Max_Features : constant Integer := 100;
+
+   type Data_Type is (Integer_Type, Float_Type, Boolean_Type, UB_String_Type);
+   pragma Ordered (Data_Type);
+
+   type Class_Range is new Positive range 1 .. Max_Features;
+   subtype Feature_Name_Type is Unbounded_String;
+   type Feature_Names_Array is array (Class_Range range <>)
+     of Feature_Name_Type;
+   type Feature_Data_Array is array (Class_Range range <>) of Unbounded_String;
+   type Data_Array is array (Class_Range range <>) of Unbounded_String;
+   type Data_Type_Array is array (Class_Range range <>) of Data_Type;
+
+   package Float_Package is new Ada.Containers.Vectors (Positive, Float);
+   subtype Float_List is Float_Package.Vector;
+   package Float_Sorting is new Float_Package.Generic_Sorting ("<");
+   function "+" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("+");
+   function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("-");
+   function "*" (L : Float; R : Float_Package.Vector)
+                 return Float_Package.Vector;
+   pragma Inline ("*");
+   function "*" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   function "**" (L : Float_Package.Vector; P : Integer)
+                  return Float_Package.Vector;
+   pragma Inline ("**");
+   function "/" (L : Float_Package.Vector; R : Float)
+                 return Float_Package.Vector;
+   pragma Inline ("/");
+   function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("abs");
+   procedure Check_Lengths (Routine_Name : String; L, R : Float_List);
+   pragma Inline (Check_Lengths);
+
+   use Float_Package;
+   package Float_List_Package is new
+     Ada.Containers.Vectors (Positive, Float_List);
+   subtype Float_List_2D is Float_List_Package.Vector;
+   function "*" (L : Float; R : Float_List_2D) return Float_List_2D;
+   function "*" (L, R : Float_List_2D) return Float_List_2D;
+   function "**" (L : Float_List_2D; P : Integer) return Float_List_2D;
+   function "/" (L : Float_List_2D; R : Float) return Float_List_2D;
+   function "+" (L, R : Float_List_2D) return Float_List_2D;
+   function "-" (L, R : Float_List_2D) return Float_List_2D;
+   function Dot (L : Float_List; R : Float_List_2D) return Float_List;
+   pragma Inline (Dot);
+   function Dot (L, R : Float_List) return Float_List_2D;
+   function Dot (L, R : Float_List_2D) return Float_List_2D;
+   function Transpose (Values : Float_List_2D) return  Float_List_2D;
+
+   use Float_List_Package;
+   package List_Of_Float_Lists_Package is new
+     Ada.Containers.Vectors (Positive, Float_List_2D);
+   subtype Float_List_3D is List_Of_Float_Lists_Package.Vector;
+
+   package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
+   subtype Integer_List is Integer_Package.Vector;
+   package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
+   procedure Check_Lengths (Routine_Name : String; L : Integer_List;
+                            R            : Float_List);
+
+   use Integer_Package;
+   package Integer_Package_2D is new
+     Ada.Containers.Vectors (Positive, Integer_List);
+   subtype Integer_List_2D is Integer_Package_2D.Vector;
+   function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
+   pragma Inline (Transpose);
+
+   package Integer_DLL_Package is new
+     Ada.Containers.Doubly_Linked_Lists (Integer);
+   subtype Integer_DL_List is Integer_DLL_Package.List;
+
+   package Boolean_Package is new Ada.Containers.Vectors
+     (Positive, Boolean);
+   subtype Boolean_List is Boolean_Package.Vector;
+   package Boolean_Sorting is new Boolean_Package.Generic_Sorting ("<");
+
+   package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
+   subtype Natural_List is Natural_Package.Vector;
+   subtype Natural_Cursor is Natural_Package.Cursor;
+   package Natural_Sorting is new Natural_Package.Generic_Sorting ("<");
+
+   use Natural_Package;
+   package Natural_List_Package is new
+     Ada.Containers.Vectors (Positive, Natural_List);
+   subtype Natural_Lists_2D is Natural_List_Package.Vector;
+
+   package Character_Package is new Ada.Containers.Vectors
+     (Positive, Character);
+   subtype Character_List is Character_Package.Vector;
+
+   package Unbounded_Package is new Ada.Containers.Vectors
+     (Positive, Unbounded_String);
+   subtype Unbounded_List is Unbounded_Package.Vector;
+   subtype Features_List is Unbounded_Package.Vector;
+   subtype Class_Names_List is Unbounded_Package.Vector;
+   subtype Feature_Names_List is Unbounded_Package.Vector;
+
+   type Row_Data (Class_Count : Class_Range := 2) is record
+      Features : Feature_Data_Array (1 .. Class_Count);
+      Label    : Unbounded_String;
+   end record;
+
+   package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
+   subtype Rows_Vector is Rows_Package.Vector;
+
+   use Unbounded_Package;
+   package Raw_Data_Package is new Ada.Containers.Vectors
+     (Positive, Unbounded_List);
+   subtype Raw_Data_Vector is Raw_Data_Package.Vector;
+
+   type Data_Rows is array (Integer range <>) of Unbounded_String;
+
+   package Label_Type_Package is new Ada.Containers.Ordered_Maps
+     (Class_Range, Data_Type);
+   subtype Label_Type_Map is Label_Type_Package.Map;
+
+   type Value_Data (Feature_Kind : Data_Type := Integer_Type) is record
+      Feature_Name : Feature_Name_Type;
+      case Feature_Kind is
+         when Integer_Type => Integer_Value     : Integer;
+         when Float_Type => Float_Value         : Float;
+         when Boolean_Type => Boolean_Value     : Boolean;
+         when UB_String_Type => UB_String_Value : Unbounded_String;
+      end case;
+   end record;
+
+   package Values_Package is new Ada.Containers.Vectors
+     (Class_Range, Value_Data);
+   subtype Value_List is Values_Package.Vector;
+
+   type Value_Record (Value_Kind : Data_Type := Integer_Type) is record
+      case Value_Kind is
+         when Integer_Type => Integer_Value     : Integer := 0;
+         when Float_Type => Float_Value         : Float := 0.0;
+         when Boolean_Type => Boolean_Value     : Boolean := False;
+         when UB_String_Type => UB_String_Value : Unbounded_String
+              := To_Unbounded_String ("");
+      end case;
+   end record;
+
+   package Value_Data_Package is new
+     Ada.Containers.Vectors (Positive, Value_Record);
+   subtype Value_Data_List is Value_Data_Package.Vector;
+
+   function "<" (L, R : Value_Record) return Boolean;
+   pragma Inline ("<");
+   function "<=" (L, R : Value_Record) return Boolean;
+   pragma Inline ("<=");
+
+   function "=" (L, R : Value_Record) return Value_Record;
+   pragma Inline ("=");
+   function "+" (L, R : Value_Record) return Value_Record;
+   function "-" (L, R : Value_Record) return Value_Record;
+   function "abs" (Value : Value_Record) return Value_Record;
+
+   function "=" (L, R : Value_Data_List) return Value_Data_List;
+   function "-" (L, R : Value_Data_List) return Value_Data_List;
+   function "abs" (aVector : Value_Data_List) return Value_Data_List;
+   procedure Check_Length (Routine_Name : String; L : Float_List;
+                           R            : Value_Data_List);
+   procedure Check_Length (Routine_Name : String; L, R : Value_Data_List);
+
+   function Dot (L, R : Value_Data_List) return Value_Record;
+
+   package Value_Data_Sorting is new
+     Value_Data_Package.Generic_Sorting ("<");
+
+   use Value_Data_Package;
+   package Value_Lists_Data_Package is new
+     Ada.Containers.Vectors (Positive, Value_Data_List);
+   subtype Value_Data_Lists_2D is Value_Lists_Data_Package.Vector;
+
+   function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   procedure Check_Lengths (Routine_Name : String; L, R : Value_Data_Lists_2D);
+   procedure Check_Length
+     (Routine_Name : String; L : Value_Data_Lists_2D; R : Float_List);
+   function Dot (L : Float_List; R : Float_List) return float;
+   function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
+   function Dot (L : Float_List; R : Value_Data_Lists_2D) return Float;
+
+   use Value_Lists_Data_Package;
+   package Value_Lists_3D_Package is new
+     Ada.Containers.Vectors (Positive, Value_Data_Lists_2D);
+   subtype Value_Data_Lists_3D is Value_Lists_3D_Package.Vector;
+
+   package Boolean_Label_Map_Package is new Ada.Containers.Ordered_Maps
+     (Boolean, Natural);
+   subtype Boolean_Label_Map is Boolean_Label_Map_Package.Map;
+
+   package Float_Label_Map_Package is new Ada.Containers.Ordered_Maps
+     (Float, Natural);
+   subtype Float_Label_Map is Float_Label_Map_Package.Map;
+
+   package Integer_Label_Map_Package is new Ada.Containers.Ordered_Maps
+     (Integer, Natural);
+   subtype Integer_Label_Map is Integer_Label_Map_Package.Map;
+
+   package UB_Label_Map_Package is new Ada.Containers.Ordered_Maps
+     (Unbounded_String, Natural);
+   subtype UB_Label_Map is UB_Label_Map_Package.Map;
+
+   type Label_Maps is record
+      Boolean_Map   : Boolean_Label_Map;
+      Float_Map     : Float_Label_Map;
+      Integer_Map   : Integer_Label_Map;
+      UB_String_Map : UB_Label_Map;
+   end record;
+
+--     type Prediction_Data is record
+--        Label      : Unbounded_String;
+--        Num_Copies : Natural := 1;
+--     end record;
+--
+--     package Prediction_Data_Package is new
+--       Ada.Containers.Doubly_Linked_Lists (Prediction_Data);
+--     subtype Predictions_List is Prediction_Data_Package.List;
+
+   package Indefinite_String_Package is new
+     Ada.Containers.Indefinite_Doubly_Linked_Lists (String);
+   subtype Indef_String_List is Indefinite_String_Package.List;
+
+   package String_Package is new Ada.Containers.Doubly_Linked_Lists
+     (Ada.Strings.Unbounded.Unbounded_String);
+   subtype String_List is String_Package.List;
+
+   use String_Package;
+   package String_List_Package is new Ada.Containers.Doubly_Linked_Lists
+     (String_List);
+   subtype String_Multi_List is String_List_Package.List;
+
+   package String_Vector_Package is new Ada.Containers.Vectors
+     (Positive, Ada.Strings.Unbounded.Unbounded_String);
+   subtype String_Vector is String_Vector_Package.Vector;
+
+   use String_Vector_Package;
+   package String_Multi_Vector_Package is new Ada.Containers.Vectors
+     (Positive, String_Vector);
+   subtype String_Multi_Vector is String_Multi_Vector_Package.Vector;
+
+   type Data_Record (Label_Kind : Data_Type := Integer_Type) is record
+      Feature_Names  : String_List;
+      Label_Name     : Unbounded_String := To_Unbounded_String ("");
+      Feature_Values : Value_Data_Lists_2D;
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
+   end record;
+
+   type Multi_Output_Data_Record is record
+      Feature_Names  : String_List;
+      Label_Names    : Unbounded_List;
+      Feature_Values : Value_Data_Lists_2D;
+      Label_Values   : Value_Data_Lists_2D;   --  num outputs x num values
+   end record;
+
+   type Partitioned_Rows is record
+      True_Rows  : Rows_Vector;
+      False_Rows : Rows_Vector;
+   end record;
+
+   package Strings_Package is new Ada.Containers.Doubly_Linked_Lists
+     (Unbounded_String);
+   subtype Strings_List is Strings_Package.List;
+
+   type Slice_Record is record
+      First : Positive;
+      Last  : Positive;
+   end record;
+
+   package Slices_Package is new Ada.Containers.Vectors
+     (Positive, Slice_Record);
+   subtype Slices_List is Slices_Package.Vector;
+
+end NL_Types;

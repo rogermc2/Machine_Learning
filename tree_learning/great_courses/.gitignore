@@ -1,0 +1,13 @@
+*.lyx~
+*.lyx#
+*.py
+*.dot
+*.ada
+*.oml
+*.bin
+*.sta
+*.arff
+*.tre
+obj/*
+*.sublime-project
+*.sublime-workspace

@@ -1,9 +1,0 @@
-*.lyx~
-*.lyx#
-*.dot
-*.ada
-*.oml
-*.bin
-*.sta
-*.arff
-obj/*
