@@ -696,7 +696,7 @@ package body Multilayer_Perceptron is
       end case;
       Printing.Print_Float_Matrix
         (Routine_Name &  "final Activations.Last_Element",
-         Activations.Last_Element, 1, 5);
+         Activations.Last_Element, 1, 1);
 
    end Forward_Pass;
 
