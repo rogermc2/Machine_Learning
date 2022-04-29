@@ -202,17 +202,17 @@ package body Stochastic_Optimizers is
       --          use Ada.Containers;
       use Maths.Float_Math_Functions;
       use Parameters_Package;
-      Routine_Name          : constant String :=
-                                "Stochastic_Optimizers.Get_Adam_Updates ";
+--        Routine_Name          : constant String :=
+--                                  "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       Updates               : Parameters_List;
    begin
-      Assert (not Self.First_Moments.Is_Empty, Routine_Name &
-                "Self.First_Moments Is_Empty.");
-      Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
-                "Self.Second_Moments Is_Empty.");
-      Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
+--        Assert (not Self.First_Moments.Is_Empty, Routine_Name &
+--                  "Self.First_Moments Is_Empty.");
+--        Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
+--                  "Self.Second_Moments Is_Empty.");
+--        Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
 
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate

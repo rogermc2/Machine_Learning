@@ -152,10 +152,6 @@ package body Base_Neural is
       end Do_XlogY;
 
    begin
-      --          Put_Line (Routine_Name);
-      --          Printing.Print_Float_Matrix (Routine_Name & "YP", YP, 1, 2);
-      --          Put_Line (Routine_Name & "YT size" & Count_Type'Image (YT'Length)
-      --                    & " x" & Count_Type'Image (YT'Length (2)));
       --  L194 Clip Y_Prob
       for row in YP'Range loop
          for col in YP'Range (2) loop
