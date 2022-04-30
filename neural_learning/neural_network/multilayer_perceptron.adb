@@ -243,6 +243,26 @@ package body Multilayer_Perceptron is
     end Backprop;
 
     --  -------------------------------------------------------------------------
+
+    procedure Check_Weights (Self : MLP_Classifier) is
+        Params  : constant Parameters_List := Self.Attributes.Params;
+        Weights : NL_Types.Float_List;
+    begin
+        for index in Params.First_Index .. Params.Last_Index loop
+            for row in Params.Element (index).Coeff_Grads'Range loop
+                for col in Params.Element (index).Coeff_Grads'Range (2) loop
+                    Weights.Append
+                      (Params.Element (index).Coeff_Grads (row, col));
+                end loop;
+            end loop;
+            for row in Params.Element (index).Intercept_Grads'Range loop
+                Weights.Append
+                  (Params.Element (index).Intercept_Grads (row));
+            end loop;
+        end loop;
+    end;
+
+    --  -------------------------------------------------------------------------
     --  L1054
     function C_Init (Hidden_Layer_Sizes  : NL_Types.Integer_List :=
                        NL_Types.Integer_Package.Empty_Vector;
@@ -379,8 +399,6 @@ package body Multilayer_Perceptron is
         --        Routine_Name       : constant String :=
         --                               "Multilayer_Perceptron.Fit ";
         Num_Features       : constant Positive := Positive (X'Length (2));
---          Classes            : constant NL_Types.Integer_List :=
---                                 Multiclass_Utils.Unique_Labels (Y);
         Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                                Self.Parameters.Hidden_Layer_Sizes;
         Y_Bin              : constant Boolean_Matrix :=
@@ -426,6 +444,8 @@ package body Multilayer_Perceptron is
             null;
             --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
         end if;
+
+        Check_Weights (Self);
 
     end Fit;
 
