@@ -1,13 +1,10 @@
 
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
---  with Criterion;
-with Estimator;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 with Encode_Utils;
 with Export_Types;
---  with Weights;
 
 package Printing is
 
@@ -15,8 +12,6 @@ package Printing is
 
    procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
                                    Start : Integer := 1; Finish : Integer := 0);
-   procedure Print_Boolean_Matrix (Name    : String;
-                                   aMatrix : Estimator.Boolean_Matrix);
    procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);
    procedure Print_Colours_List (Name    : String;
                                  Colours : Export_Types.Colours_List);

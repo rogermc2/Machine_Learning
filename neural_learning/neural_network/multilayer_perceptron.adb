@@ -76,7 +76,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix;
+                               return Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -245,11 +245,11 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    procedure Check_Weights (Self : MLP_Classifier) is
-     Routine_Name : constant String :=
+      Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Weights ";
-      Params : constant Parameters_List := Self.Attributes.Params;
-      Weight : Float;
-      Bad    : Boolean := False;
+      Params       : constant Parameters_List := Self.Attributes.Params;
+      Weight       : Float;
+      Bad          : Boolean := False;
    begin
       for index in Params.First_Index .. Params.Last_Index loop
          for row in Params.Element (index).Coeff_Grads'Range loop
@@ -508,11 +508,11 @@ package body Multilayer_Perceptron is
                              Activations  : in out Matrix_List;
                              Incremental  : Boolean := False) is
       --        use Ada.Containers;
-      --        use Estimator;
+      use Estimator;
       Routine_Name           : constant String :=
                                  "Multilayer_Perceptron.Fit_Stochastic ";
-      --        Is_Classifier          : constant Boolean :=
-      --                                   Self.Estimator_Kind = Classifier_Estimator;
+      Is_Classifier          : constant Boolean :=
+                                 Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples            : constant Positive := Positive (X'Length);
       Num_Features           : constant Positive := Positive (X'Length (2));
       Num_Classes            : constant Positive :=
@@ -527,11 +527,11 @@ package body Multilayer_Perceptron is
       Test_Size              : constant Positive
         := Positive (Self.Parameters.Validation_Fraction * Float (Num_Samples));
       Train_Size             : constant Positive := Num_Samples - Test_Size;
-      --  Stratify         : Integer_List_2D;
-      --  Should_Stratify  : Boolean;
+      Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
+      Should_Stratify        : Boolean;
       Train_X                : Float_Matrix
         (1 .. Train_Size, 1 .. Num_Features);
-      Train_Y                : NL_Arrays_And_Matrices.Boolean_Matrix
+      Train_Y                : Boolean_Matrix
         (1 .. Train_Size, 1 .. Num_Classes);
       Test_X                 : Float_Matrix
         (1 .. Test_Size, 1 .. Num_Features);
@@ -551,10 +551,10 @@ package body Multilayer_Perceptron is
 
       --  L597
       if Early_Stopping then
-         --           Should_Stratify := Is_Classifier;
-         --           if Should_Stratify then
-         --              Stratify := Y;
-         --           end if;
+         Should_Stratify := Is_Classifier;
+         if Should_Stratify then
+            Stratify := Y;
+         end if;
 
          Data_Splitter.Train_Test_Split
            (X => X, Y => Y,
@@ -710,7 +710,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix is
+                               return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       --          Routine_Name       : constant String :=
@@ -806,6 +806,8 @@ package body Multilayer_Perceptron is
                          Layer_Units : NL_Types.Integer_List) is
       --        use Ada.Containers;
       use Base_Neural;
+      use Estimator;
+      use Multiclass_Utils;
       --        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
@@ -813,8 +815,16 @@ package body Multilayer_Perceptron is
       Self.Attributes.N_Iter := 0;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
-      Self.Attributes.Out_Activation := Softmax_Activation;
       Self.Attributes.Params.Clear;
+
+      if Self.Estimator_Kind /= Classifier_Estimator then
+         Self.Attributes.Out_Activation := Identity_Activation;
+      elsif Self.Attributes.Binarizer.Y_Kind = Y_Multiclass
+      then
+         Self.Attributes.Out_Activation := Softmax_Activation;
+      else
+         Self.Attributes.Out_Activation := Logistic_Activation;
+      end if;
 
       --  L344
       for layer in 1 .. Self.Attributes.N_Layers - 1 loop
@@ -897,7 +907,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : MLP_Classifier; X : Float_Matrix)
-                      return Float_Matrix is
+                     return Float_Matrix is
    begin
       return Forward_Pass_Fast (Self, X);
 
