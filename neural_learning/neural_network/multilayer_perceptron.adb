@@ -517,8 +517,8 @@ package body Multilayer_Perceptron is
         Num_Features           : constant Positive := Positive (X'Length (2));
         Num_Classes            : constant Positive :=
                                    Positive (Self.Attributes.Classes.Length);
-        LE_U                   : Label.Label_Encoder (Label.Class_Unique,
-                                                      Num_Samples);
+--          LE_U                   : Label.Label_Encoder (Label.Class_Unique,
+--                                                        Num_Samples);
         Iter                   : Natural := 0;
         Continue               : Boolean := True;
         --  Activations: layers x samples x features
@@ -550,7 +550,8 @@ package body Multilayer_Perceptron is
         end if;
 
         --  L597
-        if Early_Stopping then
+      if Early_Stopping then
+         Put_Line (Routine_Name & "L597  *** Early_Stopping ***");
             Should_Stratify := Is_Classifier and Self.Attributes.N_Outputs = 1;
             if Should_Stratify then
                 Stratify := Y;
@@ -562,8 +563,9 @@ package body Multilayer_Perceptron is
                Train_X => Train_X, Train_Y => Train_Y,
                Test_X  => Test_X, Test_Y => Test_Y);
 
-            if Is_Classifier then
-                Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
+         if Is_Classifier then
+            null;
+--                  Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
             end if;
         end if;
 
