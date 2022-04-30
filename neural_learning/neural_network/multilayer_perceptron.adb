@@ -1082,6 +1082,9 @@ package body Multilayer_Perceptron is
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
       end if;
 
+      Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
+                  Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
+
       return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
 
    end Validate_Input;

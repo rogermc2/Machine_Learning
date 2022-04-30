@@ -72,8 +72,9 @@ package body Label is
 --                  "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
 --                  " must be less than Binarizer.Pos_Label"
 --                & Integer'Image (Binarizer.Pos_Label));
---        Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+
    end Fit;
 
    --  -------------------------------------------------------------------------
