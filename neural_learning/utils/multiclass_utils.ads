@@ -12,6 +12,7 @@ package Multiclass_Utils is
 
    function Type_Of_Target (Y : Boolean_Matrix) return Y_Type;
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
+   function Type_Of_Target (Y : Float_Matrix) return Y_Type;
    function Unique_Labels (Y : Integer_Matrix) return NL_Types.Integer_List;
 
 end Multiclass_Utils;

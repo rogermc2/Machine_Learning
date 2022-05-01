@@ -44,6 +44,8 @@ package Label is
    function Fit_Transform (Encoder : in out Label_Encoder;
                            Y       : Integer_Array) return Natural_Array;
    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+                                return Float_Matrix;
+   function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
                                 return Integer_Matrix;
    function Inverse_Transform (Self   : Label_Encoder;
                                Labels : Natural_Array) return Integer_Array;

@@ -96,7 +96,7 @@ package body Multilayer_Perceptron is
        Num_Layers, Layer  : Positive);
     procedure Update_No_Improvement_Count
       (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val        : Float_Matrix; Y_Val : Boolean_Matrix);
+       X_Val, Y_Val : Float_Matrix);
     procedure Validate_Hyperparameters (Self : MLP_Classifier);
     function Validate_Input (Self        : in out MLP_Classifier; Y : Integer_Matrix;
                              Incremental : Boolean) return Boolean_Matrix;
@@ -508,17 +508,16 @@ package body Multilayer_Perceptron is
                               Activations  : in out Matrix_List;
                               Incremental  : Boolean := False) is
     --        use Ada.Containers;
---          use Estimator;
+        use Estimator;
         Routine_Name           : constant String :=
                                    "Multilayer_Perceptron.Fit_Stochastic ";
---          Is_Classifier          : constant Boolean :=
---                                     Self.Estimator_Kind = Classifier_Estimator;
+        Is_Classifier          : constant Boolean :=
+                                   Self.Estimator_Kind = Classifier_Estimator;
         Num_Samples            : constant Positive := Positive (X'Length);
         Num_Features           : constant Positive := Positive (X'Length (2));
         Num_Classes            : constant Positive :=
                                    Positive (Self.Attributes.Classes.Length);
-        --          LE_U                   : Label.Label_Encoder (Label.Class_Unique,
-        --                                                        Num_Samples);
+        LE_U                   : Label.Label_Binarizer;
         Iter                   : Natural := 0;
         Continue               : Boolean := True;
         --  Activations: layers x samples x features
@@ -538,6 +537,8 @@ package body Multilayer_Perceptron is
           (1 .. Test_Size, 1 .. Num_Features);
         Test_Y                 : NL_Arrays_And_Matrices.Boolean_Matrix
           (1 .. Test_Size, 1 .. Num_Classes);
+        Val_Y                 : NL_Arrays_And_Matrices.Float_Matrix
+          (1 .. Test_Size, 1 .. Num_Classes) := (others => (others => 0.0));
         Batch_Size             : Positive;
         Batches                : NL_Types.Slices_List;
         Accumulated_Loss       : Float := 0.0;
@@ -564,10 +565,9 @@ package body Multilayer_Perceptron is
                Train_X => Train_X, Train_Y => Train_Y,
                Test_X  => Test_X, Test_Y => Test_Y);
 
---              if Is_Classifier then
---                  null;
---                  --  Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
---              end if;
+            if Is_Classifier then
+                Val_Y := Label.Inverse_Transform (LE_U, Test_Y);
+            end if;
         end if;
 
         --  L617
@@ -614,7 +614,7 @@ package body Multilayer_Perceptron is
 
             --  L669 Update no_improvement_count based on training loss or
             --       validation score according to early_stopping
-            Update_No_Improvement_Count (Self, Early_Stopping, Test_X, Test_Y);
+            Update_No_Improvement_Count (Self, Early_Stopping, Test_X, Val_Y);
             --  for learning rate that needs to be updated at iteration end;
             if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
                 null;
@@ -999,7 +999,7 @@ package body Multilayer_Perceptron is
     --  L716
     procedure Update_No_Improvement_Count
       (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val        : Float_Matrix; Y_Val : Boolean_Matrix) is
+       X_Val, Y_Val  : Float_Matrix) is
         Routine_Name     : constant String
           :="Multilayer_Perceptron.Update_No_Improvement_Count ";
         Sample_Weight    : constant Float_Array (1 .. 0) := (others => 0.0);

@@ -1,5 +1,5 @@
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -226,7 +226,19 @@ package body NL_Arrays_And_Matrices is
     end "-";
 
     --  ----------------------------------------------------------------------------
-    --  Diff_Max returns the maximum value of each row
+
+   procedure Check_Lengths (Routine_Name : String; L, R : Float_Matrix) is
+   begin
+      Assert (R'Length = L'Length and R'Length (2) = L'Length (2),
+              Routine_Name &
+                " right size" & Integer'Image (R'Length) & " x" &
+                Integer'Image (R'Length (2)) &
+                " should be the same as left size" & Integer'Image (L'Length) &
+                " x" & Integer'Image (L'Length (2)));
+   end Check_Lengths;
+
+   --  ----------------------------------------------------------------------------
+--  Diff_Max returns the maximum value of each row
     function Diff_Max (Data : Float_Matrix) return Float_Matrix is
         aRow      : Float_Array (Data'Range (2));
         Max_Value : Float;

@@ -29,7 +29,7 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
---        Sample_Weight : Float_Array (1 .. 0);
+      Sample_Weight : Float_Array (1 .. 0);
    begin
       Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
                Count_Type'Image (Train_X'Length (2)));
@@ -41,7 +41,7 @@ begin
 --        aClassifier := C_Init (Max_Iter => 10000,
       aClassifier := C_Init (Max_Iter => 200,
                              Activation => Base_Neural.Identity_Activation,
-                             Verbose => True);
+                             Verbose => False);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved

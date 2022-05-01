@@ -7,6 +7,7 @@
 
 package body Classification_Metrics is
 
+   procedure Check_Targets (Y_True, Y_Prediction : Float_Matrix);
    function Weighted_Sum
      (Sample_Score   : Float_Matrix;
       Sample_Weights : Float_Array;
@@ -21,6 +22,7 @@ package body Classification_Metrics is
 --                         "Classification_Metrics.Accuracy_Score, ";
       Score        :  Float_Matrix := Y_Prediction;
    begin
+      Check_Targets (Y_True, Y_Prediction);
       for row in Score'Range loop
             for col in Score'Range (2) loop
                 if Y_True (row, col) = Y_Prediction (row, col) then
@@ -62,6 +64,15 @@ package body Classification_Metrics is
       return Sum / Sum_Weights;
 
    end Average;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Check_Targets (Y_True, Y_Prediction : Float_Matrix) is
+   begin
+      NL_Arrays_And_Matrices.Check_Lengths
+        ("Classification_Metrics.Check_Targets", Y_True, Y_Prediction);
+
+   end Check_Targets;
 
    --  ------------------------------------------------------------------------
 
