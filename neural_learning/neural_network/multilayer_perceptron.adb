@@ -508,27 +508,28 @@ package body Multilayer_Perceptron is
                               Activations  : in out Matrix_List;
                               Incremental  : Boolean := False) is
     --        use Ada.Containers;
-        use Estimator;
+--          use Estimator;
         Routine_Name           : constant String :=
                                    "Multilayer_Perceptron.Fit_Stochastic ";
-        Is_Classifier          : constant Boolean :=
-                                   Self.Estimator_Kind = Classifier_Estimator;
+--          Is_Classifier          : constant Boolean :=
+--                                     Self.Estimator_Kind = Classifier_Estimator;
         Num_Samples            : constant Positive := Positive (X'Length);
         Num_Features           : constant Positive := Positive (X'Length (2));
         Num_Classes            : constant Positive :=
                                    Positive (Self.Attributes.Classes.Length);
---          LE_U                   : Label.Label_Encoder (Label.Class_Unique,
---                                                        Num_Samples);
+        --          LE_U                   : Label.Label_Encoder (Label.Class_Unique,
+        --                                                        Num_Samples);
         Iter                   : Natural := 0;
         Continue               : Boolean := True;
         --  Activations: layers x samples x features
         Early_Stopping         : constant Boolean
           := Self.Parameters.Early_Stopping and then not Incremental;
         Test_Size              : constant Positive
-          := Positive (Self.Parameters.Validation_Fraction * Float (Num_Samples));
+          := Positive (Self.Parameters.Validation_Fraction *
+                         Float (Num_Samples));
         Train_Size             : constant Positive := Num_Samples - Test_Size;
-        Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
-        Should_Stratify        : Boolean;
+--          Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
+--          Should_Stratify        : Boolean;
         Train_X                : Float_Matrix
           (1 .. Train_Size, 1 .. Num_Features);
         Train_Y                : Boolean_Matrix
@@ -550,12 +551,12 @@ package body Multilayer_Perceptron is
         end if;
 
         --  L597
-      if Early_Stopping then
-         Put_Line (Routine_Name & "L597  *** Early_Stopping ***");
-            Should_Stratify := Is_Classifier and Self.Attributes.N_Outputs = 1;
-            if Should_Stratify then
-                Stratify := Y;
-            end if;
+        if Early_Stopping then
+            Put_Line (Routine_Name & "L597  *** Early_Stopping ***");
+--              Should_Stratify := Is_Classifier and Self.Attributes.N_Outputs = 1;
+--              if Should_Stratify then
+--                  Stratify := Y;
+--              end if;
 
             Data_Splitter.Train_Test_Split
               (X => X, Y => Y,
@@ -563,10 +564,10 @@ package body Multilayer_Perceptron is
                Train_X => Train_X, Train_Y => Train_Y,
                Test_X  => Test_X, Test_Y => Test_Y);
 
-         if Is_Classifier then
-            null;
---                  Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
-            end if;
+--              if Is_Classifier then
+--                  null;
+--                  --  Test_Y := Label.Inverse_Transform (LE_U, Test_Y);
+--              end if;
         end if;
 
         --  L617
@@ -999,8 +1000,8 @@ package body Multilayer_Perceptron is
     procedure Update_No_Improvement_Count
       (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
        X_Val        : Float_Matrix; Y_Val : Boolean_Matrix) is
-        Routine_Name     : constant String :=
-                             "Multilayer_Perceptron.Update_No_Improvement_Count ";
+        Routine_Name     : constant String
+          :="Multilayer_Perceptron.Update_No_Improvement_Count ";
         Sample_Weight    : constant Float_Array (1 .. 0) := (others => 0.0);
         Last_Valid_Score : Float;
         Score_Val        : Float ;

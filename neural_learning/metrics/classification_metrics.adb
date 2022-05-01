@@ -13,17 +13,17 @@ package body Classification_Metrics is
       Normalize      : Boolean := False) return float;
 
    --  ------------------------------------------------------------------------
-
+   --  L144
    function Accuracy_Score
-     (Y_True    : Boolean_Matrix; Y_Prediction   : Float_Matrix;
-      Normalize : Boolean := True; Sample_Weight : Float_Array) return float is
+     (Y_True, Y_Prediction : Float_Matrix; Normalize : Boolean := True;
+     Sample_Weight : Float_Array) return float is
 --        Routine_Name : constant String :=
 --                         "Classification_Metrics.Accuracy_Score, ";
       Score        :  Float_Matrix := Y_Prediction;
    begin
       for row in Score'Range loop
             for col in Score'Range (2) loop
-                if Y_True (row, col) then
+                if Y_True (row, col) = Y_Prediction (row, col) then
                     Score (row, col) := Score (row, col) - 1.0;
                 end if;
             end loop;
