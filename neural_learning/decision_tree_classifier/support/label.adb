@@ -163,16 +163,14 @@ package body Label is
       use Classifier_Utilities;
       Routine_Name :  constant String :=
                        "Label.Inverse_Binarize_Multiclass ";
-      Inverse      : Float_Matrix  (Y'Range (2), Y'Range);
+      Inverse      : Float_Matrix  (Y'Range, 1 .. 1);
       Max_Indices  : Natural_Array (Y'Range);
    begin
       --  L627
       Put_Line (Routine_Name);
       Max_Indices := Arg_Max (Y);
       for row in Inverse'Range loop
-         for col in Inverse'Range (2) loop
-            Inverse (row, col) := Float (Classes.Element (Max_Indices (row)));
-         end loop;
+          Inverse (row, 1) := Float (Classes.Element (Max_Indices (row)));
       end loop;
 
       return Inverse;
@@ -217,7 +215,7 @@ package body Label is
    function Inverse_Transform (Self : Label_Binarizer; Y : Float_Matrix)
                                 return Float_Matrix is
       use Multiclass_Utils;
-      Y_Inv     : Float_Matrix (1 .. Y'Length (2), 1 .. Y'Length);
+      Y_Inv     : Float_Matrix (1 .. Y'Length, 1 .. 1);
 --        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
    begin
       if Self.Y_Kind = Y_Multiclass then
