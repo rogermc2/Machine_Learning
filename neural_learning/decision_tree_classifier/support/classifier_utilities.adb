@@ -26,7 +26,7 @@ package body Classifier_Utilities is
                              Num_Outputs : Positive := 1)
                              return Multi_Output_Data_Record;
 
-    --  -------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
     --  Arg_Max returns the index of the true values along an axis.
     function Arg_Max (Values : Boolean_Array) return Positive is
@@ -46,34 +46,14 @@ package body Classifier_Utilities is
 
     end Arg_Max;
 
-    --  ----------------------------------------------------------------------- _
-    --  Arg_Max returns the indices of the true values along an axis.
-    --  Numpy argmax(input_array, axis=None, out=None)
-    --  axis : int, optional  By default the index is into the flattened array,
-    --  otherwise along the specified axis.
-    --  Returns an array of indices into the input_array.
-    --  It has the same shape as `input_array.shape` with the dimension along
-    --  `axis` removed.
-    --  Example a = array([[10, 11, 12],   indices: [[00, 01, 02],
-    --                     [13, 14, 15]])           [[10, 11, 12],
-    --  2 rows (axis 0) x 3 columns  (axis 1)
-    --  np.argmax(a, axis=1)
-    --  returns array([2, 2]) -> [12, 15]
-    --      function Arg_Max (Values : Boolean_Matrix; Axis : Positive)
+    --  -----------------------------------------------------------------------
+    --  Arg_Max returns the indices of the maximum value in each row of a matrix.
     function Arg_Max (Values : Boolean_Matrix) return Natural_Array is
-    --          Mat         : Boolean_Matrix := Values;
         Indices : Natural_Array (1 .. Values'Length);
         Max_Value   : Boolean := False;
         Max_Index   : Positive;
         Col         : Natural;
     begin
-        --          if Axis = 1 then
-        --              Mat := Transpose (Mat);
-        --          end if;
-
-        --          declare
-        --              Indices : Natural_Array (1 .. Mat'Length);
-        --          begin
         for row in Values'Range loop
             Max_Value := False;
             Max_Index := 1;
@@ -89,7 +69,6 @@ package body Classifier_Utilities is
         end loop;
 
         return Indices;
-        --          end;  --  declare
 
     end Arg_Max;
 
@@ -131,8 +110,34 @@ package body Classifier_Utilities is
 
     end Arg_Max;
 
-    --  -------------------------------------------------------------------------
+    --  ------------------------------------------------------------------------
 
+    --  Arg_Max returns the indices of the maximum value in each row of a matrix.
+    function Arg_Max (Values : Float_Matrix) return Natural_Array is
+        Indices   : Natural_Array (1 .. Values'Length);
+        Max_Value : Float;
+        Max_Index : Positive;
+        Col       : Natural;
+    begin
+        for row in Values'Range loop
+            Max_Value := Values (row, 1);
+            Max_Index := 1;
+            Col := 1;
+            while Col < Values'Last (2) loop
+                Col := Col + 1;
+                if Values (row, Col) > Max_Value then
+                    Max_Index := Col;
+                    Max_Value := Values (row, col);
+                end if;
+            end loop;
+            Indices (row) := Max_Index;
+        end loop;
+
+        return Indices;
+
+    end Arg_Max;
+
+    --  -----------------------------------------------------------------------
     function Arg_Max (Values : Integer_List) return Positive is
         Max_Value  : Integer := Integer'First;
         Max_Index  : Positive := 1;

@@ -156,6 +156,31 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
+  --  L593 Multiclass uses the maximal score instead of a threshold.
+   function Inverse_Binarize_Multiclass (Y       : Float_Matrix;
+                                         Classes : NL_Types.Integer_List)
+                                          return Float_Matrix is
+      use Classifier_Utilities;
+      Routine_Name :  constant String :=
+                       "Label.Inverse_Binarize_Multiclass ";
+      Inverse      : Float_Matrix  (Y'Range (2), Y'Range);
+      Max_Indices  : Natural_Array (Y'Range);
+   begin
+      --  L627
+      Put_Line (Routine_Name);
+      Max_Indices := Arg_Max (Y);
+      for row in Inverse'Range loop
+         for col in Inverse'Range (2) loop
+            Inverse (row, col) := Float (Classes.Element (Max_Indices (row)));
+         end loop;
+      end loop;
+
+      return Inverse;
+
+   end Inverse_Binarize_Multiclass;
+
+   --  -------------------------------------------------------------------------
+
    --      function Inverse_Binarize_Thresholding
    --        (Y  : Boolean_Matrix;  Classes : NL_Types.Integer_List;
    --         Threshold : Float) return Boolean_Matrix is
@@ -171,6 +196,25 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+                                return Float_Matrix is
+      use Multiclass_Utils;
+      Y_Inv     : Float_Matrix (1 .. Y'Length (2), 1 .. Y'Length);
+--        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
+   begin
+      if Self.Y_Kind = Y_Multiclass then
+         Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
+      else
+         null;
+         --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
+      end if;
+
+      return Y_Inv;
+
+   end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Inverse_Transform (Self : Label_Binarizer; Y : Float_Matrix)
                                 return Float_Matrix is
       use Multiclass_Utils;
       Y_Inv     : Float_Matrix (1 .. Y'Length (2), 1 .. Y'Length);

@@ -911,8 +911,9 @@ package body Multilayer_Perceptron is
 
     function Predict (Self : MLP_Classifier; X : Float_Matrix)
                       return Float_Matrix is
+       Y_Pred : constant Float_Matrix := Forward_Pass_Fast (Self, X);
     begin
-        return Forward_Pass_Fast (Self, X);
+        return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
     end Predict;
 

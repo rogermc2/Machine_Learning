@@ -45,6 +45,8 @@ package Label is
                            Y       : Integer_Array) return Natural_Array;
    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
                                 return Float_Matrix;
+   function Inverse_Transform (Self : Label_Binarizer; Y : Float_Matrix)
+                                return Float_Matrix;
    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
                                 return Integer_Matrix;
    function Inverse_Transform (Self   : Label_Encoder;
