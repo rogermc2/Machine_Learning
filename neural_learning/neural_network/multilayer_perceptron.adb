@@ -113,7 +113,7 @@ package body Multilayer_Perceptron is
         use Ada.Containers;
         use Base_Neural;
         use NL_Types.Float_Package;
-        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+--          Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
         Num_Samples        : constant Positive := Positive (X'Length);
         Loss_Function_Name : Loss_Function;
         Deltas             : Matrix_List;
