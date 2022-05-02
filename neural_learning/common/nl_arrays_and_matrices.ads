@@ -45,6 +45,7 @@ package NL_Arrays_And_Matrices is
    function "-" (L : Float_Matrix; R : Float_Array) return Float_Matrix;
    function "-" (L : Float; R : Float_Matrix) return Float_Matrix;
    pragma Inline ("-");
+   procedure Check_Lengths (Routine_Name : String; L, R : Float_Matrix);
    function Diff_Max (Data : Float_Matrix; Axis : Positive) return Float_Matrix;
    function Dot (L, R : Float_Matrix) return Float_Matrix;
    function Dot (L : Float_Matrix; R : Float_Array)

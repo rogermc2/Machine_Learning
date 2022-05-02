@@ -12,10 +12,10 @@ package Classifier_Utilities is
    Value_Error : exception;
 
    function Arg_Max (Values : Boolean_Array) return Positive;
-   function Arg_Max (Values : Boolean_Matrix; Axis : Positive)
-                     return Natural_Array;
+   function Arg_Max (Values : Boolean_Matrix) return Natural_Array;
    function Arg_Max (Values : Boolean_List) return Positive;
    function Arg_Max (Values : Float_List) return Positive;
+   function Arg_Max (Values : Float_Matrix) return Natural_Array;
    function Arg_Max (Values : Integer_List) return Positive;
    function Bin_Count (Numbers : Natural_List) return Natural_List;
    function Bin_Count (Numbers : Value_Data_List) return Natural_List;

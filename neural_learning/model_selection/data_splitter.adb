@@ -68,7 +68,7 @@ package body Data_Splitter is
    end Iterate_Indices;
 
    --  -------------------------------------------------------------------------
-
+   --  L2325
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Integer_Array;
       Train_Size, Test_Size : Natural;
@@ -124,8 +124,8 @@ package body Data_Splitter is
 
    end Train_Test_Split;
 
-   --  -------------------------------------------------------------------------------
-
+   --  -------------------------------------------------------------------------
+   --  L2325
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Integer_Matrix;
       Train_Size, Test_Size : Natural;
@@ -169,8 +169,8 @@ package body Data_Splitter is
 
    end Train_Test_Split;
 
-   --  -------------------------------------------------------------------------------
-
+   --  -------------------------------------------------------------------------
+   --  L2325
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Boolean_Matrix;
       Train_Size, Test_Size : Natural;

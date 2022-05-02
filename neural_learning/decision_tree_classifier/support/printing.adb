@@ -34,22 +34,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Boolean_Matrix (Name    : String;
-                                   aMatrix : Estimator.Boolean_Matrix) is
-   begin
-      Put_Line (Name & ": ");
-      for row in aMatrix'First .. aMatrix'Last loop
-         for col in aMatrix'First (2)  .. aMatrix'Last (2) loop
-            Put (Boolean'Image (aMatrix (row, col)) & "  ");
-         end loop;
-         New_Line;
-      end loop;
-      New_Line;
-
-   end Print_Boolean_Matrix;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List) is
       use Export_Types;
       Bound : Graph_Bounds;
