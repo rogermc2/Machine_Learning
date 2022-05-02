@@ -147,8 +147,8 @@ package body Multilayer_Perceptron is
                 Loss := Squared_Loss (Y, Activations.Last_Element);
         end case;
 
-        Assert (Loss'Valid, Routine_Name & "L289 invalid Loss " &
-                  Float'Image (Loss));
+--          Assert (Loss'Valid, Routine_Name & "L289 invalid Loss " &
+--                    Float'Image (Loss));
 
         --  L289  Add L2 regularization term to loss
         for s in Self.Attributes.Params.First_Index ..
@@ -187,13 +187,13 @@ package body Multilayer_Perceptron is
         Last := Self.Attributes.N_Layers - 1;
         Deltas.Set_Length (Count_Type (Last));
 
-        Assert (Y'Length = Activations.Last_Element'Length and
-                  Y'Length (2) = Activations.Last_Element'Length (2),
-                Routine_Name & "L284 Activations.Last_Element size" &
-                  Count_Type'Image (Activations.Last_Element'Length) & " x" &
-                  Count_Type'Image (Activations.Last_Element'Length (2)) &
-                  " should be the same as Y size" & Integer'Image (Y'Length) &
-                  " x" & Integer'Image (Y'Length (2)));
+--          Assert (Y'Length = Activations.Last_Element'Length and
+--                    Y'Length (2) = Activations.Last_Element'Length (2),
+--                  Routine_Name & "L284 Activations.Last_Element size" &
+--                    Count_Type'Image (Activations.Last_Element'Length) & " x" &
+--                    Count_Type'Image (Activations.Last_Element'Length (2)) &
+--                    " should be the same as Y size" & Integer'Image (Y'Length) &
+--                    " x" & Integer'Image (Y'Length (2)));
         --  L301
         declare
             Diff : Float_Matrix := Activations.Last_Element;
@@ -599,7 +599,8 @@ package body Multilayer_Perceptron is
             end loop;
 
             Assert (Accumulated_Loss'Valid, Routine_Name &
-                      "invalid Accumulated_Loss" & Float'Image (Accumulated_Loss));
+                      "invalid Accumulated_Loss" &
+                      Float'Image (Accumulated_Loss));
             --  L661
             Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
             Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
@@ -925,7 +926,6 @@ package body Multilayer_Perceptron is
                              Activations              : in out Matrix_List;
                              Batch_Slice              : NL_Types.Slice_Record;
                              Batch_Size               : Positive;
-                             --    Grads                    : in out Parameters_List;
                              Accumulated_Loss         : in out Float) is
     --        use Ada.Containers;
     --        Routine_Name : constant String :=
