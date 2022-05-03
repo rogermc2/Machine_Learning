@@ -76,7 +76,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix;
+                               return Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -99,7 +99,7 @@ package body Multilayer_Perceptron is
       X_Val, Y_Val : Float_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    function Validate_Input (Self        : in out MLP_Classifier;
-                            Y : Integer_Matrix;
+                            Y           : Integer_Matrix;
                             Incremental : Boolean) return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -216,25 +216,33 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "L308");
       --  L310, L308
       for index in reverse 1 .. Self.Attributes.N_Layers - 1 loop
+         Put_Line (Routine_Name & "L310 index" & Integer'Image (index));
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
             Dot_L  : constant Float_Matrix := Deltas (index);
             Dot_R  : constant Float_Matrix := S_List.Coeff_Grads;
          begin
-            Put_Line (Routine_Name & "L310 index" & Integer'Image (index));
-              Assert (Dot_L'Length = Dot_R'Length (2) and
-                        Dot_L'Length (2) = Dot_R'Length,
-                      Routine_Name & "L284 Dot_L size" &
-                        Integer'Image (Dot_L'Length) & " x" &
-                        Integer'Image (Dot_L'Length (2)) &
-                        " should be the same as Dot_R size" &
-                        Integer'Image (Dot_R'Length) & " x" &
-                        Integer'Image (Dot_R'Length (2)));
-            Deltas (index - 1) :=
-              Dot (Dot_L, Transpose (Dot_R));
+            Put_Line (Routine_Name & "begin declare");
+            Assert (Dot_L'Length (2) = Dot_R'Length (2) and
+                      Dot_L'Length (2) = Dot_R'Length,
+                    Routine_Name & "L310 Dot_L size 2:" &
+                      Integer'Image (Dot_L'Length (2)) &
+                      " should be the same as Dot_R 2 size:" &
+                      Integer'Image (Dot_R'Length (2)));
+            Put_Line (Routine_Name & "L310 Dot_L:" &
+                      Integer'Image (Dot_L'Length) & " x" &
+                      Integer'Image (Dot_L'Length (2)) &
+                      " Dot_R T size:" &
+                      Integer'Image (Transpose (Dot_R)'Length) & " x" &
+                      Integer'Image (Transpose (Dot_R)'Length (2)));
+--              Put_Line (Routine_Name & "L310 Dot_L * Transpose (Dot_R):" &
+--                          Integer'Image (Dot (Dot_L, Transpose (Dot_R))'Length)
+--                        & " x" &
+--                          Integer'Image
+--                          (Dot (Dot_L, Transpose (Dot_R))'Length (2)));
+            Deltas (index) := Dot (Dot_L, Transpose (Dot_R));
 
-            Put_Line (Routine_Name & "Deltas  set");
             case Self.Parameters.Activation is
                when Identity_Activation => null;
                when Logistic_Activation =>
@@ -248,9 +256,12 @@ package body Multilayer_Perceptron is
             end case;
             Put_Line (Routine_Name & "Compute_Loss_Gradient");
 
-            Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
+            Compute_Loss_Gradient (Self, index, Num_Samples, Activations,
                                    Deltas, Grads);
          end;  --  declare
+         Put_Line (Routine_Name & "end loop, Self.Attributes.N_Layers:" &
+                     Integer'Image (Self.Attributes.N_Layers) &
+                   ", index" & Integer'Image (index));
       end loop;
       Put_Line (Routine_Name & "done");
 
@@ -372,7 +383,6 @@ package body Multilayer_Perceptron is
          Delta_M'First (2) .. Delta_M'Last (2));
       New_Grad     : Parameters_Record (Params.Num_Rows, Params.Num_Cols);
    begin
-         Put_Line (Routine_Name);
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       Assert (Deltas.Element (Layer)'Length =
@@ -385,7 +395,6 @@ package body Multilayer_Perceptron is
                 " of left matrix");
       Delta_Act := Dot (Transpose (Activations (Layer)), Deltas (Layer));
 
-      Put_Line (Routine_Name & "L188");
       --  L188
       declare
          --  Mean computes mean of values along the specified axis.
@@ -406,12 +415,12 @@ package body Multilayer_Perceptron is
          New_Grad.Coeff_Grads :=
            Delta_Act + Self.Parameters.Alpha * Coeffs;
 
-         Put_Line (Routine_Name & "L185+");
          New_Grad.Coeff_Grads :=
            New_Grad.Coeff_Grads / Float (Num_Samples);
          New_Grad.Intercept_Grads := Delta_Mean;
          Grads.Replace_Element (layer, New_Grad);
       end;  --  declare
+      Put_Line (Routine_Name & "done");
 
    end  Compute_Loss_Gradient;
 
@@ -448,7 +457,7 @@ package body Multilayer_Perceptron is
          end loop;
       end if;
       Layer_Units.Append (Self.Attributes.N_Outputs);
-      Put_Line (Routine_Name & "L409");
+
       --  L409
       if First_Pass then
          Initialize (Self, Layer_Units);
@@ -734,7 +743,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Float_Matrix)
-                                return Float_Matrix is
+                               return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       --          Routine_Name       : constant String :=
@@ -856,11 +865,20 @@ package body Multilayer_Perceptron is
          Fan_In := Layer_Units (layer);
          Fan_Out := Layer_Units (layer + 1);
          Put_Line (Routine_Name & "Fan_In, Fan_Out" &
-                    Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
+                     Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
+--           Put_Line (Routine_Name & "Params.Coeff_Grads size: " &
+--                       Integer'Image (Integer
+--                       (Self.Attributes.Params.Element (layer).
+--                            Coeff_Grads'Length))
+--                     & " x" &
+--                       Integer'Image (Integer
+--                       (Self.Attributes.Params.Element (layer).
+--                            Coeff_Grads'Length (2))));
+--           New_Line;
       end loop;
-        Put_Line (Routine_Name & "Params Length" &
-                    Integer'Image (Integer (Self.Attributes.Params.Length)));
+      Put_Line (Routine_Name & "Params Length" &
+                  Integer'Image (Integer (Self.Attributes.Params.Length)));
       New_Line;
 
       --  L351
@@ -935,7 +953,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : MLP_Classifier; X : Float_Matrix)
-                      return Float_Matrix is
+                     return Float_Matrix is
       Y_Pred : constant Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
