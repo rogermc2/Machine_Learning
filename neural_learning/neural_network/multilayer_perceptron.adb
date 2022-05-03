@@ -213,8 +213,14 @@ package body Multilayer_Perceptron is
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
 
-      Put_Line (Routine_Name & "L308");
       --  L310, L308
+     Put_Line (Routine_Name & "L308 Deltas (2):" &
+               Integer'Image (Deltas.Element (2)'Length) & " x" &
+               Integer'Image (Deltas.Element (2)'Length (2)));
+     Put_Line (Routine_Name & "L308 Deltas (1):");
+     Put_Line (Integer'Image (Deltas.Element (1)'Length) & " x" &
+               Integer'Image (Deltas.Element (1)'Length (2)));
+
       for index in reverse 1 .. Self.Attributes.N_Layers - 1 loop
          Put_Line (Routine_Name & "L310 index" & Integer'Image (index));
          declare
