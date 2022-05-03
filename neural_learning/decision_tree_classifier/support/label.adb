@@ -119,7 +119,7 @@ package body Label is
    begin
       --  L627
       Put_Line (Routine_Name);
-      Max_Indices := Arg_Max (Y);
+      Max_Indices := Row_Max_Indices (Y);
       for row in Max_Indices'Range loop
          for col in Max_Indices'Range loop
             Inverse (row, col) := Float (Classes.Element (Max_Indices (row)));
@@ -143,7 +143,7 @@ package body Label is
    begin
       --  L627
       Put_Line (Routine_Name);
-      Max_Indices := Arg_Max (Y);
+      Max_Indices := Row_Max_Indices (Y);
       for row in Max_Indices'Range loop
          for col in Max_Indices'Range loop
             Inverse (row, col) := Classes.Element (Max_Indices (row));
@@ -168,7 +168,7 @@ package body Label is
    begin
       --  L627
       Put_Line (Routine_Name);
-      Max_Indices := Arg_Max (Y);
+      Max_Indices := Row_Max_Indices (Y);
       for row in Inverse'Range loop
           Inverse (row, 1) := Float (Classes.Element (Max_Indices (row)));
       end loop;
