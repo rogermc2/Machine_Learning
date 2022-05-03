@@ -98,7 +98,8 @@ package body Multilayer_Perceptron is
      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
       X_Val, Y_Val : Float_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
-   function Validate_Input (Self        : in out MLP_Classifier; Y : Integer_Matrix;
+   function Validate_Input (Self        : in out MLP_Classifier;
+                            Y : Integer_Matrix;
                             Incremental : Boolean) return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
@@ -214,7 +215,7 @@ package body Multilayer_Perceptron is
 
       Put_Line (Routine_Name & "L308");
       --  L310, L308
-      for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+      for index in reverse 1 .. Self.Attributes.N_Layers - 1 loop
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
