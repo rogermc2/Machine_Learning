@@ -214,40 +214,21 @@ package body Multilayer_Perceptron is
                              Grads);
 
       --  L310, L308
-     Put_Line (Routine_Name & "L308 Deltas (2):" &
-               Integer'Image (Deltas.Element (2)'Length) & " x" &
-               Integer'Image (Deltas.Element (2)'Length (2)));
-     Put_Line (Routine_Name & "L308 Deltas (1):");
-     Put_Line (Integer'Image (Deltas.Element (1)'Length) & " x" &
-               Integer'Image (Deltas.Element (1)'Length (2)));
-
-      for index in reverse 1 .. Self.Attributes.N_Layers - 1 loop
-         Put_Line (Routine_Name & "L310 index" & Integer'Image (index));
+      for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
             Dot_L  : constant Float_Matrix := Deltas (index);
             Dot_R  : constant Float_Matrix := S_List.Coeff_Grads;
          begin
-            Put_Line (Routine_Name & "begin declare");
-            Assert (Dot_L'Length (2) = Dot_R'Length (2) and
-                      Dot_L'Length (2) = Dot_R'Length,
-                    Routine_Name & "L310 Dot_L size 2:" &
-                      Integer'Image (Dot_L'Length (2)) &
-                      " should be the same as Dot_R 2 size:" &
-                      Integer'Image (Dot_R'Length (2)));
-            Put_Line (Routine_Name & "L310 Dot_L:" &
-                      Integer'Image (Dot_L'Length) & " x" &
-                      Integer'Image (Dot_L'Length (2)) &
-                      " Dot_R T size:" &
-                      Integer'Image (Transpose (Dot_R)'Length) & " x" &
-                      Integer'Image (Transpose (Dot_R)'Length (2)));
---              Put_Line (Routine_Name & "L310 Dot_L * Transpose (Dot_R):" &
---                          Integer'Image (Dot (Dot_L, Transpose (Dot_R))'Length)
---                        & " x" &
---                          Integer'Image
---                          (Dot (Dot_L, Transpose (Dot_R))'Length (2)));
-            Deltas (index) := Dot (Dot_L, Transpose (Dot_R));
+--              Assert (Dot_L'Length (2) = Dot_R'Length (2) and
+--                        Dot_L'Length (2) = Dot_R'Length,
+--                      Routine_Name & "L310 Dot_L size 2:" &
+--                        Integer'Image (Dot_L'Length (2)) &
+--                        " should be the same as Dot_R 2 size:" &
+--                        Integer'Image (Dot_R'Length (2)));
+
+            Deltas.Replace_Element (index - 1, Dot (Dot_L, Transpose (Dot_R)));
 
             case Self.Parameters.Activation is
                when Identity_Activation => null;
@@ -260,14 +241,10 @@ package body Multilayer_Perceptron is
                   Relu_Derivative (Activations (index), Deltas (index - 1));
                when Softmax_Activation => null;
             end case;
-            Put_Line (Routine_Name & "Compute_Loss_Gradient");
 
             Compute_Loss_Gradient (Self, index, Num_Samples, Activations,
                                    Deltas, Grads);
          end;  --  declare
-         Put_Line (Routine_Name & "end loop, Self.Attributes.N_Layers:" &
-                     Integer'Image (Self.Attributes.N_Layers) &
-                   ", index" & Integer'Image (index));
       end loop;
       Put_Line (Routine_Name & "done");
 
@@ -377,8 +354,8 @@ package body Multilayer_Perceptron is
       Deltas      : Matrix_List;
       Grads       : in out Parameters_List) is
       use Ada.Containers;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Compute_Loss_Gradient ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : constant Float_Matrix := Deltas (Layer);
       Activ_M      : constant Float_Matrix := Activations (Layer);
       Params       : constant Parameters_Record :=
@@ -391,14 +368,14 @@ package body Multilayer_Perceptron is
    begin
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
-      Assert (Deltas.Element (Layer)'Length =
-                Transpose (Activations.Element (Layer))'Length (2),
-              Routine_Name & "Num rows" &
-                Integer'Image (Deltas.Element (Layer)'Length) &
-                " of right matrix doesn't equal num colums" &
-                Integer'Image
-                (Transpose (Activations.Element (Layer))'Length (2)) &
-                " of left matrix");
+--        Assert (Deltas.Element (Layer)'Length =
+--                  Transpose (Activations.Element (Layer))'Length (2),
+--                Routine_Name & "Num rows" &
+--                  Integer'Image (Deltas.Element (Layer)'Length) &
+--                  " of right matrix doesn't equal num colums" &
+--                  Integer'Image
+--                  (Transpose (Activations.Element (Layer))'Length (2)) &
+--                  " of left matrix");
       Delta_Act := Dot (Transpose (Activations (Layer)), Deltas (Layer));
 
       --  L188
@@ -411,10 +388,10 @@ package body Multilayer_Perceptron is
             Grads.Set_Length (Count_Type (Layer));
          end if;
 
-         Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
-                   "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
-                   " should equal Coeff_Grads length" &
-                   Count_Type'Image (Coeffs'Length));
+--           Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
+--                     "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
+--                     " should equal Coeff_Grads length" &
+--                     Count_Type'Image (Coeffs'Length));
 
          --  L185
          --  Coeff_Grads is a list of fan_in x fan_out matrices
@@ -426,7 +403,6 @@ package body Multilayer_Perceptron is
          New_Grad.Intercept_Grads := Delta_Mean;
          Grads.Replace_Element (layer, New_Grad);
       end;  --  declare
-      Put_Line (Routine_Name & "done");
 
    end  Compute_Loss_Gradient;
 
@@ -437,8 +413,8 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      Routine_Name       : constant String :=
-                             "Multilayer_Perceptron.Fit ";
+--        Routine_Name       : constant String :=
+--                               "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -475,8 +451,6 @@ package body Multilayer_Perceptron is
       --  Deltas is a 3D list initialized by Backprop
 
       --  L417 Initialized grads are empty vectors, no initialization required.
-
-      Put_Line (Routine_Name & "L427");
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -603,7 +577,6 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
-      Put_Line (Routine_Name & "L617");
       --  L617
       Batch_Size := Self.Parameters.Batch_Size;
       if Batch_Size = 0 then
@@ -626,7 +599,6 @@ package body Multilayer_Perceptron is
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          --  L636
-         Put_Line (Routine_Name & "L636");
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Activations, Batches (Batch_Index),
@@ -637,7 +609,6 @@ package body Multilayer_Perceptron is
                    "invalid Accumulated_Loss" &
                    Float'Image (Accumulated_Loss));
          --  L661
-         Put_Line (Routine_Name & "L661");
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
          Self.Attributes.T := Self.Attributes.T + Num_Samples;
@@ -975,9 +946,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size               : Positive;
                             Accumulated_Loss         : in out Float) is
-      --        use Ada.Containers;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Process_Batch ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Process_Batch ";
       Num_Features : constant Positive := Positive (X'Length (2));
       Num_Classes  : constant Positive := Y'Length (2);
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -996,17 +966,14 @@ package body Multilayer_Perceptron is
          end loop;
       end loop;
 
-      Put_Line (Routine_Name & "L655");
       --  L655
       Activations.Replace_Element (Activations.First_Index, X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
 
-      Put_Line (Routine_Name & "L665");
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
       --  L667 update weights
-      Put_Line (Routine_Name & "L667");
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
 
