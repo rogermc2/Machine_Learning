@@ -599,6 +599,7 @@ package body Multilayer_Perceptron is
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          --  L636
+         Put_Line (Routine_Name & "L636");
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Activations, Batches (Batch_Index),
@@ -609,6 +610,7 @@ package body Multilayer_Perceptron is
                    "invalid Accumulated_Loss" &
                    Float'Image (Accumulated_Loss));
          --  L661
+         Put_Line (Routine_Name & "L661");
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
          Self.Attributes.T := Self.Attributes.T + Num_Samples;
@@ -946,8 +948,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size               : Positive;
                             Accumulated_Loss         : in out Float) is
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Process_Batch ";
       Num_Features : constant Positive := Positive (X'Length (2));
       Num_Classes  : constant Positive := Y'Length (2);
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -956,6 +958,7 @@ package body Multilayer_Perceptron is
       Batch_Row    : Positive;
       Batch_Loss   : Float;
    begin
+      Put_Line (Routine_Name);
       for row in Batch_Slice.First .. Batch_Slice.Last loop
          Batch_Row := row - Batch_Slice.First + 1;
          for col in 1 .. Num_Features loop
@@ -974,8 +977,10 @@ package body Multilayer_Perceptron is
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
       --  L667 update weights
+      Put_Line (Routine_Name & "L667");
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
+      Put_Line (Routine_Name & "done");
 
    end Process_Batch;
 

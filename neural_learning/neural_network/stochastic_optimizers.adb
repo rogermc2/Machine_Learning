@@ -202,17 +202,17 @@ package body Stochastic_Optimizers is
       --          use Ada.Containers;
       use Maths.Float_Math_Functions;
       use Parameters_Package;
---        Routine_Name          : constant String :=
---                                  "Stochastic_Optimizers.Get_Adam_Updates ";
+      Routine_Name          : constant String :=
+                                "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       Updates               : Parameters_List;
    begin
---        Assert (not Self.First_Moments.Is_Empty, Routine_Name &
---                  "Self.First_Moments Is_Empty.");
---        Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
---                  "Self.Second_Moments Is_Empty.");
---        Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
+      Assert (not Self.First_Moments.Is_Empty, Routine_Name &
+                "Self.First_Moments Is_Empty.");
+      Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
+                "Self.Second_Moments Is_Empty.");
+      Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
 
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
@@ -220,6 +220,7 @@ package body Stochastic_Optimizers is
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
       --  L272
+      Put_Line (Routine_Name & "L272");
       for layer in Grads.First_Index .. Grads.Last_Index loop
          declare
             Layer_Grads           : constant Parameters_Record :=
@@ -236,6 +237,7 @@ package body Stochastic_Optimizers is
               := Self.Beta_2 * Second_Moments +
                 (1.0 - Self.Beta_2) * (Layer_Grads ** 2);
          begin
+            Put_Line (Routine_Name & "Grads loop");
             First_Moment_Updates.Append (Update_First_Moments);
             Second_Moment_Updates.Append (Update_Second_Moments);
          end;  --  declare
@@ -254,12 +256,14 @@ package body Stochastic_Optimizers is
                                       Second_Moment_Updates (layer);
             Coef_Update           : Parameters_Record := Self.Params (layer);
          begin
+            Put_Line (Routine_Name & "L284");
             Coef_Update := - Self.Learning_Rate * Update_First_Moments /
               Moments_Sqrt (Update_Second_Moments, Self.Epsilon);
             Updates.Append (Coef_Update);
          end;  --  declare
       end loop;
 
+      Put_Line (Routine_Name & "done");
       return Updates;
 
    end Get_Adam_Updates;
@@ -374,11 +378,12 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_List;
                             Grads  : Parameters_List) is
-      --          Routine_Name : constant String :=
-      --                           "Stochastic_Optimizers.Update_Params ";
+      Routine_Name : constant String :=
+                        "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
       --  L42
+      Put_Line (Routine_Name);
       case Self.Kind is
          when Optimizer_Adam =>
             Updates := Get_Adam_Updates (Self.Adam, Grads);
@@ -387,6 +392,7 @@ package body Stochastic_Optimizers is
          when No_Optimizer => null;
       end case;
 
+      Put_Line (Routine_Name & "L44");
       --  L44
       Params := Params + Updates;
 
