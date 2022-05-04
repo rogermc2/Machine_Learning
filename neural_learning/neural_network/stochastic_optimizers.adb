@@ -1,4 +1,4 @@
- --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
+--  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
@@ -9,7 +9,7 @@ with Maths;
 package body Stochastic_Optimizers is
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
-                           return Parameters_Record;
+                          return Parameters_Record;
    pragma Inline (Moments_Sqrt);
    procedure Zero_Init (Params : in out Parameters_List);
 
@@ -106,7 +106,7 @@ package body Stochastic_Optimizers is
    --  ------------------------------------------------------------------------
 
    function "**" (Rec : Parameters_Record; P : Integer)
-                   return Parameters_Record is
+                  return Parameters_Record is
       Result : Parameters_Record := Rec;
    begin
       Result.Coeff_Grads := Rec.Coeff_Grads ** P;
@@ -198,7 +198,7 @@ package body Stochastic_Optimizers is
    --  L256
    function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                               Grads : Parameters_List)
-                               return Parameters_List is
+                              return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
       Routine_Name          : constant String :=
@@ -220,9 +220,11 @@ package body Stochastic_Optimizers is
         (1.0 - Self.Beta_1 ** Self.Time_Step);
       --  L272
       Put_Line (Routine_Name & "L272");
+      Put_Line (Routine_Name & "Grads size" &
+                  Integer'Image (Integer (Grads.Length)));
       for layer in Grads.First_Index .. Grads.Last_Index loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
-         Put_Line (Routine_Name & "Grads (layer) size" &
+         Put_Line (Routine_Name & "Coeff_Grads (layer) size" &
                      Integer'Image (Grads.Element (layer).Coeff_Grads'Length));
          declare
             Layer_Grads           : constant Parameters_Record :=
@@ -275,7 +277,7 @@ package body Stochastic_Optimizers is
    --  L169
    function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Grads : Parameters_List)
-       return Parameters_List is
+      return Parameters_List is
       Routine_Name : constant String :=
                        "Stochastic_Optimizers. ";
       Velocity     : Parameters_Record := Self.Velocities (1);
@@ -313,7 +315,7 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
-                           return Parameters_Record is
+                          return Parameters_Record is
       use Maths.Float_Math_Functions;
       Result : Parameters_Record := M;
    begin
@@ -380,12 +382,11 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_List;
                             Grads  : Parameters_List) is
-      Routine_Name : constant String :=
-                        "Stochastic_Optimizers.Update_Params ";
+--        Routine_Name : constant String :=
+--                         "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
       --  L42
-      Put_Line (Routine_Name);
       case Self.Kind is
          when Optimizer_Adam =>
             Updates := Get_Adam_Updates (Self.Adam, Grads);
@@ -394,7 +395,6 @@ package body Stochastic_Optimizers is
          when No_Optimizer => null;
       end case;
 
-      Put_Line (Routine_Name & "L44");
       --  L44
       Params := Params + Updates;
 
