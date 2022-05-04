@@ -1,4 +1,4 @@
---  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
+ --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
@@ -199,7 +199,6 @@ package body Stochastic_Optimizers is
    function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                               Grads : Parameters_List)
                                return Parameters_List is
-      --          use Ada.Containers;
       use Maths.Float_Math_Functions;
       use Parameters_Package;
       Routine_Name          : constant String :=
@@ -222,6 +221,9 @@ package body Stochastic_Optimizers is
       --  L272
       Put_Line (Routine_Name & "L272");
       for layer in Grads.First_Index .. Grads.Last_Index loop
+         Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
+         Put_Line (Routine_Name & "Grads (layer) size" &
+                     Integer'Image (Grads.Element (layer).Coeff_Grads'Length));
          declare
             Layer_Grads           : constant Parameters_Record :=
                                       Grads (layer);
@@ -374,7 +376,7 @@ package body Stochastic_Optimizers is
    end Trigger_Stopping;
 
    --  -------------------------------------------------------------------------
-   --  L29
+   --  L29  Update_Params updates parameters with given gradients
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_List;
                             Grads  : Parameters_List) is

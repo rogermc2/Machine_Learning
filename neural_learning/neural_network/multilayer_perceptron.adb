@@ -110,7 +110,7 @@ package body Multilayer_Perceptron is
                        Y           : Boolean_Matrix;
                        Activations : in out Matrix_List;
                        Loss        : out Float;
-                       Grads       : out Parameters_List) is
+                       Grads       : in out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
       use NL_Types.Float_Package;
@@ -152,6 +152,10 @@ package body Multilayer_Perceptron is
       --                    Float'Image (Loss));
 
       --  L289  Add L2 regularization term to loss
+      Put_Line (Routine_Name & "L289");
+      Put_Line (Routine_Name & "L289 Coeff_Grads (1) size" &
+                Integer'Image
+                  (Self.Attributes.Params.First_Element.Coeff_Grads'Length));
       for s in Self.Attributes.Params.First_Index ..
         Self.Attributes.Params.Last_Index loop
          declare
@@ -247,6 +251,8 @@ package body Multilayer_Perceptron is
          end;  --  declare
       end loop;
       Put_Line (Routine_Name & "done");
+      Put_Line (Routine_Name & "done Coeff_Grads (1) size" &
+                Integer'Image (Self.Attributes.Params.First_Element.Coeff_Grads'Length));
 
    end Backprop;
 
@@ -846,15 +852,15 @@ package body Multilayer_Perceptron is
          Put_Line (Routine_Name & "Fan_In, Fan_Out" &
                      Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
---           Put_Line (Routine_Name & "Params.Coeff_Grads size: " &
---                       Integer'Image (Integer
---                       (Self.Attributes.Params.Element (layer).
---                            Coeff_Grads'Length))
---                     & " x" &
---                       Integer'Image (Integer
---                       (Self.Attributes.Params.Element (layer).
---                            Coeff_Grads'Length (2))));
---           New_Line;
+         Put_Line (Routine_Name & "Params.Coeff_Grads size: " &
+                     Integer'Image (Integer
+                     (Self.Attributes.Params.Element (layer).
+                          Coeff_Grads'Length))
+                   & " x" &
+                     Integer'Image (Integer
+                     (Self.Attributes.Params.Element (layer).
+                          Coeff_Grads'Length (2))));
+         New_Line;
       end loop;
       Put_Line (Routine_Name & "Params Length" &
                   Integer'Image (Integer (Self.Attributes.Params.Length)));
@@ -972,15 +978,19 @@ package body Multilayer_Perceptron is
       --  L655
       Activations.Replace_Element (Activations.First_Index, X_Batch);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
-
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
       --  L667 update weights
       Put_Line (Routine_Name & "L667");
+      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+                Integer'Image (Self.Attributes.Params.First_Element.Coeff_Grads'Length));
+      --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
       Put_Line (Routine_Name & "done");
+      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+                Integer'Image (Self.Attributes.Params.First_Element.Coeff_Grads'Length));
 
    end Process_Batch;
 
