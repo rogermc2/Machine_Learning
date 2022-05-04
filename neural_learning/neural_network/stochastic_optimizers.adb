@@ -207,11 +207,11 @@ package body Stochastic_Optimizers is
       Second_Moment_Updates : Moments_List;
       Updates               : Parameters_List;
    begin
-      Assert (not Self.First_Moments.Is_Empty, Routine_Name &
-                "Self.First_Moments Is_Empty.");
-      Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
-                "Self.Second_Moments Is_Empty.");
-      Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
+--        Assert (not Self.First_Moments.Is_Empty, Routine_Name &
+--                  "Self.First_Moments Is_Empty.");
+--        Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
+--                  "Self.Second_Moments Is_Empty.");
+--        Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
 
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
@@ -222,10 +222,16 @@ package body Stochastic_Optimizers is
       Put_Line (Routine_Name & "L272");
       Put_Line (Routine_Name & "Grads size" &
                   Integer'Image (Integer (Grads.Length)));
+      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+                  Integer'Image (Grads (1).Coeff_Grads'Length));
+      Put_Line (Routine_Name & "Coeff_Grads (2) size" &
+                  Integer'Image (Grads (2).Coeff_Grads'Length));
       for layer in Grads.First_Index .. Grads.Last_Index loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
-         Put_Line (Routine_Name & "Coeff_Grads (layer) size" &
-                     Integer'Image (Grads.Element (layer).Coeff_Grads'Length));
+         Put_Line (Routine_Name & "First_Moments size" &
+                     Integer'Image (Self.First_Moments (layer).Coeff_Grads'Length));
+         Put_Line (Routine_Name & "Second_Moments size" &
+                     Integer'Image (Self.Second_Moments (layer).Coeff_Grads'Length));
          declare
             Layer_Grads           : constant Parameters_Record :=
                                       Grads (layer);
