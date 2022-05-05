@@ -1,5 +1,4 @@
 
---  with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Support_4 is
@@ -14,11 +13,5 @@ package Support_4 is
    function Get_State
      (Dataset_Name : String;
       Test_Size, Train_Size : Positive) return Base_State;
---     function Get_Classifier
---       (Dataset_Name : String;
---        Classifier   : out Multilayer_Perceptron.MLP_Classifier)
---        return Boolean;
---     procedure Save_Classifier
---       (Dataset_Name : String; Classifier : Multilayer_Perceptron.MLP_Classifier);
 
 end Support_4;

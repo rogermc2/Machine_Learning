@@ -119,37 +119,6 @@ package body Support_4 is
 
    --  -------------------------------------------------------------------------
 
---     function Get_Classifier
---       (Dataset_Name : String;
---        Classifier   : out Multilayer_Perceptron.MLP_Classifier)
---        return Boolean is
---        use Ada.Directories;
---        use Ada.Streams;
---        use Stream_IO;
---        Routine_Name : constant String := "Support_4.Get_Classifier ";
---        Tree_File    : constant String := Dataset_Name & ".tre";
---        Has_Tree     : constant Boolean := Exists (Tree_File);
---        File_ID      : Stream_IO.File_Type;
---        aStream      : Stream_Access;
---     begin
---        if Has_Tree then
---           Put_Line (Routine_Name & "restoring classifier");
---
---           Open (File_ID, In_File, Tree_File);
---           aStream := Stream (File_ID);
---           Multilayer_Perceptron.MLP_Classifier'Read (aStream, Classifier);
---           Close (File_ID);
---           pragma Unreferenced (File_ID);
---
---           Put_Line (Routine_Name & "classifier restored");
---        end if;
---
---        return Has_Tree;
---
---     end Get_Classifier;
-
-   --  -------------------------------------------------------------------------
-
    procedure Save_State
      (Dataset_Name        : String;
       Num_Features        : Positive;
@@ -173,23 +142,5 @@ package body Support_4 is
    end Save_State;
 
    --  -------------------------------------------------------------------------
-
---     procedure Save_Classifier
---       (Dataset_Name : String;
---        Classifier   : Multilayer_Perceptron.MLP_Classifier) is
---        use Ada.Streams;
---        use Stream_IO;
---        --        Routine_Name : constant String := "Support_4.Save_Tree ";
---        Tree_File    : constant String := Dataset_Name & ".tre";
---        File_ID      : Stream_IO.File_Type;
---        aStream      : Stream_Access;
---     begin
---        Create (File_ID, Out_File, Tree_File);
---        aStream := Stream (File_ID);
---        Multilayer_Perceptron.MLP_Classifier'Write (aStream, Classifier);
---        Close (File_ID);
---        pragma Unreferenced (File_ID);
---
---     end Save_Classifier;
 
 end Support_4;
