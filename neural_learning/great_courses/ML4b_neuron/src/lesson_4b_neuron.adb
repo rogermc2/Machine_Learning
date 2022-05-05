@@ -40,20 +40,23 @@ begin
         Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
         Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
-        Hidden_Layer_Sizes.Append (10);
-        aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
-                               Hidden_Layer_Sizes => Hidden_Layer_Sizes,
-                               Activation => Base_Neural.Identity_Activation,
-                               Verbose => False);
-        --  Fit function adjusts weights according to data values so that better
-        --  accuracy can be achieved
-        Put_Line ("Neural_Fit");
-        Fit (aClassifier, Train_X, Train_Y);
-        Support_4.Save_Classifier (Dataset_Name, aClassifier);
-        Put_Line ("Score: " & Float'Image (Base.Score
-                  (Self => aClassifier, X => Test_X,
-                   Y => To_Float_Matrix (Test_Y),
-                   Sample_Weight => Sample_Weight)));
+        for index in 1 .. 1 loop
+            Hidden_Layer_Sizes.Clear;
+            Hidden_Layer_Sizes.Append (index * 10);
+            aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
+                                   Hidden_Layer_Sizes => Hidden_Layer_Sizes,
+                                   Activation => Base_Neural.Identity_Activation,
+                                   Verbose => False);
+            --  Fit function adjusts weights according to data values so that better
+            --  accuracy can be achieved
+            Fit (aClassifier, Train_X, Train_Y);
+            Support_4.Save_Classifier (Dataset_Name, aClassifier);
+            Put_Line (Integer'Image (index * 10) & " Score: " &
+                        Float'Image
+                        (Base.Score (Self => aClassifier, X => Test_X,
+                                     Y => To_Float_Matrix (Test_Y),
+                                     Sample_Weight => Sample_Weight)));
+        end loop;
     end;  --  declare
 
     Put_Line ("----------------------------------------------");
