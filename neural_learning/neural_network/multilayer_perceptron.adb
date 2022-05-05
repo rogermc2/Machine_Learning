@@ -114,7 +114,7 @@ package body Multilayer_Perceptron is
       use Ada.Containers;
       use Base_Neural;
       use NL_Types.Float_Package;
---        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+      Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Loss_Function_Name : Loss_Function;
       Deltas             : Matrix_List;
@@ -212,6 +212,12 @@ package body Multilayer_Perceptron is
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
+      Put_Line (Routine_Name & "L308 Grads size" &
+                  Integer'Image (Integer (Grads.Length)));
+      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+                  Integer'Image (Grads (1).Coeff_Grads'Length)
+                   & " x" &
+                     Integer'Image (Grads (1).Coeff_Grads'Length (2)));
 
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
@@ -244,8 +250,20 @@ package body Multilayer_Perceptron is
 
             Compute_Loss_Gradient (Self, index, Num_Samples, Activations,
                                    Deltas, Grads);
+            Put_Line (Routine_Name & "declare & loop end Grads size" &
+                        Integer'Image (Integer (Grads.Length)));
+            Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+                        Integer'Image (Grads (1).Coeff_Grads'Length)
+                      & " x" &
+                        Integer'Image (Grads (1).Coeff_Grads'Length (2)));
+            Put_Line (Routine_Name & "Coeff_Grads (2) size" &
+                        Integer'Image (Grads (2).Coeff_Grads'Length)
+                      & " x" &
+                        Integer'Image (Grads (2).Coeff_Grads'Length (2)));
+
          end;  --  declare
       end loop;
+      New_Line;
 
    end Backprop;
 

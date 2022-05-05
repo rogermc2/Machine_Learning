@@ -223,15 +223,25 @@ package body Stochastic_Optimizers is
       Put_Line (Routine_Name & "Grads size" &
                   Integer'Image (Integer (Grads.Length)));
       Put_Line (Routine_Name & "Coeff_Grads (1) size" &
-                  Integer'Image (Grads (1).Coeff_Grads'Length));
+                  Integer'Image (Grads (1).Coeff_Grads'Length)
+                   & " x" &
+                     Integer'Image (Grads (1).Coeff_Grads'Length (2)));
       Put_Line (Routine_Name & "Coeff_Grads (2) size" &
                   Integer'Image (Grads (2).Coeff_Grads'Length));
       for layer in Grads.First_Index .. Grads.Last_Index loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
          Put_Line (Routine_Name & "First_Moments size" &
-                     Integer'Image (Self.First_Moments (layer).Coeff_Grads'Length));
+                     Integer'Image (Self.First_Moments (layer).Coeff_Grads'Length)
+                   & " x" &
+                     Integer'Image (Self.First_Moments (layer).Coeff_Grads'Length (2)));
+         Put_Line (Routine_Name & "First_Moments Intercept size" &
+                     Integer'Image (Self.First_Moments (layer).Intercept_Grads'Length));
          Put_Line (Routine_Name & "Second_Moments size" &
-                     Integer'Image (Self.Second_Moments (layer).Coeff_Grads'Length));
+                     Integer'Image (Self.Second_Moments (layer).Coeff_Grads'Length)
+                   & " x" &
+                     Integer'Image (Self.Second_Moments (layer).Coeff_Grads'Length (2)));
+         Put_Line (Routine_Name & "Second_Moments Intercept size" &
+                     Integer'Image (Self.Second_Moments (layer).Intercept_Grads'Length));
          declare
             Layer_Grads           : constant Parameters_Record :=
                                       Grads (layer);
@@ -239,15 +249,22 @@ package body Stochastic_Optimizers is
                                       Self.First_Moments (layer);
             Second_Moments        : constant Parameters_Record :=
                                       Self.Second_Moments (layer);
-            Update_First_Moments  : constant Parameters_Record :=
-                                      Self.Beta_1 * First_Moments +
-                                        (1.0 - Self.Beta_1) * Layer_Grads;
+            Update_First_Moments  : Parameters_Record :=
+                                      Self.Beta_1 * First_Moments;
             --  L276
-            Update_Second_Moments : constant Parameters_Record
-              := Self.Beta_2 * Second_Moments +
-                (1.0 - Self.Beta_2) * (Layer_Grads ** 2);
+            Update_Second_Moments : Parameters_Record :=
+                                      Self.Beta_2 * Second_Moments;
          begin
             Put_Line (Routine_Name & "Grads loop");
+            Assert (First_Moments.Coeff_Grads'Length =
+                      Layer_Grads.Coeff_Grads'Length, Routine_Name & "Coeff_Grads length" &
+                      Integer'Image (First_Moments.Coeff_Grads'Length) &
+                      " should equal Layer_Grads length" &
+                      Integer'Image (Layer_Grads.Coeff_Grads'Length));
+            Update_First_Moments := Update_First_Moments +
+              (1.0 - Self.Beta_1) * Layer_Grads;
+            Update_Second_Moments := Update_Second_Moments +
+                (1.0 - Self.Beta_2) * (Layer_Grads ** 2);
             First_Moment_Updates.Append (Update_First_Moments);
             Second_Moment_Updates.Append (Update_Second_Moments);
          end;  --  declare
