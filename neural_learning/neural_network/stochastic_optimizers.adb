@@ -207,41 +207,13 @@ package body Stochastic_Optimizers is
       Second_Moment_Updates : Moments_List;
       Updates               : Parameters_List;
    begin
---        Assert (not Self.First_Moments.Is_Empty, Routine_Name &
---                  "Self.First_Moments Is_Empty.");
---        Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
---                  "Self.Second_Moments Is_Empty.");
---        Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
-
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
         (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
         (1.0 - Self.Beta_1 ** Self.Time_Step);
       --  L272
---        Put_Line (Routine_Name & "L272");
---        Put_Line (Routine_Name & "Grads size" &
---                    Integer'Image (Integer (Grads.Length)));
---        Put_Line (Routine_Name & "Coeff_Grads (1) size" &
---                    Integer'Image (Grads (1).Coeff_Grads'Length)
---                     & " x" &
---                       Integer'Image (Grads (1).Coeff_Grads'Length (2)));
---        Put_Line (Routine_Name & "Coeff_Grads (2) size" &
---                    Integer'Image (Grads (2).Coeff_Grads'Length));
       for layer in Grads.First_Index .. Grads.Last_Index loop
---           Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
---           Put_Line (Routine_Name & "First_Moments size" &
---                       Integer'Image (Self.First_Moments (layer).Coeff_Grads'Length)
---                     & " x" &
---                       Integer'Image (Self.First_Moments (layer).Coeff_Grads'Length (2)));
---           Put_Line (Routine_Name & "First_Moments Intercept size" &
---                       Integer'Image (Self.First_Moments (layer).Intercept_Grads'Length));
---           Put_Line (Routine_Name & "Second_Moments size" &
---                       Integer'Image (Self.Second_Moments (layer).Coeff_Grads'Length)
---                     & " x" &
---                       Integer'Image (Self.Second_Moments (layer).Coeff_Grads'Length (2)));
---           Put_Line (Routine_Name & "Second_Moments Intercept size" &
---                       Integer'Image (Self.Second_Moments (layer).Intercept_Grads'Length));
          declare
             Layer_Grads           : constant Parameters_Record :=
                                       Grads (layer);
@@ -255,9 +227,9 @@ package body Stochastic_Optimizers is
             Update_Second_Moments : Parameters_Record :=
                                       Self.Beta_2 * Second_Moments;
          begin
---              Put_Line (Routine_Name & "Grads loop");
             Assert (First_Moments.Coeff_Grads'Length =
-                      Layer_Grads.Coeff_Grads'Length, Routine_Name & "Coeff_Grads length" &
+                      Layer_Grads.Coeff_Grads'Length, Routine_Name &
+                      "Coeff_Grads length" &
                       Integer'Image (First_Moments.Coeff_Grads'Length) &
                       " should equal Layer_Grads length" &
                       Integer'Image (Layer_Grads.Coeff_Grads'Length));
@@ -283,14 +255,12 @@ package body Stochastic_Optimizers is
                                       Second_Moment_Updates (layer);
             Coef_Update           : Parameters_Record := Self.Params (layer);
          begin
-            Put_Line (Routine_Name & "L284");
             Coef_Update := - Self.Learning_Rate * Update_First_Moments /
               Moments_Sqrt (Update_Second_Moments, Self.Epsilon);
             Updates.Append (Coef_Update);
          end;  --  declare
       end loop;
 
-      Put_Line (Routine_Name & "done");
       return Updates;
 
    end Get_Adam_Updates;

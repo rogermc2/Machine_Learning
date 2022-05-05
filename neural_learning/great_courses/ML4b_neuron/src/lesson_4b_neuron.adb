@@ -44,7 +44,7 @@ begin
          Hidden_Layer_Sizes : NL_Types.Integer_List;
       begin
          Hidden_Layer_Sizes.Append (10);
-         aClassifier := C_Init (Max_Iter => 200,
+         aClassifier := C_Init (Max_Iter => 200, Tol => 0.001,
                                 Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                 Activation => Base_Neural.Identity_Activation,
                                 Verbose => False);

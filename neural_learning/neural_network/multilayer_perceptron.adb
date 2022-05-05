@@ -213,16 +213,15 @@ package body Multilayer_Perceptron is
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
-      Put_Line (Routine_Name & "L308 Last" &
-                  Integer'Image (Integer (Last)));
-      Put_Line (Routine_Name & "Coeff_Grads (Last) size" &
-                  Integer'Image (Grads (Last).Coeff_Grads'Length)
-                & " x" &
-                  Integer'Image (Grads (Last).Coeff_Grads'Length (2)));
+--        Put_Line (Routine_Name & "L308 Last" &
+--                    Integer'Image (Integer (Last)));
+--        Put_Line (Routine_Name & "Coeff_Grads (Last) size" &
+--                    Integer'Image (Grads (Last).Coeff_Grads'Length)
+--                  & " x" &
+--                    Integer'Image (Grads (Last).Coeff_Grads'Length (2)));
 
       --  L310, L308
-      for index in reverse 2 .. Self.Attributes.N_Layers - 2 loop
-         Put_Line (Routine_Name & "L308 index:" & Integer'Image (index));
+      for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
@@ -252,25 +251,25 @@ package body Multilayer_Perceptron is
 
             Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
                                    Deltas, Grads);
-            Put_Line (Routine_Name & "loop end index" & Integer'Image (index));
-            Put_Line (Routine_Name & "Coeff_Grads (index) size" &
-                        Integer'Image (Grads (index).Coeff_Grads'Length)
-                      & " x" &
-                        Integer'Image (Grads (index).Coeff_Grads'Length (2)));
+--              Put_Line (Routine_Name & "loop end index" & Integer'Image (index));
+--              Put_Line (Routine_Name & "Coeff_Grads (index) size" &
+--                          Integer'Image (Grads (index).Coeff_Grads'Length)
+--                        & " x" &
+--                          Integer'Image (Grads (index).Coeff_Grads'Length (2)));
 
          end;  --  declare
       end loop;
-      Put_Line (Routine_Name & "loop end Grads size" &
-                  Integer'Image (Integer (Grads.Length)));
-      Put_Line (Routine_Name & "Coeff_Grads (2) size" &
-                  Integer'Image (Grads (2).Coeff_Grads'Length)
-                & " x" &
-                  Integer'Image (Grads (2).Coeff_Grads'Length (2)));
-      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
-                  Integer'Image (Grads (1).Coeff_Grads'Length)
-                & " x" &
-                  Integer'Image (Grads (1).Coeff_Grads'Length (2)));
-      New_Line;
+--        Put_Line (Routine_Name & "loop end Grads size" &
+--                    Integer'Image (Integer (Grads.Length)));
+--        Put_Line (Routine_Name & "Coeff_Grads (2) size" &
+--                    Integer'Image (Grads (2).Coeff_Grads'Length)
+--                  & " x" &
+--                    Integer'Image (Grads (2).Coeff_Grads'Length (2)));
+--        Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+--                    Integer'Image (Grads (1).Coeff_Grads'Length)
+--                  & " x" &
+--                    Integer'Image (Grads (1).Coeff_Grads'Length (2)));
+--        New_Line;
 
    end Backprop;
 
@@ -617,7 +616,6 @@ package body Multilayer_Perceptron is
                    "invalid Accumulated_Loss" &
                    Float'Image (Accumulated_Loss));
          --  L661
-         Put_Line (Routine_Name & "L661");
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
          Self.Attributes.T := Self.Attributes.T + Num_Samples;
@@ -646,10 +644,11 @@ package body Multilayer_Perceptron is
                Msg := Msg & To_Unbounded_String (Routine_Name & "Training loss");
             end if;
 
-            Msg := Msg & To_Unbounded_String (" did not improve more than tol =" &
-                                                Float'Image (Self.Parameters.Tol) & " for" &
-                                                Integer'Image (Self.Parameters.N_Iter_No_Change) &
-                                                " consecutive epochs.");
+            Msg := Msg & To_Unbounded_String
+                  (" did not improve more than tol =" &
+                   Float'Image (Self.Parameters.Tol) & " for" &
+                   Integer'Image (Self.Parameters.N_Iter_No_Change) &
+                   " consecutive epochs.");
             --  L692
             Is_Stopping :=
               Trigger_Stopping (Self.Attributes.Optimizer, To_String (Msg),
@@ -827,7 +826,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
-      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -850,18 +849,18 @@ package body Multilayer_Perceptron is
          --  Add coefficent matrices and intercept vectors for layer.
          Fan_In := Layer_Units (layer);
          Fan_Out := Layer_Units (layer + 1);
-         Put_Line (Routine_Name & "Fan_In, Fan_Out" &
-                     Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
+--           Put_Line (Routine_Name & "Fan_In, Fan_Out" &
+--                       Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
-         Put_Line (Routine_Name & "Params.Coeff_Grads size: " &
-                     Integer'Image (Integer
-                     (Self.Attributes.Params.Element (layer).
-                          Coeff_Grads'Length))
-                   & " x" &
-                     Integer'Image (Integer
-                     (Self.Attributes.Params.Element (layer).
-                          Coeff_Grads'Length (2))));
-         New_Line;
+--           Put_Line (Routine_Name & "Params.Coeff_Grads size: " &
+--                       Integer'Image (Integer
+--                       (Self.Attributes.Params.Element (layer).
+--                            Coeff_Grads'Length))
+--                     & " x" &
+--                       Integer'Image (Integer
+--                       (Self.Attributes.Params.Element (layer).
+--                            Coeff_Grads'Length (2))));
+--           New_Line;
       end loop;
 
       --  L351
@@ -1110,8 +1109,8 @@ package body Multilayer_Perceptron is
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
       end if;
 
-      Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
-                  Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
+--        Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
+--                    Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
 
       return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
 
