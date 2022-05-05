@@ -112,14 +112,13 @@ package body Label is
                                          Classes : NL_Types.Integer_List)
                                           return Float_Matrix is
       use Classifier_Utilities;
-      Routine_Name :  constant String :=
-                       "Label.Inverse_Binarize_Multiclass ";
+--        Routine_Name :  constant String :=
+--                         "Label.Inverse_Binarize_Multiclass ";
       Inverse      : Float_Matrix  (Y'Range (2), Y'Range);
       Max_Indices  : Natural_Array (Y'Range (2));
    begin
       --  L627
-      Put_Line (Routine_Name);
-      Max_Indices := Arg_Max (Y);
+      Max_Indices := Row_Max_Indices (Y);
       for row in Max_Indices'Range loop
          for col in Max_Indices'Range loop
             Inverse (row, col) := Float (Classes.Element (Max_Indices (row)));
@@ -136,14 +135,13 @@ package body Label is
                                          Classes : NL_Types.Integer_List)
                                           return Integer_Matrix is
       use Classifier_Utilities;
-      Routine_Name :  constant String :=
-                       "Label.Inverse_Binarize_Multiclass ";
+--        Routine_Name :  constant String :=
+--                         "Label.Inverse_Binarize_Multiclass ";
       Inverse      : Integer_Matrix  (Y'Range (2), Y'Range);
       Max_Indices  : Natural_Array (Y'Range (2));
    begin
       --  L627
-      Put_Line (Routine_Name);
-      Max_Indices := Arg_Max (Y);
+      Max_Indices := Row_Max_Indices (Y);
       for row in Max_Indices'Range loop
          for col in Max_Indices'Range loop
             Inverse (row, col) := Classes.Element (Max_Indices (row));
@@ -161,14 +159,13 @@ package body Label is
                                          Classes : NL_Types.Integer_List)
                                           return Float_Matrix is
       use Classifier_Utilities;
-      Routine_Name :  constant String :=
-                       "Label.Inverse_Binarize_Multiclass ";
+--        Routine_Name :  constant String :=
+--                         "Label.Inverse_Binarize_Multiclass ";
       Inverse      : Float_Matrix  (Y'Range, 1 .. 1);
       Max_Indices  : Natural_Array (Y'Range);
    begin
       --  L627
-      Put_Line (Routine_Name);
-      Max_Indices := Arg_Max (Y);
+      Max_Indices := Row_Max_Indices (Y);
       for row in Inverse'Range loop
           Inverse (row, 1) := Float (Classes.Element (Max_Indices (row)));
       end loop;

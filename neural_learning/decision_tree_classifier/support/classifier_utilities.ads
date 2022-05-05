@@ -12,10 +12,8 @@ package Classifier_Utilities is
    Value_Error : exception;
 
    function Arg_Max (Values : Boolean_Array) return Positive;
-   function Arg_Max (Values : Boolean_Matrix) return Natural_Array;
    function Arg_Max (Values : Boolean_List) return Positive;
    function Arg_Max (Values : Float_List) return Positive;
-   function Arg_Max (Values : Float_Matrix) return Natural_Array;
    function Arg_Max (Values : Integer_List) return Positive;
    function Bin_Count (Numbers : Natural_List) return Natural_List;
    function Bin_Count (Numbers : Value_Data_List) return Natural_List;
@@ -31,7 +29,8 @@ package Classifier_Utilities is
 --     function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
 --                                        Num_Outputs : Positive)
 --                                        return Weights.Weight_Lists_3D;
---     function Ones (List_Length : Positive) return Weights.Weight_List;
+   function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array;
+   function Row_Max_Indices (Values : Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List;
    function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)

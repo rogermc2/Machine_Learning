@@ -9,7 +9,7 @@ with Maths;
 package body Stochastic_Optimizers is
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
-                           return Parameters_Record;
+                          return Parameters_Record;
    pragma Inline (Moments_Sqrt);
    procedure Zero_Init (Params : in out Parameters_List);
 
@@ -106,7 +106,7 @@ package body Stochastic_Optimizers is
    --  ------------------------------------------------------------------------
 
    function "**" (Rec : Parameters_Record; P : Integer)
-                   return Parameters_Record is
+                  return Parameters_Record is
       Result : Parameters_Record := Rec;
    begin
       Result.Coeff_Grads := Rec.Coeff_Grads ** P;
@@ -198,22 +198,15 @@ package body Stochastic_Optimizers is
    --  L256
    function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                               Grads : Parameters_List)
-                               return Parameters_List is
-      --          use Ada.Containers;
+                              return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
---        Routine_Name          : constant String :=
---                                  "Stochastic_Optimizers.Get_Adam_Updates ";
+      Routine_Name          : constant String :=
+                                "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       Updates               : Parameters_List;
    begin
---        Assert (not Self.First_Moments.Is_Empty, Routine_Name &
---                  "Self.First_Moments Is_Empty.");
---        Assert (not Self.Second_Moments.Is_Empty, Routine_Name &
---                  "Self.Second_Moments Is_Empty.");
---        Assert (not Grads.Is_Empty, Routine_Name & "Grads Is_Empty.");
-
       Self.Time_Step := Self.Time_Step + 1;
       --  L279 Update learning rate
       Self.Learning_Rate := Sqrt
@@ -228,14 +221,22 @@ package body Stochastic_Optimizers is
                                       Self.First_Moments (layer);
             Second_Moments        : constant Parameters_Record :=
                                       Self.Second_Moments (layer);
-            Update_First_Moments  : constant Parameters_Record :=
-                                      Self.Beta_1 * First_Moments +
-                                        (1.0 - Self.Beta_1) * Layer_Grads;
+            Update_First_Moments  : Parameters_Record :=
+                                      Self.Beta_1 * First_Moments;
             --  L276
-            Update_Second_Moments : constant Parameters_Record
-              := Self.Beta_2 * Second_Moments +
-                (1.0 - Self.Beta_2) * (Layer_Grads ** 2);
+            Update_Second_Moments : Parameters_Record :=
+                                      Self.Beta_2 * Second_Moments;
          begin
+            Assert (First_Moments.Coeff_Grads'Length =
+                      Layer_Grads.Coeff_Grads'Length, Routine_Name &
+                      "Coeff_Grads length" &
+                      Integer'Image (First_Moments.Coeff_Grads'Length) &
+                      " should equal Layer_Grads length" &
+                      Integer'Image (Layer_Grads.Coeff_Grads'Length));
+            Update_First_Moments := Update_First_Moments +
+              (1.0 - Self.Beta_1) * Layer_Grads;
+            Update_Second_Moments := Update_Second_Moments +
+                (1.0 - Self.Beta_2) * (Layer_Grads ** 2);
             First_Moment_Updates.Append (Update_First_Moments);
             Second_Moment_Updates.Append (Update_Second_Moments);
          end;  --  declare
@@ -269,7 +270,7 @@ package body Stochastic_Optimizers is
    --  L169
    function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Grads : Parameters_List)
-       return Parameters_List is
+      return Parameters_List is
       Routine_Name : constant String :=
                        "Stochastic_Optimizers. ";
       Velocity     : Parameters_Record := Self.Velocities (1);
@@ -307,7 +308,7 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
-                           return Parameters_Record is
+                          return Parameters_Record is
       use Maths.Float_Math_Functions;
       Result : Parameters_Record := M;
    begin
@@ -370,12 +371,12 @@ package body Stochastic_Optimizers is
    end Trigger_Stopping;
 
    --  -------------------------------------------------------------------------
-   --  L29
+   --  L29  Update_Params updates parameters with given gradients
    procedure Update_Params (Self   : in out Optimizer_Record;
                             Params : in out Parameters_List;
                             Grads  : Parameters_List) is
-      --          Routine_Name : constant String :=
-      --                           "Stochastic_Optimizers.Update_Params ";
+--        Routine_Name : constant String :=
+--                         "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
       --  L42
