@@ -116,11 +116,12 @@ package body Multilayer_Perceptron is
       use NL_Types.Float_Package;
       Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
+      Last               : constant Positive := Self.Attributes.N_Layers - 1;
       Loss_Function_Name : Loss_Function;
       Deltas             : Matrix_List;
       Values             : Float := 0.0;
-      Last               : Positive;
    begin
+      Grads.Set_Length (Count_Type (Last));
       Forward_Pass (Self, Activations);
 
       --  L284
@@ -185,7 +186,7 @@ package body Multilayer_Perceptron is
       --  of the ith layer.
 
       --  L295  Backward propagate python last = self.n_layers_ - 2
-      Last := Self.Attributes.N_Layers - 1;
+      --        Last := Self.Attributes.N_Layers - 1;
       Deltas.Set_Length (Count_Type (Last));
 
       --          Assert (Y'Length = Activations.Last_Element'Length and
@@ -212,27 +213,28 @@ package body Multilayer_Perceptron is
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
-      Put_Line (Routine_Name & "L308 Grads size" &
-                  Integer'Image (Integer (Grads.Length)));
-      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
-                  Integer'Image (Grads (1).Coeff_Grads'Length)
-                   & " x" &
-                     Integer'Image (Grads (1).Coeff_Grads'Length (2)));
+      Put_Line (Routine_Name & "L308 Last" &
+                  Integer'Image (Integer (Last)));
+      Put_Line (Routine_Name & "Coeff_Grads (Last) size" &
+                  Integer'Image (Grads (Last).Coeff_Grads'Length)
+                & " x" &
+                  Integer'Image (Grads (Last).Coeff_Grads'Length (2)));
 
       --  L310, L308
-      for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+      for index in reverse 2 .. Self.Attributes.N_Layers - 2 loop
+         Put_Line (Routine_Name & "L308 index:" & Integer'Image (index));
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
             Dot_L  : constant Float_Matrix := Deltas (index);
             Dot_R  : constant Float_Matrix := S_List.Coeff_Grads;
          begin
-            --              Assert (Dot_L'Length (2) = Dot_R'Length (2) and
-            --                        Dot_L'Length (2) = Dot_R'Length,
-            --                      Routine_Name & "L310 Dot_L size 2:" &
-            --                        Integer'Image (Dot_L'Length (2)) &
-            --                        " should be the same as Dot_R 2 size:" &
-            --                        Integer'Image (Dot_R'Length (2)));
+            Assert (Dot_L'Length (2) = Dot_R'Length (2) and
+                      Dot_L'Length (2) = Dot_R'Length,
+                    Routine_Name & "L310 Dot_L size 2:" &
+                      Integer'Image (Dot_L'Length (2)) &
+                      " should be the same as Dot_R 2 size:" &
+                      Integer'Image (Dot_R'Length (2)));
 
             Deltas.Replace_Element (index - 1, Dot (Dot_L, Transpose (Dot_R)));
 
@@ -248,21 +250,26 @@ package body Multilayer_Perceptron is
                when Softmax_Activation => null;
             end case;
 
-            Compute_Loss_Gradient (Self, index, Num_Samples, Activations,
+            Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
                                    Deltas, Grads);
-            Put_Line (Routine_Name & "declare & loop end Grads size" &
-                        Integer'Image (Integer (Grads.Length)));
-            Put_Line (Routine_Name & "Coeff_Grads (1) size" &
-                        Integer'Image (Grads (1).Coeff_Grads'Length)
+            Put_Line (Routine_Name & "loop end index" & Integer'Image (index));
+            Put_Line (Routine_Name & "Coeff_Grads (index) size" &
+                        Integer'Image (Grads (index).Coeff_Grads'Length)
                       & " x" &
-                        Integer'Image (Grads (1).Coeff_Grads'Length (2)));
-            Put_Line (Routine_Name & "Coeff_Grads (2) size" &
-                        Integer'Image (Grads (2).Coeff_Grads'Length)
-                      & " x" &
-                        Integer'Image (Grads (2).Coeff_Grads'Length (2)));
+                        Integer'Image (Grads (index).Coeff_Grads'Length (2)));
 
          end;  --  declare
       end loop;
+      Put_Line (Routine_Name & "loop end Grads size" &
+                  Integer'Image (Integer (Grads.Length)));
+      Put_Line (Routine_Name & "Coeff_Grads (2) size" &
+                  Integer'Image (Grads (2).Coeff_Grads'Length)
+                & " x" &
+                  Integer'Image (Grads (2).Coeff_Grads'Length (2)));
+      Put_Line (Routine_Name & "Coeff_Grads (1) size" &
+                  Integer'Image (Grads (1).Coeff_Grads'Length)
+                & " x" &
+                  Integer'Image (Grads (1).Coeff_Grads'Length (2)));
       New_Line;
 
    end Backprop;
@@ -370,8 +377,9 @@ package body Multilayer_Perceptron is
       Activations : Matrix_List;
       Deltas      : Matrix_List;
       Grads       : in out Parameters_List) is
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      use Ada.Containers;
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : constant Float_Matrix := Deltas (Layer);
       Activ_M      : constant Float_Matrix := Activations (Layer);
       Params       : constant Parameters_Record :=
@@ -390,10 +398,10 @@ package body Multilayer_Perceptron is
       Delta_Act := Dot (Transpose (Activations (Layer)), Deltas (Layer));
 
       --  L188
-      --           Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
-      --                     "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
-      --                     " should equal Coeff_Grads length" &
-      --                     Count_Type'Image (Coeffs'Length));
+      Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
+                "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
+                " should equal Coeff_Grads length" &
+                Count_Type'Image (Coeffs'Length));
 
       --  L185
       --  Coeff_Grads is a list of fan_in x fan_out matrices
@@ -402,7 +410,7 @@ package body Multilayer_Perceptron is
       New_Grad.Coeff_Grads :=
         New_Grad.Coeff_Grads / Float (Num_Samples);
       New_Grad.Intercept_Grads := Delta_Mean;
-      Grads.Append (New_Grad);
+      Grads.Replace_Element (Layer, New_Grad);
 
    end  Compute_Loss_Gradient;
 
@@ -944,8 +952,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size               : Positive;
                             Accumulated_Loss         : in out Float) is
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Process_Batch ";
+      --        Routine_Name : constant String :=
+      --                         "Multilayer_Perceptron.Process_Batch ";
       Num_Features : constant Positive := Positive (X'Length (2));
       Num_Classes  : constant Positive := Y'Length (2);
       X_Batch      : Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
