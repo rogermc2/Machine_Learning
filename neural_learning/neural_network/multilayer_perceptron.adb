@@ -683,8 +683,8 @@ package body Multilayer_Perceptron is
                                return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
-      --          Routine_Name       : constant String :=
-      --                                 "Multilayer_Perceptron.Forward_Pass_Fast ";
+--        Routine_Name       : constant String :=
+--                               "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -715,7 +715,7 @@ package body Multilayer_Perceptron is
                end case;
             end if;
 
-            if layer = 1 then
+            if layer = Num_Layers - 1 then
                Activ_Out := Activ_Coeff;
             end if;
          end;
