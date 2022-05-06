@@ -790,8 +790,6 @@ package body Multilayer_Perceptron is
       Self.Attributes.Params.Clear;  --  Layers
       Self.Attributes.Coef_Indptr.Clear;
       Self.Attributes.Intercept_Indptr.Clear;
-      Self.Attributes.N_Features := 1;
-      Self.Attributes.Feature_Names_In.Clear;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
 

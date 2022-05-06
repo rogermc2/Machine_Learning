@@ -40,9 +40,9 @@ begin
         Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
         Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
-        for index in 1 .. 2 loop
+        for index in 1 .. 1 loop
             Hidden_Layer_Sizes.Clear;
-            Hidden_Layer_Sizes.Append (index * 10);
+            Hidden_Layer_Sizes.Append (index * 20);
             aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
                                    Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                    Activation => Base_Neural.Identity_Activation,
