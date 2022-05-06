@@ -1051,7 +1051,8 @@ package body Classifier_Utilities is
 
       for row in reverse 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
-            Result (col - Start + 1, row) := Float (List_1D.Element (col));
+            --  PLplot_Auxiliary.Real_Matrix confusion Float or Long Float?????
+            Result (col - Start + 1, row) := Long_Float (List_1D.Element (col));
          end loop;
          Start := Start + Num_Cols;
       end loop;
