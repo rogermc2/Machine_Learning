@@ -72,8 +72,8 @@ package body Data_Splitter is
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Integer_Array;
       Train_Size, Test_Size : Natural;
-      Train_X : out Float_Matrix; Train_Y : out Integer_Array;
-      Test_X  : out Float_Matrix; Test_Y : out Integer_Array) is
+      Train_X : out Long_Float_Matrix; Train_Y : out Integer_Array;
+      Test_X  : out Long_Float_Matrix; Test_Y : out Integer_Array) is
       Routine_Name        : constant String := "Data_Splitter.Train_Test_Split ";
       Num_Samples         : constant Positive := X'Length;
 --        Num_Features        : constant Positive := X'Length (2);
@@ -110,14 +110,14 @@ package body Data_Splitter is
 
       for row in 1 .. Train_Size loop
          for col in Train_X'First (2) .. Train_X'Last (2) loop
-            Train_X (row, col) := X (row, col);
+            Train_X (row, col) := Long_Float (X (row, col));
          end loop;
          Train_Y (row) := Y (row);
       end loop;
 
       for row in 1 .. Test_Size loop
          for col in Test_X'First (2) .. Test_X'Last (2) loop
-            Test_X (row, col) := X (row + Train_Size, col);
+            Test_X (row, col) := Long_Float (X (row + Train_Size, col));
          end loop;
          Test_Y (row) := Y (row + Train_Size );
       end loop;
@@ -129,8 +129,8 @@ package body Data_Splitter is
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Integer_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Float_Matrix; Train_Y : out Integer_Matrix;
-      Test_X  : out Float_Matrix; Test_Y : out Integer_Matrix) is
+      Train_X : out Long_Float_Matrix; Train_Y : out Integer_Matrix;
+      Test_X  : out Long_Float_Matrix; Test_Y : out Integer_Matrix) is
       Routine_Name      : constant String :=
                               "Data_Splitter.Train_Test_Split Integer ";
       Num_Samples       : constant Positive := Positive (X'Length);
@@ -152,7 +152,7 @@ package body Data_Splitter is
       for index in Test_Indices'First .. Test_Indices'Last loop
          for col in Test_X'First (2) .. Test_X'Last (2) loop
             Test_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
+              Long_Float (X (Test_Indices (index), col));
             Test_Y (index - Test_Indices'First + 1, col) :=
               Y (Test_Indices (index), col);
          end loop;
@@ -161,7 +161,7 @@ package body Data_Splitter is
       for index in Train_Indices'First .. Train_Indices'Last loop
          for col in Train_X'First (2) .. Train_X'Last (2) loop
             Train_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
+              Long_Float (X (Test_Indices (index), col));
             Train_Y (index - Test_Indices'First + 1, col) :=
               Y (Test_Indices (index), col);
          end loop;
@@ -174,8 +174,8 @@ package body Data_Splitter is
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Boolean_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Float_Matrix; Train_Y : out Boolean_Matrix;
-      Test_X  : out Float_Matrix; Test_Y : out Boolean_Matrix) is
+      Train_X : out Long_Float_Matrix; Train_Y : out Boolean_Matrix;
+      Test_X  : out Long_Float_Matrix; Test_Y : out Boolean_Matrix) is
       Routine_Name      : constant String :=
                               "Data_Splitter.Train_Test_Split Boolean ";
       Num_Samples       : constant Positive := Positive (X'Length);
@@ -197,7 +197,7 @@ package body Data_Splitter is
       for index in Test_Indices'First .. Test_Indices'Last loop
          for col in Test_X'First (2) .. Test_X'Last (2) loop
             Test_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
+              Long_Float (X (Test_Indices (index), col));
             Test_Y (index - Test_Indices'First + 1, col) :=
               Y (Test_Indices (index), col);
          end loop;
@@ -206,7 +206,7 @@ package body Data_Splitter is
       for index in Train_Indices'First .. Train_Indices'Last loop
          for col in Train_X'First (2) .. Train_X'Last (2) loop
             Train_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
+              Long_Float (X (Test_Indices (index), col));
             Train_Y (index - Test_Indices'First + 1, col) :=
               Y (Test_Indices (index), col);
          end loop;

@@ -9,6 +9,8 @@ package Maths is
 
    package Float_Math_Functions is new
      Ada.Numerics.Generic_Elementary_Functions (Float);
+   package Long_Float_Math_Functions is new
+     Ada.Numerics.Generic_Elementary_Functions (Long_Float);
 
    function Cube_Root (Value : Float) return Float;
    function Degrees (Angle : Radian) return Degree;

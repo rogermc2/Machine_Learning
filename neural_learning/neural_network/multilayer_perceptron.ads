@@ -128,10 +128,10 @@ package Multilayer_Perceptron is
                      Max_Fun             : Natural := 15000)
                      return MLP_Classifier;
     procedure Fit (Self : in out MLP_Classifier;
-                   X    : Float_Matrix;
+                   X    : Long_Float_Matrix;
                    Y    : Integer_Matrix;
                    Incremental : Boolean := False);
-   function Predict (Self : MLP_Classifier; X : Float_Matrix)
-                     return Float_Matrix;
+   function Predict (Self : MLP_Classifier; X : Long_Float_Matrix)
+                     return Long_Float_Matrix;
 
 end Multilayer_Perceptron;

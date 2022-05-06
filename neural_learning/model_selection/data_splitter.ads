@@ -13,17 +13,17 @@ package Data_Splitter is
    procedure Train_Test_Split
      (X  : Float_Matrix; Y : Integer_Array;
       Train_Size, Test_Size : Natural;
-      Train_X : out Float_Matrix; Train_Y : out Integer_Array;
-      Test_X  : out Float_Matrix; Test_Y : out Integer_Array);
+      Train_X : out Long_Float_Matrix; Train_Y : out Integer_Array;
+      Test_X  : out Long_Float_Matrix; Test_Y : out Integer_Array);
    procedure Train_Test_Split
-      (X : Float_Matrix; Y : Integer_Matrix; Train_Size, Test_Size : Natural;
-       Train_X : out Float_Matrix; Train_Y : out Integer_Matrix;
-       Test_X  : out Float_Matrix; Test_Y : out Integer_Matrix);
+      (X : Long_Float_Matrix; Y : Integer_Matrix; Train_Size, Test_Size : Natural;
+       Train_X : out Long_Float_Matrix; Train_Y : out Integer_Matrix;
+       Test_X  : out Long_Float_Matrix; Test_Y : out Integer_Matrix);
    procedure Train_Test_Split
-     (X       : Float_Matrix; Y : Boolean_Matrix;
+     (X       : Long_Float_Matrix; Y : Boolean_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Float_Matrix; Train_Y : out Boolean_Matrix;
-      Test_X  : out Float_Matrix; Test_Y : out Boolean_Matrix);
+      Train_X : out Long_Float_Matrix; Train_Y : out Boolean_Matrix;
+      Test_X  : out Long_Float_Matrix; Test_Y : out Boolean_Matrix);
 
 private
 

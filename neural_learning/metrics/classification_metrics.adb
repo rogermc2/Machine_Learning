@@ -7,20 +7,20 @@
 
 package body Classification_Metrics is
 
-   procedure Check_Targets (Y_True, Y_Prediction : Float_Matrix);
+   procedure Check_Targets (Y_True, Y_Prediction : Long_Float_Matrix);
    function Weighted_Sum
-     (Sample_Score   : Float_Matrix;
+     (Sample_Score   : Long_Float_Matrix;
       Sample_Weights : Float_Array;
       Normalize      : Boolean := False) return float;
 
    --  ------------------------------------------------------------------------
    --  L144
    function Accuracy_Score
-     (Y_True, Y_Prediction : Float_Matrix; Normalize : Boolean := True;
+     (Y_True, Y_Prediction : Long_Float_Matrix; Normalize : Boolean := True;
      Sample_Weight : Float_Array) return float is
 --        Routine_Name : constant String :=
 --                         "Classification_Metrics.Accuracy_Score, ";
-      Score        :  Float_Matrix := Y_Prediction;
+      Score        : Long_Float_Matrix := Y_Prediction;
    begin
       Check_Targets (Y_True, Y_Prediction);
       for row in Score'Range loop
@@ -67,7 +67,7 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   procedure Check_Targets (Y_True, Y_Prediction : Float_Matrix) is
+   procedure Check_Targets (Y_True, Y_Prediction : Long_Float_Matrix) is
    begin
       NL_Arrays_And_Matrices.Check_Lengths
         ("Classification_Metrics.Check_Targets", Y_True, Y_Prediction);
@@ -105,7 +105,7 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Weighted_Sum
-     (Sample_Score   : Float_Matrix; Sample_Weights : Float_Array;
+     (Sample_Score   : Long_Float_Matrix; Sample_Weights : Float_Array;
       Normalize      : Boolean := False) return Float is
       --        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
       W_Sum       : Float;

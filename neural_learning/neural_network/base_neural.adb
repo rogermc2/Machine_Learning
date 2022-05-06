@@ -11,22 +11,25 @@ with Neural_Maths;
 
 package body Base_Neural is
 
-   EPS : constant Float := Float'Small;
+   EPS : constant Long_Float := Long_Float'Small;
 
-   function X_Log_Y (X : Boolean_Matrix; Y : Float_Matrix) return Float_Matrix;
+   function X_Log_Y (X : Boolean_Matrix; Y : Long_Float_Matrix)
+   return Long_Float_Matrix;
    pragma Inline (X_Log_Y);
 
    --  -------------------------------------------------------------------------
 
-   function Binary_Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
-                              return Float is
+   function Binary_Log_Loss (Y_True : Boolean_Matrix;
+                             Y_Prob : Long_Float_Matrix) return Float is
       --        Routine_Name : constant String :=
       --                         "Base_Neural.Binary_Log_Loss_Function ";
-      YP       : Float_Matrix := Y_Prob;
-      X_Log_Y1 : Float_Matrix (YP'Range, YP'Range (2));
-      X_Log_Y2 : Float_Matrix (YP'Range, YP'Range (2));
-      Sum1     : Float := 0.0;
-      Sum2     : Float := 0.0;
+      Unit_Matrix : constant Long_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2))
+          := (others => (others => 1.0));
+      YP          : Long_Float_Matrix := Y_Prob;
+      X_Log_Y1    : Long_Float_Matrix (YP'Range, YP'Range (2));
+      X_Log_Y2    : Long_Float_Matrix (YP'Range, YP'Range (2));
+      Sum1        : Long_Float := 0.0;
+      Sum2        : Long_Float := 0.0;
    begin
       --        Assert (Y_Prob'Length = Y_True'Length and
       --                  Y_Prob'Length (2) = Y_True'Length (2), Routine_Name &
@@ -50,7 +53,7 @@ package body Base_Neural is
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       X_Log_Y1 := X_Log_Y (Y_True, YP);
-      X_Log_Y2 := X_Log_Y (not Y_True, 1.0 - YP);
+      X_Log_Y2 := X_Log_Y (not Y_True, Unit_Matrix - YP);
 
       for row in YP'Range loop
          for col in YP'Range (2) loop
@@ -59,50 +62,50 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      return - (Sum1 + Sum2) / Float (Y_Prob'Length);
+      return - Float ((Sum1 + Sum2) / Long_Float (Y_Prob'Length));
 
    end Binary_Log_Loss;
 
    --  -------------------------------------------------------------------------
 
-   procedure Identity (Activation : Float_Matrix) is
+   procedure Identity (Activation : Long_Float_Matrix) is
    begin
       null;
    end Identity;
 
    --  ------------------------------------------------------------------------
 
-   procedure Identity_Derivative (Z   : Float_Matrix;
-                                  Del : in out Float_Matrix) is
+   procedure Identity_Derivative (Z   : Long_Float_Matrix;
+                                  Del : in out Long_Float_Matrix) is
    begin
       null;
    end Identity_Derivative;
 
    --  ------------------------------------------------------------------------
 
-   procedure Logistic (Activation : in out Float_Matrix) is
-      use Maths.Float_Math_Functions;
-      type Matrix_Float is new Float_Matrix (1 .. Activation'Length,
-                                             1 .. Activation'Length (2));
+   procedure Logistic (Activation : in out Long_Float_Matrix) is
+      use Maths.Long_Float_Math_Functions;
+      type Matrix_Float is new Long_Float_Matrix (1 .. Activation'Length,
+                                                  1 .. Activation'Length (2));
       Sigmoid  : Matrix_Float;
    begin
-      for row in Activation'Range loop
-         for col in Activation'Range (2) loop
+      for row in Sigmoid'Range loop
+         for col in Sigmoid'Range (2) loop
             Sigmoid (row, col) :=
-              (1.0 / (1.0 + Exp (Activation (row, col))));
+             1.0 / (1.0 + Exp (Activation (row, col)));
          end loop;
       end loop;
 
-      Activation := Float_Matrix (Sigmoid);
+      Activation := Long_Float_Matrix (Sigmoid);
 
    end Logistic;
 
    --  -------------------------------------------------------------------------
 
-   procedure Logistic_Derivative (Z   : Float_Matrix;
-                                  Del : in out Float_Matrix) is
-      type Matrix_Float is new Float_Matrix (1 .. Z'Length,
-                                             1 .. Z'Length (2));
+   procedure Logistic_Derivative (Z   : Long_Float_Matrix;
+                                  Del : in out Long_Float_Matrix) is
+      type Matrix_Float is new Long_Float_Matrix (1 .. Z'Length,
+                                                  1 .. Z'Length (2));
       Prod  : Matrix_Float;
    begin
       Del := Del * Z;
@@ -112,34 +115,33 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      Del := Del * Float_Matrix (Prod);
+      Del := Del * Long_Float_Matrix (Prod);
 
    end Logistic_Derivative;
 
    --  -------------------------------------------------------------------------
 
-   function Logistic_Sigmoid (X : Float) return Float is
-      use Maths.Float_Math_Functions;
+   function Logistic_Sigmoid (X : Long_Float) return Float is
+      use Maths.Long_Float_Math_Functions;
    begin
-      return 1.0 / (1.0 + Exp (X));
+      return Float (1.0 / (1.0 + Exp (X)));
    end Logistic_Sigmoid;
 
    --  ------------------------------------------------------------------------
    --  L177 Log Loss is the negative average of the log of corrected predicted
    --  probabilities for each instance.
-   function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
+   function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Long_Float_Matrix)
                        return Float is
-      --          use Ada.Containers;
       --          Routine_Name : constant String := "Base_Neural.Log_Loss ";
-      YP           : Float_Matrix := Y_Prob;
+      YP           : Long_Float_Matrix := Y_Prob;
       YT2          : Boolean_Matrix (Y_True'Range, Y_True'First (2) ..
                                        Y_True'Last (2) + 1);
-      YP2          : Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
+      YP2          : Long_Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
 
-      function Do_XlogY (Y_True : Boolean_Matrix; Y_Prob : Float_Matrix)
-                           return Float is
-         X_Y : Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
-         Sum : Float := 0.0;
+      function Do_XlogY (Y_True : Boolean_Matrix; Y_Prob : Long_Float_Matrix)
+                           return Long_Float is
+         X_Y : Long_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
+         Sum : Long_Float := 0.0;
       begin
          X_Y := X_Log_Y (Y_True, Y_Prob);
          for row in Y_Prob'Range loop
@@ -148,7 +150,7 @@ package body Base_Neural is
             end loop;
          end loop;
 
-         return - Sum / Float (Y_Prob'Length);
+         return - Sum / Long_Float (Y_Prob'Length);
       end Do_XlogY;
 
    begin
@@ -174,34 +176,35 @@ package body Base_Neural is
             end loop;
          end loop;
 
-         return Do_XlogY (YT2, YP2);
+         return Float (Do_XlogY (YT2, YP2));
 
       else
-         return Do_XlogY (Y_True, YP);
+         return Float (Do_XlogY (Y_True, YP));
       end if;
 
    end Log_Loss;
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu (Activation : in out Float_Matrix) is
-      type Matrix_Float is new Float_Matrix (1 .. Activation'Length,
-                                             1 .. Activation'Length (2));
+   procedure Relu (Activation : in out Long_Float_Matrix) is
+      type Matrix_Float is new Long_Float_Matrix (1 .. Activation'Length,
+                                                  1 .. Activation'Length (2));
       Result : Matrix_Float;
    begin
       for row in Activation'Range loop
          for col in Activation'Range (2) loop
-            Result (row, col) := Float'Max (0.0, Activation (row, col));
+            Result (row, col) := Long_Float'Max (0.0, Activation (row, col));
          end loop;
       end loop;
 
-      Activation := Float_Matrix (Result);
+      Activation := Long_Float_Matrix (Result);
 
    end Relu;
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu_Derivative (Z : Float_Matrix; Del : in out Float_Matrix) is
+   procedure Relu_Derivative (Z : Long_Float_Matrix;
+                              Del : in out Long_Float_Matrix) is
    begin
       for row in Z'Range loop
          for col in Z'Range (2) loop
@@ -215,9 +218,9 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Softmax (Activation : in out Float_Matrix) is
+   procedure Softmax (Activation : in out Long_Float_Matrix) is
 --        Routine_Name : constant String := "Base_Neural.Softmax ";
-      Tmp          : Float_Matrix := Activation - Max (Activation);
+      Tmp  : Long_Float_Matrix := Activation - Max (Activation);
    begin
       Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
       Activation := Tmp / Sum (Tmp);
@@ -226,9 +229,9 @@ package body Base_Neural is
 
    --  ------------------------------------------------------------------------
    --  L158
-   function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Float_Matrix)
+   function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Long_Float_Matrix)
                            return Float is
-      Diff : Float_Matrix := -Y_Pred;
+      Diff : Long_Float_Matrix := -Y_Pred;
    begin
       for row in Diff'Range loop
          for col in Diff'Range (2) loop
@@ -238,17 +241,17 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      return Neural_Maths.Mean (Diff ** 2) / 2.0;
+      return Float (Neural_Maths.Mean (Diff * Diff) / 2.0);
 
    end Squared_Loss;
 
    --  -------------------------------------------------------------------------
 
-   procedure Tanh (Activation : in out Float_Matrix) is
-      use Maths.Float_Math_Functions;
-      type Matrix_Float is new Float_Matrix (1 .. Activation'Length,
-                                             1 .. Activation'Length (2));
-      Result   : Matrix_Float;
+   procedure Tanh (Activation : in out Long_Float_Matrix) is
+      use Maths.Long_Float_Math_Functions;
+      type Matrix_Float is new Long_Float_Matrix (1 .. Activation'Length,
+                                                  1 .. Activation'Length (2));
+      Result : Matrix_Float;
    begin
       for row in Activation'Range loop
          for col in Activation'Range (2) loop
@@ -256,17 +259,17 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      Activation := Float_Matrix (Result);
+      Activation := Long_Float_Matrix (Result);
 
    end Tanh;
 
    --  -------------------------------------------------------------------------
 
-   procedure Tanh_Derivative (Z   : Float_Matrix;
-                              Del : in out Float_Matrix) is
-      type Matrix_Float is new Float_Matrix (1 .. Z'Length,
-                                             1 .. Z'Length (2));
-      Del_2  : Matrix_Float;
+   procedure Tanh_Derivative (Z   : Long_Float_Matrix;
+                              Del : in out Long_Float_Matrix) is
+      type Matrix_Float is new Long_Float_Matrix (1 .. Z'Length,
+                                                  1 .. Z'Length (2));
+      Del_2 : Matrix_Float;
    begin
       for row in Z'Range loop
          for col in Z'Range (2) loop
@@ -274,18 +277,18 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      Del := Del * Float_Matrix (Del_2);
+      Del := Del * Long_Float_Matrix (Del_2);
 
    end Tanh_Derivative;
 
    --  -------------------------------------------------------------------------
    --  scipy/special/_xlogy.pxd
    --  xlogy = x*log(y) so that the result is 0 if x = 0
-   function X_Log_Y (X : Boolean_Matrix; Y : Float_Matrix)
-                      return Float_Matrix is
-      use Maths.Float_Math_Functions;
-      Y1     : Float_Matrix := Y;
-      Result : Float_Matrix (Y'Range, Y'Range (2));
+   function X_Log_Y (X : Boolean_Matrix; Y : Long_Float_Matrix)
+                      return Long_Float_Matrix is
+      use Maths.Long_Float_Math_Functions;
+      Y1     : Long_Float_Matrix := Y;
+      Result : Long_Float_Matrix (Y'Range, Y'Range (2));
    begin
       for row in X'Range loop
          for col in X'Range (2) loop
