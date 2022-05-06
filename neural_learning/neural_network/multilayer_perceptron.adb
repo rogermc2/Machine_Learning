@@ -114,7 +114,7 @@ package body Multilayer_Perceptron is
       use Ada.Containers;
       use Base_Neural;
       use NL_Types.Float_Package;
-      Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+--        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Last               : constant Positive := Self.Attributes.N_Layers - 1;
       Loss_Function_Name : Loss_Function;
@@ -131,14 +131,6 @@ package body Multilayer_Perceptron is
       else
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
-
-      --                Assert (Y'Length = Activations.Last_Element'Length and
-      --                          Y'Length (2) = Activations.Last_Element'Length (2),
-      --                        Routine_Name & "L284 Activations.Last_Element size" &
-      --                          Count_Type'Image (Activations.Last_Element'Length) & " x" &
-      --                          Count_Type'Image (Activations.Last_Element'Length (2)) &
-      --                          " should be the same as Y size" & Integer'Image (Y'Length) &
-      --                          " x" & Integer'Image (Y'Length (2)));
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
@@ -186,16 +178,7 @@ package body Multilayer_Perceptron is
       --  of the ith layer.
 
       --  L295  Backward propagate python last = self.n_layers_ - 2
-      --        Last := Self.Attributes.N_Layers - 1;
       Deltas.Set_Length (Count_Type (Last));
-
-      --          Assert (Y'Length = Activations.Last_Element'Length and
-      --                    Y'Length (2) = Activations.Last_Element'Length (2),
-      --                  Routine_Name & "L284 Activations.Last_Element size" &
-      --                    Integer'Image (Activations.Last_Element'Length) & " x" &
-      --                    Integer'Image (Activations.Last_Element'Length (2)) &
-      --                    " should be the same as Y size" & Integer'Image (Y'Length) &
-      --                    " x" & Integer'Image (Y'Length (2)));
       --  L301
       declare
          Diff : Float_Matrix := Activations.Last_Element;
@@ -213,13 +196,6 @@ package body Multilayer_Perceptron is
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
                              Grads);
---        Put_Line (Routine_Name & "L308 Last" &
---                    Integer'Image (Integer (Last)));
---        Put_Line (Routine_Name & "Coeff_Grads (Last) size" &
---                    Integer'Image (Grads (Last).Coeff_Grads'Length)
---                  & " x" &
---                    Integer'Image (Grads (Last).Coeff_Grads'Length (2)));
-
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          declare
@@ -228,13 +204,6 @@ package body Multilayer_Perceptron is
             Dot_L  : constant Float_Matrix := Deltas (index);
             Dot_R  : constant Float_Matrix := S_List.Coeff_Grads;
          begin
-            Assert (Dot_L'Length (2) = Dot_R'Length (2) and
-                      Dot_L'Length (2) = Dot_R'Length,
-                    Routine_Name & "L310 Dot_L size 2:" &
-                      Integer'Image (Dot_L'Length (2)) &
-                      " should be the same as Dot_R 2 size:" &
-                      Integer'Image (Dot_R'Length (2)));
-
             Deltas.Replace_Element (index - 1, Dot (Dot_L, Transpose (Dot_R)));
 
             case Self.Parameters.Activation is
@@ -251,25 +220,8 @@ package body Multilayer_Perceptron is
 
             Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
                                    Deltas, Grads);
---              Put_Line (Routine_Name & "loop end index" & Integer'Image (index));
---              Put_Line (Routine_Name & "Coeff_Grads (index) size" &
---                          Integer'Image (Grads (index).Coeff_Grads'Length)
---                        & " x" &
---                          Integer'Image (Grads (index).Coeff_Grads'Length (2)));
-
          end;  --  declare
       end loop;
---        Put_Line (Routine_Name & "loop end Grads size" &
---                    Integer'Image (Integer (Grads.Length)));
---        Put_Line (Routine_Name & "Coeff_Grads (2) size" &
---                    Integer'Image (Grads (2).Coeff_Grads'Length)
---                  & " x" &
---                    Integer'Image (Grads (2).Coeff_Grads'Length (2)));
---        Put_Line (Routine_Name & "Coeff_Grads (1) size" &
---                    Integer'Image (Grads (1).Coeff_Grads'Length)
---                  & " x" &
---                    Integer'Image (Grads (1).Coeff_Grads'Length (2)));
---        New_Line;
 
    end Backprop;
 
@@ -731,8 +683,8 @@ package body Multilayer_Perceptron is
                                return Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
-      --          Routine_Name       : constant String :=
-      --                                 "Multilayer_Perceptron.Forward_Pass_Fast ";
+--        Routine_Name       : constant String :=
+--                               "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -763,7 +715,7 @@ package body Multilayer_Perceptron is
                end case;
             end if;
 
-            if layer = 1 then
+            if layer = Num_Layers - 1 then
                Activ_Out := Activ_Coeff;
             end if;
          end;
@@ -830,10 +782,16 @@ package body Multilayer_Perceptron is
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
-      Self.Attributes.N_Iter := 0;
+      Self.Attributes.Loss := 0.0;
+      Self.Attributes.Best_Loss := 0.0;
+      Self.Attributes.Loss_Curve.Clear;
+      Self.Attributes.No_Improvement_Count := 0;
+      Self.Attributes.T := 0;
+      Self.Attributes.Params.Clear;  --  Layers
+      Self.Attributes.Coef_Indptr.Clear;
+      Self.Attributes.Intercept_Indptr.Clear;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
-      Self.Attributes.Params.Clear;
 
       if Self.Estimator_Kind /= Classifier_Estimator then
          Self.Attributes.Out_Activation := Identity_Activation;
