@@ -35,10 +35,7 @@ begin
     begin
         Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
                     Count_Type'Image (Train_X'Length (2)));
-        Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
-                    Count_Type'Image (Train_Y'Length (2)));
         Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
-        Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
         for index in 1 .. 4 loop
             Hidden_Layer_Sizes.Clear;
