@@ -1063,15 +1063,14 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
-                          return PLplot_Auxiliary.Real_Matrix is
-      use PLplot_Auxiliary;
+                          return Real_Float_Matrix is
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_PL_Array ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
       Num_Cols     : constant Positive := Length_1D / Num_Rows;
       End_Offset   : constant Positive := Num_Cols - 1;
       Start        : Positive := List_1D.First_Index;
-      Result       : Real_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+      Result       : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
    begin
       Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
                 Integer'Image (Num_Rows) & " is incompatible with List_1D size"

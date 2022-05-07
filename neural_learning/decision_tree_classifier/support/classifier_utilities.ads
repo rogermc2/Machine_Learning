@@ -1,6 +1,4 @@
 
-with PLplot_Auxiliary;
-
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 
@@ -49,13 +47,11 @@ package Classifier_Utilities is
 --                        return Weights.Weight_List;
    function To_Float_List (F : Value_Data_List) return Float_List;
    function To_Float_List (I : Integer_List) return Float_List;
-   function To_Float_List (A : NL_Arrays_And_Matrices.Float_Array)
-                           return NL_Types.Float_List;
-   function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                             return NL_Types.Natural_List;
+   function To_Float_List (A : Float_Array) return NL_Types.Float_List;
+   function To_Natural_List (A : Natural_Array) return NL_Types.Natural_List;
    function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D;
    function To_Integer_List (Ints : Value_Data_List) return Integer_List;
-   function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
+   function To_Multi_Value_List (A : Multi_Value_Array)
                                      return Value_Data_Lists_2D;
    function To_Natural_List (Numbers : Value_Data_List) return Natural_List;
    function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
@@ -65,7 +61,7 @@ package Classifier_Utilities is
    function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
                                    return Value_Data_Lists_2D;
    function To_PL_Array (List_1D  : Float_List; Num_Rows : Positive)
-                         return PLplot_Auxiliary.Real_Matrix;
+                         return Real_Float_Matrix;
    function To_Value_2D_List (A : Value_Data_List)
                               return Value_Data_Lists_2D;
    function To_Value_2D_List (List_1D  : Value_Data_List;
@@ -74,7 +70,5 @@ package Classifier_Utilities is
    function Transpose (Values : Value_Data_Lists_2D)
                        return  Value_Data_Lists_2D;
    function Unique (Nums : Integer_List) return Integer_List;
---     function Unique_Weights (Values : Weights.Weight_Lists_2D)
---                              return Weights.Weight_List;
 
 end Classifier_Utilities;
