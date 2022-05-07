@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/base.py
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classification_Metrics;
 
@@ -10,7 +10,6 @@ package body Base is
                    X, Y : Real_Float_Matrix; Sample_Weight : Real_Float_Vector)
                    return Float is
    begin
-       Put_Line ("Base.Score");
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction  => Multilayer_Perceptron.Predict (Self, X),
          Normalize => True, Sample_Weight => Sample_Weight);

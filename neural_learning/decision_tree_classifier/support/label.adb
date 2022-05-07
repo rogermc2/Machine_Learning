@@ -359,7 +359,6 @@ package body Label is
       Y_Inv     : Real_Float_Matrix (1 .. Y'Length, 1 .. 1);
 --        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
    begin
-       Put_Line ("Label.Inverse_Transform");
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
@@ -367,7 +366,6 @@ package body Label is
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
 
-       Put_Line ("Label.Inverse_Transform done");
       return Y_Inv;
 
    end Inverse_Transform;

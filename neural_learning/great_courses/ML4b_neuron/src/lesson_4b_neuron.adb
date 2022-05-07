@@ -47,7 +47,6 @@ begin
             --  Fit function adjusts weights according to data values so that better
             --  accuracy can be achieved
             Fit (aClassifier, Train_X, Train_Y);
-            Put_Line (Routine_Name & "Fitted");
             Put_Line (Integer'Image (index * 10) & " Score: " &
                         Float'Image
                         (Base.Score (Self => aClassifier, X => Test_X,
