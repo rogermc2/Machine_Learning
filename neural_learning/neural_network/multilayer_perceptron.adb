@@ -113,7 +113,6 @@ package body Multilayer_Perceptron is
                        Grads       : out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
-      use NL_Types.Float_Package;
 --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Last               : constant Positive := Self.Attributes.N_Layers - 1;
@@ -145,19 +144,22 @@ package body Multilayer_Perceptron is
       --                    Float'Image (Loss));
 
       --  L289  Add L2 regularization term to loss
+      --  for s in self.coefs_:
       for s in Self.Attributes.Params.First_Index ..
         Self.Attributes.Params.Last_Index loop
          declare
-            S_List : constant Parameters_Record :=
-                       Self.Attributes.Params (s);
-            Ravel  : Real_Matrix_List;
+            Coeffs : constant Real_Float_Matrix :=
+                           Self.Attributes.Params (s).Coeff_Grads;
+            --  numpy.ravel (a) returns the elements of a as a 1-D array.
+            Ravel  : Real_Float_Vector (1 .. Coeffs'Length * Coeffs'Length (2));
          begin
-            for row in S_List.Coeff_Grads'Range loop
-               for col in S_List.Coeff_Grads'Range (2) loop
-                  Ravel := Ravel & S_List.Coeff_Grads (row, col);
+            for row in Coeffs'Range loop
+               for col in Coeffs'Range (2) loop
+                  Ravel ((row - 1) * Coeffs'Length (2) +
+                           col - Coeffs'First (2) + 1) := Coeffs (row, col);
                end loop;
             end loop;
-            Values := Values + Dot (Ravel, Ravel);
+            Values := Values + Ravel * Ravel;
          end;  --  declare
       end loop;
 
