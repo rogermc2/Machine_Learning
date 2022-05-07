@@ -109,9 +109,9 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function "/" (L : Long_Float_Matrix; R : Long_Float_Array)
-                  return Long_Float_Matrix is
-        Result : Long_Float_Matrix  := L;
+    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                  return Real_Float_Matrix is
+        Result : Real_Float_Matrix  := L;
     begin
         for row in L'Range loop
             for col in L'Range (2) loop
@@ -243,9 +243,9 @@ package body NL_Arrays_And_Matrices is
 
     --  ----------------------------------------------------------------------------
 
-    function "-" (L : Long_Float_Matrix; R : Long_Float_Array)
-                  return Long_Float_Matrix is
-        Result : Long_Float_Matrix := L;
+    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                  return Real_Float_Matrix is
+        Result : Real_Float_Matrix := L;
     begin
         for row in L'Range loop
             for col in L'Range (2) loop
@@ -354,8 +354,8 @@ package body NL_Arrays_And_Matrices is
 
     --  ----------------------------------------------------------------------------
 
-   function Dot (L, R : Long_Float_List) return Long_Float is
-      Result : Long_Float := 0.0;
+   function Dot (L, R : Real_Float_List) return Float is
+      Result : Float := 0.0;
    begin
       for index in L.First_Index .. L.Last_Index loop
          Result := Result + L.Element (index) * R.Element (index);
@@ -383,9 +383,9 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function Exp (M : Long_Float_Matrix) return Long_Float_Matrix is
-        use Maths.Long_Float_Math_Functions;
-        Result : Long_Float_Matrix (M'Range, M'Range (2));
+    function Exp (M : Real_Float_Matrix) return Real_Float_Matrix is
+        use Maths.Float_Math_Functions;
+        Result : Real_Float_Matrix (M'Range, M'Range (2));
     begin
         for row in M'Range loop
             for col in M'Range (2) loop
@@ -397,7 +397,8 @@ package body NL_Arrays_And_Matrices is
 
     end Exp;
 
-    --  ---------------------------------------
+    --  ------------------------------------------------------------------------
+
     function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
         Result : Float_Array (1 .. Positive (List.Length));
     begin
@@ -489,12 +490,12 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function Max (Data : Long_Float_Matrix) return Long_Float_Array is
-        Result  : Long_Float_Array (Data'Range);
-        Max_Val : Long_Float;
+    function Max (Data : Real_Float_Matrix) return Real_Float_Vector is
+        Result  : Real_Float_Vector (Data'Range);
+        Max_Val : Float;
     begin
         for row in Data'Range loop
-            Max_Val := Long_Float'First;
+            Max_Val := Float'First;
             for col in Data'Range (2) loop
                 if Data (row, col) > Max_Val then
                     Max_Val := Data (row, Col);
@@ -527,9 +528,9 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function Sum (Data : Long_Float_Matrix) return Long_Float_Array is
-        Result : Long_Float_Array (Data'Range);
-        Val    : Long_Float;
+    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector is
+        Result : Real_Float_Vector (Data'Range);
+        Val    : Float;
     begin
         for row in Data'Range loop
             Val := 0.0;
@@ -638,19 +639,19 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function To_Long_Float_Matrix (IM : Integer_Matrix)
-                                   return Long_Float_Matrix is
-        Result : Long_Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
+    function To_Real_Float_Matrix (IM : Integer_Matrix)
+                                   return Real_Float_Matrix is
+        Result : Real_Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
     begin
         for row in IM'First .. IM'Last loop
             for col in IM'First (2) .. IM'Last (2) loop
-                Result (row, col) := Long_Float (IM (row, col));
+                Result (row, col) := Float (IM (row, col));
             end loop;
         end loop;
 
         return Result;
 
-    end To_Long_Float_Matrix;
+    end To_Real_Float_Matrix;
 
     --  ------------------------------------------------------------------------
 

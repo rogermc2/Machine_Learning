@@ -68,10 +68,10 @@ package body Support_4 is
             X            : Float_Matrix := To_Float_Matrix (Bunch.Data);
             Y            : Integer_Array := To_Integer_Array (Bunch.Target);
             Num_Features : constant Positive := Positive (X'Length (2));
-            Train_X      : Long_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
+            Train_X      : Real_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
             Train_Y      : Integer_Array (1 .. Train_Size);
             Train_Y2     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
-            Test_X       : Long_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
+            Test_X       : Real_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Test_Y2      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
             Data         : Base_State (Train_Size, Test_Size, Num_Features);

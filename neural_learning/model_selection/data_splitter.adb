@@ -72,8 +72,8 @@ package body Data_Splitter is
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Integer_Array;
       Train_Size, Test_Size : Natural;
-      Train_X : out Long_Float_Matrix; Train_Y : out Integer_Array;
-      Test_X  : out Long_Float_Matrix; Test_Y : out Integer_Array) is
+      Train_X : out Real_Float_Matrix; Train_Y : out Integer_Array;
+      Test_X  : out Real_Float_Matrix; Test_Y : out Integer_Array) is
       Routine_Name        : constant String := "Data_Splitter.Train_Test_Split ";
       Num_Samples         : constant Positive := X'Length;
 --        Num_Features        : constant Positive := X'Length (2);
@@ -129,8 +129,8 @@ package body Data_Splitter is
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Integer_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Long_Float_Matrix; Train_Y : out Integer_Matrix;
-      Test_X  : out Long_Float_Matrix; Test_Y : out Integer_Matrix) is
+      Train_X : out Real_Float_Matrix; Train_Y : out Integer_Matrix;
+      Test_X  : out Real_Float_Matrix; Test_Y : out Integer_Matrix) is
       Routine_Name      : constant String :=
                               "Data_Splitter.Train_Test_Split Integer ";
       Num_Samples       : constant Positive := Positive (X'Length);
@@ -174,8 +174,8 @@ package body Data_Splitter is
    procedure Train_Test_Split
      (X       : Float_Matrix; Y : Boolean_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Long_Float_Matrix; Train_Y : out Boolean_Matrix;
-      Test_X  : out Long_Float_Matrix; Test_Y : out Boolean_Matrix) is
+      Train_X : out Real_Float_Matrix; Train_Y : out Boolean_Matrix;
+      Test_X  : out Real_Float_Matrix; Test_Y : out Boolean_Matrix) is
       Routine_Name      : constant String :=
                               "Data_Splitter.Train_Test_Split Boolean ";
       Num_Samples       : constant Positive := Positive (X'Length);

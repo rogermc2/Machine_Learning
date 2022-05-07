@@ -175,13 +175,13 @@ package body Neural_Maths is
 
    --  ------------------------------------------------------------------------
 
-   function Mean (A : Long_Float_Matrix; Axis : Positive)
-                  return Long_Float_Array is
+   function Mean (A : Real_Float_Matrix; Axis : Positive)
+                  return Real_Float_Vector is
 
-      function Do_Mean (FM : Long_Float_Matrix) return Long_Float_Array is
+      function Do_Mean (FM : Real_Float_Matrix) return Real_Float_Vector is
          Length : constant Positive := FM'Length (2);
          Sum    : Long_Float;
-         Result : Long_Float_Array (1 .. Length);
+         Result : Real_Float_Vector (1 .. Length);
       begin
          for col in FM'Range (2) loop
             Sum := 0.0;
@@ -204,7 +204,7 @@ package body Neural_Maths is
 
    --  ------------------------------------------------------------------------
 
-   function Mean (A : Long_Float_Matrix) return Long_Float is
+   function Mean (A : Real_Float_Matrix) return Long_Float is
       Length  : constant Long_Float := Long_Float (A'Length * A'Length (2));
       Sum     : Long_Float := 0.0;
    begin

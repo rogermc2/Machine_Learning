@@ -58,8 +58,8 @@ package body Multilayer_Perceptron is
      (Self        : MLP_Classifier;
       Layer       : Positive;
       Num_Samples : Positive;
-      Activations : Long_Matrix_List;
-      Deltas      : Long_Matrix_List;
+      Activations : Real_Matrix_List;
+      Deltas      : Real_Matrix_List;
       Grads       : in out Parameters_List);
    --     procedure Fit_Lbfgs (Self        : in out MLP_Classifier;
    --                          X           : Float_List_2D;
@@ -69,34 +69,34 @@ package body Multilayer_Perceptron is
    --                          Grads       : in out Parameters_List;
    --                          Layer_Units : Integer_List);
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
-                             X            : Long_Float_Matrix;
+                             X            : Real_Float_Matrix;
                              Y            : Boolean_Matrix;
-                             Activations  : in out Long_Matrix_List;
+                             Activations  : in out Real_Matrix_List;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
-                           Activations  : in out Long_Matrix_List);
-   function Forward_Pass_Fast (Self  : MLP_Classifier; X : Long_Float_Matrix)
-                               return Long_Float_Matrix;
+                           Activations  : in out Real_Matrix_List);
+   function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
+                               return Real_Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
    procedure Init_Optimizer (Self : in out MLP_Classifier);
    procedure Process_Batch (Self             : in out MLP_Classifier;
-                            X                : Long_Float_Matrix;
+                            X                : Real_Float_Matrix;
                             Y                : Boolean_Matrix;
-                            Activations      : in out Long_Matrix_List;
+                            Activations      : in out Real_Matrix_List;
                             Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float);
    procedure Update_Activations
      (Params             : Parameters_Record;
-      Activations        : in out Long_Matrix_List;
+      Activations        : in out Real_Matrix_List;
       Hidden_Activation  : Base_Neural.Activation_Type;
       Num_Layers, Layer  : Positive);
    procedure Update_No_Improvement_Count
      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val, Y_Val : Long_Float_Matrix);
+      X_Val, Y_Val : Real_Float_Matrix);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
@@ -106,20 +106,20 @@ package body Multilayer_Perceptron is
    --  L241  Backprop computes the MLP loss function and its derivatives
    --       with respect to each parameter: weights and bias vectors.
    procedure Backprop (Self        : in out MLP_Classifier;
-                       X           : Long_Float_Matrix;
+                       X           : Real_Float_Matrix;
                        Y           : Boolean_Matrix;
-                       Activations : in out Long_Matrix_List;
+                       Activations : in out Real_Matrix_List;
                        Loss        : out Float;
                        Grads       : out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
-      use Long_Float_Package;
+      use NL_Types.Float_Package;
 --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Last               : constant Positive := Self.Attributes.N_Layers - 1;
       Loss_Function_Name : Loss_Function;
-      Deltas             : Long_Matrix_List;
-      Values             : Long_Float := 0.0;
+      Deltas             : Real_Matrix_List;
+      Values             : Float := 0.0;
    begin
       Grads.Set_Length (Count_Type (Last));
       Forward_Pass (Self, Activations);
@@ -150,7 +150,7 @@ package body Multilayer_Perceptron is
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (s);
-            Ravel  : Long_Float_List;
+            Ravel  : Real_Matrix_List;
          begin
             for row in S_List.Coeff_Grads'Range loop
                for col in S_List.Coeff_Grads'Range (2) loop
@@ -162,8 +162,8 @@ package body Multilayer_Perceptron is
       end loop;
 
       --  L292
-      Loss := Loss + Float (0.5 * Long_Float (Self.Parameters.Alpha) *
-        Values / Long_Float (Num_Samples));
+      Loss := Loss + 0.5 * (Self.Parameters.Alpha *
+        Values / Float (Num_Samples));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following combinations
@@ -181,7 +181,7 @@ package body Multilayer_Perceptron is
       Deltas.Set_Length (Count_Type (Last));
       --  L301
       declare
-         Diff : Long_Float_Matrix := Activations.Last_Element;
+         Diff : Real_Float_Matrix := Activations.Last_Element;
       begin
          for row in Activations.Last_Element'Range loop
             for col in  Activations.Last_Element'Range (2) loop
@@ -201,8 +201,8 @@ package body Multilayer_Perceptron is
          declare
             S_List : constant Parameters_Record :=
                        Self.Attributes.Params (index);
-            Dot_L  : constant Long_Float_Matrix := Deltas (index);
-            Dot_R  : constant Long_Float_Matrix := S_List.Coeff_Grads;
+            Dot_L  : constant Real_Float_Matrix := Deltas (index);
+            Dot_R  : constant Real_Float_Matrix := S_List.Coeff_Grads;
          begin
             Deltas.Replace_Element (index - 1, Dot_L * Transpose (Dot_R));
 
@@ -231,7 +231,7 @@ package body Multilayer_Perceptron is
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Weights ";
       Params       : constant Parameters_List := Self.Attributes.Params;
-      Weight       : Long_Float;
+      Weight       : Float;
       Bad          : Boolean := False;
    begin
       for index in Params.First_Index .. Params.Last_Index loop
@@ -325,22 +325,22 @@ package body Multilayer_Perceptron is
      (Self        : MLP_Classifier;
       Layer       : Positive;
       Num_Samples : Positive;
-      Activations : Long_Matrix_List;
-      Deltas      : Long_Matrix_List;
+      Activations : Real_Matrix_List;
+      Deltas      : Real_Matrix_List;
       Grads       : in out Parameters_List) is
       use Ada.Containers;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Compute_Loss_Gradient ";
-      Delta_M      : constant Long_Float_Matrix := Deltas (Layer);
-      Activ_M      : constant Long_Float_Matrix := Activations (Layer);
+      Delta_M      : constant Real_Float_Matrix := Deltas (Layer);
+      Activ_M      : constant Real_Float_Matrix := Activations (Layer);
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
-      Coeffs       : constant Long_Float_Matrix := Params.Coeff_Grads;
-      Delta_Act    : Long_Float_Matrix
+      Coeffs       : constant Real_Float_Matrix := Params.Coeff_Grads;
+      Delta_Act    : Real_Float_Matrix
         (Activ_M'First (2) .. Activ_M'Last (2),
          Delta_M'First (2) .. Delta_M'Last (2));
       --  Mean computes mean of values along the specified axis.
-      Delta_Mean   : constant Long_Float_Array :=
+      Delta_Mean   : constant Real_Float_Vector :=
                        Neural_Maths.Mean (Deltas (Layer), 1);
       New_Grad     : Parameters_Record (Params.Num_Rows, Params.Num_Cols);
    begin
@@ -357,9 +357,9 @@ package body Multilayer_Perceptron is
       --  L185
       --  Coeff_Grads is a list of fan_in x fan_out matrices
       New_Grad.Coeff_Grads :=
-        Delta_Act + Long_Float (Self.Parameters.Alpha) * Coeffs;
+        Delta_Act + Self.Parameters.Alpha * Coeffs;
       New_Grad.Coeff_Grads :=
-        New_Grad.Coeff_Grads / Long_Float (Num_Samples);
+        New_Grad.Coeff_Grads / Float (Num_Samples);
       New_Grad.Intercept_Grads := Delta_Mean;
       Grads.Replace_Element (Layer, New_Grad);
 
@@ -368,7 +368,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L377  MultilayerPerceptron._Fit
    procedure Fit (Self        : in out MLP_Classifier;
-                  X           : Long_Float_Matrix;
+                  X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
@@ -380,7 +380,7 @@ package body Multilayer_Perceptron is
       Y_Bin              : constant Boolean_Matrix :=
                              Validate_Input (Self, Y, Incremental);
       Layer_Units        : NL_Types.Integer_List;
-      Activations        : Long_Matrix_List;
+      Activations        : Real_Matrix_List;
    begin
       Validate_Hyperparameters (Self);
       First_Pass :=
@@ -469,9 +469,9 @@ package body Multilayer_Perceptron is
 
    --  L563
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
-                             X            : Long_Float_Matrix;
+                             X            : Real_Float_Matrix;
                              Y            : Boolean_Matrix;
-                             Activations  : in out Long_Matrix_List;
+                             Activations  : in out Real_Matrix_List;
                              Incremental  : Boolean := False) is
       --        use Ada.Containers;
       use Estimator;
@@ -495,15 +495,15 @@ package body Multilayer_Perceptron is
       Train_Size                         : constant Positive := Num_Samples - Test_Size;
       --          Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
       --          Should_Stratify        : Boolean;
-      Train_X                            : Long_Float_Matrix
+      Train_X                            : Real_Float_Matrix
         (1 .. Train_Size, 1 .. Num_Features);
       Train_Y                            : Boolean_Matrix
         (1 .. Train_Size, 1 .. Num_Classes);
-      Test_X                             : Long_Float_Matrix
+      Test_X                             : Real_Float_Matrix
         (1 .. Test_Size, 1 .. Num_Features);
       Test_Y                             : NL_Arrays_And_Matrices.Boolean_Matrix
         (1 .. Test_Size, 1 .. Num_Classes);
-      Val_Y                              : Long_Float_Matrix
+      Val_Y                              : Real_Float_Matrix
         (1 .. Test_Size, 1 .. Num_Classes) := (others => (others => 0.0));
       Batch_Size                         : Positive;
       Batches                            : NL_Types.Slices_List;
@@ -638,7 +638,7 @@ package body Multilayer_Perceptron is
    --  computing the values of the neurons in the hidden layers and the
    --  output layer.
    procedure Forward_Pass (Self         : MLP_Classifier;
-                           Activations  : in out Long_Matrix_List) is
+                           Activations  : in out Real_Matrix_List) is
       --  The ith element of Activations (length n_layers - 1) holds
       --  the activation values of the ith layer.
       --  Activations: layers x matrix (samples x features)
@@ -679,8 +679,8 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   function Forward_Pass_Fast (Self  : MLP_Classifier; X : Long_Float_Matrix)
-                               return Long_Float_Matrix is
+   function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
+                               return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
 --        Routine_Name       : constant String :=
@@ -692,8 +692,8 @@ package body Multilayer_Perceptron is
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params_List        : constant Parameters_List := Self.Attributes.Params;
       --  Initialize first layer
-      Activation         : constant Long_Float_Matrix := X;
-      Activ_Out          : Long_Float_Matrix (X'Range,
+      Activation         : constant Real_Float_Matrix := X;
+      Activ_Out          : Real_Float_Matrix (X'Range,
                                               1 .. Self.Attributes.N_Outputs);
 
    begin
@@ -701,7 +701,7 @@ package body Multilayer_Perceptron is
       for layer in reverse 1 .. Num_Layers - 1 loop
          declare
             Params      : constant Parameters_Record := Params_List (layer);
-            Activ_Coeff : Long_Float_Matrix := Activation * Params.Coeff_Grads;
+            Activ_Coeff : Real_Float_Matrix := Activation * Params.Coeff_Grads;
          begin
             Activ_Coeff := Activ_Coeff + Params.Intercept_Grads;
 
@@ -740,12 +740,12 @@ package body Multilayer_Perceptron is
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record is
       use Maths;
-      use Long_Float_Math_Functions;
+      use Float_Math_Functions;
       use Base_Neural;
       --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
-      Factor       : Long_Float;
-      Init_Bound   : Long_Float;
+      Factor       : Float;
+      Init_Bound   : Float;
    begin
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
@@ -753,19 +753,17 @@ package body Multilayer_Perceptron is
          Factor := 6.0;
       end if;
 
-      Init_Bound := Sqrt (Factor / Long_Float (Fan_In + Fan_Out));
+      Init_Bound := Sqrt (Factor / Float (Fan_In + Fan_Out));
       --  Generate random weights
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Params.Coeff_Grads (f_in, f_out) :=
-                  Init_Bound * Long_Float (Random_Float);
+            Params.Coeff_Grads (f_in, f_out) := Init_Bound * Random_Float;
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) :=
-              Init_Bound * Long_Float (Random_Float);
+         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
       end loop;
 
       return Params;
@@ -894,9 +892,9 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   function Predict (Self : MLP_Classifier; X : Long_Float_Matrix)
-                     return Long_Float_Matrix is
-      Y_Pred : constant Long_Float_Matrix :=
+   function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
+                     return Real_Float_Matrix is
+      Y_Pred : constant Real_Float_Matrix :=
                    Forward_Pass_Fast (Self, X);
    begin
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
@@ -906,9 +904,9 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    procedure Process_Batch (Self                     : in out MLP_Classifier;
-                            X                        : Long_Float_Matrix;
+                            X                        : Real_Float_Matrix;
                             Y                        : Boolean_Matrix;
-                            Activations              : in out Long_Matrix_List;
+                            Activations              : in out Real_Matrix_List;
                             Batch_Slice              : NL_Types.Slice_Record;
                             Batch_Size               : Positive;
                             Accumulated_Loss         : in out Float) is
@@ -916,7 +914,7 @@ package body Multilayer_Perceptron is
       --                         "Multilayer_Perceptron.Process_Batch ";
       Num_Features : constant Positive := Positive (X'Length (2));
       Num_Classes  : constant Positive := Y'Length (2);
-      X_Batch      : Long_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
+      X_Batch      : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
       Y_Batch      : Boolean_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
       Grads        : Parameters_List;
       Batch_Row    : Positive;
@@ -949,18 +947,18 @@ package body Multilayer_Perceptron is
 
    procedure Update_Activations
      (Params             : Parameters_Record;
-      Activations        : in out Long_Matrix_List;
+      Activations        : in out Real_Matrix_List;
       Hidden_Activation  : Base_Neural.Activation_Type;
       Num_Layers, Layer  : Positive) is
       use Base_Neural;
       --        Routine_Name         : constant String :=
       --                                 "Multilayer_Perceptron.Update_Activations ";
-      Activ_Layer          : constant Long_Float_Matrix := Activations (layer);
-      Coefficient_Matrix   : constant Long_Float_Matrix := Params.Coeff_Grads;
+      Activ_Layer          : constant Real_Float_Matrix := Activations (layer);
+      Coefficient_Matrix   : constant Real_Float_Matrix := Params.Coeff_Grads;
       --  Intercepts: layers x intercept values
-      Intercepts           : constant Long_Float_Array :=
+      Intercepts           : constant Real_Float_Vector :=
                                  Params.Intercept_Grads;
-      Activ_Dot_Coeff      : constant Long_Float_Matrix :=
+      Activ_Dot_Coeff      : constant Real_Float_Matrix :=
                                  Activ_Layer * Coefficient_Matrix;
    begin
       --  L131 Add layer + 1
@@ -985,7 +983,7 @@ package body Multilayer_Perceptron is
    --  L716
    procedure Update_No_Improvement_Count
      (Self          : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val, Y_Val  : Long_Float_Matrix) is
+      X_Val, Y_Val  : Real_Float_Matrix) is
       Routine_Name     : constant String
         :="Multilayer_Perceptron.Update_No_Improvement_Count ";
       Sample_Weight    : constant Float_Array (1 .. 0) := (others => 0.0);
