@@ -29,13 +29,14 @@ package NL_Arrays_And_Matrices is
     subtype Matrix_List is Matrix_List_Package.Vector;
 
     package Real_Float_Arrays is new Generic_Real_Arrays (Float);
-    type Real_Float_Matrix is new Real_Float_Arrays.Real_Matrix;
-    type Real_Float_Vector is new Real_Float_Arrays.Real_Vector;
+    subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
+    subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
 
    package Real_Float_Package is new
       Ada.Containers.Vectors (Positive, Float);
    subtype Real_Float_List is Real_Float_Package.Vector;
 
+    use Real_Float_Arrays;
     package Real_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
       (Positive, Real_Float_Matrix);
     subtype Real_Matrix_List is Real_Matrix_List_Package.Vector;
@@ -55,7 +56,8 @@ package NL_Arrays_And_Matrices is
     function "+" (L, R : Float_Array) return Float_Array;
     function "+" (L, R : Float_Matrix) return Float_Matrix;
     function "+" (L : Float_Matrix; R : Float_Array) return Float_Matrix;
---      function "+" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
+    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                  return Real_Float_Matrix;
     pragma Inline ("+");
     function "-" (M : Float_Matrix) return Float_Matrix;
     function "-" (L, R : Float_Matrix) return Float_Matrix;
@@ -66,6 +68,8 @@ package NL_Arrays_And_Matrices is
                   return Real_Float_Matrix;
     pragma Inline ("-");
     procedure Check_Lengths (Routine_Name : String; L, R : Float_Matrix);
+    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix);
+    pragma Inline (Check_Lengths);
     function Diff_Max (Data : Float_Matrix; Axis : Positive)
                        return Float_Matrix;
     function Dot (L, R : Float_Matrix) return Float_Matrix;

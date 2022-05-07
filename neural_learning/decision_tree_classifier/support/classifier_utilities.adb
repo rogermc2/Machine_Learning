@@ -475,6 +475,34 @@ package body Classifier_Utilities is
 
    --  -----------------------------------------------------------------------
 
+   --  Row_Max_Indices returns the indices of the maximum value in each row
+   --  of a matrix.
+   function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array is
+      Indices   : Natural_Array (1 .. Values'Length);
+      Max_Value : Float;
+      Max_Index : Positive;
+      Col       : Natural;
+   begin
+      for row in Values'Range loop
+         Max_Value := Values (row, 1);
+         Max_Index := 1;
+         Col := 1;
+         while Col < Values'Last (2) loop
+            Col := Col + 1;
+            if Values (row, Col) > Max_Value then
+               Max_Index := Col;
+               Max_Value := Values (row, col);
+            end if;
+         end loop;
+         Indices (row) := Max_Index;
+      end loop;
+
+      return Indices;
+
+   end Row_Max_Indices;
+
+   --  -----------------------------------------------------------------------
+
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                          return Integer_List is
       use Integer_Package;

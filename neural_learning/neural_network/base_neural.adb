@@ -21,6 +21,7 @@ package body Base_Neural is
 
    function Binary_Log_Loss (Y_True : Boolean_Matrix;
                              Y_Prob : Real_Float_Matrix) return Float is
+      use Real_Float_Arrays;
       --        Routine_Name : constant String :=
       --                         "Base_Neural.Binary_Log_Loss_Function ";
       Unit_Matrix : constant Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2))
@@ -104,6 +105,7 @@ package body Base_Neural is
 
    procedure Logistic_Derivative (Z   : Real_Float_Matrix;
                                   Del : in out Real_Float_Matrix) is
+      use Real_Float_Arrays;
       type Matrix_Float is new Real_Float_Matrix (1 .. Z'Length,
                                                   1 .. Z'Length (2));
       Prod  : Matrix_Float;
@@ -231,6 +233,7 @@ package body Base_Neural is
    --  L158
    function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Real_Float_Matrix)
                            return Float is
+      use Real_Float_Arrays;
       Diff : Real_Float_Matrix := -Y_Pred;
    begin
       for row in Diff'Range loop
@@ -241,7 +244,7 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      return Float (Neural_Maths.Mean (Diff * Diff) / 2.0);
+      return Neural_Maths.Mean (Diff * Diff) / 2.0;
 
    end Squared_Loss;
 
@@ -267,6 +270,8 @@ package body Base_Neural is
 
    procedure Tanh_Derivative (Z   : Real_Float_Matrix;
                               Del : in out Real_Float_Matrix) is
+
+      use Real_Float_Arrays;
       type Matrix_Float is new Real_Float_Matrix (1 .. Z'Length,
                                                   1 .. Z'Length (2));
       Del_2 : Matrix_Float;

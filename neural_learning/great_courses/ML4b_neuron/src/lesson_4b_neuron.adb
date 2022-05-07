@@ -31,7 +31,7 @@ begin
         Train_Y       : constant Integer_Matrix := Data.Train_Y;
         Test_X        : constant Real_Float_Matrix := Data.Test_X;
         Test_Y        : constant Integer_Matrix := Data.Test_Y;
-        Sample_Weight : Float_Array (1 .. 0);
+        Sample_Weight : Real_Float_Vector (1 .. 0);
     begin
         Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
                     Count_Type'Image (Train_X'Length (2)));

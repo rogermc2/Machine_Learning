@@ -168,6 +168,22 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
+    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                  return Real_Float_Matrix is
+        Result : Real_Float_Matrix  := L;
+    begin
+        for row in L'Range loop
+            for col in L'Range (2) loop
+                Result (row, col) := Result (row, col) + R (col);
+            end loop;
+        end loop;
+
+        return Result;
+
+    end "+";
+
+    --  ------------------------------------------------------------------------
+
     function "-" (M : Float_Matrix) return Float_Matrix is
         Result : Float_Matrix (M'Range, M'Range (2));
     begin
@@ -257,8 +273,21 @@ package body NL_Arrays_And_Matrices is
 
     end "-";
 
-    --  ---------------------------------------------------
+    --  ------------------------------------------------------------------------
+
     procedure Check_Lengths (Routine_Name : String; L, R : Float_Matrix) is
+    begin
+        Assert (R'Length = L'Length and R'Length (2) = L'Length (2),
+                Routine_Name &
+                  " right size" & Integer'Image (R'Length) & " x" &
+                  Integer'Image (R'Length (2)) &
+                  " should be the same as left size" & Integer'Image (L'Length) &
+                  " x" & Integer'Image (L'Length (2)));
+    end Check_Lengths;
+
+    --  ----------------------------------------------------------------------------
+
+    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix) is
     begin
         Assert (R'Length = L'Length and R'Length (2) = L'Length (2),
                 Routine_Name &

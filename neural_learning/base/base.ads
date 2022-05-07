@@ -7,6 +7,6 @@ package Base is
 
    function Score (Self          : Multilayer_Perceptron.MLP_Classifier;
                    X, Y          : Real_Float_Matrix;
-                   Sample_Weight : Float_Array) return Float;
+                   Sample_Weight : Real_Float_Vector) return Float;
 
 end Base;

@@ -31,6 +31,7 @@ package Classifier_Utilities is
 --                                        return Weights.Weight_Lists_3D;
    function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array;
    function Row_Max_Indices (Values : Float_Matrix) return Natural_Array;
+   function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List;
    function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)

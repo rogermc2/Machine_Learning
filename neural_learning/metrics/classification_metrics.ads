@@ -6,6 +6,6 @@ package Classification_Metrics is
 
    function Accuracy_Score
      (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
-      Sample_Weight : Float_Array) return Float;
+      Sample_Weight : Real_Float_Vector) return Float;
 
 end Classification_Metrics;

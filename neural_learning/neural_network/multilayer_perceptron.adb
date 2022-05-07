@@ -113,12 +113,13 @@ package body Multilayer_Perceptron is
                        Grads       : out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
+      use Real_Float_Arrays;
 --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Last               : constant Positive := Self.Attributes.N_Layers - 1;
       Loss_Function_Name : Loss_Function;
       Deltas             : Real_Matrix_List;
-      Values             : Float := 0.0;
+      Sum_Sq_Coeffs      : Float;
    begin
       Grads.Set_Length (Count_Type (Last));
       Forward_Pass (Self, Activations);
@@ -145,6 +146,7 @@ package body Multilayer_Perceptron is
 
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
+      Sum_Sq_Coeffs := 0.0;
       for s in Self.Attributes.Params.First_Index ..
         Self.Attributes.Params.Last_Index loop
          declare
@@ -159,13 +161,13 @@ package body Multilayer_Perceptron is
                            col - Coeffs'First (2) + 1) := Coeffs (row, col);
                end loop;
             end loop;
-            Values := Values + Ravel * Ravel;
+            Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
          end;  --  declare
       end loop;
 
       --  L292
       Loss := Loss + 0.5 * (Self.Parameters.Alpha *
-        Values / Float (Num_Samples));
+        Sum_Sq_Coeffs / Float (Num_Samples));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following combinations
@@ -331,6 +333,7 @@ package body Multilayer_Perceptron is
       Deltas      : Real_Matrix_List;
       Grads       : in out Parameters_List) is
       use Ada.Containers;
+      use Real_Float_Arrays;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : constant Real_Float_Matrix := Deltas (Layer);
@@ -685,7 +688,8 @@ package body Multilayer_Perceptron is
                                return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
---        Routine_Name       : constant String :=
+      use Real_Float_Arrays;
+      --        Routine_Name       : constant String :=
 --                               "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
@@ -896,8 +900,7 @@ package body Multilayer_Perceptron is
 
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Real_Float_Matrix is
-      Y_Pred : constant Real_Float_Matrix :=
-                   Forward_Pass_Fast (Self, X);
+      Y_Pred : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
@@ -953,6 +956,7 @@ package body Multilayer_Perceptron is
       Hidden_Activation  : Base_Neural.Activation_Type;
       Num_Layers, Layer  : Positive) is
       use Base_Neural;
+      use Real_Float_Arrays;
       --        Routine_Name         : constant String :=
       --                                 "Multilayer_Perceptron.Update_Activations ";
       Activ_Layer          : constant Real_Float_Matrix := Activations (layer);
@@ -988,7 +992,7 @@ package body Multilayer_Perceptron is
       X_Val, Y_Val  : Real_Float_Matrix) is
       Routine_Name     : constant String
         :="Multilayer_Perceptron.Update_No_Improvement_Count ";
-      Sample_Weight    : constant Float_Array (1 .. 0) := (others => 0.0);
+      Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
       Last_Valid_Score : Float;
       Score_Val        : Float ;
    begin
