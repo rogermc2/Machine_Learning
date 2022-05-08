@@ -428,19 +428,6 @@ package body NL_Arrays_And_Matrices is
 
     --  ------------------------------------------------------------------------
 
-    function To_Float_Array (List : NL_Types.Float_List) return Float_Array is
-        Result : Float_Array (1 .. Positive (List.Length));
-    begin
-        for row in List.First_Index .. List.Last_Index loop
-            Result (row) := List (row);
-        end loop;
-
-        return Result;
-
-    end To_Float_Array;
-
-    --  ------------------------------------------------------------------------
-
     function Flatten (M : Float_Matrix) return Float_Array is
         Flat : Float_Array (1 .. M'Length * M'Length (2));
     begin
@@ -596,21 +583,6 @@ package body NL_Arrays_And_Matrices is
         end if;
 
     end To_Boolean_Array;
-
-    --  ------------------------------------------------------------------------
-
-    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix is
-        Result : Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
-    begin
-        for row in IM'First .. IM'Last loop
-            for col in IM'First (2) .. IM'Last (2) loop
-                Result (row, col) := Float (IM (row, col));
-            end loop;
-        end loop;
-
-        return Result;
-
-    end To_Float_Matrix;
 
     --  ------------------------------------------------------------------------
 

@@ -93,9 +93,6 @@ package NL_Arrays_And_Matrices is
     pragma Inline (Max);
     function To_Boolean_Array (List : NL_Types.Boolean_List)
                               return Boolean_Array;
-    function To_Float_Matrix (IM : Integer_Matrix) return Float_Matrix;
-    function To_Float_Array (List : NL_Types.Float_List) return Float_Array;
-    pragma Inline (To_Float_Array);
     function To_Float_Matrix (List : NL_Types.Float_List_2D)
                               return Float_Matrix;
     function To_Integer_Array (List : NL_Types.Integer_List)
