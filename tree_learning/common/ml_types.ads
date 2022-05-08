@@ -4,6 +4,7 @@ with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Multiway_Trees;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
+with Ada.Numerics.Generic_Real_Arrays;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 package ML_Types is
@@ -24,16 +25,22 @@ package ML_Types is
    subtype Feature_Class is Class_Range;
    subtype Question_Type is Class_Range;
 
-   package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
+   package Integer_Package is new
+      Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;
 
    use Integer_Package;
-   package Integer_Package_2D is new Ada.Containers.Vectors (Positive, Integer_List);
+   package Integer_Package_2D is new
+      Ada.Containers.Vectors (Positive, Integer_List);
    subtype Integer_List_2D is Integer_Package_2D.Vector;
 
    package Integer_DLL_Package is new
      Ada.Containers.Doubly_Linked_Lists (Integer);
    subtype Integer_DL_List is Integer_DLL_Package.List;
+
+    package Real_Float_Arrays is new Ada.Numerics.Generic_Real_Arrays (Float);
+    subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
+    subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
 
    package Character_Package is new Ada.Containers.Vectors
      (Positive, Character);
