@@ -174,6 +174,52 @@ package body Neural_Maths is
    end Mean;
 
    --  ------------------------------------------------------------------------
+
+   function Mean (A : Real_Float_Matrix; Axis : Positive)
+                  return Real_Float_Vector is
+      use Real_Float_Arrays;
+
+      function Do_Mean (FM : Real_Float_Matrix) return Real_Float_Vector is
+         Length : constant Positive := FM'Length (2);
+         Sum    : Float;
+         Result : Real_Float_Vector (1 .. Length);
+      begin
+         for col in FM'Range (2) loop
+            Sum := 0.0;
+            for row in FM'Range loop
+               Sum := Sum + FM (row, col);
+            end loop;
+            Result (col) := Sum / Float (Length);
+         end loop;
+         return Result;
+      end Do_Mean;
+
+   begin
+      if Axis = 1 then
+         return Do_Mean (A);
+      else
+         return Do_Mean (Transpose (A));
+      end if;
+
+   end Mean;
+
+   --  ------------------------------------------------------------------------
+
+   function Mean (A : Real_Float_Matrix) return Float is
+      Length  : constant Float := Float (A'Length * A'Length (2));
+      Sum     : Float := 0.0;
+   begin
+      for row in A'First .. A'Last loop
+         for col in A'First (2) .. A'Last (2) loop
+            Sum := Sum + A (row, col);
+         end loop;
+      end loop;
+
+      return Sum / Length;
+
+   end Mean;
+
+   --  ------------------------------------------------------------------------
    --  Based on github.com/scipy/scipy/blob/main/scipy/special/cephes/polevl.h
    --  Pol_Eval evaluates polynomial of degree N:
    --  y  =  C0  + C1 x + C2 x^2  +...+ CN x^N

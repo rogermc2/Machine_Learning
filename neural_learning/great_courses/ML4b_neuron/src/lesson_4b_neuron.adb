@@ -27,11 +27,11 @@ begin
     declare
         Data          : constant Base_State :=
                           Get_State (Dataset_Name, Train_Size, Test_Size);
-        Train_X       : constant Float_Matrix := Data.Train_X;
+        Train_X       : constant Real_Float_Matrix := Data.Train_X;
         Train_Y       : constant Integer_Matrix := Data.Train_Y;
-        Test_X        : constant Float_Matrix := Data.Test_X;
+        Test_X        : constant Real_Float_Matrix := Data.Test_X;
         Test_Y        : constant Integer_Matrix := Data.Test_Y;
-        Sample_Weight : Float_Array (1 .. 0);
+        Sample_Weight : Real_Float_Vector (1 .. 0);
     begin
         Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
                     Count_Type'Image (Train_X'Length (2)));
@@ -50,7 +50,7 @@ begin
             Put_Line (Integer'Image (index * 10) & " Score: " &
                         Float'Image
                         (Base.Score (Self => aClassifier, X => Test_X,
-                                     Y => To_Float_Matrix (Test_Y),
+                                     Y => To_Real_Float_Matrix (Test_Y),
                                      Sample_Weight => Sample_Weight)));
         end loop;
     end;  --  declare

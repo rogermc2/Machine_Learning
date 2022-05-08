@@ -187,7 +187,7 @@ package NL_Types is
    procedure Check_Lengths (Routine_Name : String; L, R : Value_Data_Lists_2D);
    procedure Check_Length
      (Routine_Name : String; L : Value_Data_Lists_2D; R : Float_List);
-   function Dot (L : Float_List; R : Float_List) return float;
+   function Dot (L, R : Float_List) return Float;
    function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
    function Dot (L : Float_List; R : Value_Data_Lists_2D) return Float;
 

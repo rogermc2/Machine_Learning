@@ -7,20 +7,20 @@
 
 package body Classification_Metrics is
 
-   procedure Check_Targets (Y_True, Y_Prediction : Float_Matrix);
+   procedure Check_Targets (Y_True, Y_Prediction : Real_Float_Matrix);
    function Weighted_Sum
-     (Sample_Score   : Float_Matrix;
-      Sample_Weights : Float_Array;
+     (Sample_Score   : Real_Float_Matrix;
+      Sample_Weights : Real_Float_Vector;
       Normalize      : Boolean := False) return float;
 
    --  ------------------------------------------------------------------------
    --  L144
    function Accuracy_Score
-     (Y_True, Y_Prediction : Float_Matrix; Normalize : Boolean := True;
-     Sample_Weight : Float_Array) return float is
+     (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
+     Sample_Weight : Real_Float_Vector) return float is
 --        Routine_Name : constant String :=
 --                         "Classification_Metrics.Accuracy_Score, ";
-      Score        :  Float_Matrix := Y_Prediction;
+      Score        : Real_Float_Matrix := Y_Prediction;
    begin
       Check_Targets (Y_True, Y_Prediction);
       for row in Score'Range loop
@@ -37,12 +37,12 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
    --  Numpy Average: avg = sum(a * weights) / sum(weights)
-   function Average (Sample_Score   : Float_Matrix;
-                     Sample_Weights : Float_Array)
+   function Average (Sample_Score   : Real_Float_Matrix;
+                     Sample_Weights : Real_Float_Vector)
                      return Float is
       --       Routine_Name : constant String :=
       --                        "Classification_Metrics.Average ";
-      Weights     : Float_Array (Sample_Score'Range (2));
+      Weights     : Real_Float_Vector (Sample_Score'Range (2));
       Sum_Weights : Float := 0.0;
       Sum         : Float := 0.0;
    begin
@@ -67,7 +67,7 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   procedure Check_Targets (Y_True, Y_Prediction : Float_Matrix) is
+   procedure Check_Targets (Y_True, Y_Prediction : Real_Float_Matrix) is
    begin
       NL_Arrays_And_Matrices.Check_Lengths
         ("Classification_Metrics.Check_Targets", Y_True, Y_Prediction);
@@ -76,7 +76,7 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   function Sum (Sample_Score : Float_Matrix) return float is
+   function Sum (Sample_Score : Real_Float_Matrix) return Float is
       Result : Float := 0.0;
    begin
       for row in Sample_Score'Range loop
@@ -91,7 +91,7 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   function Sum (Sample_Score : Float_Array) return float is
+   function Sum (Sample_Score : Real_Float_Vector) return Float is
       Result : Float := 0.0;
    begin
       for row in Sample_Score'Range loop
@@ -105,15 +105,16 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    function Weighted_Sum
-     (Sample_Score   : Float_Matrix; Sample_Weights : Float_Array;
+     (Sample_Score   : Real_Float_Matrix; Sample_Weights : Real_Float_Vector;
       Normalize      : Boolean := False) return Float is
+      use Real_Float_Arrays;
       --        Routine_Name : constant String := "Classification_Metrics.Weighted_Sum ";
       W_Sum       : Float;
    begin
       if Normalize then
          W_Sum := Average (Sample_Score, Sample_Weights);
       elsif Sample_Weights'Last >= Sample_Weights'First then
-         W_Sum := Sum (Dot (Sample_Score, Sample_Weights));
+         W_Sum := Sum (Sample_Score * Sample_Weights);
       else
          W_Sum := Sum (Sample_Score);
       end if;

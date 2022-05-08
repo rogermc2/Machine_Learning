@@ -475,6 +475,34 @@ package body Classifier_Utilities is
 
    --  -----------------------------------------------------------------------
 
+   --  Row_Max_Indices returns the indices of the maximum value in each row
+   --  of a matrix.
+   function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array is
+      Indices   : Natural_Array (1 .. Values'Length);
+      Max_Value : Float;
+      Max_Index : Positive;
+      Col       : Natural;
+   begin
+      for row in Values'Range loop
+         Max_Value := Values (row, 1);
+         Max_Index := 1;
+         Col := 1;
+         while Col < Values'Last (2) loop
+            Col := Col + 1;
+            if Values (row, Col) > Max_Value then
+               Max_Index := Col;
+               Max_Value := Values (row, col);
+            end if;
+         end loop;
+         Indices (row) := Max_Index;
+      end loop;
+
+      return Indices;
+
+   end Row_Max_Indices;
+
+   --  -----------------------------------------------------------------------
+
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                          return Integer_List is
       use Integer_Package;
@@ -1035,15 +1063,14 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
-                          return PLplot_Auxiliary.Real_Matrix is
-      use PLplot_Auxiliary;
+                          return Real_Float_Matrix is
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_PL_Array ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
       Num_Cols     : constant Positive := Length_1D / Num_Rows;
       End_Offset   : constant Positive := Num_Cols - 1;
       Start        : Positive := List_1D.First_Index;
-      Result       : Real_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+      Result       : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
    begin
       Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
                 Integer'Image (Num_Rows) & " is incompatible with List_1D size"
@@ -1051,8 +1078,7 @@ package body Classifier_Utilities is
 
       for row in reverse 1 .. Num_Rows loop
          for col in Start .. Start + End_Offset loop
-            --  PLplot_Auxiliary.Real_Matrix confusion Float or Long Float?????
-            Result (col - Start + 1, row) := Long_Float (List_1D.Element (col));
+            Result (col - Start + 1, row) := Float (List_1D.Element (col));
          end loop;
          Start := Start + Num_Cols;
       end loop;

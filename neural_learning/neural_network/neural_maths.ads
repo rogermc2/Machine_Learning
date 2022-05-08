@@ -9,5 +9,8 @@ package Neural_Maths is
    function Mean (A : Float_Matrix) return Float;
    function Mean (A : Float_Array) return Float;
    function Mean (A : Float_Matrix; Axis : Positive) return Float_Array;
+   function Mean (A : Real_Float_Matrix; Axis : Positive)
+                  return Real_Float_Vector;
+   function Mean (A : Real_Float_Matrix) return Float;
 
 end Neural_Maths;
