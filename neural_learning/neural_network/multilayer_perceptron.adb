@@ -53,8 +53,9 @@ package body Multilayer_Perceptron is
 
    First_Pass : Boolean := True;
 
-   Backprop_Duration : Duration;
-   Forward_Duration  : Duration;
+   Backprop_Duration    : Duration;
+   Forward_Duration     : Duration;
+   Activations_Duration : Duration;
 
    procedure Compute_Loss_Gradient
      (Self        : MLP_Classifier;
@@ -568,6 +569,7 @@ package body Multilayer_Perceptron is
       Batch_Duration := 0.0;
       Backprop_Duration := 0.0;
       Forward_Duration := 0.0;
+      Activations_Duration := 0.0;
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
          if Self.Parameters.Shuffle then
@@ -663,6 +665,10 @@ package body Multilayer_Perceptron is
                   Duration'Image (Forward_Duration) & " sec");
       Put_Line (Routine_Name & "Average Forward pass time per iter:" &
                   Duration'Image (Forward_Duration / Iter * 1000) & " msec");
+      Put_Line (Routine_Name & "Total Activations time:" &
+                  Duration'Image (Activations_Duration) & " sec");
+      Put_Line (Routine_Name & "Average Activations time per iter:" &
+                  Duration'Image (Activations_Duration / Iter * 1000) & " msec");
 
       --  L711
       if Early_Stopping then
@@ -692,6 +698,8 @@ package body Multilayer_Perceptron is
                              Self.Attributes.Out_Activation;
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params             : constant Parameters_List := Self.Attributes.Params;
+      Activ_Start        : constant Time := Clock;
+      Activ_Stop         : Time;
    begin
       --  129  Iterate over the hidden layers
       --  The Python range(stop) function returns a sequence of numbers,
@@ -705,6 +713,8 @@ package body Multilayer_Perceptron is
          Update_Activations (Params (layer), Activations, Hidden_Activation,
                              Num_Layers, layer);
       end loop;
+      Activ_Stop := Clock;
+      Activations_Duration := Activations_Duration + Activ_Stop - Activ_Start;
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
