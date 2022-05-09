@@ -35,13 +35,12 @@
 --  the bias values added to layer i + 1.
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Calendar; use Ada.Calendar;
+with Ada.Calendar; use Ada.Calendar;
 with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
---  with Utilities;
 
 with Base;
 with Data_Splitter;
@@ -53,6 +52,9 @@ with Utils;
 package body Multilayer_Perceptron is
 
    First_Pass : Boolean := True;
+
+   Backprop_Duration : Duration;
+   Forward_Duration  : Duration;
 
    procedure Compute_Loss_Gradient
      (Self        : MLP_Classifier;
@@ -76,7 +78,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Real_Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                                return Real_Float_Matrix;
+                               return Real_Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -120,9 +122,14 @@ package body Multilayer_Perceptron is
       Loss_Function_Name : Loss_Function;
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float;
+      Forward_Start      : Time;
+      Forward_Stop       : Time;
    begin
       Grads.Set_Length (Count_Type (Last));
+      Forward_Start := Clock;
       Forward_Pass (Self, Activations);
+      Forward_Stop := Clock;
+      Forward_Duration := Forward_Duration + Forward_Stop - Forward_Start;
 
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
@@ -478,7 +485,6 @@ package body Multilayer_Perceptron is
                              Y            : Boolean_Matrix;
                              Activations  : in out Real_Matrix_List;
                              Incremental  : Boolean := False) is
-      --        use Ada.Containers;
       use Estimator;
       Routine_Name                       : constant String :=
                                              "Multilayer_Perceptron.Fit_Stochastic ";
@@ -515,6 +521,12 @@ package body Multilayer_Perceptron is
       Accumulated_Loss                   : Float := 0.0;
       Msg                                : Unbounded_String;
       Is_Stopping                        : Boolean := False;
+--        Iter_Start                         : Time;
+--        Iter_Stop                          : Time;
+      Batch_Start                        : Time;
+      Batch_Stop                         : Time;
+      Batch_Duration                     : Duration;
+--        M_Sec                              : Duration;
    begin
       --  L576
       if not Incremental or else
@@ -529,7 +541,6 @@ package body Multilayer_Perceptron is
          --              if Should_Stratify then
          --                  Stratify := Y;
          --              end if;
-
          Data_Splitter.Train_Test_Split
            (X => X, Y => Y,
             Train_Size => Train_Size, Test_Size  => Test_Size,
@@ -553,6 +564,10 @@ package body Multilayer_Perceptron is
       end if;
 
       --  L628
+--        Iter_Start := Clock;
+      Batch_Duration := 0.0;
+      Backprop_Duration := 0.0;
+      Forward_Duration := 0.0;
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
          if Self.Parameters.Shuffle then
@@ -563,11 +578,14 @@ package body Multilayer_Perceptron is
          --  Batches is a list of slice lists
          Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          --  L636
+         Batch_Start := Clock;
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Activations, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
          end loop;
+         Batch_Stop := Clock;
+         Batch_Duration := Batch_Duration + (Batch_Stop - Batch_Start);
 
          Assert (Accumulated_Loss'Valid, Routine_Name &
                    "invalid Accumulated_Loss" &
@@ -627,6 +645,24 @@ package body Multilayer_Perceptron is
             New_Line;
          end if;
       end loop;
+--        Iter_Stop := Clock;
+--        M_Sec := (Iter_Stop - Iter_Start) * 1000;
+--        Put_Line (Routine_Name & "Iter time:" &
+--                    Duration'Image (M_Sec / 1000) & " sec");
+--        Put_Line (Routine_Name & "Average Iter time:" &
+--                    Duration'Image (M_Sec / Iter) & " msec");
+      Put_Line (Routine_Name & "Total Batch time:" &
+                  Duration'Image (Batch_Duration) & " sec");
+      Put_Line (Routine_Name & "Average batch loop time:" &
+                  Duration'Image (Batch_Duration / Iter * 1000) & " msec");
+      Put_Line (Routine_Name & "Total Backprop time:" &
+                  Duration'Image (Backprop_Duration) & " sec");
+      Put_Line (Routine_Name & "Average Backprop_Duration time per iter:" &
+                  Duration'Image (Backprop_Duration / Iter * 1000) & " msec");
+      Put_Line (Routine_Name & "Total Forward pass time:" &
+                  Duration'Image (Forward_Duration) & " sec");
+      Put_Line (Routine_Name & "Average Forward pass time per iter:" &
+                  Duration'Image (Forward_Duration / Iter * 1000) & " msec");
 
       --  L711
       if Early_Stopping then
@@ -685,12 +721,12 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                                return Real_Float_Matrix is
+                               return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       use Real_Float_Arrays;
---        Routine_Name       : constant String :=
---                               "Multilayer_Perceptron.Forward_Pass_Fast ";
+      --        Routine_Name       : constant String :=
+      --                               "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -698,7 +734,7 @@ package body Multilayer_Perceptron is
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params_List        : constant Parameters_List := Self.Attributes.Params;
       --  Initialize first layer
---        Activation         : constant Real_Float_Matrix := X;
+      --        Activation         : constant Real_Float_Matrix := X;
       Activ_Out          : Real_Float_Matrix (X'Range,
                                               1 .. Self.Attributes.N_Outputs);
       Activations        : Real_Matrix_List;
@@ -706,14 +742,14 @@ package body Multilayer_Perceptron is
       Activations.Append (X);
       --  L167 Forward propagate
       for layer in 1 .. Num_Layers - 1 loop
---           Put_Line (Routine_Name & "L167 layer" & Integer'Image (layer));
---           Put_Line (Routine_Name & "Activation size" &
---                       Integer'Image (Activations.Element (1)'Length) & " x" &
---                       Integer'Image (Activations.Element (1)'Length (2)));
---           Put_Line (Routine_Name & "Params_List (layer) size" &
---                       Integer'Image (Params_List (layer).Coeff_Grads'Length)
---                     & " x" & Integer'Image
---                       (Params_List (layer).Coeff_Grads'Length (2)));
+         --           Put_Line (Routine_Name & "L167 layer" & Integer'Image (layer));
+         --           Put_Line (Routine_Name & "Activation size" &
+         --                       Integer'Image (Activations.Element (1)'Length) & " x" &
+         --                       Integer'Image (Activations.Element (1)'Length (2)));
+         --           Put_Line (Routine_Name & "Params_List (layer) size" &
+         --                       Integer'Image (Params_List (layer).Coeff_Grads'Length)
+         --                     & " x" & Integer'Image
+         --                       (Params_List (layer).Coeff_Grads'Length (2)));
          declare
             Params             : constant Parameters_Record :=
                                    Params_List (layer);
@@ -912,7 +948,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                      return Real_Float_Matrix is
+                     return Real_Float_Matrix is
       Y_Pred : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
@@ -937,6 +973,8 @@ package body Multilayer_Perceptron is
       Grads        : Parameters_List;
       Batch_Row    : Positive;
       Batch_Loss   : Float;
+      Backprop_Start : Time;
+      Backprop_Stop  : Time;
    begin
       for row in Batch_Slice.First .. Batch_Slice.Last loop
          Batch_Row := row - Batch_Slice.First + 1;
@@ -950,7 +988,11 @@ package body Multilayer_Perceptron is
 
       --  L655
       Activations.Replace_Element (Activations.First_Index, X_Batch);
+
+      Backprop_Start := Clock;
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
+      Backprop_Stop := Clock;
+      Backprop_Duration := Backprop_Duration + Backprop_Stop - Backprop_Start;
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
