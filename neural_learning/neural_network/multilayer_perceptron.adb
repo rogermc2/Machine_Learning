@@ -95,7 +95,7 @@ package body Multilayer_Perceptron is
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float);
    procedure Update_Activations
-     (Params             : Parameters_Record;
+     (Params             : Parameters_List;
       Activations        : in out Real_Matrix_List;
       Hidden_Activation  : Base_Neural.Activation_Type;
       Num_Layers, Layer  : Positive);
@@ -524,12 +524,12 @@ package body Multilayer_Perceptron is
       Accumulated_Loss                   : Float := 0.0;
       Msg                                : Unbounded_String;
       Is_Stopping                        : Boolean := False;
-      --        Iter_Start                         : Time;
-      --        Iter_Stop                          : Time;
+      Iter_Start                         : Time;
+      Iter_Stop                          : Time;
       Batch_Start                        : Time;
       Batch_Stop                         : Time;
       Batch_Duration                     : Duration;
-      --        M_Sec                              : Duration;
+      M_Sec                              : Duration;
    begin
       --  L576
       if not Incremental or else
@@ -565,13 +565,16 @@ package body Multilayer_Perceptron is
                      " clipped to" & Integer'Image (Num_Samples));
          Batch_Size := Num_Samples;
       end if;
+      --  Batches is a list of slice lists
+      Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
-      --        Iter_Start := Clock;
+      Iter_Start := Clock;
       Batch_Duration := 0.0;
       Backprop_Duration := 0.0;
       Forward_Duration := 0.0;
       Activations_Duration := 0.0;
+
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
          if Self.Parameters.Shuffle then
@@ -579,8 +582,6 @@ package body Multilayer_Perceptron is
          end if;
 
          Accumulated_Loss := 0.0;
-         --  Batches is a list of slice lists
-         Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
          --  L636
          Batch_Start := Clock;
          for batch_index in Batches.First_Index ..
@@ -649,32 +650,32 @@ package body Multilayer_Perceptron is
             New_Line;
          end if;
       end loop;
-      --        Iter_Stop := Clock;
-      --        M_Sec := (Iter_Stop - Iter_Start) * 1000;
-      --        Put_Line (Routine_Name & "Iter time:" &
-      --                    Duration'Image (M_Sec / 1000) & " sec");
-      --        Put_Line (Routine_Name & "Average Iter time:" &
-      --                    Duration'Image (M_Sec / Iter) & " msec");
-      Put_Line (Routine_Name & "Total Batch time:" &
-                  Duration'Image (Batch_Duration) & " sec");
-      Put_Line (Routine_Name & "Average batch loop time:" &
-                  Duration'Image (Batch_Duration / Iter * 1000) & " msec");
-      Put_Line (Routine_Name & "Total Backprop time:" &
-                  Duration'Image (Backprop_Duration) & " sec");
-      Put_Line (Routine_Name & "Average Backprop_Duration time per iter:" &
-                  Duration'Image (Backprop_Duration / Iter * 1000) & " msec");
-      Put_Line (Routine_Name & "Total Forward pass time:" &
-                  Duration'Image (Forward_Duration) & " sec");
-      Put_Line (Routine_Name & "Average Forward pass time per iter:" &
-                  Duration'Image (Forward_Duration / Iter * 1000) & " msec");
-      Put_Line (Routine_Name & "Total Activations time:" &
-                  Duration'Image (Activations_Duration) & " sec");
-      Put_Line (Routine_Name & "Average Activations time per iter:" &
-                  Duration'Image (Activations_Duration / Iter * 1000) & " msec");
-      Put_Line (Routine_Name & "Max_Activations_Duration:" &
-                  Duration'Image (Max_Activations_Duration * 1000) & " msec");
-      Put_Line (Routine_Name & "Max_Softmax_Duration:" &
-                  Duration'Image (Max_Softmax_Duration * 1000) & " msec");
+            Iter_Stop := Clock;
+            M_Sec := (Iter_Stop - Iter_Start) * 1000;
+            Put_Line (Routine_Name & "Iter time:" &
+                        Duration'Image (M_Sec / 1000) & " sec");
+            Put_Line (Routine_Name & "Average Iter time:" &
+                        Duration'Image (M_Sec / Iter) & " msec");
+--        Put_Line (Routine_Name & "Total Batch time:" &
+--                    Duration'Image (Batch_Duration) & " sec");
+--        Put_Line (Routine_Name & "Average batch loop time:" &
+--                    Duration'Image (Batch_Duration / Iter * 1000) & " msec");
+--        Put_Line (Routine_Name & "Total Backprop time:" &
+--                    Duration'Image (Backprop_Duration) & " sec");
+--        Put_Line (Routine_Name & "Average Backprop_Duration time per iter:" &
+--                    Duration'Image (Backprop_Duration / Iter * 1000) & " msec");
+--        Put_Line (Routine_Name & "Total Forward pass time:" &
+--                    Duration'Image (Forward_Duration) & " sec");
+--        Put_Line (Routine_Name & "Average Forward pass time per iter:" &
+--                    Duration'Image (Forward_Duration / Iter * 1000) & " msec");
+--        Put_Line (Routine_Name & "Total Activations time:" &
+--                    Duration'Image (Activations_Duration) & " sec");
+--        Put_Line (Routine_Name & "Average Activations time per iter:" &
+--                    Duration'Image (Activations_Duration / Iter * 1000) & " msec");
+--        Put_Line (Routine_Name & "Max_Activations_Duration:" &
+--                    Duration'Image (Max_Activations_Duration * 1000) & " msec");
+--        Put_Line (Routine_Name & "Max_Softmax_Duration:" &
+--                    Duration'Image (Max_Softmax_Duration * 1000) & " msec");
 
       --  L711
       if Early_Stopping then
@@ -723,7 +724,7 @@ package body Multilayer_Perceptron is
       --  L130
       for layer in 1 .. Num_Layers - 1 loop
          Max_Activ_Start := Clock;
-         Update_Activations (Params (layer), Activations, Hidden_Activation,
+         Update_Activations (Params, Activations, Hidden_Activation,
                              Num_Layers, layer);
             Max_Activ_Stop := Clock;
             Max_Activ_Time := Max_Activ_Stop - Max_Activ_Start;
@@ -1040,7 +1041,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    procedure Update_Activations
-     (Params             : Parameters_Record;
+     (Params             : Parameters_List;
       Activations        : in out Real_Matrix_List;
       Hidden_Activation  : Base_Neural.Activation_Type;
       Num_Layers, Layer  : Positive) is
@@ -1049,10 +1050,10 @@ package body Multilayer_Perceptron is
       --        Routine_Name         : constant String :=
       --                                 "Multilayer_Perceptron.Update_Activations ";
       Activ_Layer          : constant Real_Float_Matrix := Activations (layer);
-      Coefficient_Matrix   : constant Real_Float_Matrix := Params.Coeff_Grads;
+      Coefficient_Matrix   : constant Real_Float_Matrix := Params (Layer).Coeff_Grads;
       --  Intercepts: layers x intercept values
       Intercepts           : constant Real_Float_Vector :=
-                               Params.Intercept_Grads;
+                               Params (Layer).Intercept_Grads;
       Activ_Dot_Coeff      : constant Real_Float_Matrix :=
                                Activ_Layer * Coefficient_Matrix;
    begin
