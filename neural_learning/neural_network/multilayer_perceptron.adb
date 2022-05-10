@@ -63,6 +63,7 @@ package body Multilayer_Perceptron is
       (Self        : MLP_Classifier;
        Layer       : Positive;
        Num_Samples : Positive;
+       Params      : Parameters_Record;
        Activations : Real_Matrix_List;
        Deltas      : Real_Matrix_List;
        Grads       : in out Parameters_List);
@@ -123,18 +124,21 @@ package body Multilayer_Perceptron is
                         Grads       : out Parameters_List) is
         use Ada.Containers;
         use Base_Neural;
+        use Parameters_Package;
         use Real_Float_Arrays;
         use Real_Matrix_List_Package;
---          Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+        --          Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
         Num_Samples        : constant Positive := Positive (X'Length);
         Last               : constant Positive := Self.Attributes.N_Layers - 1;
         Loss_Function_Name : Loss_Function;
+        Param_Cursor       : Parameters_Package.Cursor :=
+                               Self.Attributes.Params.First;
         Deltas             : Real_Matrix_List;
         Sum_Sq_Coeffs      : Float;
         Forward_Start      : Time;
         Forward_Stop       : Time;
     begin
-        Grads.Set_Length (Count_Type (Last));
+        --          Grads.Set_Length (Count_Type (Last));
         Forward_Start := Clock;
         Forward_Pass (Self, Activations);
         Forward_Stop := Clock;
@@ -163,11 +167,13 @@ package body Multilayer_Perceptron is
         --  L289  Add L2 regularization term to loss
         --  for s in self.coefs_:
         Sum_Sq_Coeffs := 0.0;
-        for s in Self.Attributes.Params.First_Index ..
-          Self.Attributes.Params.Last_Index loop
+        while Has_Element (Param_Cursor) loop
+            --          for s in Self.Attributes.Params.First_Index ..
+            --            Self.Attributes.Params.Last_Index loop
             declare
-                Coeffs : constant Real_Float_Matrix :=
-                           Self.Attributes.Params (s).Coeff_Grads;
+                Params : constant Parameters_Record := Element (Param_Cursor);
+                Coeffs : constant Real_Float_Matrix := Params.Coeff_Grads;
+                --                             Self.Attributes.Params (s).Coeff_Grads;
                 --  numpy.ravel (a) returns the elements of a as a 1-D array.
                 Ravel  : Real_Float_Vector (1 .. Coeffs'Length * Coeffs'Length (2));
             begin
@@ -179,6 +185,7 @@ package body Multilayer_Perceptron is
                 end loop;
                 Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
             end;  --  declare
+            Next (Param_Cursor);
         end loop;
 
         --  L292
@@ -215,8 +222,10 @@ package body Multilayer_Perceptron is
         end;
 
         --  L304  Compute gradient for the last layer
-        Compute_Loss_Gradient (Self, Last, Num_Samples, Activations, Deltas,
-                               Grads);
+        Param_Cursor := Self.Attributes.Params.Last;
+        Compute_Loss_Gradient
+          (Self, Last, Num_Samples, Element (Param_Cursor), Activations,
+           Deltas, Grads);
         --  L310, L308
         for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
             Update_Grads (Self, Activations, Deltas, Grads, Index, Num_Samples);
@@ -227,23 +236,32 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
 
     procedure Check_Weights (Self : MLP_Classifier) is
+        use Parameters_Package;
         Routine_Name : constant String :=
                          "Multilayer_Perceptron.Check_Weights ";
-        Params       : constant Parameters_List := Self.Attributes.Params;
+        --          Params       : constant Parameters_List := Self.Attributes.Params;
+        Param_Cursor : Parameters_Package.Cursor :=
+                         Self.Attributes.Params.First;
         Weight       : Float;
         Bad          : Boolean := False;
     begin
-        for index in Params.First_Index .. Params.Last_Index loop
-            for row in Params.Element (index).Coeff_Grads'Range loop
-                for col in Params.Element (index).Coeff_Grads'Range (2) loop
-                    Weight := Params.Element (index).Coeff_Grads (row, col);
+        while Has_Element (Param_Cursor) loop
+            declare
+                Params : constant Parameters_Record := Element  (Param_Cursor);
+            begin
+                --          for index in Params.First_Index .. Params.Last_Index loop
+                for row in Params.Coeff_Grads'Range loop
+                    for col in Params.Coeff_Grads'Range (2) loop
+                        Weight := Params.Coeff_Grads (row, col);
+                        Bad := Bad and not Weight'Valid;
+                    end loop;
+                end loop;
+                for row in Params.Intercept_Grads'Range loop
+                    Weight := Params.Intercept_Grads (row);
                     Bad := Bad and not Weight'Valid;
                 end loop;
-            end loop;
-            for row in Params.Element (index).Intercept_Grads'Range loop
-                Weight := Params.Element (index).Intercept_Grads (row);
-                Bad := Bad and not Weight'Valid;
-            end loop;
+            end;
+            Next  (Param_Cursor);
         end loop;
 
         Assert (not Bad, Routine_Name &
@@ -324,6 +342,7 @@ package body Multilayer_Perceptron is
       (Self        : MLP_Classifier;
        Layer       : Positive;
        Num_Samples : Positive;
+       Params      : Parameters_Record;
        Activations : Real_Matrix_List;
        Deltas      : Real_Matrix_List;
        Grads       : in out Parameters_List) is
@@ -333,8 +352,8 @@ package body Multilayer_Perceptron is
                          "Multilayer_Perceptron.Compute_Loss_Gradient ";
         Delta_M      : constant Real_Float_Matrix := Deltas (Layer);
         Activ_M      : constant Real_Float_Matrix := Activations (Layer);
-        Params       : constant Parameters_Record :=
-                         Self.Attributes.Params (Layer);
+--          Params       : constant Parameters_Record :=
+--                           Self.Attributes.Params (Layer);
         Coeffs       : constant Real_Float_Matrix := Params.Coeff_Grads;
         Delta_Act    : Real_Float_Matrix
           (Activ_M'First (2) .. Activ_M'Last (2),
