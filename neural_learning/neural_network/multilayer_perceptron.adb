@@ -128,7 +128,7 @@ package body Multilayer_Perceptron is
       use Parameters_Package;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --          Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+      Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Last               : constant Positive := Self.Attributes.N_Layers - 1;
       Loss_Function_Name : Loss_Function;
@@ -223,11 +223,14 @@ package body Multilayer_Perceptron is
 
       --  L304  Compute gradient for the last layer
       Param_Cursor := Self.Attributes.Params.Last;
+      Put_Line (Routine_Name & "L304");
       Compute_Loss_Gradient
         (Self, Last, Num_Samples, Element (Param_Cursor), Activations,
          Deltas, Grads);
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+         Previous (Param_Cursor);
+         Put_Line (Routine_Name & "L308");
          Update_Grads (Self, Activations, Deltas, Param_Cursor, Grads, Index,
          Num_Samples);
       end loop;
@@ -361,8 +364,14 @@ package body Multilayer_Perceptron is
    begin
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
+      Put_Line (Routine_Name & "Activations (Layer) size:" &
+                Count_Type'Image (Transpose (Activations (Layer))'Length) & " x"
+                & Count_Type'Image (Transpose (Activations (Layer))'Length (2))
+                & ",  Deltas (Layer) size:" &
+                 Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
+                 Count_Type'Image (Deltas.Element (Layer)'Length (2)));
       Delta_Act := Transpose (Activations (Layer)) * Deltas (Layer);
-
+      Put_Line (Routine_Name & "L188");
       --  L188
       Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
                 "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
@@ -371,8 +380,14 @@ package body Multilayer_Perceptron is
 
       --  L185
       --  Coeff_Grads is a list of fan_in x fan_out matrices
+      Put_Line (Routine_Name & "Delta_Act size:" &
+                Count_Type'Image (Delta_Act'Length) & " x" &
+                Count_Type'Image (Delta_Act'Length (2)) & ",  Coeff size:" &
+                 Count_Type'Image (Coeffs'Length) & " x" &
+                 Count_Type'Image (Coeffs'Length (2)));
       New_Grad.Coeff_Grads :=
         Delta_Act + Self.Parameters.Alpha * Coeffs;
+      Put_Line (Routine_Name & "Coeff_Grads division");
       New_Grad.Coeff_Grads :=
         New_Grad.Coeff_Grads / Float (Num_Samples);
       New_Grad.Intercept_Grads := Delta_Mean;
@@ -1096,6 +1111,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
+      Routine_Name  : constant String := "Multilayer_Perceptron.Update_Grads ";
       S_List : constant Parameters_Record :=
                  Self.Attributes.Params (Grads_Cursor);
       Dot_L  : constant Real_Float_Matrix := Deltas (index);
@@ -1115,10 +1131,12 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => null;
       end case;
 
+      Put_Line (Routine_Name & "Compute_Loss_Gradient");
       Compute_Loss_Gradient
           (Self => Self, Layer => index - 1, Num_Samples => Num_Samples,
           Params => S_List, Activations => Activations, Deltas => Deltas,
           Grads  => Grads);
+      Put_Line (Routine_Name & "Compute_Loss_Gradient done");
    end Update_Grads;
 
    --  -------------------------------------------------------------------------
