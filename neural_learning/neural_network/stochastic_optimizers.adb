@@ -31,10 +31,14 @@ package body Stochastic_Optimizers is
 
     function "+" (L, R : Parameters_List) return Parameters_List is
         use Parameters_Package;
-        Sum : Parameters_List;
+        Sum    : Parameters_List;
+        L_Curs : Cursor := L.First;
+        R_Curs : Cursor := R.First;
     begin
-        for index in L.First_Index .. L.Last_Index loop
-            Sum.Append (L (index) + R (index));
+        while Has_Element (L_Curs) loop
+            Sum.Append (L (L_Curs) + R (R_Curs));
+            Next (L_Curs);
+            Next (R_Curs);
         end loop;
 
         return Sum;
@@ -213,6 +217,8 @@ package body Stochastic_Optimizers is
                                   "Stochastic_Optimizers.Get_Adam_Updates ";
         First_Moment_Updates  : Moments_List;
         Second_Moment_Updates : Moments_List;
+        F_Cursor              : Cursor := First_Moment_Updates.First;
+        S_Cursor              : Cursor := Second_Moment_Updates.First;
         Updates               : Parameters_List;
     begin
         Self.Time_Step := Self.Time_Step + 1;
@@ -221,14 +227,14 @@ package body Stochastic_Optimizers is
           (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
           (1.0 - Self.Beta_1 ** Self.Time_Step);
         --  L272
-        for layer in Grads.First_Index .. Grads.Last_Index loop
+        --  "of" implies that layer is a cursor
+        for layer of Grads loop
             declare
-                Layer_Grads           : constant Parameters_Record :=
-                                          Grads (layer);
+                Layer_Grads           : constant Parameters_Record := layer;
                 First_Moments         : constant Parameters_Record :=
-                                          Self.First_Moments (layer);
+                                          Self.First_Moments (F_Cursor);
                 Second_Moments        : constant Parameters_Record :=
-                                          Self.Second_Moments (layer);
+                                          Self.Second_Moments (S_Cursor);
                 Update_First_Moments  : Parameters_Record :=
                                           Self.Beta_1 * First_Moments;
                 --  L276
@@ -248,25 +254,30 @@ package body Stochastic_Optimizers is
                 First_Moment_Updates.Append (Update_First_Moments);
                 Second_Moment_Updates.Append (Update_Second_Moments);
             end;  --  declare
+            Next (F_Cursor);
+            Next (S_Cursor);
         end loop;
 
         Self.First_Moments := First_Moment_Updates;
         Self.Second_Moments := Second_Moment_Updates;
 
-        for layer in First_Moment_Updates.First_Index ..
-          First_Moment_Updates.Last_Index loop
+        F_Cursor := First_Moment_Updates.First;
+        S_Cursor := Second_Moment_Updates.First;
+        for layer of Self.Params loop
             declare
                 --  L284
                 Update_First_Moments  : constant Parameters_Record :=
-                                          First_Moment_Updates (layer);
+                                          First_Moment_Updates (F_Cursor);
                 Update_Second_Moments : constant Parameters_Record :=
-                                          Second_Moment_Updates (layer);
-                Coef_Update           : Parameters_Record := Self.Params (layer);
+                                          Second_Moment_Updates (S_Cursor);
+                Coef_Update           : Parameters_Record := layer;
             begin
                 Coef_Update := - Self.Learning_Rate * Update_First_Moments /
                   Moments_Sqrt (Update_Second_Moments, Self.Epsilon);
                 Updates.Append (Coef_Update);
             end;  --  declare
+            Next (F_Cursor);
+            Next (S_Cursor);
         end loop;
 
         return Updates;
@@ -281,19 +292,21 @@ package body Stochastic_Optimizers is
       return Parameters_List is
         Routine_Name : constant String :=
                          "Stochastic_Optimizers. ";
-        Velocity     : Parameters_Record := Self.Velocities (1);
-        M_V          : Parameters_Record := Self.Velocities (1);
-        Layer_Grads  : Parameters_Record := Grads (1);
+        Velocity     : Parameters_Record := Self.Velocities.First_Element;
+        M_V          : Parameters_Record := Self.Velocities.First_Element;
+        Layer_Grads  : Parameters_Record := Grads.First_Element;
         Updates      : Parameters_List;
 
         procedure Do_Update is
+            use Parameters_Package;
+            Grads_Cursor : Parameters_Package.Cursor := Grads.First;
         begin
-            for layer in Self.Velocities.First_Index ..
-              Self.Velocities.Last_Index loop
-                Velocity := Self.Velocities (layer);
-                Layer_Grads := Grads (layer);
+            for layer of Self.Velocities loop
+                Velocity := layer;
+                Layer_Grads := Grads (Grads_Cursor);
                 M_V := Self.Momentum * Velocity - Self.Learning_Rate * Layer_Grads;
                 Updates.Append (M_V);
+                Next (Grads_Cursor);
             end loop;
         end Do_Update;
 
@@ -407,9 +420,9 @@ package body Stochastic_Optimizers is
     --          Routine_Name : constant String :=
     --                           "Stochastic_Optimizers.Zero_Init ";
     begin
-        for index in Params.First_Index .. Params.Last_Index loop
+        for index of Params loop
             declare
-                Data   : constant Parameters_Record := Params (index);
+                Data   : constant Parameters_Record := index;
                 Coeffs : constant Real_Float_Matrix
                   (1 .. Data.Coeff_Grads'Length,
                    1 .. Data.Coeff_Grads'Length (2)) :=
@@ -417,8 +430,8 @@ package body Stochastic_Optimizers is
                 Intercepts  : constant Real_Float_Vector
                   (1 .. Data.Intercept_Grads'Length) := (others => 0.0);
             begin
-                Params (index).Coeff_Grads := Coeffs;
-                Params (index).Intercept_Grads := Intercepts;
+                index.Coeff_Grads := Coeffs;
+                index.Intercept_Grads := Intercepts;
             end;
         end loop;
 

@@ -106,6 +106,7 @@ package body Multilayer_Perceptron is
    procedure Update_Grads (Self               : in out MLP_Classifier;
                            Activations        : Real_Matrix_List;
                            Deltas             : in out Real_Matrix_List;
+                           Grads_Cursor       : Parameters_Package.Cursor;
                            Grads              : in out Parameters_List;
                            Index, Num_Samples : Positive);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
@@ -167,11 +168,11 @@ package body Multilayer_Perceptron is
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
       Sum_Sq_Coeffs := 0.0;
-      while Has_Element (Param_Cursor) loop
+      for Param_Cursor of Self.Attributes.Params loop
          --          for s in Self.Attributes.Params.First_Index ..
          --            Self.Attributes.Params.Last_Index loop
          declare
-            Params : constant Parameters_Record := Element (Param_Cursor);
+            Params : constant Parameters_Record := Param_Cursor;
             Coeffs : constant Real_Float_Matrix := Params.Coeff_Grads;
             --                             Self.Attributes.Params (s).Coeff_Grads;
             --  numpy.ravel (a) returns the elements of a as a 1-D array.
@@ -185,7 +186,6 @@ package body Multilayer_Perceptron is
             end loop;
             Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
          end;  --  declare
-         Next (Param_Cursor);
       end loop;
 
       --  L292
@@ -228,7 +228,8 @@ package body Multilayer_Perceptron is
          Deltas, Grads);
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
-         Update_Grads (Self, Activations, Deltas, Grads, Index, Num_Samples);
+         Update_Grads (Self, Activations, Deltas, Param_Cursor, Grads, Index,
+         Num_Samples);
       end loop;
 
    end Backprop;
@@ -239,17 +240,13 @@ package body Multilayer_Perceptron is
       use Parameters_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Weights ";
-      --          Params       : constant Parameters_List := Self.Attributes.Params;
-      Param_Cursor : Parameters_Package.Cursor :=
-                       Self.Attributes.Params.First;
       Weight       : Float;
       Bad          : Boolean := False;
    begin
-      while Has_Element (Param_Cursor) loop
+      for Param_Cursor of Self.Attributes.Params loop
          declare
-            Params : constant Parameters_Record := Element  (Param_Cursor);
+            Params : constant Parameters_Record := Param_Cursor;
          begin
-            --          for index in Params.First_Index .. Params.Last_Index loop
             for row in Params.Coeff_Grads'Range loop
                for col in Params.Coeff_Grads'Range (2) loop
                   Weight := Params.Coeff_Grads (row, col);
@@ -261,7 +258,6 @@ package body Multilayer_Perceptron is
                Bad := Bad and not Weight'Valid;
             end loop;
          end;
-         Next  (Param_Cursor);
       end loop;
 
       Assert (not Bad, Routine_Name &
@@ -1094,13 +1090,14 @@ package body Multilayer_Perceptron is
    procedure Update_Grads (Self               : in out MLP_Classifier;
                            Activations        : Real_Matrix_List;
                            Deltas             : in out Real_Matrix_List;
+                           Grads_Cursor       : Parameters_Package.Cursor;
                            Grads              : in out Parameters_List;
                            Index, Num_Samples : Positive) is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       S_List : constant Parameters_Record :=
-                 Self.Attributes.Params (index);
+                 Self.Attributes.Params (Grads_Cursor);
       Dot_L  : constant Real_Float_Matrix := Deltas (index);
       Dot_R  : constant Real_Float_Matrix := S_List.Coeff_Grads;
    begin
@@ -1118,8 +1115,10 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => null;
       end case;
 
-      Compute_Loss_Gradient (Self, index - 1, Num_Samples, Activations,
-                             Deltas, Grads);
+      Compute_Loss_Gradient
+          (Self => Self, Layer => index - 1, Num_Samples => Num_Samples,
+          Params => S_List, Activations => Activations, Deltas => Deltas,
+          Grads  => Grads);
    end Update_Grads;
 
    --  -------------------------------------------------------------------------
