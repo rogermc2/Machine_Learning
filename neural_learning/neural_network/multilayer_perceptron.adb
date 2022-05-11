@@ -60,13 +60,13 @@ package body Multilayer_Perceptron is
    Max_Softmax_Duration     : Duration := 0.0;
 
    procedure Compute_Loss_Gradient
-     (Self        : MLP_Classifier;
-      Layer       : Positive;
-      Num_Samples : Positive;
-      Params      : Parameters_Record;
-      Activations : Real_Matrix_List;
-      Deltas      : Real_Matrix_List;
-      Grads       : in out Parameters_List);
+     (Self          : MLP_Classifier;
+      Layer         : Positive;
+      Params_Cursor : Parameters_Package.Cursor;
+      Num_Samples   : Positive;
+      Activations   : Real_Matrix_List;
+      Deltas        : Real_Matrix_List;
+      Grads         : in out Parameters_List);
    --     procedure Fit_Lbfgs (Self        : in out MLP_Classifier;
    --                          X           : Float_List_2D;
    --                          Y           : Integer_List_2D;
@@ -225,14 +225,16 @@ package body Multilayer_Perceptron is
       Param_Cursor := Self.Attributes.Params.Last;
       Put_Line (Routine_Name & "L304");
       Compute_Loss_Gradient
-        (Self, Last, Num_Samples, Element (Param_Cursor), Activations,
-         Deltas, Grads);
+        (Self, Last, Param_Cursor, Num_Samples, Activations, Deltas, Grads);
+      Put_Line (Routine_Name & "L308");
+      New_Line;
       --  L310, L308
       for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Previous (Param_Cursor);
-         Put_Line (Routine_Name & "L308");
+         Put_Line (Routine_Name & "L308 index:" & Integer'Image (index) &
+                     ",  N_Layers:" & Integer'Image (Self.Attributes.N_Layers) );
          Update_Grads (Self, Activations, Deltas, Param_Cursor, Grads, Index,
-         Num_Samples);
+                       Num_Samples);
       end loop;
 
    end Backprop;
@@ -338,61 +340,62 @@ package body Multilayer_Perceptron is
    --  Intercept_Grads is a 2D list of bias vectors where the vector at index
    --  the bias values added to layer i + 1.
    procedure Compute_Loss_Gradient
-     (Self        : MLP_Classifier;
-      Layer       : Positive;
-      Num_Samples : Positive;
-      Params      : Parameters_Record;
-      Activations : Real_Matrix_List;
-      Deltas      : Real_Matrix_List;
-      Grads       : in out Parameters_List) is
+     (Self          : MLP_Classifier;
+      Layer         : Positive;
+      Params_Cursor : Parameters_Package.Cursor;
+      Num_Samples   : Positive;
+      Activations   : Real_Matrix_List;
+      Deltas        : Real_Matrix_List;
+      Grads         : in out Parameters_List) is
       use Ada.Containers;
       use Real_Float_Arrays;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Compute_Loss_Gradient ";
       Delta_M      : constant Real_Float_Matrix := Deltas (Layer);
       Activ_M      : constant Real_Float_Matrix := Activations (Layer);
-      --          Params       : constant Parameters_Record :=
-      --                           Self.Attributes.Params (Layer);
-      Coeffs       : constant Real_Float_Matrix := Params.Coeff_Grads;
+      Self_Coeffs  : constant Real_Float_Matrix :=
+                       Self.Attributes.Params (Params_Cursor).Coeff_Grads;
       Delta_Act    : Real_Float_Matrix
         (Activ_M'First (2) .. Activ_M'Last (2),
          Delta_M'First (2) .. Delta_M'Last (2));
       --  Mean computes mean of values along the specified axis.
       Delta_Mean   : constant Real_Float_Vector :=
                        Neural_Maths.Mean (Deltas (Layer), 1);
-      New_Grad     : Parameters_Record (Params.Num_Rows, Params.Num_Cols);
    begin
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       Put_Line (Routine_Name & "Activations (Layer) size:" &
-                Count_Type'Image (Transpose (Activations (Layer))'Length) & " x"
+                  Count_Type'Image (Transpose (Activations (Layer))'Length) & " x"
                 & Count_Type'Image (Transpose (Activations (Layer))'Length (2))
                 & ",  Deltas (Layer) size:" &
-                 Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
-                 Count_Type'Image (Deltas.Element (Layer)'Length (2)));
+                  Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
+                  Count_Type'Image (Deltas.Element (Layer)'Length (2)));
+      --  L185
       Delta_Act := Transpose (Activations (Layer)) * Deltas (Layer);
-      Put_Line (Routine_Name & "L188");
-      --  L188
-      Assert (Delta_Act'Length = Coeffs'Length, Routine_Name &
+      Put_Line (Routine_Name & "L186");
+      Assert (Delta_Act'Length = Self_Coeffs'Length, Routine_Name &
                 "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
                 " should equal Coeff_Grads length" &
-                Count_Type'Image (Coeffs'Length));
+                Count_Type'Image (Self_Coeffs'Length));
 
-      --  L185
       --  Coeff_Grads is a list of fan_in x fan_out matrices
       Put_Line (Routine_Name & "Delta_Act size:" &
-                Count_Type'Image (Delta_Act'Length) & " x" &
-                Count_Type'Image (Delta_Act'Length (2)) & ",  Coeff size:" &
-                 Count_Type'Image (Coeffs'Length) & " x" &
-                 Count_Type'Image (Coeffs'Length (2)));
-      New_Grad.Coeff_Grads :=
-        Delta_Act + Self.Parameters.Alpha * Coeffs;
-      Put_Line (Routine_Name & "Coeff_Grads division");
-      New_Grad.Coeff_Grads :=
-        New_Grad.Coeff_Grads / Float (Num_Samples);
-      New_Grad.Intercept_Grads := Delta_Mean;
-      --          Grads.Replace_Element (Layer, New_Grad);
-      Grads.Prepend (New_Grad);
+                  Count_Type'Image (Delta_Act'Length) & " x" &
+                  Count_Type'Image (Delta_Act'Length (2)) & ",  Coeff size:" &
+                  Count_Type'Image (Self_Coeffs'Length) & " x" &
+                  Count_Type'Image (Self_Coeffs'Length (2)));
+      declare
+         New_Grad : Parameters_Record (Delta_Act'Length, Delta_Act'Length (2));
+      begin
+         --  L186
+         New_Grad.Coeff_Grads :=
+           Delta_Act + Self.Parameters.Alpha * Self_Coeffs;
+         Put_Line (Routine_Name & "Coeff_Grads division");
+         New_Grad.Coeff_Grads :=
+           New_Grad.Coeff_Grads / Float (Num_Samples);
+         New_Grad.Intercept_Grads := Delta_Mean;
+         Grads.Prepend (New_Grad);
+      end;
 
    end  Compute_Loss_Gradient;
 
@@ -1112,13 +1115,14 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name  : constant String := "Multilayer_Perceptron.Update_Grads ";
-      S_List : constant Parameters_Record :=
-                 Self.Attributes.Params (Grads_Cursor);
-      Dot_L  : constant Real_Float_Matrix := Deltas (index);
-      Dot_R  : constant Real_Float_Matrix := S_List.Coeff_Grads;
+      Params        : constant Parameters_Record :=
+                        Self.Attributes.Params (Grads_Cursor);
+      Dot_L         : constant Real_Float_Matrix := Deltas (index);
+      Dot_R         : constant Real_Float_Matrix := Params.Coeff_Grads;
    begin
+      --  L311
       Deltas.Replace_Element (index - 1, Dot_L * Transpose (Dot_R));
-
+      --  L312
       case Self.Parameters.Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
@@ -1131,11 +1135,12 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => null;
       end case;
 
-      Put_Line (Routine_Name & "Compute_Loss_Gradient");
+      Put_Line (Routine_Name & "L314");
+      --  L314
       Compute_Loss_Gradient
-          (Self => Self, Layer => index - 1, Num_Samples => Num_Samples,
-          Params => S_List, Activations => Activations, Deltas => Deltas,
-          Grads  => Grads);
+        (Self => Self, Layer => index - 1, Params_Cursor =>  Grads_Cursor,
+         Num_Samples => Num_Samples, Activations => Activations,
+         Deltas => Deltas, Grads => Grads);
       Put_Line (Routine_Name & "Compute_Loss_Gradient done");
    end Update_Grads;
 
