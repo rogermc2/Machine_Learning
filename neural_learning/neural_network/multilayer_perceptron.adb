@@ -893,11 +893,10 @@ package body Multilayer_Perceptron is
    --  L320
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List) is
-      --        use Ada.Containers;
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
-      --        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -911,6 +910,7 @@ package body Multilayer_Perceptron is
       Self.Attributes.Intercept_Indptr.Clear;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
+      Self.Attributes.Params.Clear;
 
       if Self.Estimator_Kind /= Classifier_Estimator then
          Self.Attributes.Out_Activation := Identity_Activation;
@@ -924,10 +924,11 @@ package body Multilayer_Perceptron is
       --  L344
       for layer in 1 .. Self.Attributes.N_Layers - 1 loop
          --  Add coefficent matrices and intercept vectors for layer.
+         Put_Line (Routine_Name & "layer: " & Integer'Image (layer));
          Fan_In := Layer_Units (layer);
          Fan_Out := Layer_Units (layer + 1);
-         --           Put_Line (Routine_Name & "Fan_In, Fan_Out" &
-         --                       Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
+         Put_Line (Routine_Name & "Fan_In, Fan_Out" &
+                     Integer'Image (Fan_In) & " ," & Integer'Image (Fan_Out));
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
          --           Put_Line (Routine_Name & "Params.Coeff_Grads size: " &
          --                       Integer'Image (Integer
