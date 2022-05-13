@@ -123,7 +123,7 @@ package body Multilayer_Perceptron is
                         Activations : in out Real_Matrix_List;
                         Loss        : out Float;
                         Grads       : out Parameters_List) is
-        use Ada.Containers;
+--          use Ada.Containers;
         use Base_Neural;
         use Parameters_Package;
         use Real_Float_Arrays;
@@ -205,7 +205,7 @@ package body Multilayer_Perceptron is
         --  of the ith layer.
 
         --  L295  Backward propagate python last = self.n_layers_ - 2
-        Deltas.Set_Length (Count_Type (Last));
+--          Deltas.Set_Length (Count_Type (Last));
 
         --  L301
         declare
@@ -218,7 +218,8 @@ package body Multilayer_Perceptron is
                     end if;
                 end loop;
             end loop;
-            Deltas.Replace_Element (Deltas.Last, Diff);
+            Deltas.Append (Diff);
+--              Deltas.Replace_Element (Deltas.Last, Diff);
         end;
 
         --  L304  Compute gradient for the last layer
@@ -232,7 +233,8 @@ package body Multilayer_Perceptron is
         for index in reverse 2 .. Self.Attributes.N_Layers - 1 loop
             Previous (Param_Cursor);
             Put_Line (Routine_Name & "L308 index:" & Integer'Image (index) &
-                        ",  N_Layers:" & Integer'Image (Self.Attributes.N_Layers) );
+                        ",  N_Layers:" &
+                        Integer'Image (Self.Attributes.N_Layers));
             Update_Grads (Self, Activations, Deltas, Param_Cursor, Grads, Index,
                           Num_Samples);
         end loop;
@@ -355,22 +357,24 @@ package body Multilayer_Perceptron is
                     Self.Attributes.Params (Params_Cursor);
         --  Mean computes mean of values along the specified axis.
         Delta_Mean   : constant Real_Float_Vector :=
-                         Neural_Maths.Mean (Deltas (Layer), 1);
+                         Neural_Maths.Mean (Deltas.First_Element, 1);
+--                           Neural_Maths.Mean (Deltas (Layer), 1);
     begin
         --  The ith element of Deltas holds the difference between the
         --  activations of the i + 1 layer and the backpropagated error.
-        Put_Line (Routine_Name & "Activations (Layer) size:" &
-                    Count_Type'Image (Transpose (Activations (Layer))'Length) &
-                    " x" & Count_Type'Image
-                    (Transpose (Activations (Layer))'Length (2))
-                  & ",  Deltas (Layer) size:" &
-                    Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
-                    Count_Type'Image (Deltas.Element (Layer)'Length (2)));
+--          Put_Line (Routine_Name & "Activations (Layer) size:" &
+--                      Count_Type'Image (Transpose (Activations (Layer))'Length) &
+--                      " x" & Count_Type'Image
+--                      (Transpose (Activations (Layer))'Length (2))
+--                    & ",  Deltas (Layer) size:" &
+--                      Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
+--                      Count_Type'Image (Deltas.Element (Layer)'Length (2)));
         --  L185
         Put_Line (Routine_Name & "L186");
         declare
-            Delta_Act : constant Real_Float_Matrix :=
-                          Transpose (Activations (Layer)) * Deltas (Layer);
+         Delta_Act : constant Real_Float_Matrix
+           := Transpose (Activations (Layer)) * Deltas.First_Element;
+--                            Transpose (Activations (Layer)) * Deltas (Layer);
             New_Grad : Parameters_Record := Params;
         begin
             Assert (Delta_Act'Length = New_Grad.Coeff_Grads'Length, Routine_Name &
@@ -1117,21 +1121,29 @@ package body Multilayer_Perceptron is
         Routine_Name  : constant String := "Multilayer_Perceptron.Update_Grads ";
         Params        : constant Parameters_Record :=
                           Self.Attributes.Params (Grads_Cursor);
-        Dot_L         : constant Real_Float_Matrix := Deltas (index);
+        --          Dot_L         : constant Real_Float_Matrix := Deltas (index);
+        Deltas_Curs   : Cursor := Deltas.First;
+        Dot_L         : constant Real_Float_Matrix :=
+                        Element (Deltas_Curs);
         Dot_R         : constant Real_Float_Matrix := Params.Coeff_Grads;
     begin
+        Put_Line (Routine_Name);
         --  L311
-        Deltas.Replace_Element (index - 1, Dot_L * Transpose (Dot_R));
+--          Deltas.Replace_Element (index - 1, Dot_L * Transpose (Dot_R));
+        Deltas.Prepend (Dot_L * Transpose (Dot_R));
+        Deltas_Curs := Deltas.First;
+        Put_Line (Routine_Name & "L312");
         --  L312
         case Self.Parameters.Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>
                 Logistic_Derivative (Z => Activations (index),
-                                     Del => Deltas (index - 1));
+                                     Del => Deltas (Deltas_Curs));
+--                                       Del => Deltas (index - 1));
             when Tanh_Activation =>
-                Tanh_Derivative (Activations (index), Deltas (index - 1));
+                Tanh_Derivative (Activations (index), Deltas (Deltas_Curs));
             when Relu_Activation =>
-                Relu_Derivative (Activations (index), Deltas (index - 1));
+                Relu_Derivative (Activations (index), Deltas (Deltas_Curs));
             when Softmax_Activation => null;
         end case;
 
