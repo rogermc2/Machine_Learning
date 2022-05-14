@@ -188,7 +188,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu (Activation : in out Real_Float_Matrix) is
+   procedure Rect_LU (Activation : in out Real_Float_Matrix) is
       type Matrix_Float is new Real_Float_Matrix (1 .. Activation'Length,
                                                   1 .. Activation'Length (2));
       Result : Matrix_Float;
@@ -201,11 +201,11 @@ package body Base_Neural is
 
       Activation := Real_Float_Matrix (Result);
 
-   end Relu;
+   end Rect_LU;
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu_Derivative (Z : Real_Float_Matrix;
+   procedure Rect_LU_Derivative (Z : Real_Float_Matrix;
                               Del : in out Real_Float_Matrix) is
    begin
       for row in Z'Range loop
@@ -216,7 +216,7 @@ package body Base_Neural is
          end loop;
       end loop;
 
-   end Relu_Derivative;
+   end Rect_LU_Derivative;
 
    --  -------------------------------------------------------------------------
 

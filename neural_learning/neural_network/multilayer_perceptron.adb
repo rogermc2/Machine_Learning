@@ -4,12 +4,12 @@
 --  In its simplest form a MLP is just three layers.
 --  An input layer represented by a real matrix X (N×d) where N is the number
 --  of training examples and d is the number of features.
---  A hidden layer which is usually a ReLU or a logistic sigmoid function.
---  Hidden layer i could be a ReLU function represented by
+--  A hidden layer which is usually a Rect_LU or a logistic sigmoid function.
+--  Hidden layer i could be a Rect_LU function represented by
 --  h_i(x) = ReLU (x) = max (x, 0)
---  In other words, if the input to the ReLU function is negative, the function
+--  In other words, if the input to the Rect_LU function is negative, the function
 --  outputs a 0.
---  If the inputs x are positive, the ReLU function will output x.
+--  If the inputs x are positive, the Rect_LU function will output x.
 --  The hidden layer feeds into the output layer which is just another function.
 --  This function could be squared error function (in the context of regression)
 --  or softmax (in the case of multiclass classification).
@@ -17,7 +17,7 @@
 --  we don't need them for now.
 --  The activation function is just what the name suggests; a function.
 --  In the example above, the activation function for the hidden layer is the
---  ReLU function.
+--  Rect_LU function.
 --  The activation function for the output layer was squared error or softmax.
 --  the word "activations" in Machine Learning almost always refers to the
 --- output of the activation function.
@@ -169,12 +169,9 @@ package body Multilayer_Perceptron is
       --  for s in self.coefs_:
       Sum_Sq_Coeffs := 0.0;
       for Param_Cursor of Self.Attributes.Params loop
-         --          for s in Self.Attributes.Params.First_Index ..
-         --            Self.Attributes.Params.Last_Index loop
          declare
             Params : constant Parameters_Record := Param_Cursor;
             Coeffs : constant Real_Float_Matrix := Params.Coeff_Grads;
-            --                             Self.Attributes.Params (s).Coeff_Grads;
             --  numpy.ravel (a) returns the elements of a as a 1-D array.
             Ravel  : Real_Float_Vector (1 .. Coeffs'Length * Coeffs'Length (2));
          begin
@@ -201,7 +198,7 @@ package body Multilayer_Perceptron is
       --  The ith element of deltas holds the difference between the activations
       --  of the i + 1 layer and the backpropagated error.
       --  Deltas are gradients of loss with respect to z in each layer.
-      --  The ith element of Activations (layers x values) is a list of values
+      --  The ith element of Activations (samples x values) is a list of values
       --  of the ith layer.
 
       --  L295  Backward propagate python last = self.n_layers_ - 2
@@ -279,7 +276,7 @@ package body Multilayer_Perceptron is
    function C_Init (Hidden_Layer_Sizes  : NL_Types.Integer_List :=
                       NL_Types.Integer_Package.Empty_Vector;
                     Activation          : Base_Neural.Activation_Type :=
-                      Base_Neural.Relu_Activation;
+                      Base_Neural.Rect_LU_Activation;
                     Solver              : Solver_Type := Adam_Solver;
                     Alpha               : Float := 0.0001;
                     Batch_Size          : Positive := 200;
@@ -358,10 +355,7 @@ package body Multilayer_Perceptron is
       --  Mean computes mean of values along the specified axis.
       Delta_Mean   : constant Real_Float_Vector :=
                        Neural_Maths.Mean (Deltas.First_Element, 1);
-      --                           Neural_Maths.Mean (Deltas (Layer), 1);
    begin
-      --  The ith element of Deltas holds the difference between the
-      --  activations of the i + 1 layer and the backpropagated error.
       Put_Line (Routine_Name & "Layer:" & Integer'Image (Layer));
       Put_Line ("Activations (Layer) size:" &
                   Count_Type'Image (Activations.Element (Layer)'Length) & " x" &
@@ -372,10 +366,13 @@ package body Multilayer_Perceptron is
                   Count_Type'Image (Deltas.First_Element'Length (2)));
       --  L185
       Put_Line (Routine_Name & "L186");
+      --  The ith element of Deltas holds the difference between the
+      --  activations of the i + 1 layer and the backpropagated error.
+      --  An activation converts the output from a layer into a form that is
+      --  suitable for input into the next layer
       declare
          Delta_Act : constant Real_Float_Matrix
            := Transpose (Activations (Layer)) * Deltas.First_Element;
-         --                            Transpose (Activations (Layer)) * Deltas (Layer);
          New_Grad  : Parameters_Record := Params;
       begin
          Assert (Delta_Act'Length = New_Grad.Coeff_Grads'Length, Routine_Name &
@@ -769,7 +766,7 @@ package body Multilayer_Perceptron is
          when Logistic_Activation =>
             Logistic (Activations (Activations.Last_Index));
          when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
-         when Relu_Activation => Relu (Activations (Activations.Last_Index));
+         when Rect_LU_Activation => Rect_LU (Activations (Activations.Last_Index));
          when Softmax_Activation =>
             Softmax_Start := Clock;
             Softmax (Activations (Activations.Last_Index));
@@ -830,7 +827,7 @@ package body Multilayer_Perceptron is
                   when Identity_Activation => null;
                   when Logistic_Activation => Logistic (Updated_Activation);
                   when Tanh_Activation => Tanh (Updated_Activation);
-                  when Relu_Activation => Relu (Updated_Activation);
+                  when Rect_LU_Activation => Rect_LU (Updated_Activation);
                   when Softmax_Activation => Softmax (Updated_Activation);
                end case;
             end if;
@@ -848,7 +845,7 @@ package body Multilayer_Perceptron is
          when Identity_Activation => null;
          when Logistic_Activation => Logistic (Activ_Out);
          when Tanh_Activation => Tanh (Activ_Out);
-         when Relu_Activation => Relu (Activ_Out);
+         when Rect_LU_Activation => Rect_LU (Activ_Out);
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
@@ -1100,7 +1097,7 @@ package body Multilayer_Perceptron is
             when Logistic_Activation =>
                Logistic (Activations (layer + 1));
             when Tanh_Activation => Tanh (Activations (layer + 1));
-            when Relu_Activation => Relu (Activations (layer + 1));
+            when Rect_LU_Activation => Rect_LU (Activations (layer + 1));
             when Softmax_Activation => Softmax (Activations (layer + 1));
          end case;
       end if;
@@ -1142,8 +1139,8 @@ package body Multilayer_Perceptron is
             --                                       Del => Deltas (index - 1));
          when Tanh_Activation =>
             Tanh_Derivative (Activations (index), Deltas (Deltas_Curs));
-         when Relu_Activation =>
-            Relu_Derivative (Activations (index), Deltas (Deltas_Curs));
+         when Rect_LU_Activation =>
+            Rect_LU_Derivative (Activations (index), Deltas (Deltas_Curs));
          when Softmax_Activation => null;
       end case;
 

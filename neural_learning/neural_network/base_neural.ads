@@ -5,11 +5,11 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 package Base_Neural is
 
    type Activation_Type is (Identity_Activation, Logistic_Activation,
-                            Tanh_Activation, Relu_Activation,
+                            Tanh_Activation, Rect_LU_Activation,
                             Softmax_Activation);
 
    type Derivative_Type is (Identity_Derivative, Logistic_Derivative,
-                            Tanh_Derivative, Relu_Derivative);
+                            Tanh_Derivative, Rect_LU_Derivative);
 
    function Binary_Log_Loss (Y_True : Boolean_Matrix;
                              Y_Prob : Real_Float_Matrix) return Float;
@@ -34,11 +34,11 @@ package Base_Neural is
    procedure Tanh_Derivative (Z   : Real_Float_Matrix;
                               Del : in out Real_Float_Matrix);
    pragma Inline (Tanh_Derivative);
-   procedure Relu (Activation : in out Real_Float_Matrix);
-   pragma Inline (Relu);
-   procedure Relu_Derivative (Z : Real_Float_Matrix;
+   procedure Rect_LU (Activation : in out Real_Float_Matrix);
+   pragma Inline (Rect_LU);
+   procedure Rect_LU_Derivative (Z : Real_Float_Matrix;
                               Del : in out Real_Float_Matrix);
-   pragma Inline (Relu_Derivative);
+   pragma Inline (Rect_LU_Derivative);
    procedure Softmax (Activation : in out Real_Float_Matrix);
    pragma Inline (Softmax);
    function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Real_Float_Matrix)
