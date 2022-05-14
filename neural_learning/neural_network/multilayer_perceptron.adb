@@ -362,10 +362,12 @@ package body Multilayer_Perceptron is
     begin
         --  The ith element of Deltas holds the difference between the
         --  activations of the i + 1 layer and the backpropagated error.
---          Put_Line (Routine_Name & "Activations (Layer) size:" &
---                      Count_Type'Image (Transpose (Activations (Layer))'Length) &
---                      " x" & Count_Type'Image
---                      (Transpose (Activations (Layer))'Length (2))
+        Put_Line (Routine_Name & "Layer:" & Integer'Image (Layer));
+        Put_Line (Routine_Name & "Activations (Layer) size:" &
+                    Count_Type'Image (Transpose (Activations (Layer))'Length) &
+                    " x" & Count_Type'Image
+                    (Transpose (Activations (Layer))'Length (2)) &
+                     ",  Deltas length:" & Count_Type'Image (Deltas.Length));
 --                    & ",  Deltas (Layer) size:" &
 --                      Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
 --                      Count_Type'Image (Deltas.Element (Layer)'Length (2)));
