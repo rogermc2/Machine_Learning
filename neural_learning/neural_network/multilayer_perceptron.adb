@@ -135,14 +135,8 @@ package body Multilayer_Perceptron is
                              Self.Attributes.Params.First;
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float;
-      Forward_Start      : Time;
-      Forward_Stop       : Time;
    begin
      Put_Line (Routine_Name);
-      Forward_Start := Clock;
-      Forward_Pass (Self, Activations);
-      Forward_Stop := Clock;
-      Forward_Duration := Forward_Duration + Forward_Stop - Forward_Start;
 
      Put_Line (Routine_Name & "L284");
       --  L284
@@ -371,25 +365,25 @@ package body Multilayer_Perceptron is
       --  An activation converts the output from a layer into a form that is
       --  suitable for input into the next layer
       declare
-         Delta_Act : constant Real_Float_Matrix
+         Act_Delta : constant Real_Float_Matrix
            := Transpose (Activations (Layer)) * Deltas.First_Element;
          New_Grad  : Parameters_Record := Params;
       begin
-         Assert (Delta_Act'Length = New_Grad.Coeff_Grads'Length, Routine_Name &
-                   "Delta_Act Length" & Count_Type'Image (Delta_Act'Length) &
+         Assert (Act_Delta'Length = New_Grad.Coeff_Grads'Length, Routine_Name &
+                   "Act_Delta Length" & Count_Type'Image (Act_Delta'Length) &
                    " should equal Coeff_Grads length" &
                    Count_Type'Image (New_Grad.Coeff_Grads'Length));
 
          --  Coeff_Grads is a list of fan_in x fan_out matrices
-         Put_Line ("Delta_Act size:" & Count_Type'Image (Delta_Act'Length) &
-                     " x" & Count_Type'Image (Delta_Act'Length (2)) &
+         Put_Line ("Act_Delta size:" & Count_Type'Image (Act_Delta'Length) &
+                     " x" & Count_Type'Image (Act_Delta'Length (2)) &
                      ",  Coeff size:" &
                      Count_Type'Image (New_Grad.Coeff_Grads'Length)
                    & " x" &
                      Count_Type'Image (New_Grad.Coeff_Grads'Length (2)));
          Put_Line (Routine_Name & "L186");
          --  L186
-         New_Grad.Coeff_Grads := Delta_Act +
+         New_Grad.Coeff_Grads := Act_Delta +
            Self.Parameters.Alpha * New_Grad.Coeff_Grads;
          Put_Line (Routine_Name & "Coeff_Grads division");
          New_Grad.Coeff_Grads := New_Grad.Coeff_Grads / Float (Num_Samples);
@@ -1040,6 +1034,8 @@ package body Multilayer_Perceptron is
       Grads          : Parameters_List;
       Batch_Row      : Positive;
       Batch_Loss     : Float;
+      Forward_Start  : Time;
+      Forward_Stop   : Time;
       Backprop_Start : Time;
       Backprop_Stop  : Time;
    begin
@@ -1059,7 +1055,12 @@ package body Multilayer_Perceptron is
       --  L645
       Activations.Clear;
       Activations.Append (X_Batch);
---        Activations.Replace_Element (Activations.First_Index, X_Batch);
+      --        Activations.Replace_Element (Activations.First_Index, X_Batch);
+
+      Forward_Start := Clock;
+      Forward_Pass (Self, Activations);
+      Forward_Stop := Clock;
+      Forward_Duration := Forward_Duration + Forward_Stop - Forward_Start;
 
       Backprop_Start := Clock;
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
