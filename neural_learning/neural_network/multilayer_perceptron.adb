@@ -376,7 +376,7 @@ package body Multilayer_Perceptron is
          --  Coeff_Grads is a list of fan_in x fan_out matrices
          Put_Line ("Act_Delta size:" & Count_Type'Image (Act_Delta'Length) &
                      " x" & Count_Type'Image (Act_Delta'Length (2)) &
-                     ",  Coeff size:" &
+                     ",  Coeff_Grads size:" &
                      Count_Type'Image (New_Grad.Coeff_Grads'Length)
                    & " x" &
                      Count_Type'Image (New_Grad.Coeff_Grads'Length (2)));
