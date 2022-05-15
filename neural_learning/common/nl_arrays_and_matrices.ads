@@ -64,6 +64,7 @@ package NL_Arrays_And_Matrices is
     function "-" (L, R : Integer_Matrix) return Integer_Matrix;
     function "-" (L : Float_Matrix; R : Float_Array) return Float_Matrix;
     function "-" (L : Float; R : Float_Matrix) return Float_Matrix;
+    function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
     function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
     pragma Inline ("-");

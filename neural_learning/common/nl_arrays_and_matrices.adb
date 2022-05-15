@@ -259,6 +259,21 @@ package body NL_Arrays_And_Matrices is
 
     --  ----------------------------------------------------------------------------
 
+    function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix is
+        Result : Real_Float_Matrix (L'Range, L'Range (2));
+    begin
+        for row in L'Range loop
+            for col in L'Range (2) loop
+                Result (row, col) := L (row, col) - R;
+            end loop;
+        end loop;
+
+        return Result;
+
+    end "-";
+
+    --  ----------------------------------------------------------------------------
+
     function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix is
         Result : Real_Float_Matrix := L;

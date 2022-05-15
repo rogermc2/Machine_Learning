@@ -56,7 +56,7 @@ package body Multilayer_Perceptron is
     Backprop_Duration        : Duration;
     Forward_Duration         : Duration;
     Activations_Duration     : Duration;
-    Max_Activations_Duration : Duration := 0.0;
+--      Max_Activations_Duration : Duration := 0.0;
     Max_Softmax_Duration     : Duration := 0.0;
 
     procedure Compute_Loss_Gradient
@@ -93,11 +93,6 @@ package body Multilayer_Perceptron is
                              Batch_Slice      : NL_Types.Slice_Record;
                              Batch_Size       : Positive;
                              Accumulated_Loss : in out Float);
-    procedure Update_Activations
-      (Params             : Parameters_Record;
-       Activations        : in out Real_Matrix_List;
-       Hidden_Activation  : Base_Neural.Activation_Type;
-       Num_Layers, Layer  : Positive);
     procedure Update_No_Improvement_Count
       (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
        X_Val, Y_Val : Real_Float_Matrix);
@@ -135,8 +130,6 @@ package body Multilayer_Perceptron is
         Deltas             : Real_Matrix_List;
         Sum_Sq_Coeffs      : Float;
     begin
-        Put_Line (Routine_Name);
-
         Put_Line (Routine_Name & "L284");
         --  L284
         if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
@@ -196,19 +189,7 @@ package body Multilayer_Perceptron is
         --  the ith layer values of a batch.
 
         --  L301
-        declare
-            Diff : Real_Float_Matrix := Activations.Last_Element;
-        begin
-            --  L295  Initialize Deltas
-            for row in Activations.Last_Element'Range loop
-                for col in  Activations.Last_Element'Range (2) loop
-                    if Y (row, col) then
-                        Diff (row, col) := Diff (row, col) - 1.0;
-                    end if;
-                end loop;
-            end loop;
-            Deltas.Append (Diff);
-        end;
+        Deltas.Append (Activations.Last_Element - 1.0);
 
         --  L304  Compute gradient for the last layer
         Param_Cursor := Self.Attributes.Params.Last;
@@ -713,41 +694,56 @@ package body Multilayer_Perceptron is
         Output_Activation : constant Activation_Type :=
                               Self.Attributes.Out_Activation;
         Num_Layers        : constant Positive := Self.Attributes.N_Layers;
-        Params_List       : constant Parameters_List := Self.Attributes.Params;
-        Params_Cursor     : Parameters_Package.Cursor := Params_List.First;
+        Params_Cursor     : Parameters_Package.Cursor :=
+                              Self.Attributes.Params.First;
         Activ_Start       : constant Time := Clock;
         Activ_Stop        : Time;
-        Max_Activ_Start   : Time;
-        Max_Activ_Stop    : Time;
-        Max_Activ_Time    : Duration;
+--          Max_Activ_Start   : Time;
+--          Max_Activ_Stop    : Time;
+--          Max_Activ_Time    : Duration;
         Softmax_Start     : Time;
         Softmax_Stop      : Time;
-        Softmax_Time       : Duration;
+        Softmax_Time      : Duration;
     begin
-        --  129  Iterate over the hidden layers
-        --  The Python range(stop) function returns a sequence of numbers,
-        --   starting from 0 by default, incrementing by 1 (by default) and
-        --   stopping BEFORE "stop". That is, at "stop" - 1.
-        --  Therefore range(self.n_layers_ - 1): range is
-        --            first (0) .. last (n_layers_ - 2)
-
         Put_Line (Routine_Name & "L130");
         --  L130
         for layer in 1 .. Num_Layers - 1 loop
             declare
-                Params : constant Parameters_Record := Element (Params_Cursor);
+                use Real_Float_Arrays;
+                Params             : constant Parameters_Record :=
+                                       Element (Params_Cursor);
+                Coefficient_Matrix : constant Real_Float_Matrix :=
+                                       Params.Coeff_Grads;
+                --  Intercepts: layers x intercept values
+                Intercepts         : constant Real_Float_Vector :=
+                                       Params.Intercept_Grads;
+                Activat_Dot_Coeff  : constant Real_Float_Matrix :=
+                                       Activations (layer) * Coefficient_Matrix;
             begin
-                Max_Activ_Start := Clock;
-                Update_Activations (Params, Activations, Hidden_Activation,
-                                    Num_Layers, layer);
-                Max_Activ_Stop := Clock;
-                Max_Activ_Time := Max_Activ_Stop - Max_Activ_Start;
-                if Max_Activ_Time > Max_Activations_Duration then
-                    Max_Activations_Duration := Max_Activ_Time;
+                --  L131 Add layer + 1
+                Activations.Append (Activat_Dot_Coeff + Intercepts);
+
+                --  L134 For the hidden layers
+                if layer /= Num_Layers - 1 then
+                    case Hidden_Activation is
+                    when Identity_Activation => null;
+                    when Logistic_Activation =>
+                        Logistic (Activations (layer + 1));
+                    when Tanh_Activation => Tanh (Activations (layer + 1));
+                    when Rect_LU_Activation => Rect_LU (Activations (layer + 1));
+                    when Softmax_Activation => Softmax (Activations (layer + 1));
+                    end case;
                 end if;
-            end;
+
+--                  Max_Activ_Stop := Clock;
+--                  Max_Activ_Time := Max_Activ_Stop - Max_Activ_Start;
+--                  if Max_Activ_Time > Max_Activations_Duration then
+--                      Max_Activations_Duration := Max_Activ_Time;
+--                  end if;
+            end;  --  declare
             Next (Params_Cursor);
         end loop;
+
         Activ_Stop := Clock;
         Activations_Duration := Activations_Duration + Activ_Stop - Activ_Start;
 
@@ -1054,7 +1050,6 @@ package body Multilayer_Perceptron is
         --  L645
         Activations.Clear;
         Activations.Append (X_Batch);
-        --        Activations.Replace_Element (Activations.First_Index, X_Batch);
 
         Forward_Start := Clock;
         Forward_Pass (Self, Activations);
@@ -1077,43 +1072,6 @@ package body Multilayer_Perceptron is
           (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
 
     end Process_Batch;
-
-    --  -------------------------------------------------------------------------
-
-    procedure Update_Activations
-      (Params             : Parameters_Record;
-       Activations        : in out Real_Matrix_List;
-       Hidden_Activation  : Base_Neural.Activation_Type;
-       Num_Layers, Layer  : Positive) is
-        use Base_Neural;
-        use Real_Float_Arrays;
-        --        Routine_Name         : constant String :=
-        --                                 "Multilayer_Perceptron.Update_Activations ";
-        Activ_Layer          : constant Real_Float_Matrix := Activations (layer);
-        Coefficient_Matrix   : constant Real_Float_Matrix := Params.Coeff_Grads;
-        --  Intercepts: layers x intercept values
-        Intercepts           : constant Real_Float_Vector :=
-                                 Params.Intercept_Grads;
-        Activ_Dot_Coeff      : constant Real_Float_Matrix :=
-                                 Activ_Layer * Coefficient_Matrix;
-    begin
-        --  L131 Add layer + 1
-        --        Activations.Replace_Element (layer + 1, Activ_Dot_Coeff + Intercepts);
-        Activations.Append (Activ_Dot_Coeff + Intercepts);
-
-        --  L134 For the hidden layers
-        if layer + 1 /= Num_Layers then
-            case Hidden_Activation is
-            when Identity_Activation => null;
-            when Logistic_Activation =>
-                Logistic (Activations (layer + 1));
-            when Tanh_Activation => Tanh (Activations (layer + 1));
-            when Rect_LU_Activation => Rect_LU (Activations (layer + 1));
-            when Softmax_Activation => Softmax (Activations (layer + 1));
-            end case;
-        end if;
-
-    end Update_Activations;
 
     --  -------------------------------------------------------------------------
 
