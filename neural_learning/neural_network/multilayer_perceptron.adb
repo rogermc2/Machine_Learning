@@ -790,13 +790,13 @@ package body Multilayer_Perceptron is
       Num_Layers         : constant Positive := Self.Attributes.N_Layers;
       Params_List        : constant Parameters_List := Self.Attributes.Params;
       Params_Cursor      : Parameters_Package.Cursor := Params_List.First;
-      --  Initialize first layer
-      --        Activation         : constant Real_Float_Matrix := X;
       Activ_Out          : Real_Float_Matrix (X'Range,
                                               1 .. Self.Attributes.N_Outputs);
-      Activations        : Real_Matrix_List;
+      --  One element list used to allow for different sized matrices
+      Prev_Activation    : Real_Matrix_List;
    begin
-      Activations.Append (X);
+      --  Initialize first layer
+      Prev_Activation.Append (X);
       --  L167 Forward propagate
       for layer in 1 .. Num_Layers - 1 loop
          --           Put_Line (Routine_Name & "L167 layer" & Integer'Image (layer));
@@ -808,10 +808,11 @@ package body Multilayer_Perceptron is
          --                     & " x" & Integer'Image
          --                       (Params_List (layer).Coeff_Grads'Length (2)));
          declare
-            Params             : constant Parameters_Record := Element (Params_Cursor);
-            --                                         Params_List (layer);
+            --  Params := Params_List (layer);
+            Params             : constant Parameters_Record :=
+                                       Element (Params_Cursor);
             Updated_Activation : Real_Float_Matrix :=
-                                   Activations (1) * Params.Coeff_Grads;
+                                   Prev_Activation (1) * Params.Coeff_Grads;
          begin
             Updated_Activation :=
               Updated_Activation + Params.Intercept_Grads;
@@ -825,7 +826,7 @@ package body Multilayer_Perceptron is
                   when Softmax_Activation => Softmax (Updated_Activation);
                end case;
             end if;
-            Activations.Replace_Element (1, Updated_Activation);
+            Prev_Activation.Replace_Element (1, Updated_Activation);
 
             if layer = Num_Layers - 1 then
                Activ_Out := Updated_Activation;
@@ -904,7 +905,6 @@ package body Multilayer_Perceptron is
       Self.Attributes.Intercept_Indptr.Clear;
       Self.Attributes.T := 0;
       Self.Attributes.N_Layers := Natural (Layer_Units.Length);
-      Self.Attributes.Params.Clear;
 
       if Self.Estimator_Kind /= Classifier_Estimator then
          Self.Attributes.Out_Activation := Identity_Activation;
@@ -916,6 +916,7 @@ package body Multilayer_Perceptron is
       end if;
 
       --  L344
+      Self.Attributes.Params.Clear;
       for layer in 1 .. Self.Attributes.N_Layers - 1 loop
          --  Add coefficent matrices and intercept vectors for layer.
          Put_Line (Routine_Name & "layer: " & Integer'Image (layer));
