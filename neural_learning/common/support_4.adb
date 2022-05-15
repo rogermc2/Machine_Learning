@@ -57,7 +57,7 @@ package body Support_4 is
          end;
 
       else
-        Put_Line (Routine_Name & "Fetch_Openml");
+         Put_Line (Routine_Name & "Fetch_Openml");
          Openml_Ada.Fetch_Openml (Dataset_File_Name => Dataset_File,
                                   Save_File_Name    => Save_File,
                                   Target_Columns    => Target_Columns,
@@ -65,19 +65,22 @@ package body Support_4 is
                                   As_Frame          => As_Frame);
          Put_Line (Routine_Name & "Openml read");
          declare
-            X            : Float_Matrix := To_Float_Matrix (Bunch.Data);
+            X            : Real_Float_Matrix :=
+                             To_Real_Float_Matrix (Bunch.Data);
             Y            : Integer_Array := To_Integer_Array (Bunch.Target);
             Num_Features : constant Positive := Positive (X'Length (2));
-            Train_X      : Real_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
+            Train_X      : Real_Float_Matrix (1 .. Train_Size,
+                                              1 .. Num_Features);
             Train_Y      : Integer_Array (1 .. Train_Size);
             Train_Y2     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
-            Test_X       : Real_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
+            Test_X       : Real_Float_Matrix (1 .. Test_Size,
+                                              1 .. Num_Features);
             Test_Y       : Integer_Array (1 .. Test_Size);
             Test_Y2      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
             Data         : Base_State (Train_Size, Test_Size, Num_Features);
          begin
             Put_Line (Routine_Name & "oml loaded");
-            Assert (X'Last > X'First, Routine_Name & "X is empty.");
+            --              Assert (X'Last > X'First, Routine_Name & "X is empty.");
             Put_Line (Routine_Name & "X Length" & Integer'Image (X'Length));
             Assert (Y'Length = X'Length, Routine_Name &
                       "Y length" & Integer'Image (Y'Length) &
@@ -91,8 +94,10 @@ package body Support_4 is
             Put_Line (Routine_Name & "Y permuted");
             --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
             Put_Line (Routine_Name & "splitting data");
-            Data_Splitter.Train_Test_Split (X, Y, Test_Size, Train_Size,
-                                            Test_X, Test_Y, Train_X, Train_Y);
+            Data_Splitter.Train_Test_Split
+              (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
+               Train_X => Train_X, Train_Y => Train_Y,
+               Test_X => Test_X, Test_Y => Test_Y);
             Put_Line ("Requested train size: " & Integer'Image (Train_Size));
             Put_Line ("Train data length: " &
                         Count_Type'Image (Train_X'Length));

@@ -70,7 +70,7 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
    --  L2325
    procedure Train_Test_Split
-     (X       : Float_Matrix; Y : Integer_Array;
+     (X       : Real_Float_Matrix; Y : Integer_Array;
       Train_Size, Test_Size : Natural;
       Train_X : out Real_Float_Matrix; Train_Y : out Integer_Array;
       Test_X  : out Real_Float_Matrix; Test_Y : out Integer_Array) is

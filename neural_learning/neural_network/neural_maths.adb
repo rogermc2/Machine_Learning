@@ -17,7 +17,7 @@ package body Neural_Maths is
    Neg_Root     : constant Float := -0.504083008264455409;
    Neg_Root_Val : constant Float := 7.2897639029768949 * 10.0 ** (-17);
 
-   function Max (X : Float_Matrix) return Float_Array;
+--     function Max (X : Float_Matrix) return Float_Array;
    --     function Psi_AS103 (X : Float) return Float;  --  Digamma AS103
    function Psi_Cephes (X : Float) return Float;
    function Zeta_Series (Z, Root, Root_Val : Float) return Float;
@@ -41,60 +41,60 @@ package body Neural_Maths is
    --  Based on github.com/scipy/scipy/blob/main/scipy/special/_logsumexp.py
    --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
    --  Computes the log of the sum of exponentials of the input elements.
-   function Log_Sum_Exponent (Log_Prob : Float_Matrix) return Float_Array is
-      use Maths.Float_Math_Functions;
-      Log_Prob_Max : constant Float_Array := Max (Log_Prob);
-      Max          : Float;
-      Diff         : Float;
-      Exp_Delta    : Float_Array (1 .. Log_Prob'Length);
-      Sum          : Float := 0.0;
-      Log_Sum      : Float_Array (1 .. Log_Prob'Length);
-   begin
-      for row in Log_Prob'First .. Log_Prob'Last loop
-         Max := Log_Prob_Max (row);
-         for col in Log_Prob'First (2) .. Log_Prob'Last (2) loop
-            --  tmp = np.exp(a - a_max)
-            Diff := Log_Prob (row, col) - Max;
-            if Diff = 0.0 then
-               Exp_Delta (col) := 1.0;
-            else
-               Exp_Delta (col) := Exp (Diff);
-            end if;
-         end loop;
-
-         for index3 in Exp_Delta'First .. Exp_Delta'Last loop
-            Sum := Sum + Exp_Delta (index3);
-         end loop;
-
-         Log_Sum (row) := Log (Sum);
-      end loop;
-
-      return Log_Sum;
-
-   end Log_Sum_Exponent;
+--     function Log_Sum_Exponent (Log_Prob : Float_Matrix) return Float_Array is
+--        use Maths.Float_Math_Functions;
+--        Log_Prob_Max : constant Float_Array := Max (Log_Prob);
+--        Max          : Float;
+--        Diff         : Float;
+--        Exp_Delta    : Float_Array (1 .. Log_Prob'Length);
+--        Sum          : Float := 0.0;
+--        Log_Sum      : Float_Array (1 .. Log_Prob'Length);
+--     begin
+--        for row in Log_Prob'First .. Log_Prob'Last loop
+--           Max := Log_Prob_Max (row);
+--           for col in Log_Prob'First (2) .. Log_Prob'Last (2) loop
+--              --  tmp = np.exp(a - a_max)
+--              Diff := Log_Prob (row, col) - Max;
+--              if Diff = 0.0 then
+--                 Exp_Delta (col) := 1.0;
+--              else
+--                 Exp_Delta (col) := Exp (Diff);
+--              end if;
+--           end loop;
+--
+--           for index3 in Exp_Delta'First .. Exp_Delta'Last loop
+--              Sum := Sum + Exp_Delta (index3);
+--           end loop;
+--
+--           Log_Sum (row) := Log (Sum);
+--        end loop;
+--
+--        return Log_Sum;
+--
+--     end Log_Sum_Exponent;
 
    --  -------------------------------------------------------------------------
 
-   function Max (X : Float_Matrix) return Float_Array is
-      XT        : constant Float_Matrix := Transpose (X);
-      Value     : Float;
-      Max_Value : Float;
-      Max_Vals  : Float_Array (1 .. XT'Length);
-   begin
-      for row in XT'First .. XT'Last loop
-         Max_Value := -Float'Last;
-         for col in XT'First (2) .. XT'Last (2) loop
-            Value := XT (row, col);
-            if Value > Max_Value then
-               Max_Vals (col) := Value;
-            end if;
-         end loop;
-         Max_Vals (row) := Max_Value;
-      end loop;
-
-      return Max_Vals;
-
-   end Max;
+--     function Max (X : Float_Matrix) return Float_Array is
+--        XT        : constant Float_Matrix := Transpose (X);
+--        Value     : Float;
+--        Max_Value : Float;
+--        Max_Vals  : Float_Array (1 .. XT'Length);
+--     begin
+--        for row in XT'First .. XT'Last loop
+--           Max_Value := -Float'Last;
+--           for col in XT'First (2) .. XT'Last (2) loop
+--              Value := XT (row, col);
+--              if Value > Max_Value then
+--                 Max_Vals (col) := Value;
+--              end if;
+--           end loop;
+--           Max_Vals (row) := Max_Value;
+--        end loop;
+--
+--        return Max_Vals;
+--
+--     end Max;
 
    --  -------------------------------------------------------------------------
 
@@ -114,32 +114,32 @@ package body Neural_Maths is
 
    --  ------------------------------------------------------------------------
 
-   function Mean (A : Float_Matrix) return Float is
-      Length  : constant Float := Float (A'Length * A'Length (2));
-      Sum     : Float := 0.0;
-   begin
-      for row in A'First .. A'Last loop
-         for col in A'First (2) .. A'Last (2) loop
-            Sum := Sum + A (row, col);
-         end loop;
-      end loop;
-
-      return Sum / Length;
-
-   end Mean;
+--     function Mean (A : Float_Matrix) return Float is
+--        Length  : constant Float := Float (A'Length * A'Length (2));
+--        Sum     : Float := 0.0;
+--     begin
+--        for row in A'First .. A'Last loop
+--           for col in A'First (2) .. A'Last (2) loop
+--              Sum := Sum + A (row, col);
+--           end loop;
+--        end loop;
+--
+--        return Sum / Length;
+--
+--     end Mean;
 
    --  ------------------------------------------------------------------------
 
-   function Mean (A : Float_Array) return Float is
-      Sum     : Float := 0.0;
-   begin
-      for item in A'First .. A'Last loop
-         Sum := Sum + A (item);
-      end loop;
-
-      return Sum / Float (A'Length);
-
-   end Mean;
+--     function Mean (A : Float_Array) return Float is
+--        Sum     : Float := 0.0;
+--     begin
+--        for item in A'First .. A'Last loop
+--           Sum := Sum + A (item);
+--        end loop;
+--
+--        return Sum / Float (A'Length);
+--
+--     end Mean;
 
    --  ------------------------------------------------------------------------
    --  Mean computes means axes along the specified axis.
@@ -147,31 +147,31 @@ package body Neural_Maths is
    --                    (4, 5, 6))
    --  Mean (A, 1) returns (2.5, 3.5, 4.5)
    --  Mean (A, 2) returns (2, 5)
-   function Mean (A : Float_Matrix; Axis : Positive) return Float_Array is
-
-      function Do_Mean (FM : Float_Matrix) return Float_Array is
-         Length : constant Positive := FM'Length (2);
-         Sum    : Float;
-         Result : Float_Array (1 .. Length);
-      begin
-         for col in FM'Range (2) loop
-            Sum := 0.0;
-            for row in FM'Range loop
-               Sum := Sum + FM (row, col);
-            end loop;
-            Result (col) := Sum / Float (Length);
-         end loop;
-         return Result;
-      end Do_Mean;
-
-   begin
-      if Axis = 1 then
-         return Do_Mean (A);
-      else
-         return Do_Mean (Transpose (A));
-      end if;
-
-   end Mean;
+--     function Mean (A : Float_Matrix; Axis : Positive) return Float_Array is
+--
+--        function Do_Mean (FM : Float_Matrix) return Float_Array is
+--           Length : constant Positive := FM'Length (2);
+--           Sum    : Float;
+--           Result : Float_Array (1 .. Length);
+--        begin
+--           for col in FM'Range (2) loop
+--              Sum := 0.0;
+--              for row in FM'Range loop
+--                 Sum := Sum + FM (row, col);
+--              end loop;
+--              Result (col) := Sum / Float (Length);
+--           end loop;
+--           return Result;
+--        end Do_Mean;
+--
+--     begin
+--        if Axis = 1 then
+--           return Do_Mean (A);
+--        else
+--           return Do_Mean (Transpose (A));
+--        end if;
+--
+--     end Mean;
 
    --  ------------------------------------------------------------------------
 
@@ -225,7 +225,8 @@ package body Neural_Maths is
    --  y  =  C0  + C1 x + C2 x^2  +...+ CN x^N
    --  Coefficients are stored in reverse order:
    --  coef [0] = CN  , ..., coef[N] = C0
-   function Pol_Eval (X : Float; Coeff : Float_Array; N : Positive) return Float is
+   function Pol_Eval (X : Float; Coeff : Real_Float_Vector; N : Positive)
+                      return Float is
       Result : Float := 0.0;
    begin
       for index in Coeff'First .. Coeff'Last loop
@@ -284,7 +285,7 @@ package body Neural_Maths is
       use Maths.Float_Math_Functions;
       Routine_Name : constant String := "Neural_Maths.Psi_Cephes ";
       Euler        : constant Float := 0.57721566490153286061;
-      A            : constant Float_Array (0 .. 6) :=
+      A            : constant Real_Float_Vector (0 .. 6) :=
                        ( 0.00833333333333333333333,
                          -0.00210927960927960927961,
                          0.000757575757575757575758,
