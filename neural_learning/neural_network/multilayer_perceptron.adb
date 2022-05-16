@@ -326,15 +326,14 @@ package body Multilayer_Perceptron is
     begin
       New_Line;
       Put_Line (Routine_Name & "Layer:" & Integer'Image (Layer));
-        Put_Line ("Activations (Layer) size:" &
-                    Count_Type'Image (Activations.Element (Layer)'Length) & " x" &
-                    Count_Type'Image (Activations.Element (Layer)'Length (2)));
-        Put_Line ("Deltas length:" & Count_Type'Image (Deltas.Length));
-        Put_Line ("Deltas (1) size:" &
-                    Count_Type'Image (Deltas.First_Element'Length) & " x" &
-                    Count_Type'Image (Deltas.First_Element'Length (2)));
+--          Put_Line ("Activations (Layer) size:" &
+--                      Count_Type'Image (Activations.Element (Layer)'Length) & " x" &
+--                      Count_Type'Image (Activations.Element (Layer)'Length (2)));
+--          Put_Line ("Deltas length:" & Count_Type'Image (Deltas.Length));
+--          Put_Line ("Deltas (1) size:" &
+--                      Count_Type'Image (Deltas.First_Element'Length) & " x" &
+--                      Count_Type'Image (Deltas.First_Element'Length (2)));
         --  L185
-        Put_Line (Routine_Name & "L186");
         --  The ith element of Deltas holds the difference between the
         --  activations of the i + 1 layer and the backpropagated error.
         --  An activation converts the output from a layer into a form that is
@@ -350,17 +349,16 @@ package body Multilayer_Perceptron is
                       Count_Type'Image (New_Grad.Coeff_Grads'Length));
 
             --  Coeff_Grads is a list of fan_in x fan_out matrices
-            Put_Line ("Act_Delta size:" & Count_Type'Image (Act_Delta'Length) &
-                        " x" & Count_Type'Image (Act_Delta'Length (2)) &
-                        ",  Coeff_Grads size:" &
-                        Count_Type'Image (New_Grad.Coeff_Grads'Length)
-                      & " x" &
-                        Count_Type'Image (New_Grad.Coeff_Grads'Length (2)));
-            Put_Line (Routine_Name & "L186");
+--              Put_Line ("Act_Delta size:" & Count_Type'Image (Act_Delta'Length) &
+--                          " x" & Count_Type'Image (Act_Delta'Length (2)) &
+--                          ",  Coeff_Grads size:" &
+--                          Count_Type'Image (New_Grad.Coeff_Grads'Length)
+--                        & " x" &
+--                          Count_Type'Image (New_Grad.Coeff_Grads'Length (2)));
             --  L186
             New_Grad.Coeff_Grads := Act_Delta +
               Self.Parameters.Alpha * New_Grad.Coeff_Grads;
-            Put_Line (Routine_Name & "Coeff_Grads division");
+            Put_Line (Routine_Name & "L187");
             New_Grad.Coeff_Grads := New_Grad.Coeff_Grads / Float (Num_Samples);
             New_Grad.Intercept_Grads := Delta_Mean;
             Grads.Prepend (New_Grad);
@@ -1050,16 +1048,13 @@ package body Multilayer_Perceptron is
         Backprop_Stop := Clock;
         Backprop_Duration := Backprop_Duration + Backprop_Stop - Backprop_Start;
 
-        Put_Line (Routine_Name & "L665");
         --  L665
         Accumulated_Loss := Accumulated_Loss + Batch_Loss *
           Float (Batch_Slice.Last - Batch_Slice.First + 1);
         --  L667 update weights
         --  Update_Params updates parameters with given gradients
-        Put_Line (Routine_Name & "L667");
         Stochastic_Optimizers.Update_Params
           (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
-        Put_Line (Routine_Name & "done");
 
     end Process_Batch;
 
@@ -1083,8 +1078,13 @@ package body Multilayer_Perceptron is
         Put_Line (Routine_Name & "Deltas (1) size:" &
                     Count_Type'Image (Element (Deltas_Curs)'Length) & " x" &
                     Count_Type'Image (Element (Deltas_Curs)'Length (2)));
+
+        Put_Line (Routine_Name & "Coeff_Grads size:" &
+                    Count_Type'Image (Params.Coeff_Grads'Length) & " x" &
+                    Count_Type'Image (Params.Coeff_Grads'Length (2)));
         --  L311
         Deltas.Append (Deltas.First_Element * Transpose (Params.Coeff_Grads));
+        Put_Line (Routine_Name & "L311+");
         Deltas_Curs := Deltas.First;
         Put_Line (Routine_Name & "updated Deltas (last) size:" &
                     Count_Type'Image (Element (Deltas_Curs)'Length) & " x" &

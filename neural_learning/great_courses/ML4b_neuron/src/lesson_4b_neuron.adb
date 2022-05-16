@@ -52,6 +52,7 @@ begin
                         (Base.Score (Self => aClassifier, X => Test_X,
                                      Y => To_Real_Float_Matrix (Test_Y),
                                      Sample_Weight => Sample_Weight)));
+            New_Line;
         end loop;
     end;  --  declare
 
