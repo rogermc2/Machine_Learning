@@ -676,10 +676,11 @@ package body Multilayer_Perceptron is
     --  The ith element of Activations (length n_layers - 1) holds
     --  the activation values of the ith layer.
     --  Activations: layers x matrix (samples x features)
-        use Base_Neural;
+      use Ada.Containers;
+      use Base_Neural;
         use Parameters_Package;
---          Routine_Name      : constant String :=
---                                "Multilayer_Perceptron.Forward_Pass ";
+        Routine_Name      : constant String :=
+                              "Multilayer_Perceptron.Forward_Pass ";
         Hidden_Activation : constant Activation_Type :=
                               Self.Parameters.Activation;
         Output_Activation : constant Activation_Type :=
@@ -698,6 +699,7 @@ package body Multilayer_Perceptron is
     begin
         --  L130
         for layer in 1 .. Num_Layers - 1 loop
+            Put_Line (Routine_Name & "layer" & Integer'Image (layer));
             declare
                 use Real_Float_Arrays;
                 Params             : constant Parameters_Record :=
@@ -712,6 +714,12 @@ package body Multilayer_Perceptron is
             begin
                 --  L131 Add layer + 1
                 Activations.Append (Activat_Dot_Coeff + Intercepts);
+                Put_Line (Routine_Name & "Coefficient_Matrix size:" &
+                    Count_Type'Image (Coefficient_Matrix'Length) & " x" &
+                    Count_Type'Image (Coefficient_Matrix'Length (2)));
+                Put_Line (Routine_Name & "Activations (layer + 1) size:" &
+                    Count_Type'Image (Activations.Element (layer + 1)'Length) & " x" &
+                    Count_Type'Image (Activations.Element (layer + 1)'Length (2)));
 
                 --  L134 For the hidden layers
                 if layer /= Num_Layers - 1 then
@@ -1006,6 +1014,7 @@ package body Multilayer_Perceptron is
                              Batch_Slice      : NL_Types.Slice_Record;
                              Batch_Size       : Positive;
                              Accumulated_Loss : in out Float) is
+        use Ada.Containers;
         Routine_Name   : constant String :=
                            "Multilayer_Perceptron.Process_Batch ";
         Num_Features   : constant Positive := Positive (X'Length (2));
@@ -1037,6 +1046,9 @@ package body Multilayer_Perceptron is
         --  L645
         Activations.Clear;
         Activations.Append (X_Batch);
+        Put_Line (Routine_Name & "Activations (1) size:" &
+                    Count_Type'Image (Activations.First_Element'Length) & " x" &
+                    Count_Type'Image (Activations.First_Element'Length (2)));
 
         Forward_Start := Clock;
         Forward_Pass (Self, Activations);
