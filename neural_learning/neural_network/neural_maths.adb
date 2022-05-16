@@ -17,8 +17,6 @@ package body Neural_Maths is
    Neg_Root     : constant Float := -0.504083008264455409;
    Neg_Root_Val : constant Float := 7.2897639029768949 * 10.0 ** (-17);
 
---     function Max (X : Float_Matrix) return Float_Array;
-   --     function Psi_AS103 (X : Float) return Float;  --  Digamma AS103
    function Psi_Cephes (X : Float) return Float;
    function Zeta_Series (Z, Root, Root_Val : Float) return Float;
 
@@ -38,69 +36,10 @@ package body Neural_Maths is
    end Digamma;
 
    --  --------------------------------------------------------------------------
-   --  Based on github.com/scipy/scipy/blob/main/scipy/special/_logsumexp.py
-   --  logsumexp (a, axis=None, b=None, keepdims=False, return_sign=False)
-   --  Computes the log of the sum of exponentials of the input elements.
---     function Log_Sum_Exponent (Log_Prob : Float_Matrix) return Float_Array is
---        use Maths.Float_Math_Functions;
---        Log_Prob_Max : constant Float_Array := Max (Log_Prob);
---        Max          : Float;
---        Diff         : Float;
---        Exp_Delta    : Float_Array (1 .. Log_Prob'Length);
---        Sum          : Float := 0.0;
---        Log_Sum      : Float_Array (1 .. Log_Prob'Length);
---     begin
---        for row in Log_Prob'First .. Log_Prob'Last loop
---           Max := Log_Prob_Max (row);
---           for col in Log_Prob'First (2) .. Log_Prob'Last (2) loop
---              --  tmp = np.exp(a - a_max)
---              Diff := Log_Prob (row, col) - Max;
---              if Diff = 0.0 then
---                 Exp_Delta (col) := 1.0;
---              else
---                 Exp_Delta (col) := Exp (Diff);
---              end if;
---           end loop;
---
---           for index3 in Exp_Delta'First .. Exp_Delta'Last loop
---              Sum := Sum + Exp_Delta (index3);
---           end loop;
---
---           Log_Sum (row) := Log (Sum);
---        end loop;
---
---        return Log_Sum;
---
---     end Log_Sum_Exponent;
-
-   --  -------------------------------------------------------------------------
-
---     function Max (X : Float_Matrix) return Float_Array is
---        XT        : constant Float_Matrix := Transpose (X);
---        Value     : Float;
---        Max_Value : Float;
---        Max_Vals  : Float_Array (1 .. XT'Length);
---     begin
---        for row in XT'First .. XT'Last loop
---           Max_Value := -Float'Last;
---           for col in XT'First (2) .. XT'Last (2) loop
---              Value := XT (row, col);
---              if Value > Max_Value then
---                 Max_Vals (col) := Value;
---              end if;
---           end loop;
---           Max_Vals (row) := Max_Value;
---        end loop;
---
---        return Max_Vals;
---
---     end Max;
-
-   --  -------------------------------------------------------------------------
 
    function Mean (A : Integer_Matrix) return Float is
-      Length  : constant Float := Float (A'Length * A'Length (2));
-      Sum     : Integer := 0;
+      Length : constant Float := Float (A'Length * A'Length (2));
+      Sum    : Integer := 0;
    begin
       for row in A'First .. A'Last loop
          for col in A'First (2) .. A'Last (2) loop
@@ -111,67 +50,6 @@ package body Neural_Maths is
       return Float (Sum) / Length;
 
    end Mean;
-
-   --  ------------------------------------------------------------------------
-
---     function Mean (A : Float_Matrix) return Float is
---        Length  : constant Float := Float (A'Length * A'Length (2));
---        Sum     : Float := 0.0;
---     begin
---        for row in A'First .. A'Last loop
---           for col in A'First (2) .. A'Last (2) loop
---              Sum := Sum + A (row, col);
---           end loop;
---        end loop;
---
---        return Sum / Length;
---
---     end Mean;
-
-   --  ------------------------------------------------------------------------
-
---     function Mean (A : Float_Array) return Float is
---        Sum     : Float := 0.0;
---     begin
---        for item in A'First .. A'Last loop
---           Sum := Sum + A (item);
---        end loop;
---
---        return Sum / Float (A'Length);
---
---     end Mean;
-
-   --  ------------------------------------------------------------------------
-   --  Mean computes means axes along the specified axis.
-   --  For a matrix A = ((1, 2, 3),
-   --                    (4, 5, 6))
-   --  Mean (A, 1) returns (2.5, 3.5, 4.5)
-   --  Mean (A, 2) returns (2, 5)
---     function Mean (A : Float_Matrix; Axis : Positive) return Float_Array is
---
---        function Do_Mean (FM : Float_Matrix) return Float_Array is
---           Length : constant Positive := FM'Length (2);
---           Sum    : Float;
---           Result : Float_Array (1 .. Length);
---        begin
---           for col in FM'Range (2) loop
---              Sum := 0.0;
---              for row in FM'Range loop
---                 Sum := Sum + FM (row, col);
---              end loop;
---              Result (col) := Sum / Float (Length);
---           end loop;
---           return Result;
---        end Do_Mean;
---
---     begin
---        if Axis = 1 then
---           return Do_Mean (A);
---        else
---           return Do_Mean (Transpose (A));
---        end if;
---
---     end Mean;
 
    --  ------------------------------------------------------------------------
 
@@ -240,40 +118,6 @@ package body Neural_Maths is
       return Result;
 
    end Pol_Eval;
-
-   --  -------------------------------------------------------------------------
-   --  Based on https://people.sc.fsu.edu/~jburkardt/f77_src/asa103/asa103.f
-   --  Applied Statistics, Volume 25, Number 3, 1976, pages 315-317
-   --     function Psi_AS103 (X : Float) return Float is
-   --        use Maths.Float_Math_Functions;
-   --        Routine_Name : constant String := "Neural_Maths.Psi_103 ";
-   --        Euler_Mascheroni : constant Float := 0.5772156649015328606;
-   --        R                : Float;
-   --        X2               : Float := X;
-   --        Digamma          : Float := 0.0;
-   --     begin
-   --        Assert (X > 0.0, Routine_Name & "X," & Float'Image (X) &
-   --                  " should be greater than zero.");
-   --
-   --        if X <= 0.00001 then
-   --           Digamma := -Euler_Mascheroni - 1.0 / X2;
-   --        else
-   --           --  Reduce to Digamma (X + N).
-   --           while X2 < 8.5 loop
-   --              Digamma := Digamma - 1.0 / X2;
-   --              X2 := X2 + 1.0;
-   --           end loop;
-   --
-   --           --  Use Stirling's (actually de Moivre's) expansion.
-   --           R := 1.0 / X2;
-   --           Digamma := Digamma + Log (X2) - 0.5 * R;
-   --           R := R ** 2;
-   --           Digamma := Digamma - R / 12.0  - R / 120.0 - R / 252.0;
-   --        end if;
-   --
-   --        return Digamma;
-   --
-   --     end Psi_AS103;
 
    --  ------------------------------------------------------------------------
    --  Based on github.com/poliastro/cephes/blob/master/src/psi.c
