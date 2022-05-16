@@ -228,7 +228,9 @@ package body Stochastic_Optimizers is
           (1.0 - Self.Beta_1 ** Self.Time_Step);
         --  L272
         --  "of" implies that layer is a cursor
+        Put_Line (Routine_Name & "L272");
         for layer of Grads loop
+            Put_Line (Routine_Name & "loop layer");
             declare
                 Layer_Grads           : constant Parameters_Record := layer;
                 First_Moments         : constant Parameters_Record :=
@@ -241,12 +243,14 @@ package body Stochastic_Optimizers is
                 Update_Second_Moments : Parameters_Record :=
                                           Self.Beta_2 * Second_Moments;
             begin
+                Put_Line (Routine_Name & "Assert");
                 Assert (First_Moments.Coeff_Grads'Length =
                           Layer_Grads.Coeff_Grads'Length, Routine_Name &
                           "Coeff_Grads length" &
                           Integer'Image (First_Moments.Coeff_Grads'Length) &
                           " should equal Layer_Grads length" &
                           Integer'Image (Layer_Grads.Coeff_Grads'Length));
+                Put_Line (Routine_Name & "Update_First_Moments");
                 Update_First_Moments := Update_First_Moments +
                   (1.0 - Self.Beta_1) * Layer_Grads;
                 Update_Second_Moments := Update_Second_Moments +
@@ -261,6 +265,7 @@ package body Stochastic_Optimizers is
         Self.First_Moments := First_Moment_Updates;
         Self.Second_Moments := Second_Moment_Updates;
 
+        Put_Line (Routine_Name & "L284");
         F_Cursor := First_Moment_Updates.First;
         S_Cursor := Second_Moment_Updates.First;
         for layer of Self.Params loop
@@ -396,10 +401,11 @@ package body Stochastic_Optimizers is
     procedure Update_Params (Self   : in out Optimizer_Record;
                              Params : in out Parameters_List;
                              Grads  : Parameters_List) is
-    --        Routine_Name : constant String :=
-    --                         "Stochastic_Optimizers.Update_Params ";
+        Routine_Name : constant String :=
+                           "Stochastic_Optimizers.Update_Params ";
         Updates      : Parameters_List;
     begin
+        Put_Line (Routine_Name & "L42");
         --  L42
         case Self.Kind is
             when Optimizer_Adam =>
@@ -409,6 +415,7 @@ package body Stochastic_Optimizers is
             when No_Optimizer => null;
         end case;
 
+        Put_Line (Routine_Name & "L44");
         --  L44
         Params := Params + Updates;
 
