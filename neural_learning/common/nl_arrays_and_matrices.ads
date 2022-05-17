@@ -42,6 +42,8 @@ package NL_Arrays_And_Matrices is
                   return Real_Float_Matrix;
     pragma Inline ("+");
     function "-" (L, R : Integer_Matrix) return Integer_Matrix;
+   function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
+                  return Real_Float_Matrix;
     function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
     function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;

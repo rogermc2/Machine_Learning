@@ -186,7 +186,7 @@ package body Multilayer_Perceptron is
         --  the ith layer values of a batch.
 
         --  L301
-        Deltas.Append (Activations.Last_Element - 1.0);
+        Deltas.Append (Activations.Last_Element - Y);
 
         --  L304  Compute gradient for the last layer
         Param_Cursor := Self.Attributes.Params.Last;
