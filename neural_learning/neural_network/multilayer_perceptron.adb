@@ -316,21 +316,22 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       Routine_Name        : constant String :=
                               "Multilayer_Perceptron.Compute_Loss_Gradient ";
-      --  Mean computes mean of values along the specified axis.
+      --  L185
       Act_Delta           : constant Real_Float_Matrix
         := Transpose (Activations (Layer)) * Deltas (Layer);
+      --  Mean computes mean of values along the specified axis.
       Delta_Mean          : constant Real_Float_Vector :=
                               Neural_Maths.Mean (Deltas (Layer), 1);
    begin
       New_Line;
       Put_Line (Routine_Name & "Layer:" & Integer'Image (Layer));
-              Put_Line ("Activations (Layer) size:" &
-                          Count_Type'Image (Activations.Element (Layer)'Length) & " x" &
-                          Count_Type'Image (Activations.Element (Layer)'Length (2)));
-              Put_Line ("Deltas length:" & Count_Type'Image (Deltas.Length));
-              Put_Line ("Deltas (Layer) size:" &
-                          Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
-                          Count_Type'Image (Deltas.Element (Layer)'Length (2)));
+      Put_Line ("Activations (Layer) size:" &
+                  Count_Type'Image (Activations.Element (Layer)'Length) & " x" &
+                  Count_Type'Image (Activations.Element (Layer)'Length (2)));
+      Put_Line ("Deltas length:" & Count_Type'Image (Deltas.Length));
+      Put_Line ("Deltas (Layer) size:" &
+                  Count_Type'Image (Deltas.Element (Layer)'Length) & " x" &
+                  Count_Type'Image (Deltas.Element (Layer)'Length (2)));
       --  L185
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
