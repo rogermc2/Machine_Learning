@@ -1,6 +1,5 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
-with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -213,8 +212,8 @@ package body Stochastic_Optimizers is
                               return Parameters_List is
         use Maths.Float_Math_Functions;
         use Parameters_Package;
-        Routine_Name          : constant String :=
-                                  "Stochastic_Optimizers.Get_Adam_Updates ";
+--          Routine_Name          : constant String :=
+--                                    "Stochastic_Optimizers.Get_Adam_Updates ";
         First_Moment_Updates  : Moments_List;
         Second_Moment_Updates : Moments_List;
         F_Cursor              : Cursor := Self.First_Moments.First;
@@ -241,12 +240,6 @@ package body Stochastic_Optimizers is
                 Update_Second_Moments : Parameters_Record :=
                                           Self.Beta_2 * Second_Moments;
             begin
-                Assert (First_Moments.Coeff_Grads'Length =
-                          Layer_Grads.Coeff_Grads'Length, Routine_Name &
-                          "Coeff_Grads length" &
-                          Integer'Image (First_Moments.Coeff_Grads'Length) &
-                          " should equal Layer_Grads length" &
-                          Integer'Image (Layer_Grads.Coeff_Grads'Length));
                 Update_First_Moments := Update_First_Moments +
                   (1.0 - Self.Beta_1) * Layer_Grads;
                 Update_Second_Moments := Update_Second_Moments +
@@ -290,8 +283,8 @@ package body Stochastic_Optimizers is
     function Get_SGD_Updates
       (Self : in out SGD_Optimizer; Grads : Parameters_List)
       return Parameters_List is
-        Routine_Name : constant String :=
-                         "Stochastic_Optimizers. ";
+--          Routine_Name : constant String :=
+--                           "Stochastic_Optimizers. ";
         Velocity     : Parameters_Record := Self.Velocities.First_Element;
         M_V          : Parameters_Record := Self.Velocities.First_Element;
         Layer_Grads  : Parameters_Record := Grads.First_Element;
@@ -311,8 +304,6 @@ package body Stochastic_Optimizers is
         end Do_Update;
 
     begin
-        Assert (not Self.Velocities.Is_Empty, Routine_Name &
-                  "Self.Velocities Is_Empty");
         Do_Update;
 
         Self.Velocities := Updates;
