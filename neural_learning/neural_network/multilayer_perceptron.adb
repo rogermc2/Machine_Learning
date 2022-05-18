@@ -35,7 +35,7 @@
 --  the bias values added to layer i + 1.
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Calendar; use Ada.Calendar;
+--  with Ada.Calendar; use Ada.Calendar;
 with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -53,11 +53,11 @@ package body Multilayer_Perceptron is
 
    First_Pass : Boolean := True;
 
-   Backprop_Duration        : Duration;
-   Forward_Duration         : Duration;
-   Activations_Duration     : Duration;
+--     Backprop_Duration        : Duration;
+--     Forward_Duration         : Duration;
+--     Activations_Duration     : Duration;
    --      Max_Activations_Duration : Duration := 0.0;
-   Max_Softmax_Duration     : Duration := 0.0;
+--     Max_Softmax_Duration     : Duration := 0.0;
 
    procedure Compute_Loss_Gradient
      (Self          : MLP_Classifier;
@@ -497,12 +497,12 @@ package body Multilayer_Perceptron is
       Accumulated_Loss                   : Float := 0.0;
       Msg                                : Unbounded_String;
       Is_Stopping                        : Boolean := False;
-      Iter_Start                         : Time;
-      Iter_Stop                          : Time;
-      Batch_Start                        : Time;
-      Batch_Stop                         : Time;
-      Batch_Duration                     : Duration;
-      M_Sec                              : Duration;
+--        Iter_Start                         : Time;
+--        Iter_Stop                          : Time;
+--        Batch_Start                        : Time;
+--        Batch_Stop                         : Time;
+--        Batch_Duration                     : Duration;
+--        M_Sec                              : Duration;
    begin
       --  L576
       if not Incremental or else
@@ -542,11 +542,11 @@ package body Multilayer_Perceptron is
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
-      Iter_Start := Clock;
-      Batch_Duration := 0.0;
-      Backprop_Duration := 0.0;
-      Forward_Duration := 0.0;
-      Activations_Duration := 0.0;
+--        Iter_Start := Clock;
+--        Batch_Duration := 0.0;
+--        Backprop_Duration := 0.0;
+--        Forward_Duration := 0.0;
+--        Activations_Duration := 0.0;
 
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
@@ -556,14 +556,14 @@ package body Multilayer_Perceptron is
 
          Accumulated_Loss := 0.0;
          --  L636
-         Batch_Start := Clock;
+--           Batch_Start := Clock;
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
                            Accumulated_Loss);
          end loop;
-         Batch_Stop := Clock;
-         Batch_Duration := Batch_Duration + (Batch_Stop - Batch_Start);
+--           Batch_Stop := Clock;
+--           Batch_Duration := Batch_Duration + (Batch_Stop - Batch_Start);
 
          Assert (Accumulated_Loss'Valid, Routine_Name &
                    "invalid Accumulated_Loss" &
@@ -624,12 +624,12 @@ package body Multilayer_Perceptron is
             New_Line;
          end if;
       end loop;
-      Iter_Stop := Clock;
-      M_Sec := (Iter_Stop - Iter_Start) * 1000;
-      Put_Line (Routine_Name & "Iter time:" &
-                  Duration'Image (M_Sec / 1000) & " sec");
-      Put_Line (Routine_Name & "Average Iter time:" &
-                  Duration'Image (M_Sec / Iter) & " msec");
+--        Iter_Stop := Clock;
+--        M_Sec := (Iter_Stop - Iter_Start) * 1000;
+--        Put_Line (Routine_Name & "Iter time:" &
+--                    Duration'Image (M_Sec / 1000) & " sec");
+--        Put_Line (Routine_Name & "Average Iter time:" &
+--                    Duration'Image (M_Sec / Iter) & " msec");
       --        Put_Line (Routine_Name & "Total Batch time:" &
       --                    Duration'Image (Batch_Duration) & " sec");
       --        Put_Line (Routine_Name & "Average batch loop time:" &
@@ -680,14 +680,14 @@ package body Multilayer_Perceptron is
       Output_Activation : constant Activation_Type :=
                             Self.Attributes.Out_Activation;
       Num_Layers        : constant Positive := Self.Attributes.N_Layers;
-      Activ_Start       : constant Time := Clock;
-      Activ_Stop        : Time;
+--        Activ_Start       : constant Time := Clock;
+--        Activ_Stop        : Time;
       --          Max_Activ_Start   : Time;
       --          Max_Activ_Stop    : Time;
       --          Max_Activ_Time    : Duration;
-      Softmax_Start     : Time;
-      Softmax_Stop      : Time;
-      Softmax_Time      : Duration;
+--        Softmax_Start     : Time;
+--        Softmax_Stop      : Time;
+--        Softmax_Time      : Duration;
    begin
       --  L130
       for layer in 1 .. Num_Layers - 1 loop
@@ -728,8 +728,8 @@ package body Multilayer_Perceptron is
          end;  --  declare
       end loop;
 
-      Activ_Stop := Clock;
-      Activations_Duration := Activations_Duration + Activ_Stop - Activ_Start;
+--        Activ_Stop := Clock;
+--        Activations_Duration := Activations_Duration + Activ_Stop - Activ_Start;
 
       --  L138 For the last layer
       case Output_Activation is
@@ -739,13 +739,13 @@ package body Multilayer_Perceptron is
          when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
          when Rect_LU_Activation => Rect_LU (Activations (Activations.Last_Index));
          when Softmax_Activation =>
-            Softmax_Start := Clock;
+--              Softmax_Start := Clock;
             Softmax (Activations (Activations.Last_Index));
-            Softmax_Stop := Clock;
-            Softmax_Time := Softmax_Stop - Softmax_Start;
-            if Softmax_Time > Max_Softmax_Duration then
-               Max_Softmax_Duration := Softmax_Time;
-            end if;
+--              Softmax_Stop := Clock;
+--              Softmax_Time := Softmax_Stop - Softmax_Start;
+--              if Softmax_Time > Max_Softmax_Duration then
+--                 Max_Softmax_Duration := Softmax_Time;
+--              end if;
       end case;
 
    end Forward_Pass;
@@ -1009,10 +1009,10 @@ package body Multilayer_Perceptron is
       Grads          : Parameters_List;
       Batch_Row      : Positive;
       Batch_Loss     : Float;
-      Forward_Start  : Time;
-      Forward_Stop   : Time;
-      Backprop_Start : Time;
-      Backprop_Stop  : Time;
+--        Forward_Start  : Time;
+--        Forward_Stop   : Time;
+--        Backprop_Start : Time;
+--        Backprop_Stop  : Time;
    begin
 --        New_Line;
 --        Put_Line (Routine_Name & "Batch_Slice" & Integer'Image (Batch_Slice.First)
@@ -1034,15 +1034,15 @@ package body Multilayer_Perceptron is
 --                    Count_Type'Image (Activations.First_Element'Length) & " x" &
 --                    Count_Type'Image (Activations.First_Element'Length (2)));
 
-      Forward_Start := Clock;
+--        Forward_Start := Clock;
       Forward_Pass (Self, Activations);
-      Forward_Stop := Clock;
-      Forward_Duration := Forward_Duration + Forward_Stop - Forward_Start;
-
-      Backprop_Start := Clock;
+--        Forward_Stop := Clock;
+--        Forward_Duration := Forward_Duration + Forward_Stop - Forward_Start;
+--
+--        Backprop_Start := Clock;
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
-      Backprop_Stop := Clock;
-      Backprop_Duration := Backprop_Duration + Backprop_Stop - Backprop_Start;
+--        Backprop_Stop := Clock;
+--        Backprop_Duration := Backprop_Duration + Backprop_Stop - Backprop_Start;
 
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
