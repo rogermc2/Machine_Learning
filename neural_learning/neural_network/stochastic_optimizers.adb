@@ -396,8 +396,8 @@ package body Stochastic_Optimizers is
     procedure Update_Params (Self   : in out Optimizer_Record;
                              Params : in out Parameters_List;
                              Grads  : Parameters_List) is
-        Routine_Name : constant String :=
-                           "Stochastic_Optimizers.Update_Params ";
+--          Routine_Name : constant String :=
+--                             "Stochastic_Optimizers.Update_Params ";
         Updates      : Parameters_List;
     begin
         --  L42
@@ -409,7 +409,6 @@ package body Stochastic_Optimizers is
             when No_Optimizer => null;
         end case;
 
-        Put_Line (Routine_Name & "L44");
         --  L44
         Params := Params + Updates;
 
