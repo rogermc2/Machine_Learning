@@ -152,10 +152,11 @@ package body Multilayer_Perceptron is
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
       Sum_Sq_Coeffs := 0.0;
-      for Param_Cursor of Self.Attributes.Params loop
+      for layer in Self.Attributes.Params.First_Index ..
+        Self.Attributes.Params.Last_Index loop
          declare
-            Params : constant Parameters_Record := Param_Cursor;
-            Coeffs : constant Real_Float_Matrix := Params.Coeff_Grads;
+            Coeffs : constant Real_Float_Matrix :=
+                           Self.Attributes.Params (Layer).Coeff_Grads;
             --  numpy.ravel (a) returns the elements of a as a 1-D array.
             Ravel  : Real_Float_Vector (1 .. Coeffs'Length * Coeffs'Length (2));
          begin
@@ -321,7 +322,7 @@ package body Multilayer_Perceptron is
         := Transpose (Activations (Layer)) * Deltas (Layer);
       --  Mean computes mean of values along the specified axis.
       Delta_Mean          : constant Real_Float_Vector :=
-                              Neural_Maths.Mean (Deltas (Layer), 1);
+                              Neural_Maths.Mean (Deltas (Layer));
    begin
       New_Line;
       Put_Line (Routine_Name & "Layer:" & Integer'Image (Layer));
@@ -354,8 +355,8 @@ package body Multilayer_Perceptron is
                    & " x" &
                      Count_Type'Image (New_Grad.Coeff_Grads'Length (2)));
 
-         New_Coeff_Grads := (1.0 + Self.Parameters.Alpha) *
-           New_Coeff_Grads / Float (Num_Samples);
+         New_Coeff_Grads := (New_Coeff_Grads + Self.Parameters.Alpha *
+           Self.Attributes.Params (layer).Coeff_Grads) / Float (Num_Samples);
          New_Grad.Coeff_Grads := New_Coeff_Grads;
          New_Grad.Intercept_Grads := New_Intercept_Grads;
          Grads.Prepend (New_Grad);
@@ -666,10 +667,10 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L119  Forward_Pass performs a forward pass on the neural network by
-   --  computing the values of the neurons in the hidden layers and the
-   --  output layer.
-   procedure Forward_Pass (Self         : MLP_Classifier;
-                           Activations  : in out Real_Matrix_List) is
+   --  computing the activation values of the neurons in the hidden layers and
+   --   the output layer.
+   procedure Forward_Pass (Self        : MLP_Classifier;
+                           Activations : in out Real_Matrix_List) is
       --  The ith element of Activations (length n_layers - 1) holds
       --  the activation values of the ith layer.
       --  Activations: layers x matrix (samples x features)
@@ -683,8 +684,6 @@ package body Multilayer_Perceptron is
       Output_Activation : constant Activation_Type :=
                             Self.Attributes.Out_Activation;
       Num_Layers        : constant Positive := Self.Attributes.N_Layers;
-      Params_Cursor     : Parameters_Package.Cursor :=
-                            Self.Attributes.Params.First;
       Activ_Start       : constant Time := Clock;
       Activ_Stop        : Time;
       --          Max_Activ_Start   : Time;
@@ -700,20 +699,15 @@ package body Multilayer_Perceptron is
          declare
             use Real_Float_Arrays;
             Params             : constant Parameters_Record :=
-                                   Element (Params_Cursor);
-            Coefficient_Matrix : constant Real_Float_Matrix :=
-                                   Params.Coeff_Grads;
-            --  Intercepts: layers x intercept values
-            Intercepts         : constant Real_Float_Vector :=
-                                   Params.Intercept_Grads;
+                                   Self.Attributes.Params (layer);
             Activat_Dot_Coeff  : constant Real_Float_Matrix :=
-                                   Activations (layer) * Coefficient_Matrix;
+                                   Activations (layer) * Params.Coeff_Grads;
          begin
             --  L131 Add layer + 1
-            Activations.Append (Activat_Dot_Coeff + Intercepts);
+            Activations.Append (Activat_Dot_Coeff + Params.Intercept_Grads);
             Put_Line (Routine_Name & "Coefficient_Matrix size:" &
-                        Count_Type'Image (Coefficient_Matrix'Length) & " x" &
-                        Count_Type'Image (Coefficient_Matrix'Length (2)));
+                        Count_Type'Image (Params.Coeff_Grads'Length) & " x" &
+                        Count_Type'Image (Params.Coeff_Grads'Length (2)));
             Put_Line (Routine_Name & "Activations (layer + 1) size:" &
                         Count_Type'Image (Activations.Element (layer + 1)'Length) & " x" &
                         Count_Type'Image (Activations.Element (layer + 1)'Length (2)));
@@ -736,7 +730,6 @@ package body Multilayer_Perceptron is
             --                      Max_Activations_Duration := Max_Activ_Time;
             --                  end if;
          end;  --  declare
-         Next (Params_Cursor);
       end loop;
 
       Activ_Stop := Clock;

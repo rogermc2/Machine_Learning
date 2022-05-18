@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
-with Ada.Containers.Indefinite_Doubly_Linked_Lists;
+with Ada.Containers.Indefinite_Vectors;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
@@ -28,9 +28,9 @@ package Stochastic_Optimizers is
    end record;
 
    package Parameters_Package is new
-     Ada.Containers.Indefinite_Doubly_Linked_Lists (Parameters_Record);
-   subtype Parameters_List is Parameters_Package.List;
-   subtype Moments_List is Parameters_Package.List;
+     Ada.Containers.Indefinite_Vectors (Positive, Parameters_Record);
+   subtype Parameters_List is Parameters_Package.Vector;
+   subtype Moments_List is Parameters_Package.Vector;
    function "+" (L, R : Parameters_List) return Parameters_List;
 
    type Base_Optimizer is record
