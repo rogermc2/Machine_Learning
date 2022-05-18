@@ -31,6 +31,7 @@ package NL_Types is
                  return Float_Package.Vector;
    pragma Inline ("*");
    function "*" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   pragma Inline ("*");
    function "**" (L : Float_Package.Vector; P : Integer)
                   return Float_Package.Vector;
    pragma Inline ("**");
@@ -47,16 +48,25 @@ package NL_Types is
      Ada.Containers.Vectors (Positive, Float_List);
    subtype Float_List_2D is Float_List_Package.Vector;
    function "*" (L : Float; R : Float_List_2D) return Float_List_2D;
+   pragma Inline ("*");
    function "*" (L, R : Float_List_2D) return Float_List_2D;
+   pragma Inline ("*");
    function "**" (L : Float_List_2D; P : Integer) return Float_List_2D;
+   pragma Inline ("**");
    function "/" (L : Float_List_2D; R : Float) return Float_List_2D;
+   pragma Inline ("/");
    function "+" (L, R : Float_List_2D) return Float_List_2D;
+   pragma Inline ("+");
    function "-" (L, R : Float_List_2D) return Float_List_2D;
+   pragma Inline ("-");
    function Dot (L : Float_List; R : Float_List_2D) return Float_List;
    pragma Inline (Dot);
    function Dot (L, R : Float_List) return Float_List_2D;
+   pragma Inline (Dot);
    function Dot (L, R : Float_List_2D) return Float_List_2D;
+   pragma Inline (Dot);
    function Transpose (Values : Float_List_2D) return  Float_List_2D;
+   pragma Inline (Transpose);
 
    use Float_List_Package;
    package List_Of_Float_Lists_Package is new
@@ -161,17 +171,26 @@ package NL_Types is
    function "=" (L, R : Value_Record) return Value_Record;
    pragma Inline ("=");
    function "+" (L, R : Value_Record) return Value_Record;
+   pragma Inline ("+");
    function "-" (L, R : Value_Record) return Value_Record;
+   pragma Inline ("-");
    function "abs" (Value : Value_Record) return Value_Record;
+   pragma Inline ("abs");
 
    function "=" (L, R : Value_Data_List) return Value_Data_List;
+   pragma Inline ("=");
    function "-" (L, R : Value_Data_List) return Value_Data_List;
+   pragma Inline ("-");
    function "abs" (aVector : Value_Data_List) return Value_Data_List;
+   pragma Inline ("abs");
    procedure Check_Length (Routine_Name : String; L : Float_List;
                            R            : Value_Data_List);
+   pragma Inline (Check_Length);
    procedure Check_Length (Routine_Name : String; L, R : Value_Data_List);
+   pragma Inline (Check_Length);
 
    function Dot (L, R : Value_Data_List) return Value_Record;
+   pragma Inline (Dot);
 
    package Value_Data_Sorting is new
      Value_Data_Package.Generic_Sorting ("<");
@@ -182,14 +201,22 @@ package NL_Types is
    subtype Value_Data_Lists_2D is Value_Lists_Data_Package.Vector;
 
    function "=" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   pragma Inline ("=");
    function "-" (L, R : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   pragma Inline ("-");
    function "abs" (aVector : Value_Data_Lists_2D) return Value_Data_Lists_2D;
+   pragma Inline ("abs");
    procedure Check_Lengths (Routine_Name : String; L, R : Value_Data_Lists_2D);
+   pragma Inline (Check_Lengths);
    procedure Check_Length
      (Routine_Name : String; L : Value_Data_Lists_2D; R : Float_List);
+   pragma Inline (Check_Length);
    function Dot (L, R : Float_List) return Float;
+   pragma Inline (Dot);
    function Dot (L, R : Value_Data_Lists_2D) return Value_Record;
+   pragma Inline (Dot);
    function Dot (L : Float_List; R : Value_Data_Lists_2D) return Float;
+   pragma Inline (Dot);
 
    use Value_Lists_Data_Package;
    package Value_Lists_3D_Package is new

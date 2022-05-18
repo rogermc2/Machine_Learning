@@ -37,21 +37,22 @@ begin
                     Count_Type'Image (Train_X'Length (2)));
         Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
 
-        for index in 1 .. 4 loop
+        for index in 1 .. 21 loop
             Hidden_Layer_Sizes.Clear;
             Hidden_Layer_Sizes.Append (index * 10);
             aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
                                    Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                    Activation => Base_Neural.Identity_Activation,
                                    Verbose => False);
-            --  Fit function adjusts weights according to data values so that better
-            --  accuracy can be achieved
+         --  The Fit function adjusts weights according to data values so
+         --  that better accuracy can be achieved
             Fit (aClassifier, Train_X, Train_Y);
             Put_Line (Integer'Image (index * 10) & " Score: " &
                         Float'Image
                         (Base.Score (Self => aClassifier, X => Test_X,
                                      Y => To_Real_Float_Matrix (Test_Y),
                                      Sample_Weight => Sample_Weight)));
+            New_Line;
         end loop;
     end;  --  declare
 

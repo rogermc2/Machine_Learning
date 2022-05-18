@@ -64,7 +64,7 @@ package Multilayer_Perceptron is
        record
            Hidden_Layer_Sizes    : NL_Types.Integer_List;
            Activation            : Base_Neural.Activation_Type :=
-                                     Base_Neural.Relu_Activation;
+                                     Base_Neural.Rect_LU_Activation;
            Solver                : Solver_Type := Adam_Solver;
            Alpha                 : Float := 0.0001;
            Batch_Size            : Natural := 0;  --  0 -> "auto"
@@ -103,7 +103,7 @@ package Multilayer_Perceptron is
     function C_Init (Hidden_Layer_Sizes  : NL_Types.Integer_List :=
                        NL_Types.Integer_Package.Empty_Vector;
                      Activation          : Base_Neural.Activation_Type :=
-                       Base_Neural.Relu_Activation;
+                       Base_Neural.Rect_LU_Activation;
                      Solver              : Solver_Type := Adam_Solver;
                      Alpha               : Float := 0.0001;
                      Batch_Size          : Positive := 200;

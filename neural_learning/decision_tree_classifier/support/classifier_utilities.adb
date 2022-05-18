@@ -449,29 +449,29 @@ package body Classifier_Utilities is
    --  -----------------------------------------------------------------------
 
    --  Row_Max_Indices returns the indices of the maximum value in each row of a matrix.
-   function Row_Max_Indices (Values : Float_Matrix) return Natural_Array is
-      Indices   : Natural_Array (1 .. Values'Length);
-      Max_Value : Float;
-      Max_Index : Positive;
-      Col       : Natural;
-   begin
-      for row in Values'Range loop
-         Max_Value := Values (row, 1);
-         Max_Index := 1;
-         Col := 1;
-         while Col < Values'Last (2) loop
-            Col := Col + 1;
-            if Values (row, Col) > Max_Value then
-               Max_Index := Col;
-               Max_Value := Values (row, col);
-            end if;
-         end loop;
-         Indices (row) := Max_Index;
-      end loop;
-
-      return Indices;
-
-   end Row_Max_Indices;
+--     function Row_Max_Indices (Values : Float_Matrix) return Natural_Array is
+--        Indices   : Natural_Array (1 .. Values'Length);
+--        Max_Value : Float;
+--        Max_Index : Positive;
+--        Col       : Natural;
+--     begin
+--        for row in Values'Range loop
+--           Max_Value := Values (row, 1);
+--           Max_Index := 1;
+--           Col := 1;
+--           while Col < Values'Last (2) loop
+--              Col := Col + 1;
+--              if Values (row, Col) > Max_Value then
+--                 Max_Index := Col;
+--                 Max_Value := Values (row, col);
+--              end if;
+--           end loop;
+--           Indices (row) := Max_Index;
+--        end loop;
+--
+--        return Indices;
+--
+--     end Row_Max_Indices;
 
    --  -----------------------------------------------------------------------
 
@@ -870,20 +870,19 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (A : NL_Arrays_And_Matrices.Float_Array)
-                            return Float_List is
-      A_List : Float_List;
-   begin
-      for index in A'First .. A'Last loop
-         A_List.Append (A (index));
-      end loop;
-      return A_List;
-   end To_Float_List;
+--     function To_Float_List (A : NL_Arrays_And_Matrices.Float_Array)
+--                              return Float_List is
+--        A_List : Float_List;
+--     begin
+--        for index in A'First .. A'Last loop
+--           A_List.Append (A (index));
+--        end loop;
+--        return A_List;
+--     end To_Float_List;
 
    --  -------------------------------------------------------------------------
 
-   function To_Float_List (F : Value_Data_List)
-                            return Float_List is
+   function To_Float_List (F : Value_Data_List) return Float_List is
       Item   : Value_Record;
       Floats : Float_List;
    begin

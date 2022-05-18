@@ -198,18 +198,18 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Pair_Items (A, B : Float_Array) return Float_Pair_List is
-      Item   : Float_Pair;
-      Result : Float_Pair_List;
-   begin
-      for index in A'First .. A'Last loop
-         Item := (A (index), B (index));
-         Result.Append (Item);
-      end loop;
-
-      return Result;
-
-   end Pair_Items;
+--     function Pair_Items (A, B : Float_Array) return Float_Pair_List is
+--        Item   : Float_Pair;
+--        Result : Float_Pair_List;
+--     begin
+--        for index in A'First .. A'Last loop
+--           Item := (A (index), B (index));
+--           Result.Append (Item);
+--        end loop;
+--
+--        return Result;
+--
+--     end Pair_Items;
 
    --  --------------------------------------------------------------------------
 
@@ -285,10 +285,10 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Float_Matrix) return Float_Matrix is
+   function Permute (aList : Real_Float_Matrix) return Real_Float_Matrix is
       List_Length  : constant Positive := Positive (aList'Length);
       Rand         : Positive;
-      Permutation  : Float_Matrix := aList;
+      Permutation  : Real_Float_Matrix := aList;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -620,7 +620,7 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
    --  Swap swaps matrix rows
-   procedure Swap (Data : in out Float_Matrix; L, R : Positive) is
+   procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive) is
       Val : Float;
    begin
       for col in Data'First (2) .. Data'Last (2) loop

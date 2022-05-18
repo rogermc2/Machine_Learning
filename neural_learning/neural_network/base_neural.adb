@@ -1,7 +1,5 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
---  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Containers;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -32,15 +30,6 @@ package body Base_Neural is
       Sum1        : Float := 0.0;
       Sum2        : Float := 0.0;
    begin
-      --        Assert (Y_Prob'Length = Y_True'Length and
-      --                  Y_Prob'Length (2) = Y_True'Length (2), Routine_Name &
-      --                  "Y_Prob size" &
-      --                  Integer'Image (Integer (Y_Prob'Length)) & " x" &
-      --                  Integer'Image (Integer (Y_Prob'Length (2))) &
-      --                  " should be the same as Y_True size" &
-      --                  Integer'Image (Integer (Y_True'Length)) & " x" &
-      --                  Integer'Image (Integer (Y_True'Length(2))));
-
       --  L226 Clip Y_Prob
       for row in YP'Range loop
          for col in YP'Range (2) loop
@@ -188,7 +177,7 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu (Activation : in out Real_Float_Matrix) is
+   procedure Rect_LU (Activation : in out Real_Float_Matrix) is
       type Matrix_Float is new Real_Float_Matrix (1 .. Activation'Length,
                                                   1 .. Activation'Length (2));
       Result : Matrix_Float;
@@ -201,11 +190,11 @@ package body Base_Neural is
 
       Activation := Real_Float_Matrix (Result);
 
-   end Relu;
+   end Rect_LU;
 
    --  -------------------------------------------------------------------------
 
-   procedure Relu_Derivative (Z : Real_Float_Matrix;
+   procedure Rect_LU_Derivative (Z : Real_Float_Matrix;
                               Del : in out Real_Float_Matrix) is
    begin
       for row in Z'Range loop
@@ -216,7 +205,7 @@ package body Base_Neural is
          end loop;
       end loop;
 
-   end Relu_Derivative;
+   end Rect_LU_Derivative;
 
    --  -------------------------------------------------------------------------
 

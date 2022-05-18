@@ -24,7 +24,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L202
-   function Type_Of_Target (Y : Float_Matrix) return Y_Type is
+   function Type_Of_Target (Y : Real_Float_Matrix) return Y_Type is
    begin
       if Y'Length (2) > 1 then
          return Y_Continuous_Multioutput;

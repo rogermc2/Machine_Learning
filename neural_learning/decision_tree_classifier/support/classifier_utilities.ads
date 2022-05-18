@@ -28,7 +28,7 @@ package Classifier_Utilities is
 --                                        Num_Outputs : Positive)
 --                                        return Weights.Weight_Lists_3D;
    function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array;
-   function Row_Max_Indices (Values : Float_Matrix) return Natural_Array;
+--     function Row_Max_Indices (Values : Float_Matrix) return Natural_Array;
    function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List;
@@ -47,7 +47,7 @@ package Classifier_Utilities is
 --                        return Weights.Weight_List;
    function To_Float_List (F : Value_Data_List) return Float_List;
    function To_Float_List (I : Integer_List) return Float_List;
-   function To_Float_List (A : Float_Array) return NL_Types.Float_List;
+--     function To_Float_List (A : Float_Array) return NL_Types.Float_List;
    function To_Natural_List (A : Natural_Array) return NL_Types.Natural_List;
    function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D;
    function To_Integer_List (Ints : Value_Data_List) return Integer_List;
