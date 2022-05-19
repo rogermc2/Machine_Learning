@@ -3,6 +3,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
+with Neural_Maths;
 --  with Printing;
 
 package body Classification_Metrics is
@@ -17,10 +18,10 @@ package body Classification_Metrics is
    --  L144
    function Accuracy_Score
      (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
-     Sample_Weight : Real_Float_Vector) return float is
-     use Real_Float_Arrays;
---        Routine_Name : constant String :=
---                         "Classification_Metrics.Accuracy_Score, ";
+      Sample_Weight        : Real_Float_Vector) return float is
+      use Real_Float_Arrays;
+      --        Routine_Name : constant String :=
+      --                         "Classification_Metrics.Accuracy_Score, ";
       Score        : Real_Float_Matrix := Y_Prediction;
    begin
       Check_Targets (Y_True, Y_Prediction);
@@ -32,31 +33,30 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
    --  Numpy Average: avg = sum(a * weights) / sum(weights)
+   --  if weights is not defined, avg = mean of a
    function Average (Sample_Score   : Real_Float_Matrix;
                      Sample_Weights : Real_Float_Vector)
                      return Float is
       --       Routine_Name : constant String :=
       --                        "Classification_Metrics.Average ";
-      Weights     : Real_Float_Vector (Sample_Score'Range (2));
       Sum_Weights : Float := 0.0;
       Sum         : Float := 0.0;
+      Result      : Float := 0.0;
    begin
       if Sample_Weights'Last < Sample_Weights'First then
-         for index in Weights'Range loop
-            Weights (index) := 1.0;
-         end loop;
+         --  Sample_Weights is not defined
+         Result := Neural_Maths.Mean (Sample_Score);
       else
-         Weights := Sample_Weights;
+         for row in Sample_Score'Range loop
+            for col in Sample_Score'Range (2) loop
+               Sum := Sum + Sample_Weights (col) * Sample_Score (row, col);
+               Sum_Weights := Sum_Weights + Sample_Weights (col);
+            end loop;
+         end loop;
+         Result := Sum / Sum_Weights;
       end if;
 
-      for row in Sample_Score'Range loop
-         for col in Sample_Score'Range (2) loop
-            Sum := Sum + Weights (col) * Sample_Score (row, col);
-            Sum_Weights := Sum_Weights + Weights (col);
-         end loop;
-      end loop;
-
-      return Sum / Sum_Weights;
+      return Result;
 
    end Average;
 
