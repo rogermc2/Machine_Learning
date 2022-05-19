@@ -1,5 +1,4 @@
 
---  with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 package body Printing is
@@ -73,51 +72,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   --     procedure Print_Criterion (Name : String;
-   --                                Data : Criterion.Criterion_Class) is
-   --        use Criterion;
-   --        use Float_Package;
-   --     begin
-   --        Put_Line (Name & ": ");
-   --        Put_Line ("Criterion_Type: " &
-   --                    Criterion_Kind'Image (Data.Criterion_Type));
-   --        Put_Line ("Y length:              " &
-   --                    Integer'Image (Integer (Data.Y.Length)));
-   --        Put_Line ("Sample_Weight length:  " &
-   --                    Integer'Image (Integer (Data.Sample_Weight.Length)));
-   --        Put_Line ("Samples length:        " &
-   --                    Integer'Image (Integer (Data.Samples.Length)));
-   --        Put_Line ("Sample_Indices length: " &
-   --                    Integer'Image (Integer (Data.Sample_Indices.Length)));
-   --        Put_Line ("Start_Row: " & Natural'Image (Data.Start_Row));
-   --        Put_Line ("Stop_Row:  " & Natural'Image (Data.Stop_Row));
-   --        Put_Line ("Split_Row: " & Natural'Image (Data.Split_Row));
-   --        Put_Line ("Num_Node_Samples:          " &
-   --                    Natural'Image (Data.Num_Node_Samples));
-   --        Put_Line ("Num_Weighted_Samples:      " &
-   --                    Float'Image (Data.Num_Weighted_Samples));
-   --        Put_Line ("Num_Weighted_Node_Samples: " &
-   --                    Float'Image (Data.Num_Weighted_Node_Samples));
-   --        Put_Line ("Num_Weighted_Left:         " &
-   --                    Float'Image (Data.Num_Weighted_Left));
-   --        Put_Line ("Num_Weighted_Right:        " &
-   --                    Float'Image (Data.Num_Weighted_Right));
-   --        Print_Float_List ("Sum_Total", Data.Sum_Total);
-   --        Print_Float_List ("Sum_Left", Data.Sum_Left);
-   --        Print_Float_List ("Sum_Right", Data.Sum_Right);
-   --        Put_Line ("Proxy_Improvement: " & Float'Image (Data.Proxy_Improvement));
-   --        case Data.Criterion_Type is
-   --           when Criterion_Classification =>
-   --              Put_Line ("Num_Classes: " & Integer'Image (Data.Num_Classes));
-   --           when Criterion_Regression =>
-   --              Put_Line ("Sq_Sum_Total: " & Float'Image (Data.Sq_Sum_Total));
-   --        end case;
-   --        New_Line;
-   --
-   --     end Print_Criterion;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_Integer_Colours_List
      (Name : String; Colours : Export_Types.Integer_Colours_List) is
       use Export_Types.Integer_Colours_Package;
@@ -135,75 +89,33 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   --      generic
-   --          type Index_Type is (<>);
-   --          type Vector_Type is  array (Index_Type) of aliased Float;
-   --      procedure Print_Floats_Vector (Name : String; aVector : Vector_Type);
-   --
-   --      procedure Print_Floats_Vector (Name : String; aVector : Vector_Type) is
-   --      begin
-   --          if Name = "" then
-   --              Put ("  ");
-   --          else
-   --              Put (Name & ":  ");
-   --          end if;
-   --          for Index in aVector'Range loop
-   --              Put (Float'Image (aVector (Index)) & "   ");
-   --          end loop;
-   --          New_Line;
-   --      end Print_Floats_Vector;
+   procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
+                                Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
+      Count : Integer := 1;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
 
-   --  -------------------------------------------------------------------
+      Put_Line (Name & ": ");
+      if Start >= anArray'First and then Finish <= anArray'Last then
+         for Index in Start .. Last loop
+            Put (Float'Image (anArray (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 4 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      else
+         Put_Line ("Print_Float_Array called with invalid start or finish index.");
+      end if;
+      New_Line;
 
-   --      generic
-   --          type Index_Type is (<>);
-   --          type Vector_Type is  array (Index_Type) of aliased Integer;
-   --      procedure Print_Integer_Vector (Name : String; aVector : Vector_Type);
-   --
-   --      --  -------------------------------------------------------------------
-   --
-   --      procedure Print_Integer_Vector (Name : String; aVector : Vector_Type) is
-   --      begin
-   --          if Name = "" then
-   --              Put ("  ");
-   --          else
-   --              Put (Name & ":  ");
-   --          end if;
-   --          for Index in aVector'Range loop
-   --              Put (Integer'Image (aVector (Index)) & "   ");
-   --          end loop;
-   --          New_Line;
-   --      end Print_Integer_Vector;
-
-   --  -------------------------------------------------------------------
-
---     procedure Print_Float_Array (Name  : String; anArray : Float_Array;
---                                  Start : Integer := 1; Finish : Integer := 0) is
---        Last  : Integer;
---        Count : Integer := 1;
---     begin
---        if Finish > 0 then
---           Last := Finish;
---        else
---           Last := Integer (anArray'Length);
---        end if;
---
---        Put_Line (Name & ": ");
---        if Start >= anArray'First and then Finish <= anArray'Last then
---           for Index in Start .. Last loop
---              Put (Float'Image (anArray (Index)) & "  ");
---              Count := Count + 1;
---              if Count > 4 then
---                 New_Line;
---                 Count := 1;
---              end if;
---           end loop;
---        else
---           Put_Line ("Print_Float_Array called with invalid start or finish index.");
---        end if;
---        New_Line;
---
---     end Print_Float_Array;
+   end Print_Float_Array;
 
    --  ------------------------------------------------------------------------
 
@@ -221,34 +133,35 @@ package body Printing is
          end if;
       end loop;
       New_Line;
+
    end Print_Float_List;
 
    --  ------------------------------------------------------------------------
 
---     procedure Print_Float_Matrix (Name  : String; aMatrix : Float_Matrix;
---                                   Start : Integer := 1; Finish : Integer := 0) is
---        Last  : Integer;
---     begin
---        if Finish > 0 then
---           Last := Finish;
---        else
---           Last := Integer (aMatrix'Length);
---        end if;
---
---        Put_Line (Name & ": ");
---        if Start >= aMatrix'First and then Finish <= aMatrix'Last then
---           for row in Start .. Last loop
---              for col in aMatrix'Range (2) loop
---                 Put (Float'Image (aMatrix (row, col)) & "  ");
---              end loop;
---              New_Line;
---           end loop;
---        else
---           Put_Line
---             ("Print_Float_Matrix called with invalid start or finish index.");
---        end if;
---
---     end Print_Float_Matrix;
+   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
+                                 Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aMatrix'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+         for row in Start .. Last loop
+            for col in aMatrix'Range (2) loop
+               Put (Float'Image (aMatrix (row, col)) & "  ");
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line
+           ("Print_Float_Matrix called with invalid start or finish index.");
+      end if;
+
+   end Print_Float_Matrix;
 
    --  ------------------------------------------------------------------------
 
@@ -260,6 +173,7 @@ package body Printing is
                      Integer'Image (anArray (Index)));
       end loop;
       New_Line;
+
    end Print_Integer_Array;
 
    --  ------------------------------------------------------------------------
@@ -278,7 +192,36 @@ package body Printing is
          Next (Curs);
       end loop;
       New_Line;
+
    end Print_Export_Map;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;
+                                   Start : Integer := 1; Finish : Integer := 0)
+   is
+      Last  : Integer;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aMatrix'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+         for row in Start .. Last loop
+            for col in aMatrix'Range (2) loop
+               Put (Integer'Image (aMatrix (row, col)) & "  ");
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line
+           ("Print_Integer_Matrix called with invalid start or finish index.");
+      end if;
+
+   end Print_Integer_Matrix;
 
    --  ------------------------------------------------------------------------
 
@@ -299,8 +242,8 @@ package body Printing is
            "Print_Multi_Value_Array called with invalid index: " &
            Integer'Image (Integer (anArray'First));
       end if;
-
       New_Line;
+
    end Print_Multi_Value_Array;
 
    --  ------------------------------------------------------------------------
@@ -576,66 +519,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   --     procedure Print_Tree (Name  : String;
-   --                           aTree : Base_Decision_Tree.Classifier) is
-   --        Tree_Nodes  : constant Tree.Tree_Class :=
-   --                        aTree.Attributes.Decision_Tree;
-   --     begin
-   --        Print_Tree (Name, Tree_Nodes);
-   --     end Print_Tree;
-   --
-   --     --  -------------------------------------------------------------------------
-   --
-   --     procedure Print_Tree (Name  : String;
-   --                           aTree : Tree.Tree_Class) is
-   --        use Tree;
-   --        use Nodes_Package;
-   --        Nodes       : constant Tree_Nodes := aTree.Nodes;
-   --        This_Indent : Natural := 0;
-   --        --  Print_Tree_Node is recursive
-   --        procedure Print_Tree_Node (Curs   : Nodes_Package.Cursor;
-   --                                   Indent : Natural := 0) is
-   --           use Ada.Containers;
-   --           Node   : constant Tree_Node := Element (Curs);
-   --        begin
-   --           This_Indent := Indent + 1;
-   --           if This_Indent > 10 then
-   --              This_Indent := 1;
-   --           end if;
-   --
-   --           declare
-   --              Offset : String (1 .. This_Indent + 1) := (others => ' ');
-   --              pos    : Natural := 1;
-   --           begin
-   --              while pos < This_Indent - 1 loop
-   --                 Offset (pos .. pos + 2) := "   ";
-   --                 pos := pos + 2;
-   --              end loop;
-   --
-   --              if This_Indent > 1 and then pos < This_Indent + 1 then
-   --                 Offset (Indent) := ' ';
-   --              end if;
-   --
-   --              Print_Node (Node, Offset);
-   --
-   --              if not Is_Leaf (Curs) then
-   --                 Print_Tree_Node (First_Child (Curs));
-   --                 if Child_Count (Curs) > 1 then
-   --                    Print_Tree_Node (Next_Sibling (First_Child (Curs)));
-   --                 end if;
-   --              end if;
-   --           end; --  declare block
-   --
-   --        end Print_Tree_Node;
-   --
-   --     begin
-   --        Put_Line (Name);
-   --        Print_Tree_Node (First_Child (Nodes.Root));
-   --
-   --     end Print_Tree;
-
-   --  -------------------------------------------------------------------------
-
    procedure Print_Unbounded_List (Name    : String;
                                    theList : Unbounded_List) is
       Count : Integer := 1;
@@ -680,24 +563,6 @@ package body Printing is
       New_Line;
 
    end Print_Unbounded_Set;
-
-   --  ------------------------------------------------------------------------
-
-   --     procedure Print_Value_List (Name    : String;
-   --                                 theList : Tree.Values_List) is
-   --        Count : Integer := 1;
-   --     begin
-   --        Put_Line (Name & ": ");
-   --        for Index in theList.First_Index .. theList.Last_Index loop
-   --           Put ("   " & Float'Image (theList.Element (Index)));
-   --           Count := Count + 1;
-   --           if Count > 5 then
-   --              New_Line;
-   --              Count := 1;
-   --           end if;
-   --        end loop;
-   --        New_Line;
-   --     end Print_Value_List;
 
    --  ------------------------------------------------------------------------
 
@@ -798,55 +663,6 @@ package body Printing is
       end if;
 
    end Print_Value_Record;
-
-   --  ------------------------------------------------------------------------
-
-   --     procedure Print_Weights (Name : String; Data : Weights.Weight_List) is
-   --        aWeight : Float;
-   --        Count   : Integer := 1;
-   --     begin
-   --        if Name'Length > 0 then
-   --           Put_Line (Name & ": ");
-   --        end if;
-   --
-   --        for Index in Data.First_Index .. Data.Last_Index loop
-   --           aWeight := Data.Element (Index);
-   --           Put (Float'Image (aWeight) & "   ");
-   --           Count := Count + 1;
-   --           if Count > 10 then
-   --              New_Line;
-   --              Count := 1;
-   --           end if;
-   --        end loop;
-   --        New_Line;
-   --     end Print_Weights;
-   --
-   --     --  ------------------------------------------------------------------------
-   --
-   --     procedure Print_Weight_Lists_2D (Name : String;
-   --                                      Data : Weights.Weight_Lists_2D) is
-   --     begin
-   --        Put_Line (Name & ": ");
-   --        for Index in Data.First_Index .. Data.Last_Index loop
-   --           Print_Weights ("", Data.Element (Index));
-   --        end loop;
-   --        New_Line;
-   --
-   --     end Print_Weight_Lists_2D;
-   --
-   --     --  ------------------------------------------------------------------------
-   --
-   --     procedure Print_Weight_Lists_3D (Name : String;
-   --                                      Data : Weights.Weight_Lists_3D) is
-   --     begin
-   --        Put_Line (Name & ": ");
-   --        for Index in Data.First_Index .. Data.Last_Index loop
-   --           Print_Weight_Lists_2D ("Output list" & Integer'Image (index),
-   --                                  Data.Element (Index));
-   --        end loop;
-   --        New_Line;
-   --
-   --     end Print_Weight_Lists_3D;
 
    --  ------------------------------------------------------------------------
 

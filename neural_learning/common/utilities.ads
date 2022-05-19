@@ -44,14 +44,11 @@ package Utilities is
                                  return Class_Range;
    function Number_Of_Features (Rows : Value_Data_List)
                                  return Class_Range;
---     function Pair_Items (A, B : Float_Array) return Float_Pair_List;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
    procedure Permute (aList : in out Integer_Array);
    pragma Inline (Permute);
    procedure Permute (aList : in out String_List);
    pragma Inline (Permute);
---     function Permute (aList : Float_Matrix) return Float_Matrix;
---     pragma Inline (Permute);
    function Permute (aList : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (Permute);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;

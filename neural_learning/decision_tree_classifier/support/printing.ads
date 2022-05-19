@@ -15,24 +15,24 @@ package Printing is
    procedure Print_Bounds (Name : String; Data : Export_Types.Bounds_List);
    procedure Print_Colours_List (Name    : String;
                                  Colours : Export_Types.Colours_List);
---     procedure Print_Criterion (Name : String;
---                                Data : Criterion.Criterion_Class);
    procedure Print_Integer_Colours_List
      (Name : String; Colours : Export_Types.Integer_Colours_List);
    procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
    procedure Print_Export_Map (Name : String; aMap : Export_Types.Export_Map);
---     procedure Print_Float_Array (Name   : String; anArray : Float_Array;
---                                  Start  : Integer := 1;
---                                  Finish : Integer := 0);
+   procedure Print_Float_Array (Name   : String; anArray : Real_Float_Vector;
+                                Start  : Integer := 1;
+                                Finish : Integer := 0);
    procedure Print_Float_List (Name  : String; theList : Float_List);
---     procedure Print_Float_Matrix (Name  : String; aMatrix : Float_Matrix;
---                                   Start : Integer := 1; Finish : Integer := 0);
+   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
+                                 Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Indefinite_List (Name    : String;
                                     theList : Indef_String_List);
    procedure Print_Integer_List (Name  : String; theList : Integer_List;
                                  Start : Positive := 1; Last : Positive := 10);
    procedure Print_Integer_List (Name    : String;
                                  theList : Integer_DL_List);
+   procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;
+                                   Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Integer_Set (Name   : String;
                                 theSet : Encode_Utils.Int_Sets.Set);
    procedure Print_Natural_Lists_2D (Name : String;
@@ -64,10 +64,5 @@ package Printing is
    procedure Print_Value_Data_Lists_3D (Name    : String;
                                         theList : Value_Data_Lists_3D);
    procedure Print_Value_Record (Name : String; Value : Value_Record);
---     procedure Print_Weights (Name : String; Data : Weights.Weight_List);
---     procedure Print_Weight_Lists_2D (Name : String;
---                                      Data : Weights.Weight_Lists_2D);
---     procedure Print_Weight_Lists_3D (Name : String;
---                                      Data : Weights.Weight_Lists_3D);
 
 end Printing;

@@ -198,21 +198,6 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Pair_Items (A, B : Float_Array) return Float_Pair_List is
---        Item   : Float_Pair;
---        Result : Float_Pair_List;
---     begin
---        for index in A'First .. A'Last loop
---           Item := (A (index), B (index));
---           Result.Append (Item);
---        end loop;
---
---        return Result;
---
---     end Pair_Items;
-
-   --  --------------------------------------------------------------------------
-
    function Pair_Items (a, b : Integer_Array) return Integer_Pair_List is
       Item   : Integer_Pair;
       Result : Integer_Pair_List;
@@ -301,46 +286,6 @@ package body Utilities is
       return Permutation;
 
    end Permute;
-
-   --  -------------------------------------------------------------------------
-
---     function Permute (aList : Float_List_2D) return Float_List_3D is
---        List_Length  : constant Positive := Positive (aList.Length);
---        Permutation  : Float_List_2D := aList;
---        Permutations : Float_List_3D;
---
---        procedure Recurse (K : Positive; A : in out Float_List_2D) is
---        begin
---           if K > 1 then
---              --  Generate permutations with k-th element unaltered
---              Recurse (K - 1, A);
---              --  Generate permutations for k-th element swapped with each
---              --  k-1 first element
---              for index in 1 .. K - 1 loop
---                 if K mod 2 = 0 then
---                    Swap (A, index, K);
---                 else
---                    Swap (A, A.First_Index, K);
---                 end if;
---
---                 Recurse (K - 1, A);
---              end loop;
---           else
---              Permutations.Append (A);
---           end if;
---
---        end Recurse;
---        pragma Inline (Recurse);
---
---     begin
---        if List_Length > 1 then
---           Recurse (List_Length, Permutation);
---        else
---           Permutations.Append (Permutation);
---        end if;
---
---        return Permutations;
---     end Permute;
 
    --  -------------------------------------------------------------------------
 

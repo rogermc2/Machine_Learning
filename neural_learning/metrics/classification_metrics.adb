@@ -1,10 +1,9 @@
 --  Based on scikit-learn/sklearn/metrics/_classification.py
 
---  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Neural_Maths;
---  with Printing;
+with Printing;
 
 package body Classification_Metrics is
 
@@ -19,13 +18,24 @@ package body Classification_Metrics is
    function Accuracy_Score
      (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
       Sample_Weight        : Real_Float_Vector) return float is
-      use Real_Float_Arrays;
-      --        Routine_Name : constant String :=
-      --                         "Classification_Metrics.Accuracy_Score, ";
-      Score        : Real_Float_Matrix := Y_Prediction;
+      Routine_Name : constant String :=
+                        "Classification_Metrics.Accuracy_Score, ";
+      eps          : constant Float := 10.0 ** (-8);
+      Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
+                       (others => (others => 0.0));
    begin
       Check_Targets (Y_True, Y_Prediction);
-      Score := abs (Y_Prediction - Y_True);
+      Printing.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
+      Printing.Print_Float_Matrix (Routine_Name & "Y_Prediction",
+                                   Y_Prediction, 1, 5);
+      for row in Score'Range loop
+         for col in Score'Range (2) loop
+            if abs (Y_Prediction (row, col) - Y_True (row, col)) > eps then
+               Score (row, col) := 1.0;
+            end if;
+         end loop;
+      end loop;
+      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
