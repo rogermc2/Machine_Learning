@@ -18,18 +18,13 @@ package body Classification_Metrics is
    function Accuracy_Score
      (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
      Sample_Weight : Real_Float_Vector) return float is
+     use Real_Float_Arrays;
 --        Routine_Name : constant String :=
 --                         "Classification_Metrics.Accuracy_Score, ";
       Score        : Real_Float_Matrix := Y_Prediction;
    begin
       Check_Targets (Y_True, Y_Prediction);
-      for row in Score'Range loop
-            for col in Score'Range (2) loop
-                if Y_True (row, col) = Y_Prediction (row, col) then
-                    Score (row, col) := Score (row, col) - 1.0;
-                end if;
-            end loop;
-      end loop;
+      Score := abs (Y_Prediction - Y_True);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
