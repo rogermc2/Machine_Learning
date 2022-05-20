@@ -644,15 +644,15 @@ package body Multilayer_Perceptron is
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
-
+   --  L144
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
                                 return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       use Real_Float_Arrays;
       use Parameters_Package;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Forward_Pass_Fast ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -662,10 +662,10 @@ package body Multilayer_Perceptron is
       Activ_Out          : Real_Float_Matrix (X'Range,
                                               1 .. Self.Attributes.N_Outputs);
       --  One element list used to allow for different sized matrices
-      Prev_Activation    : Real_Matrix_List;
+      Activations    : Real_Matrix_List;
    begin
-      --  Initialize first layer
-      Prev_Activation.Append (X);
+      --  L160 Initialize first layer
+      Activations.Append (X);
 
       --  L167 Forward propagate
       for layer in 1 .. Num_Layers - 1 loop
@@ -673,7 +673,7 @@ package body Multilayer_Perceptron is
             Params             : constant Parameters_Record :=
                                    Params_List (layer);
             Updated_Activation : Real_Float_Matrix :=
-                                   Prev_Activation (1) * Params.Coeff_Grads;
+                                   Activations (layer) * Params.Coeff_Grads;
          begin
             Updated_Activation :=
               Updated_Activation + Params.Intercept_Grads;
@@ -687,15 +687,13 @@ package body Multilayer_Perceptron is
                   when Softmax_Activation => Softmax (Updated_Activation);
                end case;
             end if;
-            Prev_Activation.Replace_Element (1, Updated_Activation);
-
-            if layer = Num_Layers - 1 then
-               Activ_Out := Updated_Activation;
-            end if;
+            Activations.Append (Updated_Activation);
          end;
       end loop;
 
+      Activ_Out := Activations.Last_Element;
       --  L172
+      Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out", Activ_Out, 1, 2);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation => Logistic (Activ_Out);
@@ -704,6 +702,7 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
+      Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 2);
       return Activ_Out;
 
    end Forward_Pass_Fast;
@@ -860,7 +859,7 @@ package body Multilayer_Perceptron is
       Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
-        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 3);
+      Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 3);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;

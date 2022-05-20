@@ -5,7 +5,7 @@
 with Maths;
 
 with Neural_Maths;
---  with Printing;
+with Printing;
 
 package body Base_Neural is
 
@@ -210,10 +210,13 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
 
    procedure Softmax (Activation : in out Real_Float_Matrix) is
---        Routine_Name : constant String := "Base_Neural.Softmax ";
+      Routine_Name : constant String := "Base_Neural.Softmax ";
       Tmp  : Real_Float_Matrix := Activation - Max (Activation);
    begin
+      Printing.Print_Float_Matrix (Routine_Name & "Activation",
+                                   Activation, 1, 1);
       Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
+      Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 1, 1);
       Activation := Tmp / Sum (Tmp);
 
    end Softmax;
