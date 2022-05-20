@@ -662,7 +662,7 @@ package body Multilayer_Perceptron is
       Activ_Out          : Real_Float_Matrix (X'Range,
                                               1 .. Self.Attributes.N_Outputs);
       --  One element list used to allow for different sized matrices
-      Activations    : Real_Matrix_List;
+      Activations        : Real_Matrix_List;
    begin
       --  L160 Initialize first layer
       Activations.Append (X);

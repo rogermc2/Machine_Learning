@@ -214,10 +214,12 @@ package body Base_Neural is
       Tmp  : Real_Float_Matrix := Activation - Max (Activation);
    begin
       Printing.Print_Float_Matrix (Routine_Name & "Activation",
-                                   Activation, 1, 1);
+                                   Activation, 123, 125);
       Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
-      Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 1, 1);
+      Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 123, 125);
       Activation := Tmp / Sum (Tmp);
+      Printing.Print_Float_Matrix (Routine_Name & "Activation out",
+                                   Activation, 123, 125);
 
    end Softmax;
 
