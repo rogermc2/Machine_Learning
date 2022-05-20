@@ -208,18 +208,21 @@ package body Base_Neural is
    end Rect_LU_Derivative;
 
    --  -------------------------------------------------------------------------
-
+   --  SoftMax returns the probability of each class
+   --  probability = exp (value) / sum of all exp (v)
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       Routine_Name : constant String := "Base_Neural.Softmax ";
+      --  Max returns a vector containing the maximum value of each matrix
       Tmp  : Real_Float_Matrix := Activation - Max (Activation);
    begin
-      Printing.Print_Float_Matrix (Routine_Name & "Activation",
-                                   Activation, 123, 125);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activation",
+--                                     Activation, 123, 125);
+--        Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 123, 125);
       Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
-      Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 123, 125);
+--        Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 123, 125);
       Activation := Tmp / Sum (Tmp);
-      Printing.Print_Float_Matrix (Routine_Name & "Activation out",
-                                   Activation, 123, 125);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activation out",
+--                                     Activation, 123, 125);
 
    end Softmax;
 

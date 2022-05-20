@@ -80,7 +80,6 @@ package body Support_4 is
             Data         : Base_State (Train_Size, Test_Size, Num_Features);
          begin
             Put_Line (Routine_Name & "oml loaded");
-            --              Assert (X'Last > X'First, Routine_Name & "X is empty.");
             Put_Line (Routine_Name & "X Length" & Integer'Image (X'Length));
             Assert (Y'Length = X'Length, Routine_Name &
                       "Y length" & Integer'Image (Y'Length) &

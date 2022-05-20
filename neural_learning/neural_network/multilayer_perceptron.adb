@@ -35,7 +35,6 @@
 --  the bias values added to layer i + 1.
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Calendar; use Ada.Calendar;
 with Ada.Containers;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -651,8 +650,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Parameters_Package;
-      Routine_Name       : constant String :=
-                             "Multilayer_Perceptron.Forward_Pass_Fast ";
+--        Routine_Name       : constant String :=
+--                               "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -665,6 +664,7 @@ package body Multilayer_Perceptron is
       Activations        : Real_Matrix_List;
    begin
       --  L160 Initialize first layer
+--        Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 1);
       Activations.Append (X);
 
       --  L167 Forward propagate
@@ -693,7 +693,8 @@ package body Multilayer_Perceptron is
 
       Activ_Out := Activations.Last_Element;
       --  L172
-      Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out", Activ_Out, 1, 2);
+--        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
+--                                     Activ_Out, 1, 2);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation => Logistic (Activ_Out);
@@ -702,7 +703,8 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
-      Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 2);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 2);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activ_O
       return Activ_Out;
 
    end Forward_Pass_Fast;
@@ -859,7 +861,7 @@ package body Multilayer_Perceptron is
       Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
-      Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 3);
+      Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 6);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;

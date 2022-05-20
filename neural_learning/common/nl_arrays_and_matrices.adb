@@ -173,14 +173,14 @@ package body NL_Arrays_And_Matrices is
    end "not";
 
    --  ------------------------------------------------------------------------
-
+   --  Max returns a vector containing the maximum value of each matrix
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector is
       Result  : Real_Float_Vector (Data'Range);
       Max_Val : Float;
    begin
       for row in Data'Range loop
-         Max_Val := Float'First;
-         for col in Data'Range (2) loop
+         Max_Val := Data (row, 1);
+         for col in 2 .. Data'Length (2) loop
             if Data (row, col) > Max_Val then
                Max_Val := Data (row, Col);
             end if;
