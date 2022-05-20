@@ -46,7 +46,7 @@ with Base;
 with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
---  with Printing;
+with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -857,8 +857,10 @@ package body Multilayer_Perceptron is
 
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                       return Real_Float_Matrix is
+      Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
+        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 3);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;

@@ -25,9 +25,9 @@ package body Classification_Metrics is
                        (others => (others => 1.0));
    begin
       Check_Targets (Y_True, Y_Prediction);
-      Printing.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
+      Printing.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 3);
       Printing.Print_Float_Matrix (Routine_Name & "Y_Prediction",
-                                   Y_Prediction, 1, 5);
+                                   Y_Prediction, 1, 3);
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if abs (Y_Prediction (row, col) - Y_True (row, col)) > eps then
@@ -35,7 +35,7 @@ package body Classification_Metrics is
             end if;
          end loop;
       end loop;
-      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
+      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 3);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 

@@ -46,6 +46,8 @@ begin
          --  The Fit function adjusts weights according to data values so
          --  that better accuracy can be achieved
          Fit (aClassifier, Train_X, Train_Y);
+         --  Score uses Predict to compare predicted Y values, based on Test_X,
+         --  with actual Test_Y values
          Put_Line (Integer'Image (index * 10) & " Score: " &
                      Float'Image
                      (Base.Score (Self => aClassifier, X => Test_X,
