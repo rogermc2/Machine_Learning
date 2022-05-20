@@ -22,7 +22,7 @@ package body Classification_Metrics is
                         "Classification_Metrics.Accuracy_Score, ";
       eps          : constant Float := 10.0 ** (-8);
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
-                       (others => (others => 0.0));
+                       (others => (others => 1.0));
    begin
       Check_Targets (Y_True, Y_Prediction);
       Printing.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
@@ -31,7 +31,7 @@ package body Classification_Metrics is
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if abs (Y_Prediction (row, col) - Y_True (row, col)) > eps then
-               Score (row, col) := 1.0;
+               Score (row, col) := 0.0;
             end if;
          end loop;
       end loop;
