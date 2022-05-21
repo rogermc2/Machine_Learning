@@ -1,57 +1,35 @@
 
-with Ada.Containers;
+--  with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Base;
 with Base_Neural;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 --  with Printing;
+with Stochastic_Optimizers;
 
 procedure Test_Fit is
-   use Ada.Containers;
-   use Multilayer_Perceptron;
-   Routine_Name       : constant String := "Test_Fit ";
-   Test_Size          : constant Positive := 1000;
-   Train_Size         : constant Positive := 5000;
-   Num_Hidden         : constant Positive := 170;
-   aClassifier        : Multilayer_Perceptron.MLP_Classifier;
-   Hidden_Layer_Sizes : NL_Types.Integer_List;
+--      use Ada.Containers;
+    use Multilayer_Perceptron;
+    Routine_Name : constant String := "Test_Fit ";
+    X            : Real_Float_Matrix (1 .. 1, 1 .. 3);
+    Y            : Integer_Matrix (1 .. 1, 1 .. 1);
+    Layer_Sizes  : NL_Types.Integer_List;
+    aClassifier  : Multilayer_Perceptron.MLP_Classifier;
 begin
-   Put_Line (Routine_Name);
-   declare
-      Data          : constant Base_State :=
-                        Get_State (Dataset_Name, Train_Size, Test_Size);
-      Train_X       : constant Real_Float_Matrix := Data.Train_X;
-      Train_Y       : constant Integer_Matrix := Data.Train_Y;
-      Test_X        : constant Real_Float_Matrix := Data.Test_X;
-      Test_Y        : constant Integer_Matrix := Data.Test_Y;
-      Sample_Weight : Real_Float_Vector (1 .. 0);
-   begin
-      Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
-                  Count_Type'Image (Train_X'Length (2)));
-      Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
-      New_Line;
-
-      Hidden_Layer_Sizes.Append (Num_Hidden);
-      for index in 1 .. 10 loop
-         aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
-                                Hidden_Layer_Sizes => Hidden_Layer_Sizes,
-                                Activation => Base_Neural.Identity_Activation,
-                                Verbose => False);
-         --  The Fit function adjusts weights according to data values so
-         --  that better accuracy can be achieved
-         Fit (aClassifier, Train_X, Train_Y);
-         Put_Line (Integer'Image (Num_Hidden) & " Score: " &
-                     Float'Image
-                     (Base.Score (Self => aClassifier, X => Test_X,
-                                  Y => To_Real_Float_Matrix (Test_Y),
-                                  Sample_Weight => Sample_Weight)));
-      end loop;
-   end;  --  declare
-
-   Put_Line ("----------------------------------------------");
-   New_Line;
+    Put_Line (Routine_Name);
+    X (1, 1) := 0.6;
+    X (1, 2) := 0.8;
+    X (1, 3) := 0.7;
+    Y (1, 1) := 0;
+    Layer_Sizes.Append (2);
+    aClassifier := C_Init
+      (Solver => Stochastic_Optimizers.Sgd_Solver, Learning_Rate_Init => 0.1,
+       Alpha => 0.1, Activation => Base_Neural.Logistic_Activation, Random_State => 1,
+       Max_Iter => 1, Hidden_Layer_Sizes => Layer_Sizes, Momentum => 0.0);
+    --  The Fit function adjusts weights according to data values so
+    --  that better accuracy can be achieved
+    Fit (aClassifier, X, Y);
 
 end Test_Fit;

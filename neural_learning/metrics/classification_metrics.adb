@@ -18,8 +18,8 @@ package body Classification_Metrics is
    function Accuracy_Score
      (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
       Sample_Weight        : Real_Float_Vector) return float is
-      Routine_Name : constant String :=
-                        "Classification_Metrics.Accuracy_Score, ";
+--        Routine_Name : constant String :=
+--                          "Classification_Metrics.Accuracy_Score, ";
       eps          : constant Float := 10.0 ** (-8);
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
                        (others => (others => 1.0));
