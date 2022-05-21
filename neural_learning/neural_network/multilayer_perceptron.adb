@@ -444,8 +444,8 @@ package body Multilayer_Perceptron is
       Early_Stopping                     : constant Boolean
         := Self.Parameters.Early_Stopping and
       then not Incremental;
-      Test_Size                          : constant Positive
-        := Positive (Self.Parameters.Validation_Fraction *
+      Test_Size                          : constant Natural
+        := Natural (Self.Parameters.Validation_Fraction *
                        Float (Num_Samples));
       Train_Size                         : constant Positive := Num_Samples - Test_Size;
       --          Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
