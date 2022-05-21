@@ -9,7 +9,6 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 --  with Printing;
 
-
 procedure Test_Fit is
    use Ada.Containers;
    use Multilayer_Perceptron;
