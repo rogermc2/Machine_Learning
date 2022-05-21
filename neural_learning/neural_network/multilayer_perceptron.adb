@@ -78,7 +78,6 @@ package body Multilayer_Perceptron is
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
-   procedure Init_Optimizer (Self : in out MLP_Classifier);
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Boolean_Matrix;
