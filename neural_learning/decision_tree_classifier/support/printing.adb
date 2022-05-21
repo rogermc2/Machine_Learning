@@ -165,7 +165,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_Array (Name : String; anArray : Integer_Array) is
+   procedure Print_Integer_Array
+     (Name : String; anArray : NL_Arrays_And_Matrices.Integer_Array) is
    begin
       Put_Line (Name & ": ");
       for Index in anArray'First .. anArray'Last loop

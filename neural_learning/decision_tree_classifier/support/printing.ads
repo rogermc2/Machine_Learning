@@ -17,7 +17,8 @@ package Printing is
                                  Colours : Export_Types.Colours_List);
    procedure Print_Integer_Colours_List
      (Name : String; Colours : Export_Types.Integer_Colours_List);
-   procedure Print_Integer_Array (Name : String; anArray : Integer_Array);
+   procedure Print_Integer_Array
+     (Name : String; anArray : NL_Arrays_And_Matrices.Integer_Array);
    procedure Print_Export_Map (Name : String; aMap : Export_Types.Export_Map);
    procedure Print_Float_Array (Name   : String; anArray : Real_Float_Vector;
                                 Start  : Integer := 1;
