@@ -8,7 +8,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Printing;
+with Printing;
 with Stochastic_Optimizers;
 with Test_Common;
 
@@ -19,11 +19,10 @@ procedure Test_Adam is
    use Stochastic_Optimizers;
    use Test_Common;
    Routine_Name   : constant String := "Test_Adam ";
-   --     Rng           : constant Float := abs (Maths.Random_Float);
    Beta_1         : constant Real_Float_Vector (1 .. 3) :=  (0.9, 1.0, 0.05);
    Beta_2         : constant Real_Float_Vector (1 .. 3) := (0.995, 1.0, 0.001);
    LR             : constant Float := 0.001;
-   --     Epsilon        : constant Float := 10.0 ** (-8);
+   Epsilon        : constant Float := 10.0 ** (-8);
    T              : constant Natural := 10;
    Params         : Parameters_List;
    Adam           : Stochastic_Optimizers.Adam_Optimizer;
@@ -36,9 +35,9 @@ procedure Test_Adam is
 begin
    Put_Line (Routine_Name);
    Test_Common.Init;
-   for index in Shapes.First_Index .. Shapes.Last_Index loop
+   for shape in Shapes.First_Index .. Shapes.First_Index loop
       declare
-         Bounds    : constant Integer_Array := Shapes.Element (index);
+         Bounds    : constant Integer_Array := Shapes.Element (shape);
          Coeff     : constant
            Real_Float_Matrix (1 .. Bounds (1), 1 .. Bounds (2))
            := (others =>  (others => 0.0));
@@ -49,6 +48,7 @@ begin
          Sec_Mom   : Parameters_Record (Bounds (1), Bounds (2));
          GR        : Parameters_Record (Bounds (1), Bounds (2));
       begin
+         Printing.Print_Integer_Array ("Bounds", Bounds);
          PR.Coeff_Grads := Coeff;
          PR.Intercept_Grads := Ints;
          Params.Append (PR);
@@ -70,6 +70,8 @@ begin
          Grads.Append (GR);
       end;
    end loop;
+    Printing.Print_Float_Matrix ("Coeff_Grads", Params (1).Coeff_Grads);
+    Printing.Print_Float_Array ("Intercept_Grads", Params (1).Intercept_Grads);
 
    for index in First_Moments.First_Index .. First_Moments.Last_Index loop
       First_Moments (index).Coeff_Grads :=
@@ -95,7 +97,7 @@ begin
 
    C_Init (Self => Adam, Params => Params,
            Initial_Learning_Rate => Learning_Rate,
-           Beta_1 => Beta_1 (1), Beta_2 => Beta_2 (1), Epsilon => 10.0 ** (-8));
+           Beta_1 => Beta_1 (1), Beta_2 => Beta_2 (1), Epsilon => Epsilon);
    Adam.First_Moments := First_Moments;
    Adam.Second_Moments := Second_Moments;
    Adam.Time_Step := T - 1;
@@ -116,6 +118,11 @@ begin
 
    Expected := Params + Updates;
    Update_Params (Adam, Grads, Params);
+    Printing.Print_Float_Matrix ("Expected Coeff_Grads", Expected (1).Coeff_Grads);
+    Printing.Print_Float_Array ("Expected Intercept_Grads", Expected (1).Intercept_Grads);
+
+    Printing.Print_Float_Matrix ("Params Coeff_Grads", Params (1).Coeff_Grads);
+    Printing.Print_Float_Array ("Params Intercept_Grads", Params (1).Intercept_Grads);
 
    for index in Params.First_Index .. Params.Last_Index loop
       Assert (Params (index) = Expected (index), Routine_Name &
