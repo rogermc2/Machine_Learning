@@ -95,6 +95,8 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
+   function Square (Rec : Parameters_Record) return Parameters_Record;
+   function Sqrt (Rec : Parameters_Record) return Parameters_Record;
    function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
                               Verbose : Boolean) return Boolean;
    procedure Update_Params (Self   : in out Optimizer_Record;

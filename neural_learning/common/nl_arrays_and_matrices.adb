@@ -8,8 +8,23 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix is
+      Result : Real_Float_Matrix  := L;
+   begin
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Result (row, col) := Result (row, col) / R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ------------------------------------------------------------------------
+
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
-                  return Real_Float_Matrix is
+                 return Real_Float_Matrix is
       Result : Real_Float_Matrix  := L;
    begin
       for row in L'Range loop
@@ -24,8 +39,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "/" (L, R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector  := L;
+   begin
+      for row in L'Range loop
+         Result (row) := Result (row) / R (row);
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  ------------------------------------------------------------------------
+
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
-                  return Real_Float_Matrix is
+                 return Real_Float_Matrix is
       Result : Real_Float_Matrix  := L;
    begin
       for row in L'Range loop
@@ -88,7 +116,7 @@ package body NL_Arrays_And_Matrices is
    --  ----------------------------------------------------------------------------
 
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
-                  return Real_Float_Matrix is
+                 return Real_Float_Matrix is
       Result : Real_Float_Matrix := L;
    begin
       for row in L'Range loop
@@ -213,7 +241,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Boolean_Array (List : NL_Types.Boolean_List)
-                               return Boolean_Array is
+                              return Boolean_Array is
    begin
       if not List.Is_Empty then
          declare
@@ -237,7 +265,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
-                                   return Real_Float_Matrix is
+                                  return Real_Float_Matrix is
    begin
       if not List.Is_Empty then
          declare
@@ -267,7 +295,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Integer_Array (List : NL_Types.Integer_List)
-                               return Integer_Array is
+                              return Integer_Array is
    begin
       if not List.Is_Empty then
          declare
@@ -291,7 +319,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Real_Float_Matrix (IM : Integer_Matrix)
-                                   return Real_Float_Matrix is
+                                  return Real_Float_Matrix is
       Result : Real_Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
    begin
       for row in IM'First .. IM'Last loop
@@ -307,7 +335,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Natural_Array (List : NL_Types.Natural_List)
-                               return Natural_Array is
+                              return Natural_Array is
    begin
       if not List.Is_Empty then
          declare

@@ -129,6 +129,27 @@ package body Stochastic_Optimizers is
 
     --  -------------------------------------------------------------------------
 
+    function Sqrt (Rec : Parameters_Record) return Parameters_Record is
+      use Maths.Float_Math_Functions;
+      Result : Parameters_Record := Rec;
+    begin
+        for row in Rec.Coeff_Grads'Range loop
+            for col in Rec.Coeff_Grads'Range (2) loop
+                Result.Coeff_Grads (row, col) :=
+                  Sqrt (Rec.Coeff_Grads (row, col));
+            end loop;
+        end loop;
+
+        for row in Rec.Intercept_Grads'Range loop
+            Result.Intercept_Grads (row) := Sqrt (Rec.Intercept_Grads (row));
+        end loop;
+
+        return Result;
+
+    end Sqrt;
+
+    --  -------------------------------------------------------------------------
+
     function "/" (L, R : Parameters_Record) return Parameters_Record is
         Result  : Parameters_Record := L;
     begin
