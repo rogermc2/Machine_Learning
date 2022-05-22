@@ -2,7 +2,7 @@
 --  Based on scikit-learn/sklearn/neural_network/tests/
 --  test_stochastic_optimizers.py
 
---  with Ada.Containers;
+with Ada.Assertions; use  Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -32,6 +32,7 @@ procedure Test_Adam is
    Grads          : Parameters_List;
    Learning_Rate  : Float;
    Updates        : Parameters_List;
+   Expected       : Parameters_List;
 begin
    Put_Line (Routine_Name);
    Test_Common.Init;
@@ -110,6 +111,15 @@ begin
            SM_Sqrt.Intercept_Grads;
          Updates.Append (FM);
       end;
+   end loop;
+
+   Expected := Params + Updates;
+   Update_Params (Adam, Grads, Params);
+
+   for index in Params.First_Index .. Params.Last_Index loop
+      Assert (Params (index) = Expected (index), Routine_Name &
+             "Params" & Integer'Image (index) & " does not equal expcted"  &
+             Integer'Image (index));
    end loop;
 
 end Test_Adam;
