@@ -8,7 +8,6 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
 --  with Printing;
 with Stochastic_Optimizers;
 with Test_Common;
@@ -31,7 +30,7 @@ begin
    Test_Common.Init;
    for index in Shapes.First_Index .. Shapes.Last_Index loop
       declare
-         Bounds    : constant NL_Types.Integer_Array := Shapes.Element (index);
+         Bounds    : constant Integer_Array := Shapes.Element (index);
          Coeff     : constant Real_Float_Matrix (1 .. Bounds (1), 1 .. Bounds (2))
            := (others =>  (others => 0.0));
          Ints      : constant Real_Float_Vector (1 .. Bounds (1)) :=

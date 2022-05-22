@@ -1,9 +1,9 @@
 
-with NL_Types;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Test_Common is
 
-   Shapes : NL_Types.Integer_Array_List;
+   Shapes : Integer_Array_List;
 
    procedure Init;
 

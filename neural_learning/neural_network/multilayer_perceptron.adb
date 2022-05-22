@@ -728,16 +728,16 @@ package body Multilayer_Perceptron is
       end if;
 
       Init_Bound := Sqrt (Factor / Float (Fan_In + Fan_Out));
-      --  Generate random weights
+      --  Generate random weights, Random_Float -1.0 .. 1.0
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Params.Coeff_Grads (f_in, f_out) := Init_Bound * Random_Float;
+            Params.Coeff_Grads (f_in, f_out) := Init_Bound * abs (Random_Float);
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
+         Params.Intercept_Grads (f_out) := Init_Bound * abs (Random_Float);
       end loop;
 
       return Params;

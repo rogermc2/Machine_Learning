@@ -22,6 +22,10 @@ package NL_Arrays_And_Matrices is
     type Boolean_Matrix is array (Integer range <>, Integer range <>) of Boolean;
     type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
 
+    package Integer_Array_Package is new
+      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);
+    subtype Integer_Array_List is Integer_Array_Package.Vector;
+
     package Real_Float_Arrays is new Generic_Real_Arrays (Float);
     subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
     subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
@@ -44,7 +48,7 @@ package NL_Arrays_And_Matrices is
     function "-" (L, R : Integer_Matrix) return Integer_Matrix;
     pragma Inline ("-");
     function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
-                 return Real_Float_Matrix;
+                  return Real_Float_Matrix;
     pragma Inline ("-");
     function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
     pragma Inline ("-");

@@ -1,7 +1,6 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
-with Ada.Containers.Indefinite_Vectors;
 with Ada.Containers.Ordered_Maps;
 with Ada.Containers.Vectors;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -86,11 +85,6 @@ package NL_Types is
    subtype Integer_List_2D is Integer_Package_2D.Vector;
    function Transpose (Values : Integer_List_2D) return  Integer_List_2D;
    pragma Inline (Transpose);
-
-   type Integer_Array is array (Integer range <>) of Integer;
-   package Integer_Array_Package is new
-     Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);
-   subtype Integer_Array_List is Integer_Array_Package.Vector;
 
    package Integer_DLL_Package is new
      Ada.Containers.Doubly_Linked_Lists (Integer);
