@@ -23,7 +23,7 @@ procedure Test_Adam is
    Beta_1         : constant Real_Float_Vector (1 .. 3) :=  (0.9, 1.0, 0.05);
    Beta_2         : constant Real_Float_Vector (1 .. 3) := (0.995, 1.0, 0.001);
    LR             : constant Float := 0.001;
---     Epsilon        : constant Float := 10.0 ** (-8);
+   --     Epsilon        : constant Float := 10.0 ** (-8);
    T              : constant Natural := 10;
    Params         : Parameters_List;
    Adam           : Stochastic_Optimizers.Adam_Optimizer;
@@ -39,7 +39,8 @@ begin
    for index in Shapes.First_Index .. Shapes.Last_Index loop
       declare
          Bounds    : constant Integer_Array := Shapes.Element (index);
-         Coeff     : constant Real_Float_Matrix (1 .. Bounds (1), 1 .. Bounds (2))
+         Coeff     : constant
+           Real_Float_Matrix (1 .. Bounds (1), 1 .. Bounds (2))
            := (others =>  (others => 0.0));
          Ints      : constant Real_Float_Vector (1 .. Bounds (1)) :=
                        (others => 0.0);
@@ -118,8 +119,10 @@ begin
 
    for index in Params.First_Index .. Params.Last_Index loop
       Assert (Params (index) = Expected (index), Routine_Name &
-             "Params" & Integer'Image (index) & " does not equal expcted"  &
-             Integer'Image (index));
+                "Params" & Integer'Image (index) & "," &
+              Float'Image (Params.Element (index).Intercept_Grads (1)) &
+                " does not equal expected value" & Integer'Image (index) & ","
+              & Float'Image (Expected.Element (index).Intercept_Grads (1)));
    end loop;
 
 end Test_Adam;
