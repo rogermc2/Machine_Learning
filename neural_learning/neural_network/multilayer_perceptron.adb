@@ -294,6 +294,7 @@ package body Multilayer_Perceptron is
        Activations   : Real_Matrix_List;
        Deltas        : Real_Matrix_List;
        Grads         : in out Parameters_List) is
+        use Ada.Containers;
         use Real_Float_Arrays;
         Routine_Name : constant String :=
                          "Multilayer_Perceptron.Compute_Loss_Gradient ";
@@ -322,6 +323,8 @@ package body Multilayer_Perceptron is
               (New_Coeff_Grads + Self.Parameters.Alpha *
                  Self.Attributes.Params (layer).Coeff_Grads) /
                 Float (Num_Samples);
+            Put_Line (Routine_Name & "Deltas length" &
+                        Count_Type'Image (Deltas.Length));
             Put_Line (Routine_Name & "New_Coeff_Grads size" &
                         Integer'Image (New_Coeff_Grads'Length) & " x" &
                         Integer'Image (New_Coeff_Grads'Length (2)));
