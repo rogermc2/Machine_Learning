@@ -70,8 +70,16 @@ begin
          Grads.Append (GR);
       end;
    end loop;
-    Printing.Print_Float_Matrix ("Coeff_Grads", Params (1).Coeff_Grads);
-    Printing.Print_Float_Array ("Intercept_Grads", Params (1).Intercept_Grads);
+   Printing.Print_Float_Matrix ("Coeff_Grads", Params (1).Coeff_Grads);
+   Printing.Print_Float_Array ("Intercept_Grads", Params (1).Intercept_Grads);
+
+   C_Init (Self => Adam, Params => Params,
+           Initial_Learning_Rate => LR,
+           Beta_1 => Beta_1 (1), Beta_2 => Beta_2 (1), Epsilon => Epsilon);
+
+   Adam.First_Moments := First_Moments;
+   Adam.Second_Moments := Second_Moments;
+   Adam.Time_Step := T - 1;
 
    for index in First_Moments.First_Index .. First_Moments.Last_Index loop
       First_Moments (index).Coeff_Grads :=
@@ -94,14 +102,6 @@ begin
 
    Learning_Rate := LR * Sqrt (1.0 - Beta_2 (1) ** T) /
      (1.0 - Beta_1 (1) ** T);
-
-   C_Init (Self => Adam, Params => Params,
-           Initial_Learning_Rate => Learning_Rate,
-           Beta_1 => Beta_1 (1), Beta_2 => Beta_2 (1), Epsilon => Epsilon);
-   Adam.First_Moments := First_Moments;
-   Adam.Second_Moments := Second_Moments;
-   Adam.Time_Step := T - 1;
-
    for index in First_Moments.First_Index .. First_Moments.Last_Index loop
       declare
          FM      : Parameters_Record := First_Moments (index);
@@ -118,16 +118,16 @@ begin
 
    Expected := Params + Updates;
    Update_Params (Adam, Grads, Params);
-    Printing.Print_Float_Matrix ("Expected Coeff_Grads", Expected (1).Coeff_Grads);
-    Printing.Print_Float_Array ("Expected Intercept_Grads", Expected (1).Intercept_Grads);
+   Printing.Print_Float_Matrix ("Expected Coeff_Grads", Expected (1).Coeff_Grads);
+   Printing.Print_Float_Array ("Expected Intercept_Grads", Expected (1).Intercept_Grads);
 
-    Printing.Print_Float_Matrix ("Params Coeff_Grads", Params (1).Coeff_Grads);
-    Printing.Print_Float_Array ("Params Intercept_Grads", Params (1).Intercept_Grads);
+   Printing.Print_Float_Matrix ("Params Coeff_Grads", Params (1).Coeff_Grads);
+   Printing.Print_Float_Array ("Params Intercept_Grads", Params (1).Intercept_Grads);
 
    for index in Params.First_Index .. Params.Last_Index loop
       Assert (Params (index) = Expected (index), Routine_Name &
                 "Params" & Integer'Image (index) & "," &
-              Float'Image (Params.Element (index).Intercept_Grads (1)) &
+                Float'Image (Params.Element (index).Intercept_Grads (1)) &
                 " does not equal expected value" & Integer'Image (index) & ","
               & Float'Image (Expected.Element (index).Intercept_Grads (1)));
    end loop;
