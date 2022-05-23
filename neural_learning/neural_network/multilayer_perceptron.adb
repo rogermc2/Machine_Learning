@@ -295,8 +295,8 @@ package body Multilayer_Perceptron is
        Deltas        : Real_Matrix_List;
        Grads         : in out Parameters_List) is
         use Real_Float_Arrays;
---          Routine_Name : constant String :=
---                           "Multilayer_Perceptron.Compute_Loss_Gradient ";
+        Routine_Name : constant String :=
+                         "Multilayer_Perceptron.Compute_Loss_Gradient ";
         --  L185
         Act_Delta    : constant Real_Float_Matrix
           := Transpose (Activations (Layer)) * Deltas (Layer);
@@ -322,6 +322,15 @@ package body Multilayer_Perceptron is
               (New_Coeff_Grads + Self.Parameters.Alpha *
                  Self.Attributes.Params (layer).Coeff_Grads) /
                 Float (Num_Samples);
+            Put_Line (Routine_Name & "New_Coeff_Grads length" &
+                        Integer'Image (New_Coeff_Grads'Length) & " x" &
+                        Integer'Image (New_Coeff_Grads'Length (2)));
+            Put_Line (Routine_Name & "New_Intercept_Grads length" &
+                        Integer'Image (New_Intercept_Grads'Length));
+            Put_Line (Routine_Name & "New_Grad.Intercept_Grads length" &
+                        Integer'Image (New_Grad.Intercept_Grads'Length));
+            Put_Line (Routine_Name & "Delta_Mean length" &
+                        Integer'Image (Delta_Mean'Length));
             New_Grad.Coeff_Grads := New_Coeff_Grads;
             New_Grad.Intercept_Grads := New_Intercept_Grads;
             Grads.Prepend (New_Grad);
