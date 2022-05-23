@@ -322,19 +322,23 @@ package body Multilayer_Perceptron is
               (New_Coeff_Grads + Self.Parameters.Alpha *
                  Self.Attributes.Params (layer).Coeff_Grads) /
                 Float (Num_Samples);
-            Put_Line (Routine_Name & "New_Coeff_Grads length" &
+            Put_Line (Routine_Name & "New_Coeff_Grads size" &
                         Integer'Image (New_Coeff_Grads'Length) & " x" &
                         Integer'Image (New_Coeff_Grads'Length (2)));
+            Put_Line (Routine_Name & "Deltas size" &
+                        Integer'Image (Deltas.Element (layer)'Length) & " x" &
+                        Integer'Image (Deltas.Element (layer)'Length (2)));
+            Put_Line (Routine_Name & "Delta_Mean length" &
+                        Integer'Image (Delta_Mean'Length));
             Put_Line (Routine_Name & "New_Intercept_Grads length" &
                         Integer'Image (New_Intercept_Grads'Length));
             Put_Line (Routine_Name & "New_Grad.Intercept_Grads length" &
                         Integer'Image (New_Grad.Intercept_Grads'Length));
-            Put_Line (Routine_Name & "Delta_Mean length" &
-                        Integer'Image (Delta_Mean'Length));
             New_Grad.Coeff_Grads := New_Coeff_Grads;
             New_Grad.Intercept_Grads := New_Intercept_Grads;
             Grads.Prepend (New_Grad);
         end;
+        New_Line;
 
     end  Compute_Loss_Gradient;
 
