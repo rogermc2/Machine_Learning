@@ -81,6 +81,10 @@
 
 \begin_body
 
+\begin_layout Part
+Theory
+\end_layout
+
 \begin_layout Section
 Equations
 \end_layout
@@ -254,6 +258,11 @@ where:
  represents a mathematical function.
 \end_layout
 
+\begin_layout Standard
+For a multi-class neural network, the number of neurons in the output layer
+ equals the number of classes.
+\end_layout
+
 \begin_layout Subsection
 Back Propagation
 \end_layout
@@ -424,7 +433,7 @@ Summary
 Feed forward:
 \begin_inset Formula 
 \begin{eqnarray*}
-Output_{_{l}} & = & Activation\left(Weights_{l-1}\cdot Output_{l-1}\right)
+Output_{_{l}} & = & Activation\left(Weights_{l-1}\cdot Output_{l-1}+Bias_{l-1}\right)
 \end{eqnarray*}
 
 \end_inset
@@ -490,6 +499,10 @@ Repeat steps 3 through 6 specified times
 
 \begin_layout Enumerate
 Predict result.
+\end_layout
+
+\begin_layout Part
+Practice
 \end_layout
 
 \begin_layout Section
@@ -619,7 +632,7 @@ Process Batch
 \end_layout
 
 \begin_layout Standard
-NS number of samples
+NB number of samples in batch
 \end_layout
 
 \begin_layout Standard
@@ -631,7 +644,7 @@ NC number of classes
 \end_layout
 
 \begin_layout Standard
-X matrix of NS rows x NF columns
+X matrix of NB rows x NF columns
 \end_layout
 
 \begin_layout Standard
@@ -645,15 +658,26 @@ Y matrix of NS x NC
  list of Activation matrices
 \end_layout
 
+\begin_layout Subsection
+Forward Pass
+\end_layout
+
 \begin_layout Standard
-\begin_inset Formula $A_{1}=X$
+\begin_inset Formula 
+\begin{eqnarray*}
+Output_{_{l}} & = & Activation\left(Weights_{l-1}\cdot Output_{l-1}+Bias_{l-1}\right)
+\end{eqnarray*}
+
 \end_inset
 
 
 \end_layout
 
-\begin_layout Subsection
-Forward Pass
+\begin_layout Standard
+\begin_inset Formula $A_{1}=X$
+\end_inset
+
+, NB rows x NF columns
 \end_layout
 
 \begin_layout Standard
