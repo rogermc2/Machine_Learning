@@ -114,7 +114,7 @@ The output of a neuron is the activation function of a weighted sum of the
  neuron’s input:
 \begin_inset Formula 
 \begin{eqnarray*}
-j_{j} & = & w_{j,1}\times x_{1}+\cdots+w_{j,N}\times x_{N}=\sum_{i=1}^{N}w_{j,i}\times x_{i}+b_{j}
+y_{j} & = & w_{j,1}\times x_{1}+\cdots+w_{j,N}\times x_{N}+b_{j}=\sum_{i=1}^{N}w_{j,i}\times x_{i}+b_{j}
 \end{eqnarray*}
 
 \end_inset
