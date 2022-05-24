@@ -324,14 +324,25 @@ D list of NL - 1 matrices
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GC_{l}=\left(A_{l}^{T}\cdot D_{l}+\alpha*CF_{l}\right)/NS$
+\begin_inset Formula $GC_{NL}=\left(A_{l}^{T}\cdot D_{l}+\alpha*CF_{l}\right)/NS$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GI_{l}[row]=Mean\left(D_{l}\left[row\right]\right)$
+\begin_inset Formula $GI_{NL}[row]=Mean\left(D_{l}\left[row\right]\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Compute Loss Gradient
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $NCG=A_{l}^{T}*D_{l}$
 \end_inset
 
 
