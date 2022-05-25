@@ -98,10 +98,18 @@ literal "false"
 
 \end_inset
 
- and 
+, 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "bsnn"
+literal "false"
+
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "nn3"
 literal "false"
 
 \end_inset
@@ -233,7 +241,7 @@ where:
 \begin_inset Formula $I_{l-1}$
 \end_inset
 
- represents input layer 
+ represents the input to layer 
 \begin_inset Formula $l-1$
 \end_inset
 
@@ -244,7 +252,7 @@ where:
 \begin_inset Formula $O_{l}$
 \end_inset
 
- represents output layer 
+ represents the output of layer 
 \begin_inset Formula $l$
 \end_inset
 
@@ -259,8 +267,8 @@ where:
 \end_layout
 
 \begin_layout Standard
-For a multi-class neural network, the number of neurons in the output layer
- equals the number of classes.
+For a multi-class neural network, the number of nodes in the output layer
+ is the number of classes.
 \end_layout
 
 \begin_layout Subsection
@@ -270,7 +278,8 @@ Back Propagation
 \begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
-EX & = & \begin{bmatrix}\frac{w_{1,1}}{\sum_{k=1}^{n}w_{1,k}} & \cdots & \frac{w_{n,1}}{\sum_{k=1}^{n}w_{n,k}}\\
+EY_{last} & = & Output_{last}-Y\\
+X & = & \begin{bmatrix}\frac{w_{1,1}}{\sum_{k=1}^{n}w_{1,k}} & \cdots & \frac{w_{n,1}}{\sum_{k=1}^{n}w_{n,k}}\\
 \vdots & \cdots & \vdots\\
 \frac{w_{1,m}}{\sum_{k=1}^{n}w_{1,k}} & \cdots & \frac{w_{n,m}}{\sum_{k=1}^{n}w_{1,k}}
 \end{bmatrix}EY
@@ -283,6 +292,13 @@ EX & = & \begin{bmatrix}\frac{w_{1,1}}{\sum_{k=1}^{n}w_{1,k}} & \cdots & \frac{w
 
 \begin_layout Standard
 where:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $Y$
+\end_inset
+
+ repesents the vector of actual class values
 \end_layout
 
 \begin_layout Standard
@@ -443,8 +459,12 @@ Output_{_{l}} & = & Activation\left(Weights_{l-1}\cdot Output_{l-1}+Bias_{l-1}\r
 
 \begin_layout Standard
 Back Propagate:
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
+E_{last} & = & Output_{last}-Y\\
 E_{l-1} & = & W_{l}^{T}\cdot E_{l}
 \end{eqnarray*}
 
@@ -501,6 +521,77 @@ Repeat steps 3 through 6 specified times
 Predict result.
 \end_layout
 
+\begin_layout Section
+Training
+\end_layout
+
+\begin_layout Standard
+The goal in training a neural network is to find weights and biases the
+ minimize the quadratic cost function 
+\begin_inset Formula $C\left(w,b\right)$
+\end_inset
+
+: 
+\begin_inset Formula 
+\begin{eqnarray*}
+C\left(w,b\right) & = & \frac{1}{2N}\sum_{i=1}^{N}\left\Vert Y_{i}\left(X_{i}\right)-A_{i}\left(i,w,b\right)\right\Vert ^{2}
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $w$
+\end_inset
+
+ denotes the collection of all weights in the network, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $b$
+\end_inset
+
+ all the biases,
+\end_layout
+
+\begin_layout Standard
+N is the total number of training inputs,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $A$
+\end_inset
+
+ is the vector of outputs from the network
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $X$
+\end_inset
+
+ is the training input data, 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $Y$
+\end_inset
+
+ is training data result values and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\sum_{i=1}^{N}$
+\end_inset
+
+ is over all training inputs 
+\begin_inset Formula $X_{i}$
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Part
 Practice
 \end_layout
@@ -526,7 +617,8 @@ Initialization
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $CF$
+Coefficients: 
+\begin_inset Formula $C$
 \end_inset
 
  list of 
@@ -537,6 +629,7 @@ Initialization
 \end_layout
 
 \begin_layout Standard
+Intercepts; 
 \begin_inset Formula $I$
 \end_inset
 
@@ -548,7 +641,7 @@ Initialization
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $CF_{l}\left[fi,fo\right]$
+\begin_inset Formula $C_{l}\left[fi,fo\right]$
 \end_inset
 
  matrix of 
@@ -574,7 +667,10 @@ Initialization
 \end_layout
 
 \begin_layout Standard
-where 
+where:
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula $l$
 \end_inset
 
@@ -589,7 +685,7 @@ where
 \begin_inset Formula $fi$
 \end_inset
 
- is number of input neurons for layer 
+ (fan in) is the number of input neurons for layer 
 \begin_inset Formula $l$
 \end_inset
 
@@ -604,7 +700,7 @@ where
 \begin_inset Formula $fo$
 \end_inset
 
- is number of output neurons for layer 
+ (fan out) is the number of output neurons for layer 
 \begin_inset Formula $l$
 \end_inset
 
@@ -617,7 +713,7 @@ where
 
 \begin_layout Standard
 Initialize each element of 
-\begin_inset Formula $CF$
+\begin_inset Formula $C$
 \end_inset
 
  and 
@@ -637,6 +733,17 @@ NB number of samples in batch
 
 \begin_layout Standard
 NF number of features
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $NN_{l}$
+\end_inset
+
+ number of neurons in layer 
+\begin_inset Formula $l$
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -674,6 +781,17 @@ Output_{_{l}} & = & Activation\left(Weights_{l-1}\cdot Output_{l-1}+Bias_{l-1}\r
 \end_layout
 
 \begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+A_{_{l}} & = & Activation\left(C_{l-1}\cdot A_{_{l}-1}+I_{l-1}\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula $A_{1}=X$
 \end_inset
 
@@ -689,14 +807,18 @@ Calculate the activation value for layers
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $A_{l+1}=A_{l}\cdot CF_{l}$
+\begin_inset Formula $A_{l+1}=A_{l}\cdot C_{l}$
 \end_inset
 
  + 
 \begin_inset Formula $I_{l}$
 \end_inset
 
+, NB rows x 
+\begin_inset Formula $NN_{l+1}$
+\end_inset
 
+ columns
 \end_layout
 
 \begin_layout Subsection
@@ -704,11 +826,32 @@ Backward Propagation
 \end_layout
 
 \begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+E_{last} & = & Output_{last}-Y\\
+E_{l-1} & = & W_{l}^{T}\cdot E_{l}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+D_{last} & = & A_{last}-Y\\
+D_{l-1} & = & W_{l}^{T}\cdot D_{l}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 D list of NL - 1 matrices
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GC$
+\begin_inset Formula $C$
 \end_inset
 
  list of 
@@ -719,7 +862,7 @@ D list of NL - 1 matrices
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GI$
+\begin_inset Formula $I$
 \end_inset
 
  list of 
@@ -730,7 +873,7 @@ D list of NL - 1 matrices
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GC_{l}\left[fi,fo\right]$
+\begin_inset Formula $C_{l}\left[fi,fo\right]$
 \end_inset
 
  matrix of 
@@ -745,7 +888,7 @@ D list of NL - 1 matrices
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GI_{l}\left[fo\right]$
+\begin_inset Formula $I_{l}\left[fo\right]$
 \end_inset
 
  array of 
@@ -763,14 +906,14 @@ D list of NL - 1 matrices
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GC_{NL}=\left(A_{l}^{T}\cdot D_{l}+\alpha*CF_{l}\right)/NS$
+\begin_inset Formula $C_{NL}=\left(A_{l}^{T}\cdot D_{l}+\alpha*F_{l}\right)/NB$
 \end_inset
 
 
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $GI_{NL}[row]=Mean\left(D_{l}\left[row\right]\right)$
+\begin_inset Formula $I_{NL}[row]=Mean\left(D_{l}\left[row\right]\right)$
 \end_inset
 
 
@@ -811,6 +954,18 @@ literal "false"
 
 https://towardsdatascience.com/building-a-simple-neural-network-from-scratch-a5c6
 b2eb0c34
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "3"
+key "nn3"
+literal "false"
+
+\end_inset
+
+http://neuralnetworksanddeeplearning.com/chap1.html
 \end_layout
 
 \end_body

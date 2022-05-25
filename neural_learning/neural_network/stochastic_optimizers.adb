@@ -18,7 +18,7 @@ package body Stochastic_Optimizers is
       use Real_Float_Arrays;
       Sum_Rec : Parameters_Record := L;
    begin
-      Sum_Rec.Coeff_Grads := L.Coeff_Grads + R.Coeff_Grads;
+      Sum_Rec.Coeff_Gradients := L.Coeff_Gradients + R.Coeff_Gradients;
       Sum_Rec.Intercept_Grads := L.Intercept_Grads + R.Intercept_Grads;
 
       return Sum_Rec;
@@ -49,9 +49,10 @@ package body Stochastic_Optimizers is
    function "-" (M : Parameters_Record) return Parameters_Record is
       Minus : Parameters_Record := M;
    begin
-      for row in Minus.Coeff_Grads'Range loop
-         for col in Minus.Coeff_Grads'Range (2) loop
-            Minus.Coeff_Grads (row, col) := - Minus.Coeff_Grads (row, col);
+      for row in Minus.Coeff_Gradients'Range loop
+         for col in Minus.Coeff_Gradients'Range (2) loop
+            Minus.Coeff_Gradients (row, col) :=
+              - Minus.Coeff_Gradients (row, col);
          end loop;
       end loop;
 
@@ -69,10 +70,10 @@ package body Stochastic_Optimizers is
    function "-" (L, R : Parameters_Record) return Parameters_Record is
       Minus : Parameters_Record := L;
    begin
-      for row in Minus.Coeff_Grads'Range loop
-         for col in Minus.Coeff_Grads'Range (2) loop
-            Minus.Coeff_Grads (row, col) :=
-              Minus.Coeff_Grads (row, col) - R.Coeff_Grads (row, col);
+      for row in Minus.Coeff_Gradients'Range loop
+         for col in Minus.Coeff_Gradients'Range (2) loop
+            Minus.Coeff_Gradients (row, col) :=
+              Minus.Coeff_Gradients (row, col) - R.Coeff_Gradients (row, col);
          end loop;
       end loop;
 
@@ -91,10 +92,10 @@ package body Stochastic_Optimizers is
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record is
       Product : Parameters_Record := R;
    begin
-      for row in Product.Coeff_Grads'Range loop
-         for col in Product.Coeff_Grads'Range (2) loop
-            Product.Coeff_Grads (row, col) :=
-              L * Product.Coeff_Grads (row, col);
+      for row in Product.Coeff_Gradients'Range loop
+         for col in Product.Coeff_Gradients'Range (2) loop
+            Product.Coeff_Gradients (row, col) :=
+              L * Product.Coeff_Gradients (row, col);
          end loop;
       end loop;
 
@@ -112,10 +113,10 @@ package body Stochastic_Optimizers is
    function Square (Rec : Parameters_Record) return Parameters_Record is
       Result : Parameters_Record := Rec;
    begin
-      for row in Rec.Coeff_Grads'Range loop
-         for col in Rec.Coeff_Grads'Range (2) loop
-            Result.Coeff_Grads (row, col) :=
-              Rec.Coeff_Grads (row, col) ** 2;
+      for row in Rec.Coeff_Gradients'Range loop
+         for col in Rec.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              Rec.Coeff_Gradients (row, col) ** 2;
          end loop;
       end loop;
 
@@ -133,10 +134,10 @@ package body Stochastic_Optimizers is
       use Maths.Float_Math_Functions;
       Result : Parameters_Record := Rec;
    begin
-      for row in Rec.Coeff_Grads'Range loop
-         for col in Rec.Coeff_Grads'Range (2) loop
-            Result.Coeff_Grads (row, col) :=
-              Sqrt (Rec.Coeff_Grads (row, col));
+      for row in Rec.Coeff_Gradients'Range loop
+         for col in Rec.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              Sqrt (Rec.Coeff_Gradients (row, col));
          end loop;
       end loop;
 
@@ -153,10 +154,10 @@ package body Stochastic_Optimizers is
    function "/" (L, R : Parameters_Record) return Parameters_Record is
       Result  : Parameters_Record := L;
    begin
-      for row in Result.Coeff_Grads'Range loop
-         for col in Result.Coeff_Grads'Range (2) loop
-            Result.Coeff_Grads (row, col) :=
-              Result.Coeff_Grads (row, col) / R.Coeff_Grads (row, col);
+      for row in Result.Coeff_Gradients'Range loop
+         for col in Result.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              Result.Coeff_Gradients (row, col) / R.Coeff_Gradients (row, col);
          end loop;
       end loop;
 
@@ -345,10 +346,10 @@ package body Stochastic_Optimizers is
       use Maths.Float_Math_Functions;
       Result : Parameters_Record := M;
    begin
-      for row in Result.Coeff_Grads'Range loop
-         for col in Result.Coeff_Grads'Range (2) loop
-            Result.Coeff_Grads (row, col) :=
-              Sqrt (Result.Coeff_Grads (row, col)) + Epsilon;
+      for row in Result.Coeff_Gradients'Range loop
+         for col in Result.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              Sqrt (Result.Coeff_Gradients (row, col)) + Epsilon;
          end loop;
       end loop;
 
@@ -448,13 +449,13 @@ package body Stochastic_Optimizers is
          declare
             Data                               : constant Parameters_Record := index;
             Coeffs                             : constant Real_Float_Matrix
-              (1 .. Data.Coeff_Grads'Length,
-               1 .. Data.Coeff_Grads'Length (2)) :=
+              (1 .. Data.Coeff_Gradients'Length,
+               1 .. Data.Coeff_Gradients'Length (2)) :=
                                                    (others => (others => 0.0));
             Intercepts                         : constant Real_Float_Vector
               (1 .. Data.Intercept_Grads'Length) := (others => 0.0);
          begin
-            index.Coeff_Grads := Coeffs;
+            index.Coeff_Gradients := Coeffs;
             index.Intercept_Grads := Intercepts;
          end;
       end loop;
