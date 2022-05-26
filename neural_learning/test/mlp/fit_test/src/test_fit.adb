@@ -62,6 +62,9 @@ begin
    aClassifier.Attributes.Best_Loss := Float'Last;
    aClassifier.Attributes.No_Improvement_Count := 0;
    aClassifier.Parameters.Solver := Sgd_Solver;
+
+   Init_Optimizer (aClassifier);
+
    Put_Line (Routine_Name & "Params size" & Integer'Image (Params.Num_Rows) & " x" &
                Integer'Image (Params.Num_Cols));
    Put_Line (Routine_Name & "Params.Coeff_Gradients size" &
