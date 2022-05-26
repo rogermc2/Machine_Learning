@@ -901,7 +901,7 @@ package body Multilayer_Perceptron is
       Y_Batch        : Boolean_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
       --  Activations: layers x samples x features
       Activations    : Real_Matrix_List;
-      Grads          : Parameters_List;
+      Gradients      : Parameters_List;
       Batch_Row      : Positive;
       Batch_Loss     : Float;
    begin
@@ -920,7 +920,7 @@ package body Multilayer_Perceptron is
       Activations.Clear;
       Activations.Append (X_Batch);
       Forward_Pass (Self, Activations);
-      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Grads);
+      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
 
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
@@ -928,7 +928,7 @@ package body Multilayer_Perceptron is
       --  L667 update weights
       --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
-        (Self.Attributes.Optimizer, Self.Attributes.Params, Grads);
+        (Self.Attributes.Optimizer, Self.Attributes.Params, Gradients);
 
    end Process_Batch;
 
