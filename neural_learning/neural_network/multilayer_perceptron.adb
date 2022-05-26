@@ -177,7 +177,6 @@ package body Multilayer_Perceptron is
                               Activations.Last_Element - Y);
 
       --  L304  Compute gradient for the last layer
-      Put_Line (Routine_Name & "L304");
       Put_Line (Routine_Name & "Y size" &
                   Integer'Image (Y'Length) & " x" &
                   Integer'Image (Y'Length (2)));
@@ -349,7 +348,6 @@ package body Multilayer_Perceptron is
       New_Gradients       : Parameters_Record
         (New_Coeff_Gradients'Length, New_Coeff_Gradients'Length (2));
    begin
-      Put_Line (Routine_Name & "L186");
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
@@ -644,8 +642,8 @@ package body Multilayer_Perceptron is
       --  the activation values of the ith layer.
       use Base_Neural;
       use Parameters_Package;
-      --        Routine_Name      : constant String :=
-      --                              "Multilayer_Perceptron.Forward_Pass ";
+--        Routine_Name      : constant String :=
+--                                    "Multilayer_Perceptron.Forward_Pass ";
       Hidden_Activation : constant Activation_Type :=
                             Self.Parameters.Activation;
       Output_Activation : constant Activation_Type :=
@@ -919,9 +917,12 @@ package body Multilayer_Perceptron is
    procedure Partial_Fit
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
       Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
+      use Label;
+      LB  : Label_Binarizer;
    begin
       if Check_Partial_Fit_First_Call (Self, Classes) then
-         null;
+         Self.Attributes.Binarizer := LB;
+         Fit (LB, Y);
       end if;
 
       Partial_Fit (Self, X, Y);
@@ -948,8 +949,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --                           "Multilayer_Perceptron.Process_Batch ";
+--        Routine_Name   : constant String :=
+--                                 "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -997,13 +998,15 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Update_Grads ";
+      Routine_Name : constant String := "Multilayer_Perceptron.Update_Grads ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
+      Put_Line (Routine_Name);
       --  L311
       Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                 Transpose (Params.Coeff_Gradients));
+      Put_Line (Routine_Name & "L312");
       --  L312
       case Self.Parameters.Activation is
          when Identity_Activation => null;
@@ -1017,10 +1020,12 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => null;
       end case;
 
+      Put_Line (Routine_Name & "L314");
       --  L314
       Compute_Loss_Gradient
         (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
          Activations => Activations, Deltas => Deltas, Gradients => Gradients);
+      Put_Line (Routine_Name & "done");
 
    end Update_Gradients;
 

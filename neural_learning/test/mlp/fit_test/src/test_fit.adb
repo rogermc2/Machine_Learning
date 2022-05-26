@@ -17,20 +17,31 @@ procedure Test_Fit is
    X            : Real_Float_Matrix (1 .. 1, 1 .. 3);
    Y            : Integer_Matrix (1 .. 1, 1 .. 1);
    Layer_Sizes  : NL_Types.Integer_List;
-   Gradients    : Parameters_List;
-   Grad_Record  : Parameters_Record (2, 1);
-   Params       : Parameters_Record (1, 2);
-   Velocities   : Parameters_List;
+   Classes      : NL_Types.Integer_List;
+--     Gradients    : Parameters_List;
+--     Grad_Record  : Parameters_Record (2, 1);
+--     Velocities   : Parameters_List;
    aClassifier  : MLP_Classifier;
 
    procedure Set_Weights (Self : in out MLP_Classifier) is
+      Coeffs_1     : constant Real_Float_Matrix (1 .. 3, 1 .. 2) :=
+                       ((0.1, 0.2), (0.3, 0.1), (0.5, 0.0));
+      Intercepts_1 : constant Real_Float_Vector (1 .. 2) := (0.1, 0.1);
+      Coeffs_2     : Real_Float_Matrix (1 .. 2, 1 .. 1);
+      Intercepts_2 : Real_Float_Vector (1 .. 1);
+      Params_1     : Parameters_Record (3, 2);
+      Params_2     : Parameters_Record (2, 1);
    begin
-      Params.Coeff_Gradients (1, 1) := 0.0;
-      Params.Coeff_Gradients (1, 2) := 0.0;
-      Params.Intercept_Grads (1) := 0.0;
-      --  Params length is num layers - 1
-      Self.Attributes.Params.Append (Params);
-      Self.Attributes.Params.Append (Params);
+      Coeffs_2 (1, 1) := 0.1;
+      Coeffs_2 (2, 1) := 0.1;
+      Intercepts_2 (1) := (1.0);
+      Params_1.Coeff_Gradients := Coeffs_1;
+      Params_1.Intercept_Grads := Intercepts_1;
+      Params_2.Coeff_Gradients := Coeffs_2;
+      Params_2.Intercept_Grads := Intercepts_2;
+      Self.Attributes.Params.Append (Params_1);
+      Self.Attributes.Params.Append (Params_2);
+
    end Set_Weights;
 
 begin
@@ -52,11 +63,11 @@ begin
    aClassifier.Attributes.N_Iter := 0;
    aClassifier.Parameters.Learning_Rate := 0.1;
    aClassifier.Attributes.N_Layers := 3;
-   Grad_Record.Coeff_Gradients (1, 1) := 0.0;
-   Grad_Record.Coeff_Gradients (2, 1) := 0.0;
-   Grad_Record.Intercept_Grads (1) := 0.0;
-   Grad_Record.Intercept_Grads (2) := 0.0;
-   Gradients.Append (Grad_Record);
+--     Grad_Record.Coeff_Gradients (1, 1) := 0.0;
+--     Grad_Record.Coeff_Gradients (2, 1) := 0.0;
+--     Grad_Record.Intercept_Grads (1) := 0.0;
+--     Grad_Record.Intercept_Grads (2) := 0.0;
+--     Gradients.Append (Grad_Record);
    aClassifier.Attributes.Out_Activation := Base_Neural.Logistic_Activation;
    aClassifier.Attributes.T := 0;
    aClassifier.Attributes.Best_Loss := Float'Last;
@@ -65,17 +76,17 @@ begin
 
    Init_Optimizer (aClassifier);
 
-   Put_Line (Routine_Name & "Params size" & Integer'Image (Params.Num_Rows) & " x" &
-               Integer'Image (Params.Num_Cols));
-   Put_Line (Routine_Name & "Params.Coeff_Gradients size" &
-               Integer'Image (Params.Coeff_Gradients'Length) & " x" &
-               Integer'Image (Params.Coeff_Gradients'Length (2)));
-   Put_Line (Routine_Name & "Params.Intercept_Grads size" &
-               Integer'Image (Params.Intercept_Grads'Length));
-   Velocities.Append (Params);
+--     Put_Line (Routine_Name & "Params.Coeff_Gradients size" &
+--                 Integer'Image (Params.Coeff_Gradients'Length) & " x" &
+--                 Integer'Image (Params.Coeff_Gradients'Length (2)));
+--     Put_Line (Routine_Name & "Params.Intercept_Grads size" &
+--                 Integer'Image (Params.Intercept_Grads'Length));
+--     Velocities.Append (Params);
    aClassifier.Attributes.Optimizer.SGD.Power_T := 0.0;
 
    --  Partial_Fit updates the model with a single iteration over the data.
-   Partial_Fit (aClassifier, X, Y);
+   Classes.Append (0);
+   Classes.Append (1);
+   Partial_Fit (aClassifier, X, Y, Classes => Classes);
 
 end Test_Fit;
