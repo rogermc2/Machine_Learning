@@ -194,6 +194,37 @@ package body Multilayer_Perceptron is
    end Backprop;
 
    --  -------------------------------------------------------------------------
+   --  scikit-learn/sklearn/utils/multiclass.py
+   --  L340  Check_Partial_Fit_First_Call returns True if this was the first
+   --  call to partial_fit on clf in which case the classes attribute
+   --  is also set on clf.
+   function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
+                                          Classes : NL_Types.Integer_List)
+                                          return Boolean is
+      use NL_Types.Integer_Package;
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
+      Result : Boolean := False;
+   begin
+      Assert (not Is_Empty (Self.Attributes.Classes) or not Is_Empty (Classes),
+              Routine_Name &
+               "Classes must be passed on the first call to Partial_Fit.");
+
+      if not Is_Empty (Classes) then
+         if not Is_Empty (Self.Attributes.Classes) then
+            null;
+         else
+            Self.Attributes.Classes := Classes;
+            Result := True;
+         end if;
+
+      end if;
+
+      return Result;
+
+   end Check_Partial_Fit_First_Call;
+
+   --  -------------------------------------------------------------------------
 
    procedure Check_Weights (Self : MLP_Classifier) is
       use Parameters_Package;
@@ -872,6 +903,30 @@ package body Multilayer_Perceptron is
       end case;
 
    end Init_Optimizer;
+
+   --  -------------------------------------------------------------------------
+   --  L778  Partial_Fit updates the model with a single iteration over the
+   --        given data.
+   procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
+                          Y    : Integer_Matrix) is
+   begin
+      Fit (Self, X, Y, Incremental => True);
+
+   end Partial_Fit;
+
+   --  -------------------------------------------------------------------------
+   --  L1186
+   procedure Partial_Fit
+     (Self : in out MLP_Classifier; X : Real_Float_Matrix;
+      Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
+   begin
+      if Check_Partial_Fit_First_Call (Self, Classes) then
+         null;
+      end if;
+
+      Partial_Fit (Self, X, Y);
+
+   end Partial_Fit;
 
    --  -------------------------------------------------------------------------
 

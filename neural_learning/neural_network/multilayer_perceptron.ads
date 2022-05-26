@@ -132,6 +132,11 @@ package Multilayer_Perceptron is
                    Y    : Integer_Matrix;
                    Incremental : Boolean := False);
    procedure Init_Optimizer (Self : in out MLP_Classifier);
+   procedure Partial_Fit (Self : in out MLP_Classifier; X: Real_Float_Matrix;
+                          Y    : Integer_Matrix);
+   procedure Partial_Fit
+     (Self : in out MLP_Classifier; X: Real_Float_Matrix;
+      Y    : Integer_Matrix; Classes : NL_Types.Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Real_Float_Matrix;
 
