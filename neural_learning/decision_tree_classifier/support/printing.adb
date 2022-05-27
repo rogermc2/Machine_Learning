@@ -3,6 +3,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body Printing is
 
+   package Real_IO is new Float_IO (Float);
+
    --  -------------------------------------------------------------------------
 
    procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
@@ -162,6 +164,35 @@ package body Printing is
       end if;
 
    end Print_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Float_Matrix_Formated
+      (Name  : String; aMatrix : Real_Float_Matrix; Places : Natural;
+       Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (aMatrix'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+         for row in Start .. Last loop
+            for col in aMatrix'Range (2) loop
+               Real_IO.Put (aMatrix (row, col), 1, Places, 0);
+               Put ("  ");
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line
+           ("Print_Float_Matrix called with invalid start or finish index.");
+      end if;
+
+   end Print_Float_Matrix_Formated;
 
    --  ------------------------------------------------------------------------
 

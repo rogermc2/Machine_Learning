@@ -1,27 +1,28 @@
 
---  with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Neural;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
---  with Printing;
+with Printing;
 with Stochastic_Optimizers;
 
 procedure Test_Fit is
-   --  use Ada.Containers;
+   use Real_Float_Arrays;
    use Multilayer_Perceptron;
    use Stochastic_Optimizers;
+
    Routine_Name : constant String := "Test_Fit ";
    X            : Real_Float_Matrix (1 .. 1, 1 .. 3);
    Y            : Integer_Matrix (1 .. 1, 1 .. 1);
    Layer_Sizes  : NL_Types.Integer_List;
    Classes      : NL_Types.Integer_List;
---     Gradients    : Parameters_List;
---     Grad_Record  : Parameters_Record (2, 1);
---     Velocities   : Parameters_List;
    aClassifier  : MLP_Classifier;
+   Coeff_Test   : constant Real_Float_Matrix (1 .. 3, 1 .. 2) :=
+                       ((0.098, 0.195756), (0.2956664, 0.096008),
+                        (0.4939998, -0.002244));
+   Coeff_Error  : Real_Float_Matrix (1 .. 3, 1 .. 2);
 
    procedure Set_Weights (Self : in out MLP_Classifier) is
       Coeffs_1     : constant Real_Float_Matrix (1 .. 3, 1 .. 2) :=
@@ -63,11 +64,6 @@ begin
    aClassifier.Attributes.N_Iter := 0;
    aClassifier.Parameters.Learning_Rate := 0.1;
    aClassifier.Attributes.N_Layers := 3;
---     Grad_Record.Coeff_Gradients (1, 1) := 0.0;
---     Grad_Record.Coeff_Gradients (2, 1) := 0.0;
---     Grad_Record.Intercept_Grads (1) := 0.0;
---     Grad_Record.Intercept_Grads (2) := 0.0;
---     Gradients.Append (Grad_Record);
    aClassifier.Attributes.Out_Activation := Base_Neural.Logistic_Activation;
    aClassifier.Attributes.T := 0;
    aClassifier.Attributes.Best_Loss := Float'Last;
@@ -75,18 +71,16 @@ begin
    aClassifier.Parameters.Solver := Sgd_Solver;
 
    Init_Optimizer (aClassifier);
-
---     Put_Line (Routine_Name & "Params.Coeff_Gradients size" &
---                 Integer'Image (Params.Coeff_Gradients'Length) & " x" &
---                 Integer'Image (Params.Coeff_Gradients'Length (2)));
---     Put_Line (Routine_Name & "Params.Intercept_Grads size" &
---                 Integer'Image (Params.Intercept_Grads'Length));
---     Velocities.Append (Params);
    aClassifier.Attributes.Optimizer.SGD.Power_T := 0.0;
 
    --  Partial_Fit updates the model with a single iteration over the data.
    Classes.Append (0);
    Classes.Append (1);
    Partial_Fit (aClassifier, X, Y, Classes => Classes);
+
+   Coeff_Error :=
+      abs (Coeff_Test -
+             aClassifier.Attributes.Params.Element (1).Coeff_Gradients);
+   Printing.Print_Float_Matrix_Formated ("Coeffs (1)", Coeff_Error, 3);
 
 end Test_Fit;
