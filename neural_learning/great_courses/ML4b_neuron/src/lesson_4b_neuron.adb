@@ -36,10 +36,10 @@ begin
       Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
       New_Line;
 
-      for index in 2 .. 2 loop
+      for index in 1 .. 2 loop
          Hidden_Layer_Sizes.Clear;
          Hidden_Layer_Sizes.Append (index * 10);
-         aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
+         aClassifier := C_Init (Max_Iter => 1000,
                                 Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                 Activation => Base_Neural.Identity_Activation,
                                 Verbose => True);

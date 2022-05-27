@@ -45,7 +45,7 @@ with Base;
 with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
-with Printing;
+--  with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -112,7 +112,7 @@ package body Multilayer_Perceptron is
       use Parameters_Package;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+      --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Loss_Function_Name : Loss_Function;
       Deltas             : Real_Matrix_List;
@@ -177,9 +177,9 @@ package body Multilayer_Perceptron is
                               Activations.Last_Element - Y);
 
       --  L304  Compute gradient for the last layer
-      Put_Line (Routine_Name & "Y size" &
-                  Integer'Image (Y'Length) & " x" &
-                  Integer'Image (Y'Length (2)));
+      --        Put_Line (Routine_Name & "Y size" &
+      --                    Integer'Image (Y'Length) & " x" &
+      --                    Integer'Image (Y'Length (2)));
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
 
@@ -202,11 +202,11 @@ package body Multilayer_Perceptron is
       use NL_Types.Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
-      Result : Boolean := False;
+      Result       : Boolean := False;
    begin
       Assert (not Is_Empty (Self.Attributes.Classes) or not Is_Empty (Classes),
               Routine_Name &
-               "Classes must be passed on the first call to Partial_Fit.");
+                "Classes must be passed on the first call to Partial_Fit.");
 
       if not Is_Empty (Classes) then
          if not Is_Empty (Self.Attributes.Classes) then
@@ -329,10 +329,10 @@ package body Multilayer_Perceptron is
       Activations   : Real_Matrix_List;
       Deltas        : Real_Matrix_List;
       Gradients     : in out Parameters_List) is
---        use Ada.Containers;
+      --        use Ada.Containers;
       use Real_Float_Arrays;
---        Routine_Name        : constant String :=
---                                "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      --        Routine_Name        : constant String :=
+      --                                "Multilayer_Perceptron.Compute_Loss_Gradient ";
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  An activation converts the output from a layer into a form that is
@@ -351,26 +351,25 @@ package body Multilayer_Perceptron is
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
           Float (Num_Samples);
---        Put_Line (Routine_Name & "Deltas length" &
---                    Count_Type'Image (Deltas.Length));
---        Put_Line (Routine_Name & "New_Coeff_Gradients size" &
---                    Integer'Image (New_Coeff_Gradients'Length) & " x" &
---                    Integer'Image (New_Coeff_Gradients'Length (2)));
---        Put_Line (Routine_Name & "Activations size" &
---                    Integer'Image (Activations.Element (layer)'Length) &
---                    " x" &
---                    Integer'Image (Activations.Element (layer)'Length (2)));
---        Put_Line (Routine_Name & "Deltas size" &
---                    Integer'Image (Deltas.Element (layer)'Length) & " x" &
---                    Integer'Image (Deltas.Element (layer)'Length (2)));
---        Put_Line (Routine_Name & "New_Intercept_Grads length" &
---                    Integer'Image (New_Intercept_Grads'Length));
---        Put_Line (Routine_Name & "New_Gradients.Intercept_Grads length" &
---                    Integer'Image (New_Gradients.Intercept_Grads'Length));
+      --        Put_Line (Routine_Name & "Deltas length" &
+      --                    Count_Type'Image (Deltas.Length));
+      --        Put_Line (Routine_Name & "New_Coeff_Gradients size" &
+      --                    Integer'Image (New_Coeff_Gradients'Length) & " x" &
+      --                    Integer'Image (New_Coeff_Gradients'Length (2)));
+      --        Put_Line (Routine_Name & "Activations size" &
+      --                    Integer'Image (Activations.Element (layer)'Length) &
+      --                    " x" &
+      --                    Integer'Image (Activations.Element (layer)'Length (2)));
+      --        Put_Line (Routine_Name & "Deltas size" &
+      --                    Integer'Image (Deltas.Element (layer)'Length) & " x" &
+      --                    Integer'Image (Deltas.Element (layer)'Length (2)));
+      --        Put_Line (Routine_Name & "New_Intercept_Grads length" &
+      --                    Integer'Image (New_Intercept_Grads'Length));
+      --        Put_Line (Routine_Name & "New_Gradients.Intercept_Grads length" &
+      --                    Integer'Image (New_Gradients.Intercept_Grads'Length));
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
       Gradients.Prepend (New_Gradients);
-      New_Line;
 
    end  Compute_Loss_Gradient;
 
@@ -571,8 +570,7 @@ package body Multilayer_Perceptron is
          Self.Attributes.Loss_Curve.Append (Self.Attributes.Loss);
          --  L668
          if Self.Parameters.Verbose then
-            Put_Line (Routine_Name & "L668 Iteration" &
-                        Integer'Image (Self.Attributes.N_Iter) &
+            Put_Line ("Iteration" & Integer'Image (Self.Attributes.N_Iter) &
                         ", loss = " & Float'Image (Self.Attributes.Loss));
          end if;
 
@@ -641,8 +639,8 @@ package body Multilayer_Perceptron is
       --  the activation values of the ith layer.
       use Base_Neural;
       use Parameters_Package;
---        Routine_Name      : constant String :=
---                                    "Multilayer_Perceptron.Forward_Pass ";
+      --        Routine_Name      : constant String :=
+      --                                    "Multilayer_Perceptron.Forward_Pass ";
       Hidden_Activation : constant Activation_Type :=
                             Self.Parameters.Activation;
       Output_Activation : constant Activation_Type :=
@@ -932,10 +930,10 @@ package body Multilayer_Perceptron is
 
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Real_Float_Matrix is
-      Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
+      --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
-      Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 6);
+      --        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 6);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;
@@ -948,8 +946,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
---        Routine_Name   : constant String :=
---                                 "Multilayer_Perceptron.Process_Batch ";
+      --        Routine_Name   : constant String :=
+      --                                 "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -997,23 +995,23 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Update_Gradients ";
+      --        Routine_Name : constant String :=
+      --                         "Multilayer_Perceptron.Update_Gradients ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
       --  L311
       Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                 Transpose (Params.Coeff_Gradients));
---        Put_Line (Routine_Name & "Activations size" &
---                    Integer'Image (Activations.Element (layer)'Length) &
---                    " x" &
---                    Integer'Image (Activations.Element (layer)'Length (2)));
---        Put_Line (Routine_Name & "Deltas size" &
---                    Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
---                    Integer'Image (Deltas.Element (layer - 1)'Length (2)));
---        Put_Line (Routine_Name & "L312 Activation_Type " &
---                    Activation_Type'Image (Self.Parameters.Activation));
+      --        Put_Line (Routine_Name & "Activations size" &
+      --                    Integer'Image (Activations.Element (layer)'Length) &
+      --                    " x" &
+      --                    Integer'Image (Activations.Element (layer)'Length (2)));
+      --        Put_Line (Routine_Name & "Deltas size" &
+      --                    Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
+      --                    Integer'Image (Deltas.Element (layer - 1)'Length (2)));
+      --        Put_Line (Routine_Name & "L312 Activation_Type " &
+      --                    Activation_Type'Image (Self.Parameters.Activation));
       --  L312
       case Self.Parameters.Activation is
          when Identity_Activation => null;
