@@ -5,6 +5,7 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types; use NL_Types;
 with Encode_Utils;
 with Export_Types;
+with Stochastic_Optimizers;
 
 package Printing is
 
@@ -45,6 +46,8 @@ package Printing is
    procedure Print_Multi_Value_Array (Name    : String;
                                       anArray : Multi_Value_Array);
    procedure Print_Natural_List (Name : String; theList : Natural_List);
+   procedure Print_Parameters
+     (Name : String; Params : Stochastic_Optimizers.Parameters_Record);
    procedure Print_RGB_Array (Name : String; anArray : Export_Types.RGB_Array);
    procedure Print_Slice (Name : String; theSlice : Slice_Record);
    procedure Print_Slices (Name  : String; theList : Slices_List;

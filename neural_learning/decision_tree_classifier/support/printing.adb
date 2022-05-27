@@ -393,7 +393,32 @@ package body Printing is
          end if;
       end loop;
       New_Line;
+
    end Print_Natural_List;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Parameters
+     (Name : String; Params : Stochastic_Optimizers.Parameters_Record) is
+   begin
+      Put_Line (Name & ": ");
+      Put_Line ("Size:" & Integer'Image (Params.Num_Rows) & " x" &
+                  Integer'Image (Params.Num_Cols));
+
+      Put_Line ("Coefficients:");
+      for row in Params.Coeff_Gradients'Range loop
+         for col in Params.Coeff_Gradients'Range (2) loop
+            Put (Float'Image (Params.Coeff_Gradients (row, col)) & " ");
+         end loop;
+         New_Line;
+      end loop;
+
+      Put_Line ("Intercepts:");
+      for col in Params.Intercept_Grads'Range loop
+         Put (Float'Image (Params.Intercept_Grads (col)) & " ");
+      end loop;
+
+   end Print_Parameters;
 
    --  ------------------------------------------------------------------------
 

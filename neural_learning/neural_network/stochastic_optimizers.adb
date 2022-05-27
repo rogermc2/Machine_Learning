@@ -5,6 +5,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
+with Printing;
+
 package body Stochastic_Optimizers is
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
@@ -305,8 +307,8 @@ package body Stochastic_Optimizers is
    function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Grads : Parameters_List)
        return Parameters_List is
-      --          Routine_Name : constant String :=
-      --                           "Stochastic_Optimizers. ";
+      Routine_Name : constant String :=
+                               "Stochastic_Optimizers.Get_SGD_Updates ";
       Velocity     : Parameters_Record := Self.Velocities.First_Element;
       M_V          : Parameters_Record := Self.Velocities.First_Element;
       Layer_Grads  : Parameters_Record := Grads.First_Element;
@@ -326,6 +328,7 @@ package body Stochastic_Optimizers is
       end Do_Update;
 
    begin
+      Printing.Print_Parameters (Routine_Name & "Velocity", Velocity);
       Do_Update;
 
       Self.Velocities := Updates;

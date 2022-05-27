@@ -94,19 +94,13 @@ package body Base_Neural is
 
    procedure Logistic_Derivative (Z   : Real_Float_Matrix;
                                   Del : in out Real_Float_Matrix) is
-      use Real_Float_Arrays;
-      type Matrix_Float is new Real_Float_Matrix (1 .. Z'Length,
-                                                  1 .. Z'Length (2));
-      Prod  : Matrix_Float;
    begin
-      Del := Del * Z;
-      for row in Z'Range loop
-         for col in Z'Range (2) loop
-            Prod (row, col) := 1.0 - Z (row, col);
+      for row in Del'Range loop
+         for col in Del'Range (2) loop
+            Del (row, col) :=
+              Del (row, col) * Z (row, col) * (1.0 - Z (row, col));
          end loop;
       end loop;
-
-      Del := Del * Real_Float_Matrix (Prod);
 
    end Logistic_Derivative;
 
