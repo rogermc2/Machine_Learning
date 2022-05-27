@@ -417,6 +417,7 @@ package body Printing is
       for col in Params.Intercept_Grads'Range loop
          Put (Float'Image (Params.Intercept_Grads (col)) & " ");
       end loop;
+      New_Line;
 
    end Print_Parameters;
 

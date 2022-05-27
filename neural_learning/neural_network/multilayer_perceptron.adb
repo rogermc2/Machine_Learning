@@ -1003,19 +1003,18 @@ package body Multilayer_Perceptron is
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
-      Put_Line (Routine_Name);
       --  L311
       Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                 Transpose (Params.Coeff_Gradients));
-      Put_Line (Routine_Name & "Activations size" &
-                  Integer'Image (Activations.Element (layer)'Length) &
-                  " x" &
-                  Integer'Image (Activations.Element (layer)'Length (2)));
-      Put_Line (Routine_Name & "Deltas size" &
-                  Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
-                  Integer'Image (Deltas.Element (layer - 1)'Length (2)));
-      Put_Line (Routine_Name & "L312 Activation_Type " &
-                  Activation_Type'Image (Self.Parameters.Activation));
+--        Put_Line (Routine_Name & "Activations size" &
+--                    Integer'Image (Activations.Element (layer)'Length) &
+--                    " x" &
+--                    Integer'Image (Activations.Element (layer)'Length (2)));
+--        Put_Line (Routine_Name & "Deltas size" &
+--                    Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
+--                    Integer'Image (Deltas.Element (layer - 1)'Length (2)));
+--        Put_Line (Routine_Name & "L312 Activation_Type " &
+--                    Activation_Type'Image (Self.Parameters.Activation));
       --  L312
       case Self.Parameters.Activation is
          when Identity_Activation => null;
