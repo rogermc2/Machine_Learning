@@ -3,7 +3,12 @@ with NL_Types;
 
 package Load_Dataset is
 
-   procedure Load_Digits (Features, Target : out NL_Types.Value_Data_Lists_2D);
-   procedure Load_Iris (Features, Target : out NL_Types.Value_Data_Lists_2D);
+   type Data_Record is record
+      Features : NL_Types.Float_List_2D;
+      Target   : NL_Types.Integer_List;
+   end record;
+
+   function Load_Digits return Data_Record;
+   function Load_Iris return Data_Record;
 
 end Load_Dataset;
