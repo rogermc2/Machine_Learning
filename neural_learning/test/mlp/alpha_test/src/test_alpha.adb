@@ -18,7 +18,7 @@ procedure Test_Alpha is
     use Stochastic_Optimizers;
 
     --   np.arange(2) means array([0, 1])
-    subtype Alpha_Values is Positive range 1 .. 2;
+    subtype Alpha_Values is Natural range 0 .. 1;
 
     Routine_Name  : constant String := "Test_Alpha ";
     Data          : constant Load_Dataset.Data_Record :=
@@ -79,7 +79,7 @@ begin
     end loop;
 
     New_Line;
-    for index in Alpha_Values'Range loop
+    for index in Alpha_Vectors.First_Index .. Alpha_Vectors.Last_Index loop
         Printing.Print_Float_List
           ("Alpha vector" & Integer'Image (index),
            Alpha_Vectors.Element (index));
