@@ -1,4 +1,4 @@
-
+--  Based on scikit-learn/sklearn/datasets/_base.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
@@ -8,6 +8,14 @@ with Classifier_Utilities;
 
 package body Load_Dataset is
 
+   --  Each Digits datapoint is an 8x8 marix of a digit image.
+   --  =================   ==============
+   --  Classes                         10
+   --  Samples per class             ~180
+   --  Samples total                 1797
+   --  Dimensionality                  64
+   --  Features             integers 0-16
+   --  =================   ==============
    --  Target: num outputs x num classes
    function Load_Digits return Data_Record is
       use Classifier_Utilities;
@@ -43,7 +51,7 @@ package body Load_Dataset is
       --  Digits_Target is 2D list num outputs x num classes
       Data.Features := To_Float_List_2D (Digit_Features);
       Data.Target := To_Integer_List (Digit_Labels);
-
+      Data.Num_Features := Positive (Data.Features.Length);
       return Data;
 
    end Load_Digits;
@@ -75,6 +83,8 @@ package body Load_Dataset is
       Assert (Integer (Iris_Data.Label_Values.Length) = Num_Samples, Routine_Name &
                 " invalid Iris Target vector");
       Data.Features := To_Float_List_2D (Iris_Data.Feature_Values);
+      Data.Num_Features := Positive (Data.Features.Length);
+
       for row in Iris_Labels.First_Index .. Iris_Labels.Last_Index loop
          Iris_Row := Iris_Labels.Element (row);
          if Iris_Row.Element (1).Value_Kind = UB_String_Type then
