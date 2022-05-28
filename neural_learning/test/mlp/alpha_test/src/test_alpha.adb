@@ -9,6 +9,7 @@ with NL_Types;
 with Printing;
 with Stochastic_Optimizers;
 
+--  Test_Alpha tests that larger alpha yields weights closer to zero.
 procedure Test_Alpha is
     use NL_Types.Float_Package;
     use NL_Types.Float_List_Package;
@@ -16,6 +17,7 @@ procedure Test_Alpha is
     use Multilayer_Perceptron;
     use Stochastic_Optimizers;
 
+    --   np.arange(2) means array([0, 1])
     subtype Alpha_Values is Positive range 1 .. 2;
 
     Routine_Name  : constant String := "Test_Alpha ";
@@ -27,11 +29,22 @@ procedure Test_Alpha is
     Y             : Integer_Matrix (1 .. 100, 1 .. 2) :=
                       (others => (others => 0));
     Layer_Sizes   : NL_Types.Integer_List;
-    Absolute_Sum  : Float := 0.0;
-    Sum           : Float := 0.0;
     Coeffs_Sum    : NL_Types.Float_List;
     Alpha_Vectors : NL_Types.Float_List_2D;
     aClassifier   : MLP_Classifier;
+
+    function Absolute_Sum (M : Real_Float_Matrix) return Float is
+        Sum : Float := 0.0;
+    begin
+        for row in M'Range loop
+            for col in M'Range (2) loop
+                Sum := Sum + abs (M (row, col));
+            end loop;
+        end loop;
+
+        return Sum;
+
+    end Absolute_Sum;
 
     --  -------------------------------------------------------------------------
 
@@ -44,14 +57,8 @@ begin
         Y (row, 1) := Data.Target (row);
     end loop;
 
-    for row in X'Range loop
-        for col in X'Range (2) loop
-            Absolute_Sum := Absolute_Sum + abs (X (row, col));
-        end loop;
-    end loop;
-
     Layer_Sizes.Append (10);
-    for alpha_value in 1 .. 3 loop
+    for alpha_value in Alpha_Values'Range loop
         aClassifier := C_Init
           (Alpha => Float (alpha_value), Random_State => 1,
            Hidden_Layer_Sizes => Layer_Sizes);
@@ -59,34 +66,28 @@ begin
         Fit (aClassifier, X, Y);
 
         Coeffs_Sum.Clear;
-        for index in Alpha_Values'Range loop
-            Sum := 0.0;
+        for index in 1 .. 2 loop
             declare
-                Params       : constant Parameters_Record :=
-                                 aClassifier.Attributes.Params.Element (index);
-                Coeff_Matrix : constant Real_Float_Matrix :=
-                                 Params.Coeff_Gradients;
+                Params : constant Parameters_Record :=
+                           aClassifier.Attributes.Params.Element (index);
             begin
-                for row in Coeff_Matrix'Range loop
-                    for col in Coeff_Matrix'Range (2) loop
-                        Sum := Sum + abs (Coeff_Matrix (row, col));
-                    end loop;
-                end loop;
+                Coeffs_Sum.Append (Absolute_Sum (Params.Coeff_Gradients));
             end;
         end loop;
 
-        Coeffs_Sum.Append (Sum);
         Alpha_Vectors.Append (Coeffs_Sum);
     end loop;
 
-    Put_Line ("Alpha_Vectors");
+    New_Line;
     for index in Alpha_Values'Range loop
-        Printing.Print_Float_List ("", Alpha_Vectors.Element (index));
+        Printing.Print_Float_List
+          ("Alpha vector" & Integer'Image (index),
+           Alpha_Vectors.Element (index));
     end loop;
 
---      for index in Alpha_Values'First .. Alpha_Values'Last - 1 loop
---          Assert (Alpha_Vectors.Element (index) >
---                    Alpha_Vectors.Element (index + 1), "");
---      end loop;
+    --      for index in Alpha_Values'First .. Alpha_Values'Last - 1 loop
+    --          Assert (Alpha_Vectors.Element (index) >
+    --                    Alpha_Vectors.Element (index + 1), "");
+    --      end loop;
 
 end Test_Alpha;

@@ -24,7 +24,7 @@ package Printing is
    procedure Print_Float_Array (Name   : String; anArray : Real_Float_Vector;
                                 Start  : Integer := 1;
                                 Finish : Integer := 0);
-   procedure Print_Float_List (Name  : String; theList : Float_List);
+   procedure Print_Float_List (Name    : String; theList : Float_List);
    procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
                                  Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Float_Matrix_Formated
