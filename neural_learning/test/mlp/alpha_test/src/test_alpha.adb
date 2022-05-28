@@ -62,7 +62,7 @@ begin
         aClassifier := C_Init
           (Alpha => Float (alpha_value), Random_State => 1,
            Hidden_Layer_Sizes => Layer_Sizes);
-        --          Init_Optimizer (aClassifier);
+        Init_Optimizer (aClassifier);
         Fit (aClassifier, X, Y);
 
         Coeffs_Sum.Clear;

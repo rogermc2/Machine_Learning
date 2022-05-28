@@ -791,13 +791,13 @@ package body Multilayer_Perceptron is
    end Init_Coeff;
 
    --  ------------------------------------------------------------------------
-   --  L320
+   --  L320  BaseMultilayerPerceptron._initialize
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List) is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
-      --        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
