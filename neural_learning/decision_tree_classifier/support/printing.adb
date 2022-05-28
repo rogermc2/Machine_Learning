@@ -124,7 +124,10 @@ package body Printing is
    procedure Print_Float_List (Name : String; theList : Float_List) is
       Count : Integer := 1;
    begin
-      Put_Line (Name & ": ");
+      if Name'Length > 0 then
+         Put_Line (Name & ": ");
+      end if;
+
       for Index in theList.First_Index .. theList.Last_Index loop
          Put (Integer'Image (Index) & ": " &
                 Float'Image (theList.Element (Index)) & "   ");
@@ -254,6 +257,17 @@ package body Printing is
       end if;
 
    end Print_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Matrix_Dimensions (Name : String;
+                                      aMatrix : Real_Float_Matrix) is
+   begin
+      Put (Name & ": ");
+      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
+      Integer'Image (aMatrix'Length (2)));
+
+   end Print_Matrix_Dimensions;
 
    --  ------------------------------------------------------------------------
 

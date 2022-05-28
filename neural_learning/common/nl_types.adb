@@ -24,6 +24,19 @@ package body NL_Types is
 
    --  ----------------------------------------------------------------------------
 
+   function ">" (L, R : Float_Package.Vector) return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result := Result and L.Element (index) > R.Element (index);
+      end loop;
+
+      return Result;
+
+   end ">";
+
+   --  ----------------------------------------------------------------------------
+
    function "+" (L, R : Float_Package.Vector) return Float_Package.Vector is
       Result : Float_Package.Vector;
    begin
@@ -140,6 +153,19 @@ package body NL_Types is
    end Check_Length;
 
    --  ----------------------------------------------------------------------------
+
+   function ">" (L, R : Float_List_Package.Vector) return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in L.First_Index .. L.Last_Index loop
+         Result := Result and L.Element (index) > R.Element (index);
+      end loop;
+
+      return Result;
+
+   end ">";
+
+   --  -------------------------------------------------------------------------
 
    function "*" (L : Float; R : Float_List_2D) return Float_List_2D is
       List_1D : Float_List;

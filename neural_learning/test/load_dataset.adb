@@ -21,7 +21,7 @@ package body Load_Dataset is
       use Classifier_Utilities;
       Routine_Name   : constant String := "Load_Dataset.Load_Digits ";
       Digits_Data    : constant NL_Types.Multi_Output_Data_Record :=
-                         Load_Data ("digits.csv");
+                         Load_Data ("../../digits.csv");
       Class_Names    : NL_Types.Class_Names_List;
       --          Feature_Names       : NL_Types.Feature_Names_List;
       Digit_Features : constant NL_Types.Value_Data_Lists_2D :=
@@ -51,7 +51,7 @@ package body Load_Dataset is
       --  Digits_Target is 2D list num outputs x num classes
       Data.Features := To_Float_List_2D (Digit_Features);
       Data.Target := To_Integer_List (Digit_Labels);
-      Data.Num_Features := Positive (Data.Features.Length);
+      Data.Num_Features := Positive (Data.Features (1).Length);
       return Data;
 
    end Load_Digits;
@@ -63,7 +63,7 @@ package body Load_Dataset is
       use NL_Types;
       Routine_Name  : constant String := "Load_Dataset.Load_Iris ";
       Iris_Data     : constant NL_Types.Multi_Output_Data_Record :=
-                        Load_Data ("iris.csv");
+                        Load_Data ("../../iris.csv");
       Class_Names   : NL_Types.Class_Names_List;
       --        Features        : NL_Types.Feature_Names_List;
       Iris_Features : constant NL_Types.Value_Data_Lists_2D :=
@@ -83,7 +83,7 @@ package body Load_Dataset is
       Assert (Integer (Iris_Data.Label_Values.Length) = Num_Samples, Routine_Name &
                 " invalid Iris Target vector");
       Data.Features := To_Float_List_2D (Iris_Data.Feature_Values);
-      Data.Num_Features := Positive (Data.Features.Length);
+      Data.Num_Features := Positive (Data.Features (1).Length);
 
       for row in Iris_Labels.First_Index .. Iris_Labels.Last_Index loop
          Iris_Row := Iris_Labels.Element (row);

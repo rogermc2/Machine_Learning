@@ -1,4 +1,5 @@
 
+--  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Load_Dataset;
@@ -9,9 +10,13 @@ with Printing;
 with Stochastic_Optimizers;
 
 procedure Test_Alpha is
+    use NL_Types.Float_Package;
+    use NL_Types.Float_List_Package;
     use Real_Float_Arrays;
     use Multilayer_Perceptron;
     use Stochastic_Optimizers;
+
+    subtype Alpha_Values is Positive range 1 .. 2;
 
     Routine_Name  : constant String := "Test_Alpha ";
     Data          : constant Load_Dataset.Data_Record :=
@@ -52,9 +57,10 @@ begin
            Hidden_Layer_Sizes => Layer_Sizes);
         --          Init_Optimizer (aClassifier);
         Fit (aClassifier, X, Y);
+
         Coeffs_Sum.Clear;
-        Sum := 0.0;
-        for index in 1 .. 2 loop
+        for index in Alpha_Values'Range loop
+            Sum := 0.0;
             declare
                 Params       : constant Parameters_Record :=
                                  aClassifier.Attributes.Params.Element (index);
@@ -73,6 +79,14 @@ begin
         Alpha_Vectors.Append (Coeffs_Sum);
     end loop;
 
-    Printing.Print_Float_List ("Alpha_Vectors 1", Alpha_Vectors.Element (1));
+    Put_Line ("Alpha_Vectors");
+    for index in Alpha_Values'Range loop
+        Printing.Print_Float_List ("", Alpha_Vectors.Element (index));
+    end loop;
+
+--      for index in Alpha_Values'First .. Alpha_Values'Last - 1 loop
+--          Assert (Alpha_Vectors.Element (index) >
+--                    Alpha_Vectors.Element (index + 1), "");
+--      end loop;
 
 end Test_Alpha;
