@@ -260,40 +260,6 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Matrix_Dimensions (Name : String;
-                                      aMatrix : Real_Float_Matrix) is
-   begin
-      Put (Name & ": ");
-      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
-      Integer'Image (aMatrix'Length (2)));
-
-   end Print_Matrix_Dimensions;
-
-   --  ------------------------------------------------------------------------
-
-   procedure Print_Multi_Value_Array (Name    : String;
-                                      anArray : Multi_Value_Array) is
-   begin
-      Put (Name);
-      if anArray'Length > 0 and anArray'First > 0 then
-         Put_Line (": ");
-         for Index in anArray'First .. anArray'Last loop
-            Put_Line (Integer'Image (anArray (Index, 1)) & ",  " &
-                        Integer'Image (anArray (Index, 2)));
-         end loop;
-      elsif anArray'Length = 0 then
-         Put_Line (" is empty.");
-      else
-         raise Print_Error with
-           "Print_Multi_Value_Array called with invalid index: " &
-           Integer'Image (Integer (anArray'First));
-      end if;
-      New_Line;
-
-   end Print_Multi_Value_Array;
-
-   --  ------------------------------------------------------------------------
-
    procedure Print_Indefinite_List (Name    : String;
                                     theList : Indef_String_List) is
       use  Indefinite_String_Package;
@@ -407,6 +373,51 @@ package body Printing is
       New_Line;
 
    end Print_Float_Lists_3D;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Matrix_Dimensions (Name : String;
+                                      aMatrix : Integer_Matrix) is
+   begin
+      Put (Name & ": ");
+      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
+      Integer'Image (aMatrix'Length (2)));
+
+   end Print_Matrix_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Matrix_Dimensions (Name : String;
+                                      aMatrix : Real_Float_Matrix) is
+   begin
+      Put (Name & ": ");
+      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
+      Integer'Image (aMatrix'Length (2)));
+
+   end Print_Matrix_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Multi_Value_Array (Name    : String;
+                                      anArray : Multi_Value_Array) is
+   begin
+      Put (Name);
+      if anArray'Length > 0 and anArray'First > 0 then
+         Put_Line (": ");
+         for Index in anArray'First .. anArray'Last loop
+            Put_Line (Integer'Image (anArray (Index, 1)) & ",  " &
+                        Integer'Image (anArray (Index, 2)));
+         end loop;
+      elsif anArray'Length = 0 then
+         Put_Line (" is empty.");
+      else
+         raise Print_Error with
+           "Print_Multi_Value_Array called with invalid index: " &
+           Integer'Image (Integer (anArray'First));
+      end if;
+      New_Line;
+
+   end Print_Multi_Value_Array;
 
    --  ------------------------------------------------------------------------
 

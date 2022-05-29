@@ -48,6 +48,8 @@ package Printing is
    procedure Print_Float_Lists_3D (Name : String; Data : Float_List_3D);
    procedure Print_Matrix_Dimensions (Name : String;
                                       aMatrix : Real_Float_Matrix);
+   procedure Print_Matrix_Dimensions (Name : String;
+                                      aMatrix : Integer_Matrix);
    procedure Print_Multi_Value_Array (Name    : String;
                                       anArray : Multi_Value_Array);
    procedure Print_Natural_List (Name : String; theList : Natural_List);

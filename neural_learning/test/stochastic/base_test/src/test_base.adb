@@ -1,6 +1,6 @@
 
 --  Based on scikit-learn/sklearn/neural_network/tests/
---  test_stochastic_optimizers.py
+--  test_base.py
 
 --  with Ada.Assertions; use  Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -12,13 +12,12 @@ with Printing;
 with Stochastic_Optimizers;
 with Test_Common;
 
---  Based on  test_adam_optimizer()
-procedure Test_Adam is
+procedure Test_Base is
    use Real_Float_Arrays;
    use Maths.Float_Math_Functions;
    use Stochastic_Optimizers;
    use Test_Common;
-   Routine_Name   : constant String := "Test_Adam ";
+   Routine_Name   : constant String := "Test_Base ";
    Beta_1         : constant Real_Float_Vector (1 .. 3) :=  (0.9, 1.0, 0.05);
    Beta_2         : constant Real_Float_Vector (1 .. 3) := (0.995, 1.0, 0.001);
    LR             : constant Float := 0.001;
@@ -41,7 +40,7 @@ begin
          Coeff     : constant
            Real_Float_Matrix (1 .. Bounds (1), 1 .. Bounds (2))
            := (others =>  (others => 0.0));
-         Ints      : constant Real_Float_Vector (1 .. Bounds (2)) :=
+         Ints      : constant Real_Float_Vector (1 .. Bounds (1)) :=
                        (others => 0.0);
          PR        : Parameters_Record (Bounds (1), Bounds (2));
       begin
@@ -124,10 +123,10 @@ begin
 
          Expected := Params + Updates;
          Update_Params (Adam, Grads, Params);
-         Printing.Print_Float_Matrix ("Expected Coeff_Gradients", Expected (1).Coeff_Gradients);
+         Printing.Print_Float_Matrix ("Expected Coeff_Grads", Expected (1).Coeff_Gradients);
          Printing.Print_Float_Array ("Expected Intercept_Grads", Expected (1).Intercept_Grads);
 
-         Printing.Print_Float_Matrix ("Params Coeff_Gradients", Params (1).Coeff_Gradients);
+         Printing.Print_Float_Matrix ("Params Coeff_Grads", Params (1).Coeff_Gradients);
          Printing.Print_Float_Array ("Params Intercept_Grads", Params (1).Intercept_Grads);
 
          --     for index in Params.First_Index .. Params.Last_Index loop
@@ -140,4 +139,4 @@ begin
       end loop;
    end loop;
 
-end Test_Adam;
+end Test_Base;
