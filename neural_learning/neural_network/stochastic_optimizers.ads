@@ -18,7 +18,7 @@ package Stochastic_Optimizers is
    --  tol or fail to increase the validation score by tol if 'early_stopping'
    --  is on, the current learning rate is divided by five.
 
-   type Optimizer_Type is (No_Optimizer, Optimizer_Adam, Optimizer_SGD);
+   type Optimizer_Type is (No_Optimizer, Optimizer_Adam, Optimizer_Base, Optimizer_SGD);
    type Solver_Type is (Lbfgs_Solver, Sgd_Solver, Adam_Solver);
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
@@ -74,6 +74,7 @@ package Stochastic_Optimizers is
       case Kind is
          when No_Optimizer => null;
          when Optimizer_Adam => Adam : Adam_Optimizer;
+         when Optimizer_Base => Base : Base_Optimizer;
          when Optimizer_SGD => SGD   : SGD_Optimizer;
       end case;
    end record;
@@ -83,7 +84,7 @@ package Stochastic_Optimizers is
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
-                     Epsilon               : Float);
+                     Epsilon               : Float := 10.0 ** (-8));
    procedure C_Init (Self                  : out SGD_Optimizer;
                      Params                : Parameters_List;
                      Initial_Learning_Rate : Float := 0.1;
@@ -95,6 +96,9 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
+
+   procedure C_Init (Self                  : out Base_Optimizer;
+                     Initial_Learning_Rate : Float := 0.1);
    function Square (Rec : Parameters_Record) return Parameters_Record;
    function Sqrt (Rec : Parameters_Record) return Parameters_Record;
    function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
