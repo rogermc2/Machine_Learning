@@ -16,10 +16,10 @@ begin
    Put_Line (Routine_Name);
    for lr in -3 .. 4 loop
       C_Init (Opt, 10.0 ** lr);
+        Assert (Trigger_Stopping (Opt_Record, "Trigger_Stopping state:", False),
+                "Test_Base failed for learning rate " & Integer'Image (lr));
    end loop;
 
-   Assert (Trigger_Stopping (Opt_Record, "Trigger_Stopping state:", True),
-          "Test_Base failed");
    Put_Line ("Test_Base passed");
 
 end Test_Base;
