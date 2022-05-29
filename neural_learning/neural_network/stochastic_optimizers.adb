@@ -69,49 +69,6 @@ package body Stochastic_Optimizers is
 
    --  ------------------------------------------------------------------------
 
-   function "-" (L, R : Parameters_Record) return Parameters_Record is
-      Minus : Parameters_Record := L;
-   begin
-      for row in Minus.Coeff_Gradients'Range loop
-         for col in Minus.Coeff_Gradients'Range (2) loop
-            Minus.Coeff_Gradients (row, col) :=
-              Minus.Coeff_Gradients (row, col) - R.Coeff_Gradients (row, col);
-         end loop;
-      end loop;
-
-      for row in Minus.Intercept_Grads'Range loop
-         Minus.Intercept_Grads (row) :=
-           Minus.Intercept_Grads (row) - R.Intercept_Grads (row);
-      end loop;
-
-      return Minus;
-
-   end "-";
-   pragma Inline ("-");
-
-   --  ------------------------------------------------------------------------
-
-   function "*" (L : Float; R : Parameters_Record) return Parameters_Record is
-      Product : Parameters_Record := R;
-   begin
-      for row in Product.Coeff_Gradients'Range loop
-         for col in Product.Coeff_Gradients'Range (2) loop
-            Product.Coeff_Gradients (row, col) :=
-              L * Product.Coeff_Gradients (row, col);
-         end loop;
-      end loop;
-
-      for row in Product.Intercept_Grads'Range loop
-         Product.Intercept_Grads (row) := L * Product.Intercept_Grads (row);
-      end loop;
-
-      return Product;
-
-   end "*";
-   pragma Inline ("*");
-
-   --  ------------------------------------------------------------------------
-
    function Square (Rec : Parameters_Record) return Parameters_Record is
       Result : Parameters_Record := Rec;
    begin
@@ -153,6 +110,26 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
+   function "*" (L : Float; R : Parameters_Record) return Parameters_Record is
+      Result  : Parameters_Record := R;
+   begin
+      for row in Result.Coeff_Gradients'Range loop
+         for col in Result.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              L * R.Coeff_Gradients (row, col);
+         end loop;
+      end loop;
+
+      for row in Result.Intercept_Grads'Range loop
+         Result.Intercept_Grads (row) := L * R.Intercept_Grads (row);
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  -------------------------------------------------------------------------
+
    function "/" (L, R : Parameters_Record) return Parameters_Record is
       Result  : Parameters_Record := L;
    begin
@@ -171,7 +148,27 @@ package body Stochastic_Optimizers is
       return Result;
 
    end "/";
-   pragma Inline ("/");
+
+   --  -------------------------------------------------------------------------
+
+   function "-" (L, R : Parameters_Record) return Parameters_Record is
+      Result  : Parameters_Record := L;
+   begin
+      for row in Result.Coeff_Gradients'Range loop
+         for col in Result.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              Result.Coeff_Gradients (row, col) - R.Coeff_Gradients (row, col);
+         end loop;
+      end loop;
+
+      for row in Result.Intercept_Grads'Range loop
+         Result.Intercept_Grads (row) :=
+           Result.Intercept_Grads (row) - R.Intercept_Grads (row);
+      end loop;
+
+      return Result;
+
+   end "-";
 
    --  -------------------------------------------------------------------------
 
@@ -444,12 +441,23 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    procedure Update_Params (Self   : in out Adam_Optimizer;
-                            Grads  : Parameters_List;
-                            Params : in out Parameters_List) is
+                            Params : in out Parameters_List;
+                            Grads  : Parameters_List) is
       --          Routine_Name : constant String := "Stochastic_Optimizers.Update_Params Adam ";
 
    begin
       Params := Params + Get_Adam_Updates (Self, Grads);
+
+   end Update_Params;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Update_Params (Self   : in out SGD_Optimizer;
+                            Params : in out Parameters_List;
+                            Grads  : Parameters_List) is
+
+   begin
+      Params := Params + Get_SGD_Updates (Self, Grads);
 
    end Update_Params;
 

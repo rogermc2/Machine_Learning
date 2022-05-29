@@ -26,12 +26,17 @@ package Stochastic_Optimizers is
       Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
       Intercept_Grads : Real_Float_Vector (1 .. Num_Cols);
    end record;
+   function "*" (L : Float; R : Parameters_Record) return Parameters_Record;
+   pragma Inline ("*");
+   function "-" (L, R : Parameters_Record) return Parameters_Record;
+   pragma Inline ("-");
 
    package Parameters_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Parameters_Record);
    subtype Parameters_List is Parameters_Package.Vector;
    subtype Moments_List is Parameters_Package.Vector;
    function "+" (L, R : Parameters_List) return Parameters_List;
+   pragma Inline ("+");
 
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
@@ -107,7 +112,10 @@ package Stochastic_Optimizers is
                             Params : in out Parameters_List;
                             Grads  : Parameters_List);
    procedure Update_Params (Self   : in out Adam_Optimizer;
-                            Grads  : Parameters_List;
-                            Params : in out Parameters_List);
+                            Params : in out Parameters_List;
+                            Grads  : Parameters_List);
+   procedure Update_Params (Self   : in out SGD_Optimizer;
+                            Params : in out Parameters_List;
+                            Grads  : Parameters_List);
 
 end Stochastic_Optimizers;
