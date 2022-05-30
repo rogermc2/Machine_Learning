@@ -128,10 +128,14 @@ begin
 
             Put_Line ("b1, b2:" & Integer'Image (b1) & ", "  & Integer'Image (b2));
             if b1 = 2 then
-                Printing.Print_Float_Matrix ("Coeff_Gradients errors",
-                                             Params (1).Coeff_Gradients - Expected (1).Coeff_Gradients);
-                Printing.Print_Float_Array (" Intercept_Grads errors",
-                                            Params (1).Intercept_Grads - Expected (1).Intercept_Grads);
+                Printing.Print_Float_Matrix ("Coeff_Gradients",
+                                             Params (1).Coeff_Gradients);
+                Printing.Print_Float_Array (" Intercept_Grads",
+                                            Params (1).Intercept_Grads);
+                Printing.Print_Float_Matrix ("Expected Coeff_Gradients",
+                                             Expected (1).Coeff_Gradients);
+                Printing.Print_Float_Array (" Expected Intercept_Grads",
+                                            Expected (1).Intercept_Grads);
             end if;
             --     for index in Params.First_Index .. Params.Last_Index loop
             --        Assert (Params (index) = Expected (index), Routine_Name &
