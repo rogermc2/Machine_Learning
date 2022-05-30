@@ -72,7 +72,7 @@ begin
             Params : constant Parameters_Record :=
                        aClassifier.Attributes.Params.Element (index);
          begin
-            Printing.Print_Parameters ("Params", Params);
+            Printing.Print_Parameters ("Params", Params, 1, 4);
             Coeffs_Sum.Append (Absolute_Sum (Params.Coeff_Gradients));
          end;
       end loop;
