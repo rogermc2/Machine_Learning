@@ -25,23 +25,7 @@ procedure No_Momentum_SGD_Test is
    Learn_Rate   : Float;
 begin
    Put_Line (Routine_Name);
-   Test_Common.Init;
-   for shape in Shapes.First_Index .. Shapes.Last_Index loop
-
-      declare
-         Bounds    : constant Integer_Array := Shapes.Element (shape);
-         Coeff     : constant
-           Real_Float_Matrix (1 .. Bounds (1), 1 .. Bounds (2))
-           := (others =>  (others => 0.0));
-         Ints      : constant Real_Float_Vector (1 .. Bounds (2)) :=
-                       (others => 0.0);
-         PR        : Parameters_Record (Bounds (1), Bounds (2));
-      begin
-         PR.Coeff_Gradients := Coeff;
-         PR.Intercept_Grads := Ints;
-         Params.Append (PR);
-      end;
-   end loop;
+   Test_Common.Init (Params);
 
    for lr in -3 .. 4 loop
 --        Put_Line ("Learning rate: " & Integer'Image (lr));
