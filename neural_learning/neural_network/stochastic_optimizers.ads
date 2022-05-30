@@ -108,14 +108,14 @@ package Stochastic_Optimizers is
    function Sqrt (Rec : Parameters_Record) return Parameters_Record;
    function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
                               Verbose : Boolean) return Boolean;
-   procedure Update_Params (Self   : in out Optimizer_Record;
-                            Params : in out Parameters_List;
-                            Grads  : Parameters_List);
-   procedure Update_Params (Self   : in out Adam_Optimizer;
-                            Params : in out Parameters_List;
-                            Grads  : Parameters_List);
-   procedure Update_Params (Self   : in out SGD_Optimizer;
-                            Params : in out Parameters_List;
-                            Grads  : Parameters_List);
+   procedure Update_Params (Self      : in out Optimizer_Record;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List);
+   procedure Update_Params (Self      : in out Adam_Optimizer;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List);
+   procedure Update_Params (Self      : in out SGD_Optimizer;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List);
 
 end Stochastic_Optimizers;
