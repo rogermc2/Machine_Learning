@@ -105,7 +105,8 @@ package Stochastic_Optimizers is
    procedure C_Init (Self                  : out Base_Optimizer;
                      Initial_Learning_Rate : Float := 0.1);
    function Square (Rec : Parameters_Record) return Parameters_Record;
-   function Sqrt (Rec : Parameters_Record) return Parameters_Record;
+   function Sqrt (Rec : Parameters_Record; Epsilon : Float := 0.0)
+      return Parameters_Record;
    function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
                               Verbose : Boolean) return Boolean;
    procedure Update_Params (Self      : in out Optimizer_Record;

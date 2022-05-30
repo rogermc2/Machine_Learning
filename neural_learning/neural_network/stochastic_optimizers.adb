@@ -89,14 +89,15 @@ package body Stochastic_Optimizers is
 
     --  -------------------------------------------------------------------------
 
-    function Sqrt (Rec : Parameters_Record) return Parameters_Record is
+    function Sqrt (Rec : Parameters_Record; Epsilon : Float := 0.0)
+    return Parameters_Record is
         use Maths.Float_Math_Functions;
         Result : Parameters_Record := Rec;
     begin
         for row in Rec.Coeff_Gradients'Range loop
             for col in Rec.Coeff_Gradients'Range (2) loop
                 Result.Coeff_Gradients (row, col) :=
-                  Sqrt (Rec.Coeff_Gradients (row, col));
+                  Sqrt (Rec.Coeff_Gradients (row, col)) + Epsilon;
             end loop;
         end loop;
 
