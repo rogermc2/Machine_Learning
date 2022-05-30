@@ -28,6 +28,8 @@ package Stochastic_Optimizers is
    end record;
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record;
    pragma Inline ("*");
+   function "/" (L, R : Parameters_Record) return Parameters_Record;
+   pragma Inline ("/");
    function "-" (L, R : Parameters_Record) return Parameters_Record;
    pragma Inline ("-");
 
