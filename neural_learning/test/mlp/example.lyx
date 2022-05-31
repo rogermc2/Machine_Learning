@@ -1,0 +1,225 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 15mm
+\topmargin 10mm
+\rightmargin 10mm
+\bottommargin 15mm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 2
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+# Manually worked out example
+\end_layout
+
+\begin_layout LyX-Code
+h1 = g(X1 * W_i1 + b11) = g(0.6 * 0.1 + 0.8 * 0.3 + 0.7 * 0.5 + 0.1)= 0.679178699175393
+\end_layout
+
+\begin_layout LyX-Code
+h2 = g(X2 * W_i2 + b12) = g(0.6 * 0.2 + 0.8 * 0.1 + 0.7 * 0 + 0.1) = 0.574442516811659
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+o1 = g(h * W2 + b21) = g(0.679 * 0.1 + 0.574 * 0.2 + 1) = 0.7654329236196236
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+d21 = -(0 - 0.765) = 0.765
+\end_layout
+
+\begin_layout LyX-Code
+d11 = (1 - 0.679) * 0.679 * 0.765 * 0.1 = 0.01667
+\end_layout
+
+\begin_layout LyX-Code
+d12 = (1 - 0.574) * 0.574 * 0.765 * 0.2 = 0.0374
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+W1grad11 = X1 * d11 + alpha * W11 = 0.6 * 0.01667 + 0.1 * 0.1 = 0.0200
+\end_layout
+
+\begin_layout LyX-Code
+W1grad11 = X1 * d12 + alpha * W12 = 0.6 * 0.0374 + 0.1 * 0.2 = 0.04244
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+W1grad21 = X2 * d11 + alpha * W13 = 0.8 * 0.01667 + 0.1 * 0.3 = 0.043336
+\end_layout
+
+\begin_layout LyX-Code
+W1grad22 = X2 * d12 + alpha * W14 = 0.8 * 0.0374 + 0.1 * 0.1 = 0.03992
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+W1grad31 = X3 * d11 + alpha * W15 = 0.6 * 0.01667 + 0.1 * 0.5 = 0.060002
+\end_layout
+
+\begin_layout LyX-Code
+W1grad32 = X3 * d12 + alpha * W16 = 0.6 * 0.0374 + 0.1 * 0 = 0.02244
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+W2grad1 = h1 * d21 + alpha * W21 = 0.679 * 0.765 + 0.1 * 0.1 = 0.5294
+\end_layout
+
+\begin_layout LyX-Code
+W2grad2 = h2 * d21 + alpha * W22 = 0.574 * 0.765 + 0.1 * 0.2 = 0.45911
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+b1grad1 = d11 = 0.01667
+\end_layout
+
+\begin_layout LyX-Code
+b1grad2 = d12 = 0.0374
+\end_layout
+
+\begin_layout LyX-Code
+b2grad = d21 = 0.765
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout LyX-Code
+W1 = W1 - eta * [W1grad11, .., W1grad32]
+\end_layout
+
+\begin_layout LyX-Code
+= [[0.1, 0.2], [0.3, 0.1], [0.5, 0]] -
+\end_layout
+
+\begin_layout LyX-Code
+0.1 * [[0.0200, 0.04244], [0.043336, 0.03992], [0.060002, 0.02244]]
+\end_layout
+
+\begin_layout LyX-Code
+= [[0.098, 0.195756], [0.2956664, 0.096008], [0.4939998, -0.002244]]
+\end_layout
+
+\begin_layout LyX-Code
+W2 = W2 - eta * [W2grad1, W2grad2] 
+\end_layout
+
+\begin_layout LyX-Code
+= [[0.1], [0.2]] - 0.1 *[[0.5294], [0.45911]] = [[0.04706], [0.154089]]
+\end_layout
+
+\begin_layout LyX-Code
+b1 = b1 - eta * [b1grad1, b1grad2]
+\end_layout
+
+\begin_layout LyX-Code
+= 0.1 - 0.1 * [0.01667, 0.0374] = [0.098333, 0.09626]
+\end_layout
+
+\begin_layout LyX-Code
+b2 = b2 - eta * b2grad = 1.0 - 0.1 * 0.765 = 0.9235
+\end_layout
+
+\end_body
+\end_document
