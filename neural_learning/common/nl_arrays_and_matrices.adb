@@ -264,6 +264,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix is
+      Result : Boolean_Matrix (IM'Range, IM'Range (2));
+   begin
+      for row in Result'Range loop
+         for col in Result'Range (2) loop
+            Result (row, col) := IM (row,col) /= 0;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end To_Boolean_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
                                   return Real_Float_Matrix is
    begin
@@ -318,22 +333,6 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
-   function To_Real_Float_Matrix (IM : Integer_Matrix)
-                                  return Real_Float_Matrix is
-      Result : Real_Float_Matrix (1 .. IM'Length, 1 .. IM'Length (2));
-   begin
-      for row in IM'First .. IM'Last loop
-         for col in IM'First (2) .. IM'Last (2) loop
-            Result (row, col) := Float (IM (row, col));
-         end loop;
-      end loop;
-
-      return Result;
-
-   end To_Real_Float_Matrix;
-
-   --  ------------------------------------------------------------------------
-
    function To_Natural_Array (List : NL_Types.Natural_List)
                               return Natural_Array is
    begin
@@ -354,6 +353,42 @@ package body NL_Arrays_And_Matrices is
          end;
       end if;
    end To_Natural_Array;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Matrix (BM : Boolean_Matrix)
+                                  return Real_Float_Matrix is
+      Result : Real_Float_Matrix (BM'Range, BM'Range (2));
+   begin
+      for row in BM'Range loop
+         for col in BM'Range (2) loop
+            if BM (row, col) then
+               Result (row, col) := 1.0;
+            else
+               Result (row, col) := 0.0;
+            end if;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end To_Real_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Matrix (IM : Integer_Matrix)
+                                  return Real_Float_Matrix is
+      Result : Real_Float_Matrix (IM'Range, IM'Range (2));
+   begin
+      for row in IM'Range loop
+         for col in IM'Range (2) loop
+            Result (row, col) := Float (IM (row, col));
+         end loop;
+      end loop;
+
+      return Result;
+
+   end To_Real_Float_Matrix;
 
    --  ------------------------------------------------------------------------
 

@@ -45,7 +45,7 @@ with Base;
 with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
---  with Printing;
+with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -93,9 +93,9 @@ package body Multilayer_Perceptron is
                                Gradients          : in out Parameters_List;
                                Layer, Num_Samples : Positive);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
-   function Validate_Input (Self        : in out MLP_Classifier;
-                            Y           : Integer_Matrix;
-                            Incremental : Boolean) return Boolean_Matrix;
+--     function Validate_Input (Self        : in out MLP_Classifier;
+--                              Y           : Integer_Matrix;
+--                              Incremental : Boolean) return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
    --  L241  Backprop computes the MLP loss function and its derivatives
@@ -112,12 +112,16 @@ package body Multilayer_Perceptron is
       use Parameters_Package;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+      Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
+      Y_Float            : constant Real_Float_Matrix :=
+                             To_Real_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function;
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float;
    begin
+      Printing.Print_Float_Matrix (Routine_Name & "Activations last",
+                                   Activations.Last_Element);
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -174,7 +178,11 @@ package body Multilayer_Perceptron is
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       Deltas.Replace_Element (Deltas.Last_Index,
-                              Activations.Last_Element - Y);
+                              Activations.Last_Element - Y_Float);
+      Printing.Print_Float_Matrix (Routine_Name & "L304 Activations last",
+                                   Activations.Last_Element);
+      Printing.Print_Float_Matrix (Routine_Name & "L304 Deltas last",
+                                   Deltas.Last_Element);
 
       --  L304  Compute gradient for the last layer
       --        Put_Line (Routine_Name & "Y size" &
@@ -183,10 +191,17 @@ package body Multilayer_Perceptron is
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
 
+      Printing.Print_Float_Matrix (Routine_Name & "L308 Deltas last",
+                                   Deltas.Last_Element);
       --  L310, L308
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Update_Gradients (Self, Activations, Deltas, Gradients, layer,
                            Num_Samples);
+      end loop;
+
+      for index in Deltas.First_Index .. Deltas.Last_Index loop
+         Printing.Print_Float_Matrix ("Deltas " & Integer'Image (index),
+                                     Deltas (index));
       end loop;
 
    end Backprop;
@@ -380,13 +395,13 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      --          Routine_Name       : constant String :=
-      --                                 "Multilayer_Perceptron.Fit ";
+--        Routine_Name       : constant String :=
+--                                 "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
-      Y_Bin              : constant Boolean_Matrix :=
-                             Validate_Input (Self, Y, Incremental);
+      Y_Bin              : constant Boolean_Matrix := To_Boolean_Matrix (Y);
+--                               Validate_Input (Self, Y, Incremental);
       Layer_Units        : NL_Types.Integer_List;
    begin
       Validate_Hyperparameters (Self);
@@ -639,8 +654,8 @@ package body Multilayer_Perceptron is
       --  the activation values of the ith layer.
       use Base_Neural;
       use Parameters_Package;
-      --        Routine_Name      : constant String :=
-      --                                    "Multilayer_Perceptron.Forward_Pass ";
+      Routine_Name      : constant String :=
+                             "Multilayer_Perceptron.Forward_Pass ";
       Hidden_Activation : constant Activation_Type :=
                             Self.Parameters.Activation;
       Output_Activation : constant Activation_Type :=
@@ -648,6 +663,8 @@ package body Multilayer_Perceptron is
       Num_Layers        : constant Positive := Self.Attributes.N_Layers;
    begin
       --  L130
+      Printing.Print_Float_Matrix (Routine_Name & "Activations last",
+                                   Activations.Last_Element);
       for layer in 1 .. Num_Layers - 1 loop
          declare
             use Real_Float_Arrays;
@@ -673,6 +690,8 @@ package body Multilayer_Perceptron is
          end;  --  declare
       end loop;
 
+      Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
+                                   Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
@@ -684,6 +703,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
+      Printing.Print_Float_Matrix (Routine_Name & "Activations last out",
+                                   Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
@@ -694,8 +715,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Parameters_Package;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Forward_Pass_Fast ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Forward_Pass_Fast ";
       Hidden_Activation  : constant Activation_Type :=
                              Self.Parameters.Activation;
       Output_Activation  : constant Activation_Type :=
@@ -737,8 +758,8 @@ package body Multilayer_Perceptron is
 
       Activ_Out := Activations.Last_Element;
       --  L172
-      --        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
-      --                                     Activ_Out, 1, 2);
+--        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
+--                                      Activ_Out, 1, 2);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation => Logistic (Activ_Out);
@@ -747,8 +768,7 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
-      --        Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 2);
-      --        Printing.Print_Float_Matrix (Routine_Name & "Activ_O
+--        Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 2);
       return Activ_Out;
 
    end Forward_Pass_Fast;
@@ -1096,38 +1116,39 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1125  MLPClassifier._validate_input
-   function Validate_Input (Self        : in out MLP_Classifier; Y : Integer_Matrix;
-                            Incremental : Boolean) return Boolean_Matrix is
-      use Ada.Containers;
-      use NL_Types.Integer_Package;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Validate_Input ";
-      Classes      : NL_Types.Integer_List;
-      Binarizer    : Label.Label_Binarizer;
-   begin
-      if Self.Attributes.Classes.Is_Empty and then
-        Self.Parameters.Warm_Start and then Incremental then
-         Classes := Multiclass_Utils.Unique_Labels (Y);
-         if Self.Parameters.Warm_Start then
-            Assert (Classes = Self.Attributes.Classes,
-                    Routine_Name & "warm_start cannot be used if Y has" &
-                      " different classes as in the previous call to fit.");
-         end if;
-         Assert (Classes.Length = Self.Attributes.Classes.Length,
-                 Routine_Name & "Y and  Self.Classes do not have the same"
-                 & "number of classes.");
-      else
-         Label.Fit (Binarizer, Y);
-         Self.Attributes.Binarizer := Binarizer;
-         Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
-      end if;
-
-      --        Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
-      --                    Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
-
-      return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
-
-   end Validate_Input;
+--     function Validate_Input (Self        : in out MLP_Classifier;
+--                              Y           : Integer_Matrix;
+--                              Incremental : Boolean) return Boolean_Matrix is
+--        use Ada.Containers;
+--        use NL_Types.Integer_Package;
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Validate_Input ";
+--        Classes      : NL_Types.Integer_List;
+--        Binarizer    : Label.Label_Binarizer;
+--     begin
+--        if Self.Attributes.Classes.Is_Empty and then
+--          Self.Parameters.Warm_Start and then Incremental then
+--           Classes := Multiclass_Utils.Unique_Labels (Y);
+--           if Self.Parameters.Warm_Start then
+--              Assert (Classes = Self.Attributes.Classes,
+--                      Routine_Name & "warm_start cannot be used if Y has" &
+--                        " different classes as in the previous call to fit.");
+--           end if;
+--           Assert (Classes.Length = Self.Attributes.Classes.Length,
+--                   Routine_Name & "Y and  Self.Classes do not have the same"
+--                   & "number of classes.");
+--        else
+--           Label.Fit (Binarizer, Y);
+--           Self.Attributes.Binarizer := Binarizer;
+--           Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+--        end if;
+--
+--        --        Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
+--        --                    Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
+--
+--        return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
+--
+--     end Validate_Input;
 
    --  -------------------------------------------------------------------------
 
