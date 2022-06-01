@@ -271,4 +271,33 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (Values : Real_Float_Matrix) return NL_Types.Float_List is
+      use Float_Sets;
+      use NL_Types.Float_Sorting;
+      Float_Value   : Float;
+      Unique_Floats : Float_Sets.Set;
+      Float_Curs    : Float_Sets.Cursor;
+      Uniq_List     : NL_Types.Float_List;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_Floats.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      Float_Curs := Unique_Floats.First;
+      while Float_Sets.Has_Element (Float_Curs) loop
+         Float_Value := Float_Sets.Element (Float_Curs);
+         Uniq_List.Append (Float_Value);
+         Float_Sets.Next (Float_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
 end Encode_Utils;

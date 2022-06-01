@@ -10,9 +10,11 @@ package Multiclass_Utils is
    type Label_Type is (Unique_Binary, Unique_Multiclass,
                        Unique_Mutilabel_Indicator);
 
+   function Is_Multilabel (Y : Real_Float_Matrix) return Boolean;
    function Type_Of_Target (Y : Boolean_Matrix) return Y_Type;
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
    function Type_Of_Target (Y : Real_Float_Matrix) return Y_Type;
    function Unique_Labels (Y : Integer_Matrix) return NL_Types.Integer_List;
+   function Unique_Labels (Y : Real_Float_Matrix) return NL_Types.Float_List;
 
 end Multiclass_Utils;

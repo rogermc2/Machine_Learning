@@ -90,7 +90,7 @@ Declarations
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula $X1=\begin{bmatrix}\begin{bmatrix}0.6 & 0.8 & 0.7\end{bmatrix}\end{bmatrix}$
+\begin_inset Formula $X=\begin{bmatrix}\begin{bmatrix}0.6 & 0.8 & 0.7\end{bmatrix}\end{bmatrix}$
 \end_inset
 
 
@@ -189,6 +189,32 @@ Forward Pass
 
 \begin_layout Standard
 Layer 1:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+X1 & = & X\left(1\right)=\begin{bmatrix}0.6 & 0.8 & 0.7\end{bmatrix}\\
+X2 & = & X1
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $h=\left[h_{1},h_{2}\right]$
+\end_inset
+
+ represents the output of activity function 
+\begin_inset Formula $g$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
 \begin_inset Formula 
 \begin{eqnarray*}
 h_{1} & = & g(X1*W_{i,1}+b1_{1})\\
@@ -204,6 +230,14 @@ h_{1} & = & g(X1*W_{i,1}+b1_{1})\\
 h_{2} & = & g(X2*W_{i,2}+b1_{2})\\
  & = & g(0.6*0.2+0.8*0.1+0.7*0+0.1)\\
  & = & 0.574442516811659
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+h & = & \begin{bmatrix}h_{1} & h_{2}\end{bmatrix}=\begin{bmatrix}0.679 & 0.574\end{bmatrix}
 \end{eqnarray*}
 
 \end_inset

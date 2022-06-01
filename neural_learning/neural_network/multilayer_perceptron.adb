@@ -650,8 +650,9 @@ package body Multilayer_Perceptron is
     --  the output layer.
     procedure Forward_Pass (Self        : MLP_Classifier;
                             Activations : in out Real_Matrix_List) is
-    --  The ith element of Activations (length n_layers - 1) holds
-    --  the activation values of the ith layer.
+    --  Activations: layers x samples x features
+    --  The ith element of Activations (length n_layers - 1) holds the
+    --  activation values of the ith layer.
         use Base_Neural;
         use Parameters_Package;
         Routine_Name      : constant String :=
@@ -662,32 +663,63 @@ package body Multilayer_Perceptron is
                               Self.Attributes.Out_Activation;
         Num_Layers        : constant Positive := Self.Attributes.N_Layers;
     begin
+       Put_Line (Routine_Name & "Solver type "
+                 & Solver_Type'Image (Self.Parameters.Solver));
         --  L130
-        Printing.Print_Float_Matrix (Routine_Name & "Activations last",
-                                     Activations.Last_Element);
         for layer in 1 .. Num_Layers - 1 loop
             declare
                 use Real_Float_Arrays;
                 Params             : constant Parameters_Record :=
                                        Self.Attributes.Params (layer);
-                Activat_Dot_Coeff  : constant Real_Float_Matrix :=
-                                       Activations (layer) * Params.Coeff_Gradients;
+                --  L131
+                Activat_Dot_Coeff  : constant Real_Float_Matrix
+                  := Activations (layer) * Params.Coeff_Gradients;
             begin
-                --  L131 Add layer + 1
+                Printing.Print_Float_Matrix
+                  (Routine_Name & "L131 layer" & Integer'Image (layer) &
+                     " Activations", Activations (layer));
+                Printing.Print_Float_Matrix
+                  (Routine_Name & "L131 Coeff_Gradients",
+                  Params.Coeff_Gradients);
+                Printing.Print_Float_Matrix
+                  (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
+                --  L132 Add layer + 1
                 Activations.Append (Activat_Dot_Coeff + Params.Intercept_Grads);
+                Put_Line (Routine_Name &
+                            "L132 Activations.Last_Index = layer + 1 " &
+                            Boolean'Image (Activations.Last_Index = layer + 1));
+                Printing.Print_Float_Matrix
+                  (Routine_Name & "L132 Added Activations",
+                    Activations.Last_Element);
+                Put_Line (Routine_Name & "L132 layer + 1 =" &
+                            Integer'Image (layer + 1));
 
                 --  L134 For the hidden layers
                 if layer /= Num_Layers - 1 then
+                    Put_Line (Routine_Name & "L134 hidden activation function "
+                               & Activation_Type'Image (Hidden_Activation));
                     case Hidden_Activation is
                     when Identity_Activation => null;
                     when Logistic_Activation =>
-                        Logistic (Activations (layer + 1));
-                    when Tanh_Activation => Tanh (Activations (layer + 1));
-                    when Rect_LU_Activation => Rect_LU (Activations (layer + 1));
-                    when Softmax_Activation => Softmax (Activations (layer + 1));
+                        Logistic (Activations (Activations.Last_Index));
+                    when Tanh_Activation =>
+                        Tanh (Activations (Activations.Last_Index));
+                    when Rect_LU_Activation =>
+                        Rect_LU (Activations (Activations.Last_Index));
+                    when Softmax_Activation =>
+                        Softmax (Activations (Activations.Last_Index));
                     end case;
+                    Printing.Print_Float_Matrix
+                      (Routine_Name & "L134 layer" &
+                         Integer'Image (Activations.Last_Index)
+                           & " Activations (last)", Activations.Last_Element);
                 end if;
             end;  --  declare
+            Printing.Print_Float_Matrix
+                      (Routine_Name & "L135 layer" &
+                         Integer'Image (Activations.Last_Index) &
+                         " Activations (last)", Activations.Last_Element);
+            New_Line;
         end loop;
 
         Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
@@ -698,12 +730,13 @@ package body Multilayer_Perceptron is
             when Logistic_Activation =>
                 Logistic (Activations (Activations.Last_Index));
             when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
-            when Rect_LU_Activation => Rect_LU (Activations (Activations.Last_Index));
+            when Rect_LU_Activation =>
+                Rect_LU (Activations (Activations.Last_Index));
             when Softmax_Activation =>
                 Softmax (Activations (Activations.Last_Index));
         end case;
 
-        Printing.Print_Float_Matrix (Routine_Name & "Activations last out",
+        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
                                      Activations.Last_Element);
     end Forward_Pass;
 
@@ -951,7 +984,8 @@ package body Multilayer_Perceptron is
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Real_Float_Matrix is
     --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
-        Y_Pred         : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
+        Y_Pred         : constant Real_Float_Matrix :=
+                           Forward_Pass_Fast (Self, X);
     begin
         --        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 6);
         return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
@@ -959,7 +993,7 @@ package body Multilayer_Perceptron is
     end Predict;
 
     --  -------------------------------------------------------------------------
-
+    --  L637
     procedure Process_Batch (Self             : in out MLP_Classifier;
                              X                : Real_Float_Matrix;
                              Y                : Boolean_Matrix;
@@ -970,6 +1004,7 @@ package body Multilayer_Perceptron is
     --                                 "Multilayer_Perceptron.Process_Batch ";
         Num_Features   : constant Positive := Positive (X'Length (2));
         Num_Classes    : constant Positive := Y'Length (2);
+        --  X_Batch: samples x features
         X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
         Y_Batch        : Boolean_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
         --  Activations: layers x samples x features
@@ -989,9 +1024,10 @@ package body Multilayer_Perceptron is
             end loop;
         end loop;
 
-        --  L645  Initialize Activations
+        --  L644  Initialize Activations
         Activations.Clear;
         Activations.Append (X_Batch);
+        --  L645
         Forward_Pass (Self, Activations);
         Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
 
