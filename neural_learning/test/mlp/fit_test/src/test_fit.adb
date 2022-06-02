@@ -1,4 +1,5 @@
 
+--  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Neural;
@@ -89,5 +90,11 @@ begin
     Coeff2_Error :=
       abs (Coeff2_Test - Params.Element (2).Coeff_Gradients);
     Printing.Print_Float_Matrix_Formated ("Coeffs (2) errors", Coeff2_Error, 3);
+
+--      Assert (Coeff1_Test = Params.Element (1).Coeff_Gradients,
+--              "Coeffs (1) Test failed");
+--      Assert (Coeff2_Test = Params.Element (2).Coeff_Gradients,
+--              "Coeffs (2) Test failed");
+--      Put_Line ("Coeffs tests passed");
 
 end Test_Fit;
