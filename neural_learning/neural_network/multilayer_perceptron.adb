@@ -968,11 +968,9 @@ package body Multilayer_Perceptron is
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
       Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
       use Label;
-      LB  : Label_Binarizer;
    begin
       if Check_Partial_Fit_First_Call (Self, Classes) then
-         Self.Attributes.Binarizer := LB;
-         Fit (LB, Y);
+         Fit (Self.Attributes.Binarizer, Y);
       end if;
 
       Partial_Fit (Self, X, Y);
