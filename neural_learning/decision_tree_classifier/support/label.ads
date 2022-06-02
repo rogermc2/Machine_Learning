@@ -41,12 +41,12 @@ package Label is
 
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
+    function Fit_Transform (Binarizer : in out Label_Binarizer;
+                            Y         : Integer_Array) return Boolean_Matrix;
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y       : Integer_Array) return Natural_Array;
     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
                                return Real_Float_Matrix;
-    --     function Inverse_Transform (Self : Label_Binarizer; Y : Float_Matrix)
-    --                                  return Float_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
                                return Integer_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
