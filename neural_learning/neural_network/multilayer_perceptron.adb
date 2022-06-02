@@ -663,8 +663,8 @@ package body Multilayer_Perceptron is
                             Self.Attributes.Out_Activation;
       Num_Layers        : constant Positive := Self.Attributes.N_Layers;
    begin
-      Put_Line (Routine_Name & "Solver type "
-                & Solver_Type'Image (Self.Parameters.Solver));
+--        Put_Line (Routine_Name & "Solver type "
+--                  & Solver_Type'Image (Self.Parameters.Solver));
       --  L130
       for layer in 1 .. Num_Layers - 1 loop
          declare
@@ -685,9 +685,8 @@ package body Multilayer_Perceptron is
               (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
             --  L132 Add layer + 1
             Activations.Append (Activat_Dot_Coeff + Params.Intercept_Grads);
-            Put_Line (Routine_Name &
-                        "L132 Activations.Last_Index = layer + 1 " &
-                        Boolean'Image (Activations.Last_Index = layer + 1));
+            Assert (Activations.Last_Index = layer + 1, Routine_Name &
+                        "L132 Activations.Last_Index /= layer + 1 ");
             Printing.Print_Float_Matrix
               (Routine_Name & "L132 Added Activations",
                Activations.Last_Element);

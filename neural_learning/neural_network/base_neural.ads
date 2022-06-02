@@ -25,6 +25,8 @@ package Base_Neural is
                                   Del : in out Real_Float_Matrix);
    pragma Inline (Logistic_Derivative);
    function Logistic_Sigmoid (X : Long_Float) return Float;
+   function Logistic_Sigmoid (X : Real_Float_Matrix)
+                               return Real_Float_Matrix;
    pragma Inline (Logistic_Sigmoid);
    function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Real_Float_Matrix)
                       return Float;
