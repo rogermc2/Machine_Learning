@@ -66,7 +66,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
-      --        Routine_Name : constant String := "Label.Binarizer Fit ";
+--         Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
       --        Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
       --                  "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
@@ -74,6 +74,9 @@ package body Label is
       --                & Integer'Image (Binarizer.Pos_Label));
       Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+
+--        Put_Line (Routine_Name & "Y_Kind " &
+--                    Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
 
    end Fit;
 
@@ -431,6 +434,9 @@ package body Label is
       Assert (Y_Kind /= Y_Continuous_Multioutput and
                 Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "does not support Multioutput target data.");
+      Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
+                Multiclass_Utils.Y_Type'Image (Y_Kind));
+      Put_Line (Routine_Name & "Num_Classes: " & Integer'Image (Num_Classes));
       if Y_Kind = Y_Binary then
          if Num_Classes = 1 then
             Binarize;

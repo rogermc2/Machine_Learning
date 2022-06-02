@@ -120,8 +120,8 @@ package body Multilayer_Perceptron is
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float;
    begin
-      Printing.Print_Float_Matrix (Routine_Name & "Activations last",
-                                   Activations.Last_Element);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activations last",
+--                                     Activations.Last_Element);
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -181,6 +181,8 @@ package body Multilayer_Perceptron is
                               Activations.Last_Element - Y_Float);
       Printing.Print_Float_Matrix (Routine_Name & "L304 Activations last",
                                    Activations.Last_Element);
+      Printing.Print_Boolean_Matrix (Routine_Name & "Y", Y);
+      Printing.Print_Float_Matrix (Routine_Name & "Y_Float", Y_Float);
       Printing.Print_Float_Matrix (Routine_Name & "L304 Deltas last",
                                    Deltas.Last_Element);
 
@@ -395,8 +397,8 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      --        Routine_Name       : constant String :=
-      --                                 "Multilayer_Perceptron.Fit ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -404,6 +406,8 @@ package body Multilayer_Perceptron is
                              Validate_Input (Self, Y, Incremental);
       Layer_Units        : NL_Types.Integer_List;
    begin
+      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
+      Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
       Validate_Hyperparameters (Self);
       First_Pass :=
         Self.Attributes.Params.Is_Empty or else
@@ -675,28 +679,28 @@ package body Multilayer_Perceptron is
             Activat_Dot_Coeff  : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
-            Printing.Print_Float_Matrix
-              (Routine_Name & "L131 layer" & Integer'Image (layer) &
-                 " Activations", Activations (layer));
-            Printing.Print_Float_Matrix
-              (Routine_Name & "L131 Coeff_Gradients",
-               Params.Coeff_Gradients);
-            Printing.Print_Float_Matrix
-              (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L131 layer" & Integer'Image (layer) &
+--                   " Activations", Activations (layer));
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L131 Coeff_Gradients",
+--                 Params.Coeff_Gradients);
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
             --  L132 Add layer + 1
             Activations.Append (Activat_Dot_Coeff + Params.Intercept_Grads);
             Assert (Activations.Last_Index = layer + 1, Routine_Name &
                         "L132 Activations.Last_Index /= layer + 1 ");
-            Printing.Print_Float_Matrix
-              (Routine_Name & "L132 Added Activations",
-               Activations.Last_Element);
-            Put_Line (Routine_Name & "L132 layer + 1 =" &
-                        Integer'Image (layer + 1));
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L132 Added Activations",
+--                 Activations.Last_Element);
+--              Put_Line (Routine_Name & "L132 layer + 1 =" &
+--                          Integer'Image (layer + 1));
 
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
-               Put_Line (Routine_Name & "L134 hidden activation function "
-                         & Activation_Type'Image (Hidden_Activation));
+--                 Put_Line (Routine_Name & "L134 hidden activation function "
+--                           & Activation_Type'Image (Hidden_Activation));
                case Hidden_Activation is
                   when Identity_Activation => null;
                   when Logistic_Activation =>
@@ -708,21 +712,21 @@ package body Multilayer_Perceptron is
                   when Softmax_Activation =>
                      Softmax (Activations (Activations.Last_Index));
                end case;
-               Printing.Print_Float_Matrix
-                 (Routine_Name & "L134 layer" &
-                    Integer'Image (Activations.Last_Index)
-                  & " Activations (last)", Activations.Last_Element);
+--                 Printing.Print_Float_Matrix
+--                   (Routine_Name & "L134 layer" &
+--                      Integer'Image (Activations.Last_Index)
+--                    & " Activations (last)", Activations.Last_Element);
             end if;
          end;  --  declare
-         Printing.Print_Float_Matrix
-           (Routine_Name & "L135 layer" &
-              Integer'Image (Activations.Last_Index) &
-              " Activations (last)", Activations.Last_Element);
-         New_Line;
+--           Printing.Print_Float_Matrix
+--             (Routine_Name & "L135 layer" &
+--                Integer'Image (Activations.Last_Index) &
+--                " Activations (last)", Activations.Last_Element);
+--           New_Line;
       end loop;
 
-      Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
-                                   Activations.Last_Element);
+--        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
+--                                     Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
@@ -735,8 +739,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
-                                   Activations.Last_Element);
+--        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
+--                                     Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
@@ -997,8 +1001,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --                                 "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                               "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
@@ -1010,6 +1014,7 @@ package body Multilayer_Perceptron is
       Batch_Row      : Positive;
       Batch_Loss     : Float;
    begin
+      Printing.Print_Boolean_Matrix (Routine_Name & "Y", Y);
       --  Get batch data
       for row in Batch_Slice.First .. Batch_Slice.Last loop
          Batch_Row := row - Batch_Slice.First + 1;
@@ -1178,8 +1183,8 @@ package body Multilayer_Perceptron is
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
       end if;
 
-      --        Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
-      --                    Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
+      Put_Line (Routine_Name & "Binarizer.Y_Kind: " &
+                   Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
 
       return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
 
