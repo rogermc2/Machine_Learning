@@ -422,4 +422,32 @@ package body NL_Arrays_And_Matrices is
 
    --  -------------------------------------------------------------------------
 
+   function Zero_Array (Num_Rows : Positive)
+                        return Real_Float_Vector is
+      Loaded : Real_Float_Vector (1 .. Num_Rows);
+   begin
+      for row in Loaded'Range loop
+         Loaded (row) := 0.0;
+      end loop;
+
+      return Loaded;
+
+   end Zero_Array;
+
+   --  -------------------------------------------------------------------------
+
+   function Zero_Matrix (Num_Rows, Num_Cols : Positive)
+                         return Real_Float_Matrix is
+      Loaded : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+   begin
+      for row in Loaded'Range loop
+         for col in Loaded'Range (2) loop
+            Loaded (row, col) := 0.0;
+         end loop;
+      end loop;
+
+      return Loaded;
+
+   end Zero_Matrix;
+
 end NL_Arrays_And_Matrices;

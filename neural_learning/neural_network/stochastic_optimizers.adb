@@ -153,6 +153,27 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
+   function "/" (L : Parameters_Record; R : Float) return Parameters_Record is
+      Result  : Parameters_Record := L;
+   begin
+      for row in Result.Coeff_Gradients'Range loop
+         for col in Result.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              Result.Coeff_Gradients (row, col) / R;
+         end loop;
+      end loop;
+
+      for row in Result.Intercept_Grads'Range loop
+         Result.Intercept_Grads (row) :=
+           Result.Intercept_Grads (row) / R;
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  -------------------------------------------------------------------------
+
    function "-" (L, R : Parameters_Record) return Parameters_Record is
       Result  : Parameters_Record := L;
    begin
