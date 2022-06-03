@@ -946,6 +946,22 @@ package body Multilayer_Perceptron is
     end Init_Optimizer;
 
     --  -------------------------------------------------------------------------
+
+    function Loss_Grad_LBFGS (Self : in out MLP_Classifier;
+                              X    : Real_Float_Matrix; Y : Boolean_Matrix;
+                              Activations : in out Real_Matrix_List;
+                              Gradients   : out Parameters_List)
+                              return Float is
+        Loss : Float;
+    begin
+        Backprop (Self, X, Y, Activations, Loss, Gradients);
+
+        return Loss;
+
+    end Loss_Grad_LBFGS;
+
+    --  -------------------------------------------------------------------------
+
     --  L778  Partial_Fit updates the model with a single iteration over the
     --        given data.
     procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
