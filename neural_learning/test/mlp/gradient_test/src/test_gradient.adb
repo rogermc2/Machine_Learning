@@ -27,7 +27,6 @@ procedure Test_Gradient is
    Y             : Integer_Array (1 .. Num_Samples);
    Y2            : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
    LB            : Label.Label_Binarizer;
-   Y_Bin         : Boolean_Matrix (1 .. Num_Samples, 1 .. 1);
    Layer_Sizes   : NL_Types.Integer_List;
    aClassifier   : MLP_Classifier;
    Activations   : Real_Matrix_List;
@@ -39,7 +38,6 @@ procedure Test_Gradient is
    Theta         : Parameters_List;
    Loss          : Float;
    pragma Unreferenced (Loss);
-   Theta_Length  : Positive;
 
    function Loss_Grad_Function (Self      : in out MLP_Classifier;
                                 Params    : Parameters_List;
@@ -67,7 +65,6 @@ begin
          Y (value) := value mod num_labels + 1;
          Y2 (value, 1) := Y (value);
       end loop;
-      Y_Bin := Label.Fit_Transform (LB, Y);
 
       --  L196
       for activ_type in Base_Neural.Activation_Type'Range loop
@@ -96,7 +93,6 @@ begin
 
             declare
                Param_Rec : Parameters_Record (Fan_In, Fan_Out);
-               --           Y_Bin : Boolean_Matrix := Label.Fit_Transform (LB, Y);
             begin
                Params.Clear;
                Param_Rec.Coeff_Gradients := Zero_Matrix (Fan_In, Fan_Out);
@@ -107,16 +103,19 @@ begin
          end loop;
 
          --  L233
-         Loss := Loss_Grad_Function (aClassifier, Theta, Y_Bin, Params);
-         Theta_Length := Positive (Theta.Length);
 
          declare
-            Num_Grad   : Parameters_List;
-            Eye        : constant Real_Float_Matrix := Unit_Matrix (Theta_Length);
-            dTheata    : Real_Vector (1 .. Theta_Length);
-            Theta_P    : Parameters_List;
-            Theta_M    : Parameters_List;
+            Y_Bin        : constant Boolean_Matrix :=
+                             Label.Fit_Transform (LB, Y);
+            Theta_Length : constant Positive := Positive (Theta.Length);
+            Eye          : constant Real_Float_Matrix :=
+                             Unit_Matrix (Theta_Length);
+            Num_Grad     : Parameters_List;
+            dTheata      : Real_Vector (1 .. Theta_Length);
+            Theta_P      : Parameters_List;
+            Theta_M      : Parameters_List;
          begin
+            Loss := Loss_Grad_Function (aClassifier, Theta, Y_Bin, Params);
             --  L239 numerically compute the gradients
             for index in 1 .. Theta_Length loop
                for e_row in 1 .. Theta_Length loop
