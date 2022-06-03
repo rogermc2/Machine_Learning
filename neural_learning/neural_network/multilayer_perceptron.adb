@@ -948,12 +948,14 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
 
     function Loss_Grad_LBFGS (Self : in out MLP_Classifier;
+                              Params : Parameters_List;
                               X    : Real_Float_Matrix; Y : Boolean_Matrix;
                               Activations : in out Real_Matrix_List;
                               Gradients   : out Parameters_List)
                               return Float is
         Loss : Float;
     begin
+        Gradients := Params;
         Backprop (Self, X, Y, Activations, Loss, Gradients);
 
         return Loss;

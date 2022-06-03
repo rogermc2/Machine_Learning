@@ -133,8 +133,9 @@ package Multilayer_Perceptron is
                    Incremental : Boolean := False);
     procedure Init_Optimizer (Self : in out MLP_Classifier);
     function Loss_Grad_LBFGS (Self : in out MLP_Classifier;
-                              X    : Real_Float_Matrix;
-                              Y    : Boolean_Matrix;
+                              Params : Parameters_List;
+                              X      : Real_Float_Matrix;
+                              Y      : Boolean_Matrix;
                               Activations : in out Real_Matrix_List;
                               Gradients   : out Parameters_List) return Float;
     procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
