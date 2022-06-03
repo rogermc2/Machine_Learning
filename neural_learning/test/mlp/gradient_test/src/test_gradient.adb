@@ -144,11 +144,28 @@ begin
             Loss := Loss_Grad_Function (aClassifier, Theta, Y_Bin, Params);
             Theta_Length := Positive (Theta.Length);
             declare
-                Num_Grads : Real_Float_Vector := Zero_Array (Theta_Length);
-                Eye       : Real_Float_Matrix := Unit_Matrix (Theta_Length);
+                Num_Grad   : Real_Float_Vector := Zero_Array (Theta_Length);
+                Eye        : Real_Float_Matrix := Unit_Matrix (Theta_Length);
+                dTheata    : Real_Vector (1 .. Theta_Length);
+                New_Theta  : Parameters_List;
+--                  New_Theta1 : Parameters_Record ;
+                Loss       : Float;
             begin
                 for index in 1 .. Theta_Length loop
-                    null;
+                    for e_row in 1 .. Theta_Length loop
+                        dTheata (e_row) := Eye (e_row, index) * 10.0 ** (-5);
+                    end loop;
+
+                    for t_index in Theta.First_Index .. Theta.Last_Index loop
+                        New_Theta.Append (Theta (t_index) + dTheata);
+                    end loop;
+
+                    Loss := Loss_Grad_Function
+                      (Self => aClassifier ,
+                       Params    => Theta,
+                       Y         => Y_Bin,
+                       Gradients => New_Theta);
+--                      Num_Grad (index) := New_Theta1;
                 end loop;
             end;
         end loop;
