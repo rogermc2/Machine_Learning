@@ -1193,7 +1193,10 @@ package body Multilayer_Perceptron is
             Self.Attributes.Binarizer := Binarizer;
             Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
         end if;
+      Printing.Print_Integer_List
+        (Routine_Name & "Classes", Self.Attributes.Classes);
 
+        Put_Line (Routine_Name & "Label_Binarize");
         return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
 
     end Validate_Input;

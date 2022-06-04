@@ -201,11 +201,16 @@ package body Printing is
 
    procedure Print_Integer_Array
      (Name : String; anArray : NL_Arrays_And_Matrices.Integer_Array) is
+      Count : Natural := 0;
    begin
       Put_Line (Name & ": ");
       for Index in anArray'First .. anArray'Last loop
-         Put_Line (Integer'Image (Index) & ":  " &
-                     Integer'Image (anArray (Index)));
+         Put (Integer'Image (anArray (Index)) & "  ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 0;
+         end if;
       end loop;
       New_Line;
 

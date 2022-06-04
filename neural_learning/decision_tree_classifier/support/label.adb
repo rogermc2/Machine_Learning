@@ -422,29 +422,29 @@ package body Label is
 
     --  -------------------------------------------------------------------------
     --  L416
-    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
-                             return Boolean_Matrix is
-        --  Routine_Name :  constant String := "Label.Label_Binarize ";
-        Y_Bin        : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
-                         (others => (others => False));
-    begin
-        for row in Y'Range loop
-            for col in Classes.First_Index .. Classes.Last_Index loop
-                if Y (row) = Classes (col) then
-                    Y_Bin (row, col) := True;
-                end if;
-            end loop;
-        end loop;
-
-        return Y_Bin;
-
-    end Label_Binarize;
+--      function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
+--                               return Boolean_Matrix is
+--          --  Routine_Name :  constant String := "Label.Label_Binarize ";
+--          Y_Bin        : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
+--                           (others => (others => False));
+--      begin
+--          for row in Y'Range loop
+--              for col in Classes.First_Index .. Classes.Last_Index loop
+--                  if Y (row) = Classes (col) then
+--                      Y_Bin (row, col) := True;
+--                  end if;
+--              end loop;
+--          end loop;
+--
+--          return Y_Bin;
+--
+--      end Label_Binarize;
 
     --  -------------------------------------------------------------------------
     --  L416
     function Label_Binarize (Y         : Integer_Array;
                              Classes   : NL_Types.Integer_List;
-                             Neg_Label : Integer) return Boolean_Matrix is
+                             Neg_Label : Integer := 0) return Boolean_Matrix is
         use Multiclass_Utils;
         Routine_Name :  constant String := "Label.Label_Binarize ";
         --        Num_Samples  : constant Positive := Y'Length;
@@ -471,7 +471,8 @@ package body Label is
         Assert (Y_Kind /= Y_Continuous_Multioutput and
                   Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                   "does not support Multioutput target data.");
-
+        Printing.Print_Integer_Array (Routine_Name & "Y", Y);
+        Put_Line (Routine_Name & "Y_Kind " & Y_Type'Image (Y_Kind));
         if Y_Kind = Y_Binary then
             if Num_Classes = 1 then
                 for row in Y'Range loop
@@ -525,13 +526,10 @@ package body Label is
     function Transform (Self : Label_Binarizer; Y : Integer_Array)
                         return Boolean_Matrix is
         Routine_Name : constant String := "Label.Transform Binarize ";
-        Labels       : Boolean_Matrix
-          (Y'Range, Self.Classes.First_Index .. Self.Classes.Last_Index);
     begin
         Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
-        Labels := Label_Binarize (Y, Self.Classes);
 
-        return Labels;
+        return Label_Binarize (Y, Self.Classes);
 
     end Transform;
 

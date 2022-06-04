@@ -9,20 +9,14 @@ with Encode_Utils;
 
 package body Multiclass_Utils is
 
-    --     pragma Warnings (Off);
-
-    --     package Label_Package is new
-    --       Ada.Containers.Ordered_Maps (Label_Type, Unbounded_String);
-
-    --     Unique_Labels_Map : Label_Package.Map;
-
     --  -------------------------------------------------------------------------
     --  L118
     function Is_Multilabel (Y : Integer_Array) return Boolean is
         use Ada.Containers;
+--          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel array ";
         Labels : constant NL_Types.Integer_List := Unique_Labels (Y);
     begin
-        return Labels.Length > 1;
+        return Labels.Length > 2;
 
     end Is_Multilabel;
 
@@ -35,7 +29,7 @@ package body Multiclass_Utils is
     --  is_multilabel ([[1, 0, 0]]) = True
     function Is_Multilabel (Y : Integer_Matrix) return Boolean is
         use Ada.Containers;
---          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel ";
+--          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
         Labels       : NL_Types.Integer_List;
         Multilabel   : Boolean := Y'Length (2) > 1;
     begin
@@ -80,7 +74,7 @@ package body Multiclass_Utils is
     begin
         if Is_Multilabel (Y) then
             Result := Y_Multilabel_Indicator;
-        elsif Y'Length > 1 then
+        elsif Y'Length > 2 then
             Result := Y_Multiclass;
         else
             Result := Y_Binary;
