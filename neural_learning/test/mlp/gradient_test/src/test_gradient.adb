@@ -19,24 +19,25 @@ procedure Test_Gradient is
    use Multilayer_Perceptron;
    use Stochastic_Optimizers;
 
-   Routine_Name  : constant String := "Test_Gradient ";
-   Eps           : constant Float := 10.0 ** (-5);
-   Num_Samples   : constant Positive := 5;
-   Num_Features  : constant Positive := 10;
-   X             : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
-   Y             : Integer_Array (1 .. Num_Samples);
-   Y2            : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
-   LB            : Label.Label_Binarizer;
-   Layer_Sizes   : NL_Types.Integer_List;
-   aClassifier   : MLP_Classifier;
-   Activations   : Real_Matrix_List;
-   Deltas        : Real_Matrix_List;
-   Layer_Units   : NL_Types.Integer_List;
-   Fan_In        : Positive;
-   Fan_Out       : Positive;
-   Params        : Parameters_List;
-   Theta         : Parameters_List;
-   Loss          : Float;
+   Routine_Name       : constant String := "Test_Gradient ";
+   Eps                : constant Float := 10.0 ** (-5);
+   Num_Samples        : constant Positive := 5;
+   Num_Features       : constant Positive := 10;
+   Hidden_Layer_Sizes : constant Positive := 10;
+   X                  : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
+   Y                  : Integer_Array (1 .. Num_Samples);
+   Y2                 : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
+   LB                 : Label.Label_Binarizer;
+   Layer_Sizes        : NL_Types.Integer_List;
+   aClassifier        : MLP_Classifier;
+   Activations        : Real_Matrix_List;
+   Deltas             : Real_Matrix_List;
+   Layer_Units        : NL_Types.Integer_List;
+   Fan_In             : Positive;
+   Fan_Out            : Positive;
+   Params             : Parameters_List;
+   Theta              : Parameters_List;
+   Loss               : Float;
    pragma Unreferenced (Loss);
 
    function Loss_Grad_Function (Self      : in out MLP_Classifier;
@@ -51,7 +52,7 @@ procedure Test_Gradient is
 
 begin
    Put_Line (Routine_Name);
-   Layer_Sizes.Append (10);
+   Layer_Sizes.Append (Hidden_Layer_Sizes);
    for sample in X'Range loop
       for feature in X'Range (2) loop
          X (sample, feature) := abs (Maths.Random_Float);
@@ -59,6 +60,7 @@ begin
    end loop;
 
    Layer_Units.Append (Num_Features);
+   Layer_Units.Append (Hidden_Layer_Sizes);
 
    for num_labels in 2 .. 3 loop
       for value in Y'Range loop
@@ -77,6 +79,7 @@ begin
          Init_Optimizer (aClassifier);
          --  L206
          Fit (aClassifier, X, Y2);
+         Layer_Units.Append (aClassifier.Attributes.N_Outputs);
          Theta := aClassifier.Attributes.Params;
 
          Activations.Clear;
@@ -85,12 +88,14 @@ begin
          --  L217
          Activations.Append (X);
 
-         for layer in 1 .. aClassifier.Attributes.N_Layers loop
-            Activations.Append (Zero_Matrix (X'Length, num_labels));
-            Deltas.Append (Zero_Matrix (X'Length, num_labels));
-            Fan_In := Layer_Units (num_labels);
-            Fan_Out := Layer_Units (num_labels + 1);
+         for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
+            Activations.Append (Zero_Matrix (X'Length, layer + 1));
+            Deltas.Append (Zero_Matrix (X'Length, layer + 1));
+            Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+            Fan_In := Layer_Units (layer);
+            Fan_Out := Layer_Units (layer + 1);
 
+            --  L224
             declare
                Param_Rec : Parameters_Record (Fan_In, Fan_Out);
             begin
@@ -102,6 +107,7 @@ begin
             end;
          end loop;
 
+         Put_Line (Routine_Name & "L233");
          --  L233
          declare
             Y_Bin        : constant Boolean_Matrix :=
@@ -116,6 +122,7 @@ begin
          begin
             Loss := Loss_Grad_Function (aClassifier, Theta, Y_Bin, Params);
             --  L239 numerically compute the gradients
+            Put_Line (Routine_Name & "L239");
             for index in 1 .. Theta_Length loop
                for e_row in 1 .. Theta_Length loop
                   dTheata (e_row) := Eye (e_row, index) * Eps;
@@ -143,6 +150,8 @@ begin
                      Theta_P.Append (Theta_Rec_M);
                   end loop;
 
+                  Put_Line (Routine_Name & "242+");
+                  --  L242
                   Loss := Loss_Grad_Function (Self => aClassifier ,
                                               Params => Theta_P, Y => Y_Bin,
                                               Gradients => Theta_P);

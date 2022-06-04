@@ -425,11 +425,30 @@ package body Label is
     --     end Inverse_Transform;
 
     --  -------------------------------------------------------------------------
+    --  L416
+    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
+                             return Boolean_Matrix is
+        --  Routine_Name :  constant String := "Label.Label_Binarize ";
+        Y_Bin        : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
+                         (others => (others => False));
+    begin
+        for row in Y'Range loop
+            for col in Classes.First_Index .. Classes.Last_Index loop
+                if Y (row) = Classes (col) then
+                    Y_Bin (row, col) := True;
+                end if;
+            end loop;
+        end loop;
 
+        return Y_Bin;
+
+    end Label_Binarize;
+
+    --  -------------------------------------------------------------------------
     --  L416
     function Label_Binarize (Y         : Integer_Array;
-                             Classes : NL_Types.Integer_List;
-                             Neg_Label : Integer := 0) return Boolean_Matrix is
+                             Classes   : NL_Types.Integer_List;
+                             Neg_Label : Integer) return Boolean_Matrix is
         use Multiclass_Utils;
         Routine_Name :  constant String := "Label.Label_Binarize ";
         --        Num_Samples  : constant Positive := Y'Length;
@@ -440,16 +459,16 @@ package body Label is
         Sorted       : NL_Types.Integer_List;
         Done         : Boolean := False;
 
-        procedure Binarize is
-        begin
-            for row in Y'Range loop
-                for col in Classes.First_Index .. Classes.Last_Index loop
-                    if Y (row) = Classes (col) then
-                        Y_Bin (row, col) := True;
-                    end if;
-                end loop;
-            end loop;
-        end Binarize;
+--          procedure Binarize is
+--          begin
+--              for row in Y'Range loop
+--                  for col in Classes.First_Index .. Classes.Last_Index loop
+--                      if Y (row) = Classes (col) then
+--                          Y_Bin (row, col) := True;
+--                      end if;
+--                  end loop;
+--              end loop;
+--          end Binarize;
 
     begin
         Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
@@ -480,24 +499,24 @@ package body Label is
         if not Done then
             Sorted := Classes;
             NL_Types.Integer_Sorting.Sort (Sorted);
-            if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
-                --  y_in_classes = np.in1d(y, classes)
-                --  Test each element of y for inclusion in classes
-                declare
-                    Y_In_Classes : Boolean_Array (Y'Range) := (others => False);
-                begin
-                    for index in Y'Range loop
-                        for c_index in Classes.First_Index .. Classes.Last_Index loop
-                            if Y (index) = Classes (c_index) then
-                                Y_In_Classes (index) := True;
-                            end if;
-                        end loop;
-                    end loop;
-                    Binarize;
-                end;
-            else
-                Binarize;
-            end if;
+--              if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
+--                  --  y_in_classes = np.in1d(y, classes)
+--                  --  Test each element of y for inclusion in classes
+--                  declare
+--                      Y_In_Classes : Boolean_Array (Y'Range) := (others => False);
+--                  begin
+--                      for index in Y'Range loop
+--                          for c_index in Classes.First_Index .. Classes.Last_Index loop
+--                              if Y (index) = Classes (c_index) then
+--                                  Y_In_Classes (index) := True;
+--                              end if;
+--                          end loop;
+--                      end loop;
+--                      Binarize;
+--                  end;
+--              else
+--                  Binarize;
+--              end if;
             Put_Line (Routine_Name & "coding incomplete!");
         end if;
 
@@ -520,6 +539,7 @@ package body Label is
         --           raise Label_Error with
         --             "Label.Transform called with invalid encoder type.";
         --        end if;
+        Put_Line (Routine_Name & "done");
 
         return Labels;
 

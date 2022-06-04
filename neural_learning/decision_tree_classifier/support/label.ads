@@ -46,22 +46,25 @@ package Label is
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y       : Integer_Array) return Natural_Array;
     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
-                               return Real_Float_Matrix;
+                                return Real_Float_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
-                               return Integer_Matrix;
+                                return Integer_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
-                               return Real_Float_Matrix;
+                                return Real_Float_Matrix;
     function Inverse_Transform (Self   : Label_Encoder;
                                 Labels : Natural_Array) return Integer_Array;
     function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
-                               return Integer_Array;
+                                return Integer_Array;
     function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
-                               return Integer_Matrix;
+                                return Integer_Matrix;
+    function Label_Binarize
+      (Y : Integer_Array; Classes : NL_Types.Integer_List)
+       return Boolean_Matrix;
     function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List;
-                             Neg_Label : Integer := 0) return Boolean_Matrix;
+                             Neg_Label : Integer) return Boolean_Matrix;
     function Transform (Self : Label_Binarizer; Y : Integer_Array)
-                       return Boolean_Matrix;
+                        return Boolean_Matrix;
     function Transform (Self : Label_Encoder; Y : Integer_Array)
-                       return Natural_Array;
+                        return Natural_Array;
 
 end Label;

@@ -45,7 +45,7 @@ with Base;
 with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
---  with Printing;
+with Printing;
 with Utils;
 
 package body Multilayer_Perceptron is
@@ -112,7 +112,7 @@ package body Multilayer_Perceptron is
         use Parameters_Package;
         use Real_Float_Arrays;
         use Real_Matrix_List_Package;
-        --        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
         Num_Samples        : constant Positive := Positive (X'Length);
         Y_Float            : constant Real_Float_Matrix :=
                                To_Real_Float_Matrix (Y);
@@ -120,8 +120,8 @@ package body Multilayer_Perceptron is
         Deltas             : Real_Matrix_List;
         Sum_Sq_Coeffs      : Float;
     begin
-        --        Printing.Print_Float_Matrix (Routine_Name & "Activations last",
-        --                                     Activations.Last_Element);
+        Printing.Print_Float_Matrix (Routine_Name & "Activations last",
+                                     Activations.Last_Element);
         --  L284
         if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
           Self.Attributes.Out_Activation = Logistic_Activation then
@@ -177,13 +177,16 @@ package body Multilayer_Perceptron is
 
         --  L301  Initialize Deltas
         Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
+        Put_Line (Routine_Name & "L301+");
         Deltas.Replace_Element (Deltas.Last_Index,
                                 Activations.Last_Element - Y_Float);
 
+        Put_Line (Routine_Name & "L304");
         --  L304  Compute gradient for the last layer
         Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                                Activations, Deltas, Gradients);
 
+        Put_Line (Routine_Name & "L308");
         --  L310, L308
         for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
             Update_Gradients (Self, Activations, Deltas, Gradients, layer,
