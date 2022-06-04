@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
---  with Printing;
+with Printing;
 
 package body Label is
 
@@ -68,10 +68,6 @@ package body Label is
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array) is
     --         Routine_Name : constant String := "Label.Binarizer Fit ";
     begin
-        --        Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
-        --                  "Binarizer.Neg_Label" & Integer'Image (Binarizer.Neg_Label) &
-        --                  " must be less than Binarizer.Pos_Label"
-        --                & Integer'Image (Binarizer.Pos_Label));
         Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
         Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
 
@@ -532,14 +528,8 @@ package body Label is
         Labels       : Boolean_Matrix
           (Y'Range, Self.Classes.First_Index .. Self.Classes.Last_Index);
     begin
-        Put_Line (Routine_Name);
-        --        if Self.Y_Kind = Y_Multiclass then
+        Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
         Labels := Label_Binarize (Y, Self.Classes);
-        --        else
-        --           raise Label_Error with
-        --             "Label.Transform called with invalid encoder type.";
-        --        end if;
-        Put_Line (Routine_Name & "done");
 
         return Labels;
 
