@@ -103,7 +103,6 @@ begin
          end loop;
 
          --  L233
-
          declare
             Y_Bin        : constant Boolean_Matrix :=
                              Label.Fit_Transform (LB, Y);
