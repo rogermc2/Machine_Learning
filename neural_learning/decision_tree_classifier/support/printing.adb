@@ -7,6 +7,25 @@ package body Printing is
 
    --  -------------------------------------------------------------------------
 
+   procedure Print_Boolean_Array
+     (Name : String; anArray : NL_Arrays_And_Matrices.Boolean_Array) is
+      Count : Natural := 0;
+   begin
+      Put_Line (Name & ": ");
+      for Index in anArray'First .. anArray'Last loop
+         Put (Boolean'Image (anArray (Index)) & "  ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 0;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Boolean_Array;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
                                    Start : Integer := 1; Finish : Integer := 0)
    is
@@ -292,7 +311,7 @@ package body Printing is
       end if;
       Put_Line (Name & ": ");
       for Index in Start .. Stop loop
-         Put (Integer'Image (theList.Element (Index)) & "   ");
+         Put (Integer'Image (theList.Element (Index)) & "  ");
          Count := Count + 1;
          if Count > 10 then
             New_Line;
