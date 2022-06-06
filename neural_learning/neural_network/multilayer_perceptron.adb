@@ -654,6 +654,7 @@ package body Multilayer_Perceptron is
     --  Activations: layers x samples x features
     --  The ith element of Activations (length n_layers - 1) holds the
     --  activation values of the ith layer.
+        use Ada.Containers;
         use Base_Neural;
         use Parameters_Package;
         Routine_Name      : constant String :=
@@ -676,9 +677,11 @@ package body Multilayer_Perceptron is
                 Activat_Dot_Coeff  : constant Real_Float_Matrix
                   := Activations (layer) * Params.Coeff_Gradients;
             begin
-                --              Printing.Print_Float_Matrix
-                --                (Routine_Name & "L131 layer" & Integer'Image (layer) &
-                --                   " Activations", Activations (layer));
+                Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer) &
+                          " Activations length" &
+                            Count_Type'Image (Activations.Length));
+--                              Printing.Print_Float_Matrix
+--                                (Routine_Name & "L131  Activations", Activations (layer));
                 --              Printing.Print_Float_Matrix
                 --                (Routine_Name & "L131 Coeff_Gradients",
                 --                 Params.Coeff_Gradients);
