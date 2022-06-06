@@ -455,16 +455,16 @@ package body Label is
         Sorted       : NL_Types.Integer_List;
         Done         : Boolean := False;
 
-        --          procedure Binarize is
-        --          begin
-        --              for row in Y'Range loop
-        --                  for col in Classes.First_Index .. Classes.Last_Index loop
-        --                      if Y (row) = Classes (col) then
-        --                          Y_Bin (row, col) := True;
-        --                      end if;
-        --                  end loop;
-        --              end loop;
-        --          end Binarize;
+        procedure Binarize is
+        begin
+            for row in Y'Range loop
+                for col in Classes.First_Index .. Classes.Last_Index loop
+                    if Y (row) = Classes (col) then
+                        Y_Bin (row, col) := True;
+                    end if;
+                end loop;
+            end loop;
+        end Binarize;
 
     begin
         Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
@@ -472,8 +472,8 @@ package body Label is
         Assert (Y_Kind /= Y_Continuous_Multioutput and
                   Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                   "does not support Multioutput target data.");
-        Printing.Print_Integer_Array (Routine_Name & "Y", Y);
-        Put_Line (Routine_Name & "Y_Kind " & Y_Type'Image (Y_Kind));
+        Printing.Print_Integer_Array (Routine_Name & "L516 Y", Y);
+        Put_Line (Routine_Name & "L516 Y_Kind " & Y_Type'Image (Y_Kind));
         --  L516
         if Y_Kind = Y_Binary then
             if Num_Classes = 1 then
@@ -493,7 +493,7 @@ package body Label is
         --  L529
         if Y_Kind = Y_Multilabel_Indicator then
             Sorted := Classes;
-            Put_Line (Routine_Name & "coding incomplete!");
+            Put_Line (Routine_Name & "L529 coding incomplete!");
         end if;
 
         if not Done then
@@ -502,53 +502,15 @@ package body Label is
             NL_Types.Integer_Sorting.Sort (Sorted);
             --  L538
             if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
-                --  y_in_classes = np.in1d(y, classes)
-                --  Test each element of y for inclusion in classes
-                declare
-                    Y_In_Classes : Boolean_Array (Y'Range) := (others => False);
-                    Y_Seen       : NL_Types.Integer_List;
-                begin
-                    --  L542
-                    for index in Y'Range loop
-                        for c_index in Classes.First_Index ..
-                          Classes.Last_Index loop
-                            if Y (index) = Classes (c_index) then
-                                Y_In_Classes (index) := True;
-                            end if;
-                        end loop;
-                    end loop;
-
-                    --  L543
-                    for index in Y'Range loop
-                        if Y_In_Classes (index) then
-                            Y_Seen.Append (Y (index));
-                        end if;
-                    end loop;
-                    Printing.Print_Boolean_Array (Routine_Name & "Y_In_Classes",
-                                                  Y_In_Classes);
-                    Printing.Print_Integer_List (Routine_Name & "Y_Seen",
-                                                 Y_Seen);
-                    declare
-                        Indices : Integer_Array (1 .. Positive (Y_Seen.Length));
-                    begin
-                        for seen_index in Y_Seen.First_Index ..
-                          Y_Seen.Last_Index loop
-                            for sort_index in Sorted.First_Index ..
-                              Sorted.Last_Index loop
-                                if Y_Seen (seen_index) =
-                                  Sorted (sort_index) then
-                                    Indices (seen_index) := sort_index;
-                                end if;
-                            end loop;
-                        end loop;
-                    end;
-                end;
+                --  L539 - L549 are needed for generating a csr sparse matrix
+                --  Binarize is all that is needed for this implementation
+                Binarize;
             else
-                null;
+                Put_Line (Routine_Name & "coding incomplete!");
             end if;
-            Put_Line (Routine_Name & "coding incomplete!");
         end if;
 
+        Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
         return Y_Bin;
 
     end Label_Binarize;

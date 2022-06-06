@@ -70,11 +70,13 @@ package body Multiclass_Utils is
     --  -------------------------------------------------------------------------
     --  L202
     function Type_Of_Target (Y : Integer_Array) return Y_Type is
-        Result : Y_Type;
+        use Ada.Containers;
+        Classes : constant NL_Types.Integer_List := Unique_Labels (Y);
+        Result  : Y_Type;
     begin
         if Is_Multilabel (Y) then
             Result := Y_Multilabel_Indicator;
-        elsif Y'Length > 2 then
+        elsif Classes.Length > 2 then
             Result := Y_Multiclass;
         else
             Result := Y_Binary;
