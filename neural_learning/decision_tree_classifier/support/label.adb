@@ -422,26 +422,6 @@ package body Label is
 
     --  -------------------------------------------------------------------------
     --  L416
-    --      function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List)
-    --                               return Boolean_Matrix is
-    --          --  Routine_Name :  constant String := "Label.Label_Binarize ";
-    --          Y_Bin        : Boolean_Matrix (Y'Range, 1 .. Positive (Classes.Length)) :=
-    --                           (others => (others => False));
-    --      begin
-    --          for row in Y'Range loop
-    --              for col in Classes.First_Index .. Classes.Last_Index loop
-    --                  if Y (row) = Classes (col) then
-    --                      Y_Bin (row, col) := True;
-    --                  end if;
-    --              end loop;
-    --          end loop;
-    --
-    --          return Y_Bin;
-    --
-    --      end Label_Binarize;
-
-    --  -------------------------------------------------------------------------
-    --  L416
     function Label_Binarize (Y         : Integer_Array;
                              Classes   : NL_Types.Integer_List;
                              Neg_Label : Integer := 0) return Boolean_Matrix is

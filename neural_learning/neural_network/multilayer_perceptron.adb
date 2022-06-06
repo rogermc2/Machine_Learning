@@ -73,7 +73,7 @@ package body Multilayer_Perceptron is
     procedure Forward_Pass (Self         : MLP_Classifier;
                             Activations  : in out Real_Matrix_List);
     function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                               return Real_Float_Matrix;
+                                return Real_Float_Matrix;
     procedure Initialize (Self        : in out MLP_Classifier;
                           Layer_Units : NL_Types.Integer_List);
     function Init_Coeff (Self            : in out MLP_Classifier;
@@ -112,7 +112,8 @@ package body Multilayer_Perceptron is
         use Parameters_Package;
         use Real_Float_Arrays;
         use Real_Matrix_List_Package;
-        Routine_Name       : constant String := "Multilayer_Perceptron.Backprop ";
+        Routine_Name       : constant String :=
+                               "Multilayer_Perceptron.Backprop ";
         Num_Samples        : constant Positive := Positive (X'Length);
         Y_Float            : constant Real_Float_Matrix :=
                                To_Real_Float_Matrix (Y);
@@ -120,7 +121,7 @@ package body Multilayer_Perceptron is
         Deltas             : Real_Matrix_List;
         Sum_Sq_Coeffs      : Float;
     begin
-        Printing.Print_Float_Matrix (Routine_Name & "Activations last",
+        Printing.Print_Float_Matrix (Routine_Name & "L284 Activations last",
                                      Activations.Last_Element);
         --  L284
         if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
@@ -153,7 +154,8 @@ package body Multilayer_Perceptron is
                 for row in Coeffs'Range loop
                     for col in Coeffs'Range (2) loop
                         Ravel ((row - 1) * Coeffs'Length (2) +
-                                 col - Coeffs'First (2) + 1) := Coeffs (row, col);
+                                 col - Coeffs'First (2) + 1) :=
+                          Coeffs (row, col);
                     end loop;
                 end loop;
                 Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
@@ -165,8 +167,8 @@ package body Multilayer_Perceptron is
                                 Sum_Sq_Coeffs / Float (Num_Samples));
 
         --  L297 Backward propagate
-        --  The calculation of delta[last]  works with the following combinations
-        --  of output activation and loss function:
+        --  The calculation of delta[last]  works with the following
+        --  combinations of output activation and loss function:
         --  sigmoid and binary cross entropy, softmax and categorical cross
         --  entropy and identity with squared loss.
         --  The ith element of deltas holds the difference between the
@@ -177,7 +179,9 @@ package body Multilayer_Perceptron is
 
         --  L301  Initialize Deltas
         Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
-        Put_Line (Routine_Name & "L301+");
+        Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
+                                     Activations.Last_Element);
+        Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
         Deltas.Replace_Element (Deltas.Last_Index,
                                 Activations.Last_Element - Y_Float);
 
@@ -193,11 +197,11 @@ package body Multilayer_Perceptron is
                               Num_Samples);
         end loop;
 
---          for index in Deltas.First_Index .. Deltas.Last_Index loop
---              Printing.Print_Float_Matrix
---                (Routine_Name & "Deltas " & Integer'Image (index),
---                 Deltas (index));
---          end loop;
+        --          for index in Deltas.First_Index .. Deltas.Last_Index loop
+        --              Printing.Print_Float_Matrix
+        --                (Routine_Name & "Deltas " & Integer'Image (index),
+        --                 Deltas (index));
+        --          end loop;
 
     end Backprop;
 
@@ -208,7 +212,7 @@ package body Multilayer_Perceptron is
     --  is also set on clf.
     function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
                                            Classes : NL_Types.Integer_List)
-                                          return Boolean is
+                                           return Boolean is
         use NL_Types.Integer_Package;
         Routine_Name : constant String :=
                          "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
@@ -711,11 +715,11 @@ package body Multilayer_Perceptron is
                     --                    & " Activations (last)", Activations.Last_Element);
                 end if;
             end;  --  declare
-            --           Printing.Print_Float_Matrix
-            --             (Routine_Name & "L135 layer" &
-            --                Integer'Image (Activations.Last_Index) &
-            --                " Activations (last)", Activations.Last_Element);
-            --           New_Line;
+            Printing.Print_Float_Matrix
+              (Routine_Name & "L135 layer" &
+                 Integer'Image (Activations.Last_Index) &
+                 " Activations (last)", Activations.Last_Element);
+            New_Line;
         end loop;
 
         --        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
@@ -739,7 +743,7 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
     --  L144
     function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                               return Real_Float_Matrix is
+                                return Real_Float_Matrix is
     --        use Ada.Containers;
         use Base_Neural;
         use Real_Float_Arrays;
@@ -959,6 +963,7 @@ package body Multilayer_Perceptron is
         Loss : Float;
     begin
         Gradients := Params;
+        Forward_Pass (Self, Activations);
         Backprop (Self, X, Y, Activations, Loss, Gradients);
 
         return Loss;
@@ -994,7 +999,7 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
 
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Real_Float_Matrix is
+                      return Real_Float_Matrix is
     --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
         Y_Pred         : constant Real_Float_Matrix :=
                            Forward_Pass_Fast (Self, X);
@@ -1193,8 +1198,8 @@ package body Multilayer_Perceptron is
             Self.Attributes.Binarizer := Binarizer;
             Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
         end if;
-      Printing.Print_Integer_List
-        (Routine_Name & "Classes", Self.Attributes.Classes);
+        Printing.Print_Integer_List
+          (Routine_Name & "Classes", Self.Attributes.Classes);
 
         Put_Line (Routine_Name & "Label_Binarize");
         return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
