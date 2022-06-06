@@ -47,8 +47,8 @@ package Multilayer_Perceptron is
         --  corresponding to layer i.
         --  an intercepts_list of intercept values representing the bias vector
         --  corresponding to layer i + 1.
-        Coef_Indptr          : Coef_Indptr_List;
-        Intercept_Indptr     : Intercept_Indptr_List;
+--          Coef_Indptr          : Coef_Indptr_List;
+--          Intercept_Indptr     : Intercept_Indptr_List;
         N_Features           : Positive := 1;
         Feature_Names_In     : NL_Types.String_List;
         N_Iter               : Natural := 0;
