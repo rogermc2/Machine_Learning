@@ -1,5 +1,5 @@
 
-with Ada.Containers.Vectors;
+--  with Ada.Containers.Vectors;
 
 with Label;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -10,32 +10,35 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
-    type Loss_Function is (Log_Loss_Function, Binary_Log_Loss_Function,
-                           Squared_Error_Function);
+    type Loss_Function_Type is (Log_Loss_Function, Binary_Log_Loss_Function,
+                                Squared_Error_Function);
 
-    type Coef_Indptr_Record is record
-        Start   : Positive := 1;
-        Last    : Positive := 1;
-        Fan_In  : Positive := 1;
-        Fan_Out : Positive := 1;
-    end record;
+    type Max_Function_Access is access function
+      (X : Parameters_List; Num : Integer := 15000) return Integer;
 
-    package Coef_Indptr_Package is new
-      Ada.Containers.Vectors (Positive, Coef_Indptr_Record);
-    subtype Coef_Indptr_List is Coef_Indptr_Package.Vector;
+--      type Coef_Indptr_Record is record
+--          Start   : Positive := 1;
+--          Last    : Positive := 1;
+--          Fan_In  : Positive := 1;
+--          Fan_Out : Positive := 1;
+--      end record;
+--
+--      package Coef_Indptr_Package is new
+--        Ada.Containers.Vectors (Positive, Coef_Indptr_Record);
+--      subtype Coef_Indptr_List is Coef_Indptr_Package.Vector;
+--
+--      type Intercept_Indptr_Record is record
+--          Start   : Positive := 1;
+--          Last    : Positive := 1;
+--      end record;
 
-    type Intercept_Indptr_Record is record
-        Start   : Positive := 1;
-        Last    : Positive := 1;
-    end record;
-
-    package Intercept_Indptr_Package is new
-      Ada.Containers.Vectors (Positive, Intercept_Indptr_Record);
-    subtype Intercept_Indptr_List is Intercept_Indptr_Package.Vector;
+--      package Intercept_Indptr_Package is new
+--        Ada.Containers.Vectors (Positive, Intercept_Indptr_Record);
+--      subtype Intercept_Indptr_List is Intercept_Indptr_Package.Vector;
 
     type MLP_Classifier_Attributes is record
         Classes              : NL_Types.Integer_List;
-        Loss_Function_Name   : Loss_Function := Log_Loss_Function;
+        Loss_Function_Name   : Loss_Function_Type := Log_Loss_Function;
         Loss                 : Float := 0.0;
         Best_Loss            : Float := 0.0;
         Loss_Curve           : NL_Types.Float_List;
@@ -47,8 +50,8 @@ package Multilayer_Perceptron is
         --  corresponding to layer i.
         --  an intercepts_list of intercept values representing the bias vector
         --  corresponding to layer i + 1.
---          Coef_Indptr          : Coef_Indptr_List;
---          Intercept_Indptr     : Intercept_Indptr_List;
+        --          Coef_Indptr          : Coef_Indptr_List;
+        --          Intercept_Indptr     : Intercept_Indptr_List;
         N_Features           : Positive := 1;
         Feature_Names_In     : NL_Types.String_List;
         N_Iter               : Natural := 0;
@@ -89,7 +92,7 @@ package Multilayer_Perceptron is
            Beta_2                : Float := 0.999;
            Epsilon               : Float := 10.0 ** (-8);
            N_Iter_No_Change      : Natural := 10;
-           Max_Fun               : Natural := 15000;
+           Max_Fun               : Max_Function_Access;
        end record;
 
     type MLP_Classifier is
@@ -111,7 +114,8 @@ package Multilayer_Perceptron is
                      Learning_Rate_Init  : Float := 0.001;
                      Power_T             : Float := 0.5;
                      Max_Iter            : Natural := 200;
-                     Loss_Function_Name  : Loss_Function := Log_Loss_Function;
+                     Loss_Function_Name  : Loss_Function_Type :=
+                       Log_Loss_Function;
                      Shuffle             : Boolean := True;
                      Random_State        : Natural := 0;
                      Tol                 : Float := 10.0 ** (-4);
@@ -125,7 +129,7 @@ package Multilayer_Perceptron is
                      Beta_2              : Float := 0.999;
                      Epsilon             : Float := 10.0 ** (-8);
                      N_Iter_No_Change    : Natural := 10;
-                     Max_Fun             : Natural := 15000)
+                     Max_Fun             : Max_Function_Access)
                      return MLP_Classifier;
     procedure Fit (Self : in out MLP_Classifier;
                    X    : Real_Float_Matrix;

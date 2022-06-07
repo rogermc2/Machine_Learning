@@ -1,4 +1,4 @@
---  Based on scipy/optimize/_optimize.py
+--  Based on scipy/optimize/optimize.py
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
