@@ -9,12 +9,13 @@ package Opt_Minimise is
 
    type Method_Type is (L_BFGS_B_Method);
    type Minimise_Options is record
-      Max_Fun     : Multilayer_Perceptron.Max_Function_Access;
-      Max_Iter    : Positive;
-      G_Tolerance : Float;
+      Max_Fun        : Multilayer_Perceptron.Max_Function_Access;
+      Max_Iter       : Positive;
+      G_Tolerance    : Float;
+      Max_Line_Steps : Natural:= 20;
    end record;
 
-   No_Options : constant Minimise_Options := (Null, 1, 0.0);
+   No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
    function Minimise (Fun  : Multilayer_Perceptron.Max_Function_Access;
                       X0   : Stochastic_Optimizers.Parameters_List;
