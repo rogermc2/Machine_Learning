@@ -6,7 +6,10 @@ package body Opt_Minimise is
 
    function Minimise (Fun  : Multilayer_Perceptron.Max_Function_Access;
                       X0   : Stochastic_Optimizers.Parameters_List;
-                      Meth : Method_Type; Bounds : Constraints.Array_Bounds)
+                      Meth   : Method_Type; Jac : Boolean := False;
+                      Bounds : Constraints.Bounds_List :=
+                                Constraints.Array_Bounds_Package.Empty_Vector;
+                      Options : Minimise_Options := No_Options)
                       return Optimise.Optimise_Result is
 --          use Optimise;
 --          Result : Optimise_Result;
