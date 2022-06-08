@@ -65,6 +65,7 @@ package NL_Arrays_And_Matrices is
    function Exp (M : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (Exp);
    function Flatten (M : Integer_Matrix) return Integer_Array;
+   function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline ("not");
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector;

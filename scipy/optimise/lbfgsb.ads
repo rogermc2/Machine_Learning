@@ -1,6 +1,6 @@
 --  Based on scipy/optimize/lbfgsb_py.py
 
---  with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 with Constraints;
 with Multilayer_Perceptron;
@@ -11,7 +11,7 @@ with Opt_Minimise;
 package LBFGSB is
 
     function Minimise_LBFGSB (Fun    : Multilayer_Perceptron.Max_Function_Access;
-                              X0     : Stochastic_Optimizers.Parameters_List;
+                              X0     : Real_Float_Matrix;
                               Meth   : Opt_Minimise.Method_Type;
                               Bounds : Constraints.Bounds_List :=
                                 Constraints.Array_Bounds_Package.Empty_Vector;

@@ -187,6 +187,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Flatten (M : Real_Float_Matrix) return Real_Float_Vector is
+      Flat : Real_Float_Vector (1 .. M'Length * M'Length (2));
+   begin
+      for row in M'Range loop
+         for col in M'Range (2) loop
+            Flat ((row - 1) * M'Length (2) + col) := M (row, col);
+         end loop;
+      end loop;
+
+      return Flat;
+
+   end Flatten;
+
+   --  ------------------------------------------------------------------------
+
    function "not" (M : Boolean_Matrix) return Boolean_Matrix is
       Result : Boolean_Matrix := M;
    begin

@@ -9,6 +9,7 @@ package Optimise is
       Success : Boolean := False;
    end record;
 
+   function Prepare_Scalar_Function () return Scalar_Function;
    function F_Min_BFGS ( X : Real_Float_Arrays.Real_Vector)
                         return Optimise_Result;
 
