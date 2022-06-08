@@ -299,7 +299,7 @@ package body Multilayer_Perceptron is
                     Beta_2              : Float := 0.999;
                     Epsilon             : Float := 10.0 ** (-8);
                     N_Iter_No_Change    : Natural := 10;
-                    Max_Fun             : Max_Function_Access)
+                    Max_Fun             : Max_Function_Access := null)
                      return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
@@ -464,7 +464,7 @@ package body Multilayer_Perceptron is
       N_Fan_Out    : Positive;
       Options      : constant Opt_Minimise.Minimise_Options :=
                        (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
-                        Self.Parameters.Tol);
+                        Self.Parameters.Tol, 20);
       Result       : Optimise.Optimise_Result;
       Grads        : Parameters_List;
    begin

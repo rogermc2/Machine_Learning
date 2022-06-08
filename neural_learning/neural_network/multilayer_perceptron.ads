@@ -92,7 +92,7 @@ package Multilayer_Perceptron is
            Beta_2                : Float := 0.999;
            Epsilon               : Float := 10.0 ** (-8);
            N_Iter_No_Change      : Natural := 10;
-           Max_Fun               : Max_Function_Access;
+           Max_Fun               : Max_Function_Access := null;
        end record;
 
     type MLP_Classifier is
@@ -129,7 +129,7 @@ package Multilayer_Perceptron is
                      Beta_2              : Float := 0.999;
                      Epsilon             : Float := 10.0 ** (-8);
                      N_Iter_No_Change    : Natural := 10;
-                     Max_Fun             : Max_Function_Access)
+                     Max_Fun             : Max_Function_Access := null)
                      return MLP_Classifier;
     procedure Fit (Self : in out MLP_Classifier;
                    X    : Real_Float_Matrix;

@@ -6,13 +6,13 @@ package Lbfgsb_F_Interface is
    type Fortran_DP_Array is array (Integer range <>) of Double_Precision;
    pragma Convention (Fortran, Fortran_DP_Array);
 
-   type Fortran_Integer_Array is array (Integer range <>) of Integer;
+   type Fortran_Integer_Array is array (Integer range <>) of Fortran_Integer;
    pragma Convention (Fortran, Fortran_Integer_Array);
 
-   type Fortran_LSave_Array is array (Integer range 1 .. 4) of Integer;
+   type Fortran_LSave_Array is array (Integer range 1 .. 4) of Fortran_Integer;
    pragma Convention (Fortran, Fortran_LSave_Array);
 
-   type Fortran_ISave_Array is array (1 .. 44) of Integer;
+   type Fortran_ISave_Array is array (1 .. 44) of Fortran_Integer;
    pragma Convention (Fortran, Fortran_ISave_Array);
 
    type Fortran_DSave_Array is array (Integer range 1 .. 29) of
@@ -21,7 +21,7 @@ package Lbfgsb_F_Interface is
 
    type Character_60 is new Fortran_Character (1 .. 60);
 
-   procedure setulb (n, m : in Fortran_Integer;
+   procedure Setulb (m : in Fortran_Integer;
                      x    : in out Fortran_DP_Array; l, u : in Fortran_DP_Array;
                      nbd  : in Fortran_Integer_Array;
                      f    : in out Double_Precision;
