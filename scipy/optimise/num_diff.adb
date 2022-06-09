@@ -13,30 +13,55 @@ package body Num_Diff is
    --  -------------------------------------------------------------------------
 
    function Approx_Derivative
-     (Fun                : access function (X : Fortran_DP_Array) return Float;
+     (Fun                : access function (X : Fortran_DP_Array)
+      return Real_Float_Vector;
       X0                 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
       Rel_Step           : NL_Types.Integer_List :=
         NL_Types.Integer_Package.Empty_Vector;
       Abs_Step           : NL_Types.Integer_List :=
         NL_Types.Integer_Package.Empty_Vector;
-      F0                 : NL_Types.Float_List :=
-        NL_Types.Float_Package.Empty_Vector;
+      F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
       As_Linear_Operator : Boolean := False) return Real_Float_Vector is
 
       use  Ada.Containers;
-      Routine_Name : constant String := "Num_Diff.Approx_Derivative ";
-      Loc_Bounds   : constant Constraints.Bounds_List :=
-                       Prepare_Bounds (Bounds, X0);
-      Result       : Real_Float_Vector (X0'Range);
+      Routine_Name  : constant String := "Num_Diff.Approx_Derivative ";
+      Loc_Bounds    : constant Constraints.Bounds_List :=
+                        Prepare_Bounds (Bounds, X0);
+      Use_One_Sided : Boolean;
+      Result        : Real_Float_Vector (X0'Range);
+
+      function Fun_Wrapped (X : Fortran_DP_Array) return Real_Float_Vector is
+      begin
+         return Fun (X);
+
+      end Fun_Wrapped;
+
    begin
       Assert (Loc_Bounds.Length = X0'Length, Routine_Name &
                 "Bounds and X0 lengths unequal.");
       if As_Linear_Operator then
-          Assert (Inf_Bounds (Bounds), Routine_Name &
-                "Bounds not supported for Linear_Operator.");
+         Assert (Inf_Bounds (Bounds), Routine_Name &
+                   "Bounds not supported for Linear_Operator.");
+      end if;
+
+      if As_Linear_Operator then
+         null;
+      else
+         if Abs_Step.Is_Empty then
+            null;
+         else
+            null;
+         end if;
+
+         case Method is
+         when FD_2_Point => null;
+         when FD_3_Point => null;
+         when FD_CS => Use_One_Sided := False;
+         when FD_None => null;
+         end case;
       end if;
 
       return Result;
@@ -58,7 +83,6 @@ package body Num_Diff is
    end Inf_Bounds;
 
    --  -------------------------------------------------------------------------
-
 
    function Prepare_Bounds (Bounds : Constraints.Bounds_List;
                             X0     : Real_Float_Vector)
