@@ -13,6 +13,13 @@ package body Num_Diff is
                                     X0 : Real_Float_Vector;
                                     Method : FD_Methods) return Float;
     function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
+    function Linear_Operator_Difference
+      (Fun : access function (X : Fortran_DP_Array)
+       return Real_Float_Vector;
+       X0, F0 : Real_Float_Vector; H : Real_Float_List; Method : FD_Methods)
+       return Real_Float_Vector;
+    function Mat_Vec (X0, F0 : Real_Float_Vector; H : Real_Float_List;
+                      Method : FD_Methods) return Real_Float_Vector;
     function Prepare_Bounds (Bounds : Constraints.Bounds_List;
                              X0     : Real_Float_Vector)
                              return Constraints.Bounds_List;
@@ -35,7 +42,7 @@ package body Num_Diff is
         Routine_Name  : constant String := "Num_Diff.Approx_Derivative ";
         Loc_Bounds    : constant Constraints.Bounds_List :=
                           Prepare_Bounds (Bounds, X0);
-        Relative_Step : Real_Float_List := Rel_Step;
+        L_Rel_Step    : Real_Float_List := Rel_Step;
         Use_One_Sided : Boolean;
         H             : Float;
         Result        : Real_Float_Vector (X0'Range);
@@ -57,12 +64,16 @@ package body Num_Diff is
 
         --  L363
         if As_Linear_Operator then
-            null;
+            if L_Rel_Step.Is_Empty then
+                L_Rel_Step (1) := Relative_Step (Method);
+            end if;
+            Result := Linear_Operator_Difference
+              (Fun_Wrapped'Access, X0, F0, L_Rel_Step, Method);
         else
             if Abs_Step.Is_Empty then
                 null;
             else
-                H := Compute_Absolute_Step (Relative_Step, X0, Method);
+                H := Compute_Absolute_Step (L_Rel_Step, X0, Method);
             end if;
 
             case Method is
@@ -73,6 +84,8 @@ package body Num_Diff is
             end case;
         end if;
 
+        --  L441 return LinearOperator((m, n), matvec)
+        --  LinearOperator implements the matrix operations used by matvec
         return Result;
 
     end Approx_Derivative;
@@ -105,6 +118,39 @@ package body Num_Diff is
         return Result;
 
     end Inf_Bounds;
+
+    --  -------------------------------------------------------------------------
+
+    function Linear_Operator_Difference
+      (Fun : access function (X : Fortran_DP_Array)
+       return Real_Float_Vector;
+       X0, F0 : Real_Float_Vector; H : Real_Float_List; Method : FD_Methods)
+       return Real_Float_Vector is
+        M  : constant Positive := F0'Length;
+        N  : constant Positive := X0'Length;
+        Result : Real_Float_Vector := X0;
+    begin
+
+        return Mat_Vec (X0, F0, H, Method);
+
+    end Linear_Operator_Difference;
+
+    --  -------------------------------------------------------------------------
+
+    function Mat_Vec (X0, F0 : Real_Float_Vector; H : Real_Float_List;
+                      Method : FD_Methods) return Real_Float_Vector is
+        Result : Real_Float_Vector (F0'Range) := (others => 0.0);
+    begin
+        case Method is
+            when FD_2_Point => null;
+            when FD_3_Point => null;
+            when FD_CS => null;
+            when FD_None => null;
+        end case;
+
+        return Result;
+
+    end Mat_Vec;
 
     --  -------------------------------------------------------------------------
 
