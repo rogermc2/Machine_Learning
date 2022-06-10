@@ -17,8 +17,7 @@ package body Num_Diff is
    --     function Linear_Operator_Difference
    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
    --        Method : FD_Methods) return Real_Float_Vector;
-   function Mat_Vec (Fun    : Fun_Access; P : Real_Float_List;
-                     X0, F0 : Real_Float_Vector;
+   function Mat_Vec (Fun    : Fun_Access; X0, F0 : Real_Float_Vector;
                      H      : Real_Float_List; Method : FD_Methods)
                      return Real_Float_Vector;
    function Prepare_Bounds (Bounds : Constraints.Bounds_List;
@@ -45,7 +44,6 @@ package body Num_Diff is
       L_Rel_Step    : Real_Float_List := Rel_Step;
       Use_One_Sided : Boolean;
       H             : Real_Float_List;
-      P             : Real_Float_List;
       df_dx         : Real_Float_Vector (X0'Range);
 
    begin
@@ -62,7 +60,7 @@ package body Num_Diff is
          if L_Rel_Step.Is_Empty then
             L_Rel_Step (1) := Relative_Step (Method);
          end if;
-         df_dx := Mat_Vec (Fun, P, X0, F0, H, Method);
+         df_dx := Mat_Vec (Fun, X0, F0, H, Method);
          --           Result := Linear_Operator_Difference
          --             (Fun_Wrapped'Access, X0, F0, L_Rel_Step, Method);
       else
@@ -140,13 +138,16 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function Mat_Vec (Fun    : Fun_Access; P : Real_Float_List;
-                     X0, F0 : Real_Float_Vector;
+   function Mat_Vec (Fun    : Fun_Access; X0, F0 : Real_Float_Vector;
                      H      : Real_Float_List; Method : FD_Methods)
                      return Real_Float_Vector is
+      use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
       Routine_Name : constant String := "Num_Diff.Mat_Vec ";
-      Norm_P  : constant Float := Norm (P);
+      M            : constant Float := Float (F0'Length);
+      N            : constant Float := Float (X0'Length);
+      P            : constant Real_Float_Vector (1 .. 2) := (M, N);
+      Norm_P  : constant Float := Sqrt (M ** 2 + N ** 2);
       dx      : Real_Float_Vector (1 .. Positive (H.Length));
       dx_P    : Real_Float_Vector (1 .. Positive (H.Length));
       df      : Real_Float_Vector (F0'Range);
@@ -157,7 +158,7 @@ package body Num_Diff is
       if F0 /= Result then
          for index in dx'Range loop
             dx (index) := H (index) / Norm_P;
-            dx_P (index) := dx (index) * P (index);
+            dx_P (index) := dx (index) * P (1) + dx (index) * P (2);
          end loop;
 
          case Method is
