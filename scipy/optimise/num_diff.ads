@@ -1,17 +1,17 @@
 --  Based on scipy/optimize/_numdiff.py
 
 with Constraints;
-with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
+--  with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 
 package Num_Diff is
 
    type FD_Methods is (FD_None, FD_2_Point, FD_3_Point, FD_CS);
-
+   type Fun_Access is access function (X : Real_Float_Vector)
+                                       return Real_Float_Vector;
    function Approx_Derivative
-     (Fun                : access function (X : Fortran_DP_Array)
-      return Real_Float_Vector;
+     (Fun                : Fun_Access;
       X0                 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;

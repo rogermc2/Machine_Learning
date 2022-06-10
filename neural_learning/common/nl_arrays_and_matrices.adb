@@ -202,6 +202,34 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Norm (M : Real_Float_List) return Float is
+      use Maths.Float_Math_Functions;
+      Sum : Float := 0.0;
+   begin
+      for row in M.First_Index .. M.Last_Index loop
+         Sum := Sum + M (row) ** 2;
+      end loop;
+
+      return Sqrt (Sum);
+
+   end Norm;
+
+   --  ------------------------------------------------------------------------
+
+   function Norm (M : Real_Float_Vector) return Float is
+      use Maths.Float_Math_Functions;
+      Sum : Float := 0.0;
+   begin
+      for row in M'Range loop
+         Sum := Sum + M (row) ** 2;
+      end loop;
+
+      return Sqrt (Sum);
+
+   end Norm;
+
+   --  ------------------------------------------------------------------------
+
    function "not" (M : Boolean_Matrix) return Boolean_Matrix is
       Result : Boolean_Matrix := M;
    begin
