@@ -14,8 +14,7 @@ package Num_Diff is
       return Real_Float_Vector;
       X0                 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
-      Rel_Step           : NL_Types.Integer_List :=
-        NL_Types.Integer_Package.Empty_Vector;
+      Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
       Abs_Step           : NL_Types.Integer_List :=
         NL_Types.Integer_Package.Empty_Vector;
       F0                 : Real_Float_Vector;
