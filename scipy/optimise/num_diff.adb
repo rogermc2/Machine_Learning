@@ -6,15 +6,24 @@ with Ada.Containers;
 
 with Maths;
 
+with NL_Types;
+
 package body Num_Diff is
+
+   type Scheme_Type is (One_Sided, Two_Sided);
 
    EPS : constant Float := Float'Small;
 
+   function Check_Bounds
+     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+      return Boolean;
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_Vector;
    function EPS_For_Method (Method : FD_Methods) return Float;
    function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
+   function Fun_Wrapped (Fun : Fun_Access; X : Real_Float_Vector)
+                         return Real_Float_Vector;
    --     function Linear_Operator_Difference
    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
    --        Method : FD_Methods) return Real_Float_Vector;
@@ -28,27 +37,72 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
+   function Adjust_Scheme_To_Bounds
+     (X0        : Real_Float_Vector; H : in out Real_Float_Vector;
+      Num_Steps : Positive; Scheme : Scheme_Type;
+      Bounds    : Constraints.Bounds_List) return Boolean is
+      use Real_Float_Arrays;
+      use Constraints.Array_Bounds_Package;
+      Lower         : NL_Types.Float_List;
+      Upper         : NL_Types.Float_List;
+      Use_One_Sided : Real_Float_Vector (H'Range);
+      All_Inf       : Boolean := False;
+      Lower_Dist    : Real_Float_Vector (H'Range);
+      Upper_Dist    : Real_Float_Vector (H'Range);
+      H_Total       : Real_Float_Vector (H'Range);
+      H_Adjusted    : Real_Float_Vector (H'Range) := H;
+      Result        : Boolean := False;
+   begin
+      Constraints.Get_Bounds (Bounds, Lower, Upper);
+      case Scheme is
+         when One_Sided => Use_One_Sided := (others => 1.0);
+         when Two_Sided =>
+            H := abs (H);
+            Use_One_Sided := (others => 0.0);
+      end case;
+
+      for index in  Bounds.First_Index .. Bounds.Last_Index loop
+         All_Inf := All_Inf or
+           Bounds.Element (index).Lower = Float'Safe_First or
+           Bounds.Element (index).Upper = Float'Safe_Last;
+      end loop;
+
+      if not All_Inf then
+         H_Total := Float (Num_Steps) * H_Total;
+         Lower_Dist := X0 - Lower;
+      end if;
+
+
+      return Result;
+
+   end Adjust_Scheme_To_Bounds;
+
+   --  -------------------------------------------------------------------------
+   --  L275
    function Approx_Derivative
      (Fun                : Fun_Access; X0 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
-      --        Abs_Step           : NL_Types.Integer_List :=
-      --          NL_Types.Integer_Package.Empty_Vector;
+      Abs_Step           : Real_Float_Vector;
       F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
       As_Linear_Operator : Boolean := False) return Real_Float_Vector is
       use  Ada.Containers;
+      use Real_Float_Arrays;
       Routine_Name  : constant String := "Num_Diff.Approx_Derivative ";
       Loc_Bounds    : constant Constraints.Bounds_List :=
                         Prepare_Bounds (Bounds, X0);
       L_Rel_Step    : Real_Float_List := Rel_Step;
+      L_F0          : Real_Float_Vector := F0;
       Use_One_Sided : Boolean;
       H             : Real_Float_Vector (X0'Range);
-      df_dx         : Real_Float_Vector (X0'Range);
+      Sign_X0       : Real_Float_Vector (X0'Range) := X0 >= 0.0;
+      dX            : Real_Float_Vector (X0'Range);
+      dF_dX         : Real_Float_Vector (X0'Range);
 
    begin
-      --  L339
+      --  L447
       Assert (Loc_Bounds.Length = X0'Length, Routine_Name &
                 "Bounds and X0 lengths unequal.");
       if As_Linear_Operator then
@@ -56,7 +110,14 @@ package body Num_Diff is
                    "Bounds not supported for Linear_Operator.");
       end if;
 
-      --  L363
+      --  L462
+      if F0'Last < F0'First then
+         L_F0 := Fun_Wrapped (Fun, L_F0);
+      end if;
+
+      Assert (Check_Bounds (X0, Bounds), Routine_Name & "invalid X0 Bounds");
+
+      --  L472
       if As_Linear_Operator then
          --  when As_Linear_Operator is True Approx_Derivative should return a
          --  LinearOperator (df_dx)
@@ -66,7 +127,20 @@ package body Num_Diff is
          --           Result := Linear_Operator_Difference
          --             (Fun_Wrapped'Access, X0, F0, L_Rel_Step, Method);
       else
-         H := Compute_Absolute_Step (L_Rel_Step, X0, Method);
+         if Abs_Step'Last < Abs_Step'First then
+            H := Compute_Absolute_Step (L_Rel_Step, X0, Method);
+         else
+            Sign_X0 := 2.0 * Sign_X0 - 1.0;
+            dX := (X0 + Abs_Step) - X0;
+            H := Abs_Step;
+            for row in H'Range loop
+               if dX (row) = 0.0 then
+                  H (row) := EPS_For_Method (Method) *
+                    Float'Max (1.0, abs (X0 (row)));
+               end if;
+            end loop;
+         end if;
+
          df_dx := Mat_Vec (Fun, X0, F0, H, Method);
 
          case Method is
@@ -82,6 +156,22 @@ package body Num_Diff is
       return df_dx;
 
    end Approx_Derivative;
+
+   --  -------------------------------------------------------------------------
+
+   function Check_Bounds
+     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+      return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in  X0'Range loop
+         Result := Result and  X0 (index) > Bounds.Element (index).Lower and
+           X0 (index) < Bounds.Element (index).Upper;
+      end loop;
+
+      return Result;
+
+   end Check_Bounds;
 
    --  -------------------------------------------------------------------------
    --  L144
