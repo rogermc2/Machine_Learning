@@ -76,6 +76,8 @@ package NL_Arrays_And_Matrices is
    function Norm (M : Real_Float_Vector) return Float;
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline ("not");
+   function Outer (L, R : Real_Float_Vector) return Real_Float_Vector;
+   pragma Inline (Outer);
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Sum);
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;

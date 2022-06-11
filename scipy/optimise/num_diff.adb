@@ -63,11 +63,11 @@ package body Num_Diff is
          if L_Rel_Step.Is_Empty then
             L_Rel_Step (1) := Relative_Step (Method);
          end if;
-         df_dx := Mat_Vec (Fun, X0, F0, H, Method);
          --           Result := Linear_Operator_Difference
          --             (Fun_Wrapped'Access, X0, F0, L_Rel_Step, Method);
       else
          H := Compute_Absolute_Step (L_Rel_Step, X0, Method);
+         df_dx := Mat_Vec (Fun, X0, F0, H, Method);
 
          case Method is
             when FD_2_Point => null;

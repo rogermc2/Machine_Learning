@@ -360,6 +360,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Outer (L, R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector := L;
+   begin
+      for row in Result'Range loop
+         Result (row) := Result (row) * R  (row);
+      end loop;
+
+      return Result;
+
+   end Outer;
+
+   --  ------------------------------------------------------------------------
+
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector is
       Result : Real_Float_Vector (Data'Range);
       Val    : Float;
