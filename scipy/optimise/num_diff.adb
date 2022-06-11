@@ -6,8 +6,6 @@ with Ada.Containers;
 
 with Maths;
 
-with NL_Types;
-
 package body Num_Diff is
 
    type Scheme_Type is (One_Sided, Two_Sided);
@@ -42,9 +40,10 @@ package body Num_Diff is
       Num_Steps : Positive; Scheme : Scheme_Type;
       Bounds    : Constraints.Bounds_List) return Boolean is
       use Real_Float_Arrays;
+      use Constraints;
       use Constraints.Array_Bounds_Package;
-      Lower         : NL_Types.Float_List;
-      Upper         : NL_Types.Float_List;
+      Lower         : constant Real_Float_Vector := Get_Lower (Bounds);
+      Upper         : constant Real_Float_Vector := Get_Upper (Bounds);
       Use_One_Sided : Real_Float_Vector (H'Range);
       All_Inf       : Boolean := False;
       Lower_Dist    : Real_Float_Vector (H'Range);
@@ -53,7 +52,6 @@ package body Num_Diff is
       H_Adjusted    : Real_Float_Vector (H'Range) := H;
       Result        : Boolean := False;
    begin
-      Constraints.Get_Bounds (Bounds, Lower, Upper);
       case Scheme is
          when One_Sided => Use_One_Sided := (others => 1.0);
          when Two_Sided =>
@@ -61,17 +59,16 @@ package body Num_Diff is
             Use_One_Sided := (others => 0.0);
       end case;
 
-      for index in  Bounds.First_Index .. Bounds.Last_Index loop
+      for index in Lower'Range loop
          All_Inf := All_Inf or
-           Bounds.Element (index).Lower = Float'Safe_First or
-           Bounds.Element (index).Upper = Float'Safe_Last;
+           Lower (index) = Float'Safe_First or
+           Upper (index) = Float'Safe_Last;
       end loop;
 
       if not All_Inf then
-         H_Total := Float (Num_Steps) * H_Total;
+         H_Total := Float (Num_Steps) * H;
          Lower_Dist := X0 - Lower;
       end if;
-
 
       return Result;
 

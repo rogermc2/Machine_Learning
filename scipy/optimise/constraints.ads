@@ -3,6 +3,7 @@
 with Ada.Containers.Vectors;
 
 with NL_Types;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Constraints is
 
@@ -17,5 +18,7 @@ package Constraints is
 
    procedure Get_Bounds (Bounds       : Bounds_List;
                          Lower, Upper : out NL_Types.Float_List);
+   function Get_Lower (Bounds : Bounds_List) return Real_Float_Vector;
+   function Get_Upper (Bounds : Bounds_List) return Real_Float_Vector;
 
 end Constraints;
