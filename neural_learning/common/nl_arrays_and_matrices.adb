@@ -36,6 +36,47 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function ">=" (L : Real_Float_Vector; R : Float) return Float_Array is
+      Result : Float_Array (L'Range) := (others => 1.0);
+   begin
+      for row in L'Range loop
+            if L (row) < R then
+                Result (row) := -1.0;
+            end if;
+      end loop;
+
+      return Result;
+
+   end ">=";
+
+   --  ------------------------------------------------------------------------
+
+   function "*" (L, R : Float_Array) return Float_Array is
+      Result : Float_Array  := L;
+   begin
+      for row in L'Range loop
+         Result (row) := Result (row) * R (row);
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ------------------------------------------------------------------------
+
+   function "*" (L : Float; R : Float_Array) return Float_Array is
+      Result : Float_Array  := R;
+   begin
+      for row in R'Range loop
+         Result (row) := L * Result (row);
+      end loop;
+
+      return Result;
+
+   end "*";
+
+   --  ------------------------------------------------------------------------
+
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix is
       Result : Real_Float_Matrix  := L;
    begin

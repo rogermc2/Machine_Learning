@@ -12,6 +12,7 @@ package NL_Arrays_And_Matrices is
    subtype Safe_Float is Float range Float'Range;
 
    type Boolean_Array is array (Integer range <>) of Boolean;
+   type Float_Array is array (Integer range <>) of Float;
    type Integer_Array is array (Integer range <>) of Integer;
    type Natural_Array is array (Integer range <>) of Natural;
    procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort
@@ -41,7 +42,11 @@ package NL_Arrays_And_Matrices is
 
    function ">=" (L : Real_Float_Vector; R : Float) return Boolean_Array;
    function ">=" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
+   function ">=" (L : Real_Float_Vector; R : Float) return Float_Array;
    pragma Inline (">=");
+   function "*" (L, R : Float_Array) return Float_Array;
+   function "*" (L : Float; R : Float_Array) return Float_Array;
+   pragma Inline ("*");
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
