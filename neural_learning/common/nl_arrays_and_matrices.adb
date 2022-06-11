@@ -243,6 +243,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector (R'Range);
+   begin
+      for row in R'Range loop
+         Result (row) := Float'Max (L, R (row));
+      end loop;
+
+      return Result;
+
+   end Max_Vec;
+
+   --  ------------------------------------------------------------------------
+
    function Norm (M : Real_Float_List) return Float is
       use Maths.Float_Math_Functions;
       Sum : Float := 0.0;

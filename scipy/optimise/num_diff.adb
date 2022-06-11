@@ -13,6 +13,7 @@ package body Num_Diff is
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_List;
+   function EPS_For_Method (Method : FD_Methods) return Float;
    function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
    --     function Linear_Operator_Difference
    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
@@ -31,8 +32,8 @@ package body Num_Diff is
      (Fun                : Fun_Access; X0 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
-      Abs_Step           : NL_Types.Integer_List :=
-        NL_Types.Integer_Package.Empty_Vector;
+--        Abs_Step           : NL_Types.Integer_List :=
+--          NL_Types.Integer_Package.Empty_Vector;
       F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
@@ -83,23 +84,47 @@ package body Num_Diff is
    end Approx_Derivative;
 
    --  -------------------------------------------------------------------------
-
+   --  L144
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_List is
       use Real_Float_Arrays;
-      Sign_X0 : Real_Float_Vector (X0'Range) := X0 >= 0.0;
-      Result : Real_Float_List;
+      R_Step   : constant Float := EPS_For_Method (Method);
+      Sign_X0  : Real_Float_Vector (X0'Range) := X0 >= 0.0;
+      Abs_Step : Real_Float_Vector (X0'Range) := R_Step * Sign_X0;
+      dX       : Real_Float_Vector (X0'Range);
+      Result   : Real_Float_List;
    begin
-      if Rel_Step.Is_Empty then
-         Rel_Step.Append (Relative_Step (Method));
-      end if;
-
+      --  L170  this is used because Sign_X0 needs to be 1 when x0 = 0.
       Sign_X0 := 2.0 * Sign_X0 - 1.0;
+
+      if Rel_Step.Is_Empty then
+         Abs_Step := Abs_Step * Max_Vec (1.0, abs (X0));
+      else
+         Abs_Step := Abs_Step * abs (X0);
+      end if;
 
       return Result;
 
    end Compute_Absolute_Step;
+
+   --  -------------------------------------------------------------------------
+
+   function EPS_For_Method (Method : FD_Methods) return Float is
+      use Maths.Float_Math_Functions;
+      Value : Float := EPS;
+   begin
+      case Method is
+         when FD_2_Point | FD_CS =>
+            Value := Sqrt (EPS);
+         when FD_3_Point =>
+            Value := EPS ** (1 / 3);
+         when FD_None => null;
+      end case;
+
+      return Value;
+
+   end EPS_For_Method;
 
    --  -------------------------------------------------------------------------
 
@@ -149,13 +174,13 @@ package body Num_Diff is
       M            : constant Float := Float (F0'Length);
       N            : constant Float := Float (X0'Length);
       P            : constant Real_Float_Vector (1 .. 2) := (M, N);
-      Norm_P  : constant Float := Sqrt (M ** 2 + N ** 2);
-      dx      : Real_Float_Vector (1 .. Positive (H.Length));
-      dx_P    : Real_Float_Vector (1 .. Positive (H.Length));
-      df      : Real_Float_Vector (F0'Range);
-      X1      : Real_Float_Vector (F0'Range);
-      X2      : Real_Float_Vector (F0'Range);
-      Result  : Real_Float_Vector (F0'Range) := (others => 0.0);
+      Norm_P       : constant Float := Sqrt (M ** 2 + N ** 2);
+      dx           : Real_Float_Vector (1 .. Positive (H.Length));
+      dx_P         : Real_Float_Vector (1 .. Positive (H.Length));
+      df           : Real_Float_Vector (F0'Range);
+      X1           : Real_Float_Vector (F0'Range);
+      X2           : Real_Float_Vector (F0'Range);
+      Result       : Real_Float_Vector (F0'Range) := (others => 0.0);
    begin
       if F0 /= Result then
          for index in dx'Range loop
@@ -177,11 +202,12 @@ package body Num_Diff is
             when FD_CS =>
                X1 := X0 + dx_P;
                Assert (False, Routine_Name &
-                       "CS incomplete, uses complex values");
+                         "CS incomplete, uses complex values");
             when FD_None => null;
          end case;
       end if;
-
+      --  Use something like?
+      --  X1 := Solve (F0, X0);
       return Result;
 
    end Mat_Vec;
@@ -190,7 +216,7 @@ package body Num_Diff is
 
    function Prepare_Bounds (Bounds : Constraints.Bounds_List;
                             X0     : Real_Float_Vector)
-                               return Constraints.Bounds_List is
+                            return Constraints.Bounds_List is
       Result : Constraints.Bounds_List;
    begin
       if Bounds.Is_Empty then

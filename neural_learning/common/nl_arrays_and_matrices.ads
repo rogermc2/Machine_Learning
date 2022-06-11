@@ -43,7 +43,6 @@ package NL_Arrays_And_Matrices is
    function ">=" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
    pragma Inline (">=");
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
-   pragma Inline ("/");
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
    function "/" (L, R : Real_Float_Vector) return Real_Float_Vector;
@@ -67,6 +66,7 @@ package NL_Arrays_And_Matrices is
    pragma Inline (Exp);
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
+   function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    function Norm (M : Real_Float_List) return Float;
    function Norm (M : Real_Float_Vector) return Float;
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
