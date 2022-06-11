@@ -12,14 +12,14 @@ package body Num_Diff is
 
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
-      Method   : FD_Methods) return Real_Float_List;
+      Method   : FD_Methods) return Real_Float_Vector;
    function EPS_For_Method (Method : FD_Methods) return Float;
    function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
    --     function Linear_Operator_Difference
    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
    --        Method : FD_Methods) return Real_Float_Vector;
    function Mat_Vec (Fun    : Fun_Access; X0, F0 : Real_Float_Vector;
-                     H      : Real_Float_List; Method : FD_Methods)
+                     H      : Real_Float_Vector; Method : FD_Methods)
                      return Real_Float_Vector;
    function Prepare_Bounds (Bounds : Constraints.Bounds_List;
                             X0     : Real_Float_Vector)
@@ -44,7 +44,7 @@ package body Num_Diff is
                         Prepare_Bounds (Bounds, X0);
       L_Rel_Step    : Real_Float_List := Rel_Step;
       Use_One_Sided : Boolean;
-      H             : Real_Float_List;
+      H             : Real_Float_Vector (X0'Range);
       df_dx         : Real_Float_Vector (X0'Range);
 
    begin
@@ -87,13 +87,12 @@ package body Num_Diff is
    --  L144
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
-      Method   : FD_Methods) return Real_Float_List is
+      Method   : FD_Methods) return Real_Float_Vector is
       use Real_Float_Arrays;
       R_Step   : constant Float := EPS_For_Method (Method);
       Sign_X0  : Real_Float_Vector (X0'Range) := X0 >= 0.0;
       Abs_Step : Real_Float_Vector (X0'Range) := R_Step * Sign_X0;
       dX       : Real_Float_Vector (X0'Range);
-      Result   : Real_Float_List;
    begin
       --  L170  this is used because Sign_X0 needs to be 1 when x0 = 0.
       Sign_X0 := 2.0 * Sign_X0 - 1.0;
@@ -107,8 +106,14 @@ package body Num_Diff is
       end if;
 
       dX := (X0 + Abs_Step) - X0;
+      for row in Abs_Step'Range loop
+         if dX (row) = 0.0 then
+            Abs_Step (row) := R_Step * Sign_X0 (row) *
+              Float'Max (1.0, abs (X0 (row)));
+         end if;
+      end loop;
 
-      return Result;
+      return Abs_Step;
 
    end Compute_Absolute_Step;
 
@@ -170,7 +175,7 @@ package body Num_Diff is
    --  -------------------------------------------------------------------------
 
    function Mat_Vec (Fun    : Fun_Access; X0, F0 : Real_Float_Vector;
-                     H      : Real_Float_List; Method : FD_Methods)
+                     H      : Real_Float_Vector; Method : FD_Methods)
                      return Real_Float_Vector is
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
@@ -179,8 +184,8 @@ package body Num_Diff is
       N            : constant Float := Float (X0'Length);
       P            : constant Real_Float_Vector (1 .. 2) := (M, N);
       Norm_P       : constant Float := Sqrt (M ** 2 + N ** 2);
-      dx           : Real_Float_Vector (1 .. Positive (H.Length));
-      dx_P         : Real_Float_Vector (1 .. Positive (H.Length));
+      dx           : Real_Float_Vector (H'Range);
+      dx_P         : Real_Float_Vector (H'Range);
       df           : Real_Float_Vector (F0'Range);
       X1           : Real_Float_Vector (F0'Range);
       X2           : Real_Float_Vector (F0'Range);
