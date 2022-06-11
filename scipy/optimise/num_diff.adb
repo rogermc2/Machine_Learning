@@ -106,6 +106,8 @@ package body Num_Diff is
          Abs_Step := Abs_Step * abs (X0);
       end if;
 
+      dX := (X0 + Abs_Step) - X0;
+
       return Result;
 
    end Compute_Absolute_Step;
