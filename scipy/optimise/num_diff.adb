@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -57,6 +57,8 @@ package body Num_Diff is
 
       --  L363
       if As_Linear_Operator then
+         --  when As_Linear_Operator is True Approx_Derivative should return a
+         --  LinearOperator (df_dx)
          if L_Rel_Step.Is_Empty then
             L_Rel_Step (1) := Relative_Step (Method);
          end if;
@@ -64,11 +66,7 @@ package body Num_Diff is
          --           Result := Linear_Operator_Difference
          --             (Fun_Wrapped'Access, X0, F0, L_Rel_Step, Method);
       else
-         if Abs_Step.Is_Empty then
-            null;
-         else
-            H := Compute_Absolute_Step (L_Rel_Step, X0, Method);
-         end if;
+         H := Compute_Absolute_Step (L_Rel_Step, X0, Method);
 
          case Method is
             when FD_2_Point => null;
@@ -87,13 +85,17 @@ package body Num_Diff is
    --  -------------------------------------------------------------------------
 
    function Compute_Absolute_Step
-     (Rel_Step : in out Real_Float_List; X0  : Real_Float_Vector;
+     (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_List is
+      use Real_Float_Arrays;
+      Sign_X0 : Real_Float_Vector (X0'Range) := X0 >= 0.0;
       Result : Real_Float_List;
    begin
       if Rel_Step.Is_Empty then
          Rel_Step.Append (Relative_Step (Method));
       end if;
+
+      Sign_X0 := 2.0 * Sign_X0 - 1.0;
 
       return Result;
 

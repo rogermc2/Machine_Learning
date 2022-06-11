@@ -39,6 +39,9 @@ package NL_Arrays_And_Matrices is
      (Positive, Real_Float_Matrix);
    subtype Real_Matrix_List is Real_Matrix_List_Package.Vector;
 
+   function ">=" (L : Real_Float_Vector; R : Float) return Boolean_Array;
+   function ">=" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
+   pragma Inline (">=");
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline ("/");
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
@@ -49,12 +52,10 @@ package NL_Arrays_And_Matrices is
                   return Real_Float_Matrix;
    pragma Inline ("+");
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
-   pragma Inline ("-");
    function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
                   return Real_Float_Matrix;
-   pragma Inline ("-");
    function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
-   pragma Inline ("-");
+   function "-" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
    pragma Inline ("-");
