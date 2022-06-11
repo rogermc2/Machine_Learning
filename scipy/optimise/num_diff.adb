@@ -32,8 +32,8 @@ package body Num_Diff is
      (Fun                : Fun_Access; X0 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
---        Abs_Step           : NL_Types.Integer_List :=
---          NL_Types.Integer_Package.Empty_Vector;
+      --        Abs_Step           : NL_Types.Integer_List :=
+      --          NL_Types.Integer_Package.Empty_Vector;
       F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
@@ -99,7 +99,9 @@ package body Num_Diff is
       Sign_X0 := 2.0 * Sign_X0 - 1.0;
 
       if Rel_Step.Is_Empty then
-         Abs_Step := Abs_Step * Max_Vec (1.0, abs (X0));
+         for row in Abs_Step'Range loop
+            Abs_Step (row) := Abs_Step (row)  + Float'Max (1.0, abs (X0 (row)));
+         end loop;
       else
          Abs_Step := Abs_Step * abs (X0);
       end if;
