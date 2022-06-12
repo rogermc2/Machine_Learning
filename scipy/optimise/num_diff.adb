@@ -222,7 +222,9 @@ package body Num_Diff is
             when FD_2_Point =>
                Adjust_Scheme_To_Bounds
                  (X0, H, 1, One_Sided, Bounds, Use_One_Sided);
-            when FD_3_Point => null;
+            when FD_3_Point =>
+               Adjust_Scheme_To_Bounds
+                 (X0, H, 1, Two_Sided, Bounds, Use_One_Sided);
             when FD_CS => Use_One_Sided := (others => 0.0);
             when FD_None => null;
          end case;
