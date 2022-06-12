@@ -230,8 +230,6 @@ package body Num_Diff is
          end case;
       end if;
 
-      --  L441 return LinearOperator((m, n), matvec)
-      --  LinearOperator implements the matrix operations used by matvec
       return df_dx;
 
    end Approx_Derivative;
