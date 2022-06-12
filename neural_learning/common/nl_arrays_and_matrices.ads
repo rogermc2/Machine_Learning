@@ -41,9 +41,12 @@ package NL_Arrays_And_Matrices is
    subtype Real_Matrix_List is Real_Matrix_List_Package.Vector;
 
    function ">=" (L : Real_Float_Vector; R : Float) return Boolean_Array;
+   function ">=" (L, R : Real_Float_Vector) return Boolean_Array;
    function ">=" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
    function ">=" (L : Real_Float_Vector; R : Float) return Float_Array;
    pragma Inline (">=");
+   function "<=" (L, R : Real_Float_Vector) return Boolean_Array;
+   pragma Inline ("<=");
    function "*" (L, R : Float_Array) return Float_Array;
    function "*" (L : Float; R : Float_Array) return Float_Array;
    pragma Inline ("*");
@@ -81,6 +84,7 @@ package NL_Arrays_And_Matrices is
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector;
    pragma Inline (Sum);
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
+   function Max (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline (Max);
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;

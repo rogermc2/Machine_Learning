@@ -15,6 +15,9 @@ package body Num_Diff is
    function Check_Bounds
      (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
       return Boolean;
+   function Check_Bounds
+     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+      return Boolean_Array;
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_Vector;
@@ -51,7 +54,9 @@ package body Num_Diff is
       H_Total       : Real_Float_Vector (H'Range);
       H_Adjusted    : Real_Float_Vector (H'Range) := H;
       X             : Real_Float_Vector (X0'Range);
-      Violated      : Boolean := False;
+      Violated      : Boolean_Array (H_Total'Range);
+      Fitting       : Boolean_Array (H_Total'Range);
+      V_F           : Boolean_Array (H_Total'Range);
       Result        : Boolean := False;
    begin
       case Scheme is
@@ -76,7 +81,10 @@ package body Num_Diff is
       case Scheme is
          when One_Sided =>
                 X := X0 + H_Total;
-                Violated := Check_Bounds (X, Bounds);
+            Violated := Check_Bounds (X, Bounds);
+            Fitting := abs (H_Total) <= Max (Lower_Dist, Upper_Dist);
+            V_F := Violated and Fitting;
+            H_Adjusted := not H_Adjusted;
          when Two_Sided =>
             null;
       end case;
@@ -169,11 +177,27 @@ package body Num_Diff is
 
    function Check_Bounds
      (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+      return Boolean_Array is
+      Result : Boolean_Array (X0'Range);
+   begin
+      for index in  X0'Range loop
+         Result (index) := X0 (index) > Bounds.Element (index).Lower and
+           X0 (index) < Bounds.Element (index).Upper;
+      end loop;
+
+      return Result;
+
+   end Check_Bounds;
+
+   --  -------------------------------------------------------------------------
+
+   function Check_Bounds
+     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
       return Boolean is
       Result : Boolean := True;
    begin
       for index in  X0'Range loop
-         Result := Result and  X0 (index) > Bounds.Element (index).Lower and
+         Result := Result and X0 (index) > Bounds.Element (index).Lower and
            X0 (index) < Bounds.Element (index).Upper;
       end loop;
 
