@@ -50,6 +50,8 @@ package body Num_Diff is
       Upper_Dist    : Real_Float_Vector (H'Range);
       H_Total       : Real_Float_Vector (H'Range);
       H_Adjusted    : Real_Float_Vector (H'Range) := H;
+      X             : Real_Float_Vector (X0'Range);
+      Violated      : Boolean := False;
       Result        : Boolean := False;
    begin
       case Scheme is
@@ -68,7 +70,16 @@ package body Num_Diff is
       if not All_Inf then
          H_Total := Float (Num_Steps) * H;
          Lower_Dist := X0 - Lower;
+         Upper_Dist := Upper - X0;
       end if;
+
+      case Scheme is
+         when One_Sided =>
+                X := X0 + H_Total;
+                Violated := Check_Bounds (X, Bounds);
+         when Two_Sided =>
+            null;
+      end case;
 
       return Result;
 
