@@ -88,6 +88,8 @@ package NL_Arrays_And_Matrices is
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector;
    function Max (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline (Max);
+   function Min (L, R : Real_Float_Vector) return Real_Float_Vector;
+   pragma Inline (Min);
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix;

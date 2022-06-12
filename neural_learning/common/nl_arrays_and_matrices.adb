@@ -416,6 +416,23 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Min (L, R : Real_Float_Vector) return Real_Float_Vector is
+      Result  : Real_Float_Vector (L'Range);
+   begin
+      for row in L'Range loop
+         if L (row) < R (row) then
+           Result (row) := L (row);
+         else
+           Result (row) := R (row);
+         end if;
+      end loop;
+
+      return Result;
+
+   end Min;
+
+   --  ------------------------------------------------------------------------
+
    function Outer (L, R : Real_Float_Vector) return Real_Float_Vector is
       Result : Real_Float_Vector := L;
    begin
