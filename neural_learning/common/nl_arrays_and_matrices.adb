@@ -77,6 +77,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "<" (L, R : Real_Float_Vector) return Boolean_Array is
+      Result : Boolean_Array (L'Range);
+   begin
+      for row in L'Range loop
+            Result (row) := L (row) < R (row);
+      end loop;
+
+      return Result;
+
+   end "<";
+
+   --  ------------------------------------------------------------------------
+
    function "*" (L, R : Float_Array) return Float_Array is
       Result : Float_Array  := L;
    begin
