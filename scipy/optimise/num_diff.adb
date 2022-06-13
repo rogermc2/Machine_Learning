@@ -324,7 +324,16 @@ package body Num_Diff is
          H_Vecs (index,index) := H (index);
       end loop;
 
-      return J_T;
+      for index in H'Range loop
+         case Method is
+         when FD_2_Point => null;
+         when FD_3_Point => null;
+         when FD_CS => null;
+         when FD_None => null;
+         end case;
+      end loop;
+
+      return Transpose (J_T);
 
    end Dense_Difference;
 
