@@ -29,6 +29,6 @@ package Num_Diff is
       F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
-      As_Linear_Operator : Boolean := False) return Real_Float_Vector;
+      As_Linear_Operator : Boolean := False) return Real_Float_Matrix;
 
 end Num_Diff;

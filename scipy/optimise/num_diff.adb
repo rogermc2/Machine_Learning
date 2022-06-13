@@ -9,6 +9,9 @@ with Maths;
 package body Num_Diff is
 
    type Scheme_Type is (One_Sided, Two_Sided);
+   type Wrapped_Access is
+     access function (Fun : Fun_Access; X : Real_Float_Vector)
+                      return Real_Float_Vector;
 
    EPS : constant Float := Float'Small;
 
@@ -21,6 +24,9 @@ package body Num_Diff is
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_Vector;
+   function Dense_Difference (Fun : Wrapped_Access; X0 : Real_Float_Vector;
+                              F0, H, Use_One_Sided : Real_Float_Vector;
+                              Method : FD_Methods) return Real_Float_Matrix;
    function EPS_For_Method (Method : FD_Methods) return Float;
    function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
    function Fun_Wrapped (Fun : Fun_Access; X : Real_Float_Vector)
@@ -161,7 +167,7 @@ package body Num_Diff is
       F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
-      As_Linear_Operator : Boolean := False) return Real_Float_Vector is
+      As_Linear_Operator : Boolean := False) return Real_Float_Matrix is
       use  Ada.Containers;
       use Real_Float_Arrays;
       Routine_Name  : constant String := "Num_Diff.Approx_Derivative ";
@@ -174,6 +180,7 @@ package body Num_Diff is
       Sign_X0       : Real_Float_Vector (X0'Range) := X0 >= 0.0;
       dX            : Real_Float_Vector (X0'Range);
       dF_dX         : Real_Float_Vector (X0'Range);
+      pragma Unreferenced (dF_dX);
 
    begin
       --  L447
@@ -218,6 +225,7 @@ package body Num_Diff is
 
          df_dx := Mat_Vec (Fun, X0, F0, H, Method);
 
+         --  L495
          case Method is
             when FD_2_Point =>
                Adjust_Scheme_To_Bounds
@@ -230,7 +238,9 @@ package body Num_Diff is
          end case;
       end if;
 
-      return df_dx;
+      --  L504 if sparsity is None:
+      return Dense_Difference (Fun_Wrapped'Access, X0, F0, H, Use_One_Sided,
+                               Method);
 
    end Approx_Derivative;
 
@@ -299,6 +309,24 @@ package body Num_Diff is
       return Abs_Step;
 
    end Compute_Absolute_Step;
+
+   --  -------------------------------------------------------------------------
+
+   function Dense_Difference (Fun : Wrapped_Access; X0 : Real_Float_Vector;
+                              F0, H, Use_One_Sided : Real_Float_Vector;
+                              Method : FD_Methods) return Real_Float_Matrix is
+      use Real_Float_Arrays;
+      H_Vecs : Real_Float_Matrix := Unit_Matrix (H'Length);
+      J_T    : Real_Float_Matrix (F0'Range, X0'Range) :=
+                 (others => (others => 0.0));
+   begin
+      for index in H'Range loop
+         H_Vecs (index,index) := H (index);
+      end loop;
+
+      return J_T;
+
+   end Dense_Difference;
 
    --  -------------------------------------------------------------------------
 
