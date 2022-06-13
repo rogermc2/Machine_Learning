@@ -10,8 +10,7 @@ package body Num_Diff is
 
    type Scheme_Type is (One_Sided, Two_Sided);
    type Wrapped_Access is
-     access function (Fun : Fun_Access; X : Real_Float_Vector)
-                      return Real_Float_Vector;
+     access function (X : Real_Float_Vector) return Real_Float_Vector;
 
    EPS : constant Float := Float'Small;
 
@@ -24,13 +23,12 @@ package body Num_Diff is
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_Vector;
-   function Dense_Difference (Fun : Wrapped_Access; X0 : Real_Float_Vector;
-                              F0, H, Use_One_Sided : Real_Float_Vector;
+   function Dense_Difference (W_Fun                    : Wrapped_Access;
+                              X0, F0, H, Use_One_Sided : Real_Float_Vector;
                               Method : FD_Methods) return Real_Float_Matrix;
    function EPS_For_Method (Method : FD_Methods) return Float;
    function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
-   function Fun_Wrapped (Fun : Fun_Access; X : Real_Float_Vector)
-                         return Real_Float_Vector;
+   function Fun_Wrapped (X : Real_Float_Vector) return Real_Float_Vector;
    --     function Linear_Operator_Difference
    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
    --        Method : FD_Methods) return Real_Float_Vector;
@@ -193,7 +191,7 @@ package body Num_Diff is
 
       --  L462
       if F0'Last < F0'First then
-         L_F0 := Fun_Wrapped (Fun, L_F0);
+         L_F0 := Fun_Wrapped (L_F0);
       end if;
 
       Assert (Check_Bounds (X0, Bounds), Routine_Name & "invalid X0 Bounds");
@@ -312,13 +310,17 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function Dense_Difference (Fun : Wrapped_Access; X0 : Real_Float_Vector;
-                              F0, H, Use_One_Sided : Real_Float_Vector;
+   function Dense_Difference (W_Fun                    : Wrapped_Access;
+                              X0, F0, H, Use_One_Sided : Real_Float_Vector;
                               Method : FD_Methods) return Real_Float_Matrix is
       use Real_Float_Arrays;
       H_Vecs : Real_Float_Matrix := Unit_Matrix (H'Length);
       J_T    : Real_Float_Matrix (F0'Range, X0'Range) :=
                  (others => (others => 0.0));
+      X      : Real_Float_Vector (X0'Range);
+      X1     : Real_Float_Vector (X0'Range);
+      dX     : Float;
+      dF     : Real_Float_Vector (X0'Range);
    begin
       for index in H'Range loop
          H_Vecs (index,index) := H (index);
@@ -326,7 +328,11 @@ package body Num_Diff is
 
       for index in H'Range loop
          case Method is
-         when FD_2_Point => null;
+         when FD_2_Point =>
+            X (index) := X0 (index) + H_Vecs (index, index);
+            dX := X (index) - X0 (index);
+            dF := W_Fun (X) - F0;
+
          when FD_3_Point => null;
          when FD_CS => null;
          when FD_None => null;
