@@ -3,7 +3,6 @@
 with Constraints;
 --  with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with NL_Types;
 
 package Num_Diff is
 

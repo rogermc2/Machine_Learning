@@ -5,8 +5,12 @@ with Differentiable_Functions;
 
 package Optimise is
 
+   type Opt_Fun_Access is access function (X : Real_Float_List) return Float;
+
    type Optimise_Result is record
+      Fun     : Opt_Fun_Access;
       X       : Real_Float_List;
+      Nit     : Positive := 1;
       Success : Boolean := False;
    end record;
 

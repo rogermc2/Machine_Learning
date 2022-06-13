@@ -49,6 +49,7 @@ with Optimise;
 with Opt_Minimise;
 with Printing;
 with Utils;
+with Utils_Optimise;
 
 package body Multilayer_Perceptron is
 
@@ -468,9 +469,6 @@ package body Multilayer_Perceptron is
       Result       : Optimise.Optimise_Result;
       Grads        : Parameters_List;
    begin
-      --        Self.Attributes.Coef_Indptr.Clear;
-      --        Self.Attributes.Intercept_Indptr.Clear;
-      --
       --        --  L524  Save sizes and indices of coefficients for faster unpacking
       --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
       --           N_Fan_In := Layer_Units.Element (index);
@@ -492,8 +490,9 @@ package body Multilayer_Perceptron is
       Result := Opt_Minimise.Minimise (Self.Parameters.Max_Fun, Grads,
                                        Opt_Minimise.L_BFGS_B_Method,
                                        Jac => True, Options => Options);
-
-      Assert (False, Routine_Name & "coding incomplete.");
+      Self.Attributes.N_Iter :=
+        Utils_Optimise.Check_Optimize_Result (Result, Self.Parameters.Max_Iter);
+      Self.Attributes.Loss := Result.Fun (Result.X);
 
    end Fit_Lbfgs;
 
