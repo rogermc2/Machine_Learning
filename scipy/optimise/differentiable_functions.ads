@@ -1,7 +1,7 @@
 --  Based on scipy/optimize/_differentiable_functions.py
 
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
-with Num_Diff;
+with Num_Diff; use Num_Diff;
 
 package Differentiable_Functions is
 
