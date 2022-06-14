@@ -10,7 +10,7 @@ with Opt_Minimise;
 
 package LBFGSB is
 
-    function Minimise_LBFGSB (Fun    : Multilayer_Perceptron.Max_Function_Access;
+    function Minimise_LBFGSB (Fun    : Optimise.Opt_Fun_Access;
                               X0     : Stochastic_Optimizers.Parameters_List;
                               Meth   : Opt_Minimise.Method_Type;
                               Bounds : Constraints.Bounds_List :=

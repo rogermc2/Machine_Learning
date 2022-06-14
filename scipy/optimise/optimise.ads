@@ -10,7 +10,10 @@ package Optimise is
    type Optimise_Result is record
       Fun     : Opt_Fun_Access;
       X       : Real_Float_List;
-      Nit     : Positive := 1;
+      N_It    : Positive := 1;
+      N_Fev   : Natural := 0;
+      N_Jev   : Natural := 0;
+      N_Hev   : Natural := 0;
       Success : Boolean := False;
    end record;
 
