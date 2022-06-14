@@ -15,11 +15,12 @@ package body Differentiable_Functions is
     procedure C_Init
       (Self                  : in out Scalar_Function;
        Fun                   : DP_Fun_Access;
-       X0                    : Fortran_DP_Array; Grad, Hess      : FD_Methods;
+       X0                    : Fortran_DP_Array; Grad, Hess : FD_Methods;
        Finite_Diff_Rel_Step,
        Finite_Diff_Bounds    : Float;
        Epsilon               : Float := 10.0 ** (-8)) is
-        Routine_Name        : constant String := "Differentiable_Functions.C_Init ";
+        Routine_Name        : constant String :=
+                                "Differentiable_Functions.C_Init ";
         Finite_Diff_Options : Finite_Options;
         pragma Unreferenced (Finite_Diff_Options);
 
@@ -47,10 +48,14 @@ package body Differentiable_Functions is
         --  L177
         Update_Grad (Self);
 
-        if Hess /= FD_None then
+        if Hess /= FD_None and Hess /= FD_Hessian_Update_Strategy then
             --  L212
             Update_Hess (Self);
             Self.H_Updated := True;
+        elsif Hess = FD_Hessian_Update_Strategy then
+            Self.Hess := Hess;
+            Self.H_Updated := True;
+            Self.X_Prev := Zero_Array (Positive (X0'Length));
         end if;
 
     end C_Init;

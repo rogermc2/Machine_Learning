@@ -11,4 +11,18 @@ package body Lbfgsb_F_Interface is
          return Result;
    end To_DP_Array;
 
+   --  -------------------------------------------------------------------------
+
+   function Zero_Array (Num_Rows : Positive) return Fortran_DP_Array is
+      Result : Fortran_DP_Array (1 .. Num_Rows);
+   begin
+         for index in Result'Range loop
+            Result (index) := Double_Precision (0.0);
+         end loop;
+
+         return Result;
+   end Zero_Array;
+
+   --  -------------------------------------------------------------------------
+
 end Lbfgsb_F_Interface;

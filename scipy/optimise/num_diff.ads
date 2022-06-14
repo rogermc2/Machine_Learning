@@ -6,7 +6,8 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Num_Diff is
 
-   type FD_Methods is (FD_None, FD_2_Point, FD_3_Point, FD_CS);
+   type FD_Methods is (FD_None, Fd_Callable, FD_2_Point, FD_3_Point, FD_CS,
+                       FD_Hessian_Update_Strategy);
    type Fun_Access is access function (X : Real_Float_Vector)
                                        return Real_Float_Vector;
    type Dimensions is record

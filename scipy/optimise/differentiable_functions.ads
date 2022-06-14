@@ -15,6 +15,8 @@ package Differentiable_Functions is
 --        Update_Fun      : DP_Fun_Access;
 --        Update_Grad     : access procedure;
       X               : Fortran_DP_Array (1 .. X_Size);
+      X_Prev          : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
+      G_Prev          : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
       N_Fev           : Natural := 0;
       N_Gev           : Natural := 0;
       N_Hev           : Natural := 0;

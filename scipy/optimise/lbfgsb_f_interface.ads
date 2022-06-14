@@ -42,5 +42,6 @@ package Lbfgsb_F_Interface is
    pragma Import (Fortran, setulb);
 
    function To_DP_Array (RA : Real_Float_Vector) return Fortran_DP_Array;
+   function Zero_Array (Num_Rows : Positive) return Fortran_DP_Array;
 
 end Lbfgsb_F_Interface;
