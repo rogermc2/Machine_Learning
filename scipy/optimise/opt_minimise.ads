@@ -7,7 +7,11 @@ with Stochastic_Optimizers;
 
 package Opt_Minimise is
 
-   type Method_Type is (L_BFGS_B_Method);
+   type Method_Type is (BFGS_Method, L_BFGS_B_Method, Nelder_Mead_Method,
+                        Powell_Method, Cobyla_Method, Cg_Method, N_Cg_Method,
+                        Newton_Cg_Method, Dogleg_Method, Trust_Ncg_Method,
+                        Tnc_Method, Trust_Constr_Method, Trust_Krylov_Method,
+                        Trust_Exact_Method, Slsqp_Method, Custom_Method);
    type Minimise_Options is record
       Max_Fun        : Multilayer_Perceptron.Max_Function_Access;
       Max_Iter       : Positive;
