@@ -1,9 +1,6 @@
 --  Based on scipy/optimize/lbfgsb_py.py
 
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-
 with Constraints;
-with Multilayer_Perceptron;
 with Stochastic_Optimizers;
 with Optimise;
 with Opt_Minimise;
