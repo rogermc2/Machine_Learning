@@ -28,7 +28,8 @@ package body Opt_Minimise is
 
    function Minimise (Fun         : Optimise.Opt_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
-                      Method      : Method_Type := No_Method; Jac : Boolean := False;
+                      Method      : Method_Type := No_Method;
+                      Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
                       Bounds      : Constraints.Bounds_List :=
                         Constraints.Array_Bounds_Package.Empty_Vector;
                       Constraints : Minimise_Constraints_List :=
@@ -36,10 +37,17 @@ package body Opt_Minimise is
                       Options     : Minimise_Options := No_Options)
                       return Optimise.Optimise_Result is
       --          use Optimise;
-      L_Method  : Method_Type := Method;
-      I_Fixed   : NL_Types.Boolean_List;
-      All_Fixed : Boolean := True;
-      Result    : Optimise.Optimise_Result;
+      use Minimise_Constraints_Package;
+      use Num_Diff;
+      L_Method    : Method_Type := Method;
+      I_Fixed     : NL_Types.Boolean_List;
+      All_Fixed   : Boolean := True;
+      --  L655 determine if finite differences are needed for any grad or jac
+      FD_Needed   : Boolean := Jac /= Fd_Callable;
+      Cons_Cursor : Cursor := Constraints.First;
+      Remove_Vars : Boolean := False;
+      Done        : Boolean := False;
+      Result      : Optimise.Optimise_Result;
    begin
       --  L531
       if L_Method = No_Method then
@@ -64,15 +72,34 @@ package body Opt_Minimise is
                   All_Fixed := All_Fixed and I_Fixed (index);
                end loop;
 
+               Done := All_Fixed;
                if All_Fixed then
                   Result := Optimize_Result_For_Equal_Bounds
                     (Fun, Bounds, Method);
                else
-                  null;
+                  while Has_Element (Cons_Cursor) loop
+                     if Element (Cons_Cursor) /= Callable_Constraint then
+                        FD_Needed := True;
+                        for index in I_Fixed.First_Index
+                          .. I_Fixed.Last_Index loop
+                           Remove_Vars := Remove_Vars or I_Fixed (index);
+                        end loop;
+                        Remove_Vars := Remove_Vars or FD_Needed or
+                          Method = Tnc_Method;
+                        if Remove_Vars then
+                           null;
+                        end if;
+                     end if;
+                     Next (Cons_Cursor);
+                  end loop;
+
                end if;
             end if;
          end if;
-         Result := LBFGSB.Minimise_LBFGSB (Fun, X0, L_Method, Bounds);
+
+         if not Done then
+            Result := LBFGSB.Minimise_LBFGSB (Fun, X0, L_Method, Bounds);
+         end if;
       end if;
 
       return Result;
