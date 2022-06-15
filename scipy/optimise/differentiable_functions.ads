@@ -1,12 +1,15 @@
 --  Based on scipy/optimize/_differentiable_functions.py
 
+with Interfaces.Fortran; use Interfaces.Fortran;
+
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with Num_Diff; use Num_Diff;
 
 package Differentiable_Functions is
 
     type Finite_Options is private;
-    type DP_Fun_Access is access function (X : Fortran_DP_Array) return Float;
+   type DP_Fun_Access is access
+     function (X : Fortran_DP_Array) return Double_Precision;
 
     --  The Scalar_Function class defines a scalar function F: R^n->R and
     --  methods for computing or approximating its first and second derivatives.
@@ -25,9 +28,10 @@ package Differentiable_Functions is
         H_Updated       : Boolean := False;
         Grad            : FD_Methods;
         Hess            : FD_Methods;
-        F               : Float := Float'Safe_Last;
+        F               : Double_Precision := Long_Float'Safe_Last;
+        G               : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
         Lowest_X        : Fortran_DP_Array (1 .. X_Size);
-        Lowest_F        : Float := Float'Safe_Last;
+        Lowest_F        : Double_Precision := Long_Float'Safe_Last;
     end record;
 
     procedure C_Init
@@ -39,8 +43,10 @@ package Differentiable_Functions is
        Epsilon                : Float := 10.0 ** (-8));
     procedure Fun_And_Grad
       (Self : in out Scalar_Function;
---        X : Fortran_DP_Array;
-       Fun : out DP_Fun_Access; Grad : out FD_Methods);
+       X    : Fortran_DP_Array;
+       Fun_Val : out Double_Precision ; Grad : out Fortran_DP_Array);
+   function Grad (Self : in out Scalar_Function; X : Fortran_DP_Array)
+                  return Fortran_DP_Array;
 
 private
 

@@ -91,7 +91,7 @@ package body LBFGSB is
             D_Save, Fortran_Integer (Options.Max_Line_Steps));
          if Task_Name (1 .. 2) = "FG" then
             Scalar_Func := Optimise.Prepare_Scalar_Function;
-            Fun_And_Grad (Scalar_Func, F, G);
+            Fun_And_Grad (Scalar_Func, X, F, G);
          elsif Task_Name (1 .. 5) = "NEW_X" then
             Scalar_Func := Optimise.Prepare_Scalar_Function;
          else
