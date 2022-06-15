@@ -62,6 +62,21 @@ package body Differentiable_Functions is
 
     --  -------------------------------------------------------------------------
 
+    procedure Fun_And_Grad
+      (Self : in out Scalar_Function;
+--        X : Fortran_DP_Array;
+       Fun : out DP_Fun_Access; Grad : out FD_Methods) is
+    begin
+        Update_Fun (Self);
+        Update_Grad (Self);
+        Fun := Self.Fun;
+        Grad := Self.Grad;
+
+    end Fun_And_Grad;
+
+    --  -------------------------------------------------------------------------
+
+
     --  L132
     function Fun_Wrapped (Self : in out Scalar_Function; Fun   : DP_Fun_Access;
                           X    : Fortran_DP_Array) return Float is
