@@ -8,7 +8,7 @@ package body Opt_Minimise is
 
    function Optimize_Result_For_Equal_Bounds
      (Fun         : Optimise.Opt_Fun_Access;
-      Bounds      : Constraints.Bounds_List; Method : Method_Type)
+      Bounds      : Constraints.Bounds_List)
       return Optimise.Optimise_Result;
    --  Standardize_Bounds converts bounds to the form required by the solver
    --     function Standardize_Bounds (Bounds : Constraints.Bounds_List;
@@ -33,8 +33,8 @@ package body Opt_Minimise is
                       Bounds      : Constraints.Bounds_List :=
                         Constraints.Array_Bounds_Package.Empty_Vector;
                       Constraints : Minimise_Constraints_List :=
-                        Minimise_Constraints_Package.Empty_List;
-                      Options     : Minimise_Options := No_Options)
+                        Minimise_Constraints_Package.Empty_List)
+--                        Options     : Minimise_Options := No_Options)
                       return Optimise.Optimise_Result is
       --          use Optimise;
       use Minimise_Constraints_Package;
@@ -74,8 +74,7 @@ package body Opt_Minimise is
 
                Done := All_Fixed;
                if All_Fixed then
-                  Result := Optimize_Result_For_Equal_Bounds
-                    (Fun, Bounds, Method);
+                  Result := Optimize_Result_For_Equal_Bounds (Fun, Bounds);
                else
                   while Has_Element (Cons_Cursor) loop
                      if Element (Cons_Cursor) /= Callable_Constraint then
@@ -86,21 +85,29 @@ package body Opt_Minimise is
                         end loop;
                         Remove_Vars := Remove_Vars or FD_Needed or
                           Method = Tnc_Method;
-                        if Remove_Vars then
-                           null;
-                        end if;
+--                          if Remove_Vars then
+--                             null;
+--                          end if;
                      end if;
                      Next (Cons_Cursor);
                   end loop;
 
                end if;
             end if;
-         end if;
+         end if;  --  not Bounds.Is_Empty
 
          if not Done then
-            Result := LBFGSB.Minimise_LBFGSB (Fun, X0, L_Method, Bounds);
+            case Method is
+               when L_BFGS_B_Method =>
+                  Result := LBFGSB.Minimise_LBFGSB (Fun, X0, L_Method, Bounds);
+               when others => null;
+            end case;
          end if;
-      end if;
+
+--           if Remove_Vars then
+--              null;
+--           end if;
+      end if;  --  Check_Options
 
       return Result;
 
@@ -110,10 +117,10 @@ package body Opt_Minimise is
 
    function Optimize_Result_For_Equal_Bounds
      (Fun         : Optimise.Opt_Fun_Access;
-      Bounds      : Constraints.Bounds_List; Method : Method_Type)
+      Bounds      : Constraints.Bounds_List)
       return Optimise.Optimise_Result is
       use NL_Arrays_And_Matrices;
-      Success : Boolean := True;
+      Success : constant Boolean := True;
       X0      : Real_Float_List;
       Result  : Optimise.Optimise_Result;
    begin

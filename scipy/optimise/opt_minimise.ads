@@ -40,8 +40,8 @@ package Opt_Minimise is
                       Bounds      : Constraints.Bounds_List :=
                         Constraints.Array_Bounds_Package.Empty_Vector;
                       Constraints : Minimise_Constraints_List :=
-                        Minimise_Constraints_Package.Empty_List;
-                      Options     : Minimise_Options := No_Options)
+                        Minimise_Constraints_Package.Empty_List)
+--                        Options     : Minimise_Options := No_Options)
                       return Optimise.Optimise_Result;
 
 end Opt_Minimise;
