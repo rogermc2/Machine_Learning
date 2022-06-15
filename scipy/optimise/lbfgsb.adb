@@ -5,14 +5,15 @@ with Interfaces.Fortran;
 with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Containers;
 
+with Differentiable_Functions;
 with Lbfgsb_F_Interface;
 
 package body LBFGSB is
    --      type Byte is range -128 .. 127;
---     type Byte is mod 256;
---     for  Byte'Size use 16;
+   --     type Byte is mod 256;
+   --     for  Byte'Size use 16;
 
---     type S60 is new Interfaces.Fortran.Fortran_Character (1 .. 60);
+   --     type S60 is new Interfaces.Fortran.Fortran_Character (1 .. 60);
 
    function Minimise_LBFGSB (Fun      : Optimise.Opt_Fun_Access;
                              X0       : Stochastic_Optimizers.Parameters_List;
@@ -30,7 +31,7 @@ package body LBFGSB is
                                Opt_Minimise.No_Options)
                              return Optimise.Optimise_Result is
       use Interfaces.Fortran;
---        use Ada.Containers;
+      --        use Ada.Containers;
       use Stochastic_Optimizers;
       use Lbfgsb_F_Interface;
       Routine_Name   : constant String := "LBFGSB.Minimise_LBFGSB";
@@ -46,8 +47,8 @@ package body LBFGSB is
       Upper_Bound    : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
       F              : Interfaces.Fortran.Double_Precision := 0.0;
       G              : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
-      PGtol          : Float := Gtol;
-      Factor         : Float := Ftol / Eps;
+      PGtol          : Double_Precision := Double_Precision (Gtol);
+      Factor         : Double_Precision := Double_Precision (Ftol / Eps);
       wa_Length      : Integer := 2 * Max_Cor * X0_Length + 5 * X0_Length
                          + 11 * Max_Cor ** 2 + 8 * Max_Cor;
       wa             : Fortran_DP_Array (1 .. wa_Length) :=  (others => 0.0);
@@ -58,6 +59,7 @@ package body LBFGSB is
       D_Save         : Fortran_DSave_Array := (others => 0.0);
       C_Save         : Character_60 := To_Fortran ("");
       Task_Name      : Character_60 := To_Fortran ("START");
+      Scalar_Func    : Differentiable_Functions.Scalar_Function (X0_Length);
       Continiue      : Boolean := True;
       Result         : Optimise.Optimise_Result;
    begin
@@ -83,13 +85,16 @@ package body LBFGSB is
       --  L361
       while Continiue loop
          Lbfgsb_F_Interface.Setulb
-           (M, X,
-            Low_Bound, Upper_Bound,
-            Fortran_Integer_Array (nbd), f, Fortran_DP_Array (g),
-            Double_Precision (factor), Double_Precision (pgtol),
-            wa, iwa, Task_Name, I_Print, C_Save,
-            L_Save, I_Save, D_Save,
-            Fortran_Integer (Options.Max_Line_Steps));
+           (M, X, Low_Bound, Upper_Bound, nbd, f, G,
+            Factor, Pgtol, Wa, Iwa, Task_Name, I_Print, C_Save, L_Save, I_Save,
+            D_Save, Fortran_Integer (Options.Max_Line_Steps));
+         if Task_Name (1 .. 2) = "FG" then
+            null;
+         elsif Task_Name (1 .. 5) = "NEW_X" then
+            Scalar_Func := Optimise.Prepare_Scalar_Function;
+         else
+            Continiue := False;
+         end if;
       end loop;
 
       return Result;
