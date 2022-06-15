@@ -32,37 +32,38 @@ package body LBFGSB is
                              return Optimise.Optimise_Result is
       use Interfaces.Fortran;
       --        use Ada.Containers;
---        use Stochastic_Optimizers;
+      --        use Stochastic_Optimizers;
       use Differentiable_Functions;
       use Lbfgsb_F_Interface;
-      Routine_Name   : constant String := "LBFGSB.Minimise_LBFGSB";
-      X0_Length      : constant Positive := Positive (X0.Length);
-      I_Print        : constant Fortran_Integer := -1;  --  L273
-      X              : Fortran_DP_Array (1 .. X0_Length);
+      Routine_Name    : constant String := "LBFGSB.Minimise_LBFGSB";
+      X0_Length       : constant Positive := Positive (X0.Length);
+      I_Print         : constant Fortran_Integer := -1;  --  L273
+      X               : Fortran_DP_Array (1 .. X0_Length);
       --          X              : Parameters_List := X0;
-      Num_Iterations : Natural := 0;
-      M              : Fortran_Integer := Fortran_Integer (Max_Cor);
-      Nbd            : Fortran_Integer_Array (1 .. X0_Length) :=
-                         (others => 0);
-      Low_Bound      : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
-      Upper_Bound    : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
-      F              : Double_Precision := 0.0;
-      G              : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
-      PGtol          : Double_Precision := Double_Precision (Gtol);
-      Factor         : Double_Precision := Double_Precision (Ftol / Eps);
-      Wa_Length      : Integer := 2 * Max_Cor * X0_Length + 5 * X0_Length
-                         + 11 * Max_Cor ** 2 + 8 * Max_Cor;
-      Wa             : Fortran_DP_Array (1 .. wa_Length) :=  (others => 0.0);
+      Num_Iterations  : Natural := 0;
+      M               : Fortran_Integer := Fortran_Integer (Max_Cor);
+      Nbd             : Fortran_Integer_Array (1 .. X0_Length) :=
+                          (others => 0);
+      Low_Bound       : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
+      Upper_Bound     : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
+      F               : Double_Precision := 0.0;
+      G               : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
+      PGtol           : Double_Precision := Double_Precision (Gtol);
+      Factor          : Double_Precision := Double_Precision (Ftol / Eps);
+      Wa_Length       : Integer := 2 * Max_Cor * X0_Length + 5 * X0_Length
+                          + 11 * Max_Cor ** 2 + 8 * Max_Cor;
+      Wa              : Fortran_DP_Array (1 .. wa_Length) :=  (others => 0.0);
       I_Wa            : Fortran_Integer_Array (1 .. 3 * X0_Length) :=
-                         (others => 0);
-      L_Save         : Fortran_LSave_Array := (others => 0);
-      I_Save         : Fortran_Integer_Array (1 .. 44) := (others => 0);
-      D_Save         : Fortran_DSave_Array := (others => 0.0);
-      C_Save         : Character_60 := To_Fortran ("");
-      Task_Name      : Character_60 := To_Fortran ("START");
-      Scalar_Func    : Differentiable_Functions.Scalar_Function (X0_Length);
-      Continiue      : Boolean := True;
-      Result         : Optimise.Optimise_Result;
+                          (others => 0);
+      L_Save          : Fortran_LSave_Array := (others => 0);
+      I_Save          : Fortran_Integer_Array (1 .. 44) := (others => 0);
+      D_Save          : Fortran_DSave_Array := (others => 0.0);
+      C_Save          : Character_60 := To_Fortran ("");
+      Task_Name       : Character_60 := To_Fortran ("START");
+      Scalar_Func     : Differentiable_Functions.Scalar_Function (X0_Length);
+      Continiue       : Boolean := True;
+      Warn_Flag       : Natural;
+      Result          : Optimise.Optimise_Result;
    begin
       --  L266
       if not Bounds.Is_Empty then
@@ -83,7 +84,7 @@ package body LBFGSB is
 
       --  L309
 
-      --  L361
+      --  L351
       while Continiue loop
          Lbfgsb_F_Interface.Setulb
            (M, X, Low_Bound, Upper_Bound, nbd, f, G,
@@ -99,6 +100,13 @@ package body LBFGSB is
          end if;
       end loop;
 
+      if Task_Name (1 .. 4) = "CONV" then
+         Warn_Flag := 0;
+      elsif Scalar_Func.N_Fev > Max_Fun or Num_Iterations > Max_Iter then
+         Warn_Flag := 1;
+      else
+         Warn_Flag := 2;
+      end if;
       return Result;
 
    end Minimise_LBFGSB;
