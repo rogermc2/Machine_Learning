@@ -4,6 +4,7 @@ with Interfaces.Fortran;
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Lbfgsb_F_Interface;
 
@@ -13,6 +14,9 @@ package body LBFGSB is
     for  Byte'Size use 16;
 
     type S60 is new Interfaces.Fortran.Fortran_Character (1 .. 60);
+
+    function To_Fortran (Text : in out Unbounded_String)
+                         return Lbfgsb_F_Interface.Character_60;
 
     function Minimise_LBFGSB (Fun    : Optimise.Opt_Fun_Access;
                               X0     : Stochastic_Optimizers.Parameters_List;
@@ -35,29 +39,29 @@ package body LBFGSB is
         use Lbfgsb_F_Interface;
         Routine_Name : constant String := "LBFGSB.Minimise_LBFGSB";
         X0_Length    : constant Positive := Positive (X0.Length);
-        I_Print        : constant Integer := -1;  --  L273
-        X              : Parameters_List := X0;
+        I_Print        : constant Fortran_Integer := -1;  --  L273
+        X              : Fortran_DP_Array (1 .. X0_Length);
+--          X              : Parameters_List := X0;
         Num_Iterations : Natural := 0;
-        M              : Integer := Max_Cor;
-        Nbd            : array (1 .. X0_Length) of
-          Interfaces.Fortran.Fortran_Integer := (others => 0);
-        Low_Bound      : array (1 .. X0_Length) of Integer := (others => 0);
-        Upper_Bound    : array (1 .. X0_Length) of Integer := (others => 0);
+        M              : Fortran_Integer := Fortran_Integer (Max_Cor);
+        Nbd            : Fortran_Integer_Array (1 .. X0_Length) :=
+                           (others => 0);
+        Low_Bound      : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
+        Upper_Bound    : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
         F              : Interfaces.Fortran.Double_Precision := 0.0;
-        G                                  : array (1 .. X0_Length) of Integer :=
-                                               (others => 0);
+        G              : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
         PGtol          : Float := Gtol;
-        Factor                             : Float := Ftol / Eps;
-        wa             : array (1 .. 2 * Max_Cor * X0_Length + 5 * X0_Length
-                                + 11 * Max_Cor ** 2 + 8 * Max_Cor) of Float :=
-                           (others => 0.0);
-        iwa            : array (1 .. 3 * X0_Length) of Fortran_Integer :=
+        Factor         : Float := Ftol / Eps;
+        wa_Length      : Integer := 2 * Max_Cor * X0_Length + 5 * X0_Length
+                                + 11 * Max_Cor ** 2 + 8 * Max_Cor;
+        wa             : Fortran_DP_Array (1 .. wa_Length) :=  (others => 0.0);
+        iwa            : Fortran_Integer_Array (1 .. 3 * X0_Length) :=
                            (others => 0);
         L_Save         : Fortran_LSave_Array := (others => 0);
         I_Save         : Fortran_Integer_Array (1 .. 44) := (others => 0);
         D_Save         : Fortran_DSave_Array := (others => 0.0);
-        C_Save         : String := "";
-        Task_Name      : String := "START";
+        C_Save         : Unbounded_String := To_Unbounded_String ("");
+        Task_Name      : Unbounded_String := To_Unbounded_String ("START");
         Continiue      : Boolean := True;
         Result       : Optimise.Optimise_Result;
     begin
@@ -83,18 +87,27 @@ package body LBFGSB is
         --  L361
         while Continiue loop
             Lbfgsb_F_Interface.Setulb
-              (Fortran_Integer (M), Fortran_DP_Array (X),
-               Fortran_DP_Array (Low_Bound), Fortran_DP_Array (Upper_Bound),
+              (M, X,
+               Low_Bound, Upper_Bound,
                Fortran_Integer_Array (nbd), f, Fortran_DP_Array (g),
                Double_Precision (factor), Double_Precision (pgtol),
-               Double_Precision (wa), Double_Precision (iwa),
-               To_Fortran (Task_Name), Fortran_Integer (I_Print),
-               To_Fortran (C_Save), L_Save, I_Save, D_Save,
+               wa, iwa, To_Fortran (Task_Name), I_Print, To_Fortran (C_Save),
+               L_Save, I_Save, D_Save,
                 Fortran_Integer (Options.Max_Line_Steps));
         end loop;
 
         return Result;
 
     end Minimise_LBFGSB;
+
+    --  ------------------------------------------------------------------------
+
+    function To_Fortran (Text : in out Unbounded_String)
+                         return Lbfgsb_F_Interface.Character_60 is
+       F_String : Lbfgsb_F_Interface.Character_60;
+    begin
+        return F_String;
+
+    end To_Fortran;
 
 end LBFGSB;
