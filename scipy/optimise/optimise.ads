@@ -1,6 +1,7 @@
 --  Based on scipy/optimize/optimize.py
 
-with Differentiable_Functions;
+with Constraints;
+with Differentiable_Functions; use Differentiable_Functions;
 with Lbfgsb_F_Interface;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
@@ -24,8 +25,17 @@ package Optimise is
     end record;
 
     function Prepare_Scalar_Function
-      return Differentiable_Functions.Scalar_Function;
-    function F_Min_BFGS (X : Real_Float_Arrays.Real_Vector)
+      (Fun : DP_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
+       Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
+       Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
+    return Scalar_Function;
+    function Prepare_Jac_Scalar_Function
+      (Fun : DP_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
+       Jac : Lbfgsb_F_Interface.Fortran_DP_Array;
+       Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
+       Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
+    return Scalar_Function;
+    function F_Min_BFGS (F : DP_Fun_Access; X : Lbfgsb_F_Interface.Fortran_DP_Array)
                          return Optimise_Result;
 
 end Optimise;

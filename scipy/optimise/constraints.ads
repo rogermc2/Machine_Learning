@@ -12,6 +12,9 @@ package Constraints is
       Upper : Float := Float'Safe_Last;
    end record;
 
+   Default_Bounds : constant Array_Bounds :=
+                       (Float'Safe_First, Float'Safe_Last);
+
    package Array_Bounds_Package is new Ada.Containers.Vectors
      (Positive, Array_Bounds);
    subtype Bounds_List is Array_Bounds_Package.Vector;

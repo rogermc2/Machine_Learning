@@ -2,6 +2,7 @@
 
 with Interfaces.Fortran; use Interfaces.Fortran;
 
+with Constraints;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with Num_Diff; use Num_Diff;
 
@@ -18,6 +19,7 @@ package Differentiable_Functions is
         --        Update_Fun      : DP_Fun_Access;
         --        Update_Grad     : access procedure;
         X               : Fortran_DP_Array (1 .. X_Size);
+        Bounds          : Constraints.Array_Bounds;
         X_Prev          : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
         G_Prev          : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
         N_Fev           : Natural := 0;
@@ -28,6 +30,7 @@ package Differentiable_Functions is
         H_Updated       : Boolean := False;
         Grad            : FD_Methods;
         Hess            : FD_Methods;
+        F_Diff_Rel_Step : Float := 0.0;
         F               : Double_Precision := Long_Float'Safe_Last;
         G               : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
         Lowest_X        : Fortran_DP_Array (1 .. X_Size);
