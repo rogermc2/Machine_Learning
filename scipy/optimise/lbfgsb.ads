@@ -1,9 +1,9 @@
 --  Based on scipy/optimize/lbfgsb_py.py
 
 with Constraints;
-with Stochastic_Optimizers;
 with Optimise;
 with Opt_Minimise;
+with Stochastic_Optimizers;
 
 package LBFGSB is
 
