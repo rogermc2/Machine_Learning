@@ -1,13 +1,14 @@
 --  Based on scipy/optimize/lbfgsb_py.py
 
 with Constraints;
+with Differentiable_Functions;
 with Optimise;
 with Opt_Minimise;
 with Stochastic_Optimizers;
 
 package LBFGSB is
 
-    function Minimise_LBFGSB (Fun    : Optimise.Opt_Fun_Access;
+    function Minimise_LBFGSB (Fun    : Differentiable_Functions.DP_Fun_Access;
                               X0     : Stochastic_Optimizers.Parameters_List;
                               Bounds : Constraints.Bounds_List :=
                                 Constraints.Array_Bounds_Package.Empty_Vector;

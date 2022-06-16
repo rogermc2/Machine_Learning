@@ -46,6 +46,7 @@ with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
 with Num_Diff;
+with Optimise;
 with Opt_Minimise;
 with Printing;
 with Utils;
@@ -301,7 +302,8 @@ package body Multilayer_Perceptron is
                      Epsilon             : Float := 10.0 ** (-8);
                      N_Iter_No_Change    : Natural := 10;
                      Max_Fun             : Max_Function_Access := null;
-                     Opt_Fun             : Optimise.Opt_Fun_Access := null)
+                     DP_Fun              : Differentiable_Functions.
+                       DP_Fun_Access := null)
                     return MLP_Classifier is
         Classifier : MLP_Classifier;
     begin
@@ -329,7 +331,7 @@ package body Multilayer_Perceptron is
         Classifier.Parameters.Epsilon             := Epsilon;
         Classifier.Parameters.N_Iter_No_Change    := N_Iter_No_Change;
         Classifier.Parameters.Max_Fun             := Max_Fun;
-        Classifier.Parameters.Opt_Fun             := Opt_Fun;
+        Classifier.Parameters.DP_Fun              := DP_Fun;
         First_Pass                                := True;
         return Classifier;
     end C_Init;
@@ -491,7 +493,7 @@ package body Multilayer_Perceptron is
 
         --  L546  Grads similar to packed_coef_inter
         Result := Opt_Minimise.Minimise
-          (Fun => Self.Parameters.Opt_Fun, X0 => Grads,
+          (Fun => Self.Parameters.DP_Fun, X0 => Grads,
            Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
         Self.Attributes.N_Iter :=
           Utils_Optimise.Check_Optimize_Result (Result, Self.Parameters.Max_Iter);

@@ -3,6 +3,7 @@
 with Ada.Containers.Doubly_Linked_Lists;
 
 with Constraints;
+with Differentiable_Functions;
 with Multilayer_Perceptron;
 with Num_Diff;
 with Optimise;
@@ -13,6 +14,7 @@ package Opt_Minimise is
    type Minimise_Constraints_Type is
      (No_Constraint, Linear_Constraint, Nonlinear_Constraint,
       Callable_Constraint);
+
    package Minimise_Constraints_Package is new
      Ada.Containers.Doubly_Linked_Lists (Minimise_Constraints_Type);
    subtype Minimise_Constraints_List is Minimise_Constraints_Package.List;
@@ -33,7 +35,7 @@ package Opt_Minimise is
 
    No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
-   function Minimise (Fun         : Optimise.Opt_Fun_Access;
+   function Minimise (Fun         : Differentiable_Functions.DP_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;

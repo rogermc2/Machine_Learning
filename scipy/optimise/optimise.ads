@@ -11,7 +11,7 @@ package Optimise is
 
     type Optimise_Result
       (Jac_Length, N_Coor, N : Natural) is record
-        Fun      : Opt_Fun_Access;
+        Fun      : DP_Fun_Access;
         X        : Real_Float_List;
         Jac      : Lbfgsb_F_Interface.Fortran_DP_Array (1 .. Jac_Length);
         N_It     : Positive := 1;
