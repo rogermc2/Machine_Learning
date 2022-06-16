@@ -35,7 +35,7 @@ package Optimise is
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
     return Scalar_Function;
-    function F_Min_BFGS (F : DP_Fun_Access; X : Lbfgsb_F_Interface.Fortran_DP_Array)
+    function F_Min_BFGS (F : DP_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array)
                          return Optimise_Result;
 
 end Optimise;

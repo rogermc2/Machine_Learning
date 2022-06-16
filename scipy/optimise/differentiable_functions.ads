@@ -19,6 +19,7 @@ package Differentiable_Functions is
         --        Update_Fun      : DP_Fun_Access;
         --        Update_Grad     : access procedure;
         X               : Fortran_DP_Array (1 .. X_Size);
+        Jac             : Fortran_DP_Array (1 .. X_Size);
         Bounds          : Constraints.Array_Bounds;
         X_Prev          : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
         G_Prev          : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
@@ -35,6 +36,7 @@ package Differentiable_Functions is
         G               : Fortran_DP_Array (1 .. X_Size) := (others => 0.0);
         Lowest_X        : Fortran_DP_Array (1 .. X_Size);
         Lowest_F        : Double_Precision := Long_Float'Safe_Last;
+        Epsilon         : Float := 10.0 ** (-8);
     end record;
 
     procedure C_Init
