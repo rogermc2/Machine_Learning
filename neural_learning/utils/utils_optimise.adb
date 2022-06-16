@@ -17,9 +17,9 @@ package body Utils_Optimise is
       end if;
 
       if Max_Iter > 0 then
-         Iter := Integer'Min (Result.Nit, Max_Iter);
+         Iter := Integer'Min (Result.N_It, Max_Iter);
       else
-         Iter := Result.Nit;
+         Iter := Result.N_It;
       end if;
 
       return Iter;

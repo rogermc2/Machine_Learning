@@ -25,7 +25,7 @@ package Optimise is
 
     function Prepare_Scalar_Function
       return Differentiable_Functions.Scalar_Function;
-    function F_Min_BFGS ( X : Real_Float_Arrays.Real_Vector)
-                        return Optimise_Result;
+    function F_Min_BFGS (X : Real_Float_Arrays.Real_Vector)
+                         return Optimise_Result;
 
 end Optimise;

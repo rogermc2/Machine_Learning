@@ -16,14 +16,13 @@ package body LBFGSB is
 
     --     type S60 is new Interfaces.Fortran.Fortran_Character (1 .. 60);
 
-    type Lbfgs_Inv_Hess_Product (N_Coor, N : Positive) is record
-        SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
-        YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
-    end record;
+--      type Lbfgs_Inv_Hess_Product (N_Coor, N : Positive) is record
+--          SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
+--          YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
+--      end record;
 
     function Minimise_LBFGSB (Fun      : Optimise.Opt_Fun_Access;
                               X0       : Stochastic_Optimizers.Parameters_List;
-                              Meth     : Opt_Minimise.Method_Type;
                               Bounds   : Constraints.Bounds_List :=
                                 Constraints.Array_Bounds_Package.Empty_Vector;
                               Max_Cor  : Positive := 10;
@@ -47,16 +46,17 @@ package body LBFGSB is
         X               : Fortran_DP_Array (1 .. X0_Length);
         --          X              : Parameters_List := X0;
         Num_Iterations  : Natural := 0;
-        M               : Fortran_Integer := Fortran_Integer (Max_Cor);
-        Nbd             : Fortran_Integer_Array (1 .. X0_Length) :=
-                            (others => 0);
+        M               : constant Fortran_Integer := Fortran_Integer (Max_Cor);
+        --  L331 nbd[i] = bounds_map[l, u] => bounds_map[1, 1] = 2
+        Nbd             : constant Fortran_Integer_Array (1 .. X0_Length) :=
+                            (others => 2);
         Low_Bound       : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
         Upper_Bound     : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
         F               : Double_Precision := 0.0;
         G               : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
         PGtol           : Double_Precision := Double_Precision (Gtol);
         Factor          : Double_Precision := Double_Precision (Ftol / Eps);
-        Wa_Length       : Integer := 2 * Max_Cor * X0_Length + 5 * X0_Length
+        Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length + 5 * X0_Length
                             + 11 * Max_Cor ** 2 + 8 * Max_Cor;
         Wa              : Fortran_DP_Array (1 .. wa_Length) :=  (others => 0.0);
         I_Wa            : Fortran_Integer_Array (1 .. 3 * X0_Length) :=
@@ -88,9 +88,14 @@ package body LBFGSB is
             --              end loop;
         end loop;
 
-        --  L309
+        --  L323
+        for index in 1 .. X0_Length loop
+            Low_Bound (index) := Double_Precision (Bounds (index).Lower);
+            Upper_Bound (index) := Double_Precision (Bounds (index).Upper);
+        end loop;
 
-        --  L351
+        --  L349
+        Num_Iterations := 0;
         while Continiue loop
             Lbfgsb_F_Interface.Setulb
               (M, X, Low_Bound, Upper_Bound, nbd, f, G,
@@ -100,7 +105,15 @@ package body LBFGSB is
                 Scalar_Func := Optimise.Prepare_Scalar_Function;
                 Fun_And_Grad (Scalar_Func, X, F, G);
             elsif Task_Name (1 .. 5) = "NEW_X" then
+                Num_Iterations := Num_Iterations + 1;
                 Scalar_Func := Optimise.Prepare_Scalar_Function;
+                if Num_Iterations > Max_Iter then
+                    Task_Name (1 .. 43) :=
+                      "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT";
+                elsif Scalar_Func.N_Fev > Max_Fun then
+                    Task_Name (1 .. 52) :=
+                      "STOP: TOTAL NO. of f AND g EVALUATIONS Exceeds LIMIT";
+                end if;
             else
                 Continiue := False;
             end if;
@@ -118,12 +131,12 @@ package body LBFGSB is
         declare
             use NL_Arrays_And_Matrices;
             MN         : constant Positive := Positive (M) * X0_Length - 1;
-            Bfgs_Iters : constant Positive := Positive (I_Save (31));
-            Num_Corrs  : constant Positive :=
-                           Positive'Min (Bfgs_Iters, Max_Cor);
+--              Bfgs_Iters : constant Positive := Positive (I_Save (31));
+--              Num_Corrs  : constant Positive :=
+--                             Positive'Min (Bfgs_Iters, Max_Cor);
             S          : Real_Float_Matrix (1 .. Positive (M), 1 .. X0_Length);
             Y          : Real_Float_Matrix (1 .. Positive (M), 1 .. X0_Length);
-            Hess_Inv   : Lbfgs_Inv_Hess_Product (Positive (M), X0_Length);
+--              Hess_Inv   : Lbfgs_Inv_Hess_Product (Positive (M), X0_Length);
             Result_J   : Optimise.Optimise_Result
               (G'Length, Positive (M), X0_Length);
         begin
@@ -142,18 +155,21 @@ package body LBFGSB is
                 end loop;
             end loop;
 
-            Hess_Inv.SK := S;
-            Hess_Inv.YK := Y;
+--              Hess_Inv.SK := S;
+--              Hess_Inv.YK := Y;
             Result_J.Fun := Fun;
             Result_J.Jac := G;
             Result_J.N_Fev := Scalar_Func.N_Fev;
             Result_J.N_Jev := Scalar_Func.N_Gev;
             Result_J.N_It := Num_Iterations;
             Result_J.Status := Warn_Flag;
-            Result_J.X := X;
             Result_J.Success := Warn_Flag = 0;
-            Result_J.SK := Hess_Inv.SK;
-            Result_J.YK := Hess_Inv.YK;
+            Result_J.SK := S;
+            Result_J.YK := Y;
+            Result_J.X.Clear;
+            for index in X'First .. X'Last loop
+                 Result_J.X.Append (Float (X (index)));
+            end loop;
 
             Result := Result_J;
         end;

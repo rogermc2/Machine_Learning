@@ -1,11 +1,12 @@
 
 --  with Ada.Containers.Vectors;
 
+with Base_Neural;
+with Estimator;
 with Label;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Base_Neural;
-with Estimator;
+with Optimise;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
@@ -93,6 +94,7 @@ package Multilayer_Perceptron is
            Epsilon               : Float := 10.0 ** (-8);
            N_Iter_No_Change      : Natural := 10;
            Max_Fun               : Max_Function_Access := null;
+           Opt_Fun               : Optimise.Opt_Fun_Access := null;
        end record;
 
     type MLP_Classifier is
@@ -129,7 +131,8 @@ package Multilayer_Perceptron is
                      Beta_2              : Float := 0.999;
                      Epsilon             : Float := 10.0 ** (-8);
                      N_Iter_No_Change    : Natural := 10;
-                     Max_Fun             : Max_Function_Access := null)
+                     Max_Fun             : Max_Function_Access := null;
+                     Opt_Fun             : Optimise.Opt_Fun_Access := null)
                      return MLP_Classifier;
     procedure Fit (Self : in out MLP_Classifier;
                    X    : Real_Float_Matrix;

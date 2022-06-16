@@ -47,7 +47,7 @@ package body Opt_Minimise is
       Cons_Cursor : Cursor := Constraints.First;
       Remove_Vars : Boolean := False;
       Done        : Boolean := False;
-      Result      : Optimise.Optimise_Result;
+      Result      : Optimise.Optimise_Result (0, 0, 0);
    begin
       --  L531
       if L_Method = No_Method then
@@ -99,7 +99,8 @@ package body Opt_Minimise is
          if not Done then
             case Method is
                when L_BFGS_B_Method =>
-                  Result := LBFGSB.Minimise_LBFGSB (Fun, X0, L_Method, Bounds);
+               Result := LBFGSB.Minimise_LBFGSB (Fun => Fun, X0 => X0,
+                                                 Bounds => Bounds);
                when others => null;
             end case;
          end if;
@@ -122,7 +123,7 @@ package body Opt_Minimise is
       use NL_Arrays_And_Matrices;
       Success : constant Boolean := True;
       X0      : Real_Float_List;
-      Result  : Optimise.Optimise_Result;
+      Result  : Optimise.Optimise_Result (0, 0, 0);
    begin
       for index in Bounds.First_Index .. Bounds.Last_Index loop
          X0.Append (Bounds (index).Lower);

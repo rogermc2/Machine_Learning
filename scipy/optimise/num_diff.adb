@@ -232,7 +232,8 @@ package body Num_Diff is
                 Adjust_Scheme_To_Bounds
                   (X0, H, 1, Two_Sided, Bounds, Use_One_Sided);
             when FD_CS => Use_One_Sided := (others => 0.0);
-            when FD_None => null;
+            when FD_None | Fd_Callable | FD_True | FD_False |
+                 FD_Hessian_Update_Strategy => null;
             end case;
         end if;
 
@@ -351,7 +352,7 @@ package body Num_Diff is
             when FD_CS =>
                 Assert (False, Routine_Name &
                           "CS not implemented, uses imaginay values");
-            when FD_None => null;
+            when others => null;
             end case;
 
             for col in J_T'Range (2) loop
@@ -375,7 +376,7 @@ package body Num_Diff is
                 Value := Sqrt (EPS);
             when FD_3_Point =>
                 Value := EPS ** (1 / 3);
-            when FD_None => null;
+            when others => null;
         end case;
 
         return Value;
@@ -458,7 +459,7 @@ package body Num_Diff is
                 X1 := X0 + dx_P;
                 Assert (False, Routine_Name &
                           "CS incomplete, uses complex values");
-            when FD_None => null;
+            when others => null;
             end case;
         end if;
         --  Use something like?
