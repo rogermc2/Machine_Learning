@@ -12,7 +12,7 @@ package body NL_Arrays_And_Matrices is
       Result : Boolean_Array (L'Range);
    begin
       for row in L'Range loop
-            Result (row) := L (row) >= R;
+         Result (row) := L (row) >= R;
       end loop;
 
       return Result;
@@ -25,7 +25,7 @@ package body NL_Arrays_And_Matrices is
       Result : Boolean_Array (L'Range);
    begin
       for row in L'Range loop
-            Result (row) := L (row) >= R (row);
+         Result (row) := L (row) >= R (row);
       end loop;
 
       return Result;
@@ -38,9 +38,9 @@ package body NL_Arrays_And_Matrices is
       Result : Real_Float_Vector (L'Range) := (others => 1.0);
    begin
       for row in L'Range loop
-            if L (row) < R then
-                Result (row) := -1.0;
-            end if;
+         if L (row) < R then
+            Result (row) := -1.0;
+         end if;
       end loop;
 
       return Result;
@@ -53,9 +53,9 @@ package body NL_Arrays_And_Matrices is
       Result : Float_Array (L'Range) := (others => 1.0);
    begin
       for row in L'Range loop
-            if L (row) < R then
-                Result (row) := -1.0;
-            end if;
+         if L (row) < R then
+            Result (row) := -1.0;
+         end if;
       end loop;
 
       return Result;
@@ -68,7 +68,7 @@ package body NL_Arrays_And_Matrices is
       Result : Boolean_Array (L'Range);
    begin
       for row in L'Range loop
-            Result (row) := L (row) <= R (row);
+         Result (row) := L (row) <= R (row);
       end loop;
 
       return Result;
@@ -81,7 +81,7 @@ package body NL_Arrays_And_Matrices is
       Result : Boolean_Array (L'Range);
    begin
       for row in L'Range loop
-            Result (row) := L (row) < R (row);
+         Result (row) := L (row) < R (row);
       end loop;
 
       return Result;
@@ -243,7 +243,7 @@ package body NL_Arrays_And_Matrices is
       Result : Real_Float_Vector := L;
    begin
       for row in L'Range loop
-            Result (row) := L (row) - R;
+         Result (row) := L (row) - R;
       end loop;
 
       return Result;
@@ -404,9 +404,9 @@ package body NL_Arrays_And_Matrices is
    begin
       for row in L'Range loop
          if L (row) >= R (row) then
-           Result (row) := L (row);
+            Result (row) := L (row);
          else
-           Result (row) := R (row);
+            Result (row) := R (row);
          end if;
       end loop;
 
@@ -421,9 +421,9 @@ package body NL_Arrays_And_Matrices is
    begin
       for row in L'Range loop
          if L (row) < R (row) then
-           Result (row) := L (row);
+            Result (row) := L (row);
          else
-           Result (row) := R (row);
+            Result (row) := R (row);
          end if;
       end loop;
 
@@ -613,6 +613,20 @@ package body NL_Arrays_And_Matrices is
       return Result;
 
    end To_Real_Float_Matrix;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Vector (List : Real_Float_List)
+                                  return Real_Float_Vector is
+      Vec : Real_Float_Vector (1 .. Positive (List.Length));
+   begin
+      for index in List.First_Index .. List.Last_Index loop
+         Vec (index) := List (index);
+      end loop;
+
+      return Vec;
+
+   end To_Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 

@@ -14,7 +14,7 @@ package body Optimise is
     --  ------------------------------------------------------------------------
     --  L1137 F_Min_BFGS minimizes a function using the BFGS algorithm.
     function F_Min_BFGS
-      (F : DP_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array)
+      (F : RF_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array)
      return Optimise_Result is
         Min_BFGS : Optimise_Result (0, 0, 0);
     begin
@@ -26,7 +26,7 @@ package body Optimise is
     --  ------------------------------------------------------------------------
     --  L1261
     function Minimise_BFGS
-      (Fun : DP_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
+      (Fun : RF_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
        Gtol : Float := 10.0 ** (-5); Norm : Float := Float'Safe_Last;
        Eps : Float := Epsilon; Max_Iter : Natural := 0;
        Disp, Return_All : Boolean := False) return Optimise_Result is
@@ -58,7 +58,7 @@ package body Optimise is
     --  ------------------------------------------------------------------------
 
     function Prepare_Scalar_Function
-      (Fun : DP_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
+      (Fun : RF_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
        return Scalar_Function is
@@ -76,7 +76,7 @@ package body Optimise is
     --  ------------------------------------------------------------------------
 
     function Prepare_Jac_Scalar_Function
-      (Fun : DP_Fun_Access; X0, Jac : Lbfgsb_F_Interface.Fortran_DP_Array;
+      (Fun : RF_Fun_Access; X0, Jac : Lbfgsb_F_Interface.Fortran_DP_Array;
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 0.0) return Scalar_Function is
         SF : Scalar_Function (1);

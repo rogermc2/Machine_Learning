@@ -3,20 +3,21 @@
 with Interfaces.Fortran; use Interfaces.Fortran;
 
 with Constraints;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with Num_Diff; use Num_Diff;
 
 package Differentiable_Functions is
 
-    type Finite_Options is private;
-   type DP_Fun_Access is access
-     function (X : Fortran_DP_Array) return Double_Precision;
+   type Finite_Options is private;
+   type RF_Fun_Access is access
+     function (X : Real_Float_Vector) return Float;
 
     --  The Scalar_Function class defines a scalar function F: R^n->R and
     --  methods for computing or approximating its first and second derivatives.
     type Scalar_Function (X_Size : Positive) is record
-        Fun             : DP_Fun_Access;
-        --        Update_Fun      : DP_Fun_Access;
+        Fun             : RF_Fun_Access;
+        --        Update_Fun      : RF_Fun_Access;
         --        Update_Grad     : access procedure;
         X               : Fortran_DP_Array (1 .. X_Size);
         Jac             : Fortran_DP_Array (1 .. X_Size);
@@ -41,7 +42,7 @@ package Differentiable_Functions is
 
     procedure C_Init
       (Self                   : in out Scalar_Function;
-       Fun                    : DP_Fun_Access;
+       Fun                    : RF_Fun_Access;
        X0                     : Fortran_DP_Array; Grad, Hess : FD_Methods;
        Finite_Diff_Rel_Step,
        Finite_Diff_Bounds     : Float;

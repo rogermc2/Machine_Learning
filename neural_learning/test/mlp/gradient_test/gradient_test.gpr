@@ -17,5 +17,11 @@ project Gradient_Test is
       for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
    end Linker;
 
+   for Languages use ("Ada", "Fortran");
+
+   package Naming is
+      for Body_Suffix ("Fortran") use ".f";
+   end Naming;
+
 end Gradient_Test;
 

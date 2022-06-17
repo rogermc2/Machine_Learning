@@ -94,7 +94,7 @@ package Multilayer_Perceptron is
          Epsilon               : Float := 10.0 ** (-8);
          N_Iter_No_Change      : Natural := 10;
          Max_Fun               : Max_Function_Access := null;
-         DP_Fun                : Differentiable_Functions.DP_Fun_Access :=
+         RF_Fun                : Differentiable_Functions.RF_Fun_Access :=
                                    null;
       end record;
 
@@ -133,9 +133,9 @@ package Multilayer_Perceptron is
                     Epsilon                                : Float := 10.0 ** (-8);
                     N_Iter_No_Change                       : Natural := 10;
                     Max_Fun                                : Max_Function_Access := null;
-                    DP_Fun                                 :
-                    Differentiable_Functions.DP_Fun_Access := null)
-                     return MLP_Classifier;
+                    RF_Fun                                 :
+                    Differentiable_Functions.RF_Fun_Access := null)
+                    return MLP_Classifier;
    procedure Fit (Self        : in out MLP_Classifier;
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
@@ -153,6 +153,12 @@ package Multilayer_Perceptron is
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
       Y    : Integer_Matrix; Classes : NL_Types.Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                      return Real_Float_Matrix;
+                     return Real_Float_Matrix;
+
+   type Loss_Grad_LBFGS_Access is access function
+     (Self        : in out MLP_Classifier; Params  : Parameters_List;
+      X           : Real_Float_Matrix; Y           : Boolean_Matrix;
+      Activations : in out Real_Matrix_List; Gradients : out Parameters_List)
+      return Float;
 
 end Multilayer_Perceptron;

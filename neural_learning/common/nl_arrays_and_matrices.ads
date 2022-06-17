@@ -95,14 +95,16 @@ package NL_Arrays_And_Matrices is
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix;
    function To_Integer_Array (List : NL_Types.Integer_List)
                                return Integer_Array;
+   function To_Natural_Array (List : NL_Types.Natural_List)
+                               return Natural_Array;
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (BM : Boolean_Matrix)
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (IM : Integer_Matrix)
                                    return Real_Float_Matrix;
-   function To_Natural_Array (List : NL_Types.Natural_List)
-                               return Natural_Array;
+   function To_Real_Float_Vector (List : Real_Float_List)
+                                   return Real_Float_Vector;
    function Transpose (Values : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline (Transpose);
    function Transpose (Values : Integer_Matrix) return Integer_Matrix;

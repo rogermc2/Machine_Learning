@@ -35,7 +35,7 @@ package Opt_Minimise is
 
    No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
-   function Minimise (Fun         : Differentiable_Functions.DP_Fun_Access;
+   function Minimise (Fun         : Differentiable_Functions.RF_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;

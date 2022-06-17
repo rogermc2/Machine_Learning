@@ -7,7 +7,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with NL_Arrays_And_Matrices;
 
-package body LBFGSB is
+package body LBFGSB1 is
    --      type Byte is range -128 .. 127;
    --     type Byte is mod 256;
    --     for  Byte'Size use 16;
@@ -23,7 +23,7 @@ package body LBFGSB is
 
    --  ------------------------------------------------------------------------
 
-   function Minimise_LBFGSB (Fun      : Differentiable_Functions.DP_Fun_Access;
+   function Minimise_LBFGSB (Fun      : Differentiable_Functions.RF_Fun_Access;
                              X0       : Stochastic_Optimizers.Parameters_List;
                              Bounds   : Constraints.Bounds_List :=
                                Constraints.Array_Bounds_Package.Empty_Vector;
@@ -158,7 +158,9 @@ package body LBFGSB is
          --              Hess_Inv.SK := S;
          --              Hess_Inv.YK := Y;
          Result_J.Fun := Fun;
-         Result_J.Jac := G;
+         for index in G'Range loop
+            Result_J.Jac (index) := Float (G (index));
+         end loop;
          Result_J.N_Fev := Scalar_Func.N_Fev;
          Result_J.N_Jev := Scalar_Func.N_Gev;
          Result_J.N_It := Num_Iterations;
@@ -226,4 +228,4 @@ package body LBFGSB is
 
    --  ------------------------------------------------------------------------
 
-end LBFGSB;
+end LBFGSB1;

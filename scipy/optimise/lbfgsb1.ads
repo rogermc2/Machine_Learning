@@ -6,9 +6,9 @@ with Optimise;
 with Opt_Minimise;
 with Stochastic_Optimizers;
 
-package LBFGSB is
+package LBFGSB1 is
 
-    function Minimise_LBFGSB (Fun    : Differentiable_Functions.DP_Fun_Access;
+    function Minimise_LBFGSB (Fun    : Differentiable_Functions.RF_Fun_Access;
                               X0     : Stochastic_Optimizers.Parameters_List;
                               Bounds : Constraints.Bounds_List :=
                                 Constraints.Array_Bounds_Package.Empty_Vector;
@@ -23,4 +23,4 @@ package LBFGSB is
                                 Opt_Minimise.No_Options)
                              return Optimise.Optimise_Result;
 
-end LBFGSB;
+end LBFGSB1;
