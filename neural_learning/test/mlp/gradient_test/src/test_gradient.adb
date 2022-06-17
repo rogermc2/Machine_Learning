@@ -151,7 +151,7 @@ begin
                      Theta_P.Append (Theta_Rec_M);
                   end loop;
 
-                  Put_Line (Routine_Name & "242+");
+                  Put_Line (Routine_Name & "242");
                   --  L242
                   Loss := Loss_Grad_Function (Self => aClassifier ,
                                               Params => Theta_P, Y => Y_Bin,
