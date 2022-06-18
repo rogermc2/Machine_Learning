@@ -8,19 +8,18 @@ project SetUlb_Test is
    for Object_Dir use "obj";
    for Main use ("test_set_ulb");
    for Exec_Dir use ".";
+   for Languages use ("Ada", "Fortran");
 
    package Compiler is
       for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
    end Compiler;
 
    package Linker is
-      for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
+      for Switches ("ada") use ("-L/usr/local/lib", "-lgfortran");
    end Linker;
 
-   for Languages use ("Ada", "Fortran");
-
    package Naming is
-      for Body_Suffix ("Fortran") use ".f";
+      for Body_Suffix ("fortran") use ".f";
    end Naming;
 
 end SetUlb_Test;
