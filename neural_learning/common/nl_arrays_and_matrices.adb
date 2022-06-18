@@ -293,6 +293,20 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Exp (V : Real_Float_Vector) return Real_Float_Vector is
+      use Maths.Float_Math_Functions;
+      Result : Real_Float_Vector (V'Range);
+   begin
+      for row in V'Range loop
+         Result (row) := Exp (V (row));
+      end loop;
+
+      return Result;
+
+   end Exp;
+
+   --  ------------------------------------------------------------------------
+
    function Flatten (M : Integer_Matrix) return Integer_Array is
       Flat : Integer_Array (1 .. M'Length * M'Length (2));
    begin

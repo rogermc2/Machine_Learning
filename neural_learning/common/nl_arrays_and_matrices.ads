@@ -40,6 +40,10 @@ package NL_Arrays_And_Matrices is
      (Positive, Real_Float_Matrix);
    subtype Real_Matrix_List is Real_Matrix_List_Package.Vector;
 
+   package Real_Vector_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Real_Float_Vector);
+   subtype Real_Vector_List is Real_Vector_List_Package.Vector;
+
    function ">=" (L : Real_Float_Vector; R : Float) return Boolean_Array;
    function ">=" (L, R : Real_Float_Vector) return Boolean_Array;
    function ">=" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
@@ -73,6 +77,7 @@ package NL_Arrays_And_Matrices is
    function Dot (L, R : Real_Float_List) return Float;
    pragma Inline (Dot);
    function Exp (M : Real_Float_Matrix) return Real_Float_Matrix;
+   function Exp (V : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline (Exp);
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
