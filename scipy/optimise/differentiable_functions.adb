@@ -8,14 +8,14 @@ package body Differentiable_Functions is
    procedure Update_Grad (Self : in out Scalar_Function);
    procedure Update_Hess (Self : in out Scalar_Function);
    procedure Update_X (Self : in out Scalar_Function;
-                       Fun  : DP_Fun_Access; X : Fortran_DP_Array);
+                       Fun  : RF_Fun_Access; X : Real_Float_Vector);
 
    --  -------------------------------------------------------------------------
 
    procedure C_Init
      (Self                  : in out Scalar_Function;
-      Fun                   : DP_Fun_Access;
-      X0                    : Fortran_DP_Array; Grad, Hess : FD_Methods;
+      Fun                   : RF_Fun_Access;
+      X0                    : Real_Float_Vector; Grad, Hess : FD_Methods;
       Finite_Diff_Rel_Step,
       Finite_Diff_Bounds    : Float;
       Epsilon               : Float := 10.0 ** (-8)) is
@@ -64,8 +64,8 @@ package body Differentiable_Functions is
 
    procedure Fun_And_Grad
      (Self    : in out Scalar_Function;
-      X       : Fortran_DP_Array;
-      Fun_Val : out Double_Precision; Grad : out Fortran_DP_Array) is
+      X       : Real_Float_Vector;
+      Fun_Val : out Float; Grad : out Real_Float_Vector) is
    begin
       Update_Fun (Self);
       Update_Grad (Self);
@@ -77,9 +77,9 @@ package body Differentiable_Functions is
    --  -------------------------------------------------------------------------
 
    --  L132
-   function Fun_Wrapped (Self : in out Scalar_Function; Fun : DP_Fun_Access;
-                         X    : Fortran_DP_Array) return Double_Precision is
-      FX : constant Double_Precision := Fun (X);
+   function Fun_Wrapped (Self : in out Scalar_Function; Fun : RF_Fun_Access;
+                         X    : Real_Float_Vector) return Float is
+      FX : constant Float := Fun (X);
    begin
       Self.N_Fev := Self.N_Fev + 1;
       if FX < Self.Lowest_F then
@@ -94,7 +94,7 @@ package body Differentiable_Functions is
    --  -------------------------------------------------------------------------
    --  L270
    function Grad (Self : in out Scalar_Function; X : Fortran_DP_Array)
-                  return Fortran_DP_Array is
+                  return Real_Float_Vector is
    begin
       Update_Grad (Self);
 
@@ -130,8 +130,8 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_X (Self : in out Scalar_Function; Fun  : DP_Fun_Access;
-                       X    : Fortran_DP_Array) is
+   procedure Update_X (Self : in out Scalar_Function; Fun  : RF_Fun_Access;
+                       X    : Real_Float_Vector) is
    begin
       Self.X := X;
       Self.F_Updated := False;

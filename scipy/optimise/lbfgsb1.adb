@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 
-with NL_Arrays_And_Matrices;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package body LBFGSB1 is
    --      type Byte is range -128 .. 127;
@@ -49,13 +49,12 @@ package body LBFGSB1 is
                              Options  : Opt_Minimise.Minimise_Options :=
                                Opt_Minimise.No_Options)
                              return Optimise.Optimise_Result is
-      --        use Ada.Containers;
-      --        use Stochastic_Optimizers;
       use Differentiable_Functions;
       Routine_Name    : constant String := "LBFGSB.Minimise_LBFGSB";
       X0_Length       : constant Positive := Positive (X0.Length);
       I_Print         : constant Fortran_Integer := -1;  --  L273
       X               : Fortran_DP_Array := Parameters_List_To_DP_Array (X0);
+      RF_X            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       Num_Iterations  : Natural := 0;
       M               : constant Fortran_Integer := Fortran_Integer (Max_Cor);
       --  L331 nbd[i] = bounds_map[l, u] => bounds_map[1, 1] = 2
@@ -65,6 +64,7 @@ package body LBFGSB1 is
       Upper_Bound     : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
       F               : Double_Precision := 0.0;
       G               : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
+      RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       PGtol           : Double_Precision := Double_Precision (Gtol);
       Factor          : Double_Precision := Double_Precision (Ftol / Eps);
       Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length + 5 * X0_Length
@@ -112,12 +112,14 @@ package body LBFGSB1 is
            (M, X, Low_Bound, Upper_Bound, nbd, f, G,
             Factor, Pgtol, Wa, I_Wa, Task_Name, I_Print, C_Save, L_Save, I_Save,
             D_Save, Fortran_Integer (Options.Max_Line_Steps));
+         RF_X := To_RF_Array (X);
          if Task_Name (1 .. 2) = "FG" then
-            Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
-            Fun_And_Grad (Scalar_Func, X, Float (F), G);
+            Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
+            RF_G := To_RF_Array (G);
+            Fun_And_Grad (Scalar_Func, RF_X, Float (F), RF_G);
          elsif Task_Name (1 .. 5) = "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
-            Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
+            Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
             if Num_Iterations > Max_Iter then
                Task_Name (1 .. 43) :=
                  "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT";
@@ -140,7 +142,6 @@ package body LBFGSB1 is
 
       --  L387
       declare
-         use NL_Arrays_And_Matrices;
          MN         : constant Positive := Positive (M) * X0_Length - 1;
          --              Bfgs_Iters : constant Positive := Positive (I_Save (31));
          --              Num_Corrs  : constant Positive :=
@@ -195,7 +196,6 @@ package body LBFGSB1 is
 
    function Parameters_List_To_DP_Array
      (PL : Stochastic_Optimizers.Parameters_List) return Fortran_DP_Array is
-      use NL_Arrays_And_Matrices;
       DP_Length : Natural := 0;
    begin
       for index in PL.First_Index .. PL.Last_Index loop

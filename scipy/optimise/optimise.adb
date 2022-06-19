@@ -6,16 +6,15 @@ with Num_Diff;
 
 package body Optimise is
 
-    type BFGS_Options is (Gtol_Option, Norm_Option, Epsilon_Option, Disp_Option,
-                          Max_Iter_Option, Return_All_Option);
+--      type BFGS_Options is (Gtol_Option, Norm_Option, Epsilon_Option, Disp_Option,
+--                            Max_Iter_Option, Return_All_Option);
 
     Epsilon : constant Float := Maths.Float_Math_Functions.Sqrt (Float'Safe_Last);
 
     --  ------------------------------------------------------------------------
     --  L1137 F_Min_BFGS minimizes a function using the BFGS algorithm.
     function F_Min_BFGS
-      (F : RF_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array)
-     return Optimise_Result is
+      (F : RF_Fun_Access; X0 : Real_Float_Vector) return Optimise_Result is
         Min_BFGS : Optimise_Result (0, 0, 0);
     begin
 
@@ -26,15 +25,15 @@ package body Optimise is
     --  ------------------------------------------------------------------------
     --  L1261
     function Minimise_BFGS
-      (Fun : RF_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
+      (Fun : RF_Fun_Access; X0 : Real_Float_Vector;
        Gtol : Float := 10.0 ** (-5); Norm : Float := Float'Safe_Last;
        Eps : Float := Epsilon; Max_Iter : Natural := 0;
        Disp, Return_All : Boolean := False) return Optimise_Result is
         Min_BFGS : Optimise_Result (0, 0, 0);
         Iters : Positive;
         Ret_All : Boolean := Return_All;
-        SF    : Scalar_Function (X0'Length);
-        F     : DP_Fun_Access;
+        SF      : Scalar_Function (X0'Length);
+        F     : RF_Fun_Access;
         My_F_Prime : Num_Diff.FD_Methods;
         Old_Val    : Float;
         K          : Natural := 0;
@@ -49,7 +48,7 @@ package body Optimise is
         SF := Prepare_Scalar_Function (Fun, X0);
         F := SF.Fun;
         My_F_Prime := SF.Grad;
-        Old_Val := Float (F (X0));
+        Old_Val := F (X0);
 
         return Min_BFGS;
 
@@ -58,7 +57,7 @@ package body Optimise is
     --  ------------------------------------------------------------------------
 
     function Prepare_Scalar_Function
-      (Fun : RF_Fun_Access; X0 : Lbfgsb_F_Interface.Fortran_DP_Array;
+      (Fun : RF_Fun_Access; X0 : Real_Float_Vector;
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
        return Scalar_Function is
@@ -76,7 +75,7 @@ package body Optimise is
     --  ------------------------------------------------------------------------
 
     function Prepare_Jac_Scalar_Function
-      (Fun : RF_Fun_Access; X0, Jac : Lbfgsb_F_Interface.Fortran_DP_Array;
+      (Fun : RF_Fun_Access; X0, Jac : Real_Float_Vector;
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 0.0) return Scalar_Function is
         SF : Scalar_Function (1);
