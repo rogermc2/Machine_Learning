@@ -26,5 +26,7 @@ package Check_Optimize is
    function Func (Self : in out Check_Data; X : Real_Float_Vector) return Float;
    function Grad (Self : in out Check_Data; X : Real_Float_Vector)
                   return Real_Float_Vector;
+   function Hess (Self : in out Check_Data; X : Real_Float_Vector)
+                  return Real_Float_Matrix;
 
 end Check_Optimize;
