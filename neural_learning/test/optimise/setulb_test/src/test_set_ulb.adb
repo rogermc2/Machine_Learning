@@ -5,26 +5,14 @@ with Interfaces.Fortran; use Interfaces.Fortran;
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Lbfgsb1; use Lbfgsb1;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
---  with Printing;
 
 --  L69 test_setulb_floatround
 procedure Test_Set_ULB is
    Routine_Name : constant String := "Test_Set_UlB ";
-   A_Tol        : constant Double_Precision := 10.0 ** (-8);
    N            : constant Integer := 5;
    M            : constant Integer := 10;
-
-   Function All_Close (A, B : Fortran_DP_Array) return Boolean is
-      Result : Boolean := True;
-   begin
-      for index in A'Range loop
-         Result := Result and abs(A (index) - B (index)) < A_Tol;
-      end loop;
-
-      return Result;
-
-   end All_Close;
 
    procedure Obj_Fun (X : Fortran_DP_Array; F : out Double_Precision;
                       G : out Fortran_DP_Array) is

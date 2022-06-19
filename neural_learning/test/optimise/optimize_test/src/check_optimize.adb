@@ -79,4 +79,14 @@ package body Check_Optimize is
 
    --  -------------------------------------------------------------------------
 
+   function Hess_P (Self : in out Check_Data; X, P : Real_Float_Vector)
+                  return Real_Float_Vector is
+      use Real_Float_Arrays;
+   begin
+      return Hess (Self, X) * P;
+
+   end Hess_P;
+
+   --  -------------------------------------------------------------------------
+
 end Check_Optimize;

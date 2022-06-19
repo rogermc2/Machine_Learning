@@ -28,5 +28,7 @@ package Check_Optimize is
                   return Real_Float_Vector;
    function Hess (Self : in out Check_Data; X : Real_Float_Vector)
                   return Real_Float_Matrix;
+   function Hess_P (Self : in out Check_Data; X, P : Real_Float_Vector)
+                  return Real_Float_Vector;
 
 end Check_Optimize;

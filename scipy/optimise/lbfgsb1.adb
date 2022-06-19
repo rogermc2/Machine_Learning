@@ -1,10 +1,7 @@
 --  Based on scipy/optimize/lbfgsb_py.py
 
-with Interfaces.Fortran;
-
 with Ada.Assertions; use Ada.Assertions;
 
-with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with NL_Arrays_And_Matrices;
 
 package body LBFGSB1 is
@@ -23,6 +20,21 @@ package body LBFGSB1 is
 
    --  ------------------------------------------------------------------------
 
+   function All_Close (A, B  : Fortran_DP_Array;
+                       A_Tol : Double_Precision := 10.0 ** (-8))
+                       return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in A'Range loop
+         Result := Result and abs(A (index) - B (index)) < A_Tol;
+      end loop;
+
+      return Result;
+
+   end All_Close;
+
+   --  ------------------------------------------------------------------------
+
    function Minimise_LBFGSB (Fun      : Differentiable_Functions.RF_Fun_Access;
                              X0       : Stochastic_Optimizers.Parameters_List;
                              Bounds   : Constraints.Bounds_List :=
@@ -37,7 +49,6 @@ package body LBFGSB1 is
                              Options  : Opt_Minimise.Minimise_Options :=
                                Opt_Minimise.No_Options)
                              return Optimise.Optimise_Result is
-      use Interfaces.Fortran;
       --        use Ada.Containers;
       --        use Stochastic_Optimizers;
       use Differentiable_Functions;
@@ -103,7 +114,7 @@ package body LBFGSB1 is
             D_Save, Fortran_Integer (Options.Max_Line_Steps));
          if Task_Name (1 .. 2) = "FG" then
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
-            Fun_And_Grad (Scalar_Func, X, F, G);
+            Fun_And_Grad (Scalar_Func, X, Float (F), G);
          elsif Task_Name (1 .. 5) = "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
@@ -202,11 +213,10 @@ package body LBFGSB1 is
       begin
          for index in PL.First_Index .. PL.Last_Index loop
             declare
-               use Interfaces.Fortran;
                Params    : constant Stochastic_Optimizers.Parameters_Record :=
                              PL (index);
                Coeffs_1D : constant Real_Float_Vector :=
-                 Flatten (Params.Coeff_Gradients);
+                             Flatten (Params.Coeff_Gradients);
             begin
                for coeff in Coeffs_1D'Range loop
                   DP_Index := DP_Index + 1;
