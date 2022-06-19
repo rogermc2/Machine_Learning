@@ -73,7 +73,7 @@ package body Check_Optimize is
          Diag_P (index, index) := P (index);
       end loop;
 
-      return T_F * (Diag_P * (T_F - P));
+      return T_F * (Diag_P * (T_F -P));
 
    end Hess;
 
