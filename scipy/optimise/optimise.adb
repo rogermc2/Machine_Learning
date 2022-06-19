@@ -12,6 +12,18 @@ package body Optimise is
     Epsilon : constant Float := Maths.Float_Math_Functions.Sqrt (Float'Safe_Last);
 
     --  ------------------------------------------------------------------------
+
+    function Check_Grad
+      (Fun    : RF_Fun_Access; Grad : Stochastic_Optimizers.Parameters_List;
+      X0 : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
+      Direction : Direction_Kind := All_Direction) return Float is
+    begin
+
+        return 0.0;
+
+    end Check_Grad;
+
+    --  ------------------------------------------------------------------------
     --  L1137 F_Min_BFGS minimizes a function using the BFGS algorithm.
     function F_Min_BFGS
       (F : RF_Fun_Access; X0 : Real_Float_Vector) return Optimise_Result is

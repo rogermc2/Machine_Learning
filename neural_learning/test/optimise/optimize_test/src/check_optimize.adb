@@ -88,5 +88,16 @@ package body Check_Optimize is
    end Hess_P;
 
    --  -------------------------------------------------------------------------
+   --  Test_Check_Grad verifes that check_grad can estimate the derivative of
+   --  the logistic function.
+   procedure Test_Check_Grad is
+      use Real_Float_Arrays;
+      X0 : Real_Float_Vector (1 .. 1);
+   begin
+      X0 (1) := 1.5;
+
+   end Test_Check_Grad;
+
+   --  -------------------------------------------------------------------------
 
 end Check_Optimize;
