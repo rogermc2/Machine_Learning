@@ -3,12 +3,12 @@
 with Constraints;
 with Differentiable_Functions; use Differentiable_Functions;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Stochastic_Optimizers;
 
 package Optimise is
 
-    type Direction_Kind is (Random_Direction, All_Direction);
-    type Opt_Fun_Access is access function (X : Real_Float_List) return Float;
+   type Direction_Kind is (Random_Direction, All_Direction);
+   type Opt_Fun_Access is access function (X : Real_Float_List) return Float;
+   type Grad_Func_Access is access function (X : Real_Float_Vector) return Float;
 
     type Optimise_Result
       (Jac_Length, N_Coor, N : Natural) is record
@@ -28,7 +28,7 @@ package Optimise is
     end record;
 
     function Check_Grad
-      (Fun    : RF_Fun_Access; Grad : Stochastic_Optimizers.Parameters_List;
+      (Fun    : RF_Fun_Access; Grad_Func : Grad_Func_Access;
       X0 : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
       Direction : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function

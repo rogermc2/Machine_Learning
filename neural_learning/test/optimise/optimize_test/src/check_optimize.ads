@@ -2,7 +2,6 @@
 --  CheckOptimize class
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Optimise; use Optimise;
 
 package Check_Optimize is
 
@@ -29,6 +28,7 @@ package Check_Optimize is
    function Hess (Self : in out Check_Data; X : Real_Float_Vector)
                   return Real_Float_Matrix;
    function Hess_P (Self : in out Check_Data; X, P : Real_Float_Vector)
-                  return Real_Float_Vector;
+                    return Real_Float_Vector;
+   procedure Test_Check_Grad;
 
 end Check_Optimize;
