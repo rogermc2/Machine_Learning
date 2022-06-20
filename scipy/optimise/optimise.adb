@@ -2,8 +2,6 @@
 
 with Maths;
 
-with Num_Diff;
-
 package body Optimise is
 
     --      type BFGS_Options is (Gtol_Option, Norm_Option, Epsilon_Option, Disp_Option,
@@ -13,14 +11,18 @@ package body Optimise is
 
     --  ------------------------------------------------------------------------
     --  L912 Approx_Fprime finds the finite difference approximation of the
-    --  derivatives of a scalar or vector-valued function.
+    --  derivatives of a scalar or vector-valued function .
     --            f(xk[i] + epsilon[i]) - f(xk[i])
     --     f'[i] = ---------------------------------
     --                         epsilon[i]
+    --  If a function maps from R^n to R^m its derivatives form an m-by-n matrix
+    --  called the Jacobian where an element (i, j) is a partial derivative of
+    --  f[i] with respect to x[j].
+    --  Approx_Fprime returns Func's partial derivatives with respect to Xk.
     function Approx_Fprime
-      (Xk      : Real_Float_Vector; Func : Num_Diff.Fun_Access;
+      (Xk : Real_Float_Vector; Func : Num_Diff.Fun_Access;
        Epsilon : Real_Float_Vector)
-      return Real_Float_Matrix is
+       return Real_Float_Matrix is
         use Num_Diff;
         F0  : constant Real_Float_Vector := Func (Xk);
 
@@ -40,17 +42,19 @@ package body Optimise is
        Fun       : Num_Diff.Fun_Access; Grad_Func : Grad_Func_Access;
        X0        : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float is
-        Step            : constant Float := Epsilon;
+        use Num_Diff;
+        Step            : Real_Float_Vector (1 .. 1);
         Analytical_Grad : Real_Float_Vector (X0'Range);
         Diff          : Real_Float_Vector (X0'Range);
     begin
+        Step (1) := Epsilon;
         case Direction is
             when Random_Direction => null;
             when All_Direction =>
                 Analytical_Grad := Grad (Self, X0);
         end case;
 
-        Diff := Analytical_Grad - Approx_Fprime (X0, Fun, Epsilon);
+        Diff := Analytical_Grad - Approx_Fprime (X0, Fun, Step);
 
         return 0.0;
 
@@ -105,7 +109,7 @@ package body Optimise is
       (Fun                           : RF_Fun_Access; X0       : Real_Float_Vector;
        Bounds                        : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
-      return Scalar_Function is
+       return Scalar_Function is
         SF : Scalar_Function (X0'Length);
     begin
         SF.Fun := Fun;

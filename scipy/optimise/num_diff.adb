@@ -156,7 +156,11 @@ package body Num_Diff is
     end Adjust_Scheme_To_Bounds;
 
     --  -------------------------------------------------------------------------
-    --  L275
+    --  L275 Approx_Derivative computes the finite difference approximation of
+    --  the derivatives of a vector-valued function.
+    --  If a function maps from R^n to R^m its derivatives form m-by-n matrix
+    --  called the Jacobian where an element (i, j) is a partial derivative of
+    --  f[i] with respect to x[j].
     function Approx_Derivative
       (Fun                : Fun_Access; X0 : Real_Float_Vector;
        Method             : FD_Methods := FD_None;
@@ -310,7 +314,7 @@ package body Num_Diff is
     end Compute_Absolute_Step;
 
     --  -------------------------------------------------------------------------
-
+    --  L567
     function Dense_Difference (W_Fun                    : Wrapped_Access;
                                X0, F0, H, Use_One_Sided : Real_Float_Vector;
                                Method : FD_Methods) return Real_Float_Matrix is

@@ -3,6 +3,7 @@
 with Constraints;
 with Differentiable_Functions; use Differentiable_Functions;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with Num_Diff;
 
 package Optimise is
 

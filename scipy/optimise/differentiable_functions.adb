@@ -30,7 +30,7 @@ package body Differentiable_Functions is
                 "Whenever the gradient is estimated via finite-differences" &
                 " the Hessian must be estimated using one of the " &
                 "quasi-Newton strategies.") ;
-      Self.X := X0;
+      Self.X0 := X0;
 
       --  L120
       Finite_Diff_Options.Rel_Step := Finite_Diff_Rel_Step;
@@ -106,7 +106,7 @@ package body Differentiable_Functions is
 
    procedure Update_Fun (Self : in out Scalar_Function) is
    begin
-      Self.F := Fun_Wrapped (Self, Self.Fun, Self.X);
+      Self.F := Fun_Wrapped (Self, Self.Fun, Self.X0);
    end Update_Fun;
 
    --  -------------------------------------------------------------------------
@@ -133,7 +133,7 @@ package body Differentiable_Functions is
    procedure Update_X (Self : in out Scalar_Function; Fun  : RF_Fun_Access;
                        X    : Real_Float_Vector) is
    begin
-      Self.X := X;
+      Self.X0 := X;
       Self.F_Updated := False;
       Self.G_Updated := False;
       Self.H_Updated := False;

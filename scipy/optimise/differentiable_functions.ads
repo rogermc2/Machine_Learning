@@ -12,15 +12,16 @@ package Differentiable_Functions is
 
     --  The Scalar_Function class defines a scalar function F: R^n->R and
     --  methods for computing or approximating its first and second derivatives.
-    type Scalar_Function (X_Size : Positive) is record
+    type Scalar_Function (X0_Size : Positive) is record
         Fun             : RF_Fun_Access;
         --        Update_Fun      : RF_Fun_Access;
         --        Update_Grad     : access procedure;
-        X               : Real_Float_Vector (1 .. X_Size);
-        Jac             : Real_Float_Vector (1 .. X_Size);
+        --  X0 is a vector of X0_Size independent variables
+        X0              : Real_Float_Vector (1 .. X0_Size);
+        Jac             : Real_Float_Vector (1 .. X0_Size);
         Bounds          : Constraints.Array_Bounds;
-        X_Prev          : Real_Float_Vector (1 .. X_Size) := (others => 0.0);
-        G_Prev          : Real_Float_Vector (1 .. X_Size) := (others => 0.0);
+        X_Prev          : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
+        G_Prev          : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
         N_Fev           : Natural := 0;
         N_Gev           : Natural := 0;
         N_Hev           : Natural := 0;
@@ -31,8 +32,8 @@ package Differentiable_Functions is
         Hess            : FD_Methods;
         F_Diff_Rel_Step : Float := 0.0;
         F               : Float := Float'Safe_Last;
-        G               : Real_Float_Vector (1 .. X_Size) := (others => 0.0);
-        Lowest_X        : Real_Float_Vector (1 .. X_Size);
+        G               : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
+        Lowest_X        : Real_Float_Vector (1 .. X0_Size);
         Lowest_F        : Float := Float'Safe_Last;
         Epsilon         : Float := 10.0 ** (-8);
     end record;
