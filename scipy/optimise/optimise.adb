@@ -45,7 +45,7 @@ package body Optimise is
         use Num_Diff;
         Step            : Real_Float_Vector (1 .. 1);
         Analytical_Grad : Real_Float_Vector (X0'Range);
-        Diff          : Real_Float_Vector (X0'Range);
+        Diff            : Real_Float_Vector (X0'Range);
     begin
         Step (1) := Epsilon;
         case Direction is
@@ -113,7 +113,7 @@ package body Optimise is
         SF : Scalar_Function (X0'Length);
     begin
         SF.Fun := Fun;
-        SF.X := X0;
+        SF.X0 := X0;
         SF.Bounds := Bounds;
         SF.F_Diff_Rel_Step := Finite_Diff_Rel_Step;
         SF.Epsilon := Epsilon;
@@ -130,7 +130,7 @@ package body Optimise is
         SF : Scalar_Function (1);
     begin
         SF.Fun := Fun;
-        SF.X := X0;
+        SF.X0 := X0;
         SF.Bounds := Bounds;
         SF.F_Diff_Rel_Step := Finite_Diff_Rel_Step;
         SF.Epsilon := Epsilon;
