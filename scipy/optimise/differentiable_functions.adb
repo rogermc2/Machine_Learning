@@ -93,7 +93,7 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
    --  L270
-   function Grad (Self : in out Scalar_Function; X : Fortran_DP_Array)
+   function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
                   return Real_Float_Vector is
    begin
       Update_Grad (Self);

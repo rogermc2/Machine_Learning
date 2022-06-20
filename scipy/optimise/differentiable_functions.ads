@@ -2,7 +2,6 @@
 
 with Constraints;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with Num_Diff; use Num_Diff;
 
 package Differentiable_Functions is
@@ -49,7 +48,7 @@ package Differentiable_Functions is
       (Self : in out Scalar_Function;
        X    : Real_Float_Vector;
        Fun_Val : out Float; Grad : out Real_Float_Vector);
-   function Grad (Self : in out Scalar_Function; X : Fortran_DP_Array)
+   function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
                   return Real_Float_Vector;
 
 private
