@@ -38,8 +38,7 @@ package body Optimise is
     --  comparing it against a (forward) finite-difference approximation of the
     --  gradient.
     function Check_Grad
-      (Self    : in out Scalar_Function;
-       Fun       : Num_Diff.Deriv_Fun_Access; Grad_Func : Grad_Func_Access;
+      (Fun       : Num_Diff.Deriv_Fun_Access; Grad_Func : Grad_Func_Access;
        X0        : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float is
         use Real_Float_Arrays;
@@ -51,7 +50,7 @@ package body Optimise is
         case Direction is
             when Random_Direction => null;
             when All_Direction =>
-                Analytical_Grad := Grad (Self, X0);
+                Analytical_Grad := Grad_Func (X0);
         end case;
 
         Diff := Analytical_Grad - Approx_Fprime (X0, Fun, Step);

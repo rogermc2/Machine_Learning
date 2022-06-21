@@ -2,7 +2,7 @@
 --  CheckOptimize class
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -48,18 +48,20 @@ package body Check_Optimize is
 --  L33 Test_Check_Grad verifes that check_grad can estimate the derivative of
 --  the logistic function.
     procedure Test_Check_Grad is
-        use Real_Float_Arrays;
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "Check_Optimize.Test_Check_Grad ";
         X0        : Real_Float_Vector (1 .. 1);
         SF        : Scalar_Function (1, 1);
-        Fun       : RF_Fun_Access;
-        Deriv_Fun : Num_Diff.Deriv_Fun_Access;
-        Grad_Func : Optimise.Grad_Func_Access;
+        Fun       : constant RF_Fun_Access := null;
+--          Deriv_Fun : Num_Diff.Deriv_Fun_Access;
+        Grad_Func : constant Optimise.Grad_Func_Access := null;
         Result    : Float;
     begin
         X0 (1) := 1.5;
         C_Init (SF, Fun, X0, Num_Diff.FD_None, Num_Diff.FD_None,
                 Epsilon, Epsilon);
-        Result := Optimise.Check_Grad (SF, Der_Logit'Access, Grad_Func, X0);
+      Result := Optimise.Check_Grad (Der_Logit'Access, Grad_Func, X0);
+      Put_Line (Routine_Name & "" & Float'Image (Result));
 
     end Test_Check_Grad;
 
