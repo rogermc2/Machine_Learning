@@ -13,6 +13,38 @@ with Optimise;
 package body Check_Optimize is
    Epsilon : constant Float := 10.0 ** (-8);
 
+   --  -------------------------------------------------------------------------
+
+   function Der_Logit (X : Real_Float_Vector) return Real_Float_Vector is
+      use Real_Float_Arrays;
+      Exp_Val : constant Real_Float_Vector := Exp (-X);
+      Result  : Real_Float_Vector := Exp_Val;
+   begin
+      for row in X'Range loop
+            Result (row) := Exp_Val (row) / (1.0 + Exp_Val (row)) ** 2;
+      end loop;
+
+      return Result;
+
+   end Der_Logit;
+
+   --  -------------------------------------------------------------------------
+
+   function Logit (X : Real_Float_Vector) return Real_Float_Vector is
+      use Real_Float_Arrays;
+      Exp_Val : constant Real_Float_Vector := Exp (-X);
+      Result : Real_Float_Vector (X'Range);
+   begin
+      for row in X'Range loop
+            Result (row) := 1.0 / (1.0 + Exp_Val (row));
+      end loop;
+
+      return Result;
+
+   end Logit;
+
+   --  -------------------------------------------------------------------------
+
 --  L33 Test_Check_Grad verifes that check_grad can estimate the derivative of
 --  the logistic function.
     procedure Test_Check_Grad is
@@ -27,7 +59,7 @@ package body Check_Optimize is
         X0 (1) := 1.5;
         C_Init (SF, Fun, X0, Num_Diff.FD_None, Num_Diff.FD_None,
                 Epsilon, Epsilon);
-        Result := Optimise.Check_Grad (SF, Deriv_Fun, Grad_Func, X0);
+        Result := Optimise.Check_Grad (SF, Der_Logit'Access, Grad_Func, X0);
 
     end Test_Check_Grad;
 

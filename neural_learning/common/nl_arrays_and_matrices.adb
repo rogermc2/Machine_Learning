@@ -176,6 +176,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector is
+      Result : Real_Float_Vector := R;
+   begin
+      for row in R'Range loop
+            Result (row) := Result (row) + L;
+      end loop;
+
+      return Result;
+
+   end "+";
+
+   --  ------------------------------------------------------------------------
+
    function "-" (L, R : Integer_Matrix) return Integer_Matrix is
       Result : Integer_Matrix (L'First .. L'Last, L'First (2) .. L'Last (2));
    begin
