@@ -30,9 +30,9 @@ package body Num_Diff is
     function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
     function Fun_Wrapped (X : Real_Float_Vector) return Real_Float_Vector;
     --     function Linear_Operator_Difference
-    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
+    --       (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
     --        Method : FD_Methods) return Real_Float_Vector;
-    function Mat_Vec (Fun    : Fun_Access; X0, F0 : Real_Float_Vector;
+    function Mat_Vec (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector;
                       H      : Real_Float_Vector; Method : FD_Methods)
                      return Real_Float_Vector;
     function Prepare_Bounds (Bounds : Constraints.Bounds_List;
@@ -162,7 +162,7 @@ package body Num_Diff is
     --  called the Jacobian where an element (i, j) is a partial derivative of
     --  f[i] with respect to x[j].
     function Approx_Derivative
-      (Fun                : Fun_Access; X0 : Real_Float_Vector;
+      (Fun                : Deriv_Fun_Access; X0 : Real_Float_Vector;
        Method             : FD_Methods := FD_None;
        Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
        Abs_Step           : Real_Float_Vector;
@@ -412,7 +412,7 @@ package body Num_Diff is
     --  -------------------------------------------------------------------------
 
     --     function Linear_Operator_Difference
-    --       (Fun    : Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
+    --       (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
     --        Method : FD_Methods) return Real_Float_Vector is
     --        M      : constant Positive := F0'Length;
     --        N      : constant Positive := X0'Length;
@@ -425,8 +425,8 @@ package body Num_Diff is
 
     --  -------------------------------------------------------------------------
 
-    function Mat_Vec (Fun    : Fun_Access; X0, F0 : Real_Float_Vector;
-                      H      : Real_Float_Vector; Method : FD_Methods)
+    function Mat_Vec (Fun : Deriv_Fun_Access; X0, F0 : Real_Float_Vector;
+                      H   : Real_Float_Vector; Method : FD_Methods)
                      return Real_Float_Vector is
         use Maths.Float_Math_Functions;
         use Real_Float_Arrays;

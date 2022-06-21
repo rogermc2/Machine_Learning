@@ -29,21 +29,23 @@ package Optimise is
     end record;
 
     function Check_Grad
-      (Self : in out Scalar_Function; Fun : Num_Diff.Fun_Access;
+      (Self : in out Scalar_Function; Fun : Num_Diff.Deriv_Fun_Access;
        Grad_Func : Grad_Func_Access; X0 : Real_Float_Vector;
        Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function
-      (Fun    : RF_Fun_Access; X0 : Real_Float_Vector;
+      (Fun    : Num_Diff.Deriv_Fun_Access; X0 : Real_Float_Vector;
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
-       Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
+       Epsilon,
+       Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
        return Scalar_Function;
     function Prepare_Jac_Scalar_Function
-      (Fun                           : RF_Fun_Access; X0 : Real_Float_Vector;
+      (Fun                           : Num_Diff.Deriv_Fun_Access;
+       X0                            : Real_Float_Vector;
        Jac                           : Real_Float_Vector;
        Bounds                        : Constraints.Array_Bounds :=
          Constraints.Default_Bounds;
-       Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
+       Epsilon, Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
        return Scalar_Function;
     function F_Min_BFGS (F : RF_Fun_Access; X0 : Real_Float_Vector)
                          return Optimise_Result;

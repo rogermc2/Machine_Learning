@@ -6,7 +6,32 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
+with Differentiable_Functions; use Differentiable_Functions;
+with Num_Diff;
+with Optimise;
+
 package body Check_Optimize is
+   Epsilon : constant Float := 10.0 ** (-8);
+
+--  L33 Test_Check_Grad verifes that check_grad can estimate the derivative of
+--  the logistic function.
+    procedure Test_Check_Grad is
+        use Real_Float_Arrays;
+        X0        : Real_Float_Vector (1 .. 1);
+        SF        : Scalar_Function (1, 1);
+        Fun       : RF_Fun_Access;
+        Deriv_Fun : Num_Diff.Deriv_Fun_Access;
+        Grad_Func : Optimise.Grad_Func_Access;
+        Result    : Float;
+    begin
+        X0 (1) := 1.5;
+        C_Init (SF, Fun, X0, Num_Diff.FD_None, Num_Diff.FD_None,
+                Epsilon, Epsilon);
+        Result := Optimise.Check_Grad (SF, Deriv_Fun, Grad_Func, X0);
+
+    end Test_Check_Grad;
+
+    --  -------------------------------------------------------------------------
 
    function Func (Self : in out Check_Data; X : Real_Float_Vector)
                   return Float is
@@ -86,17 +111,6 @@ package body Check_Optimize is
       return Hess (Self, X) * P;
 
    end Hess_P;
-
-   --  -------------------------------------------------------------------------
-   --  L33 Test_Check_Grad verifes that check_grad can estimate the derivative of
-   --  the logistic function.
-   procedure Test_Check_Grad is
-      use Real_Float_Arrays;
-      X0 : Real_Float_Vector (1 .. 1);
-   begin
-      X0 (1) := 1.5;
-
-   end Test_Check_Grad;
 
    --  -------------------------------------------------------------------------
 

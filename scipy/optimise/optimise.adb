@@ -20,7 +20,7 @@ package body Optimise is
     --  f[i] with respect to x[j].
     --  Approx_Fprime returns Func's partial derivatives with respect to Xk.
     function Approx_Fprime
-      (Xk : Real_Float_Vector; Func : Num_Diff.Fun_Access;
+      (Xk : Real_Float_Vector; Func : Num_Diff.Deriv_Fun_Access;
        Epsilon : Real_Float_Vector)
        return Real_Float_Matrix is
         use Num_Diff;
@@ -39,13 +39,13 @@ package body Optimise is
     --  gradient.
     function Check_Grad
       (Self    : in out Scalar_Function;
-       Fun       : Num_Diff.Fun_Access; Grad_Func : Grad_Func_Access;
+       Fun       : Num_Diff.Deriv_Fun_Access; Grad_Func : Grad_Func_Access;
        X0        : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float is
-        use Num_Diff;
+        use Real_Float_Arrays;
         Step            : Real_Float_Vector (1 .. 1);
-        Analytical_Grad : Real_Float_Vector (X0'Range);
-        Diff            : Real_Float_Vector (X0'Range);
+        Analytical_Grad : Real_Float_Matrix (X0'Range, 1 .. 1);
+        Diff            : Real_Float_Matrix (X0'Range, 1 .. 1);
     begin
         Step (1) := Epsilon;
         case Direction is
@@ -74,17 +74,18 @@ package body Optimise is
     --  ------------------------------------------------------------------------
     --  L1261
     function Minimise_BFGS
-      (Fun              : RF_Fun_Access; X0 : Real_Float_Vector;
-       Gtol             : Float := 10.0 ** (-5); Norm        : Float := Float'Safe_Last;
+      (Fun              : Num_Diff.Deriv_Fun_Access; X0 : Real_Float_Vector;
+       Gtol             : Float := 10.0 ** (-5);
+       Norm        : Float := Float'Safe_Last;
        Eps              : Float := Epsilon; Max_Iter : Natural := 0;
        Disp, Return_All : Boolean := False) return Optimise_Result is
         Min_BFGS   : Optimise_Result (0, 0, 0);
         Iters      : Positive;
         Ret_All    : Boolean := Return_All;
-        SF         : Scalar_Function (X0'Length);
-        F          : RF_Fun_Access;
+        SF         : Scalar_Function (X0'Length, 1);
+        F          : Num_Diff.Deriv_Fun_Access;
         My_F_Prime : Num_Diff.FD_Methods;
-        Old_Val    : Float;
+        Old_Val    : Real_Float_Vector (X0'Range);
         K          : Natural := 0;
     begin
         --  L1301
@@ -106,17 +107,22 @@ package body Optimise is
     --  ------------------------------------------------------------------------
 
     function Prepare_Scalar_Function
-      (Fun                           : RF_Fun_Access; X0       : Real_Float_Vector;
-       Bounds                        : Constraints.Array_Bounds := Constraints.Default_Bounds;
-       Epsilon, Finite_Diff_Rel_Step : Float := 0.0)
+      (Fun : Num_Diff.Deriv_Fun_Access;
+       X0 : Real_Float_Vector;
+       Bounds               : Constraints.Array_Bounds :=
+         Constraints.Default_Bounds;
+       Epsilon,
+       Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
        return Scalar_Function is
-        SF : Scalar_Function (X0'Length);
+        SF : Scalar_Function (X0'Length, 1);
     begin
         SF.Fun := Fun;
         SF.X0 := X0;
         SF.Bounds := Bounds;
         SF.F_Diff_Rel_Step := Finite_Diff_Rel_Step;
-        SF.Epsilon := Epsilon;
+        for index in SF.Epsilon'Range loop
+            SF.Epsilon (index) := Epsilon;
+        end loop;
         return SF;
 
     end Prepare_Scalar_Function;
@@ -124,17 +130,23 @@ package body Optimise is
     --  ------------------------------------------------------------------------
 
     function Prepare_Jac_Scalar_Function
-      (Fun                           : RF_Fun_Access; X0, Jac  : Real_Float_Vector;
-       Bounds                        : Constraints.Array_Bounds := Constraints.Default_Bounds;
-       Epsilon, Finite_Diff_Rel_Step : Float := 0.0) return Scalar_Function is
-        SF : Scalar_Function (1);
+      (Fun     : Num_Diff.Deriv_Fun_Access;
+      X0, Jac  : Real_Float_Vector;
+       Bounds                        : Constraints.Array_Bounds :=
+       Constraints.Default_Bounds;
+       Epsilon, Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
+       return Scalar_Function is
+        SF : Scalar_Function (X0'Length, 1);
     begin
         SF.Fun := Fun;
         SF.X0 := X0;
         SF.Bounds := Bounds;
         SF.F_Diff_Rel_Step := Finite_Diff_Rel_Step;
-        SF.Epsilon := Epsilon;
         SF.Jac := Jac;
+        for index in SF.Epsilon'Range loop
+            SF.Epsilon (index) := Epsilon;
+        end loop;
+
         return SF;
 
     end Prepare_Jac_Scalar_Function;
