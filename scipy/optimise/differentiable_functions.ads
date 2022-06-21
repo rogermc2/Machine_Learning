@@ -12,8 +12,8 @@ package Differentiable_Functions is
 
     --  The Scalar_Function class defines a scalar function F: R^n->R and
     --  methods for computing or approximating its first and second derivatives.
-    type Scalar_Function (X0_Size : Positive) is record
-        Fun             : RF_Fun_Access;
+    type Scalar_Function (X0_Size, Num_Vars : Positive) is record
+        Fun             : Num_Diff.Deriv_Fun_Access;
         --        Update_Fun      : RF_Fun_Access;
         --        Update_Grad     : access procedure;
         --  X0 is a vector of X0_Size independent variables
@@ -31,11 +31,14 @@ package Differentiable_Functions is
         Grad            : FD_Methods;
         Hess            : FD_Methods;
         F_Diff_Rel_Step : Float := 0.0;
-        F               : Float := Float'Safe_Last;
-        G               : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
+        F               : Real_Float_Vector (1 .. X0_Size) :=
+                            (others => Float'Safe_Last);
+        G               : Real_Float_Matrix (1 .. X0_Size, 1 .. Num_Vars) :=
+                            (others => (others => 0.0));
         Lowest_X        : Real_Float_Vector (1 .. X0_Size);
         Lowest_F        : Float := Float'Safe_Last;
-        Epsilon         : Float := 10.0 ** (-8);
+        Epsilon         : Real_Float_Vector (1 .. X0_Size) :=
+                            (others => 10.0 ** (-8));
     end record;
 
     procedure C_Init
@@ -46,11 +49,10 @@ package Differentiable_Functions is
        Finite_Diff_Bounds     : Float;
        Epsilon                : Float := 10.0 ** (-8));
     procedure Fun_And_Grad
-      (Self : in out Scalar_Function;
-       X    : Real_Float_Vector;
-       Fun_Val : out Float; Grad : out Real_Float_Vector);
+      (Self : in out Scalar_Function; X : Real_Float_Vector;
+       Fun_Val : out Real_Float_Vector; Grad : out Real_Float_Matrix);
    function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
-                  return Real_Float_Vector;
+                  return Real_Float_Matrix;
 
 private
 

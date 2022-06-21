@@ -8,8 +8,8 @@ package Num_Diff is
 
    type FD_Methods is (FD_None, Fd_Callable, FD_2_Point, FD_3_Point, FD_CS,
                        FD_Hessian_Update_Strategy, FD_True, FD_False);
-   type Fun_Access is access function (X : Real_Float_Vector)
-                                       return Real_Float_Vector;
+   type Deriv_Fun_Access is access function (X : Real_Float_Vector)
+                                             return Real_Float_Vector;
    type Dimensions is record
       Rows : Positive := 1;
       Cols : Positive := 1;
@@ -17,11 +17,11 @@ package Num_Diff is
 
    type Linear_Operator is record
       Dims    : Dimensions;
-      Mat_Vec : Fun_Access;  --  returns A * v.
+      Mat_Vec : Deriv_Fun_Access;  --  returns A * v.
    end record;
 
    function Approx_Derivative
-     (Fun                : Fun_Access;
+     (Fun                : Deriv_Fun_Access;
       X0                 : Real_Float_Vector;
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
