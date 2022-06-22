@@ -3,10 +3,10 @@
 with Interfaces.Fortran; use Interfaces.Fortran;
 
 with Constraints;
-with Differentiable_Functions;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with Optimise;
 with Opt_Minimise;
+with Num_Diff;
 with Stochastic_Optimizers;
 
 package LBFGSB1 is
@@ -14,7 +14,7 @@ package LBFGSB1 is
    function All_Close (A, B  : Fortran_DP_Array;
                        A_Tol : Double_Precision := 10.0 ** (-8))
                        return Boolean;
-   function Minimise_LBFGSB (Fun       : Differentiable_Functions.RF_Fun_Access;
+   function Minimise_LBFGSB (Fun       : Num_Diff.Deriv_Fun_Access;
                              X0        : Stochastic_Optimizers.Parameters_List;
                              Bounds    : Constraints.Bounds_List :=
                                Constraints.Array_Bounds_Package.Empty_Vector;

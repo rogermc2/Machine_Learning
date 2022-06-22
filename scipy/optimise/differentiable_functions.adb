@@ -65,7 +65,7 @@ package body Differentiable_Functions is
     procedure Fun_And_Grad
       (Self    : in out Scalar_Function;
        X       : Real_Float_Vector;
-       Fun_Val : out Real_Float_Vector; Grad : out Real_Float_Matrix) is
+       Fun_Val : out Real_Float_Matrix; Grad : out Real_Float_Matrix) is
     begin
         Update_Fun (Self);
         Update_Grad (Self);
@@ -79,15 +79,17 @@ package body Differentiable_Functions is
     --  L132
     function Fun_Wrapped (Self : in out Scalar_Function;
                           Fun  : Num_Diff.Deriv_Fun_Access;
-                          X    : Real_Float_Vector) return Real_Float_Vector is
-        FX : constant Real_Float_Vector := Fun (X);
+                          X    : Real_Float_Vector) return Real_Float_Matrix is
+        FX : constant Real_Float_Matrix := Fun (X);
     begin
         Self.N_Fev := Self.N_Fev + 1;
         for index in FX'Range loop
-            if FX (index) < Self.Lowest_F then
-                Self.Lowest_X := X;
-                Self.Lowest_F := FX (index);
-            end if;
+            for col in FX'Range loop
+                if FX (index, col) < Self.Lowest_F then
+                    Self.Lowest_X := X;
+                    Self.Lowest_F := FX (index, col);
+                end if;
+            end loop;
         end loop;
 
         return FX;

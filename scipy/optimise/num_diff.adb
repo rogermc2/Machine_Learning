@@ -9,8 +9,8 @@ with Maths;
 package body Num_Diff is
 
     type Scheme_Type is (One_Sided, Two_Sided);
-    type Wrapped_Access is
-      access function (X : Real_Float_Vector) return Real_Float_Vector;
+--      type Wrapped_Access is
+--        access function (X : Real_Float_Vector) return Real_Float_Vector;
 
     EPS : constant Float := Float'Small;
 
@@ -23,8 +23,9 @@ package body Num_Diff is
     function Compute_Absolute_Step
       (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
        Method   : FD_Methods) return Real_Float_Vector;
-    function Dense_Difference (W_Fun                    : Wrapped_Access;
-                               X0, F0, H, Use_One_Sided : Real_Float_Vector;
+    function Dense_Difference (W_Fun    : Deriv_Fun_Access;
+                               X0 : Real_Float_Vector; F0 : Real_Float_Matrix;
+                               H, Use_One_Sided : Real_Float_Vector;
                                Method : FD_Methods) return Real_Float_Matrix;
     function EPS_For_Method (Method : FD_Methods) return Float;
     function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
@@ -243,7 +244,7 @@ package body Num_Diff is
         end if;
 
         --  L504 if sparsity is None:
-        return Dense_Difference (Fun_Wrapped'Access, X0, F0, H, Use_One_Sided,
+        return Dense_Difference (Fun, X0, F0, H, Use_One_Sided,
                                  Method);
 
     end Approx_Derivative;
@@ -316,8 +317,9 @@ package body Num_Diff is
 
     --  -------------------------------------------------------------------------
     --  L567
-    function Dense_Difference (W_Fun                    : Wrapped_Access;
-                               X0, F0, H, Use_One_Sided : Real_Float_Vector;
+    function Dense_Difference (W_Fun                    : Deriv_Fun_Access;
+                               X0 : Real_Float_Vector; F0 : Real_Float_Matrix;
+                               H, Use_One_Sided : Real_Float_Vector;
                                Method : FD_Methods) return Real_Float_Matrix is
         use Real_Float_Arrays;
         Routine_Name  : constant String := "Num_Diff.Dense_Difference ";
@@ -328,7 +330,7 @@ package body Num_Diff is
         X1     : Real_Float_Vector (X0'Range);
         X2     : Real_Float_Vector (X0'Range);
         dX     : Float;
-        dF     : Real_Float_Vector (X0'Range);
+        dF     : Real_Float_Matrix (X0'Range, 1 .. 1);
     begin
         for index in H'Range loop
             H_Vecs (index, index) := H (index);
@@ -361,7 +363,7 @@ package body Num_Diff is
             end case;
 
             for col in J_T'Range (2) loop
-                J_T (index, col) := dF (col) / dX;
+                J_T (index, col) := dF (index, col) / dX;
             end loop;
 
         end loop;

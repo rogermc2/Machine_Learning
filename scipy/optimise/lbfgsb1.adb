@@ -3,6 +3,7 @@
 with Ada.Assertions; use Ada.Assertions;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with Differentiable_Functions;
 
 package body LBFGSB1 is
    --      type Byte is range -128 .. 127;
@@ -35,7 +36,7 @@ package body LBFGSB1 is
 
    --  ------------------------------------------------------------------------
 
-   function Minimise_LBFGSB (Fun      : Differentiable_Functions.RF_Fun_Access;
+   function Minimise_LBFGSB (Fun      : Num_Diff.Deriv_Fun_Access;
                              X0       : Stochastic_Optimizers.Parameters_List;
                              Bounds   : Constraints.Bounds_List :=
                                Constraints.Array_Bounds_Package.Empty_Vector;
@@ -77,7 +78,7 @@ package body LBFGSB1 is
       D_Save          : Fortran_DSave_Array := (others => 0.0);
       C_Save          : Character_60 := To_Fortran ("");
       Task_Name       : Character_60 := To_Fortran ("START");
-      Scalar_Func     : Differentiable_Functions.Scalar_Function (X0_Length);
+      Scalar_Func     : Differentiable_Functions.Scalar_Function (X0_Length, 1);
       Continiue       : Boolean := True;
       Warn_Flag       : Natural;
       Result          : Optimise.Optimise_Result (0, 0, 0);
@@ -116,7 +117,7 @@ package body LBFGSB1 is
          if Task_Name (1 .. 2) = "FG" then
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
             RF_G := To_RF_Array (G);
-            Fun_And_Grad (Scalar_Func, RF_X, Float (F), RF_G);
+            Fun_And_Grad (Scalar_Func, RF_X, F, RF_G);
          elsif Task_Name (1 .. 5) = "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
