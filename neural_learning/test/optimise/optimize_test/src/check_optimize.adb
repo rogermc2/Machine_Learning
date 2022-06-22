@@ -52,15 +52,13 @@ package body Check_Optimize is
       Routine_Name : constant String := "Check_Optimize.Test_Check_Grad ";
         X0        : Real_Float_Vector (1 .. 1);
 --          SF        : Scalar_Function (1, 1);
---          Fun       : constant RF_Fun_Access := null;
 --          Deriv_Fun : Num_Diff.Deriv_Fun_Access;
-        Grad_Func : constant Optimise.Grad_Func_Access := null;
         Result    : Float;
     begin
         X0 (1) := 1.5;
 --          C_Init (SF, Fun, X0, Num_Diff.FD_None, Num_Diff.FD_None,
 --                  Epsilon, Epsilon);
-      Result := Optimise.Check_Grad (Der_Logit'Access, Grad_Func, X0);
+      Result := Optimise.Check_Grad (Logit'Access, Der_Logit'Access, X0);
       Put_Line (Routine_Name & "" & Float'Image (Result));
 
     end Test_Check_Grad;

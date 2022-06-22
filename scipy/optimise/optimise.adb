@@ -38,8 +38,8 @@ package body Optimise is
     --  comparing it against a (forward) finite-difference approximation of the
     --  gradient.
     function Check_Grad
-      (Fun       : Num_Diff.Deriv_Fun_Access; Grad_Func : Grad_Func_Access;
-       X0        : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
+     (Fun, Grad_Func : Grad_Func_Access; X0 : Real_Float_Vector;
+      Epsilon        : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float is
         use Real_Float_Arrays;
         Step            : Real_Float_Vector (1 .. 1);

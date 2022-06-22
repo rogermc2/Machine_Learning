@@ -30,8 +30,7 @@ package Optimise is
     end record;
 
     function Check_Grad
-      (Fun : Num_Diff.Deriv_Fun_Access;
-       Grad_Func : Grad_Func_Access; X0 : Real_Float_Vector;
+      (Fun, Grad_Func : Grad_Func_Access; X0 : Real_Float_Vector;
        Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function
