@@ -1,5 +1,6 @@
 --  Based on scipy/optimize/optimize.py
 
+with Ada.Assertions; use Ada.Assertions;
 with Maths;
 
 package body Optimise is
@@ -38,14 +39,19 @@ package body Optimise is
     --  comparing it against a (forward) finite-difference approximation of the
     --  gradient.
     function Check_Grad
-      (Fun       : Num_Diff.Deriv_Fun_Access; Grad_Func : Grad_Func_Access;
+      (Fun       : Num_Diff.Deriv_Fun_Access;
+       Grad_Func : Grad_Func_Access;
        X0        : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float is
         use Real_Float_Arrays;
+        use Num_Diff;
+        Routine_Name : constant String := "Optimise.Check_Grad ";
         Step            : Real_Float_Vector (1 .. 1);
         Analytical_Grad : Real_Float_Matrix (X0'Range, 1 .. 1);
         Diff            : Real_Float_Matrix (X0'Range, 1 .. 1);
     begin
+        Assert (Fun /= null, Routine_Name & "Fun is null");
+        Assert (Grad_Func /= null, Routine_Name & "Grad_Func is null");
         Step (1) := Epsilon;
         case Direction is
             when Random_Direction => null;
@@ -130,9 +136,9 @@ package body Optimise is
 
     function Prepare_Jac_Scalar_Function
       (Fun     : Num_Diff.Deriv_Fun_Access;
-      X0, Jac  : Real_Float_Vector;
+       X0, Jac  : Real_Float_Vector;
        Bounds                        : Constraints.Array_Bounds :=
-       Constraints.Default_Bounds;
+         Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
        return Scalar_Function is
         SF : Scalar_Function (X0'Length, 1);
