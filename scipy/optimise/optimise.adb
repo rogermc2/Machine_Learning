@@ -21,11 +21,11 @@ package body Optimise is
     --  f[i] with respect to x[j].
     --  Approx_Fprime returns Func's partial derivatives with respect to Xk.
     function Approx_Fprime
-      (Xk : Real_Float_Vector; Func : Num_Diff.Deriv_Fun_Access;
+      (Xk : Real_Float_Vector; Func : Grad_Func_Access;
        Epsilon : Real_Float_Vector)
        return Real_Float_Matrix is
         use Num_Diff;
-        F0  : constant Real_Float_Vector := Func (Xk);
+        F0  : constant Real_Float_Matrix := Func (Xk);
 
     begin
         return Approx_Derivative
@@ -39,8 +39,7 @@ package body Optimise is
     --  comparing it against a (forward) finite-difference approximation of the
     --  gradient.
     function Check_Grad
-      (Fun       : Num_Diff.Deriv_Fun_Access;
-       Grad_Func : Grad_Func_Access;
+      (Fun, Grad_Func : Grad_Func_Access;
        X0        : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float is
         use Real_Float_Arrays;

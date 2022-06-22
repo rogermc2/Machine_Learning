@@ -16,10 +16,10 @@ package body Num_Diff is
 
     function Check_Bounds
       (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
-      return Boolean;
+       return Boolean;
     function Check_Bounds
       (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
-      return Boolean_Array;
+       return Boolean_Array;
     function Compute_Absolute_Step
       (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
        Method   : FD_Methods) return Real_Float_Vector;
@@ -28,16 +28,17 @@ package body Num_Diff is
                                Method : FD_Methods) return Real_Float_Matrix;
     function EPS_For_Method (Method : FD_Methods) return Float;
     function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
-    function Fun_Wrapped (X : Real_Float_Vector) return Real_Float_Vector;
+    function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector) return Real_Float_Matrix;
     --     function Linear_Operator_Difference
     --       (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
     --        Method : FD_Methods) return Real_Float_Vector;
-    function Mat_Vec (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector;
-                      H      : Real_Float_Vector; Method : FD_Methods)
-                     return Real_Float_Vector;
+    function Mat_Vec (Fun : Deriv_Fun_Access; X0 : Real_Float_Vector;
+                      F0  : Real_Float_Matrix; H : Real_Float_Vector;
+                      Method : FD_Methods)
+                      return Real_Float_Matrix;
     function Prepare_Bounds (Bounds : Constraints.Bounds_List;
                              X0     : Real_Float_Vector)
-                            return Constraints.Bounds_List;
+                             return Constraints.Bounds_List;
     function Relative_Step (Method : FD_Methods) return Float;
 
     --  -------------------------------------------------------------------------
@@ -166,7 +167,7 @@ package body Num_Diff is
        Method             : FD_Methods := FD_None;
        Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
        Abs_Step           : Real_Float_Vector;
-       F0                 : Real_Float_Vector;
+       F0                 : Real_Float_Matrix;
        Bounds             : Constraints.Bounds_List :=
          Constraints.Array_Bounds_Package.Empty_Vector;
        As_Linear_Operator : Boolean := False) return Real_Float_Matrix is
@@ -176,12 +177,12 @@ package body Num_Diff is
         Loc_Bounds    : constant Constraints.Bounds_List :=
                           Prepare_Bounds (Bounds, X0);
         L_Rel_Step    : Real_Float_List := Rel_Step;
-        L_F0          : Real_Float_Vector := F0;
+        L_F0          : Real_Float_Matrix := F0;
         Use_One_Sided : Real_Float_Vector (X0'Range) := (others => 0.0);
         H             : Real_Float_Vector (X0'Range);
         Sign_X0       : Real_Float_Vector (X0'Range) := X0 >= 0.0;
         dX            : Real_Float_Vector (X0'Range);
-        dF_dX         : Real_Float_Vector (X0'Range);
+        dF_dX         : Real_Float_Matrix (X0'Range, 1 .. 1);
         pragma Unreferenced (dF_dX);
 
     begin
@@ -195,7 +196,7 @@ package body Num_Diff is
 
         --  L462
         if F0'Last < F0'First then
-            L_F0 := Fun_Wrapped (L_F0);
+            L_F0 := Fun_Wrapped (Fun, X0);
         end if;
 
         Assert (Check_Bounds (X0, Bounds), Routine_Name & "invalid X0 Bounds");
@@ -251,7 +252,7 @@ package body Num_Diff is
 
     function Check_Bounds
       (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
-      return Boolean_Array is
+       return Boolean_Array is
         Result : Boolean_Array (X0'Range);
     begin
         for index in  X0'Range loop
@@ -267,7 +268,7 @@ package body Num_Diff is
 
     function Check_Bounds
       (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
-      return Boolean is
+       return Boolean is
         Result : Boolean := True;
     begin
         for index in  X0'Range loop
@@ -389,9 +390,10 @@ package body Num_Diff is
 
     --  -------------------------------------------------------------------------
 
-    function Fun_Wrapped (X : Real_Float_Vector)  return Real_Float_Vector is
+    function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
+                          return Real_Float_Matrix is
     begin
-        return X;
+        return Fun (X);
 
     end Fun_Wrapped;
 
@@ -425,9 +427,10 @@ package body Num_Diff is
 
     --  -------------------------------------------------------------------------
 
-    function Mat_Vec (Fun : Deriv_Fun_Access; X0, F0 : Real_Float_Vector;
+    function Mat_Vec (Fun : Deriv_Fun_Access; X0 : Real_Float_Vector;
+                      F0 : Real_Float_Matrix;
                       H   : Real_Float_Vector; Method : FD_Methods)
-                     return Real_Float_Vector is
+                      return Real_Float_Matrix is
         use Maths.Float_Math_Functions;
         use Real_Float_Arrays;
         Routine_Name : constant String := "Num_Diff.Mat_Vec ";
@@ -437,10 +440,11 @@ package body Num_Diff is
         Norm_P       : constant Float := Sqrt (M ** 2 + N ** 2);
         dx           : Real_Float_Vector (H'Range);
         dx_P         : Real_Float_Vector (H'Range);
-        df           : Real_Float_Vector (F0'Range);
+        df           : Real_Float_Matrix (F0'Range, 1 .. 1);
         X1           : Real_Float_Vector (F0'Range);
         X2           : Real_Float_Vector (F0'Range);
-        Result       : Real_Float_Vector (F0'Range) := (others => 0.0);
+        Result       : Real_Float_Matrix (F0'Range, 1 .. 1) :=
+                         (others => (others => 0.0));
     begin
         if F0 /= Result then
             for index in dx'Range loop
@@ -476,7 +480,7 @@ package body Num_Diff is
 
     function Prepare_Bounds (Bounds : Constraints.Bounds_List;
                              X0     : Real_Float_Vector)
-                            return Constraints.Bounds_List is
+                             return Constraints.Bounds_List is
         Result : Constraints.Bounds_List;
     begin
         if Bounds.Is_Empty then
