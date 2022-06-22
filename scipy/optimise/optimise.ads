@@ -9,8 +9,8 @@ package Optimise is
 
     type Direction_Kind is (Random_Direction, All_Direction);
     type Opt_Fun_Access is access function (X : Real_Float_List) return Float;
-   type Grad_Func_Access is access function (X : Real_Float_Vector)
-                                              return Real_Float_Matrix;
+--     type Grad_Func_Access is access function (X : Real_Float_Vector)
+--                                                return Real_Float_Matrix;
 
     type Optimise_Result
       (Jac_Length, N_Coor, N : Natural) is record
@@ -30,7 +30,7 @@ package Optimise is
     end record;
 
     function Check_Grad
-      (Fun : Num_Diff.Deriv_Fun_Access; Grad_Func : Grad_Func_Access;
+      (Fun, Grad_Func : Num_Diff.Deriv_Fun_Access;
        X0 : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function

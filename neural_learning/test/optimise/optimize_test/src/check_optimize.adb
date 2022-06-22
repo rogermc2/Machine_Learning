@@ -15,13 +15,13 @@ package body Check_Optimize is
 
    --  -------------------------------------------------------------------------
 
-   function Der_Logit (X : Real_Float_Vector) return Real_Float_Vector is
+   function Der_Logit (X : Real_Float_Vector) return Real_Float_Matrix is
       use Real_Float_Arrays;
       Exp_Val : constant Real_Float_Vector := Exp (-X);
-      Result  : Real_Float_Vector := Exp_Val;
+      Result  : Real_Float_Matrix (X'Range, 1 .. 1);
    begin
       for row in X'Range loop
-            Result (row) := Exp_Val (row) / (1.0 + Exp_Val (row)) ** 2;
+            Result (row, 1) := Exp_Val (row) / (1.0 + Exp_Val (row)) ** 2;
       end loop;
 
       return Result;
@@ -30,13 +30,13 @@ package body Check_Optimize is
 
    --  -------------------------------------------------------------------------
 
-   function Logit (X : Real_Float_Vector) return Real_Float_Vector is
+   function Logit (X : Real_Float_Vector) return Real_Float_Matrix is
       use Real_Float_Arrays;
       Exp_Val : constant Real_Float_Vector := Exp (-X);
-      Result : Real_Float_Vector (X'Range);
+      Result : Real_Float_matrix (X'Range, 1 .. 1);
    begin
       for row in X'Range loop
-            Result (row) := 1.0 / (1.0 + Exp_Val (row));
+            Result (row, 1) := 1.0 / (1.0 + Exp_Val (row));
       end loop;
 
       return Result;
