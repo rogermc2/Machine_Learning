@@ -14,7 +14,8 @@ package Optimise is
 
     type Optimise_Result
       (Jac_Length, N_Coor, N : Natural) is record
-        Fun      : RF_Fun_Access;
+--          Fun      : Num_Diff.Deriv_Fun_Access;
+        Fun      : Real_Float_List;
         X        : Real_Float_List;
         Jac      : NL_Arrays_And_Matrices.Real_Float_Vector (1 .. Jac_Length);
         N_It     : Positive := 1;

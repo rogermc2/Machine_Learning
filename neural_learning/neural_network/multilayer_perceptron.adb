@@ -45,7 +45,6 @@ with Base;
 with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
-with Num_Diff;
 with Optimise;
 with Opt_Minimise;
 with Printing;
@@ -302,8 +301,7 @@ package body Multilayer_Perceptron is
                     Epsilon             : Float := 10.0 ** (-8);
                     N_Iter_No_Change    : Natural := 10;
                     Max_Fun             : Max_Function_Access := null;
-                    RF_Fun              : Differentiable_Functions.
-                      RF_Fun_Access := null)
+                    RF_Fun              : Num_Diff.Deriv_Fun_Access := null)
                     return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin

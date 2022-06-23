@@ -7,7 +7,7 @@ with NL_Types;
 package body Opt_Minimise is
 
    function Optimize_Result_For_Equal_Bounds
-     (Fun    : Differentiable_Functions.RF_Fun_Access;
+     (Fun    : Num_Diff.Deriv_Fun_Access;
       Bounds : Constraints.Bounds_List)
       return Optimise.Optimise_Result;
    --  Standardize_Bounds converts bounds to the form required by the solver
@@ -26,7 +26,7 @@ package body Opt_Minimise is
 
    --  -------------------------------------------------------------------------
 
-   function Minimise (Fun         : Differentiable_Functions.RF_Fun_Access;
+   function Minimise (Fun         : Num_Diff.Deriv_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
@@ -117,7 +117,7 @@ package body Opt_Minimise is
    --  -------------------------------------------------------------------------
 
    function Optimize_Result_For_Equal_Bounds
-     (Fun    : Differentiable_Functions.RF_Fun_Access;
+     (Fun    : Num_Diff.Deriv_Fun_Access;
       Bounds : Constraints.Bounds_List)
       return Optimise.Optimise_Result is
       use NL_Arrays_And_Matrices;
