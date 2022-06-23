@@ -10,6 +10,8 @@ package Num_Diff is
                        FD_Hessian_Update_Strategy, FD_True, FD_False);
    type Deriv_Fun_Access is access function (X : Real_Float_Vector)
                                              return Real_Float_Matrix;
+   type Deriv_Float_Fun_Access is access function (X : Real_Float_Vector)
+                                                   return Float;
    type Dimensions is record
       Rows : Positive := 1;
       Cols : Positive := 1;

@@ -7,7 +7,7 @@ with NL_Types;
 package body Opt_Minimise is
 
    function Optimize_Result_For_Equal_Bounds
-     (Fun    : Num_Diff.Deriv_Fun_Access;
+     (Fun    : Num_Diff.Deriv_Float_Fun_Access;
       Bounds : Constraints.Bounds_List)
       return Optimise.Optimise_Result;
    --  Standardize_Bounds converts bounds to the form required by the solver
@@ -26,7 +26,7 @@ package body Opt_Minimise is
 
    --  -------------------------------------------------------------------------
 
-   function Minimise (Fun         : Num_Diff.Deriv_Fun_Access;
+   function Minimise (Fun         : Num_Diff.Deriv_Float_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
@@ -115,21 +115,22 @@ package body Opt_Minimise is
    end Minimise;
 
    --  -------------------------------------------------------------------------
-
+   --  L977
    function Optimize_Result_For_Equal_Bounds
-     (Fun    : Num_Diff.Deriv_Fun_Access;
+     (Fun    : Num_Diff.Deriv_Float_Fun_Access;
       Bounds : Constraints.Bounds_List)
       return Optimise.Optimise_Result is
       use NL_Arrays_And_Matrices;
       Success : constant Boolean := True;
-      X0      : Real_Float_List;
+      X0      : Real_Float_Vector (1 .. Positive (Bounds.Length));
+      --  L1013
       Result  : Optimise.Optimise_Result (0, 0, 0);
    begin
       for index in Bounds.First_Index .. Bounds.Last_Index loop
-         X0.Append (Bounds (index).Lower);
+         X0 (index) := Bounds (index).Lower;
       end loop;
 
-      Result.Fun := Fun;
+      Result.Fun := Fun (X0);
       Result.X := X0;
       Result.N_Fev := 1;
       Result.Success := Success;

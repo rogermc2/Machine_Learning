@@ -500,7 +500,8 @@ package body Multilayer_Perceptron is
       declare
          X_Vec : constant Real_Float_Vector := To_Real_Float_Vector (Result.X);
       begin
-         Self.Attributes.Loss := Result.Fun (X_Vec);
+         --  L566
+         Self.Attributes.Loss := Result.Fun;
       end;
 
    end Fit_Lbfgs;
