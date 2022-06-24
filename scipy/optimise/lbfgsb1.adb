@@ -18,7 +18,8 @@ package body LBFGSB1 is
    --      end record;
    function Parameters_List_To_DP_Array
      (PL : Stochastic_Optimizers.Parameters_List) return Fortran_DP_Array;
-
+   function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
+                                  return Real_Float_Vector;
    --  ------------------------------------------------------------------------
 
    function All_Close (A, B  : Fortran_DP_Array;
@@ -181,10 +182,8 @@ package body LBFGSB1 is
          Result_J.Success := Warn_Flag = 0;
          Result_J.SK := S;
          Result_J.YK := Y;
-         Result_J.X.Clear;
-         for index in X'First .. X'Last loop
-            Result_J.X.Append (Float (X (index)));
-         end loop;
+
+            Result_J.X := To_Real_Float_Vector (X);
 
          Result := Result_J;
       end;
@@ -236,6 +235,20 @@ package body LBFGSB1 is
       end;
 
    end Parameters_List_To_DP_Array;
+
+   --  ------------------------------------------------------------------------
+
+   function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
+                                  return Real_Float_Vector is
+      Vec : Real_Float_Vector (DP_Vec'Range);
+   begin
+      for index in DP_Vec'Range loop
+         Vec (index) := Float (DP_Vec (index));
+      end loop;
+
+      return Vec;
+
+   end To_Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
