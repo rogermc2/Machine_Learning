@@ -301,7 +301,8 @@ package body Multilayer_Perceptron is
                     Epsilon             : Float := 10.0 ** (-8);
                     N_Iter_No_Change    : Natural := 10;
                     Max_Fun             : Max_Function_Access := null;
-                    RF_Fun              : Num_Diff.Deriv_Fun_Access := null)
+                    RF_Fun              : Num_Diff.Deriv_Float_Fun_Access
+                    := null)
                     return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
@@ -498,7 +499,7 @@ package body Multilayer_Perceptron is
         Utils_Optimise.Check_Optimize_Result (Result, Self.Parameters.Max_Iter);
 
       declare
-         X_Vec : constant Real_Float_Vector := To_Real_Float_Vector (Result.X);
+         X_Vec : constant Real_Float_Vector := Result.X;
       begin
          --  L566
          Self.Attributes.Loss := Result.Fun;

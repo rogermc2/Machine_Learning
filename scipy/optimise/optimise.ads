@@ -16,8 +16,8 @@ package Optimise is
       (Jac_Length, N_Coor, N : Natural) is record
 --          Fun      : Num_Diff.Deriv_Fun_Access;
         Fun      : Float;
-        X        : Real_Float_List;
-        Jac      : NL_Arrays_And_Matrices.Real_Float_Vector (1 .. Jac_Length);
+        X        : Real_Float_Vector (1 .. Jac_Length);
+        Jac      : Real_Float_Vector (1 .. Jac_Length);
         N_It     : Positive := 1;
         N_Fev    : Natural := 0;
         N_Jev    : Natural := 0;
