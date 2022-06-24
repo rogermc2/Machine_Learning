@@ -35,7 +35,7 @@ package Optimise is
        X0 : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function
-      (Fun    : Num_Diff.Deriv_Fun_Access; X0 : Real_Float_Vector;
+      (Fun    : Num_Diff.Deriv_Float_Fun_Access; X0 : Real_Float_Vector;
        Bounds : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon,
        Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
