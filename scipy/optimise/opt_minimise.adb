@@ -1,6 +1,6 @@
 --  Based on scipy/optimise/_minimize.py
 
-with LBFGSB1;
+with L_BFGS_B;
 with NL_Arrays_And_Matrices;
 with NL_Types;
 
@@ -99,7 +99,7 @@ package body Opt_Minimise is
          if not Done then
             case Method is
                when L_BFGS_B_Method =>
-               Result := LBFGSB1.Minimise_LBFGSB (Fun => Fun, X0 => X0,
+               Result := L_BFGS_B.Minimise_LBFGSB (Fun => Fun, X0 => X0,
                                                  Bounds => Bounds);
                when others => null;
             end case;

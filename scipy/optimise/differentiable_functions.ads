@@ -13,7 +13,7 @@ package Differentiable_Functions is
     --  The Scalar_Function class defines a scalar function F: R^n->R and
     --  methods for computing or approximating its first and second derivatives.
     type Scalar_Function (X0_Size, Num_Vars : Positive) is record
-        Fun             : Num_Diff.Deriv_Float_Fun_Access;
+        Fun             : Deriv_Float_Fun_Access;
         --        Update_Fun      : RF_Fun_Access;
         --        Update_Grad     : access procedure;
         --  X0 is a vector of X0_Size independent variables
@@ -43,14 +43,14 @@ package Differentiable_Functions is
 
     procedure C_Init
       (Self                   : in out Scalar_Function;
-       Fun                    : RF_Fun_Access;
+       Fun                    : Deriv_Float_Fun_Access;
        X0                     : Real_Float_Vector; Grad, Hess : FD_Methods;
        Finite_Diff_Rel_Step,
        Finite_Diff_Bounds     : Float;
        Epsilon                : Float := 10.0 ** (-8));
     procedure Fun_And_Grad
       (Self : in out Scalar_Function; X : Real_Float_Vector;
-       Fun_Val : out Real_Float_Matrix; Grad : out Real_Float_Matrix);
+       Fun_Val : out Float; Grad : out Real_Float_Matrix);
    function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
                   return Real_Float_Matrix;
 

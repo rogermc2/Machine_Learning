@@ -14,7 +14,7 @@ package body Differentiable_Functions is
 
     procedure C_Init
       (Self                  : in out Scalar_Function;
-       Fun                   : RF_Fun_Access;
+       Fun                   : Deriv_Float_Fun_Access;
        X0                    : Real_Float_Vector; Grad, Hess : FD_Methods;
        Finite_Diff_Rel_Step,
        Finite_Diff_Bounds    : Float;
@@ -30,6 +30,7 @@ package body Differentiable_Functions is
                   "Whenever the gradient is estimated via finite-differences" &
                   " the Hessian must be estimated using one of the " &
                   "quasi-Newton strategies.") ;
+        Self.Fun := Fun;
         Self.X0 := X0;
 
         --  L120
@@ -65,7 +66,7 @@ package body Differentiable_Functions is
     procedure Fun_And_Grad
       (Self    : in out Scalar_Function;
        X       : Real_Float_Vector;
-       Fun_Val : out Real_Float_Matrix; Grad : out Real_Float_Matrix) is
+       Fun_Val : out Float; Grad : out Real_Float_Matrix) is
     begin
         Update_Fun (Self);
         Update_Grad (Self);
@@ -78,13 +79,13 @@ package body Differentiable_Functions is
 
     --  L132
     function Fun_Wrapped (Self : in out Scalar_Function;
-                          Fun  : Num_Diff.Deriv_Fun_Access;
+                          Fun  : Num_Diff.Deriv_Float_Fun_Access;
                           X    : Real_Float_Vector) return Real_Float_Matrix is
         FX : constant Real_Float_Matrix := Fun (X);
     begin
         Self.N_Fev := Self.N_Fev + 1;
         for index in FX'Range loop
-            for col in FX'Range loop
+            for col in FX'Range (2) loop
                 if FX (index, col) < Self.Lowest_F then
                     Self.Lowest_X := X;
                     Self.Lowest_F := FX (index, col);

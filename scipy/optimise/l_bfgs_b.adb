@@ -1,11 +1,13 @@
 --  Based on scipy/optimize/lbfgsb_py.py
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Differentiable_Functions;
+with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 
-package body LBFGSB1 is
+package body L_BFGS_B is
    --      type Byte is range -128 .. 127;
    --     type Byte is mod 256;
    --     for  Byte'Size use 16;
@@ -16,24 +18,24 @@ package body LBFGSB1 is
    --          SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
    --          YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
    --      end record;
-   function Parameters_List_To_DP_Array
-     (PL : Stochastic_Optimizers.Parameters_List) return Fortran_DP_Array;
-   function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
-                                  return Real_Float_Vector;
+     function Parameters_List_To_RF_Array
+       (PL : Stochastic_Optimizers.Parameters_List) return Real_Float_Vector;
+--     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
+--                                    return Real_Float_Vector;
    --  ------------------------------------------------------------------------
 
-   function All_Close (A, B  : Fortran_DP_Array;
-                       A_Tol : Double_Precision := 10.0 ** (-8))
-                       return Boolean is
-      Result : Boolean := True;
-   begin
-      for index in A'Range loop
-         Result := Result and abs(A (index) - B (index)) < A_Tol;
-      end loop;
-
-      return Result;
-
-   end All_Close;
+--     function All_Close (A, B  : Fortran_DP_Array;
+--                         A_Tol : Double_Precision := 10.0 ** (-8))
+--                         return Boolean is
+--        Result : Boolean := True;
+--     begin
+--        for index in A'Range loop
+--           Result := Result and abs(A (index) - B (index)) < A_Tol;
+--        end loop;
+--
+--        return Result;
+--
+--     end All_Close;
 
    --  ------------------------------------------------------------------------
 
@@ -54,31 +56,30 @@ package body LBFGSB1 is
       use Differentiable_Functions;
       Routine_Name    : constant String := "LBFGSB.Minimise_LBFGSB";
       X0_Length       : constant Positive := Positive (X0.Length);
-      I_Print         : constant Fortran_Integer := -1;  --  L273
-      X               : Fortran_DP_Array := Parameters_List_To_DP_Array (X0);
+      I_Print         : constant Integer := -1;  --  L273
+      X               : Real_Float_Vector := Parameters_List_To_RF_Array (X0);
       RF_X            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       Num_Iterations  : Natural := 0;
-      M               : constant Fortran_Integer := Fortran_Integer (Max_Cor);
+      M               : constant Integer := Max_Cor;
       --  L331 nbd[i] = bounds_map[l, u] => bounds_map[1, 1] = 2
-      Nbd             : constant Fortran_Integer_Array (1 .. X0_Length) :=
+      Nbd             : constant Integer_Array (1 .. X0_Length) :=
                           (others => 2);
-      Low_Bound       : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
-      Upper_Bound     : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
-      F               : Double_Precision := 0.0;
-      G               : Fortran_DP_Array (1 .. X0_Length) := (others => 0.0);
+      Low_Bound       : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
+      Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
+      F               : Float := 0.0;
+      G               : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
-      PGtol           : Double_Precision := Double_Precision (Gtol);
-      Factor          : Double_Precision := Double_Precision (Ftol / Eps);
+      PGtol           : Float := Gtol;
+      Factor          : Float := Ftol / Eps;
       Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length + 5 * X0_Length
                           + 11 * Max_Cor ** 2 + 8 * Max_Cor;
-      Wa              : Fortran_DP_Array (1 .. wa_Length) :=  (others => 0.0);
-      I_Wa            : Fortran_Integer_Array (1 .. 3 * X0_Length) :=
-                          (others => 0);
-      L_Save          : Fortran_LSave_Array := (others => 0);
-      I_Save          : Fortran_Integer_Array (1 .. 44) := (others => 0);
-      D_Save          : Fortran_DSave_Array := (others => 0.0);
-      C_Save          : Character_60 := To_Fortran ("");
-      Task_Name       : Character_60 := To_Fortran ("START");
+      Wa              : Real_Float_Vector (1 .. wa_Length) :=  (others => 0.0);
+      I_Wa            : Integer_Array (1 .. 3 * X0_Length) := (others => 0);
+      L_Save          : LSave_Array := (others => 0);
+      I_Save          : Integer_Array (1 .. 44) := (others => 0);
+      D_Save          : DSave_Array := (others => 0.0);
+      C_Save          : Unbounded_String := To_Unbounded_String ("");
+      Task_Name       : Unbounded_String := To_Unbounded_String ("START");
       Scalar_Func     : Differentiable_Functions.Scalar_Function (X0_Length, 1);
       Continiue       : Boolean := True;
       Warn_Flag       : Natural;
@@ -103,38 +104,38 @@ package body LBFGSB1 is
 
       --  L323
       for index in 1 .. X0_Length loop
-         Low_Bound (index) := Double_Precision (Bounds (index).Lower);
-         Upper_Bound (index) := Double_Precision (Bounds (index).Upper);
+         Low_Bound (index) := Bounds (index).Lower;
+         Upper_Bound (index) := Bounds (index).Upper;
       end loop;
 
       --  L349
       Num_Iterations := 0;
       while Continiue loop
-         Lbfgsb_F_Interface.Setulb
-           (M, X, Low_Bound, Upper_Bound, nbd, f, G,
-            Factor, Pgtol, Wa, I_Wa, Task_Name, I_Print, C_Save, L_Save, I_Save,
-            D_Save, Fortran_Integer (Options.Max_Line_Steps));
-         RF_X := To_RF_Array (X);
-         if Task_Name (1 .. 2) = "FG" then
+         Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, f, G,
+                  Factor, Pgtol, Wa, I_Wa, Task_Name, I_Print, C_Save,
+                  L_Save, I_Save, D_Save, Options.Max_Line_Steps);
+--           RF_X := To_RF_Array (X);
+         if Task_Name = To_Unbounded_String ("FG") then
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
-            RF_G := To_RF_Array (G);
-            Fun_And_Grad (Scalar_Func, RF_X, Float (F), RF_G);
-         elsif Task_Name (1 .. 5) = "NEW_X" then
+            Fun_And_Grad (Scalar_Func, X, F, G);
+         --  L369
+         elsif Task_Name = To_Unbounded_String ("NEW_X") then
             Num_Iterations := Num_Iterations + 1;
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
             if Num_Iterations > Max_Iter then
-               Task_Name (1 .. 43) :=
-                 "STOP: TOTAL NO. of ITERATIONS REACHED LIMIT";
+               Task_Name := To_Unbounded_String
+                 ("STOP: TOTAL NO. of ITERATIONS REACHED LIMIT");
             elsif Scalar_Func.N_Fev > Max_Fun then
-               Task_Name (1 .. 52) :=
-                 "STOP: TOTAL NO. of f AND g EVALUATIONS Exceeds LIMIT";
+               Task_Name := To_Unbounded_String
+                 ("STOP: TOTAL NO. of f AND g EVALUATIONS Exceeds LIMIT");
             end if;
          else
             Continiue := False;
          end if;
       end loop;
 
-      if Task_Name (1 .. 4) = "CONV" then
+      --  L378
+      if Task_Name = To_Unbounded_String ("CONV") then
          Warn_Flag := 0;
       elsif Scalar_Func.N_Fev > Max_Fun or Num_Iterations > Max_Iter then
          Warn_Flag := 1;
@@ -158,22 +159,22 @@ package body LBFGSB1 is
          --       (2mmax + 5)nmax + 12mmax^2 + 12mmax.
          for row in S'First .. S'Last loop
             for col in  S'First (2) .. S'Last (2) loop
-               S (row, col) := Float (Wa (row + (col - 1) * X0_Length));
+               S (row, col) := Wa (row + (col - 1) * X0_Length);
             end loop;
          end loop;
 
          for row in Y'First .. Y'Last loop
             for col in  Y'First (2) .. Y'Last (2) loop
                Y (row, col) :=
-                 Float (Wa (MN + row + (col - 1) * X0_Length));
+                 Wa (MN + row + (col - 1) * X0_Length);
             end loop;
          end loop;
 
          --              Hess_Inv.SK := S;
          --              Hess_Inv.YK := Y;
-         Result_J.Fun := Fun;
+         Result_J.Fun := F;
          for index in G'Range loop
-            Result_J.Jac (index) := Float (G (index));
+            Result_J.Jac (index) := G (index);
          end loop;
          Result_J.N_Fev := Scalar_Func.N_Fev;
          Result_J.N_Jev := Scalar_Func.N_Gev;
@@ -182,8 +183,7 @@ package body LBFGSB1 is
          Result_J.Success := Warn_Flag = 0;
          Result_J.SK := S;
          Result_J.YK := Y;
-
-            Result_J.X := To_Real_Float_Vector (X);
+         Result_J.X := X;
 
          Result := Result_J;
       end;
@@ -194,22 +194,22 @@ package body LBFGSB1 is
 
    --  ------------------------------------------------------------------------
 
-   function Parameters_List_To_DP_Array
-     (PL : Stochastic_Optimizers.Parameters_List) return Fortran_DP_Array is
-      DP_Length : Natural := 0;
+   function Parameters_List_To_RF_Array
+     (PL : Stochastic_Optimizers.Parameters_List) return Real_Float_Vector is
+      RF_Length : Natural := 0;
    begin
       for index in PL.First_Index .. PL.Last_Index loop
          declare
             Params : constant Stochastic_Optimizers.Parameters_Record :=
                        PL (index);
          begin
-            DP_Length := DP_Length + Params.Num_Rows * (Params.Num_Cols + 1);
+            RF_Length := RF_Length + Params.Num_Rows * (Params.Num_Cols + 1);
          end;
       end loop;
 
       declare
-         Result   : Fortran_DP_Array (1 .. DP_Length);
-         DP_Index : Natural := 0;
+         Result   : Real_Float_Vector (1 .. RF_Length);
+         RF_Index : Natural := 0;
       begin
          for index in PL.First_Index .. PL.Last_Index loop
             declare
@@ -219,14 +219,13 @@ package body LBFGSB1 is
                              Flatten (Params.Coeff_Gradients);
             begin
                for coeff in Coeffs_1D'Range loop
-                  DP_Index := DP_Index + 1;
-                  Result (DP_Index) := Double_Precision (Coeffs_1D (coeff));
+                  RF_Index := RF_Index + 1;
+                  Result (RF_Index) := Coeffs_1D (coeff);
                end loop;
 
                for int in Params.Intercept_Grads'Range loop
-                  DP_Index := DP_Index + 1;
-                  Result (DP_Index) :=
-                    Double_Precision (Params.Intercept_Grads (int));
+                  RF_Index := RF_Index + 1;
+                  Result (RF_Index) := Params.Intercept_Grads (int);
                end loop;
             end;
          end loop;
@@ -234,22 +233,22 @@ package body LBFGSB1 is
          return Result;
       end;
 
-   end Parameters_List_To_DP_Array;
+   end Parameters_List_To_RF_Array;
+
+   --  ------------------------------------------------------------------------
+--
+--     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
+--                                    return Real_Float_Vector is
+--        Vec : Real_Float_Vector (DP_Vec'Range);
+--     begin
+--        for index in DP_Vec'Range loop
+--           Vec (index) := Float (DP_Vec (index));
+--        end loop;
+--
+--        return Vec;
+--
+--     end To_Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
-   function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
-                                  return Real_Float_Vector is
-      Vec : Real_Float_Vector (DP_Vec'Range);
-   begin
-      for index in DP_Vec'Range loop
-         Vec (index) := Float (DP_Vec (index));
-      end loop;
-
-      return Vec;
-
-   end To_Real_Float_Vector;
-
-   --  ------------------------------------------------------------------------
-
-end LBFGSB1;
+end L_BFGS_B;

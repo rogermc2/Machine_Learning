@@ -76,9 +76,9 @@ package body Lbfgsb_F_Interface is
                       S_Factr, S_Pgtol : in out Float;
                       S_Wa             : in out Real_Float_Vector;
                       S_Iwa            : in out Integer_Array;
-                      S_Task_Name      : in out String;
+                      S_Task_Name      : in out Unbounded_String;
                       S_Iprint         : Integer;
-                      S_Csave          : in out String;
+                      S_Csave          : in out Unbounded_String;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
                       S_Dsave          : in out DSave_Array;
@@ -90,8 +90,8 @@ package body Lbfgsb_F_Interface is
       Pgtol     : Double_Precision := Double_Precision (S_Pgtol);
       Wa        : Fortran_DP_Array := To_DP_Array (S_Wa);
       Iwa       : Fortran_Integer_Array := Fortran_Integer_Array (S_Iwa);
-      Task_Name : Character_60 := To_Fortran (S_Task_Name);
-      Csave     : Character_60 := To_Fortran (S_Csave);
+      Task_Name : Character_60 := To_Fortran (To_String (S_Task_Name));
+      Csave     : Character_60 := To_Fortran (To_String (S_Csave));
       Lsave     : Fortran_Integer_Array := Fortran_Integer_Array (S_Lsave);
       Isave     : Fortran_Integer_Array := Fortran_Integer_Array (S_Isave);
       Dsave     : Fortran_DSave_Array;
@@ -112,8 +112,8 @@ package body Lbfgsb_F_Interface is
       S_Pgtol := Float (Pgtol);
       S_Wa := To_RF_Array (Wa);
       S_Iwa := Integer_Array (Iwa);
-      S_Task_Name := To_Ada (Task_Name);
-      S_Csave := To_Ada (Csave);
+      S_Task_Name := To_Unbounded_String (To_Ada (Task_Name));
+      S_Csave := To_Unbounded_String (To_Ada (Csave));
       S_Lsave := LSave_Array (Lsave);
       S_Isave := Integer_Array (Isave);
       for index in Dsave'Range loop
