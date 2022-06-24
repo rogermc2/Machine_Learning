@@ -13,7 +13,7 @@ package Differentiable_Functions is
     --  The Scalar_Function class defines a scalar function F: R^n->R and
     --  methods for computing or approximating its first and second derivatives.
     type Scalar_Function (X0_Size, Num_Vars : Positive) is record
-        Fun             : Num_Diff.Deriv_Fun_Access;
+        Fun             : Num_Diff.Deriv_Float_Fun_Access;
         --        Update_Fun      : RF_Fun_Access;
         --        Update_Grad     : access procedure;
         --  X0 is a vector of X0_Size independent variables

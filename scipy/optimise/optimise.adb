@@ -78,7 +78,7 @@ package body Optimise is
    --  ------------------------------------------------------------------------
    --  L1261
    function Minimise_BFGS
-     (Fun              : Num_Diff.Deriv_Fun_Access; X0 : Real_Float_Vector;
+     (Fun              : Num_Diff.Deriv_Float_Fun_Access; X0 : Real_Float_Vector;
       Gtol             : Float := 10.0 ** (-5);
       Norm             : Float := Float'Safe_Last;
       Eps              : Float := Epsilon; Max_Iter : Natural := 0;
@@ -87,9 +87,10 @@ package body Optimise is
       Iters      : Positive;
       Ret_All    : Boolean := Return_All;
       SF         : Scalar_Function (X0'Length, 1);
-      F          : Num_Diff.Deriv_Fun_Access;
+      F          : Num_Diff.Deriv_Float_Fun_Access;
       My_F_Prime : Num_Diff.FD_Methods;
-      Old_Val    : Real_Float_Matrix (X0'Range, 1 .. 1);
+      Old_Val    : Float;
+--        Old_Val    : Real_Float_Matrix (X0'Range, 1 .. 1);
       K          : Natural := 0;
    begin
       --  L1301
@@ -110,9 +111,9 @@ package body Optimise is
 
    --  ------------------------------------------------------------------------
 
-   function Prepare_Scalar_Function (Fun                  : Num_Diff.Deriv_Fun_Access;
-                                     X0                   : Real_Float_Vector;
-                                     Bounds               : Constraints.Array_Bounds :=
+   function Prepare_Scalar_Function (Fun    : Num_Diff.Deriv_Float_Fun_Access;
+                                     X0     : Real_Float_Vector;
+                                     Bounds : Constraints.Array_Bounds :=
                                        Constraints.Default_Bounds;
                                      Epsilon,
                                      Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
@@ -133,7 +134,7 @@ package body Optimise is
    --  ------------------------------------------------------------------------
 
    function Prepare_Jac_Scalar_Function
-     (Fun                           : Num_Diff.Deriv_Fun_Access;
+     (Fun                           : Num_Diff.Deriv_Float_Fun_Access;
       X0, Jac                       : Real_Float_Vector;
       Bounds                        : Constraints.Array_Bounds :=
         Constraints.Default_Bounds;

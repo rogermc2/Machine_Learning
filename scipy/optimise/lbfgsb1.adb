@@ -118,7 +118,7 @@ package body LBFGSB1 is
          if Task_Name (1 .. 2) = "FG" then
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
             RF_G := To_RF_Array (G);
-            Fun_And_Grad (Scalar_Func, RF_X, F, RF_G);
+            Fun_And_Grad (Scalar_Func, RF_X, Float (F), RF_G);
          elsif Task_Name (1 .. 5) = "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
             Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
