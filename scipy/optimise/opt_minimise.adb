@@ -3,6 +3,7 @@
 with L_BFGS_B;
 with NL_Arrays_And_Matrices;
 with NL_Types;
+with Stochastic_Optimizers;
 
 package body Opt_Minimise is
 
@@ -27,7 +28,7 @@ package body Opt_Minimise is
    --  -------------------------------------------------------------------------
 
    function Minimise (Fun         : Num_Diff.Deriv_Float_Fun_Access;
-                      X0          : Stochastic_Optimizers.Parameters_List;
+--                        X0          : Stochastic_Optimizers.Parameters_List;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
                       Bounds      : Constraints.Bounds_List :=
@@ -38,6 +39,7 @@ package body Opt_Minimise is
                       return Optimise.Optimise_Result is
       use Minimise_Constraints_Package;
       use Num_Diff;
+      X0          : Stochastic_Optimizers.Parameters_List;
       L_Method    : Method_Type := Method;
       I_Fixed     : NL_Types.Boolean_List;
       All_Fixed   : Boolean := True;
