@@ -471,7 +471,6 @@ package body Multilayer_Perceptron is
                         Self.Parameters.Tol, 20);
       Result       : Optimise.Optimise_Result (0, 0, 0);
       Grads        : Parameters_List;
-
    begin
       --        --  L524  Save sizes and indices of coefficients for faster unpacking
       --        for index in 1 .. Self.Attributes.N_Layers - 1 loop

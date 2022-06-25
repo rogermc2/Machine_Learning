@@ -36,7 +36,6 @@ package body Opt_Minimise is
                         Minimise_Constraints_Package.Empty_List)
 --                        Options     : Minimise_Options := No_Options)
                       return Optimise.Optimise_Result is
-      --          use Optimise;
       use Minimise_Constraints_Package;
       use Num_Diff;
       L_Method    : Method_Type := Method;
