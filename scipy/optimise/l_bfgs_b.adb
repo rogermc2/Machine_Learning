@@ -64,7 +64,7 @@ package body L_BFGS_B is
                           (others => 2);
       Low_Bound       : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
-      F               : Float := 0.0;
+      F_Float         : Float := 0.0;
       G               : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
 --        RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       PGtol           : Float := Gtol;
@@ -111,12 +111,12 @@ package body L_BFGS_B is
       --  L349
       Num_Iterations := 0;
       while Continiue loop
-         Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, F, G,
+         Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, F_Float, G,
                   Factor, Pgtol, Wa, I_Wa, Task_Name, I_Print, C_Save,
                   L_Save, I_Save, D_Save, Options.Max_Line_Steps);
          if Task_Name = To_Unbounded_String ("FG") then
             --  Overwrite F and G:
-            Fun_And_Grad (Scalar_Func, X, F, G);
+            Fun_And_Grad (Scalar_Func, X, F_Float, G);
          --  L369
          elsif Task_Name = To_Unbounded_String ("NEW_X") then
             Num_Iterations := Num_Iterations + 1;
@@ -170,7 +170,7 @@ package body L_BFGS_B is
 
          --              Hess_Inv.SK := S;
          --              Hess_Inv.YK := Y;
-         Result_J.Fun := F;
+         Result_J.Fun := F_Float;
          for index in G'Range loop
             Result_J.Jac (index) := G (index);
          end loop;

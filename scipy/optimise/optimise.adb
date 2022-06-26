@@ -99,7 +99,7 @@ package body Optimise is
       end if;
 
       SF := Prepare_Scalar_Function (Fun, X0);
-      F := SF.Fun;
+      F := SF.Fun_Float;
       My_F_Prime := SF.Grad;
       Old_Val := F (X0);
 
