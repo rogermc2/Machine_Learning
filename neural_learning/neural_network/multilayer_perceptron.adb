@@ -462,15 +462,15 @@ package body Multilayer_Perceptron is
                         Layer_Units     : NL_Types.Integer_List) is
       Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
       --        Num_Samples  : constant Positive := Positive (X'Length);
-      Start        : Positive := 1;
-      Last         : Positive;
-      N_Fan_In     : Positive;
-      N_Fan_Out    : Positive;
-      Options      : constant Opt_Minimise.Minimise_Options :=
-                       (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
-                        Self.Parameters.Tol, 20);
+--        Start        : Positive := 1;
+--        Last         : Positive;
+--        N_Fan_In     : Positive;
+--        N_Fan_Out    : Positive;
+--        Options      : constant Opt_Minimise.Minimise_Options :=
+--                         (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
+--                          Self.Parameters.Tol, 20);
       Result       : Optimise.Optimise_Result (0, 0, 0);
-      Grads        : Parameters_List;
+--        Grads        : Parameters_List;
    begin
       --        --  L524  Save sizes and indices of coefficients for faster unpacking
       --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
@@ -492,17 +492,20 @@ package body Multilayer_Perceptron is
 
       --  L546  Grads similar to packed_coef_inter
       Result := Opt_Minimise.Minimise
-        (Fun => Self.Parameters.RF_Fun, X0 => Grads,
-         Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
+        (Fun => Self.Parameters.RF_Fun, Method => Opt_Minimise.L_BFGS_B_Method,
+         Jac => Num_Diff.FD_True);
+--        Result := Opt_Minimise.Minimise
+--          (Fun => Self.Parameters.RF_Fun, X0 => Grads,
+--           Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
       Self.Attributes.N_Iter :=
         Utils_Optimise.Check_Optimize_Result (Result, Self.Parameters.Max_Iter);
 
-      declare
-         X_Vec : constant Real_Float_Vector := Result.X;
-      begin
+--        declare
+--           X_Vec : constant Real_Float_Vector := Result.X;
+--        begin
          --  L566
          Self.Attributes.Loss := Result.Fun;
-      end;
+--        end;
 
    end Fit_Lbfgs;
 
