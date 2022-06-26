@@ -57,7 +57,6 @@ package body L_BFGS_B is
       X0_Length       : constant Positive := Positive (X0.Length);
       I_Print         : constant Integer := -1;  --  L273
       X               : Real_Float_Vector := Parameters_List_To_RF_Array (X0);
-      RF_X            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       Num_Iterations  : Natural := 0;
       M               : constant Integer := Max_Cor;
       --  L331 nbd[i] = bounds_map[l, u] => bounds_map[1, 1] = 2
@@ -67,7 +66,7 @@ package body L_BFGS_B is
       Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       F               : Float := 0.0;
       G               : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
-      RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
+--        RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       PGtol           : Float := Gtol;
       Factor          : Float := Ftol / Eps;
       Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length + 5 * X0_Length
@@ -101,6 +100,8 @@ package body L_BFGS_B is
          --              end loop;
       end loop;
 
+      --  L306
+      Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
       --  L323
       for index in 1 .. X0_Length loop
          Low_Bound (index) := Bounds (index).Lower;
@@ -110,17 +111,15 @@ package body L_BFGS_B is
       --  L349
       Num_Iterations := 0;
       while Continiue loop
-         Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, f, G,
+         Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, F, G,
                   Factor, Pgtol, Wa, I_Wa, Task_Name, I_Print, C_Save,
                   L_Save, I_Save, D_Save, Options.Max_Line_Steps);
---           RF_X := To_RF_Array (X);
          if Task_Name = To_Unbounded_String ("FG") then
-            Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
+            --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, X, F, G);
          --  L369
          elsif Task_Name = To_Unbounded_String ("NEW_X") then
             Num_Iterations := Num_Iterations + 1;
-            Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, RF_X);
             if Num_Iterations > Max_Iter then
                Task_Name := To_Unbounded_String
                  ("STOP: TOTAL NO. of ITERATIONS REACHED LIMIT");

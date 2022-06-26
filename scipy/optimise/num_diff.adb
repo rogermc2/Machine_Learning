@@ -24,9 +24,11 @@ package body Num_Diff is
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_Vector;
    function Dense_Difference (W_Fun            : Deriv_Fun_Access;
-                              X0               : Real_Float_Vector; F0 : Real_Float_Vector;
+                              X0               : Real_Float_Vector;
+                              F0               : Real_Float_Vector;
                               H, Use_One_Sided : Real_Float_Vector;
-                              Method           : FD_Methods) return Real_Float_Matrix;
+                              Method           : FD_Methods)
+                              return Real_Float_Matrix;
    function EPS_For_Method (Method : FD_Methods) return Float;
    function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
    function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
@@ -159,7 +161,7 @@ package body Num_Diff is
    end Adjust_Scheme_To_Bounds;
 
    --  -------------------------------------------------------------------------
-   --  L275 Approx_Derivative computes the finite difference approximation of
+   --  L257 Approx_Derivative computes the finite difference approximation of
    --  the derivatives of a vector-valued function.
    --  If a function maps from R^n to R^m its derivatives form m-by-n matrix
    --  called the Jacobian where an element (i, j) is a partial derivative of
@@ -169,7 +171,7 @@ package body Num_Diff is
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
       Abs_Step           : Real_Float_Vector;
-      F0                 : Float;
+      F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
       As_Linear_Operator : Boolean := False) return Real_Float_Vector is
@@ -179,7 +181,7 @@ package body Num_Diff is
       Loc_Bounds    : constant Constraints.Bounds_List :=
                         Prepare_Bounds (Bounds, X0);
       L_Rel_Step    : Real_Float_List := Rel_Step;
-      L_F0          : Float := F0;
+      L_F0          : Real_Float_Vector := F0;
       Use_One_Sided : Real_Float_Vector (X0'Range) := (others => 0.0);
       H             : Real_Float_Vector (X0'Range);
       Sign_X0       : Real_Float_Vector (X0'Range) := X0 >= 0.0;

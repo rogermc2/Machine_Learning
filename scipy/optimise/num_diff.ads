@@ -28,7 +28,7 @@ package Num_Diff is
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
       Abs_Step           : Real_Float_Vector;
-      F0                 : Float;
+      F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
       As_Linear_Operator : Boolean := False) return Real_Float_Vector;
