@@ -22,10 +22,9 @@ package body Optimise is
    --  Approx_Fprime returns Func's partial derivatives with respect to Xk.
    function Approx_Fprime
      (Xk      : Real_Float_Vector; Func : Num_Diff.Deriv_Fun_Access;
-      Epsilon : Real_Float_Vector)
-       return Real_Float_Matrix is
+      Epsilon : Real_Float_Vector) return Real_Float_Vector is
       use Num_Diff;
-      F0  : constant Real_Float_Matrix := Func (Xk);
+      F0  : constant Real_Float_Vector := Func (Xk);
 
    begin
       return Approx_Derivative
@@ -46,8 +45,8 @@ package body Optimise is
       use Num_Diff;
       Routine_Name    : constant String := "Optimise.Check_Grad ";
       Step            : Real_Float_Vector (1 .. 1);
-      Analytical_Grad : Real_Float_Matrix (X0'Range, 1 .. 1);
-      Diff            : Real_Float_Matrix (X0'Range, 1 .. 1);
+      Analytical_Grad : Real_Float_Vector (X0'Range);
+      Diff            : Real_Float_Vector (X0'Range);
    begin
       Assert (Fun /= null, Routine_Name & "Fun is null");
       Assert (Grad_Func /= null, Routine_Name & "Grad_Func is null");

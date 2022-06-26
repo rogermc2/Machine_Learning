@@ -24,17 +24,18 @@ package body Num_Diff is
       (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
        Method   : FD_Methods) return Real_Float_Vector;
     function Dense_Difference (W_Fun    : Deriv_Fun_Access;
-                               X0 : Real_Float_Vector; F0 : Real_Float_Matrix;
+                               X0 : Real_Float_Vector; F0 : Real_Float_Vector;
                                H, Use_One_Sided : Real_Float_Vector;
                                Method : FD_Methods) return Real_Float_Matrix;
     function EPS_For_Method (Method : FD_Methods) return Float;
     function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
-    function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector) return Real_Float_Matrix;
+    function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
+                          return Real_Float_Vector;
     --     function Linear_Operator_Difference
     --       (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
     --        Method : FD_Methods) return Real_Float_Vector;
     function Mat_Vec (Fun : Deriv_Fun_Access; X0 : Real_Float_Vector;
-                      F0  : Real_Float_Matrix; H : Real_Float_Vector;
+                      F0  : Real_Float_Vector; H : Real_Float_Vector;
                       Method : FD_Methods)
                       return Real_Float_Matrix;
     function Prepare_Bounds (Bounds : Constraints.Bounds_List;
@@ -168,17 +169,17 @@ package body Num_Diff is
        Method             : FD_Methods := FD_None;
        Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
        Abs_Step           : Real_Float_Vector;
-       F0                 : Real_Float_Matrix;
+       F0                 : Real_Float_Vector;
        Bounds             : Constraints.Bounds_List :=
          Constraints.Array_Bounds_Package.Empty_Vector;
-       As_Linear_Operator : Boolean := False) return Real_Float_Matrix is
+       As_Linear_Operator : Boolean := False) return Real_Float_Vector is
         use  Ada.Containers;
         use Real_Float_Arrays;
         Routine_Name  : constant String := "Num_Diff.Approx_Derivative ";
         Loc_Bounds    : constant Constraints.Bounds_List :=
                           Prepare_Bounds (Bounds, X0);
         L_Rel_Step    : Real_Float_List := Rel_Step;
-        L_F0          : Real_Float_Matrix := F0;
+        L_F0          : Real_Float_Vector := F0;
         Use_One_Sided : Real_Float_Vector (X0'Range) := (others => 0.0);
         H             : Real_Float_Vector (X0'Range);
         Sign_X0       : Real_Float_Vector (X0'Range) := X0 >= 0.0;
@@ -244,8 +245,7 @@ package body Num_Diff is
         end if;
 
         --  L504 if sparsity is None:
-        return Dense_Difference (Fun, X0, F0, H, Use_One_Sided,
-                                 Method);
+        return Dense_Difference (Fun, X0, F0, H, Use_One_Sided, Method);
 
     end Approx_Derivative;
 
@@ -318,7 +318,7 @@ package body Num_Diff is
     --  -------------------------------------------------------------------------
     --  L567
     function Dense_Difference (W_Fun                    : Deriv_Fun_Access;
-                               X0 : Real_Float_Vector; F0 : Real_Float_Matrix;
+                               X0 : Real_Float_Vector; F0 : Real_Float_Vector;
                                H, Use_One_Sided : Real_Float_Vector;
                                Method : FD_Methods) return Real_Float_Matrix is
         use Real_Float_Arrays;
@@ -330,7 +330,7 @@ package body Num_Diff is
         X1     : Real_Float_Vector (X0'Range);
         X2     : Real_Float_Vector (X0'Range);
         dX     : Float;
-        dF     : Real_Float_Matrix (X0'Range, 1 .. 1);
+        dF     : Real_Float_Vector (X0'Range);
     begin
         for index in H'Range loop
             H_Vecs (index, index) := H (index);
@@ -362,7 +362,7 @@ package body Num_Diff is
             when others => null;
             end case;
 
-            for col in J_T'Range (2) loop
+            for col in J_T'Range loop
                 J_T (index, col) := dF (index, col) / dX;
             end loop;
 
@@ -393,7 +393,7 @@ package body Num_Diff is
     --  -------------------------------------------------------------------------
 
     function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
-                          return Real_Float_Matrix is
+                          return Real_Float_Vector is
     begin
         return Fun (X);
 
@@ -430,7 +430,7 @@ package body Num_Diff is
     --  -------------------------------------------------------------------------
 
     function Mat_Vec (Fun : Deriv_Fun_Access; X0 : Real_Float_Vector;
-                      F0 : Real_Float_Matrix;
+                      F0 : Real_Float_Vector;
                       H   : Real_Float_Vector; Method : FD_Methods)
                       return Real_Float_Matrix is
         use Maths.Float_Math_Functions;

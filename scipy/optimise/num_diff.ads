@@ -9,7 +9,7 @@ package Num_Diff is
    type FD_Methods is (FD_None, Fd_Callable, FD_2_Point, FD_3_Point, FD_CS,
                        FD_Hessian_Update_Strategy, FD_True, FD_False);
    type Deriv_Fun_Access is access function (X : Real_Float_Vector)
-                                             return Real_Float_Matrix;
+                                             return Real_Float_Vector;
    type Deriv_Float_Fun_Access is access function (X : Real_Float_Vector)
                                                    return Float;
    type Dimensions is record
@@ -28,9 +28,9 @@ package Num_Diff is
       Method             : FD_Methods := FD_None;
       Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
       Abs_Step           : Real_Float_Vector;
-      F0                 : Real_Float_Matrix;
+      F0                 : Real_Float_Vector;
       Bounds             : Constraints.Bounds_List :=
         Constraints.Array_Bounds_Package.Empty_Vector;
-      As_Linear_Operator : Boolean := False) return Real_Float_Matrix;
+      As_Linear_Operator : Boolean := False) return Real_Float_Vector;
 
 end Num_Diff;

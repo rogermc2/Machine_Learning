@@ -31,8 +31,7 @@ package Differentiable_Functions is
         Grad            : FD_Methods;
         Hess            : FD_Methods;
         F_Diff_Rel_Step : Float := 0.0;
-        F               : Real_Float_Matrix (1 .. X0_Size, 1 ..Num_Vars) :=
-                            (others => (others => Float'Safe_Last));
+        F               : Float := 0.0;
         G               : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
         Lowest_X        : Real_Float_Vector (1 .. X0_Size);
         Lowest_F        : Float := Float'Safe_Last;
