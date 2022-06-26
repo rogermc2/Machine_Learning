@@ -66,7 +66,7 @@ package body Differentiable_Functions is
     procedure Fun_And_Grad
       (Self    : in out Scalar_Function;
        X       : Real_Float_Vector;
-       Fun_Val : out Float; Grad : out Real_Float_Matrix) is
+       Fun_Val : out Float; Grad : out Real_Float_Vector) is
     begin
         Update_Fun (Self);
         Update_Grad (Self);
@@ -80,18 +80,25 @@ package body Differentiable_Functions is
     --  L132
     function Fun_Wrapped (Self : in out Scalar_Function;
                           Fun  : Num_Diff.Deriv_Float_Fun_Access;
-                          X    : Real_Float_Vector) return Real_Float_Matrix is
-        FX : constant Real_Float_Matrix := Fun (X);
+                          X    : Real_Float_Vector) return Float is
+--                            X    : Real_Float_Vector) return Real_Float_Matrix is
+        FX : constant Float := Fun (X);
+        --          FX : constant Real_Float_Matrix := Fun (X);
     begin
-        Self.N_Fev := Self.N_Fev + 1;
-        for index in FX'Range loop
-            for col in FX'Range (2) loop
-                if FX (index, col) < Self.Lowest_F then
-                    Self.Lowest_X := X;
-                    Self.Lowest_F := FX (index, col);
-                end if;
-            end loop;
-        end loop;
+        --          Self.N_Fev := Self.N_Fev + 1;
+        --          for index in FX'Range loop
+        --              for col in FX'Range (2) loop
+        --                  if FX (index, col) < Self.Lowest_F then
+        --                      Self.Lowest_X := X;
+        --                      Self.Lowest_F := FX (index, col);
+        --                  end if;
+        --              end loop;
+        --          end loop;
+
+        if FX < Self.Lowest_F then
+            Self.Lowest_X := X;
+            Self.Lowest_F := FX;
+        end if;
 
         return FX;
 
@@ -100,7 +107,7 @@ package body Differentiable_Functions is
     --  -------------------------------------------------------------------------
     --  L270
     function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
-                  return Real_Float_Matrix is
+                   return Real_Float_Vector is
     begin
         Update_Grad (Self);
 

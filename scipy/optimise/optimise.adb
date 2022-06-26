@@ -90,7 +90,6 @@ package body Optimise is
       F          : Num_Diff.Deriv_Float_Fun_Access;
       My_F_Prime : Num_Diff.FD_Methods;
       Old_Val    : Float;
---        Old_Val    : Real_Float_Matrix (X0'Range, 1 .. 1);
       K          : Natural := 0;
    begin
       --  L1301
@@ -127,6 +126,7 @@ package body Optimise is
       for index in SF.Epsilon'Range loop
          SF.Epsilon (index) := Epsilon;
       end loop;
+
       return SF;
 
    end Prepare_Scalar_Function;

@@ -30,6 +30,12 @@ package body Lbfgsb_F_Interface is
    --  x is a double precision array of dimension n.
    --  On entry x is an approximation to the solution.
    --  On exit x is the current approximation.
+   --  f is a double precision variable.
+   --  On first entry f is unspecified.
+   --  On final exit f is the value of the function at x.
+   --  g is a double precision array of dimension n.
+   --  On first entry g is unspecified.
+   --  On final exit g is the value of the gradient at x.
    --  nbd is an integer array of dimension n.
    --  On entry nbd represents the type of bounds imposed on the
    --  variables and must be specified by:
