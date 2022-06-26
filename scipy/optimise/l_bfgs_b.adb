@@ -3,7 +3,6 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Differentiable_Functions;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 
@@ -24,18 +23,18 @@ package body L_BFGS_B is
 --                                    return Real_Float_Vector;
    --  ------------------------------------------------------------------------
 
---     function All_Close (A, B  : Fortran_DP_Array;
---                         A_Tol : Double_Precision := 10.0 ** (-8))
---                         return Boolean is
---        Result : Boolean := True;
---     begin
---        for index in A'Range loop
---           Result := Result and abs(A (index) - B (index)) < A_Tol;
---        end loop;
---
---        return Result;
---
---     end All_Close;
+   function All_Close (A, B  : Real_Float_Vector;
+                       A_Tol : Float := 10.0 ** (-8))
+                       return Boolean is
+      Result : Boolean := True;
+   begin
+      for index in A'Range loop
+         Result := Result and abs(A (index) - B (index)) < A_Tol;
+      end loop;
+
+      return Result;
+
+   end All_Close;
 
    --  ------------------------------------------------------------------------
 

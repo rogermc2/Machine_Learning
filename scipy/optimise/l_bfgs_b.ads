@@ -3,11 +3,15 @@
 with Constraints;
 with Optimise;
 with Opt_Minimise;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Num_Diff;
 with Stochastic_Optimizers;
 
 package L_BFGS_B is
 
+   function All_Close (A, B  : Real_Float_Vector;
+                       A_Tol : Float := 10.0 ** (-8))
+                       return Boolean;
    function Minimise_LBFGSB (Fun       : Num_Diff.Deriv_Float_Fun_Access;
                              X0        : Stochastic_Optimizers.Parameters_List;
                              Bounds    : Constraints.Bounds_List :=
