@@ -492,11 +492,9 @@ package body Multilayer_Perceptron is
 
       --  L546  Grads similar to packed_coef_inter
       Result := Opt_Minimise.Minimise
-        (Fun => Self.Parameters.RF_Fun, Method => Opt_Minimise.L_BFGS_B_Method,
-         Jac => Num_Diff.FD_True);
---        Result := Opt_Minimise.Minimise
 --          (Fun => Self.Parameters.RF_Fun, X0 => Grads,
---           Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
+        (Fun => Self.Parameters.RF_Fun,
+         Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
       Self.Attributes.N_Iter :=
         Utils_Optimise.Check_Optimize_Result (Result, Self.Parameters.Max_Iter);
 
