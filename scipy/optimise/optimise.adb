@@ -27,9 +27,10 @@ package body Optimise is
       F0  : constant Real_Float_Vector := Func (Xk);
 
    begin
-      return Approx_Derivative
-        (Fun => Func, X0 => Xk, Method => FD_2_Point, Abs_Step => Epsilon,
-         F0  => F0);
+--        return Approx_Derivative
+--          (Fun => Func, X0 => Xk, Method => FD_2_Point, Abs_Step => Epsilon,
+--           F0  => F0);
+      return F0;
 
    end Approx_Fprime;
 
@@ -141,7 +142,7 @@ package body Optimise is
        return Scalar_Function is
       SF : Scalar_Function (X0'Length, 1);
    begin
-      SF.Fun := Fun;
+      SF.Fun_Float := Fun;
       SF.X0 := X0;
       SF.Bounds := Bounds;
       SF.F_Diff_Rel_Step := Finite_Diff_Rel_Step;

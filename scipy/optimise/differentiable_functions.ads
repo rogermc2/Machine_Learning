@@ -9,6 +9,8 @@ package Differentiable_Functions is
    type Finite_Options is private;
    type RF_Fun_Access is access
      function (X : Real_Float_Vector) return Float;
+   type UG_Fun_Access is access
+     function (X : Real_Float_Vector) return Float;
 
    --  The Scalar_Function class defines a scalar function F: R^n->R and
    --  methods for computing or approximating its first and second derivatives.
@@ -17,31 +19,31 @@ package Differentiable_Functions is
       --  x is the argument in the form of a 1-D array and args is a tuple of
       --  any additional fixed parameters needed to completely specify the
       --  function which should return a scalar.
-      Fun_Float       : Deriv_Float_Fun_Access;
+      Fun_Float        : Deriv_Float_Fun_Access;
       --        Update_Fun      : RF_Fun_Access;
-      --        Update_Grad     : access procedure;
+      Update_Grad_Impl : UG_Fun_Access;
       --  X0 is a vector of X0_Size independent variables
-      X0              : Real_Float_Vector (1 .. X0_Size);
-      Jac             : Real_Float_Vector (1 .. X0_Size);
-      Bounds          : Constraints.Array_Bounds;
-      X_Prev          : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
-      G_Prev          : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
-      N_Fev           : Natural := 0;
-      N_Gev           : Natural := 0;
-      N_Hev           : Natural := 0;
-      F_Updated       : Boolean := False;
-      G_Updated       : Boolean := False;
-      H_Updated       : Boolean := False;
-      Grad            : FD_Methods;
-      Hess            : FD_Methods;
-      F_Diff_Rel_Step : Float := 0.0;
-      F               : Float := 0.0;  --  Fun_Float result
+      X0               : Real_Float_Vector (1 .. X0_Size);
+      Jac              : Real_Float_Vector (1 .. X0_Size);
+      Bounds           : Constraints.Array_Bounds;
+      X_Prev           : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
+      G_Prev           : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
+      N_Fev            : Natural := 0;
+      N_Gev            : Natural := 0;
+      N_Hev            : Natural := 0;
+      F_Updated        : Boolean := False;
+      G_Updated        : Boolean := False;
+      H_Updated        : Boolean := False;
+      Grad             : FD_Methods;
+      Hess             : FD_Methods;
+      F_Diff_Rel_Step  : Float := 0.0;
+      F                : Float := 0.0;  --  Fun_Float result
       --  G is the result of Grad function
-      G               : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
-      Lowest_X        : Real_Float_Vector (1 .. X0_Size);
-      Lowest_F        : Float := Float'Safe_Last;
-      Epsilon         : Real_Float_Vector (1 .. X0_Size) :=
-                          (others => 10.0 ** (-8));
+      G                : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
+      Lowest_X         : Real_Float_Vector (1 .. X0_Size);
+      Lowest_F         : Float := Float'Safe_Last;
+      Epsilon          : Real_Float_Vector (1 .. X0_Size) :=
+                           (others => 10.0 ** (-8));
    end record;
 
    procedure C_Init
