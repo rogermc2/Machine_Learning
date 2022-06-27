@@ -1,6 +1,8 @@
 
 with Interfaces.Fortran; use Interfaces.Fortran;
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 package body Lbfgsb_F_Interface is
 
    type Fortran_DP_Array is array (Integer range <>) of Double_Precision;
@@ -89,6 +91,7 @@ package body Lbfgsb_F_Interface is
                       S_Isave          : in out Integer_Array;
                       S_Dsave          : in out DSave_Array;
                       S_Maxls          : Integer) is
+      Routine_Name : constant String := "Lbfgsb_F_Interface.Set_Ulb ";
       X         : Fortran_DP_Array := To_DP_Array (SX);
       F         : Double_Precision := Double_Precision (SF);
       G         : Fortran_DP_Array := To_DP_Array (SG);
@@ -96,20 +99,47 @@ package body Lbfgsb_F_Interface is
       Pgtol     : Double_Precision := Double_Precision (S_Pgtol);
       Wa        : Fortran_DP_Array := To_DP_Array (S_Wa);
       Iwa       : Fortran_Integer_Array := Fortran_Integer_Array (S_Iwa);
-      Task_Name : Character_60 := To_Fortran (To_String (S_Task_Name));
-      Csave     : Character_60 := To_Fortran (To_String (S_Csave));
+      Task_String  : constant String := To_String (S_Task_Name);
+      Csave_String : constant String := To_String (S_Csave);
+      Task_Name : Character_60;
+      Csave     : Character_60;
       Lsave     : Fortran_Integer_Array := Fortran_Integer_Array (S_Lsave);
       Isave     : Fortran_Integer_Array := Fortran_Integer_Array (S_Isave);
       Dsave     : Fortran_DSave_Array;
    begin
+      for index in Task_String'Range loop
+          Task_Name (index) := To_Fortran (Task_String (index));
+      end loop;
+
+      for index in Csave_String'Range loop
+          Csave (index) := To_Fortran (Csave_String (index));
+      end loop;
+
       for index in Dsave'Range loop
          Dsave (index) := Double_Precision (S_Dsave (index));
       end loop;
 
-      setulb (Fortran_Integer (SM), X, To_DP_Array (SL), To_DP_Array (SU),
-              Fortran_Integer_Array (S_Nbd), F, G, Factr, Pgtol,
-              Wa, Iwa, Task_Name, Fortran_Integer (S_Iprint), Csave,
-              Lsave, Isave, Dsave, Fortran_Integer (S_Maxls));
+      Put_Line (Routine_Name & "setulb");
+
+       setulb (m        => Fortran_Integer (SM),
+              x        => X,
+              l        => To_DP_Array (SL),
+              u        => To_DP_Array (SU),
+              nbd      => Fortran_Integer_Array (S_Nbd),
+              f        => F,
+              g        => G,
+              factr    => Factr,
+              pgtol    => Pgtol,
+              wa       => Wa,
+              iwa      => Iwa,
+              TaskName => Task_Name,
+              iprint   =>  Fortran_Integer (S_Iprint),
+              csave    => Csave,
+              lsave    => Lsave,
+              isave    => Isave,
+              dsave    => Dsave,
+              maxls    => Fortran_Integer (S_Maxls));
+      Put_Line (Routine_Name & "setulb returned");
 
       SX := To_RF_Array (X);
       SF := Float (F);
@@ -119,12 +149,17 @@ package body Lbfgsb_F_Interface is
       S_Wa := To_RF_Array (Wa);
       S_Iwa := Integer_Array (Iwa);
       S_Task_Name := To_Unbounded_String (To_Ada (Task_Name));
+      Put_Line (Routine_Name & "S_Task_Name set");
+      Put_Line (Routine_Name & "Task_Name: " & To_Ada (Task_Name));
       S_Csave := To_Unbounded_String (To_Ada (Csave));
+      Put_Line (Routine_Name & "Csave: " & To_Ada (Csave));
+      Put_Line (Routine_Name & "S_Csave set");
       S_Lsave := LSave_Array (Lsave);
       S_Isave := Integer_Array (Isave);
       for index in Dsave'Range loop
          S_Dsave (index) := Float (Dsave (index));
       end loop;
+      Put_Line (Routine_Name & "Set_Ulb done");
 
    end Set_Ulb;
 
