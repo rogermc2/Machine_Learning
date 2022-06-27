@@ -1,6 +1,8 @@
 --  Based on scipy/optimize/optimize.py
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Text_IO; use Ada.Text_IO;
+
 with Maths;
 
 package body Optimise is
@@ -119,6 +121,8 @@ package body Optimise is
                                      return Scalar_Function is
       SF : Scalar_Function (X0'Length, 1);
    begin
+      Put_Line ("Optimize.Prepare_Scalar_Function X0_Length" &
+                  Integer'Image (X0'Length));
       SF.Fun_Float := Fun;
       SF.X0 := X0;
       SF.Bounds := Bounds;

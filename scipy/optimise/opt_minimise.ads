@@ -6,6 +6,7 @@ with Constraints;
 with Multilayer_Perceptron;
 with Num_Diff;
 with Optimise;
+with Stochastic_Optimizers;
 
 package Opt_Minimise is
 
@@ -34,7 +35,7 @@ package Opt_Minimise is
    No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
    function Minimise (Fun         : Num_Diff.Deriv_Float_Fun_Access;
---                        X0          : Stochastic_Optimizers.Parameters_List;
+                      X0          : Stochastic_Optimizers.Parameters_List;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
                       Bounds      : Constraints.Bounds_List :=

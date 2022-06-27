@@ -2,6 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Differentiable_Functions;
 with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
@@ -53,7 +54,7 @@ package body L_BFGS_B is
                                Opt_Minimise.No_Options)
                              return Optimise.Optimise_Result is
       use Differentiable_Functions;
-      Routine_Name    : constant String := "LBFGSB.Minimise_LBFGSB";
+      Routine_Name    : constant String := "LBFGSB.Minimise_LBFGSB ";
       X0_Length       : constant Positive := Positive (X0.Length);
       I_Print         : constant Integer := -1;  --  L273
       X               : Real_Float_Vector := Parameters_List_To_RF_Array (X0);
@@ -78,7 +79,9 @@ package body L_BFGS_B is
       D_Save          : DSave_Array := (others => 0.0);
       C_Save          : S60 :=  (others => '0');
       Task_Name       : Unbounded_String := To_Unbounded_String ("START");
-      Scalar_Func     : Differentiable_Functions.Scalar_Function (X0_Length, 1);
+      --  L306
+      Scalar_Func     : Differentiable_Functions.Scalar_Function :=
+                          Optimise.Prepare_Scalar_Function (Fun, X);
       Continiue       : Boolean := True;
       Warn_Flag       : Natural;
       Result          : Optimise.Optimise_Result (0, 0, 0);
@@ -89,6 +92,7 @@ package body L_BFGS_B is
                    "Bounds and X0 have different lengths.");
       end if;
 
+      Put_Line (Routine_Name & "X0_Length" & Integer'Image (X0_Length));
       for row in Bounds.First_Index .. Bounds.Last_Index loop
          null;
          --              for col in X'Range (2) loop
@@ -101,7 +105,7 @@ package body L_BFGS_B is
       end loop;
 
       --  L306
-      Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
+--        Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
       --  L323
       for index in 1 .. X0_Length loop
          Low_Bound (index) := Bounds (index).Lower;
