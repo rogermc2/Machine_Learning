@@ -1,6 +1,8 @@
+--  Based on scipy/scipy/optimize/lbfgsb_src/lbfgsb.f
 
 with Interfaces.Fortran; use Interfaces.Fortran;
 
+--  with Ada.Characters.Latin_1;
 with Ada.Text_IO; use Ada.Text_IO;
 
 package body Lbfgsb_F_Interface is
@@ -101,8 +103,8 @@ package body Lbfgsb_F_Interface is
       Iwa       : Fortran_Integer_Array := Fortran_Integer_Array (S_Iwa);
       Task_String  : constant String := To_String (S_Task_Name);
       Csave_String : constant String := To_String (S_Csave);
-      Task_Name : Character_60;
-      Csave     : Character_60;
+      Task_Name : Character_60 := (others => To_Fortran (' '));
+      Csave     : Character_60 := (others => To_Fortran (' '));
       Lsave     : Fortran_Integer_Array := Fortran_Integer_Array (S_Lsave);
       Isave     : Fortran_Integer_Array := Fortran_Integer_Array (S_Isave);
       Dsave     : Fortran_DSave_Array;
@@ -110,6 +112,7 @@ package body Lbfgsb_F_Interface is
       for index in Task_String'Range loop
           Task_Name (index) := To_Fortran (Task_String (index));
       end loop;
+      Put_Line (Routine_Name & "input Task_Name: " & To_Ada (Task_Name));
 
       for index in Csave_String'Range loop
           Csave (index) := To_Fortran (Csave_String (index));
@@ -133,7 +136,7 @@ package body Lbfgsb_F_Interface is
               wa       => Wa,
               iwa      => Iwa,
               TaskName => Task_Name,
-              iprint   =>  Fortran_Integer (S_Iprint),
+              iprint   => Fortran_Integer (S_Iprint),
               csave    => Csave,
               lsave    => Lsave,
               isave    => Isave,
@@ -149,8 +152,10 @@ package body Lbfgsb_F_Interface is
       S_Wa := To_RF_Array (Wa);
       S_Iwa := Integer_Array (Iwa);
       S_Task_Name := To_Unbounded_String (To_Ada (Task_Name));
-      Put_Line (Routine_Name & "S_Task_Name set");
+      Put_Line (Routine_Name & "Task_Name length: " &
+                  Integer'Image (Task_Name'Length));
       Put_Line (Routine_Name & "Task_Name: " & To_Ada (Task_Name));
+      Put_Line (Routine_Name & "Csave length: " & Integer'Image (Csave'Length));
       S_Csave := To_Unbounded_String (To_Ada (Csave));
       Put_Line (Routine_Name & "Csave: " & To_Ada (Csave));
       Put_Line (Routine_Name & "S_Csave set");
