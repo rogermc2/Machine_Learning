@@ -14,7 +14,7 @@ project Gradient_Test is
    end Compiler;
 
    package Linker is
-      for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
+      for Switches ("ada") use ("-L/usr/local/gfortran/lib", "-lgfortran", "-llapack", "-lblas");
    end Linker;
 
    for Languages use ("Ada", "Fortran");
