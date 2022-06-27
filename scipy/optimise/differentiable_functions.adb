@@ -126,11 +126,12 @@ package body Differentiable_Functions is
     --  L152 for grad in FD_METHODS
     procedure Update_Grad (Self : in out Scalar_Function) is
         Fun : Deriv_Fun_Access;
+        F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
     begin
         Update_Fun (Self);
         Self.N_Gev := Self.N_Gev + 1;
         Self.G := Num_Diff.Approx_Derivative
-          (Fun, Self.X0, Abs_Step => Self.Epsilon, F0 => Self.F);
+          (Fun, Self.X0, Abs_Step => Self.Epsilon, F0 => F0);
 
     end Update_Grad;
 
