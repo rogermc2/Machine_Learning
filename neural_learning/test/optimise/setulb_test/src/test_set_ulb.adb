@@ -98,7 +98,7 @@ procedure Test_Set_ULB is
    WA                 : Real_Float_Vector (1 .. WA_Length) := (others => 0.0);
    IWA                : Integer_Array (1 .. 3 * N);
    Task_Name          : Unbounded_String;
-   C_Save             : Unbounded_String;
+   C_Save             : S60 := (others => '0');
    L_Save             : LSave_Array := (others => 0);
    I_Save             : Integer_Array (1 .. 4) := (others => 0);
    D_Save             : DSave_Array := (others => 0.0);
@@ -109,7 +109,7 @@ begin
    for iter in 1 .. 7 loop
       Obj_Fun (X, F, G);
       Set_Ulb (M, X, Low_Bound, Upper_Bound, Nbd, F, G, Factor,
-              Pg_Tol, WA, IWA, Task_Name, I_Print, C_Save, L_Save,
+              Pg_Tol, WA, IWA, C_Save, Task_Name, I_Print, L_Save,
               I_Save, D_Save, Max_Ls);
       for index in X'Range loop
          if X (index) > Upper_Bound (index) or

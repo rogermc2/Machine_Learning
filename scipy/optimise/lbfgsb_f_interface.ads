@@ -6,6 +6,7 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Lbfgsb_F_Interface is
 
+   subtype S60 is String (1 .. 60);
    type DSave_Array is array (Integer range 1 .. 29) of Float;
    type LSave_Array is array (Integer range 1 .. 4) of Integer;
 
@@ -18,9 +19,9 @@ package Lbfgsb_F_Interface is
                       S_Factr, S_Pgtol : in out Float;
                       S_Wa             : in out Real_Float_Vector;
                       S_Iwa            : in out Integer_Array;
+                      S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
                       S_Iprint         : Integer;
-                      S_Csave          : in out Unbounded_String;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
                       S_Dsave          : in out DSave_Array;

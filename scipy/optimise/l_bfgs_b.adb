@@ -76,7 +76,7 @@ package body L_BFGS_B is
       L_Save          : LSave_Array := (others => 0);
       I_Save          : Integer_Array (1 .. 44) := (others => 0);
       D_Save          : DSave_Array := (others => 0.0);
-      C_Save          : Unbounded_String := To_Unbounded_String ("");
+      C_Save          : S60 :=  (others => '0');
       Task_Name       : Unbounded_String := To_Unbounded_String ("START");
       Scalar_Func     : Differentiable_Functions.Scalar_Function (X0_Length, 1);
       Continiue       : Boolean := True;
@@ -112,7 +112,7 @@ package body L_BFGS_B is
       Num_Iterations := 0;
       while Continiue loop
          Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, F_Float, G,
-                  Factor, Pgtol, Wa, I_Wa, Task_Name, I_Print, C_Save,
+                  Factor, Pgtol, Wa, I_Wa, C_Save, Task_Name, I_Print,
                   L_Save, I_Save, D_Save, Options.Max_Line_Steps);
          if Task_Name = To_Unbounded_String ("FG") then
             --  Overwrite F and G:
