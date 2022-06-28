@@ -103,7 +103,7 @@ package body Opt_Minimise is
             case Method is
                when L_BFGS_B_Method =>
                Result := L_BFGS_B.Minimise_LBFGSB (Fun => Fun, X0 => X0,
-                                                 Bounds => Bounds);
+                                                   Bounds => Bounds);
                when others => null;
             end case;
          end if;

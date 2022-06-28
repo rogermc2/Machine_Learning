@@ -84,7 +84,7 @@ package body L_BFGS_B is
                           Optimise.Prepare_Scalar_Function (Fun, X);
       Continiue       : Boolean := True;
       Warn_Flag       : Natural;
-      Result          : Optimise.Optimise_Result (0, 0, 0);
+--        Result          : Optimise.Optimise_Result (0, 0, 0);
    begin
 --        Put_Line (Routine_Name & "X0_Length" & Integer'Image (X0_Length));
 --        Put_Line (Routine_Name & "Bounds Length" &
@@ -152,11 +152,11 @@ package body L_BFGS_B is
          --              Bfgs_Iters : constant Positive := Positive (I_Save (31));
          --              Num_Corrs  : constant Positive :=
          --                             Positive'Min (Bfgs_Iters, Max_Cor);
-         S          : Real_Float_Matrix (1 .. Positive (M), 1 .. X0_Length);
-         Y          : Real_Float_Matrix (1 .. Positive (M), 1 .. X0_Length);
+         S          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
+         Y          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
          --              Hess_Inv   : Lbfgs_Inv_Hess_Product (Positive (M), X0_Length);
-         Result_J   : Optimise.Optimise_Result
-           (G'Length, Positive (M), X'Length);
+         Result_J   : Optimise.Optimise_Result (G'Length, Positive (M),
+                                                X'Length);
       begin
          --  wa is a double precision working array of length
          --       (2mmax + 5)nmax + 12mmax^2 + 12mmax.
@@ -185,18 +185,22 @@ package body L_BFGS_B is
          Result_J.N_It := Num_Iterations;
          Result_J.Status := Warn_Flag;
          Result_J.Success := Warn_Flag = 0;
+         Put_Line (Routine_Name & "YK size: " &
+                     Integer'Image (Result_J.YK'Length) & " x" &
+                  Integer'Image (Result_J.YK'Length (2)));
+         Put_Line (Routine_Name & "Y size: " & Integer'Image (Y'Length) &
+                   " x" & Integer'Image (Y'Length (2)));
          Result_J.SK := S;
          Result_J.YK := Y;
          Put_Line (Routine_Name & "Yk set");
          Result_J.X := X;
          Put_Line (Routine_Name & "X set");
 
-         Result := Result_J;
-         Put_Line (Routine_Name & "Result set");
+         return Result_J;
       end;
-      Put_Line (Routine_Name & "done");
+--        Put_Line (Routine_Name & "done");
 
-      return Result;
+--        return Result;
 
    end Minimise_LBFGSB;
 
