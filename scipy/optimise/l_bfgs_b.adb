@@ -63,8 +63,8 @@ package body L_BFGS_B is
       --  L331 nbd[i] = bounds_map[l, u] => bounds_map[1, 1] = 2
       Nbd             : constant Integer_Array (1 .. X0_Length) :=
                           (others => 2);
-      Low_Bound       : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
-      Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
+      Low_Bound       : Real_Float_Vector (1 .. X0_Length) := (others => Float'Safe_Last);
+      Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => Float'Safe_First);
       F_Float         : Float := 0.0;
       G               : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       --        RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
@@ -86,37 +86,32 @@ package body L_BFGS_B is
       Warn_Flag       : Natural;
       Result          : Optimise.Optimise_Result (0, 0, 0);
    begin
+--        Put_Line (Routine_Name & "X0_Length" & Integer'Image (X0_Length));
+--        Put_Line (Routine_Name & "Bounds Length" &
+--                    Integer'Image (Integer (Bounds.Length)));
       --  L266
       if not Bounds.Is_Empty then
          Assert (Positive (Bounds.Length) = X0_Length, Routine_Name &
                    "Bounds and X0 have different lengths.");
+         for l in Low_Bound'Range loop
+            Low_Bound (l) := Bounds.Element (l).Lower;
+            Upper_Bound (l) := Bounds.Element (l).Upper;
+         end loop;
       end if;
 
-      Put_Line (Routine_Name & "X0_Length" & Integer'Image (X0_Length));
-      Put_Line (Routine_Name & "L266 Bounds Length" &
-                  Integer'Image (Integer (Bounds.Length)));
-      for row in Bounds.First_Index .. Bounds.Last_Index loop
-         null;
-         if X (row) < Bounds (row).Lower then
-            X (row) := Bounds (row).Lower;
-         elsif X (row) > Bounds (row).Upper then
-            X (row) := Bounds (row).Upper;
+      for row in X0.First_Index .. X0.Last_Index loop
+         if X (row) < Low_Bound (row) then
+            X (row) := Low_Bound (row);
+         elsif X (row) > Upper_Bound (row) then
+            X (row) := Upper_Bound (row);
          end if;
       end loop;
 
-      Put_Line (Routine_Name & "L306");
       --  L306
       Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
-      Put_Line (Routine_Name & "L323 bounds Length" &
-                  Integer'Image (Integer (Bounds.Length)));
-      --  L323
-      for index in 1 .. X0_Length loop
-         Put_Line (Routine_Name & "L323 index: " & Integer'Image (index));
-         Low_Bound (index) := Bounds (index).Lower;
-         Upper_Bound (index) := Bounds (index).Upper;
-      end loop;
+      Put_Line (Routine_Name & "L323 Low_Bound Length" &
+                  Integer'Image (Low_Bound'Length));
 
-      Put_Line (Routine_Name & "L349");
       --  L349
       Num_Iterations := 0;
       while Continiue loop
@@ -140,7 +135,6 @@ package body L_BFGS_B is
             Continiue := False;
          end if;
       end loop;
-      Put_Line (Routine_Name & "L378");
 
       --  L378
       if Task_Name = To_Unbounded_String ("CONV") then
@@ -151,6 +145,7 @@ package body L_BFGS_B is
          Warn_Flag := 2;
       end if;
 
+      Put_Line (Routine_Name & "L387");
       --  L387
       declare
          MN         : constant Positive := Positive (M) * X0_Length - 1;
@@ -161,7 +156,7 @@ package body L_BFGS_B is
          Y          : Real_Float_Matrix (1 .. Positive (M), 1 .. X0_Length);
          --              Hess_Inv   : Lbfgs_Inv_Hess_Product (Positive (M), X0_Length);
          Result_J   : Optimise.Optimise_Result
-           (G'Length, Positive (M), X0_Length);
+           (G'Length, Positive (M), X'Length);
       begin
          --  wa is a double precision working array of length
          --       (2mmax + 5)nmax + 12mmax^2 + 12mmax.
@@ -184,6 +179,7 @@ package body L_BFGS_B is
          for index in G'Range loop
             Result_J.Jac (index) := G (index);
          end loop;
+
          Result_J.N_Fev := Scalar_Func.N_Fev;
          Result_J.N_Jev := Scalar_Func.N_Gev;
          Result_J.N_It := Num_Iterations;
@@ -191,10 +187,14 @@ package body L_BFGS_B is
          Result_J.Success := Warn_Flag = 0;
          Result_J.SK := S;
          Result_J.YK := Y;
+         Put_Line (Routine_Name & "Yk set");
          Result_J.X := X;
+         Put_Line (Routine_Name & "X set");
 
          Result := Result_J;
+         Put_Line (Routine_Name & "Result set");
       end;
+      Put_Line (Routine_Name & "done");
 
       return Result;
 
