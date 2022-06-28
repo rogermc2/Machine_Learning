@@ -1,5 +1,7 @@
 --  Based on scipy/optimise/_minimize.py
 
+with Ada.Text_IO; use Ada.Text_IO;
+
 with L_BFGS_B;
 with NL_Arrays_And_Matrices;
 with NL_Types;
@@ -38,6 +40,7 @@ package body Opt_Minimise is
                       return Optimise.Optimise_Result is
       use Minimise_Constraints_Package;
       use Num_Diff;
+      Routine_Name : constant String := "Opt_Minimise.Minimise ";
       L_Method    : Method_Type := Method;
       I_Fixed     : NL_Types.Boolean_List;
       All_Fixed   : Boolean := True;
@@ -94,6 +97,7 @@ package body Opt_Minimise is
                end if;
             end if;
          end if;  --  not Bounds.Is_Empty
+         Put_Line (Routine_Name & "not Done test");
 
          if not Done then
             case Method is

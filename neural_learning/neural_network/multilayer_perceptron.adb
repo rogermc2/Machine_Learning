@@ -402,8 +402,8 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Fit ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -447,8 +447,10 @@ package body Multilayer_Perceptron is
          Fit_Lbfgs (Self, X, Y_Bin, Layer_Units);
          --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
       end if;
+      Put_Line (Routine_Name & "Check_Weights");
 
       Check_Weights (Self);
+      Put_Line (Routine_Name & "done");
 
    end Fit;
 
@@ -491,13 +493,17 @@ package body Multilayer_Perceptron is
       --           Start := Last + 1;
       --        end loop;
 
+      Put_Line (Routine_Name & "Grads length: " &
+                  Integer'Image (Integer (Grads.Length)));
       --  L552  Grads is similar to packed_coef_inter
       Opt_Result := Opt_Minimise.Minimise
         (Fun => Self.Parameters.RF_Fun, X0 => Grads,
          Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
+      Put_Line (Routine_Name & "Set N_Iter");
       Self.Attributes.N_Iter :=
         Utils_Optimise.Check_Optimize_Result (Opt_Result, Self.Parameters.Max_Iter);
 
+      Put_Line (Routine_Name & "L566");
 --        declare
 --           X_Vec : constant Real_Float_Vector := Result.X;
 --        begin

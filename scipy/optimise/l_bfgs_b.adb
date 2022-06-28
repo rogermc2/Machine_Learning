@@ -18,10 +18,10 @@ package body L_BFGS_B is
    --          SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
    --          YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
    --      end record;
-     function Parameters_List_To_RF_Array
-       (PL : Stochastic_Optimizers.Parameters_List) return Real_Float_Vector;
---     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
---                                    return Real_Float_Vector;
+   function Parameters_List_To_RF_Array
+     (PL : Stochastic_Optimizers.Parameters_List) return Real_Float_Vector;
+   --     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
+   --                                    return Real_Float_Vector;
    --  ------------------------------------------------------------------------
 
    function All_Close (A, B  : Real_Float_Vector;
@@ -54,7 +54,7 @@ package body L_BFGS_B is
                                Opt_Minimise.No_Options)
                              return Optimise.Optimise_Result is
       use Differentiable_Functions;
-      Routine_Name    : constant String := "LBFGSB.Minimise_LBFGSB ";
+      Routine_Name    : constant String := "L_BFGS_B.Minimise_LBFGSB ";
       X0_Length       : constant Positive := Positive (X0.Length);
       I_Print         : constant Integer := -1;  --  L273
       X               : Real_Float_Vector := Parameters_List_To_RF_Array (X0);
@@ -67,7 +67,7 @@ package body L_BFGS_B is
       Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       F_Float         : Float := 0.0;
       G               : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
---        RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
+      --        RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       PGtol           : Float := Gtol;
       Factor          : Float := Ftol / Eps;
       Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length + 5 * X0_Length
@@ -93,25 +93,30 @@ package body L_BFGS_B is
       end if;
 
       Put_Line (Routine_Name & "X0_Length" & Integer'Image (X0_Length));
+      Put_Line (Routine_Name & "L266 Bounds Length" &
+                  Integer'Image (Integer (Bounds.Length)));
       for row in Bounds.First_Index .. Bounds.Last_Index loop
          null;
-         --              for col in X'Range (2) loop
-         --                  if X.Element (row). < Bounds.Lower.Element (row) then
-         --                      X (row) := Bounds.Lower.Element (row);
-         --                  elsif X (row) > Bounds.Upper.Element (row) then
-         --                      X (row) := Bounds.Upper.Element (row);
-         --                  end if;
-         --              end loop;
+         if X (row) < Bounds (row).Lower then
+            X (row) := Bounds (row).Lower;
+         elsif X (row) > Bounds (row).Upper then
+            X (row) := Bounds (row).Upper;
+         end if;
       end loop;
 
+      Put_Line (Routine_Name & "L306");
       --  L306
---        Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
+      Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
+      Put_Line (Routine_Name & "L323 bounds Length" &
+                  Integer'Image (Integer (Bounds.Length)));
       --  L323
       for index in 1 .. X0_Length loop
+         Put_Line (Routine_Name & "L323 index: " & Integer'Image (index));
          Low_Bound (index) := Bounds (index).Lower;
          Upper_Bound (index) := Bounds (index).Upper;
       end loop;
 
+      Put_Line (Routine_Name & "L349");
       --  L349
       Num_Iterations := 0;
       while Continiue loop
@@ -121,7 +126,7 @@ package body L_BFGS_B is
          if Task_Name = To_Unbounded_String ("FG") then
             --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, X, F_Float, G);
-         --  L369
+            --  L369
          elsif Task_Name = To_Unbounded_String ("NEW_X") then
             Num_Iterations := Num_Iterations + 1;
             if Num_Iterations > Max_Iter then
@@ -135,6 +140,7 @@ package body L_BFGS_B is
             Continiue := False;
          end if;
       end loop;
+      Put_Line (Routine_Name & "L378");
 
       --  L378
       if Task_Name = To_Unbounded_String ("CONV") then
@@ -238,18 +244,18 @@ package body L_BFGS_B is
    end Parameters_List_To_RF_Array;
 
    --  ------------------------------------------------------------------------
---
---     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
---                                    return Real_Float_Vector is
---        Vec : Real_Float_Vector (DP_Vec'Range);
---     begin
---        for index in DP_Vec'Range loop
---           Vec (index) := Float (DP_Vec (index));
---        end loop;
---
---        return Vec;
---
---     end To_Real_Float_Vector;
+   --
+   --     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
+   --                                    return Real_Float_Vector is
+   --        Vec : Real_Float_Vector (DP_Vec'Range);
+   --     begin
+   --        for index in DP_Vec'Range loop
+   --           Vec (index) := Float (DP_Vec (index));
+   --        end loop;
+   --
+   --        return Vec;
+   --
+   --     end To_Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
