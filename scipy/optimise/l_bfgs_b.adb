@@ -39,8 +39,9 @@ package body L_BFGS_B is
 
    --  ------------------------------------------------------------------------
 
-   function Minimise_LBFGSB (Fun      : Num_Diff.Deriv_Float_Fun_Access;
+   procedure Minimise_LBFGSB (Fun      : Num_Diff.Deriv_Float_Fun_Access;
                              X0       : Stochastic_Optimizers.Parameters_List;
+                             Result   : in out Optimise.Optimise_Result;
                              Bounds   : Constraints.Bounds_List :=
                                Constraints.Array_Bounds_Package.Empty_Vector;
                              Max_Cor  : Positive := 10;
@@ -51,8 +52,7 @@ package body L_BFGS_B is
                              Max_Fun  : Positive := 15000;
                              Max_Iter : Positive := 15000;
                              Options  : Opt_Minimise.Minimise_Options :=
-                               Opt_Minimise.No_Options)
-                             return Optimise.Optimise_Result is
+                               Opt_Minimise.No_Options) is
       use Differentiable_Functions;
       Routine_Name    : constant String := "L_BFGS_B.Minimise_LBFGSB ";
       X0_Length       : constant Positive := Positive (X0.Length);
@@ -155,8 +155,6 @@ package body L_BFGS_B is
          S          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
          Y          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
          --              Hess_Inv   : Lbfgs_Inv_Hess_Product (Positive (M), X0_Length);
-         Result_J   : Optimise.Optimise_Result (G'Length, Positive (M),
-                                                X'Length);
       begin
          --  wa is a double precision working array of length
          --       (2mmax + 5)nmax + 12mmax^2 + 12mmax.
@@ -175,32 +173,28 @@ package body L_BFGS_B is
 
          --              Hess_Inv.SK := S;
          --              Hess_Inv.YK := Y;
-         Result_J.Fun := F_Float;
+         Result.Fun := F_Float;
          for index in G'Range loop
-            Result_J.Jac (index) := G (index);
+            Result.Jac (index) := G (index);
          end loop;
 
-         Result_J.N_Fev := Scalar_Func.N_Fev;
-         Result_J.N_Jev := Scalar_Func.N_Gev;
-         Result_J.N_It := Num_Iterations;
-         Result_J.Status := Warn_Flag;
-         Result_J.Success := Warn_Flag = 0;
+         Result.N_Fev := Scalar_Func.N_Fev;
+         Result.N_Jev := Scalar_Func.N_Gev;
+         Result.N_It := Num_Iterations;
+         Result.Status := Warn_Flag;
+         Result.Success := Warn_Flag = 0;
          Put_Line (Routine_Name & "YK size: " &
-                     Integer'Image (Result_J.YK'Length) & " x" &
-                  Integer'Image (Result_J.YK'Length (2)));
+                     Integer'Image (Result.YK'Length) & " x" &
+                  Integer'Image (Result.YK'Length (2)));
          Put_Line (Routine_Name & "Y size: " & Integer'Image (Y'Length) &
                    " x" & Integer'Image (Y'Length (2)));
-         Result_J.SK := S;
-         Result_J.YK := Y;
+         Result.SK := S;
+         Result.YK := Y;
          Put_Line (Routine_Name & "Yk set");
-         Result_J.X := X;
+         Result.X := X;
          Put_Line (Routine_Name & "X set");
-
-         return Result_J;
       end;
 --        Put_Line (Routine_Name & "done");
-
---        return Result;
 
    end Minimise_LBFGSB;
 

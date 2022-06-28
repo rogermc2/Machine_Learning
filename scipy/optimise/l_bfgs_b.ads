@@ -12,8 +12,9 @@ package L_BFGS_B is
    function All_Close (A, B  : Real_Float_Vector;
                        A_Tol : Float := 10.0 ** (-8))
                        return Boolean;
-   function Minimise_LBFGSB (Fun       : Num_Diff.Deriv_Float_Fun_Access;
+   procedure Minimise_LBFGSB (Fun      : Num_Diff.Deriv_Float_Fun_Access;
                              X0        : Stochastic_Optimizers.Parameters_List;
+                             Result    : in out Optimise.Optimise_Result;
                              Bounds    : Constraints.Bounds_List :=
                                Constraints.Array_Bounds_Package.Empty_Vector;
                              Max_Cor   : Positive := 10;
@@ -24,7 +25,6 @@ package L_BFGS_B is
                              Max_Fun   : Positive := 15000;
                              Max_Iter  : Positive := 15000;
                              Options   : Opt_Minimise.Minimise_Options :=
-                               Opt_Minimise.No_Options)
-                              return Optimise.Optimise_Result;
+                               Opt_Minimise.No_Options);
 
 end L_BFGS_B;

@@ -34,15 +34,15 @@ package Opt_Minimise is
 
    No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
-   function Minimise (Fun         : Num_Diff.Deriv_Float_Fun_Access;
+   procedure Minimise (Fun        : Num_Diff.Deriv_Float_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
+                      Result      : in out Optimise.Optimise_Result;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
                       Bounds      : Constraints.Bounds_List :=
                         Constraints.Array_Bounds_Package.Empty_Vector;
                       Constraints : Minimise_Constraints_List :=
-                        Minimise_Constraints_Package.Empty_List)
+                        Minimise_Constraints_Package.Empty_List);
 --                        Options     : Minimise_Options := No_Options)
-                      return Optimise.Optimise_Result;
 
 end Opt_Minimise;

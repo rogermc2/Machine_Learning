@@ -473,7 +473,8 @@ package body Multilayer_Perceptron is
 --                         (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
 --                          Self.Parameters.Tol, 20);
       Grads        : Parameters_List := Self.Attributes.Params;
-      Opt_Result   : Optimise.Optimise_Result (0, 0, 0);
+      Opt_Result   : Optimise.Optimise_Result
+        (Integer (Grads.Length), X'Length (2), 0);
    begin
       --        --  L524  Save sizes and indices of coefficients for faster unpacking
       --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
@@ -496,8 +497,8 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "Grads length: " &
                   Integer'Image (Integer (Grads.Length)));
       --  L552  Grads is similar to packed_coef_inter
-      Opt_Result := Opt_Minimise.Minimise
-        (Fun => Self.Parameters.RF_Fun, X0 => Grads,
+      Opt_Minimise.Minimise
+        (Fun => Self.Parameters.RF_Fun, X0 => Grads, Result => Opt_Result,
          Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
       Put_Line (Routine_Name & "Set N_Iter");
       Self.Attributes.N_Iter :=

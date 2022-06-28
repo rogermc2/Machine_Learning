@@ -27,17 +27,23 @@ package body Opt_Minimise is
    end Check_Options;
 
    --  -------------------------------------------------------------------------
-
-   function Minimise (Fun         : Num_Diff.Deriv_Float_Fun_Access;
+   --  L45 Minimization of scalar function of one or more variables.
+   --  Fun: The objective function to be minimized
+   --  fun(x, *args) -> float
+   --  x is a 1-D array with shape (n,) and ``args`` is a list of the
+   --  fixed parameters needed to completely specify the function.
+   --  x0 : ndarray, shape (n,) is an initial guess array of real elements of
+   --  size (n,);  n is the number of independent variables.
+   procedure Minimise (Fun        : Num_Diff.Deriv_Float_Fun_Access;
                       X0          : Stochastic_Optimizers.Parameters_List;
+                      Result      : in out Optimise.Optimise_Result;
                       Method      : Method_Type := No_Method;
                       Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
                       Bounds      : Constraints.Bounds_List :=
                         Constraints.Array_Bounds_Package.Empty_Vector;
                       Constraints : Minimise_Constraints_List :=
-                        Minimise_Constraints_Package.Empty_List)
+                        Minimise_Constraints_Package.Empty_List) is
 --                        Options     : Minimise_Options := No_Options)
-                      return Optimise.Optimise_Result is
       use Minimise_Constraints_Package;
       use Num_Diff;
       Routine_Name : constant String := "Opt_Minimise.Minimise ";
@@ -49,7 +55,6 @@ package body Opt_Minimise is
       Cons_Cursor : Cursor := Constraints.First;
       Remove_Vars : Boolean := False;
       Done        : Boolean := False;
-      Result      : Optimise.Optimise_Result (0, 0, 0);
    begin
       --  L531
       if L_Method = No_Method then
@@ -102,8 +107,8 @@ package body Opt_Minimise is
          if not Done then
             case Method is
                when L_BFGS_B_Method =>
-               Result := L_BFGS_B.Minimise_LBFGSB (Fun => Fun, X0 => X0,
-                                                   Bounds => Bounds);
+                  L_BFGS_B.Minimise_LBFGSB
+                    (Fun => Fun, X0 => X0, Result => Result, Bounds => Bounds);
                when others => null;
             end case;
          end if;
@@ -112,8 +117,6 @@ package body Opt_Minimise is
 --              null;
 --           end if;
       end if;  --  Check_Options
-
-      return Result;
 
    end Minimise;
 

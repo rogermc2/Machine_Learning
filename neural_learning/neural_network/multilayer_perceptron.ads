@@ -11,6 +11,12 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
+    type Loss_Grad_Access is access function
+      (Params  : Parameters_List;
+       X           : Real_Float_Matrix; Y           : Boolean_Matrix;
+       Activations : in out Real_Matrix_List; Gradients : out Parameters_List)
+       return Float;
+
     type Loss_Function_Type is (Log_Loss_Function, Binary_Log_Loss_Function,
                                 Squared_Error_Function);
 
@@ -153,11 +159,5 @@ package Multilayer_Perceptron is
        Y    : Integer_Matrix; Classes : NL_Types.Integer_List);
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                       return Real_Float_Matrix;
-
-    type Loss_Grad_LBFGS_Access is access function
-      (Self        : in out MLP_Classifier; Params  : Parameters_List;
-       X           : Real_Float_Matrix; Y           : Boolean_Matrix;
-       Activations : in out Real_Matrix_List; Gradients : out Parameters_List)
-       return Float;
 
 end Multilayer_Perceptron;
