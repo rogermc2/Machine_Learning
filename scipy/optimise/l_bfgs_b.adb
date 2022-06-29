@@ -14,15 +14,11 @@ package body L_BFGS_B is
 
     --     type S60 is new Interfaces.Fortran.Fortran_Character (1 .. 60);
 
-    type Lbfgs_Inv_Hess_Product (N_Coor, N : Positive) is record
-        SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
-        YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
-    end record;
-
     function Parameters_List_To_RF_Array
       (PL : Stochastic_Optimizers.Parameters_List) return Real_Float_Vector;
     --     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
     --                                    return Real_Float_Vector;
+
     --  ------------------------------------------------------------------------
 
     function All_Close (A, B  : Real_Float_Vector;
@@ -149,10 +145,12 @@ package body L_BFGS_B is
         declare
             MN         : constant Positive := Positive (M) * X0_Length - 1;
             Bfgs_Iters : constant Positive := Positive (I_Save (31));
-            Num_Corrs  : constant Positive := Positive'Min (Bfgs_Iters, Max_Cor);
+            Num_Corrs  : constant Positive :=
+                           Positive'Min (Bfgs_Iters, Max_Cor);
             S          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
             Y          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
-            Hess_Inv   : Lbfgs_Inv_Hess_Product (Positive (M), X0_Length);
+            Hess_Inv   : Optimise.Lbfgs_Inv_Hess_Product
+              (Positive (M), Num_Corrs);
         begin
             --  L387
             --  wa is a double precision working array of length
@@ -179,11 +177,7 @@ package body L_BFGS_B is
 
             Result.N_Fev := Scalar_Func.N_Fev;
             Result.N_Jev := Scalar_Func.N_Gev;
-            for row in Result.Hess_Inv'Range loop
-                for col in Result.Hess_Inv'Range (2) loop
-                    Result.Hess_Inv (row, col) := Hess_Inv (row , col);
-                end loop;
-            end loop;
+            Result.Hess_Inv := Hess_Inv;
             Result.N_It := Num_Iterations;
             Result.Status := Warn_Flag;
             Result.Success := Warn_Flag = 0;
