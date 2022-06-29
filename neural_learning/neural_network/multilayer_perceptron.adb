@@ -496,9 +496,9 @@ package body Multilayer_Perceptron is
 
       Put_Line (Routine_Name & "Grads length: " &
                   Integer'Image (Integer (Grads.Length)));
-      --  L552  Grads is similar to packed_coef_inter
+      --  L546  Grads is similar to packed_coef_inter
       Opt_Minimise.Minimise
-        (Fun => Self.Parameters.RF_Fun, X0 => Grads, Result => Opt_Result,
+        (Fun => Loss_Grad_LBFGS'Access, X0 => Grads, Result => Opt_Result,
          Method => Opt_Minimise.L_BFGS_B_Method, Jac => Num_Diff.FD_True);
       Put_Line (Routine_Name & "Set N_Iter");
       Self.Attributes.N_Iter :=
