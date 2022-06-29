@@ -112,7 +112,7 @@ package body Optimise is
 
    --  ------------------------------------------------------------------------
 
-   function Prepare_Scalar_Function (Fun    : Num_Diff.Deriv_Float_Fun_Access;
+   function Prepare_Scalar_Function (Fun    : Opt_Minimise.Loss_Grad_LBFGS_Access;
                                      X0     : Real_Float_Vector;
                                      Bounds : Constraints.Array_Bounds :=
                                        Constraints.Default_Bounds;

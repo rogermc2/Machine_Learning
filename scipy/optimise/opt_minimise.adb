@@ -3,13 +3,14 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with L_BFGS_B;
-with NL_Arrays_And_Matrices;
 with NL_Types;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package body Opt_Minimise is
 
    function Optimize_Result_For_Equal_Bounds
-     (Fun    : Num_Diff.Deriv_Float_Fun_Access;
+     (Fun    : Multilayer_Perceptron.Loss_Grad_Access;
+      Args   :  Multilayer_Perceptron.Loss_Grad_Args;
       Bounds : Constraints.Bounds_List)
       return Optimise.Optimise_Result;
    --  Standardize_Bounds converts bounds to the form required by the solver
@@ -34,7 +35,8 @@ package body Opt_Minimise is
    --  fixed parameters needed to completely specify the function.
    --  x0 : ndarray, shape (n,) is an initial guess array of real elements of
    --  size (n,);  n is the number of independent variables.
-   procedure Minimise (Fun        : Num_Diff.Deriv_Float_Fun_Access;
+   procedure Minimise (Fun        : Multilayer_Perceptron.Loss_Grad_Access;
+                       Args       : Multilayer_Perceptron.Loss_Grad_Args;
                       X0          : Stochastic_Optimizers.Parameters_List;
                       Result      : in out Optimise.Optimise_Result;
                       Method      : Method_Type := No_Method;
@@ -81,7 +83,7 @@ package body Opt_Minimise is
 
                Done := All_Fixed;
                if All_Fixed then
-                  Result := Optimize_Result_For_Equal_Bounds (Fun, Bounds);
+                  Result := Optimize_Result_For_Equal_Bounds (Fun, Args, Bounds);
                else
                   while Has_Element (Cons_Cursor) loop
                      if Element (Cons_Cursor) /= Callable_Constraint then
@@ -122,11 +124,19 @@ package body Opt_Minimise is
 
    --  -------------------------------------------------------------------------
    --  L977
+--     Loss_Grad_LBFGS
+--        (Self        : in out Multilayer_Perceptron.MLP_Classifier;
+--         Params      : Stochastic_Optimizers.Parameters_List;
+--         X           : Real_Float_Matrix;
+--         Y           : Boolean_Matrix;
+--         Activations : in out Real_Matrix_List;
+--         Gradients   : out Stochastic_Optimizers.Parameters_List)
+--         return Float;
    function Optimize_Result_For_Equal_Bounds
-     (Fun    : Num_Diff.Deriv_Float_Fun_Access;
+     (Fun    : Multilayer_Perceptron.Loss_Grad_Access;
+      Args   :  Multilayer_Perceptron.Loss_Grad_Args;
       Bounds : Constraints.Bounds_List)
       return Optimise.Optimise_Result is
-      use NL_Arrays_And_Matrices;
       Success : constant Boolean := True;
       X0      : Real_Float_Vector (1 .. Positive (Bounds.Length));
       --  L1013
@@ -136,7 +146,7 @@ package body Opt_Minimise is
          X0 (index) := Bounds (index).Lower;
       end loop;
 
-      Result.Fun := Fun (X0);
+      Result.Fun := Fun (Args);
       Result.X := X0;
       Result.N_Fev := 1;
       Result.Success := Success;

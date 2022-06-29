@@ -11,12 +11,6 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 package Multilayer_Perceptron is
 
-    type Loss_Grad_Access is access function
-      (Params  : Parameters_List;
-       X           : Real_Float_Matrix; Y           : Boolean_Matrix;
-       Activations : in out Real_Matrix_List; Gradients : out Parameters_List)
-       return Float;
-
     type Loss_Function_Type is (Log_Loss_Function, Binary_Log_Loss_Function,
                                 Squared_Error_Function);
 
@@ -111,6 +105,22 @@ package Multilayer_Perceptron is
            Parameters     : MLP_Classifier_Parameters;
        end record;
 
+    type Loss_Grad_Args (Num_Rows, Num_Cols : Positive) is record
+        Self        : Multilayer_Perceptron.MLP_Classifier;
+        Params      : Parameters_List;
+        X           : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+        Y           : Boolean_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+        Activations : Real_Matrix_List;
+        Gradients   : Stochastic_Optimizers.Parameters_List;
+    end record;
+
+    type Loss_Grad_Access is access function (Args : Loss_Grad_Args) return Float;
+--      type Loss_Grad_Access is access function
+--        (Params  : Parameters_List;
+--         X           : Real_Float_Matrix; Y           : Boolean_Matrix;
+--         Activations : in out Real_Matrix_List; Gradients : out Parameters_List)
+--         return Float;
+
     function C_Init (Hidden_Layer_Sizes    : NL_Types.Integer_List :=
                        NL_Types.Integer_Package.Empty_Vector;
                      Activation            : Base_Neural.Activation_Type :=
@@ -146,12 +156,13 @@ package Multilayer_Perceptron is
                    Y           : Integer_Matrix;
                    Incremental : Boolean := False);
     procedure Init_Optimizer (Self : in out MLP_Classifier);
-    function Loss_Grad_LBFGS (Self        : in out MLP_Classifier;
-                              Params      : Parameters_List;
-                              X           : Real_Float_Matrix;
-                              Y           : Boolean_Matrix;
-                              Activations : in out Real_Matrix_List;
-                              Gradients   : out Parameters_List) return Float;
+    function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Float;
+--      function Loss_Grad_LBFGS (Self        : in out MLP_Classifier;
+--                                Params      : Parameters_List;
+--                                X           : Real_Float_Matrix;
+--                                Y           : Boolean_Matrix;
+--                                Activations : in out Real_Matrix_List;
+--                                Gradients   : out Parameters_List) return Float;
     procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                            Y    : Integer_Matrix);
     procedure Partial_Fit

@@ -4,7 +4,6 @@ with Ada.Containers.Doubly_Linked_Lists;
 
 with Constraints;
 with Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Num_Diff;
 with Optimise;
 with Stochastic_Optimizers;
@@ -26,15 +25,6 @@ package Opt_Minimise is
        Trust_Krylov_Method, Trust_Constr_Method, Trust_Exact_Method,
        Slsqp_Method, Custom_Method);
 
-    type Loss_Grad_LBFGS_Access is access
-      function (Self        : in out Multilayer_Perceptron.MLP_Classifier;
-                Params      : Stochastic_Optimizers.Parameters_List;
-                X           : Real_Float_Matrix;
-                Y           : Boolean_Matrix;
-                Activations : in out Real_Matrix_List;
-                Gradients   : out Stochastic_Optimizers.Parameters_List)
-                return Float;
-
     type Minimise_Options is record
         Max_Fun        : Multilayer_Perceptron.Max_Function_Access;
         Max_Iter       : Positive;
@@ -44,7 +34,8 @@ package Opt_Minimise is
 
     No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
-    procedure Minimise (Fun         : Loss_Grad_LBFGS_Access;
+    procedure Minimise (Fun         : Multilayer_Perceptron.Loss_Grad_Access;
+                        Args        : Multilayer_Perceptron.Loss_Grad_Args;
                         X0          : Stochastic_Optimizers.Parameters_List;
                         Result      : in out Optimise.Optimise_Result;
                         Method      : Method_Type := No_Method;

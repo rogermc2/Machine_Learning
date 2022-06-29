@@ -2,8 +2,10 @@
 
 with Constraints;
 with Differentiable_Functions; use Differentiable_Functions;
+with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Num_Diff;
+with Stochastic_Optimizers;
 
 package Optimise is
 
@@ -15,6 +17,17 @@ package Optimise is
     end record;
     --     type Grad_Func_Access is access function (X : Real_Float_Vector)
     --                                                return Real_Float_Matrix;
+
+    type Loss_Grad_LBFGS_Access is access
+      function (Params : Stochastic_Optimizers.Parameters_List;
+                Args   : Real_Float_Matrix) return Float;
+--        function (Self        : in out Multilayer_Perceptron.MLP_Classifier;
+--                  Params      : Stochastic_Optimizers.Parameters_List;
+--                  X           : Real_Float_Matrix;
+--                  Y           : Boolean_Matrix;
+--                  Activations : in out Real_Matrix_List;
+--                  Gradients   : out Stochastic_Optimizers.Parameters_List)
+--                  return Float;
 
     type Optimise_Result
       (X_Length, N_Coor, N : Natural) is record
@@ -43,7 +56,8 @@ package Optimise is
        X0             : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
        Direction      : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function
-      (Fun                  : Num_Diff.Deriv_Float_Fun_Access; X0 : Real_Float_Vector;
+      (Fun                  : Multilayer_Perceptron.Loss_Grad_Access;
+       X0                   : Real_Float_Vector;
        Bounds               : Constraints.Array_Bounds := Constraints.Default_Bounds;
        Epsilon,
        Finite_Diff_Rel_Step : Float := 10.0 ** (-8))

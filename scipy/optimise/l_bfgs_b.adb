@@ -36,7 +36,7 @@ package body L_BFGS_B is
 
     --  ------------------------------------------------------------------------
 
-    procedure Minimise_LBFGSB (Fun      : Num_Diff.Deriv_Float_Fun_Access;
+    procedure Minimise_LBFGSB (Fun      : Multilayer_Perceptron.Loss_Grad_Access;
                                X0       : Stochastic_Optimizers.Parameters_List;
                                Result   : in out Optimise.Optimise_Result;
                                Bounds   : Constraints.Bounds_List :=
