@@ -46,8 +46,12 @@ procedure Test_Gradient is
                                 Y         : Boolean_Matrix;
                                 Gradients : out Parameters_List)
                                 return Float is
+      Args : Loss_Grad_Args (Y'Length, Y'Length (2));
    begin
-      return Loss_Grad_LBFGS (Self, Params, X, Y, Activations, Gradients);
+      Args.Self := Self;
+      Args.Params := Params;
+      Args.Y := Y;
+      return Loss_Grad_LBFGS (Args);
 
    end Loss_Grad_Function;
 

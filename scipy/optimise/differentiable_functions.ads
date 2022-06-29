@@ -1,6 +1,7 @@
 --  Based on scipy/optimize/_differentiable_functions.py
 
 with Constraints;
+with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Num_Diff; use Num_Diff;
 
@@ -19,7 +20,7 @@ package Differentiable_Functions is
       --  x is the argument in the form of a 1-D array and args is a tuple of
       --  any additional fixed parameters needed to completely specify the
       --  function which should return a scalar.
-      Fun_Float        : Deriv_Float_Fun_Access;
+      Fun_Float        : Multilayer_Perceptron.Loss_Grad_Access;
       --        Update_Fun      : RF_Fun_Access;
       Update_Grad_Impl : UG_Fun_Access;
       --  X0 is a vector of X0_Size independent variables
@@ -48,13 +49,14 @@ package Differentiable_Functions is
 
    procedure C_Init
      (Self                   : in out Scalar_Function;
-      Fun                    : Deriv_Float_Fun_Access;
+      Fun                    : Multilayer_Perceptron.Loss_Grad_Access;
       X0                     : Real_Float_Vector; Grad, Hess : FD_Methods;
       Finite_Diff_Rel_Step,
       Finite_Diff_Bounds     : Float;
       Epsilon                : Float := 10.0 ** (-8));
    procedure Fun_And_Grad
-     (Self    : in out Scalar_Function; X : Real_Float_Vector;
+     (Self    : in out Scalar_Function;
+      Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector);
    function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
                   return Real_Float_Vector;

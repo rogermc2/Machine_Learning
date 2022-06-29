@@ -80,7 +80,9 @@ package body Optimise is
    --  ------------------------------------------------------------------------
    --  L1261
    function Minimise_BFGS
-     (Fun              : Num_Diff.Deriv_Float_Fun_Access; X0 : Real_Float_Vector;
+     (Fun              : Multilayer_Perceptron.Loss_Grad_Access;
+      Args             : Multilayer_Perceptron.Loss_Grad_Args;
+      X0               : Real_Float_Vector;
       Gtol             : Float := 10.0 ** (-5);
       Norm             : Float := Float'Safe_Last;
       Eps              : Float := Epsilon; Max_Iter : Natural := 0;
@@ -89,7 +91,7 @@ package body Optimise is
       Iters      : Positive;
       Ret_All    : Boolean := Return_All;
       SF         : Scalar_Function (X0'Length, 1);
-      F          : Num_Diff.Deriv_Float_Fun_Access;
+      F          : Multilayer_Perceptron.Loss_Grad_Access;
       My_F_Prime : Num_Diff.FD_Methods;
       Old_Val    : Float;
       K          : Natural := 0;
@@ -104,7 +106,7 @@ package body Optimise is
       SF := Prepare_Scalar_Function (Fun, X0);
       F := SF.Fun_Float;
       My_F_Prime := SF.Grad;
-      Old_Val := F (X0);
+      Old_Val := F (Args);
 
       return Min_BFGS;
 
@@ -112,7 +114,7 @@ package body Optimise is
 
    --  ------------------------------------------------------------------------
 
-   function Prepare_Scalar_Function (Fun    : Opt_Minimise.Loss_Grad_LBFGS_Access;
+   function Prepare_Scalar_Function (Fun    : Multilayer_Perceptron.Loss_Grad_Access;
                                      X0     : Real_Float_Vector;
                                      Bounds : Constraints.Array_Bounds :=
                                        Constraints.Default_Bounds;
@@ -138,7 +140,7 @@ package body Optimise is
    --  ------------------------------------------------------------------------
 
    function Prepare_Jac_Scalar_Function
-     (Fun                           : Num_Diff.Deriv_Float_Fun_Access;
+     (Fun                           : Multilayer_Perceptron.Loss_Grad_Access;
       X0, Jac                       : Real_Float_Vector;
       Bounds                        : Constraints.Array_Bounds :=
         Constraints.Default_Bounds;

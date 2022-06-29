@@ -63,7 +63,7 @@ package Optimise is
        Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
       return Scalar_Function;
     function Prepare_Jac_Scalar_Function
-      (Fun                           : Num_Diff.Deriv_Float_Fun_Access;
+      (Fun                           : Multilayer_Perceptron.Loss_Grad_Access;
        X0                            : Real_Float_Vector;
        Jac                           : Real_Float_Vector;
        Bounds                        : Constraints.Array_Bounds :=

@@ -15,7 +15,7 @@ package body Differentiable_Functions is
 
    procedure C_Init
      (Self                  : in out Scalar_Function;
-      Fun                   : Deriv_Float_Fun_Access;
+      Fun                   : Multilayer_Perceptron.Loss_Grad_Access;
       X0                    : Real_Float_Vector; Grad, Hess : FD_Methods;
       Finite_Diff_Rel_Step,
       Finite_Diff_Bounds    : Float;
@@ -73,12 +73,12 @@ package body Differentiable_Functions is
    --  L264
    procedure Fun_And_Grad
      (Self    : in out Scalar_Function;
-      X       : Real_Float_Vector;
+      Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector) is
    begin
       Update_Fun (Self);
       Update_Grad (Self);
-      Fun_Val := Self.Fun_Float (X);
+      Fun_Val := Self.Fun_Float (Args);
       Grad := Self.G;
 
    end Fun_And_Grad;
@@ -87,10 +87,10 @@ package body Differentiable_Functions is
 
    --  L132
    function Fun_Wrapped (Self : in out Scalar_Function;
-                         Fun  : Num_Diff.Deriv_Float_Fun_Access;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args;
                          X    : Real_Float_Vector) return Float is
       --                            X    : Real_Float_Vector) return Real_Float_Matrix is
-      FX : constant Float := Fun (X);
+      FX : constant Float := Self.Fun_Float (Args);
       --          FX : constant Real_Float_Matrix := Fun (X);
    begin
       --          Self.N_Fev := Self.N_Fev + 1;
