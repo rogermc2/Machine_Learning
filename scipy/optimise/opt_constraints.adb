@@ -1,6 +1,6 @@
 --  Based on scipy/optimise/_constraints.py
 
-package body Constraints is
+package body Opt_Constraints is
 
    procedure Get_Bounds (Bounds       : Bounds_List;
                          Lower, Upper : out NL_Types.Float_List) is
@@ -40,4 +40,4 @@ package body Constraints is
 
    --  ------------------------------------------------------------------------
 
-end Constraints;
+end Opt_Constraints;

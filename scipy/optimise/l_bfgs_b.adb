@@ -39,8 +39,8 @@ package body L_BFGS_B is
     procedure Minimise_LBFGSB (Fun      : Multilayer_Perceptron.Loss_Grad_Access;
                                X0       : Stochastic_Optimizers.Parameters_List;
                                Result   : in out Optimise.Optimise_Result;
-                               Bounds   : Constraints.Bounds_List :=
-                                 Constraints.Array_Bounds_Package.Empty_Vector;
+                               Bounds   : Opt_Constraints.Bounds_List :=
+                                 Opt_Constraints.Array_Bounds_Package.Empty_Vector;
                                Max_Cor  : Positive := 10;
                                Ftol     : Float :=
                                  2.2204460492503131 * 10.0 ** (-09);

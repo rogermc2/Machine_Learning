@@ -5,7 +5,7 @@ with Ada.Containers.Vectors;
 with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
-package Constraints is
+package Opt_Constraints is
 
    type Array_Bounds is record
       Lower : Float := Float'Safe_First;
@@ -24,4 +24,4 @@ package Constraints is
    function Get_Lower (Bounds : Bounds_List) return Real_Float_Vector;
    function Get_Upper (Bounds : Bounds_List) return Real_Float_Vector;
 
-end Constraints;
+end Opt_Constraints;

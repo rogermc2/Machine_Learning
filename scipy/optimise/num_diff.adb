@@ -6,7 +6,7 @@ with Ada.Assertions; use Ada.Assertions;
 
 with Maths;
 
-with Constraints;
+with Opt_Constraints;
 
 package body Num_Diff is
 
@@ -17,16 +17,16 @@ package body Num_Diff is
    EPS : constant Float := Float'Small;
 
    function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
        return Boolean;
    function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
        return Boolean_Array;
    function Compute_Absolute_Step
      (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
       Method   : FD_Methods) return Real_Float_Vector;
    function EPS_For_Method (Method : FD_Methods) return Float;
-   function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean;
+   function Inf_Bounds (Bounds : Opt_Constraints.Bounds_List) return Boolean;
    function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
                           return Real_Float_Vector;
    --     function Linear_Operator_Difference
@@ -36,9 +36,9 @@ package body Num_Diff is
    --                        F0     : Real_Float_Vector; H : Real_Float_Vector;
    --                        Method : FD_Methods)
    --                        return Real_Float_Matrix;
-   function Prepare_Bounds (Bounds : Constraints.Bounds_List;
+   function Prepare_Bounds (Bounds : Opt_Constraints.Bounds_List;
                             X0     : Real_Float_Vector)
-                             return Constraints.Bounds_List;
+                             return Opt_Constraints.Bounds_List;
    function Relative_Step (Method : FD_Methods) return Float;
 
    --  -------------------------------------------------------------------------
@@ -46,11 +46,11 @@ package body Num_Diff is
    procedure Adjust_Scheme_To_Bounds
      (X0            : Real_Float_Vector; H : in out Real_Float_Vector;
       Num_Steps     : Positive; Scheme : Scheme_Type;
-      Bounds        : Constraints.Bounds_List;
+      Bounds        : Opt_Constraints.Bounds_List;
       Use_One_Sided : in out Real_Float_Vector) is
       use Real_Float_Arrays;
-      use Constraints;
-      use Constraints.Array_Bounds_Package;
+      use Opt_Constraints;
+      use Opt_Constraints.Array_Bounds_Package;
       Lower         : constant Real_Float_Vector := Get_Lower (Bounds);
       Upper         : constant Real_Float_Vector := Get_Upper (Bounds);
       All_Inf       : Boolean := False;
@@ -249,7 +249,7 @@ package body Num_Diff is
    --  -------------------------------------------------------------------------
 
    function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
        return Boolean_Array is
       Result : Boolean_Array (X0'Range);
    begin
@@ -265,7 +265,7 @@ package body Num_Diff is
    --  -------------------------------------------------------------------------
 
    function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Constraints.Bounds_List)
+     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
        return Boolean is
       Result : Boolean := True;
    begin
@@ -398,7 +398,7 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function Inf_Bounds (Bounds : Constraints.Bounds_List) return Boolean is
+   function Inf_Bounds (Bounds : Opt_Constraints.Bounds_List) return Boolean is
       Result : Boolean := True;
    begin
       for index in  Bounds.First_Index .. Bounds.Last_Index loop
@@ -477,10 +477,10 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function Prepare_Bounds (Bounds : Constraints.Bounds_List;
+   function Prepare_Bounds (Bounds : Opt_Constraints.Bounds_List;
                             X0     : Real_Float_Vector)
-                             return Constraints.Bounds_List is
-      Result : Constraints.Bounds_List;
+                             return Opt_Constraints.Bounds_List is
+      Result : Opt_Constraints.Bounds_List;
    begin
       if Bounds.Is_Empty then
          Result.Set_Length (X0'Length);

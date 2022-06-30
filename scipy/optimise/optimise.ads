@@ -1,6 +1,6 @@
 --  Based on scipy/optimize/_optimize.py
 
-with Constraints;
+with Opt_Constraints;
 with Differentiable_Functions; use Differentiable_Functions;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -58,7 +58,8 @@ package Optimise is
     function Prepare_Scalar_Function
       (Fun                  : Multilayer_Perceptron.Loss_Grad_Access;
        X0                   : Real_Float_Vector;
-       Bounds               : Constraints.Array_Bounds := Constraints.Default_Bounds;
+       Bounds               : Opt_Constraints.Array_Bounds :=
+         Opt_Constraints.Default_Bounds;
        Epsilon,
        Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
       return Scalar_Function;
@@ -66,8 +67,8 @@ package Optimise is
       (Fun                           : Multilayer_Perceptron.Loss_Grad_Access;
        X0                            : Real_Float_Vector;
        Jac                           : Real_Float_Vector;
-       Bounds                        : Constraints.Array_Bounds :=
-         Constraints.Default_Bounds;
+       Bounds                        : Opt_Constraints.Array_Bounds :=
+         Opt_Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
       return Scalar_Function;
     function F_Min_BFGS (F : RF_Fun_Access; X0 : Real_Float_Vector)

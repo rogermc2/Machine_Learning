@@ -1,6 +1,6 @@
 --  Based on scipy/optimize/_differentiable_functions.py
 
-with Constraints;
+with Opt_Constraints;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Num_Diff; use Num_Diff;
@@ -26,7 +26,7 @@ package Differentiable_Functions is
       --  X0 is a vector of X0_Size independent variables
       X0               : Real_Float_Vector (1 .. X0_Size);
       Jac              : Real_Float_Vector (1 .. X0_Size);
-      Bounds           : Constraints.Array_Bounds;
+      Bounds           : Opt_Constraints.Array_Bounds;
       X_Prev           : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
       G_Prev           : Real_Float_Vector (1 .. X0_Size) := (others => 0.0);
       N_Fev            : Natural := 0;

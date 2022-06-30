@@ -116,8 +116,8 @@ package body Optimise is
 
    function Prepare_Scalar_Function (Fun    : Multilayer_Perceptron.Loss_Grad_Access;
                                      X0     : Real_Float_Vector;
-                                     Bounds : Constraints.Array_Bounds :=
-                                       Constraints.Default_Bounds;
+                                     Bounds : Opt_Constraints.Array_Bounds :=
+                                       Opt_Constraints.Default_Bounds;
                                      Epsilon,
                                      Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
                                      return Scalar_Function is
@@ -142,8 +142,8 @@ package body Optimise is
    function Prepare_Jac_Scalar_Function
      (Fun                           : Multilayer_Perceptron.Loss_Grad_Access;
       X0, Jac                       : Real_Float_Vector;
-      Bounds                        : Constraints.Array_Bounds :=
-        Constraints.Default_Bounds;
+      Bounds                        : Opt_Constraints.Array_Bounds :=
+        Opt_Constraints.Default_Bounds;
       Epsilon, Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
        return Scalar_Function is
       SF : Scalar_Function (X0'Length, 1);
