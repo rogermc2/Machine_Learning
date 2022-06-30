@@ -80,7 +80,7 @@ package body L_BFGS_B is
       --  L306
       Scalar_Func     : Differentiable_Functions.Scalar_Function :=
                           Optimise.Prepare_Scalar_Function (Fun, X);
-      Continiue       : Boolean := True;
+      Continue        : Boolean := True;
       Warn_Flag       : Natural;
    begin
       --        Put_Line (Routine_Name & "X0_Length" & Integer'Image (X0_Length));
@@ -111,15 +111,16 @@ package body L_BFGS_B is
 
       --  L349
       Num_Iterations := 0;
-      while Continiue loop
+      while Continue loop
          Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, F_Float, G,
                   Factor, Pgtol, Wa, I_Wa, C_Save, Task_Name, I_Print,
                   L_Save, I_Save, D_Save, Options.Max_Line_Steps);
-         if Task_Name = To_Unbounded_String ("FG") then
+         Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));
+         if Slice (Task_Name, 1, 2) =  "FG" then
             --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, Args, F_Float, G);
             --  L369
-         elsif Task_Name = To_Unbounded_String ("NEW_X") then
+         elsif Slice (Task_Name, 1, 5) =  "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
             if Num_Iterations > Max_Iter then
                Task_Name := To_Unbounded_String
@@ -129,8 +130,13 @@ package body L_BFGS_B is
                  ("STOP: TOTAL NO. of f AND g EVALUATIONS Exceeds LIMIT");
             end if;
          else
-            Continiue := False;
+            Continue := False;
          end if;
+      end loop;  --  Task_Name starts with FG or New_X
+      Put_Line (Routine_Name & "L378 Task_Name: " & To_String (Task_Name));
+      for index in 1 .. 16 loop
+            Put_Line ("I_Save" & Integer'Image (Index) & ":" &
+            Integer'Image (I_Save (Index)));
       end loop;
 
       --  L378
@@ -146,7 +152,8 @@ package body L_BFGS_B is
       Put_Line (Routine_Name & "L387 Bfgs_Iters" &
                   Integer'Image (I_Save (31)));
       Put_Line (Routine_Name & "L387 Max_Cor" & Integer'Image (Max_Cor));
-      Assert (I_Save (31) > 0, Routine_Name & "I_Save (31) < 1");
+      Assert (I_Save (31) > 0, Routine_Name & "I_Save (31): " &
+                Integer'Image (I_Save (31)) & " < 1");
       declare
          MN         : constant Positive := Positive (M) * X0_Length - 1;
          Bfgs_Iters : constant Natural := Natural (I_Save (31));
