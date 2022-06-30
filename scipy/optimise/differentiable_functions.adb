@@ -4,18 +4,25 @@ with Ada.Assertions; use Ada.Assertions;
 
 package body Differentiable_Functions is
 
-   procedure Update_Fun (Self : in out Scalar_Function);
-   procedure Update_Grad (Self : in out Scalar_Function);
-   procedure Update_Grad_FD (Self : in out Scalar_Function);
-   procedure Update_Hess (Self : in out Scalar_Function);
+   procedure Update_Fun (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args);
+   procedure Update_Grad (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args);
+   procedure Update_Grad_FD (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args);
+   procedure Update_Hess (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args);
    procedure Update_X (Self : in out Scalar_Function;
-                       Fun  : RF_Fun_Access; X : Real_Float_Vector);
+                       Fun  : RF_Fun_Access;
+                       Args : Multilayer_Perceptron.Loss_Grad_Args;
+                       X    : Real_Float_Vector);
 
    --  -------------------------------------------------------------------------
 
    procedure C_Init
      (Self                  : in out Scalar_Function;
       Fun                   : Multilayer_Perceptron.Loss_Grad_Access;
+      Args                  : Multilayer_Perceptron.Loss_Grad_Args;
       X0                    : Real_Float_Vector; Grad, Hess : FD_Methods;
       Finite_Diff_Rel_Step,
       Finite_Diff_Bounds    : Float;
@@ -46,20 +53,20 @@ package body Differentiable_Functions is
       end if;
 
       --  L140
-      Update_Fun (Self);
+      Update_Fun (Self, Args);
       --  L143
       case Grad is
       when Fd_Callable =>
          Assert (False, Routine_Name & "Fd_Callable case not implemented.");
       when FD_2_Point | FD_3_Point | FD_CS =>
-         Update_Grad_FD (Self);
+         Update_Grad_FD (Self, Args);
       when others =>
          Assert (False, Routine_Name & "Invalid case.");
       end case;
 
       if Hess /= FD_None and Hess /= FD_Hessian_Update_Strategy then
          --  L212
-         Update_Hess (Self);
+         Update_Hess (Self, Args);
          Self.H_Updated := True;
       elsif Hess = FD_Hessian_Update_Strategy then
          Self.Hess := Hess;
@@ -76,8 +83,8 @@ package body Differentiable_Functions is
       Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector) is
    begin
-      Update_Fun (Self);
-      Update_Grad (Self);
+      Update_Fun (Self, Args);
+      Update_Grad (Self, Args);
       Fun_Val := Self.Fun_Float (Args);
       Grad := Self.G;
 
@@ -114,10 +121,12 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
    --  L270
-   function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
+   function Grad (Self : in out Scalar_Function;
+                  Args : Multilayer_Perceptron.Loss_Grad_Args;
+                  X    : Real_Float_Vector)
                   return Real_Float_Vector is
    begin
-      Update_Grad (Self);
+      Update_Grad (Self, Args);
 
       return Self.G;
 
@@ -125,14 +134,16 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_Fun (Self : in out Scalar_Function) is
+   procedure Update_Fun (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args) is
    begin
-      Self.F := Fun_Wrapped (Self, Self.Fun_Float, Self.X0);
+      Self.F := Fun_Wrapped (Self, Args, Self.X0);
    end Update_Fun;
 
    --  -------------------------------------------------------------------------
    --  L239
-   procedure Update_Grad (Self : in out Scalar_Function) is
+   procedure Update_Grad (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args) is
       --        F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
    begin
       if not Self.G_Updated then
@@ -144,11 +155,12 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
    --  L152 for grad in FD_METHODS
-   procedure Update_Grad_FD (Self : in out Scalar_Function) is
+   procedure Update_Grad_FD (Self : in out Scalar_Function;
+                             Args : Multilayer_Perceptron.Loss_Grad_Args) is
       Fun : Deriv_Fun_Access;
       F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
    begin
-      Update_Fun (Self);
+      Update_Fun (Self, Args);
       Self.N_Gev := Self.N_Gev + 1;
 --        Self.G := Num_Diff.Approx_Derivative
 --          (Fun, Self.X0, Abs_Step => Self.Epsilon, F0 => F0);
@@ -157,7 +169,8 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_Hess (Self : in out Scalar_Function) is
+   procedure Update_Hess (Self : in out Scalar_Function;
+                         Args : Multilayer_Perceptron.Loss_Grad_Args) is
    begin
       null;
 
@@ -165,7 +178,8 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_X (Self : in out Scalar_Function; Fun  : RF_Fun_Access;
+   procedure Update_X (Self : in out Scalar_Function; Fun : RF_Fun_Access;
+                        Args : Multilayer_Perceptron.Loss_Grad_Args;
                        X    : Real_Float_Vector) is
    begin
       Self.X0 := X;

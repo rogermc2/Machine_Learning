@@ -50,6 +50,7 @@ package Differentiable_Functions is
    procedure C_Init
      (Self                   : in out Scalar_Function;
       Fun                    : Multilayer_Perceptron.Loss_Grad_Access;
+      Args                   : Multilayer_Perceptron.Loss_Grad_Args;
       X0                     : Real_Float_Vector; Grad, Hess : FD_Methods;
       Finite_Diff_Rel_Step,
       Finite_Diff_Bounds     : Float;
@@ -58,8 +59,9 @@ package Differentiable_Functions is
      (Self    : in out Scalar_Function;
       Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector);
-   function Grad (Self : in out Scalar_Function; X : Real_Float_Vector)
-                  return Real_Float_Vector;
+   function Grad (Self : in out Scalar_Function;
+                  Args : Multilayer_Perceptron.Loss_Grad_Args;
+                  X    : Real_Float_Vector) return Real_Float_Vector;
 
 private
 

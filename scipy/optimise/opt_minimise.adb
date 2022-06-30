@@ -122,7 +122,7 @@ package body Opt_Minimise is
                when L_BFGS_B_Method =>
                   --  L623
                   L_BFGS_B.Minimise_LBFGSB
-                    (Fun => Fun, X0 => X0, Result => Result,
+                    (Fun => Fun, Args => Args, X0 => X0, Result => Result,
                      Bounds => L_Bounds);
                when others => null;
             end case;

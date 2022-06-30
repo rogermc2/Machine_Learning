@@ -37,6 +37,7 @@ package body L_BFGS_B is
     --  ------------------------------------------------------------------------
 
     procedure Minimise_LBFGSB (Fun      : Multilayer_Perceptron.Loss_Grad_Access;
+                               Args     : Multilayer_Perceptron.Loss_Grad_Args;
                                X0       : Stochastic_Optimizers.Parameters_List;
                                Result   : in out Optimise.Optimise_Result;
                                Bounds   : Opt_Constraints.Bounds_List :=
@@ -116,7 +117,7 @@ package body L_BFGS_B is
                      L_Save, I_Save, D_Save, Options.Max_Line_Steps);
             if Task_Name = To_Unbounded_String ("FG") then
                 --  Overwrite F and G:
-                Fun_And_Grad (Scalar_Func, X, F_Float, G);
+                Fun_And_Grad (Scalar_Func, Args, F_Float, G);
                 --  L369
             elsif Task_Name = To_Unbounded_String ("NEW_X") then
                 Num_Iterations := Num_Iterations + 1;

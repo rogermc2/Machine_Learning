@@ -13,6 +13,7 @@ package L_BFGS_B is
                        A_Tol : Float := 10.0 ** (-8))
                        return Boolean;
    procedure Minimise_LBFGSB (Fun      : Multilayer_Perceptron.Loss_Grad_Access;
+                              Args     : Multilayer_Perceptron.Loss_Grad_Args;
                              X0        : Stochastic_Optimizers.Parameters_List;
                              Result    : in out Optimise.Optimise_Result;
                              Bounds    : Opt_Constraints.Bounds_List :=
