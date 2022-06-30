@@ -473,6 +473,10 @@ package body Multilayer_Perceptron is
       --                         (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
       --                          Self.Parameters.Tol, 20);
       Grads        : constant Parameters_List := Self.Attributes.Params;
+      --  Opt_Result The optimization result represented as a Optimise_Result
+      --  record.
+      --  Important attributes are: the solution array X, a Boolean flag
+      --  Success indicating if the optimizer exited successfully
       Opt_Result   : Optimise.Optimise_Result
         (Integer (Grads.Length), X'Length (2), 0);
       Args         : Loss_Grad_Args (Y'Length, Y'Length (2));

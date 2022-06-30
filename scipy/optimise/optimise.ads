@@ -39,7 +39,7 @@ package Optimise is
         Jac       : Real_Float_Vector (1 .. X_Length);
         --  Hess: Hessian of objective function
         Hess      : Real_Float_Vector (1 .. X_Length);
-        Hess_Inv  : Lbfgs_Inv_Hess_Product (N_Coor, N);
+        Hess_Inv  : Lbfgs_Inv_Hess_Product (N_Coor, N_Coor);
         --  N_It: Number of iterations performed by the optimizer.
         N_It      : Natural := 0;
         --  Number of evaluations of the objective functions and of its
