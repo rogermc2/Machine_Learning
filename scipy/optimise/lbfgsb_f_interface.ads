@@ -10,7 +10,8 @@ package Lbfgsb_F_Interface is
    type DSave_Array is array (Integer range 1 .. 29) of Float;
    type LSave_Array is array (Integer range 1 .. 4) of Integer;
 
-   procedure Set_Ulb (SM               : Integer;
+   procedure Set_Ulb (SN               : Integer;
+                      SM               : Integer;
                       SX               : in out Real_Float_Vector;
                       SL, SU           : Real_Float_Vector;  --  bounds
                       S_Nbd            : Integer_Array;
@@ -21,7 +22,7 @@ package Lbfgsb_F_Interface is
                       S_Iwa            : in out Integer_Array;
                       S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
-                      S_Iprint         : Integer;
+                      S_Iprint         : Integer := 1;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
                       S_Dsave          : in out DSave_Array;

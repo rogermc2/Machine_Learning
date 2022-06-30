@@ -50,7 +50,8 @@ package body Lbfgsb_F_Interface is
    --  wa is a double precision working array of length
    --  (2mmax + 5)nmax + 12mmax^2 + 12mmax.
    --  iwa is an integer working array of length 3nmax.
-   procedure setulb (m            : in Fortran_Integer;
+   procedure setulb (n            : in Fortran_Integer;
+                     m            : in Fortran_Integer;
                      x            : in out Fortran_DP_Array;
                      l, u         : in Fortran_DP_Array;  --  bounds
                      nbd          : in Fortran_Integer_Array;
@@ -70,7 +71,8 @@ package body Lbfgsb_F_Interface is
 
    --  -------------------------------------------------------------------------
 
-   procedure Set_Ulb (SM               : Integer;
+   procedure Set_Ulb (SN               : Integer;
+                      SM               : Integer;
                       SX               : in out Real_Float_Vector;
                       SL, SU           : Real_Float_Vector;  --  bounds
                       S_Nbd            : Integer_Array;
@@ -81,7 +83,7 @@ package body Lbfgsb_F_Interface is
                       S_Iwa            : in out Integer_Array;
                       S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
-                      S_Iprint         : Integer;
+                      S_Iprint         : Integer := 1;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
                       S_Dsave          : in out DSave_Array;
@@ -101,12 +103,12 @@ package body Lbfgsb_F_Interface is
       Isave        : Fortran_Integer_Array := Fortran_Integer_Array (S_Isave);
       Dsave        : Fortran_DSave_Array;
    begin
-      Put_Line (Routine_Name & "F:" & Double_Precision'Image (F));
-      Put_Line (Routine_Name & "G:");
-      for index in G'Range loop
-         Put (Double_Precision'Image (G (index)) & "  ");
-      end loop;
-      New_Line;
+--        Put_Line (Routine_Name & "F in:" & Double_Precision'Image (F));
+--        Put_Line (Routine_Name & "G in:");
+--        for index in G'Range loop
+--           Put (Double_Precision'Image (G (index)) & "  ");
+--        end loop;
+--        New_Line;
       for index in Task_String'Range loop
          Task_Name (index) := To_Fortran (Task_String (index));
       end loop;
@@ -114,10 +116,17 @@ package body Lbfgsb_F_Interface is
       for index in Dsave'Range loop
          Dsave (index) := Double_Precision (S_Dsave (index));
       end loop;
-      Put_Line (Routine_Name & "SM" & Integer'Image (SM));
-      Put_Line (Routine_Name & "m" & Fortran_Integer'Image (Fortran_Integer(SM)));
+--        Put_Line (Routine_Name & "m" & Fortran_Integer'Image (Fortran_Integer(SM)));
+--        Put_Line (Routine_Name & "X in:");
+--        for index in X'Range loop
+--           Put (Double_Precision'Image (X (index)) & "  ");
+--        end loop;
+--        New_Line;
+--  subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa,
+--                    task, iprint, csave, lsave, isave, dsave, maxls)
 
-      setulb (m        => Fortran_Integer (SM),
+      setulb (n        => Fortran_Integer (SN),
+              m        => Fortran_Integer (SM),
               x        => X,
               l        => To_DP_Array (SL),
               u        => To_DP_Array (SU),
@@ -129,21 +138,32 @@ package body Lbfgsb_F_Interface is
               wa       => Wa,
               iwa      => Iwa,
               TaskName => Task_Name,
-              iprint   => Fortran_Integer (100),
---                iprint   => Fortran_Integer (S_Iprint),
+              iprint   => Fortran_Integer (S_Iprint),
               csave    => Csave,
               lsave    => Lsave,
               isave    => Isave,
               dsave    => Dsave,
               maxls    => Fortran_Integer (S_Maxls));
 
-      Put_Line (Routine_Name & "F out:" & Double_Precision'Image (F));
-      Put_Line (Routine_Name & "G length:" & Integer'Image (G'Length));
-      Put_Line (Routine_Name & "G:");
-      for index in G'Range loop
-         Put (Double_Precision'Image (G (index)) & "  ");
-      end loop;
-      New_Line;
+--        Put_Line (Routine_Name & "Task_Name out:" & To_Ada (Task_Name));
+--        Put_Line (Routine_Name & "X out:");
+--        for index in X'Range loop
+--           Put (Double_Precision'Image (X (index)) & "  ");
+--        end loop;
+--        New_Line;
+--        Put_Line (Routine_Name & "F out:" & Double_Precision'Image (F));
+--        Put_Line (Routine_Name & "G length:" & Integer'Image (G'Length));
+--        Put_Line (Routine_Name & "G:");
+--        for index in G'Range loop
+--           Put (Double_Precision'Image (G (index)) & "  ");
+--        end loop;
+--        New_Line;
+
+--        Put_Line (Routine_Name & "Dsave:");
+--        for index in Dsave'Range loop
+--           Put (Double_Precision'Image (Dsave (index)) & "  ");
+--        end loop;
+--        New_Line;
       SX := To_RF_Array (X);
       SF := Float (F);
       SG := To_RF_Array (G);
