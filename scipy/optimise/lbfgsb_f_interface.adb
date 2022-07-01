@@ -101,9 +101,11 @@ package body Lbfgsb_F_Interface is
       Task_String  : constant String := To_String (S_Task_Name);
       Task_Name    : Character_60 := (others => To_Fortran (' '));
       Csave        : Character_60 := To_Fortran (S_Csave);
-      Lsave        : Fortran_Integer_Array := To_Fortran (Integer_Array (S_Lsave));
+      Lsave        : Fortran_Integer_Array :=
+                         To_Fortran (Integer_Array (S_Lsave));
       Isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
       Dsave        : Fortran_DSave_Array;
+      NBD          : Fortran_Integer_Array := To_Fortran (S_Nbd);
    begin
 --        Put_Line (Routine_Name & "F in:" & Double_Precision'Image (F));
 --        Put_Line (Routine_Name & "G in:");
@@ -115,11 +117,22 @@ package body Lbfgsb_F_Interface is
          Task_Name (index) := To_Fortran (Task_String (index));
       end loop;
 
+      for index in NBD'Range loop
+         NBD (index) := Fortran_Integer (S_Nbd (index));
+      end loop;
+
       for index in Dsave'Range loop
          Dsave (index) := Double_Precision (S_Dsave (index));
       end loop;
       Put_Line (Routine_Name & "m:" &
                   Fortran_Integer'Image (Fortran_Integer (SM)));
+--        Put_Line (Routine_Name & "X in:");
+--        for index in X'First .. X'First + 3 loop
+--           Put (Integer'Image (index) & ":" &
+--                  Double_Precision'Image (X (index)) & "  ");
+--        end loop;
+--        New_Line;
+
       Put_Line (Routine_Name & "X in:");
       for index in X'First .. X'First + 3 loop
          Put (Integer'Image (index) & ":" &
@@ -134,7 +147,7 @@ package body Lbfgsb_F_Interface is
               x        => X,
               l        => To_DP_Array (SL),
               u        => To_DP_Array (SU),
-              nbd      => To_Fortran (S_Nbd),
+              nbd      => NBD,
               f        => F,
               g        => G,
               factr    => Factr,
@@ -217,6 +230,7 @@ package body Lbfgsb_F_Interface is
 
    function To_Fortran (IA : Integer_Array) return Fortran_Integer_Array is
       Result : Fortran_Integer_Array (IA'Range);
+      pragma Convention (Fortran, Result);
    begin
       for index in IA'Range loop
          Result (index) := Fortran_Integer (IA (index));
