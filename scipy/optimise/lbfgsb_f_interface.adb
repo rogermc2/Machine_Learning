@@ -107,12 +107,9 @@ package body Lbfgsb_F_Interface is
       Dsave        : Fortran_DSave_Array;
       NBD          : Fortran_Integer_Array := To_Fortran (S_Nbd);
    begin
+      Put_Line (Routine_Name & "N:" & Integer'Image (SN));
 --        Put_Line (Routine_Name & "F in:" & Double_Precision'Image (F));
---        Put_Line (Routine_Name & "G in:");
---        for index in G'Range loop
---           Put (Double_Precision'Image (G (index)) & "  ");
---        end loop;
---        New_Line;
+--        Put_Line (Routine_Name & "SL in:");
       for index in Task_String'Range loop
          Task_Name (index) := To_Fortran (Task_String (index));
       end loop;
@@ -124,8 +121,6 @@ package body Lbfgsb_F_Interface is
       for index in Dsave'Range loop
          Dsave (index) := Double_Precision (S_Dsave (index));
       end loop;
-      Put_Line (Routine_Name & "m:" &
-                  Fortran_Integer'Image (Fortran_Integer (SM)));
 --        Put_Line (Routine_Name & "X in:");
 --        for index in X'First .. X'First + 3 loop
 --           Put (Integer'Image (index) & ":" &
