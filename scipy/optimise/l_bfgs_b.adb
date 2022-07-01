@@ -60,15 +60,16 @@ package body L_BFGS_B is
       --  L331 nbd[i] = bounds_map[l, u] => bounds_map[1, 1] = 2
       Nbd             : constant Integer_Array (1 .. X0_Length) :=
                           (others => 2);
-      Low_Bound       : Real_Float_Vector (1 .. X0_Length) := (others => Float'Safe_Last);
-      Upper_Bound     : Real_Float_Vector (1 .. X0_Length) := (others => Float'Safe_First);
+      Low_Bound       : Real_Float_Vector (1 .. X0_Length) :=
+                            (others => Float'Safe_Last);
+      Upper_Bound     : Real_Float_Vector (1 .. X0_Length) :=
+                            (others => Float'Safe_First);
       F_Float         : Float := 0.0;
       G               : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
-      --        RF_G            : Real_Float_Vector (1 .. X0_Length) := (others => 0.0);
       PGtol           : Float := Gtol;
       Factor          : Float := Ftol / Eps;
-      Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length + 5 * X0_Length
-                          + 11 * Max_Cor ** 2 + 8 * Max_Cor;
+      Wa_Length       : constant Positive := 2 * Max_Cor * X0_Length +
+                           5 * X0_Length + 11 * Max_Cor ** 2 + 8 * Max_Cor;
       Wa              : Real_Float_Vector (1 .. wa_Length) :=  (others => 0.0);
       I_Wa            : Integer_Array (1 .. 3 * X0_Length) := (others => 0);
       L_Save          : LSave_Array := (others => 0);
@@ -241,20 +242,6 @@ package body L_BFGS_B is
       end;
 
    end Parameters_List_To_RF_Array;
-
-   --  ------------------------------------------------------------------------
-   --
-   --     function To_Real_Float_Vector (DP_Vec : Fortran_DP_Array)
-   --                                    return Real_Float_Vector is
-   --        Vec : Real_Float_Vector (DP_Vec'Range);
-   --     begin
-   --        for index in DP_Vec'Range loop
-   --           Vec (index) := Float (DP_Vec (index));
-   --        end loop;
-   --
-   --        return Vec;
-   --
-   --     end To_Real_Float_Vector;
 
    --  ------------------------------------------------------------------------
 
