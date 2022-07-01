@@ -9,7 +9,7 @@ package body Lbfgsb_F_Interface is
    type Fortran_DP_Array is array (Integer range <>) of Double_Precision;
    pragma Convention (Fortran, Fortran_DP_Array);
 
-   type Fortran_Integer_Array is array (Integer range <>) of Integer;
+   type Fortran_Integer_Array is array (Integer range <>) of Fortran_Integer;
    pragma Convention (Fortran, Fortran_Integer_Array);
 
    type Fortran_DSave_Array is array (Integer range 1 .. 29) of
@@ -18,7 +18,9 @@ package body Lbfgsb_F_Interface is
 
    type Character_60 is new Fortran_Character (1 .. 60);
 
+   function To_Ada (IA : Fortran_Integer_Array) return Integer_Array;
    function To_DP_Array (RA : Real_Float_Vector) return Fortran_DP_Array;
+   function To_Fortran (IA : Integer_Array) return Fortran_Integer_Array;
    function To_RF_Array (DPA : Fortran_DP_Array) return Real_Float_Vector;
    --     function Zero_Array (Num_Rows : Positive) return Fortran_DP_Array;
 
@@ -95,12 +97,12 @@ package body Lbfgsb_F_Interface is
       Factr        : Double_Precision := Double_Precision (S_Factr);
       Pgtol        : Double_Precision := Double_Precision (S_Pgtol);
       Wa           : Fortran_DP_Array := To_DP_Array (S_Wa);
-      Iwa          : Fortran_Integer_Array := Fortran_Integer_Array (S_Iwa);
+      Iwa          : Fortran_Integer_Array := To_Fortran (S_Iwa);
       Task_String  : constant String := To_String (S_Task_Name);
       Task_Name    : Character_60 := (others => To_Fortran (' '));
       Csave        : Character_60 := To_Fortran (S_Csave);
-      Lsave        : Fortran_Integer_Array := Fortran_Integer_Array (S_Lsave);
-      Isave        : Fortran_Integer_Array := Fortran_Integer_Array (S_Isave);
+      Lsave        : Fortran_Integer_Array := To_Fortran (Integer_Array (S_Lsave));
+      Isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
       Dsave        : Fortran_DSave_Array;
    begin
 --        Put_Line (Routine_Name & "F in:" & Double_Precision'Image (F));
@@ -116,21 +118,21 @@ package body Lbfgsb_F_Interface is
       for index in Dsave'Range loop
          Dsave (index) := Double_Precision (S_Dsave (index));
       end loop;
---        Put_Line (Routine_Name & "m" & Fortran_Integer'Image (Fortran_Integer(SM)));
+      Put_Line (Routine_Name & "m" & Fortran_Integer'Image (Fortran_Integer(SM)));
 --        Put_Line (Routine_Name & "X in:");
 --        for index in X'Range loop
 --           Put (Double_Precision'Image (X (index)) & "  ");
 --        end loop;
 --        New_Line;
+
 --  subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa,
 --                    task, iprint, csave, lsave, isave, dsave, maxls)
-
       setulb (n        => Fortran_Integer (SN),
               m        => Fortran_Integer (SM),
               x        => X,
               l        => To_DP_Array (SL),
               u        => To_DP_Array (SU),
-              nbd      => Fortran_Integer_Array (S_Nbd),
+              nbd      => To_Fortran (S_Nbd),
               f        => F,
               g        => G,
               factr    => Factr,
@@ -170,14 +172,14 @@ package body Lbfgsb_F_Interface is
       S_Factr := Float (Factr);
       S_Pgtol := Float (Pgtol);
       S_Wa := To_RF_Array (Wa);
-      S_Iwa := Integer_Array (Iwa);
+      S_Iwa := To_Ada (Iwa);
       S_Task_Name := Trim (To_Unbounded_String (To_Ada (Task_Name)),
                            Ada.Strings.Right);
       S_Csave := To_Ada (Csave);
-      S_Lsave := LSave_Array (Lsave);
-      S_Isave := Integer_Array (Isave);
-      Put_Line (Routine_Name & "Isave (1)" & Integer'Image (Isave (1)));
-      Put_Line (Routine_Name & "Isave (31)" & Integer'Image (Isave (31)));
+      S_Lsave := LSave_Array (To_Ada (Lsave));
+      S_Isave := To_Ada (Isave);
+      Put_Line (Routine_Name & "Isave (1)" & Fortran_Integer'Image (Isave (1)));
+      Put_Line (Routine_Name & "Isave (31)" & Fortran_Integer'Image (Isave (31)));
       for index in Dsave'Range loop
          S_Dsave (index) := Float (Dsave (index));
       end loop;
@@ -195,6 +197,32 @@ package body Lbfgsb_F_Interface is
 
       return Result;
    end To_DP_Array;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Ada (IA : Fortran_Integer_Array) return Integer_Array is
+      Result : Integer_Array (IA'Range);
+   begin
+      for index in IA'Range loop
+         Result (index) := Integer (IA (index));
+      end loop;
+
+      return Result;
+
+   end To_Ada;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Fortran (IA : Integer_Array) return Fortran_Integer_Array is
+      Result : Fortran_Integer_Array (IA'Range);
+   begin
+      for index in IA'Range loop
+         Result (index) := Fortran_Integer (IA (index));
+      end loop;
+
+      return Result;
+
+   end To_Fortran;
 
    --  -------------------------------------------------------------------------
 

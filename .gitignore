@@ -6,6 +6,7 @@
 *.csv
 *.o
 *.obj
+*obj*
 *.a
 *.ali
 *.dot
@@ -18,6 +19,7 @@
 *.db
 *.db*
 *.cgpr
+*lyx~
 *.DS_Store
 b__*
 .#*
