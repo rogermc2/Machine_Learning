@@ -97,10 +97,10 @@ procedure Test_Set_ULB is
    WA                 : Real_Float_Vector (1 .. WA_Length) := (others => 0.0);
    IWA                : Integer_Array (1 .. 3 * N);
    Task_Name          : Unbounded_String;
-   C_Save             : S60 := (others => '0');
+--     C_Save             : S60 := (others => '0');
    L_Save             : LSave_Array := (others => 0);
    I_Save             : Integer_Array (1 .. 44) := (others => 0);
-   D_Save             : DSave_Array := (others => 0.0);
+--     D_Save             : DSave_Array := (others => 0.0);
    Pass               : Boolean := True;
 begin
    Put (Routine_Name);
@@ -108,7 +108,7 @@ begin
    for iter in 1 .. 7 loop
       Obj_Fun (X, F, G);
       Set_Ulb (N, M, X, Low_Bound, Upper_Bound, Nbd, F, G, Factor, Pg_Tol,
-              WA, IWA, C_Save, Task_Name, L_Save, I_Save, D_Save, Max_Ls);
+              WA, IWA, Task_Name, L_Save, I_Save, Max_Ls);
       Put_Line (Routine_Name & "Isave (1)" & Integer'Image (I_save (1)));
       Put_Line (Routine_Name & "Isave (31)" & Integer'Image (I_save (31)));
       for index in X'Range loop

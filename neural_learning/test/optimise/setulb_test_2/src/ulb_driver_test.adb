@@ -35,10 +35,10 @@ procedure ULB_Driver_Test is
    WA                 : Real_Float_Vector (1 .. WA_Length) := (others => 0.0);
    IWA                : Integer_Array (1 .. 3 * N_Max);
    Task_Name          : Unbounded_String;
-   C_Save             : S60 := (others => '0');
+--     C_Save             : S60 := (others => '0');
    L_Save             : LSave_Array := (others => 0);
    I_Save             : Integer_Array (1 .. 44) := (others => 0);
-   D_Save             : DSave_Array := (others => 0.0);
+--     D_Save             : DSave_Array := (others => 0.0);
    T1                 : Float;
    T2                 : Float;
    Continue           : Boolean := True;
@@ -58,7 +58,7 @@ begin
    Task_Name := To_Unbounded_String ("START");
    while Continue loop
       Set_Ulb (N, M, X, Lower_Bound, Upper_Bound, Nbd, F, G, Factor, Pg_Tol,
-              WA, IWA, C_Save, Task_Name, L_Save, I_Save, D_Save, Max_Ls);
+              WA, IWA, Task_Name, L_Save, I_Save, Max_Ls);
       Put_Line ("Task_Name: " & To_String (Task_Name));
       if Slice (Task_Name, 1, 2) = "FG" then
          --  the minimization routine has returned to request the

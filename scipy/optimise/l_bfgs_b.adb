@@ -75,8 +75,8 @@ package body L_BFGS_B is
         I_Wa            : Integer_Array (1 .. 3 * X_Length) := (others => 0);
         L_Save          : LSave_Array := (others => 0);
         I_Save          : Integer_Array (1 .. 44) := (others => 0);
-        D_Save          : DSave_Array := (others => 0.0);
-        C_Save          : S60 :=  (others => '0');
+--          D_Save          : DSave_Array := (others => 0.0);
+--          C_Save          : S60 :=  (others => '0');
         Task_Name       : Unbounded_String := To_Unbounded_String ("START");
         --  L306
         Scalar_Func     : Differentiable_Functions.Scalar_Function :=
@@ -112,8 +112,8 @@ package body L_BFGS_B is
         Num_Iterations := 0;
         while Continue loop
             Set_Ulb (X'Length, M, X, Low_Bound, Upper_Bound, Nbd, F_Float, G,
-                     Factor, Pgtol, Wa, I_Wa, C_Save, Task_Name, L_Save, I_Save,
-                     D_Save, Options.Max_Line_Steps);
+                     Factor, Pgtol, Wa, I_Wa, Task_Name, L_Save, I_Save,
+                     Options.Max_Line_Steps);
             Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));
             if Slice (Task_Name, 1, 2) =  "FG" then
                 --  Overwrite F and G:

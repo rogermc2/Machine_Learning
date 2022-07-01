@@ -18,6 +18,9 @@ package body Lbfgsb_F_Interface is
 
    type Character_60 is new Fortran_Character (1 .. 60);
 
+   Csave  : Character_60;
+   Dsave  : Fortran_DSave_Array;
+
    function To_Ada (IA : Fortran_Integer_Array) return Integer_Array;
    function To_DP_Array (RA : Real_Float_Vector) return Fortran_DP_Array;
    function To_Fortran (IA : Integer_Array) return Fortran_Integer_Array;
@@ -84,11 +87,10 @@ package body Lbfgsb_F_Interface is
                       S_Factr, S_Pgtol : in out Float;
                       S_Wa             : in out Real_Float_Vector;
                       S_Iwa            : in out Integer_Array;
-                      S_Csave          : in out S60;
+--                        S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
-                      S_Dsave          : in out DSave_Array;
                       S_Maxls          : Integer) is
       Routine_Name : constant String := "Lbfgsb_F_Interface.Set_Ulb ";
       X            : Fortran_DP_Array := To_DP_Array (SX);
@@ -100,11 +102,10 @@ package body Lbfgsb_F_Interface is
       Iwa          : Fortran_Integer_Array := To_Fortran (S_Iwa);
       Task_String  : constant String := To_String (S_Task_Name);
       Task_Name    : Character_60 := (others => To_Fortran (' '));
-      Csave        : Character_60 := To_Fortran (S_Csave);
+--        Csave        : Character_60 := To_Fortran (S_Csave);
       Lsave        : Fortran_Integer_Array :=
                          To_Fortran (Integer_Array (S_Lsave));
       Isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
-      Dsave        : Fortran_DSave_Array;
       NBD          : Fortran_Integer_Array := To_Fortran (S_Nbd);
    begin
       Put_Line (Routine_Name & "N:" & Integer'Image (SN));
@@ -118,9 +119,9 @@ package body Lbfgsb_F_Interface is
          NBD (index) := Fortran_Integer (S_Nbd (index));
       end loop;
 
-      for index in Dsave'Range loop
-         Dsave (index) := Double_Precision (S_Dsave (index));
-      end loop;
+--        for index in Dsave'Range loop
+--           Dsave (index) := Double_Precision (S_Dsave (index));
+--        end loop;
 --        Put_Line (Routine_Name & "X in:");
 --        for index in X'First .. X'First + 3 loop
 --           Put (Integer'Image (index) & ":" &
@@ -185,14 +186,14 @@ package body Lbfgsb_F_Interface is
       S_Iwa := To_Ada (Iwa);
       S_Task_Name := Trim (To_Unbounded_String (To_Ada (Task_Name)),
                            Ada.Strings.Right);
-      S_Csave := To_Ada (Csave);
+--        S_Csave := To_Ada (Csave);
       S_Lsave := LSave_Array (To_Ada (Lsave));
       S_Isave := To_Ada (Isave);
       Put_Line (Routine_Name & "Isave (1)" & Fortran_Integer'Image (Isave (1)));
       Put_Line (Routine_Name & "Isave (31)" & Fortran_Integer'Image (Isave (31)));
-      for index in Dsave'Range loop
-         S_Dsave (index) := Float (Dsave (index));
-      end loop;
+--        for index in Dsave'Range loop
+--           S_Dsave (index) := Float (Dsave (index));
+--        end loop;
 
    end Set_Ulb;
 
