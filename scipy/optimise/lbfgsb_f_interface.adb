@@ -87,7 +87,6 @@ package body Lbfgsb_F_Interface is
                       S_Factr, S_Pgtol : in out Float;
                       S_Wa             : in out Real_Float_Vector;
                       S_Iwa            : in out Integer_Array;
---                        S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
@@ -122,19 +121,25 @@ package body Lbfgsb_F_Interface is
 --        for index in Dsave'Range loop
 --           Dsave (index) := Double_Precision (S_Dsave (index));
 --        end loop;
---        Put_Line (Routine_Name & "X in:");
---        for index in X'First .. X'First + 3 loop
---           Put (Integer'Image (index) & ":" &
---                  Double_Precision'Image (X (index)) & "  ");
---        end loop;
---        New_Line;
-
       Put_Line (Routine_Name & "X in:");
       for index in X'First .. X'First + 3 loop
          Put (Integer'Image (index) & ":" &
                 Double_Precision'Image (X (index)) & "  ");
       end loop;
-      New_Line;
+--        New_Line;
+
+--        Put_Line (Routine_Name & "SL in:");
+--        for index in SL'First .. SL'First + 3 loop
+--           Put (Integer'Image (index) & ":" &
+--                  Float'Image (SL (index)) & "  ");
+--        end loop;
+--        New_Line;
+--        Put_Line (Routine_Name & "SU in:");
+--        for index in SU'First .. SU'First + 3 loop
+--           Put (Integer'Image (index) & ":" &
+--                  Float'Image (SU (index)) & "  ");
+--        end loop;
+--        New_Line;
 
 --  subroutine setulb(n, m, x, l, u, nbd, f, g, factr, pgtol, wa, iwa,
 --                    task, iprint, csave, lsave, isave, dsave, maxls)

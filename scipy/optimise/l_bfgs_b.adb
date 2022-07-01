@@ -62,9 +62,9 @@ package body L_BFGS_B is
       Nbd             : constant Integer_Array (1 .. X_Length) :=
                           (others => 2);
       Low_Bound       : Real_Float_Vector (1 .. X_Length) :=
-                          (others => Float'Safe_Last);
-      Upper_Bound     : Real_Float_Vector (1 .. X_Length) :=
                           (others => Float'Safe_First);
+      Upper_Bound     : Real_Float_Vector (1 .. X_Length) :=
+                          (others => Float'Safe_Last);
       F_Float         : Float := 0.0;
       G               : Real_Float_Vector (1 .. X_Length) := (others => 0.0);
       PGtol           : Float := Gtol;
@@ -84,6 +84,7 @@ package body L_BFGS_B is
       Continue        : Boolean := True;
       Warn_Flag       : Natural;
    begin
+      New_Line;
       --  Put_Line (Routine_Name & "L266 X0_Length" & Integer'Image (X0_Length));
       --  L266
       if not Bounds.Is_Empty then
