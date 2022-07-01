@@ -112,7 +112,7 @@ package body L_BFGS_B is
       --  L349
       Num_Iterations := 0;
       while Continue loop
-         Set_Ulb (M, X, Low_Bound, Upper_Bound, nbd, F_Float, G,
+         Set_Ulb (X'Length, M, X, Low_Bound, Upper_Bound, nbd, F_Float, G,
                   Factor, Pgtol, Wa, I_Wa, C_Save, Task_Name, I_Print,
                   L_Save, I_Save, D_Save, Options.Max_Line_Steps);
          Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));

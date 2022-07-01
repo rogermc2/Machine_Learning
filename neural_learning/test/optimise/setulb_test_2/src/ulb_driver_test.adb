@@ -24,7 +24,7 @@ procedure ULB_Driver_Test is
    Max_Ls       : constant Integer := 20;
    Factor       : Float := 10.0 ** 7;
    Pg_Tol       : Float := 10.0 ** (-5);
-   I_Print      : constant Integer := 1;
+   I_Print      : constant Integer := -1;
    Nbd                : Integer_Array (1 .. N_Max) := (others => 0);
    Lower_Bound        : Real_Float_Vector (1 .. N_Max) := (others => 0.0);
    Upper_Bound        : Real_Float_Vector (1 .. N_Max) := (others => 1.0);
