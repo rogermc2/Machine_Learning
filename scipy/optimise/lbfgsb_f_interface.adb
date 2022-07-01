@@ -52,6 +52,7 @@ package body Lbfgsb_F_Interface is
    --  wa is a double precision working array of length
    --  (2mmax + 5)nmax + 12mmax^2 + 12mmax.
    --  iwa is an integer working array of length 3nmax.
+
    procedure setulb (n            : in Fortran_Integer;
                      m            : in Fortran_Integer;
                      x            : in out Fortran_DP_Array;
@@ -63,7 +64,7 @@ package body Lbfgsb_F_Interface is
                      wa           : in out Fortran_DP_Array;
                      iwa          : in out Fortran_Integer_Array;
                      TaskName     : in out Character_60;
-                     iprint       : in Fortran_Integer;
+                     iprint       : in Fortran_Integer := -1;
                      csave        : in out Character_60;
                      lsave        : in out Fortran_Integer_Array;
                      isave        : in out Fortran_Integer_Array;
@@ -85,7 +86,6 @@ package body Lbfgsb_F_Interface is
                       S_Iwa            : in out Integer_Array;
                       S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
-                      S_Iprint         : Integer := 1;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
                       S_Dsave          : in out DSave_Array;
@@ -142,7 +142,7 @@ package body Lbfgsb_F_Interface is
               wa       => Wa,
               iwa      => Iwa,
               TaskName => Task_Name,
-              iprint   => Fortran_Integer (S_Iprint),
+              iprint   => Fortran_Integer (-1),
               csave    => Csave,
               lsave    => Lsave,
               isave    => Isave,

@@ -80,7 +80,6 @@ procedure Test_Set_ULB is
    Max_Ls             : constant Integer := 20;
    Factor             : Float := 10.0 ** 7;
    Pg_Tol             : Float := 10.0 ** (-5);
-   I_Print            : constant Integer := -1;
    Nbd                : constant Integer_Array (1 .. N) :=
                           (others => 2);
    Low_Bound          : constant Real_Float_Vector (1 .. N) := (others => 0.0);
@@ -108,9 +107,8 @@ begin
    Task_Name := To_Unbounded_String ("START");
    for iter in 1 .. 7 loop
       Obj_Fun (X, F, G);
-      Set_Ulb (N, M, X, Low_Bound, Upper_Bound, Nbd, F, G, Factor,
-              Pg_Tol, WA, IWA, C_Save, Task_Name, I_Print, L_Save,
-              I_Save, D_Save, Max_Ls);
+      Set_Ulb (N, M, X, Low_Bound, Upper_Bound, Nbd, F, G, Factor, Pg_Tol,
+              WA, IWA, C_Save, Task_Name, L_Save, I_Save, D_Save, Max_Ls);
       Put_Line (Routine_Name & "Isave (1)" & Integer'Image (I_save (1)));
       Put_Line (Routine_Name & "Isave (31)" & Integer'Image (I_save (31)));
       for index in X'Range loop
