@@ -117,8 +117,10 @@ package body L_BFGS_B is
                   Options.Max_Line_Steps);
          Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));
          if Slice (Task_Name, 1, 2) =  "FG" then
+            Put_Line (Routine_Name & "FG Task_Name: " & To_String (Task_Name));
             --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, Args, F_Float, G);
+            Put_Line (Routine_Name & "L369 ");
             --  L369
          elsif Slice (Task_Name, 1, 5) =  "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
