@@ -43,14 +43,23 @@ procedure Test_Gradient is
 
    function Loss_Grad_Function (Self      : in out MLP_Classifier;
                                 Params    : Parameters_List;
-                                Y         : Boolean_Matrix;
-                                Gradients : out Parameters_List)
+                                X         : Real_Float_Matrix;
+                                Y         : Boolean_Matrix)
                                 return Float is
-      Args : Loss_Grad_Args (Y'Length, Y'Length (2));
+      Args : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
       Args.Self := Self;
       Args.Params := Params;
+      Args.X := X;
       Args.Y := Y;
+      Put_Line ("Loss_Grad_Function Args.X'Length" & Integer'Image (Args.X'Length));
+      Put_Line ("Args.Y'Length" & Integer'Image (Args.Y'Length));
+      Put_Line ("Args.Params Length" &
+                  Integer'Image (Integer (Args.Params.Length)));
+      Put_Line ("Args.Activations Length" &
+                  Integer'Image (Integer (Args.Activations.Length)));
+      Put_Line ("Args.Gradients Length" &
+                  Integer'Image (Integer (Args.Gradients.Length)));
       return Loss_Grad_LBFGS (Args);
 
    end Loss_Grad_Function;
@@ -125,7 +134,7 @@ begin
             Theta_P      : Parameters_List;
             Theta_M      : Parameters_List;
          begin
-            Loss := Loss_Grad_Function (aClassifier, Theta, Y_Bin, Params);
+            Loss := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin);
             --  L239 numerically compute the gradients
             Put_Line (Routine_Name & "L239");
             for index in 1 .. Theta_Length loop
@@ -157,11 +166,11 @@ begin
 
                   Put_Line (Routine_Name & "242");
                   --  L242
-                  Loss := Loss_Grad_Function (Self => aClassifier ,
-                                              Params => Theta_P, Y => Y_Bin,
-                                              Gradients => Theta_P);
-                  Loss := Loss_Grad_Function  (aClassifier, Theta_M, Y_Bin,
-                                               Theta_M);
+                  Loss := Loss_Grad_Function (Self => aClassifier,
+                                              Params => Theta_P, X => X,
+                                              Y => Y_Bin);
+                  Loss := Loss_Grad_Function  (aClassifier, Theta_M, X => X,
+                                               Y => Y_Bin);
                   Num_Grad.Append ((Theta_P.Element (1) - Theta_M.Element (1)) /
                                    (2.0 * Eps));
                end;

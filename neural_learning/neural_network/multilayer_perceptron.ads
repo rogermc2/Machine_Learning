@@ -105,11 +105,11 @@ package Multilayer_Perceptron is
            Parameters     : MLP_Classifier_Parameters;
        end record;
 
-    type Loss_Grad_Args (Num_Rows, Num_Cols : Positive) is record
+    type Loss_Grad_Args (Num_Rows, Num_X_Cols, Num_Y_Cols : Positive) is record
         Self        : Multilayer_Perceptron.MLP_Classifier;
         Params      : Parameters_List;
-        X           : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
-        Y           : Boolean_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+        X           : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_X_Cols);
+        Y           : Boolean_Matrix (1 .. Num_Rows, 1 .. Num_Y_Cols);
         Activations : Real_Matrix_List;
         Gradients   : Stochastic_Optimizers.Parameters_List;
     end record;
@@ -157,12 +157,6 @@ package Multilayer_Perceptron is
                    Incremental : Boolean := False);
     procedure Init_Optimizer (Self : in out MLP_Classifier);
     function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Float;
---      function Loss_Grad_LBFGS (Self        : in out MLP_Classifier;
---                                Params      : Parameters_List;
---                                X           : Real_Float_Matrix;
---                                Y           : Boolean_Matrix;
---                                Activations : in out Real_Matrix_List;
---                                Gradients   : out Parameters_List) return Float;
     procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                            Y    : Integer_Matrix);
     procedure Partial_Fit

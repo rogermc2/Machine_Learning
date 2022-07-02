@@ -83,15 +83,11 @@ package body Differentiable_Functions is
      (Self    : in out Scalar_Function;
       Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector) is
-      Routine_Name : constant String := "Differentiable_Functions.Fun_And_Grad";
+      Routine_Name : constant String := "Differentiable_Functions.Fun_And_Grad ";
    begin
-      Put_Line (Routine_Name);
       Update_Fun (Self, Args);
-      Put_Line (Routine_Name & "Fun updated");
       Update_Grad (Self, Args);
-      Put_Line (Routine_Name & "Grad updated");
       Fun_Val := Self.Fun_Float (Args);
-      Put_Line (Routine_Name & "Fun_Val set");
       Grad := Self.G;
       Put_Line (Routine_Name & "Grad set");
 
@@ -103,7 +99,7 @@ package body Differentiable_Functions is
    function Fun_Wrapped (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args;
                          X    : Real_Float_Vector) return Float is
-      Routine_Name : constant String := "Differentiable_Functions.Fun_Wrapped";
+--        Routine_Name : constant String := "Differentiable_Functions.Fun_Wrapped ";
       FX : Float;
    begin
       --          Self.N_Fev := Self.N_Fev + 1;
@@ -116,22 +112,21 @@ package body Differentiable_Functions is
       --              end loop;
       --          end loop;
 
-      Put_Line (Routine_Name);
-      Put_Line (Routine_Name & "Args.X'Length" & Integer'Image (Args.X'Length));
-      Put_Line (Routine_Name & "Args.Y'Length" & Integer'Image (Args.Y'Length));
-      Put_Line (Routine_Name & "Args.Params Length" &
-                  Integer'Image (Integer (Args.Params.Length)));
-      Put_Line (Routine_Name & "Args.Activations Length" &
-                  Integer'Image (Integer (Args.Activations.Length)));
-      Put_Line (Routine_Name & "Args.Gradients Length" &
-                  Integer'Image (Integer (Args.Gradients.Length)));
+--        Put_Line (Routine_Name);
+--        Put_Line (Routine_Name & "Args.X'Length" & Integer'Image (Args.X'Length));
+--        Put_Line (Routine_Name & "Args.Y'Length" & Integer'Image (Args.Y'Length));
+--        Put_Line (Routine_Name & "Args.Params Length" &
+--                    Integer'Image (Integer (Args.Params.Length)));
+--        Put_Line (Routine_Name & "Args.Activations Length" &
+--                    Integer'Image (Integer (Args.Activations.Length)));
+--        Put_Line (Routine_Name & "Args.Gradients Length" &
+--                    Integer'Image (Integer (Args.Gradients.Length)));
       FX := Self.Fun_Float (Args);
-      Put_Line (Routine_Name & "FX set");
+--        Put_Line (Routine_Name & "FX set");
       if FX < Self.Lowest_F then
          Self.Lowest_X := X;
          Self.Lowest_F := FX;
       end if;
-      Put_Line (Routine_Name & "done");
 
       return FX;
 
@@ -143,7 +138,13 @@ package body Differentiable_Functions is
                   Args : Multilayer_Perceptron.Loss_Grad_Args;
                   X    : Real_Float_Vector)
                   return Real_Float_Vector is
+      use Real_Float_Arrays;
+      Routine_Name : constant String := "Differentiable_Functions.Grad ";
+
    begin
+      if X /= Self.X0 then
+            Put_Line (Routine_Name & "X /= Self.X0");
+      end if;
       Update_Grad (Self, Args);
 
       return Self.G;
@@ -154,15 +155,11 @@ package body Differentiable_Functions is
 
    procedure Update_Fun (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args) is
-      Routine_Name : constant String := "Differentiable_Functions.Update_Fun";
+      --  Routine_Name : constant String := "Differentiable_Functions.Update_Fun ";
       FW           : Float;
-      X0           : Real_Float_Vector := Self.X0;
    begin
-      Put_Line (Routine_Name);
-      FW := Fun_Wrapped (Self, Args, X0);
-      Put_Line (Routine_Name & "FW set");
+      FW := Fun_Wrapped (Self, Args, Self.X0);
       Self.F := FW;
-      Put_Line (Routine_Name & "done");
    end Update_Fun;
 
    --  -------------------------------------------------------------------------
