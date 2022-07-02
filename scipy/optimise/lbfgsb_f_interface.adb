@@ -25,7 +25,6 @@ package body Lbfgsb_F_Interface is
    function To_DP_Array (RA : Real_Float_Vector) return Fortran_DP_Array;
    function To_Fortran (IA : Integer_Array) return Fortran_Integer_Array;
    function To_RF_Array (DPA : Fortran_DP_Array) return Real_Float_Vector;
-   --     function Zero_Array (Num_Rows : Positive) return Fortran_DP_Array;
 
    --  -------------------------------------------------------------------------
 
@@ -55,6 +54,28 @@ package body Lbfgsb_F_Interface is
    --  wa is a double precision working array of length
    --  (2mmax + 5)nmax + 12mmax^2 + 12mmax.
    --  iwa is an integer working array of length 3nmax.
+   --  isave is an integer working array of dimension 44.
+   --  On exit with 'task' = NEW_X, the following information is                                                       available:
+   --  isave(22) = the total number of intervals explored in the search of
+   --              Cauchy points;
+   --  isave(26) = the total number of skipped BFGS updates before the current
+   --              iteration;
+   --  isave(30) = the number of the current iteration;
+   --  isave(31) = the total number of BFGS updates prior to the current
+   --              iteration;
+   --  isave(33) = the number of intervals explored in the search for a Cauchy
+   --              point in the current iteration;
+   --  isave(34) = the total number of function and gradient evaluations;
+   --  isave(36) = the number of function value or gradient evaluations in the
+   --              current iteration;
+   --  if isave(37) = 0  then the subspace argmin is within the box;
+   --  if isave(37) = 1  then the subspace argmin is beyond the box;
+   --  isave(38) = the number of free variables in the current iteration;
+   --  isave(39) = the number of active constraints in the current iteration;
+   --  n + 1 - isave(40) = the number of variables leaving the set of
+   --                       active constraints in the current iteration;
+   --  isave(41) = the number of variables entering the set of active
+   --              constraints in the current iteration.
 
    procedure setulb (n            : in Fortran_Integer;
                      m            : in Fortran_Integer;
@@ -70,7 +91,7 @@ package body Lbfgsb_F_Interface is
                      iprint       : in Fortran_Integer := -1;
                      csave        : in out Character_60;
                      lsave        : in out Fortran_Integer_Array;
-                     isave        : in out Fortran_Integer_Array;
+                  isave        : in out Fortran_Integer_Array;
                      dsave        : in out Fortran_DSave_Array;
                      maxls        : in Fortran_Integer);
    pragma Import (Fortran, setulb);
@@ -101,15 +122,11 @@ package body Lbfgsb_F_Interface is
       Iwa          : Fortran_Integer_Array := To_Fortran (S_Iwa);
       Task_String  : constant String := To_String (S_Task_Name);
       Task_Name    : Character_60 := (others => To_Fortran (' '));
---        Csave        : Character_60 := To_Fortran (S_Csave);
       Lsave        : Fortran_Integer_Array :=
                          To_Fortran (Integer_Array (S_Lsave));
-      Isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
+      isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
       NBD          : Fortran_Integer_Array := To_Fortran (S_Nbd);
    begin
---        Put_Line (Routine_Name & "N:" & Integer'Image (SN));
---        Put_Line (Routine_Name & "F in:" & Double_Precision'Image (F));
---        Put_Line (Routine_Name & "SL in:");
       for index in Task_String'Range loop
          Task_Name (index) := To_Fortran (Task_String (index));
       end loop;
@@ -118,26 +135,10 @@ package body Lbfgsb_F_Interface is
          NBD (index) := Fortran_Integer (S_Nbd (index));
       end loop;
 
---        for index in Dsave'Range loop
---           Dsave (index) := Double_Precision (S_Dsave (index));
---        end loop;
-      Put_Line (Routine_Name & "X in:");
-      for index in X'First .. X'First + 3 loop
-         Put (Integer'Image (index) & ":" &
-                Double_Precision'Image (X (index)) & "  ");
-      end loop;
-      New_Line;
-
---        Put_Line (Routine_Name & "SL in:");
---        for index in SL'First .. SL'First + 3 loop
+--        Put_Line (Routine_Name & "X in:");
+--        for index in X'First .. X'First + 3 loop
 --           Put (Integer'Image (index) & ":" &
---                  Float'Image (SL (index)) & "  ");
---        end loop;
---        New_Line;
---        Put_Line (Routine_Name & "SU in:");
---        for index in SU'First .. SU'First + 3 loop
---           Put (Integer'Image (index) & ":" &
---                  Float'Image (SU (index)) & "  ");
+--                  Double_Precision'Image (X (index)) & "  ");
 --        end loop;
 --        New_Line;
 
@@ -159,7 +160,7 @@ package body Lbfgsb_F_Interface is
               iprint   => Fortran_Integer (-1),
               csave    => Csave,
               lsave    => Lsave,
-              isave    => Isave,
+           isave    => Isave,
               dsave    => Dsave,
               maxls    => Fortran_Integer (S_Maxls));
 
@@ -169,19 +170,7 @@ package body Lbfgsb_F_Interface is
          Put (Double_Precision'Image (X (index)) & "  ");
       end loop;
       New_Line;
---        Put_Line (Routine_Name & "F out:" & Double_Precision'Image (F));
---        Put_Line (Routine_Name & "G length:" & Integer'Image (G'Length));
---        Put_Line (Routine_Name & "G:");
---        for index in G'Range loop
---           Put (Double_Precision'Image (G (index)) & "  ");
---        end loop;
---        New_Line;
 
---        Put_Line (Routine_Name & "Dsave:");
---        for index in Dsave'Range loop
---           Put (Double_Precision'Image (Dsave (index)) & "  ");
---        end loop;
---        New_Line;
       SX := To_RF_Array (X);
       SF := Float (F);
       SG := To_RF_Array (G);
@@ -191,14 +180,10 @@ package body Lbfgsb_F_Interface is
       S_Iwa := To_Ada (Iwa);
       S_Task_Name := Trim (To_Unbounded_String (To_Ada (Task_Name)),
                            Ada.Strings.Right);
---        S_Csave := To_Ada (Csave);
       S_Lsave := LSave_Array (To_Ada (Lsave));
       S_Isave := To_Ada (Isave);
       Put_Line (Routine_Name & "Isave (1)" & Fortran_Integer'Image (Isave (1)));
       Put_Line (Routine_Name & "Isave (31)" & Fortran_Integer'Image (Isave (31)));
---        for index in Dsave'Range loop
---           S_Dsave (index) := Float (Dsave (index));
---        end loop;
 
    end Set_Ulb;
 
@@ -253,18 +238,6 @@ package body Lbfgsb_F_Interface is
       return Result;
 
    end To_RF_Array;
-
-   --  -------------------------------------------------------------------------
-
-   --     function Zero_Array (Num_Rows : Positive) return Fortran_DP_Array is
-   --        Result : Fortran_DP_Array (1 .. Num_Rows);
-   --     begin
-   --        for index in Result'Range loop
-   --           Result (index) := Double_Precision (0.0);
-   --        end loop;
-   --
-   --        return Result;
-   --     end Zero_Array;
 
    --  -------------------------------------------------------------------------
 

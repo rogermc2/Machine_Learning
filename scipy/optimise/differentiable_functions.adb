@@ -83,13 +83,12 @@ package body Differentiable_Functions is
      (Self    : in out Scalar_Function;
       Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector) is
-      Routine_Name : constant String := "Differentiable_Functions.Fun_And_Grad ";
+      --  Routine_Name : constant String := "Differentiable_Functions.Fun_And_Grad ";
    begin
       Update_Fun (Self, Args);
       Update_Grad (Self, Args);
       Fun_Val := Self.Fun_Float (Args);
       Grad := Self.G;
-      Put_Line (Routine_Name & "Grad set");
 
    end Fun_And_Grad;
 
@@ -167,14 +166,12 @@ package body Differentiable_Functions is
    procedure Update_Grad (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args) is
       --        F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
-      Routine_Name : String := "Differentiable_Functions.Update_Grad";
+      --  Routine_Name : String := "Differentiable_Functions.Update_Grad";
    begin
-      Put_Line (Routine_Name);
       if not Self.G_Updated then
          --           Self.Update_Grad_Impl;
          Self.G_Updated := True;
       end if;
-      Put_Line (Routine_Name & "done");
 
    end Update_Grad;
 

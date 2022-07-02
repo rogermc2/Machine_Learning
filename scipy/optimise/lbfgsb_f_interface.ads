@@ -19,7 +19,6 @@ package Lbfgsb_F_Interface is
                       S_Factr, S_Pgtol : in out Float;
                       S_Wa             : in out Real_Float_Vector;
                       S_Iwa            : in out Integer_Array;
---                        S_Csave          : in out S60;
                       S_Task_Name      : in out Unbounded_String;
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;

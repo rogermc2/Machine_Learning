@@ -75,8 +75,6 @@ package body L_BFGS_B is
       I_Wa            : Integer_Array (1 .. 3 * X_Length) := (others => 0);
       L_Save          : LSave_Array := (others => 0);
       I_Save          : Integer_Array (1 .. 44) := (others => 0);
-      --          D_Save          : DSave_Array := (others => 0.0);
-      --          C_Save          : S60 :=  (others => '0');
       Task_Name       : Unbounded_String := To_Unbounded_String ("START");
       --  L306
       Scalar_Func     : Differentiable_Functions.Scalar_Function :=
@@ -106,8 +104,6 @@ package body L_BFGS_B is
 
       --  L306
       Scalar_Func := Optimise.Prepare_Scalar_Function (Fun, X);
-      --          Put_Line (Routine_Name & "L323 Low_Bound Length" &
-      --                      Integer'Image (Low_Bound'Length));
 
       --  L349
       Num_Iterations := 0;
@@ -120,7 +116,6 @@ package body L_BFGS_B is
             Put_Line (Routine_Name & "FG Task_Name: " & To_String (Task_Name));
             --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, Args, F_Float, G);
-            Put_Line (Routine_Name & "L369 ");
             --  L369
          elsif Slice (Task_Name, 1, 5) =  "NEW_X" then
             Num_Iterations := Num_Iterations + 1;
@@ -137,13 +132,14 @@ package body L_BFGS_B is
             Continue := False;
          end if;
       end loop;  --  Task_Name starts with FG or New_X
+
       Put_Line (Routine_Name & "L378 Task_Name: " & To_String (Task_Name));
       for index in 1 .. 16 loop
          Put_Line ("I_Save" & Integer'Image (Index) & ":" &
                      Integer'Image (I_Save (Index)));
       end loop;
 
-      --  L378
+      --  L376
       if Task_Name = To_Unbounded_String ("CONV") then
          Warn_Flag := 0;
       elsif Scalar_Func.N_Fev > Max_Fun or Num_Iterations > Max_Iter then
@@ -152,10 +148,11 @@ package body L_BFGS_B is
          Warn_Flag := 2;
       end if;
 
-      Put_Line (Routine_Name & "L387 M" & Integer'Image (M));
-      Put_Line (Routine_Name & "L387 Bfgs_Iters" &
+      Put_Line (Routine_Name & "L385 Bfgs_Iters" &
                   Integer'Image (I_Save (31)));
-      Put_Line (Routine_Name & "L387 Max_Cor" & Integer'Image (Max_Cor));
+      Put_Line (Routine_Name & "L385 Max_Cor" & Integer'Image (Max_Cor));
+      --  isave(31) = the total number of BFGS updates prior the current
+      --  iteration;
       Assert (I_Save (31) > 0, Routine_Name & "I_Save (31): " &
                 Integer'Image (I_Save (31)) & " < 1");
       declare
@@ -168,7 +165,7 @@ package body L_BFGS_B is
          Hess_Inv   : Optimise.Lbfgs_Inv_Hess_Product
            (Positive (M), Num_Corrs);
       begin
-         --  L387
+         --  L385
          --  wa is a double precision working array of length
          --       (2mmax + 5)nmax + 12mmax^2 + 12mmax.
          for row in S'First .. S'Last loop
@@ -198,9 +195,7 @@ package body L_BFGS_B is
          Result.Status := Warn_Flag;
          Result.Success := Warn_Flag = 0;
          Result.X := X;
-         Put_Line (Routine_Name & "X set");
       end;
-      --        Put_Line (Routine_Name & "done");
 
    end Minimise_LBFGSB;
 
