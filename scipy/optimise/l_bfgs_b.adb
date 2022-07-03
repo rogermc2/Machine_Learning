@@ -113,11 +113,11 @@ package body L_BFGS_B is
                   Options.Max_Line_Steps);
          Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));
          if Slice (Task_Name, 1, 2) =  "FG" then
-            Put_Line (Routine_Name & "FG Task_Name: " & To_String (Task_Name));
             --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, Args, F_Float, G);
             --  L369
          elsif Slice (Task_Name, 1, 5) =  "NEW_X" then
+            --  the minimization routine has returned with a new iterate.
             Num_Iterations := Num_Iterations + 1;
             if Num_Iterations > Max_Iter then
                Task_Name := To_Unbounded_String
@@ -148,16 +148,15 @@ package body L_BFGS_B is
          Warn_Flag := 2;
       end if;
 
-      Put_Line (Routine_Name & "L385 Bfgs_Iters" &
-                  Integer'Image (I_Save (31)));
+      Put_Line (Routine_Name & "L385 current iteration number:" &
+                  Integer'Image (I_Save (30)));
+      Put_Line (Routine_Name & "L385 Bfgs_Iters" & Integer'Image (I_Save (31)));
       Put_Line (Routine_Name & "L385 Max_Cor" & Integer'Image (Max_Cor));
-      --  isave(31) = the total number of BFGS updates prior the current
+      --  isave(31) = the total number of BFGS updates prior to the current
       --  iteration;
-      Assert (I_Save (31) > 0, Routine_Name & "I_Save (31): " &
-                Integer'Image (I_Save (31)) & " < 1");
       declare
          MN         : constant Positive := Positive (M) * X0_Length - 1;
-         Bfgs_Iters : constant Natural := Natural (I_Save (31));
+         Bfgs_Iters : constant Positive := Positive (I_Save (31) + 1);
          Num_Corrs  : constant Natural :=
                         Integer'Min (Bfgs_Iters, Max_Cor);
          S          : Real_Float_Matrix (1 .. Positive (M), 1 .. X'Length);
