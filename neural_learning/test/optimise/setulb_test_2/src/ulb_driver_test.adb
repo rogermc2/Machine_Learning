@@ -4,7 +4,6 @@
 --  subject to bounds on the variables).
 --  The dimension n of this problem is variable.
 
---  with Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -41,7 +40,7 @@ procedure ULB_Driver_Test is
    T2           : Float;
    Continue     : Boolean := True;
 begin
-   Put (Routine_Name);
+   Put_Line (Routine_Name);
    for index in 1 .. N loop
       Nbd (index) := 2;
       Upper_Bound  (index) := 100.0;
@@ -74,11 +73,11 @@ begin
             G (index) := 8.0 * T2 - 16.0 * X (index) * T1;
          end loop;
          G (N) := 8.0 * T1;
-      elsif Slice (Task_Name, 1, 5) = "New_X" then
-        null;
       else
-         Continue := False;
+         Continue := Slice (Task_Name, 1, 5) = "NEW_X";
       end if;
    end loop;
+
+   Put_Line (Routine_Name & "finished");
 
 end ULB_Driver_Test;

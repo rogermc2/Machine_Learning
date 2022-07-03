@@ -97,29 +97,27 @@ procedure Test_Set_ULB is
    WA                 : Real_Float_Vector (1 .. WA_Length) := (others => 0.0);
    IWA                : Integer_Array (1 .. 3 * N);
    Task_Name          : Unbounded_String;
---     C_Save             : S60 := (others => '0');
    L_Save             : LSave_Array := (others => 0);
    I_Save             : Integer_Array (1 .. 44) := (others => 0);
---     D_Save             : DSave_Array := (others => 0.0);
    Pass               : Boolean := True;
 begin
-   Put (Routine_Name);
+   Put_Line (Routine_Name);
    Task_Name := To_Unbounded_String ("START");
    for iter in 1 .. 7 loop
       Obj_Fun (X, F, G);
       Set_Ulb (N, M, X, Low_Bound, Upper_Bound, Nbd, F, G, Factor, Pg_Tol,
-              WA, IWA, Task_Name, L_Save, I_Save, Max_Ls);
-      Put_Line (Routine_Name & "Isave (1)" & Integer'Image (I_save (1)));
-      Put_Line (Routine_Name & "Isave (31)" & Integer'Image (I_save (31)));
+               WA, IWA, Task_Name, L_Save, I_Save, Max_Ls);
+
       for index in X'Range loop
          if X (index) > Upper_Bound (index) or
            X (index) < Low_Bound (index) then
             Pass := False;
-            Put_Line ("X (" & Integer'Image (index) & ") outside bounds");
+            Put_Line ("X (" & Integer'Image (index) & ") is outside bounds");
          end if;
       end loop;
    end loop;
 
+   Put (Routine_Name);
    if Pass then
       Put_Line ("passed");
    else

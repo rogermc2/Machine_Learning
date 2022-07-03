@@ -134,10 +134,10 @@ package body L_BFGS_B is
         end loop;  --  Task_Name starts with FG or New_X
 
         Put_Line (Routine_Name & "L378 Task_Name: " & To_String (Task_Name));
-        for index in 1 .. 16 loop
-            Put_Line ("I_Save" & Integer'Image (Index) & ":" &
-                        Integer'Image (I_Save (Index)));
-        end loop;
+--          for index in 1 .. 16 loop
+--              Put_Line ("I_Save" & Integer'Image (Index) & ":" &
+--                          Integer'Image (I_Save (Index)));
+--          end loop;
 
         --  L376
         if Task_Name = To_Unbounded_String ("CONV") then
@@ -148,8 +148,8 @@ package body L_BFGS_B is
             Warn_Flag := 2;
         end if;
 
-        Put_Line (Routine_Name & "L385 current iteration number:" &
-                    Integer'Image (I_Save (30)));
+--          Put_Line (Routine_Name & "L385 current iteration number:" &
+--                      Integer'Image (I_Save (30)));
         Put_Line (Routine_Name & "L385 Max_Cor" & Integer'Image (Max_Cor));
         --  isave(31) = the total number of BFGS updates prior to the current
         --  iteration;

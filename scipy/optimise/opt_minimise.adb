@@ -120,7 +120,6 @@ package body Opt_Minimise is
                     end if;
                 end if;
             end if;
-            Put_Line (Routine_Name & "not Done test");
 
             if not Done then
                 --  L611

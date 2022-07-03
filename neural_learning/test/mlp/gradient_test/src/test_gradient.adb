@@ -42,7 +42,7 @@ procedure Test_Gradient is
     pragma Unreferenced (Loss);
 
     function Loss_Grad_Function
-      (Self        : in out MLP_Classifier; Params    : Parameters_List;
+      (Self        : in out MLP_Classifier; Params : Parameters_List;
        X           : Real_Float_Matrix; Y         : Boolean_Matrix;
        Activations : Real_Matrix_List;
        Gradients   :  Stochastic_Optimizers.Parameters_List)

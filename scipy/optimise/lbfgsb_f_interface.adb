@@ -124,7 +124,7 @@ package body Lbfgsb_F_Interface is
       Task_Name    : Character_60 := (others => To_Fortran (' '));
       Lsave        : Fortran_Integer_Array :=
                          To_Fortran (Integer_Array (S_Lsave));
-      isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
+      Isave        : Fortran_Integer_Array := To_Fortran (S_Isave);
       NBD          : Fortran_Integer_Array := To_Fortran (S_Nbd);
    begin
       for index in Task_String'Range loop
@@ -165,11 +165,11 @@ package body Lbfgsb_F_Interface is
               maxls    => Fortran_Integer (S_Maxls));
 
       Put_Line (Routine_Name & "Task_Name out:" & To_Ada (Task_Name));
-      Put_Line (Routine_Name & "X out:");
-      for index in X'First .. X'First + 3 loop
-         Put (Double_Precision'Image (X (index)) & "  ");
-      end loop;
-      New_Line;
+--        Put_Line (Routine_Name & "X out:");
+--        for index in X'First .. X'First + 3 loop
+--           Put (Double_Precision'Image (X (index)) & "  ");
+--        end loop;
+--        New_Line;
 
       SX := To_RF_Array (X);
       SF := Float (F);
@@ -182,7 +182,6 @@ package body Lbfgsb_F_Interface is
                            Ada.Strings.Right);
       S_Lsave := LSave_Array (To_Ada (Lsave));
       S_Isave := To_Ada (Isave);
-      Put_Line (Routine_Name & "Isave (1)" & Fortran_Integer'Image (Isave (1)));
       Put_Line (Routine_Name & "Isave (31)" & Fortran_Integer'Image (Isave (31)));
 
    end Set_Ulb;
