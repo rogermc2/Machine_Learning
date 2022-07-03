@@ -34,17 +34,17 @@ package Opt_Minimise is
 
     No_Options : constant Minimise_Options := (Null, 1, 0.0, 0);
 
-    procedure Minimise (Fun         : Multilayer_Perceptron.Loss_Grad_Access;
+    function Minimise (Fun         : Multilayer_Perceptron.Loss_Grad_Access;
                         Args        : Multilayer_Perceptron.Loss_Grad_Args;
                         X0          : Stochastic_Optimizers.Parameters_List;
-                        Result      : in out Optimise.Optimise_Result;
                         Method      : Method_Type := No_Method;
                         Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
                         Hess        : Num_Diff.FD_Methods := Num_Diff.FD_None;
                         Bounds      : Opt_Constraints.Bounds_List :=
                           Opt_Constraints.Array_Bounds_Package.Empty_Vector;
                         Constraints : Minimise_Constraints_List :=
-                          Minimise_Constraints_Package.Empty_List);
+                          Minimise_Constraints_Package.Empty_List)
+                       return Optimise.Optimise_Result;
     --                        Options     : Minimise_Options := No_Options)
 
 end Opt_Minimise;

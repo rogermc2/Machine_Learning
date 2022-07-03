@@ -5,9 +5,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Utils_Optimise is
 
    function Check_Optimize_Result (Result : Optimise.Optimise_Result;
-                                   Max_Iter : Natural := 0) return Positive is
+                                   Max_Iter : Natural := 0) return Natural is
       Routine_Name : constant String := "Utils_Optimise.Check_Optimize_Result ";
-      Iter : Positive;
+      Iter : Natural;
    begin
       if not Result.Success then
          Put_Line (Routine_Name & "WARNING: Solver failed to converge." &

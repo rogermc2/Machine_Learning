@@ -11,7 +11,7 @@ package Optimise is
 
     type Direction_Kind is (Random_Direction, All_Direction);
     type Opt_Fun_Access is access function (X : Real_Float_List) return Float;
-    type Lbfgs_Inv_Hess_Product (N_Coor, N : Positive) is record
+    type Lbfgs_Inv_Hess_Product (N_Coor, N : Natural) is record
         SK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
         YK : NL_Arrays_And_Matrices.Real_Float_Matrix (1 .. N_Coor, 1 .. N);
     end record;
@@ -39,7 +39,7 @@ package Optimise is
         Jac       : Real_Float_Vector (1 .. X_Length);
         --  Hess: Hessian of objective function
         Hess      : Real_Float_Vector (1 .. X_Length);
-        Hess_Inv  : Lbfgs_Inv_Hess_Product (N_Coor, N_Coor);
+        Hess_Inv  : Lbfgs_Inv_Hess_Product (N_Coor, N);
         --  N_It: Number of iterations performed by the optimizer.
         N_It      : Natural := 0;
         --  Number of evaluations of the objective functions and of its
