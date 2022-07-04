@@ -472,7 +472,7 @@ package body Multilayer_Perceptron is
       --                         (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
       --                          Self.Parameters.Tol, 20);
       Grads        : constant Parameters_List := Self.Attributes.Params;
-      --  Opt_Result The optimization result represented as a Optimise_Result
+      --  Opt_Result is the optimization result represented as a Optimise_Result
       --  record.
       --  Important attributes are: the solution array X, a Boolean flag
       --  Success indicating if the optimizer exited successfully
@@ -1003,7 +1003,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Float is
+   function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Loss_Grad_Result is
       Self        : MLP_Classifier := Args.Self;
       Gradients   : Parameters_List := Args.Params;
       Activations : Real_Matrix_List := Args.Activations;
@@ -1012,7 +1012,7 @@ package body Multilayer_Perceptron is
       Forward_Pass (Self, Activations);
       Backprop (Self, Args.X, Args.Y, Activations, Loss, Gradients);
 
-      return Loss;
+      return (Loss, Gradients);
 
    end Loss_Grad_LBFGS;
 
