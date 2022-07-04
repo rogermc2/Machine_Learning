@@ -1,6 +1,6 @@
 --  Based on scipy/optimise/_minimize.py
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with L_BFGS_B;
 with NL_Types;
@@ -49,7 +49,7 @@ package body Opt_Minimise is
     --                        Options     : Minimise_Options := No_Options)
         use Minimise_Constraints_Package;
         use Num_Diff;
-        Routine_Name : constant String := "Opt_Minimise.Minimise ";
+        --          Routine_Name : constant String := "Opt_Minimise.Minimise ";
         L_Method     : Method_Type := Method;
         L_Bounds     : Opt_Constraints.Bounds_List := Bounds;
         I_Fixed      : NL_Types.Boolean_List;
@@ -59,6 +59,7 @@ package body Opt_Minimise is
         Cons_Cursor  : Cursor := Constraints.First;
         Remove_Vars  : Boolean := False;
         Done         : Boolean := False;
+        Result       : Optimise.Optimise_Result  (Args.Num_Rows, 0, 0);
     begin
         --  L504
         if L_Method = No_Method then
@@ -93,13 +94,8 @@ package body Opt_Minimise is
 
                     Done := All_Fixed;
                     if All_Fixed then
-                        declare
-                            Result : Optimise.Optimise_Result :=
-                                       Optimize_Result_For_Equal_Bounds
-                                         (Fun, Args, Bounds);
-                        begin
-                            return Result;
-                        end;
+                        return Optimize_Result_For_Equal_Bounds
+                          (Fun, Args, Bounds);
                     else
                         while Has_Element (Cons_Cursor) loop
                             if Element (Cons_Cursor) /= Callable_Constraint then
@@ -126,12 +122,8 @@ package body Opt_Minimise is
                 case Method is
                 when L_BFGS_B_Method =>
                     --  L623
-                    declare
-                        Result : Optimise.Optimise_Result := L_BFGS_B.Minimise_LBFGSB
-                          (Fun => Fun, Args => Args, X0 => X0, Bounds => L_Bounds);
-                    begin
-                        return Result;
-                    end;
+                    return L_BFGS_B.Minimise_LBFGSB
+                      (Fun => Fun, Args => Args, X0 => X0, Bounds => L_Bounds);
                 when others => null;
                 end case;
             end if;
@@ -140,6 +132,8 @@ package body Opt_Minimise is
             --              null;
             --           end if;
         end if;  --  Check_Options
+
+        return Result;
 
     end Minimise;
 
