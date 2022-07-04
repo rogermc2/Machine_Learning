@@ -97,15 +97,17 @@ begin
             Init_Optimizer (aClassifier);
             --  L206
             Fit (aClassifier, X, Y2);
+
             Layer_Units.Append (aClassifier.Attributes.N_Outputs);
             Theta := aClassifier.Attributes.Params;
 
             Activations.Clear;
             Deltas.Clear;
             Params.Clear;
-            --  L217
+            --  L217  Initialize
+            New_Line;
+            Put_Line (Routine_Name & "L217");
             Activations.Append (X);
-
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
                 Activations.Append (Zero_Matrix (X'Length, layer + 1));
                 Deltas.Append (Zero_Matrix (X'Length, layer + 1));
@@ -124,7 +126,9 @@ begin
                     Params := aClassifier.Attributes.Params;
                 end;
             end loop;
-
+            --  L226
+            Put_Line (Routine_Name & "L226 end initialization loop");
+            New_Line;
             declare
                 Y_Bin        : constant Boolean_Matrix :=
                                  Label.Fit_Transform (LB, Y);
@@ -140,6 +144,7 @@ begin
                 Put_Line (Routine_Name & "L233");
                 Loss := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin,
                                             Activations, Params);
+
                 --  L239 numerically compute the gradients
                 Put_Line (Routine_Name & "L239");
                 for index in 1 .. Theta_Length loop
