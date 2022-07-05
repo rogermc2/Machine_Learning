@@ -115,8 +115,8 @@ package body Multilayer_Perceptron is
       use Parameters_Package;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      Routine_Name       : constant String :=
-                             "Multilayer_Perceptron.Backprop ";
+      --  Routine_Name       : constant String :=
+      --                         "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Y_Float            : constant Real_Float_Matrix :=
                              To_Real_Float_Matrix (Y);
@@ -184,7 +184,7 @@ package body Multilayer_Perceptron is
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       --        Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
       --                                     Activations.Last_Element);
-      Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
+      --  Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
 
@@ -515,7 +515,6 @@ package body Multilayer_Perceptron is
               Method => Opt_Minimise.L_BFGS_B_Method,
               Jac => Num_Diff.FD_True);
       begin
-         Put_Line (Routine_Name & "Set N_Iter");
          Self.Attributes.N_Iter :=
            Utils_Optimise.Check_Optimize_Result (Opt_Result, Self.Parameters.Max_Iter);
 

@@ -2,7 +2,7 @@
 
 with Interfaces.Fortran; use Interfaces.Fortran;
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 package body Lbfgsb_F_Interface is
 
@@ -112,7 +112,7 @@ package body Lbfgsb_F_Interface is
                       S_Lsave          : in out LSave_Array;
                       S_Isave          : in out Integer_Array;
                       S_Maxls          : Integer) is
-      Routine_Name : constant String := "Lbfgsb_F_Interface.Set_Ulb ";
+--        Routine_Name : constant String := "Lbfgsb_F_Interface.Set_Ulb ";
       X            : Fortran_DP_Array := To_DP_Array (SX);
       F            : Double_Precision := Double_Precision (SF);
       G            : Fortran_DP_Array := To_DP_Array (SG);
@@ -164,7 +164,7 @@ package body Lbfgsb_F_Interface is
               dsave    => Dsave,
               maxls    => Fortran_Integer (S_Maxls));
 
-      Put_Line (Routine_Name & "Task_Name out:" & To_Ada (Task_Name));
+      --  Put_Line (Routine_Name & "Task_Name out:" & To_Ada (Task_Name));
 --        Put_Line (Routine_Name & "X out:");
 --        for index in X'First .. X'First + 3 loop
 --           Put (Double_Precision'Image (X (index)) & "  ");
@@ -182,7 +182,7 @@ package body Lbfgsb_F_Interface is
                            Ada.Strings.Right);
       S_Lsave := LSave_Array (To_Ada (Lsave));
       S_Isave := To_Ada (Isave);
-      Put_Line (Routine_Name & "Isave (31)" & Fortran_Integer'Image (Isave (31)));
+      --  Put_Line (Routine_Name & "Isave (31)" & Fortran_Integer'Image (Isave (31)));
 
    end Set_Ulb;
 

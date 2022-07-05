@@ -106,11 +106,8 @@ begin
          Params.Clear;
          --  L217  Initialize
          New_Line;
-         Put_Line (Routine_Name & "L217");
          Activations.Append (X);
          for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-            Activations.Append (Zero_Matrix (X'Length, layer + 1));
-            Deltas.Append (Zero_Matrix (X'Length, layer + 1));
             Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
             Fan_In := Layer_Units (layer);
             Fan_Out := Layer_Units (layer + 1);
@@ -142,7 +139,7 @@ begin
             Theta_M      : Parameters_List;
             Loss_Grad    : Loss_Grad_Result;
          begin
-            --  L233
+            --  L233 analytically compute the gradients
             Put_Line (Routine_Name & "L233");
             Loss_Grad := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin,
                                              Activations, Params);
