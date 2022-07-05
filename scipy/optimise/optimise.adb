@@ -106,7 +106,7 @@ package body Optimise is
       SF := Prepare_Scalar_Function (Fun, X0);
       F := SF.Fun_Float;
       My_F_Prime := SF.Grad;
-      Old_Val := F (Args);
+      Old_Val := F (Args).Loss;
 
       return Min_BFGS;
 

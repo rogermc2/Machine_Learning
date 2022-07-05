@@ -87,7 +87,7 @@ package body Differentiable_Functions is
    begin
       Update_Fun (Self, Args);
       Update_Grad (Self, Args);
-      Fun_Val := Self.Fun_Float (Args);
+      Fun_Val := Self.Fun_Float (Args).Loss;
       Grad := Self.G;
 
    end Fun_And_Grad;
@@ -120,7 +120,7 @@ package body Differentiable_Functions is
 --                    Integer'Image (Integer (Args.Activations.Length)));
 --        Put_Line (Routine_Name & "Args.Gradients Length" &
 --                    Integer'Image (Integer (Args.Gradients.Length)));
-      FX := Self.Fun_Float (Args);
+      FX := Self.Fun_Float (Args).Loss;
 --        Put_Line (Routine_Name & "FX set");
       if FX < Self.Lowest_F then
          Self.Lowest_X := X;

@@ -32,7 +32,7 @@ package Optimise is
     type Optimise_Result
       (X_Length, N_Coor, N : Natural) is record
     --  Fun: values of objective function
-        Fun       : Float;
+        Fun       : Multilayer_Perceptron.Loss_Grad_Result;
         --  X: solution of the optimization.
         X         : Real_Float_Vector (1 .. X_Length);
         --  Jac: Jacobian of objective function

@@ -523,7 +523,7 @@ package body Multilayer_Perceptron is
          --           X_Vec : constant Real_Float_Vector := Result.X;
          --        begin
          --  L566
-         Self.Attributes.Loss := Opt_Result.Fun;
+         Self.Attributes.Loss := Opt_Result.Fun.Loss;
          --        end;
       end;
 

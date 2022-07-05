@@ -46,7 +46,7 @@ procedure Test_Gradient is
       X           : Real_Float_Matrix; Y         : Boolean_Matrix;
       Activations : Real_Matrix_List;
       Gradients   :  Stochastic_Optimizers.Parameters_List)
-       return Loss_Grad_Result is
+      return Loss_Grad_Result is
       Args : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
       Args.Self := Self;
@@ -157,12 +157,13 @@ begin
 
                declare
                   use Parameters_Package;
-                  Theta_Rec_P : Parameters_Record (Theta (index).Num_Rows,
-                                                   Theta (index).Num_Cols);
-                  Theta_Rec_M : Parameters_Record (Theta (index).Num_Rows,
-                                                   Theta (index).Num_Cols);
+                  Theta_Rec_P  : Parameters_Record (Theta (index).Num_Rows,
+                                                    Theta (index).Num_Cols);
+                  Theta_Rec_M  : Parameters_Record (Theta (index).Num_Rows,
+                                                    Theta (index).Num_Cols);
                   Loss_Grad_P  : Loss_Grad_Result;
                   Loss_Grad_M  : Loss_Grad_Result;
+                  Grad_Diff    : Parameters_List;
                begin
                   for t_index in Theta.First_Index .. Theta.Last_Index loop
                      Theta_Rec_P := Theta (t_index);
@@ -178,6 +179,13 @@ begin
                        Theta_Rec_M.Intercept_Grads - dTheata;
                   end loop;
 
+                  for index in Loss_Grad_P.Gradients.First_Index ..
+                    Loss_Grad_P.Gradients.Last_Index loop
+                     Grad_Diff.Append
+                       ((Loss_Grad_P.Gradients (index) -
+                          Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
+                  end loop;
+
                   Put_Line (Routine_Name & "242");
                   --  L242
                   Loss_Grad_P := Loss_Grad_Function
@@ -188,17 +196,16 @@ begin
                     (Self => aClassifier, Params => Theta_M, X => X,
                      Y => Y_Bin, Activations => Activations,
                      Gradients => Params);
-                  Loss_Grad_P.Loss := Loss_Grad_P.Loss - Loss_Grad_M.Loss;
-                  Loss_Grad_P.Gradients := Loss_Grad_P.Gradients - Loss_Grad_M.Gradients;
-                  Num_Grad (index) := Loss_Grad_P;
-                  Num_Grad.Append ((Theta_P.Element (1) - Theta_M.Element (1)) /
-                                   (2.0 * Eps));
+                  Num_Grad (index).Loss :=
+                    (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
+                  Num_Grad (index).Gradients := Grad_Diff;
                end;
             end loop;
 
             for index in Params.First_Index .. Params.Last_Index loop
                Printing.Print_Parameters ("Params", Params (index));
-               Printing.Print_Parameters ("Num_Grad", Num_Grad (index));
+               Printing.Print_Parameters ("Num_Grad",
+                                          Num_Grad (index).Gradients (1));
             end loop;
          end;
       end loop;
