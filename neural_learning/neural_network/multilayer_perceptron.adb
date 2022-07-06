@@ -76,7 +76,7 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Real_Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                                return Real_Float_Matrix;
+                               return Real_Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
@@ -214,7 +214,7 @@ package body Multilayer_Perceptron is
    --  is also set on clf.
    function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
                                           Classes : NL_Types.Integer_List)
-                                           return Boolean is
+                                          return Boolean is
       use NL_Types.Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
@@ -301,7 +301,7 @@ package body Multilayer_Perceptron is
                     Max_Fun             : Max_Function_Access := null;
                     RF_Fun              : Num_Diff.Deriv_Float_Fun_Access
                     := null)
-                     return MLP_Classifier is
+                    return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
       Classifier.Parameters.Hidden_Layer_Sizes  := Hidden_Layer_Sizes;
@@ -794,7 +794,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L144
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                                return Real_Float_Matrix is
+                               return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       use Real_Float_Arrays;
@@ -1019,20 +1019,11 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Pack (Params : Parameters_List) return Real_Float_Vector is
-      use Ada.Containers;
       use Coeffs_Package;
       type Coeff_Vector is array (Positive range <>) of Float;
       --        Routine_Name   : constant String := "Multilayer_Perceptron.Pack ";
-      Mat_Rows     : constant Positive :=
-                       Params.Element (1).Coeff_Gradients'Length;
-      Mat_Cols     : constant Positive :=
-                       Params.Element (1).Coeff_Gradients'Length (2);
-      Mat_Size     : constant Positive := Mat_Rows * Mat_Cols;
       Coeffs_Ints  : Coeffs_List;
-      Coeff_Mat    : Coeffs_Matrix (1 .. Mat_Rows, 1 .. Mat_Cols);
-      Coeff_Vec    : Coeff_Vector (1 .. Mat_Size);
-      Result       : Real_Float_Vector
-        (1 .. Integer (Params.Length) * Mat_Size);
+      Result_Size  : Natural := 0;
 
       function Flatten (Mat : Coeffs_Matrix) return Coeff_Vector is
          Result : Coeff_Vector (1 .. Mat'Length * Mat'Length (2));
@@ -1051,15 +1042,29 @@ package body Multilayer_Perceptron is
    begin
       for index in Params.First_Index .. Params.Last_Index loop
          Coeffs_Ints.Append (Params.Element (index).Coeff_Gradients +
-           Params.Element (index).Intercept_Grads);
+                               Params.Element (index).Intercept_Grads);
+         Result_Size := Result_Size + Coeffs_Ints.Last_Element'Length *
+           Coeffs_Ints.Last_Element'Length (2);
       end loop;
 
-      for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
-         Coeff_Mat := Coeffs_Ints (index);
-         Coeff_Vec := Flatten (Coeff_Mat);
-      end loop;
+      declare
+         Result       : Real_Float_Vector (1 .. Result_Size);
+         Result_Index : Natural := 0;
+      begin
+         for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
+            declare
+               Coeff_Mat : constant Coeffs_Matrix := Coeffs_Ints (index);
+               Coeff_Vec : constant Coeff_Vector := Flatten (Coeff_Mat);
+            begin
+               for index in Coeff_Vec'Range loop
+                  Result_Index := Result_Index + 1;
+                  Result (Result_Index) := Coeff_Vec (index);
+               end loop;
+            end;
+         end loop;
 
-      return Result;
+         return Result;
+      end;
 
    end Pack;
 
@@ -1092,7 +1097,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                      return Real_Float_Matrix is
+                     return Real_Float_Matrix is
       --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
