@@ -48,6 +48,22 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
+   function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                 return Coeffs_Matrix is
+      Sum : Coeffs_Matrix (L'Range, L'Range (2));
+   begin
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Sum (row, col) := L (row, col) + R (col);
+         end loop;
+      end loop;
+
+      return Sum;
+
+   end "+";
+
+   --  -------------------------------------------------------------------------
+
    function "-" (M : Parameters_Record) return Parameters_Record is
       Minus : Parameters_Record := M;
    begin

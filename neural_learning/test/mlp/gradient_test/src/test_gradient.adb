@@ -166,9 +166,9 @@ begin
                Put_Line (Routine_Name & "L241");
                declare
                   use Parameters_Package;
-                  Theta_Rec_P  : Parameters_Record (Theta (index).Num_Rows,
+                  Theta_P  : Parameters_Record (Theta (index).Num_Rows,
                                                     Theta (index).Num_Cols);
-                  Theta_Rec_M  : Parameters_Record (Theta (index).Num_Rows,
+                  Theta_M  : Parameters_Record (Theta (index).Num_Rows,
                                                     Theta (index).Num_Cols);
                   Loss_Grad_P  : Loss_Grad_Result;
                   Loss_Grad_M  : Loss_Grad_Result;

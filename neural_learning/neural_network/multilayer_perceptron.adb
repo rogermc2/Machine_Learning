@@ -81,6 +81,7 @@ package body Multilayer_Perceptron is
                          Layer_Units : NL_Types.Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
+   function Pack (Params : Parameters_List) return Real_Float_Vector;
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Boolean_Matrix;
@@ -1014,6 +1015,53 @@ package body Multilayer_Perceptron is
       return (Loss, Gradients);
 
    end Loss_Grad_LBFGS;
+
+   --  -------------------------------------------------------------------------
+
+   function Pack (Params : Parameters_List) return Real_Float_Vector is
+      use Ada.Containers;
+      use Coeffs_Package;
+      type Coeff_Vector is array (Positive range <>) of Float;
+      --        Routine_Name   : constant String := "Multilayer_Perceptron.Pack ";
+      Mat_Rows     : constant Positive :=
+                       Params.Element (1).Coeff_Gradients'Length;
+      Mat_Cols     : constant Positive :=
+                       Params.Element (1).Coeff_Gradients'Length (2);
+      Mat_Size     : constant Positive := Mat_Rows * Mat_Cols;
+      Coeffs_Ints  : Coeffs_List;
+      Coeff_Mat    : Coeffs_Matrix (1 .. Mat_Rows, 1 .. Mat_Cols);
+      Coeff_Vec    : Coeff_Vector (1 .. Mat_Size);
+      Result       : Real_Float_Vector
+        (1 .. Integer (Params.Length) * Mat_Size);
+
+      function Flatten (Mat : Coeffs_Matrix) return Coeff_Vector is
+         Result : Coeff_Vector (1 .. Mat'Length * Mat'Length (2));
+      begin
+         for row in Mat'Range loop
+            for col in Mat'Range (2) loop
+               Result ((row - 1) * Mat'Length (2) + col) :=
+                 Mat (row, col);
+            end loop;
+         end loop;
+
+         return Result;
+
+      end Flatten;
+
+   begin
+      for index in Params.First_Index .. Params.Last_Index loop
+         Coeffs_Ints.Append (Params.Element (index).Coeff_Gradients +
+           Params.Element (index).Intercept_Grads);
+      end loop;
+
+      for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
+         Coeff_Mat := Coeffs_Ints (index);
+         Coeff_Vec := Flatten (Coeff_Mat);
+      end loop;
+
+      return Result;
+
+   end Pack;
 
    --  -------------------------------------------------------------------------
 

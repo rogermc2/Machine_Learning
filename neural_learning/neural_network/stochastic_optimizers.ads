@@ -39,6 +39,12 @@ package Stochastic_Optimizers is
    subtype Parameters_List is Parameters_Package.Vector;
    subtype Moments_List is Parameters_Package.Vector;
    function "+" (L, R : Parameters_List) return Parameters_List;
+
+   type Coeffs_Matrix is array (Integer range <>, Integer range <>) of Float;
+   package Coeffs_Package is new
+     Ada.Containers.Indefinite_Vectors (Positive, Coeffs_Matrix);
+   subtype Coeffs_List is Coeffs_Package.Vector;
+   function "+" (L : Real_Float_Matrix; R : Real_Float_Vector) return Coeffs_Matrix;
    pragma Inline ("+");
 
    type Base_Optimizer is record
