@@ -37,7 +37,8 @@ procedure Test_Gradient is
    Fan_In             : Positive;
    Fan_Out            : Positive;
    Params             : Parameters_List;
-   Theta              : Parameters_List;
+   Theta_List         : Real_Matrix_List;
+   Theta              : Real_Vector_List;
    Loss               : Float;
    pragma Unreferenced (Loss);
 
@@ -98,8 +99,17 @@ begin
          --  L206
          Fit (aClassifier, X, Y2);
 
+         for index in aClassifier.Attributes.Params.First_Index ..
+            aClassifier.Attributes.Params.Last_Index loop
+                Theta_List.Append
+                  (aClassifier.Attributes.Params.Element (index).Coeff_Gradients +
+                  aClassifier.Attributes.Params.Element (index).Intercept_Grads);
+         end loop;
+         for index in Theta_List.First_Index ..Theta_List.Last_Index loop
+                Theta.Append (Flatten (Theta_List (index)));
+         end loop;
+
          Layer_Units.Append (aClassifier.Attributes.N_Outputs);
-         Theta := aClassifier.Attributes.Params;
 
          Activations.Clear;
          Deltas.Clear;
@@ -148,10 +158,12 @@ begin
 
             Put_Line (Routine_Name & "L239");
             for index in 1 .. Positive (Theta.Length) loop
+               --  L240
                for e_row in 1 .. Positive (Theta.Length) loop
                   dTheata (e_row) := Eye (e_row, index) * Eps;
                end loop;
 
+               Put_Line (Routine_Name & "L241");
                declare
                   use Parameters_Package;
                   Theta_Rec_P  : Parameters_Record (Theta (index).Num_Rows,
@@ -165,8 +177,10 @@ begin
                   for t_index in Theta.First_Index .. Theta.Last_Index loop
                      Theta_Rec_P := Theta (t_index);
                      Theta_Rec_M := Theta_Rec_P;
+                     Put_Line (Routine_Name & "Theta_rec initialized");
                      Theta_Rec_P.Coeff_Gradients :=
                        Theta_Rec_P.Coeff_Gradients + dTheata;
+                     Put_Line (Routine_Name & "Theta_Rec_P.Coeff_Gradients set");
                      Theta_Rec_P.Intercept_Grads :=
                        Theta_Rec_P.Intercept_Grads + dTheata;
                      Theta_P.Append (Theta_Rec_P);
@@ -175,6 +189,7 @@ begin
                      Theta_Rec_M.Intercept_Grads :=
                        Theta_Rec_M.Intercept_Grads - dTheata;
                   end loop;
+                  Put_Line (Routine_Name & "t_index loop done");
 
                   for index in Loss_Grad_P.Gradients.First_Index ..
                     Loss_Grad_P.Gradients.Last_Index loop
