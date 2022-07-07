@@ -479,6 +479,18 @@ package body Multilayer_Perceptron is
 
       Args         : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
+      Put_Line (Routine_Name &
+                  "Grads (1).Coeff_Gradients length" &
+                  Integer'Image (Grads (1).Coeff_Gradients'Length));
+      Put_Line (Routine_Name &
+                  "Grads.Intercept_Grads (1) length" &
+                  Integer'Image (Grads (1).Intercept_Grads'Length));
+      Put_Line (Routine_Name &
+                  "Grads (2).Coeff_Gradients length" &
+                  Integer'Image (Grads (2).Coeff_Gradients'Length));
+      Put_Line (Routine_Name &
+                  "Grads.Intercept_Grads (2) length" &
+                  Integer'Image (Grads (2).Intercept_Grads'Length));
       --        --  L524  Save sizes and indices of coefficients for faster unpacking
       --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
       --           N_Fan_In := Layer_Units.Element (index);
