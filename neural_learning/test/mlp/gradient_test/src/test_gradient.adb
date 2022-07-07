@@ -131,10 +131,7 @@ begin
                              Label.Fit_Transform (LB, Y);
             --  N = Theta_Length
             Theta_Length : constant Positive := Positive (Theta.Length);
-            Eye          : constant Real_Float_Matrix :=
-                             Unit_Matrix (Theta_Length);
             Num_Grad     : array (1 .. Theta_Length) of Loss_Grad_Result;
-            dTheata      : Real_Vector (1 .. Theta_Length);
             Loss_Grad    : Loss_Grad_Result;
          begin
             --  L233 analytically compute the gradients
@@ -146,61 +143,70 @@ begin
 
             Put_Line (Routine_Name & "L239");
             for index in Theta.First_Index .. Theta.Last_Index loop
-               --  L240
-               for e_row in Theta.First_Index .. Theta.Last_Index loop
-                  dTheata (e_row) := Eye (e_row, index) * Eps;
-               end loop;
-
-               Put_Line (Routine_Name & "L241");
                declare
-                  use Parameters_Package;
-                  Theta_P      : Parameters_Record (Theta (index).Num_Rows,
-                                                    Theta (index).Num_Cols);
-                  Theta_M      : Parameters_Record (Theta (index).Num_Rows,
-                                                    Theta (index).Num_Cols);
-                  Theta_P_List : Parameters_List;
-                  Theta_M_List : Parameters_List;
-                  Loss_Grad_P  : Loss_Grad_Result;
-                  Loss_Grad_M  : Loss_Grad_Result;
-                  Grad_Diff    : Parameters_List;
+                  dTheta_Length : constant Positive :=
+                                    Theta.Element (index).Num_Rows;
+                  Eye    : constant Real_Float_Matrix :=
+                             Unit_Matrix (dTheta_Length);
+                  dTheta : Real_Vector (1 .. dTheta_Length);
                begin
-                  for t_index in Theta.First_Index .. Theta.Last_Index loop
-                     Theta_P := Theta (t_index);
-                     Theta_M := Theta_P;
-                     Put_Line (Routine_Name & "Theta_rec initialized");
+                  --  L240
+                  for e_row in dTheta'Range loop
+                     dTheta (e_row) := Eye (e_row, index) * Eps;
+                  end loop;
+
+                  Put_Line (Routine_Name & "L241");
+                  declare
+                     use Parameters_Package;
+                     Theta_P      : Parameters_Record := Theta.Element (index);
+                     Theta_M      : Parameters_Record := Theta_P;
+                     Theta_P_List : Parameters_List;
+                     Theta_M_List : Parameters_List;
+                     Loss_Grad_P  : Loss_Grad_Result;
+                     Loss_Grad_M  : Loss_Grad_Result;
+                     Grad_Diff    : Parameters_List;
+                  begin
+                     Put_Line (Routine_Name &
+                                 "Theta_P.Coeff_Gradients length" &
+                                 Integer'Image (Theta_P.Coeff_Gradients'Length));
+                     Put_Line (Routine_Name & "dTheata length" &
+                                 Integer'Image (dTheta'Length));
+                     Put_Line (Routine_Name & "Theta length" &
+                                 Integer'Image (Integer (Theta.Length)));
                      Theta_P.Coeff_Gradients :=
-                       Theta_P.Coeff_Gradients + dTheata;
+                       Theta_P.Coeff_Gradients + dTheta;
                      Put_Line (Routine_Name & "Theta_P.Coeff_Gradients set");
                      Theta_P.Intercept_Grads :=
-                       Theta_P.Intercept_Grads + dTheata;
+                       Theta_P.Intercept_Grads + dTheta;
                      Theta_P_List.Append (Theta_P);
                      Theta_M.Coeff_Gradients :=
-                       Theta_M.Coeff_Gradients - dTheata;
+                       Theta_M.Coeff_Gradients - dTheta;
                      Theta_M.Intercept_Grads :=
-                       Theta_M.Intercept_Grads - dTheata;
+                       Theta_M.Intercept_Grads - dTheta;
                      Theta_M_List.Append (Theta_M);
-                  end loop;
-                  Put_Line (Routine_Name & "t_index loop done");
 
-                  Put_Line (Routine_Name & "242");
-                  --  L242
-                  Loss_Grad_P := Loss_Grad_Function
-                    (Self => aClassifier, Params => Theta_P_List, X => X,
-                     Y => Y_Bin, Activations => Activations,
-                     Gradients => Params);
-                  Loss_Grad_M := Loss_Grad_Function
-                    (Self => aClassifier, Params => Theta_M_List, X => X,
-                     Y => Y_Bin, Activations => Activations,
-                     Gradients => Params);
-                  for index in Loss_Grad_P.Gradients.First_Index ..
-                    Loss_Grad_P.Gradients.Last_Index loop
-                     Grad_Diff.Append
-                       ((Loss_Grad_P.Gradients (index) -
-                          Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
-                  end loop;
-                  Num_Grad (index).Loss :=
-                    (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
-                  Num_Grad (index).Gradients := Grad_Diff;
+                     Put_Line (Routine_Name & "t_index loop done");
+
+                     Put_Line (Routine_Name & "242");
+                     --  L242
+                     Loss_Grad_P := Loss_Grad_Function
+                       (Self => aClassifier, Params => Theta_P_List, X => X,
+                        Y => Y_Bin, Activations => Activations,
+                        Gradients => Params);
+                     Loss_Grad_M := Loss_Grad_Function
+                       (Self => aClassifier, Params => Theta_M_List, X => X,
+                        Y => Y_Bin, Activations => Activations,
+                        Gradients => Params);
+                     for index in Loss_Grad_P.Gradients.First_Index ..
+                       Loss_Grad_P.Gradients.Last_Index loop
+                        Grad_Diff.Append
+                          ((Loss_Grad_P.Gradients (index) -
+                             Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
+                     end loop;
+                     Num_Grad (index).Loss :=
+                       (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
+                     Num_Grad (index).Gradients := Grad_Diff;
+                  end;
                end;
             end loop;
 
