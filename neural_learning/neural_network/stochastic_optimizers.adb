@@ -85,55 +85,55 @@ package body Stochastic_Optimizers is
 
    --  ------------------------------------------------------------------------
 
-   function Pack (Params : Parameters_List) return Real_Float_Vector is
-      use Coeffs_Package;
-      type Coeff_Vector is array (Positive range <>) of Float;
-      --        Routine_Name   : constant String := "Multilayer_Perceptron.Pack ";
-      Coeffs_Ints  : Coeffs_List;
-      Result_Size  : Natural := 0;
-
-      function Flatten (Mat : Coeffs_Matrix) return Coeff_Vector is
-         Result : Coeff_Vector (1 .. Mat'Length * Mat'Length (2));
-      begin
-         for row in Mat'Range loop
-            for col in Mat'Range (2) loop
-               Result ((row - 1) * Mat'Length (2) + col) :=
-                 Mat (row, col);
-            end loop;
-         end loop;
-
-         return Result;
-
-      end Flatten;
-
-   begin
-      for index in Params.First_Index .. Params.Last_Index loop
-         Coeffs_Ints.Append (Params.Element (index).Coeff_Gradients +
-                               Params.Element (index).Intercept_Grads);
-         Result_Size := Result_Size + Coeffs_Ints.Last_Element'Length *
-           Coeffs_Ints.Last_Element'Length (2);
-      end loop;
-
-      declare
-         Result       : Real_Float_Vector (1 .. Result_Size);
-         Result_Index : Natural := 0;
-      begin
-         for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
-            declare
-               Coeff_Mat : constant Coeffs_Matrix := Coeffs_Ints (index);
-               Coeff_Vec : constant Coeff_Vector := Flatten (Coeff_Mat);
-            begin
-               for index in Coeff_Vec'Range loop
-                  Result_Index := Result_Index + 1;
-                  Result (Result_Index) := Coeff_Vec (index);
-               end loop;
-            end;
-         end loop;
-
-         return Result;
-      end;
-
-   end Pack;
+--     function Pack (Params : Parameters_List) return Real_Float_Vector is
+--        use Coeffs_Package;
+--        type Coeff_Vector is array (Positive range <>) of Float;
+--        --        Routine_Name   : constant String := "Multilayer_Perceptron.Pack ";
+--        Coeffs_Ints  : Coeffs_List;
+--        Result_Size  : Natural := 0;
+--
+--        function Flatten (Mat : Coeffs_Matrix) return Coeff_Vector is
+--           Result : Coeff_Vector (1 .. Mat'Length * Mat'Length (2));
+--        begin
+--           for row in Mat'Range loop
+--              for col in Mat'Range (2) loop
+--                 Result ((row - 1) * Mat'Length (2) + col) :=
+--                   Mat (row, col);
+--              end loop;
+--           end loop;
+--
+--           return Result;
+--
+--        end Flatten;
+--
+--     begin
+--        for index in Params.First_Index .. Params.Last_Index loop
+--           Coeffs_Ints.Append (Params.Element (index).Coeff_Gradients +
+--                                 Params.Element (index).Intercept_Grads);
+--           Result_Size := Result_Size + Coeffs_Ints.Last_Element'Length *
+--             Coeffs_Ints.Last_Element'Length (2);
+--        end loop;
+--
+--        declare
+--           Result       : Real_Float_Vector (1 .. Result_Size);
+--           Result_Index : Natural := 0;
+--        begin
+--           for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
+--              declare
+--                 Coeff_Mat : constant Coeffs_Matrix := Coeffs_Ints (index);
+--                 Coeff_Vec : constant Coeff_Vector := Flatten (Coeff_Mat);
+--              begin
+--                 for index in Coeff_Vec'Range loop
+--                    Result_Index := Result_Index + 1;
+--                    Result (Result_Index) := Coeff_Vec (index);
+--                 end loop;
+--              end;
+--           end loop;
+--
+--           return Result;
+--        end;
+--
+--     end Pack;
 
    --  -------------------------------------------------------------------------
 

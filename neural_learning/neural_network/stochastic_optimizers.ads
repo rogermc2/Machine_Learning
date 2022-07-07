@@ -113,7 +113,7 @@ package Stochastic_Optimizers is
 
    procedure C_Init (Self                  : out Base_Optimizer;
                      Initial_Learning_Rate : Float := 0.1);
-   function Pack (Params : Parameters_List) return Real_Float_Vector;
+--     function Pack (Params : Parameters_List) return Real_Float_Vector;
    function Square (Rec : Parameters_Record) return Parameters_Record;
    function Sqrt (Rec : Parameters_Record; Epsilon : Float := 0.0)
       return Parameters_Record;
