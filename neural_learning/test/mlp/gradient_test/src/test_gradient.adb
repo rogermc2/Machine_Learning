@@ -154,17 +154,26 @@ begin
 
                for index in Theta.First_Index .. Theta.Last_Index loop
                   declare
-                     dTheta_Length : constant Positive :=
-                                       Theta.Element (index).Num_Cols;
-                     Eye           : constant Real_Float_Matrix :=
-                                       Unit_Matrix (dTheta_Length);
-                     dTheta        : Real_Vector (1 .. dTheta_Length);
+                     Grad_Length      : constant Positive
+                       := Theta.Element (index).Coeff_Gradients'Length;
+                     Eye_Grad         : constant Real_Float_Matrix :=
+                                       Unit_Matrix (Grad_Length);
+                     dTheta_Grad      : Real_Vector (1 .. Grad_Length);
+                     Intercept_Length : constant Positive
+                       := Theta.Element (index).Intercept_Grads'Length;
+                     Eye_Intercept    : constant Real_Float_Matrix :=
+                                       Unit_Matrix (Intercept_Length);
+                     dTheta_Intercept : Real_Vector (1 .. Intercept_Length);
                   begin
                      --  L240
-                     for e_row in dTheta'Range loop
-                        dTheta (e_row) := Eye (e_row, index) * Eps;
+                     for e_row in dTheta_Grad'Range loop
+                        dTheta_Grad (e_row) := Eye_Grad (e_row, index) * Eps;
                      end loop;
 
+                     for e_row in dTheta_Intercept'Range loop
+                        dTheta_Intercept (e_row) :=
+                          Eye_Intercept (e_row, index) * Eps;
+                     end loop;
                      declare
                         use Parameters_Package;
                         Theta_P      : Parameters_Record :=
@@ -186,12 +195,20 @@ begin
 --                                      Integer'Image (dTheta'Length));
 --                          Put_Line (Routine_Name & "Theta length" &
 --                                      Integer'Image (Integer (Theta.Length)));
+                        Theta_P.Coeff_Gradients :=
+                          Theta_P.Coeff_Gradients + dTheta_Grad;
+                        Theta_P_List.Append (Theta_P);
+
+                        Theta_M.Coeff_Gradients :=
+                          Theta_M.Coeff_Gradients - dTheta_Grad;
+                        Theta_M_List.Append (Theta_M);
+
                         Theta_P.Intercept_Grads :=
-                          Theta_P.Intercept_Grads + dTheta;
+                          Theta_P.Intercept_Grads + dTheta_Intercept;
                         Theta_P_List.Append (Theta_P);
 
                         Theta_M.Intercept_Grads :=
-                          Theta_M.Intercept_Grads - dTheta;
+                          Theta_M.Intercept_Grads - dTheta_Intercept;
                         Theta_M_List.Append (Theta_M);
 
                         --  L242

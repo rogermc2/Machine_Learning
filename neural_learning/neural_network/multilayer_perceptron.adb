@@ -1020,6 +1020,9 @@ package body Multilayer_Perceptron is
       Activations : Real_Matrix_List := Args.Activations;
       Loss        : Float;
    begin
+      --  L236 _unpack
+      Self.Attributes.Params := Args.Params;
+      --  L237 _backprop
       Forward_Pass (Self, Activations);
       Backprop (Self, Args.X, Args.Y, Activations, Loss, Gradients);
 
