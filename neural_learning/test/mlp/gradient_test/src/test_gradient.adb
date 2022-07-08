@@ -105,25 +105,26 @@ begin
 
             --  L208
             Theta := aClassifier.Attributes.Params;
-            Put_Line (Routine_Name &
-                        "L208 Theta (1).Coeff_Gradients length" &
-                        Integer'Image (Theta (1).Coeff_Gradients'Length));
-            Put_Line (Routine_Name &
-                        "L208 Theta.Intercept_Grads (1) length" &
-                        Integer'Image (Theta (1).Intercept_Grads'Length));
-            Put_Line (Routine_Name &
-                        "L208 Theta (2).Coeff_Gradients length" &
-                        Integer'Image (Theta (2).Coeff_Gradients'Length));
-            Put_Line (Routine_Name &
-                        "L208 Theta.Intercept_Grads (2) length" &
-                        Integer'Image (Theta (2).Intercept_Grads'Length));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta (1).Coeff_Gradients length" &
+--                          Integer'Image (Theta (1).Coeff_Gradients'Length));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta.Intercept_Grads (1) length" &
+--                          Integer'Image (Theta (1).Intercept_Grads'Length));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta (2).Coeff_Gradients length" &
+--                          Integer'Image (Theta (2).Coeff_Gradients'Length));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta.Intercept_Grads (2) length" &
+--                          Integer'Image (Theta (2).Intercept_Grads'Length));
 
             --  L212  Initialize
             Activations.Clear;
             Deltas.Clear;
-            Params.Clear;                Activations.Append (X);
+            Params.Clear;
+            Activations.Append (X);
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-               Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+--                 Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 
@@ -137,10 +138,8 @@ begin
                   Params.Append (Param_Rec);
                end;
             end loop;
-            --  L226
-            Put_Line (Routine_Name & "L226 end initialization loop");
-            New_Line;
 
+            --  L226
             declare
                --  N = Theta_Length
                Theta_Length : constant Positive := Positive (Theta.Length);
@@ -148,17 +147,15 @@ begin
                Loss_Grad    : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
-               Put_Line (Routine_Name & "L233");
                Loss_Grad := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin,
                                                 Activations, Params);
 
                --  L239 numerically compute the gradients
 
-               Put_Line (Routine_Name & "L239");
                for index in Theta.First_Index .. Theta.Last_Index loop
                   declare
                      dTheta_Length : constant Positive :=
-                                       Theta.Element (index).Num_Rows;
+                                       Theta.Element (index).Num_Cols;
                      Eye           : constant Real_Float_Matrix :=
                                        Unit_Matrix (dTheta_Length);
                      dTheta        : Real_Vector (1 .. dTheta_Length);
@@ -168,7 +165,6 @@ begin
                         dTheta (e_row) := Eye (e_row, index) * Eps;
                      end loop;
 
-                     Put_Line (Routine_Name & "L241");
                      declare
                         use Parameters_Package;
                         Theta_P      : Parameters_Record :=
@@ -180,34 +176,24 @@ begin
                         Loss_Grad_M  : Loss_Grad_Result;
                         Grad_Diff    : Parameters_List;
                      begin
-                        Put_Line (Routine_Name &
-                                    "Theta_P.Coeff_Gradients length" &
-                                    Integer'Image (Theta_P.Coeff_Gradients'Length));
-                        Put_Line (Routine_Name &
-                                    "Theta_P.Intercept_Grads length" &
-                                    Integer'Image (Theta_P.Intercept_Grads'Length));
-                        Put_Line (Routine_Name & "dTheata length" &
-                                    Integer'Image (dTheta'Length));
-                        Put_Line (Routine_Name & "Theta length" &
-                                    Integer'Image (Integer (Theta.Length)));
-                        Theta_P.Coeff_Gradients :=
-                          Theta_P.Coeff_Gradients + dTheta;
-                        Put_Line (Routine_Name & "Theta_P.Coeff_Gradients set");
+--                          Put_Line (Routine_Name &
+--                                      "Theta_P.Coeff_Gradients length" &
+--                                      Integer'Image (Theta_P.Coeff_Gradients'Length));
+--                          Put_Line (Routine_Name &
+--                                      "Theta_P.Intercept_Grads length" &
+--                                      Integer'Image (Theta_P.Intercept_Grads'Length));
+--                          Put_Line (Routine_Name & "dTheata length" &
+--                                      Integer'Image (dTheta'Length));
+--                          Put_Line (Routine_Name & "Theta length" &
+--                                      Integer'Image (Integer (Theta.Length)));
                         Theta_P.Intercept_Grads :=
                           Theta_P.Intercept_Grads + dTheta;
-                        Put_Line (Routine_Name & "Theta_P.Intercept_Grads set");
                         Theta_P_List.Append (Theta_P);
-                        Put_Line (Routine_Name & "Theta_P added to Theta_P_List");
 
-                        Theta_M.Coeff_Gradients :=
-                          Theta_M.Coeff_Gradients - dTheta;
                         Theta_M.Intercept_Grads :=
                           Theta_M.Intercept_Grads - dTheta;
                         Theta_M_List.Append (Theta_M);
 
-                        Put_Line (Routine_Name & "t_index loop done");
-
-                        Put_Line (Routine_Name & "242");
                         --  L242
                         Loss_Grad_P := Loss_Grad_Function
                           (Self => aClassifier, Theta => Theta_P_List, X => X,

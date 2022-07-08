@@ -481,8 +481,10 @@ package body Printing is
    procedure Print_Parameters
      (Name : String; Params : Stochastic_Optimizers.Parameters_Record;
      Rows_Start : Positive := 1; Rows_Last : Positive := 10) is
-     Start : Positive := Rows_Start;
-     Last  : Positive := Rows_Last;
+     Start      : Positive := Rows_Start;
+     Last       : Positive := Rows_Last;
+     Cols_Start : Positive := Rows_Start;
+     Cols_Last  : Positive := Rows_Last;
    begin
       if Rows_Last > Params.Num_Rows then
           Last := Params.Num_Rows;
@@ -490,6 +492,14 @@ package body Printing is
 
       if Rows_Start > Rows_Last then
           Start := Rows_Last;
+      end if;
+
+      if Cols_Last > Params.Num_Cols then
+          Cols_Last := Params.Num_Cols;
+      end if;
+
+      if Cols_Start > Cols_Last then
+          Cols_Start := Cols_Last;
       end if;
 
       Put_Line (Name & ": ");
@@ -505,9 +515,10 @@ package body Printing is
       end loop;
 
       Put_Line ("Intercepts:");
-      for col in Start .. Last loop
+      for col in Cols_Start .. Cols_Last loop
          Put (Float'Image (Params.Intercept_Grads (col)) & " ");
       end loop;
+      New_Line;
       New_Line;
 
    end Print_Parameters;
