@@ -31,13 +31,15 @@ package body Loss_Functions is
 
    end Loss_Grad_Function;
 
+   --  -------------------------------------------------------------------------
+
    function Numerical_Loss_Grad
      (aClassifier : in out MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y_Bin : Boolean_Matrix;
       Activations : Real_Matrix_List; Params : Parameters_List)
-      return Loss_Grad_Array is
+      return Real_Float_Vector is
       Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
-      Num_Grad     : Loss_Grad_Array (1 .. Positive (Theta.Length));
+      Num_Grad     : Real_Float_Vector (1 .. Positive (Theta.Length));
    begin
       Put_Line (Routine_Name & "Activations length" &
                   Integer'Image (Integer (Activations.Length)));
@@ -79,7 +81,6 @@ package body Loss_Functions is
                Theta_M_List : Parameters_List;
                Loss_Grad_P  : Loss_Grad_Result;
                Loss_Grad_M  : Loss_Grad_Result;
-               Grad_Diff    : Parameters_List;
             begin
                Theta_P.Coeff_Gradients :=
                  Theta_P.Coeff_Gradients + dTheta_Grad;
@@ -113,19 +114,8 @@ package body Loss_Functions is
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
                   Y => Y_Bin, Activations => Activations,
                   Gradients => Params);
-               Num_Grad (index) := (Loss_Grad_P - Loss_Grad_M) / (2.0 * Eps);
+               Num_Grad (index) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
                Put_Line (Routine_Name & "Num_Grad (index) set");
---                 for index in Loss_Grad_P.Gradients.First_Index ..
---                   Loss_Grad_P.Gradients.Last_Index loop
---                    Grad_Diff.Append
---                      ((Loss_Grad_P.Gradients (index) -
---                         Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
---                 end loop;
-               Put_Line (Routine_Name & "Loss_Grad_P.Gradients set");
-
-               Num_Grad (index).Loss :=
-                 (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
-               Num_Grad (index).Gradients := Grad_Diff;
             end;
             Put_Line (Routine_Name & "inner declare done");
          end;

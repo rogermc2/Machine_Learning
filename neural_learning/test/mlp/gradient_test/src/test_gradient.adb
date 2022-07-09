@@ -116,7 +116,7 @@ begin
             declare
                --  N = Theta_Length
                Theta_Length : constant Positive := Positive (Theta.Length);
-               Num_Grad     : Loss_Grad_Array (1 .. Theta_Length);
+               Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
@@ -131,8 +131,7 @@ begin
                Put_Line (Routine_Name & "Num_Grad set");
                for index in Params.First_Index .. Params.Last_Index loop
                   Printing.Print_Parameters ("Params", Params (index));
-                  Printing.Print_Parameters ("Num_Grad",
-                                             Num_Grad (index).Gradients (1));
+                  Printing.Print_Float_Array ("Num_Grad", Num_Grad);
                end loop;
             end;
          end loop;

@@ -20,6 +20,6 @@ package Loss_Functions is
      (aClassifier : in out MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y_Bin : Boolean_Matrix;
       Activations : Real_Matrix_List; Params : Parameters_List)
-      return Loss_Grad_Array;
+      return Real_Float_Vector;
 
 end Loss_Functions;
