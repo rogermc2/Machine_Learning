@@ -8,8 +8,7 @@ package body Loss_Functions is
    function Loss_Grad_Function
      (Self        : in out MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y         : Boolean_Matrix;
-      Activations : Real_Matrix_List;
-      Gradients   :  Stochastic_Optimizers.Parameters_List)
+      Activations : Real_Matrix_List; Gradients   :  Parameters_List)
       return Loss_Grad_Result is
       Args : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
@@ -34,7 +33,9 @@ package body Loss_Functions is
 
    function Numerical_Loss_Grad
      (aClassifier : in out MLP_Classifier; Theta : Parameters_List;
-      Y_Bin       : Boolean_Matrix) return Loss_Grad_Array is
+      X           : Real_Float_Matrix; Y_Bin : Boolean_Matrix;
+      Activations : Real_Matrix_List; Params : Parameters_List)
+      return Loss_Grad_Array is
       Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
       Num_Grad     : Loss_Grad_Array (1 .. Positive (Theta.Length));
    begin
