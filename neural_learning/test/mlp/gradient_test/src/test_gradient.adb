@@ -98,7 +98,7 @@ begin
             Params.Clear;
             Activations.Append (X);
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-               --                 Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+               Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 
@@ -106,7 +106,6 @@ begin
                declare
                   Param_Rec : Parameters_Record (Fan_In, Fan_Out);
                begin
-                  Params.Clear;
                   Param_Rec.Coeff_Gradients := Zero_Matrix (Fan_In, Fan_Out);
                   Param_Rec.Intercept_Grads := Zero_Array (Fan_Out);
                   Params.Append (Param_Rec);
@@ -123,12 +122,11 @@ begin
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin,
                                                 Activations, Params);
-
                New_Line;
                Put_Line (Routine_Name & "L239");
                --  L239 numerically compute the gradients
-               Num_Grad := Numerical_Loss_Grad (aClassifier, Theta, X, Y_Bin,
-                                               Activations, Params);
+               Num_Grad := Numerical_Loss_Grad
+                 (aClassifier, Theta, X, Y_Bin, Activations, Params);
 
                Put_Line (Routine_Name & "Num_Grad set");
                for index in Params.First_Index .. Params.Last_Index loop

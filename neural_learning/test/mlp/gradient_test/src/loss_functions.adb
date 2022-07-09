@@ -39,8 +39,12 @@ package body Loss_Functions is
       Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
       Num_Grad     : Loss_Grad_Array (1 .. Positive (Theta.Length));
    begin
+      Put_Line (Routine_Name & "Activations length" &
+                  Integer'Image (Integer (Activations.Length)));
+      Put_Line (Routine_Name & "Params length" &
+                  Integer'Image (Integer (Params.Length)));
       for index in Theta.First_Index .. Theta.Last_Index loop
-         Put_Line (Routine_Name);
+         Put_Line (Routine_Name & "index" & Integer'Image (index));
          declare
             Coeffs           : constant Real_Float_Matrix :=
                                  Theta.Element (index).Coeff_Gradients;
