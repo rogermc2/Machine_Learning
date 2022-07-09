@@ -13,6 +13,8 @@ with NL_Types;
 with Printing;
 with Stochastic_Optimizers;
 
+with Loss_Functions; use Loss_Functions;
+
 --  Test_Gradient makes sure that the activation functions and their
 --  derivatives are correct
 procedure Test_Gradient is
@@ -20,10 +22,7 @@ procedure Test_Gradient is
    use Multilayer_Perceptron;
    use Stochastic_Optimizers;
 
-   type Loss_Grad_Array is array (Integer range <>) of Loss_Grad_Result;
-
    Routine_Name       : constant String := "Test_Gradient ";
-   Eps                : constant Float := 10.0 ** (-5);
    Num_Samples        : constant Positive := 5;
    Num_Features       : constant Positive := 10;
    Hidden_Layer_Sizes : constant Positive := 10;
@@ -48,7 +47,7 @@ procedure Test_Gradient is
       X           : Real_Float_Matrix; Y         : Boolean_Matrix;
       Activations : Real_Matrix_List;
       Gradients   :  Stochastic_Optimizers.Parameters_List)
-       return Loss_Grad_Result is
+      return Loss_Grad_Result is
       Args : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
       Args.Self := Self;
@@ -73,9 +72,11 @@ procedure Test_Gradient is
    function Numerical_Loss_Grad
      (Theta : Parameters_List;Y_Bin : Boolean_Matrix)
       return Loss_Grad_Array is
-      Num_Grad : Loss_Grad_Array (1 .. Positive (Theta.Length));
+      Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
+      Num_Grad     : Loss_Grad_Array (1 .. Positive (Theta.Length));
    begin
       for index in Theta.First_Index .. Theta.Last_Index loop
+         Put_Line (Routine_Name);
          declare
             Coeffs           : constant Real_Float_Matrix :=
                                  Theta.Element (index).Coeff_Gradients;
@@ -114,16 +115,6 @@ procedure Test_Gradient is
                Loss_Grad_M  : Loss_Grad_Result;
                Grad_Diff    : Parameters_List;
             begin
-               --                          Put_Line (Routine_Name &
-               --                                      "Theta_P.Coeff_Gradients length" &
-               --                                      Integer'Image (Theta_P.Coeff_Gradients'Length));
-               --                          Put_Line (Routine_Name &
-               --                                      "Theta_P.Intercept_Grads length" &
-               --                                      Integer'Image (Theta_P.Intercept_Grads'Length));
-               --                          Put_Line (Routine_Name & "dTheata length" &
-               --                                      Integer'Image (dTheta'Length));
-               --                          Put_Line (Routine_Name & "Theta length" &
-               --                                      Integer'Image (Integer (Theta.Length)));
                Theta_P.Coeff_Gradients :=
                  Theta_P.Coeff_Gradients + dTheta_Grad;
                Theta_P_List.Append (Theta_P);
@@ -140,6 +131,13 @@ procedure Test_Gradient is
                  Theta_M.Intercept_Grads - dTheta_Intercept;
                Theta_M_List.Append (Theta_M);
 
+               Put_Line (Routine_Name &
+                           "Theta_P.Coeff_Gradients length" &
+                           Integer'Image (Theta_P.Coeff_Gradients'Length));
+               Put_Line (Routine_Name &
+                           "Theta_P.Intercept_Grads length" &
+                           Integer'Image (Theta_P.Intercept_Grads'Length));
+               Put_Line (Routine_Name & "L242");
                --  L242
                Loss_Grad_P := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_P_List, X => X,
@@ -149,16 +147,20 @@ procedure Test_Gradient is
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
                   Y => Y_Bin, Activations => Activations,
                   Gradients => Params);
+               Put_Line (Routine_Name & "Loss_Grad_M set");
                for index in Loss_Grad_P.Gradients.First_Index ..
                  Loss_Grad_P.Gradients.Last_Index loop
                   Grad_Diff.Append
                     ((Loss_Grad_P.Gradients (index) -
                        Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
                end loop;
+               Put_Line (Routine_Name & "Loss_Grad_P.Gradients set");
+
                Num_Grad (index).Loss :=
                  (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
                Num_Grad (index).Gradients := Grad_Diff;
             end;
+            Put_Line (Routine_Name & "inner declare done");
          end;
       end loop;
 
@@ -248,9 +250,12 @@ begin
                Loss_Grad := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin,
                                                 Activations, Params);
 
+               New_Line;
+               Put_Line (Routine_Name & "L239");
                --  L239 numerically compute the gradients
                Num_Grad := Numerical_Loss_Grad (Theta, Y_Bin);
 
+               Put_Line (Routine_Name & "Num_Grad set");
                for index in Params.First_Index .. Params.Last_Index loop
                   Printing.Print_Parameters ("Params", Params (index));
                   Printing.Print_Parameters ("Num_Grad",
