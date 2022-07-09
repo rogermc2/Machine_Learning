@@ -120,8 +120,8 @@ begin
                Loss_Grad    : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
-               Loss_Grad := Loss_Grad_Function (aClassifier, Theta, X, Y_Bin,
-                                                Activations, Params);
+               Loss_Grad := Loss_Grad_Function
+                 (aClassifier, Theta, X, Y_Bin, Activations, Params);
                New_Line;
                Put_Line (Routine_Name & "L239");
                --  L239 numerically compute the gradients
@@ -137,7 +137,8 @@ begin
             end;
          end loop;
       end;
-
+      Put_Line (Routine_Name & "outer loop last");
+      New_Line;
    end loop;
 
 end Test_Gradient;

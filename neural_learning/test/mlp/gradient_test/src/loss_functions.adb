@@ -8,7 +8,7 @@ package body Loss_Functions is
    function Loss_Grad_Function
      (Self        : in out MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y         : Boolean_Matrix;
-      Activations : Real_Matrix_List; Gradients   :  Parameters_List)
+      Activations : Real_Matrix_List; Gradients  :  Parameters_List)
       return Loss_Grad_Result is
       Args : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
@@ -113,13 +113,14 @@ package body Loss_Functions is
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
                   Y => Y_Bin, Activations => Activations,
                   Gradients => Params);
-               Put_Line (Routine_Name & "Loss_Grad_M set");
-               for index in Loss_Grad_P.Gradients.First_Index ..
-                 Loss_Grad_P.Gradients.Last_Index loop
-                  Grad_Diff.Append
-                    ((Loss_Grad_P.Gradients (index) -
-                       Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
-               end loop;
+               Num_Grad (index) := (Loss_Grad_P - Loss_Grad_M) / (2.0 * Eps);
+               Put_Line (Routine_Name & "Num_Grad (index) set");
+--                 for index in Loss_Grad_P.Gradients.First_Index ..
+--                   Loss_Grad_P.Gradients.Last_Index loop
+--                    Grad_Diff.Append
+--                      ((Loss_Grad_P.Gradients (index) -
+--                         Loss_Grad_M.Gradients (index)) / (2.0 * Eps));
+--                 end loop;
                Put_Line (Routine_Name & "Loss_Grad_P.Gradients set");
 
                Num_Grad (index).Loss :=

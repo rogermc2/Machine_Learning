@@ -101,6 +101,37 @@ package body Multilayer_Perceptron is
                             Incremental : Boolean) return Boolean_Matrix;
 
    --  -------------------------------------------------------------------------
+
+   function "-" (L, R : Loss_Grad_Result) return Loss_Grad_Result is
+      Result : Loss_Grad_Result := L;
+   begin
+      Result.Loss := Result.Loss - R.Loss;
+      for index in Result.Gradients.First_Index ..
+        Result.Gradients.Last_Index loop
+         Result.Gradients (index) :=
+           Result.Gradients (index) - R.Gradients (index);
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  -------------------------------------------------------------------------
+
+   function "/" (L : Loss_Grad_Result; R : Float) return Loss_Grad_Result is
+      Result : Loss_Grad_Result := L;
+   begin
+      Result.Loss := Result.Loss / R;
+      for index in Result.Gradients.First_Index ..
+        Result.Gradients.Last_Index loop
+         Result.Gradients (index) := Result.Gradients (index) / R;
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  -------------------------------------------------------------------------
    --  L241  Backprop computes the MLP loss function and its derivatives
    --       with respect to each parameter: weights and bias vectors.
    --  Activations contains an activation matrix for each layer
@@ -722,8 +753,8 @@ package body Multilayer_Perceptron is
                             Self.Attributes.Out_Activation;
       Num_Layers        : constant Positive := Self.Attributes.N_Layers;
    begin
-      --        Put_Line (Routine_Name & "Solver type "
-      --                  & Solver_Type'Image (Self.Parameters.Solver));
+      Put_Line (Routine_Name & "Solver type "
+                & Solver_Type'Image (Self.Parameters.Solver));
       --  L130
       for layer in 1 .. Num_Layers - 1 loop
          declare
@@ -734,11 +765,11 @@ package body Multilayer_Perceptron is
             Activat_Dot_Coeff  : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
-            --  Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer) &
-            --              " Activations length" &
-            --              Count_Type'Image (Activations.Length));
-            --                              Printing.Print_Float_Matrix
-            --                                (Routine_Name & "L131  Activations", Activations (layer));
+            Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer) &
+                        " Activations length" &
+                        Integer'Image (Integer (Activations.Length)));
+            --  Printing.Print_Float_Matrix
+            --    (Routine_Name & "L131  Activations", Activations (layer));
             --              Printing.Print_Float_Matrix
             --                (Routine_Name & "L131 Coeff_Gradients",
             --                 Params.Coeff_Gradients);
@@ -784,22 +815,24 @@ package body Multilayer_Perceptron is
          --           New_Line;
       end loop;
 
-      --        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
-      --                                     Activations.Last_Element);
+      Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
+                                   Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
+            Put_Line (Routine_Name & "Logistic");
             Logistic (Activations (Activations.Last_Index));
          when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
          when Rect_LU_Activation =>
             Rect_LU (Activations (Activations.Last_Index));
          when Softmax_Activation =>
+            Put_Line (Routine_Name & "Softmax");
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      --        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
-      --                                     Activations.Last_Element);
+      Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
+                                    Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
