@@ -133,11 +133,13 @@ package body NL_Arrays_And_Matrices is
 
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
+      R_Val  : Float;
       Result : Real_Float_Matrix  := L;
    begin
       for row in L'Range loop
+         R_Val := R (row);
          for col in L'Range (2) loop
-            Result (row, col) := Result (row, col) / R (col);
+            Result (row, col) := Result (row, col) / R_Val;
          end loop;
       end loop;
 
