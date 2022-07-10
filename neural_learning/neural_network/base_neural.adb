@@ -1,18 +1,18 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Neural_Maths;
---  with Printing;
+with Printing;
 
 package body Base_Neural is
 
    EPS : constant Float := Float'Small;
 
    function X_Log_Y (X : Boolean_Matrix; Y : Real_Float_Matrix)
-                      return Real_Float_Matrix;
+                     return Real_Float_Matrix;
    pragma Inline (X_Log_Y);
 
    --  -------------------------------------------------------------------------
@@ -123,7 +123,7 @@ package body Base_Neural is
    --  L177 Log Loss is the negative average of the log of corrected predicted
    --  probabilities for each instance.
    function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Real_Float_Matrix)
-                       return Float is
+                      return Float is
       --          Routine_Name : constant String := "Base_Neural.Log_Loss ";
       YP           : Real_Float_Matrix := Y_Prob;
       YT2          : Boolean_Matrix (Y_True'Range, Y_True'First (2) ..
@@ -131,7 +131,7 @@ package body Base_Neural is
       YP2          : Real_Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
 
       function Do_XlogY (Y_True : Boolean_Matrix; Y_Prob : Real_Float_Matrix)
-                           return Float is
+                         return Float is
          X_Y : Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
          Sum : Float := 0.0;
       begin
@@ -212,25 +212,32 @@ package body Base_Neural is
    --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
    procedure Softmax (Activation : in out Real_Float_Matrix) is
-      --        Routine_Name : constant String := "Base_Neural.Softmax ";
+      Routine_Name : constant String := "Base_Neural.Softmax ";
       --  Max returns a vector containing the maximum value of each matrix
-      Tmp  : Real_Float_Matrix := Activation - Max (Activation);
+      Tmp          : Real_Float_Matrix := Activation - Max (Activation);
+      Sum_Tmp      : Real_Float_Vector (Activation'Range);
    begin
-      --        Printing.Print_Float_Matrix (Routine_Name & "Activation",
-      --                                     Activation, 123, 125);
-      --        Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 123, 125);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activation",
+--                                     Activation, 1, 1);
+--        Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 1, 1);
       Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
-      --        Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 123, 125);
-      Activation := Tmp / Sum (Tmp);
-      --        Printing.Print_Float_Matrix (Routine_Name & "Activation out",
-      --                                     Activation, 123, 125);
+      Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 1, 1);
+      Activation := Tmp;
+      Put_Line (Routine_Name & "Activation length:" &
+                  Integer'Image (Activation'Length));
+      Sum_Tmp := Sum (Tmp);
+      Put_Line (Routine_Name & "Sum_Tmp length:" &
+                  Integer'Image (Sum_Tmp'Length));
+      Activation := Activation / Sum_Tmp;
+--        Printing.Print_Float_Matrix (Routine_Name & "Activation out",
+--                                     Activation, 1, 2);
 
    end Softmax;
 
    --  ------------------------------------------------------------------------
    --  L158
    function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Real_Float_Matrix)
-                           return Float is
+                          return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Matrix := -Y_Pred;
    begin
@@ -288,7 +295,7 @@ package body Base_Neural is
    --  scipy/special/_xlogy.pxd
    --  xlogy = x*log(y) so that the result is 0 if x = 0
    function X_Log_Y (X : Boolean_Matrix; Y : Real_Float_Matrix)
-                      return Real_Float_Matrix is
+                     return Real_Float_Matrix is
       use Maths.Float_Math_Functions;
       Y1     : Real_Float_Matrix := Y;
       Result : Real_Float_Matrix (Y'Range, Y'Range (2));

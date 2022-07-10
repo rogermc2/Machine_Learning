@@ -781,11 +781,9 @@ package body Multilayer_Perceptron is
                       "L132 Activations.Last_Index"
                     & Integer'Image (Activations.Last_Index) &
                       " /= layer + 1:" & Integer'Image (layer + 1));
-            --              Printing.Print_Float_Matrix
-            --                (Routine_Name & "L132 Added Activations",
-            --                 Activations.Last_Element);
-            --              Put_Line (Routine_Name & "L132 layer + 1 =" &
-            --                          Integer'Image (layer + 1));
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L132 Added Activations",
+--                 Activations.Last_Element);
 
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
@@ -802,10 +800,10 @@ package body Multilayer_Perceptron is
                   when Softmax_Activation =>
                      Softmax (Activations (Activations.Last_Index));
                end case;
-               --                 Printing.Print_Float_Matrix
-               --                   (Routine_Name & "L134 layer" &
-               --                      Integer'Image (Activations.Last_Index)
-               --                    & " Activations (last)", Activations.Last_Element);
+--                 Printing.Print_Float_Matrix
+--                   (Routine_Name & "L134 layer" &
+--                      Integer'Image (Activations.Last_Index)
+--                    & " Activations (last)", Activations.Last_Element);
             end if;
          end;  --  declare
          --           Printing.Print_Float_Matrix
@@ -815,8 +813,8 @@ package body Multilayer_Perceptron is
          --           New_Line;
       end loop;
 
-      Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
-                                   Activations.Last_Element);
+--        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
+--                                     Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
@@ -831,8 +829,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
-                                    Activations.Last_Element);
+--        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
+--                                     Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
