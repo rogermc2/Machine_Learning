@@ -212,6 +212,7 @@ package body Base_Neural is
    --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
    procedure Softmax (Activation : in out Real_Float_Matrix) is
+      use Real_Float_Arrays;
       Routine_Name : constant String := "Base_Neural.Softmax ";
       --  Max returns a vector containing the maximum value of each matrix
       Tmp          : Real_Float_Matrix := Activation - Max (Activation);
