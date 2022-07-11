@@ -54,7 +54,7 @@ begin
    Layer_Units.Append (Num_Features);
    Layer_Units.Append (Hidden_Layer_Sizes);
 
-   for num_labels in 2 .. 2 loop
+   for num_labels in 2 .. 3 loop
       for value in Y'Range loop
          Y (value) := value mod num_labels + 1;
          Y2 (value, 1) := Y (value);

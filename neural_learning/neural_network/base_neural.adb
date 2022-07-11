@@ -1,11 +1,11 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Neural_Maths;
-with Printing;
+--  with Printing;
 
 package body Base_Neural is
 
@@ -213,25 +213,15 @@ package body Base_Neural is
    --  probability = exp (value) / sum of all exp (v)
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       use Real_Float_Arrays;
-      Routine_Name : constant String := "Base_Neural.Softmax ";
+--        Routine_Name : constant String := "Base_Neural.Softmax ";
       --  Max returns a vector containing the maximum value of each matrix
       Tmp          : Real_Float_Matrix := Activation - Max (Activation);
       Sum_Tmp      : Real_Float_Vector (Activation'Range);
    begin
---        Printing.Print_Float_Matrix (Routine_Name & "Activation",
---                                     Activation, 1, 1);
---        Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 1, 1);
       Tmp := NL_Arrays_And_Matrices.Exp (Tmp);
-      Printing.Print_Float_Matrix (Routine_Name & "Tmp", Tmp, 1, 1);
       Activation := Tmp;
-      Put_Line (Routine_Name & "Activation length:" &
-                  Integer'Image (Activation'Length));
       Sum_Tmp := Sum (Tmp);
-      Put_Line (Routine_Name & "Sum_Tmp length:" &
-                  Integer'Image (Sum_Tmp'Length));
       Activation := Activation / Sum_Tmp;
---        Printing.Print_Float_Matrix (Routine_Name & "Activation out",
---                                     Activation, 1, 2);
 
    end Softmax;
 

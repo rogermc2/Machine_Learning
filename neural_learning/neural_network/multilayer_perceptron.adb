@@ -146,8 +146,8 @@ package body Multilayer_Perceptron is
       use Parameters_Package;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --  Routine_Name       : constant String :=
-      --                         "Multilayer_Perceptron.Backprop ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
       Y_Float            : constant Real_Float_Matrix :=
                              To_Real_Float_Matrix (Y);
@@ -213,16 +213,24 @@ package body Multilayer_Perceptron is
 
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
-      --        Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
-      --                                     Activations.Last_Element);
-      --  Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
+      Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
+                                   Activations.Last_Element);
+      Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
+      Put_Line (Routine_Name & "L301 deltas length set");
+      Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
+              Routine_Name & "L301 last Activations item width" &
+                Integer'Image (Activations.Last_Element'Length (2)) &
+                " differs from Y_Float width" &
+                Integer'Image (Y_Float'Length (2)));
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
 
+      Put_Line (Routine_Name & "L304");
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
 
+      Put_Line (Routine_Name & "L308");
       --  L310, L308
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Update_Gradients (Self, Activations, Deltas, Gradients, layer,
@@ -781,9 +789,9 @@ package body Multilayer_Perceptron is
                       "L132 Activations.Last_Index"
                     & Integer'Image (Activations.Last_Index) &
                       " /= layer + 1:" & Integer'Image (layer + 1));
---              Printing.Print_Float_Matrix
---                (Routine_Name & "L132 Added Activations",
---                 Activations.Last_Element);
+            --              Printing.Print_Float_Matrix
+            --                (Routine_Name & "L132 Added Activations",
+            --                 Activations.Last_Element);
 
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
@@ -800,10 +808,10 @@ package body Multilayer_Perceptron is
                   when Softmax_Activation =>
                      Softmax (Activations (Activations.Last_Index));
                end case;
---                 Printing.Print_Float_Matrix
---                   (Routine_Name & "L134 layer" &
---                      Integer'Image (Activations.Last_Index)
---                    & " Activations (last)", Activations.Last_Element);
+               --                 Printing.Print_Float_Matrix
+               --                   (Routine_Name & "L134 layer" &
+               --                      Integer'Image (Activations.Last_Index)
+               --                    & " Activations (last)", Activations.Last_Element);
             end if;
          end;  --  declare
          --           Printing.Print_Float_Matrix
@@ -813,24 +821,22 @@ package body Multilayer_Perceptron is
          --           New_Line;
       end loop;
 
---        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
---                                     Activations.Last_Element);
+      --        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
+      --                                     Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
-            Put_Line (Routine_Name & "Logistic");
             Logistic (Activations (Activations.Last_Index));
          when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
          when Rect_LU_Activation =>
             Rect_LU (Activations (Activations.Last_Index));
          when Softmax_Activation =>
-            Put_Line (Routine_Name & "Softmax");
             Softmax (Activations (Activations.Last_Index));
       end case;
 
---        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
---                                     Activations.Last_Element);
+      --        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
+      --                                     Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
