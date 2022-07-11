@@ -214,9 +214,8 @@ package body Multilayer_Perceptron is
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
-                                   Activations.Last_Element);
+                                   Activations.Last_Element, 1, 2);
       Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
-      Put_Line (Routine_Name & "L301 deltas length set");
       Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
               Routine_Name & "L301 last Activations item width" &
                 Integer'Image (Activations.Last_Element'Length (2)) &
@@ -769,9 +768,7 @@ package body Multilayer_Perceptron is
       --  L130
       for layer in 1 .. Num_Layers - 1 loop
          New_Line;
-         Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer));  --   &
---                       " Activations length" &
---                       Integer'Image (Integer (Activations.Length)));
+         Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer));
          declare
             use Real_Float_Arrays;
             Params             : constant Parameters_Record :=
@@ -780,11 +777,9 @@ package body Multilayer_Perceptron is
             Activat_Dot_Coeff  : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
---              Printing.Print_Float_Matrix
---                (Routine_Name & "L131  Activations", Activations (layer));
             Printing.Print_Float_Matrix
               (Routine_Name & "L131 Coeff_Gradients",
-               Params.Coeff_Gradients);
+               Params.Coeff_Gradients, 1, 2);
 --              Printing.Print_Float_Matrix
 --                (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
             --  L132 Add layer + 1
