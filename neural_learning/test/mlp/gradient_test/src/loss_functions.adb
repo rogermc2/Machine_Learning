@@ -41,7 +41,7 @@ package body Loss_Functions is
       Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
       Num_Grad     : Real_Float_Vector (1 .. Positive (Theta.Length));
    begin
-      Put_Line (Routine_Name & "Activations length" &
+      Put_Line (Routine_Name & "Activations size" &
                   Integer'Image (Integer (Activations.Length)));
       Put_Line (Routine_Name & "Params length" &
                   Integer'Image (Integer (Params.Length)));
@@ -62,8 +62,7 @@ package body Loss_Functions is
             --  L240
             for row in dTheta_Grad'Range loop
                for col in dTheta_Grad'Range (2) loop
-                  dTheta_Grad (row, col) :=
-                    Coeffs (row, col) * Eps;
+                  dTheta_Grad (row, col) := Coeffs (row, col) * Eps;
                end loop;
             end loop;
 
@@ -74,20 +73,17 @@ package body Loss_Functions is
             declare
                use Real_Float_Arrays;
                use Parameters_Package;
-               Theta_P      : Parameters_Record :=
-                                Theta.Element (index);
+               Theta_P      : Parameters_Record := Theta.Element (index);
                Theta_M      : Parameters_Record := Theta_P;
                Theta_P_List : Parameters_List;
                Theta_M_List : Parameters_List;
                Loss_Grad_P  : Loss_Grad_Result;
                Loss_Grad_M  : Loss_Grad_Result;
             begin
-               Theta_P.Coeff_Gradients :=
-                 Theta_P.Coeff_Gradients + dTheta_Grad;
+               Theta_P.Coeff_Gradients := Theta_P.Coeff_Gradients + dTheta_Grad;
                Theta_P_List.Append (Theta_P);
 
-               Theta_M.Coeff_Gradients :=
-                 Theta_M.Coeff_Gradients - dTheta_Grad;
+               Theta_M.Coeff_Gradients := Theta_M.Coeff_Gradients - dTheta_Grad;
                Theta_M_List.Append (Theta_M);
 
                Theta_P.Intercept_Grads :=

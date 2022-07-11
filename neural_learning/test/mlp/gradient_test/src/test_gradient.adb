@@ -119,11 +119,14 @@ begin
                Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
+               New_Line;
+               Put_Line (Routine_Name & "L239 analytically compute the gradients");
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
                  (aClassifier, Theta, X, Y_Bin, Activations, Params);
                New_Line;
-               Put_Line (Routine_Name & "L239");
+
+               Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Activations, Params);
