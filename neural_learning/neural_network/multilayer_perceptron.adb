@@ -517,15 +517,19 @@ package body Multilayer_Perceptron is
 
       Args         : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
+      Put_Line (Routine_Name & "Grads length: " &
+                  Integer'Image (Integer (Grads.Length)));
       Put_Line (Routine_Name &
-                  "Grads (1).Coeff_Gradients length" &
-                  Integer'Image (Grads (1).Coeff_Gradients'Length));
+                  "Grads (1).Coeff_Gradients size" &
+                  Integer'Image (Grads (1).Coeff_Gradients'Length) & " x"
+                  & Integer'Image (Grads (1).Coeff_Gradients'Length (2)));
       Put_Line (Routine_Name &
                   "Grads.Intercept_Grads (1) length" &
                   Integer'Image (Grads (1).Intercept_Grads'Length));
       Put_Line (Routine_Name &
                   "Grads (2).Coeff_Gradients length" &
-                  Integer'Image (Grads (2).Coeff_Gradients'Length));
+                  Integer'Image (Grads (2).Coeff_Gradients'Length) & " x"
+                  & Integer'Image (Grads (2).Coeff_Gradients'Length (2)));
       Put_Line (Routine_Name &
                   "Grads.Intercept_Grads (2) length" &
                   Integer'Image (Grads (2).Intercept_Grads'Length));
@@ -546,9 +550,6 @@ package body Multilayer_Perceptron is
       --           Self.Attributes.Intercept_Indptr.Append ((Start, Last));
       --           Start := Last + 1;
       --        end loop;
-
-      Put_Line (Routine_Name & "Grads length: " &
-                  Integer'Image (Integer (Grads.Length)));
 
       Args.Self := Self;
       Args.Params := Grads;

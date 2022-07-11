@@ -37,9 +37,6 @@ procedure Test_Gradient is
    Fan_Out            : Positive;
    Params             : Parameters_List;
    Theta              : Parameters_List;
-   --      Loss               : Float;
-   --      pragma Unreferenced (Loss);
-
 begin
    Put_Line (Routine_Name);
    Layer_Sizes.Append (Hidden_Layer_Sizes);
@@ -77,18 +74,20 @@ begin
 
             --  L208
             Theta := aClassifier.Attributes.Params;
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta (1).Coeff_Gradients length" &
-            --                          Integer'Image (Theta (1).Coeff_Gradients'Length));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta.Intercept_Grads (1) length" &
-            --                          Integer'Image (Theta (1).Intercept_Grads'Length));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta (2).Coeff_Gradients length" &
-            --                          Integer'Image (Theta (2).Coeff_Gradients'Length));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta.Intercept_Grads (2) length" &
-            --                          Integer'Image (Theta (2).Intercept_Grads'Length));
+            Put_Line (Routine_Name &
+                        "L208 Theta (1).Coeff_Gradients size" &
+                        Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
+                        & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
+            Put_Line (Routine_Name &
+                        "L208 Theta.Intercept_Grads (1) length" &
+                        Integer'Image (Theta (1).Intercept_Grads'Length));
+            Put_Line (Routine_Name &
+                        "L208 Theta (2).Coeff_Gradients length" &
+                        Integer'Image (Theta (2).Coeff_Gradients'Length) & " x"
+                        & Integer'Image (Theta (2).Coeff_Gradients'Length (2)));
+            Put_Line (Routine_Name &
+                        "L208 Theta.Intercept_Grads (2) length" &
+                        Integer'Image (Theta (2).Intercept_Grads'Length));
 
             --  L212  Initialize
             Params.Clear;
@@ -120,7 +119,7 @@ begin
                Loss_Grad := Loss_Grad_Function
                  (aClassifier, Theta, X, Y_Bin, Params);
                Put_Line (Routine_Name & "analytically computed loss" &
-                         Float'Image (Loss_Grad.Loss));
+                           Float'Image (Loss_Grad.Loss));
 
                New_Line;
                Put_Line (Routine_Name & "L239 numerically compute the gradients");
