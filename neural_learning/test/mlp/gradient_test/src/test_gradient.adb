@@ -32,8 +32,6 @@ procedure Test_Gradient is
    LB                 : Label.Label_Binarizer;
    Layer_Sizes        : NL_Types.Integer_List;
    aClassifier        : MLP_Classifier;
-   Activations        : Real_Matrix_List;
-   Deltas             : Real_Matrix_List;
    Layer_Units        : NL_Types.Integer_List;
    Fan_In             : Positive;
    Fan_Out            : Positive;
@@ -93,10 +91,7 @@ begin
             --                          Integer'Image (Theta (2).Intercept_Grads'Length));
 
             --  L212  Initialize
-            Activations.Clear;
-            Deltas.Clear;
             Params.Clear;
-            Activations.Append (X);
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
                Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
@@ -123,13 +118,15 @@ begin
                Put_Line (Routine_Name & "L239 analytically compute the gradients");
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
-                 (aClassifier, Theta, X, Y_Bin, Activations, Params);
-               New_Line;
+                 (aClassifier, Theta, X, Y_Bin, Params);
+               Put_Line (Routine_Name & "analytically computed loss" &
+                         Float'Image (Loss_Grad.Loss));
 
+               New_Line;
                Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
                Num_Grad := Numerical_Loss_Grad
-                 (aClassifier, Theta, X, Y_Bin, Activations, Params);
+                 (aClassifier, Theta, X, Y_Bin, Params);
 
                Put_Line (Routine_Name & "Num_Grad set");
                for index in Params.First_Index .. Params.Last_Index loop

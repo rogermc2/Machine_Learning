@@ -763,8 +763,15 @@ package body Multilayer_Perceptron is
    begin
       Put_Line (Routine_Name & "Solver type "
                 & Solver_Type'Image (Self.Parameters.Solver));
+--        Printing.Print_Float_Matrix
+--          (Routine_Name & "entry L130 Activations Last_Element ",
+--           Activations.Last_Element);
       --  L130
       for layer in 1 .. Num_Layers - 1 loop
+         New_Line;
+         Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer));  --   &
+--                       " Activations length" &
+--                       Integer'Image (Integer (Activations.Length)));
          declare
             use Real_Float_Arrays;
             Params             : constant Parameters_Record :=
@@ -773,25 +780,22 @@ package body Multilayer_Perceptron is
             Activat_Dot_Coeff  : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
-            Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer) &
-                        " Activations length" &
-                        Integer'Image (Integer (Activations.Length)));
-            --  Printing.Print_Float_Matrix
-            --    (Routine_Name & "L131  Activations", Activations (layer));
-            --              Printing.Print_Float_Matrix
-            --                (Routine_Name & "L131 Coeff_Gradients",
-            --                 Params.Coeff_Gradients);
-            --              Printing.Print_Float_Matrix
-            --                (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L131  Activations", Activations (layer));
+            Printing.Print_Float_Matrix
+              (Routine_Name & "L131 Coeff_Gradients",
+               Params.Coeff_Gradients);
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
             --  L132 Add layer + 1
             Activations.Append (Activat_Dot_Coeff + Params.Intercept_Grads);
             Assert (Activations.Last_Index = layer + 1, Routine_Name &
                       "L132 Activations.Last_Index"
                     & Integer'Image (Activations.Last_Index) &
                       " /= layer + 1:" & Integer'Image (layer + 1));
-            --              Printing.Print_Float_Matrix
-            --                (Routine_Name & "L132 Added Activations",
-            --                 Activations.Last_Element);
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L132 Added Activations",
+--                 Activations.Last_Element);
 
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
@@ -835,8 +839,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      --        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
-      --                                     Activations.Last_Element);
+--        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
+--                                     Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------

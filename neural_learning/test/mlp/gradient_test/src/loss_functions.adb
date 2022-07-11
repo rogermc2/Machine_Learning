@@ -6,12 +6,13 @@ with Ada.Text_IO; use Ada.Text_IO;
 package body Loss_Functions is
 
    function Loss_Grad_Function
-     (Self        : in out MLP_Classifier; Theta : Parameters_List;
-      X           : Real_Float_Matrix; Y         : Boolean_Matrix;
-      Activations : Real_Matrix_List; Gradients  :  Parameters_List)
-      return Loss_Grad_Result is
+     (Self        : MLP_Classifier; Theta : Parameters_List;
+      X           : Real_Float_Matrix; Y   : Boolean_Matrix;
+       Gradients  :  Parameters_List) return Loss_Grad_Result is
+      Activations : Real_Matrix_List;
       Args : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
+      Activations.Append (X);
       Args.Self := Self;
       Args.Params := Theta;
       Args.X := X;
@@ -34,18 +35,17 @@ package body Loss_Functions is
    --  -------------------------------------------------------------------------
 
    function Numerical_Loss_Grad
-     (aClassifier : in out MLP_Classifier; Theta : Parameters_List;
+     (aClassifier : MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y_Bin : Boolean_Matrix;
-      Activations : Real_Matrix_List; Params : Parameters_List)
-      return Real_Float_Vector is
+      Params : Parameters_List) return Real_Float_Vector is
       Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
-      Num_Grad     : Real_Float_Vector (1 .. Positive (Theta.Length));
+      Num_Grad     : Real_Float_Vector (1 .. Positive (Theta.Length)) :=
+                       (others => 0.0);
    begin
-      Put_Line (Routine_Name & "Activations size" &
-                  Integer'Image (Integer (Activations.Length)));
       Put_Line (Routine_Name & "Params length" &
                   Integer'Image (Integer (Params.Length)));
       for index in Theta.First_Index .. Theta.Last_Index loop
+         New_Line;
          Put_Line (Routine_Name & "index" & Integer'Image (index));
          declare
             Coeffs           : constant Real_Float_Matrix :=
@@ -104,12 +104,10 @@ package body Loss_Functions is
                --  L242
                Loss_Grad_P := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_P_List, X => X,
-                  Y => Y_Bin, Activations => Activations,
-                  Gradients => Params);
+                  Y => Y_Bin,  Gradients => Params);
                Loss_Grad_M := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
-                  Y => Y_Bin, Activations => Activations,
-                  Gradients => Params);
+                  Y => Y_Bin, Gradients => Params);
                Num_Grad (index) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
                Put_Line (Routine_Name & "Num_Grad (index) set");
             end;

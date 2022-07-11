@@ -12,14 +12,13 @@ package Loss_Functions is
    Eps  : constant Float := 10.0 ** (-5);
 
    function Loss_Grad_Function
-     (Self        : in out MLP_Classifier; Theta : Parameters_List;
+     (Self        : MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y : Boolean_Matrix;
-      Activations : Real_Matrix_List; Gradients : Parameters_List)
-      return Loss_Grad_Result;
+      Gradients : Parameters_List) return Loss_Grad_Result;
    function Numerical_Loss_Grad
-     (aClassifier : in out MLP_Classifier; Theta : Parameters_List;
+     (aClassifier : MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y_Bin : Boolean_Matrix;
-      Activations : Real_Matrix_List; Params : Parameters_List)
+      Params : Parameters_List)
       return Real_Float_Vector;
 
 end Loss_Functions;
