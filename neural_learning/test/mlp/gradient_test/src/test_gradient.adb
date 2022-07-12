@@ -10,7 +10,7 @@ with Label;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Printing;
+--  with Printing;
 with Stochastic_Optimizers;
 
 with Loss_Functions; use Loss_Functions;
@@ -61,6 +61,9 @@ begin
       begin
          --  L196
          for activ_type in Base_Neural.Activation_Type'Range loop
+            New_Line;
+            Put_Line (Routine_Name & "Activation Type:" &
+                        Base_Neural.Activation_Type'Image (activ_type));
             aClassifier := C_Init
               (Activation => activ_type,
                Hidden_Layer_Sizes => Layer_Sizes,
@@ -109,8 +112,8 @@ begin
             --  L226
             declare
                --  N = Theta_Length
-               Theta_Length : constant Positive := Positive (Theta.Length);
-               Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
+--                 Theta_Length : constant Positive := Positive (Theta.Length);
+--                 Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
                New_Line;
@@ -122,16 +125,16 @@ begin
                            Float'Image (Loss_Grad.Loss));
 
                New_Line;
-               Put_Line (Routine_Name & "L239 numerically compute the gradients");
+--                 Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
-               Num_Grad := Numerical_Loss_Grad
-                 (aClassifier, Theta, X, Y_Bin, Params);
+--                 Num_Grad := Numerical_Loss_Grad
+--                   (aClassifier, Theta, X, Y_Bin, Params);
 
-               Put_Line (Routine_Name & "Num_Grad set");
-               for index in Params.First_Index .. Params.Last_Index loop
-                  Printing.Print_Parameters ("Params", Params (index));
-                  Printing.Print_Float_Array ("Num_Grad", Num_Grad);
-               end loop;
+--                 Put_Line (Routine_Name & "Num_Grad set");
+--                 for index in Params.First_Index .. Params.Last_Index loop
+--                    Printing.Print_Parameters ("Params", Params (index));
+--                    Printing.Print_Float_Array ("Num_Grad", Num_Grad);
+--                 end loop;
             end;
          end loop;
       end;

@@ -83,6 +83,9 @@ package NL_Arrays_And_Matrices is
    function Flatten (M : Integer_Matrix) return Integer_Array;
    function Flatten (M : Real_Float_Matrix) return Real_Float_Vector;
    function Max_Vec (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
+   function Multiply_Elements (L, R : Real_Float_Matrix)
+                               return Real_Float_Matrix;
+   pragma Inline (Multiply_Elements);
    function Norm (M : Real_Float_List) return Float;
    function Norm (M : Real_Float_Vector) return Float;
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;

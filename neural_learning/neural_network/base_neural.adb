@@ -268,9 +268,7 @@ package body Base_Neural is
                               Del : in out Real_Float_Matrix) is
 
       use Real_Float_Arrays;
-      type Matrix_Float is new Real_Float_Matrix (1 .. Z'Length,
-                                                  1 .. Z'Length (2));
-      Del_2 : Matrix_Float;
+      Del_2 : Real_Float_Matrix (1 .. Z'Length, 1 .. Z'Length (2));
    begin
       for row in Z'Range loop
          for col in Z'Range (2) loop
@@ -278,7 +276,7 @@ package body Base_Neural is
          end loop;
       end loop;
 
-      Del := Del * Real_Float_Matrix (Del_2);
+      Del := Multiply_Elements (Del, Del_2);
 
    end Tanh_Derivative;
 

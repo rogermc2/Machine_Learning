@@ -91,7 +91,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function "*" (L, R : Float_Array) return Float_Array is
-      Result : Float_Array  := L;
+      Result : Float_Array := L;
    begin
       for row in L'Range loop
          Result (row) := Result (row) * R (row);
@@ -104,7 +104,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function "*" (L : Float; R : Float_Array) return Float_Array is
-      Result : Float_Array  := R;
+      Result : Float_Array := R;
    begin
       for row in R'Range loop
          Result (row) := L * Result (row);
@@ -117,7 +117,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix is
-      Result : Real_Float_Matrix  := L;
+      Result : Real_Float_Matrix := L;
    begin
       for row in L'Range loop
          for col in L'Range (2) loop
@@ -134,7 +134,7 @@ package body NL_Arrays_And_Matrices is
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
       R_Val  : Float;
-      Result : Real_Float_Matrix  := L;
+      Result : Real_Float_Matrix := L;
    begin
       for row in L'Range loop
          R_Val := R (row);
@@ -150,7 +150,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function "/" (L, R : Real_Float_Vector) return Real_Float_Vector is
-      Result : Real_Float_Vector  := L;
+      Result : Real_Float_Vector := L;
    begin
       for row in L'Range loop
          Result (row) := Result (row) / R (row);
@@ -164,7 +164,7 @@ package body NL_Arrays_And_Matrices is
 
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
                  return Real_Float_Matrix is
-      Result : Real_Float_Matrix  := L;
+      Result : Real_Float_Matrix := L;
    begin
       for row in L'Range loop
          for col in L'Range (2) loop
@@ -362,6 +362,21 @@ package body NL_Arrays_And_Matrices is
       return Result;
 
    end Max_Vec;
+
+   --  ------------------------------------------------------------------------
+
+   function Multiply_Elements (L, R : Real_Float_Matrix) return Real_Float_Matrix is
+      Result : Real_Float_Matrix := L;
+   begin
+      for row in L'Range loop
+         for col in L'Range (2) loop
+            Result (row, col) := Result (row, col) * R (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Multiply_Elements;
 
    --  ------------------------------------------------------------------------
 

@@ -102,18 +102,26 @@ package body Loss_Functions is
                Loss_Grad_M  : Loss_Grad_Result;
             begin
                Theta_P.Coeff_Gradients := Theta_P.Coeff_Gradients + dTheta_Grad;
-               Theta_P_List.Append (Theta_P);
-
-               Theta_M.Coeff_Gradients := Theta_M.Coeff_Gradients - dTheta_Grad;
-               Theta_M_List.Append (Theta_M);
-
                Theta_P.Intercept_Grads :=
                  Theta_P.Intercept_Grads + dTheta_Intercept;
-               Theta_P_List.Append (Theta_P);
+               if t_index = 1 then
+                  Theta_P_List.Append (Theta_P);
+                  Theta_P_List.Append (Theta (2));
+               else
+                  Theta_P_List.Append (Theta (1));
+                  Theta_P_List.Append (Theta_P);
+               end if;
 
+               Theta_M.Coeff_Gradients := Theta_M.Coeff_Gradients - dTheta_Grad;
                Theta_M.Intercept_Grads :=
                  Theta_M.Intercept_Grads - dTheta_Intercept;
-               Theta_M_List.Append (Theta_M);
+               if t_index = 1 then
+                  Theta_M_List.Append (Theta_M);
+                  Theta_M_List.Append (Theta (2));
+               else
+                  Theta_M_List.Append (Theta (1));
+                  Theta_M_List.Append (Theta_M);
+               end if;
 
                Put_Line
                  (Routine_Name & "L242 Theta_P.Coeff_Gradients size" &

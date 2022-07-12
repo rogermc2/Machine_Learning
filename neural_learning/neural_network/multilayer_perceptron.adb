@@ -1166,8 +1166,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --        Routine_Name : constant String :=
-      --                         "Multilayer_Perceptron.Update_Gradients ";
+      Routine_Name : constant String :=
+                        "Multilayer_Perceptron.Update_Gradients ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
@@ -1181,8 +1181,8 @@ package body Multilayer_Perceptron is
       --        Put_Line (Routine_Name & "Deltas size" &
       --                    Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
       --                    Integer'Image (Deltas.Element (layer - 1)'Length (2)));
-      --        Put_Line (Routine_Name & "L312 Activation_Type " &
-      --                    Activation_Type'Image (Self.Parameters.Activation));
+      Put_Line (Routine_Name & "L312 Activation_Type " &
+                  Activation_Type'Image (Self.Parameters.Activation));
       --  L312
       case Self.Parameters.Activation is
          when Identity_Activation => null;
@@ -1196,6 +1196,7 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => null;
       end case;
 
+      Put_Line (Routine_Name & "L314");
       --  L314
       Compute_Loss_Gradient
         (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
