@@ -19,15 +19,15 @@ package body Loss_Functions is
       Args.Y := Y;
       Args.Activations := Activations;
       Args.Gradients := Gradients;
-      Put_Line ("Loss_Grad_Function Args.X'Length" &
-                  Integer'Image (Args.X'Length));
-      Put_Line ("Args.Y'Length" & Integer'Image (Args.Y'Length));
-      Put_Line ("Args.Params (Theta) Length" &
-                  Integer'Image (Integer (Args.Params.Length)));
-      Put_Line ("Args.Activations Length" &
-                  Integer'Image (Integer (Args.Activations.Length)));
-      Put_Line ("Args.Gradients Length" &
-                  Integer'Image (Integer (Args.Gradients.Length)));
+--        Put_Line ("Loss_Grad_Function Args.X'Length" &
+--                    Integer'Image (Args.X'Length));
+--        Put_Line ("Args.Y'Length" & Integer'Image (Args.Y'Length));
+--        Put_Line ("Args.Params (Theta) Length" &
+--                    Integer'Image (Integer (Args.Params.Length)));
+--        Put_Line ("Args.Activations Length" &
+--                    Integer'Image (Integer (Args.Activations.Length)));
+--        Put_Line ("Args.Gradients Length" &
+--                    Integer'Image (Integer (Args.Gradients.Length)));
       return Loss_Grad_LBFGS (Args);
 
    end Loss_Grad_Function;

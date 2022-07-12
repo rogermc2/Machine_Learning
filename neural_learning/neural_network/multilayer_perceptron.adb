@@ -213,9 +213,9 @@ package body Multilayer_Perceptron is
 
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
-      Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
-                                   Activations.Last_Element, 1, 2);
-      Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
+--        Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
+--                                     Activations.Last_Element, 1, 2);
+--        Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
       Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
               Routine_Name & "L301 last Activations item width" &
                 Integer'Image (Activations.Last_Element'Length (2)) &
@@ -224,12 +224,10 @@ package body Multilayer_Perceptron is
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
 
-      Put_Line (Routine_Name & "L304");
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
 
-      Put_Line (Routine_Name & "L308");
       --  L310, L308
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Update_Gradients (Self, Activations, Deltas, Gradients, layer,
@@ -1196,7 +1194,6 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => null;
       end case;
 
-      Put_Line (Routine_Name & "L314");
       --  L314
       Compute_Loss_Gradient
         (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,

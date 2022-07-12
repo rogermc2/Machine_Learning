@@ -10,7 +10,7 @@ with Label;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
---  with Printing;
+with Printing;
 with Stochastic_Optimizers;
 
 with Loss_Functions; use Loss_Functions;
@@ -49,7 +49,7 @@ begin
    Layer_Units.Append (Num_Features);
    Layer_Units.Append (Hidden_Layer_Sizes);
 
-   for num_labels in 2 .. 3 loop
+   for num_labels in 2 .. 2 loop
       for value in Y'Range loop
          Y (value) := value mod num_labels + 1;
          Y2 (value, 1) := Y (value);
@@ -77,25 +77,25 @@ begin
 
             --  L208
             Theta := aClassifier.Attributes.Params;
-            Put_Line (Routine_Name &
-                        "L208 Theta (1).Coeff_Gradients size" &
-                        Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
-                        & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
-            Put_Line (Routine_Name &
-                        "L208 Theta.Intercept_Grads (1) length" &
-                        Integer'Image (Theta (1).Intercept_Grads'Length));
-            Put_Line (Routine_Name &
-                        "L208 Theta (2).Coeff_Gradients length" &
-                        Integer'Image (Theta (2).Coeff_Gradients'Length) & " x"
-                        & Integer'Image (Theta (2).Coeff_Gradients'Length (2)));
-            Put_Line (Routine_Name &
-                        "L208 Theta.Intercept_Grads (2) length" &
-                        Integer'Image (Theta (2).Intercept_Grads'Length));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta (1).Coeff_Gradients size" &
+--                          Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
+--                          & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta.Intercept_Grads (1) length" &
+--                          Integer'Image (Theta (1).Intercept_Grads'Length));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta (2).Coeff_Gradients length" &
+--                          Integer'Image (Theta (2).Coeff_Gradients'Length) & " x"
+--                          & Integer'Image (Theta (2).Coeff_Gradients'Length (2)));
+--              Put_Line (Routine_Name &
+--                          "L208 Theta.Intercept_Grads (2) length" &
+--                          Integer'Image (Theta (2).Intercept_Grads'Length));
 
             --  L212  Initialize
             Params.Clear;
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-               Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+--                 Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 
@@ -112,8 +112,8 @@ begin
             --  L226
             declare
                --  N = Theta_Length
---                 Theta_Length : constant Positive := Positive (Theta.Length);
---                 Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
+               Theta_Length : constant Positive := Positive (Theta.Length);
+               Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
                New_Line;
@@ -125,16 +125,18 @@ begin
                            Float'Image (Loss_Grad.Loss));
 
                New_Line;
---                 Put_Line (Routine_Name & "L239 numerically compute the gradients");
+               Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
---                 Num_Grad := Numerical_Loss_Grad
---                   (aClassifier, Theta, X, Y_Bin, Params);
+               Num_Grad := Numerical_Loss_Grad
+                 (aClassifier, Theta, X, Y_Bin, Params);
 
---                 Put_Line (Routine_Name & "Num_Grad set");
---                 for index in Params.First_Index .. Params.Last_Index loop
---                    Printing.Print_Parameters ("Params", Params (index));
---                    Printing.Print_Float_Array ("Num_Grad", Num_Grad);
---                 end loop;
+               Put_Line (Routine_Name & "Num_Grad set");
+               for index in Loss_Grad.Gradients.First_Index ..
+                 Loss_Grad.Gradients.Last_Index loop
+                  Printing.Print_Parameters ("Loss_Grad.Gradients",
+                                             Loss_Grad.Gradients (index));
+                  Printing.Print_Float_Array ("Num_Grad", Num_Grad);
+               end loop;
             end;
          end loop;
       end;
