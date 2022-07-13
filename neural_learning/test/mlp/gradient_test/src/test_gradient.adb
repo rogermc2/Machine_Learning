@@ -76,7 +76,12 @@ begin
             Layer_Units.Append (aClassifier.Attributes.N_Outputs);
 
             --  L208
+            --  aClassifier.Attributes.Params is set by
+            --  Multilayer_Perceptron.Initialize on first pass of
+            --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
+            Put_Line (Routine_Name & "L208 Theta_Length:" &
+                        Integer'Image (Positive (Theta.Length)));
 --              Put_Line (Routine_Name &
 --                          "L208 Theta (1).Coeff_Gradients size" &
 --                          Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
@@ -116,6 +121,7 @@ begin
                Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
+               Put_Line (Routine_Name & "Theta_Length:" & Integer'Image (Theta_Length));
                New_Line;
                Put_Line (Routine_Name & "L239 analytically compute the gradients");
                --  L233 analytically compute the gradients
