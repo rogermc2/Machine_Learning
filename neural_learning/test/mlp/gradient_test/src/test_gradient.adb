@@ -80,6 +80,7 @@ begin
             --  Multilayer_Perceptron.Initialize on first pass of
             --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
+
             Put_Line (Routine_Name & "L208 Theta_Length:" &
                         Integer'Image (Positive (Theta.Length)));
 --              Put_Line (Routine_Name &
