@@ -37,6 +37,35 @@ procedure Test_Gradient is
    Fan_Out            : Positive;
    Params             : Parameters_List;
    Theta              : Parameters_List;
+
+   --  MLP L43  Pack the parameters into a single vector
+   function Pack (Params_List : Parameters_List) return NL_Types.Float_List is
+      Packed_Data : NL_Types.Float_List;
+
+   begin
+      for index in Params_List.First_Index .. Params_List.Last_Index loop
+         declare
+            Params : constant Stochastic_Optimizers.Parameters_Record :=
+                       Params_List (index);
+         begin
+            for row in Params.Coeff_Gradients'Range loop
+               for col in Params.Coeff_Gradients'Range (2) loop
+                  Packed_Data.Append (Params.Coeff_Gradients (row, col));
+               end loop;
+            end loop;
+
+            for row in Params.Intercept_Grads'Range loop
+               Packed_Data.Append (Params.Intercept_Grads (row));
+            end loop;
+         end;
+      end loop;
+
+      return Packed_Data;
+
+   end Pack;
+
+   --  -------------------------------------------------------------------------
+
 begin
    Put_Line (Routine_Name);
    Layer_Sizes.Append (Hidden_Layer_Sizes);
@@ -83,25 +112,25 @@ begin
 
             Put_Line (Routine_Name & "L208 Theta_Length:" &
                         Integer'Image (Positive (Theta.Length)));
---              Put_Line (Routine_Name &
---                          "L208 Theta (1).Coeff_Gradients size" &
---                          Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
---                          & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
---              Put_Line (Routine_Name &
---                          "L208 Theta.Intercept_Grads (1) length" &
---                          Integer'Image (Theta (1).Intercept_Grads'Length));
---              Put_Line (Routine_Name &
---                          "L208 Theta (2).Coeff_Gradients length" &
---                          Integer'Image (Theta (2).Coeff_Gradients'Length) & " x"
---                          & Integer'Image (Theta (2).Coeff_Gradients'Length (2)));
---              Put_Line (Routine_Name &
---                          "L208 Theta.Intercept_Grads (2) length" &
---                          Integer'Image (Theta (2).Intercept_Grads'Length));
+            --              Put_Line (Routine_Name &
+            --                          "L208 Theta (1).Coeff_Gradients size" &
+            --                          Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
+            --                          & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
+            --              Put_Line (Routine_Name &
+            --                          "L208 Theta.Intercept_Grads (1) length" &
+            --                          Integer'Image (Theta (1).Intercept_Grads'Length));
+            --              Put_Line (Routine_Name &
+            --                          "L208 Theta (2).Coeff_Gradients length" &
+            --                          Integer'Image (Theta (2).Coeff_Gradients'Length) & " x"
+            --                          & Integer'Image (Theta (2).Coeff_Gradients'Length (2)));
+            --              Put_Line (Routine_Name &
+            --                          "L208 Theta.Intercept_Grads (2) length" &
+            --                          Integer'Image (Theta (2).Intercept_Grads'Length));
 
             --  L212  Initialize
             Params.Clear;
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
---                 Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+               --                 Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 

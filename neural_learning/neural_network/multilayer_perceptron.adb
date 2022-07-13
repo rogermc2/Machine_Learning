@@ -81,7 +81,6 @@ package body Multilayer_Perceptron is
                           Layer_Units : NL_Types.Integer_List);
     function Init_Coeff (Self            : in out MLP_Classifier;
                          Fan_In, Fan_Out : Positive) return Parameters_Record;
-    function Pack (Params_List : Parameters_List) return NL_Types.Float_List;
     procedure Process_Batch (Self             : in out MLP_Classifier;
                              X                : Real_Float_Matrix;
                              Y                : Boolean_Matrix;
@@ -1067,34 +1066,6 @@ package body Multilayer_Perceptron is
     end Loss_Grad_LBFGS;
 
     --  -------------------------------------------------------------------------
-    --  L43  Pack the parameters into a single vector
-    function Pack (Params_List : Parameters_List) return NL_Types.Float_List is
-        Packed_Data : NL_Types.Float_List;
-
-    begin
-        for index in Params_List.First_Index .. Params_List.Last_Index loop
-            declare
-                Params : constant Stochastic_Optimizers.Parameters_Record :=
-                           Params_List (index);
-            begin
-                for row in Params.Coeff_Gradients'Range loop
-                    for col in Params.Coeff_Gradients'Range (2) loop
-                        Packed_Data.Append (Params.Coeff_Gradients (row, col));
-                    end loop;
-                end loop;
-
-                for row in Params.Intercept_Grads'Range loop
-                    Packed_Data.Append (Params.Intercept_Grads (row));
-                end loop;
-            end;
-        end loop;
-
-        return Packed_Data;
-
-    end Pack;
-
-    --  -------------------------------------------------------------------------
-
     --  L778  Partial_Fit updates the model with a single iteration over the
     --        given data.
     procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
