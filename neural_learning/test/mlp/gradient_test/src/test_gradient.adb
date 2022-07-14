@@ -39,30 +39,30 @@ procedure Test_Gradient is
    Theta              : Parameters_List;
 
    --  MLP L43  Pack the parameters into a single vector
-   function Pack (Params_List : Parameters_List) return NL_Types.Float_List is
-      Packed_Data : NL_Types.Float_List;
-
-   begin
-      for index in Params_List.First_Index .. Params_List.Last_Index loop
-         declare
-            Params : constant Stochastic_Optimizers.Parameters_Record :=
-                       Params_List (index);
-         begin
-            for row in Params.Coeff_Gradients'Range loop
-               for col in Params.Coeff_Gradients'Range (2) loop
-                  Packed_Data.Append (Params.Coeff_Gradients (row, col));
-               end loop;
-            end loop;
-
-            for row in Params.Intercept_Grads'Range loop
-               Packed_Data.Append (Params.Intercept_Grads (row));
-            end loop;
-         end;
-      end loop;
-
-      return Packed_Data;
-
-   end Pack;
+--     function Pack (Params_List : Parameters_List) return NL_Types.Float_List is
+--        Packed_Data : NL_Types.Float_List;
+--
+--     begin
+--        for index in Params_List.First_Index .. Params_List.Last_Index loop
+--           declare
+--              Params : constant Stochastic_Optimizers.Parameters_Record :=
+--                         Params_List (index);
+--           begin
+--              for row in Params.Coeff_Gradients'Range loop
+--                 for col in Params.Coeff_Gradients'Range (2) loop
+--                    Packed_Data.Append (Params.Coeff_Gradients (row, col));
+--                 end loop;
+--              end loop;
+--
+--              for row in Params.Intercept_Grads'Range loop
+--                 Packed_Data.Append (Params.Intercept_Grads (row));
+--              end loop;
+--           end;
+--        end loop;
+--
+--        return Packed_Data;
+--
+--     end Pack;
 
    --  -------------------------------------------------------------------------
 
