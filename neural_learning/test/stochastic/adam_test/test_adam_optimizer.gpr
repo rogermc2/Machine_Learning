@@ -3,8 +3,8 @@ with "gnatcoll.gpr";
 
 project Test_Adam_Optimizer is
 
-   for Source_Dirs use ("src", "../../../datasets", "../../../neural_network", "../../../decision_tree_classifier/support", "../../../common", "../../../utils", "../../../export", "../../../../../../usr/local/include/plplot", "../../../model_selection", "../../../base", 
-      "../../../metrics", "../../../test");
+   for Source_Dirs use ("src", "../../../datasets", "../../../neural_network", "../../../decision_tree_classifier/support", "../../../common", "../../../utils", "../../../export", 
+      "../../../../../../usr/local/include/plplot", "../../../model_selection", "../../../base", "../../../metrics", "../../../test");
    for Object_Dir use "obj";
    for Main use ("test_adam");
    for Exec_Dir use ".";
@@ -14,7 +14,6 @@ project Test_Adam_Optimizer is
    end Compiler;
 
    package Linker is
-      for Switches ("ada") use ("-L/usr/local/lib", "-lplplot");
    end Linker;
 
 end Test_Adam_Optimizer;
