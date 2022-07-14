@@ -9,6 +9,7 @@ with Openml_Ada;
 
 with Data_Splitter;
 with NL_Types;
+with Printing;
 with Utilities;
 
 package body Support_4 is
@@ -64,19 +65,27 @@ package body Support_4 is
                                   Bunch             => Bunch,
                                   As_Frame          => As_Frame);
          Put_Line (Routine_Name & "Openml read");
+         Printing.Print_Float_Matrix
+           (Routine_Name & "Bunch.Data", To_Real_Float_Matrix (Bunch.Data),
+            1, 1);
+
+         Printing.Print_Integer_Array
+           (Routine_Name & "Bunch.Target", To_Integer_Array (Bunch.Target),
+            1, 10);
+         Put_Line (Routine_Name & "declare train and test items");
          declare
             X            : Real_Float_Matrix :=
                              To_Real_Float_Matrix (Bunch.Data);
             Y            : Integer_Array := To_Integer_Array (Bunch.Target);
             Num_Features : constant Positive := Positive (X'Length (2));
-            Train_X      : Real_Float_Matrix (1 .. Train_Size,
-                                              1 .. Num_Features);
-            Train_Y      : Integer_Array (1 .. Train_Size);
-            Train_Y2     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
-            Test_X       : Real_Float_Matrix (1 .. Test_Size,
-                                              1 .. Num_Features);
-            Test_Y       : Integer_Array (1 .. Test_Size);
-            Test_Y2      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
+--              Train_X      : Real_Float_Matrix (1 .. Train_Size,
+--                                                1 .. Num_Features);
+--              Train_Y      : Integer_Array (1 .. Train_Size);
+--              Train_Y2     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
+--              Test_X       : Real_Float_Matrix (1 .. Test_Size,
+--                                                1 .. Num_Features);
+--              Test_Y       : Integer_Array (1 .. Test_Size);
+--              Test_Y2      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
             Data         : Base_State (Train_Size, Test_Size, Num_Features);
          begin
             Put_Line (Routine_Name & "oml loaded");
@@ -90,29 +99,29 @@ package body Support_4 is
             X := Utilities.Permute (X);
             Put_Line (Routine_Name & "X permuted");
             Utilities.Permute (Y);
-            Put_Line (Routine_Name & "Y permuted");
-            --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
-            Put_Line (Routine_Name & "splitting data");
-            Data_Splitter.Train_Test_Split
-              (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
-               Train_X => Train_X, Train_Y => Train_Y,
-               Test_X => Test_X, Test_Y => Test_Y);
-            Put_Line ("Requested train size: " & Integer'Image (Train_Size));
-            Put_Line ("Train data length: " &
-                        Count_Type'Image (Train_X'Length));
-
-            for row in Train_Y2'First .. Train_Y2'Last loop
-               Train_Y2 (row, 1) := Train_Y (row);
-            end loop;
-
-            for row in Test_Y2'First .. Test_Y2'Last loop
-               Test_Y2 (row, 1) := Test_Y (row);
-            end loop;
-
-            Data.Train_X := Train_X;
-            Data.Train_Y := Train_Y2;
-            Data.Test_X := Test_X;
-            Data.Test_Y := Test_Y2;
+--              Put_Line (Routine_Name & "Y permuted");
+--              --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
+--              Put_Line (Routine_Name & "splitting data");
+--              Data_Splitter.Train_Test_Split
+--                (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
+--                 Train_X => Train_X, Train_Y => Train_Y,
+--                 Test_X => Test_X, Test_Y => Test_Y);
+--              Put_Line ("Requested train size: " & Integer'Image (Train_Size));
+--              Put_Line ("Train data length: " &
+--                          Count_Type'Image (Train_X'Length));
+--
+--              for row in Train_Y2'First .. Train_Y2'Last loop
+--                 Train_Y2 (row, 1) := Train_Y (row);
+--              end loop;
+--
+--              for row in Test_Y2'First .. Test_Y2'Last loop
+--                 Test_Y2 (row, 1) := Test_Y (row);
+--              end loop;
+--
+--              Data.Train_X := Train_X;
+--              Data.Train_Y := Train_Y2;
+--              Data.Test_X := Test_X;
+--              Data.Test_Y := Test_Y2;
 
             Save_State (Dataset_Name, Num_Features, Data, Bunch);
             return Data;

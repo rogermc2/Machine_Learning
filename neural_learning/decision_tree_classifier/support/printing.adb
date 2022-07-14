@@ -191,8 +191,8 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Matrix_Formated
-      (Name  : String; aMatrix : Real_Float_Matrix; Places : Natural;
-       Start : Integer := 1; Finish : Integer := 0) is
+     (Name  : String; aMatrix : Real_Float_Matrix; Places : Natural;
+      Start : Integer := 1; Finish : Integer := 0) is
       Last  : Integer;
    begin
       if Finish > 0 then
@@ -220,18 +220,31 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Integer_Array
-     (Name : String; anArray : NL_Arrays_And_Matrices.Integer_Array) is
+     (Name  : String; anArray : NL_Arrays_And_Matrices.Integer_Array;
+      Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
       Count : Natural := 0;
    begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
+
       Put_Line (Name & ": ");
-      for Index in anArray'First .. anArray'Last loop
-         Put (Integer'Image (anArray (Index)) & "  ");
-         Count := Count + 1;
-         if Count > 10 then
-            New_Line;
-            Count := 0;
-         end if;
-      end loop;
+      if Start >= anArray'First and then Finish <= anArray'Last then
+         for Index in Start .. Last loop
+            Put (Integer'Image (anArray (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 0;
+            end if;
+         end loop;
+      else
+         Put_Line
+           ("Print_Integer_Array called with invalid start or finish index.");
+      end if;
       New_Line;
 
    end Print_Integer_Array;
@@ -401,23 +414,23 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Matrix_Dimensions (Name : String;
+   procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Integer_Matrix) is
    begin
       Put (Name & ": ");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &
-      Integer'Image (aMatrix'Length (2)));
+                  Integer'Image (aMatrix'Length (2)));
 
    end Print_Matrix_Dimensions;
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Matrix_Dimensions (Name : String;
+   procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Real_Float_Matrix) is
    begin
       Put (Name & ": ");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &
-      Integer'Image (aMatrix'Length (2)));
+                  Integer'Image (aMatrix'Length (2)));
 
    end Print_Matrix_Dimensions;
 
@@ -480,27 +493,27 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Parameters
-     (Name : String; Params : Stochastic_Optimizers.Parameters_Record;
-     Rows_Start : Positive := 1; Rows_Last : Positive := 10) is
-     Start      : Positive := Rows_Start;
-     Last       : Positive := Rows_Last;
-     Cols_Start : Positive := Rows_Start;
-     Cols_Last  : Positive := Rows_Last;
+     (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
+      Rows_Start : Positive := 1; Rows_Last : Positive := 10) is
+      Start      : Positive := Rows_Start;
+      Last       : Positive := Rows_Last;
+      Cols_Start : Positive := Rows_Start;
+      Cols_Last  : Positive := Rows_Last;
    begin
       if Rows_Last > Params.Num_Rows then
-          Last := Params.Num_Rows;
+         Last := Params.Num_Rows;
       end if;
 
       if Rows_Start > Rows_Last then
-          Start := Rows_Last;
+         Start := Rows_Last;
       end if;
 
       if Cols_Last > Params.Num_Cols then
-          Cols_Last := Params.Num_Cols;
+         Cols_Last := Params.Num_Cols;
       end if;
 
       if Cols_Start > Cols_Last then
-          Cols_Start := Cols_Last;
+         Cols_Start := Cols_Last;
       end if;
 
       Put_Line (Name & ": ");
