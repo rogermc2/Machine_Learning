@@ -1,9 +1,11 @@
 --  Based on scikit-learn/sklearn/metrics/_classification.py
 
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
+with Multiclass_Utils;
 with Neural_Maths;
---  with Printing;
+with Printing;
 
 package body Classification_Metrics is
 
@@ -18,8 +20,8 @@ package body Classification_Metrics is
    function Accuracy_Score
      (Y_True, Y_Prediction : Real_Float_Matrix; Normalize : Boolean := True;
       Sample_Weight        : Real_Float_Vector) return float is
---        Routine_Name : constant String :=
---                          "Classification_Metrics.Accuracy_Score, ";
+      Routine_Name : constant String :=
+                        "Classification_Metrics.Accuracy_Score, ";
       eps          : constant Float := 10.0 ** (-8);
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
                        (others => (others => 1.0));
@@ -35,7 +37,7 @@ package body Classification_Metrics is
             end if;
          end loop;
       end loop;
---        Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 2);
+      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 2);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
@@ -73,10 +75,22 @@ package body Classification_Metrics is
    --  ------------------------------------------------------------------------
 
    procedure Check_Targets (Y_True, Y_Prediction : Real_Float_Matrix) is
+      use Multiclass_Utils;
+      Type_True : constant Y_Type := Type_Of_Target (Y_True);
+      Type_Pred : Y_Type := Type_Of_Target (Y_Prediction);
    begin
       NL_Arrays_And_Matrices.Check_Lengths
         ("Classification_Metrics.Check_Targets", Y_True, Y_Prediction);
+      if Type_True = Y_Binary and Type_Pred = Y_Multiclass then
+         Type_Pred := Y_Multiclass;
+      end if;
 
+      Assert (Type_True = Y_Binary or Type_True = Y_Multiclass or
+                Type_True = Y_Multilabel_Indicator, "Y_Type " &
+                Y_Type'Image (Type_True) & " is not supported");
+      if Type_True = Y_Binary then
+         null;
+      end if;
    end Check_Targets;
 
    --  ------------------------------------------------------------------------
