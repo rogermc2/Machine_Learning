@@ -9,7 +9,7 @@ with Openml_Ada;
 
 with Data_Splitter;
 with NL_Types;
-with Printing;
+--  with Printing;
 with Utilities;
 
 package body Support_4 is
@@ -65,14 +65,7 @@ package body Support_4 is
                                   Bunch             => Bunch,
                                   As_Frame          => As_Frame);
          Put_Line (Routine_Name & "Openml read");
-         Printing.Print_Float_Matrix
-           (Routine_Name & "Bunch.Data", To_Real_Float_Matrix (Bunch.Data),
-            1, 1);
 
-         Printing.Print_Integer_Array
-           (Routine_Name & "Bunch.Target", To_Integer_Array (Bunch.Target),
-            1, 10);
-         Put_Line (Routine_Name & "declare train and test items");
          declare
             X            : Real_Float_Matrix :=
                              To_Real_Float_Matrix (Bunch.Data);
