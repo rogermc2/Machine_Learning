@@ -42,7 +42,7 @@ begin
          aClassifier := C_Init (Max_Iter => 1000,
                                 Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                 Activation => Base_Neural.Identity_Activation,
-                                Verbose => True);
+                                Verbose => False);
          --  The Fit function adjusts weights according to data values so
          --  that better accuracy can be achieved
          Fit (aClassifier, Train_X, Train_Y);

@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Label is
 
@@ -452,8 +452,8 @@ package body Label is
         Assert (Y_Kind /= Y_Continuous_Multioutput and
                   Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                   "does not support Multioutput target data.");
-        Printing.Print_Integer_Array (Routine_Name & "L516 Y", Y);
-        Put_Line (Routine_Name & "L516 Y_Kind " & Y_Type'Image (Y_Kind));
+        --  Printing.Print_Integer_Array (Routine_Name & "L516 Y", Y);
+        --  Put_Line (Routine_Name & "L516 Y_Kind " & Y_Type'Image (Y_Kind));
         --  L516
         if Y_Kind = Y_Binary then
             if Num_Classes = 1 then
@@ -490,7 +490,7 @@ package body Label is
             end if;
         end if;
 
-        Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
+        --  Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
         return Y_Bin;
 
     end Label_Binarize;
@@ -499,9 +499,9 @@ package body Label is
 
     function Transform (Self : Label_Binarizer; Y : Integer_Array)
                         return Boolean_Matrix is
-        Routine_Name : constant String := "Label.Transform Binarize ";
+        --  Routine_Name : constant String := "Label.Transform Binarize ";
     begin
-        Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
+        --  Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
 
         return Label_Binarize (Y, Self.Classes);
 

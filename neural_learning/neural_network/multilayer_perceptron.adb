@@ -47,7 +47,7 @@ with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
-with Printing;
+--  with Printing;
 with Utils;
 with Utils_Optimise;
 
@@ -629,7 +629,7 @@ package body Multilayer_Perceptron is
 
         --  L597
         if Early_Stopping then
-            Put_Line (Routine_Name & "L597  *** Early_Stopping ***");
+            --  Put_Line (Routine_Name & "L597  *** Early_Stopping ***");
             --              Should_Stratify := Is_Classifier and Self.Attributes.N_Outputs = 1;
             --              if Should_Stratify then
             --                  Stratify := Y;
@@ -759,15 +759,15 @@ package body Multilayer_Perceptron is
                               Self.Attributes.Out_Activation;
         Num_Layers        : constant Positive := Self.Attributes.N_Layers;
     begin
-        Put_Line (Routine_Name & "Solver type "
-                  & Solver_Type'Image (Self.Parameters.Solver));
+        --  Put_Line (Routine_Name & "Solver type "
+        --            & Solver_Type'Image (Self.Parameters.Solver));
         --        Printing.Print_Float_Matrix
         --          (Routine_Name & "entry L130 Activations Last_Element ",
         --           Activations.Last_Element);
         --  L130
         for layer in 1 .. Num_Layers - 1 loop
-            New_Line;
-            Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer));
+            --  New_Line;
+            --  Put_Line (Routine_Name & "L131 layer" & Integer'Image (layer));
             declare
                 use Real_Float_Arrays;
                 Params             : constant Parameters_Record :=
@@ -776,9 +776,9 @@ package body Multilayer_Perceptron is
                 Activat_Dot_Coeff  : constant Real_Float_Matrix
                   := Activations (layer) * Params.Coeff_Gradients;
             begin
-                Printing.Print_Float_Matrix
-                  (Routine_Name & "L131 Coeff_Gradients",
-                   Params.Coeff_Gradients, 1, 2);
+                --  Printing.Print_Float_Matrix
+                --    (Routine_Name & "L131 Coeff_Gradients",
+                --     Params.Coeff_Gradients, 1, 2);
                 --              Printing.Print_Float_Matrix
                 --                (Routine_Name & "L131 Activat_Dot_Coeff", Activat_Dot_Coeff);
                 --  L132 Add layer + 1
@@ -1163,8 +1163,8 @@ package body Multilayer_Perceptron is
         use Base_Neural;
         use Real_Float_Arrays;
         use Real_Matrix_List_Package;
-        Routine_Name : constant String :=
-                         "Multilayer_Perceptron.Update_Gradients ";
+        --  Routine_Name : constant String :=
+        --                   "Multilayer_Perceptron.Update_Gradients ";
         Params       : constant Parameters_Record :=
                          Self.Attributes.Params (Layer);
     begin
@@ -1178,8 +1178,8 @@ package body Multilayer_Perceptron is
         --        Put_Line (Routine_Name & "Deltas size" &
         --                    Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
         --                    Integer'Image (Deltas.Element (layer - 1)'Length (2)));
-        Put_Line (Routine_Name & "L312 Activation_Type " &
-                    Activation_Type'Image (Self.Parameters.Activation));
+        --  Put_Line (Routine_Name & "L312 Activation_Type " &
+        --              Activation_Type'Image (Self.Parameters.Activation));
         --  L312
         case Self.Parameters.Activation is
             when Identity_Activation => null;
@@ -1292,10 +1292,9 @@ package body Multilayer_Perceptron is
             Self.Attributes.Binarizer := Binarizer;
             Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
         end if;
-        Printing.Print_Integer_List
-          (Routine_Name & "Classes", Self.Attributes.Classes);
+        --  Printing.Print_Integer_List
+        --    (Routine_Name & "Classes", Self.Attributes.Classes);
 
-        Put_Line (Routine_Name & "Label_Binarize");
         return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
 
     end Validate_Input;
