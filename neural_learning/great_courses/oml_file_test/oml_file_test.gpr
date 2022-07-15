@@ -3,8 +3,8 @@ with "gnatcoll.gpr";
 
 project Oml_File_Test is
 
-   for Source_Dirs use ("src", "../../datasets", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../decision_tree_classifier/src", "../../export", 
-      "/usr/local/include/plplot_bindings/ada");
+   for Source_Dirs use ("src", "../../datasets", "../../decision_tree_classifier/support", "../../common", "../../utils", "../../export", 
+"../../decision_tree_classifier/support", "../../neural_network");
    for Object_Dir use "obj";
    for Main use ("oml_file_tester.adb");
    for Exec_Dir use ".";
