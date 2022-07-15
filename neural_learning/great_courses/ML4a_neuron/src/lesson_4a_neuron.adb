@@ -31,12 +31,12 @@ begin
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
---        Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
---                 Count_Type'Image (Train_X'Length (2)));
---        Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
---                 Count_Type'Image (Train_Y'Length (2)));
---        Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
---        Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
+      Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
+               Count_Type'Image (Train_X'Length (2)));
+      Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
+               Count_Type'Image (Train_Y'Length (2)));
+      Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
+      Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
 --        aClassifier := C_Init (Max_Iter => 10000,
       aClassifier := C_Init (Max_Iter => 200,
@@ -46,11 +46,11 @@ begin
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
       Put_Line ("Neural_Fit");
---        Fit (aClassifier, Train_X, Train_Y);
---        Put_Line ("Score: " & Float'Image (Base.Score
---                  (Self => aClassifier, X => Test_X,
---                   Y => To_Real_Float_Matrix (Test_Y),
---                   Sample_Weight => Sample_Weight)));
+      Fit (aClassifier, Train_X, Train_Y);
+      Put_Line ("Score: " & Float'Image (Base.Score
+                (Self => aClassifier, X => Test_X,
+                 Y => To_Real_Float_Matrix (Test_Y),
+                 Sample_Weight => Sample_Weight)));
    end;  --  declare
 
    Put_Line ("----------------------------------------------");
