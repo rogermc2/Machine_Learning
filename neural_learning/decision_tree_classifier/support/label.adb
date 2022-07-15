@@ -495,15 +495,15 @@ package body Label is
                 --  Binarize is all that is needed for this implementation
                 Y_Bin := Binarize (Y);
 
-            elsif Y_Kind = Y_Multilabel_Indicator then
-                Y_Bin := Binarize (Y);
             else
-                Put_Line (Routine_Name & Y_Type'Image (Y_Kind) &
-                            " target data is not supported by Label_Binarize");
+                Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
+                          Y_Type'Image (Y_Kind) &
+                          " target data is not supported by Label_Binarize");
+                Y_Bin := Binarize (Y);
             end if;
         end if;
 
-        Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
+--          Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
         return Y_Bin;
 
     end Label_Binarize;
