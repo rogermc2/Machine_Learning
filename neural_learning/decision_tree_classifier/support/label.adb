@@ -200,17 +200,17 @@ package body Label is
    --  L586 Multiclass uses the maximal score instead of a threshold.
    function Inverse_Binarize_Multiclass (Y       : Real_Float_Matrix;
                                          Classes : NL_Types.Integer_List)
-                                          return Integer_Array is
+                                          return Integer_Matrix is
       use Classifier_Utilities;
       --        Routine_Name :  constant String :=
       --                         "Label.Inverse_Binarize_Multiclass ";
-      Inverse      : Integer_Array  (Y'Range);
+      Inverse      : Integer_Matrix  (Y'Range, 1 .. 1);
       Max_Indices  : Natural_Array (Y'Range);
    begin
       --  L627
       Max_Indices := Row_Max_Indices (Y);
       for row in Inverse'Range loop
-         Inverse (row) := Classes.Element (Max_Indices (row));
+         Inverse (row, 1) := Classes.Element (Max_Indices (row));
       end loop;
 
       return Inverse;
@@ -392,10 +392,10 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
-                                return Integer_Array is
+                                return Integer_Matrix is
       use Multiclass_Utils;
 --        Threshold : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
-      Y_Inv     : Integer_Array (1 .. Y'Length);
+      Y_Inv     : Integer_Matrix (1 .. Y'Length, 1 .. 1);
    begin
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);

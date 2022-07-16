@@ -1091,7 +1091,7 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
 
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Integer_Array is
+                     return Integer_Matrix is
     --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
         Y_Pred         : constant Real_Float_Matrix :=
                            Forward_Pass_Fast (Self, X);
