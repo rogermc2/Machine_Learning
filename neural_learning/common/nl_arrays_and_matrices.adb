@@ -267,6 +267,18 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix) is
+   begin
+      Assert (R'Length = L'Length and R'Length (2) = L'Length (2),
+              Routine_Name &
+                " right size" & Integer'Image (R'Length) & " x" &
+                Integer'Image (R'Length (2)) &
+                " should be the same as left size" & Integer'Image (L'Length) &
+                " x" & Integer'Image (L'Length (2)));
+   end Check_Lengths;
+
+   --  ----------------------------------------------------------------------------
+
    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix) is
    begin
       Assert (R'Length = L'Length and R'Length (2) = L'Length (2),

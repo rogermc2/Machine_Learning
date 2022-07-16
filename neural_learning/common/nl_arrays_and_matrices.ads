@@ -73,6 +73,7 @@ package NL_Arrays_And_Matrices is
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
                   return Real_Float_Matrix;
    pragma Inline ("-");
+   procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix);
    pragma Inline (Check_Lengths);
    function Dot (L, R : Real_Float_List) return Float;

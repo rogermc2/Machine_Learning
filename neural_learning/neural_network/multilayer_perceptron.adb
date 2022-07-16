@@ -434,6 +434,7 @@ package body Multilayer_Perceptron is
     procedure Fit (Self        : in out MLP_Classifier;
                    X           : Real_Float_Matrix;
                    Y           : Integer_Matrix;
+                   Y_Bin       : out Boolean_Matrix;
                    Incremental : Boolean := False) is
         use Ada.Containers;
         --          Routine_Name       : constant String :=
@@ -441,11 +442,11 @@ package body Multilayer_Perceptron is
         Num_Features       : constant Positive := Positive (X'Length (2));
         Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                                Self.Parameters.Hidden_Layer_Sizes;
-        Y_Bin              : constant Boolean_Matrix :=
-                               Validate_Input (Self, Y, Incremental);
         Layer_Units        : NL_Types.Integer_List;
         Activations        : Real_Matrix_List;
     begin
+        --  L394
+        Y_Bin := Validate_Input (Self, Y, Incremental);
         --        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
         --        Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
         --  L385
@@ -482,7 +483,6 @@ package body Multilayer_Perceptron is
             --  L444
         elsif Self.Parameters.Solver = Lbfgs_Solver then
             Fit_Lbfgs (Self, X, Y_Bin, Activations);
-            --           Fit_Lbfgs (Self, X, Y_2D, Activations, Deltas, Grads, Layer_Units);
         end if;
 
         Check_Weights (Self);
@@ -1069,9 +1069,9 @@ package body Multilayer_Perceptron is
     --  L778  Partial_Fit updates the model with a single iteration over the
     --        given data.
     procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-                           Y    : Integer_Matrix) is
+                           Y    : Integer_Matrix; Y_Bin : out Boolean_Matrix) is
     begin
-        Fit (Self, X, Y, Incremental => True);
+        Fit (Self, X, Y, Y_Bin, Incremental => True);
 
     end Partial_Fit;
 
@@ -1079,14 +1079,15 @@ package body Multilayer_Perceptron is
     --  L1186
     procedure Partial_Fit
       (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-       Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
+       Y    : Integer_Matrix; Y_Bin : out Boolean_Matrix;
+       Classes : NL_Types.Integer_List) is
         use Label;
     begin
         if Check_Partial_Fit_First_Call (Self, Classes) then
             Fit (Self.Attributes.Binarizer, Y);
         end if;
 
-        Partial_Fit (Self, X, Y);
+        Partial_Fit (Self, X, Y, Y_Bin);
 
     end Partial_Fit;
 

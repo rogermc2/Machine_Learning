@@ -157,14 +157,16 @@ package Multilayer_Perceptron is
    procedure Fit (Self        : in out MLP_Classifier;
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
+                  Y_Bin       : out Boolean_Matrix;
                   Incremental : Boolean := False);
    procedure Init_Optimizer (Self : in out MLP_Classifier);
    function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Loss_Grad_Result;
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-                          Y    : Integer_Matrix);
+                          Y    : Integer_Matrix; Y_Bin : out Boolean_Matrix);
    procedure Partial_Fit
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-      Y    : Integer_Matrix; Classes : NL_Types.Integer_List);
+      Y    : Integer_Matrix; Y_Bin : out Boolean_Matrix;
+      Classes : NL_Types.Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                       return Real_Float_Matrix;
 
