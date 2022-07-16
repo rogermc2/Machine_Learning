@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/metrics/_classification.py
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Multiclass_Utils;
 with Neural_Maths;
@@ -76,9 +76,13 @@ package body Classification_Metrics is
 
    procedure Check_Targets (Y_True, Y_Prediction : Real_Float_Matrix) is
       use Multiclass_Utils;
+      Routine_Name : constant String := "Classification_Metrics.Check_Targets";
       Type_True : constant Y_Type := Type_Of_Target (Y_True);
       Type_Pred : Y_Type := Type_Of_Target (Y_Prediction);
    begin
+      Put_Line (Routine_Name & "True type:" & Y_Type'Image (Type_True));
+      Put_Line (Routine_Name & "Prediction type:" & Y_Type'Image (Type_Pred));
+
       NL_Arrays_And_Matrices.Check_Lengths
         ("Classification_Metrics.Check_Targets", Y_True, Y_Prediction);
       if Type_True = Y_Binary and Type_Pred = Y_Multiclass then
@@ -86,7 +90,7 @@ package body Classification_Metrics is
       end if;
 
       Assert (Type_True = Y_Binary or Type_True = Y_Multiclass or
-                Type_True = Y_Multilabel_Indicator, "Y_Type " &
+                Type_True = Y_Multilabel_Indicator, Routine_Name & "Y_Type " &
                 Y_Type'Image (Type_True) & " is not supported");
       if Type_True = Y_Binary then
          null;
