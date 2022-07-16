@@ -168,7 +168,7 @@ package Multilayer_Perceptron is
       Y       : Integer_Matrix; Y_Bin : out Boolean_Matrix;
       Classes : NL_Types.Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Real_Float_Matrix;
+                     return Integer_Array;
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Boolean_Matrix;
