@@ -96,9 +96,6 @@ package body Multilayer_Perceptron is
                                 Gradients          : in out Parameters_List;
                                 Layer, Num_Samples : Positive);
     procedure Validate_Hyperparameters (Self : MLP_Classifier);
-    function Validate_Input (Self        : in out MLP_Classifier;
-                             Y           : Integer_Matrix;
-                             Incremental : Boolean) return Boolean_Matrix;
 
     --  -------------------------------------------------------------------------
 
