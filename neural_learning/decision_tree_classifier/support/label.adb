@@ -390,13 +390,14 @@ package body Label is
    end Inverse_Transform;
 
    --  -------------------------------------------------------------------------
-
+   --  L361
    function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                 return Integer_Matrix is
       use Multiclass_Utils;
 --        Threshold : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
       Y_Inv     : Integer_Matrix (1 .. Y'Length, 1 .. 1);
    begin
+      --  L398
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else

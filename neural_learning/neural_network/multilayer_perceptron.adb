@@ -88,8 +88,8 @@ package body Multilayer_Perceptron is
                              Batch_Size       : Positive;
                              Accumulated_Loss : in out Float);
     procedure Update_No_Improvement_Count
-      (Self         : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val, Y_Val : Real_Float_Matrix);
+      (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+       X_Val : Real_Float_Matrix; Y_Val : Boolean_Matrix);
     procedure Update_Gradients (Self               : in out MLP_Classifier;
                                 Activations        : Real_Matrix_List;
                                 Deltas             : in out Real_Matrix_List;
@@ -683,7 +683,7 @@ package body Multilayer_Perceptron is
 
             --  L669 Update no_improvement_count based on training loss or
             --       validation score according to early_stopping
-            Update_No_Improvement_Count (Self, Early_Stopping, Test_X, Val_Y);
+            Update_No_Improvement_Count (Self, Early_Stopping, Test_X, Test_Y);
             --  for learning rate that needs to be updated at iteration end;
             if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
                 null;
@@ -1201,8 +1201,8 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
     --  L716
     procedure Update_No_Improvement_Count
-      (Self          : in out MLP_Classifier; Early_Stopping : Boolean;
-       X_Val, Y_Val  : Real_Float_Matrix) is
+      (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+       X_Val  : Real_Float_Matrix; Y_Val : Boolean_Matrix) is
         Routine_Name     : constant String
           := "Multilayer_Perceptron.Update_No_Improvement_Count ";
         Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
