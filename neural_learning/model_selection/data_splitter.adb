@@ -2,7 +2,7 @@
 --  Based on scikit-learn/sklearn/model_selection/_split.py
 
 with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Utilities;
 --  with Printing;
@@ -43,7 +43,7 @@ package body Data_Splitter is
    procedure Iterate_Indices
      (Self                        : Base_Shuffle_Data;
       Train_Indices, Test_Indices : out Integer_Array) is
-      --        Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
+      Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
       Num_Train     : constant Natural := Self.Train_Size;
       Num_Test      : constant Natural := Self.Test_Size;
       Num_Samples   : constant Natural := Num_Train + Num_Test;
@@ -60,7 +60,11 @@ package body Data_Splitter is
             Test_Indices (test_index) := Perms (test_index);
          end loop;
 
+         Put_Line (Routine_Name & "Num_Samples:" & Integer'Image (Num_Samples));
+         Put_Line (Routine_Name & "Num_Test:" & Integer'Image (Num_Test));
          for train_index in Num_Test + 1 .. Num_Samples loop
+            Put_Line (Routine_Name & "train_index:" &
+                        Integer'Image (train_index));
             Train_Indices (train_index) := Perms (train_index);
          end loop;
       end loop;
@@ -120,6 +124,7 @@ package body Data_Splitter is
       Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size,
                                Default_Test_Size);
 
+      Put_Line (Routine_Name);
       Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
 
       for index in Test_Indices'First .. Test_Indices'Last loop
@@ -164,7 +169,7 @@ package body Data_Splitter is
 
       Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size,
                                Default_Test_Size);
-
+      Put_Line (Routine_Name);
       Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
 
       for index in Test_Indices'First .. Test_Indices'Last loop
