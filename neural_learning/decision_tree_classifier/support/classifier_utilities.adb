@@ -825,6 +825,20 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function To_Integer_List_2D (Data : Value_Data_Lists_2D)
+                                return Integer_List_2D  is
+      I2_List : Integer_List_2D;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         I2_List.Append (To_Integer_List (Data (index)));
+      end loop;
+
+      return I2_List;
+
+   end To_Integer_List_2D;
+
+   --  -------------------------------------------------------------------------
+
    function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
                                  return Value_Data_Lists_2D is
       Value    : Value_Record (Integer_Type);

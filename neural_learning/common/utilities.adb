@@ -238,6 +238,25 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
+   function Permute (aList : Integer_Matrix) return Integer_Matrix is
+      List_Length  : constant Positive := Positive (aList'Length);
+      Rand         : Positive;
+      Permutation  : Integer_Matrix := aList;
+   begin
+      if List_Length > 1 then
+         for index in 1 .. List_Length - 1 loop
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Swap (Permutation, index, Rand);
+         end loop;
+      end if;
+
+      return Permutation;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
    procedure Permute (aList : in out String_List) is
       use String_Package;
       List_Length  : constant Positive := Positive (aList.Length);
@@ -585,6 +604,19 @@ package body Utilities is
       Item := Data (L);
       Data (L) := Data (R);
       Data (R) := Item;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Swap (Data : in out Integer_Matrix; L, R : Positive) is
+      Val : Integer;
+   begin
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
 
    end Swap;
 

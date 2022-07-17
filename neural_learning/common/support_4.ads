@@ -12,7 +12,7 @@ package Support_4 is
    end record;
 
    function Get_State
-     (Dataset : Load_Dataset.Data_Record; Test_Size, Train_Size : Positive)
+     (Dataset : Load_Dataset.Digits_Data_Record; Test_Size, Train_Size : Positive)
       return Base_State;
    function Get_State
      (Dataset_Name : String;

@@ -24,8 +24,8 @@ procedure Lesson_4A_Neuron is
 begin
    Put_Line (Routine_Name);
    declare
-      Digits_Data   : constant Load_Dataset.Data_Record :=
-                        Load_Dataset.Load_Digits;
+      Digits_Data   : constant Load_Dataset.Digits_Data_Record :=
+                        Load_Dataset.Load_Digits ("../../Datasets/digits.csv");
       --        Features      : constant Real_Float_Matrix :=
       --                          To_Real_Float_Matrix (Digits_Data.Features);
       --        Target        : NL_Types.Integer_List;

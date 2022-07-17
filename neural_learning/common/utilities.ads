@@ -46,6 +46,7 @@ package Utilities is
                                  return Class_Range;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
    procedure Permute (aList : in out Integer_Array);
+   function Permute (aList : Integer_Matrix) return Integer_Matrix;
    pragma Inline (Permute);
    procedure Permute (aList : in out String_List);
    pragma Inline (Permute);
@@ -70,8 +71,8 @@ package Utilities is
    function Split_String (aString, Pattern : String)
                            return String_List;
    procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive);
-   pragma Inline (Swap);
    procedure Swap (Data : in out Integer_Array; L, R : Positive);
+   procedure Swap (Data : in out Integer_Matrix; L, R : Positive);
    pragma Inline (Swap);
    function XY_To_Rows (X, Y : Value_Data_Lists_2D)
                          return Rows_Vector;

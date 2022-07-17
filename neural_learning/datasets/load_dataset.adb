@@ -17,19 +17,20 @@ package body Load_Dataset is
    --  Features             integers 0-16
    --  =================   ==============
    --  Target: num outputs x num classes
-   function Load_Digits return Data_Record is
+   function Load_Digits (File_Name : String) return Digits_Data_Record is
       use Classifier_Utilities;
       Routine_Name   : constant String := "Load_Dataset.Load_Digits ";
       Digits_Data    : constant NL_Types.Multi_Output_Data_Record :=
-                         Load_Data ("../../digits.csv");
+                         Load_Data (File_Name);
       Class_Names    : NL_Types.Class_Names_List;
-      --          Feature_Names       : NL_Types.Feature_Names_List;
       Digit_Features : constant NL_Types.Value_Data_Lists_2D :=
                          Digits_Data.Feature_Values;
-      Digit_Labels   : constant NL_Types.Value_Data_List :=
-                         Digits_Data.Feature_Values.Element (1);
+--        Feature_Names  : constant NL_Types.Value_Data_List :=
+--                           Digits_Data.Feature_Values.Element (1);
+      Digit_Values   : constant NL_Types.Value_Data_Lists_2D :=
+                         Digits_Data.Label_Values;
       Num_Samples    : constant Natural := Natural (Digit_Features.Length);
-      Data           : Data_Record;
+      Data           : Digits_Data_Record;
    begin
       Class_Names.Append (To_Unbounded_String ("0"));
       Class_Names.Append (To_Unbounded_String ("1"));
@@ -45,12 +46,12 @@ package body Load_Dataset is
 
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
-      Assert (Integer (Digits_Data.Label_Values.Length) = Num_Samples, Routine_Name &
+      Assert (Integer (Digit_Values.Length) = Num_Samples, Routine_Name &
                 " invalid Digits Target vector");
 
       --  Digits_Target is 2D list num outputs x num classes
       Data.Features := To_Float_List_2D (Digit_Features);
-      Data.Target := To_Integer_List (Digit_Labels);
+      Data.Target := To_Integer_List_2D (Digit_Values);
       Data.Num_Features := Positive (Data.Features (1).Length);
       return Data;
 
@@ -58,12 +59,12 @@ package body Load_Dataset is
 
    --  -------------------------------------------------------------------------
 
-   function Load_Iris return Data_Record is
+   function Load_Iris (File_Name : String) return Iris_Data_Record is
       use Classifier_Utilities;
       use NL_Types;
       Routine_Name  : constant String := "Load_Dataset.Load_Iris ";
       Iris_Data     : constant NL_Types.Multi_Output_Data_Record :=
-                        Load_Data ("../../iris.csv");
+                        Load_Data (File_Name);
       Class_Names   : NL_Types.Class_Names_List;
       --        Features        : NL_Types.Feature_Names_List;
       Iris_Features : constant NL_Types.Value_Data_Lists_2D :=
@@ -72,7 +73,7 @@ package body Load_Dataset is
                         Iris_Data.Label_Values;
       Iris_Row      : NL_Types.Value_Data_List;
       Num_Samples   : constant Natural := Natural (Iris_Features.Length);
-      Data          : Data_Record;
+      Data          : Iris_Data_Record;
    begin
       Class_Names.Append (To_Unbounded_String ("Setosa"));
       Class_Names.Append (To_Unbounded_String ("Versicolour"));

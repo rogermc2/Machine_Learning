@@ -58,20 +58,20 @@ package NL_Arrays_And_Matrices is
    pragma Inline ("*");
    function "/" (L, R : Real_Float_Matrix) return Real_Float_Matrix;
    function "/" (L : Real_Float_Matrix; R : Real_Float_Vector)
-                  return Real_Float_Matrix;
+                 return Real_Float_Matrix;
    function "/" (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline ("/");
    function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
-                  return Real_Float_Matrix;
+                 return Real_Float_Matrix;
    function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline ("+");
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
-                  return Real_Float_Matrix;
+                 return Real_Float_Matrix;
    function "-" (L : Real_Float_Matrix; R : Float) return Real_Float_Matrix;
    function "-" (L : Real_Float_Vector; R : Float) return Real_Float_Vector;
    function "-" (L : Real_Float_Matrix; R : Real_Float_Vector)
-                  return Real_Float_Matrix;
+                 return Real_Float_Matrix;
    pragma Inline ("-");
    procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Integer_Matrix);
@@ -102,20 +102,22 @@ package NL_Arrays_And_Matrices is
    function Min (L, R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline (Min);
    function To_Boolean_Array (List : NL_Types.Boolean_List)
-                               return Boolean_Array;
+                              return Boolean_Array;
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix;
    function To_Integer_Array (List : NL_Types.Integer_List)
-                               return Integer_Array;
+                              return Integer_Array;
+   function To_Integer_Matrix (List : NL_Types.Integer_List_2D)
+                               return Integer_Matrix;
    function To_Natural_Array (List : NL_Types.Natural_List)
-                               return Natural_Array;
+                              return Natural_Array;
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
-                                   return Real_Float_Matrix;
+                                  return Real_Float_Matrix;
    function To_Real_Float_Matrix (BM : Boolean_Matrix)
-                                   return Real_Float_Matrix;
+                                  return Real_Float_Matrix;
    function To_Real_Float_Matrix (IM : Integer_Matrix)
-                                   return Real_Float_Matrix;
+                                  return Real_Float_Matrix;
    function To_Real_Float_Vector (List : Real_Float_List)
-                                   return Real_Float_Vector;
+                                  return Real_Float_Vector;
    function Transpose (Values : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline (Transpose);
    function Transpose (Values : Integer_Matrix) return Integer_Matrix;
