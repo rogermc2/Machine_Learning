@@ -11,6 +11,8 @@ package body Base_Neural is
 
    EPS : constant Float := Float'Small;
 
+   function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
+                     return Real_Float_Matrix;
    function X_Log_Y (X : Boolean_Matrix; Y : Real_Float_Matrix)
                      return Real_Float_Matrix;
    pragma Inline (X_Log_Y);
@@ -44,6 +46,46 @@ package body Base_Neural is
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       X_Log_Y1 := X_Log_Y (Y_True, YP);
       X_Log_Y2 := X_Log_Y (not Y_True, Unit_Matrix - YP);
+
+      for row in YP'Range loop
+         for col in YP'Range (2) loop
+            Sum1 := Sum1 + X_Log_Y1 (row, col);
+            Sum2 := Sum2 + X_Log_Y2 (row, col);
+         end loop;
+      end loop;
+
+      return - (Sum1 + Sum2) / Float (Y_Prob'Length);
+
+   end Binary_Log_Loss;
+
+   --  -------------------------------------------------------------------------
+
+   function Binary_Log_Loss (Y_True : Integer_Matrix;
+                             Y_Prob : Real_Float_Matrix) return Float is
+      use Real_Float_Arrays;
+      --        Routine_Name : constant String :=
+      --                         "Base_Neural.Binary_Log_Loss_Function ";
+      YP          : Real_Float_Matrix := Y_Prob;
+      X_Log_Y1    : Real_Float_Matrix (YP'Range, YP'Range (2));
+      X_Log_Y2    : Real_Float_Matrix (YP'Range, YP'Range (2));
+      Sum1        : Float := 0.0;
+      Sum2        : Float := 0.0;
+   begin
+      --  L226 Clip Y_Prob
+      for row in YP'Range loop
+         for col in YP'Range (2) loop
+            if YP (row, col) < EPS then
+               YP (row, col) := EPS;
+            elsif YP (row, col) > 1.0 - EPS then
+               YP (row, col) := 1.0 - EPS;
+            end if;
+         end loop;
+      end loop;
+
+      --  xlogy = x*log(y) so that the result is 0 if x = 0
+      X_Log_Y1 := X_Log_Y (Y_True, YP);
+      X_Log_Y2 := X_Log_Y (Unit_Integer_Matrix (Y_True'Length) - Y_True,
+                           Unit_Float_Matrix (YP'Length) - YP);
 
       for row in YP'Range loop
          for col in YP'Range (2) loop
@@ -178,6 +220,62 @@ package body Base_Neural is
 
    --  -------------------------------------------------------------------------
 
+   function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
+                      return Float is
+      --          Routine_Name : constant String := "Base_Neural.Log_Loss ";
+      YP           : Real_Float_Matrix := Y_Prob;
+      YT2          : Integer_Matrix (Y_True'Range, Y_True'First (2) ..
+                                       Y_True'Last (2) + 1);
+      YP2          : Real_Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
+
+      function Do_XlogY (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
+                         return Float is
+         X_Y : Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
+         Sum : Float := 0.0;
+      begin
+         X_Y := X_Log_Y (Y_True, Y_Prob);
+         for row in Y_Prob'Range loop
+            for col in Y_Prob'Range (2) loop
+               Sum := Sum + X_Y (row, col);
+            end loop;
+         end loop;
+
+         return - Sum / Float (Y_Prob'Length);
+      end Do_XlogY;
+
+   begin
+      --  L194 Clip Y_Prob
+      for row in YP'Range loop
+         for col in YP'Range (2) loop
+            if YP (row, col) < EPS then
+               YP (row, col) := EPS;
+            elsif YP (row, col) > 1.0 - EPS then
+               YP (row, col) := 1.0 - EPS;
+            end if;
+         end loop;
+      end loop;
+
+      --  xlogy = x*log(y) so that the result is 0 if x = 0
+      if YP'Length (2) = 1 then
+         for row in YP'Range loop
+            for col in YP'Range (2) loop
+               YP2 (row, col) := YP (row, col);
+               YP2 (row, col + 1) := 1.0 - YP (row, col);
+               YT2 (row, col) := Y_True (row, col);
+               YT2 (row, col + 1) := 1 - Y_True (row, col);
+            end loop;
+         end loop;
+
+         return Do_XlogY (YT2, YP2);
+
+      else
+         return Do_XlogY (Y_True, YP);
+      end if;
+
+   end Log_Loss;
+
+   --  -------------------------------------------------------------------------
+
    procedure Rect_LU (Activation : in out Real_Float_Matrix) is
       type Matrix_Float is new Real_Float_Matrix (1 .. Activation'Length,
                                                   1 .. Activation'Length (2));
@@ -245,6 +343,25 @@ package body Base_Neural is
    end Squared_Loss;
 
    --  -------------------------------------------------------------------------
+  --  L158
+   function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
+                          return Float is
+      use Real_Float_Arrays;
+      Diff : Real_Float_Matrix := -Y_Pred;
+   begin
+      for row in Diff'Range loop
+         for col in Diff'Range (2) loop
+            if Y_True (row, col) /= 0 then
+               Diff (row, col) := 1.0 + Diff (row, col);
+            end if;
+         end loop;
+      end loop;
+
+      return Neural_Maths.Mean (Diff * Diff) / 2.0;
+
+   end Squared_Loss;
+
+   --  -------------------------------------------------------------------------
 
    procedure Tanh (Activation : in out Real_Float_Matrix) is
       use Maths.Float_Math_Functions;
@@ -296,6 +413,33 @@ package body Base_Neural is
                   Y1 (row, col) := EPS;
                end if;
                if X (row, col) then
+                  Result (row, col) :=  Log (Y1 (row, col));
+               end if;
+            end if;
+         end loop;
+      end loop;
+
+      return Result;
+
+   end X_Log_Y;
+
+   --  -------------------------------------------------------------------------
+ --  scipy/special/_xlogy.pxd
+   --  xlogy = x*log(y) so that the result is 0 if x = 0
+   function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
+                     return Real_Float_Matrix is
+      use Maths.Float_Math_Functions;
+      Y1     : Real_Float_Matrix := Y;
+      Result : Real_Float_Matrix (Y'Range, Y'Range (2)) :=
+                   (others => (others => 0.0));
+   begin
+      for row in X'Range loop
+         for col in X'Range (2) loop
+            if X (row, col) /= 0 then
+               if Y1 (row, col) < EPS then
+                  Y1 (row, col) := EPS;
+               end if;
+               if X (row, col) /= 0 then
                   Result (row, col) :=  Log (Y1 (row, col));
                end if;
             end if;

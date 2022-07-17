@@ -13,6 +13,8 @@ package Base_Neural is
 
    function Binary_Log_Loss (Y_True : Boolean_Matrix;
                              Y_Prob : Real_Float_Matrix) return Float;
+   function Binary_Log_Loss (Y_True : Integer_Matrix;
+                             Y_Prob : Real_Float_Matrix) return Float;
    pragma Inline (Binary_Log_Loss);
    procedure Identity (Activation : Real_Float_Matrix);
    pragma Inline (Identity);
@@ -30,6 +32,8 @@ package Base_Neural is
    pragma Inline (Logistic_Sigmoid);
    function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Real_Float_Matrix)
                       return Float;
+   function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
+                      return Float;
    pragma Inline (Log_Loss);
    procedure Tanh (Activation : in out Real_Float_Matrix);
    pragma Inline (Tanh);
@@ -43,6 +47,8 @@ package Base_Neural is
    pragma Inline (Rect_LU_Derivative);
    procedure Softmax (Activation : in out Real_Float_Matrix);
    pragma Inline (Softmax);
+   function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
+                           return Float;
    function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Real_Float_Matrix)
                            return Float;
    pragma Inline (Squared_Loss);

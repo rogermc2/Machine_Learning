@@ -9,7 +9,7 @@ with Printing;
 
 package body Classification_Metrics is
 
-    procedure Check_Targets (Y_True, Y_Prediction : Boolean_Matrix);
+    procedure Check_Targets (Y_True, Y_Prediction : Integer_Matrix);
     function Weighted_Sum
       (Sample_Score   : Real_Float_Matrix;
        Sample_Weights : Real_Float_Vector;
@@ -18,7 +18,7 @@ package body Classification_Metrics is
     --  ------------------------------------------------------------------------
     --  L144
     function Accuracy_Score
-      (Y_True, Y_Prediction : Boolean_Matrix; Normalize : Boolean := True;
+      (Y_True, Y_Prediction : Integer_Matrix; Normalize : Boolean := True;
        Sample_Weight        : Real_Float_Vector) return float is
         Routine_Name : constant String :=
                          "Classification_Metrics.Accuracy_Score, ";
@@ -74,7 +74,7 @@ package body Classification_Metrics is
 
     --  ------------------------------------------------------------------------
 
-    procedure Check_Targets (Y_True, Y_Prediction : Boolean_Matrix) is
+    procedure Check_Targets (Y_True, Y_Prediction : Integer_Matrix) is
         use Multiclass_Utils;
         Routine_Name : constant String := "Classification_Metrics.Check_Targets";
         Type_True : constant Y_Type := Type_Of_Target (Y_True);
@@ -93,8 +93,9 @@ package body Classification_Metrics is
                   Type_True = Y_Multilabel_Indicator, Routine_Name & "Y_Type " &
                   Y_Type'Image (Type_True) & " is not supported");
         if Type_True = Y_Binary then
-            null;
+            Put_Line (Routine_Name & "Y_Binary case not coded");
         end if;
+
     end Check_Targets;
 
     --  ------------------------------------------------------------------------

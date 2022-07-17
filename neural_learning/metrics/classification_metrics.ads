@@ -5,7 +5,7 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 package Classification_Metrics is
 
    function Accuracy_Score
-     (Y_True, Y_Prediction : Boolean_Matrix; Normalize : Boolean := True;
+     (Y_True, Y_Prediction : Integer_Matrix; Normalize : Boolean := True;
       Sample_Weight : Real_Float_Vector) return Float;
 
 end Classification_Metrics;

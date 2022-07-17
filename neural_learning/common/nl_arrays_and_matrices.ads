@@ -74,6 +74,7 @@ package NL_Arrays_And_Matrices is
                   return Real_Float_Matrix;
    pragma Inline ("-");
    procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix);
+   procedure Check_Lengths (Routine_Name : String; L, R : Integer_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix);
    pragma Inline (Check_Lengths);
    function Dot (L, R : Real_Float_List) return Float;
@@ -119,8 +120,9 @@ package NL_Arrays_And_Matrices is
    pragma Inline (Transpose);
    function Transpose (Values : Integer_Matrix) return Integer_Matrix;
    pragma Inline (Transpose);
-   function Zero_Array (Num_Rows : Positive)
-                        return Real_Float_Vector;
+   function Unit_Float_Matrix (Num_Rows : Positive) return Real_Float_Matrix;
+   function Unit_Integer_Matrix (Num_Rows : Positive) return Integer_Matrix;
+   function Zero_Array (Num_Rows : Positive) return Real_Float_Vector;
    function Zero_Matrix (Num_Rows, Num_Cols : Positive)
                          return Real_Float_Matrix;
 

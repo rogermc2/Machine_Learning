@@ -8,7 +8,7 @@ with Classification_Metrics;
 package body Base is
    --  Score returns the mean accuracy on the given test data and labels.
    function Score (Self : Multilayer_Perceptron.MLP_Classifier;
-                   X : Real_Float_Matrix; Y : Boolean_Matrix;
+                   X : Real_Float_Matrix; Y : Integer_Matrix;
                    Sample_Weight : Real_Float_Vector)
                    return Float is
    begin
