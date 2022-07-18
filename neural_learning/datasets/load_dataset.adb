@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets/_base.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 --  with Printing;
@@ -42,13 +42,17 @@ package body Load_Dataset is
       Class_Names.Append (To_Unbounded_String ("7"));
       Class_Names.Append (To_Unbounded_String ("8"));
       Class_Names.Append (To_Unbounded_String ("9"));
-      Class_Names.Append (To_Unbounded_String ("10"));
+--        Class_Names.Append (To_Unbounded_String ("10"));
 
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
       Assert (Integer (Digit_Values.Length) = Num_Samples, Routine_Name &
                 " invalid Digits Target vector");
 
+      Put_Line (Routine_Name & "Digit_Features length" &
+                  Integer'Image (Natural (Digit_Features.Length)));
+      Put_Line (Routine_Name & "Digit_Values length" &
+                  Integer'Image (Natural (Digit_Values.Length)));
       --  Digits_Target is 2D list num outputs x num classes
       Data.Features := To_Float_List_2D (Digit_Features);
       Data.Target := To_Integer_List_2D (Digit_Values);

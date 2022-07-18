@@ -18,8 +18,10 @@ procedure Lesson_4A_Neuron is
    use Multilayer_Perceptron;
    Routine_Name    : constant String := "Lesson_4A_Neuron ";
    --     Dataset_Name    : constant String := "mnist_784";
-   Test_Size       : constant Positive := 1000;
-   Train_Size      : constant Positive := 5000;
+--     Test_Size       : constant Positive := 1000;
+--     Train_Size      : constant Positive := 5000;
+   Test_Size       : constant Positive := 300;
+   Train_Size      : constant Positive := 1400;
    aClassifier     : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name);

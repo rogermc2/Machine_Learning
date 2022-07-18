@@ -43,12 +43,13 @@ package body Data_Splitter is
    procedure Iterate_Indices
      (Self                        : Base_Shuffle_Data;
       Train_Indices, Test_Indices : out Integer_Array) is
---        Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
+      Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
       Num_Train     : constant Natural := Self.Train_Size;
       Num_Test      : constant Natural := Self.Test_Size;
       Num_Samples   : constant Natural := Num_Train + Num_Test;
       Perms         : Integer_Array (1 .. Num_Samples);
    begin
+      Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
       for index in 1 .. Num_Samples loop
          Perms (index) := index;
       end loop;
@@ -122,14 +123,19 @@ package body Data_Splitter is
 
       Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
 
+      Put_Line (Routine_Name & "X size:" & Integer'Image (X'Length) &
+                 " x"  & Integer'Image (X'Length (2)));
+      Put_Line (Routine_Name & "Train_X size:" & Integer'Image (Train_X'Length) &
+                 " x"  & Integer'Image (Train_X'Length (2)));
+      Put_Line (Routine_Name & "Test_X size:" & Integer'Image (Test_X'Length) &
+                 " x"  & Integer'Image (Test_X'Length (2)));
       for index in Test_Indices'Range loop
-         Put_Line (Routine_Name & "index" & Integer'Image (index));
+--           Put_Line (Routine_Name & "index" & Integer'Image (index));
+--           Put_Line (Routine_Name & "Test_Indices (index)" &
+--                       Integer'Image (Test_Indices (index)));
          for col in Test_X'Range (2) loop
-            Put_Line (Routine_Name & "col" & Integer'Image (col));
-            Put_Line (Routine_Name & "Test_Indices (index)" &
-                        Integer'Image (Test_Indices (index)));
-            Put_Line (Routine_Name & "col" & Integer'Image (col));
-            Put_Line (Routine_Name & "X length:" & Integer'Image (X'Length));
+--              Put_Line (Routine_Name & "col" & Integer'Image (col));
+--              Put_Line (Routine_Name & "col" & Integer'Image (col));
             Test_X (index - Test_Indices'First + 1, col) :=
               X (Test_Indices (index), col);
          end loop;
