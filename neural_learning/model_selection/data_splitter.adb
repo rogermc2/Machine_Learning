@@ -61,11 +61,10 @@ package body Data_Splitter is
          end loop;
 
          Put_Line (Routine_Name & "Num_Samples:" & Integer'Image (Num_Samples));
+         Put_Line (Routine_Name & "Num_Train:" & Integer'Image (Num_Train));
          Put_Line (Routine_Name & "Num_Test:" & Integer'Image (Num_Test));
-         for train_index in Num_Test + 1 .. Num_Samples loop
-            Put_Line (Routine_Name & "train_index:" &
-                        Integer'Image (train_index));
-            Train_Indices (train_index) := Perms (train_index);
+         for train_index in 1 .. Num_Train loop
+            Train_Indices (train_index) := Perms (Num_Test + train_index);
          end loop;
       end loop;
 
@@ -131,6 +130,9 @@ package body Data_Splitter is
          for col in Test_X'First (2) .. Test_X'Last (2) loop
             Test_X (index - Test_Indices'First + 1, col) :=
               X (Test_Indices (index), col);
+         end loop;
+
+         for col in Test_Y'First (2) .. Test_Y'Last (2) loop
             Test_Y (index - Test_Indices'First + 1, col) :=
               Y (Test_Indices (index), col);
          end loop;
@@ -140,6 +142,9 @@ package body Data_Splitter is
          for col in Train_X'First (2) .. Train_X'Last (2) loop
             Train_X (index - Test_Indices'First + 1, col) :=
               X (Test_Indices (index), col);
+         end loop;
+
+         for col in Train_Y'First (2) .. Train_Y'Last (2) loop
             Train_Y (index - Test_Indices'First + 1, col) :=
               Y (Test_Indices (index), col);
          end loop;
