@@ -39,7 +39,8 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
-      Train_Y_Bin   : Boolean_Matrix (Train_Y'Range, Train_Y'Range (2));
+      Num_Classes   : constant Positive := 10;
+      Train_Y_Bin   : Boolean_Matrix (Train_Y'Range, 1 .. Num_Classes);
 --        Test_Y_Bin    : Boolean_Matrix (Test_Y'Range, Test_Y'Range (2));
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
