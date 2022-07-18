@@ -41,8 +41,8 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
-with Base;
-with Data_Splitter;
+--  with Base;
+--  with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
@@ -71,7 +71,7 @@ package body Multilayer_Perceptron is
    --  Layer_Units  : NL_Types.Integer_List);
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Real_Float_Matrix;
-                             Y            : Integer_Matrix;
+                             Y            : Boolean_Matrix;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Real_Matrix_List);
@@ -83,13 +83,15 @@ package body Multilayer_Perceptron is
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
-                            Y                : Integer_Matrix;
+                            Y                : Boolean_Matrix;
                             Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float);
    procedure Update_No_Improvement_Count
-     (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix);
+     (Self   : in out MLP_Classifier);
+--     procedure Update_No_Improvement_Count
+--       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+--        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix);
    procedure Update_Gradients (Self               : in out MLP_Classifier;
                                Activations        : Real_Matrix_List;
                                Deltas             : in out Real_Matrix_List;
@@ -134,7 +136,7 @@ package body Multilayer_Perceptron is
    --  Activations contains an activation matrix for each layer
    procedure Backprop (Self        : in out MLP_Classifier;
                        X           : Real_Float_Matrix;
-                       Y           : Integer_Matrix;
+                       Y           : Boolean_Matrix;
                        Activations : in out Real_Matrix_List;
                        Loss        : out Float;
                        Gradients   : out Parameters_List) is
@@ -434,8 +436,8 @@ package body Multilayer_Perceptron is
                   Y_Bin       : out Boolean_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
---        Routine_Name       : constant String :=
---                               "Multilayer_Perceptron.Fit ";
+      --        Routine_Name       : constant String :=
+      --                               "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -475,7 +477,7 @@ package body Multilayer_Perceptron is
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
-         Fit_Stochastic (Self, X, Y, Incremental);
+         Fit_Stochastic (Self, X, Y_Bin, Incremental);
 
          --  L444
       elsif Self.Parameters.Solver = Lbfgs_Solver then
@@ -579,7 +581,7 @@ package body Multilayer_Perceptron is
    --  L563
    procedure Fit_Stochastic (Self        : in out MLP_Classifier;
                              X           : Real_Float_Matrix;
-                             Y           : Integer_Matrix;
+                             Y           : Boolean_Matrix;
                              Incremental : Boolean := False) is
       --        use Estimator;
       Routine_Name                       : constant String :=
@@ -587,29 +589,29 @@ package body Multilayer_Perceptron is
       --        Is_Classifier                      : constant Boolean :=
       --                                               Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples                        : constant Positive := Positive (X'Length);
-      Num_Features                       : constant Positive := Positive (X'Length (2));
-      Num_Classes                        : constant Positive :=
-                                             Positive (Self.Attributes.Classes.Length);
+--        Num_Features                       : constant Positive := Positive (X'Length (2));
+--        Num_Classes                        : constant Positive :=
+--                                               Positive (Self.Attributes.Classes.Length);
       --        LE_U                               : Label.Label_Binarizer;
       Iter                               : Natural := 0;
       Continue                           : Boolean := True;
       Early_Stopping                     : constant Boolean
         := Self.Parameters.Early_Stopping and
       then not Incremental;
-      Test_Size                          : constant Natural
-        := Natural (Self.Parameters.Validation_Fraction *
-                      Float (Num_Samples));
-      Train_Size                         : constant Positive := Num_Samples - Test_Size;
+      --  Test_Size                          : constant Natural
+      --    := Natural (Self.Parameters.Validation_Fraction *
+      --                  Float (Num_Samples));
+      --        Train_Size                         : constant Positive := Num_Samples - Test_Size;
       --          Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
       --          Should_Stratify        : Boolean;
-      Train_X                            : Real_Float_Matrix
-        (1 .. Train_Size, 1 .. Num_Features);
-      Train_Y                            : Integer_Matrix
-        (1 .. Train_Size, 1 .. Num_Classes);
-      Test_X                             : Real_Float_Matrix
-        (1 .. Test_Size, 1 .. Num_Features);
-      Test_Y                             : Integer_Matrix
-        (1 .. Test_Size, 1 .. Num_Classes);
+      --        Train_X                            : Real_Float_Matrix
+      --          (1 .. Train_Size, 1 .. Num_Features);
+      --        Train_Y                            : Integer_Matrix
+      --          (1 .. Train_Size, 1 .. Num_Classes);
+      --        Test_X                             : Real_Float_Matrix
+      --          (1 .. Test_Size, 1 .. Num_Features);
+      --        Test_Y                             : Integer_Matrix
+      --          (1 .. Test_Size, 1 .. Num_Classes);
       --        Val_Y                              : Real_Float_Matrix
       --          (1 .. Test_Size, 1 .. Num_Classes) := (others => (others => 0.0));
       Batch_Size                         : Positive;
@@ -626,16 +628,17 @@ package body Multilayer_Perceptron is
 
       --  L597
       if Early_Stopping then
+         Put_Line (Routine_Name & "L597  Early_Stopping not coded!");
          --  Put_Line (Routine_Name & "L597  *** Early_Stopping ***");
          --              Should_Stratify := Is_Classifier and Self.Attributes.N_Outputs = 1;
          --              if Should_Stratify then
          --                  Stratify := Y;
          --              end if;
-         Data_Splitter.Train_Test_Split
-           (X => X, Y => Y,
-            Train_Size => Train_Size, Test_Size  => Test_Size,
-            Train_X => Train_X, Train_Y => Train_Y,
-            Test_X  => Test_X, Test_Y => Test_Y);
+         --  Data_Splitter.Train_Test_Split
+         --    (X => X, Y => Y,
+         --     Train_Size => Train_Size, Test_Size  => Test_Size,
+         --     Train_X => Train_X, Train_Y => Train_Y,
+         --     Test_X  => Test_X, Test_Y => Test_Y);
 
          --           if Is_Classifier then
          --              Val_Y := Label.Inverse_Transform (LE_U, Test_Y);
@@ -683,7 +686,7 @@ package body Multilayer_Perceptron is
 
          --  L669 Update no_improvement_count based on training loss or
          --       validation score according to early_stopping
-         Update_No_Improvement_Count (Self, Early_Stopping, Test_X, Test_Y);
+         Update_No_Improvement_Count (Self);
          --  for learning rate that needs to be updated at iteration end;
          if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
             null;
@@ -1105,7 +1108,7 @@ package body Multilayer_Perceptron is
    --  L637
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
-                            Y                : Integer_Matrix;
+                            Y                : Boolean_Matrix;
                             Batch_Slice      : NL_Types.Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
@@ -1115,7 +1118,7 @@ package body Multilayer_Perceptron is
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
-      Y_Batch        : Integer_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
+      Y_Batch        : Boolean_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
       --  Activations: layers x samples x features
       Activations    : Real_Matrix_List;
       Gradients      : Parameters_List;
@@ -1199,53 +1202,76 @@ package body Multilayer_Perceptron is
    end Update_Gradients;
 
    --  -------------------------------------------------------------------------
-   --  L716
+   --  L716 Early_Stopping
+--     procedure Update_No_Improvement_Count
+--       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+--        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix) is
+--        Routine_Name     : constant String
+--          := "Multilayer_Perceptron.Update_No_Improvement_Count ";
+--        Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
+--        Last_Valid_Score : Float;
+--        Score_Val        : Float;
+--     begin
+--        if Early_Stopping then
+--           Score_Val := Base.Score (Self, X_Val, Y_Val, Sample_Weight);
+--           Self.Parameters.Validation_Scores.Append (Score_Val);
+--           Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
+--           if Self.Parameters.Verbose then
+--              Put_Line (Routine_Name & "Validation score: " &
+--                          Float'Image (Last_Valid_Score));
+--           end if;
+--
+--           --  L728
+--           if Last_Valid_Score <
+--             Self.Parameters.Best_Validation_Score + Self.Parameters.Tol then
+--              Self.Attributes.No_Improvement_Count :=
+--                Self.Attributes.No_Improvement_Count + 1;
+--           else
+--              Self.Attributes.No_Improvement_Count := 0;
+--           end if;
+--
+--           if Last_Valid_Score > Self.Parameters.Best_Validation_Score then
+--              Self.Parameters.Best_Validation_Score := Last_Valid_Score;
+--              Self.Parameters.Best_Params := Self.Attributes.Params;
+--           end if;
+--
+--        else
+--           if Self.Attributes.Loss_Curve.Last_Element >
+--             Self.Attributes.Best_Loss then
+--              Self.Attributes.No_Improvement_Count :=
+--                Self.Attributes.No_Improvement_Count + 1;
+--           else
+--              Self.Attributes.No_Improvement_Count := 0;
+--           end if;
+--
+--           if Self.Attributes.Loss_Curve.Last_Element <
+--             Self.Attributes.Best_Loss then
+--              Self.Attributes.Best_Loss :=
+--                Self.Attributes.Loss_Curve.Last_Element;
+--           end if;
+--        end if;
+--
+--     end Update_No_Improvement_Count;
+
+   --  -------------------------------------------------------------------------
+   --  L716 not Early_Stopping
    procedure Update_No_Improvement_Count
-     (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
-      X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix) is
-      Routine_Name     : constant String
-        := "Multilayer_Perceptron.Update_No_Improvement_Count ";
-      Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
-      Last_Valid_Score : Float;
-      Score_Val        : Float;
+     (Self   : in out MLP_Classifier) is
+--        Routine_Name     : constant String
+--          := "Multilayer_Perceptron.Update_No_Improvement_Count ";
    begin
-      if Early_Stopping then
-         Score_Val := Base.Score (Self, X_Val, Y_Val, Sample_Weight);
-         Self.Parameters.Validation_Scores.Append (Score_Val);
-         Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
-         if Self.Parameters.Verbose then
-            Put_Line (Routine_Name & "Validation score: " &
-                        Float'Image (Last_Valid_Score));
-         end if;
-
-         --  L728
-         if Last_Valid_Score <
-           Self.Parameters.Best_Validation_Score + Self.Parameters.Tol then
-            Self.Attributes.No_Improvement_Count :=
-              Self.Attributes.No_Improvement_Count + 1;
-         else
-            Self.Attributes.No_Improvement_Count := 0;
-         end if;
-
-         if Last_Valid_Score > Self.Parameters.Best_Validation_Score then
-            Self.Parameters.Best_Validation_Score := Last_Valid_Score;
-            Self.Parameters.Best_Params := Self.Attributes.Params;
-         end if;
-
+      if Self.Attributes.Loss_Curve.Last_Element >
+        Self.Attributes.Best_Loss then
+         Self.Attributes.No_Improvement_Count :=
+           Self.Attributes.No_Improvement_Count + 1;
       else
-         if Self.Attributes.Loss_Curve.Last_Element >
-           Self.Attributes.Best_Loss then
-            Self.Attributes.No_Improvement_Count :=
-              Self.Attributes.No_Improvement_Count + 1;
-         else
-            Self.Attributes.No_Improvement_Count := 0;
-         end if;
+         Self.Attributes.No_Improvement_Count := 0;
+      end if;
 
-         if Self.Attributes.Loss_Curve.Last_Element <
-           Self.Attributes.Best_Loss then
-            Self.Attributes.Best_Loss :=
-              Self.Attributes.Loss_Curve.Last_Element;
-         end if;
+      if Self.Attributes.Loss_Curve.Last_Element <
+        Self.Attributes.Best_Loss then
+         Self.Attributes.Best_Loss :=
+           Self.Attributes.Loss_Curve.Last_Element;
       end if;
 
    end Update_No_Improvement_Count;
