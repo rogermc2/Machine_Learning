@@ -18,15 +18,16 @@ package body Samples_Generator is
       Return_Distributions : Boolean := False)
       return Multilabel_Classification is
       use NL_Types;
+      type Words_Matrix is array (Positive range <>, Positive range <>) of
+        Integer;
       Cum_P_C_List    : Float_List;
 
-      procedure Sample_Example is
+      function Sample_Example (Y : out Integer_List) return Words_Matrix is
          --              use Ada.Containers;
          use Maths;
          use Integer_Sorting;
          Y_Size    : Natural := N_Classes + 1;
          Num_Words : Natural := 0;
-         Y         : Integer_List;
          Class     : Integer_List;
       begin
          --  pick a nonzero number of labels by rejection sampling
@@ -56,16 +57,21 @@ package body Samples_Generator is
             while Num_Words = 0 loop
                Num_Words := Poisson_Single (Float (N_labels));
             end loop;
+
             declare
-               Words : Integer_Matrix (1 .. N_Features, 1 .. Num_Words);
+               Words : Words_Matrix (1 .. N_Features, 1 .. Num_Words);
             begin
                if Y.Is_Empty then
+                  --  sample does'nt belong to a class so generate a noise word
                   for row in Words'Range loop
                      for col in Words'Range (2) loop
                         Words (row, col) := abs (Maths.Random_Integer);
                      end loop;
                   end loop;
+               else  --  sample words with replacement from selected classes
+                  null;
                end if;
+               return Words;
             end;
          end;
 
