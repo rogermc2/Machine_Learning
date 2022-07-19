@@ -77,6 +77,7 @@ package NL_Arrays_And_Matrices is
    procedure Check_Lengths (Routine_Name : String; L, R : Integer_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix);
    pragma Inline (Check_Lengths);
+   function Cumulative_Sum (A : Float_Array) return Float_Array;
    function Dot (L, R : Real_Float_List) return Float;
    pragma Inline (Dot);
    function Exp (M : Real_Float_Matrix) return Real_Float_Matrix;
@@ -90,6 +91,8 @@ package NL_Arrays_And_Matrices is
    pragma Inline (Multiply_Elements);
    function Norm (M : Real_Float_List) return Float;
    function Norm (M : Real_Float_Vector) return Float;
+   function Normalize (M : Float_Array) return Float_Array;
+   function Normalize_Rows (M : Real_Float_Matrix) return Real_Float_Matrix;
    function "not" (M : Boolean_Matrix) return Boolean_Matrix;
    pragma Inline ("not");
    function Outer (L, R : Real_Float_Vector) return Real_Float_Vector;
