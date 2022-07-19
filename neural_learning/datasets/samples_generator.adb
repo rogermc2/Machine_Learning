@@ -1,6 +1,11 @@
 --  Based on scikit-learn/sklearn/datasets/samples_generator.py
 
+with Ada.Containers;
+
 with Maths;
+
+with Classifier_Utilities;
+with NL_Types;
 
 package body Samples_Generator is
 
@@ -14,11 +19,27 @@ package body Samples_Generator is
        return Multilabel_Classification is
 
         procedure Sample_Example is
-            Y_Size : Positive := N_Classes + 1;
+            use Ada.Containers;
+            use Maths;
+            Y_Size    : Natural := N_Classes + 1;
+            Num_Words : Natural := 0;
+            Y         : NL_Types.Integer_List;
+            Class     : Integer;
         begin
-            while not Allow_Unlabeled loop
-                null;
+            --  pick a nonzero number of labels by rejection sampling
+            while (not Allow_Unlabeled and Y_Size = 0) or Y_Size > N_Classes loop
+                Y_Size := Poisson_Single (Float (N_labels));
             end loop;
+
+            while Natural (Y.Length) /= Y_Size loop
+                Class := Classifier_Utilities.Search_Sorted_Integer_List (Cumulative_Sum);
+            end loop;
+
+            --  pick a nonzero document length by rejection sampling
+            while Num_Words = 0 loop
+                Num_Words := Poisson_Single (Float (N_labels));
+            end loop;
+
         end Sample_Example;
 
         P_C            : Float_Array (1 .. N_Classes);
