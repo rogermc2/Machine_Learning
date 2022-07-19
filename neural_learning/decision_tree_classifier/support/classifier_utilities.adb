@@ -372,7 +372,9 @@ package body Classifier_Utilities is
    end Row_Max_Indices;
 
    --  -----------------------------------------------------------------------
-
+   --  Search_Sorted_Integer_List finds the indices into List_A such that,
+   --  if the corresponding elements in List_B were inserted before the indices,
+   --  the order of List_A would be preserved.
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List is
       use Integer_Package;
@@ -397,6 +399,33 @@ package body Classifier_Utilities is
       return theList;
 
    end Search_Sorted_Integer_List;
+
+   --  -------------------------------------------------------------------------
+
+   function Search_Sorted_Float_List (List_A, List_B : Float_List)
+                                        return Integer_List is
+      use Float_Package;
+      use Float_Sorting;
+      Item    : Float;
+      Index_A : Positive;
+      theList : Integer_List;
+   begin
+      if not Is_Sorted (List_A) then
+         raise Value_Error with
+           "Search_Sorted called with unsorted list.";
+      end if;
+
+      for index_B in List_B.First_Index .. List_B.Last_Index loop
+         Item := List_B.Element (index_B);
+         Index_A := List_A.Find_Index (Item);
+         if Index_A /= Value_Data_Package.No_Index then
+            theList.Append (Index_A);
+         end if;
+      end loop;
+
+      return theList;
+
+   end Search_Sorted_Float_List;
 
    --  -------------------------------------------------------------------------
 

@@ -18,6 +18,8 @@ package body Samples_Generator is
        Return_Distributions : Boolean := False)
        return Multilabel_Classification is
 
+        Cum_P_C_List    : NL_Types.Float_List;
+
         procedure Sample_Example is
             use Ada.Containers;
             use Maths;
@@ -31,14 +33,23 @@ package body Samples_Generator is
                 Y_Size := Poisson_Single (Float (N_labels));
             end loop;
 
-            while Natural (Y.Length) /= Y_Size loop
-                Class := Classifier_Utilities.Search_Sorted_Integer_List (Cumulative_Sum);
-            end loop;
+            declare
+                Prob : NL_Types.Float_List;
+            begin
+                for index in 1 .. Y_Size - Natural (Y.Length) loop
+                    Prob.Append (abs (Maths.Random_Float));
+                end loop;
 
-            --  pick a nonzero document length by rejection sampling
-            while Num_Words = 0 loop
-                Num_Words := Poisson_Single (Float (N_labels));
-            end loop;
+                while Natural (Y.Length) /= Y_Size loop
+                    Class := Classifier_Utilities.Search_Sorted_Integer_List
+                      (Cum_P_C_List, Prob);
+                end loop;
+
+                --  pick a nonzero document length by rejection sampling
+                while Num_Words = 0 loop
+                    Num_Words := Poisson_Single (Float (N_labels));
+                end loop;
+            end;
 
         end Sample_Example;
 
@@ -61,6 +72,10 @@ package body Samples_Generator is
             end loop;
         end loop;
         P_W_C := Normalize_Rows (P_W_C);
+
+        for index in Cum_P_C'Range loop
+            Cum_P_C_List.Append (Cum_P_C (index));
+        end loop;
 
         return Classification;
 

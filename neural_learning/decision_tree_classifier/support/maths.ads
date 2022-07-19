@@ -15,7 +15,7 @@ package Maths is
    function Cube_Root (Value : Float) return Float;
    function Degrees (Angle : Radian) return Degree;
    function Poisson (Lambda : Float) return Integer;
-    function Poisson_Single (Lambda : Float) return Integer;
+   function Poisson_Single (Lambda : Float) return Integer;
    function Radians (Angle : Degree) return Radian;
    function Random_Float return Float;
    function Random_Integer return Integer;

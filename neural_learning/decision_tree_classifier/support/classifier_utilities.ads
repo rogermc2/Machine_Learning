@@ -27,6 +27,8 @@ package Classifier_Utilities is
    function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List;
+   function Search_Sorted_Float_List (List_A, List_B : Float_List)
+                                        return Integer_List;
    function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)
                       return Natural_List;
    function Set_Diff (Values : Integer_Array; Uniques : Natural_Array)
