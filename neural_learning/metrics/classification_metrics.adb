@@ -27,9 +27,9 @@ package body Classification_Metrics is
    begin
       --  L210
       Check_Targets (Y_True, Y_Prediction);
-      --        Printing.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 2);
-      --        Printing.Print_Float_Matrix (Routine_Name & "Y_Prediction",
-      --                                     Y_Prediction, 1, 2);
+      Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
+      Printing.Print_Integer_Matrix (Routine_Name & "Y_Prediction",
+                                     Y_Prediction, 1, 5);
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if Y_Prediction (row, col) = Y_True (row, col) then
@@ -48,7 +48,7 @@ package body Classification_Metrics is
    --  if weights is not defined, avg = mean of a
    function Average (Sample_Score   : Real_Float_Matrix;
                      Sample_Weights : Real_Float_Vector)
-                      return Float is
+                     return Float is
       --       Routine_Name : constant String :=
       --                        "Classification_Metrics.Average ";
       Sum_Weights : Float := 0.0;
@@ -81,8 +81,8 @@ package body Classification_Metrics is
       Type_True    : constant Y_Type := Type_Of_Target (Y_True);
       Type_Pred    : Y_Type := Type_Of_Target (Y_Prediction);
    begin
---        Put_Line (Routine_Name & "True type: " & Y_Type'Image (Type_True));
---        Put_Line (Routine_Name & "Prediction type: " & Y_Type'Image (Type_Pred));
+      --        Put_Line (Routine_Name & "True type: " & Y_Type'Image (Type_True));
+      --        Put_Line (Routine_Name & "Prediction type: " & Y_Type'Image (Type_Pred));
 
       NL_Arrays_And_Matrices.Check_Lengths
         ("Classification_Metrics.Check_Targets", Y_True, Y_Prediction);
