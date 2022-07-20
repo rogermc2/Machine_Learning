@@ -39,6 +39,7 @@ package Label is
 
     Label_Error : Exception;
 
+    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     function Fit_Transform (Binarizer : in out Label_Binarizer;
