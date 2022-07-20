@@ -13,6 +13,8 @@ package NL_Arrays_And_Matrices is
 
    type Boolean_Array is array (Integer range <>) of Boolean;
    type Float_Array is array (Integer range <>) of Float;
+   procedure Float_Array_Sort is new Ada.Containers.Generic_Array_Sort
+     (Integer, Float, Float_Array);
    type Integer_Array is array (Integer range <>) of Integer;
    type Natural_Array is array (Integer range <>) of Natural;
    procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort

@@ -21,8 +21,8 @@ package Samples_Generator is
       (N_Samples : Positive := 100; N_Features : Positive := 20;
        N_Classes : Positive := 5; N_labels : Positive := 2;
        Length : Positive := 50; Allow_Unlabeled : Boolean := True;
-       Sparse : Boolean := False;
-       Return_Indicator : Return_Indicator_Type := RI_Dense;
+--         Sparse : Boolean := False;
+--         Return_Indicator : Return_Indicator_Type := RI_Dense;
        Return_Distributions : Boolean := False)
        return Multilabel_Classification;
 

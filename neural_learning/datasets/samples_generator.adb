@@ -9,17 +9,40 @@ with NL_Types;
 
 package body Samples_Generator is
 
+    --  Make_Multilabel_Classificationg generates a random multilabel
+    --  classification problem.
+    --  For each sample, the generative process is:
+    --    1. pick the number of labels: n ~ Poisson(n_labels)
+    --    2. n times, choose a class c: c ~ Multinomial(theta)
+    --    3. pick the document length: k ~ Poisson(length)
+    --    4. k times, choose a word: w ~ Multinomial(theta_c)
+    --  Returns:
+    --  X     : The generated samples as an n_samples x n_features matrix
+    --  Y     : The label sets as an n_samples x n_classes matrix
+    --  p_c   : The probability of each class being drawn as an n_classes array
+    --          Only returned if return_distributions is True
+    --  p_w_c : The probability of each feature being drawn given each class as
+    --          an n_features x n_classes matrix
+    --          Only returned if return_distributions is True
     function Make_Multilabel_Classification
-      (N_Samples            : Positive := 100; N_Features : Positive := 20;
-       N_Classes            : Positive := 5; N_labels : Positive := 2;
-       Length               : Positive := 50; Allow_Unlabeled : Boolean := True;
-       Sparse               : Boolean := False;
-       Return_Indicator     : Return_Indicator_Type := RI_Dense;
+      (N_Samples       : Positive := 100;
+       N_Features      : Positive := 20;
+       N_Classes       : Positive := 5;
+       N_labels        : Positive := 2;
+       --  Length is the sum of the features (number of words if documents) and
+       --  is drawn from a Poisson distribution with this expected value.
+       Length          : Positive := 50;
+       --  If Allow_Unlabeled is True then some instances might not belong to
+       --  any class
+       Allow_Unlabeled : Boolean := True;
+--         Sparse               : Boolean := False;
+--         Return_Indicator     : Return_Indicator_Type := RI_Dense;
+       --  If Return_Distributions is True then return the prior class
+       --  probability and conditional probabilities of features given classes
+       --  from which the data was drawn
        Return_Distributions : Boolean := False)
        return Multilabel_Classification is
         use NL_Types;
---          type Words_Matrix is array (Positive range <>, Positive range <>) of
---            Integer;
         Cum_P_C_List    : Float_List;
 
         function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
@@ -121,6 +144,7 @@ package body Samples_Generator is
         P_W_C          : Real_Float_Matrix (1 .. N_Features, 1 .. N_Classes);
         Classification : Multilabel_Classification
           (N_Samples, N_Features, N_Classes);
+        Y              : Integer_List;
     begin
         for index in P_C'Range loop
             P_C (index) := abs (Maths.Random_Float);
@@ -137,6 +161,29 @@ package body Samples_Generator is
 
         for index in Cum_P_C'Range loop
             Cum_P_C_List.Append (Cum_P_C (index));
+        end loop;
+
+        for index in 1 .. N_Samples loop
+            declare
+                Sample_Y  : Integer_List;
+                Words     : constant Integer_Array :=
+                              Sample_Example (P_W_C, Sample_Y);
+                X_Indices : Integer_List;
+            begin
+                for index in Words'Range loop
+                    X_Indices.Append (Words (index));
+                    Y.Append_Vector (Sample_Y);
+                end loop;
+
+                declare
+                    X_Data : Float_Array (1 .. Positive (X_Indices.Length))
+                      := (others => 1.0);
+                    X      : array (X_Data'Range, 1 .. X_Indices.Length)
+                      of Float;
+                begin
+                    null;
+                end;
+            end;
         end loop;
 
         return Classification;
