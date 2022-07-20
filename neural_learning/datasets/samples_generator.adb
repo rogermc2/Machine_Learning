@@ -22,7 +22,8 @@ package body Samples_Generator is
         Integer;
       Cum_P_C_List    : Float_List;
 
-      function Sample_Example (Y : out Integer_List) return Words_Matrix is
+      function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
+                               return Words_Matrix is
          --              use Ada.Containers;
          use Maths;
          use Integer_Sorting;
@@ -59,7 +60,10 @@ package body Samples_Generator is
             end loop;
 
             declare
-               Words : Words_Matrix (1 .. N_Features, 1 .. Num_Words);
+               Words          : Words_Matrix (1 .. N_Features, 1 .. Num_Words);
+               Cum_P_W_Sample : Float_Array (1 .. N_Classes);
+               P_W_C_2        : Real_Float_Matrix (P_W_C'Range, P_W_C'Range (2));
+
             begin
                if Y.Is_Empty then
                   --  sample does'nt belong to a class so generate a noise word
@@ -69,7 +73,11 @@ package body Samples_Generator is
                      end loop;
                   end loop;
                else  --  sample words with replacement from selected classes
-                  null;
+                  for row in P_W_C'Range loop
+                    for col in P_W_C'Range (2) loop
+                       P_W_C_2 (row, col) := P_W_C (row, Y (col));
+                    end loop;
+                  end loop;
                end if;
                return Words;
             end;
