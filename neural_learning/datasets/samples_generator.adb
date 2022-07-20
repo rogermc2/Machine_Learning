@@ -16,15 +16,14 @@ package body Samples_Generator is
        Sparse               : Boolean := False;
        Return_Indicator     : Return_Indicator_Type := RI_Dense;
        Return_Distributions : Boolean := False)
-      return Multilabel_Classification is
+       return Multilabel_Classification is
         use NL_Types;
-        type Words_Matrix is array (Positive range <>, Positive range <>) of
-          Integer;
+--          type Words_Matrix is array (Positive range <>, Positive range <>) of
+--            Integer;
         Cum_P_C_List    : Float_List;
 
         function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
-                               return Words_Matrix is
-        --              use Ada.Containers;
+                                 return Integer_Array is
             use Maths;
             use Integer_Sorting;
             Y_Size    : Natural := N_Classes + 1;
@@ -60,20 +59,23 @@ package body Samples_Generator is
                 end loop;
 
                 declare
-                    Words          : Words_Matrix (1 .. N_Features,
-                                                   1 .. Num_Words);
-                    Cum_P_W_Sample : Float_Array (1 .. N_Classes);
-                    P_W_C_2        : Real_Float_Matrix (P_W_C'Range,
-                                                        P_W_C'Range (2));
+                    use Float_Package;
+                    use Float_Sorting;
+                    Words           : Integer_Array (1 .. Num_Words);
+                    Word_List       : Integer_List;
+                    Cum_P_W_Sample  : Float_Array (1 .. N_Classes);
+                    Cum_Sample_List : Float_List;
+                    P_W_C_2         : Real_Float_Matrix (P_W_C'Range,
+                                                         P_W_C'Range (2));
                 begin
                     if Y.Is_Empty then
                         --  sample does'nt belong to a class so generate a
                         --  noise word
-                        for row in Words'Range loop
-                            for col in Words'Range (2) loop
-                                Words (row, col) := abs (Maths.Random_Integer);
-                            end loop;
+                        for index in 1 .. Num_Words loop
+                            Word_List.Append
+                              (abs (Maths.Random_Integer) * N_Features);
                         end loop;
+
                     else  --  sample words with replacement from selected classes
                         for row in P_W_C'Range loop
                             for col in P_W_C'Range (2) loop
@@ -90,11 +92,23 @@ package body Samples_Generator is
                         end loop;
                         Cum_P_W_Sample := Cumulative_Sum (Cum_P_W_Sample);
                         for col in Cum_P_W_Sample'Range loop
-                            Cum_P_W_Sample (col) :=
-                              Cum_P_W_Sample (col) / Cum_P_W_Sample (Cum_P_W_Sample'Last);
+                            Cum_Sample_List.Append
+                              (Cum_P_W_Sample (col) /
+                                   Cum_P_W_Sample (Cum_P_W_Sample'Last));
                         end loop;
+                        Sort (Cum_Sample_List);
+
+                        Prob.Clear;
+                        for index in 1 .. Num_Words loop
+                            Prob.Append (abs (Maths.Random_Float));
+                        end loop;
+                        Word_List := Classifier_Utilities.Search_Sorted_Float_List
+                          (Cum_Sample_List, Prob);
                     end if;
 
+                    for index in 1 .. Num_Words loop
+                        Words (index) := Word_List (index);
+                    end loop;
                     return Words;
                 end;
             end;
