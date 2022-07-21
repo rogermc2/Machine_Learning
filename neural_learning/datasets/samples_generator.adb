@@ -144,7 +144,6 @@ package body Samples_Generator is
       Cum_P_C        : Float_Array (1 .. N_Classes);
       P_W_C          : Real_Float_Matrix (1 .. N_Features, 1 .. N_Classes);
       X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features);
-      Y              : Integer_Matrix (1 .. N_Samples, 1 .. N_Classes);
       Y_Bool         : Boolean_Matrix (1 .. N_Samples, 1 .. N_Classes);
       Classification : Multilabel_Classification
         (N_Samples, N_Features, N_Classes);
@@ -204,6 +203,7 @@ package body Samples_Generator is
       Y_Bool := Label.Transform (LB, Y_List);
 
       Classification.X := X;
+      Classification.Y := To_Integer_Matrix (Y_Bool);
       return Classification;
 
    end Make_Multilabel_Classification;
