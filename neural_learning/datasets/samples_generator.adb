@@ -1,6 +1,7 @@
 --  Based on scikit-learn/sklearn/datasets/samples_generator.py
 
 --  with Ada.Containers;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -47,7 +48,9 @@ package body Samples_Generator is
       Return_Distributions : Boolean := False)
        return Multilabel_Classification is
       use NL_Types;
-      Cum_P_C_List    : Float_List;
+      Routine_Name : constant String :=
+                       "Samples_Generator.Make_Multilabel_Classification ";
+      Cum_P_C_List : Float_List;
 
       function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
                                  return Integer_Array is
@@ -116,6 +119,7 @@ package body Samples_Generator is
                        Cum_P_W_Sample (row) + P_W_C_2 (row, col);
                   end loop;
                end loop;
+
                Cum_P_W_Sample := Cumulative_Sum (Cum_P_W_Sample);
                for col in Cum_P_W_Sample'Range loop
                   Cum_Sample_List.Append
@@ -128,6 +132,7 @@ package body Samples_Generator is
                for index in 1 .. Num_Words loop
                   Prob.Append (abs (Maths.Random_Float));
                end loop;
+
                Word_List := Classifier_Utilities.Search_Sorted_Float_List
                  (Cum_Sample_List, Prob);
             end if;
@@ -135,6 +140,7 @@ package body Samples_Generator is
             for index in 1 .. Num_Words loop
                Words (index) := Word_List (index);
             end loop;
+
             return Words;
          end;
 
@@ -152,6 +158,7 @@ package body Samples_Generator is
       Y0             : Integer_Array (1 .. N_Classes);
       Y_List         : Integer_List;
    begin
+      Put_Line (Routine_Name);
       for index in P_C'Range loop
          P_C (index) := abs (Maths.Random_Float);
       end loop;
@@ -170,7 +177,9 @@ package body Samples_Generator is
       end loop;
 
       --  L436
-      for index in 1 .. N_Samples loop
+      for sample_index in 1 .. N_Samples loop
+         Put_Line (Routine_Name & "L436 sample_index:" &
+                     Integer'Image (sample_index));
          declare
             Sample_Y  : Integer_List;
             --  L437
@@ -186,6 +195,7 @@ package body Samples_Generator is
                --  L440
                Y_List.Append_Vector (Sample_Y);
             end loop;
+            Put_Line (Routine_Name & "L440 done");
 
             --  csr_matrix((X_data, X_indices, X_indptr),
             --  shape=(n_samples, n_features)) is
@@ -199,6 +209,7 @@ package body Samples_Generator is
                   X (row, col) := 1.0;
                end loop;
             end loop;
+            Put_Line (Routine_Name & "X set");
          end;
       end loop;
 

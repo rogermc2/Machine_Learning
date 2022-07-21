@@ -406,13 +406,15 @@ package body Classifier_Utilities is
                                         return Integer_List is
       use Float_Package;
       use Float_Sorting;
-      Item    : Float;
-      Index_A : Positive;
-      theList : Integer_List;
+      Routine_Name : constant String :=
+                       "Classifier_Utilities.Search_Sorted_Float_List ";
+      Item         : Float;
+      Index_A      : Natural;
+      theList      : Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
-           "Search_Sorted called with unsorted list.";
+           Routine_Name & "Search_Sorted called with unsorted list.";
       end if;
 
       for index_B in List_B.First_Index .. List_B.Last_Index loop
