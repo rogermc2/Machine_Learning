@@ -3,6 +3,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Neural;
+with base;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
@@ -37,5 +38,8 @@ begin
     for i in 1 .. 100 loop
         Partial_Fit (aClassifier, X, Y, Y_Bin, Classes);
     end loop;
+
+    Put_Line (Routine_Name & "Score" &
+                Float'Image (Base.Score (aClassifier, X, Y)));
 
 end Test_Multi_Label_Classification;
