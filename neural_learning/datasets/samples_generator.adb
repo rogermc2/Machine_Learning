@@ -149,7 +149,7 @@ package body Samples_Generator is
       Classification : Multilabel_Classification
         (N_Samples, N_Features, N_Classes);
       LB             : Label.Label_Binarizer;
-      Y0             : Integer_Array (1 .. N_Classes) := (others => 0);
+      Y0             : Integer_Array (1 .. N_Classes);
       Y_List         : Integer_List;
    begin
       for index in P_C'Range loop
@@ -169,15 +169,19 @@ package body Samples_Generator is
          Cum_P_C_List.Append (Cum_P_C (index));
       end loop;
 
+      --  L436
       for index in 1 .. N_Samples loop
          declare
             Sample_Y  : Integer_List;
+            --  L437
             Words     : constant Integer_Array :=
                           Sample_Example (P_W_C, Sample_Y);
             X_Indices : Integer_List;
          begin
             for index in Words'Range loop
+               --  L438
                X_Indices.Append (Words (index));
+               --  L440
                Y_List.Append_Vector (Sample_Y);
             end loop;
 
@@ -192,8 +196,12 @@ package body Samples_Generator is
          end;
       end loop;
 
+      --  L453
+      for index in Y0'Range loop
+         Y0 (index) := index - Y0'First;
+      end loop;
       Label.Fit (LB, Y0);
-      Y_Bool := Label.Transform (LB, Y);
+      Y_Bool := Label.Transform (LB, Y_List);
 
       Classification.X := X;
       return Classification;

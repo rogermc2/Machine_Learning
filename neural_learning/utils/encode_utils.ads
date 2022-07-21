@@ -24,6 +24,8 @@ package Encode_Utils is
    function Unique (Values : Integer_Array) return Integer_Array;
    function Unique (Values : Boolean_Array) return Boolean_Array;
    function Unique (Values : Integer_Array) return NL_Types.Integer_List;
+   function Unique (Values : NL_Types.Integer_List)
+                    return NL_Types.Integer_List;
    function Unique (Values : Integer_Array; Inverse : out Natural_Array)
                     return Integer_Array;
    function Unique (Values : Integer_Matrix) return Integer_Array;

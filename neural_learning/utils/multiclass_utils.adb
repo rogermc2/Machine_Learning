@@ -22,6 +22,18 @@ package body Multiclass_Utils is
 
     --  -------------------------------------------------------------------------
     --  L118
+    function Is_Multilabel (Y : NL_Types.Integer_List) return Boolean is
+        use Ada.Containers;
+--          Routine_Name : constant String :=
+--                           "Multiclass_Utils.Is_Multilabel Integer_List ";
+        Labels : constant NL_Types.Integer_List := Unique_Labels (Y);
+    begin
+        return Labels.Length > 2;
+
+    end Is_Multilabel;
+
+    --  -------------------------------------------------------------------------
+--  L118
     --  Examples:
     --  is_multilabel ([0, 1, 0, 1]) = False
     --  is_multilabel ([[1, 0], [0, 0]]) = True
@@ -87,7 +99,26 @@ package body Multiclass_Utils is
     end Type_Of_Target;
 
     --  -------------------------------------------------------------------------
-    --  L202
+
+    function Type_Of_Target (Y : NL_Types.Integer_List) return Y_Type is
+        use Ada.Containers;
+        Classes : constant NL_Types.Integer_List := Unique_Labels (Y);
+        Result  : Y_Type;
+    begin
+        if Is_Multilabel (Y) then
+            Result := Y_Multilabel_Indicator;
+        elsif Classes.Length > 2 then
+            Result := Y_Multiclass;
+        else
+            Result := Y_Binary;
+        end if;
+
+        return Result;
+
+    end Type_Of_Target;
+
+    --  -------------------------------------------------------------------------
+     --  L202
     function Type_Of_Target (Y : Integer_Matrix) return Y_Type is
     --        Routine_Name : constant String :=
     --                           "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
@@ -146,6 +177,15 @@ package body Multiclass_Utils is
     --  -------------------------------------------------------------------------
     --  L42 unique_labels
     function Unique_Labels (Y : Integer_Array) return NL_Types.Integer_List is
+    begin
+        return Encode_Utils.Unique (Y);
+
+    end Unique_Labels;
+
+    --  -------------------------------------------------------------------------
+    --  L42 unique_labels
+    function Unique_Labels (Y : NL_Types.Integer_List)
+                            return NL_Types.Integer_List is
     begin
         return Encode_Utils.Unique (Y);
 
