@@ -8,6 +8,7 @@ with Maths;
 with Classifier_Utilities;
 with Label;
 with NL_Types;
+with Printing;
 
 package body Samples_Generator is
 
@@ -54,6 +55,9 @@ package body Samples_Generator is
 
       function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
                                  return Integer_Array is
+         Routine_Name : constant String :=
+                       "Samples_Generator.Make_Multilabel_Classification." &
+                       "Sample_Example ";
          use Maths;
          use Integer_Sorting;
          Y_Size    : Natural := N_Classes + 1;
@@ -61,25 +65,25 @@ package body Samples_Generator is
          Num_Words : Natural := 0;
          Class     : Integer_List;
       begin
-         Put_Line (Routine_Name & "Sample_Example");
          --  pick a nonzero number of labels per document by rejection sampling
          while (not Allow_Unlabeled and Y_Size = 0) or Y_Size > N_Classes loop
             Y_Size := Poisson_Single (Float (N_labels));
          end loop;
 
-         Assert (Y_Size > 0, Routine_Name & "Sample_Example Y_Size = 0");
+         Assert (Y_Size > 0, Routine_Name & "Y_Size = 0");
 
          for index in 1 .. Y_Size - Natural (Y.Length) loop
             Prob.Append (abs (Maths.Random_Float));
          end loop;
-
+         Printing.Print_Float_List (Routine_Name & "Cum_P_C_List", Cum_P_C_List);
+         Printing.Print_Float_List (Routine_Name & "Prob", Prob);
          Put_Line (Routine_Name & "Prob length" &
                      Integer'Image (Integer (Prob.Length)));
          Put_Line (Routine_Name & "Cum_P_C_List length" &
                      Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410
          while Natural (Y.Length) /= Y_Size loop
-            -- pick a class with probability P(c)
+            --  pick a class with probability P(c)
             Class := Classifier_Utilities.Search_Sorted_Float_List
               (Cum_P_C_List, Prob);
             Assert (Integer (Class.Length) > 0, Routine_Name &
@@ -90,6 +94,9 @@ package body Samples_Generator is
             for index in Class.First_Index .. Class.Last_Index loop
                if not Y.Contains (Class (index)) then
                   Y.Append (Class (index));
+               else
+                  Assert (False, Routine_Name & "Duplicate class " &
+                            Integer'Image (Class (index)));
                end if;
             end loop;
          end loop;
