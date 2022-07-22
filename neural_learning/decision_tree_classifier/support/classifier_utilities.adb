@@ -394,11 +394,14 @@ package body Classifier_Utilities is
          Item := List_B.Element (index_B);
          Pos_Found := False;
          for index_A in List_A.First_Index .. List_A.Last_Index loop
-            if List_A (index_A) > Item then
-               Pos_Found := True;
-               theList.Append (Index_A);
+            if not Pos_Found then
+               Pos_Found := List_A (index_A) > Item;
+               if Pos_Found then
+                  theList.Append (Index_A);
+               end if;
             end if;
          end loop;
+
          if not Pos_Found then
             theList.Append (List_A.Last_Index + 1);
          end if;
@@ -429,11 +432,14 @@ package body Classifier_Utilities is
          Item := List_B.Element (index_B);
          Pos_Found := False;
          for index_A in List_A.First_Index .. List_A.Last_Index loop
-            if List_A (index_A) > Item then
-               Pos_Found := True;
-               theList.Append (Index_A);
+            if not Pos_Found then
+               Pos_Found := List_A (index_A) > Item;
+               if Pos_Found then
+                  theList.Append (Index_A);
+               end if;
             end if;
          end loop;
+
          if not Pos_Found then
             theList.Append (List_A.Last_Index + 1);
          end if;

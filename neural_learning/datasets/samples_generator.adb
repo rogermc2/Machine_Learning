@@ -47,35 +47,38 @@ package body Samples_Generator is
       --  probability and conditional probabilities of features given classes
       --  from which the data was drawn
       Return_Distributions : Boolean := False)
-       return Multilabel_Classification is
+      return Multilabel_Classification is
       use NL_Types;
       Routine_Name : constant String :=
                        "Samples_Generator.Make_Multilabel_Classification ";
       Cum_P_C_List : Float_List;
 
       function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
-                                 return Integer_Array is
+                               return Integer_Array is
          Routine_Name : constant String :=
-                       "Samples_Generator.Make_Multilabel_Classification." &
-                       "Sample_Example ";
+                          "Samples_Generator.Make_Multilabel_Classification." &
+                          "Sample_Example ";
          use Maths;
          use Integer_Sorting;
-         Y_Size    : Natural := N_Classes + 1;
-         Prob      : NL_Types.Float_List;
-         Num_Words : Natural := 0;
-         Class     : Integer_List;
+         Num_Classes  : constant Positive := P_W_C'Length;
+         Y_Size       : Positive := Num_Classes + 1;
+         Prob         : NL_Types.Float_List;
+         Num_Words    : Natural := 0;
+         Class        : Integer_List;
       begin
          --  pick a nonzero number of labels per document by rejection sampling
-         while (not Allow_Unlabeled and Y_Size = 0) or Y_Size > N_Classes loop
+         while (not Allow_Unlabeled and Y_Size = 0) or Y_Size > Num_Classes loop
             Y_Size := Poisson_Single (Float (N_labels));
          end loop;
+         Put_Line (Routine_Name & "Y_Size:" & Integer'Image (Y_Size));
 
          Assert (Y_Size > 0, Routine_Name & "Y_Size = 0");
 
          for index in 1 .. Y_Size - Natural (Y.Length) loop
             Prob.Append (abs (Maths.Random_Float));
          end loop;
-         Printing.Print_Float_List (Routine_Name & "Cum_P_C_List", Cum_P_C_List);
+         Printing.Print_Float_List (Routine_Name &
+                                      "Cum_P_C_List", Cum_P_C_List);
          Printing.Print_Float_List (Routine_Name & "Prob", Prob);
          Put_Line (Routine_Name & "Prob length" &
                      Integer'Image (Integer (Prob.Length)));
@@ -83,26 +86,24 @@ package body Samples_Generator is
                      Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410
          while Natural (Y.Length) /= Y_Size loop
+            Put_Line (Routine_Name & "Y.Length /= Y_Size");
+            Put_Line (Routine_Name & "Y.Length: " &
+                        Integer'Image (Integer (Y.Length)) & " Y size: " &
+                        Integer'Image (Y_Size));
             --  pick a class with probability P(c)
             Class := Classifier_Utilities.Search_Sorted_Float_List
               (Cum_P_C_List, Prob);
+            Printing.Print_Integer_List (Routine_Name & "Class", Class);
             Assert (Integer (Class.Length) > 0, Routine_Name &
                       "Sample_Example Class size = 0");
-            Put_Line (Routine_Name & "Y.Length: " &
-            Integer'Image (Integer (Y.Length)) & " Y size: " &
-                        Integer'Image (Y_Size));
             for index in Class.First_Index .. Class.Last_Index loop
-               if not Y.Contains (Class (index)) then
-                  Y.Append (Class (index));
-               else
-                  Assert (False, Routine_Name & "Duplicate class " &
-                            Integer'Image (Class (index)));
-               end if;
+               Y.Append (Class (index));
             end loop;
          end loop;
          Put_Line (Routine_Name & "Y set");
          Sort (Y);
          Put_Line (Routine_Name & "Y sorted");
+         Printing.Print_Integer_List (Routine_Name & "Y", Y);
 
          --  L420 pick a nonzero document length by rejection sampling
          while Num_Words = 0 loop
@@ -115,11 +116,12 @@ package body Samples_Generator is
             use Float_Sorting;
             Words           : Integer_Array (1 .. Num_Words);
             Word_List       : Integer_List;
-            Cum_P_W_Sample  : Float_Array (1 .. N_Classes);
+            Cum_P_W_Sample  : Float_Array (1 .. Num_Classes);
             Cum_Sample_List : Float_List;
             P_W_C_2         : Real_Float_Matrix (P_W_C'Range,
                                                  P_W_C'Range (2));
          begin
+            --  L425 generate a document of length n_words
             if Y.Is_Empty then
                Put_Line (Routine_Name & "Y empty");
                --  sample does'nt belong to a class so generate a
@@ -130,7 +132,7 @@ package body Samples_Generator is
                end loop;
 
             else
-               --  sample words with replacement from selected classes
+               --  L431 sample words with replacement from selected classes
                for row in P_W_C'Range loop
                   for col in P_W_C'Range (2) loop
                      P_W_C_2 (row, col) := P_W_C (row, Y (col));
@@ -153,7 +155,10 @@ package body Samples_Generator is
                          Cum_P_W_Sample (Cum_P_W_Sample'Last));
                end loop;
                Sort (Cum_Sample_List);
+               Printing.Print_Float_List
+                 (Routine_Name & "Cum_Sample_List", Cum_Sample_List);
 
+               --  L434
                Prob.Clear;
                for index in 1 .. Num_Words loop
                   Prob.Append (abs (Maths.Random_Float));
@@ -162,6 +167,8 @@ package body Samples_Generator is
                Word_List := Classifier_Utilities.Search_Sorted_Float_List
                  (Cum_Sample_List, Prob);
             end if;
+            Printing.Print_Integer_List
+              (Routine_Name & "Word_List", Word_List);
 
             for index in 1 .. Num_Words loop
                Words (index) := Word_List (index);
