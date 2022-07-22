@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/datasets/samples_generator.py
 
---  with Ada.Containers;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -61,30 +61,43 @@ package body Samples_Generator is
          Num_Words : Natural := 0;
          Class     : Integer_List;
       begin
-         --  pick a nonzero number of labels by rejection sampling
+         Put_Line (Routine_Name & "Sample_Example");
+         --  pick a nonzero number of labels per document by rejection sampling
          while (not Allow_Unlabeled and Y_Size = 0) or Y_Size > N_Classes loop
             Y_Size := Poisson_Single (Float (N_labels));
          end loop;
+
+         Assert (Y_Size > 0, Routine_Name & "Sample_Example Y_Size = 0");
 
          for index in 1 .. Y_Size - Natural (Y.Length) loop
             Prob.Append (abs (Maths.Random_Float));
          end loop;
 
+         Put_Line (Routine_Name & "Prob set");
+         --  L410
          while Natural (Y.Length) /= Y_Size loop
             Class := Classifier_Utilities.Search_Sorted_Float_List
               (Cum_P_C_List, Prob);
+            Assert (Integer (Class.Length) > 0, Routine_Name &
+                      "Sample_Example Class size = 0");
+            Put_Line (Routine_Name & "Y.Length: " &
+            Integer'Image (Integer (Y.Length)) & " Y size: " &
+                        Integer'Image (Y_Size));
             for index in Class.First_Index .. Class.Last_Index loop
                if not Y.Contains (Class (index)) then
                   Y.Append (Class (index));
                end if;
             end loop;
          end loop;
+         Put_Line (Routine_Name & "Y set");
          Sort (Y);
+         Put_Line (Routine_Name & "Y sorted");
 
          --  L420 pick a nonzero document length by rejection sampling
          while Num_Words = 0 loop
             Num_Words := Poisson_Single (Float (Expected_Length));
          end loop;
+         Put_Line (Routine_Name & "Num_Words set");
 
          declare
             use Float_Package;
@@ -97,6 +110,7 @@ package body Samples_Generator is
                                                  P_W_C'Range (2));
          begin
             if Y.Is_Empty then
+               Put_Line (Routine_Name & "Y empty");
                --  sample does'nt belong to a class so generate a
                --  noise word
                for index in 1 .. Num_Words loop
@@ -111,6 +125,7 @@ package body Samples_Generator is
                      P_W_C_2 (row, col) := P_W_C (row, Y (col));
                   end loop;
                end loop;
+               Put_Line (Routine_Name & "P_W_C_2 set");
 
                for row in P_W_C_2'Range loop
                   Cum_P_W_Sample (row) := 0.0;
