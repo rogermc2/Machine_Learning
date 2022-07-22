@@ -73,9 +73,13 @@ package body Samples_Generator is
             Prob.Append (abs (Maths.Random_Float));
          end loop;
 
-         Put_Line (Routine_Name & "Prob set");
+         Put_Line (Routine_Name & "Prob length" &
+                     Integer'Image (Integer (Prob.Length)));
+         Put_Line (Routine_Name & "Cum_P_C_List length" &
+                     Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410
          while Natural (Y.Length) /= Y_Size loop
+            -- pick a class with probability P(c)
             Class := Classifier_Utilities.Search_Sorted_Float_List
               (Cum_P_C_List, Prob);
             Assert (Integer (Class.Length) > 0, Routine_Name &

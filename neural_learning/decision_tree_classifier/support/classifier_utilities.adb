@@ -375,13 +375,15 @@ package body Classifier_Utilities is
    --  Search_Sorted_Integer_List finds the indices into List_A such that,
    --  if the corresponding elements in List_B were inserted before the indices,
    --  the order of List_A would be preserved.
+   --  The Search_Sorted functions returns the indices where new elements in
+   --  List_B should be inserted into List_A to keep List_A sorted.
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
                                         return Integer_List is
       use Integer_Package;
       use Integer_Sorting;
-      Item    : Integer;
-      Index_A : Positive;
-      theList : Integer_List;
+      Item      : Integer;
+      Pos_Found : Boolean;
+      theList   : Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -390,9 +392,15 @@ package body Classifier_Utilities is
 
       for index_B in List_B.First_Index .. List_B.Last_Index loop
          Item := List_B.Element (index_B);
-         Index_A := List_A.Find_Index (Item);
-         if Index_A /= Value_Data_Package.No_Index then
-            theList.Append (Index_A);
+         Pos_Found := False;
+         for index_A in List_A.First_Index .. List_A.Last_Index loop
+            if List_A (index_A) > Item then
+               Pos_Found := True;
+               theList.Append (Index_A);
+            end if;
+         end loop;
+         if not Pos_Found then
+            theList.Append (List_A.Last_Index + 1);
          end if;
       end loop;
 
@@ -408,9 +416,9 @@ package body Classifier_Utilities is
       use Float_Sorting;
       Routine_Name : constant String :=
                        "Classifier_Utilities.Search_Sorted_Float_List ";
-      Item         : Float;
-      Index_A      : Natural;
-      theList      : Integer_List;
+      Item      : Float;
+      Pos_Found : Boolean;
+      theList   : Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
@@ -419,9 +427,15 @@ package body Classifier_Utilities is
 
       for index_B in List_B.First_Index .. List_B.Last_Index loop
          Item := List_B.Element (index_B);
-         Index_A := List_A.Find_Index (Item);
-         if Index_A /= Value_Data_Package.No_Index then
-            theList.Append (Index_A);
+         Pos_Found := False;
+         for index_A in List_A.First_Index .. List_A.Last_Index loop
+            if List_A (index_A) > Item then
+               Pos_Found := True;
+               theList.Append (Index_A);
+            end if;
+         end loop;
+         if not Pos_Found then
+            theList.Append (List_A.Last_Index + 1);
          end if;
       end loop;
 
