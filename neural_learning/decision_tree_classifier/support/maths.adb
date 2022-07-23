@@ -112,6 +112,19 @@ package body Maths is
         return Integer (Random (Integer_Gen));
     end Random_Integer;
 
+   --  ------------------------------------------------------------------------
+
+    function Random_Integer (First, Last : Integer) return Integer is
+      subtype R_Range is Integer range First .. Last;
+      package Random_Integer_Package is new
+        Ada.Numerics.Discrete_Random (R_Range);
+      use Random_Integer_Package;
+      Gen : Generator;
+    begin
+      return Random (Gen);
+
+    end Random_Integer;
+
     --  ------------------------------------------------------------------------
 
 end Maths;
