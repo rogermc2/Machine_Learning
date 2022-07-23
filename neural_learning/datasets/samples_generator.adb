@@ -70,16 +70,9 @@ package body Samples_Generator is
          --  sampling
          while (not Allow_Unlabeled and Y_Size = 0) or Y_Size > Num_Classes loop
             --  L406
-            Put_Line (Routine_Name &
-                        " L406 not Allow_Unlabeled and Y_Size = 0: " &
-                        Boolean'Image (not Allow_Unlabeled and Y_Size = 0));
-            Put_Line (Routine_Name & " L406 Y_Size = 0: " &
-                        Boolean'Image (Y_Size = 0));
-            Y_Size := Poisson_Single (Float (N_labels));
+            Y_Size := Poisson_Single (Float (N_labels)) + 1;
          end loop;
          Put_Line (Routine_Name & " L407 Y_Size:" & Integer'Image (Y_Size));
-
-         Assert (Y_Size > 0, Routine_Name & "L407 Y_Size = 0");
 
          for index in 1 .. Y_Size - Natural (Y.Length) loop
             Prob.Append (abs (Maths.Random_Float));
@@ -93,22 +86,21 @@ package body Samples_Generator is
                      Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410
          while Natural (Y.Length) /= Y_Size loop
-            Put_Line (Routine_Name & "Y.Length /= Y_Size");
-            Put_Line (Routine_Name & "Y.Length: " &
+            Put_Line (Routine_Name & "L410 Y.Length /= Y_Size");
+            Put_Line (Routine_Name & "L410 Y.Length: " &
                         Integer'Image (Integer (Y.Length)) & " Y size: " &
                         Integer'Image (Y_Size));
             --  pick a class with probability P(c)
+            --  L412
             Class := Classifier_Utilities.Search_Sorted_Float_List
               (Cum_P_C_List, Prob);
-            Printing.Print_Integer_List (Routine_Name & "Class", Class);
+            Printing.Print_Integer_List (Routine_Name & "L412 Class", Class);
             Assert (Integer (Class.Length) > 0, Routine_Name &
-                      "Sample_Example Class size = 0");
+                      "L412 Class size = 0");
             for index in Class.First_Index .. Class.Last_Index loop
                Y.Append (Class (index));
             end loop;
          end loop;
-         Put_Line (Routine_Name & "L420 Y.Length: " &
-                        Integer'Image (Integer (Y.Length)));
          Printing.Print_Integer_List (Routine_Name & "L420 Y", Y);
 
          --  L420 pick a nonzero document length by rejection sampling
@@ -139,11 +131,11 @@ package body Samples_Generator is
             else
                --  L431 sample words with replacement from selected classes
                for row in P_W_C'Range loop
---                    Put_Line (Routine_Name & "L431 Y Row:" &
---                                Integer'Image (row));
+                  Put_Line (Routine_Name & "L431 Y Row:" &
+                              Integer'Image (row));
                   for col in Y.First_Index .. Y.Last_Index loop
---                       Put_Line (Routine_Name & "L431 Y col:" &
---                                   Integer'Image (col));
+                     Put_Line (Routine_Name & "L431 Y col:" &
+                                 Integer'Image (col));
                      P_W_C_2 (row, col) := P_W_C (row, Y (col));
                   end loop;
                end loop;
