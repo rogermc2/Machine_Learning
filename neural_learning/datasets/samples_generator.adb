@@ -53,14 +53,15 @@ package body Samples_Generator is
                        "Samples_Generator.Make_Multilabel_Classification ";
       Cum_P_C_List : Float_List;
 
-      function Sample_Example (P_W_C : Real_Float_Matrix; Y : out Integer_List)
-                               return Integer_Array is
+      function Sample_Example
+          (P_W_C_Ex : Real_Float_Matrix; Y_Ex : out Integer_List)
+           return Integer_Array is
          Routine_Name : constant String :=
                           "Samples_Generator.Make_Multilabel_Classification." &
                           "Sample_Example ";
          use Maths;
          --           use Integer_Sorting;
-         Num_Classes  : constant Positive := P_W_C'Length;
+         Num_Classes  : constant Positive := P_W_C_Ex'Length;
          Y_Size       : Natural := Num_Classes + 1;
          Prob         : NL_Types.Float_List;
          Num_Words    : Natural := 0;
@@ -74,7 +75,7 @@ package body Samples_Generator is
          end loop;
          Put_Line (Routine_Name & " L407 Y_Size:" & Integer'Image (Y_Size));
 
-         for index in 1 .. Y_Size - Natural (Y.Length) loop
+         for index in 1 .. Y_Size - Natural (Y_Ex.Length) loop
             Prob.Append (abs (Maths.Random_Float));
          end loop;
          Printing.Print_Float_List (Routine_Name &
@@ -85,10 +86,10 @@ package body Samples_Generator is
          Put_Line (Routine_Name & "Cum_P_C_List length" &
                      Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410
-         while Natural (Y.Length) /= Y_Size loop
-            Put_Line (Routine_Name & "L410 Y.Length /= Y_Size");
-            Put_Line (Routine_Name & "L410 Y.Length: " &
-                        Integer'Image (Integer (Y.Length)) & " Y size: " &
+         while Natural (Y_Ex.Length) /= Y_Size loop
+            Put_Line (Routine_Name & "L410 Y_Ex.Length /= Y_Size");
+            Put_Line (Routine_Name & "L410 Y_Ex.Length: " &
+                        Integer'Image (Integer (Y_Ex.Length)) & " Y_Ex size: " &
                         Integer'Image (Y_Size));
             --  pick a class with probability P(c)
             --  L412
@@ -98,10 +99,10 @@ package body Samples_Generator is
             Assert (Integer (Class.Length) > 0, Routine_Name &
                       "L412 Class size = 0");
             for index in Class.First_Index .. Class.Last_Index loop
-               Y.Append (Class (index));
+               Y_Ex.Append (Class (index));
             end loop;
          end loop;
-         Printing.Print_Integer_List (Routine_Name & "L420 Y", Y);
+         Printing.Print_Integer_List (Routine_Name & "L420 Y_Ex", Y_Ex);
 
          --  L420 pick a nonzero document length by rejection sampling
          while Num_Words = 0 loop
@@ -117,10 +118,10 @@ package body Samples_Generator is
             Cum_P_W_Sample  : Float_Array (1 .. Num_Classes);
             Cum_Sample_List : Float_List;
             P_W_C_2         : Real_Float_Matrix
-              (P_W_C'Range, P_W_C'Range (2)) := (others => (others => 0.0));
+              (P_W_C_Ex'Range, P_W_C_Ex'Range (2)) := (others => (others => 0.0));
          begin
             --  L425 generate a document of length n_words
-            if Y.Is_Empty then
+            if Y_Ex.Is_Empty then
                --  sample does'nt belong to a class so generate a
                --  noise word
                for index in 1 .. Num_Words loop
@@ -130,13 +131,16 @@ package body Samples_Generator is
 
             else
                --  L431 sample words with replacement from selected classes
-               for row in P_W_C'Range loop
-                  Put_Line (Routine_Name & "L431 Y Row:" &
+               --  cumulative_p_w_sample =
+               --  p_w_c.take(y, axis=1).sum(axis=1).cumsum()
+               --  y: column indices of values to be fetched from p_w_c
+               for row in 1 .. N_Features loop
+                  Put_Line (Routine_Name & "L431 Y_Ex Row:" &
                               Integer'Image (row));
-                  for col in Y.First_Index .. Y.Last_Index loop
-                     Put_Line (Routine_Name & "L431 Y col:" &
+                  for col in Y_Ex.First_Index .. Y_Ex.Last_Index loop
+                     Put_Line (Routine_Name & "L431 Y_Ex col:" &
                                  Integer'Image (col));
-                     P_W_C_2 (row, col) := P_W_C (row, Y (col));
+                     P_W_C_2 (row, col) := P_W_C_Ex (row, Y_Ex (col));
                   end loop;
                end loop;
                Put_Line (Routine_Name & "L431 P_W_C_2 set");
@@ -192,7 +196,7 @@ package body Samples_Generator is
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
       Y0             : Integer_Array (1 .. N_Classes);
-      Y_List         : Integer_List;
+      Y              : Integer_List;
       X_Indices      : Integer_Array_List;
 --        X_Indices      : Integer_List;
       X_Ind_Ptr      : Integer_List;
@@ -230,7 +234,7 @@ package body Samples_Generator is
                X_Indices.Append (Words);
                X_Ind_Ptr.Append (sample_index);
                --  L440
-               Y_List.Append_Vector (Sample_Y);
+               Y.Append_Vector (Sample_Y);
             end loop;
             Put_Line (Routine_Name & "L440 done");
 
@@ -265,7 +269,7 @@ package body Samples_Generator is
          Y0 (index) := index - Y0'First;
       end loop;
       Label.Fit (LB, Y0);
-      Y_Bool := Label.Transform (LB, Y_List);
+      Y_Bool := Label.Transform (LB, Y);
 
       --          Classification.X := X;
       Classification.Y := To_Integer_Matrix (Y_Bool);
