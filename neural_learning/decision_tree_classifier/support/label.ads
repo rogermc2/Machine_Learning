@@ -66,7 +66,7 @@ package Label is
                         return Boolean_Matrix;
     function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List)
                         return Boolean_Matrix;
-    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_2D)
+    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_Array)
                         return Boolean_Matrix;
     function Transform (Self : Label_Encoder; Y : Integer_Array)
                         return Natural_Array;

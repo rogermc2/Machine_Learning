@@ -638,7 +638,7 @@ package body Label is
 
     --  -------------------------------------------------------------------------
 
-    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_2D)
+    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_Array)
                         return Boolean_Matrix is
       use NL_Types;
       use Integer_Package;
@@ -649,10 +649,10 @@ package body Label is
       Class_Curs    : Cursor;
       Class         : Integer;
       Max_Index     : Positive := 1;
-      Classes_Array : array (1 .. Positive (Y.Length)) of Integer_List;
+      Classes_Array : Integer_List_Array (1 .. Y'Length);
     begin
-      for row in Y.First_Index .. Y.Last_Index loop
-         Y_Row := Y.Element (row);
+      for row in Y'Range loop
+         Y_Row := Y (row);
          Classes.Clear;
          for col in Y_Row.First_Index .. Y_Row.Last_Index loop
             Class_Curs := Self.Classes.Find (Y_Row (col));
@@ -670,7 +670,7 @@ package body Label is
 
       declare
          Bool_List : Integer_List;
-         Result    : Boolean_Matrix (1 .. Positive (Y.Length), 1 .. Max_Index);
+         Result    : Boolean_Matrix (Y'Range, 1 .. Max_Index);
       begin
          for row in Result'Range loop
             Bool_List := Classes_Array (row);

@@ -53,6 +53,7 @@ package body Samples_Generator is
                        "Samples_Generator.Make_Multilabel_Classification ";
       Cum_P_C_List : Float_List;
 
+      --  Sample_Example returns one sample example word vector and Y vector
       function Sample_Example
         (P_W_C_Ex : Real_Float_Matrix; Y_Gen : out Integer_List)
            return Integer_Array is
@@ -204,7 +205,7 @@ package body Samples_Generator is
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
 --        Y0             : Integer_Array (1 .. N_Classes);
-      Y              : Integer_List_2D;
+      Y              : Integer_List_Array (1 .. N_Samples);
       X_Indices      : Integer_Array_List;
       --        X_Indices      : Integer_List;
       X_Ind_Ptr      : Integer_List;
@@ -241,9 +242,9 @@ package body Samples_Generator is
                --  L438
                X_Indices.Append (Words);
                X_Ind_Ptr.Append (sample_index);
-               --  L440
-               Y.Append (Sample_Y);
             end loop;
+            --  L440
+            Y (sample_index) := Sample_Y;
          end;
       end loop;
 
@@ -276,8 +277,6 @@ package body Samples_Generator is
       declare
          Y_Bool : constant Boolean_Matrix := Label.Transform (LB, Y);
       begin
-         Put_Line (Routine_Name & "L453 Y Size:" &
-                     Integer'Image (Integer (Y.Length)));
          Put_Line (Routine_Name & "L453 Y_Bool Size:" &
                      Integer'Image (Y_Bool'Length));
          Put_Line (Routine_Name & "L453 Label.Transform (LB, Y) Size:" &
