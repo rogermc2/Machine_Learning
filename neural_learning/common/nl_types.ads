@@ -99,6 +99,11 @@ package NL_Types is
    subtype Boolean_List is Boolean_Package.Vector;
    package Boolean_Sorting is new Boolean_Package.Generic_Sorting ("<");
 
+   use Boolean_Package;
+   package Boolean_Package_2D is new
+     Ada.Containers.Vectors (Positive, Boolean_List);
+   subtype Boolean_List_2D is Boolean_Package_2D.Vector;
+
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
    subtype Natural_Cursor is Natural_Package.Cursor;

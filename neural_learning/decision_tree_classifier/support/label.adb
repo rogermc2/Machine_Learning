@@ -441,7 +441,7 @@ package body Label is
 
     --  -------------------------------------------------------------------------
     --  L416
-    function Label_Binarize (Y, Classes   : NL_Types.Integer_List;
+    function Label_Binarize (Y, Classes : NL_Types.Integer_List;
                              Neg_Label : Integer := 0) return Boolean_Matrix is
         use Ada.Containers;
         use Multiclass_Utils;
@@ -633,6 +633,52 @@ package body Label is
     begin
 
         return Label_Binarize (Y, Self.Classes);
+
+    end Transform;
+
+    --  -------------------------------------------------------------------------
+
+    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_2D)
+                        return Boolean_Matrix is
+      use NL_Types;
+      use Integer_Package;
+      --  Routine_Name : constant String := "Label.Transform Binarize ";
+      Y_Row      : Integer_List;
+      Index      : Integer_List;
+      Indices    : Integer_List_2D;
+      Class_Curs : Cursor;
+      Class      : Integer;
+      Max_Index  : Positive := 1;
+      Bool       : array (1 .. Positive (Y.Length)) of Integer_List;
+    begin
+      for row in Y.First_Index .. Y.Last_Index loop
+         Y_Row := Y.Element (row);
+         Index.Clear;
+         for col in Y_Row.First_Index .. Y_Row.Last_Index loop
+            Class_Curs := Self.Classes.Find (Y_Row (col));
+            Class := Element (Class_Curs);
+            Index.Append (Class);
+         end loop;
+
+         if Positive (Index.Length) > Max_Index then
+            Max_Index := Positive (Index.Length);
+         end if;
+
+         Indices.Append (Index);
+         Bool (row) := Index;
+      end loop;
+      declare
+         Bool_List : Integer_List;
+         Result    : Boolean_Matrix (1 .. Positive (Y.Length), 1 .. Max_Index);
+      begin
+         for row in Result'Range loop
+            Bool_List := Bool (row);
+            for col in Bool_List.First_Index .. Bool_List.Last_Index loop
+               Result (row, col) := Bool_List (col);
+            end loop;
+         end loop;
+         return Result;
+      end;
 
     end Transform;
 
