@@ -668,17 +668,19 @@ package body Label is
          Classes_Array (row) := Classes;
       end loop;
 
+      --  Binarize
       declare
-         Bool_List      : Integer_List;
-         Integer_Result : Integer_Matrix (Y'Range, 1 .. Max_Index);
-         Result         : Boolean_Matrix (Y'Range, 1 .. Max_Index);
+         Bool_List : Integer_List;
+         Result    : Boolean_Matrix (Y'Range, 1 .. Max_Index) :=
+                       (others => (others => False));
       begin
          for row in Result'Range loop
             Bool_List := Classes_Array (row);
             for col in Bool_List.First_Index .. Bool_List.Last_Index loop
-               Integer_Result (row, col) := Bool_List.Element (col);
+               Result (row, Bool_List.Element (col)) := True;
             end loop;
          end loop;
+
          return Result;
       end;
 
