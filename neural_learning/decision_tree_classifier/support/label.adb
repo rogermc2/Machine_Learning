@@ -669,13 +669,14 @@ package body Label is
       end loop;
 
       declare
-         Bool_List : Integer_List;
-         Result    : Boolean_Matrix (Y'Range, 1 .. Max_Index);
+         Bool_List      : Integer_List;
+         Integer_Result : Integer_Matrix (Y'Range, 1 .. Max_Index);
+         Result         : Boolean_Matrix (Y'Range, 1 .. Max_Index);
       begin
          for row in Result'Range loop
             Bool_List := Classes_Array (row);
             for col in Bool_List.First_Index .. Bool_List.Last_Index loop
-               Result (row, col) := Bool_List.Element (col);
+               Integer_Result (row, col) := Bool_List.Element (col);
             end loop;
          end loop;
          return Result;
