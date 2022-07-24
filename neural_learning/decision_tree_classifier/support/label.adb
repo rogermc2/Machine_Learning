@@ -643,38 +643,39 @@ package body Label is
       use NL_Types;
       use Integer_Package;
       --  Routine_Name : constant String := "Label.Transform Binarize ";
-      Y_Row      : Integer_List;
-      Index      : Integer_List;
-      Indices    : Integer_List_2D;
-      Class_Curs : Cursor;
-      Class      : Integer;
-      Max_Index  : Positive := 1;
-      Bool       : array (1 .. Positive (Y.Length)) of Integer_List;
+      Y_Row         : Integer_List;
+      Classes       : Integer_List;
+      Indices       : Integer_List_2D;
+      Class_Curs    : Cursor;
+      Class         : Integer;
+      Max_Index     : Positive := 1;
+      Classes_Array : array (1 .. Positive (Y.Length)) of Integer_List;
     begin
       for row in Y.First_Index .. Y.Last_Index loop
          Y_Row := Y.Element (row);
-         Index.Clear;
+         Classes.Clear;
          for col in Y_Row.First_Index .. Y_Row.Last_Index loop
             Class_Curs := Self.Classes.Find (Y_Row (col));
             Class := Element (Class_Curs);
-            Index.Append (Class);
+            Classes.Append (Class);
          end loop;
 
-         if Positive (Index.Length) > Max_Index then
-            Max_Index := Positive (Index.Length);
+         if Positive (Classes.Length) > Max_Index then
+            Max_Index := Positive (Classes.Length);
          end if;
 
-         Indices.Append (Index);
-         Bool (row) := Index;
+         Indices.Append (Classes);
+         Classes_Array (row) := Classes;
       end loop;
+
       declare
          Bool_List : Integer_List;
          Result    : Boolean_Matrix (1 .. Positive (Y.Length), 1 .. Max_Index);
       begin
          for row in Result'Range loop
-            Bool_List := Bool (row);
+            Bool_List := Classes_Array (row);
             for col in Bool_List.First_Index .. Bool_List.Last_Index loop
-               Result (row, col) := Bool_List (col);
+               Result (row, col) := Bool_List.Element (col);
             end loop;
          end loop;
          return Result;

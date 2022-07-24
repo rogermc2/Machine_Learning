@@ -203,7 +203,7 @@ package body Samples_Generator is
       Classification : Multilabel_Classification
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
-      Y0             : Integer_Array (1 .. N_Classes);
+--        Y0             : Integer_Array (1 .. N_Classes);
       Y              : Integer_List_2D;
       X_Indices      : Integer_Array_List;
       --        X_Indices      : Integer_List;
@@ -271,11 +271,8 @@ package body Samples_Generator is
          --           Put_Line (Routine_Name & "X_Sp set");
          null;
       end;
+
       --  L453
-      for index in Y0'Range loop
-         Y0 (index) := index - Y0'First;
-      end loop;
-      Label.Fit (LB, Y0);
       declare
          Y_Bool : constant Boolean_Matrix := Label.Transform (LB, Y);
       begin
