@@ -242,8 +242,8 @@ package body Samples_Generator is
             begin
                 for word_index in Words'Range loop
                     --  L438
-                    Put_Line (Routine_Name & "L438 word_index:" &
-                                Integer'Image (word_index));
+--                      Put_Line (Routine_Name & "L438 word_index:" &
+--                                  Integer'Image (word_index));
                     X_Indices.Append (Words);
                     X_Ind_Ptr.Append (sample_index);
                 end loop;
@@ -252,7 +252,6 @@ package body Samples_Generator is
             end;
         end loop;
 
-        Put_Line (Routine_Name & "L441");
         --  L441
         declare
             --           X_Sp      : Real_Float_Matrix
@@ -278,16 +277,16 @@ package body Samples_Generator is
             null;
         end;
 
-        Put_Line (Routine_Name & "L453");
         --  L453
         declare
             Y_Bool : constant Boolean_Matrix := Label.Transform (LB, Y);
         begin
-            Put_Line (Routine_Name & "L453+");
-            Put_Line (Routine_Name & "L453 Y_Bool Size:" &
-                        Integer'Image (Y_Bool'Length));
-            Put_Line (Routine_Name & "L453 Label.Transform (LB, Y) Size:" &
-                        Integer'Image (Label.Transform (LB, Y)'Length));
+            Put_Line (Routine_Name & "L453 Y_Bool size :" &
+                        Integer'Image (Y_Bool'Length) & " x" &
+                        Integer'Image (Y_Bool'Length (2)));
+            Put_Line (Routine_Name & "L453 Classification.Y length:" &
+                        Integer'Image (Classification.Y'Length) & " x" &
+                        Integer'Image (Classification.Y'Length (2)));
 
             Classification.Y := To_Integer_Matrix (Y_Bool);
         end;

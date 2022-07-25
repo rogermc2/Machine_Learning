@@ -643,12 +643,11 @@ package body Label is
                         return Boolean_Matrix is
       use NL_Types;
       use Integer_Package;
-      Routine_Name : constant String := "Label.Transform Integer_List_Array";
+      Routine_Name : constant String := "Label.Transform Integer_List_Array ";
       Y_Row         : Integer_List;
       Classes       : Integer_List;
       Indices       : Integer_List_2D;
       Class_Curs    : Cursor;
-      Class         : Integer;
       Max_Index     : Positive := 1;
       Classes_Array : Integer_List_Array (1 .. Y'Length);
     begin
@@ -658,8 +657,7 @@ package body Label is
          for col in Y_Row.First_Index .. Y_Row.Last_Index loop
             Class_Curs := Self.Classes.Find (Y_Row (col));
             if Class_Curs /= No_Element then
-                    Class := Element (Class_Curs);
-                    Classes.Append (Class);
+                    Classes.Append (Element (Class_Curs));
             end if;
          end loop;
 
@@ -671,11 +669,13 @@ package body Label is
          Classes_Array (row) := Classes;
       end loop;
 
+     Put_Line (Routine_Name & "Max_Index :" & Integer'Image (Max_Index));
       --  Binarize
       declare
          Bool_List : Integer_List;
-         Result    : Boolean_Matrix (Y'Range, 1 .. Max_Index) :=
-                       (others => (others => False));
+         Result    : Boolean_Matrix (Y'Range,
+                                     1 .. Positive (Self.Classes.Length)) :=
+                          (others => (others => False));
       begin
          for row in Result'Range loop
             Bool_List := Classes_Array (row);
