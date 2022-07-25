@@ -207,9 +207,7 @@ package body Samples_Generator is
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
       Y              : Integer_List_Array (1 .. N_Samples);
-      X_Indices      : Integer_Array_List;  --  list of arrays
-      --        X_Indices      : Integer_List;
-      X_Ind_Ptr      : Integer_List;
+      X_Ind_Ptr      : Integer_List_Array (1 .. N_Samples);
    begin
       Put_Line (Routine_Name);
       for index in P_C'Range loop
@@ -243,8 +241,8 @@ package body Samples_Generator is
                --  L438
                --                      Put_Line (Routine_Name & "L438 word_index:" &
                --                                  Integer'Image (word_index));
-               X_Indices.Append (Words);
-               X_Ind_Ptr.Append (sample_index);
+               X_Ind_Ptr (sample_index) :=
+                 Classifier_Utilities.To_Integer_List (Words);
             end loop;
             --  L440
             Y (sample_index) := Sample_Y;
@@ -252,29 +250,19 @@ package body Samples_Generator is
       end loop;
 
       --  L441
-      declare
-         X_Sp : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features);
-      begin
-         --  csr_matrix((X_data, X_indices, X_indptr),
-         --  shape=(n_samples, n_features)) is
-         --  a representation where the column indices for row i are
-         --  in X_indices[X_indptr[i] : X_indptr[i + 1]] and their
-         --  related values are in X_data[X_indptr[i]:X_indptr[i+1]]
+      --  csr_matrix((X_data, X_indices, X_indptr),
+      --  shape=(n_samples, n_features)) is
+      --  a representation where the column indices for row i are
+      --  in X_indices[X_indptr[i] : X_indptr[i + 1]] and their
+      --  related values are in X_data[X_indptr[i]:X_indptr[i+1]]
 
-         for index in X_Indices.First_Index .. X_Indices.Last_Index loop
-            Printing.Print_Integer_Array (Routine_Name & "L441 X_Indices",
-                                          X_Indices (index));
+      for row in X'Range loop
+         for sp_col in X_Ind_Ptr (row).First_Index ..
+           X_Ind_Ptr (row).Last_Index loop
+            X (row, sp_col) := 1.0;
          end loop;
-
-         for row in X_Sp'Range loop
-            for sp_col in X_Indices.Element (X_Ind_Ptr.Element (row)) ..
-              X_Indices.Element (X_Ind_Ptr.Element (row + 1)) loop
-               X_Sp (row, sp_col) := 1.0;
-            end loop;
-         end loop;
-         Put_Line (Routine_Name & "X_Sp set");
-         null;
-      end;
+      end loop;
+      Put_Line (Routine_Name & "X set");
 
       --  L453
       Label.Fit (LB, Y);

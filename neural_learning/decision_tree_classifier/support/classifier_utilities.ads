@@ -42,6 +42,7 @@ package Classifier_Utilities is
    function To_Float_List (I : Integer_List) return Float_List;
    function To_Float_List_2D (Data : Value_Data_Lists_2D) return Float_List_2D;
    function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D;
+   function To_Integer_List (Ints : Integer_Array) return Integer_List;
    function To_Integer_List (Ints : Value_Data_List) return Integer_List;
    function To_Integer_List_2D (Data : Value_Data_Lists_2D) return Integer_List_2D;
    function To_Multi_Value_List (A : Multi_Value_Array)

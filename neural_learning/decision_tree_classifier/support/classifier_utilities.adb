@@ -414,18 +414,18 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Float_List (List_A, List_B : Float_List)
-                                        return Integer_List is
+                                      return Integer_List is
       use Float_Package;
       use Float_Sorting;
       Routine_Name : constant String :=
                        "Classifier_Utilities.Search_Sorted_Float_List ";
-      Item      : Float;
-      Pos_Found : Boolean;
-      theList   : Integer_List;
+      Item         : Float;
+      Pos_Found    : Boolean;
+      theList      : Integer_List;
    begin
       if not Is_Sorted (List_A) then
          raise Value_Error with
-           Routine_Name & "Search_Sorted called with unsorted list.";
+         Routine_Name & "Search_Sorted called with unsorted list.";
       end if;
 
       for index_B in List_B.First_Index .. List_B.Last_Index loop
@@ -809,6 +809,19 @@ package body Classifier_Utilities is
       return F2_List;
 
    end To_Float_List_2D;
+
+   --  -------------------------------------------------------------------------
+
+   function To_Integer_List (Ints : Integer_Array) return Integer_List is
+      Values : Integer_List;
+   begin
+      for index in Ints'Range loop
+         Values.Append (Ints (index));
+      end loop;
+
+      return Values;
+
+   end To_Integer_List;
 
    --  -------------------------------------------------------------------------
 
