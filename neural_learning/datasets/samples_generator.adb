@@ -207,6 +207,7 @@ package body Samples_Generator is
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
       Y              : Integer_List_Array (1 .. N_Samples);
+      X_Indices      : Integer_List;
       X_Ind_Ptr      : Integer_List_Array (1 .. N_Samples);
    begin
       Put_Line (Routine_Name);
@@ -237,13 +238,9 @@ package body Samples_Generator is
             Words     : constant Integer_Array :=
                           Sample_Example (P_W_C, Sample_Y);
          begin
-            for word_index in Words'Range loop
-               --  L438
-               --                      Put_Line (Routine_Name & "L438 word_index:" &
-               --                                  Integer'Image (word_index));
-               X_Ind_Ptr (sample_index) :=
-                 Classifier_Utilities.To_Integer_List (Words);
-            end loop;
+            --  L438
+            X_Indices := Classifier_Utilities.To_Integer_List (Words);
+            X_Ind_Ptr (sample_index) := X_Indices;
             --  L440
             Y (sample_index) := Sample_Y;
          end;
@@ -256,13 +253,17 @@ package body Samples_Generator is
       --  in X_indices[X_indptr[i] : X_indptr[i + 1]] and their
       --  related values are in X_data[X_indptr[i]:X_indptr[i+1]]
 
-      for row in X'Range loop
-         for sp_col in X_Ind_Ptr (row).First_Index ..
-           X_Ind_Ptr (row).Last_Index loop
-            X (row, sp_col) := 1.0;
+      --  sum_duplicates
+      declare
+         X_Data : Integer_List_Array (1 .. N_Samples);
+      begin
+         for row in X_Ind_Ptr'Range loop
+            for sp_col in X_Ind_Ptr (row).First_Index ..
+              X_Ind_Ptr (row).Last_Index loop
+               X_Data (row).Append (1.0);
+            end loop;
          end loop;
-      end loop;
-      Put_Line (Routine_Name & "X set");
+      end;
 
       --  L453
       Label.Fit (LB, Y);
