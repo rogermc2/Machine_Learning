@@ -154,18 +154,16 @@ package Multilayer_Perceptron is
                      RF_Fun                : Num_Diff.Deriv_Float_Fun_Access
                      := null)
                      return MLP_Classifier;
-    function Fit (Self        : in out MLP_Classifier;
-                  X           : Real_Float_Matrix;
-                  Y           : Integer_Matrix;
-                  Incremental : Boolean := False) return Boolean_Matrix;
+    procedure Fit (Self : in out MLP_Classifier;
+                  X     : Real_Float_Matrix;
+                  Y     : Integer_Matrix; Incremental : Boolean := False);
     procedure Init_Optimizer (Self : in out MLP_Classifier);
     function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Loss_Grad_Result;
-    function Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-                          Y    : Integer_Matrix) return Boolean_Matrix;
-    function Partial_Fit
+    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
+                          Y    : Integer_Matrix);
+    procedure Partial_Fit
       (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-       Y   : Integer_Matrix; Classes : NL_Types.Integer_List)
-       return Boolean_Matrix;
+       Y   : Integer_Matrix; Classes : NL_Types.Integer_List);
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                       return Integer_Matrix;
     function Validate_Input (Self        : in out MLP_Classifier;

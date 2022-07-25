@@ -430,10 +430,9 @@ package body Multilayer_Perceptron is
 
     --  -------------------------------------------------------------------------
     --  L377  MultilayerPerceptron._Fit
-    function Fit (Self        : in out MLP_Classifier;
-                  X           : Real_Float_Matrix;
-                  Y           : Integer_Matrix;
-                  Incremental : Boolean := False) return Boolean_Matrix is
+    procedure Fit (Self : in out MLP_Classifier;
+                  X     : Real_Float_Matrix;
+                  Y     : Integer_Matrix; Incremental : Boolean := False) is
         use Ada.Containers;
         --  Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
         Num_Features       : constant Positive := Positive (X'Length (2));
@@ -484,8 +483,6 @@ package body Multilayer_Perceptron is
         end if;
 
         Check_Weights (Self);
-
-        return Y_Bin;
 
     end Fit;
 
@@ -1069,20 +1066,19 @@ package body Multilayer_Perceptron is
     --  -------------------------------------------------------------------------
     --  L778  Partial_Fit updates the model with a single iteration over the
     --        given data.
-    function Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-                          Y    : Integer_Matrix) return Boolean_Matrix is
+    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
+                           Y    : Integer_Matrix) is
     begin
 
-        return Fit (Self, X, Y, Incremental => True);
+        Fit (Self, X, Y, Incremental => True);
 
     end Partial_Fit;
 
     --  -------------------------------------------------------------------------
     --  L1186
-    function  Partial_Fit
+    procedure  Partial_Fit
       (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-       Y    : Integer_Matrix; Classes : NL_Types.Integer_List)
-      return Boolean_Matrix is
+       Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
         use Label;
     begin
 
@@ -1090,7 +1086,7 @@ package body Multilayer_Perceptron is
             Fit (Self.Attributes.Binarizer, Y);
         end if;
 
-        return Partial_Fit (Self, X, Y);
+        Partial_Fit (Self, X, Y);
 
     end Partial_Fit;
 
