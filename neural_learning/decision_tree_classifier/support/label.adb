@@ -659,7 +659,6 @@ package body Label is
       Classes       : Integer_List;
       Indices       : Integer_List_2D;
       Class_Curs    : Cursor;
-      Max_Index     : Positive := 1;
       Classes_Array : Integer_List_Array (1 .. Y'Length);
    begin
       for row in Y'Range loop
@@ -673,10 +672,6 @@ package body Label is
                Put_Line (Routine_Name & "Class not found");
             end if;
          end loop;
-
-         if Natural (Classes.Length) > Max_Index then
-            Max_Index := Positive (Classes.Length);
-         end if;
 
          Indices.Append (Classes);
          Classes_Array (row) := Classes;

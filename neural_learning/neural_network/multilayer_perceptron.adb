@@ -436,8 +436,7 @@ package body Multilayer_Perceptron is
                   Y_Bin       : out Boolean_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Fit ";
+      --  Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -1070,7 +1069,15 @@ package body Multilayer_Perceptron is
    --        given data.
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Integer_Matrix; Y_Bin : out Boolean_Matrix) is
+      Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
    begin
+      Assert (Y_Bin'Length = Y'Length, Routine_Name & "Y_Bin Length" &
+              Integer'Image (Y_Bin'Length) & " should equal Y Length" &
+              Integer'Image (Y'Length));
+      Assert (Y_Bin'Length = Y'Length, Routine_Name & "Y_Bin Length 2" &
+              Integer'Image (Y_Bin'Length (2)) & " should equal Y Length 2" &
+              Integer'Image (Y'Length) (2));
+
       Fit (Self, X, Y, Y_Bin, Incremental => True);
 
    end Partial_Fit;
@@ -1082,7 +1089,15 @@ package body Multilayer_Perceptron is
       Y       : Integer_Matrix; Y_Bin : out Boolean_Matrix;
       Classes : NL_Types.Integer_List) is
       use Label;
+      Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
+      Assert (Y_Bin'Length = Y'Length, Routine_Name & "Y_Bin Length" &
+              Integer'Image (Y_Bin'Length) & " should equal Y Length" &
+              Integer'Image (Y'Length));
+      Assert (Y_Bin'Length = Y'Length, Routine_Name & "Y_Bin Length 2" &
+              Integer'Image (Y_Bin'Length (2)) & " should equal Y Length 2" &
+              Integer'Image (Y'Length) (2));
+
       if Check_Partial_Fit_First_Call (Self, Classes) then
          Fit (Self.Attributes.Binarizer, Y);
       end if;
