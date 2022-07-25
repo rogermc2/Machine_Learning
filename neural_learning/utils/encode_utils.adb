@@ -326,10 +326,39 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (Values : NL_Types.Integer_List_Array)
+                    return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Value_Row   : NL_Types.Integer_List;
+      Unique_Ints : Int_Sets.Set;
+      Int_Curs    : Int_Sets.Cursor;
+      Uniq_List   : NL_Types.Integer_List;
+   begin
+      for row in Values'Range loop
+         Value_Row := Values (row);
+         for col in Value_Row.First_Index .. Value_Row.Last_Index loop
+            Unique_Ints.Include (Value_Row (col));
+         end loop;
+      end loop;
+
+      Int_Curs := Unique_Ints.First;
+      while Has_Element (Int_Curs) loop
+         Uniq_List.Append (Element (Int_Curs));
+         Next (Int_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
    function Unique (Values : Real_Float_Matrix) return NL_Types.Float_List is
       use Float_Sets;
       use NL_Types.Float_Sorting;
-      Float_Value   : Float;
       Unique_Floats : Float_Sets.Set;
       Float_Curs    : Float_Sets.Cursor;
       Uniq_List     : NL_Types.Float_List;
@@ -341,10 +370,9 @@ package body Encode_Utils is
       end loop;
 
       Float_Curs := Unique_Floats.First;
-      while Float_Sets.Has_Element (Float_Curs) loop
-         Float_Value := Float_Sets.Element (Float_Curs);
-         Uniq_List.Append (Float_Value);
-         Float_Sets.Next (Float_Curs);
+      while Has_Element (Float_Curs) loop
+         Uniq_List.Append (Element (Float_Curs));
+         Next (Float_Curs);
       end loop;
 
       Sort (Uniq_List);

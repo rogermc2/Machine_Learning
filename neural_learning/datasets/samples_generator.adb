@@ -277,7 +277,8 @@ package body Samples_Generator is
             null;
         end;
 
-        --  L453
+      --  L453
+        Label.Fit (LB, Y);
         declare
             Y_Bool : constant Boolean_Matrix := Label.Transform (LB, Y);
         begin

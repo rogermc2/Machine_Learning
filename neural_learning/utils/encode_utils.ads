@@ -31,6 +31,7 @@ package Encode_Utils is
    function Unique (Values : Integer_Matrix) return Integer_Array;
    function Unique (Values : Integer_Matrix) return NL_Types.Integer_List;
    function Unique (Values : Integer_Matrix) return Int_Sets.Set;
+   function Unique (Values : NL_Types.Integer_List_Array) return NL_Types.Integer_List;
    function Unique (Values : Real_Float_Matrix) return NL_Types.Float_List;
 
 end Encode_Utils;
