@@ -93,7 +93,8 @@ package body Label is
         Routine_Name : constant String := "Label.Encoder Fit ";
     begin
         Assert (Encoder.Encoder_Kind = Class_Unique, Routine_Name &
-                  "Label.Fit called with label encoder instead of unique encode");
+                  "Label.Fit called with label encoder instead of a"
+                  & " unique encode");
         Encoder.Uniques := Encode_Utils.Unique (Y);
     end Fit;
 
@@ -642,7 +643,7 @@ package body Label is
                         return Boolean_Matrix is
       use NL_Types;
       use Integer_Package;
-      --  Routine_Name : constant String := "Label.Transform Binarize ";
+      Routine_Name : constant String := "Label.Transform Integer_List_Array";
       Y_Row         : Integer_List;
       Classes       : Integer_List;
       Indices       : Integer_List_2D;
@@ -656,11 +657,13 @@ package body Label is
          Classes.Clear;
          for col in Y_Row.First_Index .. Y_Row.Last_Index loop
             Class_Curs := Self.Classes.Find (Y_Row (col));
-            Class := Element (Class_Curs);
-            Classes.Append (Class);
+            if Class_Curs /= No_Element then
+                    Class := Element (Class_Curs);
+                    Classes.Append (Class);
+            end if;
          end loop;
 
-         if Positive (Classes.Length) > Max_Index then
+         if Natural (Classes.Length) > Max_Index then
             Max_Index := Positive (Classes.Length);
          end if;
 
