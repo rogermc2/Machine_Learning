@@ -254,16 +254,13 @@ package body Samples_Generator is
       --  related values are in X_data[X_indptr[i]:X_indptr[i+1]]
 
       --  sum_duplicates
-      declare
-         X_Data : Integer_List_Array (1 .. N_Samples);
-      begin
-         for row in X_Ind_Ptr'Range loop
-            for sp_col in X_Ind_Ptr (row).First_Index ..
-              X_Ind_Ptr (row).Last_Index loop
-               X_Data (row).Append (1.0);
-            end loop;
+      for row in X_Ind_Ptr'Range loop
+         for sp_col in X_Ind_Ptr (row).First_Index ..
+           X_Ind_Ptr (row).Last_Index loop
+            X (row, X_Ind_Ptr (row).Element (sp_col)) :=
+              X (row, X_Ind_Ptr (row).Element (sp_col)) + 1.0;
          end loop;
-      end;
+      end loop;
 
       --  L453
       Label.Fit (LB, Y);
