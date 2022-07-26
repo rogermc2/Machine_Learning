@@ -34,7 +34,7 @@ package body Samples_Generator is
      (N_Samples            : Positive := 100;
       N_Features           : Positive := 20;
       N_Classes            : Positive := 5;
-      N_labels             : Positive := 2;
+      N_Labels             : Positive := 2;
       --  Length is the sum of the features (number of words for documents) and
       --  is drawn from a Poisson distribution with this expected value.
       Expected_Length      : Positive := 50;
@@ -74,18 +74,19 @@ package body Samples_Generator is
             --  L406
             Y_Size := Poisson_Single (Float (N_labels));
          end loop;
-         Put_Line (Routine_Name & " L407 Y_Size:" & Integer'Image (Y_Size));
+--           Put_Line (Routine_Name & " L407 Y_Size:" & Integer'Image (Y_Size));
 
          for index in 1 .. Y_Size loop
             Prob.Append (abs (Maths.Random_Float));
          end loop;
-         Printing.Print_Float_List (Routine_Name &
-                                      "Cum_P_C_List", Cum_P_C_List);
-         Printing.Print_Float_List (Routine_Name & "Prob", Prob);
-         Put_Line (Routine_Name & "Prob length" &
-                     Integer'Image (Integer (Prob.Length)));
-         Put_Line (Routine_Name & "Cum_P_C_List length" &
-                     Integer'Image (Integer (Cum_P_C_List.Length)));
+
+--           Printing.Print_Float_List (Routine_Name &
+--                                        "Cum_P_C_List", Cum_P_C_List);
+--           Printing.Print_Float_List (Routine_Name & "Prob", Prob);
+--           Put_Line (Routine_Name & "Prob length" &
+--                       Integer'Image (Integer (Prob.Length)));
+--           Put_Line (Routine_Name & "Cum_P_C_List length" &
+--                       Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410 pick n classes
          while Natural (Y_Gen.Length) /= Y_Size loop
             --              Put_Line (Routine_Name & "L410 Y_Gen.Length /= Y_Size");
@@ -108,8 +109,8 @@ package body Samples_Generator is
          while Num_Words = 0 loop
             Num_Words := Poisson_Single (Float (Expected_Length));
          end loop;
-         Put_Line (Routine_Name & "L424 Num_Words: " &
-                     Integer'Image (Num_Words));
+--           Put_Line (Routine_Name & "L424 Num_Words: " &
+--                       Integer'Image (Num_Words));
 
          declare
             use Float_Package;
@@ -153,7 +154,6 @@ package body Samples_Generator is
                      P_W_C_2 (row, col) := P_W_C_Ex (row, Y_Gen (col));
                   end loop;
                end loop;
-               Put_Line (Routine_Name & "L431 P_W_C_2 set");
 
                for row in P_W_C_2'Range loop
                   Cum_P_W_Sample (row) := 0.0;
@@ -172,8 +172,8 @@ package body Samples_Generator is
                          Cum_P_W_Sample (Cum_P_W_Sample'Last));
                end loop;
                Sort (Cum_Sample_List);
-               Printing.Print_Float_List
-                 (Routine_Name & " L433 Cum_Sample_List", Cum_Sample_List);
+--                 Printing.Print_Float_List
+--                   (Routine_Name & " L433 Cum_Sample_List", Cum_Sample_List);
 
                --  L434
                Prob.Clear;
@@ -185,13 +185,12 @@ package body Samples_Generator is
                Word_List := Classifier_Utilities.Search_Sorted_Float_List
                  (Cum_Sample_List, Prob);
             end if;
-            Printing.Print_Integer_List
-              (Routine_Name & "L430 Word_List", Word_List);
+--              Printing.Print_Integer_List
+--                (Routine_Name & "L430 Word_List", Word_List);
 
             for index in 1 .. Num_Words loop
                Words (index) := Word_List (index);
             end loop;
-            Put_Line (Routine_Name & "done");
 
             return Words;
          end;

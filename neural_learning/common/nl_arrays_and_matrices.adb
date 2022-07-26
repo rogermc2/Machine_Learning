@@ -271,7 +271,7 @@ package body NL_Arrays_And_Matrices is
     begin
         Assert (R'Length = L'Length and R'Length (2) = L'Length (2),
                 Routine_Name &
-                  " right size" & Integer'Image (R'Length) & " x" &
+                  " Check_Lengths right size" & Integer'Image (R'Length) & " x" &
                   Integer'Image (R'Length (2)) &
                   " should be the same as left size" & Integer'Image (L'Length) &
                   " x" & Integer'Image (L'Length (2)));

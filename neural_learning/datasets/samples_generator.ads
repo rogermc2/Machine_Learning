@@ -27,7 +27,7 @@ package Samples_Generator is
      (N_Samples            : Positive := 100;
       N_Features           : Positive := 20;
       N_Classes            : Positive := 5;
-      N_labels             : Positive := 2;
+      N_Labels             : Positive := 2;
       Expected_Length      : Positive := 50;
       Allow_Unlabeled      : Boolean := True;
       --         Sparse : Boolean := False;

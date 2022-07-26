@@ -522,7 +522,7 @@ package body Multilayer_Perceptron is
                     "Grads.Intercept_Grads (1) length" &
                     Integer'Image (Grads (1).Intercept_Grads'Length));
         Put_Line (Routine_Name &
-                    "Grads (2).Coeff_Gradients length" &
+                    "Grads (2).Coeff_Gradients size" &
                     Integer'Image (Grads (2).Coeff_Gradients'Length) & " x"
                   & Integer'Image (Grads (2).Coeff_Gradients'Length (2)));
         Put_Line (Routine_Name &
@@ -1098,9 +1098,10 @@ package body Multilayer_Perceptron is
         Y_Pred         : constant Real_Float_Matrix :=
                            Forward_Pass_Fast (Self, X);
     begin
-        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 6);
-        Printing.Print_Integer_Matrix (Routine_Name & "Inverse_Transform",
-                                       Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 1, 6);
+        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 4);
+        Printing.Print_Integer_Matrix
+          (Routine_Name & "Inverse_Transform",
+           Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 1, 4);
         return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
     end Predict;
