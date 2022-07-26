@@ -234,20 +234,17 @@ package body Label is
     function Inverse_Binarize_Thresholding
       (Y : Real_Float_Matrix; Output_Type : Multiclass_Utils.Y_Type;
        Classes : NL_Types.Integer_List; Threshold : Float)
-       return Boolean_Matrix is
+       return Integer_Matrix is
         use Ada.Containers;
         use Multiclass_Utils;
         Routine_Name :  constant String :=
                          "Label.Inverse_Binarize_Thresholding ";
-        Y_Thresh     : Boolean_Matrix (Y'Range, Y'Range (2)) :=
-                         (others => (others => False));
-        Inverse      : Boolean_Matrix (Y'Range, Y'Range (2)) :=
-                         (others => (others => False));
+        Y_Thresh     : Integer_Matrix (Y'Range, Y'Range (2)) :=
+                         (others => (others => 0));
+        Inverse      : Integer_Matrix (Y'Range, Y'Range (2)) :=
+                         (others => (others => 0));
     begin
         Put_Line (Routine_Name);
-        --          for index in Inverse'Range loop
-        --              Inverse (index) := Integer (Y (index));
-        --          end loop;
         if Output_Type = Y_Binary then
             Assert (Y'Length (2) <= 2, Routine_Name &
                       "output_type is binary but Y'Length (2) is " &
@@ -263,7 +260,9 @@ package body Label is
         --  L653
         for row in Y_Thresh'Range loop
             for col in Y_Thresh'Range (2) loop
-                Y_Thresh (row, col) := Y (row, col) > Threshold;
+                if Y (row, col) > Threshold then
+                    Y_Thresh (row, col) := 1;
+                end if;
             end loop;
         end loop;
 
@@ -278,7 +277,19 @@ package body Label is
             elsif Classes.Length = 1 then
                 null;
             else
-                null;
+                declare
+                    Y_Ravel : Integer_Array
+                      (1 .. Y_Thresh'Length * Y_Thresh'Length (2));
+                begin
+                    for row in Y_Thresh'Range loop
+                        for col in Y_Thresh'Range (2) loop
+                            Y_Ravel ((row - 1) * Y_Thresh'Length (2) +
+                                       col - Y_Thresh'First (2) + 1) :=
+                              Y_Thresh (row, col);
+                        end loop;
+                    end loop;
+
+                end;
             end if;
 
         elsif Output_Type = Y_Multilabel_Indicator then
@@ -438,8 +449,8 @@ package body Label is
                                 return Integer_Matrix is
         use Multiclass_Utils;
         Routine_Name : constant String := "Label.Inverse_Transform ";
-        --        Threshold : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
-        Y_Inv     : Integer_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
+        Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
+        Y_Inv        : Integer_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
     begin
         --  L398
         if Self.Y_Kind = Y_Multiclass then
@@ -447,7 +458,8 @@ package body Label is
             Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
         else
             Put_Line (Routine_Name & "Y is not Multiclass");
-            Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
+            Y_Inv := Inverse_Binarize_Thresholding
+              (Y, Self.Y_Kind, Self.Classes, Threshold);
         end if;
 
         return Y_Inv;

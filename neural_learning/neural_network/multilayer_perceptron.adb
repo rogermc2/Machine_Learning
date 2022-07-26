@@ -182,7 +182,8 @@ package body Multilayer_Perceptron is
                 Coeffs : constant Real_Float_Matrix :=
                            Self.Attributes.Params (Layer).Coeff_Gradients;
                 --  numpy.ravel (a) returns the elements of a as a 1-D array.
-                Ravel  : Real_Float_Vector (1 .. Coeffs'Length * Coeffs'Length (2));
+                Ravel  : Real_Float_Vector
+                  (1 .. Coeffs'Length * Coeffs'Length (2));
             begin
                 for row in Coeffs'Range loop
                     for col in Coeffs'Range (2) loop
