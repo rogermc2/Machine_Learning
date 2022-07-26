@@ -53,7 +53,7 @@ package Label is
     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
                                 return Integer_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
-                                return Integer_Matrix;
+                                return Binary_Matrix;
     function Inverse_Transform (Self   : Label_Encoder;
                                 Labels : Natural_Array) return Integer_Array;
     function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)

@@ -1092,15 +1092,15 @@ package body Multilayer_Perceptron is
     end Partial_Fit;
 
     --  -------------------------------------------------------------------------
-
+    --  L1168
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Integer_Matrix is
+                     return Binary_Matrix is
         Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
         Y_Pred         : constant Real_Float_Matrix :=
                            Forward_Pass_Fast (Self, X);
     begin
         Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 4);
-        Printing.Print_Integer_Matrix
+        Printing.Print_Binary_Matrix
           (Routine_Name & "Inverse_Transform",
            Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 1, 4);
         return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);

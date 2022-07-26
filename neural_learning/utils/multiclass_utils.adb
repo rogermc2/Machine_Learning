@@ -181,7 +181,26 @@ package body Multiclass_Utils is
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
-   --  L202
+
+   function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
+      --        Routine_Name : constant String :=
+      --                           "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
+      Result : Y_Type;
+   begin
+      if Y'Length (2) > 1 then
+         Result := Y_Multiclass_Multioutput;
+      elsif Y'Length > 1 then
+         Result := Y_Multiclass;
+      else
+         Result := Y_Binary;
+      end if;
+
+      return Result;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+    --  L202
    function Type_Of_Target (Y : Real_Float_Matrix) return Y_Type is
       Result : Y_Type;
    begin

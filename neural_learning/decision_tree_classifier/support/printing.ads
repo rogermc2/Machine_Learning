@@ -11,6 +11,8 @@ package Printing is
 
    Print_Error : Exception;
 
+   procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
+                                   Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Boolean_Array
      (Name : String; anArray : NL_Arrays_And_Matrices.Boolean_Array);
    procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;

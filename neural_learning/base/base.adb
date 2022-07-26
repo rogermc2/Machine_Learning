@@ -11,7 +11,7 @@ package body Base is
                    X : Real_Float_Matrix; Y : Integer_Matrix)
                    return Float is
       Routine_Name : constant String := "Base.Score ";
-      Pred         : constant Integer_Matrix :=
+      Pred         : constant Binary_Matrix :=
                          Multilayer_Perceptron.Predict (Self, X);
    begin
 --        Printing.Print_Float_Matrix ("Routine_Name X", X, 1 ,1);
@@ -27,7 +27,7 @@ package body Base is
                    Sample_Weight : Real_Float_Vector)
                    return Float is
       Routine_Name : constant String := "Base.Score with Weight ";
-      Pred         : constant Integer_Matrix :=
+      Pred         : constant Binary_Matrix :=
                          Multilayer_Perceptron.Predict (Self, X);
    begin
       Check_Lengths (Routine_Name, Pred, Y);

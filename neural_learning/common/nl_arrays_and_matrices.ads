@@ -10,7 +10,9 @@ package NL_Arrays_And_Matrices is
    use Ada.Numerics;
 
    subtype Safe_Float is Float range Float'Range;
+   subtype Binary is Integer range 0 .. 1;
 
+   type Binary_Array is array (Integer range <>) of Binary;
    type Boolean_Array is array (Integer range <>) of Boolean;
    type Float_Array is array (Integer range <>) of Float;
    procedure Float_Array_Sort is new Ada.Containers.Generic_Array_Sort
@@ -22,6 +24,7 @@ package NL_Arrays_And_Matrices is
 
    type Multi_Value_Array is array (Integer range <>, Integer range <>)
      of Integer;
+   type Binary_Matrix is array (Integer range <>, Integer range <>) of Binary;
    type Boolean_Matrix is array (Integer range <>, Integer range <>) of Boolean;
    type Integer_Matrix is array (Integer range <>, Integer range <>) of Integer;
 
@@ -77,6 +80,8 @@ package NL_Arrays_And_Matrices is
    pragma Inline ("-");
    procedure Check_Lengths (Routine_Name : String; L, R : Boolean_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Integer_Matrix);
+   procedure Check_Lengths (Routine_Name : String;
+                            L            : Binary_Matrix; R : Integer_Matrix);
    procedure Check_Lengths (Routine_Name : String; L, R : Real_Float_Matrix);
    pragma Inline (Check_Lengths);
    function Cumulative_Sum (A : Float_Array) return Float_Array;

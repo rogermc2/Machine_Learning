@@ -212,11 +212,11 @@ package body Label is
     --  L586 Multiclass uses the maximal score instead of a threshold.
     function Inverse_Binarize_Multiclass (Y       : Real_Float_Matrix;
                                           Classes : NL_Types.Integer_List)
-                                          return Integer_Matrix is
+                                          return Binary_Matrix is
         use Classifier_Utilities;
         --        Routine_Name :  constant String :=
         --                         "Label.Inverse_Binarize_Multiclass ";
-        Inverse      : Integer_Matrix  (Y'Range, 1 .. 1);
+        Inverse      : Binary_Matrix  (Y'Range, 1 .. 1);
         Max_Indices  : Natural_Array (Y'Range);
     begin
         --  L627
@@ -234,14 +234,14 @@ package body Label is
     function Inverse_Binarize_Thresholding
       (Y : Real_Float_Matrix; Output_Type : Multiclass_Utils.Y_Type;
        Classes : NL_Types.Integer_List; Threshold : Float)
-       return Integer_Matrix is
+       return Binary_Matrix is
         use Ada.Containers;
         use Multiclass_Utils;
         Routine_Name :  constant String :=
                          "Label.Inverse_Binarize_Thresholding ";
-        Y_Thresh     : Integer_Matrix (Y'Range, Y'Range (2)) :=
+        Y_Thresh     : Binary_Matrix (Y'Range, Y'Range (2)) :=
                          (others => (others => 0));
-        Inverse      : Integer_Matrix (Y'Range, Y'Range (2)) :=
+        Inverse      : Binary_Matrix (Y'Range, Y'Range (2)) :=
                          (others => (others => 0));
     begin
         Put_Line (Routine_Name);
@@ -446,11 +446,11 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  L361
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
-                                return Integer_Matrix is
+                                return Binary_Matrix is
         use Multiclass_Utils;
         Routine_Name : constant String := "Label.Inverse_Transform ";
         Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
-        Y_Inv        : Integer_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
+        Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
     begin
         --  L398
         if Self.Y_Kind = Y_Multiclass then
