@@ -844,8 +844,8 @@ package body Multilayer_Perceptron is
         use Base_Neural;
         use Real_Float_Arrays;
         use Parameters_Package;
-        --          Routine_Name       : constant String :=
-        --                                 "Multilayer_Perceptron.Forward_Pass_Fast ";
+        Routine_Name       : constant String :=
+                                 "Multilayer_Perceptron.Forward_Pass_Fast ";
         Hidden_Activation  : constant Activation_Type :=
                                Self.Parameters.Activation;
         Output_Activation  : constant Activation_Type :=
@@ -856,11 +856,17 @@ package body Multilayer_Perceptron is
 --                                                  1 .. Self.Attributes.N_Outputs);
           (X'Range, 1 .. Integer (Self.Attributes.Classes.Length));
         --  One element list used to allow for different sized matrices
-        Activations        : Real_Matrix_List;
+--          Activations        : Real_Matrix_List;
+        Activations        : array (X'Range) of Real_Float_List;
     begin
         --  L160 Initialize first layer
         --        Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 1);
-        Activations.Append (X);
+        --          Activations.Append (X);
+      for row in X'Range loop
+         for col in X'Range (2) loop
+            Activations (row).Append (X (row, col));
+         end loop;
+      end loop;
 
         --  L167 Forward propagate
         for layer in 1 .. Num_Layers - 1 loop
@@ -869,11 +875,13 @@ package body Multilayer_Perceptron is
                                        Params_List (layer);
                 Updated_Activation : Real_Float_Matrix :=
                                        Activations (layer) * Params.Coeff_Gradients;
+--                                         Activations (layer) * Params.Coeff_Gradients;
+--              begin
             begin
                 Updated_Activation :=
                   Updated_Activation + Params.Intercept_Grads;
 
-                if layer /= Num_Layers - 1 then
+                if layer /= Num_Layers - 2 then
                     case Hidden_Activation is
                     when Identity_Activation => null;
                     when Logistic_Activation => Logistic (Updated_Activation);
@@ -882,14 +890,15 @@ package body Multilayer_Perceptron is
                     when Softmax_Activation => Softmax (Updated_Activation);
                     end case;
                 end if;
-                Activations.Append (Updated_Activation);
+--                  Activations.Append (Updated_Activation);
             end;
         end loop;
 
-        Activ_Out := Activations.Last_Element;
+--          Activ_Out := Activations.Last_Element;
+        Activ_Out := Updated_Activation;
         --  L172
-        --        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
-        --                                      Activ_Out, 1, 2);
+        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
+                                     Activ_Out, 1, 2);
         case Output_Activation is
             when Identity_Activation => null;
             when Logistic_Activation => Logistic (Activ_Out);

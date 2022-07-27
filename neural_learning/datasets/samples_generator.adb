@@ -8,7 +8,7 @@ with Maths;
 with Classifier_Utilities;
 with Label;
 with NL_Types;
-with Printing;
+--  with Printing;
 
 package body Samples_Generator is
 
@@ -103,7 +103,7 @@ package body Samples_Generator is
                Y_Gen.Append (Class (index));
             end loop;
          end loop;
-         Printing.Print_Integer_List (Routine_Name & "L420 Y_Gen", Y_Gen);
+--           Printing.Print_Integer_List (Routine_Name & "L420 Y_Gen", Y_Gen);
 
          --  L420 pick a nonzero document length by rejection sampling
          while Num_Words = 0 loop
@@ -229,8 +229,8 @@ package body Samples_Generator is
 
       --  L436
       for sample_index in 1 .. N_Samples loop
-         Put_Line (Routine_Name & "L436 sample_index:" &
-                     Integer'Image (sample_index));
+--           Put_Line (Routine_Name & "L436 sample_index:" &
+--                       Integer'Image (sample_index));
          declare
             Sample_Y  : Integer_List;
             --  L437
