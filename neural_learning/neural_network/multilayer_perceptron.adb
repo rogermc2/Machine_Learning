@@ -1346,7 +1346,7 @@ package body Multilayer_Perceptron is
    end Validate_Hyperparameters;
 
    --  -------------------------------------------------------------------------
-   --  L1125  MLPClassifier._validate_input
+   --  L1108  MLPClassifier._validate_input
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Boolean_Matrix is
@@ -1357,9 +1357,14 @@ package body Multilayer_Perceptron is
       Classes      : NL_Types.Integer_List;
       Binarizer    : Label.Label_Binarizer;
    begin
-      if Self.Attributes.Classes.Is_Empty and then
-        Self.Parameters.Warm_Start and then Incremental then
-         --  L1147
+      if Self.Attributes.Classes.Is_Empty or else
+        (not Self.Parameters.Warm_Start and not Incremental) then
+         --  L1139
+         Label.Fit (Binarizer, Y);
+         Self.Attributes.Binarizer := Binarizer;
+         Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+      else
+         --  L1143
          Classes := Multiclass_Utils.Unique_Labels (Y);
          if Self.Parameters.Warm_Start then
             Assert (Classes = Self.Attributes.Classes,
@@ -1369,16 +1374,13 @@ package body Multilayer_Perceptron is
 
          Assert (Classes.Length = Self.Attributes.Classes.Length,
                  Routine_Name & "Y and  Self.Classes do not have the same"
-                 & "number of classes.");
-      else
-         Label.Fit (Binarizer, Y);
-         Self.Attributes.Binarizer := Binarizer;
-         Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+                 & " number of classes.");
       end if;
+
       Printing.Print_Integer_List
         (Routine_Name & "Classes", Self.Attributes.Classes);
-
-      return Label.Label_Binarize (Flatten (Y), Self.Attributes.Classes);
+      --  L1159
+      return Label.Transform (Self.Attributes.Binarizer, Flatten (Y));
 
    end Validate_Input;
 
