@@ -436,7 +436,7 @@ package body Multilayer_Perceptron is
                   X     : Real_Float_Matrix;
                   Y     : Integer_Matrix; Incremental : Boolean := False) is
       use Ada.Containers;
-      --  Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
+      Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -446,7 +446,7 @@ package body Multilayer_Perceptron is
       Layer_Units        : NL_Types.Integer_List;
       Activations        : Real_Matrix_List;
    begin
-      --        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
+     Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
       --        Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
       --  L385
       Validate_Hyperparameters (Self);
@@ -1027,7 +1027,7 @@ package body Multilayer_Perceptron is
          Fan_In := Layer_Units (layer);
          Fan_Out := Layer_Units (layer + 1);
          Put_Line (Routine_Name & "Fan_In, Fan_Out:" & Integer'Image (Fan_In)
-                  & Integer'Image (Fan_Out));
+                   & Integer'Image (Fan_Out));
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
       end loop;
 
@@ -1125,8 +1125,8 @@ package body Multilayer_Perceptron is
    --        given data.
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Integer_Matrix) is
+--        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
    begin
-
       Fit (Self, X, Y, Incremental => True);
 
    end Partial_Fit;
@@ -1137,8 +1137,8 @@ package body Multilayer_Perceptron is
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
       Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
       use Label;
+--        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
-
       if Check_Partial_Fit_First_Call (Self, Classes) then
          Fit (Self.Attributes.Binarizer, Y);
       end if;
@@ -1357,6 +1357,7 @@ package body Multilayer_Perceptron is
       Classes      : NL_Types.Integer_List;
       Binarizer    : Label.Label_Binarizer;
    begin
+      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
@@ -1373,8 +1374,10 @@ package body Multilayer_Perceptron is
          end if;
 
          Assert (Classes.Length = Self.Attributes.Classes.Length,
-                 Routine_Name & "Y and  Self.Classes do not have the same"
-                 & " number of classes.");
+                 Routine_Name & "Y" & Count_Type'Image (Classes.Length) &
+                   " and Self.Classes" &
+                   Count_Type'Image (Self.Attributes.Classes.Length) &
+                   " have different numbers of classes.");
       end if;
 
       Printing.Print_Integer_List

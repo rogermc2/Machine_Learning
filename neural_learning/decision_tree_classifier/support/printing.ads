@@ -12,7 +12,7 @@ package Printing is
    Print_Error : Exception;
 
    procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
-                                   Start : Integer := 1; Finish : Integer := 0);
+                                  Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Boolean_Array
      (Name : String; anArray : NL_Arrays_And_Matrices.Boolean_Array);
    procedure Print_Boolean_Matrix (Name  : String; aMatrix : Boolean_Matrix;
@@ -39,8 +39,10 @@ package Printing is
                                     theList : Indef_String_List);
    procedure Print_Integer_List (Name  : String; theList : Integer_List;
                                  Start : Positive := 1; Last : Positive := 10);
-   procedure Print_Integer_List (Name    : String;
-                                 theList : Integer_DL_List);
+   procedure Print_Integer_List (Name    : String; theList : Integer_DL_List);
+   procedure Print_Integer_List_Array
+     (Name    : String; theArray : Integer_List_Array;
+      Start   : Integer := 1; Finish : Integer := 0);
    procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix;
                                    Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Integer_Set (Name   : String;

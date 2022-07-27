@@ -723,6 +723,21 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Integer_Matrix (Bin : Binary_Matrix) return Integer_Matrix is
+      Result : Integer_Matrix (Bin'Range, Bin'Range (2));
+   begin
+      for row in Bin'Range loop
+         for col in Bin'Range (2) loop
+               Result (row, col) := Bin (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end To_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Integer_Matrix (Bool : Boolean_Matrix) return Integer_Matrix is
       Result   : Integer_Matrix (Bool'Range, Bool'Range (2)) :=
                    (others => (others => 0));

@@ -11,7 +11,7 @@ package Samples_Generator is
       Distributions                     : Boolean)
    is record
       X : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features);
-      Y : Integer_Matrix (1 .. N_Samples, 1 .. N_Classes);
+      Y : Binary_Matrix (1 .. N_Samples, 1 .. N_Classes);
       case Distributions is
          when True =>
             --  The probability p_c of each class being drawn

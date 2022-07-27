@@ -7,7 +7,7 @@ with base;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
---  with Printing;
+with Printing;
 with Samples_Generator; use Samples_Generator;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
@@ -21,12 +21,13 @@ procedure Test_Multi_Label_Classification is
    --  N_Classes:  5;
    --  N_Labels:   2;
    Test_X              : constant Real_Float_Matrix := Test_Classification.X;
-   Test_Y              : constant Integer_Matrix := Test_Classification.Y;
+   Test_Y              : constant Binary_Matrix := Test_Classification.Y;
    Classes             : NL_Types.Integer_List;
    Layer_Sizes         : NL_Types.Integer_List;
    aClassifier         : MLP_Classifier;
 begin
    Put_Line (Routine_Name);
+   Printing.Print_Binary_Matrix (Routine_Name & "Test_Y", Test_Y, 1, 4);
    Layer_Sizes.Append (50);
    Put_Line (Routine_Name & "initializing aClassifier");
    aClassifier := Multilayer_Perceptron.C_Init
@@ -48,9 +49,10 @@ begin
 
    for test_num in 1 .. 100 loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));
-      Partial_Fit (aClassifier, Test_X, Test_Y, Classes);
+      Partial_Fit (aClassifier, Test_X, To_Integer_Matrix (Test_Y), Classes);
       Put_Line (Routine_Name & "Score" &
-                  Float'Image (Base.Score (aClassifier, Test_X, Test_Y)));
+                  Float'Image (Base.Score (aClassifier, Test_X,
+                  To_Integer_Matrix (Test_Y))));
    end loop;
 
 end Test_Multi_Label_Classification;

@@ -8,7 +8,7 @@ package body Printing is
    --  -------------------------------------------------------------------------
 
    procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
-                                   Start : Integer := 1; Finish : Integer := 0)
+                                  Start : Integer := 1; Finish : Integer := 0)
    is
       Last : Integer;
    begin
@@ -276,6 +276,36 @@ package body Printing is
       New_Line;
 
    end Print_Integer_Array;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_List_Array
+     (Name  : String; theArray : Integer_List_Array;
+      Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
+      aList : Integer_List;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (theArray'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= theArray'First and then Finish <= theArray'Last then
+         for row in Start .. Last loop
+            aList := theArray (row);
+            for col in aList.First_Index .. aList.Last_Index loop
+               Put (Integer'Image (aList (col)) & "  ");
+            end loop;
+            New_Line;
+         end loop;
+      else
+         Put_Line
+           ("Print_Integer_List_Array called with invalid start or finish index.");
+      end if;
+
+   end Print_Integer_List_Array;
 
    --  ------------------------------------------------------------------------
 

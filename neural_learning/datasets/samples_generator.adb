@@ -8,7 +8,7 @@ with Maths;
 with Classifier_Utilities;
 with Label;
 with NL_Types;
---  with Printing;
+with Printing;
 
 package body Samples_Generator is
 
@@ -262,9 +262,10 @@ package body Samples_Generator is
       end loop;
 
       --  L453
+      Printing.Print_Integer_List_Array (Routine_Name & "L453 Y", Y, 1, 4);
       Label.Fit (LB, Y);
       declare
-         Y_Bool : constant Boolean_Matrix := Label.Transform (LB, Y);
+         Y_Bin : constant Binary_Matrix := Label.Transform (LB, Y);
       begin
          --           Put_Line (Routine_Name & "L453 Y_Bool size :" &
          --                       Integer'Image (Y_Bool'Length) & " x" &
@@ -272,11 +273,11 @@ package body Samples_Generator is
          --           Put_Line (Routine_Name & "L453 Classification.Y length:" &
          --                       Integer'Image (Classification.Y'Length) & " x" &
          --                       Integer'Image (Classification.Y'Length (2)));
-
-         Classification.Y := To_Integer_Matrix (Y_Bool);
+         Classification.Y := Y_Bin;
       end;
 
       Classification.X := X;
+
       if Return_Distributions then
          Classification.Class_Probability := P_C;
          Classification.Feature_Class_Probability := P_W_C;
