@@ -1044,6 +1044,8 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
+      Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
+
    end Initialize;
 
    --  -------------------------------------------------------------------------
