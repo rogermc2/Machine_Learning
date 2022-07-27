@@ -4,31 +4,31 @@ with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Containers;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
+--  with Maths;
 
-with Opt_Constraints;
+--  with Opt_Constraints;
 
 package body Num_Diff is
 
-   type Scheme_Type is (One_Sided, Two_Sided);
+--     type Scheme_Type is (One_Sided, Two_Sided);
    --      type Wrapped_Access is
    --        access function (X : Real_Float_Vector) return Real_Float_Vector;
 
-   EPS : constant Float := Float'Small;
+--     EPS : constant Float := Float'Small;
 
-   function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
-       return Boolean;
-   function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
-       return Boolean_Array;
-   function Compute_Absolute_Step
-     (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
-      Method   : FD_Methods) return Real_Float_Vector;
-   function EPS_For_Method (Method : FD_Methods) return Float;
-   function Inf_Bounds (Bounds : Opt_Constraints.Bounds_List) return Boolean;
-   function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
-                          return Real_Float_Vector;
+--     function Check_Bounds
+--       (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
+--         return Boolean;
+--     function Check_Bounds
+--       (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
+--         return Boolean_Array;
+--     function Compute_Absolute_Step
+--       (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
+--        Method   : FD_Methods) return Real_Float_Vector;
+--     function EPS_For_Method (Method : FD_Methods) return Float;
+--     function Inf_Bounds (Bounds : Opt_Constraints.Bounds_List) return Boolean;
+--     function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
+--                            return Real_Float_Vector;
    --     function Linear_Operator_Difference
    --       (Fun    : Deriv_Fun_Access; X0, F0 : Real_Float_Vector; H : Real_Float_List;
    --        Method : FD_Methods) return Real_Float_Vector;
@@ -36,125 +36,125 @@ package body Num_Diff is
    --                        F0     : Real_Float_Vector; H : Real_Float_Vector;
    --                        Method : FD_Methods)
    --                        return Real_Float_Matrix;
-   function Prepare_Bounds (Bounds : Opt_Constraints.Bounds_List;
-                            X0     : Real_Float_Vector)
-                             return Opt_Constraints.Bounds_List;
-   function Relative_Step (Method : FD_Methods) return Float;
+--     function Prepare_Bounds (Bounds : Opt_Constraints.Bounds_List;
+--                              X0     : Real_Float_Vector)
+--                               return Opt_Constraints.Bounds_List;
+--     function Relative_Step (Method : FD_Methods) return Float;
 
    --  -------------------------------------------------------------------------
 
-   procedure Adjust_Scheme_To_Bounds
-     (X0            : Real_Float_Vector; H : in out Real_Float_Vector;
-      Num_Steps     : Positive; Scheme : Scheme_Type;
-      Bounds        : Opt_Constraints.Bounds_List;
-      Use_One_Sided : in out Real_Float_Vector) is
-      use Real_Float_Arrays;
-      use Opt_Constraints;
-      use Opt_Constraints.Array_Bounds_Package;
-      Lower         : constant Real_Float_Vector := Get_Lower (Bounds);
-      Upper         : constant Real_Float_Vector := Get_Upper (Bounds);
-      All_Inf       : Boolean := False;
-      Lower_Dist    : Real_Float_Vector (H'Range);
-      Upper_Dist    : Real_Float_Vector (H'Range);
-      Min_Dist      : Real_Float_Vector (H'Range);
-      H_Total       : Real_Float_Vector (H'Range);
-      X             : Real_Float_Vector (X0'Range);
-      H_Adjusted    : Real_Float_Vector (H'Range);
-      Violated      : Boolean_Array (H_Total'Range);
-      Fitting       : Boolean_Array (H_Total'Range);
-      V_F           : Boolean_Array (H_Total'Range);
-      Forward       : Boolean_Array (H_Total'Range);
-      Backward      : Boolean_Array (H_Total'Range);
-      Central       : Boolean_Array (H_Total'Range);
-      Adjusted_Cent : Boolean_Array (H_Total'Range);
-   begin
-      H_Adjusted := H;
-      case Scheme is
-         when One_Sided => Use_One_Sided := (others => 1.0);
-         when Two_Sided =>
-            H := abs (H);
-            Use_One_Sided := (others => 0.0);
-      end case;
-
-      for index in Lower'Range loop
-         All_Inf := All_Inf or
-           Lower (index) = Float'Safe_First or
-           Upper (index) = Float'Safe_Last;
-      end loop;
-
-      if not All_Inf then
-         H_Total := Float (Num_Steps) * H;
-         Lower_Dist := X0 - Lower;
-         Upper_Dist := Upper - X0;
-      end if;
-
-      --  L63
-      case Scheme is
-         when One_Sided =>
-            X := X0 + H_Total;
-            Violated := Check_Bounds (X, Bounds);
-            Fitting := abs (H_Total) <= Max (Lower_Dist, Upper_Dist);
-            V_F := Violated and Fitting;
-            --  L61
-            for index in H_Adjusted'Range loop
-               if V_F (index) then
-                  H_Adjusted (index) := -1.0 * H_Adjusted (index);
-               end if;
-            end loop;
-
-            Fitting := not Fitting;
-            Forward := (Upper_Dist >= Lower_Dist) and Fitting;
-
-            for index in H_Adjusted'Range loop
-               if Forward (index) then
-                  H_Adjusted (index) :=
-                    Upper_Dist (index) / Float (Num_Steps);
-               end if;
-            end loop;
-
-            Backward := (Upper_Dist < Lower_Dist) and Fitting;
-            for index in H_Adjusted'Range loop
-               if Backward (index) then
-                  H_Adjusted (index) :=
-                    -Lower_Dist (index) / Float (Num_Steps);
-               end if;
-            end loop;
-
-         when Two_Sided =>
-            Central := Lower_Dist >= H_Total;
-            Forward := (Upper_Dist >= Lower_Dist) and not Central;
-            for index in H_Adjusted'Range loop
-               if Forward (index) then
-                  H_Adjusted (index) :=
-                    Float'Min (H (index), 0.5 * Upper_Dist (index)) /
-                      Float (Num_Steps);
-                  Use_One_Sided (index) := 1.0;
-               end if;
-            end loop;
-
-            Backward := (Upper_Dist < Lower_Dist) and not Central;
-            for index in H_Adjusted'Range loop
-               if Backward (index) then
-                  H_Adjusted (index) :=
-                    -Float'Min (H (index), 0.5 * Lower_Dist (index)) /
-                    Float (Num_Steps);
-                  Use_One_Sided (index) := 1.0;
-               end if;
-            end loop;
-
-            Min_Dist := Min (Upper_Dist, Lower_Dist);
-            Adjusted_Cent := (not Central) and (abs (H_Adjusted) <= Min_Dist);
-            for index in H_Adjusted'Range loop
-               if Adjusted_Cent (index) then
-                  Use_One_Sided (index) := 0.0;
-               end if;
-            end loop;
-
-      end case;
-
-      H := H_Adjusted;
-
-   end Adjust_Scheme_To_Bounds;
+--     procedure Adjust_Scheme_To_Bounds
+--       (X0            : Real_Float_Vector; H : in out Real_Float_Vector;
+--        Num_Steps     : Positive; Scheme : Scheme_Type;
+--        Bounds        : Opt_Constraints.Bounds_List;
+--        Use_One_Sided : in out Real_Float_Vector) is
+--        use Real_Float_Arrays;
+--        use Opt_Constraints;
+--        use Opt_Constraints.Array_Bounds_Package;
+--        Lower         : constant Real_Float_Vector := Get_Lower (Bounds);
+--        Upper         : constant Real_Float_Vector := Get_Upper (Bounds);
+--        All_Inf       : Boolean := False;
+--        Lower_Dist    : Real_Float_Vector (H'Range);
+--        Upper_Dist    : Real_Float_Vector (H'Range);
+--        Min_Dist      : Real_Float_Vector (H'Range);
+--        H_Total       : Real_Float_Vector (H'Range);
+--        X             : Real_Float_Vector (X0'Range);
+--        H_Adjusted    : Real_Float_Vector (H'Range);
+--        Violated      : Boolean_Array (H_Total'Range);
+--        Fitting       : Boolean_Array (H_Total'Range);
+--        V_F           : Boolean_Array (H_Total'Range);
+--        Forward       : Boolean_Array (H_Total'Range);
+--        Backward      : Boolean_Array (H_Total'Range);
+--        Central       : Boolean_Array (H_Total'Range);
+--        Adjusted_Cent : Boolean_Array (H_Total'Range);
+--     begin
+--        H_Adjusted := H;
+--        case Scheme is
+--           when One_Sided => Use_One_Sided := (others => 1.0);
+--           when Two_Sided =>
+--              H := abs (H);
+--              Use_One_Sided := (others => 0.0);
+--        end case;
+--
+--        for index in Lower'Range loop
+--           All_Inf := All_Inf or
+--             Lower (index) = Float'Safe_First or
+--             Upper (index) = Float'Safe_Last;
+--        end loop;
+--
+--        if not All_Inf then
+--           H_Total := Float (Num_Steps) * H;
+--           Lower_Dist := X0 - Lower;
+--           Upper_Dist := Upper - X0;
+--        end if;
+--
+--        --  L63
+--        case Scheme is
+--           when One_Sided =>
+--              X := X0 + H_Total;
+--              Violated := Check_Bounds (X, Bounds);
+--              Fitting := abs (H_Total) <= Max (Lower_Dist, Upper_Dist);
+--              V_F := Violated and Fitting;
+--              --  L61
+--              for index in H_Adjusted'Range loop
+--                 if V_F (index) then
+--                    H_Adjusted (index) := -1.0 * H_Adjusted (index);
+--                 end if;
+--              end loop;
+--
+--              Fitting := not Fitting;
+--              Forward := (Upper_Dist >= Lower_Dist) and Fitting;
+--
+--              for index in H_Adjusted'Range loop
+--                 if Forward (index) then
+--                    H_Adjusted (index) :=
+--                      Upper_Dist (index) / Float (Num_Steps);
+--                 end if;
+--              end loop;
+--
+--              Backward := (Upper_Dist < Lower_Dist) and Fitting;
+--              for index in H_Adjusted'Range loop
+--                 if Backward (index) then
+--                    H_Adjusted (index) :=
+--                      -Lower_Dist (index) / Float (Num_Steps);
+--                 end if;
+--              end loop;
+--
+--           when Two_Sided =>
+--              Central := Lower_Dist >= H_Total;
+--              Forward := (Upper_Dist >= Lower_Dist) and not Central;
+--              for index in H_Adjusted'Range loop
+--                 if Forward (index) then
+--                    H_Adjusted (index) :=
+--                      Float'Min (H (index), 0.5 * Upper_Dist (index)) /
+--                        Float (Num_Steps);
+--                    Use_One_Sided (index) := 1.0;
+--                 end if;
+--              end loop;
+--
+--              Backward := (Upper_Dist < Lower_Dist) and not Central;
+--              for index in H_Adjusted'Range loop
+--                 if Backward (index) then
+--                    H_Adjusted (index) :=
+--                      -Float'Min (H (index), 0.5 * Lower_Dist (index)) /
+--                      Float (Num_Steps);
+--                    Use_One_Sided (index) := 1.0;
+--                 end if;
+--              end loop;
+--
+--              Min_Dist := Min (Upper_Dist, Lower_Dist);
+--              Adjusted_Cent := (not Central) and (abs (H_Adjusted) <= Min_Dist);
+--              for index in H_Adjusted'Range loop
+--                 if Adjusted_Cent (index) then
+--                    Use_One_Sided (index) := 0.0;
+--                 end if;
+--              end loop;
+--
+--        end case;
+--
+--        H := H_Adjusted;
+--
+--     end Adjust_Scheme_To_Bounds;
 
    --  -------------------------------------------------------------------------
    --  L257 Approx_Derivative computes the finite difference approximation of
@@ -248,69 +248,69 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
-       return Boolean_Array is
-      Result : Boolean_Array (X0'Range);
-   begin
-      for index in  X0'Range loop
-         Result (index) := X0 (index) > Bounds.Element (index).Lower and
-           X0 (index) < Bounds.Element (index).Upper;
-      end loop;
-
-      return Result;
-
-   end Check_Bounds;
+--     function Check_Bounds
+--       (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
+--         return Boolean_Array is
+--        Result : Boolean_Array (X0'Range);
+--     begin
+--        for index in  X0'Range loop
+--           Result (index) := X0 (index) > Bounds.Element (index).Lower and
+--             X0 (index) < Bounds.Element (index).Upper;
+--        end loop;
+--
+--        return Result;
+--
+--     end Check_Bounds;
 
    --  -------------------------------------------------------------------------
 
-   function Check_Bounds
-     (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
-       return Boolean is
-      Result : Boolean := True;
-   begin
-      for index in  X0'Range loop
-         Result := Result and X0 (index) > Bounds.Element (index).Lower and
-           X0 (index) < Bounds.Element (index).Upper;
-      end loop;
-
-      return Result;
-
-   end Check_Bounds;
+--     function Check_Bounds
+--       (X0 : Real_Float_Vector; Bounds : Opt_Constraints.Bounds_List)
+--         return Boolean is
+--        Result : Boolean := True;
+--     begin
+--        for index in  X0'Range loop
+--           Result := Result and X0 (index) > Bounds.Element (index).Lower and
+--             X0 (index) < Bounds.Element (index).Upper;
+--        end loop;
+--
+--        return Result;
+--
+--     end Check_Bounds;
 
    --  -------------------------------------------------------------------------
    --  L144
-   function Compute_Absolute_Step
-     (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
-      Method   : FD_Methods) return Real_Float_Vector is
-      use Real_Float_Arrays;
-      R_Step   : constant Float := EPS_For_Method (Method);
-      Sign_X0  : Real_Float_Vector (X0'Range) := X0 >= 0.0;
-      Abs_Step : Real_Float_Vector (X0'Range) := R_Step * Sign_X0;
-      dX       : Real_Float_Vector (X0'Range);
-   begin
-      --  L170  this is used because Sign_X0 needs to be 1 when x0 = 0.
-      Sign_X0 := 2.0 * Sign_X0 - 1.0;
-
-      if Rel_Step.Is_Empty then
-         for row in Abs_Step'Range loop
-            Abs_Step (row) := Abs_Step (row)  + Float'Max (1.0, abs (X0 (row)));
-         end loop;
-      else
-         Abs_Step := Abs_Step * abs (X0);
-      end if;
-
-      dX := (X0 + Abs_Step) - X0;
-      for row in Abs_Step'Range loop
-         if dX (row) = 0.0 then
-            Abs_Step (row) := R_Step * Sign_X0 (row) *
-              Float'Max (1.0, abs (X0 (row)));
-         end if;
-      end loop;
-
-      return Abs_Step;
-
-   end Compute_Absolute_Step;
+--     function Compute_Absolute_Step
+--       (Rel_Step : in out Real_Float_List; X0 : Real_Float_Vector;
+--        Method   : FD_Methods) return Real_Float_Vector is
+--        use Real_Float_Arrays;
+--        R_Step   : constant Float := EPS_For_Method (Method);
+--        Sign_X0  : Real_Float_Vector (X0'Range) := X0 >= 0.0;
+--        Abs_Step : Real_Float_Vector (X0'Range) := R_Step * Sign_X0;
+--        dX       : Real_Float_Vector (X0'Range);
+--     begin
+--        --  L170  this is used because Sign_X0 needs to be 1 when x0 = 0.
+--        Sign_X0 := 2.0 * Sign_X0 - 1.0;
+--
+--        if Rel_Step.Is_Empty then
+--           for row in Abs_Step'Range loop
+--              Abs_Step (row) := Abs_Step (row)  + Float'Max (1.0, abs (X0 (row)));
+--           end loop;
+--        else
+--           Abs_Step := Abs_Step * abs (X0);
+--        end if;
+--
+--        dX := (X0 + Abs_Step) - X0;
+--        for row in Abs_Step'Range loop
+--           if dX (row) = 0.0 then
+--              Abs_Step (row) := R_Step * Sign_X0 (row) *
+--                Float'Max (1.0, abs (X0 (row)));
+--           end if;
+--        end loop;
+--
+--        return Abs_Step;
+--
+--     end Compute_Absolute_Step;
 
    --  -------------------------------------------------------------------------
    --  L547
@@ -371,44 +371,44 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function EPS_For_Method (Method : FD_Methods) return Float is
-      use Maths.Float_Math_Functions;
-      Value : Float := EPS;
-   begin
-      case Method is
-         when FD_2_Point | FD_CS =>
-            Value := Sqrt (EPS);
-         when FD_3_Point =>
-            Value := EPS ** (1 / 3);
-         when others => null;
-      end case;
-
-      return Value;
-
-   end EPS_For_Method;
-
-   --  -------------------------------------------------------------------------
-
-   function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
-                          return Real_Float_Vector is
-   begin
-      return Fun (X);
-
-   end Fun_Wrapped;
+--     function EPS_For_Method (Method : FD_Methods) return Float is
+--        use Maths.Float_Math_Functions;
+--        Value : Float := EPS;
+--     begin
+--        case Method is
+--           when FD_2_Point | FD_CS =>
+--              Value := Sqrt (EPS);
+--           when FD_3_Point =>
+--              Value := EPS ** (1 / 3);
+--           when others => null;
+--        end case;
+--
+--        return Value;
+--
+--     end EPS_For_Method;
 
    --  -------------------------------------------------------------------------
 
-   function Inf_Bounds (Bounds : Opt_Constraints.Bounds_List) return Boolean is
-      Result : Boolean := True;
-   begin
-      for index in  Bounds.First_Index .. Bounds.Last_Index loop
-         Result := Result and Bounds (index).Lower = Float'Last and
-           Bounds.Element (index).Upper = Float'Last;
-      end loop;
+--     function Fun_Wrapped (Fun : Deriv_Fun_Access; X : Real_Float_Vector)
+--                            return Real_Float_Vector is
+--     begin
+--        return Fun (X);
+--
+--     end Fun_Wrapped;
 
-      return Result;
+   --  -------------------------------------------------------------------------
 
-   end Inf_Bounds;
+--     function Inf_Bounds (Bounds : Opt_Constraints.Bounds_List) return Boolean is
+--        Result : Boolean := True;
+--     begin
+--        for index in  Bounds.First_Index .. Bounds.Last_Index loop
+--           Result := Result and Bounds (index).Lower = Float'Last and
+--             Bounds.Element (index).Upper = Float'Last;
+--        end loop;
+--
+--        return Result;
+--
+--     end Inf_Bounds;
 
    --  -------------------------------------------------------------------------
 
@@ -477,33 +477,33 @@ package body Num_Diff is
 
    --  -------------------------------------------------------------------------
 
-   function Prepare_Bounds (Bounds : Opt_Constraints.Bounds_List;
-                            X0     : Real_Float_Vector)
-                             return Opt_Constraints.Bounds_List is
-      Result : Opt_Constraints.Bounds_List;
-   begin
-      if Bounds.Is_Empty then
-         Result.Set_Length (X0'Length);
-      else
-         Result := Bounds;
-      end if;
-
-      return Result;
-
-   end Prepare_Bounds;
+--     function Prepare_Bounds (Bounds : Opt_Constraints.Bounds_List;
+--                              X0     : Real_Float_Vector)
+--                               return Opt_Constraints.Bounds_List is
+--        Result : Opt_Constraints.Bounds_List;
+--     begin
+--        if Bounds.Is_Empty then
+--           Result.Set_Length (X0'Length);
+--        else
+--           Result := Bounds;
+--        end if;
+--
+--        return Result;
+--
+--     end Prepare_Bounds;
 
    --  -------------------------------------------------------------------------
 
-   function Relative_Step (Method : FD_Methods) return Float is
-      use Maths.Float_Math_Functions;
-   begin
-      if Method = FD_3_Point then
-         return EPS ** (1 / 3);
-      else
-         return Sqrt (EPS);
-      end if;
-
-   end Relative_Step;
+--     function Relative_Step (Method : FD_Methods) return Float is
+--        use Maths.Float_Math_Functions;
+--     begin
+--        if Method = FD_3_Point then
+--           return EPS ** (1 / 3);
+--        else
+--           return Sqrt (EPS);
+--        end if;
+--
+--     end Relative_Step;
 
    --  -------------------------------------------------------------------------
 

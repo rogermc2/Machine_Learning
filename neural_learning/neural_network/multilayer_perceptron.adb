@@ -852,8 +852,9 @@ package body Multilayer_Perceptron is
                                Self.Attributes.Out_Activation;
         Num_Layers         : constant Positive := Self.Attributes.N_Layers;
         Params_List        : constant Parameters_List := Self.Attributes.Params;
-        Activ_Out          : Real_Float_Matrix (X'Range,
-                                                1 .. Self.Attributes.N_Outputs);
+        Activ_Out          : Real_Float_Matrix --  (X'Range,
+--                                                  1 .. Self.Attributes.N_Outputs);
+          (X'Range, 1 .. Integer (Self.Attributes.Classes.Length));
         --  One element list used to allow for different sized matrices
         Activations        : Real_Matrix_List;
     begin

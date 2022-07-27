@@ -6,6 +6,7 @@ with Classification_Metrics;
 --  with Printing;
 
 package body Base is
+
    --  Score returns the mean accuracy on the given test data and labels.
    function Score (Self : Multilayer_Perceptron.MLP_Classifier;
                    X : Real_Float_Matrix; Y : Integer_Matrix)
