@@ -366,6 +366,7 @@ package body Multilayer_Perceptron is
       Classifier.Parameters.RF_Fun              := RF_Fun;
       First_Pass                                := True;
       return Classifier;
+
    end C_Init;
 
    --  -------------------------------------------------------------------------
@@ -997,7 +998,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
-      --        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -1025,6 +1026,8 @@ package body Multilayer_Perceptron is
          --  Add coefficent matrices and intercept vectors for layer.
          Fan_In := Layer_Units (layer);
          Fan_Out := Layer_Units (layer + 1);
+         Put_Line (Routine_Name & "Fan_In, Fan_Out:" & Integer'Image (Fan_In)
+                  & Integer'Image (Fan_Out));
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
       end loop;
 
