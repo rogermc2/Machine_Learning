@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Label is
 
@@ -76,15 +76,12 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
-      Routine_Name : constant String := "Label.Binarizer Fit ";
+      --  Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
-      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
       Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
-      Put_Line (Routine_Name & "Y_Kind " &
-                  Multiclass_Utils.Y_Type'Image (Binarizer.Y_Kind));
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
-      Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
-                                   Binarizer.Classes);
+--        Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
+--                                     Binarizer.Classes);
    end Fit;
 
    --  -------------------------------------------------------------------------

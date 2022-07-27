@@ -436,7 +436,7 @@ package body Multilayer_Perceptron is
                   X     : Real_Float_Matrix;
                   Y     : Integer_Matrix; Incremental : Boolean := False) is
       use Ada.Containers;
-      Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
+--        Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -446,7 +446,7 @@ package body Multilayer_Perceptron is
       Layer_Units        : NL_Types.Integer_List;
       Activations        : Real_Matrix_List;
    begin
-     Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
+     --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
       --        Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
       --  L385
       Validate_Hyperparameters (Self);
@@ -1350,14 +1350,12 @@ package body Multilayer_Perceptron is
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Boolean_Matrix is
-      use Ada.Containers;
       use NL_Types.Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Validate_Input ";
       Classes      : NL_Types.Integer_List;
       Binarizer    : Label.Label_Binarizer;
    begin
-      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
@@ -1371,17 +1369,16 @@ package body Multilayer_Perceptron is
             Assert (Classes = Self.Attributes.Classes,
                     Routine_Name & "warm_start cannot be used if Y has" &
                       " different classes as in the previous call to fit.");
+         else
+            for index in Classes.First_Index .. Classes.Last_Index loop
+               Assert (Self.Attributes.Classes.Contains (Classes (index)),
+                        Routine_Name & "Y has classes not in Self.Classes");
+            end loop;
          end if;
-
-         Assert (Classes.Length = Self.Attributes.Classes.Length,
-                 Routine_Name & "Y" & Count_Type'Image (Classes.Length) &
-                   " and Self.Classes" &
-                   Count_Type'Image (Self.Attributes.Classes.Length) &
-                   " have different numbers of classes.");
       end if;
 
-      Printing.Print_Integer_List
-        (Routine_Name & "Classes", Self.Attributes.Classes);
+--        Printing.Print_Integer_List
+--          (Routine_Name & "Classes", Self.Attributes.Classes);
       --  L1159
       return Label.Transform (Self.Attributes.Binarizer, Flatten (Y));
 
