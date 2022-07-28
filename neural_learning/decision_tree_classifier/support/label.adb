@@ -461,6 +461,9 @@ package body Label is
             Y_Inv := Inverse_Binarize_Thresholding
               (Y, Self.Y_Kind, Self.Classes, Threshold);
         end if;
+        Put_Line (Routine_Name & "L399 Y_Inv size:" &
+                    Integer'Image (Y_Inv'Length) & " x" &
+                    Integer'Image (Y_Inv'Length (2)));
 
         return Y_Inv;
 
@@ -600,10 +603,14 @@ package body Label is
         Done         : Boolean := False;
 
         function Binarize (Y_In : Integer_Matrix) return Boolean_Matrix is
-            Result : Boolean_Matrix (Y_In'Range,
-                                     1 .. Positive (Classes.Length)) :=
+            Result : Boolean_Matrix (Y_In'Range, 1 .. Num_Classes) :=
                        (others => (others => False));
         begin
+            Put_Line (Routine_Name & "Binarize Num_Classes:" &
+                        Integer'Image (Num_Classes));
+            Put_Line (Routine_Name & "Binarize Y_In size:" &
+                        Integer'Image (Y_In'Length) & " x" &
+                        Integer'Image (Y_In'Length (2)));
             for row in Y_In'Range loop
                 for col in Classes.First_Index .. Classes.Last_Index loop
                     if Y_In (row, col) = Classes (col) then
@@ -612,6 +619,9 @@ package body Label is
                 end loop;
             end loop;
 
+            Put_Line (Routine_Name & "Binarize Result size:" &
+                        Integer'Image (Result'Length) & " x" &
+                        Integer'Image (Result'Length (2)));
             return Result;
 
         end Binarize;
@@ -623,6 +633,8 @@ package body Label is
                   Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                   "does not support Multioutput target data.");
 
+        Put_Line (Routine_Name & "L516 Y size:" & Integer'Image (Y'Length) &
+                    " x" & Integer'Image (Y'Length (2)));
         --  L516
         if Y_Kind = Y_Binary then
             if Num_Classes = 1 then
@@ -658,6 +670,7 @@ package body Label is
                 Y_Bin := Binarize (Y);
 
             else
+                --  L551
                 Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
                           Y_Type'Image (Y_Kind) &
                           " target data is not supported by Label_Binarize");
@@ -665,6 +678,9 @@ package body Label is
             end if;
         end if;
 
+        Put_Line (Routine_Name & "Y_Bin size:" &
+                    Integer'Image (Y_Bin'Length) &  " x" &
+                    Integer'Image (Y_Bin'Length (2)));
         --          Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
         return Y_Bin;
 
