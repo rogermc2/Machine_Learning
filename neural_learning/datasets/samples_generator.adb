@@ -7,10 +7,62 @@ with Maths;
 
 with Classifier_Utilities;
 with Label;
-with NL_Types;
 --  with Printing;
 
 package body Samples_Generator is
+
+   function Make_Classification
+     (N_Samples            : Positive := 100;
+      N_Features           : Positive := 20;
+      N_Informative        : Positive := 20;
+      N_Redundant          : Positive := 20;
+      N_Repeated           : Natural := 0;
+      N_Classes            : Positive := 2;
+      N_Clusters_Per_Class : Positive := 2;
+      Weights              : NL_Types.Float_List;
+      Flip_Y               : Float := 0.01;
+      Class_Sep            : Float := 1.0;
+      Hypercube            : Boolean := True;
+      Shift                : Float := 0.0;
+      Scale                : Float := 1.0;
+      Shuffle              : Boolean := True)
+      return Classification_Data is
+      Routine_Name          : constant String :=
+                                "Samples_Generator.Make_Classification ";
+      Data                  : Classification_Data (N_Samples, N_Features,
+                                                   N_Classes, False);
+      N_Useless             : constant Integer := N_Features - N_Informative -
+                                N_Redundant - N_Repeated;
+      N_Clusters            : constant Integer :=
+                                N_Classes * N_Clusters_Per_Class;
+      N_Samples_Per_Cluster : Integer_Array (1 .. N_Clusters);
+      L_Weights             : NL_Types.Float_List := Weights;
+   begin
+      Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
+              Routine_Name & "the number of informative, redundant and " &
+                "repeated features must be less than the totalnumber of features");
+      if not L_Weights.Is_Empty then
+         if Integer (L_Weights.Length) = N_Classes - 1 then
+            Put_Line (Routine_Name & "weights not coded");
+         end if;
+      else
+         for index in 1 .. N_Classes loop
+            L_Weights.Append (1.0 / Float (N_Classes));
+           end loop;
+      end if;
+
+      --  Distribute samples among clusters by weight
+      for index in 1 .. N_Clusters loop
+         N_Samples_Per_Cluster (index) := Integer
+           (Float (N_Samples) * Weights (index mod N_Classes) /
+           Float (N_Clusters_Per_Class));
+      end loop;
+
+      return Data;
+
+   end Make_Classification;
+
+   --  -------------------------------------------------------------------------
 
    --  Make_Multilabel_Classification generates random samples with multiple
    --  labels reflecting a bag of words drawn from a mixture of topics.
@@ -46,8 +98,7 @@ package body Samples_Generator is
       --  If Return_Distributions is True then return the prior class
       --  probability and conditional probabilities of features given classes
       --  from which the data was drawn
-      Return_Distributions : Boolean := False)
-      return Multilabel_Classification is
+      Return_Distributions : Boolean := False) return Classification_Data is
       use NL_Types;
       Routine_Name : constant String :=
                        "Samples_Generator.Make_Multilabel_Classification ";
@@ -74,19 +125,19 @@ package body Samples_Generator is
             --  L406
             Y_Size := Poisson_Single (Float (N_labels));
          end loop;
---           Put_Line (Routine_Name & " L407 Y_Size:" & Integer'Image (Y_Size));
+         --           Put_Line (Routine_Name & " L407 Y_Size:" & Integer'Image (Y_Size));
 
          for index in 1 .. Y_Size loop
             Prob.Append (abs (Maths.Random_Float));
          end loop;
 
---           Printing.Print_Float_List (Routine_Name &
---                                        "Cum_P_C_List", Cum_P_C_List);
---           Printing.Print_Float_List (Routine_Name & "Prob", Prob);
---           Put_Line (Routine_Name & "Prob length" &
---                       Integer'Image (Integer (Prob.Length)));
---           Put_Line (Routine_Name & "Cum_P_C_List length" &
---                       Integer'Image (Integer (Cum_P_C_List.Length)));
+         --           Printing.Print_Float_List (Routine_Name &
+         --                                        "Cum_P_C_List", Cum_P_C_List);
+         --           Printing.Print_Float_List (Routine_Name & "Prob", Prob);
+         --           Put_Line (Routine_Name & "Prob length" &
+         --                       Integer'Image (Integer (Prob.Length)));
+         --           Put_Line (Routine_Name & "Cum_P_C_List length" &
+         --                       Integer'Image (Integer (Cum_P_C_List.Length)));
          --  L410 pick n classes
          while Natural (Y_Gen.Length) /= Y_Size loop
             --              Put_Line (Routine_Name & "L410 Y_Gen.Length /= Y_Size");
@@ -103,14 +154,14 @@ package body Samples_Generator is
                Y_Gen.Append (Class (index));
             end loop;
          end loop;
---           Printing.Print_Integer_List (Routine_Name & "L420 Y_Gen", Y_Gen);
+         --           Printing.Print_Integer_List (Routine_Name & "L420 Y_Gen", Y_Gen);
 
          --  L420 pick a nonzero document length by rejection sampling
          while Num_Words = 0 loop
             Num_Words := Poisson_Single (Float (Expected_Length));
          end loop;
---           Put_Line (Routine_Name & "L424 Num_Words: " &
---                       Integer'Image (Num_Words));
+         --           Put_Line (Routine_Name & "L424 Num_Words: " &
+         --                       Integer'Image (Num_Words));
 
          declare
             use Float_Package;
@@ -172,8 +223,8 @@ package body Samples_Generator is
                          Cum_P_W_Sample (Cum_P_W_Sample'Last));
                end loop;
                Sort (Cum_Sample_List);
---                 Printing.Print_Float_List
---                   (Routine_Name & " L433 Cum_Sample_List", Cum_Sample_List);
+               --                 Printing.Print_Float_List
+               --                   (Routine_Name & " L433 Cum_Sample_List", Cum_Sample_List);
 
                --  L434
                Prob.Clear;
@@ -185,8 +236,8 @@ package body Samples_Generator is
                Word_List := Classifier_Utilities.Search_Sorted_Float_List
                  (Cum_Sample_List, Prob);
             end if;
---              Printing.Print_Integer_List
---                (Routine_Name & "L430 Word_List", Word_List);
+            --              Printing.Print_Integer_List
+            --                (Routine_Name & "L430 Word_List", Word_List);
 
             for index in 1 .. Num_Words loop
                Words (index) := Word_List (index);
@@ -202,7 +253,7 @@ package body Samples_Generator is
       P_W_C          : Real_Float_Matrix (1 .. N_Features, 1 .. N_Classes);
       X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
         := (others => (others => 0.0));
-      Classification : Multilabel_Classification
+      Classification : Classification_Data
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
       Y              : Array_Of_Integer_Lists (1 .. N_Samples);
@@ -229,8 +280,8 @@ package body Samples_Generator is
 
       --  L436
       for sample_index in 1 .. N_Samples loop
---           Put_Line (Routine_Name & "L436 sample_index:" &
---                       Integer'Image (sample_index));
+         --           Put_Line (Routine_Name & "L436 sample_index:" &
+         --                       Integer'Image (sample_index));
          declare
             Sample_Y  : Integer_List;
             --  L437
@@ -262,7 +313,7 @@ package body Samples_Generator is
       end loop;
 
       --  L453
---        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
+      --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
       Label.Fit (LB, Y);
       declare
          Y_Bin : constant Binary_Matrix := Label.Transform (LB, Y);
