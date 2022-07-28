@@ -455,7 +455,8 @@ package body Multilayer_Perceptron is
           (not Self.Parameters.Warm_Start and then not Incremental);
 
         --  L402
-        Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
+      Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
+      Put_Line (Routine_Name & "L402 N_Outputs" & Integer'Image (Self.Attributes.N_Outputs));
         --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
         Layer_Units.Append (Num_Features);
         if Hidden_Layer_Sizes.Length > 0 then
@@ -1384,16 +1385,6 @@ package body Multilayer_Perceptron is
             end if;
         end if;
 
-        --        Printing.Print_Integer_List
-        --          (Routine_Name & "Classes", Self.Attributes.Classes);
-        --  L1159
-        Put_Line (Routine_Name & "L1159 Binarizer.Classes length:" &
-                    Integer'Image
-                    (Integer (Self.Attributes.Binarizer.Classes.Length)));
-        Put_Line (Routine_Name & "L1159 output size:" &
-                    Integer'Image (Label.Transform (Self.Attributes.Binarizer, Y)'Length) &
-                    " x" &
-                    Integer'Image (Label.Transform (Self.Attributes.Binarizer, Y)'Length (2)));
         return Label.Transform (Self.Attributes.Binarizer, Y);
 
     end Validate_Input;
