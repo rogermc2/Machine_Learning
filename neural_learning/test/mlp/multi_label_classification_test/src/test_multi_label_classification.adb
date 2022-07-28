@@ -27,15 +27,12 @@ procedure Test_Multi_Label_Classification is
    aClassifier         : MLP_Classifier;
 begin
    Put_Line (Routine_Name);
---     Printing.Print_Binary_Matrix (Routine_Name & "Test_Y", Test_Y, 1, 4);
    Layer_Sizes.Append (50);
-   Put_Line (Routine_Name & "initializing aClassifier");
+
    aClassifier := Multilayer_Perceptron.C_Init
      (Solver => Sgd_Solver, Hidden_Layer_Sizes => Layer_Sizes, Max_Iter => 150,
       Random_State => 0, Activation => Base_Neural.Logistic_Activation,
       Alpha => 10.0 ** (-5), Learning_Rate_Init => 0.2);
-
-   Put_Line (Routine_Name & "aClassifier initialized");
 
    Put_Line (Routine_Name & "Test_X size" & Integer'Image (Test_X'Length)
              & " x" & Integer'Image (Test_X'Length (2)));
@@ -47,7 +44,8 @@ begin
       Classes.Append (count);
    end loop;
 
-   for test_num in 1 .. 100 loop
+--     for test_num in 1 .. 100 loop
+   for test_num in 1 .. 1 loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));
       Partial_Fit (aClassifier, Test_X, To_Integer_Matrix (Test_Y), Classes);
       Put_Line (Routine_Name & "Score" &

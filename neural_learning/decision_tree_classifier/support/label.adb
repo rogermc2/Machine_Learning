@@ -241,17 +241,16 @@ package body Label is
       Inverse      : Binary_Matrix (Y'Range, Y'Range (2)) :=
                        (others => (others => 0));
    begin
-      Put_Line (Routine_Name);
       if Output_Type = Y_Binary then
          Assert (Y'Length (2) <= 2, Routine_Name &
                    "output_type is binary but Y'Length (2) is " &
                    Integer'Image (Y'Length (2)));
-      else
-         Assert (Y'Length (2) = Integer (Classes.Length), Routine_Name &
-                   "The number of classes" &
-                   Integer'Image (Integer (Classes.Length)) &
-                   " is not equal to Y'Length (2)" &
-                   Integer'Image (Y'Length (2)));
+--        else
+--           Assert (Y'Length (2) = Integer (Classes.Length), Routine_Name &
+--                     "The number of classes" &
+--                     Integer'Image (Integer (Classes.Length)) &
+--                     " is not equal to Y'Length (2)" &
+--                     Integer'Image (Y'Length (2)));
       end if;
 
       --  L653
@@ -461,9 +460,9 @@ package body Label is
          Y_Inv := Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
-      Put_Line (Routine_Name & "L399 Y_Inv size:" &
-                  Integer'Image (Y_Inv'Length) & " x" &
-                  Integer'Image (Y_Inv'Length (2)));
+--        Put_Line (Routine_Name & "L399 Y_Inv size:" &
+--                    Integer'Image (Y_Inv'Length) & " x" &
+--                    Integer'Image (Y_Inv'Length (2)));
 
       return Y_Inv;
 
@@ -581,7 +580,6 @@ package body Label is
          end if;
       end if;
 
-      --          Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
       return Y_Bin;
 
    end Label_Binarize;
@@ -595,7 +593,6 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name :  constant String :=
                        "Label.Label_Binarize Integer_Matrix ";
-      --        Num_Samples  : constant Positive := Y'Length;
       Num_Classes  : constant Positive := Y'Length (2);
       Y_Bool       : Boolean_Matrix (Y'Range, Y'Range (2))
         := (others => (others => False));
@@ -620,9 +617,6 @@ package body Label is
             end loop;
          end loop;
 
-         Put_Line (Routine_Name & "Binarize Result size:" &
-                     Integer'Image (Result'Length) & " x" &
-                     Integer'Image (Result'Length (2)));
          return Result;
 
       end Binarize;
@@ -653,14 +647,12 @@ package body Label is
       end if;
 
       --  L529
-      if Y_Kind = Y_Multilabel_Indicator then
-         Put_Line (Routine_Name & "L529 Y_Bool size:" & Integer'Image (Y_Bool'Length) &
-                  " x" & Integer'Image (Y_Bool'Length (2)));
+--        if Y_Kind = Y_Multilabel_Indicator then
 --           Assert (Classes.Length = Y_Bool'Length (2),
 --                   Routine_Name & "L529 class size" &
 --                     Count_Type'Image (Classes.Length) & " is different to Y size"
 --                   & Integer'Image (Y_Bool'Length (2)));
-      end if;
+--        end if;
 
       if not Done then
          --  L528
