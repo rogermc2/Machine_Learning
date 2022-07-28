@@ -279,8 +279,8 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Integer_List_Array
-     (Name  : String; theArray : Integer_List_Array;
+   procedure Print_Array_Of_Integer_Lists
+     (Name  : String; theArray : Array_Of_Integer_Lists;
       Start : Integer := 1; Finish : Integer := 0) is
       Last  : Integer;
       aList : Integer_List;
@@ -302,10 +302,10 @@ package body Printing is
          end loop;
       else
          Put_Line
-           ("Print_Integer_List_Array called with invalid start or finish index.");
+           ("Print_Array_Of_Integer_Lists called with invalid start or finish index.");
       end if;
 
-   end Print_Integer_List_Array;
+   end Print_Array_Of_Integer_Lists;
 
    --  ------------------------------------------------------------------------
 

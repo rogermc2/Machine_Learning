@@ -42,10 +42,10 @@ package Label is
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
    procedure Fit (Binarizer : in out Label_Binarizer;
-                  Y         : NL_Types.Integer_List_Array);
+                  Y         : NL_Types.Array_Of_Integer_Lists);
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     function Fit_Transform (Binarizer : in out Label_Binarizer;
-                            Y         : Integer_Array) return Boolean_Matrix;
+                            Y         : Integer_Matrix) return Boolean_Matrix;
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y       : Integer_Array) return Natural_Array;
     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
@@ -62,15 +62,15 @@ package Label is
                                 return Integer_Matrix;
     function Label_Binarize (Y, Classes : NL_Types.Integer_List;
                              Neg_Label : Integer := 0) return Boolean_Matrix;
-    function Label_Binarize (Y : Integer_Array; Classes : NL_Types.Integer_List;
+    function Label_Binarize (Y : Integer_Matrix; Classes : NL_Types.Integer_List;
                              Neg_Label : Integer := 0) return Boolean_Matrix;
-    function Transform (Self : Label_Binarizer; Y : Integer_Array)
+    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                         return Boolean_Matrix;
     function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List)
                         return Boolean_Matrix;
-    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_Array)
+    function Transform (Self : Label_Binarizer; Y : NL_Types.Array_Of_Integer_Lists)
                         return Boolean_Matrix;
-    function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List_Array)
+    function Transform (Self : Label_Binarizer; Y : NL_Types.Array_Of_Integer_Lists)
                         return Binary_Matrix;
     function Transform (Self : Label_Encoder; Y : Integer_Array)
                         return Natural_Array;

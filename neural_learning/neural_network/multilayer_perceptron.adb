@@ -900,7 +900,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       --  L167 Forward propagate
-      for layer in 1 .. Num_Layers - 1 loop
+      for layer in 1 .. Num_Layers loop
          Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
          declare
             Params             : constant Parameters_Record :=
@@ -922,7 +922,7 @@ package body Multilayer_Perceptron is
                         Integer'Image (Updated_Activation'Length) & " x" &
                         Integer'Image (Updated_Activation'Length (2)));
 
-            if layer /= Num_Layers - 2 then
+            if layer /= Num_Layers - 1 then
                case Hidden_Activation is
                   when Identity_Activation => null;
                   when Logistic_Activation => Logistic (Updated_Activation);
@@ -936,6 +936,9 @@ package body Multilayer_Perceptron is
          end;
       end loop;
 
+            Put_Line (Routine_Name & "Activations matrix size:" &
+                        Integer'Image (To_Matrix (Activations)'Length) & " x" &
+                        Integer'Image (To_Matrix (Activations)'Length (2)));
       Activ_Out := To_Matrix (Activations);
 
       --  L172
@@ -1380,7 +1383,7 @@ package body Multilayer_Perceptron is
 --        Printing.Print_Integer_List
 --          (Routine_Name & "Classes", Self.Attributes.Classes);
       --  L1159
-      return Label.Transform (Self.Attributes.Binarizer, Flatten (Y));
+      return Label.Transform (Self.Attributes.Binarizer, Y);
 
    end Validate_Input;
 

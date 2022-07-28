@@ -56,7 +56,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Is_Multilabel (Y : NL_Types.Integer_List_Array) return Boolean is
+   function Is_Multilabel (Y : NL_Types.Array_Of_Integer_Lists) return Boolean is
       use Ada.Containers;
       --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
       Labels       : NL_Types.Integer_List;
@@ -142,7 +142,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Type_Of_Target (Y : NL_Types.Integer_List_Array) return Y_Type is
+   function Type_Of_Target (Y : NL_Types.Array_Of_Integer_Lists) return Y_Type is
       use Ada.Containers;
       Classes : constant NL_Types.Integer_List := Unique_Labels (Y);
       Result  : Y_Type;
@@ -276,7 +276,7 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
-   function Unique_Labels (Y : NL_Types.Integer_List_Array)
+   function Unique_Labels (Y : NL_Types.Array_Of_Integer_Lists)
                             return NL_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);

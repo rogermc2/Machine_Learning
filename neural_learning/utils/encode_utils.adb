@@ -326,7 +326,7 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
-   function Unique (Values : NL_Types.Integer_List_Array)
+   function Unique (Values : NL_Types.Array_Of_Integer_Lists)
                     return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;

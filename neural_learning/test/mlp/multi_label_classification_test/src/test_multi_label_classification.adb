@@ -7,7 +7,7 @@ with base;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Printing;
+--  with Printing;
 with Samples_Generator; use Samples_Generator;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
@@ -27,7 +27,7 @@ procedure Test_Multi_Label_Classification is
    aClassifier         : MLP_Classifier;
 begin
    Put_Line (Routine_Name);
-   Printing.Print_Binary_Matrix (Routine_Name & "Test_Y", Test_Y, 1, 4);
+--     Printing.Print_Binary_Matrix (Routine_Name & "Test_Y", Test_Y, 1, 4);
    Layer_Sizes.Append (50);
    Put_Line (Routine_Name & "initializing aClassifier");
    aClassifier := Multilayer_Perceptron.C_Init

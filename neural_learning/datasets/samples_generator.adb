@@ -8,7 +8,7 @@ with Maths;
 with Classifier_Utilities;
 with Label;
 with NL_Types;
-with Printing;
+--  with Printing;
 
 package body Samples_Generator is
 
@@ -205,9 +205,9 @@ package body Samples_Generator is
       Classification : Multilabel_Classification
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
-      Y              : Integer_List_Array (1 .. N_Samples);
+      Y              : Array_Of_Integer_Lists (1 .. N_Samples);
       X_Indices      : Integer_List;
-      X_Ind_Ptr      : Integer_List_Array (1 .. N_Samples);
+      X_Ind_Ptr      : Array_Of_Integer_Lists (1 .. N_Samples);
    begin
       Put_Line (Routine_Name);
       for index in P_C'Range loop
@@ -262,7 +262,7 @@ package body Samples_Generator is
       end loop;
 
       --  L453
-      Printing.Print_Integer_List_Array (Routine_Name & "L453 Y", Y, 1, 4);
+--        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
       Label.Fit (LB, Y);
       declare
          Y_Bin : constant Binary_Matrix := Label.Transform (LB, Y);

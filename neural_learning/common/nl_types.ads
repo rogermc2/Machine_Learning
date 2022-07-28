@@ -80,7 +80,7 @@ package NL_Types is
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;
    package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
-   type Integer_List_Array is array (Integer range <>) of Integer_List;
+   type Array_Of_Integer_Lists is array (Integer range <>) of Integer_List;
 
    procedure Check_Lengths (Routine_Name : String; L : Integer_List;
                             R            : Float_List);
