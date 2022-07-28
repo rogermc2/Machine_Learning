@@ -596,7 +596,7 @@ package body Label is
       Routine_Name :  constant String :=
                        "Label.Label_Binarize Integer_Matrix ";
       --        Num_Samples  : constant Positive := Y'Length;
-      Num_Classes  : constant Positive := Positive (Y'Length (2));
+      Num_Classes  : constant Positive := Y'Length (2);
       Y_Bool       : Boolean_Matrix (Y'Range, Y'Range (2))
         := (others => (others => False));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
