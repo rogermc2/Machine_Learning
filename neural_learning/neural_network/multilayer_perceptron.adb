@@ -894,17 +894,25 @@ package body Multilayer_Perceptron is
       Activations       : Activations_Array (X'Range);
    begin
       --  L160 Initialize first layer
-      --        Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 1);
       for row in X'Range loop
          for col in X'Range (2) loop
             Activations (row).Append (X (row, col));
          end loop;
       end loop;
+      Put_Line (Routine_Name & "L166 Activations");
+      for row in 1 .. 4 loop
+         for col in 1 .. 6 loop
+            Put (Float'Image (Activations (row).Element (col)));
+         end loop;
+         New_Line;
+      end loop;
 
       --  L167 Forward propagate
       --  python range(self.n_layers_ - 1) = 0 .. self.n_layers_ - 1
       for layer in 1 .. Num_Layers - 1 loop
---           Put_Line (Routine_Name & "layer:" & Integer'Image (layer));
+         Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
+         Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
+                                      To_Matrix (Activations), 1, 2);
          declare
             Params             : constant Parameters_Record :=
                                    Params_List (layer);
@@ -913,17 +921,16 @@ package body Multilayer_Perceptron is
             Updated_Activation : Real_Float_Matrix
               := Activations_Matrix * Params.Coeff_Gradients;
          begin
---              Put_Line (Routine_Name & "Activations_Matrix size:" &
---                          Integer'Image (Activations_Matrix'Length) & " x" &
---                          Integer'Image (Activations_Matrix'Length (2)));
---              Put_Line (Routine_Name & "Params.Coeff_Gradients size:" &
---                          Integer'Image (Params.Coeff_Gradients'Length) & " x" &
---                          Integer'Image (Params.Coeff_Gradients'Length (2)));
+            Printing.Print_Float_Matrix
+              (Routine_Name & "L167 Coeff_Gradients",
+               Params.Coeff_Gradients, 1, 2);
             Updated_Activation :=
               Updated_Activation + Params.Intercept_Grads;
             Put_Line (Routine_Name & "Updated_Activation size:" &
                         Integer'Image (Updated_Activation'Length) & " x" &
                         Integer'Image (Updated_Activation'Length (2)));
+            Printing.Print_Float_Matrix (Routine_Name & "L168 Updated_Activation",
+                                   Updated_Activation, 1, 2);
 
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -939,9 +946,6 @@ package body Multilayer_Perceptron is
          end;
       end loop;
 
---        Put_Line (Routine_Name & "Activations matrix size:" &
---                    Integer'Image (To_Matrix (Activations)'Length) & " x" &
---                    Integer'Image (To_Matrix (Activations)'Length (2)));
       Activ_Out := To_Matrix (Activations);
 
       --  L172
@@ -984,13 +988,13 @@ package body Multilayer_Perceptron is
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
             Params.Coeff_Gradients (f_in, f_out) :=
-              Init_Bound * abs (Random_Float);
+              Init_Bound * Random_Float;
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) := Init_Bound * abs (Random_Float);
+         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
       end loop;
 
       return Params;
