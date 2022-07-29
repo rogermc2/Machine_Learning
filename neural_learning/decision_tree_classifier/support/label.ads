@@ -23,6 +23,10 @@ package Label is
         Y_Kind    : Multiclass_Utils.Y_Type := Multiclass_Utils.Y_Unknown;
     end record;
 
+    type Multi_Label_Binarizer is record
+        Classes   : NL_Types.Integer_List;
+    end record;
+
     --  Label_Encoder should be used to encode target values,
     --  i.e. Y and not the input X.
     type Label_Encoder (Encoder_Kind : Class_Type; Num_Items : Positive) is
@@ -40,8 +44,7 @@ package Label is
     Label_Error : Exception;
 
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
-   procedure Fit (Binarizer : in out Label_Binarizer;
-                  Classes   : NL_Types.Integer_List);
+    procedure Fit (Binarizer : in out Multi_Label_Binarizer; Y : Integer_Array);
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
     procedure Fit (Binarizer : in out Label_Binarizer;
                   Y         : NL_Types.Array_Of_Integer_Lists);

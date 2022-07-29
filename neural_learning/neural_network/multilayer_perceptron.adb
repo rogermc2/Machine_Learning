@@ -1154,7 +1154,8 @@ package body Multilayer_Perceptron is
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
             Fit (Self.Attributes.Binarizer, Y);
          else
-            Fit (Self.Attributes.Binarizer, Classes);
+            Fit (Self.Attributes.Binarizer, Y);
+--              Fit (Self.Attributes.Binarizer, Classes);
          end if;
       end if;
 

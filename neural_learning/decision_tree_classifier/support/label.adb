@@ -96,23 +96,28 @@ package body Label is
    end Fit;
 
    --  -------------------------------------------------------------------------
-
-   procedure Fit (Binarizer : in out Label_Binarizer;
-                  Classes   : NL_Types.Integer_List) is
+   --  L740 Fit
+   procedure Fit (Binarizer : in out Multi_Label_Binarizer;
+                  Y : Integer_Array) is
       Routine_Name : constant String := "Label.Binarizer Fit Classes ";
+      Classes      : NL_Types.Integer_List;
       Duplicates   : Boolean := False;
    begin
       if Binarizer.Classes.Is_Empty then
-         null;
+         --  L758
+         Assert (False, Routine_Name &
+                      "empty classes not coded");
       else
+         --  L759
          for index in Classes.First_Index + 1 .. Classes.Last_Index loop
             Duplicates := Duplicates and Classes (index) in
               Classes.First_Index + index - 1 .. Classes.Last_Index;
             Assert (not Duplicates, Routine_Name &
                       "Classes contains duplicates.");
          end loop;
-
+             Classes := Binarizer.Classes;
       end if;
+
 --        Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
 --        Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
 
