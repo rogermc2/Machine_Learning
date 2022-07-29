@@ -48,8 +48,8 @@ package Label is
    procedure C_Init (MLB     : in out Multi_Label_Binarizer;
                      Classes : Integer_List := Integer_Package.Empty_Vector);
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
-   procedure Fit (Binarizer : in out Multi_Label_Binarizer; Y : Integer_Array);
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
+   procedure Fit (Binarizer : in out Multi_Label_Binarizer; Y : Integer_Matrix);
    procedure Fit (Binarizer : in out Label_Binarizer;
                   Y         : Array_Of_Integer_Lists);
    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);

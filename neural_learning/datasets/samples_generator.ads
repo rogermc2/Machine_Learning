@@ -1,7 +1,6 @@
 --  Based on scikit-learn/sklearn/datasets/samples_generator.py
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
 
 package Samples_Generator is
 
@@ -23,23 +22,6 @@ package Samples_Generator is
          when False => null;
       end case;
    end record;
-
-   function Make_Classification
-     (N_Samples            : Positive := 100;
-      N_Features           : Positive := 20;
-      N_Informative        : Positive := 20;
-      N_Redundant          : Positive := 20;
-      N_Repeated           : Natural := 0;
-      N_Classes            : Positive := 2;
-      N_Clusters_per_Class : Positive := 2;
-      Weights              : NL_Types.Float_List;
-      Flip_Y               : Float := 0.01;
-      Class_Sep            : Float := 1.0;
-      Hypercube            : Boolean := True;
-      Shift                : Float := 0.0;
-      Scale                : Float := 1.0;
-      Shuffle              : Boolean := True)
-      return Classification_Test_Data;
 
    function Make_Multilabel_Classification
      (N_Samples            : Positive := 100;

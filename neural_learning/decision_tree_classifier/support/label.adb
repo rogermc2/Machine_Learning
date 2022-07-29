@@ -115,14 +115,15 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L740 Fit
    procedure Fit (Binarizer : in out Multi_Label_Binarizer;
-                  Y : Integer_Array) is
-      Routine_Name : constant String := "Label.Binarizer Fit Classes ";
+                  Y : Integer_Matrix) is
+      Routine_Name : constant String :=
+                       "Label.Binarizer Fit Multi_Label_Binarizer ";
       Classes      : NL_Types.Integer_List;
       Duplicates   : Boolean := False;
    begin
       if Binarizer.Classes.Is_Empty then
          --  L758
-         Assert (False, Routine_Name & "empty classes not coded");
+         Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
       else
          --  L759
          for index in Classes.First_Index + 1 .. Classes.Last_Index loop
@@ -134,8 +135,7 @@ package body Label is
              Classes := Binarizer.Classes;
       end if;
 
---        Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
---        Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+      Binarizer.Classes := Classes;
 
    end Fit;
 

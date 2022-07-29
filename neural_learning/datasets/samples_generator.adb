@@ -7,60 +7,10 @@ with Maths;
 
 with Classifier_Utilities;
 with Label;
+with NL_Types;
 --  with Printing;
 
 package body Samples_Generator is
-
-   function Make_Classification
-     (N_Samples            : Positive := 100;
-      N_Features           : Positive := 20;
-      N_Informative        : Positive := 20;
-      N_Redundant          : Positive := 20;
-      N_Repeated           : Natural := 0;
-      N_Classes            : Positive := 2;
-      N_Clusters_Per_Class : Positive := 2;
-      Weights              : NL_Types.Float_List;
-      Flip_Y               : Float := 0.01;
-      Class_Sep            : Float := 1.0;
-      Hypercube            : Boolean := True;
-      Shift                : Float := 0.0;
-      Scale                : Float := 1.0;
-      Shuffle              : Boolean := True)
-      return Classification_Test_Data is
-      Routine_Name          : constant String :=
-                                "Samples_Generator.Make_Classification ";
-      Data                  : Classification_Test_Data (N_Samples, N_Features,
-                                                        N_Classes, False);
-      N_Useless             : constant Integer := N_Features - N_Informative -
-                                N_Redundant - N_Repeated;
-      N_Clusters            : constant Integer :=
-                                N_Classes * N_Clusters_Per_Class;
-      N_Samples_Per_Cluster : Integer_Array (1 .. N_Clusters);
-      L_Weights             : NL_Types.Float_List := Weights;
-   begin
-      Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
-              Routine_Name & "the number of informative, redundant and " &
-                "repeated features must be less than the totalnumber of features");
-      if not L_Weights.Is_Empty then
-         if Integer (L_Weights.Length) = N_Classes - 1 then
-            Put_Line (Routine_Name & "weights not coded");
-         end if;
-      else
-         for index in 1 .. N_Classes loop
-            L_Weights.Append (1.0 / Float (N_Classes));
-         end loop;
-      end if;
-
-      --  Distribute samples among clusters by weight
-      for index in 1 .. N_Clusters loop
-         N_Samples_Per_Cluster (index) := Integer
-           (Float (N_Samples) * Weights (index mod N_Classes) /
-                Float (N_Clusters_Per_Class));
-      end loop;
-
-      return Data;
-
-   end Make_Classification;
 
    --  -------------------------------------------------------------------------
 
