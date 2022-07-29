@@ -848,8 +848,8 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       use Parameters_Package;
       type Activations_Array is array (Integer range <>) of Real_Float_List;
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Forward_Pass_Fast ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
                                        return Activations_Array is
@@ -921,9 +921,9 @@ package body Multilayer_Perceptron is
 --                          Integer'Image (Params.Coeff_Gradients'Length (2)));
             Updated_Activation :=
               Updated_Activation + Params.Intercept_Grads;
---              Put_Line (Routine_Name & "Updated_Activation size:" &
---                          Integer'Image (Updated_Activation'Length) & " x" &
---                          Integer'Image (Updated_Activation'Length (2)));
+            Put_Line (Routine_Name & "Updated_Activation size:" &
+                        Integer'Image (Updated_Activation'Length) & " x" &
+                        Integer'Image (Updated_Activation'Length (2)));
 
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -945,8 +945,8 @@ package body Multilayer_Perceptron is
       Activ_Out := To_Matrix (Activations);
 
       --  L172
---        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
---                                     Activ_Out, 1, 2);
+      Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
+                                   Activ_Out, 1, 4);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation => Logistic (Activ_Out);
@@ -955,7 +955,7 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
-      --        Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 2);
+     Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 4);
       return Activ_Out;
 
    end Forward_Pass_Fast;
