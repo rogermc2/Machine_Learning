@@ -46,6 +46,23 @@ package body Label is
    --        Ind_Ptr : Integer_Array (1 .. IP_Length);
    --     end record;
 
+   procedure C_Init (LB : in out Label_Binarizer; Neg_Label : Float := 0.0;
+                     Pos_Label : Float := 1.0) is
+   begin
+      LB.Neg_Label := Neg_Label;
+      LB.Pos_Label := Pos_Label;
+
+   end C_Init;
+
+   --  -------------------------------------------------------------------------
+
+   procedure C_Init (MLB : in out Multi_Label_Binarizer;
+                     Classes : Integer_List := Integer_Package.Empty_Vector) is
+   begin
+      MLB.Classes := Classes;
+
+   end C_Init;
+
    --  -------------------------------------------------------------------------
 
    --     function Cum_Sum (A : Boolean_Array) return Integer_Array is
@@ -105,8 +122,7 @@ package body Label is
    begin
       if Binarizer.Classes.Is_Empty then
          --  L758
-         Assert (False, Routine_Name &
-                      "empty classes not coded");
+         Assert (False, Routine_Name & "empty classes not coded");
       else
          --  L759
          for index in Classes.First_Index + 1 .. Classes.Last_Index loop
@@ -235,9 +251,8 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    --  L586 Multiclass uses the maximal score instead of a threshold.
-   function Inverse_Binarize_Multiclass (Y       : Real_Float_Matrix;
-                                         Classes : NL_Types.Integer_List)
-                                         return Binary_Matrix is
+   function Inverse_Binarize_Multiclass
+     (Y : Real_Float_Matrix; Classes : Integer_List) return Binary_Matrix is
       use Classifier_Utilities;
       --        Routine_Name :  constant String :=
       --                         "Label.Inverse_Binarize_Multiclass ";
@@ -258,7 +273,7 @@ package body Label is
 
    function Inverse_Binarize_Thresholding
      (Y       : Real_Float_Matrix; Output_Type : Multiclass_Utils.Y_Type;
-      Classes : NL_Types.Integer_List; Threshold : Float)
+      Classes : Integer_List; Threshold : Float)
       return Binary_Matrix is
       use Ada.Containers;
       use Multiclass_Utils;
@@ -392,7 +407,6 @@ package body Label is
    --   Inverse_Transform transforms labels back to original encoding
    function Inverse_Transform (Self : Label_Encoder; Labels : Natural_Array)
                                return Integer_Array is
-      use NL_Types;
       Routine_Name :  constant String := "Label.Inverse_Transform ";
       aRange       : Integer_Array (1 .. Positive (Self.Uniques'Length));
       Diff         : Natural_List;
@@ -421,7 +435,7 @@ package body Label is
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
                                return Integer_Array is
       aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
-      Diff    : NL_Types.Natural_List;
+      Diff    : Natural_List;
       Result  : Integer_Array (1 .. Positive (Y'Length));
    begin
       for index in Self.Classes'Range loop
@@ -443,7 +457,6 @@ package body Label is
 
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                return Integer_Matrix is
-      use NL_Types;
       YT        : constant Integer_Matrix := Transpose (Y);
       aRange    : Integer_Array (1 .. Y'Length);
       Diff      : Natural_List;
@@ -528,7 +541,7 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  L416
-   function Label_Binarize (Y, Classes : NL_Types.Integer_List;
+   function Label_Binarize (Y, Classes : Integer_List;
                             Neg_Label  : Integer := 0) return Boolean_Matrix is
       use Ada.Containers;
       use Multiclass_Utils;
@@ -538,10 +551,10 @@ package body Label is
                                      1 .. Positive (Classes.Length))
         := (others => (others => False));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : NL_Types.Integer_List;
+      Sorted       : Integer_List;
       Done         : Boolean := False;
 
-      function Binarize (Y_In : NL_Types.Integer_List)
+      function Binarize (Y_In : Integer_List)
                          return Boolean_Matrix is
          Result : Boolean_Matrix
            (1 .. Positive (Y_In.Length), 1 .. Positive (Classes.Length))
@@ -615,7 +628,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Integer_Matrix;
-                            Classes   : NL_Types.Integer_List;
+                            Classes   : Integer_List;
                             Neg_Label : Integer := 0) return Boolean_Matrix is
       --        use Ada.Containers;
       use Multiclass_Utils;
@@ -625,7 +638,7 @@ package body Label is
       Y_Bool       : Boolean_Matrix (Y'Range, Y'Range (2))
         := (others => (others => False));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : NL_Types.Integer_List;
+      Sorted       : Integer_List;
       Done         : Boolean := False;
 
       function Binarize (Y_In : Integer_Matrix) return Boolean_Matrix is
@@ -723,7 +736,7 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Transform (Self : Label_Binarizer; Y : NL_Types.Integer_List)
+   function Transform (Self : Label_Binarizer; Y : Integer_List)
                        return Boolean_Matrix is
       --  Routine_Name : constant String := "Label.Transform Binarize ";
    begin
@@ -734,9 +747,8 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Transform (Self : Label_Binarizer; Y : NL_Types.Array_Of_Integer_Lists)
+   function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
                        return Binary_Matrix is
-      use NL_Types;
       use Integer_Package;
       Routine_Name  : constant String := "Label.Transform Array_Of_Integer_Lists ";
       Y_Row         : Integer_List;
@@ -783,9 +795,8 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform
-     (Self : Label_Binarizer; Y : NL_Types.Array_Of_Integer_Lists)
+     (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
       return Boolean_Matrix is
-      use NL_Types;
       use Integer_Package;
       Routine_Name  : constant String := "Label.Transform Array_Of_Integer_Lists ";
       Y_Row         : Integer_List;
