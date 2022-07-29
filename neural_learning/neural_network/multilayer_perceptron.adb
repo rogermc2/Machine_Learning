@@ -910,9 +910,9 @@ package body Multilayer_Perceptron is
       --  L167 Forward propagate
       --  python range(self.n_layers_ - 1) = 0 .. self.n_layers_ - 1
       for layer in 1 .. Num_Layers - 1 loop
-         Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
-         Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
-                                      To_Matrix (Activations), 1, 2);
+--           Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
+--           Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
+--                                        To_Matrix (Activations), 1, 2);
          declare
             Params             : constant Parameters_Record :=
                                    Params_List (layer);

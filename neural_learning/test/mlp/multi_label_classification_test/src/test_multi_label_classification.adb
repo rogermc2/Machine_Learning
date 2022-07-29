@@ -46,7 +46,8 @@ begin
    end loop;
 
 --     for test_num in 1 .. 100 loop
-   for test_num in 1 .. 1 loop
+   for test_num in 1 .. 1
+   loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));
       Partial_Fit (aClassifier, Test_X, To_Integer_Matrix (Test_Y), Classes);
       Put_Line (Routine_Name & "Score" &
