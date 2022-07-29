@@ -7,7 +7,7 @@ package Samples_Generator is
 
    type Return_Indicator_Type is (RI_Dense);
 
-   type Classification_Data
+   type Classification_Test_Data
      (N_Samples, N_Features, N_Classes  : Positive;
       Distributions                     : Boolean)
    is record
@@ -39,7 +39,7 @@ package Samples_Generator is
       Shift                : Float := 0.0;
       Scale                : Float := 1.0;
       Shuffle              : Boolean := True)
-      return Classification_Data;
+      return Classification_Test_Data;
 
    function Make_Multilabel_Classification
      (N_Samples            : Positive := 100;
@@ -51,6 +51,6 @@ package Samples_Generator is
       --         Sparse : Boolean := False;
       --         Return_Indicator : Return_Indicator_Type := RI_Dense;
       Return_Distributions : Boolean := False)
-      return Classification_Data;
+      return Classification_Test_Data;
 
 end Samples_Generator;

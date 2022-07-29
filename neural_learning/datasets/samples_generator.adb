@@ -26,11 +26,11 @@ package body Samples_Generator is
       Shift                : Float := 0.0;
       Scale                : Float := 1.0;
       Shuffle              : Boolean := True)
-      return Classification_Data is
+      return Classification_Test_Data is
       Routine_Name          : constant String :=
                                 "Samples_Generator.Make_Classification ";
-      Data                  : Classification_Data (N_Samples, N_Features,
-                                                   N_Classes, False);
+      Data                  : Classification_Test_Data (N_Samples, N_Features,
+                                                        N_Classes, False);
       N_Useless             : constant Integer := N_Features - N_Informative -
                                 N_Redundant - N_Repeated;
       N_Clusters            : constant Integer :=
@@ -48,14 +48,14 @@ package body Samples_Generator is
       else
          for index in 1 .. N_Classes loop
             L_Weights.Append (1.0 / Float (N_Classes));
-           end loop;
+         end loop;
       end if;
 
       --  Distribute samples among clusters by weight
       for index in 1 .. N_Clusters loop
          N_Samples_Per_Cluster (index) := Integer
            (Float (N_Samples) * Weights (index mod N_Classes) /
-           Float (N_Clusters_Per_Class));
+                Float (N_Clusters_Per_Class));
       end loop;
 
       return Data;
@@ -98,7 +98,8 @@ package body Samples_Generator is
       --  If Return_Distributions is True then return the prior class
       --  probability and conditional probabilities of features given classes
       --  from which the data was drawn
-      Return_Distributions : Boolean := False) return Classification_Data is
+      Return_Distributions : Boolean := False)
+      return Classification_Test_Data is
       use NL_Types;
       Routine_Name : constant String :=
                        "Samples_Generator.Make_Multilabel_Classification ";
@@ -253,7 +254,7 @@ package body Samples_Generator is
       P_W_C          : Real_Float_Matrix (1 .. N_Features, 1 .. N_Classes);
       X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
         := (others => (others => 0.0));
-      Classification : Classification_Data
+      Classification : Classification_Test_Data
         (N_Samples, N_Features, N_Classes, Return_Distributions);
       LB             : Label.Label_Binarizer;
       Y              : Array_Of_Integer_Lists (1 .. N_Samples);

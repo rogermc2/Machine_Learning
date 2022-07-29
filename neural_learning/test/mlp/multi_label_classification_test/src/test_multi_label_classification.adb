@@ -7,16 +7,16 @@ with base;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
---  with Printing;
+with Printing;
 with Samples_Generator; use Samples_Generator;
 with Stochastic_Optimizers; use Stochastic_Optimizers;
 
 procedure Test_Multi_Label_Classification is
 
    Routine_Name        : constant String := "Test_Multi_Label_Classification ";
-   Test_Classification : constant Multilabel_Classification :=
+   Test_Classification : constant Classification_Test_Data :=
                            Make_Multilabel_Classification (N_Samples => 50);
-   --  Default Multilabel_Classification parameters:
+   --  Default Classification_Test_Data parameters:
    --  N_Features: 20;
    --  N_Classes:  5;
    --  N_Labels:   2;
@@ -38,6 +38,7 @@ begin
              & " x" & Integer'Image (Test_X'Length (2)));
    Put_Line (Routine_Name & "Test_Y size" & Integer'Image (Test_Y'Length)
              & " x" & Integer'Image (Test_Y'Length (2)));
+   Printing.Print_Binary_Matrix (Routine_Name & "Test_Y", Test_Y, 1, 6);
 
    --  L393
    for count in 0 .. 4 loop
