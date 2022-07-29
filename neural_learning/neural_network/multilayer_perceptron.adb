@@ -1140,15 +1140,22 @@ package body Multilayer_Perceptron is
    end Partial_Fit;
 
    --  -------------------------------------------------------------------------
-   --  L1186
+   --  L1186  Partial_Fit updates the model with one iteration over the data
    procedure  Partial_Fit
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
       Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
       use Label;
+      use Multiclass_Utils;
+      LB : Label_Binarizer;
       --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
       if Check_Partial_Fit_First_Call (Self, Classes) then
-         Fit (Self.Attributes.Binarizer, Y);
+         Self.Attributes.Binarizer := LB;
+         if Type_Of_Target (Y) = Y_Multilabel_Indicator then
+            Fit (Self.Attributes.Binarizer, Y);
+         else
+            Fit (Self.Attributes.Binarizer, Classes);
+         end if;
       end if;
 
       Partial_Fit (Self, X, Y);

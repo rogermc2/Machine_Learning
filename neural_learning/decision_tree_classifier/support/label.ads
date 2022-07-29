@@ -40,8 +40,10 @@ package Label is
     Label_Error : Exception;
 
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
-    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
    procedure Fit (Binarizer : in out Label_Binarizer;
+                  Classes   : NL_Types.Integer_List);
+    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
+    procedure Fit (Binarizer : in out Label_Binarizer;
                   Y         : NL_Types.Array_Of_Integer_Lists);
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     function Fit_Transform (Binarizer : in out Label_Binarizer;
