@@ -238,10 +238,10 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Integer_Matrix) return Integer_Matrix is
-      List_Length  : constant Positive := Positive (aList'Length);
+   function Permute (aMatrix : Integer_Matrix) return Integer_Matrix is
+      List_Length  : constant Positive := Positive (aMatrix'Length);
       Rand         : Positive;
-      Permutation  : Integer_Matrix := aList;
+      Permutation  : Integer_Matrix := aMatrix;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -289,10 +289,10 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Real_Float_Matrix) return Real_Float_Matrix is
-      List_Length  : constant Positive := Positive (aList'Length);
+   function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix is
+      List_Length  : constant Positive := Positive (aMatrix'Length);
       Rand         : Positive;
-      Permutation  : Real_Float_Matrix := aList;
+      Permutation  : Real_Float_Matrix := aMatrix;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop

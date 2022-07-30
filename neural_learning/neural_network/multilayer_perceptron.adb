@@ -40,6 +40,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
+with Utilities;
 
 --  with Base;
 --  with Data_Splitter;
@@ -155,7 +156,7 @@ package body Multilayer_Perceptron is
       Sum_Sq_Coeffs      : Float;
    begin
       --  Printing.Print_Float_Matrix (Routine_Name & "L284 Activations last",
-      --                               Activations.Last_Element);
+      --           Activations.Last_Element);
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
@@ -214,7 +215,7 @@ package body Multilayer_Perceptron is
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       --        Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
-      --                                     Activations.Last_Element, 1, 2);
+      --                 Activations.Last_Element, 1, 2);
       --        Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
       Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
               Routine_Name & "L301 last Activations item width" &
@@ -364,7 +365,7 @@ package body Multilayer_Perceptron is
       Classifier.Parameters.N_Iter_No_Change    := N_Iter_No_Change;
       Classifier.Parameters.Max_Fun             := Max_Fun;
       Classifier.Parameters.RF_Fun              := RF_Fun;
-      First_Pass                                := True;
+      First_Pass            := True;
       return Classifier;
 
    end C_Init;
@@ -389,7 +390,7 @@ package body Multilayer_Perceptron is
       --        use Ada.Containers;
       use Real_Float_Arrays;
       --        Routine_Name        : constant String :=
-      --                                "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      --            "Multilayer_Perceptron.Compute_Loss_Gradient ";
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  An activation converts the output from a layer into a form that is
@@ -409,21 +410,21 @@ package body Multilayer_Perceptron is
            Self.Attributes.Params (layer).Coeff_Gradients) /
           Float (Num_Samples);
       --        Put_Line (Routine_Name & "Deltas length" &
-      --                    Count_Type'Image (Deltas.Length));
+      --  Count_Type'Image (Deltas.Length));
       --        Put_Line (Routine_Name & "New_Coeff_Gradients size" &
-      --                    Integer'Image (New_Coeff_Gradients'Length) & " x" &
-      --                    Integer'Image (New_Coeff_Gradients'Length (2)));
+      --  Integer'Image (New_Coeff_Gradients'Length) & " x" &
+      --  Integer'Image (New_Coeff_Gradients'Length (2)));
       --        Put_Line (Routine_Name & "Activations size" &
-      --                    Integer'Image (Activations.Element (layer)'Length) &
-      --                    " x" &
-      --                    Integer'Image (Activations.Element (layer)'Length (2)));
+      --  Integer'Image (Activations.Element (layer)'Length) &
+      --" x" &
+      --  Integer'Image (Activations.Element (layer)'Length (2)));
       --        Put_Line (Routine_Name & "Deltas size" &
-      --                    Integer'Image (Deltas.Element (layer)'Length) & " x" &
-      --                    Integer'Image (Deltas.Element (layer)'Length (2)));
+      --  Integer'Image (Deltas.Element (layer)'Length) & " x" &
+      --  Integer'Image (Deltas.Element (layer)'Length (2)));
       --        Put_Line (Routine_Name & "New_Intercept_Grads length" &
-      --                    Integer'Image (New_Intercept_Grads'Length));
+      --  Integer'Image (New_Intercept_Grads'Length));
       --        Put_Line (Routine_Name & "New_Gradients.Intercept_Grads length" &
-      --                    Integer'Image (New_Gradients.Intercept_Grads'Length));
+      --  Integer'Image (New_Gradients.Intercept_Grads'Length));
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
       Gradients.Prepend (New_Gradients);
@@ -450,7 +451,7 @@ package body Multilayer_Perceptron is
       --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
       --  Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
       Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
-             "Hidden_Layer_Sizes is empty");
+                "Hidden_Layer_Sizes is empty");
       --  L385
       Validate_Hyperparameters (Self);
       First_Pass :=
@@ -509,8 +510,8 @@ package body Multilayer_Perceptron is
       --        N_Fan_In     : Positive;
       --        N_Fan_Out    : Positive;
       --        Options      : constant Opt_Minimise.Minimise_Options :=
-      --                         (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
-      --                          Self.Parameters.Tol, 20);
+      --     (Self.Parameters.Max_Fun, Self.Parameters.Max_Iter,
+      --      Self.Parameters.Tol, 20);
       Grads        : constant Parameters_List := Self.Attributes.Params;
       --  Opt_Result is the optimization result represented as a Optimise_Result
       --  record.
@@ -541,7 +542,7 @@ package body Multilayer_Perceptron is
       --           N_Fan_Out := Layer_Units.Element (index + 1);
       --           Last := Start + N_Fan_In * N_Fan_Out;
       --           Self.Attributes.Coef_Indptr.Append ((Start, Last,
-      --                                               N_Fan_In, N_Fan_Out));
+      --       N_Fan_In, N_Fan_Out));
       --           Start := Last + 1;
       --        end loop;
       --
@@ -589,42 +590,26 @@ package body Multilayer_Perceptron is
                              Y           : Boolean_Matrix;
                              Incremental : Boolean := False) is
       --        use Estimator;
-      Routine_Name                       : constant String :=
-                                             "Multilayer_Perceptron.Fit_Stochastic ";
-      --        Is_Classifier                      : constant Boolean :=
-      --                                               Self.Estimator_Kind = Classifier_Estimator;
-      Num_Samples                        : constant Positive := Positive (X'Length);
-      --        Num_Features                       : constant Positive := Positive (X'Length (2));
-      --        Num_Classes                        : constant Positive :=
-      --                                               Positive (Self.Attributes.Classes.Length);
-      --        LE_U                               : Label.Label_Binarizer;
-      Iter                               : Natural := 0;
-      Continue                           : Boolean := True;
-      Early_Stopping                     : constant Boolean
-        := Self.Parameters.Early_Stopping and
-      then not Incremental;
-      --  Test_Size                          : constant Natural
-      --    := Natural (Self.Parameters.Validation_Fraction *
-      --                  Float (Num_Samples));
-      --        Train_Size                         : constant Positive := Num_Samples - Test_Size;
-      --          Stratify               : Boolean_Matrix (Y'Range, Y'Range (2));
-      --          Should_Stratify        : Boolean;
-      --        Train_X                            : Real_Float_Matrix
-      --          (1 .. Train_Size, 1 .. Num_Features);
-      --        Train_Y                            : Integer_Matrix
-      --          (1 .. Train_Size, 1 .. Num_Classes);
-      --        Test_X                             : Real_Float_Matrix
-      --          (1 .. Test_Size, 1 .. Num_Features);
-      --        Test_Y                             : Integer_Matrix
-      --          (1 .. Test_Size, 1 .. Num_Classes);
-      --        Val_Y                              : Real_Float_Matrix
-      --          (1 .. Test_Size, 1 .. Num_Classes) := (others => (others => 0.0));
-      Batch_Size                         : Positive;
-      Batches                            : Slices_List;
-      Accumulated_Loss                   : Float := 0.0;
-      Msg                                : Unbounded_String;
-      Is_Stopping                        : Boolean := False;
+      Routine_Name     : constant String :=
+                           "Multilayer_Perceptron.Fit_Stochastic ";
+      --        Is_Classifier  : constant Boolean :=
+      --       Self.Estimator_Kind = Classifier_Estimator;
+      Num_Samples      : constant Positive := Positive (X'Length);
+      --        Num_Features   : constant Positive := Positive (X'Length (2));
+      --        Num_Classes    : constant Positive :=
+      --       Positive (Self.Attributes.Classes.Length);
+      --        LE_U           : Label.Label_Binarizer;
+      Iter             : Natural := 0;
+      Continue         : Boolean := True;
+      Early_Stopping   : Boolean := Self.Parameters.Early_Stopping;
+      Batch_Size       : Positive;
+      Batches          : Slices_List;
+      Sample_Index     : Integer_Array (1 .. Num_Samples);
+      Accumulated_Loss : Float := 0.0;
+      Msg              : Unbounded_String;
+      Is_Stopping      : Boolean := False;
    begin
+      Early_Stopping := Early_Stopping and then not Incremental;
       --  L576
       if not Incremental or else
         Self.Attributes.Optimizer.Kind = No_Optimizer then
@@ -651,7 +636,10 @@ package body Multilayer_Perceptron is
       end if;
 
       Put_Line (Routine_Name & "L617 Optimizer.Kind: " &
-               Optimizer_Type'Image (Self.Attributes.Optimizer.Kind));
+                  Optimizer_Type'Image (Self.Attributes.Optimizer.Kind));
+      for index in Sample_Index'Range loop
+         Sample_Index (index) := index;
+      end loop;
       --  L617
       Batch_Size := Self.Parameters.Batch_Size;
       if Batch_Size = 0 then
@@ -669,13 +657,15 @@ package body Multilayer_Perceptron is
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
          if Self.Parameters.Shuffle then
-            null;
+            Utilities.Permute (Sample_Index);
+            Assert (False, Routine_Name & "L629  Shuffle not coded!");
          end if;
 
          Accumulated_Loss := 0.0;
          --  L636
          for batch_index in Batches.First_Index ..
            Batches.Last_Index loop
+            --  L649
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
                            Accumulated_Loss);
          end loop;
@@ -801,7 +791,7 @@ package body Multilayer_Perceptron is
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
                --                 Put_Line (Routine_Name & "L134 hidden activation function "
-               --                           & Activation_Type'Image (Hidden_Activation));
+               --       & Activation_Type'Image (Hidden_Activation));
                case Hidden_Activation is
                   when Identity_Activation => null;
                   when Logistic_Activation =>
@@ -815,8 +805,8 @@ package body Multilayer_Perceptron is
                end case;
                --                 Printing.Print_Float_Matrix
                --                   (Routine_Name & "L134 layer" &
-               --                      Integer'Image (Activations.Last_Index)
-               --                    & " Activations (last)", Activations.Last_Element);
+               --  Integer'Image (Activations.Last_Index)
+               --& " Activations (last)", Activations.Last_Element);
             end if;
          end;  --  declare
          --           Printing.Print_Float_Matrix
@@ -827,7 +817,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       --        Printing.Print_Float_Matrix (Routine_Name & "L138 Activations last",
-      --                                     Activations.Last_Element);
+      --                 Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
@@ -841,7 +831,7 @@ package body Multilayer_Perceptron is
       end case;
 
       --        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
-      --                                     Activations.Last_Element);
+      --                 Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
@@ -915,9 +905,9 @@ package body Multilayer_Perceptron is
       --  L167 Forward propagate
       --  python range(self.n_layers_ - 1) = 0 .. self.n_layers_ - 1
       for layer in 1 .. Num_Layers - 1 loop
-         --           Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
-         --           Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
-         --                                        To_Matrix (Activations), 1, 2);
+         --  Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
+         --  Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
+         --           To_Matrix (Activations), 1, 2);
          declare
             Params             : constant Parameters_Record :=
                                    Params_List (layer);
@@ -1153,7 +1143,7 @@ package body Multilayer_Perceptron is
       Y       : Integer_Matrix; Classes : Integer_List) is
       use Label;
       use Multiclass_Utils;
-      LB : Label_Binarizer;
+      LB           : Label_Binarizer;
       Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
       --
@@ -1163,7 +1153,7 @@ package body Multilayer_Perceptron is
             Fit (Self.Attributes.Binarizer, Y);
          else
             Assert (False, Routine_Name & "not Y_Multilabel_Indicator not coded");
---              Fit (Self.Attributes.Binarizer, Classes);
+            --              Fit (Self.Attributes.Binarizer, Classes);
          end if;
       end if;
 
@@ -1196,7 +1186,7 @@ package body Multilayer_Perceptron is
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
       --        Routine_Name   : constant String :=
-      --                                 "Multilayer_Perceptron.Process_Batch ";
+      --             "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
@@ -1215,6 +1205,7 @@ package body Multilayer_Perceptron is
          for col in 1 .. Num_Features loop
             X_Batch (Batch_Row, col) := X (row, col);
          end loop;
+
          for col in Y'Range (2) loop
             Y_Batch (Batch_Row, col) := Y (row, col);
          end loop;
@@ -1255,13 +1246,13 @@ package body Multilayer_Perceptron is
       --  L311
       Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                 Transpose (Params.Coeff_Gradients));
-      --        Put_Line (Routine_Name & "Activations size" &
-      --                    Integer'Image (Activations.Element (layer)'Length) &
-      --                    " x" &
-      --                    Integer'Image (Activations.Element (layer)'Length (2)));
-      --        Put_Line (Routine_Name & "Deltas size" &
-      --                    Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
-      --                    Integer'Image (Deltas.Element (layer - 1)'Length (2)));
+      --  Put_Line (Routine_Name & "Activations size" &
+      --  Integer'Image (Activations.Element (layer)'Length) &
+      --  " x" &
+      --  Integer'Image (Activations.Element (layer)'Length (2)));
+      --  Put_Line (Routine_Name & "Deltas size" &
+      --  Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
+      --  Integer'Image (Deltas.Element (layer - 1)'Length (2)));
       --  Put_Line (Routine_Name & "L312 Activation_Type " &
       --              Activation_Type'Image (Self.Parameters.Activation));
       --  L312
@@ -1301,7 +1292,7 @@ package body Multilayer_Perceptron is
    --           Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
    --           if Self.Parameters.Verbose then
    --              Put_Line (Routine_Name & "Validation score: " &
-   --                          Float'Image (Last_Valid_Score));
+   --      Float'Image (Last_Valid_Score));
    --           end if;
    --
    --           --  L728
@@ -1362,7 +1353,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L455
    procedure Validate_Hyperparameters (Self : MLP_Classifier) is
-      --                               Incremental, Reset : Boolean) is
+      --           Incremental, Reset : Boolean) is
       --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Hyperparameters ";
    begin
       null;
@@ -1380,9 +1371,9 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer;
    begin
-      --        Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
-      --                    Integer'Image (Y'Length (2)));
-      --        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
+      --  Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
+      --           Integer'Image (Y'Length (2)));
+      --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139

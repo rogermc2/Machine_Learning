@@ -46,11 +46,9 @@ package Utilities is
                                  return Class_Range;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
    procedure Permute (aList : in out Integer_Array);
-   function Permute (aList : Integer_Matrix) return Integer_Matrix;
-   pragma Inline (Permute);
+   function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
-   pragma Inline (Permute);
-   function Permute (aList : Real_Float_Matrix) return Real_Float_Matrix;
+   function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (Permute);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range);
