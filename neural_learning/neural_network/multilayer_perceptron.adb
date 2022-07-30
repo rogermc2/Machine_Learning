@@ -68,7 +68,7 @@ package body Multilayer_Perceptron is
                         Activations  : in out Real_Matrix_List);
    --  Deltas       : Real_Matrix_List;
    --  Grads        : in out Parameters_List;
-   --  Layer_Units  : NL_Types.Integer_List);
+   --  Layer_Units  : Integer_List);
    procedure Fit_Stochastic (Self         : in out MLP_Classifier;
                              X            : Real_Float_Matrix;
                              Y            : Boolean_Matrix;
@@ -76,15 +76,15 @@ package body Multilayer_Perceptron is
    procedure Forward_Pass (Self         : MLP_Classifier;
                            Activations  : in out Real_Matrix_List);
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                                return Real_Float_Matrix;
+                               return Real_Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : NL_Types.Integer_List);
+                         Layer_Units : Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Boolean_Matrix;
-                            Batch_Slice      : NL_Types.Slice_Record;
+                            Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float);
    procedure Update_No_Improvement_Count
@@ -248,9 +248,9 @@ package body Multilayer_Perceptron is
    --  call to partial_fit on clf in which case the classes attribute
    --  is also set on clf.
    function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
-                                          Classes : NL_Types.Integer_List)
-                                           return Boolean is
-      use NL_Types.Integer_Package;
+                                          Classes : Integer_List)
+                                          return Boolean is
+      use Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
       Result       : Boolean := False;
@@ -307,8 +307,8 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1054
-   function C_Init (Hidden_Layer_Sizes  : NL_Types.Integer_List :=
-                      NL_Types.Integer_Package.Empty_Vector;
+   function C_Init (Hidden_Layer_Sizes  : Integer_List :=
+                      Integer_Package.Empty_Vector;
                     Activation          : Base_Neural.Activation_Type :=
                       Base_Neural.Rect_LU_Activation;
                     Solver              : Solver_Type := Adam_Solver;
@@ -336,7 +336,7 @@ package body Multilayer_Perceptron is
                     Max_Fun             : Max_Function_Access := null;
                     RF_Fun              : Num_Diff.Deriv_Float_Fun_Access
                     := null)
-                     return MLP_Classifier is
+                    return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
       Classifier.Parameters.Hidden_Layer_Sizes  := Hidden_Layer_Sizes;
@@ -438,12 +438,12 @@ package body Multilayer_Perceptron is
       use Ada.Containers;
       Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
       Num_Features       : constant Positive := Positive (X'Length (2));
-      Hidden_Layer_Sizes : constant NL_Types.Integer_List :=
+      Hidden_Layer_Sizes : constant Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
       --  L394
       Y_Bin              : constant Boolean_Matrix :=
                              Validate_Input (Self, Y, Incremental);
-      Layer_Units        : NL_Types.Integer_List;
+      Layer_Units        : Integer_List;
       Activations        : Real_Matrix_List;
    begin
       --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
@@ -498,7 +498,7 @@ package body Multilayer_Perceptron is
                         Activations     : in out Real_Matrix_List) is
       --  Deltas          : in out Real_Matrix_List;
       --  Grads           : in out Parameters_List;
-      --  Layer_Units     : NL_Types.Integer_List) is
+      --  Layer_Units     : Integer_List) is
       Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
       --        Num_Samples  : constant Positive := Positive (X'Length);
       --        Start        : Positive := 1;
@@ -617,7 +617,7 @@ package body Multilayer_Perceptron is
       --        Val_Y                              : Real_Float_Matrix
       --          (1 .. Test_Size, 1 .. Num_Classes) := (others => (others => 0.0));
       Batch_Size                         : Positive;
-      Batches                            : NL_Types.Slices_List;
+      Batches                            : Slices_List;
       Accumulated_Loss                   : Float := 0.0;
       Msg                                : Unbounded_String;
       Is_Stopping                        : Boolean := False;
@@ -842,7 +842,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L144
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                                return Real_Float_Matrix is
+                               return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       use Real_Float_Arrays;
@@ -852,7 +852,7 @@ package body Multilayer_Perceptron is
                        "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
-                                       return Activations_Array is
+                                     return Activations_Array is
          Result   : Activations_Array (Activations'Range);
       begin
          for row in Activations'Range loop
@@ -866,7 +866,7 @@ package body Multilayer_Perceptron is
       end To_Activations_Array;
 
       function To_Matrix (Activations : Activations_Array)
-                            return Real_Float_Matrix is
+                          return Real_Float_Matrix is
          Row_Data : Real_Float_List;
          Result   : Real_Float_Matrix (Activations'Range, 1 ..
                                          Integer (Activations (1).Length));
@@ -910,9 +910,9 @@ package body Multilayer_Perceptron is
       --  L167 Forward propagate
       --  python range(self.n_layers_ - 1) = 0 .. self.n_layers_ - 1
       for layer in 1 .. Num_Layers - 1 loop
---           Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
---           Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
---                                        To_Matrix (Activations), 1, 2);
+         --           Put_Line (Routine_Name & "L167 layer:" & Integer'Image (layer));
+         --           Printing.Print_Float_Matrix (Routine_Name & "L167 Activations",
+         --                                        To_Matrix (Activations), 1, 2);
          declare
             Params             : constant Parameters_Record :=
                                    Params_List (layer);
@@ -930,7 +930,7 @@ package body Multilayer_Perceptron is
                         Integer'Image (Updated_Activation'Length) & " x" &
                         Integer'Image (Updated_Activation'Length (2)));
             Printing.Print_Float_Matrix (Routine_Name & "L168 Updated_Activation",
-                                   Updated_Activation, 1, 2);
+                                         Updated_Activation, 1, 2);
 
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -959,7 +959,7 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
-     Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 4);
+      Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 4);
       return Activ_Out;
 
    end Forward_Pass_Fast;
@@ -1004,7 +1004,7 @@ package body Multilayer_Perceptron is
    --  ------------------------------------------------------------------------
    --  L320  BaseMultilayerPerceptron._initialize
    procedure Initialize (Self        : in out MLP_Classifier;
-                         Layer_Units : NL_Types.Integer_List) is
+                         Layer_Units : Integer_List) is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
@@ -1142,12 +1142,12 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1186  Partial_Fit updates the model with one iteration over the data
    procedure  Partial_Fit
-     (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-      Y    : Integer_Matrix; Classes : NL_Types.Integer_List) is
+     (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
+      Y       : Integer_Matrix; Classes : Integer_List) is
       use Label;
       use Multiclass_Utils;
       LB : Label_Binarizer;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
+      Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
       --
       if Check_Partial_Fit_First_Call (Self, Classes) then
@@ -1155,7 +1155,8 @@ package body Multilayer_Perceptron is
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
             Fit (Self.Attributes.Binarizer, Y);
          else
-            Fit (Self.Attributes.Binarizer, Classes);
+            Assert (False, Routine_Name & "not Y_Multilabel_Indicator not coded");
+--              Fit (Self.Attributes.Binarizer, Classes);
          end if;
       end if;
 
@@ -1166,7 +1167,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                      return Binary_Matrix is
+                     return Binary_Matrix is
       Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
@@ -1184,7 +1185,7 @@ package body Multilayer_Perceptron is
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Boolean_Matrix;
-                            Batch_Slice      : NL_Types.Slice_Record;
+                            Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
       --        Routine_Name   : constant String :=
@@ -1366,15 +1367,15 @@ package body Multilayer_Perceptron is
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Boolean_Matrix is
-      use NL_Types.Integer_Package;
+      use Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Validate_Input ";
-      Classes      : NL_Types.Integer_List;
+      Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer;
    begin
---        Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
---                    Integer'Image (Y'Length (2)));
---        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
+      --        Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
+      --                    Integer'Image (Y'Length (2)));
+      --        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
