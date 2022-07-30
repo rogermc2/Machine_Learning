@@ -126,7 +126,7 @@ package body Label is
          Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
       else
          --  L759
-         for index in Classes.First_Index + 1 .. Classes.Last_Index loop
+         for index in Classes.First_Index .. Classes.Last_Index - 1 loop
             Duplicates := Duplicates and Classes (index) in
               Classes.First_Index + index - 1 .. Classes.Last_Index;
             Assert (not Duplicates, Routine_Name &
