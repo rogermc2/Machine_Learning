@@ -4,6 +4,7 @@ with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
+with Ada.Numerics.Elementary_Functions;
 
 --  with Printing;
 
@@ -82,6 +83,19 @@ package body Stochastic_Optimizers is
 
    end "-";
    pragma Inline ("-");
+
+   --  ------------------------------------------------------------------------
+   --  Iteration_Ends perform updates to learning rate and potential other
+   --  states at the end of an iteration
+   procedure Iteration_Ends (Self      : in out SGD_Optimizer;
+                             Time_Step : Integer) is
+      use Ada.Numerics.Elementary_Functions;
+   begin
+      if Self.LR_Schedule = Invscaling_LR_Schedule then
+         Self.Learning_Rate := Self.Initial_Learning_Rate /
+            (Float(Time_Step + 1) ** Self.Power_T);
+      end if;
+   end Iteration_Ends;
 
    --  ------------------------------------------------------------------------
 

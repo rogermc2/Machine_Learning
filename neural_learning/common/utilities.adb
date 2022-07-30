@@ -584,6 +584,19 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
    --  Swap swaps matrix rows
+   procedure Swap (Data : in out Boolean_Matrix; L, R : Positive) is
+      Val : Boolean;
+   begin
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+   --  Swap swaps matrix rows
    procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive) is
       Val : Float;
    begin

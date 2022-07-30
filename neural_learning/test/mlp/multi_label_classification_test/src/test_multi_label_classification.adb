@@ -2,8 +2,8 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Base;
 with Base_Neural;
-with base;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
@@ -25,6 +25,7 @@ procedure Test_Multi_Label_Classification is
    Classes             : NL_Types.Integer_List;
    Layer_Sizes         : NL_Types.Integer_List;
    aClassifier         : MLP_Classifier;
+   Score               : Float;
 begin
    Put_Line (Routine_Name);
    Layer_Sizes.Append (50);
@@ -50,9 +51,8 @@ begin
    loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));
       Partial_Fit (aClassifier, Test_X, To_Integer_Matrix (Test_Y), Classes);
-      Put_Line (Routine_Name & "Score" &
-                  Float'Image (Base.Score (aClassifier, Test_X,
-                  To_Integer_Matrix (Test_Y))));
+      Score := Base.Score (aClassifier, Test_X, To_Integer_Matrix (Test_Y));
+      Put_Line (Routine_Name & "Score" & Float'Image (Score));
    end loop;
 
 end Test_Multi_Label_Classification;

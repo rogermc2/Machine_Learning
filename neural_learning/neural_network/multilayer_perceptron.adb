@@ -48,7 +48,7 @@ with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
-with Printing;
+--  with Printing;
 with Utils;
 with Utils_Optimise;
 
@@ -470,8 +470,8 @@ package body Multilayer_Perceptron is
          end loop;
       end if;
       Layer_Units.Append (Self.Attributes.N_Outputs);
-      Printing.Print_Integer_List (Routine_Name & "L409 Layer_Units",
-                                   Layer_Units);
+--        Printing.Print_Integer_List (Routine_Name & "L409 Layer_Units",
+--                                     Layer_Units);
       --  L409
       if First_Pass then
          Initialize (Self, Layer_Units);
@@ -604,7 +604,6 @@ package body Multilayer_Perceptron is
       Early_Stopping   : Boolean := Self.Parameters.Early_Stopping;
       Batch_Size       : Positive;
       Batches          : Slices_List;
-      Sample_Index     : Integer_Array (1 .. Num_Samples);
       Accumulated_Loss : Float := 0.0;
       Msg              : Unbounded_String;
       Is_Stopping      : Boolean := False;
@@ -635,11 +634,9 @@ package body Multilayer_Perceptron is
          --           end if;
       end if;
 
-      Put_Line (Routine_Name & "L617 Optimizer.Kind: " &
-                  Optimizer_Type'Image (Self.Attributes.Optimizer.Kind));
-      for index in Sample_Index'Range loop
-         Sample_Index (index) := index;
-      end loop;
+--        Put_Line (Routine_Name & "L617 Optimizer.Kind: " &
+--                    Optimizer_Type'Image (Self.Attributes.Optimizer.Kind));
+
       --  L617
       Batch_Size := Self.Parameters.Batch_Size;
       if Batch_Size = 0 then
@@ -654,13 +651,11 @@ package body Multilayer_Perceptron is
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
+      Put_Line (Routine_Name & "Max_Iter" &
+                  Integer'Image (Self.Parameters.Max_Iter));
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
-         if Self.Parameters.Shuffle then
-            Utilities.Permute (Sample_Index);
-            Assert (False, Routine_Name & "L629  Shuffle not coded!");
-         end if;
-
+         --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  L636
          for batch_index in Batches.First_Index ..
@@ -677,7 +672,8 @@ package body Multilayer_Perceptron is
          Self.Attributes.Loss_Curve.Append (Self.Attributes.Loss);
          --  L668
          if Self.Parameters.Verbose then
-            Put_Line ("Iteration" & Integer'Image (Self.Attributes.N_Iter) &
+            Put_Line (Routine_Name & "Iteration" &
+                        Integer'Image (Self.Attributes.N_Iter) &
                         ", loss = " & Float'Image (Self.Attributes.Loss));
          end if;
 
@@ -686,7 +682,7 @@ package body Multilayer_Perceptron is
          Update_No_Improvement_Count (Self);
          --  for learning rate that needs to be updated at iteration end;
          if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
-            null;
+            Iteration_Ends (Self.Attributes.Optimizer.SGD, Self.Attributes.T);
          end if;
 
          --  676
@@ -713,8 +709,7 @@ package body Multilayer_Perceptron is
             end if;
          end if;
 
-         Continue := Continue and not Incremental;
-         if Continue and
+         if not Incremental and
            Self.Attributes.N_Iter = Self.Parameters.Max_Iter then
             Put_Line ("    Maximum iterations (" &
                         Integer'Image (Self.Parameters.Max_Iter) &
@@ -843,8 +838,8 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       use Parameters_Package;
       type Activations_Array is array (Integer range <>) of Real_Float_List;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Forward_Pass_Fast ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
                                      return Activations_Array is
@@ -894,7 +889,7 @@ package body Multilayer_Perceptron is
             Activations (row).Append (X (row, col));
          end loop;
       end loop;
-      Put_Line (Routine_Name & "L166 Activations");
+
       for row in 1 .. 4 loop
          for col in 1 .. 6 loop
             Put (Float'Image (Activations (row).Element (col)));
@@ -916,16 +911,16 @@ package body Multilayer_Perceptron is
             Updated_Activation : Real_Float_Matrix
               := Activations_Matrix * Params.Coeff_Gradients;
          begin
-            Printing.Print_Float_Matrix
-              (Routine_Name & "L167 Coeff_Gradients",
-               Params.Coeff_Gradients, 1, 2);
+--              Printing.Print_Float_Matrix
+--                (Routine_Name & "L167 Coeff_Gradients",
+--                 Params.Coeff_Gradients, 1, 2);
             Updated_Activation :=
               Updated_Activation + Params.Intercept_Grads;
-            Put_Line (Routine_Name & "Updated_Activation size:" &
-                        Integer'Image (Updated_Activation'Length) & " x" &
-                        Integer'Image (Updated_Activation'Length (2)));
-            Printing.Print_Float_Matrix (Routine_Name & "L168 Updated_Activation",
-                                         Updated_Activation, 1, 2);
+--              Put_Line (Routine_Name & "Updated_Activation size:" &
+--                          Integer'Image (Updated_Activation'Length) & " x" &
+--                          Integer'Image (Updated_Activation'Length (2)));
+--              Printing.Print_Float_Matrix (Routine_Name & "L168 Updated_Activation",
+--                                           Updated_Activation, 1, 2);
 
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -944,8 +939,8 @@ package body Multilayer_Perceptron is
       Activ_Out := To_Matrix (Activations);
 
       --  L172
-      Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
-                                   Activ_Out, 1, 4);
+--        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
+--                                     Activ_Out, 1, 4);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation => Logistic (Activ_Out);
@@ -954,7 +949,7 @@ package body Multilayer_Perceptron is
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
-      Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 4);
+--        Printing.Print_Float_Matrix (Routine_Name & "Activ_Out", Activ_Out, 1, 4);
       return Activ_Out;
 
    end Forward_Pass_Fast;
@@ -1003,7 +998,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
-      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -1047,7 +1042,7 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
-      Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
+--        Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
 
    end Initialize;
 
@@ -1162,17 +1157,35 @@ package body Multilayer_Perceptron is
    end Partial_Fit;
 
    --  -------------------------------------------------------------------------
+
+   procedure Permute (X : in out Real_Float_Matrix;
+                      Y : in out Boolean_Matrix) is
+      Num_Samples : constant Positive := Positive (X'Length);
+      Rand        : Positive;
+   begin
+      if Num_Samples > 1 then
+         for index in 1 .. Num_Samples - 1 loop
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (Num_Samples - index));
+            Utilities.Swap (X, index, Rand);
+            Utilities.Swap (Y, index, Rand);
+         end loop;
+      end if;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Binary_Matrix is
-      Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
    begin
-      Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 4);
-      Printing.Print_Binary_Matrix
-        (Routine_Name & "Inverse_Transform",
-         Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 1, 4);
+--        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 4);
+--        Printing.Print_Binary_Matrix
+--          (Routine_Name & "Inverse_Transform",
+--           Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 1, 4);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;
@@ -1210,6 +1223,10 @@ package body Multilayer_Perceptron is
             Y_Batch (Batch_Row, col) := Y (row, col);
          end loop;
       end loop;
+
+      if Self.Parameters.Shuffle then
+         Permute (X_Batch, Y_Batch);
+      end if;
 
       --  L644  Initialize Activations
       Activations.Clear;

@@ -356,7 +356,8 @@ package body Label is
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         null;
+         Put_Line ("Label.Inverse_Transform Boolean_Matrix not Y_Multiclass" &
+                   "not coded");
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
 
@@ -394,7 +395,8 @@ package body Label is
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         null;
+         Put_Line ("Label.Inverse_Transform Boolean_Matrix return " &
+                   "Integer_Matrix not Y_Multiclass not coded");
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
 
@@ -488,16 +490,16 @@ package body Label is
    function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                return Binary_Matrix is
       use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Inverse_Transform ";
+--        Routine_Name : constant String := "Label.Inverse_Transform ";
       Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
       Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
    begin
       --  L398
       if Self.Y_Kind = Y_Multiclass then
-         Put_Line (Routine_Name & "Y is Multiclass");
+--           Put_Line (Routine_Name & "Y is Multiclass");
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         Put_Line (Routine_Name & "Y is not Multiclass");
+--           Put_Line (Routine_Name & "Y is not Multiclass");
          Y_Inv := Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
@@ -682,6 +684,7 @@ package body Label is
                end loop;
             end loop;
             Done := True;
+
          elsif Num_Classes > 2 then
             Y_Kind := Y_Multiclass;
          end if;
@@ -714,9 +717,9 @@ package body Label is
          end if;
       end if;
 
-      Put_Line (Routine_Name & "Y_Bool size:" &
-                  Integer'Image (Y_Bool'Length) &  " x" &
-                  Integer'Image (Y_Bool'Length (2)));
+--        Put_Line (Routine_Name & "Y_Bool size:" &
+--                    Integer'Image (Y_Bool'Length) &  " x" &
+--                    Integer'Image (Y_Bool'Length (2)));
       --          Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
       return Y_Bool;
 
