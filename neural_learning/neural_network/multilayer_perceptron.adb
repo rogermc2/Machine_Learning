@@ -183,17 +183,18 @@ package body Multilayer_Perceptron is
             Coeffs : constant Real_Float_Matrix :=
                        Self.Attributes.Params (Layer).Coeff_Gradients;
             --  numpy.ravel (a) returns the elements of a as a 1-D array.
-            Ravel  : Real_Float_Vector
-              (1 .. Coeffs'Length * Coeffs'Length (2));
+--              Ravel  : Real_Float_Vector
+--                (1 .. Coeffs'Length * Coeffs'Length (2));
          begin
             for row in Coeffs'Range loop
                for col in Coeffs'Range (2) loop
-                  Ravel ((row - 1) * Coeffs'Length (2) +
-                           col - Coeffs'First (2) + 1) :=
-                    Coeffs (row, col);
+                  Sum_Sq_Coeffs := Sum_Sq_Coeffs + Coeffs (row, col) ** 2;
+--                    Ravel ((row - 1) * Coeffs'Length (2) +
+--                             col - Coeffs'First (2) + 1) :=
+--                      Coeffs (row, col);
                end loop;
             end loop;
-            Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
+--              Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
          end;  --  declare
       end loop;
 
@@ -658,7 +659,7 @@ package body Multilayer_Perceptron is
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  L636
-         for batch_index in Batches.First_Index ..
+         for Batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             --  L649
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
@@ -1198,8 +1199,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --             "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                 "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
