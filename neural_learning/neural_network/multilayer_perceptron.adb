@@ -432,6 +432,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L377  MultilayerPerceptron._Fit
+   --  L759  MultilayerPerceptron.Fit
    procedure Fit (Self  : in out MLP_Classifier;
                   X     : Real_Float_Matrix;
                   Y     : Integer_Matrix; Incremental : Boolean := False) is
@@ -447,7 +448,9 @@ package body Multilayer_Perceptron is
       Activations        : Real_Matrix_List;
    begin
       --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
-      --        Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
+      --  Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
+      Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
+             "Hidden_Layer_Sizes is empty");
       --  L385
       Validate_Hyperparameters (Self);
       First_Pass :=
@@ -475,7 +478,7 @@ package body Multilayer_Perceptron is
 
       Activations.Append (X);
 
-      --  L417 Initialized grads are empty vectors, no initialization required.
+      --  L417 Initialized grads are empty vectors, no initialization needed.
       --  L427
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -647,6 +650,8 @@ package body Multilayer_Perceptron is
          --           end if;
       end if;
 
+      Put_Line (Routine_Name & "L617 Optimizer.Kind: " &
+               Optimizer_Type'Image (Self.Attributes.Optimizer.Kind));
       --  L617
       Batch_Size := Self.Parameters.Batch_Size;
       if Batch_Size = 0 then
@@ -1141,6 +1146,8 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1186  Partial_Fit updates the model with one iteration over the data
+   --  Don't provide default for Classes to avoid ambiguity with
+   --  Partial_Fit (X, Y)
    procedure  Partial_Fit
      (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
       Y       : Integer_Matrix; Classes : Integer_List) is
