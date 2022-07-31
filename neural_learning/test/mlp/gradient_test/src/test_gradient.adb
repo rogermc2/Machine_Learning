@@ -27,7 +27,6 @@ procedure Test_Gradient is
    Num_Features       : constant Positive := 10;
    Hidden_Layer_Sizes : constant Positive := 10;
    X                  : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
---     Y                  : Integer_Array (1 .. Num_Samples);
    Y                  : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
    LB                 : Label.Label_Binarizer;
    Layer_Sizes        : NL_Types.Integer_List;
@@ -37,35 +36,6 @@ procedure Test_Gradient is
    Fan_Out            : Positive;
    Params             : Parameters_List;
    Theta              : Parameters_List;
-
-   --  MLP L43  Pack the parameters into a single vector
---     function Pack (Params_List : Parameters_List) return NL_Types.Float_List is
---        Packed_Data : NL_Types.Float_List;
---
---     begin
---        for index in Params_List.First_Index .. Params_List.Last_Index loop
---           declare
---              Params : constant Stochastic_Optimizers.Parameters_Record :=
---                         Params_List (index);
---           begin
---              for row in Params.Coeff_Gradients'Range loop
---                 for col in Params.Coeff_Gradients'Range (2) loop
---                    Packed_Data.Append (Params.Coeff_Gradients (row, col));
---                 end loop;
---              end loop;
---
---              for row in Params.Intercept_Grads'Range loop
---                 Packed_Data.Append (Params.Intercept_Grads (row));
---              end loop;
---           end;
---        end loop;
---
---        return Packed_Data;
---
---     end Pack;
-
-   --  -------------------------------------------------------------------------
-
 begin
    Put_Line (Routine_Name);
    Layer_Sizes.Append (Hidden_Layer_Sizes);
@@ -78,7 +48,7 @@ begin
    Layer_Units.Append (Num_Features);
    Layer_Units.Append (Hidden_Layer_Sizes);
 
-   for num_labels in 2 .. 2 loop
+   for num_labels in 2 .. 3 loop
       for value in Y'Range loop
          Y (value, 1) := value mod num_labels + 1;
       end loop;
