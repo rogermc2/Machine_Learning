@@ -46,7 +46,7 @@ package body Label is
    --        Ind_Ptr : Integer_Array (1 .. IP_Length);
    --     end record;
 
-   procedure C_Init (LB : in out Label_Binarizer; Neg_Label : Float := 0.0;
+   procedure C_Init (LB        : in out Label_Binarizer; Neg_Label : Float := 0.0;
                      Pos_Label : Float := 1.0) is
    begin
       LB.Neg_Label := Neg_Label;
@@ -56,7 +56,7 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   procedure C_Init (MLB : in out Multi_Label_Binarizer;
+   procedure C_Init (MLB     : in out Multi_Label_Binarizer;
                      Classes : Integer_List := Integer_Package.Empty_Vector) is
    begin
       MLB.Classes := Classes;
@@ -115,7 +115,7 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L740 Fit
    procedure Fit (Binarizer : in out Multi_Label_Binarizer;
-                  Y : Integer_Matrix) is
+                  Y         : Integer_Matrix) is
       Routine_Name : constant String :=
                        "Label.Binarizer Fit Multi_Label_Binarizer ";
       Classes      : NL_Types.Integer_List;
@@ -132,7 +132,7 @@ package body Label is
             Assert (not Duplicates, Routine_Name &
                       "Classes contains duplicates.");
          end loop;
-             Classes := Binarizer.Classes;
+         Classes := Binarizer.Classes;
       end if;
 
       Binarizer.Classes := Classes;
@@ -357,7 +357,7 @@ package body Label is
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
          Put_Line ("Label.Inverse_Transform Boolean_Matrix not Y_Multiclass" &
-                   "not coded");
+                     "not coded");
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
 
@@ -396,7 +396,7 @@ package body Label is
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
          Put_Line ("Label.Inverse_Transform Boolean_Matrix return " &
-                   "Integer_Matrix not Y_Multiclass not coded");
+                     "Integer_Matrix not Y_Multiclass not coded");
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
 
@@ -490,16 +490,16 @@ package body Label is
    function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                return Binary_Matrix is
       use Multiclass_Utils;
---        Routine_Name : constant String := "Label.Inverse_Transform ";
+      --        Routine_Name : constant String := "Label.Inverse_Transform ";
       Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
       Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
    begin
       --  L398
       if Self.Y_Kind = Y_Multiclass then
---           Put_Line (Routine_Name & "Y is Multiclass");
+         --           Put_Line (Routine_Name & "Y is Multiclass");
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
---           Put_Line (Routine_Name & "Y is not Multiclass");
+         --           Put_Line (Routine_Name & "Y is not Multiclass");
          Y_Inv := Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
@@ -636,8 +636,8 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name :  constant String :=
                        "Label.Label_Binarize Integer_Matrix ";
-      Num_Classes  : constant Positive := Y'Length (2);
-      Y_Bin        : Binary_Matrix (Y'Range, Y'Range (2))
+      Num_Classes  : constant Positive := Positive (Classes.Length);
+      Y_Bin        : Binary_Matrix (Y'Range, 1 .. Num_Classes)
         := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
       Sorted       : Integer_List;
@@ -647,16 +647,9 @@ package body Label is
          Result : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
                     (others => (others => 0));
       begin
-         --           Put_Line (Routine_Name & "Binarize Num_Classes:" &
-         --                       Integer'Image (Num_Classes));
-         --           Put_Line (Routine_Name & "Binarize Y_In size:" &
-         --                       Integer'Image (Y_In'Length) & " x" &
-         --                       Integer'Image (Y_In'Length (2)));
-         Assert (Y_In'Length (2) = Integer (Classes.Length), Routine_Name &
-                "Binarize Y_In'Length (2) /= Classes length");
          for row in Y_In'Range loop
-            for col in Classes.First_Index .. Classes.Last_Index loop
-               if Y_In (row, col) = Classes (col) then
+            for col in Y_In'Range (2) loop
+               if Classes.Contains (Y_In (row, col)) then
                   Result (row, col) := 1;
                end if;
             end loop;
@@ -672,12 +665,7 @@ package body Label is
       Assert (Y_Kind /= Y_Continuous_Multioutput and
                 Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "does not support Multioutput target data.");
-      Assert (Y'Length (2) = Integer (Classes.Length), Routine_Name &
-                "Y'Length (2)" & Integer'Image (Y'Length (2)) &
-                " /= Classes length" & Count_Type'Image (Classes.Length));
 
-      --        Put_Line (Routine_Name & "L516 Y size:" & Integer'Image (Y'Length) &
-      --                    " x" & Integer'Image (Y'Length (2)));
       --  L516
       if Y_Kind = Y_Binary then
          if Num_Classes = 1 then
@@ -722,10 +710,6 @@ package body Label is
          end if;
       end if;
 
---        Put_Line (Routine_Name & "Y_Bool size:" &
---                    Integer'Image (Y_Bool'Length) &  " x" &
---                    Integer'Image (Y_Bool'Length (2)));
-      --          Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
       return Y_Bin;
 
    end Label_Binarize;
