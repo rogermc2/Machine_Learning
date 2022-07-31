@@ -644,14 +644,18 @@ package body Label is
       Done         : Boolean := False;
 
       function Binarize (Y_In : Integer_Matrix) return Binary_Matrix is
-         Result : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
-                    (others => (others => 0));
+         use Integer_Package;
+         Class_Index : Natural;
+         Result      : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
+                         (others => (others => 0));
       begin
          for row in Y_In'Range loop
             for col in Y_In'Range (2) loop
-               if Classes.Contains (Y_In (row, col)) then
-                  Result (row, col) := 1;
-               end if;
+               Class_Index := Classes.Find_Index (Y_In (row, col));
+               Assert (Class_Index /= No_Index, Routine_Name &
+                         "Binarize invalid class" &
+                         Integer'Image (Y_In (row, col)));
+               Result (row, Class_Index) := 1;
             end loop;
          end loop;
 
