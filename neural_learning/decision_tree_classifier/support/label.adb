@@ -151,9 +151,9 @@ package body Label is
    end Fit;
 
    --  -------------------------------------------------------------------------
-
+   --  L416
    function Fit_Transform (Binarizer : in out Label_Binarizer;
-                           Y         : Integer_Matrix) return Boolean_Matrix is
+                           Y         : Integer_Matrix) return Binary_Matrix is
    begin
       Fit (Binarizer, Y);
       return Transform (Binarizer, Y);
@@ -631,21 +631,21 @@ package body Label is
    --  L416
    function Label_Binarize (Y         : Integer_Matrix;
                             Classes   : Integer_List;
-                            Neg_Label : Integer := 0) return Boolean_Matrix is
+                            Neg_Label : Integer := 0) return Binary_Matrix is
       --        use Ada.Containers;
       use Multiclass_Utils;
       Routine_Name :  constant String :=
                        "Label.Label_Binarize Integer_Matrix ";
       Num_Classes  : constant Positive := Y'Length (2);
-      Y_Bool       : Boolean_Matrix (Y'Range, Y'Range (2))
-        := (others => (others => False));
+      Y_Bin        : Binary_Matrix (Y'Range, Y'Range (2))
+        := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
       Sorted       : Integer_List;
       Done         : Boolean := False;
 
-      function Binarize (Y_In : Integer_Matrix) return Boolean_Matrix is
-         Result : Boolean_Matrix (Y_In'Range, 1 .. Num_Classes) :=
-                    (others => (others => False));
+      function Binarize (Y_In : Integer_Matrix) return Binary_Matrix is
+         Result : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
+                    (others => (others => 0));
       begin
          --           Put_Line (Routine_Name & "Binarize Num_Classes:" &
          --                       Integer'Image (Num_Classes));
@@ -655,7 +655,7 @@ package body Label is
          for row in Y_In'Range loop
             for col in Classes.First_Index .. Classes.Last_Index loop
                if Y_In (row, col) = Classes (col) then
-                  Result (row, col) := True;
+                  Result (row, col) := 1;
                end if;
             end loop;
          end loop;
@@ -679,7 +679,7 @@ package body Label is
             for row in Y'Range loop
                for col in Classes.First_Index .. Classes.Last_Index loop
                   if Neg_Label /= 0 then
-                     Y_Bool (row, col) := True;
+                     Y_Bin (row, col) := 1;
                   end if;
                end loop;
             end loop;
@@ -706,14 +706,14 @@ package body Label is
          if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
             --  Label.py L539 - L549 needed to generate a csr sparse matrix
             --  Binarize is all that is needed for this implementation
-            Y_Bool := Binarize (Y);
+            Y_Bin := Binarize (Y);
 
          else
             --  L551
             Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
                       Y_Type'Image (Y_Kind) &
                       " target data is not supported by Label_Binarize");
-            Y_Bool := Binarize (Y);
+            Y_Bin := Binarize (Y);
          end if;
       end if;
 
@@ -721,14 +721,14 @@ package body Label is
 --                    Integer'Image (Y_Bool'Length) &  " x" &
 --                    Integer'Image (Y_Bool'Length (2)));
       --          Printing.Print_Boolean_Matrix (Routine_Name & " result Y_Bin", Y_Bin);
-      return Y_Bool;
+      return Y_Bin;
 
    end Label_Binarize;
 
    --  -------------------------------------------------------------------------
 
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
-                       return Boolean_Matrix is
+                       return Binary_Matrix is
       --  Routine_Name : constant String := "Label.Transform Binarize ";
    begin
       --  Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);

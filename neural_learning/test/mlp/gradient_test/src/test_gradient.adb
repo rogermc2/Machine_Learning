@@ -27,8 +27,8 @@ procedure Test_Gradient is
    Num_Features       : constant Positive := 10;
    Hidden_Layer_Sizes : constant Positive := 10;
    X                  : Real_Float_Matrix (1 .. Num_Samples, 1 .. Num_Features);
-   Y                  : Integer_Array (1 .. Num_Samples);
-   Y2                 : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
+--     Y                  : Integer_Array (1 .. Num_Samples);
+   Y                  : Integer_Matrix (1 .. Num_Samples, 1 .. 1);
    LB                 : Label.Label_Binarizer;
    Layer_Sizes        : NL_Types.Integer_List;
    aClassifier        : MLP_Classifier;
@@ -80,13 +80,12 @@ begin
 
    for num_labels in 2 .. 2 loop
       for value in Y'Range loop
-         Y (value) := value mod num_labels + 1;
-         Y2 (value, 1) := Y (value);
+         Y (value, 1) := value mod num_labels + 1;
       end loop;
 
       declare
          --  L194
-         Y_Bin : constant Boolean_Matrix := Label.Fit_Transform (LB, Y);
+         Y_Bin : constant Binary_Matrix := Label.Fit_Transform (LB, Y);
       begin
          --  L196
          for activ_type in Base_Neural.Activation_Type'Range loop
@@ -101,7 +100,7 @@ begin
                Random_State => 1, Max_Iter => 1);
             Init_Optimizer (aClassifier);
             --  L206
-            Fit (aClassifier, X, Y2);
+            Fit (aClassifier, X, Y);
             Layer_Units.Append (aClassifier.Attributes.N_Outputs);
 
             --  L208

@@ -54,7 +54,7 @@ package Label is
                   Y         : Array_Of_Integer_Lists);
    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
    function Fit_Transform (Binarizer : in out Label_Binarizer;
-                           Y         : Integer_Matrix) return Boolean_Matrix;
+                           Y         : Integer_Matrix) return Binary_Matrix;
    function Fit_Transform (Encoder : in out Label_Encoder;
                            Y       : Integer_Array) return Natural_Array;
    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
@@ -72,9 +72,9 @@ package Label is
    function Label_Binarize (Y, Classes : Integer_List;
                             Neg_Label  : Integer := 0) return Boolean_Matrix;
    function Label_Binarize (Y         : Integer_Matrix; Classes : Integer_List;
-                            Neg_Label : Integer := 0) return Boolean_Matrix;
+                            Neg_Label : Integer := 0) return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
-                        return Boolean_Matrix;
+                        return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_List)
                         return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
