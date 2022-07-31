@@ -78,6 +78,7 @@ package body Multilayer_Perceptron is
                             Activations  : in out Real_Matrix_List);
     function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
                                return Real_Float_Matrix;
+<<<<<<< Updated upstream
     procedure Initialize (Self        : in out MLP_Classifier;
                           Layer_Units : Integer_List);
     function Init_Coeff (Self            : in out MLP_Classifier;
@@ -251,6 +252,174 @@ package body Multilayer_Perceptron is
     --  is also set on clf.
     function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
                                            Classes : Integer_List)
+=======
+   procedure Initialize (Self        : in out MLP_Classifier;
+                         Layer_Units : Integer_List);
+   function Init_Coeff (Self            : in out MLP_Classifier;
+                        Fan_In, Fan_Out : Positive) return Parameters_Record;
+   procedure Process_Batch (Self             : in out MLP_Classifier;
+                            X                : Real_Float_Matrix;
+                            Y                : Boolean_Matrix;
+                            Batch_Slice      : Slice_Record;
+                            Batch_Size       : Positive;
+                            Accumulated_Loss : in out Float);
+   procedure Update_No_Improvement_Count
+     (Self   : in out MLP_Classifier);
+   --     procedure Update_No_Improvement_Count
+   --       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+   --        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix);
+   procedure Update_Gradients (Self               : in out MLP_Classifier;
+                               Activations        : Real_Matrix_List;
+                               Deltas             : in out Real_Matrix_List;
+                               Gradients          : in out Parameters_List;
+                               Layer, Num_Samples : Positive);
+   procedure Validate_Hyperparameters (Self : MLP_Classifier);
+
+   --  -------------------------------------------------------------------------
+
+   function "-" (L, R : Loss_Grad_Result) return Loss_Grad_Result is
+      Result : Loss_Grad_Result := L;
+   begin
+      Result.Loss := Result.Loss - R.Loss;
+      for index in Result.Gradients.First_Index ..
+        Result.Gradients.Last_Index loop
+         Result.Gradients (index) :=
+           Result.Gradients (index) - R.Gradients (index);
+      end loop;
+
+      return Result;
+
+   end "-";
+
+   --  -------------------------------------------------------------------------
+
+   function "/" (L : Loss_Grad_Result; R : Float) return Loss_Grad_Result is
+      Result : Loss_Grad_Result := L;
+   begin
+      Result.Loss := Result.Loss / R;
+      for index in Result.Gradients.First_Index ..
+        Result.Gradients.Last_Index loop
+         Result.Gradients (index) := Result.Gradients (index) / R;
+      end loop;
+
+      return Result;
+
+   end "/";
+
+   --  -------------------------------------------------------------------------
+   --  L241  Backprop computes the MLP loss function and its derivatives
+   --       with respect to each parameter: weights and bias vectors.
+   --  Activations contains an activation matrix for each layer
+   procedure Backprop (Self        : in out MLP_Classifier;
+                       X           : Real_Float_Matrix;
+                       Y           : Boolean_Matrix;
+                       Activations : in out Real_Matrix_List;
+                       Loss        : out Float;
+                       Gradients   : out Parameters_List) is
+      use Ada.Containers;
+      use Base_Neural;
+      use Parameters_Package;
+      use Real_Float_Arrays;
+      use Real_Matrix_List_Package;
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Backprop ";
+      Num_Samples        : constant Positive := Positive (X'Length);
+      Y_Float            : constant Real_Float_Matrix :=
+                             To_Real_Float_Matrix (Y);
+      Loss_Function_Name : Loss_Function_Type;
+      Deltas             : Real_Matrix_List;
+      Sum_Sq_Coeffs      : Float;
+   begin
+      --  Printing.Print_Float_Matrix (Routine_Name & "L284 Activations last",
+      --           Activations.Last_Element);
+      --  L284
+      if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
+        Self.Attributes.Out_Activation = Logistic_Activation then
+         Loss_Function_Name := Binary_Log_Loss_Function;
+      else
+         Loss_Function_Name := Self.Attributes.Loss_Function_Name;
+      end if;
+
+      case Loss_Function_Name is
+         when Binary_Log_Loss_Function =>
+            Loss := Binary_Log_Loss (Y, Activations.Last_Element);
+         when Log_Loss_Function =>
+            Loss := Log_Loss (Y, Activations.Last_Element);
+         when Squared_Error_Function =>
+            Loss := Squared_Loss (Y, Activations.Last_Element);
+      end case;
+
+      --  L289  Add L2 regularization term to loss
+      --  for s in self.coefs_:
+      Sum_Sq_Coeffs := 0.0;
+      for layer in Self.Attributes.Params.First_Index ..
+        Self.Attributes.Params.Last_Index loop
+         declare
+            Coeffs : constant Real_Float_Matrix :=
+                       Self.Attributes.Params (Layer).Coeff_Gradients;
+         begin
+            for row in Coeffs'Range loop
+               for col in Coeffs'Range (2) loop
+                  Sum_Sq_Coeffs := Sum_Sq_Coeffs + Coeffs (row, col) ** 2;
+               end loop;
+            end loop;
+         end;  --  declare
+      end loop;
+
+      --  L292
+      Loss := Loss + 0.5 * (Self.Parameters.Alpha *
+                              Sum_Sq_Coeffs / Float (Num_Samples));
+
+      --  L297 Backward propagate
+      --  The calculation of delta[last]  works with the following
+      --  combinations of output activation and loss function:
+      --  sigmoid and binary cross entropy, softmax and categorical cross
+      --  entropy and identity with squared loss.
+      --  The ith element of deltas holds the difference between the
+      --  activations of the i + 1 layer and the backpropagated error.
+      --  Deltas are gradients of loss with respect to z in each layer.
+      --  The ith element of Activations (batch samples x classes) is a list
+      --  of the ith layer class values of a batch.
+
+      --  L301  Initialize Deltas
+      Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
+      --        Printing.Print_Float_Matrix (Routine_Name & "L301+ Activations last",
+      --                 Activations.Last_Element, 1, 2);
+      --        Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float", Y_Float);
+      Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
+              Routine_Name & "L301 last Activations item width" &
+                Integer'Image (Activations.Last_Element'Length (2)) &
+                " differs from Y_Float width" &
+                Integer'Image (Y_Float'Length (2)));
+      Deltas.Replace_Element (Deltas.Last_Index,
+                              Activations.Last_Element - Y_Float);
+
+      --  L304  Compute gradient for the last layer
+      Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
+                             Activations, Deltas, Gradients);
+
+      --  L310, L308
+      for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+         Update_Gradients (Self, Activations, Deltas, Gradients, layer,
+                           Num_Samples);
+      end loop;
+
+      --          for index in Deltas.First_Index .. Deltas.Last_Index loop
+      --              Printing.Print_Float_Matrix
+      --                (Routine_Name & "Deltas " & Integer'Image (index),
+      --                 Deltas (index));
+      --          end loop;
+
+   end Backprop;
+
+   --  -------------------------------------------------------------------------
+   --  scikit-learn/sklearn/utils/multiclass.py
+   --  L340  Check_Partial_Fit_First_Call returns True if this was the first
+   --  call to partial_fit on clf in which case the classes attribute
+   --  is also set on clf.
+   function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
+                                          Classes : Integer_List)
+>>>>>>> Stashed changes
                                           return Boolean is
         use Integer_Package;
         Routine_Name : constant String :=
@@ -1181,6 +1350,7 @@ package body Multilayer_Perceptron is
     --  L1168
     function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Binary_Matrix is
+<<<<<<< Updated upstream
     --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
         Y_Pred         : constant Real_Float_Matrix :=
                            Forward_Pass_Fast (Self, X);
@@ -1224,6 +1394,238 @@ package body Multilayer_Perceptron is
 
             for col in Y'Range (2) loop
                 Y_Batch (Batch_Row, col) := Y (row, col);
+=======
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
+      Y_Pred         : constant Real_Float_Matrix :=
+                         Forward_Pass_Fast (Self, X);
+   begin
+--        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 4);
+--        Printing.Print_Binary_Matrix
+--          (Routine_Name & "Inverse_Transform",
+--           Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 1, 4);
+      return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
+
+   end Predict;
+
+   --  -------------------------------------------------------------------------
+   --  L637
+   procedure Process_Batch (Self             : in out MLP_Classifier;
+                            X                : Real_Float_Matrix;
+                            Y                : Boolean_Matrix;
+                            Batch_Slice      : Slice_Record;
+                            Batch_Size       : Positive;
+                            Accumulated_Loss : in out Float) is
+--        Routine_Name   : constant String :=
+--                   "Multilayer_Perceptron.Process_Batch ";
+      Num_Features   : constant Positive := Positive (X'Length (2));
+      Num_Classes    : constant Positive := Y'Length (2);
+      --  X_Batch: samples x features
+      X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
+      Y_Batch        : Boolean_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
+      --  Activations: layers x samples x features
+      Activations    : Real_Matrix_List;
+      Gradients      : Parameters_List;
+      Batch_Row      : Positive;
+      Batch_Loss     : Float;
+   begin
+      --        Printing.Print_Boolean_Matrix (Routine_Name & "Y", Y);
+      --  Get batch data
+      for row in Batch_Slice.First .. Batch_Slice.Last loop
+         Batch_Row := row - Batch_Slice.First + 1;
+         for col in 1 .. Num_Features loop
+            X_Batch (Batch_Row, col) := X (row, col);
+         end loop;
+
+         for col in Y'Range (2) loop
+            Y_Batch (Batch_Row, col) := Y (row, col);
+         end loop;
+      end loop;
+
+      if Self.Parameters.Shuffle then
+         Permute (X_Batch, Y_Batch);
+      end if;
+
+      --  L644  Initialize Activations
+      Activations.Clear;
+      Activations.Append (X_Batch);
+      --  L645
+      Forward_Pass (Self, Activations);
+      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
+
+      --  L665
+      Accumulated_Loss := Accumulated_Loss + Batch_Loss *
+        Float (Batch_Slice.Last - Batch_Slice.First + 1);
+      --  L667 update weights
+      --  Update_Params updates parameters with given gradients
+      Stochastic_Optimizers.Update_Params
+        (Self.Attributes.Optimizer, Self.Attributes.Params, Gradients);
+
+   end Process_Batch;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Update_Gradients (Self               : in out MLP_Classifier;
+                               Activations        : Real_Matrix_List;
+                               Deltas             : in out Real_Matrix_List;
+                               Gradients          : in out Parameters_List;
+                               Layer, Num_Samples : Positive) is
+      use Base_Neural;
+      use Real_Float_Arrays;
+      use Real_Matrix_List_Package;
+      --  Routine_Name : constant String :=
+      --                   "Multilayer_Perceptron.Update_Gradients ";
+      Params       : constant Parameters_Record :=
+                       Self.Attributes.Params (Layer);
+   begin
+      --  L311
+      Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
+                                Transpose (Params.Coeff_Gradients));
+      --  Put_Line (Routine_Name & "Activations size" &
+      --  Integer'Image (Activations.Element (layer)'Length) &
+      --  " x" &
+      --  Integer'Image (Activations.Element (layer)'Length (2)));
+      --  Put_Line (Routine_Name & "Deltas size" &
+      --  Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
+      --  Integer'Image (Deltas.Element (layer - 1)'Length (2)));
+      --  Put_Line (Routine_Name & "L312 Activation_Type " &
+      --              Activation_Type'Image (Self.Parameters.Activation));
+      --  L312
+      case Self.Parameters.Activation is
+         when Identity_Activation => null;
+         when Logistic_Activation =>
+            Logistic_Derivative (Z => Activations (Layer),
+                                 Del => Deltas (Layer - 1));
+         when Tanh_Activation =>
+            Tanh_Derivative (Activations (Layer), Deltas (Layer - 1));
+         when Rect_LU_Activation =>
+            Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
+         when Softmax_Activation => null;
+      end case;
+
+      --  L314
+      Compute_Loss_Gradient
+        (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
+         Activations => Activations, Deltas => Deltas, Gradients => Gradients);
+
+   end Update_Gradients;
+
+   --  -------------------------------------------------------------------------
+   --  L716 Early_Stopping
+   --     procedure Update_No_Improvement_Count
+   --       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+   --        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix) is
+   --        Routine_Name     : constant String
+   --          := "Multilayer_Perceptron.Update_No_Improvement_Count ";
+   --        Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
+   --        Last_Valid_Score : Float;
+   --        Score_Val        : Float;
+   --     begin
+   --        if Early_Stopping then
+   --           Score_Val := Base.Score (Self, X_Val, Y_Val, Sample_Weight);
+   --           Self.Parameters.Validation_Scores.Append (Score_Val);
+   --           Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
+   --           if Self.Parameters.Verbose then
+   --              Put_Line (Routine_Name & "Validation score: " &
+   --      Float'Image (Last_Valid_Score));
+   --           end if;
+   --
+   --           --  L728
+   --           if Last_Valid_Score <
+   --             Self.Parameters.Best_Validation_Score + Self.Parameters.Tol then
+   --              Self.Attributes.No_Improvement_Count :=
+   --                Self.Attributes.No_Improvement_Count + 1;
+   --           else
+   --              Self.Attributes.No_Improvement_Count := 0;
+   --           end if;
+   --
+   --           if Last_Valid_Score > Self.Parameters.Best_Validation_Score then
+   --              Self.Parameters.Best_Validation_Score := Last_Valid_Score;
+   --              Self.Parameters.Best_Params := Self.Attributes.Params;
+   --           end if;
+   --
+   --        else
+   --           if Self.Attributes.Loss_Curve.Last_Element >
+   --             Self.Attributes.Best_Loss then
+   --              Self.Attributes.No_Improvement_Count :=
+   --                Self.Attributes.No_Improvement_Count + 1;
+   --           else
+   --              Self.Attributes.No_Improvement_Count := 0;
+   --           end if;
+   --
+   --           if Self.Attributes.Loss_Curve.Last_Element <
+   --             Self.Attributes.Best_Loss then
+   --              Self.Attributes.Best_Loss :=
+   --                Self.Attributes.Loss_Curve.Last_Element;
+   --           end if;
+   --        end if;
+   --
+   --     end Update_No_Improvement_Count;
+
+   --  -------------------------------------------------------------------------
+   --  L716 not Early_Stopping
+   procedure Update_No_Improvement_Count
+     (Self   : in out MLP_Classifier) is
+      --        Routine_Name     : constant String
+      --          := "Multilayer_Perceptron.Update_No_Improvement_Count ";
+   begin
+      if Self.Attributes.Loss_Curve.Last_Element >
+        Self.Attributes.Best_Loss then
+         Self.Attributes.No_Improvement_Count :=
+           Self.Attributes.No_Improvement_Count + 1;
+      else
+         Self.Attributes.No_Improvement_Count := 0;
+      end if;
+
+      if Self.Attributes.Loss_Curve.Last_Element <
+        Self.Attributes.Best_Loss then
+         Self.Attributes.Best_Loss :=
+           Self.Attributes.Loss_Curve.Last_Element;
+      end if;
+
+   end Update_No_Improvement_Count;
+
+   --  -------------------------------------------------------------------------
+   --  L455
+   procedure Validate_Hyperparameters (Self : MLP_Classifier) is
+      --           Incremental, Reset : Boolean) is
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Hyperparameters ";
+   begin
+      null;
+
+   end Validate_Hyperparameters;
+
+   --  -------------------------------------------------------------------------
+   --  L1108  MLPClassifier._validate_input
+   function Validate_Input (Self        : in out MLP_Classifier;
+                            Y           : Integer_Matrix;
+                            Incremental : Boolean) return Boolean_Matrix is
+      use Integer_Package;
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Validate_Input ";
+      Classes      : Integer_List;
+      Binarizer    : Label.Label_Binarizer;
+   begin
+      --  Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
+      --           Integer'Image (Y'Length (2)));
+      --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
+      if Self.Attributes.Classes.Is_Empty or else
+        (not Self.Parameters.Warm_Start and not Incremental) then
+         --  L1139
+         Label.Fit (Binarizer, Y);
+         Self.Attributes.Binarizer := Binarizer;
+         Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+      else
+         --  L1143
+         Classes := Multiclass_Utils.Unique_Labels (Y);
+         if Self.Parameters.Warm_Start then
+            Assert (Classes = Self.Attributes.Classes,
+                    Routine_Name & "warm_start cannot be used if Y has" &
+                      " different classes as in the previous call to fit.");
+         else
+            for index in Classes.First_Index .. Classes.Last_Index loop
+               Assert (Self.Attributes.Classes.Contains (Classes (index)),
+                       Routine_Name & "Y has classes not in Self.Classes");
+>>>>>>> Stashed changes
             end loop;
         end loop;
 
