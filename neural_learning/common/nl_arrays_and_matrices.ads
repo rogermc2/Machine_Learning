@@ -70,6 +70,7 @@ package NL_Arrays_And_Matrices is
                  return Real_Float_Matrix;
    function "+" (L : Float; R : Real_Float_Vector) return Real_Float_Vector;
    pragma Inline ("+");
+   function "-" (L, R : Binary_Matrix) return Binary_Matrix;
    function "-" (L, R : Integer_Matrix) return Integer_Matrix;
    function "-" (L : Real_Float_Matrix; R : Boolean_Matrix)
                  return Real_Float_Matrix;
@@ -122,6 +123,8 @@ package NL_Arrays_And_Matrices is
    function To_Integer_Matrix (Bool : Boolean_Matrix)  return Integer_Matrix;
    function To_Natural_Array (List : NL_Types.Natural_List)
                               return Natural_Array;
+   function To_Real_Float_Matrix (Matrix : Binary_Matrix)
+                                  return Real_Float_Matrix;
    function To_Real_Float_Matrix (List : NL_Types.Float_List_2D)
                                   return Real_Float_Matrix;
    function To_Real_Float_Matrix (BM : Boolean_Matrix)

@@ -632,7 +632,7 @@ package body Label is
    function Label_Binarize (Y         : Integer_Matrix;
                             Classes   : Integer_List;
                             Neg_Label : Integer := 0) return Binary_Matrix is
-      --        use Ada.Containers;
+      use Ada.Containers;
       use Multiclass_Utils;
       Routine_Name :  constant String :=
                        "Label.Label_Binarize Integer_Matrix ";
@@ -652,6 +652,8 @@ package body Label is
          --           Put_Line (Routine_Name & "Binarize Y_In size:" &
          --                       Integer'Image (Y_In'Length) & " x" &
          --                       Integer'Image (Y_In'Length (2)));
+         Assert (Y_In'Length (2) = Integer (Classes.Length), Routine_Name &
+                "Binarize Y_In'Length (2) /= Classes length");
          for row in Y_In'Range loop
             for col in Classes.First_Index .. Classes.Last_Index loop
                if Y_In (row, col) = Classes (col) then
@@ -670,6 +672,9 @@ package body Label is
       Assert (Y_Kind /= Y_Continuous_Multioutput and
                 Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "does not support Multioutput target data.");
+      Assert (Y'Length (2) = Integer (Classes.Length), Routine_Name &
+                "Y'Length (2)" & Integer'Image (Y'Length (2)) &
+                " /= Classes length" & Count_Type'Image (Classes.Length));
 
       --        Put_Line (Routine_Name & "L516 Y size:" & Integer'Image (Y'Length) &
       --                    " x" & Integer'Image (Y'Length (2)));

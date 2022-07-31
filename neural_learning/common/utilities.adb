@@ -329,33 +329,33 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
---     function Prediction_String (Label_Counts : Predictions_List)
---                                 return String is
---        use Prediction_Data_Package;
---        Count_Cursor : Cursor := Label_Counts.First;
---        Prediction   : Prediction_Data;
---        Total        : Natural := 0;
---        Leaf_Data    : Unbounded_String := To_Unbounded_String
---          ("{'");
---     begin
---        while Has_Element (Count_Cursor) loop
---           Total := Total + Element (Count_Cursor).Num_Copies;
---           Next (Count_Cursor);
---        end loop;
---        Count_Cursor := Label_Counts.First;
---        while Has_Element (Count_Cursor) loop
---           Prediction := Element (Count_Cursor);
---           Leaf_Data := Leaf_Data & To_Unbounded_String
---             (To_String (Prediction.Label) & "': '" &
---                Integer'Image ((100 * Prediction.Num_Copies) / Total) &
---                "%'");
---           if Count_Cursor /= Label_Counts.Last then
---              Leaf_Data := Leaf_Data & ", ";
---           end if;
---           Next (Count_Cursor);
---        end loop;
---        return To_String (Leaf_Data) & "}";
---     end Prediction_String;
+   --     function Prediction_String (Label_Counts : Predictions_List)
+   --                                 return String is
+   --        use Prediction_Data_Package;
+   --        Count_Cursor : Cursor := Label_Counts.First;
+   --        Prediction   : Prediction_Data;
+   --        Total        : Natural := 0;
+   --        Leaf_Data    : Unbounded_String := To_Unbounded_String
+   --          ("{'");
+   --     begin
+   --        while Has_Element (Count_Cursor) loop
+   --           Total := Total + Element (Count_Cursor).Num_Copies;
+   --           Next (Count_Cursor);
+   --        end loop;
+   --        Count_Cursor := Label_Counts.First;
+   --        while Has_Element (Count_Cursor) loop
+   --           Prediction := Element (Count_Cursor);
+   --           Leaf_Data := Leaf_Data & To_Unbounded_String
+   --             (To_String (Prediction.Label) & "': '" &
+   --                Integer'Image ((100 * Prediction.Num_Copies) / Total) &
+   --                "%'");
+   --           if Count_Cursor /= Label_Counts.Last then
+   --              Leaf_Data := Leaf_Data & ", ";
+   --           end if;
+   --           Next (Count_Cursor);
+   --        end loop;
+   --        return To_String (Leaf_Data) & "}";
+   --     end Prediction_String;
 
    --  -------------------------------------------------------------------------
 
@@ -581,6 +581,19 @@ package body Utilities is
       return Split_List;
 
    end Split_String;
+
+   --  -------------------------------------------------------------------------
+   --  Swap swaps matrix rows
+   procedure Swap (Data : in out Binary_Matrix; L, R : Positive) is
+      Val : Natural;
+   begin
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
+
+   end Swap;
 
    --  -------------------------------------------------------------------------
    --  Swap swaps matrix rows

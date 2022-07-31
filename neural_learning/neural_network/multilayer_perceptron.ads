@@ -89,7 +89,7 @@ package Multilayer_Perceptron is
       Self        : Multilayer_Perceptron.MLP_Classifier;
       Params      : Parameters_List;
       X           : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_X_Cols);
-      Y           : Boolean_Matrix (1 .. Num_Rows, 1 .. Num_Y_Cols);
+      Y           : Binary_Matrix (1 .. Num_Rows, 1 .. Num_Y_Cols);
       Activations : Real_Matrix_List;
       Gradients   : Parameters_List;
    end record;
@@ -148,6 +148,6 @@ package Multilayer_Perceptron is
                       return Binary_Matrix;
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
-                            Incremental : Boolean) return Boolean_Matrix;
+                            Incremental : Boolean) return Binary_Matrix;
 
 end Multilayer_Perceptron;

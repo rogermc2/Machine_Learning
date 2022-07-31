@@ -13,18 +13,20 @@ package body Base_Neural is
 
    function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
                      return Real_Float_Matrix;
-   function X_Log_Y (X : Boolean_Matrix; Y : Real_Float_Matrix)
+   function X_Log_Y (X : Binary_Matrix; Y : Real_Float_Matrix)
                      return Real_Float_Matrix;
    pragma Inline (X_Log_Y);
 
    --  -------------------------------------------------------------------------
 
-   function Binary_Log_Loss (Y_True : Boolean_Matrix;
+   function Binary_Log_Loss (Y_True : Binary_Matrix;
                              Y_Prob : Real_Float_Matrix) return Float is
       use Real_Float_Arrays;
       --        Routine_Name : constant String :=
       --                         "Base_Neural.Binary_Log_Loss_Function ";
-      Unit_Matrix : constant Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2))
+      Binary_Unit_Matrix : constant Binary_Matrix (Y_True'Range, Y_True'Range (2))
+        := (others => (others => 1));
+      Float_Unit_Matrix : constant Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2))
         := (others => (others => 1.0));
       YP          : Real_Float_Matrix := Y_Prob;
       X_Log_Y1    : Real_Float_Matrix (YP'Range, YP'Range (2));
@@ -45,7 +47,8 @@ package body Base_Neural is
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       X_Log_Y1 := X_Log_Y (Y_True, YP);
-      X_Log_Y2 := X_Log_Y (not Y_True, Unit_Matrix - YP);
+      X_Log_Y2 := X_Log_Y (Binary_Unit_Matrix - Y_True,
+                           Float_Unit_Matrix - YP);
 
       for row in YP'Range loop
          for col in YP'Range (2) loop
@@ -164,15 +167,15 @@ package body Base_Neural is
    --  ------------------------------------------------------------------------
    --  L177 Log Loss is the negative average of the log of corrected predicted
    --  probabilities for each instance.
-   function Log_Loss (Y_True : Boolean_Matrix; Y_Prob : Real_Float_Matrix)
+   function Log_Loss (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
                       return Float is
       --          Routine_Name : constant String := "Base_Neural.Log_Loss ";
       YP           : Real_Float_Matrix := Y_Prob;
-      YT2          : Boolean_Matrix (Y_True'Range, Y_True'First (2) ..
+      YT2          : Binary_Matrix (Y_True'Range, Y_True'First (2) ..
                                        Y_True'Last (2) + 1);
       YP2          : Real_Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
 
-      function Do_XlogY (Y_True : Boolean_Matrix; Y_Prob : Real_Float_Matrix)
+      function Do_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
                          return Float is
          X_Y : Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
          Sum : Float := 0.0;
@@ -206,7 +209,7 @@ package body Base_Neural is
                YP2 (row, col) := YP (row, col);
                YP2 (row, col + 1) := 1.0 - YP (row, col);
                YT2 (row, col) := Y_True (row, col);
-               YT2 (row, col + 1) := not Y_True (row, col);
+               YT2 (row, col + 1) := 1 - Y_True (row, col);
             end loop;
          end loop;
 
@@ -325,14 +328,14 @@ package body Base_Neural is
 
    --  ------------------------------------------------------------------------
    --  L158
-   function Squared_Loss (Y_True : Boolean_Matrix; Y_Pred : Real_Float_Matrix)
+   function Squared_Loss (Y_True : Binary_Matrix; Y_Pred : Real_Float_Matrix)
                           return Float is
       use Real_Float_Arrays;
       Diff : Real_Float_Matrix := -Y_Pred;
    begin
       for row in Diff'Range loop
          for col in Diff'Range (2) loop
-            if Y_True (row, col) then
+            if Y_True (row, col) = 1 then
                Diff (row, col) := 1.0 + Diff (row, col);
             end if;
          end loop;
@@ -400,7 +403,7 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
    --  scipy/special/_xlogy.pxd
    --  xlogy = x*log(y) so that the result is 0 if x = 0
-   function X_Log_Y (X : Boolean_Matrix; Y : Real_Float_Matrix)
+   function X_Log_Y (X : Binary_Matrix; Y : Real_Float_Matrix)
                      return Real_Float_Matrix is
       use Maths.Float_Math_Functions;
       Y1     : Real_Float_Matrix := Y;
@@ -408,11 +411,11 @@ package body Base_Neural is
    begin
       for row in X'Range loop
          for col in X'Range (2) loop
-            if X (row, col) then
+            if X (row, col) = 1 then
                if Y1 (row, col) < EPS then
                   Y1 (row, col) := EPS;
                end if;
-               if X (row, col) then
+               if X (row, col) = 1 then
                   Result (row, col) :=  Log (Y1 (row, col));
                end if;
             end if;

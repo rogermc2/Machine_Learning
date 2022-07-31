@@ -68,6 +68,7 @@ package Utilities is
                                  Value   : Value_Record);
    function Split_String (aString, Pattern : String)
                            return String_List;
+   procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
    procedure Swap (Data : in out Boolean_Matrix; L, R : Positive);
    procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive);
    procedure Swap (Data : in out Integer_Array; L, R : Positive);

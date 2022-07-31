@@ -7,7 +7,7 @@ package body Loss_Functions is
 
    function Loss_Grad_Function
      (Self        : MLP_Classifier; Theta : Parameters_List;
-      X           : Real_Float_Matrix; Y   : Boolean_Matrix;
+      X           : Real_Float_Matrix; Y  : Binary_Matrix;
       Gradients   :  Parameters_List) return Loss_Grad_Result is
       Activations : Real_Matrix_List;
       Args        : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
@@ -36,7 +36,7 @@ package body Loss_Functions is
 
    function Numerical_Loss_Grad
      (aClassifier : MLP_Classifier; Theta : Parameters_List;
-      X           : Real_Float_Matrix; Y_Bin : Boolean_Matrix;
+      X           : Real_Float_Matrix; Y  : Binary_Matrix;
       Params      : Parameters_List) return Real_Float_Vector is
 --        use Real_Float_Arrays;
       Routine_Name : constant String := "Test_Gradient.Numerical_Loss_Grad ";
@@ -133,10 +133,10 @@ package body Loss_Functions is
                --  L242
                Loss_Grad_P := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_P_List, X => X,
-                  Y => Y_Bin,  Gradients => Params);
+                  Y => Y,  Gradients => Params);
                Loss_Grad_M := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
-                  Y => Y_Bin, Gradients => Params);
+                  Y => Y, Gradients => Params);
                Num_Grad (t_index) :=
                  (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
                Put_Line (Routine_Name & "Num_Grad (t_index) set");
