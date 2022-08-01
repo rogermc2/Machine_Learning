@@ -33,7 +33,7 @@ begin
    aClassifier := Multilayer_Perceptron.C_Init
      (Solver => Sgd_Solver, Hidden_Layer_Sizes => Layer_Sizes, Max_Iter => 150,
       Random_State => 0, Activation => Base_Neural.Logistic_Activation,
-      Alpha => 10.0 ** (-5), Learning_Rate_Init => 0.2, Verbose => True);
+      Alpha => 10.0 ** (-5), Learning_Rate_Init => 0.2, Verbose => False);
 
    Put_Line (Routine_Name & "Test_X size" & Integer'Image (Test_X'Length)
              & " x" & Integer'Image (Test_X'Length (2)));
