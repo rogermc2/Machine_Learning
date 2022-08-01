@@ -50,7 +50,7 @@ begin
    for test_num in 1 .. 1
    loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));
-      Partial_Fit (aClassifier, Test_X, To_Integer_Matrix (Test_Y), Classes);
+      Partial_Fit (aClassifier, Test_X, Test_Y, Classes);
       Score := Base.Score (aClassifier, Test_X, To_Integer_Matrix (Test_Y));
       Put_Line (Routine_Name & "Score" & Float'Image (Score));
    end loop;

@@ -20,6 +20,7 @@ package Encode_Utils is
                     Check_Unknown : Boolean := True) return Natural_Array;
    function Map_To_Integer (Values  : Integer_Array;
                             Uniques : Integer_Array) return Natural_Array;
+   function Unique (Values : Binary_Matrix) return NL_Types.Integer_List;
    function Unique (Values : Natural_Array) return Natural_Array;
    function Unique (Values : Integer_Array) return Integer_Array;
    function Unique (Values : Boolean_Array) return Boolean_Array;

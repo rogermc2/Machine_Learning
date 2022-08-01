@@ -47,6 +47,8 @@ package Label is
                      Neg_Label : Float := 0.0; Pos_Label : Float := 1.0);
    procedure C_Init (MLB     : in out Multi_Label_Binarizer;
                      Classes : Integer_List := Integer_Package.Empty_Vector);
+   procedure Fit (Binarizer : in out Label_Binarizer; Classes : Integer_List);
+   procedure Fit (Binarizer : in out Label_Binarizer; Y : Binary_Matrix);
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
    procedure Fit (Binarizer : in out Multi_Label_Binarizer; Y : Integer_Matrix);
@@ -73,6 +75,8 @@ package Label is
                             Neg_Label  : Integer := 0) return Boolean_Matrix;
    function Label_Binarize (Y         : Integer_Matrix; Classes : Integer_List;
                             Neg_Label : Integer := 0) return Binary_Matrix;
+   function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
+                        return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                         return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_List)

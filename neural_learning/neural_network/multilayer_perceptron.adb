@@ -367,7 +367,8 @@ package body Multilayer_Perceptron is
       Classifier.Parameters.N_Iter_No_Change    := N_Iter_No_Change;
       Classifier.Parameters.Max_Fun             := Max_Fun;
       Classifier.Parameters.RF_Fun              := RF_Fun;
-      First_Pass            := True;
+      First_Pass := True;
+
       return Classifier;
 
    end C_Init;
@@ -434,15 +435,13 @@ package body Multilayer_Perceptron is
    end  Compute_Loss_Gradient;
 
    --  -------------------------------------------------------------------------
-   --  L377  MultilayerPerceptron._Fit
-   --  L759  MultilayerPerceptron.Fit
-   --  The Y values are class labels in classification,
-   --  real numbers in regression.
+
    procedure Fit (Self  : in out MLP_Classifier;
                   X     : Real_Float_Matrix;
-                  Y     : Integer_Matrix; Incremental : Boolean := False) is
+                  Y     : Binary_Matrix; Incremental : Boolean := False) is
       use Ada.Containers;
-      Routine_Name       : constant String := "Multilayer_Perceptron.Fit ";
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Fit Binary Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -464,6 +463,76 @@ package body Multilayer_Perceptron is
 
       --  L402
       Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
+      Put_Line (Routine_Name & "N_Outputs" &
+                  Integer'Image (Self.Attributes.N_Outputs));
+
+      --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
+      Layer_Units.Append (Num_Features);
+      if Hidden_Layer_Sizes.Length > 0 then
+         for index in Hidden_Layer_Sizes.First_Index ..
+           Hidden_Layer_Sizes.Last_Index loop
+            Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
+         end loop;
+      end if;
+      Layer_Units.Append (Self.Attributes.N_Outputs);
+      --        Printing.Print_Integer_List (Routine_Name & "L409 Layer_Units",
+      --                                     Layer_Units);
+      --  L409
+      if First_Pass then
+         Initialize (Self, Layer_Units);
+      end if;
+
+      Activations.Append (X);
+
+      --  L417 Initialized grads are empty vectors, no initialization needed.
+      --  L427
+      if Self.Parameters.Solver = Sgd_Solver or else
+        Self.Parameters.Solver = Adam_Solver then
+         Fit_Stochastic (Self, X, Y_Bin, Incremental);
+
+         --  L444
+      elsif Self.Parameters.Solver = Lbfgs_Solver then
+         Fit_Lbfgs (Self, X, Y_Bin, Activations);
+      end if;
+
+      Check_Weights (Self);
+
+   end  Fit;
+
+   --  -------------------------------------------------------------------------
+   --  L377  MultilayerPerceptron._Fit
+   --  L759  MultilayerPerceptron.Fit
+   --  The Y values are class labels in classification,
+   --  real numbers in regression.
+   procedure Fit (Self  : in out MLP_Classifier;
+                  X     : Real_Float_Matrix;
+                  Y     : Integer_Matrix; Incremental : Boolean := False) is
+      use Ada.Containers;
+      Routine_Name       : constant String :=
+                             "Multilayer_Perceptron.Fit Integer Y ";
+      Num_Features       : constant Positive := Positive (X'Length (2));
+      Hidden_Layer_Sizes : constant Integer_List :=
+                             Self.Parameters.Hidden_Layer_Sizes;
+      --  L394
+      Y_Bin              : constant Binary_Matrix :=
+                             Validate_Input (Self, Y, Incremental);
+      Layer_Units        : Integer_List;
+      Activations        : Real_Matrix_List;
+   begin
+      --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y);
+      --  Printing.Print_Boolean_Matrix (Routine_Name & "Y_Bin", Y_Bin);
+      Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
+                "Hidden_Layer_Sizes is empty");
+      --  L385
+      Validate_Hyperparameters (Self);
+      First_Pass :=
+        Self.Attributes.Params.Is_Empty or else
+        (not Self.Parameters.Warm_Start and then not Incremental);
+
+      --  L402
+      Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
+      Put_Line (Routine_Name & "N_Outputs" &
+                  Integer'Image (Self.Attributes.N_Outputs));
 
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
@@ -1144,10 +1213,47 @@ package body Multilayer_Perceptron is
    --  L778  Partial_Fit updates the model with a single iteration over the
    --        given data.
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
+                          Y    : Binary_Matrix) is
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
+   begin
+      Fit (Self, X, Y, Incremental => True);
+
+   end Partial_Fit;
+
+   --  -------------------------------------------------------------------------
+  --  L778  Partial_Fit updates the model with a single iteration over the
+   --        given data.
+   procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Integer_Matrix) is
       --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
    begin
       Fit (Self, X, Y, Incremental => True);
+
+   end Partial_Fit;
+
+   --  -------------------------------------------------------------------------
+  --  L1186  Partial_Fit updates the model with one iteration over the data
+   --  Don't provide default for Classes to avoid ambiguity with
+   --  Partial_Fit (X, Y)
+   procedure  Partial_Fit
+     (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
+      Y       : Integer_Matrix; Classes : Integer_List) is
+      use Label;
+      use Multiclass_Utils;
+      LB           : Label_Binarizer;
+--        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
+   begin
+      --
+      if Check_Partial_Fit_First_Call (Self, Classes) then
+         Self.Attributes.Binarizer := LB;
+         if Type_Of_Target (Y) = Y_Multilabel_Indicator then
+            Fit (Self.Attributes.Binarizer, Y);
+         else
+            Fit (Self.Attributes.Binarizer, Classes);
+         end if;
+      end if;
+
+      Partial_Fit (Self, X, Y);
 
    end Partial_Fit;
 
@@ -1157,11 +1263,11 @@ package body Multilayer_Perceptron is
    --  Partial_Fit (X, Y)
    procedure  Partial_Fit
      (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
-      Y       : Integer_Matrix; Classes : Integer_List) is
+      Y       : Binary_Matrix; Classes : Integer_List) is
       use Label;
       use Multiclass_Utils;
       LB           : Label_Binarizer;
-      Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
+--        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
       --
       if Check_Partial_Fit_First_Call (Self, Classes) then
@@ -1169,8 +1275,8 @@ package body Multilayer_Perceptron is
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
             Fit (Self.Attributes.Binarizer, Y);
          else
-            Assert (False, Routine_Name & "not Y_Multilabel_Indicator not coded");
-            --              Fit (Self.Attributes.Binarizer, Classes);
+--              Assert (False, Routine_Name & "not Y_Multilabel_Indicator not coded");
+            Fit (Self.Attributes.Binarizer, Classes);
          end if;
       end if;
 
@@ -1403,11 +1509,52 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1108  MLPClassifier._validate_input
    function Validate_Input (Self        : in out MLP_Classifier;
+                            Y           : Binary_Matrix;
+                            Incremental : Boolean) return Binary_Matrix is
+      use Integer_Package;
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Validate_Input Binary Y ";
+      Classes      : Integer_List;
+      Binarizer    : Label.Label_Binarizer;
+   begin
+      --  Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
+      --           Integer'Image (Y'Length (2)));
+      --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
+      if Self.Attributes.Classes.Is_Empty or else
+        (not Self.Parameters.Warm_Start and not Incremental) then
+         --  L1139
+         Self.Attributes.Binarizer := Binarizer;
+         Label.Fit (Self.Attributes.Binarizer, Y);
+         Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
+      else
+         --  L1143
+         Classes := Multiclass_Utils.Unique_Labels (Y);
+         if Self.Parameters.Warm_Start then
+            Assert (Classes = Self.Attributes.Classes,
+                    Routine_Name & "warm_start cannot be used if Y has" &
+                      " different classes as in the previous call to fit.");
+         else
+            for index in Classes.First_Index .. Classes.Last_Index loop
+               Assert (Self.Attributes.Classes.Contains (Classes (index)),
+                       Routine_Name & "Y has classes not in Self.Classes");
+            end loop;
+         end if;
+      end if;
+
+      --  Python code downcasts to bool to prevent upcasting when working with
+      --  float32 data
+      return Label.Transform (Self.Attributes.Binarizer, Y);
+
+   end Validate_Input;
+
+   --  -------------------------------------------------------------------------
+  --  L1108  MLPClassifier._validate_input
+   function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Binary_Matrix is
       use Integer_Package;
       Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Validate_Input ";
+                       "Multilayer_Perceptron.Validate_Input Integer Y";
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer;
    begin

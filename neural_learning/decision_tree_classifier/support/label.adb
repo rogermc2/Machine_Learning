@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
---  with Printing;
+with Printing;
 
 package body Label is
 
@@ -81,33 +81,83 @@ package body Label is
    --     end Cum_Sum;
 
    --  -------------------------------------------------------------------------
-
-   procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array) is
-      --         Routine_Name : constant String := "Label.Binarizer Fit ";
+   --  L742
+   procedure Fit (Binarizer : in out Label_Binarizer; Classes : Integer_List) is
+      use Integer_Sorting;
+      Routine_Name : constant String := "Label.Binarizer Fit Classes ";
+      L_Classes    : Integer_List := Classes;
    begin
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
-      Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+      if Binarizer.Classes.Is_Empty then
+         Sort (L_Classes);
+         Binarizer.Classes := L_Classes;
+      else
+         for index in Binarizer.Classes.First_Index ..
+           Binarizer.Classes.Last_Index - 1 loop
+            for index_2 in index + 1 .. Binarizer.Classes.Last_Index loop
+               Assert (Binarizer.Classes (index_2) /= Binarizer.Classes (index),
+                       Routine_Name &
+                         "Binarizer.Classes contains duplicate classes");
+            end loop;
+         end loop;
+      end if;
 
    end Fit;
 
    --  -------------------------------------------------------------------------
 
-   procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
-      --  Routine_Name : constant String := "Label.Binarizer Fit ";
+   procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array) is
+      use Multiclass_Utils;
+      Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
       Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+      Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
+                Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
+                "label binarization does not support multioutput target data");
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
-      --        Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
-      --                                     Binarizer.Classes);
+
+   end Fit;
+
+   --  -------------------------------------------------------------------------
+   --  L264
+   procedure Fit (Binarizer : in out Label_Binarizer; Y : Binary_Matrix) is
+      use Multiclass_Utils;
+      Routine_Name : constant String := "Label.Binarizer Fit ";
+   begin
+      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+      Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
+                Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
+                "label binarization does not support multioutput target data");
+      Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+      Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
+                                   Binarizer.Classes);
+   end Fit;
+
+   --  -------------------------------------------------------------------------
+   --  L264
+   procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
+      use Multiclass_Utils;
+      Routine_Name : constant String := "Label.Binarizer Fit ";
+   begin
+      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+      Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
+                Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
+                "label binarization does not support multioutput target data");
+      Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+      Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
+                                   Binarizer.Classes);
    end Fit;
 
    --  -------------------------------------------------------------------------
 
    procedure Fit (Binarizer : in out Label_Binarizer;
                   Y         : NL_Types.Array_Of_Integer_Lists) is
-      --         Routine_Name : constant String := "Label.Binarizer Fit ";
+      use Multiclass_Utils;
+      Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
       Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
+      Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
+                Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
+                "label binarization does not support multioutput target data");
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
 
    end Fit;
@@ -628,6 +678,22 @@ package body Label is
    end Label_Binarize;
 
    --  -------------------------------------------------------------------------
+
+   function Label_Binarize (Y         : Binary_Matrix; Classes : Integer_List;
+                            Neg_Label : Integer := 0) return Binary_Matrix is
+      Y_Int : Integer_Matrix (Y'Range, Y'Range (2));
+   begin
+      for row in Y'Range loop
+         for col in Y'Range (2) loop
+            Y_Int (row, col) := Y (row, col);
+         end loop;
+      end loop;
+
+      return Label_Binarize (Y_Int, Classes, Neg_Label);
+
+   end Label_Binarize;
+
+   --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Integer_Matrix;
                             Classes   : Integer_List;
@@ -720,12 +786,22 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
+   function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
+                       return Binary_Matrix is
+      Routine_Name : constant String := "Label.Transform Binarize Binary Y ";
+   begin
+      Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
+      return Label_Binarize (Y, Self.Classes);
+
+   end Transform;
+
+   --  -------------------------------------------------------------------------
+
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                        return Binary_Matrix is
-      --  Routine_Name : constant String := "Label.Transform Binarize ";
+      Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
    begin
-      --  Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
-
+      Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
       return Label_Binarize (Y, Self.Classes);
 
    end Transform;

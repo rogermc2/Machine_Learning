@@ -228,6 +228,15 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
+   function Unique_Labels (Y : Binary_Matrix) return NL_Types.Integer_List is
+   begin
+      --  L111
+      return Encode_Utils.Unique (Y);
+
+   end Unique_Labels;
+
+   --  -------------------------------------------------------------------------
+   --  L42 unique_labels
    function Unique_Labels (Y : Real_Float_Matrix) return NL_Types.Float_List is
    begin
       --  L101
