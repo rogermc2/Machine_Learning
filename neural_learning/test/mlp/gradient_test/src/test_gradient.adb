@@ -48,7 +48,7 @@ begin
    Layer_Units.Append (Num_Features);
    Layer_Units.Append (Hidden_Layer_Sizes);
 
-   for num_labels in 2 .. 3 loop
+   for num_labels in 2 .. 2 loop
       for value in Y'Range loop
          Y (value, 1) := value mod num_labels + 1;
       end loop;
@@ -58,9 +58,11 @@ begin
          Y_Bin : constant Binary_Matrix := Label.Fit_Transform (LB, Y);
       begin
          --  L196
-         for activ_type in Base_Neural.Activation_Type'Range loop
+--           for activ_type in Base_Neural.Activation_Type'Range loop
+         for activ_type in Base_Neural.Activation_Type'First ..
+            Base_Neural.Activation_Type'First loop
             New_Line;
-            Put_Line (Routine_Name & "Activation Type:" &
+            Put_Line (Routine_Name & "Activation Type: " &
                         Base_Neural.Activation_Type'Image (activ_type));
             aClassifier := C_Init
               (Activation => activ_type,
@@ -79,6 +81,8 @@ begin
             --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
 
+            Put_Line (Routine_Name & "L208 Coeff_Gradients Length:" &
+                        Integer'Image (Positive (aClassifier.Attributes.Params.Element (1).Coeff_Gradients'Length)));
             Put_Line (Routine_Name & "L208 Theta_Length:" &
                         Integer'Image (Positive (Theta.Length)));
             --              Put_Line (Routine_Name &

@@ -25,8 +25,7 @@ package body Base is
 
    function Score (Self : Multilayer_Perceptron.MLP_Classifier;
                    X : Real_Float_Matrix; Y : Integer_Matrix;
-                   Sample_Weight : Real_Float_Vector)
-                   return Float is
+                   Sample_Weight : Real_Float_Vector) return Float is
       Routine_Name : constant String := "Base.Score with Weight ";
       Pred         : constant Binary_Matrix :=
                          Multilayer_Perceptron.Predict (Self, X);
