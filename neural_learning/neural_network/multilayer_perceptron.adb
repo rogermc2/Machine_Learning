@@ -1051,7 +1051,7 @@ package body Multilayer_Perceptron is
       use Maths;
       use Float_Math_Functions;
       use Base_Neural;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      --  Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
@@ -1111,7 +1111,8 @@ package body Multilayer_Perceptron is
       --  L344
       Self.Attributes.Params.Clear;  --  Layers
       --  python range(self.n_layers_ - 1) => 0 .. self.n_layers_ - 1
-      for layer in 1 .. Self.Attributes.N_Layers loop
+      for layer in 1 .. Self.Attributes.N_Layers - 1 loop
+         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          --  Add coefficent matrices and intercept vectors for layer.
          Fan_In := Layer_Units (layer);
          Fan_Out := Layer_Units (layer + 1);
@@ -1120,6 +1121,7 @@ package body Multilayer_Perceptron is
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
       end loop;
 
+      Put_Line (Routine_Name & "L351");
       --  L351
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
@@ -1133,7 +1135,7 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
-      --        Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
+      Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
 
    end Initialize;
 
