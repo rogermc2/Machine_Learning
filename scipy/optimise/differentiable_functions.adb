@@ -13,10 +13,10 @@ package body Differentiable_Functions is
                          Args : Multilayer_Perceptron.Loss_Grad_Args);
    procedure Update_Hess (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args);
-   procedure Update_X (Self : in out Scalar_Function;
-                       Fun  : RF_Fun_Access;
-                       Args : Multilayer_Perceptron.Loss_Grad_Args;
-                       X    : Real_Float_Vector);
+--     procedure Update_X (Self : in out Scalar_Function;
+--                         Fun  : RF_Fun_Access;
+--                         Args : Multilayer_Perceptron.Loss_Grad_Args;
+--                         X    : Real_Float_Vector);
 
    --  -------------------------------------------------------------------------
 
@@ -200,16 +200,16 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_X (Self : in out Scalar_Function; Fun : RF_Fun_Access;
-                        Args : Multilayer_Perceptron.Loss_Grad_Args;
-                       X    : Real_Float_Vector) is
-   begin
-      Self.X0 := X;
-      Self.F_Updated := False;
-      Self.G_Updated := False;
-      Self.H_Updated := False;
-
-   end Update_X;
+--     procedure Update_X (Self : in out Scalar_Function; Fun : RF_Fun_Access;
+--                          Args : Multilayer_Perceptron.Loss_Grad_Args;
+--                         X    : Real_Float_Vector) is
+--     begin
+--        Self.X0 := X;
+--        Self.F_Updated := False;
+--        Self.G_Updated := False;
+--        Self.H_Updated := False;
+--
+--     end Update_X;
 
    --  -------------------------------------------------------------------------
 

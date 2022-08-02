@@ -109,7 +109,6 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
@@ -123,7 +122,6 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
@@ -138,7 +136,6 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
@@ -154,8 +151,7 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
-      Binarizer.Y_Kind := Multiclass_Utils.Type_Of_Target (Y);
-      Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
+        Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
@@ -367,19 +363,6 @@ package body Label is
             Assert (False, Routine_Name &
                       "Y_Binary Classes.Length = 1 not coded");
          else
-            --              declare
-            --                 Y_Ravel : Integer_Array
-            --                   (1 .. Y_Thresh'Length * Y_Thresh'Length (2));
-            --              begin
-            --                 for row in Y_Thresh'Range loop
-            --                    for col in Y_Thresh'Range (2) loop
-            --                       Y_Ravel ((row - 1) * Y_Thresh'Length (2) +
-            --                                  col - Y_Thresh'First (2) + 1) :=
-            --                         Y_Thresh (row, col);
-            --                    end loop;
-            --                 end loop;
-            --
-            --              end;
             Assert (False, Routine_Name &
                       "Y_Binary Classes.Length /= 1 not coded");
          end if;

@@ -1268,15 +1268,18 @@ package body Multilayer_Perceptron is
       Y       : Binary_Matrix; Classes : Integer_List) is
       use Label;
       use Multiclass_Utils;
-      LB           : Label_Binarizer;
---        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
+      LB           : Label_Binarizer (Type_Of_Target (Y));
+      Routine_Name : constant String :=
+                         "Multilayer_Perceptron.Partial_Fit Binary ";
    begin
-      --
+      Put_Line (Routine_Name & " Y type: " &
+                  Y_Type'Image (Type_Of_Target (Y)));
       if Check_Partial_Fit_First_Call (Self, Classes) then
          Self.Attributes.Binarizer := LB;
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
             Fit (Self.Attributes.Binarizer, Y);
          else
+                Put_Line (Routine_Name & " not Y_Multilabel_Indicator");
 --              Assert (False, Routine_Name & "not Y_Multilabel_Indicator not coded");
             Fit (Self.Attributes.Binarizer, Classes);
          end if;
@@ -1514,10 +1517,11 @@ package body Multilayer_Perceptron is
                             Y           : Binary_Matrix;
                             Incremental : Boolean) return Binary_Matrix is
       use Integer_Package;
+      use Multiclass_Utils;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Validate_Input Binary Y ";
       Classes      : Integer_List;
-      Binarizer    : Label.Label_Binarizer;
+      Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
       --  Put_Line (Routine_Name & "Y size:" &  Integer'Image (Y'Length) & " x" &
       --           Integer'Image (Y'Length (2)));
