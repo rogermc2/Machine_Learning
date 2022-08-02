@@ -39,6 +39,28 @@ package body Multiclass_Utils is
    --  is_multilabel ([[1, 0], [0, 0]]) = True
    --  is_multilabel ([[1], [0], [0]]) = False
    --  is_multilabel ([[1, 0, 0]]) = True
+   function Is_Multilabel (Y : Binary_Matrix) return Boolean is
+      use Ada.Containers;
+      --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
+      Labels       : NL_Types.Integer_List;
+      Multilabel   : Boolean := Y'Length (2) > 1;
+   begin
+      if Multilabel then
+         Labels := Unique_Labels (Y);
+         Multilabel := Labels.Length < 3;
+      end if;
+
+      return Multilabel;
+
+   end Is_Multilabel;
+
+   --  -------------------------------------------------------------------------
+   --  L118
+   --  Examples:
+   --  is_multilabel ([0, 1, 0, 1]) = False
+   --  is_multilabel ([[1, 0], [0, 0]]) = True
+   --  is_multilabel ([[1], [0], [0]]) = False
+   --  is_multilabel ([[1, 0, 0]]) = True
    function Is_Multilabel (Y : Integer_Matrix) return Boolean is
       use Ada.Containers;
       --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
@@ -184,10 +206,12 @@ package body Multiclass_Utils is
 
    function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
       --        Routine_Name : constant String :=
-      --                           "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
+      --                           "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
       Result : Y_Type;
    begin
-      if Y'Length (2) > 1 then
+      if Is_Multilabel (Y) then
+         Result := Y_Multilabel_Indicator;
+      elsif Y'Length (2) > 1 then
          Result := Y_Multiclass_Multioutput;
       elsif Y'Length > 1 then
          Result := Y_Multiclass;

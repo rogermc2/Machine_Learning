@@ -351,6 +351,7 @@ package body Label is
          end loop;
       end loop;
 
+      --  L657
       if Output_Type = Y_Binary then
          if Y_Thresh'Length (2) = 2 then
             for row in Y_Thresh'Range loop
@@ -523,7 +524,7 @@ package body Label is
    function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                return Binary_Matrix is
       use Multiclass_Utils;
-      --        Routine_Name : constant String := "Label.Inverse_Transform ";
+      Routine_Name : constant String := "Label.Inverse_Transform ";
       Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
       Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
    begin
@@ -532,7 +533,7 @@ package body Label is
          --           Put_Line (Routine_Name & "Y is Multiclass");
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         --           Put_Line (Routine_Name & "Y is not Multiclass");
+         Put_Line (Routine_Name & "Y is not Multiclass");
          Y_Inv := Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
