@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Label is
 
@@ -131,8 +131,7 @@ package body Label is
                 "label binarization does not support multioutput target data");
 
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
-      Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
-                                   Binarizer.Classes);
+
    end Fit;
 
    --  -------------------------------------------------------------------------
@@ -145,8 +144,7 @@ package body Label is
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
-      Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
-                                   Binarizer.Classes);
+
    end Fit;
 
    --  -------------------------------------------------------------------------
@@ -395,7 +393,7 @@ package body Label is
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         Put_Line ("Label.Inverse_Transform Boolean_Matrix not Y_Multiclass" &
+         Assert (False, "Label.Inverse_Transform Boolean_Matrix not Y_Multiclass" &
                      "not coded");
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
@@ -434,7 +432,7 @@ package body Label is
       if Self.Y_Kind = Y_Multiclass then
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         Put_Line ("Label.Inverse_Transform Boolean_Matrix return " &
+         Assert (False, "Label.Inverse_Transform Boolean_Matrix return " &
                      "Integer_Matrix not Y_Multiclass not coded");
          --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
       end if;
@@ -529,22 +527,17 @@ package body Label is
    function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                return Binary_Matrix is
       use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Inverse_Transform ";
+--        Routine_Name : constant String := "Label.Inverse_Transform ";
       Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
       Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
    begin
       --  L398
       if Self.Y_Kind = Y_Multiclass then
-         --           Put_Line (Routine_Name & "Y is Multiclass");
          Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         Put_Line (Routine_Name & "Y is not Multiclass");
          Y_Inv := Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
-      --        Put_Line (Routine_Name & "L399 Y_Inv size:" &
-      --                    Integer'Image (Y_Inv'Length) & " x" &
-      --                    Integer'Image (Y_Inv'Length (2)));
 
       return Y_Inv;
 
@@ -777,9 +770,8 @@ package body Label is
 
    function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
                        return Binary_Matrix is
-      Routine_Name : constant String := "Label.Transform Binarize Binary Y ";
+--        Routine_Name : constant String := "Label.Transform Binarize Binary Y ";
    begin
-      Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
       return Label_Binarize (Y, Self.Classes);
 
    end Transform;
@@ -788,9 +780,8 @@ package body Label is
 
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                        return Binary_Matrix is
-      Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
+--        Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
    begin
-      Printing.Print_Integer_List (Routine_Name & "Classes", Self.Classes);
       return Label_Binarize (Y, Self.Classes);
 
    end Transform;
@@ -826,7 +817,7 @@ package body Label is
             if Class_Curs /= No_Element then
                Classes.Append (Element (Class_Curs));
             else
-               Put_Line (Routine_Name & "Class not found");
+               Assert (False, Routine_Name & "Class not found");
             end if;
          end loop;
 
@@ -874,7 +865,7 @@ package body Label is
             if Class_Curs /= No_Element then
                Classes.Append (Element (Class_Curs));
             else
-               Put_Line (Routine_Name & "Class not found");
+               Assert (False, Routine_Name & "Class not found");
             end if;
          end loop;
 

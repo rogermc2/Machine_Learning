@@ -2,10 +2,10 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Multiclass_Utils is
 
@@ -191,13 +191,11 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
 
    function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
-     Routine_Name : constant String :=
-                       "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
+--       Routine_Name : constant String :=
+--                         "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
       Result : Y_Type;
    begin
-      Put_Line (Routine_Name);
       if Is_Multilabel (Y) then
-         Put_Line (Routine_Name & "Is_Multilabel");
          Result := Y_Multilabel_Indicator;
       elsif Y'Length (2) > 1 then
          Result := Y_Multiclass_Multioutput;
@@ -248,7 +246,6 @@ package body Multiclass_Utils is
       Unique_Val   : Natural := 0;
       Result       : NL_Types.Integer_List;
    begin
-      Put_Line (Routine_Name);
       --  L78
       if Label_Kind = Y_Binary then
          Label_Kind := Y_Multiclass;
@@ -272,8 +269,6 @@ package body Multiclass_Utils is
       else  -- Uniques = Unique_Multiclass
          Assert (False, Routine_Name & "Unique_Multiclass not coded ");
       end if;
-
-      Printing.Print_Integer_List (Routine_Name & "Result", Result);
 
       return Result;
 
