@@ -122,9 +122,14 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name : constant String := "Label.Binarizer Fit ";
    begin
+      Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
+                "Neg_Label " & Float'Image (Binarizer.Neg_Label)  &
+                " must be less than Pos_Label " &
+                  Float'Image (Binarizer.Pos_Label));
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
+
       Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
       Printing.Print_Integer_List (Routine_Name & "Binarizer.Classes",
                                    Binarizer.Classes);

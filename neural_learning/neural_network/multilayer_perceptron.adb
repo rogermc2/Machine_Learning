@@ -1278,15 +1278,19 @@ package body Multilayer_Perceptron is
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Partial_Fit Binary ";
    begin
+      Put_Line (Routine_Name);
       Put_Line (Routine_Name & " Y type: " &
                   Y_Type'Image (Type_Of_Target (Y)));
       if Check_Partial_Fit_First_Call (Self, Classes) then
          Printing.Print_Integer_List (Routine_Name & "Classes", Classes);
          Self.Attributes.Binarizer := LB;
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
+            Put_Line (Routine_Name & "Y_Multilabel_Indicator");
+            Printing.Print_Binary_Matrix (Routine_Name & "Y(1)", Y, 1, 1);
+            --  Y_Multilabel_Indicator and Y are Correct
             Fit (Self.Attributes.Binarizer, Y);
          else
-            Put_Line (Routine_Name & " not Y_Multilabel_Indicator");
+            Put_Line (Routine_Name & "not Y_Multilabel_Indicator");
             --              Assert (False, Routine_Name & "not Y_Multilabel_Indicator not coded");
             Fit (Self.Attributes.Binarizer, Classes);
          end if;

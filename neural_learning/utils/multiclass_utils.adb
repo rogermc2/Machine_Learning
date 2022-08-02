@@ -1,13 +1,15 @@
 --  Based on scikit-learn/sklearn/utils.multiclass.py
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
---  with Ada.Text_IO; use Ada.Text_IO;
-
---  with Printing;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
+with Printing;
 
 package body Multiclass_Utils is
+
+   type Unique_Label_Types is (Unique_Multiclass, Unique_Indicator, Non_Unique);
 
    --  -------------------------------------------------------------------------
    --  L118
@@ -40,17 +42,9 @@ package body Multiclass_Utils is
    --  is_multilabel ([[1], [0], [0]]) = False
    --  is_multilabel ([[1, 0, 0]]) = True
    function Is_Multilabel (Y : Binary_Matrix) return Boolean is
-      use Ada.Containers;
-      --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
-      Labels       : NL_Types.Integer_List;
-      Multilabel   : Boolean := Y'Length (2) > 1;
    begin
-      if Multilabel then
-         Labels := Unique_Labels (Y);
-         Multilabel := Labels.Length < 3;
-      end if;
 
-      return Multilabel;
+      return Y'Length (2) > 1;
 
    end Is_Multilabel;
 
@@ -62,17 +56,9 @@ package body Multiclass_Utils is
    --  is_multilabel ([[1], [0], [0]]) = False
    --  is_multilabel ([[1, 0, 0]]) = True
    function Is_Multilabel (Y : Integer_Matrix) return Boolean is
-      use Ada.Containers;
-      --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
-      Labels       : NL_Types.Integer_List;
-      Multilabel   : Boolean := Y'Length (2) > 1;
    begin
-      if Multilabel then
-         Labels := Unique_Labels (Y);
-         Multilabel := Labels.Length < 3;
-      end if;
 
-      return Multilabel;
+      return Y'Length (2) > 1;
 
    end Is_Multilabel;
 
@@ -205,11 +191,13 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
 
    function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
-      --        Routine_Name : constant String :=
-      --                           "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
+     Routine_Name : constant String :=
+                       "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
       Result : Y_Type;
    begin
+      Put_Line (Routine_Name);
       if Is_Multilabel (Y) then
+         Put_Line (Routine_Name & "Is_Multilabel");
          Result := Y_Multilabel_Indicator;
       elsif Y'Length (2) > 1 then
          Result := Y_Multiclass_Multioutput;
@@ -253,9 +241,41 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
    function Unique_Labels (Y : Binary_Matrix) return NL_Types.Integer_List is
+      Routine_Name : constant String :=
+                       "Multiclass_Utils.Unique_Labels Binary ";
+      Label_Kind   : Y_Type := Type_Of_Target (Y);
+      Uniques      : Unique_Label_Types := Non_Unique;
+      Unique_Val   : Natural := 0;
+      Result       : NL_Types.Integer_List;
    begin
+      Put_Line (Routine_Name);
+      --  L78
+      if Label_Kind = Y_Binary then
+         Label_Kind := Y_Multiclass;
+      end if;
+
+      case Label_Kind is
+         when Y_Binary | Y_Multiclass => Uniques := Unique_Multiclass;
+         when Y_Multilabel_Indicator => Uniques := Unique_Indicator;
+         when Y_Unknown | Y_Continuous | Y_Continuous_Multioutput |
+              Y_Multiclass_Multioutput => null;
+      end case;
+
+      Assert (Uniques /= Non_Unique, Routine_Name &
+             "Invalid label type: " & Y_Type'Image (Label_Kind));
       --  L111
-      return Encode_Utils.Unique (Y);
+      if Uniques = Unique_Indicator then
+         for index in Y'Range (2) loop
+            Result.Append (Unique_Val);
+            Unique_Val := Unique_Val + 1;
+         end loop;
+      else  -- Uniques = Unique_Multiclass
+         Assert (False, Routine_Name & "Unique_Multiclass not coded ");
+      end if;
+
+      Printing.Print_Integer_List (Routine_Name & "Result", Result);
+
+      return Result;
 
    end Unique_Labels;
 
