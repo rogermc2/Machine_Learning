@@ -45,14 +45,14 @@ begin
    for count in 0 .. 4 loop
       Classes.Append (count);
    end loop;
-
---     for test_num in 1 .. 100 loop
+--  OK here Test_Y size 50 x 5
+--  --     for test_num in 1 .. 100 loop
    for test_num in 1 .. 1
    loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));
       Partial_Fit (aClassifier, Test_X, Test_Y, Classes);
-      Score := Base.Score (aClassifier, Test_X, To_Integer_Matrix (Test_Y));
-      Put_Line (Routine_Name & "Score" & Float'Image (Score));
+--        Score := Base.Score (aClassifier, Test_X, To_Integer_Matrix (Test_Y));
+--        Put_Line (Routine_Name & "Score" & Float'Image (Score));
    end loop;
 
 end Test_Multi_Label_Classification;
