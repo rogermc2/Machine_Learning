@@ -2,7 +2,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Base;
+--  with Base;
 with Base_Neural;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -25,7 +25,7 @@ procedure Test_Multi_Label_Classification is
    Classes             : NL_Types.Integer_List;
    Layer_Sizes         : NL_Types.Integer_List;
    aClassifier         : MLP_Classifier;
-   Score               : Float;
+--     Score               : Float;
 begin
    Put_Line (Routine_Name);
    Layer_Sizes.Append (50);

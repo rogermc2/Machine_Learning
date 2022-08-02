@@ -250,9 +250,9 @@ package body Multilayer_Perceptron is
    --  L340  Check_Partial_Fit_First_Call returns True if this was the first
    --  call to partial_fit on clf in which case the classes attribute
    --  is also set on clf.
-   function Check_Partial_Fit_First_Call (Self    : in out MLP_Classifier;
-                                          Classes : Integer_List)
-                                          return Boolean is
+   --  Implemented in Multilayer_Perceptron to avoid circular references
+   function Check_Partial_Fit_First_Call
+     (Self : in out MLP_Classifier; Classes : Integer_List) return Boolean is
       use Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Check_Partial_Fit_First_Call ";
@@ -263,10 +263,12 @@ package body Multilayer_Perceptron is
                 "Classes must be passed on the first call to Partial_Fit.");
 
       if not Is_Empty (Classes) then
-         if not Is_Empty (Self.Attributes.Classes) then
-            null;
+         if not Self.Attributes.Classes.Is_Empty then
+            Assert  (Self.Attributes.Classes = Classes, Routine_Name &
+                       "Classes is not the same as on last call to partial_fit");
          else
-            Self.Attributes.Classes := Classes;
+            --  This is the first call to partial_fit
+            Self.Attributes.Classes := Multiclass_Utils.Unique_Labels (Classes);
             Result := True;
          end if;
 
@@ -339,7 +341,7 @@ package body Multilayer_Perceptron is
                     Max_Fun             : Max_Function_Access := null;
                     RF_Fun              : Num_Diff.Deriv_Float_Fun_Access
                     := null)
-                    return MLP_Classifier is
+                 return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
       Classifier.Parameters.Hidden_Layer_Sizes  := Hidden_Layer_Sizes;
@@ -865,15 +867,15 @@ package body Multilayer_Perceptron is
                --                      Put_Line (Routine_Name & "L134 hidden activation function "
                --                                & Activation_Type'Image (Hidden_Activation));
                case Hidden_Activation is
-                  when Identity_Activation => null;
-                  when Logistic_Activation =>
-                     Logistic (Activations (Activations.Last_Index));
-                  when Tanh_Activation =>
-                     Tanh (Activations (Activations.Last_Index));
-                  when Rect_LU_Activation =>
-                     Rect_LU (Activations (Activations.Last_Index));
-                  when Softmax_Activation =>
-                     Softmax (Activations (Activations.Last_Index));
+               when Identity_Activation => null;
+               when Logistic_Activation =>
+                  Logistic (Activations (Activations.Last_Index));
+               when Tanh_Activation =>
+                  Tanh (Activations (Activations.Last_Index));
+               when Rect_LU_Activation =>
+                  Rect_LU (Activations (Activations.Last_Index));
+               when Softmax_Activation =>
+                  Softmax (Activations (Activations.Last_Index));
                end case;
                --                 Printing.Print_Float_Matrix
                --                   (Routine_Name & "L134 layer" &
@@ -894,14 +896,14 @@ package body Multilayer_Perceptron is
       --          Put_Line (Routine_Name & "L138 last activation function "
       --                      & Activation_Type'Image (Output_Activation));
       case Output_Activation is
-         when Identity_Activation => null;
-         when Logistic_Activation =>
-            Logistic (Activations (Activations.Last_Index));
-         when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
-         when Rect_LU_Activation =>
-            Rect_LU (Activations (Activations.Last_Index));
-         when Softmax_Activation =>
-            Softmax (Activations (Activations.Last_Index));
+      when Identity_Activation => null;
+      when Logistic_Activation =>
+         Logistic (Activations (Activations.Last_Index));
+      when Tanh_Activation => Tanh (Activations (Activations.Last_Index));
+      when Rect_LU_Activation =>
+         Rect_LU (Activations (Activations.Last_Index));
+      when Softmax_Activation =>
+         Softmax (Activations (Activations.Last_Index));
       end case;
 
       --        Printing.Print_Float_Matrix (Routine_Name & "L140 Activations last out",
@@ -911,7 +913,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L144
    function Forward_Pass_Fast (Self  : MLP_Classifier; X : Real_Float_Matrix)
-                               return Real_Float_Matrix is
+                            return Real_Float_Matrix is
       --        use Ada.Containers;
       use Base_Neural;
       use Real_Float_Arrays;
@@ -921,7 +923,7 @@ package body Multilayer_Perceptron is
                        "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
-                                     return Activations_Array is
+                                  return Activations_Array is
          Result   : Activations_Array (Activations'Range);
       begin
          for row in Activations'Range loop
@@ -935,7 +937,7 @@ package body Multilayer_Perceptron is
       end To_Activations_Array;
 
       function To_Matrix (Activations : Activations_Array)
-                          return Real_Float_Matrix is
+                       return Real_Float_Matrix is
          Row_Data : Real_Float_List;
          Result   : Real_Float_Matrix (Activations'Range, 1 ..
                                          Integer (Activations (1).Length));
@@ -1010,11 +1012,11 @@ package body Multilayer_Perceptron is
 
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
-                  when Identity_Activation => null;
-                  when Logistic_Activation => Logistic (Updated_Activation);
-                  when Tanh_Activation => Tanh (Updated_Activation);
-                  when Rect_LU_Activation => Rect_LU (Updated_Activation);
-                  when Softmax_Activation => Softmax (Updated_Activation);
+               when Identity_Activation => null;
+               when Logistic_Activation => Logistic (Updated_Activation);
+               when Tanh_Activation => Tanh (Updated_Activation);
+               when Rect_LU_Activation => Rect_LU (Updated_Activation);
+               when Softmax_Activation => Softmax (Updated_Activation);
                end case;
             end if;
 
@@ -1034,11 +1036,11 @@ package body Multilayer_Perceptron is
       --        Printing.Print_Float_Matrix (Routine_Name & "L172 Activ_Out",
       --                                     Activ_Out, 1, 4);
       case Output_Activation is
-         when Identity_Activation => null;
-         when Logistic_Activation => Logistic (Activ_Out);
-         when Tanh_Activation => Tanh (Activ_Out);
-         when Rect_LU_Activation => Rect_LU (Activ_Out);
-         when Softmax_Activation => Softmax (Activ_Out);
+      when Identity_Activation => null;
+      when Logistic_Activation => Logistic (Activ_Out);
+      when Tanh_Activation => Tanh (Activ_Out);
+      when Rect_LU_Activation => Rect_LU (Activ_Out);
+      when Softmax_Activation => Softmax (Activ_Out);
       end case;
 
       Printing.Print_Float_Matrix (Routine_Name & "Activ_Out",
@@ -1148,51 +1150,51 @@ package body Multilayer_Perceptron is
    procedure Init_Optimizer (Self : in out MLP_Classifier) is
    begin
       case Self.Parameters.Solver is
-         when Adam_Solver =>
-            declare
-               Optimizer : Optimizer_Record (Optimizer_Adam);
-            begin
-               Stochastic_Optimizers.C_Init
-                 (Optimizer.Adam, Params => Self.Attributes.Params,
-                  Initial_Learning_Rate =>
-                    Self.Parameters.Learning_Rate_Init,
-                  Beta_1 => Self.Parameters.Beta_1,
-                  Beta_2 => Self.Parameters.Beta_2,
-                  Epsilon => Self.Parameters.Epsilon);
+      when Adam_Solver =>
+         declare
+            Optimizer : Optimizer_Record (Optimizer_Adam);
+         begin
+            Stochastic_Optimizers.C_Init
+              (Optimizer.Adam, Params => Self.Attributes.Params,
+               Initial_Learning_Rate =>
+                 Self.Parameters.Learning_Rate_Init,
+               Beta_1 => Self.Parameters.Beta_1,
+               Beta_2 => Self.Parameters.Beta_2,
+               Epsilon => Self.Parameters.Epsilon);
 
-               Self.Attributes.Optimizer := Optimizer;
-            end;
+            Self.Attributes.Optimizer := Optimizer;
+         end;
 
-         when Lbfgs_Solver =>
-            declare
-               Optimizer : Optimizer_Record (Optimizer_SGD);
-            begin
-               Stochastic_Optimizers.C_Init
-                 (Optimizer.SGD, Params => Self.Attributes.Params,
-                  Initial_Learning_Rate =>
-                    Self.Parameters.Learning_Rate_Init,
-                  Learning_Rate => Self.Parameters.Learning_Rate,
-                  Momentum => Self.Parameters.Momentum,
-                  Use_Nesterov => Self.Parameters.Nesterovs_Momentum,
-                  Power_T => Self.Parameters.Power_T);
+      when Lbfgs_Solver =>
+         declare
+            Optimizer : Optimizer_Record (Optimizer_SGD);
+         begin
+            Stochastic_Optimizers.C_Init
+              (Optimizer.SGD, Params => Self.Attributes.Params,
+               Initial_Learning_Rate =>
+                 Self.Parameters.Learning_Rate_Init,
+               Learning_Rate => Self.Parameters.Learning_Rate,
+               Momentum => Self.Parameters.Momentum,
+               Use_Nesterov => Self.Parameters.Nesterovs_Momentum,
+               Power_T => Self.Parameters.Power_T);
 
-               Self.Attributes.Optimizer := Optimizer;
-            end;
+            Self.Attributes.Optimizer := Optimizer;
+         end;
 
-         when Sgd_Solver =>
-            declare
-               Optimizer : Optimizer_Record (Optimizer_SGD);
-            begin
-               Stochastic_Optimizers.C_Init
-                 (Optimizer.SGD, Params => Self.Attributes.Params,
-                  Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
-                  Learning_Rate => Self.Parameters.Learning_Rate,
-                  Momentum => Self.Parameters.Momentum,
-                  Use_Nesterov => Self.Parameters.Nesterovs_Momentum,
-                  Power_T => Self.Parameters.Power_T);
+      when Sgd_Solver =>
+         declare
+            Optimizer : Optimizer_Record (Optimizer_SGD);
+         begin
+            Stochastic_Optimizers.C_Init
+              (Optimizer.SGD, Params => Self.Attributes.Params,
+               Initial_Learning_Rate => Self.Parameters.Learning_Rate_Init,
+               Learning_Rate => Self.Parameters.Learning_Rate,
+               Momentum => Self.Parameters.Momentum,
+               Use_Nesterov => Self.Parameters.Nesterovs_Momentum,
+               Power_T => Self.Parameters.Power_T);
 
-               Self.Attributes.Optimizer := Optimizer;
-            end;
+            Self.Attributes.Optimizer := Optimizer;
+         end;
       end case;
 
    end Init_Optimizer;
@@ -1279,6 +1281,7 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & " Y type: " &
                   Y_Type'Image (Type_Of_Target (Y)));
       if Check_Partial_Fit_First_Call (Self, Classes) then
+         Printing.Print_Integer_List (Routine_Name & "Classes", Classes);
          Self.Attributes.Binarizer := LB;
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
             Fit (Self.Attributes.Binarizer, Y);
@@ -1317,7 +1320,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Binary_Matrix is
+                  return Binary_Matrix is
       Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
@@ -1415,15 +1418,15 @@ package body Multilayer_Perceptron is
       --              Activation_Type'Image (Self.Parameters.Activation));
       --  L312
       case Self.Parameters.Activation is
-         when Identity_Activation => null;
-         when Logistic_Activation =>
-            Logistic_Derivative (Z => Activations (Layer),
-                                 Del => Deltas (Layer - 1));
-         when Tanh_Activation =>
-            Tanh_Derivative (Activations (Layer), Deltas (Layer - 1));
-         when Rect_LU_Activation =>
-            Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
-         when Softmax_Activation => null;
+      when Identity_Activation => null;
+      when Logistic_Activation =>
+         Logistic_Derivative (Z => Activations (Layer),
+                              Del => Deltas (Layer - 1));
+      when Tanh_Activation =>
+         Tanh_Derivative (Activations (Layer), Deltas (Layer - 1));
+      when Rect_LU_Activation =>
+         Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
+      when Softmax_Activation => null;
       end case;
 
       --  L314
