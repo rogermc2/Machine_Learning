@@ -8,6 +8,8 @@ with NL_Types;
 with Printing;
 with Stochastic_Optimizers;
 
+with Examples;
+
 procedure Test_Target_Type is
    use NL_Types.Float_Package;
    use NL_Types.Float_List_Package;
@@ -18,6 +20,7 @@ procedure Test_Target_Type is
    Routine_Name  : constant String := "Test_Target_Type ";
 begin
    Put_Line (Routine_Name);
+   Examples.Init;
    for row in 1 .. 100 loop
       for col in 1 .. Data.Num_Features loop
          X (row, col) := Features (row, col);
