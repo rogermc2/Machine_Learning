@@ -1,32 +1,29 @@
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Multilayer_Perceptron;
-with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
-with Printing;
-with Stochastic_Optimizers;
+--  with Printing;
 
-with Examples;
+with Examples; use Examples;
+with Multiclass_Utils; use Multiclass_Utils;
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 procedure Test_Target_Type is
-   use NL_Types.Float_Package;
-   use NL_Types.Float_List_Package;
-   use Real_Float_Arrays;
-   use Multilayer_Perceptron;
-   use Stochastic_Optimizers;
-
-   Routine_Name  : constant String := "Test_Target_Type ";
+    Routine_Name : constant String := "Test_Target_Type ";
+    Target_Type  : Y_Type;
 begin
-   Put_Line (Routine_Name);
-   Examples.Init;
-   for row in 1 .. 100 loop
-      for col in 1 .. Data.Num_Features loop
-         X (row, col) := Features (row, col);
-      end loop;
-      Y (row, 1) := Data.Target (row);
-   end loop;
-
+    Put_Line (Routine_Name);
+    Examples.Init;
+    for index in Binary_Examples.B_Binary.First_Index ..
+      Binary_Examples.B_Binary.Last_Index loop
+        declare
+            B_Array     : constant Binary_Array := Binary_Examples.B_Binary (index);
+        begin
+            Target_Type := Type_Of_Target (B_Array);
+            Assert (Target_Type = Y_Binary,
+                    "Type_of_target should be Y_Binary, but got " &
+                    Y_Type'Image (Target_Type));
+        end;
+    end loop;
 
 end Test_Target_Type;

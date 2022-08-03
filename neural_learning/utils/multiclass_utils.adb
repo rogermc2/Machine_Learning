@@ -103,6 +103,43 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
+   function Type_Of_Target (Y : Binary_Array) return Y_Type is
+--       Routine_Name : constant String :=
+--                         "Multiclass_Utils.Type_Of_Target Binary_Array ";
+      Result : Y_Type;
+   begin
+      if Y'Length > 1 then
+         Result := Y_Multiclass;
+      else
+         Result := Y_Binary;
+      end if;
+
+      return Result;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+
+   function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
+--       Routine_Name : constant String :=
+--                         "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
+      Result : Y_Type;
+   begin
+      if Is_Multilabel (Y) then
+         Result := Y_Multilabel_Indicator;
+      elsif Y'Length (2) > 1 then
+         Result := Y_Multiclass_Multioutput;
+      elsif Y'Length > 1 then
+         Result := Y_Multiclass;
+      else
+         Result := Y_Binary;
+      end if;
+
+      return Result;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
    --  L202
    function Type_Of_Target (Y : Boolean_Matrix) return Y_Type is
       pragma Unreferenced (Y);
@@ -172,27 +209,6 @@ package body Multiclass_Utils is
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type is
       --        Routine_Name : constant String :=
       --                           "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
-      Result : Y_Type;
-   begin
-      if Is_Multilabel (Y) then
-         Result := Y_Multilabel_Indicator;
-      elsif Y'Length (2) > 1 then
-         Result := Y_Multiclass_Multioutput;
-      elsif Y'Length > 1 then
-         Result := Y_Multiclass;
-      else
-         Result := Y_Binary;
-      end if;
-
-      return Result;
-
-   end Type_Of_Target;
-
-   --  -------------------------------------------------------------------------
-
-   function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
---       Routine_Name : constant String :=
---                         "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
       Result : Y_Type;
    begin
       if Is_Multilabel (Y) then

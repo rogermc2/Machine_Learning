@@ -11,6 +11,7 @@ package Multiclass_Utils is
                        Unique_Mutilabel_Indicator);
 
    function Is_Multilabel (Y : Real_Float_Matrix) return Boolean;
+   function Type_Of_Target (Y : Binary_Array) return Y_Type;
    function Type_Of_Target (Y : Binary_Matrix) return Y_Type;
    function Type_Of_Target (Y : Boolean_Matrix) return Y_Type;
    function Type_Of_Target (Y : Integer_Array) return Y_Type;
