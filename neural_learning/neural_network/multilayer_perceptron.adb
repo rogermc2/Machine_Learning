@@ -1183,14 +1183,16 @@ package body Multilayer_Perceptron is
       use Label;
       use Multiclass_Utils;
       LB           : Label_Binarizer (Type_Of_Target (Y));
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Partial_Fit Binary ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Partial_Fit Binary ";
    begin
       if Check_Partial_Fit_First_Call (Self, Classes) then
          Self.Attributes.Binarizer := LB;
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
+            Put_Line (Routine_Name & "Multilabel_Indicator");
             Fit (Self.Attributes.Binarizer, Y);
          else
+            Put_Line (Routine_Name & "not Multilabel_Indicator");
             Fit (Self.Attributes.Binarizer, Classes);
          end if;
       end if;

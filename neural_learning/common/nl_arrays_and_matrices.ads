@@ -36,9 +36,25 @@ package NL_Arrays_And_Matrices is
    subtype Real_Float_Matrix is Real_Float_Arrays.Real_Matrix;
    subtype Real_Float_Vector is Real_Float_Arrays.Real_Vector;
 
+   package Binary_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Binary_Array);
+   subtype Binary_List is Binary_List_Package.Vector;
+
+   package Binary_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Binary_Matrix);
+   subtype Binary_Matrix_List is Binary_Matrix_List_Package.Vector;
+
+   package Boolean_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Boolean_Matrix);
+   subtype Boolean_Matrix_List is Boolean_Matrix_List_Package.Vector;
+
    package Real_Float_Package is new
      Ada.Containers.Vectors (Positive, Float);
    subtype Real_Float_List is Real_Float_Package.Vector;
+
+   package Integer_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
+     (Positive, Integer_Matrix);
+   subtype Integer_Matrix_List is Integer_Matrix_List_Package.Vector;
 
    use Real_Float_Arrays;
    package Real_Matrix_List_Package is new Ada.Containers.Indefinite_Vectors
