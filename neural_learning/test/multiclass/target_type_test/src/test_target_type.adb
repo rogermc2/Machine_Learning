@@ -17,12 +17,12 @@ begin
     for index in Binary_Examples.B_Binary.First_Index ..
       Binary_Examples.B_Binary.Last_Index loop
         declare
-            B_Array     : constant Binary_Array := Binary_Examples.B_Binary (index);
+            B_Array : constant Binary_Array := Binary_Examples.B_Binary (index);
         begin
             Target_Type := Type_Of_Target (B_Array);
-            Assert (Target_Type = Y_Binary,
-                    "Type_of_target should be Y_Binary, but got " &
-                    Y_Type'Image (Target_Type));
+            Assert (Target_Type = Y_Binary, "Type_of_target for binary index" &
+                      Integer'Image (index) & " should be Y_Binary, but got " &
+                      Y_Type'Image (Target_Type));
         end;
     end loop;
 
