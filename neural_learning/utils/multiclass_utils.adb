@@ -14,23 +14,18 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L118
    function Is_Multilabel (Y : Integer_Array) return Boolean is
-      use Ada.Containers;
-      --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel array ";
-      Labels : constant NL_Types.Integer_List := Unique_Labels (Y);
    begin
-      return Labels.Length > 2;
+      pragma Unreferenced (Y);
+      return False;
 
    end Is_Multilabel;
 
    --  -------------------------------------------------------------------------
    --  L118
    function Is_Multilabel (Y : NL_Types.Integer_List) return Boolean is
-      use Ada.Containers;
-      --          Routine_Name : constant String :=
-      --                           "Multiclass_Utils.Is_Multilabel Integer_List ";
-      Labels : constant NL_Types.Integer_List := Unique_Labels (Y);
    begin
-      return Labels.Length > 2;
+      pragma Unreferenced (Y);
+      return False;
 
    end Is_Multilabel;
 
@@ -104,17 +99,9 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
 
    function Type_Of_Target (Y : Binary_Array) return Y_Type is
---       Routine_Name : constant String :=
---                         "Multiclass_Utils.Type_Of_Target Binary_Array ";
-      Result : Y_Type;
    begin
-      if Y'Length > 1 then
-         Result := Y_Multiclass;
-      else
-         Result := Y_Binary;
-      end if;
-
-      return Result;
+      pragma Unreferenced (Y);
+      return Y_Binary;
 
    end Type_Of_Target;
 
