@@ -18,6 +18,7 @@ package Multiclass_Utils is
    function Type_Of_Target (Y : NL_Types.Integer_List) return Y_Type;
    function Type_Of_Target (Y : NL_Types.Array_Of_Integer_Lists) return Y_Type;
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type;
+   function Type_Of_Target (Y : Real_Float_Vector) return Y_Type;
    function Type_Of_Target (Y : Real_Float_Matrix) return Y_Type;
    function Unique_Labels (Y : Binary_Matrix) return NL_Types.Integer_List;
    function Unique_Labels (Y : Integer_Array) return NL_Types.Integer_List;

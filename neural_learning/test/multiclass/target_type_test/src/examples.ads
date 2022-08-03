@@ -38,8 +38,8 @@ package Examples is
     end record;
 
     type Continuous is record
-        C_Float1   : Float_Array (1 .. 1) := (1 => 10.0 ** (-5));
-        C_Float2   : Float_Array (1 .. 2) := (0.0, 0.5);
+        C_Float1   : Real_Float_Vector (1 .. 1) := (1 => 10.0 ** (-5));
+        C_Float2   : Real_Float_Vector (1 .. 2) := (0.0, 0.5);
         C_Float3   : Real_Float_Matrix (1 .. 2, 1 .. 1) :=
                        ((1 => 0.0), (1 => 0.5));
     end record;

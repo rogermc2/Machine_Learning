@@ -214,6 +214,15 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
     --  L202
+   function Type_Of_Target (Y : Real_Float_Vector) return Y_Type is
+   begin
+      pragma Unreferenced (Y);
+      return Y_Continuous;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+  --  L202
    function Type_Of_Target (Y : Real_Float_Matrix) return Y_Type is
       Result : Y_Type;
    begin
@@ -230,7 +239,7 @@ package body Multiclass_Utils is
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
-   --  unique_labels L101
+    --  unique_labels L101
    --     function Unique_Multiclass_Set (Y : Integer_Matrix)
    --                                     return Encode_Utils.Int_Sets.Set is
    --     begin
