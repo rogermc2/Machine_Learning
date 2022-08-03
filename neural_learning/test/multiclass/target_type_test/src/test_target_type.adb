@@ -12,5 +12,6 @@ begin
 
    Binary_Tests;
    Continuous_Tests;
+   Multilabel_Indicator_Tests;
 
 end Test_Target_Type;
