@@ -62,9 +62,9 @@ package body Tests is
 
    procedure Continuous_Multioutput_Tests is
       Routine_Name : constant String := "Tests.Continuous_Multioutput_Tests ";
-      Target_Type  : Y_Type;
 
       procedure CM_Test (CM : Real_Float_Matrix) is
+         Target_Type  : Y_Type;
       begin
          Target_Type := Type_Of_Target (CM);
          Assert (Target_Type = Y_Continuous_Multioutput,
@@ -88,7 +88,7 @@ package body Tests is
 --        procedure CM_Test (CM : Real_Float_Matrix) is
 --        begin
 --           Target_Type := Type_Of_Target (CM);
---           Assert (Target_Type = Y_Continuous_Multioutput,
+--           Assert (Target_Type = ,
 --                   "Type_of_target for continuous multioutput matrix should be " &
 --                     "but got Y_Continuous " & Y_Type'Image (Target_Type));
 --        end CM_Test;

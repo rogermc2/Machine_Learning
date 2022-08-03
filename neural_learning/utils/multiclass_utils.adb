@@ -98,6 +98,21 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
+   generic
+      type Item is private;
+      type Array_Type is array (Integer range <>) of Item;
+   function Type_Of_Array_Target (Y : Array_Type) return Y_Type;
+
+   function Type_Of_Array_Target (Y : Array_Type) return Y_Type is
+   begin
+      pragma Unreferenced (Y);
+      return Y_Binary;
+
+   end Type_Of_Array_Target;
+
+   --  -------------------------------------------------------------------------
+
+--     function Type_Of_Target (Y : Binary_Array) is new Type_Of_Array_Target (Binary);
    function Type_Of_Target (Y : Binary_Array) return Y_Type is
    begin
       pragma Unreferenced (Y);
