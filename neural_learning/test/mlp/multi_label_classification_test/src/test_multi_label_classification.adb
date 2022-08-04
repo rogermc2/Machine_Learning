@@ -1,3 +1,5 @@
+--  Based on scikit-learn/sklearn/neural_network/tests/test_mlp.py
+--  test_multilabel_classification
 
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -45,8 +47,8 @@ begin
    for count in 0 .. 4 loop
       Classes.Append (count);
    end loop;
---  OK here Test_Y size 50 x 5
---  --     for test_num in 1 .. 100 loop
+
+--   for test_num in 1 .. 100 loop
    for test_num in 1 .. 1
    loop
       Put_Line (Routine_Name & "test_num" & Integer'Image (test_num));

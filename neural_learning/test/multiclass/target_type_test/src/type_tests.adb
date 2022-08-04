@@ -1,3 +1,4 @@
+--  Based on scikit-learn/sklearn/utils/tests/test_multiclass.py
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;

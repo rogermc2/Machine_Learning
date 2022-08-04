@@ -19,31 +19,32 @@ package body Multiclass_Utils is
 --     function Check_Classification (Y : Array_Type) return Boolean;
 --
 --     function Check_Classification (Y : Array_Type) return Boolean is
---          Target_Type : constant Y_Type := Type_Of_Target (Y);
+--        Target_Type : constant Y_Type := Type_Of_Target (Y);
 --     begin
+--        return Y'Length /= 0;
 --        return Target_Type in
---            Y_Binary | Y_Multiclass | Y_Multiclass_Multioutput |
---            Y_Multilabel_Indicator | Y_Multilabel_Sequences;
---
+--          Y_Binary | Y_Multiclass | Y_Multiclass_Multioutput |
+--        Y_Multilabel_Indicator | Y_Multilabel_Sequences;
+
 --     end Check_Classification;
 
    --  -------------------------------------------------------------------------
    --  L180
---     function Check_Classification_Targets (Y : Binary_Array) return Boolean is
---          function Check is new Check_Classification
---            (Item => Binary, Array_Type => Binary_Array);
---     begin
---        return Check (Y);
+--        function Check_Classification_Targets (Y : Binary_Array) return Boolean is
+--             function Check is new Check_Classification
+--               (Item => Binary, Array_Type => Binary_Array);
+--        begin
+--           return Check (Y);
 --
---     end Check_Classification_Targets;
+--        end Check_Classification_Targets;
 
    --  -------------------------------------------------------------------------
    --  L180
    function Check_Classification_Targets (Y : Binary_Matrix) return Boolean is
    begin
       return Type_Of_Target (Y) in
-          Y_Binary | Y_Multiclass | Y_Multiclass_Multioutput |
-          Y_Multilabel_Indicator | Y_Multilabel_Sequences;
+        Y_Binary | Y_Multiclass | Y_Multiclass_Multioutput |
+      Y_Multilabel_Indicator | Y_Multilabel_Sequences;
 
    end Check_Classification_Targets;
 
@@ -135,39 +136,39 @@ package body Multiclass_Utils is
    end Is_Multilabel;
 
    --  -------------------------------------------------------------------------
---   target_types:
---   * binary: Y contains <= 2 discrete values and is 1d or a column
---       vector.
---   * continuous: Y is an array of floats that are not all integers and is 1d
---       or a column vector.
---   * continuous-multioutput: Y is a 2d array of floats that are not all
---       integers and both dimensions are of size > 1.
---   * multiclass: Y contains more than two discrete values, is not a
---        sequence of sequences, and is 1d or a column vector.
---   * multiclass-multioutput: Y is a 2d array that contains more
---        than two discrete values, is not a sequence of sequences, and both
---        dimensions are of size > 1.
---   * multilabel-indicator: Y is a label indicator matrix, an array
---        of two dimensions with at least two columns and at most two unique
---        values.
---   * unknown: Y is array-like but none of the above, such as a 3d array,
---        sequence of sequences or an array of non-sequence objects.
+   --   target_types:
+   --   * binary: Y contains <= 2 discrete values and is 1d or a column
+   --       vector.
+   --   * continuous: Y is an array of floats that are not all integers and is 1d
+   --       or a column vector.
+   --   * continuous-multioutput: Y is a 2d array of floats that are not all
+   --       integers and both dimensions are of size > 1.
+   --   * multiclass: Y contains more than two discrete values, is not a
+   --        sequence of sequences, and is 1d or a column vector.
+   --   * multiclass-multioutput: Y is a 2d array that contains more
+   --        than two discrete values, is not a sequence of sequences, and both
+   --        dimensions are of size > 1.
+   --   * multilabel-indicator: Y is a label indicator matrix, an array
+   --        of two dimensions with at least two columns and at most two unique
+   --        values.
+   --   * unknown: Y is array-like but none of the above, such as a 3d array,
+   --        sequence of sequences or an array of non-sequence objects.
 
---     generic
---        type Item is private;
---        type Array_Type is array (Integer range <>) of Item;
---     function Type_Of_Array_Target (Y : Array_Type) return Y_Type;
---
---     function Type_Of_Array_Target (Y : Array_Type) return Y_Type is
---     begin
---        pragma Unreferenced (Y);
---        return Y_Binary;
---
---     end Type_Of_Array_Target;
+   --     generic
+   --        type Item is private;
+   --        type Array_Type is array (Integer range <>) of Item;
+   --     function Type_Of_Array_Target (Y : Array_Type) return Y_Type;
+   --
+   --     function Type_Of_Array_Target (Y : Array_Type) return Y_Type is
+   --     begin
+   --        pragma Unreferenced (Y);
+   --        return Y_Binary;
+   --
+   --     end Type_Of_Array_Target;
 
    --  -------------------------------------------------------------------------
 
---     function Type_Of_Target (Y : Binary_Array) is new Type_Of_Array_Target (Binary);
+   --     function Type_Of_Target (Y : Binary_Array) is new Type_Of_Array_Target (Binary);
    function Type_Of_Target (Y : Binary_Array) return Y_Type is
    begin
       pragma Unreferenced (Y);
@@ -178,8 +179,8 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
 
    function Type_Of_Target (Y : Binary_Matrix ) return Y_Type is
---       Routine_Name : constant String :=
---                         "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
+      --       Routine_Name : constant String :=
+      --                         "Multiclass_Utils.Type_Of_Target Binary_Matrix ";
       Result : Y_Type;
    begin
       if Is_Multilabel (Y) then
@@ -283,7 +284,7 @@ package body Multiclass_Utils is
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
-    --  L202
+   --  L202
    function Type_Of_Target (Y : String_Array) return Y_Type is
    begin
       pragma Unreferenced (Y);
@@ -310,7 +311,7 @@ package body Multiclass_Utils is
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
-  --  L202
+   --  L202
    function Type_Of_Target (Y : Real_Float_Matrix) return Y_Type is
       Result : Y_Type;
    begin
@@ -327,7 +328,7 @@ package body Multiclass_Utils is
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
-    --  unique_labels L101
+   --  unique_labels L101
    --     function Unique_Multiclass_Set (Y : Integer_Matrix)
    --                                     return Encode_Utils.Int_Sets.Set is
    --     begin
@@ -359,7 +360,7 @@ package body Multiclass_Utils is
       end case;
 
       Assert (Uniques /= Non_Unique, Routine_Name &
-             "Invalid label type: " & Y_Type'Image (Label_Kind));
+                "Invalid label type: " & Y_Type'Image (Label_Kind));
       --  L111
       if Uniques = Unique_Indicator then
          for index in Y'Range (2) loop
@@ -394,7 +395,7 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
    function Unique_Labels (Y : NL_Types.Integer_List)
-                            return NL_Types.Integer_List is
+                              return NL_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);
 
@@ -425,7 +426,7 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
    function Unique_Labels (Y : NL_Types.Array_Of_Integer_Lists)
-                            return NL_Types.Integer_List is
+                              return NL_Types.Integer_List is
    begin
       return Encode_Utils.Unique (Y);
 
