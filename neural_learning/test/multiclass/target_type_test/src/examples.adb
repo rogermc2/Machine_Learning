@@ -23,7 +23,6 @@ package body Examples is
         Mat_1 : constant Integer_Matrix (1 .. 3, 1 .. 1) :=
                   ((1 => 1), (1 => 0), (1 => 2));
     begin
-        Multiclass_Examples.MC_Float.Append ((1.0, 0.0, 0.2));
         Multiclass_Examples.MC_Integer_Array.Append
           ((1, 0, 2, 2, 1, 4, 2, 4, 4, 4));
         Multiclass_Examples.MC_Integer_Array.Append ((1, 0, 2));
@@ -40,8 +39,6 @@ package body Examples is
     procedure Init_Multiclass_Multioutput is
         Mat_1 : constant Integer_Matrix (1 .. 1, 1 .. 3) := (1 => (1, 0, 2));
     begin
-        Multiclass_Multioutput_Examples.MCO_Float.Append
-         (((1.0, 0.0, 2.0, 2.0), (1.0, 4.0, 2.0, 4.0)));
         Multiclass_Multioutput_Examples.MCO_Integer.Append
         (((1, 0, 2, 2), (1, 4, 2, 4)));
         Multiclass_Multioutput_Examples.MCO_Integer.Append (Mat_1);

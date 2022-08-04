@@ -1,26 +1,7 @@
 
-with Ada.Containers.Vectors;
-
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Examples is
-
-    subtype String_1 is String (1 .. 1);
-    subtype String_2 is String (1 .. 2);
-    subtype String_3 is String (1 .. 3);
-
-    type String1_Array is array (1 .. 1) of String_1;
-    type String21_Array is array (1 .. 2) of String_1;
-    type String2_Array is array (1 .. 2) of String_2;
-    type String3_Array is array (1 .. 2) of String_3;
-
-    package String1_Package is new Ada.Containers.Vectors (Positive, String_1);
-    subtype String_Array is String1_Package.Vector;
-
-    type String_Matrix is array (1 .. 2, 1 .. 2) of String_1;
-    package String2_Matrix_Package is new Ada.Containers.Vectors
-      (Positive, String_Matrix);
-    subtype String2_Matrix_Array is String2_Matrix_Package.Vector;
 
     type Binary_Record is record
         B_Binary      : Binary_List;
@@ -59,14 +40,12 @@ package Examples is
     end record;
 
     type Multiclass_Record is record
-        MC_Float          : Real_Vector_List;
         MC_Integer_Array  : Integer_Array_List;
         MC_Integer_Matrix : Integer_Matrix_List;
         MC_Strings        : String_Array;
     end record;
 
     type Multiclass_Multioutput_Record is record
-        MCO_Float   : Real_Matrix_List;
         MCO_Integer : Integer_Matrix_List;
         MCO_Strings : String2_Matrix_Array;
     end record;

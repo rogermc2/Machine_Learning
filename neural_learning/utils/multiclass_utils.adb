@@ -51,9 +51,13 @@ package body Multiclass_Utils is
    --  is_multilabel ([[1], [0], [0]]) = False
    --  is_multilabel ([[1, 0, 0]]) = True
    function Is_Multilabel (Y : Integer_Matrix) return Boolean is
+      Multilabel : Boolean := False;
    begin
+      if Y'Length (2) > 1 then
+         Multilabel := Integer (Unique_Labels (Y).Length) < 3;
+      end if;
 
-      return Y'Length (2) > 1;
+      return Multilabel;
 
    end Is_Multilabel;
 
@@ -62,7 +66,6 @@ package body Multiclass_Utils is
    function Is_Multilabel (Y : NL_Types.Array_Of_Integer_Lists) return Boolean is
       use Ada.Containers;
       --          Routine_Name : constant String := "Multiclass_Utils.Is_Multilabel matrix ";
-      Labels       : NL_Types.Integer_List;
       Multilabel   : Boolean := False;
    begin
       for row in Y'Range loop
@@ -72,8 +75,7 @@ package body Multiclass_Utils is
       end loop;
 
       if Multilabel then
-         Labels := Unique_Labels (Y);
-         Multilabel := Labels.Length < 3;
+         Multilabel := Integer (Unique_Labels (Y).Length) < 3;
       end if;
 
       return Multilabel;
@@ -97,18 +99,35 @@ package body Multiclass_Utils is
    end Is_Multilabel;
 
    --  -------------------------------------------------------------------------
+--   target_types:
+--   * binary: Y contains <= 2 discrete values and is 1d or a column
+--       vector.
+--   * continuous: Y is an array of floats that are not all integers and is 1d
+--       or a column vector.
+--   * continuous-multioutput: Y is a 2d array of floats that are not all
+--       integers and both dimensions are of size > 1.
+--   * multiclass: Y contains more than two discrete values, is not a
+--        sequence of sequences, and is 1d or a column vector.
+--   * multiclass-multioutput: Y is a 2d array that contains more
+--        than two discrete values, is not a sequence of sequences, and both
+--        dimensions are of size > 1.
+--   * multilabel-indicator: Y is a label indicator matrix, an array
+--        of two dimensions with at least two columns and at most two unique
+--        values.
+--   * unknown: Y is array-like but none of the above, such as a 3d array,
+--        sequence of sequences or an array of non-sequence objects.
 
-   generic
-      type Item is private;
-      type Array_Type is array (Integer range <>) of Item;
-   function Type_Of_Array_Target (Y : Array_Type) return Y_Type;
-
-   function Type_Of_Array_Target (Y : Array_Type) return Y_Type is
-   begin
-      pragma Unreferenced (Y);
-      return Y_Binary;
-
-   end Type_Of_Array_Target;
+--     generic
+--        type Item is private;
+--        type Array_Type is array (Integer range <>) of Item;
+--     function Type_Of_Array_Target (Y : Array_Type) return Y_Type;
+--
+--     function Type_Of_Array_Target (Y : Array_Type) return Y_Type is
+--     begin
+--        pragma Unreferenced (Y);
+--        return Y_Binary;
+--
+--     end Type_Of_Array_Target;
 
    --  -------------------------------------------------------------------------
 
@@ -146,7 +165,7 @@ package body Multiclass_Utils is
    function Type_Of_Target (Y : Boolean_Matrix) return Y_Type is
       pragma Unreferenced (Y);
    begin
-      return Y_Binary;
+      return Y_Multilabel_Indicator;
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
@@ -229,6 +248,24 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
     --  L202
+   function Type_Of_Target (Y : String_Array) return Y_Type is
+   begin
+      pragma Unreferenced (Y);
+      return Y_Multiclass;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+   --  L202
+   function Type_Of_Target (Y : String_Matrix) return Y_Type is
+   begin
+      pragma Unreferenced (Y);
+      return Y_Multiclass_Multioutput;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+   --  L202
    function Type_Of_Target (Y : Real_Float_Vector) return Y_Type is
    begin
       pragma Unreferenced (Y);
@@ -243,7 +280,7 @@ package body Multiclass_Utils is
    begin
       if Is_Multilabel (Y) then
          Result := Y_Multilabel_Indicator;
-      elsif Y'Length (2) > 1 then
+      elsif Y'Length > 1 and Y'Length (2) > 1 then
          Result := Y_Continuous_Multioutput;
       else
          Result := Y_Continuous;
