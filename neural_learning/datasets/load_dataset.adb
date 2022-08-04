@@ -17,32 +17,36 @@ package body Load_Dataset is
    --  Features             integers 0-16
    --  =================   ==============
    --  Target: num outputs x num classes
-   function Load_Digits (File_Name : String) return Digits_Data_Record is
+   function Load_Digits (File_Name : String; Num_Classes : Positive := 10)
+                         return Digits_Data_Record is
       use Classifier_Utilities;
-      Routine_Name   : constant String := "Load_Dataset.Load_Digits ";
-      Digits_Data    : constant NL_Types.Multi_Output_Data_Record :=
+      Routine_Name    : constant String := "Load_Dataset.Load_Digits ";
+      Digits_Data     : constant NL_Types.Multi_Output_Data_Record :=
                          Load_Data (File_Name);
-      Class_Names    : NL_Types.Class_Names_List;
-      Digit_Features : constant NL_Types.Value_Data_Lists_2D :=
+      All_Class_Names : NL_Types.Class_Names_List;
+      Digit_Features  : constant NL_Types.Value_Data_Lists_2D :=
                          Digits_Data.Feature_Values;
 --        Feature_Names  : constant NL_Types.Value_Data_List :=
 --                           Digits_Data.Feature_Values.Element (1);
-      Digit_Values   : constant NL_Types.Value_Data_Lists_2D :=
+      Digit_Values    : constant NL_Types.Value_Data_Lists_2D :=
                          Digits_Data.Label_Values;
-      Num_Samples    : constant Natural := Natural (Digit_Features.Length);
-      Data           : Digits_Data_Record;
+      Num_Samples     : constant Natural := Natural (Digit_Features.Length);
+      Data            : Digits_Data_Record;
    begin
-      Class_Names.Append (To_Unbounded_String ("0"));
-      Class_Names.Append (To_Unbounded_String ("1"));
-      Class_Names.Append (To_Unbounded_String ("2"));
-      Class_Names.Append (To_Unbounded_String ("3"));
-      Class_Names.Append (To_Unbounded_String ("4"));
-      Class_Names.Append (To_Unbounded_String ("5"));
-      Class_Names.Append (To_Unbounded_String ("6"));
-      Class_Names.Append (To_Unbounded_String ("7"));
-      Class_Names.Append (To_Unbounded_String ("8"));
-      Class_Names.Append (To_Unbounded_String ("9"));
---        Class_Names.Append (To_Unbounded_String ("10"));
+      All_Class_Names.Append (To_Unbounded_String ("0"));
+      All_Class_Names.Append (To_Unbounded_String ("1"));
+      All_Class_Names.Append (To_Unbounded_String ("2"));
+      All_Class_Names.Append (To_Unbounded_String ("3"));
+      All_Class_Names.Append (To_Unbounded_String ("4"));
+      All_Class_Names.Append (To_Unbounded_String ("5"));
+      All_Class_Names.Append (To_Unbounded_String ("6"));
+      All_Class_Names.Append (To_Unbounded_String ("7"));
+      All_Class_Names.Append (To_Unbounded_String ("8"));
+      All_Class_Names.Append (To_Unbounded_String ("9"));
+
+      for index in 1 .. Num_Classes loop
+         Data.Class_Names.Append (All_Class_Names (index));
+      end loop;
 
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
