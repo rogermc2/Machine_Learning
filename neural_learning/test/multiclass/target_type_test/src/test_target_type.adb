@@ -2,7 +2,7 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Examples;
-with Tests; use Tests;
+with Type_Tests; use Type_Tests;
 
 procedure Test_Target_Type is
    Routine_Name : constant String := "Test_Target_Type ";
