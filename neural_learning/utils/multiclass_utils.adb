@@ -12,7 +12,43 @@ package body Multiclass_Utils is
    type Unique_Label_Types is (Unique_Multiclass, Unique_Indicator, Non_Unique);
 
    --  -------------------------------------------------------------------------
-   --  L118
+
+--     generic
+--        type Item is private;
+--        type Array_Type is array (Integer range <>) of Item;
+--     function Check_Classification (Y : Array_Type) return Boolean;
+--
+--     function Check_Classification (Y : Array_Type) return Boolean is
+--          Target_Type : constant Y_Type := Type_Of_Target (Y);
+--     begin
+--        return Target_Type in
+--            Y_Binary | Y_Multiclass | Y_Multiclass_Multioutput |
+--            Y_Multilabel_Indicator | Y_Multilabel_Sequences;
+--
+--     end Check_Classification;
+
+   --  -------------------------------------------------------------------------
+   --  L180
+--     function Check_Classification_Targets (Y : Binary_Array) return Boolean is
+--          function Check is new Check_Classification
+--            (Item => Binary, Array_Type => Binary_Array);
+--     begin
+--        return Check (Y);
+--
+--     end Check_Classification_Targets;
+
+   --  -------------------------------------------------------------------------
+   --  L180
+   function Check_Classification_Targets (Y : Binary_Matrix) return Boolean is
+   begin
+      return Type_Of_Target (Y) in
+          Y_Binary | Y_Multiclass | Y_Multiclass_Multioutput |
+          Y_Multilabel_Indicator | Y_Multilabel_Sequences;
+
+   end Check_Classification_Targets;
+
+   --  -------------------------------------------------------------------------
+   --   --  L118
    function Is_Multilabel (Y : Integer_Array) return Boolean is
    begin
       pragma Unreferenced (Y);
@@ -319,7 +355,7 @@ package body Multiclass_Utils is
          when Y_Binary | Y_Multiclass => Uniques := Unique_Multiclass;
          when Y_Multilabel_Indicator => Uniques := Unique_Indicator;
          when Y_Unknown | Y_Continuous | Y_Continuous_Multioutput |
-              Y_Multiclass_Multioutput => null;
+              Y_Multiclass_Multioutput | Y_Multilabel_Sequences => null;
       end case;
 
       Assert (Uniques /= Non_Unique, Routine_Name &

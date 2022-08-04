@@ -6,10 +6,11 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 package Multiclass_Utils is
    type Y_Type is (Y_Unknown, Y_Continuous, Y_Continuous_Multioutput, Y_Binary,
                    Y_Multiclass, Y_Multiclass_Multioutput,
-                   Y_Multilabel_Indicator);
+                   Y_Multilabel_Indicator, Y_Multilabel_Sequences);
    type Label_Type is (Unique_Binary, Unique_Multiclass,
                        Unique_Mutilabel_Indicator);
 
+   function Check_Classification_Targets (Y : Binary_Matrix) return Boolean;
    function Is_Multilabel (Y : Real_Float_Matrix) return Boolean;
    function Type_Of_Target (Y : Binary_Array) return Y_Type;
    function Type_Of_Target (Y : Binary_Matrix) return Y_Type;
