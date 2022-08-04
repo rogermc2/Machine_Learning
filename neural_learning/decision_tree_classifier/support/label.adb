@@ -120,7 +120,7 @@ package body Label is
    --  L264
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Binary_Matrix) is
       use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Binarizer Fit ";
+      Routine_Name : constant String := "Label.Fit Binarizer Binary_Matrix ";
    begin
       Assert (Binarizer.Neg_Label < Binarizer.Pos_Label, Routine_Name &
                 "Neg_Label " & Float'Image (Binarizer.Neg_Label)  &
@@ -138,8 +138,9 @@ package body Label is
    --  L264
    procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix) is
       use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Binarizer Fit ";
+      Routine_Name : constant String := "Label.Fit Binarizer Integer_Matrix ";
    begin
+      Put_Line (Routine_Name);
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
@@ -152,7 +153,8 @@ package body Label is
    procedure Fit (Binarizer : in out Label_Binarizer;
                   Y         : NL_Types.Array_Of_Integer_Lists) is
       use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Binarizer Fit ";
+      Routine_Name : constant String :=
+                       "Label.Fit Binarizer Array_Of_Integer_Lists ";
    begin
         Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
@@ -166,7 +168,7 @@ package body Label is
    procedure Fit (Binarizer : in out Multi_Label_Binarizer;
                   Y         : Integer_Matrix) is
       Routine_Name : constant String :=
-                       "Label.Binarizer Fit Multi_Label_Binarizer ";
+                       "Label.Fit Multi_Label_Binarizer ";
       Classes      : NL_Types.Integer_List;
       Duplicates   : Boolean := False;
    begin
@@ -191,7 +193,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
-      Routine_Name : constant String := "Label.Encoder Fit ";
+      Routine_Name : constant String := "Label.Fit Encoder ";
    begin
       Assert (Encoder.Encoder_Kind = Class_Unique, Routine_Name &
                 "Label.Fit called with label encoder instead of a"
@@ -221,7 +223,8 @@ package body Label is
          Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
       else
          raise Label_Error with
-           "Label.Fit_Transform called with label encoder instead of unique encoder";
+           "Label.Fit_Transform called with label encoder instead of" &
+           " unique encoder";
       end if;
 
       return Encoded_Labels;

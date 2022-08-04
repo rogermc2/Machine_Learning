@@ -1468,15 +1468,17 @@ package body Multilayer_Perceptron is
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Integer_Matrix;
                             Incremental : Boolean) return Binary_Matrix is
+      use Multiclass_Utils;
       use Integer_Package;
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Validate_Input Integer Y";
       Classes      : Integer_List;
-      Binarizer    : Label.Label_Binarizer;
+      Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
+         Put_Line (Routine_Name & "L1139");
          Self.Attributes.Binarizer := Binarizer;
          Label.Fit (Self.Attributes.Binarizer, Y);
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
