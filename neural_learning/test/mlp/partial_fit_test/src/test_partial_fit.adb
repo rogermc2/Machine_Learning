@@ -29,10 +29,12 @@ begin
       Random_State => 1, Tol => 0.0, Alpha => 10.0 ** (-5),
       Learning_Rate_Init => 0.2);
 
-    Init_Optimizer (aClassifier);
+   Init_Optimizer (aClassifier);
+   Put_Line (Routine_Name & "Optimizer initialized");
    Fit (aClassifier, X, Y);
+   Put_Line (Routine_Name & "aClassifier fitted");
    declare
-      Pred1 : constant Binary_Matrix :=Predict (aClassifier, X);
+      Pred1 : constant Binary_Matrix := Predict (aClassifier, X);
    begin
       Printing.Print_Binary_Matrix ("Pred1", Pred1);
    end;

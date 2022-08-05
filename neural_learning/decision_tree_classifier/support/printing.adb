@@ -342,6 +342,7 @@ package body Printing is
       Put_Line (Name & ": ");
       if Start >= aMatrix'First and then Finish <= aMatrix'Last then
          for row in Start .. Last loop
+            Put ("Row" & Integer'Image (row) & ":");
             for col in aMatrix'Range (2) loop
                Put (Integer'Image (aMatrix (row, col)) & "  ");
             end loop;

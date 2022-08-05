@@ -515,8 +515,10 @@ package body Multilayer_Perceptron is
       Layer_Units        : Integer_List;
       Activations        : Real_Matrix_List;
    begin
+      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 2);
       Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
                 "Hidden_Layer_Sizes is empty");
+      Put_Line (Routine_Name & "L385");
       --  L385
       Validate_Hyperparameters (Self);
       First_Pass :=
@@ -536,8 +538,10 @@ package body Multilayer_Perceptron is
       end if;
       Layer_Units.Append (Self.Attributes.N_Outputs);
       --  L409
+      Printing.Print_Integer_Matrix (Routine_Name & "L409 Y", Y, 1, 15);
       if First_Pass then
          Initialize (Self, Layer_Units);
+         Put_Line (Routine_Name & "Self initialized");
       end if;
 
       Activations.Append (X);
@@ -1157,9 +1161,8 @@ package body Multilayer_Perceptron is
       use Label;
       use Multiclass_Utils;
       LB           : Label_Binarizer;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
+      --  Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 2 ";
    begin
-      --
       if Check_Partial_Fit_First_Call (Self, Classes) then
          Self.Attributes.Binarizer := LB;
          if Type_Of_Target (Y) = Y_Multilabel_Indicator then
@@ -1417,7 +1420,7 @@ package body Multilayer_Perceptron is
    --  L455
    procedure Validate_Hyperparameters (Self : MLP_Classifier) is
       --           Incremental, Reset : Boolean) is
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Validate_Hyperparameters ";
+      --  Routine_Name : constant String := "Multilayer_Perceptron.Validate_Hyperparameters ";
    begin
       null;
 
@@ -1431,10 +1434,11 @@ package body Multilayer_Perceptron is
       use Integer_Package;
       use Multiclass_Utils;
       Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Validate_Input Binary Y ";
+                       "Multilayer_Perceptron.Validate_Input Binary matrix ";
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
+      Put_Line (Routine_Name);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
@@ -1471,19 +1475,22 @@ package body Multilayer_Perceptron is
       use Multiclass_Utils;
       use Integer_Package;
       Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Validate_Input Integer Y";
+                       "Multilayer_Perceptron.Validate_Input Integer matrix ";
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
+      Put_Line (Routine_Name);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
-         Put_Line (Routine_Name & "L1139");
+         Put_Line (Routine_Name & "L1139 classes empty: " &
+                  Boolean'Image (Self.Attributes.Classes.Is_Empty));
          Self.Attributes.Binarizer := Binarizer;
          Label.Fit (Self.Attributes.Binarizer, Y);
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
       else
          --  L1143
+         Put_Line (Routine_Name & "L1143");
          Classes := Multiclass_Utils.Unique_Labels (Y);
          if Self.Parameters.Warm_Start then
             Assert (Classes = Self.Attributes.Classes,

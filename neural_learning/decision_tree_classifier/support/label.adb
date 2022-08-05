@@ -715,6 +715,7 @@ package body Label is
       end Binarize;
 
    begin
+      Put_Line (Routine_Name);
       Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
       --  L506
       Assert (Y_Kind /= Y_Continuous_Multioutput and
