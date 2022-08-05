@@ -7,35 +7,35 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Load_Dataset;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
+--  with NL_Types;
 with Printing;
 with Stochastic_Optimizers;
-with Utilities;
+--  with Utilities;
 
 procedure Test_Partial_Fit is
    use Real_Float_Arrays;
    use Multilayer_Perceptron;
    use Stochastic_Optimizers;
 
-   function Get_CSV_Data (File_Name : String) return NL_Types.Raw_Data_Vector is
-      Data_File    : File_Type;
-      Raw_CSV_Data : NL_Types.Raw_Data_Vector;
-   begin
-      Open (Data_File, In_File, File_Name);
-      Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
-      Close (Data_File);
-
-      for row in Raw_CSV_Data.First_Index .. Raw_CSV_Data.First_Index loop
-         Printing.Print_Unbounded_List ("", Raw_CSV_Data.Element (row));
-      end loop;
-
-      return Raw_CSV_Data;
-
-   end Get_CSV_Data;
+--     function Get_CSV_Data (File_Name : String) return NL_Types.Raw_Data_Vector is
+--        Data_File    : File_Type;
+--        Raw_CSV_Data : NL_Types.Raw_Data_Vector;
+--     begin
+--        Open (Data_File, In_File, File_Name);
+--        Raw_CSV_Data := Utilities.Load_Raw_CSV_Data (Data_File);
+--        Close (Data_File);
+--
+--        for row in Raw_CSV_Data.First_Index .. Raw_CSV_Data.First_Index loop
+--           Printing.Print_Unbounded_List ("", Raw_CSV_Data.Element (row));
+--        end loop;
+--
+--        return Raw_CSV_Data;
+--
+--     end Get_CSV_Data;
 
    Routine_Name  : constant String := "Test_Partial_Fit ";
-   Raw_CSV_Data  : NL_Types.Raw_Data_Vector :=
-                     Get_CSV_Data ("../../digits.csv");
+--     Raw_CSV_Data  : NL_Types.Raw_Data_Vector :=
+--                       Get_CSV_Data ("../../digits.csv");
    Data          : constant Load_Dataset.Digits_Data_Record :=
                      Load_Dataset.Load_Digits
                        ("../../digits.csv", Num_Classes => 3);
