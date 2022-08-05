@@ -1,10 +1,10 @@
 --  Based on scikit-learn/sklearn/datasets/_base.py
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
---  with Printing;
+with Printing;
 
 package body Load_Dataset is
 
@@ -17,50 +17,59 @@ package body Load_Dataset is
    --  Features             integers 0-16
    --  =================   ==============
    --  Target: num outputs x num classes
-   function Load_Digits (File_Name : String; Num_Classes : Positive := 10)
+   function Load_Digits (File_Name : String; Num_Classes : Natural := 10)
                          return Digits_Data_Record is
       use Classifier_Utilities;
       Routine_Name    : constant String := "Load_Dataset.Load_Digits ";
       Digits_Data     : constant NL_Types.Multi_Output_Data_Record :=
-                         Load_Data (File_Name);
-      All_Class_Names : NL_Types.Class_Names_List;
+                          Load_Data (File_Name);
       Digit_Features  : constant NL_Types.Value_Data_Lists_2D :=
-                         Digits_Data.Feature_Values;
---        Feature_Names  : constant NL_Types.Value_Data_List :=
---                           Digits_Data.Feature_Values.Element (1);
+                          Digits_Data.Feature_Values;
       Digit_Values    : constant NL_Types.Value_Data_Lists_2D :=
-                         Digits_Data.Label_Values;
-      Num_Samples     : constant Natural := Natural (Digit_Features.Length);
-      Data            : Digits_Data_Record;
+                          Digits_Data.Label_Values;
+      Num_Samples     : constant Positive := Natural (Digit_Features.Length);
+      Num_Features    : constant Positive :=
+                          Natural (Digit_Features (1).Length);
+      List_Row        : NL_Types.Value_Data_List;
+      Data            : Digits_Data_Record (Num_Samples, Num_Features,
+                                            Num_Classes);
    begin
-      All_Class_Names.Append (To_Unbounded_String ("0"));
-      All_Class_Names.Append (To_Unbounded_String ("1"));
-      All_Class_Names.Append (To_Unbounded_String ("2"));
-      All_Class_Names.Append (To_Unbounded_String ("3"));
-      All_Class_Names.Append (To_Unbounded_String ("4"));
-      All_Class_Names.Append (To_Unbounded_String ("5"));
-      All_Class_Names.Append (To_Unbounded_String ("6"));
-      All_Class_Names.Append (To_Unbounded_String ("7"));
-      All_Class_Names.Append (To_Unbounded_String ("8"));
-      All_Class_Names.Append (To_Unbounded_String ("9"));
-
-      for index in 1 .. Num_Classes loop
-         Data.Class_Names.Append (All_Class_Names (index));
-      end loop;
-
+      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Digit_Values",
+                                          Digit_Values, 5);
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
       Assert (Integer (Digit_Values.Length) = Num_Samples, Routine_Name &
                 " invalid Digits Target vector");
 
-      Put_Line (Routine_Name & "Digit_Features length" &
-                  Integer'Image (Natural (Digit_Features.Length)));
-      Put_Line (Routine_Name & "Digit_Values length" &
-                  Integer'Image (Natural (Digit_Values.Length)));
-      --  Digits_Target is 2D list num outputs x num classes
-      Data.Features := To_Float_List_2D (Digit_Features);
-      Data.Target := To_Integer_List_2D (Digit_Values);
-      Data.Num_Features := Positive (Data.Features (1).Length);
+      if Num_Classes > 0 then
+         for index in 1 .. Num_Classes loop
+            Data.Classes (index) := index - 1;
+         end loop;
+      end if;
+
+      --        Put_Line (Routine_Name & "Digit_Features length" &
+      --                    Integer'Image (Natural (Digit_Features.Length)));
+      --        Put_Line (Routine_Name & "Digit_Values length" &
+      --                    Integer'Image (Natural (Digit_Values.Length)));
+      for row in Digit_Features.First_Index .. Digit_Features.Last_Index loop
+         List_Row := Digit_Features (row);
+         for col in List_Row.First_Index .. List_Row.Last_Index loop
+            Data.Features (row, col) := List_Row.Element (col).Integer_Value;
+         end loop;
+      end loop;
+
+      for row in Digit_Values.First_Index .. Digit_Values.Last_Index loop
+         Data.Target (row) :=
+           Digit_Values.Element (row).Element (1).Integer_Value;
+      end loop;
+      Printing.Print_Integer_Array (Routine_Name & "Data.Target", Data.Target, 1, 10);
+
+      if Num_Classes > 0 then
+         for index in Data.Target'Range loop
+            Data.Target (index) := Data.Target (index) mod Num_Classes;
+         end loop;
+      end if;
+
       return Data;
 
    end Load_Digits;
