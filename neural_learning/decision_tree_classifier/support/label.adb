@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Label is
 
@@ -304,13 +304,12 @@ package body Label is
    function Inverse_Binarize_Multiclass
      (Y : Real_Float_Matrix; Classes : Integer_List) return Binary_Matrix is
       use Classifier_Utilities;
-      Routine_Name   :  constant String :=
-                          "Label.Inverse_Binarize_Multiclass Float_Matrix ";
---        Classes_Length : constant Natural := Integer (Classes.Length);
+--        Routine_Name   :  constant String :=
+--                            "Label.Inverse_Binarize_Multiclass Float_Matrix ";
       Inverse        : Binary_Matrix  (Y'Range, 1 .. 1);
       Max_Indices    : Integer_Array (Y'Range);
    begin
-      --  L627 "Classes", Classes);
+      --  L627
       Max_Indices := Arg_Max (Y);
       for row in Inverse'Range loop
          if Classes.Element (Max_Indices (row)) > 1 then
@@ -319,7 +318,6 @@ package body Label is
             Inverse (row, 1) := Classes.Element (Max_Indices (row));
          end if;
       end loop;
-      Printing.Print_Binary_Matrix (Routine_Name & "Inverse", Inverse, 1, 10);
 
       return Inverse;
 
@@ -536,17 +534,15 @@ package body Label is
       use Multiclass_Utils;
 --        Routine_Name : constant String := "Label.Inverse_Transform ";
       Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
-      Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
+--        Y_Inv        : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2));
    begin
       --  L398
       if Self.Y_Kind = Y_Multiclass then
-         Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
+         return Inverse_Binarize_Multiclass (Y, Self.Classes);
       else
-         Y_Inv := Inverse_Binarize_Thresholding
+         return Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
-
-      return Y_Inv;
 
    end Inverse_Transform;
 

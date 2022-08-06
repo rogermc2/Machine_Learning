@@ -55,7 +55,7 @@ begin
     declare
         Pred1 : constant Binary_Matrix := Predict (aClassifier, X);
     begin
-        Printing.Print_Binary_Matrix ("Pred1", Pred1);
+        Printing.Print_Binary_Matrix ("Pred1", Pred1, 1, 4);
     end;
 
     --  Partial_Fit updates the model with a single iteration over the data.
