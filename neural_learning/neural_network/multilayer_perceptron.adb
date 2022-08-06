@@ -344,7 +344,12 @@ package body Multilayer_Perceptron is
                  return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
-      Classifier.Parameters.Hidden_Layer_Sizes  := Hidden_Layer_Sizes;
+      if Hidden_Layer_Sizes.Is_Empty then
+            --  L1276 Default Hidden_Layer_Sizes
+            Classifier.Parameters.Hidden_Layer_Sizes.Append (100);
+      else
+            Classifier.Parameters.Hidden_Layer_Sizes := Hidden_Layer_Sizes;
+      end if;
       Classifier.Parameters.Activation          := Activation;
       Classifier.Parameters.Solver              := Solver;
       Classifier.Parameters.Alpha               := Alpha;
@@ -515,10 +520,8 @@ package body Multilayer_Perceptron is
       Layer_Units        : Integer_List;
       Activations        : Real_Matrix_List;
    begin
-      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 2);
       Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
                 "Hidden_Layer_Sizes is empty");
-      Put_Line (Routine_Name & "L385");
       --  L385
       Validate_Hyperparameters (Self);
       First_Pass :=
@@ -537,11 +540,11 @@ package body Multilayer_Perceptron is
          end loop;
       end if;
       Layer_Units.Append (Self.Attributes.N_Outputs);
+
       --  L409
-      Printing.Print_Integer_Matrix (Routine_Name & "L409 Y", Y, 1, 15);
+--        Printing.Print_Integer_Matrix (Routine_Name & "L409 Y", Y, 1, 15);
       if First_Pass then
          Initialize (Self, Layer_Units);
-         Put_Line (Routine_Name & "Self initialized");
       end if;
 
       Activations.Append (X);
@@ -1438,7 +1441,6 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
-      Put_Line (Routine_Name);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
@@ -1479,18 +1481,17 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
-      Put_Line (Routine_Name);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
-         Put_Line (Routine_Name & "L1139 classes empty: " &
-                  Boolean'Image (Self.Attributes.Classes.Is_Empty));
+--           Put_Line (Routine_Name & "L1139 classes empty: " &
+--                    Boolean'Image (Self.Attributes.Classes.Is_Empty));
          Self.Attributes.Binarizer := Binarizer;
          Label.Fit (Self.Attributes.Binarizer, Y);
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
       else
          --  L1143
-         Put_Line (Routine_Name & "L1143");
+--           Put_Line (Routine_Name & "L1143");
          Classes := Multiclass_Utils.Unique_Labels (Y);
          if Self.Parameters.Warm_Start then
             Assert (Classes = Self.Attributes.Classes,

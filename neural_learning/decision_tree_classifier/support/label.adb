@@ -140,7 +140,6 @@ package body Label is
       use Multiclass_Utils;
       Routine_Name : constant String := "Label.Fit Binarizer Integer_Matrix ";
    begin
-      Put_Line (Routine_Name);
       Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                 Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
                 "label binarization does not support multioutput target data");
@@ -715,7 +714,6 @@ package body Label is
       end Binarize;
 
    begin
-      Put_Line (Routine_Name);
       Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
       --  L506
       Assert (Y_Kind /= Y_Continuous_Multioutput and
