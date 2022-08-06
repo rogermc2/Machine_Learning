@@ -77,6 +77,28 @@ package body Classifier_Utilities is
    end Arg_Max;
 
    --  ------------------------------------------------------------------------
+--  Arg_Max returns the indices of the maximum values along an axis.
+   function Arg_Max (Values : Real_Float_Matrix) return Integer_Array is
+      Max_Values  : Real_Float_Vector (Values'Range (2)) :=
+                        (others => Float'Safe_First);
+      Value       : Float;
+      Max_Indices : Integer_Array (Values'Range (2)) := (others => 1);
+   begin
+      for row in Values'Range loop
+            for col in Values'Range (2) loop
+                Value := Values (row, col);
+                if Value > Max_Values (col) then
+                    Max_Indices (col) := row;
+                    Max_Values (col) := Value;
+                end if;
+            end loop;
+      end loop;
+
+      return Max_Indices;
+
+   end Arg_Max;
+
+   --  ------------------------------------------------------------------------
 
    function Arg_Max (Values : Integer_List) return Positive is
       Max_Value  : Integer := Integer'First;

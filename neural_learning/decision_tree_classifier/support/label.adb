@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
---  with Printing;
+with Printing;
 
 package body Label is
 
@@ -300,21 +300,25 @@ package body Label is
    --     end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
-
    --  L586 Multiclass uses the maximal score instead of a threshold.
    function Inverse_Binarize_Multiclass
      (Y : Real_Float_Matrix; Classes : Integer_List) return Binary_Matrix is
       use Classifier_Utilities;
-      --        Routine_Name :  constant String :=
-      --                         "Label.Inverse_Binarize_Multiclass ";
-      Inverse      : Binary_Matrix  (Y'Range, 1 .. 1);
-      Max_Indices  : Natural_Array (Y'Range);
+      Routine_Name   :  constant String :=
+                          "Label.Inverse_Binarize_Multiclass ";
+--        Classes_Length : constant Natural := Integer (Classes.Length);
+      Inverse        : Binary_Matrix  (Y'Range, 1 .. 1);
+      Max_Indices    : Integer_Array (Y'Range (2));
    begin
       --  L627
-      Max_Indices := Row_Max_Indices (Y);
+      Put_Line (Routine_Name);
+      Max_Indices := Arg_Max (Y);
+      Printing.Print_Integer_Array (Routine_Name & "Max_Indices", Max_Indices);
       for row in Inverse'Range loop
          Inverse (row, 1) := Classes.Element (Max_Indices (row));
+--           Inverse (row, 1) := Classes.Element (row mod Classes_Length + 1);
       end loop;
+      Printing.Print_Binary_Matrix (Routine_Name & "Inverse", Inverse);
 
       return Inverse;
 
