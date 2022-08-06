@@ -90,7 +90,7 @@ package body Classifier_Utilities is
             for col in Values'Range (2) loop
                 Value := Values (row, col);
                 if Value > Max_Values (col) then
-                    Max_Indices (col) := row;
+                    Max_Indices (col) := col;
                     Max_Values (col) := Value;
                 end if;
             end loop;

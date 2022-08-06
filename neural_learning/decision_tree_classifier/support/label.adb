@@ -318,8 +318,9 @@ package body Label is
          Put_Line (Routine_Name & "Row:" & Integer'Image (row));
          Put_Line (Routine_Name & "Max_Indices: " &
                      Integer'Image (Max_Indices (row)));
+         Put_Line (Routine_Name & "Inverse item: " &
+                     Integer'Image (Classes.Element (Max_Indices (row))));
          Inverse (row, 1) := Classes.Element (Max_Indices (row));
---           Inverse (row, 1) := Classes.Element (row mod Classes_Length + 1);
       end loop;
       Printing.Print_Binary_Matrix (Routine_Name & "Inverse", Inverse);
 
