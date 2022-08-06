@@ -308,21 +308,18 @@ package body Label is
                           "Label.Inverse_Binarize_Multiclass Float_Matrix ";
 --        Classes_Length : constant Natural := Integer (Classes.Length);
       Inverse        : Binary_Matrix  (Y'Range, 1 .. 1);
-      Max_Indices    : Integer_Array (Y'Range (2));
+      Max_Indices    : Integer_Array (Y'Range);
    begin
-      --  L627
-      Put_Line (Routine_Name);
+      --  L627 "Classes", Classes);
       Max_Indices := Arg_Max (Y);
-      Printing.Print_Integer_Array (Routine_Name & "Max_Indices", Max_Indices);
       for row in Inverse'Range loop
-         Put_Line (Routine_Name & "Row:" & Integer'Image (row));
-         Put_Line (Routine_Name & "Max_Indices: " &
-                     Integer'Image (Max_Indices (row)));
-         Put_Line (Routine_Name & "Inverse item: " &
-                     Integer'Image (Classes.Element (Max_Indices (row))));
-         Inverse (row, 1) := Classes.Element (Max_Indices (row));
+         if Classes.Element (Max_Indices (row)) > 1 then
+            Inverse (row, 1) := 1;
+         else
+            Inverse (row, 1) := Classes.Element (Max_Indices (row));
+         end if;
       end loop;
-      Printing.Print_Binary_Matrix (Routine_Name & "Inverse", Inverse);
+      Printing.Print_Binary_Matrix (Routine_Name & "Inverse", Inverse, 1, 10);
 
       return Inverse;
 
