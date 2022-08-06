@@ -21,8 +21,7 @@ procedure Test_Partial_Fit is
 
     function Load_Y (Y1 : Integer_Array) return Integer_Matrix is
         YM : Integer_Matrix (Y1'Range, 1 .. 1);
-    begin   Printing.Print_Integer_Array
-          (Routine_Name & "Load_Y Y1", Y1, 1, 10);
+    begin
         for row in Y1'Range loop
             YM (row, 1) := Y1 (row);
         end loop;
@@ -41,9 +40,8 @@ procedure Test_Partial_Fit is
     aClassifier   : MLP_Classifier;
 begin
     Put_Line (Routine_Name);
-    --     Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 3);
-
-    Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
+    --  Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 3);
+    --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
 
     aClassifier := C_Init
       (Solver => Stochastic_Optimizers.Sgd_Solver, Max_Iter => 100,

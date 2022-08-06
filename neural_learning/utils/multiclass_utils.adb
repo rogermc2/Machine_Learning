@@ -2,10 +2,10 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Multiclass_Utils is
 
@@ -265,14 +265,14 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
    --  L202
    function Type_Of_Target (Y : Integer_Matrix) return Y_Type is
-      Routine_Name : constant String :=
-                               "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
+--        Routine_Name : constant String :=
+--                                 "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
       Result : Y_Type;
    begin
-      Put_Line (Routine_Name & "Y num cols:" & Integer'Image (Y'Length (2)));
-      Put_Line (Routine_Name & "Y num Unique_Labels:" &
-                  Integer'Image (Integer (Unique_Labels (Y).Length)));
-      Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
+--        Put_Line (Routine_Name & "Y num cols:" & Integer'Image (Y'Length (2)));
+--        Put_Line (Routine_Name & "Y num Unique_Labels:" &
+--                    Integer'Image (Integer (Unique_Labels (Y).Length)));
+--        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
       if Y'Length (2) = 1 and  Integer (Unique_Labels (Y).Length) < 3 then
          Result := Y_Binary;
       elsif Is_Multilabel (Y) then

@@ -4,7 +4,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
-with Printing;
+--  with Printing;
 
 package body Load_Dataset is
 
@@ -34,8 +34,6 @@ package body Load_Dataset is
       Data            : Digits_Data_Record (Num_Samples, Num_Features,
                                             Num_Classes);
    begin
-      Printing.Print_Value_Data_Lists_2D (Routine_Name & "Digit_Values",
-                                          Digit_Values, 5);
       Assert (Num_Samples > 0, Routine_Name &
                 " called with empty Features vector.");
       Assert (Integer (Digit_Values.Length) = Num_Samples, Routine_Name &
@@ -47,10 +45,6 @@ package body Load_Dataset is
          end loop;
       end if;
 
-      --        Put_Line (Routine_Name & "Digit_Features length" &
-      --                    Integer'Image (Natural (Digit_Features.Length)));
-      --        Put_Line (Routine_Name & "Digit_Values length" &
-      --                    Integer'Image (Natural (Digit_Values.Length)));
       for row in Digit_Features.First_Index .. Digit_Features.Last_Index loop
          List_Row := Digit_Features (row);
          for col in List_Row.First_Index .. List_Row.Last_Index loop
@@ -62,7 +56,6 @@ package body Load_Dataset is
          Data.Target (row) :=
            Digit_Values.Element (row).Element (1).Integer_Value;
       end loop;
-      Printing.Print_Integer_Array (Routine_Name & "Data.Target", Data.Target, 1, 10);
 
       if Num_Classes > 0 then
          for index in Data.Target'Range loop
