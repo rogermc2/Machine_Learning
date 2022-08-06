@@ -79,6 +79,8 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 --  Arg_Max returns the indices of the maximum values along an axis.
    function Arg_Max (Values : Real_Float_Matrix) return Integer_Array is
+--        Routine_Name : constant String :=
+--                           "Classifier_Utilities.Arg_Max Float_Matrix ";
       Max_Values  : Real_Float_Vector (Values'Range (2)) :=
                         (others => Float'Safe_First);
       Value       : Float;

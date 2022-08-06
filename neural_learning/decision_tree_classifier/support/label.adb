@@ -237,7 +237,7 @@ package body Label is
                                          return Real_Float_Matrix is
       use Classifier_Utilities;
       --        Routine_Name :  constant String :=
-      --                         "Label.Inverse_Binarize_Multiclass ";
+      --                         "Label.Inverse_Binarize_Multiclass Boolean_Matrix 1 ";
       Inverse      : Real_Float_Matrix  (Y'Range (2), Y'Range);
       Max_Indices  : Natural_Array (Y'Range (2));
    begin
@@ -261,7 +261,7 @@ package body Label is
                                          return Integer_Matrix is
       use Classifier_Utilities;
       --        Routine_Name :  constant String :=
-      --                         "Label.Inverse_Binarize_Multiclass ";
+      --                         "Label.Inverse_Binarize_Multiclass Boolean_Matrix 2 ";
       Inverse      : Integer_Matrix  (Y'Range (2), Y'Range);
       Max_Indices  : Natural_Array (Y'Range (2));
    begin
@@ -305,7 +305,7 @@ package body Label is
      (Y : Real_Float_Matrix; Classes : Integer_List) return Binary_Matrix is
       use Classifier_Utilities;
       Routine_Name   :  constant String :=
-                          "Label.Inverse_Binarize_Multiclass ";
+                          "Label.Inverse_Binarize_Multiclass Float_Matrix ";
 --        Classes_Length : constant Natural := Integer (Classes.Length);
       Inverse        : Binary_Matrix  (Y'Range, 1 .. 1);
       Max_Indices    : Integer_Array (Y'Range (2));
@@ -315,6 +315,9 @@ package body Label is
       Max_Indices := Arg_Max (Y);
       Printing.Print_Integer_Array (Routine_Name & "Max_Indices", Max_Indices);
       for row in Inverse'Range loop
+         Put_Line (Routine_Name & "Row:" & Integer'Image (row));
+         Put_Line (Routine_Name & "Max_Indices: " &
+                     Integer'Image (Max_Indices (row)));
          Inverse (row, 1) := Classes.Element (Max_Indices (row));
 --           Inverse (row, 1) := Classes.Element (row mod Classes_Length + 1);
       end loop;
