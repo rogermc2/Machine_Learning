@@ -4,6 +4,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Base;
 with Load_Dataset;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -38,6 +39,7 @@ procedure Test_Partial_Fit is
     Y             : constant Integer_Matrix := Load_Y (Data.Target);
     --      Classes      : constant Integer_Array := Data.Classes;
     aClassifier   : MLP_Classifier;
+   Score               : Float;
 begin
     Put_Line (Routine_Name);
     --  Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 3);
@@ -58,6 +60,7 @@ begin
         Printing.Print_Binary_Matrix ("Pred1", Pred1, 1, 4);
     end;
 
-    --  Partial_Fit updates the model with a single iteration over the data.
+    Score := Base.Score (aClassifier, X, Y);
+    Put_Line (Routine_Name & " Score:" & Float'Image (Score));
 
 end Test_Partial_Fit;
