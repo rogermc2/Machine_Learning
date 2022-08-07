@@ -1014,7 +1014,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
---        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -1037,6 +1037,8 @@ package body Multilayer_Perceptron is
 
       --  L344
       Self.Attributes.Params.Clear;  --  Layers
+      Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
+      --  L351
       --  python range(self.n_layers_ - 1) => 0 .. self.n_layers_ - 1
       for layer in 1 .. Self.Attributes.N_Layers - 1 loop
           --  Add coefficent matrices and intercept vectors for layer.
@@ -1044,8 +1046,13 @@ package body Multilayer_Perceptron is
          Fan_Out := Layer_Units (layer + 1);
          Self.Attributes.Params.Append (Init_Coeff (Self, Fan_In, Fan_Out));
       end loop;
+      Put_Line
+        (Routine_Name & "layer 2 Coeff_Gradients size" &
+         Integer'Image (Self.Attributes.Params.Element (2).Coeff_Gradients'Length));
+      Printing.Print_Float_Matrix
+        (Routine_Name & "layer 2 Coeff_Gradients",
+         Self.Attributes.Params.Element (2).Coeff_Gradients, 1, 4);
 
-      --  L351
       if Self.Parameters.Solver = Sgd_Solver or else
         Self.Parameters.Solver = Adam_Solver then
          Self.Attributes.Loss_Curve.Clear;
