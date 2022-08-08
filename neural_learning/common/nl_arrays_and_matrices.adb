@@ -529,7 +529,7 @@ package body NL_Arrays_And_Matrices is
    end "not";
 
    --  ------------------------------------------------------------------------
-   --  Max returns a vector containing the maximum value of each matrix
+   --  Max returns a vector containing the maximum value of each row of a matrix
    function Max (Data : Real_Float_Matrix) return Real_Float_Vector is
       Result  : Real_Float_Vector (Data'Range);
       Max_Val : Float;

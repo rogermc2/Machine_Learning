@@ -9,7 +9,7 @@ with Neural_Maths;
 
 package body Base_Neural is
 
-   EPS : constant Float := Float'Small;
+   EPS : constant Float := Float'Safe_Small;
 
    function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
                      return Real_Float_Matrix;
@@ -312,10 +312,11 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
    --  SoftMax returns the probability of each class
    --  probability = exp (value) / sum of all exp (v)
+   --  Activation: n_samples x n_features
    procedure Softmax (Activation : in out Real_Float_Matrix) is
       use Real_Float_Arrays;
       --        Routine_Name : constant String := "Base_Neural.Softmax ";
-      --  Max returns a vector containing the maximum value of each matrix
+      --  Max returns a vector with the maximum value of each row of a matrix
       Tmp          : Real_Float_Matrix := Activation - Max (Activation);
       Sum_Tmp      : Real_Float_Vector (Activation'Range);
    begin
