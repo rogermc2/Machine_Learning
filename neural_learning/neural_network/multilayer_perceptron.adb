@@ -771,6 +771,7 @@ package body Multilayer_Perceptron is
               Trigger_Stopping (Self.Attributes.Optimizer, To_String (Msg),
                                 Self.Parameters.Verbose);
             Continue := not Is_Stopping;
+
             if Continue then
                Self.Attributes.No_Improvement_Count := 0;
             end if;
@@ -1256,8 +1257,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --                   "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                       "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
@@ -1296,6 +1297,8 @@ package body Multilayer_Perceptron is
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
+        Put_Line (Routine_Name & "Accumulated_Loss" &
+                    Float'Image (Accumulated_Loss));
       --  L667 update weights
       --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
