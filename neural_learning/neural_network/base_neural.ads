@@ -13,8 +13,6 @@ package Base_Neural is
 
    function Binary_Log_Loss (Y_True : Binary_Matrix;
                              Y_Prob : Real_Float_Matrix) return Float;
-   function Binary_Log_Loss (Y_True : Integer_Matrix;
-                             Y_Prob : Real_Float_Matrix) return Float;
    pragma Inline (Binary_Log_Loss);
    procedure Identity (Activation : Real_Float_Matrix);
    pragma Inline (Identity);

@@ -21,20 +21,29 @@ package body Base_Neural is
 
    function Binary_Log_Loss (Y_True : Binary_Matrix;
                              Y_Prob : Real_Float_Matrix) return Float is
-      use Real_Float_Arrays;
       --        Routine_Name : constant String :=
       --                         "Base_Neural.Binary_Log_Loss_Function ";
-      Binary_Unit_Matrix : constant Binary_Matrix (Y_True'Range, Y_True'Range (2))
-        := (others => (others => 1));
-      Float_Unit_Matrix  : constant Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2))
-        := (others => (others => 1.0));
-      YP                 : Real_Float_Matrix := Y_Prob;
-      X_Log_Y1           : Real_Float_Matrix (YP'Range, YP'Range (2));
-      X_Log_Y2           : Real_Float_Matrix (YP'Range, YP'Range (2));
-      Sum1               : Float := 0.0;
-      Sum2               : Float := 0.0;
+       YP           : Real_Float_Matrix := Y_Prob;
+      YT2          : Binary_Matrix := Y_True;
+      YP2          : Real_Float_Matrix := YP;
+
+      function Sum_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
+                         return Float is
+         X_Y : constant Real_Float_Matrix := X_Log_Y (Y_True, Y_Prob);
+         Sum : Float := 0.0;
+      begin
+         for row in X_Y'Range loop
+            for col in X_Y'Range (2) loop
+               Sum := Sum + X_Y (row, col);
+            end loop;
+         end loop;
+
+         return Sum;
+
+      end Sum_XlogY;
+
    begin
-      --  L226 Clip Y_Prob
+      --  L194 Clip Y_Prob
       for row in YP'Range loop
          for col in YP'Range (2) loop
             if YP (row, col) < EPS then
@@ -42,62 +51,14 @@ package body Base_Neural is
             elsif YP (row, col) > 1.0 - EPS then
                YP (row, col) := 1.0 - EPS;
             end if;
+            YT2 (row, col) := 1 - YT2 (row, col);
+            YP2 (row, col) := 1.0 - YP2 (row, col);
          end loop;
       end loop;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
-      X_Log_Y1 := X_Log_Y (Y_True, YP);
-      X_Log_Y2 := X_Log_Y (Binary_Unit_Matrix - Y_True,
-                           Float_Unit_Matrix - YP);
-
-      for row in YP'Range loop
-         for col in YP'Range (2) loop
-            Sum1 := Sum1 + X_Log_Y1 (row, col);
-            Sum2 := Sum2 + X_Log_Y2 (row, col);
-         end loop;
-      end loop;
-
-      return - (Sum1 + Sum2) / Float (Y_Prob'Length);
-
-   end Binary_Log_Loss;
-
-   --  -------------------------------------------------------------------------
-
-   function Binary_Log_Loss (Y_True : Integer_Matrix;
-                             Y_Prob : Real_Float_Matrix) return Float is
-      use Real_Float_Arrays;
-      --        Routine_Name : constant String :=
-      --                         "Base_Neural.Binary_Log_Loss_Function ";
-      YP          : Real_Float_Matrix := Y_Prob;
-      X_Log_Y1    : Real_Float_Matrix (YP'Range, YP'Range (2));
-      X_Log_Y2    : Real_Float_Matrix (YP'Range, YP'Range (2));
-      Sum1        : Float := 0.0;
-      Sum2        : Float := 0.0;
-   begin
-      --  L226 Clip Y_Prob
-      for row in YP'Range loop
-         for col in YP'Range (2) loop
-            if YP (row, col) < EPS then
-               YP (row, col) := EPS;
-            elsif YP (row, col) > 1.0 - EPS then
-               YP (row, col) := 1.0 - EPS;
-            end if;
-         end loop;
-      end loop;
-
-      --  xlogy = x*log(y) so that the result is 0 if x = 0
-      X_Log_Y1 := X_Log_Y (Y_True, YP);
-      X_Log_Y2 := X_Log_Y (Unit_Integer_Matrix (Y_True'Length) - Y_True,
-                           Unit_Float_Matrix (YP'Length) - YP);
-
-      for row in YP'Range loop
-         for col in YP'Range (2) loop
-            Sum1 := Sum1 + X_Log_Y1 (row, col);
-            Sum2 := Sum2 + X_Log_Y2 (row, col);
-         end loop;
-      end loop;
-
-      return - (Sum1 + Sum2) / Float (Y_Prob'Length);
+      return - (Sum_XlogY (Y_True, YP) + Sum_XlogY (YT2, YP2)) /
+        Float (YP'Length);
 
    end Binary_Log_Loss;
 
@@ -165,47 +126,11 @@ package body Base_Neural is
    end Logistic_Sigmoid;
 
    --  ------------------------------------------------------------------------
-   --  L205 Binary Log Loss is the negative average of the log of corrected
-   --  predicted probabilities for each instance.
+
    function Log_Loss (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
                       return Float is
-      --  Routine_Name : constant String := "Base_Neural.Log_Loss ";
-      YP           : Real_Float_Matrix := Y_Prob;
-      YT2          : Binary_Matrix := Y_True;
-      YP2          : Real_Float_Matrix := YP;
-
-      function Sum_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
-                         return Float is
-         X_Y : constant Real_Float_Matrix := X_Log_Y (Y_True, Y_Prob);
-         Sum : Float := 0.0;
-      begin
-         for row in X_Y'Range loop
-            for col in X_Y'Range (2) loop
-               Sum := Sum + X_Y (row, col);
-            end loop;
-         end loop;
-
-         return Sum;
-
-      end Sum_XlogY;
-
    begin
-      --  L194 Clip Y_Prob
-      for row in YP'Range loop
-         for col in YP'Range (2) loop
-            if YP (row, col) < EPS then
-               YP (row, col) := EPS;
-            elsif YP (row, col) > 1.0 - EPS then
-               YP (row, col) := 1.0 - EPS;
-            end if;
-            YT2 (row, col) := 1 - YT2 (row, col);
-            YP2 (row, col) := 1.0 - YP2 (row, col);
-         end loop;
-      end loop;
-
-      --  xlogy = x*log(y) so that the result is 0 if x = 0
-      return - (Sum_XlogY (Y_True, YP) + Sum_XlogY (YT2, YP2)) /
-          Float (YP'Length (2));
+      return Binary_Log_Loss (Y_True, Y_Prob);
 
    end Log_Loss;
 
