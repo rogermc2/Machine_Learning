@@ -174,7 +174,7 @@ package body Base_Neural is
       YT2          : Binary_Matrix := Y_True;
       YP2          : Real_Float_Matrix := YP;
 
-      function Do_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
+      function Sum_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
                          return Float is
          X_Y : constant Real_Float_Matrix := X_Log_Y (Y_True, Y_Prob);
          Sum : Float := 0.0;
@@ -187,7 +187,7 @@ package body Base_Neural is
 
          return Sum;
 
-      end Do_XlogY;
+      end Sum_XlogY;
 
    begin
       --  L194 Clip Y_Prob
@@ -204,7 +204,7 @@ package body Base_Neural is
       end loop;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
-      return - (Do_XlogY (Y_True, YP) - Do_XlogY (YT2, YP2)) /
+      return - (Sum_XlogY (Y_True, YP) + Sum_XlogY (YT2, YP2)) /
           Float (YP'Length (2));
 
    end Log_Loss;
