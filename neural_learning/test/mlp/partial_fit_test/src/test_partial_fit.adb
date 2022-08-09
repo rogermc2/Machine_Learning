@@ -47,7 +47,7 @@ begin
     aClassifier := C_Init
       (Solver => Stochastic_Optimizers.Sgd_Solver, Max_Iter => 100,
        Random_State => 1, Tol => 0.0, Alpha => 10.0 ** (-5),
-       Learning_Rate_Init => 0.2, Verbose => False);
+       Learning_Rate_Init => 0.2, Verbose => True);
 
     Init_Optimizer (aClassifier);
     Put_Line (Routine_Name & "Optimizer initialized");

@@ -11,8 +11,7 @@ package Base_Neural is
    type Derivative_Type is (Identity_Derivative, Logistic_Derivative,
                             Tanh_Derivative, Rect_LU_Derivative);
 
-   function Binary_Log_Loss (Y_True : Binary_Matrix;
-                             Y_Prob : Real_Float_Matrix) return Float;
+   function Binary_Log_Loss (Y_True, Y_Prob : Real_Float_Matrix) return Float;
    pragma Inline (Binary_Log_Loss);
    procedure Identity (Activation : Real_Float_Matrix);
    pragma Inline (Identity);
@@ -28,8 +27,7 @@ package Base_Neural is
    function Logistic_Sigmoid (X : Real_Float_Matrix)
                                return Real_Float_Matrix;
    pragma Inline (Logistic_Sigmoid);
-   function Log_Loss (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
-                      return Float;
+   function Log_Loss (Y_True, Y_Prob : Real_Float_Matrix) return Float;
    function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
                       return Float;
    pragma Inline (Log_Loss);
@@ -47,8 +45,7 @@ package Base_Neural is
    pragma Inline (Softmax);
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
                            return Float;
-   function Squared_Loss (Y_True : Binary_Matrix; Y_Pred : Real_Float_Matrix)
-                           return Float;
+   function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix) return Float;
    pragma Inline (Squared_Loss);
 
 end Base_Neural;
