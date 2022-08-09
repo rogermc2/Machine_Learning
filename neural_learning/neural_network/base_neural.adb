@@ -165,29 +165,28 @@ package body Base_Neural is
    end Logistic_Sigmoid;
 
    --  ------------------------------------------------------------------------
-   --  L177 Log Loss is the negative average of the log of corrected predicted
-   --  probabilities for each instance.
+   --  L205 Binary Log Loss is the negative average of the log of corrected
+   --  predicted probabilities for each instance.
    function Log_Loss (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
                       return Float is
-      --          Routine_Name : constant String := "Base_Neural.Log_Loss ";
+      --  Routine_Name : constant String := "Base_Neural.Log_Loss ";
       YP           : Real_Float_Matrix := Y_Prob;
-      YT2          : Binary_Matrix (Y_True'Range, Y_True'First (2) ..
-                                      Y_True'Last (2) + 1);
-      YP2          : Real_Float_Matrix (YP'Range, YP'First (2) .. YP'Last (2) + 1);
+      YT2          : Binary_Matrix := Y_True;
+      YP2          : Real_Float_Matrix := YP;
 
       function Do_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
                          return Float is
-         X_Y : Real_Float_Matrix (Y_Prob'Range, Y_Prob'Range (2));
+         X_Y : constant Real_Float_Matrix := X_Log_Y (Y_True, Y_Prob);
          Sum : Float := 0.0;
       begin
-         X_Y := X_Log_Y (Y_True, Y_Prob);
-         for row in Y_Prob'Range loop
-            for col in Y_Prob'Range (2) loop
+         for row in X_Y'Range loop
+            for col in X_Y'Range (2) loop
                Sum := Sum + X_Y (row, col);
             end loop;
          end loop;
 
-         return - Sum / Float (Y_Prob'Length);
+         return Sum;
+
       end Do_XlogY;
 
    begin
@@ -199,25 +198,14 @@ package body Base_Neural is
             elsif YP (row, col) > 1.0 - EPS then
                YP (row, col) := 1.0 - EPS;
             end if;
+            YT2 (row, col) := 1 - YT2 (row, col);
+            YP2 (row, col) := 1.0 - YP2 (row, col);
          end loop;
       end loop;
 
       --  xlogy = x*log(y) so that the result is 0 if x = 0
-      if YP'Length (2) = 1 then
-         for row in YP'Range loop
-            for col in YP'Range (2) loop
-               YP2 (row, col) := YP (row, col);
-               YP2 (row, col + 1) := 1.0 - YP (row, col);
-               YT2 (row, col) := Y_True (row, col);
-               YT2 (row, col + 1) := 1 - Y_True (row, col);
-            end loop;
-         end loop;
-
-         return Do_XlogY (YT2, YP2);
-
-      else
-         return Do_XlogY (Y_True, YP);
-      end if;
+      return - (Do_XlogY (Y_True, YP) - Do_XlogY (YT2, YP2)) /
+          Float (YP'Length (2));
 
    end Log_Loss;
 
