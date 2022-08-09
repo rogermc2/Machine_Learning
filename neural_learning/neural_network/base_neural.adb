@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
+with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -321,8 +322,10 @@ package body Base_Neural is
 
     function X_Log_Y (X : Integer; Y : Float) return Float is
         use Maths.Float_Math_Functions;
+        Routine_Name : constant String := "Base_Neural.X_Log_Y ";
         Result : Float;
     begin
+        Assert (Y /= 0.0, Routine_Name & "Y = 0.0");
         if X = 0 then
             Result := 0.0;
         else
@@ -362,6 +365,7 @@ package body Base_Neural is
     begin
         for row in X'Range loop
             for col in X'Range (2) loop
+                Assert (Y (row, col) /= 0.0, "Base_neural Y has a 0.0 value");
                 Result (row, col) := X_Log_Y (X (row, col), Y (row, col));
             end loop;
         end loop;

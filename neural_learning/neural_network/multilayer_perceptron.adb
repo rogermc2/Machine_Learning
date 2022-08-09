@@ -157,7 +157,8 @@ package body Multilayer_Perceptron is
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float;
    begin
-      --        Printing.Print_Float_Matrix (Routine_Name & "L284 Y_Float", Y_Float);
+      Printing.Print_Float_Matrix
+          (Routine_Name & "Y_Float", Y_Float, 1, 3);
       Is_Probilities_Matrix (Routine_Name & "Y_Float ", Y_Float);
       --  L284
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
@@ -167,6 +168,10 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
 
+      Printing.Print_Float_Matrix
+          (Routine_Name & "L284+ Activations.Last_Element",
+           Activations.Last_Element);
+      Put_Line (Routine_Name & "L284+");
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y, Activations.Last_Element);
@@ -180,6 +185,7 @@ package body Multilayer_Perceptron is
             Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
       end case;
 
+      Put_Line (Routine_Name & "L289");
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
       Sum_Sq_Coeffs := 0.0;
@@ -553,6 +559,7 @@ package body Multilayer_Perceptron is
       end if;
 
       Activations.Append (X);
+      Put_Line (Routine_Name & "L417");
 
       --  L417 Initialized grads are empty vectors, no initialization needed.
       --  L427
@@ -560,6 +567,7 @@ package body Multilayer_Perceptron is
         Self.Parameters.Solver = Adam_Solver then
          Fit_Stochastic (Self, X, Y_Bin, Incremental);
 
+            Put_Line (Routine_Name & "L444");
          --  L444
       elsif Self.Parameters.Solver = Lbfgs_Solver then
          Fit_Lbfgs (Self, X, Y_Bin, Activations);
@@ -722,6 +730,7 @@ package body Multilayer_Perceptron is
       --  Batches is a list of slice lists
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
+      Put_Line (Routine_Name & "L628");
       --  L628
       --        Put_Line (Routine_Name & "Max_Iter" &
       --                    Integer'Image (Self.Parameters.Max_Iter));
@@ -733,10 +742,13 @@ package body Multilayer_Perceptron is
          for Batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             --  L649
+            Put_Line (Routine_Name & "Batch_index" &
+                        Integer'Image (Batch_index));
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
                            Accumulated_Loss);
          end loop;
 
+         Put_Line (Routine_Name & "L661");
          --  L661
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
          Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
@@ -1137,6 +1149,9 @@ package body Multilayer_Perceptron is
    begin
       for row in PM'Range loop
          for col in PM'Range (2) loop
+            Assert (PM (row, col) > 0.0, Msg & "Matrix" &
+                      Integer'Image (row) & "," & Integer'Image (col) & " = " &
+                      Float'Image (PM (row, col)));
             Sum (row) := Sum (row) + PM (row, col);
          end loop;
       end loop;
@@ -1284,8 +1299,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --                         "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                             "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
@@ -1297,7 +1312,7 @@ package body Multilayer_Perceptron is
       Batch_Row      : Positive;
       Batch_Loss     : Float;
    begin
-      --        Printing.Print_Boolean_Matrix (Routine_Name & "Y", Y);
+--        Printing.Print_Binary_Matrix (Routine_Name & "Y", Y);
       --  Get batch data
       for row in Batch_Slice.First .. Batch_Slice.Last loop
          Batch_Row := row - Batch_Slice.First + 1;
@@ -1317,6 +1332,7 @@ package body Multilayer_Perceptron is
       --  L644  Initialize Activations
       Activations.Clear;
       Activations.Append (X_Batch);
+      Put_Line (Routine_Name & "L645");
       --  L645
       Forward_Pass (Self, Activations);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
