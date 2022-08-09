@@ -23,12 +23,12 @@ package body Base_Neural is
                              Y_Prob : Real_Float_Matrix) return Float is
       --        Routine_Name : constant String :=
       --                         "Base_Neural.Binary_Log_Loss_Function ";
-       YP           : Real_Float_Matrix := Y_Prob;
+      YP           : Real_Float_Matrix := Y_Prob;
       YT2          : Binary_Matrix := Y_True;
-      YP2          : Real_Float_Matrix := YP;
+      YP2          : Real_Float_Matrix (YP'Range, YP'Range (2));
 
       function Sum_XlogY (Y_True : Binary_Matrix; Y_Prob : Real_Float_Matrix)
-                         return Float is
+                          return Float is
          X_Y : constant Real_Float_Matrix := X_Log_Y (Y_True, Y_Prob);
          Sum : Float := 0.0;
       begin
@@ -52,7 +52,7 @@ package body Base_Neural is
                YP (row, col) := 1.0 - EPS;
             end if;
             YT2 (row, col) := 1 - YT2 (row, col);
-            YP2 (row, col) := 1.0 - YP2 (row, col);
+            YP2 (row, col) := 1.0 - YP (row, col);
          end loop;
       end loop;
 
