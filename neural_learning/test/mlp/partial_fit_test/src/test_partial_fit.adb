@@ -4,13 +4,12 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Base;
+with Base;
 with Load_Dataset;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Printing;
+with Printing;
 with Stochastic_Optimizers;
---  with Utilities;
 
 procedure Test_Partial_Fit is
    use Real_Float_Arrays;
@@ -40,7 +39,7 @@ procedure Test_Partial_Fit is
    aClassifier         : MLP_Classifier;
    Score               : Float;
 begin
-   Put_Line (Routine_Name);
+   Put_Line (Routine_Name & "Y Length" & Integer'Image (Y'Length));
    --  Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 3);
    --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
 
@@ -53,13 +52,13 @@ begin
    Put_Line (Routine_Name & "Optimizer initialized");
    Fit (aClassifier, X, Y);
    Put_Line (Routine_Name & "aClassifier fitted");
---     declare
---        Pred1 : constant Binary_Matrix := Predict (aClassifier, X);
---     begin
---        Printing.Print_Binary_Matrix ("Pred1", Pred1, 1, 4);
---     end;
---
---     Score := Base.Score (aClassifier, X, Y);
---     Put_Line (Routine_Name & " Score:" & Float'Image (Score));
+   declare
+      Pred1 : constant Binary_Matrix := Predict (aClassifier, X);
+   begin
+      Printing.Print_Binary_Matrix ("Pred1", Pred1, 1, 4);
+   end;
+
+   Score := Base.Score (aClassifier, X, Y);
+   Put_Line (Routine_Name & " Score:" & Float'Image (Score));
 
 end Test_Partial_Fit;

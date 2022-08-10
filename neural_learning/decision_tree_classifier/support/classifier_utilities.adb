@@ -872,7 +872,7 @@ package body Classifier_Utilities is
                Values.Append
                  (Integer'Value (To_String (Item.UB_String_Value)));
          end case;
-         Values.Append (Item.Integer_Value);
+
       end loop;
 
       return Values;

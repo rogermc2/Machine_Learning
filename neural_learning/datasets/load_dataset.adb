@@ -30,7 +30,11 @@ package body Load_Dataset is
       Num_Samples     : constant Positive := Natural (Digit_Features.Length);
       Num_Features    : constant Positive :=
                           Natural (Digit_Features (1).Length);
-      List_Row        : NL_Types.Value_Data_List;
+      Index_Values    : Boolean_Array (1 .. Integer (Digit_Values.Length));
+      Short_Features  : NL_Types.Integer_List_2D;
+      Short_Values    : NL_Types.Integer_List;
+      List_Row        : NL_Types.Integer_List;
+      Features_Row    : NL_Types.Integer_List;
       Data            : Digits_Data_Record (Num_Samples, Num_Features,
                                             Num_Classes);
    begin
@@ -45,25 +49,44 @@ package body Load_Dataset is
          end loop;
       end if;
 
-      for row in Digit_Features.First_Index .. Digit_Features.Last_Index loop
-         List_Row := Digit_Features (row);
-         for col in List_Row.First_Index .. List_Row.Last_Index loop
-            Data.Features (row, col) := List_Row.Element (col).Integer_Value;
+      if Num_Classes < 10 then
+         for index in Index_Values'Range loop
+            List_Row := To_Integer_List (Digit_Values (index));
+            Index_Values (index) := List_Row (1) < Num_Classes;
          end loop;
-      end loop;
 
-      for row in Digit_Values.First_Index .. Digit_Values.Last_Index loop
-         Data.Target (row) :=
-           Digit_Values.Element (row).Element (1).Integer_Value;
-      end loop;
-
-      if Num_Classes > 0 then
-         for index in Data.Target'Range loop
-            Data.Target (index) := Data.Target (index) mod Num_Classes;
+         for row in Index_Values'Range loop
+            if Index_Values (row) then
+               Short_Values.Append (To_Integer_List (Digit_Values (row)));
+               Features_Row := To_Integer_List (Digit_Features (row));
+               Short_Features.Append (Features_Row);
+            end if;
          end loop;
+
+         declare
+            Short_Data : Digits_Data_Record
+              (Integer (Short_Values.Length), Num_Features, Num_Classes);
+         begin
+            Short_Data.Target := To_Integer_Array (Short_Values);
+            Short_Data.Features := To_Integer_Matrix (Short_Features);
+            return Short_Data;
+         end;
+
+      else
+         for row in Digit_Features.First_Index .. Digit_Features.Last_Index loop
+            List_Row := To_Integer_List (Digit_Features (row));
+            for col in List_Row.First_Index .. List_Row.Last_Index loop
+               Data.Features (row, col) := List_Row.Element (col);
+            end loop;
+         end loop;
+
+         for row in Digit_Values.First_Index .. Digit_Values.Last_Index loop
+            Data.Target (row) :=
+              Digit_Values.Element (row).Element (1).Integer_Value;
+         end loop;
+
+         return Data;
       end if;
-
-      return Data;
 
    end Load_Digits;
 

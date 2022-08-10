@@ -728,8 +728,8 @@ package body Multilayer_Perceptron is
          Batch_Size := Num_Samples;
       end if;
       --  Batches is a list of slice lists
-      Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
-      Put_Line (Routine_Name & "Batch_Size" & Integer'Image (Batch_Size));
+--        Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
+--        Put_Line (Routine_Name & "Batch_Size" & Integer'Image (Batch_Size));
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
@@ -739,13 +739,12 @@ package body Multilayer_Perceptron is
          Iter := Iter + 1;
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
-         Put_Line (Routine_Name & "Iter" & Integer'Image (Iter));
          --  L636
          for Batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             --  L649
-            Put_Line (Routine_Name & "Batch_index" &
-                        Integer'Image (Batch_index));
+--              Put_Line (Routine_Name & "L649 Batch_index" &
+--                          Integer'Image (Batch_index));
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
                            Accumulated_Loss);
          end loop;
