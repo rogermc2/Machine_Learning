@@ -184,6 +184,7 @@ package body Multilayer_Perceptron is
 --              Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
       end case;
 
+      Put_Line (Routine_Name & "L289 Loss" & Float'Image (Loss));
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
       Sum_Sq_Coeffs := 0.0;
@@ -211,6 +212,7 @@ package body Multilayer_Perceptron is
       --  L292
       Loss := Loss + 0.5 * (Self.Parameters.Alpha *
                               Sum_Sq_Coeffs / Float (Num_Samples));
+      Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following
@@ -688,6 +690,7 @@ package body Multilayer_Perceptron is
       Msg              : Unbounded_String;
       Is_Stopping      : Boolean := False;
    begin
+      Self.Attributes.Loss_Curve.Clear;
       Early_Stopping := Early_Stopping and then not Incremental;
       --  L576
       if not Incremental or else
@@ -791,10 +794,12 @@ package body Multilayer_Perceptron is
 
          if not Incremental and
            Self.Attributes.N_Iter = Self.Parameters.Max_Iter then
-            Put_Line ("    Maximum iterations (" &
+            Put_Line (Routine_Name & "Maximum iterations (" &
                         Integer'Image (Self.Parameters.Max_Iter) &
                         ") reached but the optimization hasn't " &
                         "converged yet.");
+            Put_Line (Routine_Name & "Tol:" &
+                        Float'Image (Self.Parameters.Tol));
             New_Line;
          end if;
       end loop;
