@@ -184,7 +184,7 @@ package body Multilayer_Perceptron is
 --              Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
       end case;
 
-      Put_Line (Routine_Name & "L289 Loss" & Float'Image (Loss));
+--        Put_Line (Routine_Name & "L289 Loss" & Float'Image (Loss));
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
       Sum_Sq_Coeffs := 0.0;
@@ -212,7 +212,7 @@ package body Multilayer_Perceptron is
       --  L292
       Loss := Loss + 0.5 * (Self.Parameters.Alpha *
                               Sum_Sq_Coeffs / Float (Num_Samples));
-      Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
+--        Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following
@@ -728,6 +728,8 @@ package body Multilayer_Perceptron is
          Batch_Size := Num_Samples;
       end if;
       --  Batches is a list of slice lists
+      Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
+      Put_Line (Routine_Name & "Batch_Size" & Integer'Image (Batch_Size));
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
 
       --  L628
@@ -737,12 +739,13 @@ package body Multilayer_Perceptron is
          Iter := Iter + 1;
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
+         Put_Line (Routine_Name & "Iter" & Integer'Image (Iter));
          --  L636
          for Batch_index in Batches.First_Index ..
            Batches.Last_Index loop
             --  L649
---              Put_Line (Routine_Name & "Batch_index" &
---                          Integer'Image (Batch_index));
+            Put_Line (Routine_Name & "Batch_index" &
+                        Integer'Image (Batch_index));
             Process_Batch (Self, X, Y, Batches (Batch_Index), Batch_Size,
                            Accumulated_Loss);
          end loop;
