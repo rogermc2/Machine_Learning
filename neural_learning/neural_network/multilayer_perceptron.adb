@@ -55,6 +55,7 @@ with Utils_Optimise;
 package body Multilayer_Perceptron is
 
    First_Pass : Boolean := True;
+   BP_Count   : Integer := 0;
 
    procedure Compute_Loss_Gradient
      (Self          : MLP_Classifier;
@@ -95,7 +96,7 @@ package body Multilayer_Perceptron is
    --       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
    --        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix);
    procedure Update_Hidden_Layer_Gradients
-     (Self               : in out MLP_Classifier;
+     (Self               : MLP_Classifier;
       Activations        : Real_Matrix_List;
       Deltas             : in out Real_Matrix_List;
       Gradients          : in out Parameters_List;
@@ -155,8 +156,9 @@ package body Multilayer_Perceptron is
                              To_Real_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function_Type;
       Deltas             : Real_Matrix_List;
-      Sum_Sq_Coeffs      : Float;
+      Sum_Sq_Coeffs      : Float := 0.0;
    begin
+        BP_Count := BP_Count + 1;
 --        Printing.Print_Float_Matrix
 --            (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
       Is_Probilities_Matrix (Routine_Name & "Y_Prob ", Y_Prob);
@@ -174,42 +176,32 @@ package body Multilayer_Perceptron is
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Prob, Activations.Last_Element);
---              Put_Line (Routine_Name & "L289 Binary_Log_Loss" &
---                          Float'Image (Loss));
          when Log_Loss_Function =>
             Loss := Log_Loss (Y_Prob, Activations.Last_Element);
---              Put_Line (Routine_Name & "L289 Log_Loss" & Float'Image (Loss));
          when Squared_Error_Function =>
             Loss := Squared_Loss (Y_Prob, Activations.Last_Element);
---              Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
       end case;
 
 --        Put_Line (Routine_Name & "L289 Loss" & Float'Image (Loss));
       --  L289  Add L2 regularization term to loss
       --  for s in self.coefs_:
-      Sum_Sq_Coeffs := 0.0;
       for layer in Self.Attributes.Params.First_Index ..
         Self.Attributes.Params.Last_Index loop
          declare
             Coeffs : constant Real_Float_Matrix :=
                        Self.Attributes.Params (Layer).Coeff_Gradients;
-            --  numpy.ravel (a) returns the elements of a as a 1-D array.
-            --              Ravel  : Real_Float_Vector
-            --                (1 .. Coeffs'Length * Coeffs'Length (2));
          begin
+            Put_Line (Routine_Name & "L289 Coeffs (1, 1)" & Float'Image (Coeffs (1, 1)));
             for row in Coeffs'Range loop
                for col in Coeffs'Range (2) loop
                   Sum_Sq_Coeffs := Sum_Sq_Coeffs + Coeffs (row, col) ** 2;
-                  --                    Ravel ((row - 1) * Coeffs'Length (2) +
-                  --                             col - Coeffs'First (2) + 1) :=
-                  --                      Coeffs (row, col);
                end loop;
             end loop;
-            --              Sum_Sq_Coeffs := Sum_Sq_Coeffs + Ravel * Ravel;
          end;  --  declare
       end loop;
 
       --  L292
+      Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
       Loss := Loss + 0.5 * (Self.Parameters.Alpha *
                               Sum_Sq_Coeffs / Float (Num_Samples));
 --        Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
@@ -239,20 +231,30 @@ package body Multilayer_Perceptron is
                               Activations.Last_Element - Y_Prob);
 
       --  L304  Compute gradient for the last layer
+      Gradients.Clear;
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
+--        Put_Line (Routine_Name & "L304 Gradients.Length" &
+--                    Integer'Image (Integer (Gradients.Length)));
 
       --  L310, L308
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Update_Hidden_Layer_Gradients
            (Self, Activations, Deltas, Gradients, layer, Num_Samples);
       end loop;
+--        Put_Line (Routine_Name & "L317 Gradients 1 size" &
+--                    Integer'Image (Gradients.Element (1).Num_Rows) & " x" &
+--                    Integer'Image (Gradients.Element (1).Num_Cols));
+--        Put_Line (Routine_Name & "L317 Gradients 2 size" &
+--                    Integer'Image (Gradients.Element (2).Num_Rows) & " x" &
+--                    Integer'Image (Gradients.Element (2).Num_Cols));
 
       --          for index in Deltas.First_Index .. Deltas.Last_Index loop
       --              Printing.Print_Float_Matrix
       --                (Routine_Name & "Deltas " & Integer'Image (index),
       --                 Deltas (index));
       --          end loop;
+      Put_Line (Routine_Name & "count:" & Integer'Image (BP_Count));
 
    end Backprop;
 
@@ -1348,13 +1350,20 @@ package body Multilayer_Perceptron is
       --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Self.Attributes.Params, Gradients);
+      case Self.Attributes.Optimizer.Kind is
+         when Optimizer_Adam =>
+            Self.Attributes.Params := Self.Attributes.Optimizer.Adam.Params;
+         when Optimizer_SGD =>
+            Self.Attributes.Params := Self.Attributes.Optimizer.SGD.Params;
+         when Optimizer_Base | No_Optimizer => null;
+      end case;
 
    end Process_Batch;
 
    --  -------------------------------------------------------------------------
 
    procedure Update_Hidden_Layer_Gradients
-     (Self               : in out MLP_Classifier;
+     (Self               : MLP_Classifier;
       Activations        : Real_Matrix_List;
       Deltas             : in out Real_Matrix_List;
       Gradients          : in out Parameters_List;
@@ -1362,8 +1371,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --  Routine_Name : constant String :=
-      --                   "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
@@ -1380,6 +1389,9 @@ package body Multilayer_Perceptron is
       --  Put_Line (Routine_Name & "L312 Activation_Type " &
       --              Activation_Type'Image (Self.Parameters.Activation));
       --  L312
+      --  Activations (Layer) is the data computed by the logistic activation
+      --  function during the forward pass.
+      --  Deltas (Layer - 1) is the backpropagated error signal to be updated.
       case Self.Parameters.Activation is
       when Identity_Activation => null;
       when Logistic_Activation =>
@@ -1391,6 +1403,8 @@ package body Multilayer_Perceptron is
          Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
       when Softmax_Activation => null;
       end case;
+--        Printing.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
+--                                     Deltas (Layer - 1), 1, 1);
 
       --  L314
       Compute_Loss_Gradient

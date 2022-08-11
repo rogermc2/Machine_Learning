@@ -207,10 +207,13 @@ package body Base_Neural is
     end Rect_LU;
 
     --  -------------------------------------------------------------------------
-
+    --  L132  del[Z == 0] = 0 means
+    --        for each element of Z that is 0, repalce the corresponding
+    --        element of del with 0   (f(x) = max(0 , x))
     procedure Rect_LU_Derivative (Z   : Real_Float_Matrix;
                                   Del : in out Real_Float_Matrix) is
     begin
+
         for row in Z'Range loop
             for col in Z'Range (2) loop
                 if Z (row, col) = 0.0 then

@@ -539,7 +539,14 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L44
-      Params := Params + Updates;
+--        Params := Params + Updates;
+      case Self.Kind is
+         when Optimizer_Adam =>
+            Self.Adam.Params := Params + Updates;
+         when Optimizer_SGD =>
+            Self.SGD.Params := Params + Updates;
+         when Optimizer_Base | No_Optimizer => null;
+      end case;
 
    end Update_Params;
 
