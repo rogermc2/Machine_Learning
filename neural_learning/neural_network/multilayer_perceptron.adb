@@ -80,7 +80,6 @@ package body Multilayer_Perceptron is
                            Gradients    : Parameters_List;
                            Activations  : in out Real_Matrix_List);
    function Forward_Pass_Fast (Self      : MLP_Classifier;
-                               Gradients : Parameters_List;
                                X         : Real_Float_Matrix)
                                return Real_Float_Matrix;
    procedure Initialize (Self        : in out MLP_Classifier;
@@ -91,6 +90,7 @@ package body Multilayer_Perceptron is
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;
+                            Params           : in out Parameters_List;
                             Gradients        : in out Parameters_List;
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
@@ -577,7 +577,6 @@ package body Multilayer_Perceptron is
       elsif Self.Parameters.Solver = Lbfgs_Solver then
          Fit_Lbfgs (Self, X, Y_Bin, Self.Attributes.Params, Activations);
       end if;
-      --        Self.Attributes.Params := Params;
 
       Check_Weights (Self);
 
@@ -686,6 +685,7 @@ package body Multilayer_Perceptron is
       --        Num_Classes    : constant Positive :=
       --       Positive (Self.Attributes.Classes.Length);
       --        LE_U           : Label.Label_Binarizer;
+      Params           : Parameters_List := Self.Attributes.Params;
       Iter             : Natural := 0;
       Continue         : Boolean := True;
       Early_Stopping   : Boolean := Self.Parameters.Early_Stopping;
@@ -750,7 +750,7 @@ package body Multilayer_Perceptron is
             --  L649
             --              Put_Line (Routine_Name & "L649 Batch_index" &
             --                          Integer'Image (Batch_index));
-            Process_Batch (Self, X, Y, Gradients, Batches (Batch_Index),
+            Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
          end loop;
 
@@ -898,7 +898,6 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L144
    function Forward_Pass_Fast (Self      : MLP_Classifier;
-                               Gradients : Parameters_List;
                                X         : Real_Float_Matrix)
                                return Real_Float_Matrix is
       use Base_Neural;
@@ -961,7 +960,7 @@ package body Multilayer_Perceptron is
       for layer in 1 .. Num_Layers - 1 loop
          declare
             Params             : constant Parameters_Record :=
-                                   Gradients (layer);
+                                   Self.Attributes.Params (layer);
             Activations_Matrix : constant Real_Float_Matrix :=
                                    To_Matrix (Activations);
             Updated_Activation : Real_Float_Matrix
@@ -1288,7 +1287,7 @@ package body Multilayer_Perceptron is
                      return Binary_Matrix is
       Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
-                         Forward_Pass_Fast (Self, Self.Attributes.Params, X);
+                         Forward_Pass_Fast (Self, X);
    begin
       Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 1, 4);
       Printing.Print_Binary_Matrix
@@ -1303,6 +1302,7 @@ package body Multilayer_Perceptron is
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;
+                            Params           : in out Parameters_List;
                             Gradients        : in out Parameters_List;
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
@@ -1341,7 +1341,7 @@ package body Multilayer_Perceptron is
       Activations.Append (X_Batch);
 
       --  L645
-      Forward_Pass (Self, Self.Attributes.Params, Activations);
+      Forward_Pass (Self, Gradients, Activations);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
 
       --  L665
@@ -1352,14 +1352,7 @@ package body Multilayer_Perceptron is
       --  L667 update weights
       --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
-        (Self.Attributes.Optimizer, Self.Attributes.Params, Gradients);
-      case Self.Attributes.Optimizer.Kind is
-         when Optimizer_Adam =>
-            Self.Attributes.Params := Self.Attributes.Optimizer.Adam.Params;
-         when Optimizer_SGD =>
-            Self.Attributes.Params := Self.Attributes.Optimizer.SGD.Params;
-         when Optimizer_Base | No_Optimizer => null;
-      end case;
+        (Self.Attributes.Optimizer, Params, Gradients);
 
    end Process_Batch;
 
