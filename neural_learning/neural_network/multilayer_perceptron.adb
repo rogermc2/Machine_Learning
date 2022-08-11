@@ -158,7 +158,7 @@ package body Multilayer_Perceptron is
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float := 0.0;
    begin
-        BP_Count := BP_Count + 1;
+--          BP_Count := BP_Count + 1;
 --        Printing.Print_Float_Matrix
 --            (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
       Is_Probilities_Matrix (Routine_Name & "Y_Prob ", Y_Prob);
@@ -254,7 +254,7 @@ package body Multilayer_Perceptron is
       --                (Routine_Name & "Deltas " & Integer'Image (index),
       --                 Deltas (index));
       --          end loop;
-      Put_Line (Routine_Name & "count:" & Integer'Image (BP_Count));
+--        Put_Line (Routine_Name & "count:" & Integer'Image (BP_Count));
 
    end Backprop;
 
