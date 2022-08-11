@@ -1353,6 +1353,7 @@ package body Multilayer_Perceptron is
       --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Params, Gradients);
+      Self.Attributes.Params := Params;
 
    end Process_Batch;
 
