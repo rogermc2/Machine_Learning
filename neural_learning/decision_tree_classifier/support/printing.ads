@@ -30,8 +30,10 @@ package Printing is
                                 Start  : Integer := 1;
                                 Finish : Integer := 0);
    procedure Print_Float_List (Name    : String; theList : Float_List);
-   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
-                                 Start : Integer := 1; Finish : Integer := 0);
+   procedure Print_Float_Matrix
+      (Name  : String; aMatrix : Real_Float_Matrix;
+       Start : Integer := 1; Finish : Integer := 0;
+       Col_Start : Integer := 1; Col_Finish : Integer := 0);
    procedure Print_Float_Matrix_Formated
      (Name  : String; aMatrix : Real_Float_Matrix; Places : Natural;
       Start : Integer := 1; Finish : Integer := 0);

@@ -6,7 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 with Ada.Numerics.Elementary_Functions;
 
---  with Printing;
+with Printing;
 
 package body Stochastic_Optimizers is
 
@@ -523,11 +523,17 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self      : in out Optimizer_Record;
                             Params    : in out Parameters_List;
                             Gradients : Parameters_List) is
-      --          Routine_Name : constant String :=
-      --                             "Stochastic_Optimizers.Update_Params ";
+      Routine_Name : constant String :=
+                         "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
       --  L42
+      Printing.Print_Float_Matrix
+          (Routine_Name & "L42 Params.Element (1) Coeffs",
+           Params (1).Coeff_Gradients, 1, 1, 1, 4);
+      Printing.Print_Float_Matrix
+          (Routine_Name & "L42 Params.Element (2) Coeffs",
+           Params (2).Coeff_Gradients, 1, 1);
       case Self.Kind is
          when Optimizer_Adam =>
             Updates := Get_Adam_Updates (Self.Adam, Gradients);
@@ -539,7 +545,13 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L44
---        Params := Params + Updates;
+      Params := Params + Updates;
+      Printing.Print_Float_Matrix
+          (Routine_Name & "L44 Params.Element (1) Coeffs",
+           Params (1).Coeff_Gradients, 1, 1, 1, 4);
+      Printing.Print_Float_Matrix
+          (Routine_Name & "L44 Params.Element (2) Coeffs",
+           Params (2).Coeff_Gradients, 1, 1);
       case Self.Kind is
          when Optimizer_Adam =>
             Self.Adam.Params := Params + Updates;
@@ -547,6 +559,12 @@ package body Stochastic_Optimizers is
             Self.SGD.Params := Params + Updates;
          when Optimizer_Base | No_Optimizer => null;
       end case;
+      Printing.Print_Float_Matrix
+          (Routine_Name & "end Params.Element (1) Coeffs",
+           Params (1).Coeff_Gradients, 1, 1, 1, 4);
+      Printing.Print_Float_Matrix
+          (Routine_Name & "end Params.Element (2) Coeffs",
+           Params (2).Coeff_Gradients, 1, 1);
 
    end Update_Params;
 

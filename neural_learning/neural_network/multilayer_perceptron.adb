@@ -196,7 +196,8 @@ package body Multilayer_Perceptron is
             Coeffs : constant Real_Float_Matrix :=
                        Self.Attributes.Params (Layer).Coeff_Gradients;
          begin
-            Put_Line (Routine_Name & "L289 Coeffs (1, 1)" & Float'Image (Coeffs (1, 1)));
+            Put_Line (Routine_Name & "L289 Coeffs (1, 1)" &
+                        Float'Image (Coeffs (1, 1)));
             for row in Coeffs'Range loop
                for col in Coeffs'Range (2) loop
                   Sum_Sq_Coeffs := Sum_Sq_Coeffs + Coeffs (row, col) ** 2;
@@ -206,10 +207,10 @@ package body Multilayer_Perceptron is
       end loop;
 
       --  L292
-      Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
+--        Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
       Loss := Loss + 0.5 * (Self.Parameters.Alpha *
                               Sum_Sq_Coeffs / Float (Num_Samples));
-      Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
+--        Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following
@@ -244,12 +245,12 @@ package body Multilayer_Perceptron is
          Update_Hidden_Layer_Gradients
            (Self, Activations, Deltas, Gradients, layer, Num_Samples);
       end loop;
-      Put_Line (Routine_Name & "L317 Gradients 1 size" &
-                  Integer'Image (Gradients.Element (1).Num_Rows) & " x" &
-                  Integer'Image (Gradients.Element (1).Num_Cols));
-      Put_Line (Routine_Name & "L317 Gradients 2 size" &
-                  Integer'Image (Gradients.Element (2).Num_Rows) & " x" &
-                  Integer'Image (Gradients.Element (2).Num_Cols));
+--        Put_Line (Routine_Name & "L317 Gradients 1 size" &
+--                    Integer'Image (Gradients.Element (1).Num_Rows) & " x" &
+--                    Integer'Image (Gradients.Element (1).Num_Cols));
+--        Put_Line (Routine_Name & "L317 Gradients 2 size" &
+--                    Integer'Image (Gradients.Element (2).Num_Rows) & " x" &
+--                    Integer'Image (Gradients.Element (2).Num_Cols));
 
       --          for index in Deltas.First_Index .. Deltas.Last_Index loop
       --              Printing.Print_Float_Matrix

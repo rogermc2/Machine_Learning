@@ -190,21 +190,32 @@ package body Printing is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
-                                 Start : Integer := 1; Finish : Integer := 0) is
-      Last  : Integer;
+   procedure Print_Float_Matrix
+      (Name  : String; aMatrix : Real_Float_Matrix;
+       Start : Integer := 1; Finish : Integer := 0;
+       Col_Start : Integer := 1; Col_Finish : Integer := 0) is
+      Last_Row : Integer;
+      Last_Col : Integer;
    begin
       if Finish > 0 then
-         Last := Finish;
+         Last_Row := Finish;
       else
-         Last := Integer (aMatrix'Length);
+         Last_Row := Integer (aMatrix'Length);
+      end if;
+
+      if Col_Finish > 0 then
+         Last_Col := Col_Finish;
+      else
+         Last_Col := Integer (aMatrix'Length (2));
       end if;
 
       Put_Line (Name & ": ");
-      if Start >= aMatrix'First and then Finish <= aMatrix'Last then
-         for row in Start .. Last loop
+      if Start >= aMatrix'First and then Finish <= aMatrix'Last and then
+          Col_Start >= aMatrix'First (2) and then
+          Col_Finish <= aMatrix'Last (2) then
+         for row in Start .. Last_Row loop
             Put ("Row" & Integer'Image (row) & ":");
-            for col in aMatrix'Range (2) loop
+            for col in Col_Start .. Last_Col loop
                Put (Float'Image (aMatrix (row, col)) & "  ");
             end loop;
             New_Line;

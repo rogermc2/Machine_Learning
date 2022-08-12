@@ -44,9 +44,9 @@ begin
    --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
 
    aClassifier := C_Init
-     (Solver => Stochastic_Optimizers.Sgd_Solver, Max_Iter => 100,
+     (Solver => Stochastic_Optimizers.Sgd_Solver, Max_Iter => 20,
       Random_State => 1, Tol => 0.0, Alpha => 10.0 ** (-5),
-      Learning_Rate_Init => 0.2, Verbose => True);
+      Learning_Rate_Init => 0.2, Verbose => False);
 
    Init_Optimizer (aClassifier);
    Put_Line (Routine_Name & "Optimizer initialized");
