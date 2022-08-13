@@ -196,10 +196,10 @@ package body Multilayer_Perceptron is
             Coeffs : constant Real_Float_Matrix :=
                        Self.Attributes.Params (Layer).Coeff_Gradients;
          begin
-            if layer = 1 then
-               Put_Line (Routine_Name & "L289 Coeffs (29, 28)" &
-                           Float'Image (Coeffs (29, 28)));
-            end if;
+--              if layer = 1 then
+--                 Put_Line (Routine_Name & "L289 Coeffs (29, 28)" &
+--                             Float'Image (Coeffs (29, 28)));
+--              end if;
             for row in Coeffs'Range loop
                for col in Coeffs'Range (2) loop
                   Sum_Sq_Coeffs := Sum_Sq_Coeffs + Coeffs (row, col) ** 2;
