@@ -6,12 +6,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 with Ada.Numerics.Elementary_Functions;
 
-with Printing;
+--  with Printing;
 
 package body Stochastic_Optimizers is
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
-                           return Parameters_Record;
+                          return Parameters_Record;
    pragma Inline (Moments_Sqrt);
    procedure Zero_Init (Params : in out Parameters_List);
 
@@ -93,61 +93,61 @@ package body Stochastic_Optimizers is
    begin
       if Self.LR_Schedule = Invscaling_LR_Schedule then
          Self.Learning_Rate := Self.Initial_Learning_Rate /
-            (Float(Time_Step + 1) ** Self.Power_T);
+           (Float(Time_Step + 1) ** Self.Power_T);
       end if;
    end Iteration_Ends;
 
    --  ------------------------------------------------------------------------
 
---     function Pack (Params : Parameters_List) return Real_Float_Vector is
---        use Coeffs_Package;
---        type Coeff_Vector is array (Positive range <>) of Float;
---        --        Routine_Name   : constant String := "Multilayer_Perceptron.Pack ";
---        Coeffs_Ints  : Coeffs_List;
---        Result_Size  : Natural := 0;
---
---        function Flatten (Mat : Coeffs_Matrix) return Coeff_Vector is
---           Result : Coeff_Vector (1 .. Mat'Length * Mat'Length (2));
---        begin
---           for row in Mat'Range loop
---              for col in Mat'Range (2) loop
---                 Result ((row - 1) * Mat'Length (2) + col) :=
---                   Mat (row, col);
---              end loop;
---           end loop;
---
---           return Result;
---
---        end Flatten;
---
---     begin
---        for index in Params.First_Index .. Params.Last_Index loop
---           Coeffs_Ints.Append (Params.Element (index).Coeff_Gradients +
---                                 Params.Element (index).Intercept_Grads);
---           Result_Size := Result_Size + Coeffs_Ints.Last_Element'Length *
---             Coeffs_Ints.Last_Element'Length (2);
---        end loop;
---
---        declare
---           Result       : Real_Float_Vector (1 .. Result_Size);
---           Result_Index : Natural := 0;
---        begin
---           for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
---              declare
---                 Coeff_Mat : constant Coeffs_Matrix := Coeffs_Ints (index);
---                 Coeff_Vec : constant Coeff_Vector := Flatten (Coeff_Mat);
---              begin
---                 for index in Coeff_Vec'Range loop
---                    Result_Index := Result_Index + 1;
---                    Result (Result_Index) := Coeff_Vec (index);
---                 end loop;
---              end;
---           end loop;
---
---           return Result;
---        end;
---
---     end Pack;
+   --     function Pack (Params : Parameters_List) return Real_Float_Vector is
+   --        use Coeffs_Package;
+   --        type Coeff_Vector is array (Positive range <>) of Float;
+   --        --        Routine_Name   : constant String := "Multilayer_Perceptron.Pack ";
+   --        Coeffs_Ints  : Coeffs_List;
+   --        Result_Size  : Natural := 0;
+   --
+   --        function Flatten (Mat : Coeffs_Matrix) return Coeff_Vector is
+   --           Result : Coeff_Vector (1 .. Mat'Length * Mat'Length (2));
+   --        begin
+   --           for row in Mat'Range loop
+   --              for col in Mat'Range (2) loop
+   --                 Result ((row - 1) * Mat'Length (2) + col) :=
+   --                   Mat (row, col);
+   --              end loop;
+   --           end loop;
+   --
+   --           return Result;
+   --
+   --        end Flatten;
+   --
+   --     begin
+   --        for index in Params.First_Index .. Params.Last_Index loop
+   --           Coeffs_Ints.Append (Params.Element (index).Coeff_Gradients +
+   --                                 Params.Element (index).Intercept_Grads);
+   --           Result_Size := Result_Size + Coeffs_Ints.Last_Element'Length *
+   --             Coeffs_Ints.Last_Element'Length (2);
+   --        end loop;
+   --
+   --        declare
+   --           Result       : Real_Float_Vector (1 .. Result_Size);
+   --           Result_Index : Natural := 0;
+   --        begin
+   --           for index in Coeffs_Ints.First_Index .. Coeffs_Ints.Last_Index loop
+   --              declare
+   --                 Coeff_Mat : constant Coeffs_Matrix := Coeffs_Ints (index);
+   --                 Coeff_Vec : constant Coeff_Vector := Flatten (Coeff_Mat);
+   --              begin
+   --                 for index in Coeff_Vec'Range loop
+   --                    Result_Index := Result_Index + 1;
+   --                    Result (Result_Index) := Coeff_Vec (index);
+   --                 end loop;
+   --              end;
+   --           end loop;
+   --
+   --           return Result;
+   --        end;
+   --
+   --     end Pack;
 
    --  -------------------------------------------------------------------------
 
@@ -172,7 +172,7 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    function Sqrt (Rec : Parameters_Record; Epsilon : Float := 0.0)
-                   return Parameters_Record is
+                  return Parameters_Record is
       use Maths.Float_Math_Functions;
       Result : Parameters_Record := Rec;
    begin
@@ -345,7 +345,7 @@ package body Stochastic_Optimizers is
    --  L256
    function Get_Adam_Updates (Self  : in out Adam_Optimizer;
                               Grads : Parameters_List)
-                               return Parameters_List is
+                              return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
       --          Routine_Name          : constant String :=
@@ -418,7 +418,7 @@ package body Stochastic_Optimizers is
    --  L169
    function Get_SGD_Updates
      (Self : in out SGD_Optimizer; Gradients : Parameters_List)
-       return Parameters_List is
+      return Parameters_List is
       --          Routine_Name : constant String :=
       --                           "Stochastic_Optimizers.Get_SGD_Updates ";
       Updates      : Parameters_List;
@@ -456,7 +456,7 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    function Moments_Sqrt (M : Parameters_Record; Epsilon : Float := 0.0)
-                           return Parameters_Record is
+                          return Parameters_Record is
       use Maths.Float_Math_Functions;
       Result : Parameters_Record := M;
    begin
@@ -523,17 +523,20 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self      : in out Optimizer_Record;
                             Params    : in out Parameters_List;
                             Gradients : Parameters_List) is
-      Routine_Name : constant String :=
-                         "Stochastic_Optimizers.Update_Params ";
+--        Routine_Name : constant String :=
+--                         "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
+--        Max_Update   : Float := 0.0;
+--        Max_Row      : Integer := 0;
+--        Max_Col      : Integer := 0;
    begin
       --  L42
-      Printing.Print_Float_Matrix
-          (Routine_Name & "L42 Params.Element (1) Coeffs",
-           Params (1).Coeff_Gradients, 1, 1, 1, 4);
-      Printing.Print_Float_Matrix
-          (Routine_Name & "L42 Params.Element (2) Coeffs",
-           Params (2).Coeff_Gradients, 1, 1);
+--        Printing.Print_Float_Matrix
+--          (Routine_Name & "L42 Params (1) Coeffs row 29",
+--           Params (1).Coeff_Gradients, 29, 29, 24, 30);
+      --        Printing.Print_Float_Matrix
+      --            (Routine_Name & "L42 Params (2) Coeffs",
+      --             Params (2).Coeff_Gradients, 1, 1);
       case Self.Kind is
          when Optimizer_Adam =>
             Updates := Get_Adam_Updates (Self.Adam, Gradients);
@@ -545,13 +548,29 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L44
+--        Printing.Print_Float_Matrix
+--          (Routine_Name & "L44 Updates (1) Coeffs row 29: ",
+--           Updates (1).Coeff_Gradients, 29, 29, 24, 30);
+--        for row in 1 .. Updates.Element (1).Num_Rows loop
+--           for col in 1 .. Updates.Element (1).Num_Cols loop
+--              if abs (Updates.Element (1).Coeff_Gradients (row, col)) >
+--              abs (Max_Update) then
+--                 Max_Update := Updates.Element (1).Coeff_Gradients (row, col);
+--                 Max_Row := row;
+--                 Max_Col := col;
+--              end if;
+--           end loop;
+--        end loop;
+--        Put_Line (Routine_Name & "L44 Max Update (1) Coeffs ("&
+--                    Integer'Image (Max_Row) & "," &
+--                    Integer'Image (Max_Col) & "): " & Float'Image (Max_Update));
       Params := Params + Updates;
-      Printing.Print_Float_Matrix
-          (Routine_Name & "L44 Params.Element (1) Coeffs",
-           Params (1).Coeff_Gradients, 1, 1, 1, 4);
-      Printing.Print_Float_Matrix
-          (Routine_Name & "L44 Params.Element (2) Coeffs",
-           Params (2).Coeff_Gradients, 1, 1);
+--        Printing.Print_Float_Matrix
+--          (Routine_Name & "L44 Params (1) Coeffs row 29",
+--           Params (1).Coeff_Gradients, 29, 29, 24, 30);
+      --        Printing.Print_Float_Matrix
+      --            (Routine_Name & "L44 Params (2) Coeffs",
+      --             Params (2).Coeff_Gradients, 1, 1);
       case Self.Kind is
          when Optimizer_Adam =>
             Self.Adam.Params := Params + Updates;
@@ -559,36 +578,36 @@ package body Stochastic_Optimizers is
             Self.SGD.Params := Params + Updates;
          when Optimizer_Base | No_Optimizer => null;
       end case;
-      Printing.Print_Float_Matrix
-          (Routine_Name & "end Params.Element (1) Coeffs",
-           Params (1).Coeff_Gradients, 1, 1, 1, 4);
-      Printing.Print_Float_Matrix
-          (Routine_Name & "end Params.Element (2) Coeffs",
-           Params (2).Coeff_Gradients, 1, 1);
+--        Printing.Print_Float_Matrix
+--          (Routine_Name & "end Params (1) Coeffs row 29",
+--           Params (1).Coeff_Gradients, 29, 29, 24, 30);
+      --        Printing.Print_Float_Matrix
+      --            (Routine_Name & "end Params (2) Coeffs",
+      --             Params (2).Coeff_Gradients, 1, 1);
 
    end Update_Params;
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_Params (Self      : in out Adam_Optimizer;
-                            Params    : in out Parameters_List;
-                            Gradients : Parameters_List) is
-
-   begin
-      Params := Params + Get_Adam_Updates (Self, Gradients);
-
-   end Update_Params;
+   --     procedure Update_Params (Self      : in out Adam_Optimizer;
+   --                              Params    : in out Parameters_List;
+   --                              Gradients : Parameters_List) is
+   --
+   --     begin
+   --        Params := Params + Get_Adam_Updates (Self, Gradients);
+   --
+   --     end Update_Params;
 
    --  -------------------------------------------------------------------------
 
-   procedure Update_Params (Self      : in out SGD_Optimizer;
-                            Params    : in out Parameters_List;
-                            Gradients : Parameters_List) is
-
-   begin
-      Params := Params + Get_SGD_Updates (Self, Gradients);
-
-   end Update_Params;
+   --     procedure Update_Params (Self      : in out SGD_Optimizer;
+   --                              Params    : in out Parameters_List;
+   --                              Gradients : Parameters_List) is
+   --
+   --     begin
+   --        Params := Params + Get_SGD_Updates (Self, Gradients);
+   --
+   --     end Update_Params;
 
    --  -------------------------------------------------------------------------
 
