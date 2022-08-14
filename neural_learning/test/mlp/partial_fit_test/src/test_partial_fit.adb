@@ -59,9 +59,9 @@ begin
    declare
       Pred1 : constant Integer_Matrix := Predict (aClassifier, X);
    begin
-      Printing.Print_Integer_Matrix ("Errors Pred1 - Y", Pred1 - Y, 1, 10);
---        Printing.Print_Integer_Matrix ("Pred1", Pred1, 35, 50);
---        Printing.Print_Integer_Matrix ("Y", Y, 35, 50);
+      Printing.Print_Integer_Matrix ("Errors Pred1 - Y", Pred1 - Y, 35, 40);
+      Printing.Print_Integer_Matrix ("Pred1", Pred1, 35, 40);
+      Printing.Print_Integer_Matrix ("Y", Y, 35, 40);
    end;
 
 --     Score := Base.Score (aClassifier, X, Y);
