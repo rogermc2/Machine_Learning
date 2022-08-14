@@ -329,6 +329,31 @@ package body Classifier_Utilities is
 
    --  ---------------------------------------------------------------------------
 
+   function Max_Probability_Indices (Probabilities : Real_Float_Matrix)
+                                     return Integer_Array is
+      --        Routine_Name : constant String :=
+      --                           "Classifier_Utilities.Max_Probability_Indices ";
+      Max_Values  : Real_Float_Vector (Probabilities'Range) := (others => 0.0);
+      Value       : Float;
+      Max_Indices : Integer_Array (Probabilities'Range) := (others => 1);
+   begin
+      for row in Probabilities'Range loop
+         for col in Probabilities'Range (2) loop
+            Value := Probabilities (row, col);
+            if Value > Max_Values (row) then
+               Max_Indices (row) := col;
+               Max_Values (row) := Value;
+            end if;
+         end loop;
+
+      end loop;
+
+      return Max_Indices;
+
+   end Max_Probability_Indices;
+
+   --  ------------------------------------------------------------------------
+
    procedure Parse_Header
      (Header       : Unbounded_List; Num_Features : Positive;
       Data_Record  : in out Multi_Output_Data_Record) is
@@ -344,7 +369,8 @@ package body Classifier_Utilities is
    end Parse_Header;
 
    --  -------------------------------------------------------------------------
-   --  Row_Max_Indices returns the indices of the maximum value in each row of a matrix.
+   --  Row_Max_Indices returns the indices of the maximum value in each row of
+   --  a matrix.
    function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array is
       Indices     : Natural_Array (1 .. Values'Length);
       Max_Value   : Boolean := False;

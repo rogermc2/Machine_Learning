@@ -59,10 +59,10 @@ package Label is
                             Y         : Integer_Matrix) return Binary_Matrix;
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y       : Integer_Array) return Natural_Array;
-    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
-                                return Real_Float_Matrix;
-    function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
-                                return Integer_Matrix;
+--      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+--                                  return Real_Float_Matrix;
+--      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+--                                  return Integer_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                 return Integer_Matrix;
     function Inverse_Transform (Self   : Label_Encoder;
