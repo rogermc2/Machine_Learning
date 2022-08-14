@@ -147,7 +147,7 @@ package Multilayer_Perceptron is
      (Self : in out MLP_Classifier; X : Real_Float_Matrix;
       Y       : Integer_Matrix; Classes : Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                      return Binary_Matrix;
+                      return Integer_Matrix;
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Binary_Matrix;
                             Incremental : Boolean) return Binary_Matrix;
