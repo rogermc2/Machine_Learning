@@ -59,12 +59,13 @@ package body Base_Neural is
       end Sum_XlogY;
 
       YP_Clip : Real_Float_Matrix := Y_Prob;
+      Result  : Float := 0.0;
 
    begin
       Clip (YP_Clip);
 
       if YP_Clip'Length (2) > 1 and Y_True'Length (2) > 1 then
-         return - (Sum_XlogY (Y_True, YP_Clip)) / Float (YP_Clip'Length);
+         Result := - (Sum_XlogY (Y_True, YP_Clip)) / Float (YP_Clip'Length);
 
       elsif YP_Clip'Length (2) = 1 and Y_True'Length (2) = 1  then
          Put_Line (Routine_Name & "YP_Clip'Length (2) = 1");
@@ -78,13 +79,14 @@ package body Base_Neural is
                YT2 (row, 1) := 1.0 - Y_True (row, 1);
                YT2 (row, 2) := Y_True (row, 1);
             end loop;
-            return - (Sum_XlogY (YT2, YP2)) / Float (YP2'Length);
+            Result := - (Sum_XlogY (YT2, YP2)) / Float (YP2'Length);
          end;
       else
           Assert (False, Routine_Name &
                          "uncoded Y_True, Y_Prob number of columns.");
-          return 0.0;
       end if;
+
+      return Result;
 
    end Log_Loss;
 
