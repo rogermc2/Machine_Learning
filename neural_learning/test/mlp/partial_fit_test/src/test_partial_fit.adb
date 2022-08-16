@@ -12,59 +12,72 @@ with Printing;
 with Stochastic_Optimizers;
 
 procedure Test_Partial_Fit is
-   use Real_Float_Arrays;
-   use Multilayer_Perceptron;
-   use Stochastic_Optimizers;
+    use Real_Float_Arrays;
+    use Multilayer_Perceptron;
+    use Stochastic_Optimizers;
 
-   Routine_Name  : constant String := "Test_Partial_Fit ";
+    Routine_Name  : constant String := "Test_Partial_Fit ";
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
-   function Load_Y (Y1 : Integer_Array) return Integer_Matrix is
-      YM : Integer_Matrix (Y1'Range, 1 .. 1);
-   begin
-      for row in Y1'Range loop
-         YM (row, 1) := Y1 (row);
-      end loop;
+    function Load_Y (Y1 : Integer_Array) return Integer_Matrix is
+        YM : Integer_Matrix (Y1'Range, 1 .. 1);
+    begin
+        for row in Y1'Range loop
+            YM (row, 1) := Y1 (row);
+        end loop;
 
-      return YM;
+        return YM;
 
-   end Load_Y;
+    end Load_Y;
 
-   --  -------------------------------------------------------------------------
+    --  -------------------------------------------------------------------------
 
-   Data                : constant Load_Dataset.Digits_Data_Record :=
-                           Load_Dataset.Load_Digits
-                             ("../../digits.csv", Num_Classes => 3);
-   X                   : constant Real_Float_Matrix :=
-                           To_Real_Float_Matrix (Data.Features);
-   Y                   : constant Integer_Matrix := Load_Y (Data.Target);
-   --      Classes      : constant Integer_Array := Data.Classes;
-   aClassifier         : MLP_Classifier;
---     Score               : Float;
+    Data                : constant Load_Dataset.Digits_Data_Record :=
+                            Load_Dataset.Load_Digits
+                              ("../../digits.csv", Num_Classes => 3);
+    X                   : constant Real_Float_Matrix :=
+                            To_Real_Float_Matrix (Data.Features);
+    Y                   : constant Integer_Matrix := Load_Y (Data.Target);
+    --      Classes      : constant Integer_Array := Data.Classes;
+    aClassifier         : MLP_Classifier;
+    --     Score               : Float;
 begin
-   Put_Line (Routine_Name & "Y Length" & Integer'Image (Y'Length));
-   --  Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 3);
-   --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
+    Put_Line (Routine_Name & "Y Length" & Integer'Image (Y'Length));
+    --  Printing.Print_Float_Matrix (Routine_Name & "X", X, 1, 3);
+    --  Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
 
-   aClassifier := C_Init
-     (Solver => Stochastic_Optimizers.Sgd_Solver, Max_Iter => 1000,
-      Random_State => 1, Tol => 0.0, Alpha => 10.0 ** (-5),
-      Learning_Rate_Init => 0.2, Verbose => False);
+    aClassifier := C_Init
+      (Solver => Stochastic_Optimizers.Sgd_Solver, Max_Iter => 20,
+       Random_State => 1, Tol => 0.0, Alpha => 10.0 ** (-5),
+       Learning_Rate_Init => 0.2, Verbose => True,
+       Batch_Size => Y'Length);
 
-   Init_Optimizer (aClassifier);
-   Put_Line (Routine_Name & "Optimizer initialized");
-   Fit (aClassifier, X, Y);
-   Put_Line (Routine_Name & "aClassifier fitted");
-   declare
-      Pred1 : constant Integer_Matrix := Predict (aClassifier, X);
-   begin
-      Printing.Print_Integer_Matrix ("Errors Pred1 - Y", Pred1 - Y, 35, 40);
-      Printing.Print_Integer_Matrix ("Pred1", Pred1, 35, 40);
-      Printing.Print_Integer_Matrix ("Y", Y, 35, 40);
-   end;
+    Init_Optimizer (aClassifier);
+    Put_Line (Routine_Name & "Optimizer initialized");
+    Fit (aClassifier, X, Y);
+    Put_Line (Routine_Name & "aClassifier fitted");
+    declare
+        Pred1       : constant Integer_Matrix := Predict (aClassifier, X);
+        Errors      : constant Integer_Matrix := Pred1 - Y;
+        Error_Count : Natural := 0;
+    begin
+        for row in Errors'Range loop
+            if Errors (row, 1) /= 0 then
+                Error_Count := Error_Count + 1;
+            end if;
+        end loop;
 
---     Score := Base.Score (aClassifier, X, Y);
---     Put_Line (Routine_Name & " Score:" & Float'Image (Score));
+        Put_Line (Routine_Name & "Error Count, Score:" &
+                    Integer'Image (Error_Count) & "," &
+                    Float'Image (Float (Pred1'Length - Error_Count) /
+                      Float (Pred1'Length)));
+        Printing.Print_Integer_Matrix ("Errors Pred1 - Y", Errors, 35, 40);
+        --        Printing.Print_Integer_Matrix ("Pred1", Pred1, 35, 40);
+        --        Printing.Print_Integer_Matrix ("Y", Y, 35, 40);
+    end;
+
+    --     Score := Base.Score (aClassifier, X, Y);
+    --     Put_Line (Routine_Name & " Score:" & Float'Image (Score));
 
 end Test_Partial_Fit;

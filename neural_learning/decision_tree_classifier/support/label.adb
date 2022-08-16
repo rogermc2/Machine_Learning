@@ -64,23 +64,6 @@ package body Label is
     end C_Init;
 
     --  -------------------------------------------------------------------------
-
-    --     function Cum_Sum (A : Boolean_Array) return Integer_Array is
-    --        Result : Integer_Array (A'Range);
-    --        Sum    : Natural := 0;
-    --     begin
-    --        for index in A'Range loop
-    --           if A (index) then
-    --              Sum := Sum + 1;
-    --           end if;
-    --           Result (index) := Sum;
-    --        end loop;
-    --
-    --        return Result;
-    --
-    --     end Cum_Sum;
-
-    --  -------------------------------------------------------------------------
     --  L742
     procedure Fit (Binarizer : in out Label_Binarizer; Classes : Integer_List) is
         use Integer_Sorting;
