@@ -28,8 +28,8 @@ package Base_Neural is
                                return Real_Float_Matrix;
    pragma Inline (Logistic_Sigmoid);
    function Log_Loss (Y_True, Y_Prob : Real_Float_Matrix) return Float;
-   function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
-                      return Float;
+--     function Log_Loss (Y_True : Integer_Matrix; Y_Prob : Real_Float_Matrix)
+--                        return Float;
    pragma Inline (Log_Loss);
    procedure Tanh (Activation : in out Real_Float_Matrix);
    pragma Inline (Tanh);
