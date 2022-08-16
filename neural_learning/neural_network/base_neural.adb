@@ -14,8 +14,6 @@ package body Base_Neural is
 
     --      function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
     --                        return Real_Float_Matrix;
-    function X_Log_Y (X, Y : Real_Float_Matrix) return Real_Float_Matrix;
-    pragma Inline (X_Log_Y);
 
     --  -------------------------------------------------------------------------
 
@@ -32,7 +30,6 @@ package body Base_Neural is
         end loop;
 
     end Clip;
-    pragma Inline (Clip);
 
     --  -------------------------------------------------------------------------
     --  L205
