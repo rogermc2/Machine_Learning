@@ -1,16 +1,17 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
 with Neural_Maths;
-with Test_Support;
+--  with Test_Support;
 
 package body Base_Neural is
 
-   EPS : constant Float := 10.0 ** (-16);
+   EPS : constant Float := 10.0 ** (-16);  --  temporary fof comparision with
+                                           --  Python results
 --     EPS : constant Float := Float'Safe_Small;
 
    --      function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
@@ -78,13 +79,13 @@ package body Base_Neural is
                YT2 (row, 1) := 1.0 - Y_True (row, 1);
                YT2 (row, 2) := Y_True (row, 1);
             end loop;
-            Test_Support.Print_Float_Matrix (Routine_Name & "YT2", YT2);
-            Test_Support.Print_Float_Matrix (Routine_Name & "YP2", YP2);
-            Test_Support.Print_Float_Matrix (Routine_Name & "XlogY",
-                                            X_Log_Y (YT2,  YP2));
-            Put_Line (Routine_Name & "eps: " & Float'Image (EPS));
-            Put_Line (Routine_Name & "Sum_XlogY: " &
-                        Float'Image (Sum_XlogY (YT2, YP2)));
+--              Test_Support.Print_Float_Matrix (Routine_Name & "YT2", YT2);
+--              Test_Support.Print_Float_Matrix (Routine_Name & "YP2", YP2);
+--              Test_Support.Print_Float_Matrix (Routine_Name & "XlogY",
+--                                              X_Log_Y (YT2,  YP2));
+--              Put_Line (Routine_Name & "eps: " & Float'Image (EPS));
+--              Put_Line (Routine_Name & "Sum_XlogY: " &
+--                          Float'Image (Sum_XlogY (YT2, YP2)));
             Result := - (Sum_XlogY (YT2,  YP2)) / Float (YP2'Length);
          end;
       else
