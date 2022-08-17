@@ -6,11 +6,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with Neural_Maths;
---  with Printing;
+with Test_Support;
 
 package body Base_Neural is
 
-   EPS : constant Float := 10.0 ** (-8);
+   EPS : constant Float := 10.0 ** (-16);
+--     EPS : constant Float := Float'Safe_Small;
 
    --      function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
    --                        return Real_Float_Matrix;
@@ -67,7 +68,6 @@ package body Base_Neural is
          Result := - (Sum_XlogY (Y_True, YP_Clip)) / Float (YP_Clip'Length);
 
       elsif YP_Clip'Length (2) = 1 and Y_True'Length (2) = 1 then
-         Put_Line (Routine_Name & "YP_Clip'Length (2) = 1");
          declare
             YP2  : Real_Float_Matrix (YP_Clip'Range, 1 .. 2);
             YT2  : Real_Float_Matrix (Y_True'Range, 1 .. 2);
@@ -78,7 +78,15 @@ package body Base_Neural is
                YT2 (row, 1) := 1.0 - Y_True (row, 1);
                YT2 (row, 2) := Y_True (row, 1);
             end loop;
-            Result := - (Sum_XlogY (YT2, YP2)) / Float (YP2'Length);
+            Test_Support.Print_Float_Matrix (Routine_Name & "YT2", YT2);
+            Test_Support.Print_Float_Matrix (Routine_Name & "YP_Clip", YP_Clip);
+            Test_Support.Print_Float_Matrix (Routine_Name & "YP2", YP2);
+            Test_Support.Print_Float_Matrix (Routine_Name & "XlogY",
+                                            X_Log_Y (YT2,  YP2));
+            Put_Line (Routine_Name & "eps: " & Float'Image (EPS));
+            Put_Line (Routine_Name & "Sum_XlogY: " &
+                        Float'Image (Sum_XlogY (YT2, YP2)));
+            Result := - (Sum_XlogY (YT2,  YP2)) / Float (YP2'Length);
          end;
       else
          Assert (False, Routine_Name &
