@@ -40,9 +40,9 @@ var
   NumData : integer; { number of data (neuron inputs, data per pattern } 
   NumPatterns : integer; { number of training patterns } 
 
-  fichpesos : tfichtxt; { file of weights } 
+  weights_file : tfichtxt; { file of weights } 
   fileerror : tfichtxt; { file of errors } 
-  nfichpesos : string; { name of weights file } 
+  nweights_file : string; { name of weights file } 
   nficherror : string; { error file name } 
 
   recordaerror : boolean; { says if the EMCs are recorded }
@@ -122,33 +122,33 @@ procedure introtraining;
     var i,j : integer; 
     begin 
       write('enter file name: ');
-      readln(nfichpesos);
-      assign(fichpesos,nfichpesos);
-      reset(fichpesos);
-      readln(fichpesos,numpatrones);
-      readln(fichpesos,numdatos);
-      for i:=1 to numpatrones do begin
+      readln(nweights_file);
+      assign(weights_file,nweights_file);
+      reset(weights_file);
+      readln(weights_file,numpatternes);
+      readln(weights_file,numdatos);
+      for i:=1 to numpatternes do begin
         for j:=1 to numdatos do begin
-          readln(fichpesos,patrentr[i,j]);
+          readln(weights_file,patrentr[i,j]);
         end;
-        readln(fichpesos,salidad[i]);
+        readln(weights_file,salidad[i]);
       end;
-      close(fichpesos);
-      patronactivo:=true;
+      close(weights_file);
+      pattern_active:=true;
     end;
   {-------------------------------------}
   procedure readweightsfile;
     var i : integer;
     begin
-      write('introduzca nombre del fichero: ');
-      readln(nfichpesos);
-      assign(fichpesos,nfichpesos); 
-      reset(fichpesos); 
-      readln(fichpesos, numdata); 
+      write('introduzca nombre del file: ');
+      readln(nweights_file);
+      assign(weights_file,nweights_file); 
+      reset(weights_file); 
+      readln(weights_file, numdata); 
       for i:=1 to numdata do begin 
-        read(fichpesos,neurona.peso[i]); 
+        read(weights_file,neurona.peso[i]); 
       end; 
-      close(fichpesos); 
+      close(weights_file); 
       activepattern:=true; 
       neuron.trained:=true; 
       writeln('training not done.'); 
@@ -160,17 +160,17 @@ procedure introtraining;
     begin 
       write('enter file name: '); 
       readln(nfichweights); 
-      assign(fichpesos,nfichpesos);
-      rewrite(fichpesos); 
+      assign(weights_file,nweights_file);
+      rewrite(weights_file); 
       writeln(weightfile, numpatterns); 
-      writeln(fichpesos,numdata); 
-      for i:=1 to numpatrones do begin 
+      writeln(weights_file,numdata); 
+      for i:=1 to numpatternes do begin 
         for j:=1 to numdata do begin 
-          writeln(fichpesos,patrentr[i,j]); 
+          writeln(weights_file,patrentr[i,j]); 
         end; 
-        writeln(fichpesos,out[i]); 
+        writeln(weights_file,out[i]); 
       end; 
-      close(fichpesos); 
+      close(weights_file); 
     end; 
   {-------------------------------------} 
   begin 
@@ -236,7 +236,7 @@ procedure trainneuron;
            neuron.trend:=neuron.trend+2*saillearn*current_error; 
       end; 
   {-------------------------------------} 
-    procedure iniclista(var list : preal); 
+    procedure init_list(var list : preal); 
       begin 
         list:=nil; 
       end; 
@@ -319,7 +319,7 @@ procedure trainneuron;
 {***************************************************************************}
 procedure introlearning_rate;
   begin
-    write('introduzca nueva velocidad de aprendizaje: ');
+    write('introduzca nueva speed de learning: ');
     readln(learning_rate);
   end;
 {***************************************************************************}
@@ -331,20 +331,20 @@ procedure intromaxerror;
 {********************** p r i n c i p a l **********************************}
 begin
   fin:=false;
-  patronactivo:=false;
+  pattern_active:=false;
   inicvar;
   while not fin do begin
     writeln;
     writeln('**** Practica de Sistemas Conexionistas por Pablo Saavedra Lopez ****');
-    writeln('Menu Principal : ');
-    writeln('         [1] entrenar neurona');
-    writeln('         [2] probar la neurona');
-    writeln('         [3] guardar pesos neurona en fichero');
-    writeln('         [4] elegir patrones entrenamiento');
-    writeln('         [5] ver patron de entrenamiento actual');
-    writeln('         [6] cambiar velocidad de aprendizaje ',learning_rate:7:5);
-    writeln('         [7] cambiar error maximo permitido ',maxerror:7:5);
-    writeln('         [8] grabar EMC sucesivo a fichero = ',grabaerror);
+    writeln('Main Menu : ');
+    writeln('         [1] train neuron');
+    writeln('         [2] test the neuron');
+    writeln('         [3] save weights neurona to file');
+    writeln('         [4] choose training  patterns');
+    writeln('         [5] watch pattern de training actual');
+    writeln('         [6] change learning speed ',learning_rate:7:5);
+    writeln('         [7] change maximimun permitted error ',maxerror:7:5);
+    writeln('         [8] record EMC successive to file = ',grabaerror);
     writeln(' [9] record successive weights to file = ',recordweights); 
     writeln(' [0] exit.'); 
     write(' option:'); readln(key); 
@@ -358,7 +358,7 @@ begin
        '7':intromaxerror; 
        '8':recorderror:=not(recorderror); 
        '9':recordweights:=not(recordweights); 
-       '0':end:=true; 
+       '0':fin:=true; 
     end; 
   end; 
 end.

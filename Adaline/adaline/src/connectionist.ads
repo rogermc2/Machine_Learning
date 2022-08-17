@@ -8,6 +8,8 @@ package Connectionist is
       Weights    : Real_Float_Vector (1 .. Num_Weights);
    end record;
 
-   procedure Run_Adaline;
+   procedure Train (theAdaline       : in out Adaline_Class;
+                       Input         : Real_Float_Vector; Desired,
+                       Learning_Rate : Float);
 
 end Connectionist;
