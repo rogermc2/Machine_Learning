@@ -9,18 +9,20 @@ package body Training is
       Key   : Character;
       Count : Natural := 0;
       Ok    : Boolean := False;
+      Quit  : Boolean := False;
    begin
       Put_Line ("** CHANGE TRAINING PATTERN **");
-      while not Ok and Count < 3 loop
+      while not Ok and Count < 3 and not Quit loop
          Count := Count + 1;
-         Put_Line (" [1] enter patterns manually.");
-         Put_Line (" [2] read patterns from file.");
-         Put_Line (" [3] read weights already calculated and do not train");
-         Put_Line (" [4] write training pattern to file");
-         Put_Line (" [0] return to main menu.");
+         Put_Line (" 0: return to main menu.");
+         Put_Line (" 1: enter patterns manually.");
+         Put_Line (" 2: read patterns from file.");
+         Put_Line (" 3: read weights already calculated and do not train");
+         Put_Line (" 4: write training pattern to file");
          Put ("Enter option:");
          Get (Key);
          case Key is
+         when '0' => Quit := True;
          when '1' => Ok := True;  --  enter patterns;
          when '2' => Ok := True;  --  readpatternsfile;
          when '3' => Ok := True;  --  readweightsfile;

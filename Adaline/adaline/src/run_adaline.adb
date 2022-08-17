@@ -29,7 +29,7 @@ begin
          when '1' => Training.Train_Neuron;
          when '2' => null; --  testneuron;
          when '3' => null; --  saveweights;
-         when '4' => null; --   introtraining;
+         when '4' => Training.Initialize_Training;
          when '5' => null; --  verpatrentr;
          when '6' => null; --  introvelalearn;
          when '7' => null; --  intromaxerror;
