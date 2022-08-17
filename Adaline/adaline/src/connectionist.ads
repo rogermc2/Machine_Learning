@@ -1,7 +1,7 @@
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
-package Adaline is
+package Connectionist is
 
    type Adaline_Class (Num_Weights : Positive) is record
       Num_Inputs : Positive;
@@ -10,4 +10,4 @@ package Adaline is
 
    procedure Run_Adaline;
 
-end Adaline;
+end Connectionist;
