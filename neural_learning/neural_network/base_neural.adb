@@ -79,7 +79,6 @@ package body Base_Neural is
                YT2 (row, 2) := Y_True (row, 1);
             end loop;
             Test_Support.Print_Float_Matrix (Routine_Name & "YT2", YT2);
-            Test_Support.Print_Float_Matrix (Routine_Name & "YP_Clip", YP_Clip);
             Test_Support.Print_Float_Matrix (Routine_Name & "YP2", YP2);
             Test_Support.Print_Float_Matrix (Routine_Name & "XlogY",
                                             X_Log_Y (YT2,  YP2));
@@ -371,7 +370,7 @@ package body Base_Neural is
       Result       : Float;
    begin
       if Y1 = 0.0 then
-         Y1 := 10.0 ** (-8);
+         Y1 := EPS;
       end if;
 
       if X = 0.0 then
