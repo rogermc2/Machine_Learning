@@ -1,25 +1,14 @@
 
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Maths;
+
 with Base_Neural; use Base_Neural;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with Test_Support;
 
 procedure Test_Base is
-
-    procedure Print_Float_Matrix
-      (Name  : String; aMatrix : Real_Float_Matrix) is
-    begin
-        Put_Line (Name & ": ");
-        for row in aMatrix'Range loop
-            for col in aMatrix'Range (2) loop
-                Put (Float'Image (aMatrix (row, col)) & "  ");
-            end loop;
-            New_Line;
-        end loop;
-
-    end Print_Float_Matrix;
-
-    --  ------------------------------------------------------------------------
+    use Maths.Float_Math_Functions;
 
     Routine_Name  : constant String := "Test_Base ";
     Y_True        : constant Real_Float_Matrix (1 .. 3, 1 .. 1) :=
@@ -36,13 +25,16 @@ begin
     Put_Line ("Binary log loss:" &
                 Float'Image (Binary_Log_Loss (Y_True, Y_Prob)));
 
-    Print_Float_Matrix ("YP_Clip", YP_Clip);
+    Test_Support.Print_Float_Matrix ("YP_Clip", YP_Clip);
 
     declare
         XLY : constant Real_Float_Matrix := X_Log_Y (Y_True, YP_Clip);
     begin
         Put_Line ("X_Log_Y width:" & Integer'Image (XLY'Length (2)));
-        Print_Float_Matrix ("X_Log_Y", XLY);
+        Test_Support.Print_Float_Matrix ("X_Log_Y", XLY);
     end;
+
+    Put_Line  ("Log 1.0:" & Float'Image (Log (0.99999999)));
+    Put_Line  ("Log 0.0:" & Float'Image (Log (0.000000001)));
 
 end Test_Base;
