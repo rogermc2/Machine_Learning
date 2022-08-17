@@ -8,13 +8,11 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Printing;
 with Stochastic_Optimizers;
 with Test_Common;
 
 --  Based on  test_sgd_optimizer_no_momentum()
 procedure No_Momentum_SGD_Test is
---     use Real_Float_Arrays;
    use Stochastic_Optimizers;
    use Test_Common;
    Routine_Name : constant String := "No_Momentum_SGD_Test ";
@@ -28,11 +26,11 @@ begin
    Test_Common.Init (Params);
 
    for lr in -3 .. 4 loop
---        Put_Line ("Learning rate: " & Integer'Image (lr));
       Grads.Clear;
       Expected.Clear;
       Learn_Rate := 10.0 ** lr;
-      C_Init (SGD, Params => Params, Learning_Rate => Learn_Rate, Momentum => 0.0);
+      C_Init (SGD, Params => Params, Learning_Rate => Learn_Rate,
+              Momentum => 0.0);
 
       for shape in Shapes.First_Index .. Shapes.Last_Index loop
          declare
