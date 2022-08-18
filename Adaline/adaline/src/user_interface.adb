@@ -3,17 +3,17 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 package body User_Interface is
 
-   procedure Introduce_Patterns is
+   procedure Introduce_Layers is
    begin
       null;
-   end Introduce_Patterns;
+   end Introduce_Layers;
 
    --  ------------------------------------------------------------------------
 
-   procedure Read_Patterns_File is
+   procedure Read_Layers_File is
    begin
       null;
-   end Read_Patterns_File;
+   end Read_Layers_File;
 
    --  ------------------------------------------------------------------------
 
@@ -36,22 +36,22 @@ package body User_Interface is
       Count : Natural := 0;
       Ok    : Boolean := False;
    begin
-      Put_Line ("** CHANGE TRAINING PATTERN * *");
+      Put_Line ("** CHANGE TRAINING Layer * *");
       while not Ok and Count < 3 loop
          Count := Count + 1;
-         Put_Line (" [1] enter patterns manually.");
-         Put_Line (" [2] read patterns from file.");
+         Put_Line (" [1] enter layers manually.");
+         Put_Line (" [2] read layers from file.");
          Put_Line (" [3] read weights already calculated and do not train");
-         Put_Line (" [4] write training pattern to file");
+         Put_Line (" [4] write training layer to file");
          Put_Line (" [0] return to main menu.");
          Put ("Enter option: ");
          Get (Key);
          case Key is
          when '0' => Ok := True;
-         when '1' => Ok := True; --  enter patterns;
+         when '1' => Ok := True; --  enter Layers;
          when '2' =>
             Ok := True;
-            Read_Patterns_File;
+            Read_Layers_File;
          when '3' =>
             Ok := True;
             Read_Weights_File;

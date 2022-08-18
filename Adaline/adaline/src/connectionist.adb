@@ -28,10 +28,10 @@ package body Connectionist is
     subtype Neural_Net_List is Neural_Net_Package.Vector;
 
     Max_Data     : constant Positive := 10;
-    Max_Patterns : constant Positive := 10;
+    Max_Layers : constant Positive := 10;
 
     subtype Data is  Real_Float_Vector (1.. Max_Data);
-    type Pattern is array (1.. Max_Data) of Data;
+    type Layer is array (1.. Max_Data) of Data;
     subtype Output is Real_Float_Vector (1.. Max_Data);
 
     Float_Gen : Ada.Numerics.Float_Random.Generator;
@@ -41,11 +41,11 @@ package body Connectionist is
     Max_Error      : Float := 0.0001;  --  maximum allowed error
 --      Neuron        : Neural_Node_Class;
     Neural_Net     : Neural_Net_List;
-    --    input_patterns : tpatrentr; { array of input patterns
+    --    input_Layers : tpatrentr; { array of input Layers
     --    outputd  : toutput; { array of desired outputs
-    Active_Pattern : Boolean := False; -- Training pattern loaded
-    Num_Data       : Natural := 0; --  number of data (neuron inputs, data per pattern }
-    Num_Patterns   : Natural := 0;  --  number of training patterns }
+    Active_Layer : Boolean := False; -- Training Layer loaded
+    Num_Data       : Natural := 0; --  number of data (neuron inputs, data per Layer }
+    Num_Layers   : Natural := 0;  --  number of training Layers }
     --
     --    fichpesos : tfichtxt; { file of weights }
     --    fileerror : tfichtxt; { file of errors }

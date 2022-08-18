@@ -285,7 +285,7 @@ procedure trainneuron;
            write('enter weights file name Input ',i,' : '); 
            readln(filename[i]); 
          end;
-         iniclist(reallist); 
+         initlist(reallist); 
          for i:=1 to NumData do 
            putinlist(reallist,neuron.weight[i]); 
       end; 

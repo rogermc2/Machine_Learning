@@ -7,11 +7,11 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Connectionist_Types is
 
-    Max_Data     : constant Positive := 10;
-    Max_Patterns : constant Positive := 10;
+--      Max_Data   : constant Positive := 10;
+--      Max_Layers : constant Positive := 10;
 
     type Processing_Element
-      (Num_Patterns, Num_Inputs, Num_Weights : Positive) is record
+      (Num_Inputs, Num_Weights : Positive) is record
         Entries   : Real_Float_Vector (1 .. Num_Inputs);
         Weights   : Real_Float_Vector (1 .. Num_Weights);
         Activ     : Float;   --  activation signal
@@ -31,15 +31,15 @@ package Connectionist_Types is
 
     --  inputs and weights in the neuron:
     --  tdata = array [1..maxdata] of real;
-    --  input patterns:
-    --  tpatrentr = array [1 .. maxpatterns] of tdata;
+    --  input Layers:
+    --  tpatrentr = array [1 .. maxLayers] of tdata;
     --  "Data" includes inputs and weights
 
     use Real_Float_Arrays;
     subtype Data_Type is Real_Float_Vector;
-    package Pattern_Package is new
+    package Layer_Package is new
       Ada.Containers.Indefinite_Vectors (Positive, Data_Type);
-    subtype Pattern_List is Pattern_Package.Vector;
+    subtype Layer_List is Layer_Package.Vector;
 
     subtype Output_Type is Real_Float_Vector;
 
