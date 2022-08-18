@@ -183,8 +183,8 @@ package body Training is
          Put_Line ("There Is No Training Layer Loaded.");
       else
          Put ("Enter Name Of Emc File: ");
-         Get_Line (Error_File_Name);
-         Put_Line (To_String (Error_File_Name));
+         Error_File_Name := Get_Line;
+--           Put_Line (To_String (Error_File_Name));
 
          Create (Error_File_ID, Out_File, To_String (Error_File_Name));
 --           Open (Error_File_ID, Out_File, To_String (Error_File_Name));
