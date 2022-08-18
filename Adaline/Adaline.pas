@@ -16,7 +16,7 @@ type
         weight : tdata; {array of weights} 
         vactiv : real; {activation signal} 
         output : real; {exit}
-        tendencon : boolean; {indicates if the trend is active} 
+        activetrend : boolean; {indicates if the trend is active} 
         trend : real; {trend value} 
         trained : boolean; {the neuron is trained} 
         link : ppe; {link to next PE} 
@@ -85,7 +85,7 @@ procedure calcoutput(var neuron : tpe);
     neuron.output:=neuron.vactiv; 
   end;
 {***************************************************** **************************} 
-procedure inicneuron( var neuron : tpe ); 
+procedure initneuron( var neuron : tpe ); 
   var i : integer; 
   begin 
     for i:=1 to numdata do begin 
@@ -131,7 +131,7 @@ procedure introtraining;
         for j:=1 to numdatos do begin
           readln(weights_file,patrentr[i,j]);
         end;
-        readln(weights_file,salidad[i]);
+        readln(weights_file,departured[i]);
       end;
       close(weights_file);
       pattern_active:=true;
@@ -201,10 +201,10 @@ procedure trainneuron;
     cpattern : integer; { input pattern counter } 
     i,j,k,l : integer; 
     filename : array [1..MaxData] of string; 
-    royallist : preal; { list where we will store the weights in time } 
+    reallist : preal; { list where we will store the weights in time } 
     value : real; { value we take from the list } 
   {-------------------------------------} 
-    procedure calcemc; 
+    procedure calculate; 
       var i : integer; 
        begin 
          for i:=1 to numpatterns do begin 
@@ -279,7 +279,7 @@ procedure trainneuron;
          assign(errorfile,nerrorfile); 
          rewrite(errorfile); 
       end; 
-      inichneuron(neuron); 
+      initneuron(neuron); 
       if recordweights then begin 
          for i:=1 to NumData do begin 
            write('enter weights file name Input ',i,' : '); 
@@ -291,7 +291,7 @@ procedure trainneuron;
       end; 
       write(' want trend (y/n) ? '); 
       readln(option); 
-      if option='s' then neuron.tendencon:=true else neuron.tendencon:=false; 
+      if option='s' then neuron.activetrend:=true else neuron.activetrend:=false; 
       interactions:=0; 
       emc:=0; 
       endtraining:=false; 
@@ -304,7 +304,7 @@ procedure trainneuron;
           cpattern:=cpattern+1;
         end; 
         interactions:=interactions+1; 
-        calcemc; 
+        calculate; 
         writeln('in the interaction ',interactions,' the emc has been ',emc); 
         if writeerror=true then write(errorfile,emc); 
         if recordweights then begin 
@@ -313,7 +313,7 @@ procedure trainneuron;
         end; 
         if emc
    
-     salida deseada: ',salidad[i]:5:3);
+     exit desired: ',departured[i]:5:3);
     end;
   end;
 {***************************************************************************}
