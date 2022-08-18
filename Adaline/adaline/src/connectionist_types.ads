@@ -10,9 +10,9 @@ package Connectionist_Types is
     Max_Data     : constant Positive := 10;
     Max_Patterns : constant Positive := 10;
 
-    type Neural_Node_Class
+    type Processing_Element
       (Num_Patterns, Num_Inputs, Num_Weights : Positive) is record
-        Entries   : Real_Float_Matrix (1 .. Num_Patterns, 1 .. Num_Inputs);
+        Entries   : Real_Float_Vector (1 .. Num_Inputs);
         Weights   : Real_Float_Vector (1 .. Num_Weights);
         Activ     : Float;   --  activation signal
         Output    : Float;   --  exit
@@ -25,11 +25,22 @@ package Connectionist_Types is
       Ada.Containers.Vectors (Positive, Float);
     subtype Data_Value_List is Data_Values_Package.Vector;
 
-    package Neural_Net_Package is new
-      Ada.Containers.Indefinite_Vectors (Positive, Neural_Node_Class);
-    subtype Neural_Net_List is Neural_Net_Package.Vector;
+    package Processing_Element_Package is new
+      Ada.Containers.Indefinite_Vectors (Positive, Processing_Element);
+    subtype Processing_Element_List is Processing_Element_Package.Vector;
 
-    subtype Pattern_Type is Real_Float_Matrix;
+    --  inputs and weights in the neuron:
+    --  tdata = array [1..maxdata] of real;
+    --  input patterns:
+    --  tpatrentr = array [1 .. maxpatterns] of tdata;
+    --  "Data" includes inputs and weights
+
+    use Real_Float_Arrays;
+    subtype Data_Type is Real_Float_Vector;
+    package Pattern_Package is new
+      Ada.Containers.Indefinite_Vectors (Positive, Data_Type);
+    subtype Pattern_List is Pattern_Package.Vector;
+
     subtype Output_Type is Real_Float_Vector;
 
 end Connectionist_Types;

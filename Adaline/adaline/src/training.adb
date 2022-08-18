@@ -15,7 +15,7 @@ package body Training is
 
     --  ------------------------------------------------------------------------
 
-    procedure Calc_Output (Neuron : in out Neural_Node_Class) is
+    procedure Calc_Output (Neuron : in out Processing_Element) is
     begin
         null;
 
@@ -36,7 +36,7 @@ package body Training is
 
     --  ------------------------------------------------------------------------
 
-    procedure Change_Weights (Neuron : in out Neural_Node_Class) is
+    procedure Change_Weights (Neuron : in out Processing_Element) is
     begin
         null;
     end ;
@@ -75,30 +75,32 @@ package body Training is
     --  ------------------------------------------------------------------------
 
     procedure Enter_Patterns (Num_Data, Num_Patterns  : in out Positive;
-                              Pattern_Entries         : out Pattern_Type;
+                              Pattern_Entries         : out Pattern_List;
                               Output_Data             : out Output_Type;
                               Active_Pattern          : in out Boolean) is
+        Pattern_Data : Float;
+        Data         : Data_Type (1 .. Num_Data);
     begin
         Put ("Enter number of patterns: ");
         Get (Num_Patterns);
         Put ("Enter number of entries: ");
         Get (Num_Data);
 
-        declare
-            Patterns : Pattern_Type (1 .. Num_Patterns, 1 .. Num_Data);
-        begin
+--          declare
+--              Patterns : Pattern_Type (1 .. Num_Patterns, 1 .. Num_Data);
+--          begin
             for patt_index in 1 .. Num_Patterns loop
                 for data_index in 1 .. Num_Data loop
                     Put ("Enter pattern data (" & Integer'Image (patt_index) &
                            "," & Integer'Image (data_index) & "):" );
-                    Get (Patterns (patt_index, data_index));
+                    Get (Data (data_index));
                 end loop;
-                Pattern_Entries := Patterns;
+                Pattern_Entries.Append (Data);
 
                 Put ("Enter desired output: ");
                 Get (Output_Data (patt_index));
             end loop;
-        end;  --  declare block
+--          end;  --  declare block
 
         Active_Pattern := True;
 
@@ -106,18 +108,13 @@ package body Training is
 
     --  ------------------------------------------------------------------------
 
-    procedure Init_Neuron (Neuron : in out Neural_Node_Class;
+    procedure Init_Neuron (Neuron : in out Processing_Element;
                            Num_Data, Num_Patterns : Positive) is
         use Ada.Numerics.Float_Random;
     begin
         for row in 1 .. Num_Data loop
             Neuron.Weights (row) := 3.0 * Float (Random (Float_Gen));
-        end loop;
-
-        for row in 1 .. Num_Patterns loop
-            for col in 1 .. Num_Data loop
-                Neuron.Entries (row, col) := 0.0;
-            end loop;
+            Neuron.Entries (row) := 0.0;
         end loop;
 
         Neuron.Trend := 3.0 * Float (Random (Float_Gen));
@@ -129,18 +126,16 @@ package body Training is
 
     --  ------------------------------------------------------------------------
 
-    procedure Set_Pattern (Neuron   : in out Neural_Node_Class;
+    procedure Set_Pattern (Neuron   : in out Processing_Element;
                            Num_Data : Positive;
-                           Pattern  : Pattern_Type;
+                           Pattern  : Data_Type;
                            Errors   : in out Output_Type) is
     --  received pattern, desired output
         use Maths.Float_Math_Functions;
         Current_Error : Float;
     begin
         for row in Neuron.Entries'Range loop
-            for col in Neuron.Entries'Range (2) loop
-                Neuron.Entries (row, col) := Pattern (row, col);
-            end loop;
+                Neuron.Entries (row) := Pattern (row);
         end loop;
 
         --  Calculate The Output
@@ -153,15 +148,15 @@ package body Training is
     --  ------------------------------------------------------------------------
 
     procedure Train_Neuron
-      (Neuron : in out Neural_Node_Class; Num_Data, Num_Patterns : Natural;
+      (Neuron : in out Processing_Element; Num_Data, Num_Patterns : Natural;
        Active_Pattern, Record_Weights, Write_Error : Boolean) is
-        End_Training : Boolean;
-        Num_Interactions : Natural := 0;
-        Emc : Float;
+        End_Training       : Boolean;
+        Num_Interactions   : Natural := 0;
+        Emc                : Float;
         --  Errors : Output_Type;  -- Array Of Errors
-        Option : Character;
-        Pattern : Pattern_Type (1 .. Num_Patterns, 1 .. Num_Data);
-        Pattern_Count : Integer;
+        Option             : Character;
+        Patterns           : Pattern_List;
+        Pattern_Count      : Integer;
         Error_File_Name    : Unbounded_String;
         Weights_File_Names : NL_Types.Data_Rows (1 .. Num_Data);
         Error_File_ID      : File_Type;
@@ -205,8 +200,8 @@ package body Training is
             while not End_Training loop
                 Pattern_Count := 1;
                 while Pattern_Count <= Num_Patterns loop
-                    Set_Pattern (Neuron, Num_Data, Pattern (Pattern_Count),
-                                 Errors);
+                    Set_Pattern (Neuron, Num_Data, Patterns (Pattern_Count),
+                                 Output);
                     Change_Weights (Neuron);
                     Pattern_Count := Pattern_Count + 1;
                 end loop;
