@@ -6,41 +6,43 @@ with Connectionist_Types; use Connectionist_Types;
 with Training;
 
 procedure Run_Adaline is
-   Num_Data             : Natural;
-   Num_Layers           : Natural;
-   Layer_Entries        : Layer_List;
-   Active_Layer         : Boolean;
-   Record_Weights       : Boolean := False;
-   Write_Error          : Boolean := False;
-   Key                  : Character;
-   Finish               : Boolean := False;
-   Pattern_Active       : Boolean := False;
-   Output_Data          : Output_Type
+   Routine_Name    : constant String := "Run_Adaline ";
+   Num_Data        : Natural;
+   Num_Layers      : Natural;
+   Layer_Entries   : Layer_List;
+   Active_Layer    : Boolean;
+   Record_Weights  : Boolean := False;
+   Write_Error     : Boolean := False;
+   Key             : Character;
+   Finish          : Boolean := False;
+   Pattern_Active  : Boolean := False;
+   Output_Data     : Output_Type
      := Training.Initialize_Training (Num_Data, Num_Layers, Layer_Entries,
                                       Active_Layer);
-   Num_Weights          : Natural := Num_Layers;
+   Num_Weights     : Natural := Num_Layers;
 begin
-
+   Put_Line (Routine_Name & "Num_Data:" & Integer'Image (Num_Data));
+   Put_Line (Routine_Name & "Num_Layers:" & Integer'Image (Num_Layers));
    declare
-      Neuron       : Processing_Element (Num_Data, Num_Weights);
+      Neuron  : Processing_Element (Num_Data, Num_Weights);
    begin
-   while not Finish loop
-      New_Line;
-      Put_Line ("Main Menu");
-      Put_Line ("1: train neuron");
-      Put_Line ("2: test the neuron");
-      Put_Line ("3: save neuron weights to file");
-      Put_Line ("4: choose training patterns");
-      Put_Line ("5: watch pattern de training actual");
-      Put_Line ("6: change learning speed ");
-      Put_Line ("7: change maximimun permitted error ");
-      Put_Line ("8: record EMC successive to file");
-      Put_Line ("9: record successive weights to file");
-      Put_Line ("0: exit");
+      while not Finish loop
+         New_Line;
+         Put_Line ("Main Menu");
+         Put_Line ("1: train neuron");
+         Put_Line ("2: test the neuron");
+         Put_Line ("3: save neuron weights to file");
+         Put_Line ("4: choose training layers");
+         Put_Line ("5: watch actual training layers");
+         Put_Line ("6: change learning speed ");
+         Put_Line ("7: change maximimun permitted error ");
+         Put_Line ("8: record EMC  to file");
+         Put_Line ("9: record weights to file");
+         Put_Line ("0: exit");
 
-      Put ("Enter option: ");
-      Get (Key);
-      case Key is
+         Put ("Enter option: ");
+         Get (Key);
+         case Key is
          when '1' => Training.Train_Neuron
               (Neuron, Num_Data, Num_Layers, Active_Layer, Record_Weights,
                Write_Error);
@@ -55,10 +57,10 @@ begin
          when '0' => Finish := True;
          when others =>
             Put_Line ("Invalid option!");
-      end case;
+         end case;
 
       end loop;
-      end;  --  declare block
+   end;  --  declare block
 
 end Run_Adaline;
 

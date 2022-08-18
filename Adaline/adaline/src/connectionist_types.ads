@@ -7,9 +7,6 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Connectionist_Types is
 
---      Max_Data   : constant Positive := 10;
---      Max_Layers : constant Positive := 10;
-
     type Processing_Element
       (Num_Inputs, Num_Weights : Natural) is record
         Entries   : Real_Float_Vector (1 .. Num_Inputs);

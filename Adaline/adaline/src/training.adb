@@ -47,18 +47,18 @@ package body Training is
                            Layer_Entries           : out Layer_List;
                            Active_Layer            : out Boolean) return Output_Type is
    begin
-      Put ("Enter number of Layers: ");
+      Put ("Enter number of layers: ");
       Get (Num_Layers);
       Put ("Enter number of entries: ");
       Get (Num_Data);
       declare
          Data        : Data_Type (1 .. Num_Data);
-         Output_Data : Output_Type (1 .. Num_Data);
+         Output_Data : Output_Type (1 .. Num_Layers);
       begin
          for layer_index in 1 .. Num_Layers loop
             for data_index in 1 .. Num_Data loop
-               Put ("Enter data (" & Integer'Image (layer_index) & ","
-                    & Integer'Image (data_index) & "):" );
+               Put ("Enter data for layer" & Integer'Image (layer_index) &
+                      ", input"  & Integer'Image (data_index) & ": " );
                Get (Data (data_index));
             end loop;
 
@@ -90,10 +90,10 @@ package body Training is
       while not Ok and Count < 3 and not Quit loop
          Count := Count + 1;
          Put_Line (" 0: return to main menu.");
-         Put_Line (" 1: enter Layers manually.");
-         Put_Line (" 2: read Layers from file.");
+         Put_Line (" 1: enter layers manually.");
+         Put_Line (" 2: read layers from file.");
          Put_Line (" 3: read weights already calculated and do not train");
-         Put_Line (" 4: write training Layer to file");
+         Put_Line (" 4: write training layer to file");
          Put ("Enter option: ");
          Get (Key);
          case Key is
