@@ -11,7 +11,7 @@ package Connectionist_Types is
 --      Max_Layers : constant Positive := 10;
 
     type Processing_Element
-      (Num_Inputs, Num_Weights : Positive) is record
+      (Num_Inputs, Num_Weights : Natural) is record
         Entries   : Real_Float_Vector (1 .. Num_Inputs);
         Weights   : Real_Float_Vector (1 .. Num_Weights);
         Activ     : Float;   --  activation signal
