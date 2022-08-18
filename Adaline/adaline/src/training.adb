@@ -184,8 +184,10 @@ package body Training is
       else
          Put ("Enter Name Of Emc File: ");
          Get_Line (Error_File_Name);
+         Put_Line (To_String (Error_File_Name));
 
-         Open (Error_File_ID, Out_File, To_String (Error_File_Name));
+         Create (Error_File_ID, Out_File, To_String (Error_File_Name));
+--           Open (Error_File_ID, Out_File, To_String (Error_File_Name));
          --           Rewrite (Errorfile);
 
          Init_Neuron (Neuron, Num_Data, Num_Layers);
