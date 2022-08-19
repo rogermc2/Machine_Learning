@@ -188,6 +188,7 @@ package body Label is
     function Fit_Transform (Binarizer : in out Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix is
     begin
+        Put_Line ("Label.Fit_Transform Integer_Matrix");
         Fit (Binarizer, Y);
         return Transform (Binarizer, Y);
 
@@ -201,6 +202,7 @@ package body Label is
                            return Natural_Array is
         Encoded_Labels : Natural_Array (1 .. Y'Length);
     begin
+        Put_Line ("Label.Fit_Transform Integer_Array");
         if Encoder.Encoder_Kind = Class_Unique then
             Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
         else

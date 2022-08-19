@@ -23,13 +23,12 @@ package body Type_Tests is
     procedure Binary_Tests is
         Routine_Name : constant String := "Type_Tests.Binary_Tests ";
     begin
-        Put_Line (Routine_Name);
-
         for index in Binary_Examples.B_Binary.First_Index ..
           Binary_Examples.B_Binary.Last_Index loop
             Check ("Binary_Array Binary ", Y_Binary,
                    Type_Of_Target (Binary_Examples.B_Binary (index)));
         end loop;
+        Put_Line (Routine_Name & "completed");
 
     end Binary_Tests;
 
@@ -47,12 +46,12 @@ package body Type_Tests is
         end Vec_Test;
 
     begin
-        Put_Line (Routine_Name);
         Vec_Test (Continuous_Examples.C_Float1);
         Vec_Test (Continuous_Examples.C_Float2);
 
         Check ("Real_Float_Matrix Continuous", Y_Continuous,
                Type_Of_Target (Continuous_Examples.C_Float3));
+        Put_Line (Routine_Name & "completed");
 
     end Continuous_Tests;
 
@@ -69,9 +68,9 @@ package body Type_Tests is
         end CM_Test;
 
     begin
-        Put_Line (Routine_Name);
         CM_Test (Continuous_Multioutput_Examples.CM_Float1);
         CM_Test (Continuous_Multioutput_Examples.CM_Float2);
+        Put_Line (Routine_Name & "completed");
 
     end Continuous_Multioutput_Tests;
 
@@ -106,7 +105,6 @@ package body Type_Tests is
         end Integer_Matrix_Test;
 
     begin
-        Put_Line (Routine_Name);
         for index in Multilabel_Indicator_Examples.MI_Binary.First_Index ..
           Multilabel_Indicator_Examples.MI_Binary.Last_Index loop
             Binary_Matrix_Test
@@ -130,6 +128,8 @@ package body Type_Tests is
             Integer_Matrix_Test
               (Multilabel_Indicator_Examples.MI_Integer (index));
         end loop;
+        Put_Line (Routine_Name & "completed");
+
     end Multilabel_Indicator_Tests;
 
     --  -------------------------------------------------------------------------
@@ -137,8 +137,6 @@ package body Type_Tests is
     procedure Multiclass_Tests is
         Routine_Name : constant String := "Type_Tests.Multiclass_Tests ";
     begin
-        Put_Line (Routine_Name);
-
         for index in Multiclass_Examples.MC_Integer_Array.First_Index ..
           Multiclass_Examples.MC_Integer_Array.Last_Index loop
             Check ("Multiclass Integer Vector",
@@ -156,6 +154,7 @@ package body Type_Tests is
         Check ("Multiclass Strings",
                Type_Of_Target (Multiclass_Examples.MC_Strings),
                Y_Multiclass);
+        Put_Line (Routine_Name & "completed");
 
     end Multiclass_Tests;
 
@@ -165,8 +164,6 @@ package body Type_Tests is
         Routine_Name : constant String :=
                          "Type_Tests.Multiclass_Multioutput_Tests ";
     begin
-        Put_Line (Routine_Name);
-
         for index in Multiclass_Multioutput_Examples.MCO_Integer.First_Index ..
           Multiclass_Multioutput_Examples.MCO_Integer.Last_Index loop
             Check ("Multiclass Multioutput Integer matrix",
@@ -182,6 +179,8 @@ package body Type_Tests is
                      (Multiclass_Multioutput_Examples.MCO_Strings (index)),
                    Y_Multiclass_Multioutput);
         end loop;
+
+        Put_Line (Routine_Name & "completed");
 
     end Multiclass_Multioutput_Tests;
 

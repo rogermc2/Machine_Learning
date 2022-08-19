@@ -42,6 +42,7 @@ begin
 
          Put ("Enter option: ");
          Get (Key);
+         Skip_Line;
          case Key is
          when '1' => Training.Train_Neuron
               (Neuron, Num_Data, Num_Layers, Active_Layer, Record_Weights,

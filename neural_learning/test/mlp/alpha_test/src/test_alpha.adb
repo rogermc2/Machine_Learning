@@ -21,8 +21,8 @@ procedure Test_Alpha is
    subtype Alpha_Values is Natural range 0 .. 1;
 
    Routine_Name  : constant String := "Test_Alpha ";
-   Data          : constant Load_Dataset.Data_Record :=
-                     Load_Dataset.Load_Digits;
+   Data          : constant Load_Dataset.Digits_Data_Record :=
+                     Load_Dataset.Load_Digits ("../../digits.csv");
    Features      : constant Real_Float_Matrix :=
                      To_Real_Float_Matrix (Data.Features);
    X             : Real_Float_Matrix (1 .. 100, 1 .. Data.Num_Features);
