@@ -124,9 +124,9 @@ package Stochastic_Optimizers is
    procedure Update_Params (Self      : in out Optimizer_Record;
                             Params    : in out Parameters_List;
                             Gradients : Parameters_List);
---     procedure Update_Params (Self      : in out Adam_Optimizer;
---                              Params    : in out Parameters_List;
---                              Gradients : Parameters_List);
+   procedure Update_Params (Self      : in out Adam_Optimizer;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List);
    procedure Update_Params (Self      : in out SGD_Optimizer;
                             Params    : in out Parameters_List;
                             Gradients : Parameters_List);

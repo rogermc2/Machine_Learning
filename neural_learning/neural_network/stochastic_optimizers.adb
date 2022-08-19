@@ -589,14 +589,14 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-   --     procedure Update_Params (Self      : in out Adam_Optimizer;
-   --                              Params    : in out Parameters_List;
-   --                              Gradients : Parameters_List) is
-   --
-   --     begin
-   --        Params := Params + Get_Adam_Updates (Self, Gradients);
-   --
-   --     end Update_Params;
+      procedure Update_Params (Self      : in out Adam_Optimizer;
+                               Params    : in out Parameters_List;
+                               Gradients : Parameters_List) is
+
+      begin
+         Params := Params + Get_Adam_Updates (Self, Gradients);
+
+      end Update_Params;
 
    --  -------------------------------------------------------------------------
 
