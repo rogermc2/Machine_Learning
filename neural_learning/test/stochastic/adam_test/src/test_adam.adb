@@ -8,7 +8,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Printing;
+with Test_Support;
 with Stochastic_Optimizers;
 with Test_Common;
 
@@ -131,14 +131,14 @@ begin
             Put_Line ("Params index" & Integer'Image (index));
             if Params (index).Coeff_Gradients /=
               Expected (index).Coeff_Gradients then
-               Printing.Print_Float_Matrix
+               Test_Support.Print_Float_Matrix
                  ("Coeff_Gradient errors", Params (index).Coeff_Gradients -
                       Expected (index).Coeff_Gradients);
             end if;
 
             if Params (index).Intercept_Grads /=
               Expected (index).Intercept_Grads then
-               Printing.Print_Float_Array
+               Test_Support.Print_Float_Array
                  ("Intercept_Grads errors",
                   Params (index).Intercept_Grads -
                       Expected (index).Intercept_Grads);

@@ -44,7 +44,8 @@ package Stochastic_Optimizers is
    package Coeffs_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Coeffs_Matrix);
    subtype Coeffs_List is Coeffs_Package.Vector;
-   function "+" (L : Real_Float_Matrix; R : Real_Float_Vector) return Coeffs_Matrix;
+   function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                 return Coeffs_Matrix;
    pragma Inline ("+");
 
    type Base_Optimizer is record
