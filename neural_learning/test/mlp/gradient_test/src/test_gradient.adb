@@ -10,7 +10,7 @@ with Label;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
-with Printing;
+with Test_Support;
 with Stochastic_Optimizers;
 
 with Loss_Functions; use Loss_Functions;
@@ -134,16 +134,17 @@ begin
                            Float'Image (Loss_Grad.Loss));
 
                New_Line;
-               Put_Line (Routine_Name & "L239 numerically compute the gradients");
+               Put_Line (Routine_Name &
+                           "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Params);
 
                for index in Loss_Grad.Gradients.First_Index ..
                  Loss_Grad.Gradients.Last_Index loop
---                    Printing.Print_Parameters ("Loss_Grad.Gradients",
+--                    Test_Support.Print_Parameters ("Loss_Grad.Gradients",
 --                                               Loss_Grad.Gradients (index));
-                  Printing.Print_Float_Array
+                  Test_Support.Print_Float_Array
                     ("Num_Grad (" & Integer'Image (index) & ")", Num_Grad);
                end loop;
             end;
