@@ -33,6 +33,8 @@ package Stochastic_Optimizers is
    pragma Inline ("/");
    function "-" (L, R : Parameters_Record) return Parameters_Record;
    pragma Inline ("-");
+   function "abs" (Rec : Parameters_Record) return Parameters_Record;
+   pragma Inline ("abs");
 
    package Parameters_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Parameters_Record);

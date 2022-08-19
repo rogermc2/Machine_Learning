@@ -277,6 +277,26 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
+   function "abs" (Rec : Parameters_Record) return Parameters_Record is
+      Result : Parameters_Record := Rec;
+   begin
+      for row in Rec.Coeff_Gradients'Range loop
+         for col in Rec.Coeff_Gradients'Range (2) loop
+            Result.Coeff_Gradients (row, col) :=
+              abs (Rec.Coeff_Gradients (row, col));
+         end loop;
+      end loop;
+
+      for row in Rec.Intercept_Grads'Range loop
+         Result.Intercept_Grads (row) := abs (Rec.Intercept_Grads (row));
+      end loop;
+
+      return Result;
+
+   end "abs";
+
+   --  -------------------------------------------------------------------------
+
    procedure C_Init (Self                  : out Adam_Optimizer;
                      --  Coeff_Params: layers x features x values
                      --  Intercept_Params: laysers x values
