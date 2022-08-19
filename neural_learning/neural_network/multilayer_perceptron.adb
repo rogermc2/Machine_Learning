@@ -235,9 +235,9 @@ package body Multilayer_Perceptron is
                 " differs from Y_Prob width" &
                 Integer'Image (Y_Prob'Length (2)));
       --  L301  Y_Prob checked; contains only 1s and 0s
-      Printing.Print_Float_Matrix
-        (Routine_Name & "L301 Activations.Last_Element - Y_Prob",
-         Activations.Last_Element - Y_Prob, 1, 1);
+--        Printing.Print_Float_Matrix
+--          (Routine_Name & "L301 Activations.Last_Element - Y_Prob",
+--           Activations.Last_Element - Y_Prob, 1, 1);
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Prob);
 
@@ -566,8 +566,8 @@ package body Multilayer_Perceptron is
       Layer_Units.Append (Self.Attributes.N_Outputs);
 
       --  L409
-      Printing.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin",
-                                    Y_Bin, 1, 4);
+--        Printing.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin",
+--                                      Y_Bin, 1, 4);
       if First_Pass then
          Initialize (Self, Layer_Units);
       end if;
@@ -1511,7 +1511,6 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
-      Put_Line (Routine_Name);
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
@@ -1552,21 +1551,18 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
-      Put_Line (Routine_Name & "Type_Of_Target (Y): " &
-                Y_Type'Image (Type_Of_Target (Y)));
+--        Put_Line (Routine_Name & "Type_Of_Target (Y): " &
+--                  Y_Type'Image (Type_Of_Target (Y)));
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
-         Put_Line (Routine_Name & "L1139 classes empty: " &
-                    Boolean'Image (Self.Attributes.Classes.Is_Empty));
+--           Put_Line (Routine_Name & "L1139 classes empty: " &
+--                      Boolean'Image (Self.Attributes.Classes.Is_Empty));
          Self.Attributes.Binarizer := Binarizer;
-         Put_Line (Routine_Name & "L1139 Binarizer set");
          Label.Fit (Self.Attributes.Binarizer, Y);
-         Put_Line (Routine_Name & "L1139 fit ");
          Self.Attributes.Classes := Self.Attributes.Binarizer.Classes;
       else
          --  L1143
-         Put_Line (Routine_Name & "L1143");
          Classes := Multiclass_Utils.Unique_Labels (Y);
          if Self.Parameters.Warm_Start then
             Assert (Classes = Self.Attributes.Classes,
