@@ -26,6 +26,9 @@ package Classifier_Utilities is
                        return Multi_Output_Data_Record;
    function Max_Probability_Indices (Probabilities : Real_Float_Matrix)
                                      return Integer_Array;
+   function Probabilities (aMatrix : Real_Float_Matrix)
+                           return Real_Float_Matrix;
+   function Probabilities (Vec : Real_Float_Vector) return Real_Float_Vector;
    function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array;
    function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
@@ -58,7 +61,7 @@ package Classifier_Utilities is
                                       return Value_Data_Lists_2D;
    function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
                                    return Value_Data_Lists_2D;
-   function To_PL_Array (List_1D  : Float_List; Num_Rows : Positive)
+   function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
                          return Real_Float_Matrix;
    function To_Value_2D_List (A : Value_Data_List)
                               return Value_Data_Lists_2D;
