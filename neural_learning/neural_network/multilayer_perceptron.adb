@@ -598,7 +598,7 @@ package body Multilayer_Perceptron is
                         Activations     : in out Real_Matrix_List) is
       --  Deltas          : in out Real_Matrix_List;
       --  Layer_Units     : Integer_List) is
-      Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
+--        Routine_Name : constant String := "Multilayer_Perceptron.Fit_Lbfgs ";
       --        Num_Samples  : constant Positive := Positive (X'Length);
       --        Start        : Positive := 1;
       --        Last         : Positive;
@@ -615,22 +615,22 @@ package body Multilayer_Perceptron is
 
       Args         : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
    begin
-      Put_Line (Routine_Name & "Gradients length: " &
-                  Integer'Image (Integer (Gradients.Length)));
-      Put_Line (Routine_Name &
-                  "Gradients (1).Coeff_Gradients size" &
-                  Integer'Image (Gradients (1).Coeff_Gradients'Length) & " x"
-                & Integer'Image (Gradients (1).Coeff_Gradients'Length (2)));
-      Put_Line (Routine_Name &
-                  "Gradients.Intercept_Grads (1) length" &
-                  Integer'Image (Gradients (1).Intercept_Grads'Length));
-      Put_Line (Routine_Name &
-                  "Gradients (2).Coeff_Gradients size" &
-                  Integer'Image (Gradients (2).Coeff_Gradients'Length) & " x"
-                & Integer'Image (Gradients (2).Coeff_Gradients'Length (2)));
-      Put_Line (Routine_Name &
-                  "Gradients.Intercept_Grads (2) length" &
-                  Integer'Image (Gradients (2).Intercept_Grads'Length));
+--        Put_Line (Routine_Name & "Gradients length: " &
+--                    Integer'Image (Integer (Gradients.Length)));
+--        Put_Line (Routine_Name &
+--                    "Gradients (1).Coeff_Gradients size" &
+--                    Integer'Image (Gradients (1).Coeff_Gradients'Length) & " x"
+--                  & Integer'Image (Gradients (1).Coeff_Gradients'Length (2)));
+--        Put_Line (Routine_Name &
+--                    "Gradients.Intercept_Grads (1) length" &
+--                    Integer'Image (Gradients (1).Intercept_Grads'Length));
+--        Put_Line (Routine_Name &
+--                    "Gradients (2).Coeff_Gradients size" &
+--                    Integer'Image (Gradients (2).Coeff_Gradients'Length) & " x"
+--                  & Integer'Image (Gradients (2).Coeff_Gradients'Length (2)));
+--        Put_Line (Routine_Name &
+--                    "Gradients.Intercept_Grads (2) length" &
+--                    Integer'Image (Gradients (2).Intercept_Grads'Length));
       --        --  L524  Save sizes and indices of coefficients for faster unpacking
       --        for index in 1 .. Self.Attributes.N_Layers - 1 loop
       --           N_Fan_In := Layer_Units.Element (index);
@@ -860,6 +860,9 @@ package body Multilayer_Perceptron is
                     & Integer'Image (Activations.Last_Index) &
                       " /= layer + 1:" & Integer'Image (layer + 1));
 
+--              Is_Probilities_Matrix
+--                (Routine_Name & "L134 Activations.Last_Element ",
+--                 Activations.Last_Element);
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -877,6 +880,8 @@ package body Multilayer_Perceptron is
          end;  --  declare
       end loop;
 
+--        Is_Probilities_Matrix (Routine_Name & "L138 Activations.Last_Element ",
+--                               Activations.Last_Element);
       --  L138 For the last layer
       case Output_Activation is
          when Identity_Activation => null;
@@ -890,8 +895,8 @@ package body Multilayer_Perceptron is
       end case;
 
       --  Check that Activations.Last_Element rows are probabilities
-      Is_Probilities_Matrix (Routine_Name & "Activations.Last_Element ",
-                             Activations.Last_Element);
+--        Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
+--                               Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
