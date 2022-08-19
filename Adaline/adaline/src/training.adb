@@ -86,6 +86,8 @@ package body Training is
       Quit  : Boolean := False;
       Dummy : Output_Type (1 .. 0);
    begin
+      Num_Data := 0;
+      Num_Layers := 0;
       Put_Line ("** CHANGE TRAINING Layer **");
       while not Ok and Count < 3 and not Quit loop
          Count := Count + 1;
@@ -182,9 +184,9 @@ package body Training is
       if not Active_Layer then
          Put_Line ("There Is No Training Layer Loaded.");
       else
+         Skip_Line;
          Put ("Enter Name Of Emc File: ");
          Error_File_Name := Get_Line;
---           Put_Line (To_String (Error_File_Name));
 
          Create (Error_File_ID, Out_File, To_String (Error_File_Name));
 --           Open (Error_File_ID, Out_File, To_String (Error_File_Name));

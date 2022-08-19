@@ -9,12 +9,12 @@ package Connectionist_Types is
 
     type Processing_Element
       (Num_Inputs, Num_Weights : Natural) is record
-        Entries   : Real_Float_Vector (1 .. Num_Inputs);
-        Weights   : Real_Float_Vector (1 .. Num_Weights);
-        Activ     : Float;   --  activation signal
-        Output    : Float;   --  exit
-        Tendencon : Boolean; --  indicates if the trend is active
-        Trend     : Float;   --  trend value}
+        Entries   : Real_Float_Vector (1 .. Num_Inputs) := (others => 0.0);
+        Weights   : Real_Float_Vector (1 .. Num_Weights) := (others => 0.0);
+        Activ     : Float := 0.0;   --  activation signal
+        Output    : Float := 0.0;   --  exit
+        Tendencon : Boolean := False; --  indicates if the trend is active
+        Trend     : Float := 0.0;   --  trend value
         Trained   : Boolean := False; --  the neuron is trained
     end record;
 
