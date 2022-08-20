@@ -11,7 +11,7 @@ with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Stochastic_Optimizers;
-with Test_Support;
+with Printing;
 
 with Loss_Functions; use Loss_Functions;
 
@@ -118,7 +118,9 @@ begin
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Params);
 
-               Test_Support.Print_Float_Vector ("Num_Grad", Num_Grad);
+               Printing.Print_Float_Array ("Num_Grad", Num_Grad);
+               Printing.Print_Float_Matrix
+                 ("Loss_Grad", Loss_Grad.Gradients (1).Coeff_Gradients, 1, 2);
             end;
          end loop;
       end;
