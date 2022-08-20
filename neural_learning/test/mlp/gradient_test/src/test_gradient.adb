@@ -59,7 +59,8 @@ begin
       begin
          --  L196
          --           for activ_type in Base_Neural.Activation_Type'Range loop
-         for activ_type in Base_Neural.Activation_Type'First .. Base_Neural.Activation_Type'First loop
+         for activ_type in Base_Neural.Activation_Type'First ..
+              Base_Neural.Activation_Type'First loop
             New_Line;
             Put_Line (Routine_Name & "Activation Type: " &
                         Base_Neural.Activation_Type'Image (activ_type));
@@ -117,12 +118,7 @@ begin
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Params);
 
-               for index in Loss_Grad.Gradients.First_Index ..
-                 Loss_Grad.Gradients.Last_Index loop
-                  Test_Support.Print_Parameters
-                    ("Loss_Grad.Gradients", Loss_Grad.Gradients (index), 1, 2);
-                  Test_Support.Print_Float_Array ("Num_Grad", Num_Grad);
-               end loop;
+               Test_Support.Print_Float_Vector ("Num_Grad", Num_Grad);
             end;
          end loop;
       end;
