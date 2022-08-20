@@ -13,6 +13,9 @@ package Test_Support is
     procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                  Start : Integer := 1; Finish : Integer := 0);
     procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix);
+    procedure Print_Parameters
+      (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
+       Rows_Start : Positive := 1; Rows_Last : Positive := 10);
    procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector);
 
 end Test_Support;

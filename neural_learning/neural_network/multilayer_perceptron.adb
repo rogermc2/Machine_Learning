@@ -1171,7 +1171,8 @@ package body Multilayer_Perceptron is
       for row in Sum'Range loop
          Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
                    Sum (row) <= 1.0 + 10.0 ** (-6), Msg &
-                   " (" & Integer'Image (row) & ") Sum = " & Float'Image (Sum (row)));
+                   "Total probability for row (" & Integer'Image (row) &
+                   ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
       end loop;
 
    end Is_Probilities_Matrix;
