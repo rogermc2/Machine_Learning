@@ -58,7 +58,8 @@ begin
          Y_Bin : constant Binary_Matrix := Label.Fit_Transform (LB, Y);
       begin
          --  L196
-         for activ_type in Base_Neural.Activation_Type'Range loop
+         --           for activ_type in Base_Neural.Activation_Type'Range loop
+         for activ_type in Base_Neural.Activation_Type'First .. Base_Neural.Activation_Type'First loop
             New_Line;
             Put_Line (Routine_Name & "Activation Type: " &
                         Base_Neural.Activation_Type'Image (activ_type));
@@ -82,7 +83,7 @@ begin
             --  L212  Initialize
             Params.Clear;
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-               --    Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+               Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 
@@ -95,6 +96,7 @@ begin
                   Params.Append (Param_Rec);
                end;
             end loop;
+            New_Line;
 
             --  L226
             declare
@@ -103,14 +105,13 @@ begin
                Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
---                 Put_Line (Routine_Name & "L239 analytically compute the gradients");
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
                  (aClassifier, Theta, X, Y_Bin, Params);
                Put_Line (Routine_Name & "analytically computed loss" &
                            Float'Image (Loss_Grad.Loss));
-
                New_Line;
+
                Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
                Num_Grad := Numerical_Loss_Grad
@@ -118,14 +119,13 @@ begin
 
                for index in Loss_Grad.Gradients.First_Index ..
                  Loss_Grad.Gradients.Last_Index loop
-                  Test_Support.Print_Parameters ("Loss_Grad.Gradients",
-                                             Loss_Grad.Gradients (index), 1, 2);
+                  Test_Support.Print_Parameters
+                    ("Loss_Grad.Gradients", Loss_Grad.Gradients (index), 1, 2);
                   Test_Support.Print_Float_Array ("Num_Grad", Num_Grad);
                end loop;
             end;
          end loop;
       end;
---        Put_Line (Routine_Name & "outer loop last");
       New_Line;
    end loop;
 

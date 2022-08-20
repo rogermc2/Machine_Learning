@@ -1181,15 +1181,17 @@ package body Multilayer_Perceptron is
 
    function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Loss_Grad_Result is
       Self        : MLP_Classifier := Args.Self;
+      Params      : Parameters_List:= Args.Params;
       Activations : Real_Matrix_List := Args.Activations;
-      Loss        : constant Float := Float'Safe_Last;
+      Loss        : Float := Float'Safe_Last;
    begin
       --  L236 _unpack
-      Self.Attributes.Params := Args.Params;
+      Self.Attributes.Params := Params;
       --  L237 _backprop
-      Forward_Pass (Self, Args.Params, Activations);
+      Forward_Pass (Self, Params, Activations);
+      Backprop (Self, Args.X, Args.Y, Activations, Loss, Params);
 
-      return (Loss, Args.Params);
+      return (Loss, Params);
 
    end Loss_Grad_LBFGS;
 
