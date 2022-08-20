@@ -102,9 +102,9 @@ begin
             --  L226
             declare
                --  N = Theta_Length
-               Theta_Length : constant Positive := Positive (Theta.Length);
-               Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
-               Loss_Grad    : Loss_Grad_Result;
+               --  Theta_Length : constant Positive := Positive (Theta.Length);
+               Num_Grad  : Real_Float_Matrix (Y_Bin'Range, Y_Bin'Range (2));
+               Loss_Grad : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
@@ -118,7 +118,7 @@ begin
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Params);
 
-               Printing.Print_Float_Array ("Num_Grad", Num_Grad);
+               Printing.Print_Float_Matrix ("Num_Grad", Num_Grad);
                Printing.Print_Float_Matrix
                  ("Loss_Grad", Loss_Grad.Gradients (1).Coeff_Gradients, 1, 2);
             end;

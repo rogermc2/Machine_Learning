@@ -29,10 +29,11 @@ package body Loss_Functions is
    function Numerical_Loss_Grad
      (aClassifier : MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y  : Binary_Matrix;
-      Params      : Parameters_List) return Real_Float_Vector is
+      Params      : Parameters_List) return Real_Float_Matrix is
       Routine_Name : constant String := "Loss_Functions.Numerical_Loss_Grad ";
       Theta_Length : constant Positive := Positive (Theta.Length);
-      Num_Grad     : Real_Float_Vector (1 .. Theta_Length) := (others => 0.0);
+      Num_Grad     : Real_Float_Matrix (Y'Range, Y'Range (2)) :=
+                         (others => (others => 0.0));
    begin
       --  Put_Line (Routine_Name & "Theta length" & Integer'Image (Theta_Length));
       --  Put_Line (Routine_Name & "Theta (1).Coeff_Gradients size" &
@@ -126,14 +127,18 @@ package body Loss_Functions is
             --                             "L242 Theta_P.Intercept_Grads length" &
             --                             Integer'Image (Theta_P.Intercept_Grads'Length));
             --  L242
-            Loss_Grad_P := Loss_Grad_Function
-              (Self => aClassifier, Theta => Theta_P_List, X => X,
-               Y => Y,  Gradients => Params);
-            Loss_Grad_M := Loss_Grad_Function
-              (Self => aClassifier, Theta => Theta_M_List, X => X,
-               Y => Y, Gradients => Params);
-            Num_Grad (t_index) :=
-              (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
+            for col in Num_Grad'Range (2) loop
+                    Loss_Grad_P := Loss_Grad_Function
+                      (Self => aClassifier, Theta => Theta_P_List, X => X,
+                       Y => Y,  Gradients => Params);
+                    Loss_Grad_M := Loss_Grad_Function
+                      (Self => aClassifier, Theta => Theta_M_List, X => X,
+                       Y => Y, Gradients => Params);
+                    Num_Grad (t_index, col) :=
+                      (Loss_Grad_P.Gradients (1).Coeff_Gradients (1, col) -
+                           Loss_Grad_M.Gradients (1).Coeff_Gradients (1, col))
+                           / (2.0 * Eps);
+            end loop;
             --                 Put_Line (Routine_Name & "Num_Grad (t_index) set");
 
             --              Put_Line (Routine_Name & "inner declare done");
