@@ -1,7 +1,7 @@
 
 --  Based on scikit-learn/sklearn/neural_network/tests/test_mlp.py test_gradient
 --  with Ada.Assertions; use Ada.Assertions;
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 package body Loss_Functions is
 
@@ -39,16 +39,15 @@ package body Loss_Functions is
       X           : Real_Float_Matrix; Y  : Binary_Matrix;
       Params      : Parameters_List) return Real_Float_Vector is
 --        use Real_Float_Arrays;
---        Routine_Name : constant String := "Loss_Functions.Numerical_Loss_Grad ";
+      Routine_Name : constant String := "Loss_Functions.Numerical_Loss_Grad ";
       Theta_Length : constant Positive := Positive (Theta.Length);
 --        Eye          : Real_Float_Matrix := Unit_Matrix (Theta_Length) * Eps;
       Num_Grad     : Real_Float_Vector (1 .. Theta_Length) := (others => 0.0);
    begin
---        Put_Line (Routine_Name & "Theta length" & Integer'Image (Theta_Length));
---        Put_Line (Routine_Name &
---                    "Theta (1).Coeff_Gradients size" &
---                    Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
---                  & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
+      Put_Line (Routine_Name & "Theta length" & Integer'Image (Theta_Length));
+      Put_Line (Routine_Name & "Theta (1).Coeff_Gradients size" &
+                  Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
+                & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
 --        Put_Line (Routine_Name &
 --                    "Theta.Intercept_Grads (1) length" &
 --                    Integer'Image (Theta (1).Intercept_Grads'Length));

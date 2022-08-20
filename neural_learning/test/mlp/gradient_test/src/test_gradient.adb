@@ -58,9 +58,7 @@ begin
          Y_Bin : constant Binary_Matrix := Label.Fit_Transform (LB, Y);
       begin
          --  L196
---           for activ_type in Base_Neural.Activation_Type'Range loop
-         for activ_type in Base_Neural.Activation_Type'First ..
-            Base_Neural.Activation_Type'First loop
+         for activ_type in Base_Neural.Activation_Type'Range loop
             New_Line;
             Put_Line (Routine_Name & "Activation Type: " &
                         Base_Neural.Activation_Type'Image (activ_type));
@@ -81,29 +79,10 @@ begin
             --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
 
---              Put_Line (Routine_Name & "L208 Coeff_Gradients Length:" &
---                          Integer'Image (Positive (aClassifier.Attributes.Params.Element (1).Coeff_Gradients'Length)));
---              Put_Line (Routine_Name & "L208 Theta_Length:" &
---                          Integer'Image (Positive (Theta.Length)));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta (1).Coeff_Gradients size" &
-            --                          Integer'Image (Theta (1).Coeff_Gradients'Length) & " x"
-            --                          & Integer'Image (Theta (1).Coeff_Gradients'Length (2)));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta.Intercept_Grads (1) length" &
-            --                          Integer'Image (Theta (1).Intercept_Grads'Length));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta (2).Coeff_Gradients length" &
-            --                          Integer'Image (Theta (2).Coeff_Gradients'Length) & " x"
-            --                          & Integer'Image (Theta (2).Coeff_Gradients'Length (2)));
-            --              Put_Line (Routine_Name &
-            --                          "L208 Theta.Intercept_Grads (2) length" &
-            --                          Integer'Image (Theta (2).Intercept_Grads'Length));
-
             --  L212  Initialize
             Params.Clear;
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-               --                 Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
+               --    Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 
@@ -124,8 +103,6 @@ begin
                Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
                Loss_Grad    : Loss_Grad_Result;
             begin
---                 Put_Line (Routine_Name & "Theta_Length:" & Integer'Image (Theta_Length));
---                 New_Line;
 --                 Put_Line (Routine_Name & "L239 analytically compute the gradients");
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
@@ -139,11 +116,10 @@ begin
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Params);
 
-               Put_Line (Routine_Name & "Num_Grad set");
                for index in Loss_Grad.Gradients.First_Index ..
                  Loss_Grad.Gradients.Last_Index loop
                   Test_Support.Print_Parameters ("Loss_Grad.Gradients",
-                                             Loss_Grad.Gradients (index));
+                                             Loss_Grad.Gradients (index), 1, 2);
                   Test_Support.Print_Float_Array ("Num_Grad", Num_Grad);
                end loop;
             end;
