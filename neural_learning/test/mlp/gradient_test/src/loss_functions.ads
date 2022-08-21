@@ -18,6 +18,6 @@ package Loss_Functions is
    function Numerical_Loss_Grad
      (aClassifier : MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y : Binary_Matrix;
-      Params : Parameters_List) return Real_Float_Vector;
+      Params : Parameters_List) return Real_Vector_List;
 
 end Loss_Functions;

@@ -65,6 +65,8 @@ package Printing is
    procedure Print_Parameters
      (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
       Rows_Start : Positive := 1; Rows_Last : Positive := 10);
+   procedure Print_Real_Vector_List (Name        : String;
+                                     Vector_List : Real_Vector_List);
    procedure Print_RGB_Array (Name : String; anArray : Export_Types.RGB_Array);
    procedure Print_Slice (Name : String; theSlice : Slice_Record);
    procedure Print_Slices (Name  : String; theList : Slices_List;

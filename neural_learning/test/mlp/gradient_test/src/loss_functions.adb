@@ -1,8 +1,8 @@
 
 --  Based on scikit-learn/sklearn/neural_network/tests/test_mlp.py test_gradient
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
-with Printing;
+--  with Printing;
 
 package body Loss_Functions is
 
@@ -32,10 +32,10 @@ package body Loss_Functions is
    function Numerical_Loss_Grad
      (aClassifier : MLP_Classifier; Theta : Parameters_List;
       X           : Real_Float_Matrix; Y  : Binary_Matrix;
-      Params      : Parameters_List) return Real_Float_Vector is
-      Routine_Name : constant String := "Loss_Functions.Numerical_Loss_Grad ";
-      Theta_Length : constant Positive := Positive (Theta.Length);
-      Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
+      Params      : Parameters_List) return Real_Vector_List is
+--        Routine_Name  : constant String := "Loss_Functions.Numerical_Loss_Grad ";
+      Theta_Length  : constant Positive := Positive (Theta.Length);
+      Num_Grad_List : Real_Vector_List;
    begin
       for t_index in 1 .. Theta_Length loop
          declare
@@ -44,19 +44,17 @@ package body Loss_Functions is
                                  Theta.Element (t_index).Coeff_Gradients;
             Intcepts         : constant Real_Float_Vector :=
                                  Theta.Element (t_index).Intercept_Grads;
+            Num_Grad         : Real_Float_Vector (Coeffs'Range);
             Theta_P          : Parameters_Record := Theta.Element (t_index);
             Theta_M          : Parameters_Record := Theta.Element (t_index);
             Theta_P_List     : Parameters_List;
             Theta_M_List     : Parameters_List;
             Loss_Grad_P      : Loss_Grad_Result;
             Loss_Grad_M      : Loss_Grad_Result;
---              Coeff_Diff       : Float;
---              Grad_Diff        : Parameters_Record
---                (Coeffs'Length, Coeffs'Length (2));
          begin
-            Printing.Print_Matrix_Dimensions
-              (Routine_Name & "Coeffs (" & Integer'Image (t_index) & ")",
-               Coeffs);
+--              Printing.Print_Matrix_Dimensions
+--                (Routine_Name & "Coeffs (" & Integer'Image (t_index) & ")",
+--                 Coeffs);
             --  L240
             Theta_P.Coeff_Gradients := Coeffs;
             Theta_P.Intercept_Grads := Intcepts;
@@ -64,7 +62,7 @@ package body Loss_Functions is
             Theta_M.Intercept_Grads := Intcepts;
 
             for row in 1 .. Theta_P.Num_Rows loop
-               Put_Line (Routine_Name & "L240 row" & Integer'Image (row));
+--                 Put_Line (Routine_Name & "L240 row" & Integer'Image (row));
                for col in Theta_P.Coeff_Gradients'Range (2) loop
                   if col = t_index then
                      Theta_P.Coeff_Gradients (row, col) :=
@@ -117,15 +115,14 @@ package body Loss_Functions is
                Loss_Grad_M := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
                   Y => Y, Gradients => Params);
-               Num_Grad (row) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) / (2.0 * Eps);
-               Put_Line
-                 (Routine_Name & "L242 Num_Grad (row):" & Float'Image (Num_Grad (row)));
+               Num_Grad (row) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) /
+                 (2.0 * Eps);
             end loop;
+            Num_Grad_List.Append (Num_Grad);
          end;
       end loop;
-      Printing.Print_Float_Array (Routine_Name & "Num_Grad", Num_Grad);
 
-      return Num_Grad;
+      return Num_Grad_List;
 
    end Numerical_Loss_Grad;
 

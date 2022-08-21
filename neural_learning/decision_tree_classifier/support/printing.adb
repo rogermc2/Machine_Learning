@@ -191,9 +191,9 @@ package body Printing is
    --  ------------------------------------------------------------------------
 
    procedure Print_Float_Matrix
-      (Name  : String; aMatrix : Real_Float_Matrix;
-       Start : Integer := 1; Finish : Integer := 0;
-       Col_Start : Integer := 1; Col_Finish : Integer := 0) is
+     (Name      : String; aMatrix : Real_Float_Matrix;
+      Start     : Integer := 1; Finish : Integer := 0;
+      Col_Start : Integer := 1; Col_Finish : Integer := 0) is
       Last_Row : Integer;
       Last_Col : Integer;
    begin
@@ -211,8 +211,8 @@ package body Printing is
 
       Put_Line (Name & ": ");
       if Start >= aMatrix'First and then Finish <= aMatrix'Last and then
-          Col_Start >= aMatrix'First (2) and then
-          Col_Finish <= aMatrix'Last (2) then
+        Col_Start >= aMatrix'First (2) and then
+        Col_Finish <= aMatrix'Last (2) then
          for row in Start .. Last_Row loop
             Put ("Row" & Integer'Image (row) & ":");
             for col in Col_Start .. Last_Col loop
@@ -606,6 +606,19 @@ package body Printing is
       New_Line;
 
    end Print_Parameters;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Real_Vector_List (Name        : String;
+                                     Vector_List : Real_Vector_List) is
+   begin
+      Put_Line (Name & ": ");
+      for index in Vector_List.First_Index .. Vector_List.Last_Index loop
+         Print_Float_Array ("Item" & Integer'Image (index),
+                            Vector_List (Index));
+      end loop;
+
+   end Print_Real_Vector_List;
 
    --  ------------------------------------------------------------------------
 
