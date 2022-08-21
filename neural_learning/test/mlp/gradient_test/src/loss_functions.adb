@@ -48,8 +48,8 @@ package body Loss_Functions is
             Theta_M          : Parameters_Record := Theta.Element (t_index);
             Theta_P_List     : Parameters_List;
             Theta_M_List     : Parameters_List;
-            Loss_Grad_P_List : Loss_Grad_Result;
-            Loss_Grad_M_List : Loss_Grad_Result;
+            Loss_Grad_P      : Loss_Grad_Result;
+            Loss_Grad_M      : Loss_Grad_Result;
             Coeff_Diff       : Float;
             Grad_Diff        : Parameters_Record (Coeffs'Length, Coeffs'Length (2));
          begin
@@ -62,8 +62,9 @@ package body Loss_Functions is
             Theta_M.Coeff_Gradients := Coeffs;
             Theta_M.Intercept_Grads := Intcepts;
 
-            for row in Coeffs'Range loop
-               for col in Coeffs'Range (2) loop
+            for row in 1 .. Theta_P.Num_Rows loop
+               Put_Line (Routine_Name & "L240 row" & Integer'Image (row));
+               for col in Theta_P.Coeff_Gradients'Range (2) loop
                   if col = t_index then
                      Theta_P.Coeff_Gradients (row, col) :=
                        Theta_P.Coeff_Gradients (row, col) + Eps;
@@ -79,7 +80,7 @@ package body Loss_Functions is
                     Theta_M.Intercept_Grads (row) - Eps;
                end if;
 
-               for col in Coeffs'Range (2) loop
+               for col in Theta_P.Coeff_Gradients'Range (2) loop
                   if col = t_index then
                      Theta_P.Coeff_Gradients (row, col) :=
                        Theta_P.Coeff_Gradients (row, col) + Eps;
@@ -107,27 +108,33 @@ package body Loss_Functions is
                   Theta_M_List.Append (Theta_M);
                end if;
 
-               Put_Line (Routine_Name & "L242");
                --  L242 loss_grad_fun returns mlp._loss_grad_lbfgs [value, grad]
                --  where grad is packed coeffs + intercepts
-               Loss_Grad_P_List := Loss_Grad_Function
+               Loss_Grad_P := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_P_List, X => X,
                   Y => Y,  Gradients => Params);
-               Loss_Grad_M_List := Loss_Grad_Function
+               Loss_Grad_M := Loss_Grad_Function
                  (Self => aClassifier, Theta => Theta_M_List, X => X,
                   Y => Y, Gradients => Params);
+               Put_Line
+                 (Routine_Name & "L242 Loss_Grad_P length:" &
+                    Integer'Image (Integer (Loss_Grad_P.Parameters.Length)));
 
-               for col in Coeffs'Range (2) loop
+               for col in Loss_Grad_P.Parameters (1).Coeff_Gradients'Range (2)
+               loop
                   Put_Line (Routine_Name & "L242+ col" & Integer'Image (col));
+                  Printing.Print_Matrix_Dimensions
+                    (Routine_Name & "L242+ Coeff_Gradients",
+                       Loss_Grad_P.Parameters (col).Coeff_Gradients);
                   Coeff_Diff :=
-                    (Loss_Grad_P_List.Parameters (col).Coeff_Gradients (1, col) -
-                         Loss_Grad_M_List.Parameters (1).Coeff_Gradients (1, 1)) /
+                    (Loss_Grad_P.Parameters (col).Coeff_Gradients (1, col) -
+                         Loss_Grad_M.Parameters (1).Coeff_Gradients (1, 1)) /
                       (2.0 * Eps);
                   Put_Line (Routine_Name & "L242+ Coeff_Diff set");
 
                   Grad_Diff.Intercept_Grads (t_index) :=
-                    (Loss_Grad_P_List.Parameters(1).Intercept_Grads (1) -
-                         Loss_Grad_M_List.Parameters (1).Intercept_Grads (1)) /
+                    (Loss_Grad_P.Parameters(1).Intercept_Grads (1) -
+                         Loss_Grad_M.Parameters (1).Intercept_Grads (1)) /
                       (2.0 * Eps);
                   Grad_Diff.Coeff_Gradients (t_index, 1) := Coeff_Diff;
                   Num_Grad.Append (Grad_Diff);
