@@ -125,7 +125,7 @@ begin
 
                Printing.Print_Parameters ("Num_Grad (1)", Num_Grad (1));
                Printing.Print_Float_Matrix
-                 ("Loss_Grad", Loss_Grad.Gradients (1).Coeff_Gradients, 1, 2);
+                 ("Loss_Grad", Loss_Grad.Parameters (1).Coeff_Gradients, 1, 2);
             end;
          end loop;
       end;

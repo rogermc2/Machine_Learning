@@ -95,8 +95,8 @@ package Multilayer_Perceptron is
    end record;
 
    type Loss_Grad_Result is record
-      Loss      : Float;
-      Gradients : Parameters_List;
+      Loss       : Float;
+      Parameters : Parameters_List;
    end record;
    function "-" (L, R : Loss_Grad_Result) return Loss_Grad_Result;
    function "/" (L : Loss_Grad_Result; R : Float) return Loss_Grad_Result;

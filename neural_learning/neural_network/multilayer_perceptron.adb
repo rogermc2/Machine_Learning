@@ -114,10 +114,10 @@ package body Multilayer_Perceptron is
       Result : Loss_Grad_Result := L;
    begin
       Result.Loss := Result.Loss - R.Loss;
-      for index in Result.Gradients.First_Index ..
-        Result.Gradients.Last_Index loop
-         Result.Gradients (index) :=
-           Result.Gradients (index) - R.Gradients (index);
+      for index in Result.Parameters.First_Index ..
+        Result.Parameters.Last_Index loop
+         Result.Parameters (index) :=
+           Result.Parameters (index) - R.Parameters (index);
       end loop;
 
       return Result;
@@ -130,9 +130,9 @@ package body Multilayer_Perceptron is
       Result : Loss_Grad_Result := L;
    begin
       Result.Loss := Result.Loss / R;
-      for index in Result.Gradients.First_Index ..
-        Result.Gradients.Last_Index loop
-         Result.Gradients (index) := Result.Gradients (index) / R;
+      for index in Result.Parameters.First_Index ..
+        Result.Parameters.Last_Index loop
+         Result.Parameters (index) := Result.Parameters (index) / R;
       end loop;
 
       return Result;
