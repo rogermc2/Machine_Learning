@@ -80,6 +80,11 @@ begin
             --  Multilayer_Perceptron.Initialize on first pass of
             --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
+            New_Line;
+            for index in 1 .. Integer (Theta.Length) loop
+               Printing.Print_Parameters ("Theta (" & Integer' Image (index) & ")",
+                                          Theta.Element (index), 1, 3);
+            end loop;
 
             --  L212  Initialize
             Params.Clear;
@@ -102,8 +107,8 @@ begin
             --  L226
             declare
                --  N = Theta_Length
-               Theta_Length : constant Positive := Positive (Theta.Length);
-               Num_Grad     : Real_Float_Vector (1 .. Theta_Length);
+               --  Theta_Length : constant Positive := Positive (Theta.Length);
+               Num_Grad     : Parameters_List;
                Loss_Grad    : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
@@ -118,7 +123,7 @@ begin
                Num_Grad := Numerical_Loss_Grad
                  (aClassifier, Theta, X, Y_Bin, Params);
 
-               Printing.Print_Float_Array ("Num_Grad", Num_Grad);
+               Printing.Print_Parameters ("Num_Grad (1)", Num_Grad (1));
                Printing.Print_Float_Matrix
                  ("Loss_Grad", Loss_Grad.Gradients (1).Coeff_Gradients, 1, 2);
             end;

@@ -498,7 +498,7 @@ package body Printing is
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Real_Float_Matrix) is
    begin
-      Put (Name & ": ");
+      Put (Name & " size:");
       Put_Line (Integer'Image (aMatrix'Length) & "  x" &
                   Integer'Image (aMatrix'Length (2)));
 
