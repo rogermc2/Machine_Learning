@@ -8,8 +8,6 @@ package body Loss_Functions2 is
 
 --      Epsilon : constant Float := 10.0 ** (-5);
 
-    function Pack (Theta : Parameters_List) return Real_Float_Vector;
-
     --  -------------------------------------------------------------------------
 
     --  L228 loss_grad_fun returns mlp._loss_grad_lbfgs [value, grad]
@@ -36,14 +34,13 @@ package body Loss_Functions2 is
     --  -------------------------------------------------------------------------
 
     function Numerical_Loss_Grad
-      (aClassifier : MLP_Classifier; Theta : Parameters_List;
+      (aClassifier : MLP_Classifier; Theta : Real_Float_Vector;
        X           : Real_Float_Matrix; Y  : Binary_Matrix;
        Params      : Parameters_List) return Real_Float_Vector is
         use Real_Float_Arrays;
 --          Routine_Name  : constant String :=
 --                            "Loss_Functions2.Numerical_Loss_Grad ";
         Epsilon       : constant Float := 10.0 ** (-5);
-        Theata_Vec    : constant Real_Float_Vector := Pack (Theta);
         D_Theta       : constant Real_Float_Matrix :=
                           Epsilon * Unit_Matrix (Theata_Vec'Length);
         Loss_Grad_P   : Loss_Grad_Result;

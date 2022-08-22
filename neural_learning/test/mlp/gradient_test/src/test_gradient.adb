@@ -13,7 +13,7 @@ with NL_Types;
 with Stochastic_Optimizers;
 with Printing;
 
-with Loss_Functions; use Loss_Functions;
+with Loss_Functions2; use Loss_Functions2;
 
 --  Test_Gradient makes sure that the activation functions and their
 --  derivatives are correct
@@ -60,7 +60,7 @@ begin
          --  L196
          --           for activ_type in Base_Neural.Activation_Type'Range loop
          for activ_type in Base_Neural.Activation_Type'First ..
-              Base_Neural.Activation_Type'First loop
+           Base_Neural.Activation_Type'First loop
             New_Line;
             Put_Line (Routine_Name & "Activation Type: " &
                         Base_Neural.Activation_Type'Image (activ_type));
@@ -80,11 +80,11 @@ begin
             --  Multilayer_Perceptron.Initialize on first pass of
             --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
---              New_Line;
---              for index in 1 .. Integer (Theta.Length) loop
---                 Printing.Print_Parameters ("Theta (" & Integer' Image (index) & ")",
---                                            Theta.Element (index), 1, 3);
---              end loop;
+            --              New_Line;
+            --              for index in 1 .. Integer (Theta.Length) loop
+            --                 Printing.Print_Parameters ("Theta (" & Integer' Image (index) & ")",
+            --                                            Theta.Element (index), 1, 3);
+            --              end loop;
 
             --  L212  Initialize
             Params.Clear;
@@ -106,26 +106,26 @@ begin
 
             --  L226
             declare
-               --  N = Theta_Length
-               --  Theta_Length : constant Positive := Positive (Theta.Length);
-               Num_Grad     : Real_Vector_List;
-               Loss_Grad    : Loss_Grad_Result;
+               Theata_Vec : constant Real_Float_Vector := Pack (Theta);
+               Loss_Grad  : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
-                 (aClassifier, Theta, X, Y_Bin, Params);
+                 (aClassifier, Theata_Vec, X, Y_Bin, Params);
                Put_Line (Routine_Name & "analytically computed loss" &
                            Float'Image (Loss_Grad.Loss));
                New_Line;
 
                Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
-               Num_Grad := Numerical_Loss_Grad
-                 (aClassifier, Theta, X, Y_Bin, Params);
-
-               Printing.Print_Real_Vector_List ("Num_Grad", Num_Grad);
-               Printing.Print_Float_Matrix
-                 ("Loss_Grad", Loss_Grad.Parameters (1).Coeff_Gradients, 1, 2);
+               declare
+                  Num_Grad  : constant Real_Float_Vector := Numerical_Loss_Grad
+                    (aClassifier, Theata_Vec, X, Y_Bin, Params);
+               begin
+                  Printing.Print_Float_Array ("Num_Grad", Num_Grad);
+                  Printing.Print_Float_Matrix
+                    ("Loss_Grad", Loss_Grad.Parameters (1).Coeff_Gradients, 1, 2);
+               end;
             end;
          end loop;
       end;
