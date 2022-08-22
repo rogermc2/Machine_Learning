@@ -40,15 +40,15 @@ package body Loss_Functions2 is
        X           : Real_Float_Matrix; Y  : Binary_Matrix;
        Params      : Parameters_List) return Real_Float_Vector is
         use Real_Float_Arrays;
-        --          Routine_Name  : constant String :=
-        --                            "Loss_Functions2.Numerical_Loss_Grad ";
-        Epsilon     : constant Float := 10.0 ** (-5);
-        Theata_Vec  : constant Real_Float_Vector := Pack (Theta);
-        D_Theta     : constant Real_Float_Matrix :=
+--          Routine_Name : constant String :=
+--                           "Loss_Functions2.Numerical_Loss_Grad ";
+        Epsilon      : constant Float := 10.0 ** (-5);
+        Theata_Vec   : constant Real_Float_Vector := Pack (Theta);
+        D_Theta      : constant Real_Float_Matrix :=
                         Epsilon * Unit_Matrix (Theata_Vec'Length);
-        Loss_Grad_P : Loss_Grad_Result;
-        Loss_Grad_M : Loss_Grad_Result;
-        Num_Grad    : Real_Float_Vector (Theata_Vec'Range) := (others => 0.0);
+        Loss_Grad_P  : Loss_Grad_Result;
+        Loss_Grad_M  : Loss_Grad_Result;
+        Num_Grad     : Real_Float_Vector (Theata_Vec'Range) := (others => 0.0);
     begin
         for t_index in Theata_Vec'Range loop
             --  L240
@@ -107,10 +107,11 @@ package body Loss_Functions2 is
     --  Extract the coefficients and intercepts from packed_parameters.
     function Unpack (Mlp : MLP_Classifier; Packed_Params : Real_Float_Vector)
                      return Parameters_List is
+--          Routine_Name : constant String := "Loss_Functions2.Unpack ";
         PP_Index : Natural := 0;
         Params   : Parameters_List;
     begin
-        for index in 1 .. Mlp.Attributes.N_Layers loop
+        for index in 1 .. Mlp.Attributes.N_Layers - 1 loop
             declare
                 Param_Rec : Parameters_Record := Mlp.Attributes.Params (index);
             begin
