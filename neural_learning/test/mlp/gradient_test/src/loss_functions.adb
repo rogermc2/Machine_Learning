@@ -2,128 +2,138 @@
 --  Based on scikit-learn/sklearn/neural_network/tests/test_mlp.py test_gradient
 --  with Ada.Text_IO; use Ada.Text_IO;
 
---  with Printing;
-
 package body Loss_Functions is
 
-   --  L228 loss_grad_fun returns mlp._loss_grad_lbfgs [value, grad]
-   --  where grad is packed coeffs + intercepts
-   function Loss_Grad_Function
-     (Self        : MLP_Classifier; Theta : Parameters_List;
-      X           : Real_Float_Matrix; Y  : Binary_Matrix;
-      Gradients   :  Parameters_List) return Loss_Grad_Result is
-      Activations : Real_Matrix_List;
-      Args        : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
-   begin
-      Activations.Append (X);
-      Args.Self := Self;
-      Args.Params := Theta;
-      Args.X := X;
-      Args.Y := Y;
-      Args.Activations := Activations;
-      Args.Gradients := Gradients;
+    function Pack (Theta : Parameters_List) return Real_Float_Vector;
+    function Unpack (Mlp : MLP_Classifier; Packed_Params : Real_Float_Vector)
+                     return Parameters_List;
 
-      return Loss_Grad_LBFGS (Args);
+    --  -------------------------------------------------------------------------
 
-   end Loss_Grad_Function;
+    --  L228 loss_grad_fun returns mlp._loss_grad_lbfgs [value, grad]
+    --  where grad is packed coeffs + intercepts
+    function Loss_Grad_Function
+      (Self        : MLP_Classifier; Theta : Parameters_List;
+       X           : Real_Float_Matrix; Y  : Binary_Matrix;
+       Gradients   :  Parameters_List) return Loss_Grad_Result is
+        Activations : Real_Matrix_List;
+        Args        : Loss_Grad_Args (X'Length, X'Length (2), Y'Length (2));
+    begin
+        Activations.Append (X);
+        Args.Self := Self;
+        Args.Params := Theta;
+        Args.X := X;
+        Args.Y := Y;
+        Args.Activations := Activations;
+        Args.Gradients := Gradients;
 
-   --  -------------------------------------------------------------------------
+        return Loss_Grad_LBFGS (Args);
 
-   function Numerical_Loss_Grad
-     (aClassifier : MLP_Classifier; Theta : Parameters_List;
-      X           : Real_Float_Matrix; Y  : Binary_Matrix;
-      Params      : Parameters_List) return Real_Vector_List is
---        Routine_Name  : constant String := "Loss_Functions.Numerical_Loss_Grad ";
-      Theta_Length  : constant Positive := Positive (Theta.Length);
-      Num_Grad_List : Real_Vector_List;
-   begin
-      for t_index in 1 .. Theta_Length loop
-         declare
-            use Parameters_Package;
-            Coeffs           : constant Real_Float_Matrix :=
-                                 Theta.Element (t_index).Coeff_Gradients;
-            Intcepts         : constant Real_Float_Vector :=
-                                 Theta.Element (t_index).Intercept_Grads;
-            Num_Grad         : Real_Float_Vector (Coeffs'Range);
-            Theta_P          : Parameters_Record := Theta.Element (t_index);
-            Theta_M          : Parameters_Record := Theta.Element (t_index);
-            Theta_P_List     : Parameters_List;
-            Theta_M_List     : Parameters_List;
-            Loss_Grad_P      : Loss_Grad_Result;
-            Loss_Grad_M      : Loss_Grad_Result;
-         begin
---              Printing.Print_Matrix_Dimensions
---                (Routine_Name & "Coeffs (" & Integer'Image (t_index) & ")",
---                 Coeffs);
+    end Loss_Grad_Function;
+
+    --  -------------------------------------------------------------------------
+
+    function Numerical_Loss_Grad
+      (MLP : MLP_Classifier; Theta : Parameters_List;
+       X           : Real_Float_Matrix; Y  : Binary_Matrix;
+       Params      : Parameters_List) return Parameters_List is
+        use Real_Float_Arrays;
+--          Routine_Name : constant String :=
+--                           "Loss_Functions.Numerical_Loss_Grad ";
+        Epsilon      : constant Float := 10.0 ** (-5);
+        Theata_Vec   : constant Real_Float_Vector := Pack (Theta);
+        D_Theta      : constant Real_Float_Matrix :=
+                        Epsilon * Unit_Matrix (Theata_Vec'Length);
+        Loss_Grad_P  : Loss_Grad_Result;
+        Loss_Grad_M  : Loss_Grad_Result;
+        Num_Grad     : Real_Float_Vector (Theata_Vec'Range) := (others => 0.0);
+    begin
+        for t_index in Theata_Vec'Range loop
             --  L240
-            Theta_P.Coeff_Gradients := Coeffs;
-            Theta_P.Intercept_Grads := Intcepts;
-            Theta_M.Coeff_Gradients := Coeffs;
-            Theta_M.Intercept_Grads := Intcepts;
+            declare
+                D_Theta_Vec : Real_Float_Vector (D_Theta'Range);
+            begin
+                for row in D_Theta'Range loop
+                    D_Theta_Vec (row) := D_Theta (row, t_index);
+                end loop;
+                --  L242 loss_grad_fun returns mlp._loss_grad_lbfgs [, grad]
+                --  where grad is packed coeffs + intercepts
+                Loss_Grad_P := Loss_Grad_Function
+                  (Self => MLP,
+                   Theta => Unpack (MLP, Theata_Vec + D_Theta_Vec), X => X,
+                   Y => Y,  Gradients => Params);
+                Loss_Grad_M := Loss_Grad_Function
+                  (Self => MLP,
+                   Theta => Unpack (MLP, Theata_Vec - D_Theta_Vec), X => X,
+                   Y => Y, Gradients => Params);
+                Num_Grad (t_index) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) /
+                  (2.0 * Epsilon);
+            end;
+        end loop;
 
-            for row in 1 .. Theta_P.Num_Rows loop
---                 Put_Line (Routine_Name & "L240 row" & Integer'Image (row));
-               for col in Theta_P.Coeff_Gradients'Range (2) loop
-                  if col = t_index then
-                     Theta_P.Coeff_Gradients (row, col) :=
-                       Theta_P.Coeff_Gradients (row, col) + Eps;
-                     Theta_M.Coeff_Gradients (row, col) :=
-                       Theta_M.Coeff_Gradients (row, col) - Eps;
-                  end if;
-               end loop;
+        return Unpack (MLP, Num_Grad);
 
-               if row = t_index then
-                  Theta_P.Intercept_Grads (row) :=
-                    Theta_P.Intercept_Grads (row) + Eps;
-                  Theta_M.Intercept_Grads (row) :=
-                    Theta_M.Intercept_Grads (row) - Eps;
-               end if;
+    end Numerical_Loss_Grad;
 
-               for col in Theta_P.Coeff_Gradients'Range (2) loop
-                  if col = t_index then
-                     Theta_P.Coeff_Gradients (row, col) :=
-                       Theta_P.Coeff_Gradients (row, col) + Eps;
-                  end if;
-               end loop;
+    --  -------------------------------------------------------------------------
 
-               if row = t_index then
-                  Theta_P.Intercept_Grads (row) :=
-                    Theta_P.Intercept_Grads (row) + Eps;
-               end if;
+    function Pack (Theta : Parameters_List) return Real_Float_Vector is
+        Pack_List : Real_Float_List;
+    begin
+        for index in Theta.First_Index .. Theta.Last_Index loop
+            declare
+                Param : constant Parameters_Record := Theta (index);
+            begin
+                for row in Param.Coeff_Gradients'Range loop
+                    for col in Param.Coeff_Gradients'Range (2) loop
+                        Pack_List.Append (Param.Coeff_Gradients (row, col));
+                    end loop;
+                end loop;
 
-               if t_index = 1 then
-                  Theta_P_List.Append (Theta_P);
-                  Theta_P_List.Append (Theta (2));
-               else
-                  Theta_P_List.Append (Theta (1));
-                  Theta_P_List.Append (Theta_P);
-               end if;
+                for row in Param.Intercept_Grads'Range loop
+                    Pack_List.Append (Param.Intercept_Grads (row));
+                end loop;
+            end;
+        end loop;
 
-               if t_index = 1 then
-                  Theta_M_List.Append (Theta_M);
-                  Theta_M_List.Append (Theta (2));
-               else
-                  Theta_M_List.Append (Theta (1));
-                  Theta_M_List.Append (Theta_M);
-               end if;
+        return To_Real_Float_Vector (Pack_List);
 
-               --  L242 loss_grad_fun returns mlp._loss_grad_lbfgs [, grad]
-               --  where grad is packed coeffs + intercepts
-               Loss_Grad_P := Loss_Grad_Function
-                 (Self => aClassifier, Theta => Theta_P_List, X => X,
-                  Y => Y,  Gradients => Params);
-               Loss_Grad_M := Loss_Grad_Function
-                 (Self => aClassifier, Theta => Theta_M_List, X => X,
-                  Y => Y, Gradients => Params);
-               Num_Grad (row) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) /
-                 (2.0 * Eps);
-            end loop;
-            Num_Grad_List.Append (Num_Grad);
-         end;
-      end loop;
+    end Pack;
 
-      return Num_Grad_List;
+    --  -------------------------------------------------------------------------
 
-   end Numerical_Loss_Grad;
+    --  Extract the coefficients and intercepts from packed_parameters.
+    function Unpack (Mlp : MLP_Classifier; Packed_Params : Real_Float_Vector)
+                     return Parameters_List is
+--          Routine_Name : constant String := "Loss_Functions.Unpack ";
+        PP_Index : Natural := 0;
+        Params   : Parameters_List;
+    begin
+        for index in 1 .. Mlp.Attributes.N_Layers - 1 loop
+            declare
+                Param_Rec : Parameters_Record := Mlp.Attributes.Params (index);
+            begin
+                for row in Param_Rec.Coeff_Gradients'Range loop
+                    for col in Param_Rec.Coeff_Gradients'Range (2) loop
+                        PP_Index := PP_Index + 1;
+                        Param_Rec.Coeff_Gradients (row, col) :=
+                          Packed_Params (PP_Index);
+                    end loop;
+                end loop;
+
+                for row in Param_Rec.Intercept_Grads'Range loop
+                    PP_Index := PP_Index + 1;
+                    Param_Rec.Intercept_Grads (row) :=
+                      Packed_Params (PP_Index);
+                end loop;
+                Params.Append (Param_Rec);
+            end;
+        end loop;
+
+        return Params;
+
+    end Unpack;
+
+    --  -------------------------------------------------------------------------
 
 end Loss_Functions;

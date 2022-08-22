@@ -111,7 +111,7 @@ package body L_BFGS_B is
          Set_Ulb (X'Length, M, X, Low_Bound, Upper_Bound, Nbd, F_Float, G,
                   Factor, Pgtol, Wa, I_Wa, Task_Name, L_Save, I_Save,
                   Options.Max_Line_Steps);
-         Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));
+         --  Put_Line (Routine_Name & "L356 Task_Name: " & To_String (Task_Name));
          if Slice (Task_Name, 1, 2) =  "FG" then
             --  Overwrite F and G:
             Fun_And_Grad (Scalar_Func, Args, F_Float, G);
@@ -133,12 +133,6 @@ package body L_BFGS_B is
          end if;
       end loop;  --  Task_Name starts with FG or New_X
 
-      Put_Line (Routine_Name & "L378 Task_Name: " & To_String (Task_Name));
-      --          for index in 1 .. 16 loop
-      --              Put_Line ("I_Save" & Integer'Image (Index) & ":" &
-      --                          Integer'Image (I_Save (Index)));
-      --          end loop;
-
       --  L376
       if Task_Name = To_Unbounded_String ("CONV") then
          Warn_Flag := 0;
@@ -148,9 +142,7 @@ package body L_BFGS_B is
          Warn_Flag := 2;
       end if;
 
-      --          Put_Line (Routine_Name & "L385 current iteration number:" &
-      --                      Integer'Image (I_Save (30)));
-      Put_Line (Routine_Name & "L385 Max_Cor" & Integer'Image (Max_Cor));
+      --  Put_Line (Routine_Name & "L385 Max_Cor" & Integer'Image (Max_Cor));
       --  isave(31) = the total number of BFGS updates prior to the current
       --  iteration;
       declare

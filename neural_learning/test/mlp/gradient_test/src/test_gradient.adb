@@ -13,7 +13,7 @@ with NL_Types;
 with Stochastic_Optimizers;
 with Printing;
 
-with Loss_Functions2; use Loss_Functions2;
+with Loss_Functions; use Loss_Functions;
 
 --  Test_Gradient makes sure that the activation functions and their
 --  derivatives are correct
@@ -48,7 +48,7 @@ begin
    Layer_Units.Append (Num_Features);
    Layer_Units.Append (Hidden_Layer_Sizes);
 
-   for num_labels in 2 .. 2 loop
+   for num_labels in 2 .. 3 loop
       for value in Y'Range loop
          Y (value, 1) := value mod num_labels + 1;
       end loop;
@@ -58,9 +58,9 @@ begin
          Y_Bin : constant Binary_Matrix := Label.Fit_Transform (LB, Y);
       begin
          --  L196
-         --           for activ_type in Base_Neural.Activation_Type'Range loop
-         for activ_type in Base_Neural.Activation_Type'First ..
-           Base_Neural.Activation_Type'First loop
+         for activ_type in Base_Neural.Activation_Type'Range loop
+--           for activ_type in Base_Neural.Activation_Type'First ..
+--             Base_Neural.Activation_Type'First loop
             New_Line;
             Put_Line (Routine_Name & "Activation Type: " &
                         Base_Neural.Activation_Type'Image (activ_type));
@@ -80,16 +80,10 @@ begin
             --  Multilayer_Perceptron.Initialize on first pass of
             --  Multilayer_Perceptron.Fit
             Theta := aClassifier.Attributes.Params;
-            --              New_Line;
-            --              for index in 1 .. Integer (Theta.Length) loop
-            --                 Printing.Print_Parameters ("Theta (" & Integer' Image (index) & ")",
-            --                                            Theta.Element (index), 1, 3);
-            --              end loop;
 
             --  L212  Initialize
             Params.Clear;
             for layer in 1 .. aClassifier.Attributes.N_Layers - 1 loop
-               Put_Line (Routine_Name & "L222 layer" & Integer'Image (layer));
                Fan_In := Layer_Units (layer);
                Fan_Out := Layer_Units (layer + 1);
 
@@ -118,12 +112,15 @@ begin
                Put_Line (Routine_Name & "L239 numerically compute the gradients");
                --  L239 numerically compute the gradients
                declare
-                  Num_Grad  : constant Real_Float_Vector := Numerical_Loss_Grad
+                  Num_Grad : constant Parameters_List := Numerical_Loss_Grad
                     (aClassifier, Theta, X, Y_Bin, Params);
                begin
-                  Printing.Print_Float_Array ("Num_Grad", Num_Grad);
                   Printing.Print_Float_Matrix
-                    ("Loss_Grad", Loss_Grad.Parameters (1).Coeff_Gradients, 1, 2);
+                    ("Loss_Grad",
+                     Loss_Grad.Parameters (1).Coeff_Gradients, 1, 1, 1, 6);
+                  Printing.Print_Float_Matrix
+                    ("Num_Grad",
+                     Num_Grad.Element (1).Coeff_Gradients, 1, 1, 1, 6);
                end;
             end;
          end loop;
