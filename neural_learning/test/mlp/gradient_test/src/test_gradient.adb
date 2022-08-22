@@ -106,12 +106,11 @@ begin
 
             --  L226
             declare
-               Theata_Vec : constant Real_Float_Vector := Pack (Theta);
                Loss_Grad  : Loss_Grad_Result;
             begin
                --  L233 analytically compute the gradients
                Loss_Grad := Loss_Grad_Function
-                 (aClassifier, Theata_Vec, X, Y_Bin, Params);
+                 (aClassifier, Theta, X, Y_Bin, Params);
                Put_Line (Routine_Name & "analytically computed loss" &
                            Float'Image (Loss_Grad.Loss));
                New_Line;
@@ -120,7 +119,7 @@ begin
                --  L239 numerically compute the gradients
                declare
                   Num_Grad  : constant Real_Float_Vector := Numerical_Loss_Grad
-                    (aClassifier, Theata_Vec, X, Y_Bin, Params);
+                    (aClassifier, Theta, X, Y_Bin, Params);
                begin
                   Printing.Print_Float_Array ("Num_Grad", Num_Grad);
                   Printing.Print_Float_Matrix

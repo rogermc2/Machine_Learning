@@ -6,7 +6,9 @@
 
 package body Loss_Functions2 is
 
---      Epsilon : constant Float := 10.0 ** (-5);
+    function Pack (Theta : Parameters_List) return Real_Float_Vector;
+    function Unpack (Mlp : MLP_Classifier; Packed_Params : Real_Float_Vector)
+                     return Parameters_List;
 
     --  -------------------------------------------------------------------------
 
@@ -34,31 +36,41 @@ package body Loss_Functions2 is
     --  -------------------------------------------------------------------------
 
     function Numerical_Loss_Grad
-      (aClassifier : MLP_Classifier; Theta : Real_Float_Vector;
+      (MLP : MLP_Classifier; Theta : Parameters_List;
        X           : Real_Float_Matrix; Y  : Binary_Matrix;
        Params      : Parameters_List) return Real_Float_Vector is
         use Real_Float_Arrays;
---          Routine_Name  : constant String :=
---                            "Loss_Functions2.Numerical_Loss_Grad ";
-        Epsilon       : constant Float := 10.0 ** (-5);
-        D_Theta       : constant Real_Float_Matrix :=
-                          Epsilon * Unit_Matrix (Theata_Vec'Length);
-        Loss_Grad_P   : Loss_Grad_Result;
-        Loss_Grad_M   : Loss_Grad_Result;
-        Num_Grad      : Real_Float_Vector (Theata_Vec'Range) := (others => 0.0);
+        --          Routine_Name  : constant String :=
+        --                            "Loss_Functions2.Numerical_Loss_Grad ";
+        Epsilon     : constant Float := 10.0 ** (-5);
+        Theata_Vec  : constant Real_Float_Vector := Pack (Theta);
+        D_Theta     : constant Real_Float_Matrix :=
+                        Epsilon * Unit_Matrix (Theata_Vec'Length);
+        Loss_Grad_P : Loss_Grad_Result;
+        Loss_Grad_M : Loss_Grad_Result;
+        Num_Grad    : Real_Float_Vector (Theata_Vec'Range) := (others => 0.0);
     begin
         for t_index in Theata_Vec'Range loop
             --  L240
-            --  L242 loss_grad_fun returns mlp._loss_grad_lbfgs [, grad]
-            --  where grad is packed coeffs + intercepts
-            Loss_Grad_P := Loss_Grad_Function
-              (Self => aClassifier, Theta => Theata_Vec + D_Theta, X => X,
-               Y => Y,  Gradients => Params);
-            Loss_Grad_M := Loss_Grad_Function
-              (Self => aClassifier, Theta => Theata_Vec - D_Theta, X => X,
-               Y => Y, Gradients => Params);
-            Num_Grad (t_index) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) /
-              (2.0 * Epsilon);
+            declare
+                D_Theta_Vec : Real_Float_Vector (D_Theta'Range);
+            begin
+                for row in D_Theta'Range loop
+                    D_Theta_Vec (row) := D_Theta (row, t_index);
+                end loop;
+                --  L242 loss_grad_fun returns mlp._loss_grad_lbfgs [, grad]
+                --  where grad is packed coeffs + intercepts
+                Loss_Grad_P := Loss_Grad_Function
+                  (Self => MLP,
+                   Theta => Unpack (MLP, Theata_Vec + D_Theta_Vec), X => X,
+                   Y => Y,  Gradients => Params);
+                Loss_Grad_M := Loss_Grad_Function
+                  (Self => MLP,
+                   Theta => Unpack (MLP, Theata_Vec - D_Theta_Vec), X => X,
+                   Y => Y, Gradients => Params);
+                Num_Grad (t_index) := (Loss_Grad_P.Loss - Loss_Grad_M.Loss) /
+                  (2.0 * Epsilon);
+            end;
         end loop;
 
         return Num_Grad;
@@ -80,7 +92,7 @@ package body Loss_Functions2 is
                     end loop;
                 end loop;
 
-                for row in Param.Coeff_Gradients'Range loop
+                for row in Param.Intercept_Grads'Range loop
                     Pack_List.Append (Param.Intercept_Grads (row));
                 end loop;
             end;
@@ -89,6 +101,39 @@ package body Loss_Functions2 is
         return To_Real_Float_Vector (Pack_List);
 
     end Pack;
+
+    --  -------------------------------------------------------------------------
+
+    --  Extract the coefficients and intercepts from packed_parameters.
+    function Unpack (Mlp : MLP_Classifier; Packed_Params : Real_Float_Vector)
+                     return Parameters_List is
+        PP_Index : Natural := 0;
+        Params   : Parameters_List;
+    begin
+        for index in 1 .. Mlp.Attributes.N_Layers loop
+            declare
+                Param_Rec : Parameters_Record := Mlp.Attributes.Params (index);
+            begin
+                for row in Param_Rec.Coeff_Gradients'Range loop
+                    for col in Param_Rec.Coeff_Gradients'Range (2) loop
+                        PP_Index := PP_Index + 1;
+                        Param_Rec.Coeff_Gradients (row, col) :=
+                          Packed_Params (PP_Index);
+                    end loop;
+                end loop;
+
+                for row in Param_Rec.Intercept_Grads'Range loop
+                    PP_Index := PP_Index + 1;
+                    Param_Rec.Intercept_Grads (row) :=
+                      Packed_Params (PP_Index);
+                end loop;
+                Params.Append (Param_Rec);
+            end;
+        end loop;
+
+        return Params;
+
+    end Unpack;
 
     --  -------------------------------------------------------------------------
 
