@@ -24,6 +24,8 @@ package Test_Support is
    procedure Print_Parameters
      (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
       Rows_Start : Positive := 1; Rows_Last : Positive := 10);
+   procedure Print_Unbound_Array (Name : String;
+                                   UB   : Unbounded_String_Array);
    procedure Print_Unbound_List (Name : String; UB : NL_Types.Unbounded_List);
    procedure Print_Unbound_Matrix (Name : String;
                                    UB   : Unbounded_String_Matrix);

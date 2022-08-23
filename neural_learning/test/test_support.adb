@@ -215,6 +215,25 @@ package body Test_Support is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Unbound_Array (Name : String;
+                                 UB   : Unbounded_String_Array) is
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+      for Index in UB'Range loop
+         Put (To_String (UB (Index)) & "  ");
+         Count := Count + 1;
+         if Count > 10 then
+            New_Line;
+            Count := 1;
+         end if;
+      end loop;
+      New_Line;
+
+   end Print_Unbound_Array;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Unbound_List (Name : String;
                                  UB   : NL_Types.Unbounded_List) is
       Count : Integer := 1;

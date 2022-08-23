@@ -37,14 +37,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Classifier_Utilities;
 with Encode_Utils;
 --  with Printing;
+--  with Test_Support;
 
 package body Label is
-
-   --     type CSR_Matrix (Num_NZ, IP_Length : Positive) is record
-   --        Data    : Integer_Array (1 .. Num_NZ);
-   --        Indices : Integer_Array (1 .. Num_NZ);
-   --        Ind_Ptr : Integer_Array (1 .. IP_Length);
-   --     end record;
 
    procedure C_Init (LB        : in out Label_Binarizer; Neg_Label : Float := 0.0;
                      Pos_Label : Float := 1.0) is
@@ -229,9 +224,12 @@ package body Label is
    function Fit_Transform
      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
       return Binary_Matrix is
+--        Routine_Name : constant String :=
+--                         "Label.Fit_Transform Unbounded_String_Array ";
    begin
-      Put_Line ("Label.Fit_Transform Unbounded_String_Array");
+--        Test_Support.Print_Unbound_Array  (Routine_Name & "Y", Y);
       Fit (Binarizer, Y);
+
       return Transform (Binarizer, Y);
 
    end Fit_Transform;
