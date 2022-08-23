@@ -331,15 +331,24 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
 
-   function Type_Of_Target (Y : Unbounded_String_Matrix) return Y_Type is
+   function Type_Of_Target (Y : Unbounded_String_Array) return Y_Type is
    begin
       pragma Unreferenced (Y);
-      return Y_Multiclass_Multioutput;
+      return Y_Multiclass;
 
    end Type_Of_Target;
 
    --  -------------------------------------------------------------------------
-   --  unique_labels L101
+
+   function Type_Of_Target (Y : Unbounded_String_Matrix) return Y_Type is
+   begin
+      pragma Unreferenced (Y);
+      return Y_Multiclass;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+  --  unique_labels L101
    --     function Unique_Multiclass_Set (Y : Integer_Matrix)
    --                                     return Encode_Utils.Int_Sets.Set is
    --     begin

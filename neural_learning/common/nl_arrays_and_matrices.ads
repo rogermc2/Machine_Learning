@@ -22,7 +22,11 @@ package NL_Arrays_And_Matrices is
     type Natural_Array is array (Integer range <>) of Natural;
     procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort
       (Integer, Integer, Integer_Array);
+
     type Unbounded_String_Array is array (Integer range <>) of
+      Ada.Strings.Unbounded.Unbounded_String;
+    type Unbounded_String_Matrix is
+      array (Integer range <>, Integer range <>) of
       Ada.Strings.Unbounded.Unbounded_String;
 
     type Multi_Value_Array is array (Integer range <>, Integer range <>)
@@ -32,9 +36,6 @@ package NL_Arrays_And_Matrices is
       Boolean;
     type Integer_Matrix is array (Integer range <>, Integer range <>) of
       Integer;
-    type Unbounded_String_Matrix is
-      array (Integer range <>, Integer range <>) of
-      Ada.Strings.Unbounded.Unbounded_String;
 
     package Integer_Array_Package is new
       Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);

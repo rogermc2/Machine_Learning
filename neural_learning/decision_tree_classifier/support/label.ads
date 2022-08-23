@@ -61,6 +61,10 @@ package Label is
                    Y : Integer_Matrix);
     procedure Fit (Binarizer : in out Label_Binarizer;
                    Y         : Array_Of_Integer_Lists);
+    procedure Fit (Binarizer : in out UB_Label_Binarizer;
+                   Y : Unbounded_String_Array);
+    procedure Fit (Binarizer : in out UB_Label_Binarizer;
+                   Y : Unbounded_String_Matrix);
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     function Fit_Transform (Binarizer : in out Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix;
@@ -92,13 +96,15 @@ package Label is
                         return Binary_Matrix;
     function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                         return Binary_Matrix;
-    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
-                        return Binary_Matrix;
     function Transform (Self : Label_Binarizer; Y : Integer_List)
                         return Boolean_Matrix;
     function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
                         return Boolean_Matrix;
     function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
+                        return Binary_Matrix;
+    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Array)
+                        return Binary_Matrix;
+    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
                         return Binary_Matrix;
     function Transform (Self : Label_Encoder; Y : Integer_Array)
                         return Natural_Array;
