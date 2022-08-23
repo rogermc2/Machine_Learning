@@ -362,24 +362,46 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    --  L586 Multiclass uses the maximal score instead of a threshold.
---     function Inverse_Binarize_Multiclass
---       (Y_Prob : Binary_Matrix ; Classes : Unbounded_List)
---        return Unbounded_String_Array is
---        use Classifier_Utilities;
---        --          Routine_Name   :  constant String :=
---        --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
---        Inverse        : Unbounded_String_Array  (Y_Prob'Range);
---        Max_Indices    : Integer_Array (Y_Prob'Range);
---     begin
---        --  L627
---        Max_Indices := Max_Probability_Indices (Y_Prob);
---        for row in Inverse'Range loop
---           Inverse (row) := Classes.Element (Max_Indices (row));
---        end loop;
---
---        return Inverse;
---
---     end Inverse_Binarize_Multiclass;
+   --     function Inverse_Binarize_Multiclass
+   --       (Y_Prob : Binary_Matrix ; Classes : Unbounded_List)
+   --        return Unbounded_String_Array is
+   --        use Classifier_Utilities;
+   --        --          Routine_Name   :  constant String :=
+   --        --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
+   --        Inverse        : Unbounded_String_Array  (Y_Prob'Range);
+   --        Max_Indices    : Integer_Array (Y_Prob'Range);
+   --     begin
+   --        --  L627
+   --        Max_Indices := Max_Probability_Indices (Y_Prob);
+   --        for row in Inverse'Range loop
+   --           Inverse (row) := Classes.Element (Max_Indices (row));
+   --        end loop;
+   --
+   --        return Inverse;
+   --
+   --     end Inverse_Binarize_Multiclass;
+
+   --  -------------------------------------------------------------------------
+
+   --  L586 Multiclass uses the maximal score instead of a threshold.
+   function Inverse_Binarize_Multiclass
+     (Y_Prob : Binary_Matrix ; Classes : Unbounded_List)
+      return Unbounded_String_Array is
+      use Classifier_Utilities;
+      --          Routine_Name   :  constant String :=
+      --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
+      Inverse     : Unbounded_String_Array (Y_Prob'Range);
+      Max_Indices : Integer_Array (Y_Prob'Range);
+   begin
+      --  L627
+      Max_Indices := Max_Probability_Indices (Y_Prob);
+      for row in Inverse'Range loop
+         Inverse (row) := Classes.Element (Max_Indices (row));
+      end loop;
+
+      return Inverse;
+
+   end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
 
@@ -624,6 +646,18 @@ package body Label is
          return Inverse_Binarize_Thresholding
            (Y, Self.Y_Kind, Self.Classes, Threshold);
       end if;
+
+   end Inverse_Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Inverse_Transform (Self : UB_Label_Binarizer; Y : Binary_Matrix)
+                               return Unbounded_String_Array is
+      --        Routine_Name : constant String :=
+      --          "Label.Inverse_Transform Unbounded_String_Array ";
+   begin
+      --  L398
+      return Inverse_Binarize_Multiclass (Y, Self.Classes);
 
    end Inverse_Transform;
 
