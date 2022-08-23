@@ -24,6 +24,8 @@ package Classifier_Utilities is
                                return Value_Data_Lists_2D;
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return Multi_Output_Data_Record;
+   function Max_Probability_Indices (Probabilities : Binary_Matrix)
+                                     return Integer_Array;
    function Max_Probability_Indices (Probabilities : Real_Float_Matrix)
                                      return Integer_Array;
    function Probabilities (aMatrix : Real_Float_Matrix)

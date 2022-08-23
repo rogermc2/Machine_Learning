@@ -329,6 +329,30 @@ package body Classifier_Utilities is
 
    --  ---------------------------------------------------------------------------
 
+   function Max_Probability_Indices (Probabilities : Binary_Matrix)
+                                     return Integer_Array is
+      --        Routine_Name : constant String :=
+      --                           "Classifier_Utilities.Max_Probability_Indices ";
+      Max_Values  : Integer_Array (Probabilities'Range) := (others => 0);
+      Value       : Integer;
+      Max_Indices : Integer_Array (Probabilities'Range) := (others => 1);
+   begin
+      for row in Probabilities'Range loop
+         for col in Probabilities'Range (2) loop
+            Value := Probabilities (row, col);
+            if Value > Max_Values (row) then
+               Max_Indices (row) := col;
+               Max_Values (row) := Value;
+            end if;
+         end loop;
+
+      end loop;
+
+      return Max_Indices;
+
+   end Max_Probability_Indices;
+
+   --  ------------------------------------------------------------------------
 
    function Max_Probability_Indices (Probabilities : Real_Float_Matrix)
                                      return Integer_Array is
