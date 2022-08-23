@@ -148,10 +148,10 @@ package body Label is
     --  -------------------------------------------------------------------------
 
     procedure Fit (Binarizer : in out UB_Label_Binarizer;
-                   Y         : Unbounded_String_Matrix) is
+                   Y : Unbounded_String_Array) is
         use Multiclass_Utils;
         Routine_Name : constant String :=
-                         "Label.Fit Binarizer Unbounded_String_Matrix ";
+                         "Label.Fit Binarizer Unbounded_String_Array ";
     begin
         Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
                   Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
@@ -211,6 +211,18 @@ package body Label is
 
     --  -------------------------------------------------------------------------
     --  L305
+    function Fit_Transform
+      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
+       return Binary_Matrix is
+    begin
+        Put_Line ("Label.Fit_Transform Unbounded_String_Array");
+        Fit (Binarizer, Y);
+        return Transform (Binarizer, Y);
+
+    end Fit_Transform;
+
+    --  -------------------------------------------------------------------------
+   --  L305
     function Fit_Transform
       (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Matrix)
        return Binary_Matrix is

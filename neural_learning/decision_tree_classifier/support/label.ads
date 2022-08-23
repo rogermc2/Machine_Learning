@@ -65,6 +65,9 @@ package Label is
     function Fit_Transform (Binarizer : in out Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix;
     function Fit_Transform
+      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
+       return Binary_Matrix;
+    function Fit_Transform
       (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Matrix)
        return Binary_Matrix;
     function Fit_Transform (Encoder : in out Label_Encoder;

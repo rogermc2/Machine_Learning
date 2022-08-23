@@ -445,6 +445,16 @@ package body Multiclass_Utils is
 
    --  -------------------------------------------------------------------------
    --  L42 unique_labels
+   function Unique_Labels (Y : Unbounded_String_Array)
+                           return NL_Types.Unbounded_List is
+   begin
+      --  L111
+      return Encode_Utils.Unique (Y);
+
+   end Unique_Labels;
+
+   --  -------------------------------------------------------------------------
+   --  L42 unique_labels
    function Unique_Labels (Y : Unbounded_String_Matrix)
                            return NL_Types.Unbounded_List is
    begin
