@@ -1,5 +1,6 @@
 
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with NL_Types;
 with Stochastic_Optimizers;
 
 package Test_Support is
@@ -13,6 +14,10 @@ package Test_Support is
     procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                  Start : Integer := 1; Finish : Integer := 0);
     procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix);
+    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
+                                   Start : Integer := 1; Finish : Integer := 0);
+    procedure Print_Integer_List (Name  : String;
+                                  aList : NL_Types.Integer_List);
     procedure Print_Parameters
       (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
        Rows_Start : Positive := 1; Rows_Last : Positive := 10);

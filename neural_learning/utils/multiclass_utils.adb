@@ -269,10 +269,6 @@ package body Multiclass_Utils is
 --                                 "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
       Result : Y_Type;
    begin
---        Put_Line (Routine_Name & "Y num cols:" & Integer'Image (Y'Length (2)));
---        Put_Line (Routine_Name & "Y num Unique_Labels:" &
---                    Integer'Image (Integer (Unique_Labels (Y).Length)));
---        Printing.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 3);
       if Y'Length (2) = 1 and  Integer (Unique_Labels (Y).Length) < 3 then
          Result := Y_Binary;
       elsif Is_Multilabel (Y) then
@@ -330,6 +326,15 @@ package body Multiclass_Utils is
       end if;
 
       return Result;
+
+   end Type_Of_Target;
+
+   --  -------------------------------------------------------------------------
+
+   function Type_Of_Target (Y : Unbounded_String_Matrix) return Y_Type is
+   begin
+      pragma Unreferenced (Y);
+      return Y_Multiclass_Multioutput;
 
    end Type_Of_Target;
 
@@ -439,7 +444,17 @@ package body Multiclass_Utils is
    end Unique_Labels;
 
    --  -------------------------------------------------------------------------
-   --  L101
+   --  L42 unique_labels
+   function Unique_Labels (Y : Unbounded_String_Matrix)
+                           return NL_Types.Unbounded_List is
+   begin
+      --  L111
+      return Encode_Utils.Unique (Y);
+
+   end Unique_Labels;
+
+   --  -------------------------------------------------------------------------
+--  L101
    --     function Unique_Label_Set (Y : Integer_Matrix)
    --                                return Encode_Utils.Int_Sets.Set is
    --        Labels       : Encode_Utils.Int_Sets.Set;

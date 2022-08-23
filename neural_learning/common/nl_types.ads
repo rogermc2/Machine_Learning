@@ -121,6 +121,7 @@ package NL_Types is
    package Unbounded_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
    subtype Unbounded_List is Unbounded_Package.Vector;
+   package Unbounded_Sorting is new Unbounded_Package.Generic_Sorting ("<");
    subtype Features_List is Unbounded_Package.Vector;
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;

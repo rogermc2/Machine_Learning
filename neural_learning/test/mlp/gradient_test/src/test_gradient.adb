@@ -35,7 +35,7 @@ procedure Test_Gradient is
    Fan_In             : Positive;
    Fan_Out            : Positive;
    Params             : Parameters_List;
-   Theta              : Parameters_List;
+--     Theta              : Parameters_List;
    Loss_Grad          : Loss_Grad_Result;
 begin
    Put_Line (Routine_Name);
@@ -80,7 +80,7 @@ begin
             --  aClassifier.Attributes.Params is set by
             --  Multilayer_Perceptron.Initialize on first pass of
             --  Multilayer_Perceptron.Fit
-            Theta := aClassifier.Attributes.Params;
+--              Theta := aClassifier.Attributes.Params;
 
             --  L212  Initialize
             Params.Clear;
@@ -102,7 +102,7 @@ begin
             --  L226
             --  L233 analytically compute the gradients
             Loss_Grad := Loss_Grad_Function
-              (aClassifier, Theta, X, Y_Bin, Params);
+              (aClassifier, aClassifier.Attributes.Params, X, Y_Bin, Params);
             Put_Line (Routine_Name & "analytically computed loss" &
                         Float'Image (Loss_Grad.Loss));
             New_Line;
@@ -111,7 +111,7 @@ begin
             --  L239 numerically compute the gradients
             declare
                Num_Grad : constant Parameters_List := Numerical_Loss_Grad
-                 (aClassifier, Theta, X, Y_Bin, Params);
+                 (aClassifier, aClassifier.Attributes.Params, X, Y_Bin, Params);
             begin
                Printing.Print_Float_Matrix
                  ("Loss_Grad",

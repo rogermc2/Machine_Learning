@@ -1,3 +1,4 @@
+--  Based on scikit-learn/sklearn/preprocessing/_encoders.py
 
 package body Encoders is
 

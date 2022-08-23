@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Printing;
+--  with Printing;
 
 package body Label is
 
@@ -146,6 +146,21 @@ package body Label is
     end Fit;
 
     --  -------------------------------------------------------------------------
+
+    procedure Fit (Binarizer : in out UB_Label_Binarizer;
+                   Y         : Unbounded_String_Matrix) is
+        use Multiclass_Utils;
+        Routine_Name : constant String :=
+                         "Label.Fit Binarizer Unbounded_String_Matrix ";
+    begin
+        Assert (Binarizer.Y_Kind /= Y_Continuous_Multioutput and
+                  Binarizer.Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
+                  "label binarization does not support multioutput target data");
+        Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+
+    end Fit;
+
+    --  -------------------------------------------------------------------------
     --  L740 Fit
     procedure Fit (Binarizer : in out Multi_Label_Binarizer;
                    Y         : Integer_Matrix) is
@@ -184,7 +199,7 @@ package body Label is
     end Fit;
 
     --  -------------------------------------------------------------------------
-    --  L416
+    --  L305
     function Fit_Transform (Binarizer : in out Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix is
     begin
@@ -195,11 +210,23 @@ package body Label is
     end Fit_Transform;
 
     --  -------------------------------------------------------------------------
+    --  L305
+    function Fit_Transform
+      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Matrix)
+       return Binary_Matrix is
+    begin
+        Put_Line ("Label.Fit_Transform Unbounded_String_Matrix");
+        Fit (Binarizer, Y);
+        return Transform (Binarizer, Y);
+
+    end Fit_Transform;
+
+    --  -------------------------------------------------------------------------
     --  Fit_Transform fits label encoder and returns encoded labels
     --  Balanced class weights should be given by
     --  n_samples / (n_classes * np.bincount(y))
     function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_Array)
-                           return Natural_Array is
+                            return Natural_Array is
         Encoded_Labels : Natural_Array (1 .. Y'Length);
     begin
         Put_Line ("Label.Fit_Transform Integer_Array");
@@ -217,50 +244,50 @@ package body Label is
 
     --  -------------------------------------------------------------------------
     --  L593 Multiclass uses the maximal score instead of a threshold.
---      function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
---                                            Classes : NL_Types.Integer_List)
---                                           return Real_Float_Matrix is
---          use Classifier_Utilities;
---          --        Routine_Name :  constant String :=
---          --                         "Label.Inverse_Binarize_Multiclass Boolean_Matrix 1 ";
---          Inverse      : Real_Float_Matrix  (Y'Range (2), Y'Range);
---          Max_Indices  : Natural_Array (Y'Range (2));
---      begin
---          --  L627
---          Max_Indices := Row_Max_Indices (Y);
---          for row in Max_Indices'Range loop
---              for col in Max_Indices'Range loop
---                  Inverse (row, col) :=
---                    Float (Classes.Element (Max_Indices (row)));
---              end loop;
---          end loop;
---
---          return Inverse;
---
---      end Inverse_Binarize_Multiclass;
+    --      function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
+    --                                            Classes : NL_Types.Integer_List)
+    --                                           return Real_Float_Matrix is
+    --          use Classifier_Utilities;
+    --          --        Routine_Name :  constant String :=
+    --          --                         "Label.Inverse_Binarize_Multiclass Boolean_Matrix 1 ";
+    --          Inverse      : Real_Float_Matrix  (Y'Range (2), Y'Range);
+    --          Max_Indices  : Natural_Array (Y'Range (2));
+    --      begin
+    --          --  L627
+    --          Max_Indices := Row_Max_Indices (Y);
+    --          for row in Max_Indices'Range loop
+    --              for col in Max_Indices'Range loop
+    --                  Inverse (row, col) :=
+    --                    Float (Classes.Element (Max_Indices (row)));
+    --              end loop;
+    --          end loop;
+    --
+    --          return Inverse;
+    --
+    --      end Inverse_Binarize_Multiclass;
 
     --  -------------------------------------------------------------------------
     --  L593 Multiclass uses the maximal score instead of a threshold.
---      function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
---                                            Classes : NL_Types.Integer_List)
---                                           return Integer_Matrix is
---          use Classifier_Utilities;
---          --        Routine_Name :  constant String :=
---          --                         "Label.Inverse_Binarize_Multiclass Boolean_Matrix 2 ";
---          Inverse      : Integer_Matrix  (Y'Range (2), Y'Range);
---          Max_Indices  : Natural_Array (Y'Range (2));
---      begin
---          --  L627
---          Max_Indices := Row_Max_Indices (Y);
---          for row in Max_Indices'Range loop
---              for col in Max_Indices'Range loop
---                  Inverse (row, col) := Classes.Element (Max_Indices (row));
---              end loop;
---          end loop;
---
---          return Inverse;
---
---      end Inverse_Binarize_Multiclass;
+    --      function Inverse_Binarize_Multiclass (Y       : Boolean_Matrix;
+    --                                            Classes : NL_Types.Integer_List)
+    --                                           return Integer_Matrix is
+    --          use Classifier_Utilities;
+    --          --        Routine_Name :  constant String :=
+    --          --                         "Label.Inverse_Binarize_Multiclass Boolean_Matrix 2 ";
+    --          Inverse      : Integer_Matrix  (Y'Range (2), Y'Range);
+    --          Max_Indices  : Natural_Array (Y'Range (2));
+    --      begin
+    --          --  L627
+    --          Max_Indices := Row_Max_Indices (Y);
+    --          for row in Max_Indices'Range loop
+    --              for col in Max_Indices'Range loop
+    --                  Inverse (row, col) := Classes.Element (Max_Indices (row));
+    --              end loop;
+    --          end loop;
+    --
+    --          return Inverse;
+    --
+    --      end Inverse_Binarize_Multiclass;
 
     --  -------------------------------------------------------------------------
 
@@ -289,20 +316,20 @@ package body Label is
     function Inverse_Binarize_Multiclass
       (Y_Prob : Real_Float_Matrix; Classes : Integer_List) return Integer_Matrix is
         use Classifier_Utilities;
-        Routine_Name   :  constant String :=
-                           "Label.Inverse_Binarize_Multiclass Float_Matrix ";
+        --          Routine_Name   :  constant String :=
+        --                             "Label.Inverse_Binarize_Multiclass Float_Matrix ";
         Inverse        : Integer_Matrix  (Y_Prob'Range, 1 .. 1);
         Max_Indices    : Integer_Array (Y_Prob'Range);
     begin
         --  L627
-        Printing.Print_Integer_List (Routine_Name & "Classes",  Classes);
-        Printing.Print_Float_Matrix (Routine_Name & "Y_Prob",  Y_Prob, 35, 40);
+        --          Printing.Print_Integer_List (Routine_Name & "Classes",  Classes);
+        --          Printing.Print_Float_Matrix (Routine_Name & "Y_Prob",  Y_Prob, 35, 40);
         Max_Indices := Max_Probability_Indices (Y_Prob);
         for row in Inverse'Range loop
             Inverse (row, 1) := Classes.Element (Max_Indices (row));
         end loop;
-      Printing.Print_Integer_Matrix (Routine_Name & "Inverse", Inverse,
-                                     35, 40);
+        --        Printing.Print_Integer_Matrix (Routine_Name & "Inverse", Inverse,
+        --                                       35, 40);
 
         return Inverse;
 
@@ -313,7 +340,7 @@ package body Label is
     function Inverse_Binarize_Thresholding
       (Y       : Real_Float_Matrix; Output_Type : Multiclass_Utils.Y_Type;
        Classes : Integer_List; Threshold : Float)
-      return Integer_Matrix is
+       return Integer_Matrix is
         use Ada.Containers;
         use Multiclass_Utils;
         Routine_Name :  constant String :=
@@ -374,23 +401,23 @@ package body Label is
 
     --  -------------------------------------------------------------------------
 
---      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
---                                 return Real_Float_Matrix is
---          use Multiclass_Utils;
---          Y_Inv     : Real_Float_Matrix (1 .. Y'Length (2), 1 .. Y'Length);
---          --        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
---      begin
---          if Self.Y_Kind = Y_Multiclass then
---              Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
---          else
---              Assert (False, "Label.Inverse_Transform Boolean_Matrix not Y_Multiclass" &
---                        "not coded");
---              --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
---          end if;
---
---          return Y_Inv;
+    --      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+    --                                 return Real_Float_Matrix is
+    --          use Multiclass_Utils;
+    --          Y_Inv     : Real_Float_Matrix (1 .. Y'Length (2), 1 .. Y'Length);
+    --          --        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
+    --      begin
+    --          if Self.Y_Kind = Y_Multiclass then
+    --              Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
+    --          else
+    --              Assert (False, "Label.Inverse_Transform Boolean_Matrix not Y_Multiclass" &
+    --                        "not coded");
+    --              --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
+    --          end if;
+    --
+    --          return Y_Inv;
 
---      end Inverse_Transform;
+    --      end Inverse_Transform;
 
     --  -------------------------------------------------------------------------
 
@@ -413,29 +440,29 @@ package body Label is
 
     --  -------------------------------------------------------------------------
 
---      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
---                                 return Integer_Matrix is
---          use Multiclass_Utils;
---          Y_Inv     : Integer_Matrix (1 .. Y'Length (2), 1 .. Y'Length);
---          --        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
---      begin
---          if Self.Y_Kind = Y_Multiclass then
---              Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
---          else
---              Assert (False, "Label.Inverse_Transform Boolean_Matrix return " &
---                        "Integer_Matrix not Y_Multiclass not coded");
---              --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
---          end if;
---
---          return Y_Inv;
---
---      end Inverse_Transform;
+    --      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+    --                                 return Integer_Matrix is
+    --          use Multiclass_Utils;
+    --          Y_Inv     : Integer_Matrix (1 .. Y'Length (2), 1 .. Y'Length);
+    --          --        Threshold : Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
+    --      begin
+    --          if Self.Y_Kind = Y_Multiclass then
+    --              Y_Inv := Inverse_Binarize_Multiclass (Y, Self.Classes);
+    --          else
+    --              Assert (False, "Label.Inverse_Transform Boolean_Matrix return " &
+    --                        "Integer_Matrix not Y_Multiclass not coded");
+    --              --   Y_Inv := Inverse_Binarize_Thresholding (Y, Self.Classes, Threshold);
+    --          end if;
+    --
+    --          return Y_Inv;
+    --
+    --      end Inverse_Transform;
 
     --  -------------------------------------------------------------------------
 
     --   Inverse_Transform transforms labels back to original encoding
     function Inverse_Transform (Self : Label_Encoder; Labels : Natural_Array)
-                               return Integer_Array is
+                                return Integer_Array is
         Routine_Name :  constant String := "Label.Inverse_Transform ";
         aRange       : Integer_Array (1 .. Positive (Self.Uniques'Length));
         Diff         : Natural_List;
@@ -462,7 +489,7 @@ package body Label is
     --  -------------------------------------------------------------------------
 
     function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
-                               return Integer_Array is
+                                return Integer_Array is
         aRange  : Integer_Array (1 .. Positive (Self.Uniques'Length));
         Diff    : Natural_List;
         Result  : Integer_Array (1 .. Positive (Y'Length));
@@ -485,7 +512,7 @@ package body Label is
     --  -------------------------------------------------------------------------
 
     function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
-                               return Integer_Matrix is
+                                return Integer_Matrix is
         YT        : constant Integer_Matrix := Transpose (Y);
         aRange    : Integer_Array (1 .. Y'Length);
         Diff      : Natural_List;
@@ -515,7 +542,7 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  L361
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
-                               return Integer_Matrix is
+                                return Integer_Matrix is
         use Multiclass_Utils;
         --        Routine_Name : constant String := "Label.Inverse_Transform ";
         Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
@@ -576,7 +603,7 @@ package body Label is
         Done         : Boolean := False;
 
         function Binarize (Y_In : Integer_List)
-                         return Boolean_Matrix is
+                           return Boolean_Matrix is
             Result : Boolean_Matrix
               (1 .. Positive (Y_In.Length), 1 .. Positive (Classes.Length))
               := (others => (others => False));
@@ -754,9 +781,101 @@ package body Label is
     end Label_Binarize;
 
     --  -------------------------------------------------------------------------
+  --  L416
+    function Label_Binarize (Y         : Unbounded_String_Matrix;
+                             Classes   : Unbounded_List;
+                             Neg_Label : Integer := 0) return Binary_Matrix is
+        use Ada.Containers;
+        use Multiclass_Utils;
+        Routine_Name :  constant String :=
+                         "Label.Label_Binarize Unbounded_String_Matrix ";
+        Num_Classes  : constant Positive := Positive (Classes.Length);
+        Y_Bin        : Binary_Matrix (Y'Range, 1 .. Num_Classes)
+          := (others => (others => 0));
+        Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
+        Sorted       : Unbounded_List;
+        Done         : Boolean := False;
+
+        function Binarize (Y_In : Unbounded_String_Matrix)
+                           return Binary_Matrix is
+            use Unbounded_Package;
+            Class_Index : Natural;
+            Result      : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
+                            (others => (others => 0));
+        begin
+            for row in Y_In'Range loop
+                for col in Y_In'Range (2) loop
+                    Class_Index := Classes.Find_Index (Y_In (row, col));
+                    Assert (Class_Index /= No_Index, Routine_Name &
+                              "Binarize invalid class" &
+                              To_String (Y_In (row, col)));
+                    Result (row, Class_Index) := 1;
+                end loop;
+            end loop;
+
+            return Result;
+
+        end Binarize;
+
+    begin
+        Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
+        --  L506
+        Assert (Y_Kind /= Y_Continuous_Multioutput and
+                  Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
+                  "does not support Multioutput target data.");
+
+        --  L516
+        if Y_Kind = Y_Binary then
+            if Num_Classes = 1 then
+                for row in Y'Range loop
+                    for col in Classes.First_Index .. Classes.Last_Index loop
+                        if Neg_Label /= 0 then
+                            Y_Bin (row, col) := 1;
+                        end if;
+                    end loop;
+                end loop;
+                Done := True;
+
+            elsif Num_Classes > 2 then
+                Y_Kind := Y_Multiclass;
+            end if;
+        end if;
+
+        --  L529
+        --        if Y_Kind = Y_Multilabel_Indicator then
+        --           Assert (Classes.Length = Y_Bool'Length (2),
+        --                   Routine_Name & "L529 class size" &
+        --                     Count_Type'Image (Classes.Length) & " is different to Y size"
+        --                   & Integer'Image (Y_Bool'Length (2)));
+        --        end if;
+
+        if not Done then
+            --  L528
+            Sorted := Classes;
+            NL_Types.Unbounded_Sorting.Sort (Sorted);
+            --  L538
+            if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
+                --  Label.py L539 - L549 needed to generate a csr sparse matrix
+                --  Binarize is all that is needed for this implementation
+                Y_Bin := Binarize (Y);
+
+            else
+                --  L551
+                Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
+                          Y_Type'Image (Y_Kind) &
+                          " target data is not supported by Label_Binarize");
+                Y_Bin := Binarize (Y);
+            end if;
+        end if;
+
+        return Y_Bin;
+
+    end Label_Binarize;
+
+    --  -------------------------------------------------------------------------
 
     function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
-                       return Binary_Matrix is
+                        return Binary_Matrix is
     --        Routine_Name : constant String := "Label.Transform Binarize Binary Y ";
     begin
         return Label_Binarize (Y, Self.Classes);
@@ -765,8 +884,18 @@ package body Label is
 
     --  -------------------------------------------------------------------------
 
+    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
+                        return Binary_Matrix is
+    --        Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
+    begin
+        return Label_Binarize (Y, Self.Classes);
+
+    end Transform;
+
+    --  -------------------------------------------------------------------------
+
     function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
-                       return Binary_Matrix is
+                        return Binary_Matrix is
     --        Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
     begin
         return Label_Binarize (Y, Self.Classes);
@@ -776,7 +905,7 @@ package body Label is
     --  -------------------------------------------------------------------------
 
     function Transform (Self : Label_Binarizer; Y : Integer_List)
-                       return Boolean_Matrix is
+                        return Boolean_Matrix is
     --  Routine_Name : constant String := "Label.Transform Binarize ";
     begin
 
@@ -787,7 +916,7 @@ package body Label is
     --  -------------------------------------------------------------------------
 
     function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
-                       return Binary_Matrix is
+                        return Binary_Matrix is
         use Integer_Package;
         Routine_Name  : constant String := "Label.Transform Array_Of_Integer_Lists ";
         Y_Row         : Integer_List;
@@ -835,7 +964,7 @@ package body Label is
 
     function Transform
       (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
-      return Boolean_Matrix is
+       return Boolean_Matrix is
         use Integer_Package;
         Routine_Name  : constant String := "Label.Transform Array_Of_Integer_Lists ";
         Y_Row         : Integer_List;
@@ -882,7 +1011,7 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  Transform returns labels as normalized encodings
     function Transform (Self : Label_Encoder; Y : Integer_Array)
-                       return Natural_Array is
+                        return Natural_Array is
         Labels : Natural_Array (1 .. Y'Length);
     begin
         if Self.Encoder_Kind = Class_Unique then

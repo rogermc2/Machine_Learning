@@ -105,6 +105,55 @@ package body Test_Support is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
+                                  Start : Integer := 1; Finish : Integer := 0) is
+      Last  : Integer;
+      Count : Integer := 1;
+   begin
+      if Finish > 0 then
+         Last := Finish;
+      else
+         Last := Integer (anArray'Length);
+      end if;
+
+      Put_Line (Name & ": ");
+      if Start >= anArray'First and then Finish <= anArray'Last then
+         for Index in Start .. Last loop
+            Put (Integer'Image (anArray (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 4 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      else
+         Put_Line ("Print_Integer_Array called with invalid start or finish index.");
+      end if;
+      New_Line;
+
+   end Print_Integer_Array;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Integer_List (Name : String;
+                                 aList : NL_Types.Integer_List) is
+      Count : Integer := 1;
+   begin
+      Put_Line (Name & ": ");
+         for Index in aList.First_Index .. aList.Last_Index loop
+            Put (Integer'Image (aList (Index)) & "  ");
+            Count := Count + 1;
+            if Count > 10 then
+               New_Line;
+               Count := 1;
+            end if;
+         end loop;
+      New_Line;
+
+   end Print_Integer_List;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Parameters
      (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
       Rows_Start : Positive := 1; Rows_Last : Positive := 10) is

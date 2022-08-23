@@ -1,3 +1,4 @@
+--  Adapted from scikit-learn/scikit-learn.git sklearn/preprocessing/_label.py
 
 with Ada.Containers.Ordered_Maps;
 with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
@@ -24,7 +25,12 @@ package Label is
     end record;
 
     type Multi_Label_Binarizer is record
-        Classes     : Integer_List;
+        Classes : Integer_List;
+    end record;
+
+    type UB_Label_Binarizer
+      (Y_Kind : Multiclass_Utils.Y_Type := Multiclass_Utils.Y_Unknown) is record
+        Classes : Unbounded_List;
     end record;
 
     --  Label_Encoder should be used to encode target values,
@@ -51,18 +57,22 @@ package Label is
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Binary_Matrix);
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Array);
     procedure Fit (Binarizer : in out Label_Binarizer; Y : Integer_Matrix);
-    procedure Fit (Binarizer : in out Multi_Label_Binarizer; Y : Integer_Matrix);
+    procedure Fit (Binarizer : in out Multi_Label_Binarizer;
+                   Y : Integer_Matrix);
     procedure Fit (Binarizer : in out Label_Binarizer;
                    Y         : Array_Of_Integer_Lists);
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     function Fit_Transform (Binarizer : in out Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix;
+    function Fit_Transform
+      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Matrix)
+       return Binary_Matrix;
     function Fit_Transform (Encoder : in out Label_Encoder;
                             Y       : Integer_Array) return Natural_Array;
---      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
---                                  return Real_Float_Matrix;
---      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
---                                  return Integer_Matrix;
+    --      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+    --                                  return Real_Float_Matrix;
+    --      function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix)
+    --                                  return Integer_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                 return Integer_Matrix;
     function Inverse_Transform (Self   : Label_Encoder;
@@ -78,6 +88,8 @@ package Label is
     function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
                         return Binary_Matrix;
     function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
+                        return Binary_Matrix;
+    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
                         return Binary_Matrix;
     function Transform (Self : Label_Binarizer; Y : Integer_List)
                         return Boolean_Matrix;

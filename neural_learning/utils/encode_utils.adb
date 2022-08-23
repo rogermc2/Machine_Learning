@@ -4,7 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Printing;
+--  with Printing;
 
 package body Encode_Utils is
 
@@ -45,8 +45,8 @@ package body Encode_Utils is
                New_Line;
                Put ("Encode_Error: Encode_Utils.Encode Values contains ");
                Put_Line ("previously unseen labels.");
-               Printing.Print_Integer_Array ("Unique list", Uniques);
-               Printing.Print_Integer_Array ("Unseen labels", Diff);
+--                 Printing.Print_Integer_Array ("Unique list", Uniques);
+--                 Printing.Print_Integer_Array ("Unseen labels", Diff);
                raise Encode_Error;
             end if;
          end;
@@ -402,6 +402,36 @@ package body Encode_Utils is
       while Has_Element (Float_Curs) loop
          Uniq_List.Append (Element (Float_Curs));
          Next (Float_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Unbounded_String_Matrix)
+                    return NL_Types.Unbounded_List is
+      use UB_String_Sets;
+      use NL_Types.Unbounded_Sorting;
+      Value             : Unbounded_String;
+      Unique_UB_Strings : UB_String_Sets.Set;
+      UB_Curs           : UB_String_Sets.Cursor;
+      Uniq_List         : NL_Types.Unbounded_List;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_UB_Strings.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      UB_Curs := Unique_UB_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Curs) loop
+         Value := UB_String_Sets.Element (UB_Curs);
+         Uniq_List.Append (Value);
+         UB_String_Sets.Next (UB_Curs);
       end loop;
 
       Sort (Uniq_List);
