@@ -48,6 +48,20 @@ package body Test_Support is
 
     --  ------------------------------------------------------------------------
 
+    procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix) is
+    begin
+        Put_Line (Name & ": ");
+        for row in aMatrix'Range loop
+            for col in aMatrix'Range (2) loop
+                Put (Integer'Image (aMatrix (row, col)) & "  ");
+            end loop;
+            New_Line;
+        end loop;
+
+    end Print_Binary_Matrix;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                  Start : Integer := 1; Finish : Integer := 0) is
         Last  : Integer;

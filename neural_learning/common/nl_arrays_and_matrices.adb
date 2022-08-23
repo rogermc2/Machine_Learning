@@ -932,6 +932,36 @@ package body NL_Arrays_And_Matrices is
 
    --  -------------------------------------------------------------------------
 
+   function Zero_Matrix (Num_Rows, Num_Cols : Positive) return Binary_Matrix is
+      Loaded : Binary_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+   begin
+      for row in Loaded'Range loop
+         for col in Loaded'Range (2) loop
+            Loaded (row, col) := 0;
+         end loop;
+      end loop;
+
+      return Loaded;
+
+   end Zero_Matrix;
+
+   --  -------------------------------------------------------------------------
+
+   function Zero_Matrix (Num_Rows, Num_Cols : Positive) return Integer_Matrix is
+      Loaded : Integer_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+   begin
+      for row in Loaded'Range loop
+         for col in Loaded'Range (2) loop
+            Loaded (row, col) := 0;
+         end loop;
+      end loop;
+
+      return Loaded;
+
+   end Zero_Matrix;
+
+   --  -------------------------------------------------------------------------
+
    function Zero_Matrix (Num_Rows, Num_Cols : Positive)
                          return Real_Float_Matrix is
       Loaded : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
@@ -945,5 +975,7 @@ package body NL_Arrays_And_Matrices is
       return Loaded;
 
    end Zero_Matrix;
+
+   --  -------------------------------------------------------------------------
 
 end NL_Arrays_And_Matrices;

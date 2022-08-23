@@ -182,6 +182,8 @@ package NL_Arrays_And_Matrices is
     function Unit_Float_Matrix (Num_Rows : Positive) return Real_Float_Matrix;
     function Unit_Integer_Matrix (Num_Rows : Positive) return Integer_Matrix;
     function Zero_Array (Num_Rows : Positive) return Real_Float_Vector;
+    function Zero_Matrix (Num_Rows, Num_Cols : Positive) return Binary_Matrix;
+    function Zero_Matrix (Num_Rows, Num_Cols : Positive) return Integer_Matrix;
     function Zero_Matrix (Num_Rows, Num_Cols : Positive)
                           return Real_Float_Matrix;
 

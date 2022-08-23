@@ -364,6 +364,32 @@ package body Label is
 
     --  -------------------------------------------------------------------------
 
+    --  L586 Multiclass uses the maximal score instead of a threshold.
+    function Inverse_Binarize_Multiclass
+      (Y_Prob : Binary_Matrix ; Classes : Integer_List)
+       return Unbounded_String_Array is
+        use Classifier_Utilities;
+        --          Routine_Name   :  constant String :=
+        --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
+        Inverse        : Unbounded_String_Array  (Y_Prob'Range);
+        Max_Indices    : Integer_Array (Y_Prob'Range);
+    begin
+        --  L627
+        --          Printing.Print_Integer_List (Routine_Name & "Classes",  Classes);
+        --          Printing.Print_Float_Matrix (Routine_Name & "Y_Prob",  Y_Prob, 35, 40);
+        Max_Indices := Max_Probability_Indices (Y_Prob);
+        for row in Inverse'Range loop
+            Inverse (row) := Classes.Element (Max_Indices (row));
+        end loop;
+        --        Printing.Print_Integer_Matrix (Routine_Name & "Inverse", Inverse,
+        --                                       35, 40);
+
+        return Inverse;
+
+    end Inverse_Binarize_Multiclass;
+
+    --  -------------------------------------------------------------------------
+
     function Inverse_Binarize_Thresholding
       (Y       : Real_Float_Matrix; Output_Type : Multiclass_Utils.Y_Type;
        Classes : Integer_List; Threshold : Float)
@@ -585,7 +611,27 @@ package body Label is
     end Inverse_Transform;
 
     --  -------------------------------------------------------------------------
-    --  L361 Inverse_Transform transforms binary labels back to
+
+    function Inverse_Transform (Self : Label_Binarizer; Y : Binary_Matrix)
+                                return Unbounded_String_Matrix is
+        use Multiclass_Utils;
+        --        Routine_Name : constant String :=
+--          "Label.Inverse_Transform Unbounded_String_Matrix ";
+        Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
+    begin
+        --  L398
+        if Self.Y_Kind = Y_Multiclass then
+            return Inverse_Binarize_Multiclass (Y, Self.Classes);
+        else
+            return Inverse_Binarize_Thresholding
+              (Y, Self.Y_Kind, Self.Classes, Threshold);
+        end if;
+
+    end Inverse_Transform;
+
+    --  -------------------------------------------------------------------------
+
+   --  L361 Inverse_Transform transforms binary labels back to
     --       multi-class labels
     --     function Inverse_Transform (Self : Label_Binarizer; Y : Boolean_Matrix;
     --                                 Use_Threshold : Boolean := False;
@@ -674,7 +720,8 @@ package body Label is
         if Y_Kind = Y_Multilabel_Indicator then
             Assert (Classes.Length = Y_Bin'Length (2),
                     Routine_Name & "L529 class size" &
-                      Count_Type'Image (Classes.Length) & " is different to Y size"
+                      Count_Type'Image (Classes.Length) &
+                      " is different to Y size"
                     & Integer'Image (Y_Bin'Length (2)));
         end if;
 
@@ -735,18 +782,30 @@ package body Label is
         function Binarize (Y_In : Integer_Matrix) return Binary_Matrix is
             use Integer_Package;
             Class_Index : Natural;
+            Class_Index_1 : Natural;
+            One_Class     : Boolean := True;
             Result      : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
                             (others => (others => 0));
         begin
             for row in Y_In'Range loop
                 for col in Y_In'Range (2) loop
                     Class_Index := Classes.Find_Index (Y_In (row, col));
+                    if row = Y_In'First then
+                        Class_Index_1 :=  Class_Index;
+                    elsif One_Class then
+                        One_Class := Class_Index = Class_Index_1;
+                    end if;
                     Assert (Class_Index /= No_Index, Routine_Name &
                               "Binarize invalid class" &
                               Integer'Image (Y_In (row, col)));
                     Result (row, Class_Index) := 1;
                 end loop;
             end loop;
+
+            --  one class case defaults to negative label
+            if One_Class then
+                Result := Zero_Matrix (Result'Length, Result'Length (2));
+            end if;
 
             return Result;
 
@@ -827,18 +886,30 @@ package body Label is
                            return Binary_Matrix is
             use Unbounded_Package;
             Class_Index : Natural;
+            Class_Index_1 : Natural;
+            One_Class     : Boolean := True;
             Result      : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
                             (others => (others => 0));
         begin
             for row in Y_In'Range loop
                 for col in Y_In'Range (2) loop
                     Class_Index := Classes.Find_Index (Y_In (row, col));
+                    if row = Y_In'First then
+                        Class_Index_1 :=  Class_Index;
+                    elsif One_Class then
+                        One_Class := Class_Index = Class_Index_1;
+                    end if;
                     Assert (Class_Index /= No_Index, Routine_Name &
                               "Binarize invalid class" &
                               To_String (Y_In (row, col)));
                     Result (row, Class_Index) := 1;
                 end loop;
             end loop;
+
+            --  one class case defaults to negative label
+            if One_Class then
+                Result := Zero_Matrix (Result'Length, Result'Length (2));
+            end if;
 
             return Result;
 
@@ -928,17 +999,28 @@ package body Label is
         function Binarize (Y_In : Unbounded_String_Array)
                            return Binary_Matrix is
             use Unbounded_Package;
-            Class_Index : Natural;
-            Result      : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
-                            (others => (others => 0));
+            Class_Index   : Natural;
+            Class_Index_1 : Natural;
+            One_Class     : Boolean := True;
+            Result        : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
+                              (others => (others => 0));
         begin
             for row in Y_In'Range loop
                 Class_Index := Classes.Find_Index (Y_In (row));
+                if row = Y_In'First then
+                    Class_Index_1 :=  Class_Index;
+                elsif One_Class then
+                    One_Class := Class_Index = Class_Index_1;
+                end if;
                 Assert (Class_Index /= No_Index, Routine_Name &
-                          "Binarize invalid class" &
-                          To_String (Y_In (row)));
+                          "Binarize invalid class" & To_String (Y_In (row)));
                 Result (row, Class_Index) := 1;
             end loop;
+
+            --  one class case defaults to negative label
+            if One_Class then
+                Result := Zero_Matrix (Result'Length, Result'Length (2));
+            end if;
 
             return Result;
 

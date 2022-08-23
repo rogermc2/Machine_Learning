@@ -82,6 +82,8 @@ package Label is
     --                                  return Integer_Matrix;
     function Inverse_Transform (Self : Label_Binarizer; Y : Real_Float_Matrix)
                                 return Integer_Matrix;
+    function Inverse_Transform (Self : Label_Binarizer; Y : Binary_Matrix)
+                                return Unbounded_String_Matrix;
     function Inverse_Transform (Self   : Label_Encoder;
                                 Labels : Natural_Array) return Integer_Array;
     function Inverse_Transform (Self : Label_Encoder; Y : Integer_Array)
