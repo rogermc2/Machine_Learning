@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Label;
 with NL_Types; use NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Test_Support;
+--  with Test_Support;
 
 procedure Test_Label_Binarizer is
    use Unbounded_Package;
@@ -29,19 +29,20 @@ procedure Test_Label_Binarizer is
    LB               : Label.UB_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
+   --  One class case should default to negative label
    Expected_Classes.Append (Pos);
    Got := Label.Fit_Transform (LB, Inp1);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
---     Test_Support.Print_Binary_Matrix ("Got1", Got1);
    Assert (Got = Expected1, "Got1 invalid data");
    Assert (Label.Inverse_Transform (LB, Got) = Inp1, "invalid inverse Got");
 
+   --  Two classes case
    Expected_Classes.Prepend (Neg);
-   Test_Support.Print_Binary_Matrix ("Fit_Transform",
-                                     Label.Fit_Transform (LB, Inp2));
+--     Test_Support.Print_Binary_Matrix ("Fit_Transform",
+--                                       Label.Fit_Transform (LB, Inp2));
    Got := Label.Fit_Transform (LB, Inp2);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
-   Test_Support.Print_Binary_Matrix ("Got2", Got);
+--     Test_Support.Print_Binary_Matrix ("Got2", Got);
    Assert (Got = Expected2, "Got2 invalid data");
 
    Put_Line (Routine_Name & "tests passed.");
