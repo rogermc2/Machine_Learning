@@ -24,8 +24,9 @@ procedure Test_Label_Binarizer is
                         ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
    Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
                         ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
-   Got             : Binary_Matrix (1 .. 4, 1 .. 1);
---     Got2             : Binary_Matrix (1 .. 4, 1 .. 2);
+   To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
+                        ((1, 0), (0, 1), (0, 1), (1, 0));
+   Got              : Binary_Matrix (1 .. 4, 1 .. 1);
    LB               : Label.UB_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
@@ -44,6 +45,9 @@ begin
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
 --     Test_Support.Print_Binary_Matrix ("Got2", Got);
    Assert (Got = Expected2, "Got2 invalid data");
+
+   Assert (Label.Inverse_Transform (LB, To_Invert) = Inp2,
+           "invalid inverse To_Invert");
 
    Put_Line (Routine_Name & "tests passed.");
 
