@@ -24,21 +24,25 @@ procedure Test_Label_Binarizer is
                         ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
    Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
                         ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
-   Got1             : Binary_Matrix (1 .. 4, 1 .. 1);
-   Got2             : Binary_Matrix (1 .. 4, 1 .. 2);
+   Got             : Binary_Matrix (1 .. 4, 1 .. 1);
+--     Got2             : Binary_Matrix (1 .. 4, 1 .. 2);
    LB               : Label.UB_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
    Expected_Classes.Append (Pos);
-   Got1 := Label.Fit_Transform (LB, Inp1);
+   Got := Label.Fit_Transform (LB, Inp1);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
 --     Test_Support.Print_Binary_Matrix ("Got1", Got1);
-   Assert (Got1 = Expected1, "Got1 invalid data");
-   Assert (Label.Inverse_Transform (LB, Got1) = Inp1, "invalid inverse Got");
+   Assert (Got = Expected1, "Got1 invalid data");
+   Assert (Label.Inverse_Transform (LB, Got) = Inp1, "invalid inverse Got");
 
    Expected_Classes.Prepend (Neg);
-   Got2 := Label.Fit_Transform (LB, Inp2);
+   Test_Support.Print_Binary_Matrix ("Fit_Transform",
+                                     Label.Fit_Transform (LB, Inp2));
+   Got := Label.Fit_Transform (LB, Inp2);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
+   Test_Support.Print_Binary_Matrix ("Got2", Got);
+   Assert (Got = Expected2, "Got2 invalid data");
 
    Put_Line (Routine_Name & "tests passed.");
 

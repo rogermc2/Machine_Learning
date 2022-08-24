@@ -224,10 +224,10 @@ package body Label is
    function Fit_Transform
      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
       return Binary_Matrix is
---        Routine_Name : constant String :=
---                         "Label.Fit_Transform Unbounded_String_Array ";
+      --        Routine_Name : constant String :=
+      --                         "Label.Fit_Transform Unbounded_String_Array ";
    begin
---        Test_Support.Print_Unbound_Array  (Routine_Name & "Y", Y);
+      --        Test_Support.Print_Unbound_Array  (Routine_Name & "Y", Y);
       Fit (Binarizer, Y);
 
       return Transform (Binarizer, Y);
@@ -1036,7 +1036,7 @@ package body Label is
         := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
       Sorted       : Unbounded_List;
-      Done         : Boolean := False;
+      --        Done         : Boolean := False;
 
       function Binarize (Y_In : Unbounded_String_Array)
                          return Binary_Matrix is
@@ -1078,39 +1078,54 @@ package body Label is
 
       --  L516
       if Y_Kind = Y_Binary then
-         if Num_Classes = 1 then
-            for row in Y'Range loop
-               for col in Classes.First_Index .. Classes.Last_Index loop
-                  if Neg_Label /= 0 then
-                     Y_Bin (row, col) := 1;
-                  end if;
+         Put_Line (Routine_Name & "Y_Kind = Y_Binary");
+         declare
+            Y_Bin1 : Binary_Matrix (Y'Range, 1 .. 1)
+              := (others => (others => 0));
+         begin
+            if Num_Classes = 1 then
+               for row in Y'Range loop
+                  for col in Classes.First_Index .. Classes.Last_Index loop
+                     if Neg_Label /= 0 then
+                        Y_Bin1 (row, 1) := 1;
+                     end if;
+                  end loop;
                end loop;
-            end loop;
-            Done := True;
+               --                 Done := True;
+               return Y_Bin1;
 
-         elsif Num_Classes > 2 then
-            Y_Kind := Y_Multiclass;
-         end if;
+            elsif Num_Classes > 2 then
+               Y_Kind := Y_Multiclass;
+            end if;
+         end;
       end if;
 
-      if not Done then
-         --  L528
-         Sorted := Classes;
-         NL_Types.Unbounded_Sorting.Sort (Sorted);
-         --  L538
-         if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
-            --  Label.py L539 - L549 needed to generate a csr sparse matrix
-            --  Binarize is all that is needed for this implementation
-            Y_Bin := Binarize (Y);
+      --        if not Done then
+      --  L528
+      Sorted := Classes;
+      NL_Types.Unbounded_Sorting.Sort (Sorted);
+      --  L538
+      if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
+         Put_Line (Routine_Name & "Y_Kind = Y_Binary or Y_Multiclass");
+         --  Label.py L539 - L549 needed to generate a csr sparse matrix
+         --  Binarize is all that is needed for this implementation
 
-         else
-            --  L551
-            Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
-                      Y_Type'Image (Y_Kind) &
-                      " target data is not supported by Label_Binarize");
-            Y_Bin := Binarize (Y);
-         end if;
+         declare
+            Y_Bin2 : Binary_Matrix (Y'Range, 1 .. 1)
+              := (others => (others => 0));
+         begin
+            Y_Bin2 := Binarize (Y);
+            return Y_Bin2;
+         end;
+
+      else
+         --  L551
+         Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
+                   Y_Type'Image (Y_Kind) &
+                   " target data is not supported by Label_Binarize");
+         Y_Bin := Binarize (Y);
       end if;
+      --        end if;
 
       return Y_Bin;
 
