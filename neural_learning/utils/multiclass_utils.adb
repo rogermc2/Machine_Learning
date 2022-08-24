@@ -332,9 +332,14 @@ package body Multiclass_Utils is
    --  -------------------------------------------------------------------------
 
    function Type_Of_Target (Y : Unbounded_String_Array) return Y_Type is
+      use Ada.Containers;
+      Classes : constant NL_Types.Unbounded_List := Unique_Labels (Y);
    begin
-      pragma Unreferenced (Y);
-      return Y_Multiclass;
+      if Classes.Length > 2 then
+         return Y_Multiclass;
+      else
+         return Y_Binary;
+      end if;
 
    end Type_Of_Target;
 
