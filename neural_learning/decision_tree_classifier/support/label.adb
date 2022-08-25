@@ -32,6 +32,7 @@
 --      ['tokyo', 'tokyo', 'paris']
 
 with Ada.Assertions; use Ada.Assertions;
+with Ada.Containers.Generic_Constrained_Array_Sort;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
@@ -708,11 +709,12 @@ package body Label is
    generic
       use Multiclass_Utils;
       type Index_Type is range <>;
-      type Y_Item_Type is private;
-      type Class_Type   is private;
-      type Y_Array_Type is array (Index_Type) of Y_Item_Type;
+--        type Y_Item_Type is private;
+      type Class_Type is private;
+      type Y_Array_Type is array (Index_Type) of Class_Type;
       type Class_Array_Type is array (Index_Type) of Class_Type;
       with function Type_Of_Target (Y : Y_Array_Type) return Y_Type;
+      with function "<" (L, R : Class_Type) return Boolean is <>;
 
    function Label_Binarize_G (Y         : Y_Array_Type;
                               Classes   : Class_Array_Type;
@@ -723,9 +725,11 @@ package body Label is
                               Classes   : Class_Array_Type;
                               Neg_Label : Integer := 0;
                               Pos_Label : Integer := 1) return Binary_Matrix is
-      use Ada.Containers;
       Routine_Name :  constant String :=
                        "Label.Label_Binarize Unbounded_String_Array ";
+      procedure Class_Sort is new
+        Ada.Containers.Generic_Constrained_Array_Sort (Index_Type, Class_Type,
+                                                       Class_Array_Type);
       Num_Classes  : constant Positive := Positive (Classes'Length);
       Y_Bin        : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
         := (others => (others => 0));
@@ -756,7 +760,7 @@ package body Label is
                            (others => (others => Neg_Label));
       begin
          for row in 1 .. Y_In'Length loop
-            Class_Index := Natural (Find_Index_G (Classes, Y_In (Index_Type (row))));
+            Class_Index := Find_Index_G (Classes, Y_In (Index_Type (row)));
             if row = Integer (Y_In'First) then
                Class_Index_1 :=  Class_Index;
             elsif One_Class then
@@ -814,7 +818,7 @@ package body Label is
 
       --  L528
       Sorted := Classes;
---        NL_Types.Unbounded_Sorting.Sort (Sorted);
+      Class_Sort (Sorted);
       --  L538
       if Y_Kind = Y_Binary then
          Put_Line (Routine_Name & "L538 Y_Binary");
