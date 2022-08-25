@@ -860,6 +860,32 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Unbound_Array (UB_List : NL_Types.Unbounded_List)
+                               return Unbounded_String_Array is
+   begin
+      if not UB_List.Is_Empty then
+         declare
+            Result : Unbounded_String_Array
+              (UB_List.First_Index .. UB_List.Last_Index);
+         begin
+            for row in Result'Range loop
+               Result (row) := UB_List (row);
+            end loop;
+            return Result;
+         end;
+
+      else
+         declare
+            Result : Unbounded_String_Array (1 .. 0);
+         begin
+            return Result;
+         end;
+      end if;
+
+   end To_Unbound_Array;
+
+   --  ------------------------------------------------------------------------
+
    function Transpose (Values : Boolean_Matrix) return Boolean_Matrix is
       Result : Boolean_Matrix (1 .. Values'Length (2), 1 .. Values'Length);
    begin

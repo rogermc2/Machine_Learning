@@ -14,29 +14,29 @@ procedure Test_Label_Binarizer is
    Routine_Name     : constant String := "Test_Label_Binarizer ";
    Neg              : constant Unbounded_String := To_Unbounded_String ("neg");
    Pos              : constant Unbounded_String := To_Unbounded_String ("pos");
-   Spam             : constant Unbounded_String := To_Unbounded_String ("spam");
-   Ham              : constant Unbounded_String := To_Unbounded_String ("ham");
-   Eggs             : constant Unbounded_String := To_Unbounded_String ("eggs");
-   Zero             : constant Unbounded_String := To_Unbounded_String ("0");
+--     Spam             : constant Unbounded_String := To_Unbounded_String ("spam");
+--     Ham              : constant Unbounded_String := To_Unbounded_String ("ham");
+--     Eggs             : constant Unbounded_String := To_Unbounded_String ("eggs");
+--     Zero             : constant Unbounded_String := To_Unbounded_String ("0");
    Inp1             : constant Unbounded_String_Array (1 .. 4) :=
                         (Pos, Pos, Pos, Pos);
    Inp2             : constant Unbounded_String_Array (1 .. 4) :=
                         (Neg, Pos, Pos, Neg);
-   Inp3             : constant Unbounded_String_Array (1 .. 5) :=
-                        (Spam, Ham, Eggs, Ham, Zero);
+--     Inp3             : constant Unbounded_String_Array (1 .. 5) :=
+--                          (Spam, Ham, Eggs, Ham, Zero);
    Expected_Classes : Unbounded_List;
    --  one class case should default to negative label (0)
    Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
                         ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
    Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
                         ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
-   Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
-                        ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
-                         (0, 0, 1, 0), (1, 0, 0, 0));
+--     Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
+--                          ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
+--                           (0, 0, 1, 0), (1, 0, 0, 0));
    To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
                         ((1, 0), (0, 1), (0, 1), (1, 0));
    Got              : Binary_Matrix (1 .. 4, 1 .. 1);
-   Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
+--     Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
    LB               : Label.UB_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
@@ -67,7 +67,7 @@ begin
 --     Expected_Classes.Append (Eggs);
 --     Expected_Classes.Append (Ham);
 --     Expected_Classes.Append (Spam);
-   Test_Support.Print_Binary_Matrix ("Got2", Label.Fit_Transform (LB, Inp3));
+--     Test_Support.Print_Binary_Matrix ("Got2", Label.Fit_Transform (LB, Inp3));
 --     Got2 := Label.Fit_Transform (LB, Inp3);
 
 --     Assert (LB.Classes = Expected_Classes, "Unexpected classes");
