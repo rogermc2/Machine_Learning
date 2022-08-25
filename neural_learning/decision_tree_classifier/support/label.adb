@@ -708,8 +708,7 @@ package body Label is
    --  L416
    generic
       use Multiclass_Utils;
-      type Index_Type is range <>;
---        type Y_Item_Type is private;
+      type Index_Type is range <>;  --  Any signed integer type
       type Class_Type is private;
       type Y_Array_Type is array (Index_Type) of Class_Type;
       type Class_Array_Type is array (Index_Type) of Class_Type;
@@ -1172,6 +1171,24 @@ package body Label is
 
    --  -------------------------------------------------------------------------
    --  L416
+
+   function Label_Binarize2 (Y         : Unbounded_String_Array;
+                             Classes   : Unbounded_List;
+                             Neg_Label : Integer := 0;
+                             Pos_Label : Integer := 1) return Binary_Matrix is
+      subtype UB_String_Array_Type is Unbounded_String_Array
+        (1 .. Y'Length);
+      subtype Classes_Array_Type is Unbounded_String_Array
+        (integer (Classes.First_Index) .. integer (Classes.Last_Index));
+      function Label_Binarize_UB is new Label_Binarize_G
+        (Index_Type => Integer, Class_Type => Unbounded_String,
+         Y_Array_Type => UB_String_Array_Type,
+         Class_Array_Type => Classes_Array_Type);
+
+   begin
+      return Label_Binarize_UB (Y, To_Unbound_Array (Classes));
+   end Label_Binarize2;
+
    function Label_Binarize (Y         : Unbounded_String_Array;
                             Classes   : Unbounded_List;
                             Neg_Label : Integer := 0;
