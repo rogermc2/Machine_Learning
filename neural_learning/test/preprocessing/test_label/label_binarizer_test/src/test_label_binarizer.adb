@@ -14,16 +14,16 @@ procedure Test_Label_Binarizer is
    Routine_Name     : constant String := "Test_Label_Binarizer ";
    Neg              : constant Unbounded_String := To_Unbounded_String ("neg");
    Pos              : constant Unbounded_String := To_Unbounded_String ("pos");
---     Spam             : constant Unbounded_String := To_Unbounded_String ("spam");
---     Ham              : constant Unbounded_String := To_Unbounded_String ("ham");
---     Eggs             : constant Unbounded_String := To_Unbounded_String ("eggs");
---     Zero             : constant Unbounded_String := To_Unbounded_String ("0");
+   Spam             : constant Unbounded_String := To_Unbounded_String ("spam");
+   Ham              : constant Unbounded_String := To_Unbounded_String ("ham");
+   Eggs             : constant Unbounded_String := To_Unbounded_String ("eggs");
+   Zero             : constant Unbounded_String := To_Unbounded_String ("0");
    Inp1             : constant Unbounded_String_Array (1 .. 4) :=
                         (Pos, Pos, Pos, Pos);
    Inp2             : constant Unbounded_String_Array (1 .. 4) :=
                         (Neg, Pos, Pos, Neg);
---     Inp3             : constant Unbounded_String_Array (1 .. 5) :=
---                          (Spam, Ham, Eggs, Ham, Zero);
+   Inp3             : constant Unbounded_String_Array (1 .. 5) :=
+                        (Spam, Ham, Eggs, Ham, Zero);
    Expected_Classes : Unbounded_List;
    --  one class case should default to negative label (0)
    Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
@@ -36,14 +36,12 @@ procedure Test_Label_Binarizer is
    To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
                         ((1, 0), (0, 1), (0, 1), (1, 0));
    Got              : Binary_Matrix (1 .. 4, 1 .. 1);
---     Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
+   Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
    LB               : Label.UB_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
    --  One class case should default to negative label
    Expected_Classes.Append (Pos);
-   Test_Support.Print_Binary_Matrix ("Fit_Transform",
-                                     Label.Fit_Transform (LB, Inp1));
    Got := Label.Fit_Transform (LB, Inp1);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
    Assert (Got = Expected1, "Got1 invalid data");
@@ -51,26 +49,27 @@ begin
 
    --  Two classes case
    Expected_Classes.Prepend (Neg);
-   Test_Support.Print_Binary_Matrix ("Fit_Transform",
+   Test_Support.Print_Binary_Matrix ("Two classes case Fit_Transform",
                                      Label.Fit_Transform (LB, Inp2));
    Got := Label.Fit_Transform (LB, Inp2);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
-   Test_Support.Print_Binary_Matrix ("Got2", Got);
-   Assert (Got = Expected2, "Got2 invalid data");
+   Assert (Got = Expected2, "Two classes case Got invalid data");
 
    Assert (Label.Inverse_Transform (LB, To_Invert) = Inp2,
            "invalid inverse To_Invert");
 
    --   multiclass case
    Expected_Classes.Clear;
---     Expected_Classes.Append (Zero);
---     Expected_Classes.Append (Eggs);
---     Expected_Classes.Append (Ham);
---     Expected_Classes.Append (Spam);
---     Test_Support.Print_Binary_Matrix ("Got2", Label.Fit_Transform (LB, Inp3));
---     Got2 := Label.Fit_Transform (LB, Inp3);
+   Expected_Classes.Append (Zero);
+   Expected_Classes.Append (Eggs);
+   Expected_Classes.Append (Ham);
+   Expected_Classes.Append (Spam);
+   Put_Line ("multiclass case");
+   Test_Support.Print_Binary_Matrix ("multiclass case Fit_Transform", Label.Fit_Transform (LB, Inp3));
+   Got2 := Label.Fit_Transform (LB, Inp3);
+   Test_Support.Print_Binary_Matrix ("Got2", Got2);
 
---     Assert (LB.Classes = Expected_Classes, "Unexpected classes");
+   Assert (LB.Classes = Expected_Classes, "Unexpected classes");
 
    Put_Line (Routine_Name & "tests passed.");
 
