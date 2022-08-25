@@ -730,10 +730,10 @@ package body Label is
       Y_Bin        : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
         := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : Unbounded_List;
+      Sorted       : Class_Array_Type;
 
-      function Find_Index (Container : Class_Array_Type;
-                           Item      : Class_Type) return Natural is
+      function Find_Index_G (Container : Class_Array_Type;
+                             Item      : Class_Type) return Natural is
          Result : Natural := 0;
       begin
          for index in Container'Range loop
@@ -744,28 +744,28 @@ package body Label is
 
          return Result;
 
-      end Find_Index;
+      end Find_Index_G;
 
-      function Binarize (Y_In : Unbounded_String_Array)
+      function Binarize (Y_In : Y_Array_Type)
                          return Binary_Matrix is
          use Unbounded_Package;
          Class_Index   : Natural;
          Class_Index_1 : Natural;
          One_Class     : Boolean := True;
-         Result        : Binary_Matrix (Y_In'Range, 1 .. 1) :=
+         Result        : Binary_Matrix (1 .. Y_In'Length, 1 .. 1) :=
                            (others => (others => Neg_Label));
       begin
-         for row in Y_In'Range loop
-            Class_Index := Find_Index (Classes, Y_In (row));
-            if row = Y_In'First then
+         for row in 1 .. Y_In'Length loop
+            Class_Index := Natural (Find_Index_G (Classes, Y_In (Index_Type (row))));
+            if row = Integer (Y_In'First) then
                Class_Index_1 :=  Class_Index;
             elsif One_Class then
                One_Class := Class_Index = Class_Index_1;
             end if;
 
             Assert (Class_Index /= No_Index, Routine_Name &
-                      "Binarize invalid class" & To_String (Y_In (row)));
-            if not One_Class and then Class_Index = Classes.Last_Index then
+                      "Binarize invalid class");
+            if not One_Class and then Class_Index = Natural (Classes'Last) then
                Result (row, 1) := Pos_Label;
             end if;
          end loop;
@@ -791,15 +791,14 @@ package body Label is
       if Y_Kind = Y_Binary then
          Put_Line (Routine_Name & "L516 Y_Binary");
          declare
-            Y_Bin1 : Binary_Matrix (Y'Range, 1 .. 1)
+            Y_Bin1 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
               := (others => (others => 0));
          begin
             if Num_Classes = 1 then
                for row in Y'Range loop
-                  for col in Classes.First_Index ..
-                    Classes.Last_Index loop
+                  for col in Classes'First .. Classes'Last loop
                      if Neg_Label /= 0 then
-                        Y_Bin1 (row, 1) := 1;
+                        Y_Bin1 (integer (row), 1) := Pos_Label;
                      end if;
                   end loop;
                end loop;
@@ -815,14 +814,14 @@ package body Label is
 
       --  L528
       Sorted := Classes;
-      NL_Types.Unbounded_Sorting.Sort (Sorted);
+--        NL_Types.Unbounded_Sorting.Sort (Sorted);
       --  L538
       if Y_Kind = Y_Binary then
          Put_Line (Routine_Name & "L538 Y_Binary");
          --  Label.py L539 - L549 needed to generate a csr sparse matrix
          --  Binarize is all that is needed for this implementation
          declare
-            Y_Bin2 : Binary_Matrix (Y'Range, 1 .. 1)
+            Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
               := (others => (others => Neg_Label));
          begin
             Y_Bin2 := Binarize (Y);
@@ -832,7 +831,7 @@ package body Label is
       elsif Y_Kind = Y_Multiclass then
          Put_Line (Routine_Name & "L538 Y_Multiclass");
          declare
-            Y_Bin2 : Binary_Matrix (Y'Range, 1 .. Num_Classes)
+            Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
               := (others => (others => Neg_Label));
          begin
             Y_Bin2 := Binarize (Y);
