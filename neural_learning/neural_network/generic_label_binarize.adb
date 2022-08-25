@@ -1,7 +1,8 @@
+--  Adapted from scikit-learn/scikit-learn.git sklearn/preprocessing/_label.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Containers.Generic_Constrained_Array_Sort;
-with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Containers.Generic_Array_Sort;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with NL_Types;
 
@@ -12,15 +13,15 @@ package body Generic_Label_Binarize is
                               Neg_Label : Integer := 0;
                               Pos_Label : Integer := 1) return Binary_Matrix is
       Routine_Name :  constant String :=
-                       "Label.Label_Binarize Unbounded_String_Array ";
+                       "Generic_Label_Binarize.Label.Label_Binarize_G ";
       procedure Class_Sort is new
-        Ada.Containers.Generic_Constrained_Array_Sort (Index_Type, Class_Type,
+        Ada.Containers.Generic_Array_Sort (Index_Type, Class_Type,
                                                        Class_Array_Type);
       Num_Classes  : constant Positive := Positive (Classes'Length);
       Y_Bin        : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
         := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : Class_Array_Type;
+      Sorted       : Class_Array_Type (Classes'Range);
 
       function Find_Index_G (Container : Class_Array_Type;
                              Item      : Class_Type) return Natural is
@@ -79,7 +80,6 @@ package body Generic_Label_Binarize is
 
       --  L516
       if Y_Kind = Y_Binary then
-         Put_Line (Routine_Name & "L516 Y_Binary");
          declare
             Y_Bin1 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
               := (others => (others => 0));
@@ -100,14 +100,12 @@ package body Generic_Label_Binarize is
             end if;
          end;
       end if;
-      Put_Line (Routine_Name & "L528");
 
       --  L528
       Sorted := Classes;
       Class_Sort (Sorted);
       --  L538
       if Y_Kind = Y_Binary then
-         Put_Line (Routine_Name & "L538 Y_Binary");
          --  Label.py L539 - L549 needed to generate a csr sparse matrix
          --  Binarize is all that is needed for this implementation
          declare
@@ -119,7 +117,6 @@ package body Generic_Label_Binarize is
          end;
 
       elsif Y_Kind = Y_Multiclass then
-         Put_Line (Routine_Name & "L538 Y_Multiclass");
          declare
             Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
               := (others => (others => Neg_Label));
@@ -129,7 +126,6 @@ package body Generic_Label_Binarize is
          end;
 
       else
-         Put_Line (Routine_Name & "L551");
          --  L551
          Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
                    Y_Type'Image (Y_Kind) &
