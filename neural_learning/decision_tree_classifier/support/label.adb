@@ -706,11 +706,11 @@ package body Label is
     --  -------------------------------------------------------------------------
     --  L416
     generic
-        type Index_Type is range <>;
         type Y_Item_Type is private;
         type Class_Type   is private;
-        type Y_Array is array (Index_Type) of Y_Item_Type;
-        type Class_Array is array (Index_Type) of Class_Type;
+	type Index_Type is (<>);
+        type Y_Array is array (Index_Type range <>) of Y_Item_Type;
+        type Class_Array is array (Index_Type range <>) of Class_Type;
     function Label_Binarize_G (Y         : Y_Array;
                                Classes   : Class_Array;
                                Neg_Label : Integer := 0;
