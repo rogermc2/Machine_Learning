@@ -728,7 +728,7 @@ package body Label is
       Class_Array_Type => Integer_Array,
       Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
-      return Label_Binarize_Int.Label_Binarize_G
+      return Label_Binarize_Int.Label_Binarize
           (Y_Array, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
@@ -764,7 +764,7 @@ package body Label is
       Class_Array_Type => Integer_Array,
       Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
-      return Label_Binarize_Integer.Label_Binarize_G
+      return Label_Binarize_Integer.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
@@ -784,7 +784,7 @@ package body Label is
       Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
       "<" => Ada.Strings.Unbounded."<");
    begin
-      return Label_Binarize_UB.Label_Binarize_G
+      return Label_Binarize_UB.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
@@ -804,7 +804,7 @@ package body Label is
       Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
       "<" => Ada.Strings.Unbounded."<");
    begin
-      return Label_Binarize_UB.Label_Binarize_G
+      return Label_Binarize_UB.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
