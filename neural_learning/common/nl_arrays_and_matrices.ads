@@ -98,6 +98,7 @@ package NL_Arrays_And_Matrices is
     pragma Inline (">=");
     function "<=" (L, R : Real_Float_Vector) return Boolean_Array;
     pragma Inline ("<=");
+    function "<" (L, R : Integer_Array) return Boolean_Array;
     function "<" (L, R : Real_Float_Vector) return Boolean_Array;
     pragma Inline ("<");
     function "*" (L, R : Float_Array) return Float_Array;

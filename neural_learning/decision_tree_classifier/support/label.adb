@@ -708,87 +708,18 @@ package body Label is
 
    --  L416
    function Label_Binarize (Y, Classes : Integer_List;
-                            Neg_Label  : Integer := 0) return Boolean_Matrix is
-      use Ada.Containers;
-      use Multiclass_Utils;
-      Routine_Name : constant String := "Label.Label_Binarize Integer_List ";
-      Num_Classes  : constant Positive := Positive (Classes.Length);
-      Y_Bin        : Boolean_Matrix (Y.First_Index .. Y.Last_Index,
-                                     1 .. Positive (Classes.Length))
-        := (others => (others => False));
-      Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : Integer_List;
-      Done         : Boolean := False;
-
-      function Binarize (Y_In : Integer_List)
-                         return Boolean_Matrix is
-         Result : Boolean_Matrix
-           (1 .. Positive (Y_In.Length), 1 .. Positive (Classes.Length))
-           := (others => (others => False));
-      begin
-         for row in Y_In.First_Index .. Y_In.Last_Index loop
-            for col in Classes.First_Index .. Classes.Last_Index loop
-               if Y_In (row) = Classes (col) then
-                  Result (row, col) := True;
-               end if;
-            end loop;
-         end loop;
-
-         return Result;
-
-      end Binarize;
-
+                            Neg_Label  : Integer := 0;
+                            Pos_Label  : Integer := 1) return Binary_Matrix is
+     Classes_Array : constant Integer_Array := To_Integer_Array (Classes);
+     Y_Array       : constant Integer_Array := To_Integer_Array (Y);
+      package Label_Binarize_Int is new Generic_Label_Binarize
+     (Index_Type => Integer, Class_Type => Integer,
+      Y_Array_Type  => Integer_Array ,
+      Class_Array_Type => Integer_Array,
+      Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
-      Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
-      --  L506
-      Assert (Y_Kind /= Y_Continuous_Multioutput and
-                Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
-                "does not support Multioutput target data.");
-
-      --  L516
-      if Y_Kind = Y_Binary then
-         if Num_Classes = 1 then
-            for row in Y.First_Index .. Y.Last_Index loop
-               for col in Classes.First_Index .. Classes.Last_Index loop
-                  if Neg_Label /= 0 then
-                     Y_Bin (row, col) := True;
-                  end if;
-               end loop;
-            end loop;
-            Done := True;
-         elsif Num_Classes > 2 then
-            Y_Kind := Y_Multiclass;
-         end if;
-      end if;
-
-      --  L529
-      if Y_Kind = Y_Multilabel_Indicator then
-         Assert (Classes.Length = Y_Bin'Length (2),
-                 Routine_Name & "L529 class size" &
-                   Count_Type'Image (Classes.Length) &
-                   " is different to Y size"
-                 & Integer'Image (Y_Bin'Length (2)));
-      end if;
-
-      if not Done then
-         --  L528
-         Sorted := Classes;
-         NL_Types.Integer_Sorting.Sort (Sorted);
-         --  L538
-         if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
-            --  Label.py L539 - L549 needed to generate a csr sparse matrix
-            --  Binarize is all that is needed for this implementation
-            Y_Bin := Binarize (Y);
-
-         else
-            Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
-                      Y_Type'Image (Y_Kind) &
-                      " target data is not supported by Label_Binarize");
-            Y_Bin := Binarize (Y);
-         end if;
-      end if;
-
-      return Y_Bin;
+      return Label_Binarize_Int.Label_Binarize_G
+          (Y_Array, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
 
@@ -1012,16 +943,6 @@ package body Label is
    end Label_Binarize;
 
    --  -------------------------------------------------------------------------
-
-   function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
-                       return Binary_Matrix is
-      --        Routine_Name : constant String := "Label.Transform Binarize Binary Y ";
-   begin
-      return Label_Binarize (Y, Self.Classes);
-
-   end Transform;
-
-   --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Unbounded_String_Array;
                              Classes   : Unbounded_List;
@@ -1042,6 +963,16 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
+   function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
+                       return Binary_Matrix is
+      --        Routine_Name : constant String := "Label.Transform Binarize Binary Y ";
+   begin
+      return Label_Binarize (Y, Self.Classes);
+
+   end Transform;
+
+   --  -------------------------------------------------------------------------
+
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                        return Binary_Matrix is
       --        Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
@@ -1053,7 +984,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : Label_Binarizer; Y : Integer_List)
-                       return Boolean_Matrix is
+                       return Binary_Matrix is
       --  Routine_Name : constant String := "Label.Transform Binarize ";
    begin
 

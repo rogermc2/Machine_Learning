@@ -77,6 +77,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function "<" (L, R : Integer_Array) return Boolean_Array is
+      Result : Boolean_Array (L'Range);
+   begin
+      for row in L'Range loop
+         Result (row) := L (row) < R (row);
+      end loop;
+
+      return Result;
+
+   end "<";
+
+   --  ------------------------------------------------------------------------
+
    function "<" (L, R : Real_Float_Vector) return Boolean_Array is
       Result : Boolean_Array (L'Range);
    begin
@@ -861,7 +874,7 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function To_Unbound_Array (UB_List : NL_Types.Unbounded_List)
-                               return Unbounded_String_Array is
+                              return Unbounded_String_Array is
    begin
       if not UB_List.Is_Empty then
          declare

@@ -93,7 +93,8 @@ package Label is
    function Inverse_Transform (Self : Label_Encoder; Y : Integer_Matrix)
                                 return Integer_Matrix;
    function Label_Binarize (Y, Classes : Integer_List;
-                            Neg_Label  : Integer := 0) return Boolean_Matrix;
+                            Neg_Label  : Integer := 0;
+                            Pos_Label  : Integer := 1) return Binary_Matrix;
    function Label_Binarize (Y         : Integer_Matrix; Classes : Integer_List;
                             Neg_Label : Integer := 0) return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
@@ -101,7 +102,7 @@ package Label is
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                         return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_List)
-                        return Boolean_Matrix;
+                        return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
                         return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
