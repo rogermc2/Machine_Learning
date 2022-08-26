@@ -37,6 +37,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Classifier_Utilities;
 with Encode_Utils;
 with Generic_Label_Binarize_Array;
+with Generic_Label_Binarize_Matrix;
 --  with Printing;
 --  with Test_Support;
 
@@ -746,101 +747,16 @@ package body Label is
                             Classes   : Integer_List;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
-      use Ada.Containers;
-      use Multiclass_Utils;
-      Routine_Name :  constant String :=
-                       "Label.Label_Binarize Integer_Matrix ";
-      Num_Classes  : constant Positive := Positive (Classes.Length);
-      Y_Bin        : Binary_Matrix (Y'Range, 1 .. Num_Classes)
-        := (others => (others => 0));
-      Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : Integer_List;
-      Done         : Boolean := False;
-
-      function Binarize (Y_In : Integer_Matrix) return Binary_Matrix is
-         use Integer_Package;
-         Class_Index   : Natural;
-         Class_Index_1 : Natural;
-         One_Class     : Boolean := True;
-         Result        : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
-                           (others => (others => 0));
-      begin
-         for row in Y_In'Range loop
-            for col in Y_In'Range (2) loop
-               Class_Index := Classes.Find_Index (Y_In (row, col));
-               if row = Y_In'First then
-                  Class_Index_1 :=  Class_Index;
-               elsif One_Class then
-                  One_Class := Class_Index = Class_Index_1;
-               end if;
-               Assert (Class_Index /= No_Index, Routine_Name &
-                         "Binarize invalid class" &
-                         Integer'Image (Y_In (row, col)));
-               Result (row, Class_Index) := 1;
-            end loop;
-         end loop;
-
-         --  one class case defaults to negative label
-         if One_Class then
-            Result := Zero_Matrix (Result'Length, Result'Length (2));
-         end if;
-
-         return Result;
-
-      end Binarize;
-
+        Classes_Array : constant Integer_Array :=
+                          To_Integer_Array (Classes);
+      package Label_Binarize_Integer is new Generic_Label_Binarize_Matrix
+     (Index_Type => Integer, Class_Type => Integer,
+      Y_Matrix_Type => Integer_Matrix,
+      Class_Array_Type => Integer_Array,
+      Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
-      Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
-      --  L506
-      Assert (Y_Kind /= Y_Continuous_Multioutput and
-                Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
-                "does not support Multioutput target data.");
-
-      --  L516
-      if Y_Kind = Y_Binary then
-         if Num_Classes = 1 then
-            for row in Y'Range loop
-               for col in Classes.First_Index .. Classes.Last_Index loop
-                  if Neg_Label /= 0 then
-                     Y_Bin (row, col) := 1;
-                  end if;
-               end loop;
-            end loop;
-            Done := True;
-
-         elsif Num_Classes > 2 then
-            Y_Kind := Y_Multiclass;
-         end if;
-      end if;
-
-      --  L529
-      --        if Y_Kind = Y_Multilabel_Indicator then
-      --           Assert (Classes.Length = Y_Bool'Length (2),
-      --                   Routine_Name & "L529 class size" &
-      --                     Count_Type'Image (Classes.Length) & " is different to Y size"
-      --                   & Integer'Image (Y_Bool'Length (2)));
-      --        end if;
-
-      if not Done then
-         --  L528
-         Sorted := Classes;
-         NL_Types.Integer_Sorting.Sort (Sorted);
-         --  L538
-         if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
-            --  Label.py L539 - L549 needed to generate a csr sparse matrix
-            --  Binarize is all that is needed for this implementation
-            Y_Bin := Binarize (Y);
-
-         else
-            --  L551
-            Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
-                      Y_Type'Image (Y_Kind) &
-                      " target data is not supported by Label_Binarize");
-            Y_Bin := Binarize (Y);
-         end if;
-      end if;
-
-      return Y_Bin;
+      return Label_Binarize_Integer.Label_Binarize_G
+        (Y, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
 
@@ -848,98 +764,19 @@ package body Label is
    --  L416
    function Label_Binarize (Y         : Unbounded_String_Matrix;
                             Classes   : Unbounded_List;
-                            Neg_Label : Integer := 0) return Binary_Matrix is
-      use Ada.Containers;
-      use Multiclass_Utils;
-      Routine_Name :  constant String :=
-                       "Label.Label_Binarize Unbounded_String_Matrix ";
-      Num_Classes  : constant Positive := Positive (Classes.Length);
-      Y_Bin        : Binary_Matrix (Y'Range, 1 .. Num_Classes)
-        := (others => (others => 0));
-      Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
-      Sorted       : Unbounded_List;
-
-      function Binarize (Y_In : Unbounded_String_Matrix)
-                         return Binary_Matrix is
-         use Unbounded_Package;
-         Class_Index   : Natural;
-         Class_Index_1 : Natural;
-         One_Class     : Boolean := True;
-         Result        : Binary_Matrix (Y_In'Range, 1 .. Num_Classes) :=
-                           (others => (others => 0));
-      begin
-         for row in Y_In'Range loop
-            for col in Y_In'Range (2) loop
-               Class_Index := Classes.Find_Index (Y_In (row, col));
-               if row = Y_In'First then
-                  Class_Index_1 :=  Class_Index;
-               elsif One_Class then
-                  One_Class := Class_Index = Class_Index_1;
-               end if;
-               Assert (Class_Index /= No_Index, Routine_Name &
-                         "Binarize invalid class" &
-                         To_String (Y_In (row, col)));
-               Result (row, Class_Index) := 1;
-            end loop;
-         end loop;
-
-         --  one class case defaults to negative label
-         if One_Class then
-            Result := Zero_Matrix (Result'Length, Result'Length (2));
-         end if;
-
-         return Result;
-
-      end Binarize;
-
+                            Neg_Label : Integer := 0;
+                            Pos_Label : Integer := 1) return Binary_Matrix is
+      Classes_Array : constant Unbounded_String_Array :=
+                          To_Unbound_Array (Classes);
+      package Label_Binarize_UB is new Generic_Label_Binarize_Matrix
+     (Index_Type => Integer, Class_Type => Unbounded_String,
+      Y_Matrix_Type  => Unbounded_String_Matrix ,
+      Class_Array_Type => Unbounded_String_Array,
+      Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
+      "<" => Ada.Strings.Unbounded."<");
    begin
-      Assert (Y_Kind /= Y_Unknown, Routine_Name & "unknown target data type.");
-      --  L506
-      Assert (Y_Kind /= Y_Continuous_Multioutput and
-                Y_Kind /= Y_Multiclass_Multioutput, Routine_Name &
-                "does not support Multioutput target data.");
-
-      --  L516
-      if Y_Kind = Y_Binary and then Num_Classes = 1 then
-         for row in Y'Range loop
-            for col in Classes.First_Index .. Classes.Last_Index loop
-               if Neg_Label /= 0 then
-                  Y_Bin (row, col) := 1;
-               end if;
-            end loop;
-         end loop;
-
-      else
-         if Num_Classes > 2 then
-            Y_Kind := Y_Multiclass;
-         end if;
-         --  L529
-         --        if Y_Kind = Y_Multilabel_Indicator then
-         --           Assert (Classes.Length = Y_Bool'Length (2),
-         --                   Routine_Name & "L529 class size" &
-         --                     Count_Type'Image (Classes.Length) & " is different to Y size"
-         --                   & Integer'Image (Y_Bool'Length (2)));
-         --        end if;
-
-         --  L528
-         Sorted := Classes;
-         NL_Types.Unbounded_Sorting.Sort (Sorted);
-         --  L538
-         if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
-            --  Label.py L539 - L549 needed to generate a csr sparse matrix
-            --  Binarize is all that is needed for this implementation
-            Y_Bin := Binarize (Y);
-
-         else
-            --  L551
-            Assert (Y_Kind = Y_Multilabel_Indicator, Routine_Name &
-                      Y_Type'Image (Y_Kind) &
-                      " target data is not supported by Label_Binarize");
-            Y_Bin := Binarize (Y);
-         end if;
-      end if;
-
-      return Y_Bin;
+      return Label_Binarize_UB.Label_Binarize_G
+        (Y, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
 
@@ -959,7 +796,8 @@ package body Label is
       "<" => Ada.Strings.Unbounded."<");
    begin
       return Label_Binarize_UB.Label_Binarize_G
-          (Y, Classes_Array, Neg_Label, Pos_Label);
+        (Y, Classes_Array, Neg_Label, Pos_Label);
+
    end Label_Binarize;
 
    --  -------------------------------------------------------------------------
