@@ -184,7 +184,7 @@ package body Label is
    begin
       if Binarizer.Classes.Is_Empty then
          --  L758
-         Binarizer.Classes := Multiclass_Utils.Unique_Labels (Y);
+         Classes := Multiclass_Utils.Unique_Labels (Y);
       else
          --  L759
          for index in Classes.First_Index .. Classes.Last_Index - 1 loop
@@ -223,7 +223,16 @@ package body Label is
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
-   --  L305
+
+   function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
+                           Y         : Integer_Matrix) return Binary_Matrix is
+   begin
+      Fit (Binarizer, Y);
+      return Transform (Binarizer, Y);
+
+   end Fit_Transform;
+
+   --  -------------------------------------------------------------------------
    function Fit_Transform
      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
       return Binary_Matrix is
@@ -940,6 +949,17 @@ package body Label is
       end if;
 
       return Labels;
+
+   end Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Transform (Self : Multi_Label_Binarizer; Y : Integer_Matrix)
+                        return Binary_Matrix is
+--        Routine_Name : constant String :=
+--                         "Label.Transform Binarize Unbounded_String_Array Y ";
+   begin
+      return Label_Binarize (Y, Self.Classes);
 
    end Transform;
 

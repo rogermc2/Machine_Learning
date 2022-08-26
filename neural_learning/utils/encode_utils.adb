@@ -304,11 +304,14 @@ package body Encode_Utils is
    function Unique (Values : Integer_Matrix) return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;
+      Routine_Name    : constant String :=
+                          "Encode_Utils.Unique Integer_Matrix ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
       Uniq_List       : NL_Types.Integer_List;
    begin
+      Put_Line (Routine_Name);
       for row in Values'Range loop
          for col in Values'Range (2) loop
             Unique_Integers.Include (Values (row, col));
@@ -323,6 +326,8 @@ package body Encode_Utils is
       end loop;
 
       Sort (Uniq_List);
+      Put_Line (Routine_Name & "Uniq_List length" &
+                  Integer'Image (Integer (Uniq_List.Length)));
 
       return Uniq_List;
 

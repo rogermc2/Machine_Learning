@@ -1,7 +1,6 @@
 --  Based on scikit-learn/sklearn/preprocessing/tests/test_label.py
 
 with Ada.Assertions; use  Ada.Assertions;
-with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Label;
@@ -10,16 +9,14 @@ with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 --  with Test_Support;
 
 procedure Test_Multilabel_Binarizer is
-   use Unbounded_Package;
    Routine_Name     : constant String := "Test_Multilabel_Binarizer ";
---        Inp1             : constant Unbounded_String_Array (1 .. 4) :=
---                          (Pos, Pos, Pos, Pos);
---     Inp2             : constant Unbounded_String_Array (1 .. 4) :=
---                          (Neg, Pos, Pos, Neg);
---     Inp3             : constant Unbounded_String_Array (1 .. 5) :=
---                          (Spam, Ham, Eggs, Ham, Zero);
+   Indicator_Mat    : constant Binary_Matrix (1 .. 3, 1 .. 3) :=
+                        ((0, 1, 1), (1, 0, 0), (1, 1, 0));
+   lambda1          : constant Integer_Matrix (1 .. 3, 1 .. 2) :=
+                        ((2, 3), (1, 0), (1, 2));
+   lambda2_1        : constant Integer_Array (1 .. 1) := (1 => 1);
+   lambda2          :  Integer_Array_List;
    Expected_Classes : Unbounded_List;
-   --  one class case should default to negative label (0)
    Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
                         ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
    Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
@@ -29,16 +26,18 @@ procedure Test_Multilabel_Binarizer is
                          (0, 0, 1, 0), (1, 0, 0, 0));
    To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
                         ((1, 0), (0, 1), (0, 1), (1, 0));
-   Got              : Binary_Matrix (1 .. 4, 1 .. 1);
+   MLB              : Label.Multi_Label_Binarizer;
+   Got1             : constant Binary_Matrix :=
+                        Label.Fit_Transform (MLB, lambda1);
    Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
-   LB               : Label.UB_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
-   --  One class case should default to negative label
---     Expected_Classes.Append (Pos);
---     Got := Label.Fit_Transform (LB, Inp1);
+   lambda2.Append ((2, 3));
+   lambda2.Append (lambda2_1);
+   lambda2.Append ((1, 2));
+
 --     Assert (LB.Classes = Expected_Classes, "Unexpected classes");
---     Assert (Got = Expected1, "Got1 invalid data");
+   Assert (Got1 = Indicator_Mat, "Got1 invalid data");
 --     Assert (Label.Inverse_Transform (LB, Got) = Inp1, "invalid inverse Got");
 --
 --     --  Two classes case
