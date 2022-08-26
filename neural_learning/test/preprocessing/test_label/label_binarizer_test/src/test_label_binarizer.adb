@@ -7,7 +7,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Label;
 with NL_Types; use NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Test_Support;
+--  with Test_Support;
 
 procedure Test_Label_Binarizer is
    use Unbounded_Package;
@@ -64,10 +64,10 @@ begin
    Expected_Classes.Append (Spam);
    Put_Line ("multiclass case");
    Got2 := Label.Fit_Transform (LB, Inp3);
---     Test_Support.Print_Binary_Matrix ("Got2", Got2);
 
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
-   Assert (Got2 = Expected3, "multiclasss case Got2 invalid data");
+   Assert (Got2 = Expected3, "multiclasss test Got2 invalid data");
+   Assert (Label.Inverse_Transform (LB, Got2) = Inp3, "multiclassinvalid inverse Got2");
 
    Put_Line (Routine_Name & "tests passed.");
 
