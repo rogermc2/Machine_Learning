@@ -30,9 +30,9 @@ procedure Test_Label_Binarizer is
                         ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
    Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
                         ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
---     Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
---                          ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
---                           (0, 0, 1, 0), (1, 0, 0, 0));
+   Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
+                        ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
+                         (0, 0, 1, 0), (1, 0, 0, 0));
    To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
                         ((1, 0), (0, 1), (0, 1), (1, 0));
    Got              : Binary_Matrix (1 .. 4, 1 .. 1);
@@ -49,8 +49,6 @@ begin
 
    --  Two classes case
    Expected_Classes.Prepend (Neg);
-   Test_Support.Print_Binary_Matrix ("Two classes case Fit_Transform",
-                                     Label.Fit_Transform (LB, Inp2));
    Got := Label.Fit_Transform (LB, Inp2);
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
    Assert (Got = Expected2, "Two classes case Got invalid data");
@@ -65,11 +63,11 @@ begin
    Expected_Classes.Append (Ham);
    Expected_Classes.Append (Spam);
    Put_Line ("multiclass case");
-   Test_Support.Print_Binary_Matrix ("multiclass case Fit_Transform", Label.Fit_Transform (LB, Inp3));
    Got2 := Label.Fit_Transform (LB, Inp3);
-   Test_Support.Print_Binary_Matrix ("Got2", Got2);
+--     Test_Support.Print_Binary_Matrix ("Got2", Got2);
 
    Assert (LB.Classes = Expected_Classes, "Unexpected classes");
+   Assert (Got2 = Expected3, "multiclasss case Got2 invalid data");
 
    Put_Line (Routine_Name & "tests passed.");
 
