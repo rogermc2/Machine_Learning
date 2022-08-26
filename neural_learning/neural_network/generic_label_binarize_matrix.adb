@@ -6,7 +6,7 @@ with Ada.Containers.Generic_Array_Sort;
 
 with NL_Types;
 
-package body Generic_Label_Binarize is
+package body Generic_Label_Binarize_Matrix is
 
    function Find_Index_G (Container : Class_Array_Type;
                           Item      : Class_Type) return Natural;
@@ -175,4 +175,4 @@ package body Generic_Label_Binarize is
 
    --  -------------------------------------------------------------------------
 
-end Generic_Label_Binarize;
+end Generic_Label_Binarize_Matrix;

@@ -36,7 +36,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Classifier_Utilities;
 with Encode_Utils;
-with Generic_Label_Binarize;
+with Generic_Label_Binarize_Array;
 --  with Printing;
 --  with Test_Support;
 
@@ -712,7 +712,7 @@ package body Label is
                             Pos_Label  : Integer := 1) return Binary_Matrix is
      Classes_Array : constant Integer_Array := To_Integer_Array (Classes);
      Y_Array       : constant Integer_Array := To_Integer_Array (Y);
-      package Label_Binarize_Int is new Generic_Label_Binarize
+      package Label_Binarize_Int is new Generic_Label_Binarize_Array
      (Index_Type => Integer, Class_Type => Integer,
       Y_Array_Type  => Integer_Array ,
       Class_Array_Type => Integer_Array,
@@ -950,7 +950,7 @@ package body Label is
                              Pos_Label : Integer := 1) return Binary_Matrix is
       Classes_Array : constant Unbounded_String_Array :=
                           To_Unbound_Array (Classes);
-      package Label_Binarize_UB is new Generic_Label_Binarize
+      package Label_Binarize_UB is new Generic_Label_Binarize_Array
      (Index_Type => Integer, Class_Type => Unbounded_String,
       Y_Array_Type  => Unbounded_String_Array ,
       Class_Array_Type => Unbounded_String_Array,
