@@ -223,12 +223,18 @@ package body Label is
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
-
+   --  L789
    function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                            Y         : Integer_Matrix) return Binary_Matrix is
+      Class_Mapping : Integer_List;
    begin
-      Fit (Binarizer, Y);
-      return Transform (Binarizer, Y);
+      if not Binarizer.Classes.Is_Empty then
+         Fit (Binarizer, Y);
+         return Transform (Binarizer, Y);
+      else
+         Put_Line ("Label.Fit_Transform Classes.Is_Empty");
+         return Transform (Binarizer, Y, Class_Mapping);
+      end if;
 
    end Fit_Transform;
 
@@ -720,16 +726,16 @@ package body Label is
    function Label_Binarize (Y, Classes : Integer_List;
                             Neg_Label  : Integer := 0;
                             Pos_Label  : Integer := 1) return Binary_Matrix is
-     Classes_Array : constant Integer_Array := To_Integer_Array (Classes);
-     Y_Array       : constant Integer_Array := To_Integer_Array (Y);
+      Classes_Array : constant Integer_Array := To_Integer_Array (Classes);
+      Y_Array       : constant Integer_Array := To_Integer_Array (Y);
       package Label_Binarize_Int is new Generic_Label_Binarize_Array
-     (Index_Type => Integer, Class_Type => Integer,
-      Y_Array_Type  => Integer_Array ,
-      Class_Array_Type => Integer_Array,
-      Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
+        (Index_Type => Integer, Class_Type => Integer,
+         Y_Array_Type  => Integer_Array ,
+         Class_Array_Type => Integer_Array,
+         Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
       return Label_Binarize_Int.Label_Binarize
-          (Y_Array, Classes_Array, Neg_Label, Pos_Label);
+        (Y_Array, Classes_Array, Neg_Label, Pos_Label);
 
    end Label_Binarize;
 
@@ -756,13 +762,13 @@ package body Label is
                             Classes   : Integer_List;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
-        Classes_Array : constant Integer_Array :=
-                          To_Integer_Array (Classes);
+      Classes_Array : constant Integer_Array :=
+                        To_Integer_Array (Classes);
       package Label_Binarize_Integer is new Generic_Label_Binarize_Matrix
-     (Index_Type => Integer, Class_Type => Integer,
-      Y_Matrix_Type => Integer_Matrix,
-      Class_Array_Type => Integer_Array,
-      Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
+        (Index_Type => Integer, Class_Type => Integer,
+         Y_Matrix_Type => Integer_Matrix,
+         Class_Array_Type => Integer_Array,
+         Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
       return Label_Binarize_Integer.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
@@ -776,13 +782,13 @@ package body Label is
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
       Classes_Array : constant Unbounded_String_Array :=
-                          To_Unbound_Array (Classes);
+                        To_Unbound_Array (Classes);
       package Label_Binarize_UB is new Generic_Label_Binarize_Matrix
-     (Index_Type => Integer, Class_Type => Unbounded_String,
-      Y_Matrix_Type  => Unbounded_String_Matrix ,
-      Class_Array_Type => Unbounded_String_Array,
-      Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
-      "<" => Ada.Strings.Unbounded."<");
+        (Index_Type => Integer, Class_Type => Unbounded_String,
+         Y_Matrix_Type  => Unbounded_String_Matrix ,
+         Class_Array_Type => Unbounded_String_Array,
+         Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
+         "<" => Ada.Strings.Unbounded."<");
    begin
       return Label_Binarize_UB.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
@@ -792,17 +798,17 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L416
    function Label_Binarize (Y         : Unbounded_String_Array;
-                             Classes   : Unbounded_List;
-                             Neg_Label : Integer := 0;
-                             Pos_Label : Integer := 1) return Binary_Matrix is
+                            Classes   : Unbounded_List;
+                            Neg_Label : Integer := 0;
+                            Pos_Label : Integer := 1) return Binary_Matrix is
       Classes_Array : constant Unbounded_String_Array :=
-                          To_Unbound_Array (Classes);
+                        To_Unbound_Array (Classes);
       package Label_Binarize_UB is new Generic_Label_Binarize_Array
-     (Index_Type => Integer, Class_Type => Unbounded_String,
-      Y_Array_Type  => Unbounded_String_Array ,
-      Class_Array_Type => Unbounded_String_Array,
-      Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
-      "<" => Ada.Strings.Unbounded."<");
+        (Index_Type => Integer, Class_Type => Unbounded_String,
+         Y_Array_Type  => Unbounded_String_Array ,
+         Class_Array_Type => Unbounded_String_Array,
+         Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
+         "<" => Ada.Strings.Unbounded."<");
    begin
       return Label_Binarize_UB.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
@@ -955,10 +961,27 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : Multi_Label_Binarizer; Y : Integer_Matrix)
-                        return Binary_Matrix is
---        Routine_Name : constant String :=
---                         "Label.Transform Binarize Unbounded_String_Array Y ";
+                       return Binary_Matrix is
+      --        Routine_Name : constant String :=
+      --                         "Label.Transform Binarize Unbounded_String_Array Y ";
    begin
+      return Label_Binarize (Y, Self.Classes);
+
+   end Transform;
+
+   --  -------------------------------------------------------------------------
+
+   function Transform (Self          : Multi_Label_Binarizer; Y : Integer_Matrix;
+                       Class_Mapping : Integer_List) return Binary_Matrix is
+      --        Routine_Name : constant String :=
+      --                         "Label.Transform Binarize Unbounded_String_Array Y ";
+      Index : Integer_List;
+   begin
+      for row in Y'Range loop
+         for col in Y'Range (2) loop
+            Index.Append (Class_Mapping (col));
+         end loop;
+      end loop;
       return Label_Binarize (Y, Self.Classes);
 
    end Transform;
@@ -967,8 +990,8 @@ package body Label is
 
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Array)
                        return Binary_Matrix is
---        Routine_Name : constant String :=
---                         "Label.Transform Binarize Unbounded_String_Array Y ";
+      --        Routine_Name : constant String :=
+      --                         "Label.Transform Binarize Unbounded_String_Array Y ";
    begin
       return Label_Binarize (Y, Self.Classes);
 

@@ -269,7 +269,7 @@ package body Multiclass_Utils is
 --                                 "Multiclass_Utils.Type_Of_Target Integer_Matrix ";
       Result : Y_Type;
    begin
-      if Y'Length (2) = 1 and  Integer (Unique_Labels (Y).Length) < 3 then
+      if Y'Length (2) = 1 and Integer (Unique_Labels (Y).Length) < 3 then
          Result := Y_Binary;
       elsif Is_Multilabel (Y) then
          Result := Y_Multilabel_Indicator;

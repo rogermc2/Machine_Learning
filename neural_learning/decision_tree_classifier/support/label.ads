@@ -112,6 +112,8 @@ package Label is
                         return Binary_Matrix;
    function Transform (Self : Multi_Label_Binarizer; Y : Integer_Matrix)
                         return Binary_Matrix;
+   function Transform (Self : Multi_Label_Binarizer; Y : Integer_Matrix;
+                       Class_Mapping : Integer_List) return Binary_Matrix;
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Array)
                         return Binary_Matrix;
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
