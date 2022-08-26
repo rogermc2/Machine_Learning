@@ -744,7 +744,8 @@ package body Label is
    --  L416
    function Label_Binarize (Y         : Integer_Matrix;
                             Classes   : Integer_List;
-                            Neg_Label : Integer := 0) return Binary_Matrix is
+                            Neg_Label : Integer := 0;
+                            Pos_Label : Integer := 1) return Binary_Matrix is
       use Ada.Containers;
       use Multiclass_Utils;
       Routine_Name :  constant String :=

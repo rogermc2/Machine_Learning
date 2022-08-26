@@ -15,10 +15,11 @@ package body Generic_Label_Binarize_Array is
 
    function Binarize_Binary (Y                    : Y_Array_Type;
                              Classes              : Class_Array_Type;
-                             Neg_Label, Pos_Label : Integer) return Binary_Matrix is
+                             Neg_Label, Pos_Label : Integer)
+                             return Binary_Matrix is
       use NL_Types.Unbounded_Package;
       Routine_Name  :  constant String :=
-                        "Generic_Label_Binarize.Binarize_Binary ";
+                        "Generic_Label_Binarize_Array.Binarize_Binary ";
       Class_Index   : Natural;
       Class_Index_1 : Natural;
       One_Class     : Boolean := True;

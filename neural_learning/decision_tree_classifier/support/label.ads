@@ -96,7 +96,8 @@ package Label is
                             Neg_Label  : Integer := 0;
                             Pos_Label  : Integer := 1) return Binary_Matrix;
    function Label_Binarize (Y         : Integer_Matrix; Classes : Integer_List;
-                            Neg_Label : Integer := 0) return Binary_Matrix;
+                            Neg_Label : Integer := 0;
+                            Pos_Label : Integer := 1) return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Binary_Matrix)
                         return Binary_Matrix;
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
