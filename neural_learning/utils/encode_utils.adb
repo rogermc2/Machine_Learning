@@ -45,8 +45,8 @@ package body Encode_Utils is
                New_Line;
                Put ("Encode_Error: Encode_Utils.Encode Values contains ");
                Put_Line ("previously unseen labels.");
---                 Printing.Print_Integer_Array ("Unique list", Uniques);
---                 Printing.Print_Integer_Array ("Unseen labels", Diff);
+               --                 Printing.Print_Integer_Array ("Unique list", Uniques);
+               --                 Printing.Print_Integer_Array ("Unseen labels", Diff);
                raise Encode_Error;
             end if;
          end;
@@ -301,6 +301,44 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (List : Integer_Array_List) return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Routine_Name    : constant String :=
+                          "Encode_Utils.Unique Integer_Array_List ";
+      Int_Value       : Integer;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      Put_Line (Routine_Name);
+      for index in List.First_Index .. List.Last_Index loop
+         declare
+            Values : constant Integer_Array := List (index);
+         begin
+            for col in Values'Range loop
+               Unique_Integers.Include (Values (col));
+            end loop;
+         end;
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+      Put_Line (Routine_Name & "Uniq_List length" &
+                  Integer'Image (Integer (Uniq_List.Length)));
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
    function Unique (Values : Integer_Matrix) return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;
@@ -427,7 +465,7 @@ package body Encode_Utils is
       Uniq_List         : NL_Types.Unbounded_List;
    begin
       for row in Values'Range loop
-            Unique_UB_Strings.Include (Values (row));
+         Unique_UB_Strings.Include (Values (row));
       end loop;
 
       UB_Curs := Unique_UB_Strings.First;

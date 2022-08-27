@@ -176,6 +176,33 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L740 Fit
    procedure Fit (Binarizer : in out Multi_Label_Binarizer;
+                  Y         : Integer_Array_List) is
+      Routine_Name : constant String :=
+                       "Label.Fit Multi_Label_Binarizer ";
+      Classes      : NL_Types.Integer_List;
+      Duplicates   : Boolean := False;
+   begin
+      if Binarizer.Classes.Is_Empty then
+         --  L758
+         Classes := Multiclass_Utils.Unique_Labels (Y);
+      else
+         --  L759
+         for index in Classes.First_Index .. Classes.Last_Index - 1 loop
+            Duplicates := Duplicates and Classes (index) in
+              Classes.First_Index + index - 1 .. Classes.Last_Index;
+            Assert (not Duplicates, Routine_Name &
+                      "Classes contains duplicates.");
+         end loop;
+         Classes := Binarizer.Classes;
+      end if;
+
+      Binarizer.Classes := Classes;
+
+   end Fit;
+
+   --  -------------------------------------------------------------------------
+ --  L740 Fit
+   procedure Fit (Binarizer : in out Multi_Label_Binarizer;
                   Y         : Integer_Matrix) is
       Routine_Name : constant String :=
                        "Label.Fit Multi_Label_Binarizer ";
@@ -225,6 +252,24 @@ package body Label is
    --  -------------------------------------------------------------------------
    --  L789
    function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
+                           Y         : Integer_Array_List)
+                           return Binary_Matrix is
+      Class_Mapping : Integer_List;
+   begin
+      if not Binarizer.Classes.Is_Empty then
+         Fit (Binarizer, Y);
+         return Transform (Binarizer, Y);
+
+      else
+         Put_Line ("Label.Fit_Transform Classes.Is_Empty");
+         return Transform (Binarizer, Y, Class_Mapping);
+      end if;
+
+   end Fit_Transform;
+
+   --  -------------------------------------------------------------------------
+ --  L789
+   function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                            Y         : Integer_Matrix) return Binary_Matrix is
       Class_Mapping : Integer_List;
    begin
@@ -239,7 +284,9 @@ package body Label is
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
-   function Fit_Transform
+
+   function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
+                           Y         : Integer_Matrix) return Binary_Matrix;   function Fit_Transform
      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
       return Binary_Matrix is
       --        Routine_Name : constant String :=
@@ -982,6 +1029,7 @@ package body Label is
             Index.Append (Class_Mapping (col));
          end loop;
       end loop;
+
       return Label_Binarize (Y, Self.Classes);
 
    end Transform;
