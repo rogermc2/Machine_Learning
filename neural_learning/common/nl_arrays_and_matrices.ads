@@ -18,10 +18,10 @@ package NL_Arrays_And_Matrices is
     type Float_Array is array (Integer range <>) of Float;
     procedure Float_Array_Sort is new Ada.Containers.Generic_Array_Sort
       (Integer, Float, Float_Array);
-    type Integer_Array is array (Integer range <>) of Integer;
+    type Integer_Array is array (Natural range <>) of Integer;
     type Natural_Array is array (Integer range <>) of Natural;
     procedure Integer_Array_Sort is new Ada.Containers.Generic_Array_Sort
-      (Integer, Integer, Integer_Array);
+      (Natural, Integer, Integer_Array);
 
     type Unbounded_String_Array is array (Integer range <>) of
       Ada.Strings.Unbounded.Unbounded_String;
@@ -34,11 +34,11 @@ package NL_Arrays_And_Matrices is
     type Binary_Matrix is array (Integer range <>, Integer range <>) of Binary;
     type Boolean_Matrix is array (Integer range <>, Integer range <>) of
       Boolean;
-    type Integer_Matrix is array (Integer range <>, Integer range <>) of
+    type Integer_Matrix is array (Natural range <>, Natural range <>) of
       Integer;
 
     package Integer_Array_Package is new
-      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);
+      Ada.Containers.Indefinite_Vectors (Natural, Integer_Array);
     subtype Integer_Array_List is Integer_Array_Package.Vector;
 
     package Real_Float_Arrays is new Generic_Real_Arrays (Float);
