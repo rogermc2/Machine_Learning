@@ -44,9 +44,9 @@ with Generic_Label_Binarize_Matrix;
 
 package body Label is
 
-   function Transform_CM
-     (Self          : Multi_Label_Binarizer; Y : Integer_Array_List;
-      Class_Mapping : Integer_List) return Binary_Matrix;
+--     function Transform_CM
+--       (Self          : Multi_Label_Binarizer; Y : Integer_Array_List;
+--        Class_Mapping : Integer_List) return Binary_Matrix;
    function Transform_CM
      (Self          : Multi_Label_Binarizer; Y : Integer_Matrix;
       Class_Mapping : Integer_List) return Binary_Matrix;
@@ -252,8 +252,9 @@ package body Label is
    --  L305
    function Fit_Transform (Binarizer : in out Label_Binarizer;
                            Y         : Integer_Matrix) return Binary_Matrix is
+      Routine_Name  : constant String := "Label.Fit_Transform Integer_Matrix";
    begin
-      Put_Line ("Label.Fit_Transform Integer_Matrix");
+      Put_Line (Routine_Name);
       Fit (Binarizer, Y);
       return Transform (Binarizer, Y);
 
@@ -264,8 +265,9 @@ package body Label is
    function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                            Y         : Integer_Array_List)
                            return Binary_Matrix is
-      Routine_Name  : constant String := "Label.Fit_Transform ";
-      Class_Mapping : Integer_List;
+      Routine_Name  : constant String :=
+                          "Label.Fit_Transform Integer_Array_List ";
+--        Class_Mapping : Integer_List;
    begin
       Assert (not Binarizer.Classes.Is_Empty, Routine_Name &
                 "Binarizer.Classes is empty");
@@ -278,6 +280,8 @@ package body Label is
    --  L789
    function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                            Y         : Integer_Matrix) return Binary_Matrix is
+      Routine_Name  : constant String :=
+                          "Label.Fit_Transform Integer_Matrix ";
       Class_Mapping : Integer_List;
    begin
       if not Binarizer.Classes.Is_Empty then
@@ -323,14 +327,16 @@ package body Label is
    --  n_samples / (n_classes * np.bincount(y))
    function Fit_Transform (Encoder : in out Label_Encoder; Y : Integer_Array)
                            return Natural_Array is
+      Routine_Name  : constant String :=
+                          "Label.Fit_Transform Encoder Integer_Array ";
       Encoded_Labels : Natural_Array (1 .. Y'Length);
    begin
-      Put_Line ("Label.Fit_Transform Integer_Array");
+      Put_Line (Routine_Name);
       if Encoder.Encoder_Kind = Class_Unique then
          Encoder.Uniques := Encode_Utils.Unique (Y, Encoded_Labels);
       else
-         raise Label_Error with
-           "Label.Fit_Transform called with label encoder instead of" &
+         raise Label_Error with Routine_Name &
+           "called with label encoder instead of" &
            " unique encoder";
       end if;
 
@@ -1078,26 +1084,26 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   function Transform_CM
-     (Self          : Multi_Label_Binarizer; Y : Integer_Array_List;
-      Class_Mapping : Integer_List) return Binary_Matrix is
-      --        Routine_Name : constant String :=
-      --                         "Label.Transform_CM Integer_Array_List ";
-      Values_List : Integer_List;
-   begin
-      for index in Y.First_Index .. Y.Last_Index loop
-         declare
-            Values : constant Integer_Array := Y (index);
-         begin
-            for col in Values'Range loop
-               Values_List.Append (Class_Mapping (col));
-            end loop;
-         end;
-      end loop;
-
-      return Label_Binarize (Values_List, Self.Classes);
-
-   end Transform_CM;
+--     function Transform_CM
+--       (Self          : Multi_Label_Binarizer; Y : Integer_Array_List;
+--        Class_Mapping : Integer_List) return Binary_Matrix is
+--        --        Routine_Name : constant String :=
+--        --                         "Label.Transform_CM Integer_Array_List ";
+--        Values_List : Integer_List;
+--     begin
+--        for index in Y.First_Index .. Y.Last_Index loop
+--           declare
+--              Values : constant Integer_Array := Y (index);
+--           begin
+--              for col in Values'Range loop
+--                 Values_List.Append (Class_Mapping (col));
+--              end loop;
+--           end;
+--        end loop;
+--
+--        return Label_Binarize (Values_List, Self.Classes);
+--
+--     end Transform_CM;
 
    --  -------------------------------------------------------------------------
 
