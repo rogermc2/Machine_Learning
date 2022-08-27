@@ -37,6 +37,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Classifier_Utilities;
 with Encode_Utils;
 with Generic_Label_Binarize_Array;
+with Generic_Label_Binarize_Array_List;
 with Generic_Label_Binarize_Matrix;
 --  with Printing;
 --  with Test_Support;

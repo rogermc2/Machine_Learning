@@ -13,7 +13,7 @@ package body Generic_Label_Binarize_Array_List is
 
    --  ------------------------------------------------------------------------
 
-   function Binarize (Y                    : Y_Matrix_Type;
+   function Binarize (Y                    : Y_Array_List_Type;
                       Classes              : Class_Array_Type;
                       Neg_Label, Pos_Label : Integer) return Binary_Matrix is
       use NL_Types.Unbounded_Package;
@@ -55,7 +55,7 @@ package body Generic_Label_Binarize_Array_List is
 
    --  ------------------------------------------------------------------------
 
-   function Label_Binarize (Y         : Y_Matrix_Type;
+   function Label_Binarize (Y         : Y_Array_List_Type;
                             Classes   : Class_Array_Type;
                             Neg_Label : Integer := 0;
                             Pos_Label : Integer := 1) return Binary_Matrix is
