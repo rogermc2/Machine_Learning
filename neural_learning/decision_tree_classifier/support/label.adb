@@ -821,13 +821,13 @@ package body Label is
       Classes_Array : constant Integer_Array :=
                         To_Integer_Array (Classes);
       package Label_Binarize_Integer_Array_List is new
-        Generic_Label_Binarize_Array_List
-        (Index_Type       => Integer,
-         Class_Type       => Integer,
-         Y_List_Type      => Integer_Array_List,
-         Class_Array_Type => Integer_Array,
-         Type_Of_Target   => Multiclass_Utils.Type_Of_Target,
-         "<"              => "<");
+        Generic_Label_Binarize_Array_List (Index_Type => Integer,
+Class_Type         => Integer,
+Y_Array_Type       => Integer_Array,
+Array_List_Package => Integer_Array_Package,
+Class_Array_Type   => Integer_Array,
+Type_Of_Target     => Multiclass_Utils.Type_Of_Target,
+"<"                => "<");
    begin
       return Label_Binarize_Integer_Array_List.Label_Binarize
         (Y, Classes, Neg_Label, Pos_Label);
