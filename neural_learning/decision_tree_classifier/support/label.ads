@@ -112,10 +112,10 @@ package Label is
                         return Boolean_Matrix;
    function Transform (Self : Label_Binarizer; Y : Array_Of_Integer_Lists)
                         return Binary_Matrix;
+   function Transform (Self : Multi_Label_Binarizer; Y : Integer_Array_List)
+                        return Binary_Matrix;
    function Transform (Self : Multi_Label_Binarizer; Y : Integer_Matrix)
                         return Binary_Matrix;
-   function Transform (Self : Multi_Label_Binarizer; Y : Integer_Matrix;
-                       Class_Mapping : Integer_List) return Binary_Matrix;
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Array)
                         return Binary_Matrix;
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)

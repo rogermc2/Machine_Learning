@@ -4,7 +4,7 @@ with Ada.Assertions; use  Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Label;
-with NL_Types; use NL_Types;
+--  with NL_Types; use NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 --  with Test_Support;
 
@@ -12,24 +12,24 @@ procedure Test_Multilabel_Binarizer is
    Routine_Name     : constant String := "Test_Multilabel_Binarizer ";
    Indicator_Mat    : constant Binary_Matrix (1 .. 3, 1 .. 3) :=
                         ((0, 1, 1), (1, 0, 0), (1, 1, 0));
-   lambda_Mat          : constant Integer_Matrix (1 .. 3, 1 .. 2) :=
-                        ((2, 3), (1, 0), (1, 2));
+--     lambda_Mat          : constant Integer_Matrix (1 .. 3, 1 .. 2) :=
+--                          ((2, 3), (1, 0), (1, 2));
    lambda1_1        : constant Integer_Array (1 .. 1) := (1 => 1);
    lambda1          :  Integer_Array_List;
-   Expected_Classes : Unbounded_List;
-   Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
-                        ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
-   Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
-                        ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
-   Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
-                        ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
-                         (0, 0, 1, 0), (1, 0, 0, 0));
-   To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
-                        ((1, 0), (0, 1), (0, 1), (1, 0));
+--     Expected_Classes : Unbounded_List;
+--     Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
+--                          ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
+--     Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
+--                          ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
+--     Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
+--                          ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
+--                           (0, 0, 1, 0), (1, 0, 0, 0));
+--     To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
+--                          ((1, 0), (0, 1), (0, 1), (1, 0));
    MLB              : Label.Multi_Label_Binarizer;
    Got1             : constant Binary_Matrix :=
                         Label.Fit_Transform (MLB, lambda1);
-   Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
+--     Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
 begin
    Put_Line (Routine_Name);
    lambda1.Append ((2, 3));
