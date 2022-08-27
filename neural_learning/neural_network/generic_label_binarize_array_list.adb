@@ -26,7 +26,7 @@ package body Generic_Label_Binarize_Array_List is
    begin
       for row in 1 .. Y_Length loop
          declare
-            Y_Array : constant Y_Array_Type := Y.Element (Index_Type (row));
+            Y_Array : constant Y_Array_Type := Y (row);
          begin
             for col in Y_Array'First .. Y_Array'Last loop
                Class_Index := Find_Index (Classes, Y_Array (col));

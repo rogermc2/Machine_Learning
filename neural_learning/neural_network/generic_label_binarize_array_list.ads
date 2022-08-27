@@ -9,7 +9,7 @@ generic
     type Class_Type is private;
     type Y_Array_Type is array (Index_Type range <>) of Class_Type;
     with package Array_List_Package is new
-      Ada.Containers.Indefinite_Vectors (Index_Type, Y_Array_Type);
+      Ada.Containers.Indefinite_Vectors (Positive, Y_Array_Type);
     type Class_Array_Type is array (Index_Type range <>) of Class_Type;
     with function Type_Of_Target (Y : Y_Array_Type) return Y_Type;
     with function "<" (L, R : Class_Type) return Boolean is <>;

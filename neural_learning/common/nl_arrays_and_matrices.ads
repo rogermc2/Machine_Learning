@@ -34,11 +34,11 @@ package NL_Arrays_And_Matrices is
     type Binary_Matrix is array (Integer range <>, Integer range <>) of Binary;
     type Boolean_Matrix is array (Integer range <>, Integer range <>) of
       Boolean;
-    type Integer_Matrix is array (Natural range <>, Natural range <>) of
+    type Integer_Matrix is array (Integer range <>, Integer range <>) of
       Integer;
 
     package Integer_Array_Package is new
-      Ada.Containers.Indefinite_Vectors (Natural, Integer_Array);
+      Ada.Containers.Indefinite_Vectors (Positive, Integer_Array);
     subtype Integer_Array_List is Integer_Array_Package.Vector;
 
     package Real_Float_Arrays is new Generic_Real_Arrays (Float);

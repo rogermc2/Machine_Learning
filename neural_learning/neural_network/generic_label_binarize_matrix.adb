@@ -26,7 +26,7 @@ package body Generic_Label_Binarize_Matrix is
       for row in 1 .. Y'Length loop
          for col in 1 .. Num_Classes loop
             Class_Index :=
-              Find_Index (Classes, Y (Index_Type (row), Index_Type (col)));
+              Find_Index (Classes, Y (row, col));
             Assert (Class_Index /= No_Index, Routine_Name &
                       "Binarize invalid class");
             Result (row, Class_Index) := Pos_Label;
