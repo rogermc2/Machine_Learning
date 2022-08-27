@@ -79,7 +79,7 @@ package body Generic_Label_Binarize_Array_List is
       for row in Y.First_Index .. Y.Last_Index loop
          declare
             Y_Array : constant Y_Array_Type := Y (row);
-            Y_Kind  : Multiclass_Utils.Y_Type := Type_Of_Target (Y_Array);
+            Y_Kind  : constant Multiclass_Utils.Y_Type := Type_Of_Target (Y_Array);
          begin
             Put_Line (Routine_Name & "Y_Kind " & Y_Type'Image (Y_Kind));
             Assert (Y_Kind /= Y_Unknown, Routine_Name &
@@ -90,57 +90,20 @@ package body Generic_Label_Binarize_Array_List is
                       "does not support Multioutput target data.");
 
             --  L516
-            if Y_Kind = Y_Binary then
-               declare
-                  Y_Bin1 : Binary_Matrix (1 .. Y_Length, 1 .. 1)
-                    := (others => (others => 0));
-               begin
-                  if Num_Classes = 1 then
-                     for col in Classes'First .. Classes'Last loop
-                        if Neg_Label /= 0 then
-                           Y_Bin1 (integer (row), 1) := Pos_Label;
-                        end if;
-                     end loop;
-
-                     return Y_Bin1;
-
-                  elsif Num_Classes > 2 then
-                     Y_Kind := Y_Multiclass;
-                  end if;
-               end;
-            end if;
+            Assert (Y_Kind /= Y_Binary, Routine_Name & "Y_Binary not coded");
 
             --  L528
             Sorted := Classes;
             Class_Sort (Sorted);
 
             --  L538
-            if Y_Kind = Y_Binary then
-               --  Label.py L539 - L549 needed to generate a csr sparse matrix
-               --  Binarize is all that is needed for this implementation
-               declare
-                  Y_Bin2 : Binary_Matrix (1 .. Y_Length, 1 .. 1)
-                    := (others => (others => Neg_Label));
-               begin
-                  Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
-                  return Y_Bin2;
-               end;
+            Assert (Y_Kind /= Y_Multiclass, Routine_Name &
+                      "Y_Multiclass not coded");
 
-            elsif Y_Kind = Y_Multiclass then
-               declare
-                  Y_Bin2 : Binary_Matrix (1 .. Y_Length, 1 .. Num_Classes)
-                    := (others => (others => Neg_Label));
-               begin
-                  Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
-                  return Y_Bin2;
-               end;
-
-            else
-               --  L551
-               Assert (Y_Kind = Y_Multilabel_Indicator, Y_Type'Image (Y_Kind) &
-                         " target data is not supported by " & Routine_Name);
-               Y_Bin := Binarize (Y, Classes, Neg_Label, Pos_Label);
-            end if;
+            --  L551
+            Assert (Y_Kind = Y_Multilabel_Indicator, Y_Type'Image (Y_Kind) &
+                      " target data is not supported by " & Routine_Name);
+            Y_Bin := Binarize (Y, Classes, Neg_Label, Pos_Label);
          end;
       end loop;
 
