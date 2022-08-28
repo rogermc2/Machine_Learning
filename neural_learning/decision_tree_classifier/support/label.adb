@@ -1095,6 +1095,7 @@ package body Label is
       Class_Mapping : in out Integer_List) return Binary_Matrix is
       --        Routine_Name : constant String :=
       --                         "Label.Transform_CM Integer_Array_List ";
+      Indices : Integer_List;
    begin
       for index in Y.First_Index .. Y.Last_Index loop
          declare
@@ -1103,6 +1104,9 @@ package body Label is
             for col in Values'Range loop
                if not Class_Mapping.Contains (Values (col)) then
                   Class_Mapping.Append (Values (col));
+                  Indices.Append (col);
+               else
+                  Indices.Append (Class_Mapping.Find_Index (Values (col)));
                end if;
             end loop;
          end;
@@ -1110,7 +1114,8 @@ package body Label is
 
       declare
          Result : Binary_Matrix (1 .. Positive (Y.Length),
-                                 1 .. Positive (Class_Mapping.Length));
+                                 1 .. Positive (Class_Mapping.Length)) :=
+                                 (others => (others => 1));
       begin
          return Result;
       end;
