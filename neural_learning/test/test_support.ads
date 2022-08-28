@@ -21,6 +21,12 @@ package Test_Support is
                                   Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Integer_List (Name  : String;
                                  aList : NL_Types.Integer_List);
+   procedure Print_Matrix_Dimensions (Name    : String;
+                                      aMatrix : Binary_Matrix);
+   procedure Print_Matrix_Dimensions (Name    : String;
+                                      aMatrix : Integer_Matrix);
+   procedure Print_Matrix_Dimensions (Name    : String;
+                                      aMatrix : Real_Float_Matrix);
    procedure Print_Parameters
      (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
       Rows_Start : Positive := 1; Rows_Last : Positive := 10);

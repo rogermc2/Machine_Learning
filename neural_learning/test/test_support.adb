@@ -168,6 +168,39 @@ package body Test_Support is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Matrix_Dimensions (Name    : String;
+                                      aMatrix : Binary_Matrix) is
+   begin
+      Put (Name & ": ");
+      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
+                  Integer'Image (aMatrix'Length (2)));
+
+   end Print_Matrix_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Matrix_Dimensions (Name    : String;
+                                      aMatrix : Integer_Matrix) is
+   begin
+      Put (Name & ": ");
+      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
+                  Integer'Image (aMatrix'Length (2)));
+
+   end Print_Matrix_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Print_Matrix_Dimensions (Name    : String;
+                                      aMatrix : Real_Float_Matrix) is
+   begin
+      Put (Name & " size:");
+      Put_Line (Integer'Image (aMatrix'Length) & "  x" &
+                  Integer'Image (aMatrix'Length (2)));
+
+   end Print_Matrix_Dimensions;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Parameters
      (Name       : String; Params : Stochastic_Optimizers.Parameters_Record;
       Rows_Start : Positive := 1; Rows_Last : Positive := 10) is
