@@ -268,6 +268,7 @@ package body Label is
       Routine_Name  : constant String :=
                         "Label.Fit_Transform Integer_Array_List ";
    begin
+      Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
       Put_Line (Routine_Name);
       if not Binarizer.Classes.Is_Empty then
          Fit (Binarizer, Y);
@@ -1094,9 +1095,10 @@ package body Label is
      (Y             : Integer_Array_List;
       Class_Mapping : in out Integer_List) return Binary_Matrix is
       use Integer_Sorting;
-      --        Routine_Name : constant String :=
-      --                         "Label.Transform_CM Integer_Array_List ";
+      Routine_Name : constant String :=
+                             "Label.Transform_CM Integer_Array_List ";
    begin
+      Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
       for index in Y.First_Index .. Y.Last_Index loop
          declare
             Values : constant Integer_Array := Y (index);
