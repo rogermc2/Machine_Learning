@@ -1114,14 +1114,17 @@ package body Label is
 
       declare
          Result : Binary_Matrix (1 .. Positive (Y.Length),
-                                 1 .. Positive (Class_Mapping.Length));
+                                 1 .. Positive (Class_Mapping.Length)) :=
+         (others => (others => 0));
       begin
          for row in Y.First_Index .. Y.Last_Index loop
             declare
                Values : constant Integer_Array := Y (row);
             begin
                for col in Values'Range loop
-                 Result (row, col) := Class_Mapping.Find_Index (Values (col));
+                  if Class_Mapping.Contains (Values (col)) then
+                     Result (row, col) := 1;
+                  end if;
                end loop;
             end;
          end loop;
