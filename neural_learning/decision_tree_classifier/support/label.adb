@@ -265,6 +265,8 @@ package body Label is
    function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                            Y         : Integer_Array_List)
                            return Binary_Matrix is
+
+      use Integer_Sorting;
       Routine_Name  : constant String :=
                         "Label.Fit_Transform Integer_Array_List ";
    begin
@@ -281,7 +283,13 @@ package body Label is
             CM_Matrix     : constant Binary_Matrix :=
                               Transform_CM (Y, Class_Mapping);
          begin
---              Binarizer.Classes := Encode_Utils.Unique (Class_Mapping);
+            --              Binarizer.Classes := Encode_Utils.Unique (Class_Mapping);
+            for key in Class_Mapping.First_Key .. Class_Mapping.Last_Key loop
+               Binarizer.Classes.Append (Class_Mapping.Element (key));
+            end loop;
+            Sort (Binarizer.Classes);
+            Test_Support.Print_Integer_List (Routine_Name & "Classes",
+                                             Binarizer.Classes);
             return CM_Matrix;
          end;
       end if;
@@ -1095,7 +1103,6 @@ package body Label is
      (Y             : Integer_Array_List;
       Class_Mapping : in out Integer_Label_Map) return Binary_Matrix is
       use Integer_Label_Map_Package;
---        use Integer_Sorting;
       Routine_Name : constant String :=
                        "Label.Transform_CM Integer_Array_List ";
       Map_Val      : Integer := -1;
@@ -1104,18 +1111,29 @@ package body Label is
       for index in Y.First_Index .. Y.Last_Index loop
          declare
             Values : constant Integer_Array := Y (index);
+            Found  : Boolean := False;
          begin
             for col in Values'Range loop
-               if Class_Mapping.Find (Values (col)) = No_Element then
+               if not Class_Mapping.Is_Empty then
+                  for key in Class_Mapping.First_Key .. Class_Mapping.Last_Key loop
+                     if Class_Mapping.Element (key) = Values (col) then
+                        Found := True;
+                     end if;
+                  end loop;
+               end if;
+
+               if not Found then
+                  Put_Line (Routine_Name & "Values (col)" &
+                              Integer'Image (Values (col)));
                   Map_Val := Map_Val + 1;
-                  Class_Mapping.Include (Values (col), Map_Val);
+                  Class_Mapping.Include (Map_Val, Values (col));
                end if;
             end loop;
          end;
       end loop;
---        Sort (Class_Mapping);
+
       Test_Support.Print_Integer_Map (Routine_Name & "Class_Mapping",
-                                       Class_Mapping);
+                                      Class_Mapping);
       declare
          Result  : Binary_Matrix
            (1 .. Positive (Y.Length), 1 .. Positive (Class_Mapping.Length))
