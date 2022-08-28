@@ -45,8 +45,8 @@ with Generic_Label_Binarize_Matrix;
 package body Label is
 
    function Transform_CM
-     (Self          : Multi_Label_Binarizer; Y : Integer_Array_List;
-      Class_Mapping : in out Integer_List) return Binary_Matrix;
+     (Y : Integer_Array_List; Class_Mapping : in out Integer_List)
+      return Binary_Matrix;
 --     function Transform_CM
 --       (Self          : Multi_Label_Binarizer; Y : Integer_Matrix;
 --        Class_Mapping : Integer_List) return Binary_Matrix;
@@ -277,7 +277,7 @@ package body Label is
             use Integer_Sorting;
             Class_Mapping : Integer_List;
             CM_Matrix     : constant Binary_Matrix :=
-                              Transform_CM (Binarizer, Y, Class_Mapping);
+                              Transform_CM (Y, Class_Mapping);
          begin
             Sort (Class_Mapping);
             Binarizer.Classes := Encode_Utils.Unique (Class_Mapping);
@@ -1091,8 +1091,8 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform_CM
-     (Self          : Multi_Label_Binarizer; Y : Integer_Array_List;
-      Class_Mapping : in out Integer_List) return Binary_Matrix is
+      (Y : Integer_Array_List;
+       Class_Mapping : in out Integer_List) return Binary_Matrix is
       --        Routine_Name : constant String :=
       --                         "Label.Transform_CM Integer_Array_List ";
       Indices : Integer_List;
