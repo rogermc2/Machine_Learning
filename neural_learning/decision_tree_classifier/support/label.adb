@@ -1116,19 +1116,18 @@ package body Label is
 --        Sort (Class_Mapping);
       Test_Support.Print_Integer_Map (Routine_Name & "Class_Mapping",
                                        Class_Mapping);
-
       declare
          Result  : Binary_Matrix
            (1 .. Positive (Y.Length), 1 .. Positive (Class_Mapping.Length))
-           := (others => (others => 0));
+           := (others => (others => 1));
       begin
          for row in Y.First_Index .. Y.Last_Index loop
             declare
                Values : constant Integer_Array := Y (row);
             begin
                for col in Values'Range loop
-                  if Class_Mapping.Contains (Values (col)) then
-                     Result (row, col) := 1;
+                  if Class_Mapping.Element (col) /= Values (col) then
+                     Result (row, col) := 0;
                   end if;
                end loop;
             end;
