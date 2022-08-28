@@ -274,12 +274,12 @@ package body Label is
          return Transform (Binarizer, Y);
       else
          declare
-            use Integer_Sorting;
             Class_Mapping : Integer_List;
+            --  L817
             CM_Matrix     : constant Binary_Matrix :=
                               Transform_CM (Y, Class_Mapping);
          begin
-            Sort (Class_Mapping);
+            --   Class_Mapping sort done in Transform_CM
             Binarizer.Classes := Encode_Utils.Unique (Class_Mapping);
             return CM_Matrix;
          end;
@@ -1093,6 +1093,7 @@ package body Label is
    function Transform_CM
      (Y             : Integer_Array_List;
       Class_Mapping : in out Integer_List) return Binary_Matrix is
+      use Integer_Sorting;
       --        Routine_Name : constant String :=
       --                         "Label.Transform_CM Integer_Array_List ";
    begin
@@ -1107,6 +1108,7 @@ package body Label is
             end loop;
          end;
       end loop;
+      Sort (Class_Mapping);
 
       declare
          Result : Binary_Matrix (1 .. Positive (Y.Length),
