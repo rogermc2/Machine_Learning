@@ -40,7 +40,7 @@ with Generic_Label_Binarize_Array;
 with Generic_Label_Binarize_Array_List;
 with Generic_Label_Binarize_Matrix;
 --  with Printing;
---  with Test_Support;
+with Test_Support;
 
 package body Label is
 
@@ -1096,7 +1096,7 @@ package body Label is
       Class_Mapping : in out Integer_List) return Binary_Matrix is
       use Integer_Sorting;
       Routine_Name : constant String :=
-                             "Label.Transform_CM Integer_Array_List ";
+                       "Label.Transform_CM Integer_Array_List ";
    begin
       Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
       for index in Y.First_Index .. Y.Last_Index loop
@@ -1111,11 +1111,13 @@ package body Label is
          end;
       end loop;
       Sort (Class_Mapping);
+      Test_Support.Print_Integer_List (Routine_Name & "Class_Mapping",
+                                       Class_Mapping);
 
       declare
-         Result : Binary_Matrix (1 .. Positive (Y.Length),
-                                 1 .. Positive (Class_Mapping.Length)) :=
-         (others => (others => 0));
+         Result  : Binary_Matrix
+           (1 .. Positive (Y.Length), 1 .. Positive (Class_Mapping.Length))
+           := (others => (others => 0));
       begin
          for row in Y.First_Index .. Y.Last_Index loop
             declare
@@ -1128,9 +1130,10 @@ package body Label is
                end loop;
             end;
          end loop;
-
+         Test_Support.Print_Binary_Matrix (Routine_Name & "Result", Result);
          return Result;
       end;
+
    end Transform_CM;
 
    --  -------------------------------------------------------------------------

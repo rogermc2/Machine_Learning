@@ -1,4 +1,5 @@
 --  Based on scikit-learn/sklearn/preprocessing/tests/test_label.py
+--  test_multilabel_binarizer()
 
 with Ada.Assertions; use  Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
