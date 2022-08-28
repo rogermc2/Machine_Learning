@@ -168,6 +168,25 @@ package body Test_Support is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Integer_Map
+     (Name : String; aMap : NL_Types.Integer_Label_Map) is
+      use NL_Types.Integer_Label_Map_Package;
+      Curs : Cursor := aMap.First;
+      aKey : Integer;
+   begin
+      Put_Line (Name & ": ");
+      while Has_Element (Curs) loop
+         aKey := Key (Curs);
+         Put_Line (Integer'Image (aKey) & ":  " &
+                     Integer'Image (Element (Curs)));
+         Next (Curs);
+      end loop;
+      New_Line;
+
+   end Print_Integer_Map;
+
+   --  ------------------------------------------------------------------------
+
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix) is
    begin

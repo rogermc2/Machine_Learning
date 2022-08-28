@@ -45,11 +45,11 @@ with Test_Support;
 package body Label is
 
    function Transform_CM
-     (Y : Integer_Array_List; Class_Mapping : in out Integer_List)
+     (Y : Integer_Array_List; Class_Mapping : in out Integer_Label_Map)
       return Binary_Matrix;
    --     function Transform_CM
    --       (Self          : Multi_Label_Binarizer; Y : Integer_Matrix;
-   --        Class_Mapping : Integer_List) return Binary_Matrix;
+   --        Class_Mapping : Integer_Label_Map) return Binary_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -273,15 +273,15 @@ package body Label is
       if not Binarizer.Classes.Is_Empty then
          Fit (Binarizer, Y);
          return Transform (Binarizer, Y);
+
       else
          declare
-            Class_Mapping : Integer_List;
+            Class_Mapping : Integer_Label_Map;
             --  L817
             CM_Matrix     : constant Binary_Matrix :=
                               Transform_CM (Y, Class_Mapping);
          begin
-            --   Class_Mapping sort done in Transform_CM
-            Binarizer.Classes := Encode_Utils.Unique (Class_Mapping);
+--              Binarizer.Classes := Encode_Utils.Unique (Class_Mapping);
             return CM_Matrix;
          end;
       end if;
@@ -1093,10 +1093,12 @@ package body Label is
 
    function Transform_CM
      (Y             : Integer_Array_List;
-      Class_Mapping : in out Integer_List) return Binary_Matrix is
-      use Integer_Sorting;
+      Class_Mapping : in out Integer_Label_Map) return Binary_Matrix is
+      use Integer_Label_Map_Package;
+--        use Integer_Sorting;
       Routine_Name : constant String :=
                        "Label.Transform_CM Integer_Array_List ";
+      Map_Val      : Integer := -1;
    begin
       Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
       for index in Y.First_Index .. Y.Last_Index loop
@@ -1104,14 +1106,15 @@ package body Label is
             Values : constant Integer_Array := Y (index);
          begin
             for col in Values'Range loop
-               if not Class_Mapping.Contains (Values (col)) then
-                  Class_Mapping.Append (Values (col));
+               if Class_Mapping.Find (Values (col)) = No_Element then
+                  Map_Val := Map_Val + 1;
+                  Class_Mapping.Include (Values (col), Map_Val);
                end if;
             end loop;
          end;
       end loop;
-      Sort (Class_Mapping);
-      Test_Support.Print_Integer_List (Routine_Name & "Class_Mapping",
+--        Sort (Class_Mapping);
+      Test_Support.Print_Integer_Map (Routine_Name & "Class_Mapping",
                                        Class_Mapping);
 
       declare
