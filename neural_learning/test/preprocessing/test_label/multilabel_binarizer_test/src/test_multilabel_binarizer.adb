@@ -38,8 +38,7 @@ begin
    lambda1.Append (lambda1_3);
 
    declare
-      Got1 : constant Binary_Matrix :=
-               Label.Fit_Transform (MLB, lambda1);
+      Got1 : constant Binary_Matrix := Label.Fit_Transform (MLB, lambda1);
    begin
       Test_Support.Print_Binary_Matrix ("Got1", Got1);
       --     Assert (LB.Classes = Expected_Classes, "Unexpected classes");
