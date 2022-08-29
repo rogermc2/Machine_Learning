@@ -15,24 +15,17 @@ procedure Test_Multilabel_Binarizer is
    Routine_Name     : constant String := "Test_Multilabel_Binarizer ";
    Indicator_Mat    : constant Binary_Matrix (1 .. 3, 1 .. 3) :=
                         ((0, 1, 1), (1, 0, 0), (1, 1, 0));
-   --     lambda_Mat          : constant Integer_Matrix (1 .. 3, 1 .. 2) :=
-   --                          ((2, 3), (1, 0), (1, 2));
+   Indicator_Mat2    : constant Binary_Matrix (1 .. 3, 1 .. 4) :=
+                        ((0, 0, 1, 1), (1, 1, 0, 0), (0, 1, 1, 0));
+   lambda_Mat       : constant Integer_Matrix (1 .. 3, 1 .. 2) :=
+                           ((2, 3), (1, 0), (1, 2));
    lambda1_1        : constant Integer_Array (1 .. 2) := (2, 3);
    lambda1_2        : constant Integer_Array (1 .. 1) := (1 => 1);
    lambda1_3        : constant Integer_Array (1 .. 2) := (1, 2);
    lambda1          : Integer_Array_List;
    Expected_Classes : NL_Types.Integer_List;
-   --     Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
-   --                          ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
-   --     Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
-   --                          ((1 => 0), (1 => 1), (1 => 1), (1 => 0));
-   --     Expected3        : constant Binary_Matrix (1 .. 5, 1 .. 4) :=
-   --                          ((0, 0, 0, 1), (0, 0, 1, 0), (0, 1, 0, 0),
-   --                           (0, 0, 1, 0), (1, 0, 0, 0));
-   --     To_Invert        : constant Binary_Matrix (1 .. 4, 1 .. 2) :=
-   --                          ((1, 0), (0, 1), (0, 1), (1, 0));
-   --     Got2             : Binary_Matrix (1 .. 5, 1 .. 4);
-   MLB2             : Label.Multi_Label_Binarizer;
+   Expected_Mat_Classes : NL_Types.Integer_List;
+   MLB              : Label.Multi_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
    lambda1.Append (lambda1_1);
@@ -41,31 +34,56 @@ begin
    Expected_Classes.Append (1);
    Expected_Classes.Append (2);
    Expected_Classes.Append (3);
+   Expected_Mat_Classes := Expected_Classes;
+   Expected_Mat_Classes.Prepend (0);
 
-   --  fit_transform case
+   --    fit case
+   Label.Fit (MLB, lambda1);
    declare
-      MLB : Label.Multi_Label_Binarizer;
-      Got : constant Binary_Matrix := Label.Fit_Transform (MLB, lambda1);
+      Got : constant Binary_Matrix := Label.Transform (lambda1);
    begin
+      Assert (MLB.Classes = Expected_Classes, "Unexpected classes");
       Test_Support.Print_Binary_Matrix ("Got", Got);
       Assert (MLB.Classes = Expected_Classes, "Unexpected classes");
       Assert (Got = Indicator_Mat, "Got invalid data");
       Assert (Label.Inverse_Transform (MLB, Got) = lambda1,
               "invalid inverse Got");
    end;
-   Put_Line (Routine_Name & "fit_transform tests passed.");
 
-   --    fit case
-   Label.Fit (MLB2, lambda1);
+   Label.Fit (MLB, lambda_Mat);
    declare
       Got : constant Binary_Matrix := Label.Transform (lambda1);
    begin
-      Assert (MLB2.Classes = Expected_Classes, "Unexpected classes");
+      Assert (MLB.Classes = Expected_Classes, "Unexpected classes");
+      Test_Support.Print_Binary_Matrix ("Got", Got);
+      Assert (MLB.Classes = Expected_Classes, "Unexpected classes");
+      Assert (Got = Indicator_Mat, "Got invalid data");
+      Assert (Label.Inverse_Transform (MLB, Got) = lambda1,
+              "invalid inverse Got");
+   end;
+
+   --  fit_transform case
+   declare
+      MLB2 : Label.Multi_Label_Binarizer;
+      Got : constant Binary_Matrix := Label.Fit_Transform (MLB2, lambda1);
+   begin
       Test_Support.Print_Binary_Matrix ("Got", Got);
       Assert (MLB2.Classes = Expected_Classes, "Unexpected classes");
       Assert (Got = Indicator_Mat, "Got invalid data");
       Assert (Label.Inverse_Transform (MLB2, Got) = lambda1,
               "invalid inverse Got");
+   end;
+
+   declare
+      MLB2 : Label.Multi_Label_Binarizer;
+      Got  : constant Binary_Matrix := Label.Fit_Transform (MLB2, lambda_Mat);
+   begin
+      Test_Support.Print_Binary_Matrix ("lambda_Mat Got", Got);
+      Assert (MLB2.Classes = Expected_Mat_Classes,
+              "Unexpected lambda_Mat classes");
+      Assert (Got = Indicator_Mat2, "Got invalid lambda_Mat data");
+      Assert (Label.Inverse_Transform (MLB2, Got) = lambda_Mat,
+              "invalid inverse lambda_Mat Got");
    end;
 
    Put_Line (Routine_Name & "tests passed.");
