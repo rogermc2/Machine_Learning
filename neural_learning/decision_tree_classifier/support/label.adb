@@ -1105,30 +1105,32 @@ package body Label is
       use Integer_Label_Map_Package;
       Routine_Name : constant String :=
                        "Label.Transform_CM Integer_Array_List ";
-      Map_Val      : Integer := -1;
+      Map_Key      : Integer := -1;
    begin
       Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
+      Class_Mapping.Clear;
       for index in Y.First_Index .. Y.Last_Index loop
          declare
             Values : constant Integer_Array := Y (index);
             Found  : Boolean := False;
          begin
-            for col in Values'Range loop
-               if not Class_Mapping.Is_Empty then
+            if Class_Mapping.Is_Empty then
+               Map_Key := Map_Key + 1;
+               Class_Mapping.Include (Map_Key, Values (Values'First));
+
+            else
+               for col in Values'Range loop
                   for key in Class_Mapping.First_Key .. Class_Mapping.Last_Key loop
-                     if Class_Mapping.Element (key) = Values (col) then
-                        Found := True;
+                     if not Found then
+                        Found := Class_Mapping.Element (key) = Values (col);
+                        if Found then
+                           Map_Key := Map_Key + 1;
+                           Class_Mapping.Include (Map_Key, Values (col));
+                        end if;
                      end if;
                   end loop;
-               end if;
-
-               if not Found then
-                  Put_Line (Routine_Name & "Values (col)" &
-                              Integer'Image (Values (col)));
-                  Map_Val := Map_Val + 1;
-                  Class_Mapping.Include (Map_Val, Values (col));
-               end if;
-            end loop;
+               end loop;
+            end if;
          end;
       end loop;
 
@@ -1137,16 +1139,18 @@ package body Label is
       declare
          Result  : Binary_Matrix
            (1 .. Positive (Y.Length), 1 .. Positive (Class_Mapping.Length))
-           := (others => (others => 1));
+           := (others => (others => 0));
       begin
          for row in Y.First_Index .. Y.Last_Index loop
             declare
                Values : constant Integer_Array := Y (row);
             begin
                for col in Values'Range loop
-                  if Class_Mapping.Element (col) /= Values (col) then
-                     Result (row, col) := 0;
-                  end if;
+                  for key in Class_Mapping.First_Key .. Class_Mapping.Last_Key loop
+                     if Values (col) = Class_Mapping.Element (key) then
+                        Result (row, col) := 1;
+                     end if;
+                  end loop;
                end loop;
             end;
          end loop;
@@ -1178,7 +1182,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Array)
-                       return Binary_Matrix is
+                    return Binary_Matrix is
       --        Routine_Name : constant String :=
       --                         "Label.Transform Binarize Unbounded_String_Array Y ";
    begin
@@ -1189,7 +1193,7 @@ package body Label is
    --  -------------------------------------------------------------------------
 
    function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
-                       return Binary_Matrix is
+                    return Binary_Matrix is
       --        Routine_Name : constant String := "Label.Transform Binarize Unbounded_String_Matrix Y ";
    begin
       return Label_Binarize (Y, Self.Classes);
@@ -1199,3 +1203,6 @@ package body Label is
    --  -------------------------------------------------------------------------
 
 end Label;
+
+--  end Label;
+--                    Result (row, col) := 1;
