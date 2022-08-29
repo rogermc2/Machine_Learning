@@ -379,7 +379,6 @@ package body Encode_Utils is
       Ints_Curs       : Int_Sets.Cursor;
       Uniq_List       : NL_Types.Integer_List;
    begin
-      Put_Line (Routine_Name);
       for row in Values'Range loop
          for col in Values'Range (2) loop
             Unique_Integers.Include (Values (row, col));
@@ -394,8 +393,6 @@ package body Encode_Utils is
       end loop;
 
       Sort (Uniq_List);
-      Put_Line (Routine_Name & "Uniq_List length" &
-                  Integer'Image (Integer (Uniq_List.Length)));
 
       return Uniq_List;
 
