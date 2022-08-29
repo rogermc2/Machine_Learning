@@ -48,7 +48,7 @@ package body Test_Support is
 
    --  ------------------------------------------------------------------------
 
-   procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix) is
+   procedure Print_Binary_Matrix (Name : String; aMatrix : Binary_Matrix) is
    begin
       Put_Line (Name & ": ");
       for row in aMatrix'Range loop
@@ -187,6 +187,19 @@ package body Test_Support is
 
    --  ------------------------------------------------------------------------
 
+   procedure Print_Integer_Matrix (Name : String; aMatrix : Integer_Matrix) is
+   begin
+      Put_Line (Name & ": ");
+      for row in aMatrix'Range loop
+         for col in aMatrix'Range (2) loop
+            Put (Integer'Image (aMatrix (row, col)) & "  ");
+         end loop;
+         New_Line;
+      end loop;
+
+   end Print_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix) is
    begin

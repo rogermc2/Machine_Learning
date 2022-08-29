@@ -379,22 +379,34 @@ package body Label is
    end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
- --  L586 Multiclass uses the maximal score instead of a threshold.
+   --  L586 Multiclass uses the maximal score instead of a threshold.
    function Inverse_Binarize_Multiclass
      (Y : Binary_Matrix; Classes : Integer_List) return Integer_Matrix is
       use Classifier_Utilities;
       --          Routine_Name   :  constant String :=
-      --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
-      Inverse        : Integer_Matrix  (Y'Range, 1 .. 1);
+      --                             "Label.Inverse_Binarize_Multiclass Integer_Matrix ";
+      Dim            : Natural := 0;
       Max_Indices    : Integer_Array (Y'Range);
    begin
       --  L627
       Max_Indices := Max_Probability_Indices (Y);
-      for row in Inverse'Range loop
-         Inverse (row, 1) := Classes.Element (Max_Indices (row));
+      for col in Y'Range (2) loop
+         if Y (1, col) = 1 then
+            Dim := Dim + 1;
+         end if;
       end loop;
 
-      return Inverse;
+      declare
+         Inverse : Integer_Matrix  (Y'Range, 1 .. Dim);
+      begin
+         for row in Inverse'Range loop
+            for col in Inverse'Range (2) loop
+               Inverse (row, col) := Classes.Element (Max_Indices (row));
+            end loop;
+         end loop;
+
+         return Inverse;
+      end;
 
    end Inverse_Binarize_Multiclass;
 

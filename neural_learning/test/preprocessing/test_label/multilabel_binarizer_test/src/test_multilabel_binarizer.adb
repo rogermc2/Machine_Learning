@@ -82,6 +82,9 @@ begin
       Assert (MLB2.Classes = Expected_Mat_Classes,
               "Unexpected lambda_Mat classes");
       Assert (Got = Indicator_Mat2, "Got invalid lambda_Mat data");
+      Test_Support.Print_Integer_Matrix ("lambda_Mat", lambda_Mat);
+      Test_Support.Print_Integer_Matrix ("lambda_Mat inverse",
+                                         Label.Inverse_Transform (MLB2, Got));
       Assert (Label.Inverse_Transform (MLB2, Got) = lambda_Mat,
               "invalid inverse lambda_Mat Got");
    end;

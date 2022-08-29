@@ -372,8 +372,8 @@ package body Encode_Utils is
    function Unique (Values : Integer_Matrix) return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;
-      Routine_Name    : constant String :=
-                          "Encode_Utils.Unique Integer_Matrix ";
+--        Routine_Name    : constant String :=
+--                            "Encode_Utils.Unique Integer_Matrix ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
