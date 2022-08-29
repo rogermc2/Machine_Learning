@@ -5,11 +5,13 @@ with Ada.Assertions; use  Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Label;
---  with NL_Types; use NL_Types;
+with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Test_Support;
 
 procedure Test_Multilabel_Binarizer is
+   use NL_Types.Integer_Package;
+   use Integer_Array_Package;
    Routine_Name     : constant String := "Test_Multilabel_Binarizer ";
    Indicator_Mat    : constant Binary_Matrix (1 .. 3, 1 .. 3) :=
                         ((0, 1, 1), (1, 0, 0), (1, 1, 0));
@@ -18,8 +20,8 @@ procedure Test_Multilabel_Binarizer is
    lambda1_1        : constant Integer_Array (1 .. 2) := (2, 3);
    lambda1_2        : constant Integer_Array (1 .. 1) := (1 => 1);
    lambda1_3        : constant Integer_Array (1 .. 2) := (1, 2);
-   lambda1          :  Integer_Array_List;
-   --     Expected_Classes : Unbounded_List;
+   lambda1          : Integer_Array_List;
+   Expected_Classes : NL_Types.Integer_List;
    --     Expected1        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
    --                          ((1 => 0), (1 => 0), (1 => 0), (1 => 0));
    --     Expected2        : constant Binary_Matrix (1 .. 4, 1 .. 1) :=
@@ -36,14 +38,18 @@ begin
    lambda1.Append (lambda1_1);
    lambda1.Append (lambda1_2);
    lambda1.Append (lambda1_3);
+   Expected_Classes.Append (1);
+   Expected_Classes.Append (2);
+   Expected_Classes.Append (3);
 
    declare
       Got1 : constant Binary_Matrix := Label.Fit_Transform (MLB, lambda1);
    begin
       Test_Support.Print_Binary_Matrix ("Got1", Got1);
-      --     Assert (LB.Classes = Expected_Classes, "Unexpected classes");
+      Assert (MLB.Classes = Expected_Classes, "Unexpected classes");
       Assert (Got1 = Indicator_Mat, "Got1 invalid data");
-      --     Assert (Label.Inverse_Transform (LB, Got) = Inp1, "invalid inverse Got");
+      Assert (Label.Inverse_Transform (MLB, Got1) = lambda1,
+              "invalid inverse Got1");
    end;
    --     --  Two classes case
    --     Expected_Classes.Prepend (Neg);

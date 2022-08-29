@@ -472,18 +472,60 @@ package body Label is
 
     --  L586 Multiclass uses the maximal score instead of a threshold.
     function Inverse_Binarize_Multiclass
-      (Y_Prob : Binary_Matrix ; Classes : Unbounded_List)
+      (Y : Binary_Matrix ; Classes : Unbounded_List)
        return Unbounded_String_Array is
         use Classifier_Utilities;
         --          Routine_Name   :  constant String :=
         --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
-        Inverse     : Unbounded_String_Array (Y_Prob'Range);
-        Max_Indices : Integer_Array (Y_Prob'Range);
+        Inverse     : Unbounded_String_Array (Y'Range);
+        Max_Indices : Integer_Array (Y'Range);
     begin
         --  L627
-        Max_Indices := Max_Probability_Indices (Y_Prob);
+        Max_Indices := Max_Probability_Indices (Y);
         for row in Inverse'Range loop
             Inverse (row) := Classes.Element (Max_Indices (row));
+        end loop;
+
+        return Inverse;
+
+    end Inverse_Binarize_Multiclass;
+
+    --  -------------------------------------------------------------------------
+    --  L586 Multiclass uses the maximal score instead of a threshold.
+    function Inverse_Binarize_Multiclass
+      (Y : Binary_Matrix ; Classes : Integer_List) return Integer_Array_List is
+--          use Classifier_Utilities;
+        --          Routine_Name   :  constant String :=
+        --                             "Label.Inverse_Binarize_Multiclass Binary_Matrix ";
+        Inverse          : Integer_Array_List;
+--          Max_Indices      : Integer_Array (Y'Range);
+        Row_Classes      : Integer_List;
+        Row_Classes_List : Integer_List_2D;
+    begin
+        --  L627
+--          Max_Indices := Max_Probability_Indices (Y);
+        for row in Y'Range loop
+            Row_Classes.Clear;
+            for col in Y'Range (2) loop
+                if Y (row, col) = 1 then
+                    Row_Classes.Append (Classes (col));
+                end if;
+            end loop;
+            Row_Classes_List.Append (Row_Classes);
+        end loop;
+
+        for row in Row_Classes_List.First_Index ..
+          Row_Classes_List.Last_Index loop
+            declare
+                Row_Classes   : constant Integer_List := Row_Classes_List (row);
+                Inverse_Array : Integer_Array
+                  (1 .. Positive (Row_Classes.Length));
+            begin
+                for col in Row_Classes.First_Index .. Row_Classes.Last_Index loop
+                    Inverse_Array (col) := Row_Classes (col);
+                end loop;
+                Inverse.Append (Inverse_Array);
+            end;
         end loop;
 
         return Inverse;
@@ -724,7 +766,8 @@ package body Label is
                                 return Integer_Matrix is
         use Multiclass_Utils;
         --        Routine_Name : constant String := "Label.Inverse_Transform ";
-        Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label) / 2.0;
+        Threshold    : constant Float := (Self.Pos_Label + Self.Neg_Label)
+                         / 2.0;
     begin
         --  L398
         if Self.Y_Kind = Y_Multiclass then
@@ -733,6 +776,21 @@ package body Label is
             return Inverse_Binarize_Thresholding
               (Y, Self.Y_Kind, Self.Classes, Threshold);
         end if;
+
+    end Inverse_Transform;
+
+    --  -------------------------------------------------------------------------
+
+    function Inverse_Transform (Self : Multi_Label_Binarizer; Y : Binary_Matrix)
+                                return Integer_Array_List is
+        use Multiclass_Utils;
+        Routine_Name : constant String :=
+                         "Label.Inverse_Transform Multi_Label_Binarizer ";
+    begin
+        --  L398
+        Assert (Self.Y_Kind = Y_Multiclass, Routine_Name &
+                  "only supports Y_Multiclass");
+        return Inverse_Binarize_Multiclass (Y, Self.Classes);
 
     end Inverse_Transform;
 
