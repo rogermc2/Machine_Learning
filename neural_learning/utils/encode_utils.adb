@@ -337,14 +337,13 @@ package body Encode_Utils is
    function Unique (List : Integer_Array_List) return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;
-      Routine_Name    : constant String :=
-                          "Encode_Utils.Unique Integer_Array_List ";
+      --  Routine_Name    : constant String :=
+      --                      "Encode_Utils.Unique Integer_Array_List ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
       Uniq_List       : NL_Types.Integer_List;
    begin
-      Put_Line (Routine_Name);
       for index in List.First_Index .. List.Last_Index loop
          declare
             Values : constant Integer_Array := List (index);
@@ -363,8 +362,6 @@ package body Encode_Utils is
       end loop;
 
       Sort (Uniq_List);
-      Put_Line (Routine_Name & "Uniq_List length" &
-                  Integer'Image (Integer (Uniq_List.Length)));
 
       return Uniq_List;
 
