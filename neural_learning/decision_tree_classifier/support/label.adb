@@ -238,6 +238,33 @@ package body Label is
    end Fit;
 
    --  -------------------------------------------------------------------------
+   --  L740 Fit
+   procedure Fit (Binarizer : in out UB_Multi_Label_Binarizer;
+                  Y         : Unbounded_String_Array_List) is
+--        Routine_Name : constant String :=
+--                         "Label.Fit MLB Unbounded_String_Array_List ";
+      Classes      : NL_Types.Unbounded_List;
+--        Duplicates   : Boolean := False;
+   begin
+      if Binarizer.Classes.Is_Empty then
+         --  L758
+         Classes := Multiclass_Utils.Unique_Labels (Y);
+      else
+         --  L759
+--           for index in Classes.First_Index .. Classes.Last_Index - 1 loop
+--              Duplicates := Duplicates and Classes (index) in
+--                Classes.First_Index + index - 1 .. Classes.Last_Index;
+--              Assert (not Duplicates, Routine_Name &
+--                        "Classes contains duplicates.");
+--           end loop;
+         Classes := Binarizer.Classes;
+      end if;
+
+      Binarizer.Classes := Classes;
+
+   end Fit;
+
+   --  -------------------------------------------------------------------------
 
    procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array) is
       Routine_Name : constant String := "Label.Fit Encoder ";

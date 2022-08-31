@@ -37,6 +37,12 @@ package Label is
         Classes : Unbounded_List;
     end record;
 
+    type UB_Multi_Label_Binarizer
+      (Y_Kind : Multiclass_Utils.Y_Type := Multiclass_Utils.Y_Multiclass)
+    is record
+        Classes : Unbounded_List;
+    end record;
+
     --  Label_Encoder should be used to encode target values,
     --  i.e. Y and not the input X.
     type Label_Encoder (Encoder_Kind : Class_Type; Num_Items : Positive) is
@@ -72,6 +78,8 @@ package Label is
     procedure Fit (Encoder : in out Label_Encoder; Y : Integer_Array);
     procedure Fit (Binarizer : in out Multi_Label_Binarizer;
                    Y         : Integer_Array_List);
+    procedure Fit (Binarizer : in out UB_Multi_Label_Binarizer;
+                   Y         : Unbounded_String_Array_List);
     function Fit_Transform (Binarizer : in out Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix;
     function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;

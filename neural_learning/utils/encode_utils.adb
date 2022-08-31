@@ -510,6 +510,42 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (Values : Unbounded_String_Array_List)
+                    return NL_Types.Unbounded_List is
+      use UB_String_Sets;
+      use NL_Types.Unbounded_Sorting;
+      --  Routine_Name    : constant String :=
+      --                      "Encode_Utils.Unique Unbounded_String_Array_List ";
+      UB_Value        : Unbounded_String;
+      Unique_Strings  : UB_String_Sets.Set;
+      UB_Curs         : UB_String_Sets.Cursor;
+      Uniq_List       : NL_Types.Unbounded_List;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         declare
+            UB_Array : constant Unbounded_String_Array := Values (index);
+         begin
+            for col in UB_Array'Range loop
+               Unique_Strings.Include (UB_Array (col));
+            end loop;
+         end;
+      end loop;
+
+      UB_Curs := Unique_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Curs) loop
+         UB_Value := UB_String_Sets.Element (UB_Curs);
+         Uniq_List.Append (UB_Value);
+         UB_String_Sets.Next (UB_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
    function Unique (Values : Unbounded_String_Matrix)
                     return NL_Types.Unbounded_List is
       use UB_String_Sets;

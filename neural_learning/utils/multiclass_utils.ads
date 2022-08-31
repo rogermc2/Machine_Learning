@@ -28,6 +28,8 @@ package Multiclass_Utils is
    function Unique_Labels (Y : Binary_Matrix) return NL_Types.Integer_List;
    function Unique_Labels (Y : Integer_Array) return NL_Types.Integer_List;
    function Unique_Labels (Y : Integer_Array_List) return NL_Types.Integer_List;
+   function Unique_Labels (Y : Unbounded_String_Array_List)
+                           return NL_Types.Unbounded_List;
    function Unique_Labels (Y : NL_Types.Integer_List)
                            return NL_Types.Integer_List;
    function Unique_Labels (Y : Integer_Matrix) return NL_Types.Integer_List;

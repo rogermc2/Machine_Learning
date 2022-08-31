@@ -37,6 +37,7 @@ procedure Test_Multilabel_Binarizer is
    Expected_Classes     : NL_Types.Integer_List;
    Expected_Mat_Classes : NL_Types.Integer_List;
    MLB                  : Label.Multi_Label_Binarizer;
+   UB_MLB               : Label.UB_Multi_Label_Binarizer;
 begin
    Put_Line (Routine_Name);
    lambda1.Append (lambda1_1);
@@ -99,14 +100,14 @@ begin
    String1.Append (Inp13);
 
    --  fit case strings
-   Label.Fit (MLB, String1);
+   Label.Fit (UB_MLB, String1);
    declare
       Got : constant Binary_Matrix := Label.Transform (String1);
    begin
       Test_Support.Print_Binary_Matrix ("String1 Got", Got);
-      --        Assert (MLB.Classes = Expected_Classes, "fit case unexpected classes");
+      --        Assert (UB_MLB.Classes = Expected_Classes, "fit case unexpected classes");
       --        Assert (Got = Indicator_Mat, "fit case Got invalid data");
-      Assert (Label.Inverse_Transform (MLB, Got) = String1,
+      Assert (Label.Inverse_Transform (UB_MLB, Got) = String1,
               "fit case invalid inverse Got");
    end;
 

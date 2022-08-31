@@ -40,6 +40,8 @@ package Encode_Utils is
    function Unique (Values : Real_Float_Matrix) return NL_Types.Float_List;
    function Unique (Values : Unbounded_String_Array)
                     return NL_Types.Unbounded_List;
+   function Unique (Values : Unbounded_String_Array_List)
+                    return NL_Types.Unbounded_List;
    function Unique (Values : Unbounded_String_Matrix)
                     return NL_Types.Unbounded_List;
 
