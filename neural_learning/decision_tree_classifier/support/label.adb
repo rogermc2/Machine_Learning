@@ -50,6 +50,9 @@ package body Label is
    function Transform_CM
      (Y : Integer_Matrix; Class_Mapping : in out Integer_List)
       return Binary_Matrix;
+   function Transform_CM
+     (Y             : Unbounded_String_Array_List;
+      Class_Mapping : in out Unbounded_List) return Binary_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -1121,7 +1124,7 @@ package body Label is
    --  L835
    function Transform (Y : Integer_Array_List) return Binary_Matrix is
       --  Routine_Name  : constant String :=
-      --                    "Label.Transform MLB Integer_Array_List ";
+      --                    "Label.Transform Integer_Array_List ";
       Class_Mapping : Integer_List;
    begin
       return Transform_CM (Y, Class_Mapping);
@@ -1134,6 +1137,17 @@ package body Label is
       --        Routine_Name : constant String :=
       --                         "Label.Transform Integer_Matrix ";
       Class_Mapping :  Integer_List;
+   begin
+      return Transform_CM (Y, Class_Mapping);
+
+   end Transform;
+
+   --  -------------------------------------------------------------------------
+   --  L835
+   function Transform (Y : Unbounded_String_Array_List) return Binary_Matrix is
+      --  Routine_Name  : constant String :=
+      --                    "Label.Transform Unbounded_String_Array_List ";
+      Class_Mapping : Unbounded_List;
    begin
       return Transform_CM (Y, Class_Mapping);
 
@@ -1238,6 +1252,63 @@ package body Label is
                   end if;
                end loop;
             end loop;
+         end loop;
+
+         return Result;
+      end;
+
+   end Transform_CM;
+
+   --  -------------------------------------------------------------------------
+
+   function Transform_CM
+     (Y             : Unbounded_String_Array_List;
+      Class_Mapping : in out Unbounded_List) return Binary_Matrix is
+      use Unbounded_Sorting;
+      Routine_Name : constant String :=
+                       "Label.Transform_CM Unbounded_String_Array_List ";
+   begin
+      Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
+      Class_Mapping.Clear;
+
+      for index in Y.First_Index .. Y.Last_Index loop
+         declare
+            Values : constant Unbounded_String_Array := Y (index);
+            Found  : Boolean := False;
+         begin
+            for col in Values'Range loop
+               for key in Class_Mapping.First_Index ..
+                 Class_Mapping.Last_Index loop
+                  Found := Found or
+                    Class_Mapping (key) = Values (col);
+               end loop;
+
+               if not Found then
+                  Class_Mapping.Append (Values (col));
+               end if;
+            end loop;
+         end;
+      end loop;
+
+      Sort (Class_Mapping);
+      declare
+         Result  : Binary_Matrix
+           (1 .. Positive (Y.Length), 1 .. Positive (Class_Mapping.Length))
+           := (others => (others => 0));
+      begin
+         for row in Y.First_Index .. Y.Last_Index loop
+            declare
+               Values : constant Unbounded_String_Array := Y (row);
+            begin
+               for col in Values'Range loop
+                  for key in Class_Mapping.First_Index ..
+                    Class_Mapping.Last_Index loop
+                     if Values (col) = Class_Mapping.Element (key) then
+                        Result (row, key) := 1;
+                     end if;
+                  end loop;
+               end loop;
+            end;
          end loop;
 
          return Result;

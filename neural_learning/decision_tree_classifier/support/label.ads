@@ -136,6 +136,7 @@ package Label is
                         return Binary_Matrix;
     function Transform (Y : Integer_Array_List) return Binary_Matrix;
     function Transform (Y : Integer_Matrix) return Binary_Matrix;
+    function Transform (Y : Unbounded_String_Array_List) return Binary_Matrix;
     function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Array)
                         return Binary_Matrix;
     function Transform (Self : UB_Label_Binarizer; Y : Unbounded_String_Matrix)
