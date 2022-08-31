@@ -8,11 +8,12 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Label;
 with NL_Types;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Test_Support;
+with Test_Support;
 
 procedure Test_Multilabel_Binarizer is
    use NL_Types.Integer_Package;
    use Integer_Array_Package;
+   use NL_Types.Unbounded_Package;
    Routine_Name         : constant String := "Test_Multilabel_Binarizer ";
    Spam                 : constant Unbounded_String := To_Unbounded_String ("spam");
    Eggs                 : constant Unbounded_String := To_Unbounded_String ("eggs");
@@ -35,6 +36,7 @@ procedure Test_Multilabel_Binarizer is
    lambda1              : Integer_Array_List;
    String1              : Unbounded_String_Array_List;
    Expected_Classes     : NL_Types.Integer_List;
+   Expected_UB_Classes  : NL_Types.Unbounded_List;
    Expected_Mat_Classes : NL_Types.Integer_List;
    MLB                  : Label.Multi_Label_Binarizer;
    UB_MLB               : Label.UB_Multi_Label_Binarizer;
@@ -100,15 +102,21 @@ begin
    String1.Append (Inp13);
 
    --  fit case strings
+   Put_Line (Routine_Name & "fit case strings");
+   Expected_UB_Classes.Append (Zero);
+   Expected_UB_Classes.Append (Eggs);
+   Expected_UB_Classes.Append (Spam);
    Label.Fit (UB_MLB, String1);
+   Test_Support.Print_Unbound_List ("UB_MLB.Classes", UB_MLB.Classes);
    declare
       Got : constant Binary_Matrix := Label.Transform (String1);
    begin
       Test_Support.Print_Binary_Matrix ("String1 Got", Got);
-      --        Assert (UB_MLB.Classes = Expected_Classes, "fit case unexpected classes");
+      Assert (UB_MLB.Classes = Expected_UB_Classes,
+              "Strings fit case unexpected classes");
       --        Assert (Got = Indicator_Mat, "fit case Got invalid data");
-      Assert (Label.Inverse_Transform (UB_MLB, Got) = String1,
-              "fit case invalid inverse Got");
+--        Assert (Label.Inverse_Transform (UB_MLB, Got) = String1,
+--                "fit case invalid inverse Got");
    end;
 
    Put_Line (Routine_Name & "tests passed.");
