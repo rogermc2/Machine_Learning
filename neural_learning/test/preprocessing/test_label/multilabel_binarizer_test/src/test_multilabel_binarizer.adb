@@ -14,6 +14,7 @@ procedure Test_Multilabel_Binarizer is
    use NL_Types.Integer_Package;
    use Integer_Array_Package;
    use NL_Types.Unbounded_Package;
+   use Unbounded_String_Array_Package;
    Routine_Name         : constant String := "Test_Multilabel_Binarizer ";
    Spam                 : constant Unbounded_String := To_Unbounded_String ("spam");
    Eggs                 : constant Unbounded_String := To_Unbounded_String ("eggs");
@@ -115,8 +116,8 @@ begin
       Assert (UB_MLB.Classes = Expected_UB_Classes,
               "Strings fit case unexpected classes");
       --        Assert (Got = Indicator_Mat, "fit case Got invalid data");
---        Assert (Label.Inverse_Transform (UB_MLB, Got) = String1,
---                "fit case invalid inverse Got");
+      Assert (Label.Inverse_Transform (UB_MLB, Got) = String1,
+              "fit case invalid inverse Got");
    end;
 
    Put_Line (Routine_Name & "tests passed.");

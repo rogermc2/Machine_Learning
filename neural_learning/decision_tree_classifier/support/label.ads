@@ -112,6 +112,9 @@ package Label is
                                 return Integer_Matrix;
     function Inverse_Transform (Self : Multi_Label_Binarizer; Y : Binary_Matrix)
                                 return Integer_Array_List;
+   function Inverse_Transform (Self : UB_Multi_Label_Binarizer;
+                               Y    : Binary_Matrix)
+                                return Unbounded_String_Array_List;
     function Inverse_Transform (Self : Multi_Label_Binarizer; Y : Binary_Matrix)
                                 return Integer_Matrix;
     function Label_Binarize (Y, Classes : Integer_List;

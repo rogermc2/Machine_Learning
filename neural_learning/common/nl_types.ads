@@ -126,6 +126,11 @@ package NL_Types is
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
 
+   use Unbounded_Package;
+   package Unbounded_Package_2D is new
+     Ada.Containers.Vectors (Positive, Unbounded_List);
+   subtype Unbounded_List_2D is Unbounded_Package_2D.Vector;
+
    type Row_Data (Class_Count : Class_Range := 2) is record
       Features : Feature_Data_Array (1 .. Class_Count);
       Label    : Unbounded_String;
@@ -134,7 +139,6 @@ package NL_Types is
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
-   use Unbounded_Package;
    package Raw_Data_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_List);
    subtype Raw_Data_Vector is Raw_Data_Package.Vector;
