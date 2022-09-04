@@ -40,7 +40,7 @@ with Generic_Label_Binarize_Array;
 with Generic_Label_Binarize_Array_List;
 with Generic_Label_Binarize_Matrix;
 --  with Printing;
-with Test_Support;
+--  with Test_Support;
 
 package body Label is
 
@@ -352,6 +352,40 @@ package body Label is
    end Fit_Transform;
 
    --  -------------------------------------------------------------------------
+  --  L789
+   function Fit_Transform (Binarizer : in out UB_Multi_Label_Binarizer;
+                           Y         : Unbounded_String_Array_List)
+                           return Binary_Matrix is
+      use Unbounded_Sorting;
+      Routine_Name  : constant String :=
+                        "Label.Fit_Transform Unbounded_String_Array_List ";
+   begin
+      Assert (not Y.Is_Empty, Routine_Name & "Y is empty");
+      if not Binarizer.Classes.Is_Empty then
+         Fit (Binarizer, Y);
+         return Transform (Y);
+
+      else
+         declare
+            Class_Mapping : Unbounded_List;
+            --  L814 yt = self._transform(y, class_mapping)
+            CM_Matrix     : constant Binary_Matrix :=
+                              Transform_CM (Y, Class_Mapping);
+         begin
+            for key in Class_Mapping.First_Index ..
+              Class_Mapping.Last_Index loop
+               Binarizer.Classes.Append (Class_Mapping.Element (key));
+            end loop;
+
+            --  L817
+            Sort (Binarizer.Classes);
+            return CM_Matrix;
+         end;
+      end if;
+
+   end Fit_Transform;
+
+   --  -------------------------------------------------------------------------
    --  L305
    function Fit_Transform
      (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Matrix)
@@ -411,8 +445,8 @@ package body Label is
    --  L586
    function Inverse_Binarize_Multiclass
      (Y : Binary_Matrix; Classes : Integer_List) return Integer_Matrix is
-      Routine_Name     :  constant String :=
-                           "Label.Inverse_Binarize_Multiclass Integer_Matrix ";
+--        Routine_Name     :  constant String :=
+--                             "Label.Inverse_Binarize_Multiclass Integer_Matrix ";
       Dim              : Natural := 0;
    begin
       --  L627
@@ -421,7 +455,7 @@ package body Label is
             Dim := Dim + 1;
          end if;
       end loop;
-      Test_Support.Print_Binary_Matrix (Routine_Name & "Y", Y);
+
       declare
          Inverse : Integer_Matrix  (Y'Range, 1 .. Dim);
          I_Col   : Natural;
@@ -444,7 +478,7 @@ package body Label is
    end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
-   --  L586 Multiclass uses the maximal score instead of a threshold.
+   --  L586
    function Inverse_Binarize_Multiclass
      (Y : Binary_Matrix ; Classes : Unbounded_List)
       return Unbounded_String_Array is
@@ -465,7 +499,7 @@ package body Label is
    end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
-   --  L586 Multiclass uses the maximal score instead of a threshold.
+   --  L586
    function Inverse_Binarize_Multiclass
      (Y : Binary_Matrix ; Classes : Integer_List) return Integer_Array_List is
       --          Routine_Name   :  constant String :=
@@ -504,11 +538,10 @@ package body Label is
    end Inverse_Binarize_Multiclass;
 
    --  -------------------------------------------------------------------------
-   --  L586 Multiclass uses the maximal score instead of a threshold.
+   --  L586
    function Inverse_Binarize_Multiclass
      (Y : Binary_Matrix ; Classes : Unbounded_List)
       return Unbounded_String_Array_List is
-      --          use Classifier_Utilities;
       --          Routine_Name   :  constant String :=
       --                             "Label.Inverse_Binarize_Multiclass Unbounded_String_Array_List ";
       Inverse          : Unbounded_String_Array_List;
@@ -546,7 +579,7 @@ package body Label is
 
    --  -------------------------------------------------------------------------
 
-   --  L586 Multiclass uses the maximal score instead of a threshold.
+   --  L586
    function Inverse_Binarize_Multiclass
      (Y_Prob : Binary_Matrix ; Classes : Unbounded_List)
       return Unbounded_String_Matrix is

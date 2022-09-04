@@ -85,7 +85,11 @@ package Label is
     function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
                             Y         : Integer_Matrix) return Binary_Matrix;
     function Fit_Transform (Binarizer : in out Multi_Label_Binarizer;
-                            Y         : Integer_Array_List) return Binary_Matrix;
+                            Y         : Integer_Array_List)
+                            return Binary_Matrix;
+    function Fit_Transform (Binarizer : in out UB_Multi_Label_Binarizer;
+                            Y         : Unbounded_String_Array_List)
+                            return Binary_Matrix;
     function Fit_Transform
       (Binarizer : in out UB_Label_Binarizer; Y : Unbounded_String_Array)
        return Binary_Matrix;

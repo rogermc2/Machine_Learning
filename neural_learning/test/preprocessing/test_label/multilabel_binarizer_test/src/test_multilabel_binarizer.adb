@@ -20,7 +20,7 @@ procedure Test_Multilabel_Binarizer is
    Eggs                 : constant Unbounded_String := To_Unbounded_String ("eggs");
    Zero                 : constant Unbounded_String := To_Unbounded_String ("0");
    Inp11                : constant Unbounded_String_Array (1 .. 2) :=
-                           (Spam, Zero);
+                           (Zero, Spam);
    Inp12                : constant Unbounded_String_Array (1 .. 1) :=
                             (1 => Eggs);
    Inp13                : constant Unbounded_String_Array (1 .. 2) :=
@@ -98,6 +98,7 @@ begin
               "matrix fit_transform case invalid inverse lambda_Mat Got");
    end;
 
+   String1.Clear;
    String1.Append (Inp11);
    String1.Append (Inp12);
    String1.Append (Inp13);
@@ -115,9 +116,21 @@ begin
       Test_Support.Print_Binary_Matrix ("String1 Got", Got);
       Assert (UB_MLB.Classes = Expected_UB_Classes,
               "Strings fit case unexpected classes");
-      --        Assert (Got = Indicator_Mat, "fit case Got invalid data");
+      --    Assert (Got = Indicator_Mat, "fit case Got invalid data");
       Assert (Label.Inverse_Transform (UB_MLB, Got) = String1,
               "fit case invalid inverse Got");
+   end;
+
+   --  fit_transform case strings
+   declare
+      MLB2 : Label.UB_Multi_Label_Binarizer;
+      Got  : constant Binary_Matrix := Label.Fit_Transform (MLB2, String1);
+   begin
+      Assert (MLB2.Classes = Expected_UB_Classes,
+              "fit_transform case unexpected classes");
+--        Assert (Got = Indicator_Mat, "fit_transform case Got invalid data");
+      Assert (Label.Inverse_Transform (MLB2, Got) = String1,
+              "fit_transform case invalid inverse Got");
    end;
 
    Put_Line (Routine_Name & "tests passed.");
