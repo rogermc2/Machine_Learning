@@ -5,6 +5,7 @@ with Ada.Containers.Generic_Array_Sort;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with NL_Types;
+--  with Printing;
 
 package body Generic_Label_Binarize_Matrix is
 
@@ -23,6 +24,8 @@ package body Generic_Label_Binarize_Matrix is
       Result       : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes) :=
                        (others => (others => Neg_Label));
    begin
+      Put_Line (Routine_Name & "Num_Classes" & Integer'Image (Num_Classes));
+      Put_Line (Routine_Name & "Y length " & Integer'Image (Y'Length));
       for row in 1 .. Y'Length loop
          for col in 1 .. Num_Classes loop
             Class_Index :=
@@ -114,6 +117,7 @@ package body Generic_Label_Binarize_Matrix is
             Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
               := (others => (others => Neg_Label));
          begin
+            Put_Line (Routine_Name & "Y length " & Integer'Image (Y'Length));
             Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
             return Y_Bin2;
          end;

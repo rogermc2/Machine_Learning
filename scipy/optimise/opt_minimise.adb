@@ -40,7 +40,7 @@ package body Opt_Minimise is
                        X0          : Stochastic_Optimizers.Parameters_List;
                        Method      : Method_Type := No_Method;
                        Jac         : Num_Diff.FD_Methods := Num_Diff.FD_None;
-                       Hess        : Num_Diff.FD_Methods := Num_Diff.FD_None;
+--                         Hess        : Num_Diff.FD_Methods := Num_Diff.FD_None;
                        Bounds      : Opt_Constraints.Bounds_List :=
                          Opt_Constraints.Array_Bounds_Package.Empty_Vector;
                        Constraints : Minimise_Constraints_List :=
