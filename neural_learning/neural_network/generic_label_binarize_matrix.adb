@@ -19,15 +19,16 @@ package body Generic_Label_Binarize_Matrix is
                       Neg_Label, Pos_Label : Integer) return Binary_Matrix is
       use NL_Types.Unbounded_Package;
       Routine_Name :  constant String := "Generic_Label_Binarize.Binarize ";
-      Num_Classes  : constant Positive := Classes'Length;
+--        Num_Classes  : constant Positive := Classes'Length;
       Class_Index  : Natural;
-      Result       : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes) :=
+      Result       : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2)) :=
                        (others => (others => Neg_Label));
    begin
-      Put_Line (Routine_Name & "Num_Classes" & Integer'Image (Num_Classes));
-      Put_Line (Routine_Name & "Y length " & Integer'Image (Y'Length));
+--        Assert (Y'length (2) /= Num_Classes, Routine_Name & "Num_Classes" &
+--                  Integer'Image (Num_Classes) & "> Y (2) length" &
+--                  Integer'Image (Y'Length (2)));
       for row in 1 .. Y'Length loop
-         for col in 1 .. Num_Classes loop
+         for col in 1 .. Y'Length (2) loop
             Class_Index :=
               Find_Index (Classes, Y (row, col));
             Assert (Class_Index /= No_Index, Routine_Name &
@@ -57,7 +58,7 @@ package body Generic_Label_Binarize_Matrix is
    end Find_Index;
 
    --  ------------------------------------------------------------------------
-
+   --  L416
    function Label_Binarize (Y         : Y_Matrix_Type;
                             Classes   : Class_Array_Type;
                             Neg_Label : Integer := 0;
@@ -117,7 +118,6 @@ package body Generic_Label_Binarize_Matrix is
             Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
               := (others => (others => Neg_Label));
          begin
-            Put_Line (Routine_Name & "Y length " & Integer'Image (Y'Length));
             Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
             return Y_Bin2;
          end;
