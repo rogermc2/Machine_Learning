@@ -48,7 +48,7 @@ with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
-with Printing;
+--  with Printing;
 with Utils;
 with Utils_Optimise;
 
@@ -1046,7 +1046,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
-      Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -1069,7 +1069,8 @@ package body Multilayer_Perceptron is
 
       --  L344
       Self.Attributes.Params.Clear;  --  Layers
-      Printing.Print_Integer_List (Routine_Name & "Layer_Units", Layer_Units);
+--        Printing.Print_Integer_List (Routine_Name &
+--                                       "Layer_Units", Layer_Units);
 
       --  L351
       --  python range(self.n_layers_ - 1) => 0 .. self.n_layers_ - 1
@@ -1295,14 +1296,14 @@ package body Multilayer_Perceptron is
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                       return Integer_Matrix is
-      Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
    begin
-      Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 35, 40);
-      Printing.Print_Integer_Matrix
-        (Routine_Name & "Inverse_Transform",
-         Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 35, 40);
+--        Printing.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred, 35, 40);
+--        Printing.Print_Integer_Matrix
+--          (Routine_Name & "Inverse_Transform",
+--           Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred), 35, 40);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;
