@@ -2,6 +2,8 @@
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
+
+with Base;
 with Load_Dataset;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -32,7 +34,7 @@ procedure Test_Digits is
    Random_Index       : Positive;
    Layer_Sizes        : NL_Types.Integer_List;
    aClassifier        : MLP_Classifier;
-
+   theScore           : Float;
 begin
    Put_Line (Routine_Name);
    for index in 1 .. Num_Samples loop
@@ -60,5 +62,8 @@ begin
    Layer_Sizes.Append (128);
    aClassifier := C_Init (Hidden_Layer_Sizes => Layer_Sizes);
    Fit (aClassifier, X_Train, Y_Train);
+
+   theScore := Base.Score (aClassifier, X_Test, Y_Test);
+   Put_Line ("Score: " & Float'Image (theScore));
 
 end Test_Digits;

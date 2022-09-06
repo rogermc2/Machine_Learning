@@ -5,7 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Multiclass_Utils;
 with Neural_Maths;
-with Printing;
+--  with Printing;
 
 package body Classification_Metrics is
 
@@ -62,9 +62,9 @@ package body Classification_Metrics is
                                             Y_Prediction);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
-      Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
-      Printing.Print_Integer_Matrix (Routine_Name & "Y_Prediction",
-                                     Y_Prediction, 1, 5);
+--        Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
+--        Printing.Print_Integer_Matrix (Routine_Name & "Y_Prediction",
+--                                       Y_Prediction, 1, 5);
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if Y_Prediction (row, col) = Y_True (row, col) then
@@ -72,7 +72,7 @@ package body Classification_Metrics is
             end if;
          end loop;
       end loop;
-      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
+--        Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
 
       return Weighted_Sum (Score, Normalize);
 
@@ -92,9 +92,9 @@ package body Classification_Metrics is
       NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_Prediction, Y_True);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
-      Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
-      Printing.Print_Binary_Matrix (Routine_Name & "Y_Prediction",
-                                     Y_Prediction, 1, 5);
+--        Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
+--        Printing.Print_Binary_Matrix (Routine_Name & "Y_Prediction",
+--                                       Y_Prediction, 1, 5);
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if Y_Prediction (row, col) = Y_True (row, col) then
@@ -102,7 +102,7 @@ package body Classification_Metrics is
             end if;
          end loop;
       end loop;
-      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
+--        Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 
@@ -122,9 +122,9 @@ package body Classification_Metrics is
                                             Y_Prediction);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
-      Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
-      Printing.Print_Integer_Matrix (Routine_Name & "Y_Prediction",
-                                     Y_Prediction, 1, 5);
+--        Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
+--        Printing.Print_Integer_Matrix (Routine_Name & "Y_Prediction",
+--                                       Y_Prediction, 1, 5);
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if Y_Prediction (row, col) = Y_True (row, col) then
@@ -132,7 +132,7 @@ package body Classification_Metrics is
             end if;
          end loop;
       end loop;
-      Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
+--        Printing.Print_Float_Matrix (Routine_Name & "Score", Score, 1, 10);
 
       return Weighted_Sum (Score, Sample_Weight, Normalize);
 

@@ -19,14 +19,11 @@ package body Generic_Label_Binarize_Matrix is
                       Neg_Label, Pos_Label : Integer) return Binary_Matrix is
       use NL_Types.Unbounded_Package;
       Routine_Name :  constant String := "Generic_Label_Binarize.Binarize ";
---        Num_Classes  : constant Positive := Classes'Length;
       Class_Index  : Natural;
-      Result       : Binary_Matrix (1 .. Y'Length, 1 .. Y'Length (2)) :=
+      Result       : Binary_Matrix (1 .. Y'Length, 1 .. Classes'Length) :=
                        (others => (others => Neg_Label));
    begin
---        Assert (Y'length (2) /= Num_Classes, Routine_Name & "Num_Classes" &
---                  Integer'Image (Num_Classes) & "> Y (2) length" &
---                  Integer'Image (Y'Length (2)));
+      Put_Line (Routine_Name & "Y'Length (2)" & Integer'Image (Y'Length (2)));
       for row in 1 .. Y'Length loop
          for col in 1 .. Y'Length (2) loop
             Class_Index :=
