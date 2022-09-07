@@ -45,7 +45,8 @@ package Utilities is
    function Number_Of_Features (Rows : Value_Data_List)
                                  return Class_Range;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
-   procedure Permute (aList : in out Integer_Array);
+   procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array);
+   procedure Permute (anArray : in out Integer_Array);
    function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
    function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix;
@@ -71,6 +72,7 @@ package Utilities is
    procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
    procedure Swap (Data : in out Boolean_Matrix; L, R : Positive);
    procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive);
+   procedure Swap (Data : in out Float_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Matrix; L, R : Positive);
    pragma Inline (Swap);

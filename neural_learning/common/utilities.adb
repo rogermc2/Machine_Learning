@@ -213,22 +213,47 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   procedure Permute (aList : in out Integer_Array) is
-      List_Length  : constant Positive := Positive (aList'Length);
+   procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array) is
+      Array_Length  : constant Positive := Positive (anArray'Length);
       Index_2      : Natural;
       Rand         : Positive;
    begin
-      if List_Length > 1 then
-         for row in aList'First .. aList'Last loop
+      if Array_Length > 1 then
+         for row in anArray'Range loop
             Rand := row +
-              Natural (abs (Maths.Random_Float) * Float (List_Length - row));
+              Natural (abs (Maths.Random_Float) * Float (Array_Length - row));
             Index_2 := 0;
-            while Index_2 <= aList'Last and then Index_2 < Rand loop
+            while Index_2 <= anArray'Last and then Index_2 < Rand loop
                Index_2 := Index_2 + 1;
             end loop;
 
-            if Index_2 <= aList'Last then
-               Swap (aList, row, Index_2);
+            if Index_2 <= anArray'Last then
+               Swap (anArray, row, Index_2);
+            end if;
+
+         end loop;
+      end if;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Permute (anArray : in out Integer_Array) is
+      Array_Length  : constant Positive := Positive (anArray'Length);
+      Index_2      : Natural;
+      Rand         : Positive;
+   begin
+      if Array_Length > 1 then
+         for row in anArray'Range loop
+            Rand := row +
+              Natural (abs (Maths.Random_Float) * Float (Array_Length - row));
+            Index_2 := 0;
+            while Index_2 <= anArray'Last and then Index_2 < Rand loop
+               Index_2 := Index_2 + 1;
+            end loop;
+
+            if Index_2 <= anArray'Last then
+               Swap (anArray, row, Index_2);
             end if;
 
          end loop;
@@ -623,8 +648,18 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out Integer_Array;
-                   L, R : Positive) is
+   procedure Swap (Data : in out Float_Array; L, R : Positive) is
+      Item : Float;
+   begin
+      Item := Data (L);
+      Data (L) := Data (R);
+      Data (R) := Item;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Swap (Data : in out Integer_Array; L, R : Positive) is
       Item : Integer;
    begin
       Item := Data (L);
