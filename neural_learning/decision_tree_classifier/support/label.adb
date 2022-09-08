@@ -620,12 +620,6 @@ package body Label is
          Assert (Y'Length (2) <= 2, Routine_Name &
                    "output_type is binary but Y'Length (2) is " &
                    Integer'Image (Y'Length (2)));
-         --        else
-         --           Assert (Y'Length (2) = Integer (Classes.Length), Routine_Name &
-         --                     "The number of classes" &
-         --                     Integer'Image (Integer (Classes.Length)) &
-         --                     " is not equal to Y'Length (2)" &
-         --                     Integer'Image (Y'Length (2)));
       end if;
 
       --  L653
@@ -642,7 +636,7 @@ package body Label is
          if Y_Thresh'Length (2) = 2 then
             for row in Y_Thresh'Range loop
                for col in Y_Thresh'Range (2) loop
-                  Inverse (row, col) := Classes (Y_Thresh (row, 2));
+                  Inverse (row, col) := Classes (Y_Thresh (row, 2) + 1);
                end loop;
             end loop;
 
