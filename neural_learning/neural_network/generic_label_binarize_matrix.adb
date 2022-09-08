@@ -23,7 +23,6 @@ package body Generic_Label_Binarize_Matrix is
       Result       : Binary_Matrix (1 .. Y'Length, 1 .. Classes'Length) :=
                        (others => (others => Neg_Label));
    begin
-      Put_Line (Routine_Name & "Y'Length (2)" & Integer'Image (Y'Length (2)));
       for row in 1 .. Y'Length loop
          for col in 1 .. Y'Length (2) loop
             Class_Index :=
@@ -112,7 +111,7 @@ package body Generic_Label_Binarize_Matrix is
          --  Label.py L539 - L549 needed to generate a csr sparse matrix
          --  Binarize is all that is needed for this implementation
          declare
-            Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
+            Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
               := (others => (others => Neg_Label));
          begin
             Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);

@@ -61,6 +61,7 @@ begin
     aClassifier := C_Init (Hidden_Layer_Sizes => Layer_Sizes);
     Fit (aClassifier, X_Train, Y_Train);
 
+    Put_Line ("Fitted");
     theScore := Base.Score (aClassifier, X_Test, Y_Test);
     Put_Line ("Score: " & Float'Image (theScore));
 
