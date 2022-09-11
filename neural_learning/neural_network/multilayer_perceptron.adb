@@ -171,13 +171,8 @@ package body Multilayer_Perceptron is
       --  L284
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
-      if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
-        Self.Attributes.Out_Activation = Logistic_Activation then
-         Loss_Function_Name := Binary_Log_Loss_Function;
-      else
-         Loss_Function_Name := Self.Attributes.Loss_Function_Name;
-      end if;
-
+      Test_Support.Print_Matrix_Dimensions
+        (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
       Assert (Y_Prob'Length = Activations.Last_Element'Length, Routine_Name &
                 "L284+ Y_Prob and Activations.Last_Element lengths are" &
                 " different");
@@ -186,6 +181,12 @@ package body Multilayer_Perceptron is
                 Integer'Image (Y_Prob'Length (2)) & " to" &
                 " Activations.Last_Element columns" &
                 Integer'Image (Activations.Last_Element'Length (2)));
+      if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
+        Self.Attributes.Out_Activation = Logistic_Activation then
+         Loss_Function_Name := Binary_Log_Loss_Function;
+      else
+         Loss_Function_Name := Self.Attributes.Loss_Function_Name;
+      end if;
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Prob",
         Y_Prob);
       Test_Support.Print_Matrix_Dimensions
@@ -873,6 +874,9 @@ package body Multilayer_Perceptron is
             Updated_Activ_Grads : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
+            Test_Support.Print_Matrix_Dimensions
+              (Routine_Name & "L131 Updated_Activ_Grads ", Updated_Activ_Grads);
+
             --  L132 Add layer + 1 activation
             Activations.Append (Updated_Activ_Grads + Params.Intercept_Grads);
             Assert (Activations.Last_Index = layer + 1, Routine_Name &
@@ -899,6 +903,9 @@ package body Multilayer_Perceptron is
             end if;
          end;  --  declare
       end loop;
+      Test_Support.Print_Matrix_Dimensions
+        (Routine_Name & "L138 Activations.Last_Element ",
+         Activations.Last_Element);
 
       --        Is_Probilities_Matrix (Routine_Name & "L138 Activations.Last_Element ",
       --                               Activations.Last_Element);
@@ -914,6 +921,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
+      Test_Support.Print_Matrix_Dimensions
+        (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
       --  Check that Activations.Last_Element rows are probabilities
       --        Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
       --                               Activations.Last_Element);
