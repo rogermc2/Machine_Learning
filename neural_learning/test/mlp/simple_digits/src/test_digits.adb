@@ -25,7 +25,6 @@ procedure Test_Digits is
    X_Train            : Real_Float_Matrix (1 .. Num_Samples, 1 .. Data.Num_Features);
    Y_Train            : Integer_Matrix (1 .. Num_Samples, 1 .. 1) :=
                           (others => (others => 0));
---     Labels             : constant Integer_Array := Data.Target;
    X_Test             : Real_Float_Matrix (1 .. Num_Samples, 1 .. Data.Num_Features);
    Y_Test             : Integer_Matrix (1 .. Num_Samples, 1 .. 1) :=
                           (others => (others => 0));
@@ -56,6 +55,7 @@ begin
       Y_Train (row, 1) := Data.Target (Random_Index);
       Y_Test (row, 1) := Data.Target (Random_Index);
    end loop;
+
    Test_Support.Print_Matrix_Dimensions ("X", X_Train);
    Test_Support.Print_Matrix_Dimensions ("Y", Y_Train);
 

@@ -164,6 +164,7 @@ package body Base_Neural is
 
    function Binary_Log_Loss (Y_True, Y_Prob : Real_Float_Matrix)
                               return Float is
+--        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
       YT2          : Real_Float_Matrix
         (Y_True'Range, Y_True'First (2) .. Y_True'Last (2) + 1);
       YP_Clip      : Real_Float_Matrix := Y_Prob;
@@ -187,6 +188,10 @@ package body Base_Neural is
       end Do_XlogY;
 
    begin
+--        Put_Line (Routine_Name & "Y_True size" & Integer'Image (Y_True'Length) &
+--                    " x" & Integer'Image (Y_True'Length (2)));
+--        Put_Line (Routine_Name & "Y_Prob size" & Integer'Image (Y_Prob'Length) &
+--                    " x" & Integer'Image (Y_Prob'Length (2)));
       Clip (YP_Clip);
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for row in Y_Prob'Range loop

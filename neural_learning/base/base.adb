@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/base.py
 
---  with Ada.Text_IO; use Ada.Text_IO;
+with Ada.Text_IO; use Ada.Text_IO;
 
 with Classification_Metrics;
 --  with Printing;
@@ -12,10 +12,11 @@ package body Base is
                    X    : Real_Float_Matrix; Y : Integer_Matrix)
                    return Float is
       Routine_Name : constant String := "Base.Score ";
+      --  Pred returns a matrix of samples x classes
       Pred         : constant Integer_Matrix :=
                        Multilayer_Perceptron.Predict (Self, X);
    begin
-      Check_Lengths (Routine_Name, Pred, Y);
+      Put_Line (Routine_Name & "Y'Length (2)" & Integer'Image (Y'Length (2)));
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction => Pred, Normalize => True);
    end Score;
@@ -30,7 +31,7 @@ package body Base is
                        Multilayer_Perceptron.Predict (Self, X);
    begin
       Check_Lengths (Routine_Name, Pred, Y);
-      --        Printing.Print_Float_Matrix ("Routine_Name X", X, 1 ,1);
+      Put_Line (Routine_Name & "Y'Length (2)" & Integer'Image (Y'Length (2)));
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction => Pred, Normalize => True,
          Sample_Weight => Sample_Weight);

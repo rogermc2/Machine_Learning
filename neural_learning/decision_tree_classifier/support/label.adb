@@ -609,17 +609,24 @@ package body Label is
       return Integer_Matrix is
       use Ada.Containers;
       use Multiclass_Utils;
-      Routine_Name :  constant String :=
+      Routine_Name : constant String :=
                        "Label.Inverse_Binarize_Thresholding ";
+      Num_Classes  : constant Positive := Positive (Classes.Length);
       Y_Thresh     : Integer_Matrix (Y'Range, Y'Range (2)) :=
                        (others => (others => 0));
       Inverse      : Integer_Matrix (Y'Range, Y'Range (2)) :=
                        (others => (others => 0));
    begin
+      Put_Line (Routine_Name & "Num_Classes:" & Integer'Image (Num_Classes));
       if Output_Type = Y_Binary then
          Assert (Y'Length (2) <= 2, Routine_Name &
                    "output_type is binary but Y'Length (2) is " &
                    Integer'Image (Y'Length (2)));
+      else
+         Assert (Y'Length (2) /= Num_Classes, Routine_Name &
+                   "output_type is binary but Y'Length (2) " &
+                   Integer'Image (Y'Length (2)) & " is not Num_Classes" &
+                   Integer'Image (Num_Classes));
       end if;
 
       --  L653
@@ -633,7 +640,9 @@ package body Label is
 
       --  L657
       if Output_Type = Y_Binary then
+         Put_Line (Routine_Name & "Output_Type = Y_Binary");
          if Y_Thresh'Length (2) = 2 then
+            Put_Line (Routine_Name & "Thresh'Length (2) = 2");
             for row in Y_Thresh'Range loop
                for col in Y_Thresh'Range (2) loop
                   Inverse (row, col) := Classes (Y_Thresh (row, 2) + 1);
