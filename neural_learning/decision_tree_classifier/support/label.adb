@@ -997,7 +997,7 @@ package body Label is
    end Label_Binarize;
 
    --  -------------------------------------------------------------------------
-
+   --  L416
    function Label_Binarize (Y         : Integer_Matrix;
                             Classes   : Integer_List;
                             Neg_Label : Integer := 0;
@@ -1077,7 +1077,7 @@ package body Label is
    end Transform;
 
    --  -------------------------------------------------------------------------
-
+   --  L327  Transform transforms multi-class labels to binary labels.
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                        return Binary_Matrix is
       --        Routine_Name : constant String := "Label.Transform Binarize Integer Y ";

@@ -178,13 +178,19 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
 
---        Assert (Y_Prob'Length = Activations.Last_Element'Length and then
---                Y_Prob'Length (2) = Activations.Last_Element'Length (2),
---          Routine_Name & "L284+ Y_Prob size" &
---          Integer'Image (Y_Prob'Length) & " x" &
---          Integer'Image (Y_Prob'Length (2)) & " Activations.Last_Element size" &
---          Integer'Image (Activations.Last_Element'Length) & " x" &
---          Integer'Image (Activations.Last_Element'Length (2)));
+      Assert (Y_Prob'Length = Activations.Last_Element'Length, Routine_Name &
+                "L284+ Y_Prob and Activations.Last_Element lengths are" &
+                " different");
+      Assert (Y_Prob'Length (2) = Activations.Last_Element'Length (2),
+              Routine_Name & "L284+ Y_Prob has different number of columns" &
+                Integer'Image (Y_Prob'Length (2)) & " to" &
+                " Activations.Last_Element columns" &
+                Integer'Image (Activations.Last_Element'Length (2)));
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Prob",
+        Y_Prob);
+      Test_Support.Print_Matrix_Dimensions
+        (Routine_Name & "L284+ Activations.Last_Element",
+         Activations.Last_Element);
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
@@ -496,7 +502,7 @@ package body Multilayer_Perceptron is
         (not Self.Parameters.Warm_Start and then not Incremental);
 
       --  L402
-      Self.Attributes.N_Outputs := Positive (Y'Length (2));
+      Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
       Put_Line (Routine_Name & "L402 N_Outputs" &
                   Integer'Image (Self.Attributes.N_Outputs));
 
@@ -535,7 +541,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L377  MultilayerPerceptron._Fit
    --  L759  MultilayerPerceptron.Fit
-   --  The Y values are class labels in classification,
+   --  The Y_Bin values are class labels in classification,
    --  real numbers in regression.
    procedure Fit (Self        : in out MLP_Classifier;
                   X           : Real_Float_Matrix;
@@ -547,12 +553,12 @@ package body Multilayer_Perceptron is
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
-      --  L394
+      --  L394  Y_Bin has dimensions num_samples x num_classes
+      --  Validate_Input generates class columns from the Y columns
       Y_Bin              : constant Binary_Matrix :=
                              Validate_Input (Self, Y, Incremental);
       Layer_Units        : Integer_List;
       Activations        : Real_Matrix_List;
-      --        Params             : Parameters_List;
    begin
       Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
                 "Hidden_Layer_Sizes is empty");
@@ -562,8 +568,10 @@ package body Multilayer_Perceptron is
         Self.Attributes.Params.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
 
-      --  L402
-      Self.Attributes.N_Outputs := Positive (Y'Length (2));
+      --  L402  In this context "Outputs" are "classes" having binary values
+      --  0 or 1 for each sample depending whether or not the sample output
+      --  value corresponds to th class value
+      Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
       Put_Line (Routine_Name & "L402 N_Outputs" &
                   Integer'Image (Self.Attributes.N_Outputs));
 
