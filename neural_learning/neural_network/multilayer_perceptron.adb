@@ -49,7 +49,7 @@ with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
 --  with Printing;
---  with Test_Support;
+with Test_Support;
 with Utils;
 with Utils_Optimise;
 
@@ -169,6 +169,8 @@ package body Multilayer_Perceptron is
       --  Printing.Print_Float_Matrix (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
       Is_Probilities_Matrix (Routine_Name & "Y_Prob ", Y_Prob);
       --  L284
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
@@ -176,13 +178,13 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
 
-      Assert (Y_Prob'Length = Activations.Last_Element'Length and then
-              Y_Prob'Length (2) = Activations.Last_Element'Length (2),
-        Routine_Name & "L284+ Y_Prob size" &
-        Integer'Image (Y_Prob'Length) & " x" &
-        Integer'Image (Y_Prob'Length (2)) & " Activations.Last_Element size" &
-        Integer'Image (Activations.Last_Element'Length) & " x" &
-        Integer'Image (Activations.Last_Element'Length (2)));
+--        Assert (Y_Prob'Length = Activations.Last_Element'Length and then
+--                Y_Prob'Length (2) = Activations.Last_Element'Length (2),
+--          Routine_Name & "L284+ Y_Prob size" &
+--          Integer'Image (Y_Prob'Length) & " x" &
+--          Integer'Image (Y_Prob'Length (2)) & " Activations.Last_Element size" &
+--          Integer'Image (Activations.Last_Element'Length) & " x" &
+--          Integer'Image (Activations.Last_Element'Length (2)));
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
@@ -494,7 +496,9 @@ package body Multilayer_Perceptron is
         (not Self.Parameters.Warm_Start and then not Incremental);
 
       --  L402
-      Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
+      Self.Attributes.N_Outputs := Positive (Y'Length (2));
+      Put_Line (Routine_Name & "L402 N_Outputs" &
+                  Integer'Image (Self.Attributes.N_Outputs));
 
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
@@ -560,6 +564,8 @@ package body Multilayer_Perceptron is
 
       --  L402
       Self.Attributes.N_Outputs := Positive (Y'Length (2));
+      Put_Line (Routine_Name & "L402 N_Outputs" &
+                  Integer'Image (Self.Attributes.N_Outputs));
 
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
