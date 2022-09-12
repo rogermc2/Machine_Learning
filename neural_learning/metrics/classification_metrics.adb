@@ -51,8 +51,9 @@ package body Classification_Metrics is
 
    --  ------------------------------------------------------------------------
 
-   function Accuracy_Score (Y_True, Y_Prediction : Integer_Matrix;
-                            Normalize            : Boolean := True) return Float is
+   function Accuracy_Score
+      (Y_True, Y_Prediction : Integer_Matrix; Normalize : Boolean := True)
+       return Float is
       Routine_Name : constant String :=
                        "Classification_Metrics.Accuracy_Score ";
       Score        : Real_Float_Matrix (Y_True'Range, Y_True'Range (2)) :=
