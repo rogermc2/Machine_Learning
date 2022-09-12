@@ -1330,7 +1330,16 @@ package body Multilayer_Perceptron is
    end Predict;
 
    --  -------------------------------------------------------------------------
-   --  L637
+   --  L1237  Probability estimates
+   function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
+                     return Real_Float_Matrix is
+   begin
+      return Forward_Pass_Fast (Self, X);
+
+   end Predict_ProbA;
+
+   --  -------------------------------------------------------------------------
+  --  L637
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;

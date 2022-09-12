@@ -4,10 +4,10 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
+with Base;
 with Data_Splitter;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with NL_Types;
 with Samples_Generator; use Samples_Generator;
 with Test_Support;
 
@@ -25,15 +25,18 @@ procedure Classifier_Example is
     X_Test        : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
     Y_Test        : Integer_Matrix (1 .. Test_Size, Y'Range (2));
     MLP           : MLP_Classifier := C_Init (Max_Iter => 300);
+    Prediction    : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
+    Score         : Float;
 
 begin
     Put_Line (Routine_Name);
     Data_Splitter.Train_Test_Split (X, Y, Train_Size, Test_Size, X_Train,
                                     Y_Train, X_Test, Y_Test);
     Fit (MLP, X_Train, Y_Train);
-    pred
+    Prediction := Predict_ProbA (MLP, X_Test);
+    Test_Support.Print_Matrix_Dimensions ("Prediction", Prediction);
 
-    Test_Support.Print_Matrix_Dimensions ("X", X);
-    Test_Support.Print_Matrix_Dimensions ("Y", Y);
+    Score := Base.Score (MLP, X_Test, Y_Test);
+    Put_Line ("Score: " & Float'Image (Score));
 
 end Classifier_Example;
