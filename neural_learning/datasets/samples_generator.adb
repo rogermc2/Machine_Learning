@@ -146,12 +146,11 @@ package body Samples_Generator is
                      Assert (Y_Gen (col) <= P_W_C_Ex'Length (2),
                              Routine_Name & "L431 Y_Gen col " &
                                Integer'Image (Y_Gen (col)) &
-                               " > P_W_C_Ex'Length (2)"  &
+                               " > PWC_Ex'Length (2)"  &
                                Integer'Image (P_W_C_Ex'Length (2)));
                      Assert (col <= P_W_C_2'Length (2),
-                             Routine_Name & "L431 col " &
-                               Integer'Image (Y_Gen (col)) &
-                               " > P_W_C_2'Length (2)"  &
+                             Routine_Name & "L431 Y_Gen col " &
+                               Integer'Image (col) & " > num PWC_2 cols"  &
                                Integer'Image (P_W_C_2'Length (2)));
                      P_W_C_2 (row, col) := P_W_C_Ex (row, Y_Gen (col));
                   end loop;
