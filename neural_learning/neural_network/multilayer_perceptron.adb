@@ -1319,7 +1319,8 @@ package body Multilayer_Perceptron is
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
    begin
-      Put_Line (Routine_Name & "Y_Pred'Length (2)" & Integer'Image (Y_Pred'Length (2)));
+      Put_Line (Routine_Name & "Y_Pred'Length (2)" &
+                  Integer'Image (Y_Pred'Length (2)));
       --        Test_Support.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred);
       --        Test_Support.Print_Integer_Matrix
       --          (Routine_Name & "Inverse_Transform",
