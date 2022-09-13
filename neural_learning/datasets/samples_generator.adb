@@ -13,7 +13,161 @@ with NL_Types;
 package body Samples_Generator is
 
    --  -------------------------------------------------------------------------
+   --  Make_Classification generates a random n-class classification problem
+   --  which initially creates clusters of points normally distributed (std=1)
+   --  about vertices of an n_informative-dimensional hypercube with sides of
+   --  length 2*class_sep and assigns an equal number of clusters to each class.
+   --  It introduces interdependence between these features and adds various
+   --  types of further noise to the data.
+   function Make_Classification
+     (N_Samples            : Positive := 100;
+      N_Features           : Positive := 20;
+      N_Informative        : Positive := 2;
+      N_Redundant          : Positive := 2;
+      N_Repeated           : Natural := 0;
+      N_Classes            : Positive := 2;
+      N_Clusters_Per_Class : Positive := 2;
+      Weights              : in out NL_Types.Float_List;
+      Flip_Y               : Float := 0.01;
+      Class_Sep            : Float := 1.0;
+      Hypercube            : Boolean := True;
+      Shift                : Float := 0.0;
+      Scale                : Float := 1.0;
+      Shuffle              : Boolean := True;
+      Random_State         : Boolean := False)
+      return Classification_Test_Data is
+      use NL_Types;
+      use Float_Package;
+      use Maths.Float_Math_Functions;
+      Routine_Name : constant String :=
+                       "Samples_Generator.Make_Multilabel_Classification ";
+      N_Clusters   :constant Positive := N_Classes * N_Clusters_Per_Class;
+      N_Useless    :constant Positive := N_Features - N_Informative -
+                       N_Redundant - N_Repeated;
+      Sum               : Float := 0.0;
 
+      N_Samples_Per_Cluster  : Integer_Array (1 .. N_Clusters);
+      N_Cluster_Samples      : Natural := 0;
+      X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
+        := (others => (others => 0.0));
+      Y              : Integer_Array (1 .. N_Samples) := (others => 0);
+      Classification : Classification_Test_Data (N_Samples, N_Features,
+                                                 N_Classes);
+      LB             : Label.Label_Binarizer;
+      X_Indices      : Integer_List;
+      X_Ind_Ptr      : Array_Of_Integer_Lists (1 .. N_Samples);
+   begin
+      Put_Line (Routine_Name);
+      Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
+              Routine_Name & "the total number of informative, redundant " &
+                " and repeated features must be less than number of " &
+                " features");
+
+      Assert (Float (N_Informative) >= Maths.Float_Math_Functions.Log
+              (Float (N_Classes * N_Clusters_Per_Class), 2.0), Routine_Name &
+                "N_Classes * N_Clusters_Per_Class must be smaller than or " &
+                "equal to 2 ^ N_Informative");
+
+      --  L192
+      if Is_Empty (Weights) then
+         for index in 1 .. N_Classes loop
+            Weights.Append (1.0 / Float (N_Classes));
+         end loop;
+      else
+         Assert (Integer (Weights.Length) = N_Classes or else
+                 Integer (Weights.Length) = N_Classes - 1, Routine_Name &
+                   "the specified number of weights is incompatible with the " &
+                   "number of classes.");
+         if Integer (Weights.Length) = N_Classes - 1 then
+            for index in Weights.First_Index .. Weights.Last_Index loop
+               Sum := Sum + Weights (index);
+            end loop;
+            Weights.Append (1.0 - Sum);
+         end if;
+      end if;
+
+      --  Distribute samples among clusters by weight
+      for index in N_Samples_Per_Cluster'Range loop
+         N_Samples_Per_Cluster (index) :=
+           Integer (Float (N_Samples) * Weights (index mod N_Classes)
+                    / Float (N_Clusters_Per_Class));
+      end loop;
+      for index in N_Samples_Per_Cluster'Range loop
+         N_Cluster_Samples := N_Cluster_Samples + N_Samples_Per_Cluster (index);
+      end loop;
+
+      for index in 1 .. N_Samples - N_Cluster_Samples loop
+         N_Samples_Per_Cluster (index mod N_Clusters) :=
+           N_Samples_Per_Cluster (index mod N_Clusters) + 1;
+      end loop;
+
+      P_W_C := Normalize_Rows (P_W_C);
+
+      for index in Cum_P_C'Range loop
+         Cum_P_C_List.Append (Cum_P_C (index));
+      end loop;
+
+      --  L436
+      for sample_index in 1 .. N_Samples loop
+         --           Put_Line (Routine_Name & "L436 sample_index:" &
+         --                       Integer'Image (sample_index));
+         declare
+            Sample_Y  : Integer_List;
+            --  L437
+            Words     : constant Integer_Array :=
+                          Sample_Example (P_W_C, Sample_Y);
+         begin
+            --  L438
+            X_Indices := Classifier_Utilities.To_Integer_List (Words);
+            X_Ind_Ptr (sample_index) := X_Indices;
+            --  L440
+            Y (sample_index) := Sample_Y;
+         end;
+      end loop;
+
+      --  L441
+      --  csr_matrix((X_data, X_indices, X_indptr),
+      --  shape=(n_samples, n_features)) is
+      --  a representation where the column indices for row i are
+      --  in X_indices[X_indptr[i] : X_indptr[i + 1]] and their
+      --  related values are in X_data[X_indptr[i]:X_indptr[i+1]]
+
+      --  sum_duplicates
+      for row in X_Ind_Ptr'Range loop
+         for sp_col in X_Ind_Ptr (row).First_Index ..
+           X_Ind_Ptr (row).Last_Index loop
+            X (row, X_Ind_Ptr (row).Element (sp_col)) :=
+              X (row, X_Ind_Ptr (row).Element (sp_col)) + 1.0;
+         end loop;
+      end loop;
+
+      --  L453
+      --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
+      Label.Fit (LB, Y);
+      declare
+         Y_Bin : constant Binary_Matrix := Label.Transform (LB, Y);
+      begin
+         --           Put_Line (Routine_Name & "L453 Y_Bool size :" &
+         --                       Integer'Image (Y_Bool'Length) & " x" &
+         --                       Integer'Image (Y_Bool'Length (2)));
+         --           Put_Line (Routine_Name & "L453 Classification.Y length:" &
+         --                       Integer'Image (Classification.Y'Length) & " x" &
+         --                       Integer'Image (Classification.Y'Length (2)));
+         Classification.Y := Y_Bin;
+      end;
+
+      Classification.X := X;
+
+      if Return_Distributions then
+         Classification.Class_Probability := P_C;
+         Classification.Feature_Class_Probability := P_W_C;
+      end if;
+
+      return Classification;
+
+   end Make_Classification;
+
+   --  -------------------------------------------------------------------------
    --  Make_Multilabel_Classification generates random samples with multiple
    --  labels reflecting a bag of words drawn from a mixture of topics.
    --  The number of topics for each document is drawn from a Poisson
@@ -49,7 +203,7 @@ package body Samples_Generator is
       --  probability and conditional probabilities of features given classes
       --  from which the data was drawn
       Return_Distributions : Boolean := False)
-      return Classification_Test_Data is
+      return Multilabel_Classification_Test_Data is
       use NL_Types;
       Routine_Name : constant String :=
                        "Samples_Generator.Make_Multilabel_Classification ";
@@ -287,5 +441,6 @@ package body Samples_Generator is
       return Classification;
 
    end Make_Multilabel_Classification;
+
 
 end Samples_Generator;
