@@ -14,6 +14,8 @@ package Maths is
 
    function Cube_Root (Value : Float) return Float;
    function Degrees (Angle : Radian) return Degree;
+   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0)
+                                 return Float;
    function Poisson (Lambda : Float) return Integer;
    function Poisson_Single (Lambda : Float) return Integer;
    function Radians (Angle : Degree) return Radian;

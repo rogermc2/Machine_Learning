@@ -117,20 +117,26 @@ package body Samples_Generator is
       --  L222 Build the polytope whose vertices become cluster centroids
       Centroids := Generate_Hypercube (N_Clusters, N_Informative);
       Centroids := 2.0 * Class_Sep * Centroids - Class_Sep;
-      if not Hypercube then
-         declare
-            Rand_Clusters : Real_Float_Vector (1 .. N_Clusters);
-            Rand_Inform   : Real_Float_Vector (1 .. N_Informative);
-         begin
-            for index in Rand_Clusters'Range loop
-               Rand_Clusters (index) := abs (Maths.Random_Float);
-            end loop;
-            for index in Rand_Inform'Range loop
-               Rand_Inform (index) := abs (Maths.Random_Float);
-            end loop;
-            Centroids := Centroids * Rand_Clusters;
-         end;
-      end if;
+--        if not Hypercube then
+--           declare
+--              Rand_Clusters : Real_Float_Vector (1 .. N_Clusters);
+--              Rand_Inform   : Real_Float_Vector (1 .. N_Informative);
+--           begin
+--              for index in Rand_Clusters'Range loop
+--                 Rand_Clusters (index) := abs (Maths.Random_Float);
+--              end loop;
+--              for index in Rand_Inform'Range loop
+--                 Rand_Inform (index) := abs (Maths.Random_Float);
+--              end loop;
+--              Centroids := Centroids * Rand_Clusters;
+--           end;
+--        end if;
+
+      for row in X'Range loop
+         for col in 1 .. N_Informative loop
+            X (row, col) := Maths.Normal_Distribution;
+         end loop;
+      end loop;
 
       --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
       Label.Fit (LB, Y);

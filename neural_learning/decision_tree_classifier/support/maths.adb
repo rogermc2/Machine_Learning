@@ -29,6 +29,18 @@ package body Maths is
 
    --  -----------------------------------------------------------------------
 
+   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0) return Float is
+      use Ada.Numerics;
+      use Float_Random;
+      use Float_Math_Functions;
+   begin
+      return Mu + Sigma * Sqrt (-2.0 * Log (Random (Float_Gen), 10.0)) *
+        Cos (2.0 * Pi * Random (Float_Gen));
+
+   end Normal_Distribution;
+
+   --  -----------------------------------------------------------------------
+
    --      function Poisson (Mean : Float := 0.0) return Integer is
    --          use Ada.Numerics.Float_Random;
    --          use Float_Math_Functions;
