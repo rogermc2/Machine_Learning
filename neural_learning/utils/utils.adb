@@ -45,7 +45,7 @@ package body Utils is
    end Gen_Batches;
 
    --  -------------------------------------------------------------------------
-
+   --  Knuth's algorithm S
    function Sample_Without_Replacement (Population_Size, Sample_Size : Natural)
                                         return Integer_Array is
       --        Routine_Name : constant String := "Utils.Sample_Without_Replacement ";
@@ -54,14 +54,15 @@ package body Utils is
       u            : Float;
       Samples      : Integer_Array (1 .. Sample_Size);
    begin
-      while N_Selected < Sample_Size loop
-         u := abs (Maths.Random_Float);
-         if Float (Population_Size - N_Checked) * u <
-           Float (Sample_Size - N_Selected) then
-            Samples (N_Selected) := N_Checked;
-            N_Selected := N_Selected + 1;
-         end if;
+      while N_Checked < Population_Size and then
+        N_Selected < Sample_Size loop
          N_Checked := N_Checked + 1;
+            u := abs (Maths.Random_Float);
+            if Float (Population_Size - N_Checked - 1) * u <
+              Float (Sample_Size - N_Selected) then
+               Samples (N_Selected) := N_Checked;
+               N_Selected := N_Selected + 1;
+            end if;
       end loop;
 
       return Samples;
@@ -121,6 +122,29 @@ package body Utils is
 
    --  ------------------------------------------------------------------------
 
+   --  From https://rosettacode.org/wiki/Knuth%27s_algorithm_S#Ada
+   --  Knuth's algorithm S is a method of randomly sampling n items from a set
+   --  of M items with equal probability where M >= n and M, the number of
+   --  items, is unknown until the end.
+   --  This means that equal probability sampling should be maintained for all
+   --  successive items > n as they become available (although the content of
+   --  Algorithm:
+   --  1. Select the first n items as the sample as they become available;
+   --  2. For the i-th item where i > n, have a random chance of n/i of keeping it.
+   --     If failing this chance, the sample remains unchanged.
+   --     otherwise, have it randomly (1/n) replace one of the previously selected
+   --     n items of the sample.
+   --  3. Repeat the 2nd step for any subsequent items.
+   --  Task:
+   --  1. Create a function S_Of_N_Creator that given n, the maximum sample size,
+   --     returns a function S_Of_N that takes one parameter, item.
+   --  2. Function S_Of_N when called with successive items returns an
+   --     equi-weighted random sample of up to n of its items so far each time it
+   --     is called, calculated using Knuths Algorithm S.
+   --  The Ada example, instead of defining a function S_of_N_Creator, defines a
+   --  generic packgage with that name.
+   --  The generic parameters are N (=Sample_Size) and the type of the items to be
+   --  sampled:
    package body S_Of_N_Creator is
 
       package Rand_Float renames Ada.Numerics.Float_Random;
@@ -132,17 +156,19 @@ package body Utils is
       Item_Count : Natural := 0; -- global counter
       Sample     : Item_Array;   -- also used globally
 
-      procedure Update(New_Item : Item_Type) is
+      procedure Update (New_Item : Item_Type) is
       begin
          Item_Count := Item_Count + 1;
          if Item_Count <= Sample_Size then
             --  select the first Sample_Size items as the sample
             Sample (Item_Count) := New_Item;
          else
-            --  for I-th item, I > Sample_Size: Sample_Size/I chance of keeping it
+            --  for the I-th item where I > Sample_Size:
+            --  Sample_Size/I is the chance of keeping it
             if (Float (Sample_Size) / Float (Item_Count)) >
-              Rand_Float.Random (F_Gen)  then
-               --  randomly (1 / Sample_Size) replace one of the items of the sample
+              Rand_Float.Random (F_Gen) then
+               --  randomly (1 / Sample_Size) replace one of the items of the
+               --  sample
                Sample (Rand_Discrete.Random (D_Gen)) := New_Item;
             end if;
          end if;
@@ -159,6 +185,7 @@ package body Utils is
       --  at package instantiation, initialize rnd-generators
       Rand_Discrete.Reset (D_Gen);
       Rand_Float.Reset (F_Gen);
+
    end S_Of_N_Creator;
 
    --  ------------------------------------------------------------------------
