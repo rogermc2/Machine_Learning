@@ -12,6 +12,17 @@ with NL_Types;
 
 package body Samples_Generator is
 
+   function Generate_Hypercube (N_Rows, N_Cols : Positive) return
+   Real_Float_Matrix is
+      Hypercube : Real_Float_Matrix (1 .. N_Rows, 1 .. N_Cols);
+   begin
+
+      return Hypercube;
+
+   end Generate_Hypercube;
+
+   --  -------------------------------------------------------------------------
+
    --  -------------------------------------------------------------------------
    --  Make_Classification generates a random n-class classification problem
    --  which initially creates clusters of points normally distributed (std=1)
@@ -101,8 +112,7 @@ package body Samples_Generator is
            N_Samples_Per_Cluster (index mod N_Clusters) + 1;
       end loop;
 
-      P_W_C := Normalize_Rows (P_W_C);
-
+      --  Build the polytope whose vertices become cluster centroids
       for index in Cum_P_C'Range loop
          Cum_P_C_List.Append (Cum_P_C (index));
       end loop;
