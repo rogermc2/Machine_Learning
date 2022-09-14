@@ -179,6 +179,8 @@ package NL_Arrays_And_Matrices is
                                    return Real_Float_Matrix;
    function To_Real_Float_Matrix (IM : Integer_Matrix)
                                    return Real_Float_Matrix;
+   function To_Real_Float_Vector (List : Integer_Array)
+                                  return Real_Float_Vector;
    function To_Real_Float_Vector (List : Real_Float_List)
                                    return Real_Float_Vector;
    function To_Unbound_Array (UB_List : NL_Types.Unbounded_List)

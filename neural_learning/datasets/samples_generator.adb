@@ -4,6 +4,7 @@ with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
+with Utils;
 
 with Classifier_Utilities;
 with Label;
@@ -12,16 +13,14 @@ with NL_Types;
 
 package body Samples_Generator is
 
-   function Generate_Hypercube (N_Rows, N_Cols : Positive) return
-   Real_Float_Matrix is
-      Hypercube : Real_Float_Matrix (1 .. N_Rows, 1 .. N_Cols);
+   function Generate_Hypercube (Population_Size, Sample_Size : Positive)
+                                return Real_Float_Vector is
    begin
 
-      return Hypercube;
+      return To_Real_Float_Vector (Utils.Sample_Without_Replacement
+                                   (Population_Size, Sample_Size));
 
    end Generate_Hypercube;
-
-   --  -------------------------------------------------------------------------
 
    --  -------------------------------------------------------------------------
    --  Make_Classification generates a random n-class classification problem
@@ -50,6 +49,7 @@ package body Samples_Generator is
       use NL_Types;
       use Float_Package;
       use Maths.Float_Math_Functions;
+      use Real_Float_Arrays;
       Routine_Name : constant String :=
                        "Samples_Generator.Make_Multilabel_Classification ";
       N_Clusters   :constant Positive := N_Classes * N_Clusters_Per_Class;
@@ -62,6 +62,8 @@ package body Samples_Generator is
       X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
         := (others => (others => 0.0));
       Y              : Integer_Array (1 .. N_Samples) := (others => 0);
+      Centroids      : Real_Float_Vector (1 .. N_Informative);
+
       Classification : Classification_Test_Data (N_Samples, N_Features,
                                                  N_Classes);
       LB             : Label.Label_Binarizer;
@@ -112,46 +114,24 @@ package body Samples_Generator is
            N_Samples_Per_Cluster (index mod N_Clusters) + 1;
       end loop;
 
-      --  Build the polytope whose vertices become cluster centroids
-      for index in Cum_P_C'Range loop
-         Cum_P_C_List.Append (Cum_P_C (index));
-      end loop;
-
-      --  L436
-      for sample_index in 1 .. N_Samples loop
-         --           Put_Line (Routine_Name & "L436 sample_index:" &
-         --                       Integer'Image (sample_index));
+      --  L222 Build the polytope whose vertices become cluster centroids
+      Centroids := Generate_Hypercube (N_Clusters, N_Informative);
+      Centroids := 2.0 * Class_Sep * Centroids - Class_Sep;
+      if not Hypercube then
          declare
-            Sample_Y  : Integer_List;
-            --  L437
-            Words     : constant Integer_Array :=
-                          Sample_Example (P_W_C, Sample_Y);
+            Rand_Clusters : Real_Float_Vector (1 .. N_Clusters);
+            Rand_Inform   : Real_Float_Vector (1 .. N_Informative);
          begin
-            --  L438
-            X_Indices := Classifier_Utilities.To_Integer_List (Words);
-            X_Ind_Ptr (sample_index) := X_Indices;
-            --  L440
-            Y (sample_index) := Sample_Y;
+            for index in Rand_Clusters'Range loop
+               Rand_Clusters (index) := abs (Maths.Random_Float);
+            end loop;
+            for index in Rand_Inform'Range loop
+               Rand_Inform (index) := abs (Maths.Random_Float);
+            end loop;
+            Centroids := Centroids * Rand_Clusters;
          end;
-      end loop;
+      end if;
 
-      --  L441
-      --  csr_matrix((X_data, X_indices, X_indptr),
-      --  shape=(n_samples, n_features)) is
-      --  a representation where the column indices for row i are
-      --  in X_indices[X_indptr[i] : X_indptr[i + 1]] and their
-      --  related values are in X_data[X_indptr[i]:X_indptr[i+1]]
-
-      --  sum_duplicates
-      for row in X_Ind_Ptr'Range loop
-         for sp_col in X_Ind_Ptr (row).First_Index ..
-           X_Ind_Ptr (row).Last_Index loop
-            X (row, X_Ind_Ptr (row).Element (sp_col)) :=
-              X (row, X_Ind_Ptr (row).Element (sp_col)) + 1.0;
-         end loop;
-      end loop;
-
-      --  L453
       --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
       Label.Fit (LB, Y);
       declare

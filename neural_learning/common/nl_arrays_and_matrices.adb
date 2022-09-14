@@ -859,6 +859,20 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Real_Float_Vector (List : Integer_Array)
+                                  return Real_Float_Vector is
+      Vec : Real_Float_Vector (List'Range);
+   begin
+      for index in List'Range loop
+         Vec (index) := Float (List (index));
+      end loop;
+
+      return Vec;
+
+   end To_Real_Float_Vector;
+
+   --  ------------------------------------------------------------------------
+
    function To_Real_Float_Vector (List : Real_Float_List)
                                   return Real_Float_Vector is
       Vec : Real_Float_Vector (1 .. Positive (List.Length));
