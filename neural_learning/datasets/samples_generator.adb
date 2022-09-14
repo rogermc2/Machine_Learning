@@ -14,11 +14,19 @@ with NL_Types;
 package body Samples_Generator is
 
    function Generate_Hypercube (Population_Size, Sample_Size : Positive)
-                                return Real_Float_Vector is
+                                return Real_Float_Matrix is
+      Vec       : constant Real_Float_Vector :=
+                    To_Real_Float_Vector (Utils.Sample_Without_Replacement
+                                          (Population_Size, Sample_Size));
+      Hypercube : Real_Float_Matrix (1 .. Population_Size, 1 .. Sample_Size);
    begin
+      for row in Hypercube'Range loop
+         for col in Hypercube'Range (2) loop
+            Hypercube (row, col) := Vec ((row - 1) * Sample_Size + col);
+         end loop;
+      end loop;
 
-      return To_Real_Float_Vector (Utils.Sample_Without_Replacement
-                                   (Population_Size, Sample_Size));
+      return Hypercube;
 
    end Generate_Hypercube;
 
@@ -50,25 +58,26 @@ package body Samples_Generator is
       use Float_Package;
       use Maths.Float_Math_Functions;
       use Real_Float_Arrays;
-      Routine_Name : constant String :=
-                       "Samples_Generator.Make_Multilabel_Classification ";
-      N_Clusters   :constant Positive := N_Classes * N_Clusters_Per_Class;
-      N_Useless    :constant Positive := N_Features - N_Informative -
-                       N_Redundant - N_Repeated;
+      Routine_Name      : constant String :=
+                            "Samples_Generator.Make_Multilabel_Classification ";
+      N_Clusters        :constant Positive := N_Classes * N_Clusters_Per_Class;
+      N_Useless         :constant Positive := N_Features - N_Informative -
+                            N_Redundant - N_Repeated;
       Sum               : Float := 0.0;
 
       N_Samples_Per_Cluster  : Integer_Array (1 .. N_Clusters);
       N_Cluster_Samples      : Natural := 0;
-      X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
+      X                      : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
         := (others => (others => 0.0));
-      Y              : Integer_Array (1 .. N_Samples) := (others => 0);
-      Centroids      : Real_Float_Vector (1 .. N_Informative);
+      Y                      : Integer_Array (1 .. N_Samples) := (others => 0);
+      Centroids              : Real_Float_Matrix (1 .. N_Clusters,
+                                                  1 .. N_Informative);
 
-      Classification : Classification_Test_Data (N_Samples, N_Features,
-                                                 N_Classes);
-      LB             : Label.Label_Binarizer;
-      X_Indices      : Integer_List;
-      X_Ind_Ptr      : Array_Of_Integer_Lists (1 .. N_Samples);
+      Classification         : Classification_Test_Data (N_Samples, N_Features,
+                                                         N_Classes);
+      LB                     : Label.Label_Binarizer;
+      X_Indices              : Integer_List;
+      X_Ind_Ptr              : Array_Of_Integer_Lists (1 .. N_Samples);
    begin
       Put_Line (Routine_Name);
       Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
@@ -119,10 +128,10 @@ package body Samples_Generator is
       Centroids := 2.0 * Class_Sep * Centroids - Class_Sep;
       if not Hypercube then
          for row in X'Range loop
---              for col in 1 .. N_Informative loop
-               Centroids (row) :=
-                 abs (Maths.Random_Float) * Centroids (row);
---              end loop;
+            for col in 1 .. N_Informative loop
+               Centroids (row, col) :=
+                 abs (Maths.Random_Float) * Centroids (row, col);
+            end loop;
          end loop;
       end if;
 
