@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/datasets/samples_generator.py
 
+with System.Aux_DEC;
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -13,15 +14,24 @@ with NL_Types;
 
 package body Samples_Generator is
 
+   --  _generate_hypercube(samples, dimensions, rng) returns distinct binary
+   --  samples of length dimensions.
+   --  Sample_Without_Replacement (n_population, n_samples):
+   --  n_population : the size of the set to sample from (samples).
+   --  n_samples : the number of integers to sample (dimensions).
    function Generate_Hypercube (Population_Size, Sample_Size : Positive)
-                                return Real_Float_Matrix is
-      Vec       : constant Real_Float_Vector :=
-                    To_Real_Float_Vector (Utils.Sample_Without_Replacement
-                                          (Population_Size, Sample_Size));
-      Hypercube : Real_Float_Matrix (1 .. Population_Size, 1 .. Sample_Size);
+                                return Integer_Matrix is
+      use System.Aux_DEC;
+      Dims      : constant Positive := 2 ** Sample_Size;
+      Vec       : constant Integer_Array :=
+                      Utils.Sample_Without_Replacement (Dims, Population_Size);
+      Bits      : Bit_Array_32;
+      Hypercube : Integer_Matrix (1 .. Population_Size, 1 .. Sample_Size);
    begin
       for row in Hypercube'Range loop
          for col in Hypercube'Range (2) loop
+            Bits := To_Bit_Array_32
+                  (Unsigned_32 (Vec ((row - 1) * Sample_Size + col)));
             Hypercube (row, col) := Vec ((row - 1) * Sample_Size + col);
          end loop;
       end loop;
