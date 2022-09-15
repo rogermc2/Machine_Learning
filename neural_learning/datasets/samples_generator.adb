@@ -14,6 +14,36 @@ with NL_Types;
 
 package body Samples_Generator is
 
+    procedure Create_Redundent_Features
+      (X : in out Real_Float_Matrix; N_Informative, N_Redundant : Natural) is
+        use Real_Float_Arrays;
+        A                     : Real_Float_Matrix (1 .. N_Informative,
+                                                   1 .. N_Informative);
+        X1                    : Real_Float_Matrix (X'Range, 1 .. N_Redundant);
+    begin
+        for x_row in X'Range loop
+            for x_col in N_Informative + 1 ..
+              N_Informative + N_Redundant loop
+                X1 (x_row, x_col - N_Informative + 1) := X (x_row, x_col);
+            end loop;
+        end loop;
+
+        for row in A'Range loop
+            for col in A'Range (2) loop
+                A (row, col) := Maths.Random_Float;
+            end loop;
+        end loop;
+        X1 := X1 * A;
+
+        for x_row in X'Range loop
+            for x_col in N_Informative + 1 ..
+              N_Informative + N_Redundant loop
+                X (x_row, x_col) := X1 (x_row, x_col - N_Informative + 1);
+            end loop;
+        end loop;
+    end Create_Redundent_Features;
+
+    --  ------------------------------------------------------------------------
     --  _generate_hypercube(samples, dimensions, rng) returns distinct binary
     --  samples of length dimensions.
     --  Sample_Without_Replacement (n_population, n_samples):
@@ -196,26 +226,7 @@ package body Samples_Generator is
 
         --  L247  Create redundant features
         if N_Redundant > 0 then
-            for x_row in X'Range loop
-                for x_col in N_Informative + 1 ..
-                  N_Informative + N_Redundant loop
-                    X1 (x_row, x_col - N_Informative + 1) := X (x_row, x_col);
-                end loop;
-            end loop;
-
-            for row in A'Range loop
-                for col in A'Range (2) loop
-                    A (row, col) := Maths.Random_Float;
-                end loop;
-            end loop;
-            X1 := X1 * A;
-
-            for x_row in X'Range loop
-                for x_col in N_Informative + 1 ..
-                  N_Informative + N_Redundant loop
-                     X (x_row, x_col) := X1 (x_row, x_col - N_Informative + 1);
-                end loop;
-            end loop;
+            Create_Redundent_Features (X, N_Informative, N_Redundant);
         end if;
 
         --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
