@@ -96,6 +96,7 @@ package body Samples_Generator is
         X_k                   : Real_Float_Vector (1 .. N_Informative);
         A                     : Real_Float_Matrix (1 .. N_Informative,
                                                    1 .. N_Informative);
+        X1                    : Real_Float_Matrix (X'Range, 1 .. N_Redundant);
         Classification        : Classification_Test_Data
           (N_Samples, N_Features, N_Classes);
         LB                    : Label.Label_Binarizer;
@@ -187,11 +188,35 @@ package body Samples_Generator is
                 X_k := X_k * A;
                 --  shift the cluster to a vertex
                 for c_col in Centroid'Range loop
-                    Centroid (c_col) := Centroids (row,c_col);
+                    Centroid (c_col) := Centroids (row, c_col);
                 end loop;
                 X_k := X_k + Centroid;
             end loop;
         end loop;
+
+        --  L247  Create redundant features
+        if N_Redundant > 0 then
+            for x_row in X'Range loop
+                for x_col in N_Informative + 1 ..
+                  N_Informative + N_Redundant loop
+                    X1 (x_row, x_col - N_Informative + 1) := X (x_row, x_col);
+                end loop;
+            end loop;
+
+            for row in A'Range loop
+                for col in A'Range (2) loop
+                    A (row, col) := Maths.Random_Float;
+                end loop;
+            end loop;
+            X1 := X1 * A;
+
+            for x_row in X'Range loop
+                for x_col in N_Informative + 1 ..
+                  N_Informative + N_Redundant loop
+                     X (x_row, x_col) := X1 (x_row, x_col - N_Informative + 1);
+                end loop;
+            end loop;
+        end if;
 
         --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
         Label.Fit (LB, Y);
