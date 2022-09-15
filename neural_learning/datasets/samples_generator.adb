@@ -9,17 +9,21 @@ with Utils;
 
 with Classifier_Utilities;
 with Label;
-with NL_Types;
 --  with Printing;
 
 package body Samples_Generator is
 
+    procedure Repeat_Features
+      (X : in out Real_Float_Matrix;
+       N_Informative, N_Redundant, N_Repeated : Natural);
+
+    --  ------------------------------------------------------------------------
+
     procedure Create_Redundent_Features
       (X : in out Real_Float_Matrix; N_Informative, N_Redundant : Natural) is
         use Real_Float_Arrays;
-        A                     : Real_Float_Matrix (1 .. N_Informative,
-                                                   1 .. N_Informative);
-        X1                    : Real_Float_Matrix (X'Range, 1 .. N_Redundant);
+        A  : Real_Float_Matrix (1 .. N_Informative, 1 .. N_Informative);
+        X1 : Real_Float_Matrix (X'Range, 1 .. N_Redundant);
     begin
         for x_row in X'Range loop
             for x_col in N_Informative + 1 ..
@@ -41,6 +45,7 @@ package body Samples_Generator is
                 X (x_row, x_col) := X1 (x_row, x_col - N_Informative + 1);
             end loop;
         end loop;
+
     end Create_Redundent_Features;
 
     --  ------------------------------------------------------------------------
@@ -126,7 +131,6 @@ package body Samples_Generator is
                                                    1 .. N_Informative);
         Classification        : Classification_Test_Data
           (N_Samples, N_Features, N_Classes);
-        LB                    : Label.Label_Binarizer;
     begin
         Put_Line (Routine_Name);
         Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
@@ -226,6 +230,11 @@ package body Samples_Generator is
         --  L247  Create redundant features
         if N_Redundant > 0 then
             Create_Redundent_Features (X, N_Informative, N_Redundant);
+        end if;
+
+        --  L247  Repeat some features
+        if N_Repeated > 0 then
+            Repeat_Features (X, N_Informative, N_Redundant, N_Repeated);
         end if;
 
         return Classification;
@@ -422,7 +431,7 @@ package body Samples_Generator is
         P_W_C          : Real_Float_Matrix (1 .. N_Features, 1 .. N_Classes);
         X              : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features)
           := (others => (others => 0.0));
-        Classification : Classification_Test_Data
+        Classification : Multilabel_Classification_Test_Data
           (N_Samples, N_Features, N_Classes, Return_Distributions);
         LB             : Label.Label_Binarizer;
         Y              : Array_Of_Integer_Lists (1 .. N_Samples);
@@ -507,5 +516,34 @@ package body Samples_Generator is
 
     end Make_Multilabel_Classification;
 
+    --  ------------------------------------------------------------------------
+
+    procedure Repeat_Features (X : in out Real_Float_Matrix;
+                               N_Informative, N_Redundant,
+                               N_Repeated : Natural) is
+        Offset  : constant Natural := N_Informative + N_Redundant;
+        F_Num   : constant Float := Float (Offset - 1);
+        Indices : Integer_Array (1 .. N_Repeated);
+        X1      : Real_Float_Matrix (X'Range, Indices'Range);
+    begin
+        for item in Indices'Range loop
+           Indices (item) := Integer (F_Num *  Maths.Random_Float + 0.5);
+        end loop;
+
+        for row in X1'Range loop
+            for col in X1'Range (2) loop
+                X1 (row, col) := X (row, col);
+            end loop;
+        end loop;
+
+        for row in X1'Range loop
+            for col in X1'Range (2) loop
+                X (row , col + Offset - 1) := X1 (row, col);
+            end loop;
+        end loop;
+
+    end Repeat_Features;
+
+    --  ------------------------------------------------------------------------
 
 end Samples_Generator;
