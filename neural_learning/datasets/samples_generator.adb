@@ -90,12 +90,15 @@ package body Samples_Generator is
                                   (others => 0);
         Centroids             : Real_Float_Matrix (1 .. N_Clusters,
                                                    1 .. N_Informative);
-
+        Centroid              : Real_Float_Vector (1 .. N_Informative);
+        Stop                  : Positive := 1;
+        Start                 : Positive := 1;
+        X_k                   : Real_Float_Vector (1 .. N_Informative);
+        A                     : Real_Float_Matrix (1 .. N_Informative,
+                                                   1 .. N_Informative);
         Classification        : Classification_Test_Data
           (N_Samples, N_Features, N_Classes);
         LB                    : Label.Label_Binarizer;
-        X_Indices             : Integer_List;
-        X_Ind_Ptr             : Array_Of_Integer_Lists (1 .. N_Samples);
     begin
         Put_Line (Routine_Name);
         Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
@@ -162,7 +165,33 @@ package body Samples_Generator is
             end loop;
         end loop;
 
-        --  Create clusters
+        --  L235 Create clusters
+        for row in Centroids'Range loop
+            for col in Centroids'Range (2) loop
+                Start := Stop;
+                Stop := Stop + N_Samples_Per_Cluster (col);
+                for y_index in Start .. Stop loop
+                    --  assign label
+                    Y (y_index) := col mod N_Classes;
+                    --  slice a view X_k of the cluster
+                    for x_col in 1 .. N_Informative loop
+                        X_k (x_col) := X (y_index, x_col);
+                    end loop;
+                end loop;
+                --  introduce random covariance
+                for a_row in A'Range loop
+                    for a_col in A'Range (2) loop
+                        A (a_row, a_col) := Maths.Random_Float;
+                    end loop;
+                end loop;
+                X_k := X_k * A;
+                --  shift the cluster to a vertex
+                for c_col in Centroid'Range loop
+                    Centroid (c_col) := Centroids (row,c_col);
+                end loop;
+                X_k := X_k + Centroid;
+            end loop;
+        end loop;
 
         --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
         Label.Fit (LB, Y);
