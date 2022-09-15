@@ -99,9 +99,7 @@ package body Samples_Generator is
        Shuffle              : Boolean := True;
        Random_State         : Boolean := False)
        return Classification_Test_Data is
-        use NL_Types;
-        use Float_Package;
-        use Maths.Float_Math_Functions;
+        use NL_Types.Float_Package;
         use Real_Float_Arrays;
         Routine_Name          : constant String
           := "Samples_Generator.Make_Multilabel_Classification ";
@@ -126,7 +124,6 @@ package body Samples_Generator is
         X_k                   : Real_Float_Vector (1 .. N_Informative);
         A                     : Real_Float_Matrix (1 .. N_Informative,
                                                    1 .. N_Informative);
-        X1                    : Real_Float_Matrix (X'Range, 1 .. N_Redundant);
         Classification        : Classification_Test_Data
           (N_Samples, N_Features, N_Classes);
         LB                    : Label.Label_Binarizer;
@@ -166,6 +163,7 @@ package body Samples_Generator is
               Integer (Float (N_Samples) * Weights (index mod N_Classes)
                        / Float (N_Clusters_Per_Class));
         end loop;
+
         for index in N_Samples_Per_Cluster'Range loop
             N_Cluster_Samples :=
               N_Cluster_Samples + N_Samples_Per_Cluster (index);
@@ -216,6 +214,7 @@ package body Samples_Generator is
                     end loop;
                 end loop;
                 X_k := X_k * A;
+
                 --  shift the cluster to a vertex
                 for c_col in Centroid'Range loop
                     Centroid (c_col) := Centroids (row, c_col);
@@ -227,27 +226,6 @@ package body Samples_Generator is
         --  L247  Create redundant features
         if N_Redundant > 0 then
             Create_Redundent_Features (X, N_Informative, N_Redundant);
-        end if;
-
-        --        Printing.Print_Array_Of_Integer_Lists (Routine_Name & "L453 Y", Y, 1, 4);
-        Label.Fit (LB, Y);
-        declare
-            Y_Bin : constant Binary_Matrix := Label.Transform (LB, Y);
-        begin
-            --           Put_Line (Routine_Name & "L453 Y_Bool size :" &
-            --                       Integer'Image (Y_Bool'Length) & " x" &
-            --                       Integer'Image (Y_Bool'Length (2)));
-            --           Put_Line (Routine_Name & "L453 Classification.Y length:" &
-            --                       Integer'Image (Classification.Y'Length) & " x" &
-            --                       Integer'Image (Classification.Y'Length (2)));
-            Classification.Y := Y_Bin;
-        end;
-
-        Classification.X := X;
-
-        if Return_Distributions then
-            Classification.Class_Probability := P_C;
-            Classification.Feature_Class_Probability := P_W_C;
         end if;
 
         return Classification;
