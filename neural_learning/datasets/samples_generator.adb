@@ -14,7 +14,7 @@ with Utilities;
 
 package body Samples_Generator is
 
-    function Generate_Hypercube (Population_Size, Sample_Size : Positive)
+    function Generate_Hypercube (Samples, Dimensions : Positive)
                                  return Binary_Matrix;
     procedure Randomly_Shift_And_Scale
       (X     : in out Real_Float_Matrix; N_Features : Positive;
@@ -153,28 +153,28 @@ package body Samples_Generator is
     --  Sample_Without_Replacement (n_population, n_samples):
     --  n_population : the size of the set to sample from (samples).
     --  n_samples : the number of integers to sample (dimensions).
-    function Generate_Hypercube (Population_Size, Sample_Size : Positive)
+    function Generate_Hypercube (Samples, Dimensions : Positive)
                                  return Binary_Matrix is
         use System.Aux_DEC;
         Routine_Name : constant String :=
                          "Samples_Generator.Generate_Hypercube ";
-        Dims      : constant Positive := 2 ** Sample_Size;
+        Dims      : constant Positive := 2 ** Dimensions;
         Out_Vec   : constant Integer_Array :=
-                      Utils.Sample_Without_Replacement (Dims, Population_Size);
+                      Utils.Sample_Without_Replacement (Dims, Samples);
         Bits      : Bit_Array_32;
-        Hypercube : Binary_Matrix (1 .. Population_Size, 1 .. Dims) :=
+        Hypercube : Binary_Matrix (1 .. Samples, 1 .. Dimensions) :=
                       (others => (others => 0));
     begin
-        Put_Line (Routine_Name & "Population_Size" &
-                    Integer'Image (Population_Size));
-        Put_Line (Routine_Name & "Dims" & Integer'Image (Dims));
-        Test_Support.Print_Integer_Array (Routine_Name & "Out_Vec", Out_Vec);
+--          Put_Line (Routine_Name & "Samples" & Integer'Image (Samples));
+--          Put_Line (Routine_Name & "Dimensions" & Integer'Image (Dimensions));
+--          Put_Line (Routine_Name & "Dims" & Integer'Image (Dims));
+--          Test_Support.Print_Integer_Array (Routine_Name & "Out_Vec", Out_Vec);
 
-        for row in Out_Vec'Range loop
+        for row in Hypercube'Range loop
             Bits := To_Bit_Array_32 (Unsigned_32 (Out_Vec (row)));
-            for bit_pos in Bits'Range loop
-                if Bits (bit_pos) then
-                    Hypercube (row, bit_pos + 1) := 1;
+            for col in Hypercube'Range (2) loop
+                if Bits (col - 1) then
+                    Hypercube (row, col) := 1;
                 end if;
             end loop;
         end loop;
