@@ -10,6 +10,7 @@ with Utils;
 with Classifier_Utilities;
 with Label;
 --  with Printing;
+with Utilities;
 
 package body Samples_Generator is
 
@@ -21,6 +22,9 @@ package body Samples_Generator is
    procedure Repeat_Features
      (X                                      : in out Real_Float_Matrix;
       N_Informative, N_Redundant, N_Repeated : Natural);
+   procedure Shuffle_Data (X          : in out Real_Float_Matrix;
+                           Y          : in out Integer_Array;
+                           N_Features : Positive);
 
    --  ------------------------------------------------------------------------
 
@@ -67,7 +71,7 @@ package body Samples_Generator is
 
       for row in X'Range loop
          for col in X'Last (2) - N_Useless .. X'Last (2) loop
-            X (row, col) := Useless (row, col - N_Useless);
+            X (row, col) := Useless (row, col - N_Useless + 1);
          end loop;
       end loop;
 
@@ -126,8 +130,8 @@ package body Samples_Generator is
       Hypercube            : Boolean := True;
       Shift                : Shift_List := Default_Shift_List;
       Scale                : Scale_List := Default_Scale_List;
-      Shuffle              : Boolean := True;
-      Random_State         : Boolean := False)
+      Shuffle              : Boolean := True)
+--        Random_State         : Boolean := False)
       return Classification_Test_Data is
       use NL_Types.Float_Package;
       use Real_Float_Arrays;
@@ -272,6 +276,16 @@ package body Samples_Generator is
 
       Randomly_Shift_And_Scale (X, N_Features, Shift, Scale, Class_Sep);
 
+      if Shuffle then
+         Shuffle_Data (X, Y, N_Features);
+      end if;
+
+      Classification.X := X;
+
+      for row in Y'Range loop
+         Classification.Y (row, 1) := Y (row);
+      end loop;
+
       return Classification;
 
    end Make_Classification;
@@ -306,7 +320,6 @@ package body Samples_Generator is
       --  If Allow_Unlabeled is True then some instances might not belong to
       --  any class
       Allow_Unlabeled      : Boolean := True;
-      --         Sparse               : Boolean := False;
       --         Return_Indicator     : Return_Indicator_Type := RI_Dense;
       --  If Return_Distributions is True then return the prior class
       --  probability and conditional probabilities of features given classes
@@ -596,7 +609,7 @@ package body Samples_Generator is
 
       if Scale.Is_Empty then
          for index in 1 .. N_Features loop
-            L_Scale.Append (Float (Maths.Random_Integer (1, 100));
+            L_Scale.Append (Float (Maths.Random_Integer (1, 100)));
          end loop;
 
       elsif Scale.Length = 1 then
@@ -643,6 +656,38 @@ package body Samples_Generator is
       end loop;
 
    end Repeat_Features;
+
+   --  ------------------------------------------------------------------------
+
+   procedure Shuffle_Data (X          : in out Real_Float_Matrix;
+                           Y          : in out Integer_Array;
+                           N_Features : Positive) is
+      Row_Indicies     : Integer_Array (X'Range);
+      Feature_Indicies : Integer_Array (1 .. N_Features);
+      P_X              : Real_Float_Matrix (X'Range, X'Range (2));
+      P_Y              : Integer_Array (Y'Range);
+   begin
+      for index in Row_Indicies'Range loop
+            Row_Indicies (index) := index;
+      end loop;
+      Utilities.Permute (Row_Indicies);
+
+      for index in Feature_Indicies'Range loop
+            Feature_Indicies (index) := index;
+      end loop;
+      Utilities.Permute (Feature_Indicies);
+
+      for row in X'Range loop
+         P_Y (row) := Y (Row_Indicies (row));
+         for col in X'Range (2) loop
+            P_X (row, col) := X (Row_Indicies (row), Feature_Indicies (col));
+         end loop;
+      end loop;
+
+      X := P_X;
+      Y := P_Y;
+
+   end Shuffle_Data;
 
    --  ------------------------------------------------------------------------
 

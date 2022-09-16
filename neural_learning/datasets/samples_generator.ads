@@ -55,8 +55,9 @@ package Samples_Generator is
       Hypercube            : Boolean := True;
       Shift                : Shift_List := Default_Shift_List;
       Scale                : Scale_List := Default_Scale_List;
-      Shuffle              : Boolean := True;
-      Random_State         : Boolean := False) return Classification_Test_Data;
+      Shuffle              : Boolean := True)
+--        Random_State         : Boolean := False)
+      return Classification_Test_Data;
    function Make_Multilabel_Classification
      (N_Samples            : Positive := 100;
       N_Features           : Positive := 20;
