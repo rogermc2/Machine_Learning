@@ -2,7 +2,7 @@
 --  Based on scikit-learn/sklearn/utils/__init__.py
 --  and scikit-learn/sklearn/utils/_random.pyx
 
---  with Ada.Assertions; use Ada.Assertions;
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Numerics.Discrete_Random;
 with Ada.Numerics.Float_Random;
 --  with Ada.Text_IO; use Ada.Text_IO;
@@ -48,7 +48,7 @@ package body Utils is
    --  Knuth's algorithm S
    function Sample_Without_Replacement (Population_Size, Sample_Size : Natural)
                                         return Integer_Array is
-      --        Routine_Name : constant String := "Utils.Sample_Without_Replacement ";
+      Routine_Name : constant String := "Utils.Sample_Without_Replacement ";
       N_Checked    : integer := 0;
       N_Selected   : integer := 0;
       u            : Float;
@@ -57,12 +57,15 @@ package body Utils is
       while N_Checked < Population_Size and then
         N_Selected < Sample_Size loop
          N_Checked := N_Checked + 1;
-            u := abs (Maths.Random_Float);
-            if Float (Population_Size - N_Checked - 1) * u <
-              Float (Sample_Size - N_Selected) then
-               Samples (N_Selected) := N_Checked;
-               N_Selected := N_Selected + 1;
-            end if;
+         u := abs (Maths.Random_Float);
+         if Float (Population_Size - N_Checked - 1) * u <
+           Float (Sample_Size - N_Selected) then
+            Assert (N_Selected <= Sample_Size, Routine_Name & "N_Selected" &
+                      Integer'Image (N_Selected) & ", Sample_Size" &
+                      Integer'Image (Sample_Size));
+            N_Selected := N_Selected + 1;
+            Samples (N_Selected) := N_Checked;
+         end if;
       end loop;
 
       return Samples;

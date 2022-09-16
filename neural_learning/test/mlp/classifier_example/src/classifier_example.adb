@@ -8,6 +8,7 @@ with Base;
 with Data_Splitter;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with NL_Types;
 with Samples_Generator; use Samples_Generator;
 with Test_Support;
 
@@ -16,8 +17,9 @@ procedure Classifier_Example is
     Num_Samples   : constant Positive := 100;
     Test_Size     : constant Positive := Num_Samples / 4;
     Train_Size    : constant Positive := Num_Samples - Test_Size;
+    Weights       : NL_Types.Float_List;
     Test_Data     : constant Classification_Test_Data :=
-                      Make_Multilabel_Classification (Num_Samples);
+                     Make_Classification (Num_Samples, Weights => Weights);
     X             : constant Real_Float_Matrix := Test_Data.X;
     Y             : constant Integer_Matrix := To_Integer_Matrix (Test_Data.Y);
     X_Train       : Real_Float_Matrix (1 .. Train_Size, X'Range (2));

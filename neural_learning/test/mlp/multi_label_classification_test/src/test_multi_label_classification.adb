@@ -16,7 +16,7 @@ with Stochastic_Optimizers; use Stochastic_Optimizers;
 procedure Test_Multi_Label_Classification is
 
    Routine_Name        : constant String := "Test_Multi_Label_Classification ";
-   Test_Classification : constant Classification_Test_Data :=
+   Test_Classification : constant Multilabel_Classification_Test_Data :=
                            Make_Multilabel_Classification (N_Samples => 50);
    --  Default Classification_Test_Data parameters:
    --  N_Features: 20;

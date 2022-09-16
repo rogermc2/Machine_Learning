@@ -86,6 +86,7 @@ package body Samples_Generator is
    function Generate_Hypercube (Population_Size, Sample_Size : Positive)
                                 return Integer_Matrix is
       use System.Aux_DEC;
+      Routine_Name : constant String := "Samples_Generator.Generate_Hypercube ";
       Dims      : constant Positive := 2 ** Sample_Size;
       Vec       : constant Integer_Array :=
                     Utils.Sample_Without_Replacement (Dims, Population_Size);
@@ -98,8 +99,9 @@ package body Samples_Generator is
             Bits := To_Bit_Array_32
               (Unsigned_32 (Vec ((row - 1) * Sample_Size + col)));
             for h_col in Bits'Range loop
+               Put_Line (Routine_Name & "h_col:" & Integer'Image (h_col));
                if Bits (h_col) then
-                  Hypercube (row, h_col) := 1;
+                  Hypercube (row, h_col + 1) := 1;
                end if;
             end loop;
          end loop;
@@ -131,7 +133,7 @@ package body Samples_Generator is
       Shift                : Shift_List := Default_Shift_List;
       Scale                : Scale_List := Default_Scale_List;
       Shuffle              : Boolean := True)
---        Random_State         : Boolean := False)
+     --        Random_State         : Boolean := False)
       return Classification_Test_Data is
       use NL_Types.Float_Package;
       use Real_Float_Arrays;
@@ -193,8 +195,9 @@ package body Samples_Generator is
       --  Distribute samples among clusters by weight
       for index in N_Samples_Per_Cluster'Range loop
          N_Samples_Per_Cluster (index) :=
-           Integer (Float (N_Samples) * Weights (index mod N_Classes)
-                    / Float (N_Clusters_Per_Class));
+           Integer (Float (N_Samples) *
+                        Weights (index mod Integer (Weights.Length) + 1) /
+                      Float (N_Clusters_Per_Class));
       end loop;
 
       for index in N_Samples_Per_Cluster'Range loop
@@ -604,7 +607,7 @@ package body Samples_Generator is
          end loop;
       else
          Assert (Positive (Shift.Length) = N_Features, Routine_Name &
-                "Shift length is not N_Features");
+                   "Shift length is not N_Features");
       end if;
 
       if Scale.Is_Empty then
@@ -618,7 +621,7 @@ package body Samples_Generator is
          end loop;
       else
          Assert (Positive (Scale.Length) = N_Features, Routine_Name &
-                "Scale length is not N_Features");
+                   "Scale length is not N_Features");
       end if;
 
       for row in X'Range loop
@@ -668,12 +671,12 @@ package body Samples_Generator is
       P_Y              : Integer_Array (Y'Range);
    begin
       for index in Row_Indicies'Range loop
-            Row_Indicies (index) := index;
+         Row_Indicies (index) := index;
       end loop;
       Utilities.Permute (Row_Indicies);
 
       for index in Feature_Indicies'Range loop
-            Feature_Indicies (index) := index;
+         Feature_Indicies (index) := index;
       end loop;
       Utilities.Permute (Feature_Indicies);
 
