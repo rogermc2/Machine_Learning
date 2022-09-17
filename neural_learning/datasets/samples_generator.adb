@@ -114,27 +114,26 @@ package body Samples_Generator is
     procedure Create_Redundent_Features
       (X : in out Real_Float_Matrix; N_Informative, N_Redundant : Natural) is
         use Real_Float_Arrays;
-        A  : Real_Float_Matrix (1 .. N_Informative, 1 .. N_Informative);
-        X1 : Real_Float_Matrix (X'Range, 1 .. N_Redundant);
+        B  : Real_Float_Matrix (1 .. N_Informative, 1 .. N_Redundant);
+        X1 : Real_Float_Matrix (X'Range, 1 .. N_Informative);
     begin
-        for x_row in X'Range loop
-            for x_col in N_Informative + 1 ..
-              N_Informative + N_Redundant loop
-                X1 (x_row, x_col - N_Informative + 1) := X (x_row, x_col);
+        for row in B'Range loop
+            for col in B'Range (2) loop
+                B (row, col) := Maths.Random_Float;
             end loop;
         end loop;
 
-        for row in A'Range loop
-            for col in A'Range (2) loop
-                A (row, col) := Maths.Random_Float;
+        for row in X1'Range loop
+            for col in X1'Range (2) loop
+                X1 (row, col) := X (row, col);
             end loop;
         end loop;
-        X1 := X1 * A;
 
-        for x_row in X'Range loop
-            for x_col in N_Informative + 1 ..
-              N_Informative + N_Redundant loop
-                X (x_row, x_col) := X1 (x_row, x_col - N_Informative + 1);
+        X1 := X1 * B;
+
+        for row in X1'Range loop
+            for col in X1'Range (2)  loop
+                X (row, N_Informative + col) := X1 (row, col);
             end loop;
         end loop;
 
@@ -152,9 +151,9 @@ package body Samples_Generator is
             end loop;
         end loop;
 
-        for row in X'Range loop
-            for col in X'Last (2) - N_Useless .. X'Last (2) loop
-                X (row, col) := Useless (row, col - N_Useless + 1);
+        for row in Useless'Range loop
+            for col in Useless'Range (2) loop
+                X (row, X'Last (2) - N_Useless + col) := Useless (row, col);
             end loop;
         end loop;
 
