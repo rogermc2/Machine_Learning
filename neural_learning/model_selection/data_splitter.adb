@@ -28,13 +28,11 @@ package body Data_Splitter is
 
    procedure Init_Base_Shuffle_Split
      (Self                   : in out Base_Shuffle_Data; Num_Splits : Natural;
-      Train_Size, Test_Size,
-      Default_Test_Size      : Natural) is
+      Train_Size, Test_Size  : Natural) is
    begin
       Self.Num_Splits := Num_Splits;
       Self.Train_Size := Train_Size;
       Self.Test_Size := Test_Size;
-      Self.Default_Test_Size := Default_Test_Size;
 
    end Init_Base_Shuffle_Split;
 
@@ -71,10 +69,10 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
    --  L2325
    procedure Train_Test_Split
-     (X       : Real_Float_Matrix; Y : Integer_Array;
+     (X                     : Real_Float_Matrix; Y : Integer_Array;
       Train_Size, Test_Size : Natural;
-      Train_X : out Real_Float_Matrix; Train_Y : out Integer_Array;
-      Test_X  : out Real_Float_Matrix; Test_Y : out Integer_Array) is
+      Train_X               : out Real_Float_Matrix; Train_Y : out Integer_Array;
+      Test_X                : out Real_Float_Matrix; Test_Y : out Integer_Array) is
       Routine_Name : constant String := "Data_Splitter.Train_Test_Split ";
       Num_Samples  : constant Positive := X'Length;
    begin
@@ -83,17 +81,17 @@ package body Data_Splitter is
                 " is different to X length" & Natural'Image (Num_Samples));
 
       for row in 1 .. Train_Size loop
-         for col in Train_X'First (2) .. Train_X'Last (2) loop
+         for col in Train_X'Range (2) loop
             Train_X (row, col) := X (row, col);
          end loop;
          Train_Y (row) := Y (row);
       end loop;
 
       for row in 1 .. Test_Size loop
-         for col in Test_X'First (2) .. Test_X'Last (2) loop
+         for col in Test_X'Range (2) loop
             Test_X (row, col) := X (row + Train_Size, col);
          end loop;
-         Test_Y (row) := Y (row + Train_Size );
+         Test_Y (row) := Y (row + Train_Size);
       end loop;
 
    end Train_Test_Split;
@@ -101,14 +99,13 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
    --  L2325 Integer Y
    procedure Train_Test_Split
-     (X       : Real_Float_Matrix; Y : Integer_Matrix;
+     (X                     : Real_Float_Matrix; Y : Integer_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Real_Float_Matrix; Train_Y : out Integer_Matrix;
-      Test_X  : out Real_Float_Matrix; Test_Y : out Integer_Matrix) is
+      Train_X               : out Real_Float_Matrix; Train_Y : out Integer_Matrix;
+      Test_X                : out Real_Float_Matrix; Test_Y : out Integer_Matrix) is
       Routine_Name      : constant String :=
-                              "Data_Splitter.Train_Test_Split Integer ";
+                            "Data_Splitter.Train_Test_Split Integer ";
       Num_Samples       : constant Positive := Positive (X'Length);
-      Default_Test_Size : constant Positive := Train_Size / 4;
       Train_Indices     : Integer_Array (1 .. Train_Size);
       Test_Indices      : Integer_Array (1 .. Test_Size);
       Shuffle_Data      : Base_Shuffle_Data
@@ -118,43 +115,27 @@ package body Data_Splitter is
                 "Y length" & Integer'Image (Integer (Y'Length)) &
                 " is different to X length" & Natural'Image (Num_Samples));
 
-      Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size,
-                               Default_Test_Size);
-
+      Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size);
+      --  L2425
       Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
 
-      Put_Line (Routine_Name & "X size:" & Integer'Image (X'Length) &
-                 " x"  & Integer'Image (X'Length (2)));
-      Put_Line (Routine_Name & "Train_X size:" & Integer'Image (Train_X'Length) &
-                 " x"  & Integer'Image (Train_X'Length (2)));
-      Put_Line (Routine_Name & "Test_X size:" & Integer'Image (Test_X'Length) &
-                 " x"  & Integer'Image (Test_X'Length (2)));
-      for index in Test_Indices'Range loop
---           Put_Line (Routine_Name & "index" & Integer'Image (index));
---           Put_Line (Routine_Name & "Test_Indices (index)" &
---                       Integer'Image (Test_Indices (index)));
+      for row in Test_X'Range loop
          for col in Test_X'Range (2) loop
---              Put_Line (Routine_Name & "col" & Integer'Image (col));
---              Put_Line (Routine_Name & "col" & Integer'Image (col));
-            Test_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
+            Test_X (row, col) := X (Test_Indices (row), col);
          end loop;
 
          for col in Test_Y'Range (2) loop
-            Test_Y (index - Test_Indices'First + 1, col) :=
-              Y (Test_Indices (index), col);
+            Test_Y (row, col) := Y (Test_Indices (row), col);
          end loop;
       end loop;
 
-      for index in Train_Indices'Range loop
+      for row in Train_X'Range loop
          for col in Train_X'Range (2) loop
-            Train_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
+            Train_X (row, col) :=  X (Train_Indices (row), col);
          end loop;
 
          for col in Train_Y'Range (2) loop
-            Train_Y (index - Test_Indices'First + 1, col) :=
-              Y (Test_Indices (index), col);
+            Train_Y (row, col) := Y (Train_Indices (row), col);
          end loop;
       end loop;
 
@@ -163,14 +144,13 @@ package body Data_Splitter is
    --  -------------------------------------------------------------------------
    --  L2325  Boolean Y
    procedure Train_Test_Split
-     (X       : Real_Float_Matrix; Y : Boolean_Matrix;
+     (X                     : Real_Float_Matrix; Y : Boolean_Matrix;
       Train_Size, Test_Size : Natural;
-      Train_X : out Real_Float_Matrix; Train_Y : out Boolean_Matrix;
-      Test_X  : out Real_Float_Matrix; Test_Y : out Boolean_Matrix) is
+      Train_X               : out Real_Float_Matrix; Train_Y : out Boolean_Matrix;
+      Test_X                : out Real_Float_Matrix; Test_Y : out Boolean_Matrix) is
       Routine_Name      : constant String :=
-                              "Data_Splitter.Train_Test_Split Boolean ";
+                            "Data_Splitter.Train_Test_Split Boolean ";
       Num_Samples       : constant Positive := Positive (X'Length);
-      Default_Test_Size : constant Positive := Train_Size / 4;
       Train_Indices     : Integer_Array (1 .. Train_Size);
       Test_Indices      : Integer_Array (1 .. Test_Size);
       Shuffle_Data      : Base_Shuffle_Data
@@ -180,26 +160,27 @@ package body Data_Splitter is
                 "Y length" & Integer'Image (Integer (Y'Length)) &
                 " is different to X length" & Natural'Image (Num_Samples));
 
-      Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size,
-                               Default_Test_Size);
+      Init_Base_Shuffle_Split (Shuffle_Data, 1, Train_Size, Test_Size);
       Put_Line (Routine_Name);
       Base_Shuffle_Split (Shuffle_Data, Train_Indices, Test_Indices);
 
-      for index in Test_Indices'First .. Test_Indices'Last loop
-         for col in Test_X'First (2) .. Test_X'Last (2) loop
-            Test_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
-            Test_Y (index - Test_Indices'First + 1, col) :=
-              Y (Test_Indices (index), col);
+      for row in Test_Indices'Range loop
+         for col in Test_X'Range (2) loop
+            Test_X (row, col) := X (Test_Indices (row), col);
+         end loop;
+
+         for col in Test_Y'Range (2) loop
+            Test_Y (row, col) := Y (Test_Indices (row), col);
          end loop;
       end loop;
 
-      for index in Train_Indices'First .. Train_Indices'Last loop
-         for col in Train_X'First (2) .. Train_X'Last (2) loop
-            Train_X (index - Test_Indices'First + 1, col) :=
-              X (Test_Indices (index), col);
-            Train_Y (index - Test_Indices'First + 1, col) :=
-              Y (Test_Indices (index), col);
+      for row in Train_X'Range loop
+         for col in Train_X'Range (2) loop
+            Train_X (row, col) := X (Train_Indices (row), col);
+         end loop;
+
+         for col in Train_Y'Range (2) loop
+            Train_Y (row, col) := Y (Train_Indices (row), col);
          end loop;
       end loop;
 
