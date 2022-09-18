@@ -12,10 +12,12 @@ package Test_Support is
                            return Boolean;
    function Almost_Equal (A, B     : Stochastic_Optimizers.Parameters_Record;
                           Accuracy : Integer) return Boolean;
-   procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix);
+   procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
+                                  Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                 Start : Integer := 1; Finish : Integer := 0);
-   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix);
+   procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
+                                 Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector);
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
                                   Start : Integer := 1; Finish : Integer := 0);

@@ -166,8 +166,9 @@ package body Multilayer_Perceptron is
    begin
       --          BP_Count := BP_Count + 1;
       --  Y_Prob checked; contains only 1s and 0s
-      --  Printing.Print_Float_Matrix (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
-      Is_Probilities_Matrix (Routine_Name & "Y_Prob ", Y_Prob);
+      Test_Support.Print_Binary_Matrix (Routine_Name & "Y", Y, 1, 3);
+      Test_Support.Print_Float_Matrix (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
+      Is_Probilities_Matrix ("Backprop Y_Prob ", Y_Prob);
       --  L284
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
@@ -1195,11 +1196,13 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix) is
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Is_Probilities_Matrix, ";
       Sum : Real_Float_Vector (PM'Range) := (others => 0.0);
    begin
       for row in PM'Range loop
          for col in PM'Range (2) loop
-            Assert (PM (row, col) >= 0.0, Msg & "Matrix" &
+            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
                       Integer'Image (row) & "," & Integer'Image (col) & " = " &
                       Float'Image (PM (row, col)));
             Sum (row) := Sum (row) + PM (row, col);
@@ -1208,7 +1211,7 @@ package body Multilayer_Perceptron is
 
       for row in Sum'Range loop
          Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
-                   Sum (row) <= 1.0 + 10.0 ** (-6), Msg &
+                   Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
                    "Total probability for row (" & Integer'Image (row) &
                    ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
       end loop;
