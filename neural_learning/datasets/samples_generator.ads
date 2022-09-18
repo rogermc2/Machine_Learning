@@ -10,10 +10,10 @@ package Samples_Generator is
    type Return_Indicator_Type is (RI_Dense);
 
    type Classification_Test_Data
-     (N_Samples, N_Features, N_Classes  : Positive)
+     (N_Samples, N_Features : Positive)
    is record
       X : Real_Float_Matrix (1 .. N_Samples, 1 .. N_Features);
-      Y : Binary_Matrix (1 .. N_Samples, 1 .. N_Classes);
+      Y : Binary_Matrix (1 .. N_Samples, 1 .. 1);
    end record;
 
    type Multilabel_Classification_Test_Data

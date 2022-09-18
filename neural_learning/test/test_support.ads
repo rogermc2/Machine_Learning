@@ -25,7 +25,8 @@ package Test_Support is
                                  aList : NL_Types.Integer_List);
    procedure Print_Integer_Map (Name : String;
                                 aMap : NL_Types.Integer_Label_Map);
-   procedure Print_Integer_Matrix (Name  : String; aMatrix : Integer_Matrix);
+   procedure Print_Integer_Matrix (Name : String; aMatrix : Integer_Matrix;
+                                   Start : Integer := 1; Finish : Integer := 0);
    procedure Print_Matrix_Dimensions (Name    : String;
                                       aMatrix : Binary_Matrix);
    procedure Print_Matrix_Dimensions (Name    : String;

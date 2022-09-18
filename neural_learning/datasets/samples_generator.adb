@@ -232,8 +232,7 @@ package body Samples_Generator is
                                 (others => (others => 0.0));
       Y                     : Integer_Array (1 .. N_Samples) :=
                                 (others => 0);
-      Classification        : Classification_Test_Data (N_Samples, N_Features,
-                                                        N_Classes);
+      Classification        : Classification_Test_Data (N_Samples, N_Features);
    begin
       Assert (N_Informative + N_Redundant + N_Repeated <= N_Features,
               Routine_Name & "the total number of informative, redundant " &

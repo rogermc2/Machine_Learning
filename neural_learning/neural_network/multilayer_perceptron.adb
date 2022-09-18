@@ -566,6 +566,8 @@ package body Multilayer_Perceptron is
                 "Hidden_Layer_Sizes is empty");
       --  L385
       Validate_Hyperparameters (Self);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Bin", Y_Bin);
       First_Pass :=
         Self.Attributes.Params.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
@@ -1591,8 +1593,8 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
-      --        Put_Line (Routine_Name & "Type_Of_Target (Y): " &
-      --                  Y_Type'Image (Type_Of_Target (Y)));
+      Put_Line (Routine_Name & "Type_Of_Target (Y): " &
+                Y_Type'Image (Type_Of_Target (Y)));
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
@@ -1618,6 +1620,7 @@ package body Multilayer_Perceptron is
 
       --  Python code downcasts to bool to prevent upcasting when working with
       --  float32 data
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
       return Label.Transform (Self.Attributes.Binarizer, Y);
 
    end Validate_Input;

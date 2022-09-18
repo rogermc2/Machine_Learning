@@ -29,11 +29,15 @@ procedure Classifier_Example is
     MLP           : MLP_Classifier := C_Init (Max_Iter => 300);
     Prediction    : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
     Score         : Float;
-
 begin
     Put_Line (Routine_Name);
+    Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
     Data_Splitter.Train_Test_Split (X, Y, Train_Size, Test_Size, X_Train,
                                     Y_Train, X_Test, Y_Test);
+    Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
+    Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Test", Y_Test);
+    Test_Support.Print_Integer_Matrix (Routine_Name & "Y_Train", Y_Train, 1, 3);
+    New_Line;
     Fit (MLP, X_Train, Y_Train);
     Prediction := Predict_ProbA (MLP, X_Test);
     Test_Support.Print_Matrix_Dimensions ("Prediction", Prediction);
