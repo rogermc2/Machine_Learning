@@ -27,7 +27,6 @@ procedure Classifier_Example is
     X_Test        : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
     Y_Test        : Integer_Matrix (1 .. Test_Size, Y'Range (2));
     MLP           : MLP_Classifier := C_Init (Max_Iter => 300);
-    Prediction    : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
     Score         : Float;
 begin
     Put_Line (Routine_Name);
@@ -39,8 +38,11 @@ begin
     Test_Support.Print_Integer_Matrix (Routine_Name & "Y_Train", Y_Train, 1, 3);
     New_Line;
     Fit (MLP, X_Train, Y_Train);
-    Prediction := Predict_ProbA (MLP, X_Test);
-    Test_Support.Print_Matrix_Dimensions ("Prediction", Prediction);
+    declare
+        Prediction : constant Real_Float_Matrix := Predict_ProbA (MLP, X_Test);
+    begin
+        Test_Support.Print_Matrix_Dimensions ("Prediction", Prediction);
+    end;
 
     Score := Base.Score (MLP, X_Test, Y_Test);
     Put_Line ("Score: " & Float'Image (Score));
