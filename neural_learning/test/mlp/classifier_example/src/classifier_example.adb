@@ -39,14 +39,16 @@ begin
     New_Line;
     Fit (MLP, X_Train, Y_Train);
     declare
-        Predict_Prob : constant Real_Float_Matrix := Predict_ProbA (MLP, X_Test);
-        Prediction   : constant Integer_Matrix := Predict (MLP, X_Test);
+      Predict_Prob : constant Real_Float_Matrix :=
+                       Predict_ProbA (MLP, Slice (X_Test, 1, 2));
+      Prediction   : constant Integer_Matrix :=
+                       Predict (MLP, Slice (X_Test, 1, 5));
     begin
         Test_Support.Print_Matrix_Dimensions ("Prediction", Prediction);
         Test_Support.Print_Float_Matrix (Routine_Name & "Predict_Prob",
-                                         Predict_Prob, 1, 3);
+                                         Predict_Prob);
         Test_Support.Print_Integer_Matrix (Routine_Name & "Prediction",
-                                           Prediction, 1, 3);
+                                           Prediction);
     end;
 
     Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Test", Y_Test);
