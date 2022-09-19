@@ -168,10 +168,10 @@ package body Multilayer_Perceptron is
       --  Y_Prob checked; contains only 1s and 0s
       Is_Probilities_Matrix ("Backprop Y_Prob ", Y_Prob);
       --  L284
---        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
---        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
---        Test_Support.Print_Matrix_Dimensions
---          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
+      --        Test_Support.Print_Matrix_Dimensions
+      --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
       Assert (Y_Prob'Length = Activations.Last_Element'Length, Routine_Name &
                 "L284+ Y_Prob and Activations.Last_Element lengths are" &
                 " different");
@@ -186,11 +186,11 @@ package body Multilayer_Perceptron is
       else
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
---        Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Prob",
---          Y_Prob);
---        Test_Support.Print_Matrix_Dimensions
---          (Routine_Name & "L284+ Activations.Last_Element",
---           Activations.Last_Element);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Prob",
+      --          Y_Prob);
+      --        Test_Support.Print_Matrix_Dimensions
+      --          (Routine_Name & "L284+ Activations.Last_Element",
+      --           Activations.Last_Element);
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
@@ -838,7 +838,7 @@ package body Multilayer_Perceptron is
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
                    & Integer'Image (Iter) & "  loss: " &
-                   Float'Image (Self.Attributes.Loss));
+                     Float'Image (Self.Attributes.Loss));
       end if;
 
    end Fit_Stochastic;
@@ -874,8 +874,8 @@ package body Multilayer_Perceptron is
             Updated_Activ_Grads : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
---              Test_Support.Print_Matrix_Dimensions
---                (Routine_Name & "L131 Updated_Activ_Grads ", Updated_Activ_Grads);
+            --              Test_Support.Print_Matrix_Dimensions
+            --                (Routine_Name & "L131 Updated_Activ_Grads ", Updated_Activ_Grads);
 
             --  L132 Add layer + 1 activation
             Activations.Append (Updated_Activ_Grads + Params.Intercept_Grads);
@@ -903,9 +903,9 @@ package body Multilayer_Perceptron is
             end if;
          end;  --  declare
       end loop;
---        Test_Support.Print_Matrix_Dimensions
---          (Routine_Name & "L138 Activations.Last_Element ",
---           Activations.Last_Element);
+      --        Test_Support.Print_Matrix_Dimensions
+      --          (Routine_Name & "L138 Activations.Last_Element ",
+      --           Activations.Last_Element);
 
       --  L138 For the last layer
       case Output_Activation is
@@ -919,8 +919,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
---        Test_Support.Print_Matrix_Dimensions
---          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
+      --        Test_Support.Print_Matrix_Dimensions
+      --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
       --  Check that Activations.Last_Element rows are probabilities
       --        Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
       --                               Activations.Last_Element);
@@ -936,8 +936,8 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       use Parameters_Package;
       type Activations_Array is array (Integer range <>) of Real_Float_List;
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Forward_Pass_Fast ";
+      --        Routine_Name : constant String :=
+      --                         "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
                                      return Activations_Array is
@@ -959,8 +959,8 @@ package body Multilayer_Perceptron is
          Result   : Real_Float_Matrix (Activations'Range, 1 ..
                                          Integer (Activations (1).Length));
       begin
---           Put_Line (Routine_Name & "To_Matrix Activations (1).Length" &
---                       Integer'Image (Integer (Activations (1).Length)));
+         --           Put_Line (Routine_Name & "To_Matrix Activations (1).Length" &
+         --                       Integer'Image (Integer (Activations (1).Length)));
          for row in Result'Range loop
             Row_Data := Activations (row);
             for col in Result'Range (2) loop
@@ -982,8 +982,8 @@ package body Multilayer_Perceptron is
       --  Activations_Array used to allow for different sized matrices
       Activations       : Activations_Array (X'Range);
    begin
---        Put_Line (Routine_Name & "N_Outputs" &
---                    Integer'Image (Integer (Self.Attributes.N_Outputs)));
+      --        Put_Line (Routine_Name & "N_Outputs" &
+      --                    Integer'Image (Integer (Self.Attributes.N_Outputs)));
       --  L160 Initialize first layer
       for row in X'Range loop
          for col in X'Range (2) loop
@@ -1029,8 +1029,8 @@ package body Multilayer_Perceptron is
          when Rect_LU_Activation => Rect_LU (Activ_Out);
          when Softmax_Activation => Softmax (Activ_Out);
       end case;
---        Put_Line (Routine_Name & "Activ_Out cols" &
---                    Integer'Image (Activ_Out'Length (2)));
+      --        Put_Line (Routine_Name & "Activ_Out cols" &
+      --                    Integer'Image (Activ_Out'Length (2)));
 
       return Activ_Out;
 
@@ -1194,7 +1194,7 @@ package body Multilayer_Perceptron is
    procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix) is
       Routine_Name : constant String :=
                        "Multilayer_Perceptron.Is_Probilities_Matrix, ";
-      Sum : Real_Float_Vector (PM'Range) := (others => 0.0);
+      Sum          : Real_Float_Vector (PM'Range) := (others => 0.0);
    begin
       for row in PM'Range loop
          for col in PM'Range (2) loop
@@ -1318,12 +1318,8 @@ package body Multilayer_Perceptron is
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
    begin
-      Put_Line (Routine_Name & "Y_Pred'Length (2)" &
-                  Integer'Image (Y_Pred'Length (2)));
-      --        Test_Support.Print_Float_Matrix (Routine_Name & "Y_Pred", Y_Pred);
-      --        Test_Support.Print_Integer_Matrix
-      --          (Routine_Name & "Inverse_Transform",
-      --           Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred));
+      New_Line;
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;
@@ -1331,14 +1327,14 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1237  Probability estimates
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Real_Float_Matrix is
+                           return Real_Float_Matrix is
    begin
       return Forward_Pass_Fast (Self, X);
 
    end Predict_ProbA;
 
    --  -------------------------------------------------------------------------
-  --  L637
+   --  L637
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;
@@ -1588,7 +1584,7 @@ package body Multilayer_Perceptron is
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
       Put_Line (Routine_Name & "Type_Of_Target (Y): " &
-                Y_Type'Image (Type_Of_Target (Y)));
+                  Y_Type'Image (Type_Of_Target (Y)));
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
