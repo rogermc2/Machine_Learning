@@ -6,6 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with NL_Types;
 --  with Printing;
+--  with Test_Support;
 
 package body Generic_Label_Binarize_Matrix is
 
@@ -65,12 +66,9 @@ package body Generic_Label_Binarize_Matrix is
         Ada.Containers.Generic_Array_Sort (Index_Type, Class_Type,
                                            Class_Array_Type);
       Num_Classes  : constant Positive := Positive (Classes'Length);
-      Y_Bin        : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
-        := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
       Sorted       : Class_Array_Type (Classes'Range);
    begin
-      Put_Line (Routine_Name & "Y_Kind " & Y_Type'Image (Y_Kind));
       Assert (Y_Kind /= Y_Unknown, Routine_Name &
                 "unknown target data type.");
       --  L506
@@ -80,25 +78,27 @@ package body Generic_Label_Binarize_Matrix is
 
       --  L516
       if Y_Kind = Y_Binary then
-         declare
-            Y_Bin1 : Binary_Matrix (1 .. Y'Length, 1 .. 1)
-              := (others => (others => 0));
-         begin
-            if Num_Classes = 1 then
+         Put_Line (Routine_Name & "L516 Num_Classes:" &
+                     Integer'Image (Num_Classes));
+         if Num_Classes = 1 then
+            declare
+               Y_Bin : Binary_Matrix (1 .. Y'Length, 1 .. 1)
+                 := (others => (others => 0));
+            begin
                for row in Y'Range loop
                   for col in Classes'First .. Classes'Last loop
                      if Neg_Label /= 0 then
-                        Y_Bin1 (integer (row), 1) := Pos_Label;
+                        Y_Bin (integer (row), 1) := Pos_Label;
                      end if;
                   end loop;
                end loop;
 
-               return Y_Bin1;
+               return Y_Bin;
+            end;
 
-            elsif Num_Classes > 2 then
-               Y_Kind := Y_Multiclass;
-            end if;
-         end;
+         elsif Num_Classes > 2 then
+            Y_Kind := Y_Multiclass;
+         end if;
       end if;
 
       --  L528
@@ -106,28 +106,38 @@ package body Generic_Label_Binarize_Matrix is
       Class_Sort (Sorted);
 
       --  L538
-      --        if Y_Kind = Y_Binary then
-      --           --  Label.py L539 - L549 needed to generate a csr sparse matrix
-      --           --  Binarize is all that is needed for this implementation
-      --           declare
-      --              Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
-      --                := (others => (others => Neg_Label));
-      --           begin
-      --              Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
-      --              return Y_Bin2;
-      --           end;
-
-      if Y_Kind = Y_Multiclass then
-         return Binarize (Y, Classes, Neg_Label, Pos_Label);
-
-      else
+      if Y_Kind = Y_Binary or Y_Kind = Y_Multiclass then
+         --  Label.py L539 - L549 needed to generate a csr sparse matrix
+         --  Binarize is all that is needed for this implementation
+         --           return Binarize (Y, Classes, Neg_Label, Pos_Label);
+         null;
+      elsif Y_Kind = Y_Multilabel_Indicator then
          --  L551
-         Assert (Y_Kind = Y_Multilabel_Indicator, Y_Type'Image (Y_Kind) &
+         Assert (False, "L551 Y_Multilabel_Indicator" &
                    " target data is not supported by " & Routine_Name);
-         Y_Bin := Binarize (Y, Classes, Neg_Label, Pos_Label);
+         return Binarize (Y, Classes, Neg_Label, Pos_Label);
+      else
+         Assert (False, Y_Type'Image (Y_Kind) &
+                   " target data is not supported by " & Routine_Name);
+         return Binarize (Y, Classes, Neg_Label, Pos_Label);
       end if;
 
-      return Y_Bin;
+      --  L587
+      if Y_Kind = Y_Binary then
+         declare
+            Y_Bin   : constant Binary_Matrix :=
+                        Binarize (Y, Classes, Neg_Label, Pos_Label);
+            Y_Bin_1 : Binary_Matrix (Y'Range, 1 .. 1) :=
+                        (others => (others => Neg_Label));
+         begin
+            for row in Y'Range loop
+               Y_Bin_1 (row, 1) := Y_Bin (row, Y'Last (2));
+            end loop;
+            return Y_Bin_1;
+         end;
+      end if;
+
+      return Binarize (Y, Classes, Neg_Label, Pos_Label);
 
    end Label_Binarize;
 

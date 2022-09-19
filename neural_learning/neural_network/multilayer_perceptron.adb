@@ -587,7 +587,7 @@ package body Multilayer_Perceptron is
 
       --  L409
       Test_Support.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin", Y_Bin,
-                                        1, 4);
+                                        1, 8);
       if First_Pass then
          Initialize (Self, Layer_Units);
       end if;
