@@ -1314,12 +1314,12 @@ package body Multilayer_Perceptron is
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Integer_Matrix is
-      Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
+      --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
    begin
-      New_Line;
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
+      --        New_Line;
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;
@@ -1328,8 +1328,35 @@ package body Multilayer_Perceptron is
    --  L1237  Probability estimates
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
                            return Real_Float_Matrix is
+      Routine_Name   : constant String := "Multilayer_Perceptron.Predict_ProbA ";
    begin
-      return Forward_Pass_Fast (Self, X);
+      declare
+         Y_Pred  : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
+      begin
+         if Self.Attributes.N_Outputs = 1 then
+            declare
+               Y_Pred_1  : Real_Float_Matrix
+                 (1 .. Y_Pred'Length * Y_Pred'Length (2), 1 .. 2);
+            begin
+               for row in Y_Pred'Range loop
+                  for col in Y_Pred'Range (2) loop
+                     Y_Pred_1 (row - Y_Pred'First + col, 1) := Y_Pred (row, col);
+                  end loop;
+               end loop;
+
+               for row in Y_Pred_1'Range loop
+                  Y_Pred_1 (row, 2) := 1.0 - Y_Pred (row, 1);
+               end loop;
+
+               Put_Line (Routine_Name & "Y_Pred_1");
+               return Y_Pred_1;
+            end;
+
+         else
+            Put_Line (Routine_Name & "Y_Pred");
+            return Y_Pred;
+         end if;
+      end;
 
    end Predict_ProbA;
 

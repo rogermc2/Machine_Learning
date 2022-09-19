@@ -69,7 +69,6 @@ package body Generic_Label_Binarize_Matrix is
         := (others => (others => 0));
       Y_Kind       : Multiclass_Utils.Y_Type := Type_Of_Target (Y);
       Sorted       : Class_Array_Type (Classes'Range);
-
    begin
       Put_Line (Routine_Name & "Y_Kind " & Y_Type'Image (Y_Kind));
       Assert (Y_Kind /= Y_Unknown, Routine_Name &
@@ -107,25 +106,19 @@ package body Generic_Label_Binarize_Matrix is
       Class_Sort (Sorted);
 
       --  L538
-      if Y_Kind = Y_Binary then
-         --  Label.py L539 - L549 needed to generate a csr sparse matrix
-         --  Binarize is all that is needed for this implementation
-         declare
-            Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
-              := (others => (others => Neg_Label));
-         begin
-            Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
-            return Y_Bin2;
-         end;
+      --        if Y_Kind = Y_Binary then
+      --           --  Label.py L539 - L549 needed to generate a csr sparse matrix
+      --           --  Binarize is all that is needed for this implementation
+      --           declare
+      --              Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
+      --                := (others => (others => Neg_Label));
+      --           begin
+      --              Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
+      --              return Y_Bin2;
+      --           end;
 
-      elsif Y_Kind = Y_Multiclass then
-         declare
-            Y_Bin2 : Binary_Matrix (1 .. Y'Length, 1 .. Num_Classes)
-              := (others => (others => Neg_Label));
-         begin
-            Y_Bin2 := Binarize (Y, Classes, Neg_Label, Pos_Label);
-            return Y_Bin2;
-         end;
+      if Y_Kind = Y_Multiclass then
+         return Binarize (Y, Classes, Neg_Label, Pos_Label);
 
       else
          --  L551

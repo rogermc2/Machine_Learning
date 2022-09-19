@@ -40,18 +40,16 @@ begin
     Fit (MLP, X_Train, Y_Train);
     declare
       Predict_Prob : constant Real_Float_Matrix :=
-                       Predict_ProbA (MLP, Slice (X_Test, 1, 2));
+                       Predict_ProbA (MLP, Slice (X_Test, 1, 8));
       Prediction   : constant Integer_Matrix :=
-                       Predict (MLP, Slice (X_Test, 1, 5));
+                       Predict (MLP, Slice (X_Test, 1, 8));
     begin
-        Test_Support.Print_Matrix_Dimensions ("Prediction", Prediction);
         Test_Support.Print_Float_Matrix (Routine_Name & "Predict_Prob",
                                          Predict_Prob);
         Test_Support.Print_Integer_Matrix (Routine_Name & "Prediction",
                                            Prediction);
     end;
 
-    Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Test", Y_Test);
     Score := Base.Score (MLP, X_Test, Y_Test);
     Put_Line ("Score: " & Float'Image (Score));
 

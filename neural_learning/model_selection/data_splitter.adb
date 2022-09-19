@@ -41,13 +41,12 @@ package body Data_Splitter is
    procedure Iterate_Indices
      (Self                        : Base_Shuffle_Data;
       Train_Indices, Test_Indices : out Integer_Array) is
-      Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
+--        Routine_Name  : constant String := "Data_Splitter.Iterate_Indices ";
       Num_Train     : constant Natural := Self.Train_Size;
       Num_Test      : constant Natural := Self.Test_Size;
       Num_Samples   : constant Natural := Num_Train + Num_Test;
       Perms         : Integer_Array (1 .. Num_Samples);
    begin
-      Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
       for index in 1 .. Num_Samples loop
          Perms (index) := index;
       end loop;
