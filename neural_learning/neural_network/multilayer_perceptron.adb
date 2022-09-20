@@ -166,10 +166,11 @@ package body Multilayer_Perceptron is
    begin
       --          BP_Count := BP_Count + 1;
       --  Y_Prob checked; contains only 1s and 0s
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
+      Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
       Is_Probilities_Matrix ("Backprop Y_Prob ", Y_Prob);
       --  L284
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
       --        Test_Support.Print_Matrix_Dimensions
       --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
       Assert (Y_Prob'Length = Activations.Last_Element'Length, Routine_Name &
@@ -1370,8 +1371,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --          Routine_Name   : constant String :=
-      --                                "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                         "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
@@ -1405,6 +1406,8 @@ package body Multilayer_Perceptron is
 
       --  L645
       Forward_Pass (Self, Gradients, Activations);
+      Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Batch ",
+                                        Slice (Y_Batch, 1, 5));
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
 
       --  L665
