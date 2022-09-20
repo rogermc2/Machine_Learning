@@ -980,11 +980,9 @@ package body Multilayer_Perceptron is
       Activ_Out         : Real_Float_Matrix
         (X'Range, 1 .. Integer (Self.Attributes.N_Outputs));
       --  Activations_Array used to allow for different sized matrices
-      Activations       : Activations_Array (X'Range);
-   begin
       --  L160 Initialize first layer
-      Activations := To_Activations_Array (X);
-
+      Activations       : Activations_Array := To_Activations_Array (X);
+   begin
 --        Test_Support.Print_Float_Matrix (Routine_Name & "X", X, 1, 2);
       Test_Support.Print_Float_Matrix (Routine_Name & "layer 1 Activations",
                                        To_Matrix (Activations), 1, 2);

@@ -254,17 +254,12 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
 
    procedure Rect_LU (Activation : in out Real_Float_Matrix) is
-      type Matrix_Float is new Real_Float_Matrix (1 .. Activation'Length,
-                                                  1 .. Activation'Length (2));
-      Result : Matrix_Float;
    begin
       for row in Activation'Range loop
          for col in Activation'Range (2) loop
-            Result (row, col) := Float'Max (0.0, Activation (row, col));
+            Activation (row, col) := Float'Max (0.0, Activation (row, col));
          end loop;
       end loop;
-
-      Activation := Real_Float_Matrix (Result);
 
    end Rect_LU;
 
@@ -333,17 +328,12 @@ package body Base_Neural is
 
    procedure Tanh (Activation : in out Real_Float_Matrix) is
       use Maths.Float_Math_Functions;
-      type Matrix_Float is new Real_Float_Matrix (1 .. Activation'Length,
-                                                  1 .. Activation'Length (2));
-      Result : Matrix_Float;
    begin
       for row in Activation'Range loop
          for col in Activation'Range (2) loop
-            Result (row, col) := Tanh (Activation (row, col));
+            Activation (row, col) := Tanh (Activation (row, col));
          end loop;
       end loop;
-
-      Activation := Real_Float_Matrix (Result);
 
    end Tanh;
 
