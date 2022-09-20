@@ -87,7 +87,7 @@ package body Multilayer_Perceptron is
                          Layer_Units : Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
-   procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
+--     procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;
@@ -158,48 +158,47 @@ package body Multilayer_Perceptron is
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Backprop ";
       Num_Samples        : constant Positive := Positive (X'Length);
-      Y_Prob             : constant Real_Float_Matrix :=
+      Y_Float            : constant Real_Float_Matrix :=
                              To_Real_Float_Matrix (Y);
       Loss_Function_Name : Loss_Function_Type;
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float := 0.0;
    begin
       --          BP_Count := BP_Count + 1;
-      --  Y_Prob checked; contains only 1s and 0s
+      --  Y_Float checked; contains only 1s and 0s
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob ", Y_Prob);
+--        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
       Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
-      Is_Probilities_Matrix ("Backprop Y_Prob ", Y_Prob);
       --  L284
       --        Test_Support.Print_Matrix_Dimensions
       --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
-      Assert (Y_Prob'Length = Activations.Last_Element'Length, Routine_Name &
-                "L284+ Y_Prob and Activations.Last_Element lengths are" &
-                " different");
-      Assert (Y_Prob'Length (2) = Activations.Last_Element'Length (2),
-              Routine_Name & "L284+ Y_Prob has different number of columns" &
-                Integer'Image (Y_Prob'Length (2)) & " to" &
-                " Activations.Last_Element columns" &
-                Integer'Image (Activations.Last_Element'Length (2)));
+--        Assert (Y_Float'Length = Activations.Last_Element'Length, Routine_Name &
+--                  "L284+ Y_Float and Activations.Last_Element lengths are" &
+--                  " different");
+--        Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
+--                Routine_Name & "L284+ Y_Float has different number of columns" &
+--                  Integer'Image (Y_Float'Length (2)) & " to" &
+--                  " Activations.Last_Element columns" &
+--                  Integer'Image (Activations.Last_Element'Length (2)));
       if Self.Attributes.Loss_Function_Name = Log_Loss_Function and then
         Self.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
       else
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Prob",
-      --          Y_Prob);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Float",
+      --          Y_Float);
       --        Test_Support.Print_Matrix_Dimensions
       --          (Routine_Name & "L284+ Activations.Last_Element",
       --           Activations.Last_Element);
 
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
-            Loss := Binary_Log_Loss (Y_Prob, Activations.Last_Element);
+            Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
          when Log_Loss_Function =>
-            Loss := Log_Loss (Y_Prob, Activations.Last_Element);
+            Loss := Log_Loss (Y_Float, Activations.Last_Element);
          when Squared_Error_Function =>
-            Loss := Squared_Loss (Y_Prob, Activations.Last_Element);
+            Loss := Squared_Loss (Y_Float, Activations.Last_Element);
       end case;
 
       --        Put_Line (Routine_Name & "L289 Loss" & Float'Image (Loss));
@@ -242,19 +241,19 @@ package body Multilayer_Perceptron is
 
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
-      --          Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Prob",
+      --          Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float",
       --                                       Y_Prob, 1, 2);
-      Assert (Activations.Last_Element'Length (2) = Y_Prob'Length (2),
+      Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
               Routine_Name & "L301 last Activations item width" &
                 Integer'Image (Activations.Last_Element'Length (2)) &
-                " differs from Y_Prob width" &
-                Integer'Image (Y_Prob'Length (2)));
+                " differs from Y_Float width" &
+                Integer'Image (Y_Float'Length (2)));
       --  L301  Y_Prob checked; contains only 1s and 0s
       --        Printing.Print_Float_Matrix
-      --          (Routine_Name & "L301 Activations.Last_Element - Y_Prob",
-      --           Activations.Last_Element - Y_Prob, 1, 1);
+      --          (Routine_Name & "L301 Activations.Last_Element - Y_Float",
+      --           Activations.Last_Element - Y_Float, 1, 1);
       Deltas.Replace_Element (Deltas.Last_Index,
-                              Activations.Last_Element - Y_Prob);
+                              Activations.Last_Element - Y_Float);
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
@@ -1192,28 +1191,28 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix) is
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Is_Probilities_Matrix, ";
-      Sum          : Real_Float_Vector (PM'Range) := (others => 0.0);
-   begin
-      for row in PM'Range loop
-         for col in PM'Range (2) loop
-            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
-                      Integer'Image (row) & "," & Integer'Image (col) & " = " &
-                      Float'Image (PM (row, col)));
-            Sum (row) := Sum (row) + PM (row, col);
-         end loop;
-      end loop;
-
-      for row in Sum'Range loop
-         Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
-                   Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
-                   "Total probability for row (" & Integer'Image (row) &
-                   ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
-      end loop;
-
-   end Is_Probilities_Matrix;
+--     procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix) is
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Is_Probilities_Matrix, ";
+--        Sum          : Real_Float_Vector (PM'Range) := (others => 0.0);
+--     begin
+--        for row in PM'Range loop
+--           for col in PM'Range (2) loop
+--              Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
+--                        Integer'Image (row) & "," & Integer'Image (col) & " = " &
+--                        Float'Image (PM (row, col)));
+--              Sum (row) := Sum (row) + PM (row, col);
+--           end loop;
+--        end loop;
+--
+--        for row in Sum'Range loop
+--           Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
+--                     Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
+--                     "Total probability for row (" & Integer'Image (row) &
+--                     ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
+--        end loop;
+--
+--     end Is_Probilities_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -1315,12 +1314,10 @@ package body Multilayer_Perceptron is
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
                      return Integer_Matrix is
-      --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
+--        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
    begin
-      --        New_Line;
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
       return Label.Inverse_Transform (Self.Attributes.Binarizer, Y_Pred);
 
    end Predict;
@@ -1332,6 +1329,7 @@ package body Multilayer_Perceptron is
       Routine_Name   : constant String := "Multilayer_Perceptron.Predict_ProbA ";
    begin
       declare
+         --  L1265
          Y_Pred  : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
       begin
          if Self.Attributes.N_Outputs = 1 then
@@ -1349,7 +1347,7 @@ package body Multilayer_Perceptron is
                   Y_Pred_1 (row, 2) := 1.0 - Y_Pred (row, 1);
                end loop;
 
-               Put_Line (Routine_Name & "Y_Pred_1");
+               Put_Line (Routine_Name & "N_Outputs = 1 Y_Pred_1");
                return Y_Pred_1;
             end;
 

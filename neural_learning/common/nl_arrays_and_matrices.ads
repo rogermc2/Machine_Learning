@@ -164,6 +164,8 @@ package NL_Arrays_And_Matrices is
                    return Binary_Matrix;
    function Slice (Matrix : Real_Float_Matrix; First, Last : Positive)
                    return Real_Float_Matrix;
+   function Slice (Matrix : Integer_Matrix; First, Last : Positive)
+                   return Integer_Matrix;
    function To_Boolean_Array (List : NL_Types.Boolean_List)
                                return Boolean_Array;
    function To_Boolean_Matrix (IM : Integer_Matrix) return Boolean_Matrix;

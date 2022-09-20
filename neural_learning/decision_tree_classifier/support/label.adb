@@ -637,12 +637,12 @@ package body Label is
          end loop;
       end loop;
 
-      --  L657
+      --  L657 Inverse transform data
       if Output_Type = Y_Binary then
          --           Put_Line (Routine_Name & "Output_Type = Y_Binary");
          declare
-            Inverse      : Integer_Matrix (Y'Range, 1 .. 1) :=
-                             (others => (others => 0));
+            Inverse : Integer_Matrix (Y'Range, 1 .. 1) :=
+                        (others => (others => 0));
          begin
             if Y_Thresh'Length (2) = 2 then
                --              Put_Line (Routine_Name & "Thresh'Length (2) = 2");
@@ -656,8 +656,9 @@ package body Label is
                Assert (False, Routine_Name &
                          "Y_Binary Classes.Length = 1 not coded");
             else
-               Assert (False, Routine_Name &
-                         "Y_Binary Classes.Length /= 1 not coded");
+               for row in Inverse'Range loop
+                  Inverse (row, 1) := Classes (Y_Thresh (row, 1) + 1);
+               end loop;
             end if;
             return Inverse;
          end;

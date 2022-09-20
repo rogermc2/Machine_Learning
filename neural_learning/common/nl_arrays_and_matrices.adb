@@ -642,6 +642,22 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function Slice (Matrix : Integer_Matrix; First, Last : Positive)
+                   return Integer_Matrix is
+      Result : Integer_Matrix (1 .. Last - First + 1, Matrix'Range (2));
+   begin
+      for row in First .. Last loop
+         for col in Result'Range (2) loop
+            Result (row - First + 1, col) := Matrix  (row, col);
+         end loop;
+      end loop;
+
+      return Result;
+
+   end Slice;
+
+   --  ------------------------------------------------------------------------
+
    function Sum (Data : Real_Float_Matrix) return Real_Float_Vector is
       Result : Real_Float_Vector (Data'Range);
       Val    : Float;
