@@ -6,6 +6,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Multiclass_Utils;
 with Neural_Maths;
 --  with Printing;
+--  with Test_Support;
 
 package body Classification_Metrics is
 
@@ -63,9 +64,6 @@ package body Classification_Metrics is
                                             Y_Prediction);
       --  L210
       Check_Targets (Y_True, Y_Prediction);
---        Printing.Print_Integer_Matrix (Routine_Name & "Y_True", Y_True, 1, 5);
---        Printing.Print_Integer_Matrix (Routine_Name & "Y_Prediction",
---                                       Y_Prediction, 1, 5);
       for row in Score'Range loop
          for col in Score'Range (2) loop
             if Y_Prediction (row, col) = Y_True (row, col) then
@@ -176,7 +174,7 @@ package body Classification_Metrics is
    end Average;
 
    --  ------------------------------------------------------------------------
-
+   --  L57
    procedure Check_Targets (Y_True, Y_Prediction : Integer_Matrix) is
       use Multiclass_Utils;
       Routine_Name : constant String :=
@@ -186,7 +184,7 @@ package body Classification_Metrics is
    begin
       --        Put_Line (Routine_Name & "True type: " & Y_Type'Image (Type_True));
       --        Put_Line (Routine_Name & "Prediction type: " & Y_Type'Image (Type_Pred));
-
+      --  L84
       NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y_True,
                                             Y_Prediction);
       if Type_True = Y_Binary and Type_Pred = Y_Multiclass then
@@ -196,9 +194,9 @@ package body Classification_Metrics is
       Assert (Type_True = Y_Binary or Type_True = Y_Multiclass or
                 Type_True = Y_Multilabel_Indicator, Routine_Name & "Y_Type " &
                 Y_Type'Image (Type_True) & " is not supported");
-      if Type_True = Y_Binary then
-         Put_Line (Routine_Name & "Y_Binary case not coded");
-      end if;
+--        if Type_True = Y_Binary then
+--           Put_Line (Routine_Name & "Y_Binary case not coded");
+--        end if;
 
    end Check_Targets;
 
