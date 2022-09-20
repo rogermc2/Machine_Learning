@@ -572,7 +572,7 @@ package body Multilayer_Perceptron is
       --  0 or 1 for each sample depending whether or not the sample output
       --  value corresponds to th class value
       Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
-      Put_Line (Routine_Name & "L402 N_Outputs (classes)" &
+      Put_Line (Routine_Name & "L402 N_Outputs" &
                   Integer'Image (Self.Attributes.N_Outputs));
 
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
@@ -587,11 +587,12 @@ package body Multilayer_Perceptron is
 
       --  L409
       Test_Support.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin", Y_Bin,
-                                        1, 8);
+                                        1, 7);
       if First_Pass then
          Initialize (Self, Layer_Units);
       end if;
 
+      Activations.Clear;
       Activations.Append (X);
 
       --  L417 Initialized grads are empty vectors, no initialization needed.
@@ -938,8 +939,8 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       use Parameters_Package;
       type Activations_Array is array (Integer range <>) of Real_Float_List;
-      Routine_Name : constant String :=
-                             "Multilayer_Perceptron.Forward_Pass_Fast ";
+--        Routine_Name : constant String :=
+--                               "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
                                      return Activations_Array is
@@ -984,9 +985,8 @@ package body Multilayer_Perceptron is
       Activations       : Activations_Array := To_Activations_Array (X);
    begin
 --        Test_Support.Print_Float_Matrix (Routine_Name & "X", X, 1, 2);
-      Test_Support.Print_Float_Matrix (Routine_Name & "layer 1 Activations",
-                                       To_Matrix (Activations), 1, 2);
-
+--        Test_Support.Print_Float_Matrix (Routine_Name & "layer 1 Activations",
+--                                         To_Matrix (Activations), 1, 2);
       --  L167 Forward propagate
       --  python range(self.n_layers_ - 1) = 0 .. self.n_layers_ - 1
       for layer in 1 .. Num_Layers - 1 loop
