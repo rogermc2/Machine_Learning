@@ -33,9 +33,12 @@ begin
     Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
     Data_Splitter.Train_Test_Split (X, Y, Train_Size, Test_Size, X_Train,
                                     Y_Train, X_Test, Y_Test);
+    Test_Support.Print_Matrix_Dimensions (Routine_Name & "X_Train", X_Train);
     Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Train", Y_Train);
+    Test_Support.Print_Matrix_Dimensions (Routine_Name & "X_Test", X_Test);
     Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Test", Y_Test);
-    Test_Support.Print_Integer_Matrix (Routine_Name & "Y_Train", Y_Train, 1, 3);
+--      Test_Support.Print_Float_Matrix (Routine_Name & "X_Train", X_Train, 1, 3);
+--      Test_Support.Print_Float_Matrix (Routine_Name & "X_Test", X_Test, 1, 3);
     New_Line;
    Fit (MLP, X_Train, Y_Train);
 

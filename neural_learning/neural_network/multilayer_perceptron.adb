@@ -166,9 +166,9 @@ package body Multilayer_Perceptron is
    begin
       --          BP_Count := BP_Count + 1;
       --  Y_Float checked; contains only 1s and 0s
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
+--        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
 --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
-      Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
+--        Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
       --  L284
       --        Test_Support.Print_Matrix_Dimensions
       --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
@@ -927,17 +927,19 @@ package body Multilayer_Perceptron is
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
-   --  L144 Forward_Pass_Fast is the same as _forward_pass but does not record
-   --  all layer activations and returns only the last layer's activation of
-   --  size n_samples x n_outputs
+   --  L144 Forward_Pass_Fast predict using the trained model
+   --
+   --  It is the same as Forward_Pass but does not record all layer activations
+   --  and returns only the last layer's activation of size
+   --  n_samples x n_outputs
    function Forward_Pass_Fast (Self : MLP_Classifier; X : Real_Float_Matrix)
                                return Real_Float_Matrix is
       use Base_Neural;
       use Real_Float_Arrays;
       use Parameters_Package;
       type Activations_Array is array (Integer range <>) of Real_Float_List;
-      --        Routine_Name : constant String :=
-      --                         "Multilayer_Perceptron.Forward_Pass_Fast ";
+      Routine_Name : constant String :=
+                             "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
                                      return Activations_Array is
@@ -959,8 +961,6 @@ package body Multilayer_Perceptron is
          Result   : Real_Float_Matrix (Activations'Range, 1 ..
                                          Integer (Activations (1).Length));
       begin
-         --           Put_Line (Routine_Name & "To_Matrix Activations (1).Length" &
-         --                       Integer'Image (Integer (Activations (1).Length)));
          for row in Result'Range loop
             Row_Data := Activations (row);
             for col in Result'Range (2) loop
@@ -982,14 +982,12 @@ package body Multilayer_Perceptron is
       --  Activations_Array used to allow for different sized matrices
       Activations       : Activations_Array (X'Range);
    begin
-      --        Put_Line (Routine_Name & "N_Outputs" &
-      --                    Integer'Image (Integer (Self.Attributes.N_Outputs)));
       --  L160 Initialize first layer
-      for row in X'Range loop
-         for col in X'Range (2) loop
-            Activations (row).Append (X (row, col));
-         end loop;
-      end loop;
+      Activations := To_Activations_Array (X);
+
+--        Test_Support.Print_Float_Matrix (Routine_Name & "X", X, 1, 2);
+      Test_Support.Print_Float_Matrix (Routine_Name & "layer 1 Activations",
+                                       To_Matrix (Activations), 1, 2);
 
       --  L167 Forward propagate
       --  python range(self.n_layers_ - 1) = 0 .. self.n_layers_ - 1
@@ -1369,8 +1367,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      Routine_Name   : constant String :=
-                         "Multilayer_Perceptron.Process_Batch ";
+--        Routine_Name   : constant String :=
+--                           "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
@@ -1404,8 +1402,8 @@ package body Multilayer_Perceptron is
 
       --  L645
       Forward_Pass (Self, Gradients, Activations);
-      Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Batch ",
-                                        Slice (Y_Batch, 1, 5));
+--        Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Batch ",
+--                                          Slice (Y_Batch, 1, 5));
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
 
       --  L665
