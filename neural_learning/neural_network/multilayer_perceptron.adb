@@ -43,6 +43,7 @@ with Maths;
 --  with Utilities;
 
 --  with Base;
+with Classifier_Utilities;
 --  with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
@@ -87,7 +88,7 @@ package body Multilayer_Perceptron is
                          Layer_Units : Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
-   --     procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
+   procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;
@@ -891,9 +892,9 @@ package body Multilayer_Perceptron is
                     & Integer'Image (Activations.Last_Index) &
                       " /= layer + 1:" & Integer'Image (layer + 1));
 
-            --              Is_Probilities_Matrix
-            --                (Routine_Name & "L134 Activations.Last_Element ",
-            --                 Activations.Last_Element);
+            Is_Probilities_Matrix
+              (Routine_Name & "L134 Activations.Last_Element ",
+               Activations.Last_Element);
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -910,9 +911,6 @@ package body Multilayer_Perceptron is
             end if;
          end;  --  declare
       end loop;
-      --        Test_Support.Print_Matrix_Dimensions
-      --          (Routine_Name & "L138 Activations.Last_Element ",
-      --           Activations.Last_Element);
 
       --  L138 For the last layer
       case Output_Activation is
@@ -929,8 +927,8 @@ package body Multilayer_Perceptron is
       --        Test_Support.Print_Matrix_Dimensions
       --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
       --  Check that Activations.Last_Element rows are probabilities
-      --        Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
-      --                               Activations.Last_Element);
+      Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
+                             Activations.Last_Element);
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
@@ -945,8 +943,8 @@ package body Multilayer_Perceptron is
       use Real_Float_Arrays;
       use Parameters_Package;
       type Activations_Array is array (Integer range <>) of Real_Float_List;
-      --        Routine_Name : constant String :=
-      --                               "Multilayer_Perceptron.Forward_Pass_Fast ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
                                      return Activations_Array is
@@ -1036,6 +1034,9 @@ package body Multilayer_Perceptron is
          --        Put_Line (Routine_Name & "Activ_Out cols" &
          --                    Integer'Image (Activ_Out'Length (2)));
 
+         Test_Support.Print_Float_Array
+           (Routine_Name & "Activ_Out col sums",
+            Classifier_Utilities.Sum_Cols (Activ_Out));
          return Activ_Out;
       end;
 
@@ -1196,28 +1197,28 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
 
-   --     procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix) is
-   --        Routine_Name : constant String :=
-   --                         "Multilayer_Perceptron.Is_Probilities_Matrix, ";
-   --        Sum          : Real_Float_Vector (PM'Range) := (others => 0.0);
-   --     begin
-   --        for row in PM'Range loop
-   --           for col in PM'Range (2) loop
-   --              Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
-   --                        Integer'Image (row) & "," & Integer'Image (col) & " = " &
-   --                        Float'Image (PM (row, col)));
-   --              Sum (row) := Sum (row) + PM (row, col);
-   --           end loop;
-   --        end loop;
-   --
-   --        for row in Sum'Range loop
-   --           Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
-   --                     Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
-   --                     "Total probability for row (" & Integer'Image (row) &
-   --                     ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
-   --        end loop;
-   --
-   --     end Is_Probilities_Matrix;
+   procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix) is
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Is_Probilities_Matrix, ";
+      Sum          : Real_Float_Vector (PM'Range) := (others => 0.0);
+   begin
+      for row in PM'Range loop
+         for col in PM'Range (2) loop
+            Assert (PM (row, col) >= 0.0, Routine_Name & Msg & "Matrix" &
+                      Integer'Image (row) & "," & Integer'Image (col) & " = " &
+                      Float'Image (PM (row, col)));
+            Sum (row) := Sum (row) + PM (row, col);
+         end loop;
+      end loop;
+
+      for row in Sum'Range loop
+         Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
+                   Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
+                   "Total probability for row (" & Integer'Image (row) &
+                   ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
+      end loop;
+
+   end Is_Probilities_Matrix;
 
    --  -------------------------------------------------------------------------
 
@@ -1336,32 +1337,32 @@ package body Multilayer_Perceptron is
       Y_Pred       : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
---        if Self.Attributes.N_Outputs = 1 then
---           declare
---              Y_Pred_1  : Real_Float_Matrix
---                (1 .. Y_Pred'Length * Y_Pred'Length (2), 1 .. 2);
---           begin
---              Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred_1",
---                                                    Y_Pred_1);
---              for row in Y_Pred'Range loop
---                 for col in Y_Pred'Range (2) loop
---                    Y_Pred_1 (row - Y_Pred'First + col, 1) := Y_Pred (row, col);
---                 end loop;
---              end loop;
---
---              for row in Y_Pred_1'Range loop
---                 Y_Pred_1 (row, 1) := 1.0 - Y_Pred (row, 1);
---                 --                    Y_Pred_1 (row, 2) := 1.0 - Y_Pred (row, 1);
---              end loop;
---
---              Put_Line (Routine_Name & "N_Outputs = 1 Y_Pred_1");
---              return Y_Pred_1;
---           end;
---
---        else
+      --        if Self.Attributes.N_Outputs = 1 then
+      --           declare
+      --              Y_Pred_1  : Real_Float_Matrix
+      --                (1 .. Y_Pred'Length * Y_Pred'Length (2), 1 .. 2);
+      --           begin
+      --              Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred_1",
+      --                                                    Y_Pred_1);
+      --              for row in Y_Pred'Range loop
+      --                 for col in Y_Pred'Range (2) loop
+      --                    Y_Pred_1 (row - Y_Pred'First + col, 1) := Y_Pred (row, col);
+      --                 end loop;
+      --              end loop;
+      --
+      --              for row in Y_Pred_1'Range loop
+      --                 Y_Pred_1 (row, 1) := 1.0 - Y_Pred (row, 1);
+      --                 --                    Y_Pred_1 (row, 2) := 1.0 - Y_Pred (row, 1);
+      --              end loop;
+      --
+      --              Put_Line (Routine_Name & "N_Outputs = 1 Y_Pred_1");
+      --              return Y_Pred_1;
+      --           end;
+      --
+      --        else
 
-         return Y_Pred;
---        end if;
+      return Y_Pred;
+      --        end if;
 
    end Predict_ProbA;
 
