@@ -1331,40 +1331,37 @@ package body Multilayer_Perceptron is
    --  L1237  Probability estimates
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
                            return Real_Float_Matrix is
-      Routine_Name   : constant String := "Multilayer_Perceptron.Predict_ProbA ";
+      Routine_Name : constant String := "Multilayer_Perceptron.Predict_ProbA ";
+      --  L1265
+      Y_Pred       : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin
-      declare
-         --  L1265
-         Y_Pred  : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
-      begin
-         Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
-         if Self.Attributes.N_Outputs = 1 then
-            declare
-               Y_Pred_1  : Real_Float_Matrix
-                 (1 .. Y_Pred'Length * Y_Pred'Length (2), 1 .. 2);
-            begin
-               Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred_1",
-                                                     Y_Pred_1);
-               for row in Y_Pred'Range loop
-                  for col in Y_Pred'Range (2) loop
-                     Y_Pred_1 (row - Y_Pred'First + col, 1) := Y_Pred (row, col);
-                  end loop;
-               end loop;
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred", Y_Pred);
+--        if Self.Attributes.N_Outputs = 1 then
+--           declare
+--              Y_Pred_1  : Real_Float_Matrix
+--                (1 .. Y_Pred'Length * Y_Pred'Length (2), 1 .. 2);
+--           begin
+--              Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Pred_1",
+--                                                    Y_Pred_1);
+--              for row in Y_Pred'Range loop
+--                 for col in Y_Pred'Range (2) loop
+--                    Y_Pred_1 (row - Y_Pred'First + col, 1) := Y_Pred (row, col);
+--                 end loop;
+--              end loop;
+--
+--              for row in Y_Pred_1'Range loop
+--                 Y_Pred_1 (row, 1) := 1.0 - Y_Pred (row, 1);
+--                 --                    Y_Pred_1 (row, 2) := 1.0 - Y_Pred (row, 1);
+--              end loop;
+--
+--              Put_Line (Routine_Name & "N_Outputs = 1 Y_Pred_1");
+--              return Y_Pred_1;
+--           end;
+--
+--        else
 
-               for row in Y_Pred_1'Range loop
-                  Y_Pred_1 (row, 1) := 1.0 - Y_Pred (row, 1);
---                    Y_Pred_1 (row, 2) := 1.0 - Y_Pred (row, 1);
-               end loop;
-
-               Put_Line (Routine_Name & "N_Outputs = 1 Y_Pred_1");
-               return Y_Pred_1;
-            end;
-
-         else
-            Put_Line (Routine_Name & "Y_Pred");
-            return Y_Pred;
-         end if;
-      end;
+         return Y_Pred;
+--        end if;
 
    end Predict_ProbA;
 

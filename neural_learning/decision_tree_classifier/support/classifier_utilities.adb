@@ -801,8 +801,7 @@ package body Classifier_Utilities is
 
    --  -----------------------------------------------------------------------
 
-   function Sum_Cols (aList : Float_List_2D)
-                   return Float_List is
+   function Sum_Cols (aList : Float_List_2D) return Float_List is
       theSum : Float_List;
       Value  : Float;
    begin
@@ -821,8 +820,25 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Sum_Cols (aList : Value_Data_Lists_2D)
-                   return Value_Data_List is
+   function Sum_Cols (aMatrix : Real_Float_Matrix) return Real_Float_Vector is
+      theSum : Real_Float_Vector (aMatrix'Range);
+      Value  : Float;
+   begin
+      for row in aMatrix'Range loop
+         Value := 0.0;
+         for col in aMatrix'Range (2) loop
+            Value := Value + aMatrix (row, col);
+         end loop;
+         theSum (row) := Value;
+      end loop;
+
+      return theSum;
+
+   end Sum_Cols;
+
+   --  -------------------------------------------------------------------------
+
+   function Sum_Cols (aList : Value_Data_Lists_2D) return Value_Data_List is
       theSum     : Value_Data_List;
       Value_Type : constant Data_Type :=
                      aList.Element (1).Element (1).Value_Kind;
