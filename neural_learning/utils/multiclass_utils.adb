@@ -172,7 +172,8 @@ package body Multiclass_Utils is
    function Type_Of_Target (Y : Binary_Array) return Y_Type is
    begin
       pragma Unreferenced (Y);
-      return Y_Binary;
+--        return Y_Binary;
+      return Y_Multiclass;
 
    end Type_Of_Target;
 
@@ -190,7 +191,8 @@ package body Multiclass_Utils is
       elsif Y'Length > 1 then
          Result := Y_Multiclass;
       else
-         Result := Y_Binary;
+--           Result := Y_Binary;
+         Result := Y_Multiclass;
       end if;
 
       return Result;
@@ -217,7 +219,8 @@ package body Multiclass_Utils is
       elsif Classes.Length > 2 then
          Result := Y_Multiclass;
       else
-         Result := Y_Binary;
+--           Result := Y_Binary;
+         Result := Y_Multiclass;
       end if;
 
       return Result;
@@ -236,7 +239,8 @@ package body Multiclass_Utils is
       elsif Classes.Length > 2 then
          Result := Y_Multiclass;
       else
-         Result := Y_Binary;
+--           Result := Y_Binary;
+         Result := Y_Multiclass;
       end if;
 
       return Result;
@@ -255,7 +259,8 @@ package body Multiclass_Utils is
       elsif Classes.Length > 2 then
          Result := Y_Multiclass;
       else
-         Result := Y_Binary;
+--           Result := Y_Binary;
+         Result := Y_Multiclass;
       end if;
 
       return Result;
@@ -270,7 +275,8 @@ package body Multiclass_Utils is
       Result : Y_Type;
    begin
       if Y'Length (2) = 1 and Integer (Unique_Labels (Y).Length) < 3 then
-         Result := Y_Binary;
+--           Result := Y_Binary;
+         Result := Y_Multiclass;
       elsif Is_Multilabel (Y) then
          Result := Y_Multilabel_Indicator;
       elsif Y'Length (2) > 1 then
@@ -278,7 +284,8 @@ package body Multiclass_Utils is
       elsif Y'Length > 1 then
          Result := Y_Multiclass;
       else
-         Result := Y_Binary;
+--           Result := Y_Binary;
+         Result := Y_Multiclass;
       end if;
 
       return Result;
@@ -338,7 +345,8 @@ package body Multiclass_Utils is
       if Classes.Length > 2 then
          return Y_Multiclass;
       else
-         return Y_Binary;
+--           return Y_Binary;
+         return Y_Multiclass;
       end if;
 
    end Type_Of_Target;
