@@ -102,7 +102,7 @@ package Multilayer_Perceptron is
    function "/" (L : Loss_Grad_Result; R : Float) return Loss_Grad_Result;
 
    type Loss_Grad_Access is access function (Args : Loss_Grad_Args)
-                                              return Loss_Grad_Result;
+                                             return Loss_Grad_Result;
 
    function C_Init (Hidden_Layer_Sizes    : Integer_List :=
                       Integer_Package.Empty_Vector;
@@ -133,23 +133,24 @@ package Multilayer_Perceptron is
                     Max_Fun               : Max_Function_Access := null;
                     RF_Fun                : Num_Diff.Deriv_Float_Fun_Access
                     := null)
-                     return MLP_Classifier;
+                    return MLP_Classifier;
    procedure Fit (Self  : in out MLP_Classifier;
                   X     : Real_Float_Matrix;
                   Y     : Integer_Matrix; Incremental : Boolean := False);
    procedure Init_Optimizer (Self : in out MLP_Classifier);
+   procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
    function Loss_Grad_LBFGS (Args : Loss_Grad_Args) return Loss_Grad_Result;
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
-                           Y    : Binary_Matrix; Classes : Integer_List);
+                          Y    : Binary_Matrix; Classes : Integer_List);
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Integer_Matrix);
    procedure Partial_Fit
-     (Self : in out MLP_Classifier; X : Real_Float_Matrix;
+     (Self    : in out MLP_Classifier; X : Real_Float_Matrix;
       Y       : Integer_Matrix; Classes : Integer_List);
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                      return Integer_Matrix;
+                     return Integer_Matrix;
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Real_Float_Matrix;
+                           return Real_Float_Matrix;
    function Validate_Input (Self        : in out MLP_Classifier;
                             Y           : Binary_Matrix;
                             Incremental : Boolean) return Binary_Matrix;

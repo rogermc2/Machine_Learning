@@ -43,7 +43,7 @@ with Maths;
 --  with Utilities;
 
 --  with Base;
-with Classifier_Utilities;
+--  with Classifier_Utilities;
 --  with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
@@ -88,7 +88,6 @@ package body Multilayer_Perceptron is
                          Layer_Units : Integer_List);
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record;
-   procedure Is_Probilities_Matrix (Msg : String; PM : Real_Float_Matrix);
    procedure Process_Batch (Self             : in out MLP_Classifier;
                             X                : Real_Float_Matrix;
                             Y                : Binary_Matrix;
@@ -892,9 +891,9 @@ package body Multilayer_Perceptron is
                     & Integer'Image (Activations.Last_Index) &
                       " /= layer + 1:" & Integer'Image (layer + 1));
 
-            Is_Probilities_Matrix
-              (Routine_Name & "L134 Activations.Last_Element ",
-               Activations.Last_Element);
+--              Is_Probilities_Matrix
+--                (Routine_Name & "L134 Activations.Last_Element ",
+--                 Activations.Last_Element);
             --  L134 For the hidden layers
             if layer /= Num_Layers - 1 then
                case Hidden_Activation is
@@ -1034,9 +1033,10 @@ package body Multilayer_Perceptron is
          --        Put_Line (Routine_Name & "Activ_Out cols" &
          --                    Integer'Image (Activ_Out'Length (2)));
 
-         Test_Support.Print_Float_Array
-           (Routine_Name & "Activ_Out col sums",
-            Classifier_Utilities.Sum_Cols (Activ_Out));
+         Is_Probilities_Matrix (Routine_Name & "Activ_Out", Activ_Out);
+--           Test_Support.Print_Float_Array
+--             (Routine_Name & "Activ_Out col sums",
+--              Classifier_Utilities.Sum_Cols (Activ_Out));
          return Activ_Out;
       end;
 
