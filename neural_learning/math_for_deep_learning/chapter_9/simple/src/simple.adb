@@ -9,7 +9,7 @@ with Base;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
---  with Test_Support; use Test_Support;
+with Test_Support; use Test_Support;
 
 procedure Simple is
    use Real_Float_Arrays;
@@ -71,5 +71,23 @@ begin
 
    Score := Base.Score (MLP, X_Test, Y_Test);
    Put_Line ("Model accuracy: " & Float'Image (Score));
+
+   declare
+      W0 : constant Real_Float_Matrix :=
+             MLP.Attributes.Params.Element (1).Coeff_Gradients;
+      b0 : constant Real_Float_Vector :=
+             MLP.Attributes.Params.Element (1).Intercept_Grads;
+      W1 : constant Real_Float_Matrix :=
+             MLP.Attributes.Params.Element (2).Coeff_Gradients;
+      b1 : constant Real_Float_Vector :=
+             MLP.Attributes.Params.Element (2).Intercept_Grads;
+   begin
+      Print_Matrix_Dimensions ("W0", W0);
+      Print_Float_Matrix ("W0", Transpose (W0));
+      Print_Float_Vector ("b0", b0);
+      Print_Matrix_Dimensions ("W1", W1);
+      Print_Float_Matrix ("W1", Transpose (W1));
+      Print_Float_Vector ("b1", b1);
+   end;
 
 end Simple;
