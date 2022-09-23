@@ -82,12 +82,13 @@ begin
       b1 : constant Real_Float_Vector :=
              MLP.Attributes.Params.Element (2).Intercept_Grads;
    begin
-      Print_Matrix_Dimensions ("W0", W0);
-      Print_Float_Matrix ("W0", Transpose (W0));
-      Print_Float_Vector ("b0", b0);
-      Print_Matrix_Dimensions ("W1", W1);
-      Print_Float_Matrix ("W1", Transpose (W1));
-      Print_Float_Vector ("b1", b1);
+      Print_Float_Matrix ("X_Test", X_Test, 1, 1);
+--        Print_Matrix_Dimensions ("Hidden layer W0", W0);
+      Print_Float_Matrix ("Hidden layer W0", Transpose (W0));
+      Print_Float_Vector ("Hidden layer b0", b0);
+--        Print_Matrix_Dimensions ("Output layer W1", W1);
+      Print_Float_Matrix ("Output layer W1", Transpose (W1));
+      Print_Float_Vector ("Output layer b1", b1);
    end;
 
 end Simple;
