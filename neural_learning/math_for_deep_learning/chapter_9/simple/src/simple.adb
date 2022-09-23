@@ -20,13 +20,14 @@ procedure Simple is
    Y1           : Float_Array (1 .. 50);
    Y2           : Float_Array (1 .. 50);
    X            : Real_Float_Matrix (1 .. Num_Samples, 1 .. 2);
-   Y            : Integer_Matrix (1 .. Num_Samples, 1 .. 1) :=
+   Y            : constant Integer_Matrix (1 .. Num_Samples, 1 .. 1) :=
                     (1 .. 50 => (others => 0),
                      51 .. Num_Samples => (others => 1));
    X_Train      : Real_Float_Matrix (1 .. 75, 1 .. 2);
    X_Test       : Real_Float_Matrix (1 .. Num_Samples - 75, 1 .. 2);
    Y_Train      : Integer_Matrix (1 .. 75, 1 .. 1);
    Y_Test       : Integer_Matrix (1 .. Num_Samples - 75, 1 .. 1);
+   Indicies     : Integer_Array (1 .. Num_Samples);
    Layer_Sizes  : NL_Types.Integer_List;
    MLP          : MLP_Classifier;
    Score        : Float;
@@ -48,21 +49,23 @@ begin
       X (row, 2) := Y2 (row - 50);
    end loop;
 
-   X := Utilities.Permute (X);
-   Y := Utilities.Permute (Y);
+   for row in 1 ..Num_Samples loop
+      Indicies (row) := row;
+   end loop;
+   Utilities.Permute (Indicies);
 
    for row in 1 .. 75 loop
       for col in X'Range (2) loop
-         X_Train (row, col) := X (row, col);
+         X_Train (row, col) := X (Indicies (row), col);
       end loop;
-      Y_Train (row, 1) := Y (row, 1);
+      Y_Train (row, 1) := Y (Indicies (row), 1);
    end loop;
 
    for row in 76 .. Num_Samples loop
       for col in X'Range (2) loop
-         X_Test (row - 75, col) := X (row, col);
+         X_Test (row - 75, col) := X (Indicies (row), col);
       end loop;
-      Y_Test (row - 75, 1) := Y (row, 1);
+      Y_Test (row - 75, 1) := Y (Indicies (row), 1);
    end loop;
 
    Layer_Sizes.Append (5);
