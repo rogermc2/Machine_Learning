@@ -18,8 +18,8 @@ package body Base is
                        Multilayer_Perceptron.Predict (Self, X);
    begin
       NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y,  Pred);
-      Test_Support.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 5);
-      Test_Support.Print_Integer_Matrix (Routine_Name & "Pred", Pred, 1, 5);
+      Test_Support.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
+      Test_Support.Print_Integer_Matrix (Routine_Name & "Pred", Pred, 1, 10);
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction => Pred, Normalize => True);
    end Score;

@@ -1022,7 +1022,6 @@ package body Multilayer_Perceptron is
             end;
         end loop;
 
-        --        Activ_Out := To_Matrix (Activations);
         declare
             Activ_Out  : Real_Float_Matrix := To_Matrix (Activations);
         begin
@@ -1038,9 +1037,6 @@ package body Multilayer_Perceptron is
             --                    Integer'Image (Activ_Out'Length (2)));
 
             Is_Probilities_Matrix (Routine_Name & "Activ_Out", Activ_Out);
-            --           Test_Support.Print_Float_Array
-            --             (Routine_Name & "Activ_Out col sums",
-            --              Classifier_Utilities.Sum_Cols (Activ_Out));
             return Activ_Out;
         end;
 
