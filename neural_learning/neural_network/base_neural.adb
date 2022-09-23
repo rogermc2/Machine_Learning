@@ -67,6 +67,8 @@ package body Base_Neural is
       Clip (YP_Clip);
       if YP_Clip'Length (2) > 1 and Y_True'Length (2) > 1 then
          Result := - (Sum_XlogY (Y_True, YP_Clip)) / Float (YP_Clip'Length);
+         Put_Line (Routine_Name & "Y_True'Length (2): " &
+                        Integer'Image (Y_True'Length (2)));
          Put_Line (Routine_Name & "YP_Clip'Length (2): " &
                         Integer'Image (YP_Clip'Length (2)));
          Put_Line (Routine_Name & "Sum_XlogY: " &
