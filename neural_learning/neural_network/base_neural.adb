@@ -1,6 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
@@ -11,8 +11,8 @@ with Neural_Maths;
 package body Base_Neural is
 
    EPS : constant Float := 10.0 ** (-16);  --  temporary fof comparision with
-                                           --  Python results
---     EPS : constant Float := Float'Safe_Small;
+   --  Python results
+   --     EPS : constant Float := Float'Safe_Small;
 
    --      function X_Log_Y (X : Integer_Matrix; Y : Real_Float_Matrix)
    --                        return Real_Float_Matrix;
@@ -40,8 +40,32 @@ package body Base_Neural is
    --  y is the label (0 and 1 for binary)
    --  p(y) is the predicted probability of the data point being 1 for all
    --  N points.
+   --  y_prob : n_samples x n_classes, predicted probabilities returned by a
+   --  classifier's predict_proba method.
    function Log_Loss (Y_True, Y_Prob : Real_Float_Matrix) return Float is
-      Routine_Name : constant String := "Base_Neural.Log_Loss_Function ";
+--        Routine_Name : constant String := "Base_Neural.Log_Loss_Function ";
+
+      --  ----------------------------------------------------------------------
+
+      function Check_Columns (Mat : Real_Float_Matrix)
+                              return Real_Float_Matrix is
+      begin
+         if Mat'Length (2) = 1 then
+            declare
+               Mat2  : Real_Float_Matrix (Mat'Range, 1 .. 2);
+            begin
+               for row in Mat2'Range loop
+                  Mat2 (row, 1) := 1.0 - Mat (row, 1);
+                  Mat2 (row, 2) := Mat (row, 1);
+               end loop;
+               return Mat2;
+            end;
+
+         else
+            return Mat;
+         end if;
+
+      end Check_Columns;
 
       --  ----------------------------------------------------------------------
 
@@ -62,44 +86,14 @@ package body Base_Neural is
       --  ----------------------------------------------------------------------
 
       YP_Clip : Real_Float_Matrix := Y_Prob;
-      Result  : Float := 0.0;
    begin
       Clip (YP_Clip);
-      if YP_Clip'Length (2) > 1 and Y_True'Length (2) > 1 then
-         Result := - (Sum_XlogY (Y_True, YP_Clip)) / Float (YP_Clip'Length);
---           Put_Line (Routine_Name & "Y_True'Length (2): " &
---                          Integer'Image (Y_True'Length (2)));
---           Put_Line (Routine_Name & "YP_Clip'Length (2): " &
---                          Integer'Image (YP_Clip'Length (2)));
---           Put_Line (Routine_Name & "Sum_XlogY: " &
---                          Float'Image (Sum_XlogY (Y_True, YP_Clip)));
-
-      elsif YP_Clip'Length (2) = 1 and Y_True'Length (2) = 1 then
-         declare
-            YP2  : Real_Float_Matrix (YP_Clip'Range, 1 .. 2);
-            YT2  : Real_Float_Matrix (Y_True'Range, 1 .. 2);
-         begin
-            for row in YP2'Range loop
-               YP2 (row, 1) := 1.0 - YP_Clip (row, 1);
-               YP2 (row, 2) := YP_Clip (row, 1);
-               YT2 (row, 1) := 1.0 - Y_True (row, 1);
-               YT2 (row, 2) := Y_True (row, 1);
-            end loop;
---              Test_Support.Print_Float_Matrix (Routine_Name & "YT2", YT2);
---              Test_Support.Print_Float_Matrix (Routine_Name & "YP2", YP2);
---              Test_Support.Print_Float_Matrix (Routine_Name & "XlogY",
---                                              X_Log_Y (YT2,  YP2));
---              Put_Line (Routine_Name & "eps: " & Float'Image (EPS));
---              Put_Line (Routine_Name & "Sum_XlogY: " &
---                          Float'Image (Sum_XlogY (YT2, YP2)));
-            Result := - (Sum_XlogY (YT2,  YP2)) / Float (YP2'Length);
-         end;
-      else
-         Assert (False, Routine_Name &
-                   "uncoded Y_True, Y_Prob number of columns.");
-      end if;
-
-      return Result;
+      declare
+         YT : constant Real_Float_Matrix := Check_Columns (Y_True);
+         YP : constant Real_Float_Matrix := Check_Columns (YP_Clip);
+      begin
+         return - (Sum_XlogY (YT,  YP)) / Float (YP'Length);
+      end;
 
    end Log_Loss;
 
@@ -151,7 +145,7 @@ package body Base_Neural is
    --  ------------------------------------------------------------------------
 
    function Logistic_Sigmoid (X : Real_Float_Matrix)
-                               return Real_Float_Matrix is
+                              return Real_Float_Matrix is
       use Maths.Float_Math_Functions;
       Sigmoid  : Real_Float_Matrix (X'Range, X'Range (2));
    begin
@@ -169,8 +163,8 @@ package body Base_Neural is
    --  ------------------------------------------------------------------------
 
    function Binary_Log_Loss (Y_True, Y_Prob : Real_Float_Matrix)
-                              return Float is
---        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
+                             return Float is
+      --        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
       YT2          : Real_Float_Matrix
         (Y_True'Range, Y_True'First (2) .. Y_True'Last (2) + 1);
       YP_Clip      : Real_Float_Matrix := Y_Prob;
@@ -178,7 +172,7 @@ package body Base_Neural is
         (Y_Prob'Range, Y_Prob'First (2) .. Y_Prob'Last (2) + 1);
 
       function Do_XlogY (Y_True, Y_Pred : Real_Float_Matrix)
-                           return Float is
+                         return Float is
          X_Y : Real_Float_Matrix (Y_Pred'Range, Y_Pred'Range (2));
          Sum : Float := 0.0;
       begin
@@ -194,8 +188,8 @@ package body Base_Neural is
       end Do_XlogY;
 
    begin
---        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_True", Y_True);
---        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob", Y_Prob);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_True", Y_True);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob", Y_Prob);
       Clip (YP_Clip);
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for row in Y_Prob'Range loop
@@ -308,7 +302,7 @@ package body Base_Neural is
    --  ------------------------------------------------------------------------
    --  L158
    function Squared_Loss (Y_True, Y_Pred : Real_Float_Matrix)
-                           return Float is
+                          return Float is
       use Real_Float_Arrays;
       Diff : constant Real_Float_Matrix := Y_True - Y_Pred;
    begin
@@ -320,7 +314,7 @@ package body Base_Neural is
    --  -------------------------------------------------------------------------
    --  L158
    function Squared_Loss (Y_True : Integer_Matrix; Y_Pred : Real_Float_Matrix)
-                           return Float is
+                          return Float is
       use Real_Float_Arrays;
       Diff : constant Real_Float_Matrix :=
                To_Real_Float_Matrix (Y_True) - Y_Pred;
