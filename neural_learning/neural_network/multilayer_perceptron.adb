@@ -167,7 +167,7 @@ package body Multilayer_Perceptron is
       --          BP_Count := BP_Count + 1;
       --  Y_Float checked; contains only 1s and 0s
       Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
---        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
+      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
       --        Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
       --  L284
       --        Test_Support.Print_Matrix_Dimensions
@@ -935,12 +935,14 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      --        Test_Support.Print_Matrix_Dimensions
-      --          (Routine_Name & "Activations.Last_Element" &
-      --             Integer'Image (Activations.Last_Index), Activations.Last_Element);
-      --  Check that Activations.Last_Element rows are probabilities
-      Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
-                             Activations.Last_Element);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Activations.Last_Element",
+         Activations.Last_Element, 1, 3);
+      if Activations.Last_Element'Length (2) > 1 then
+         --  Check that Activations.Last_Element rows are probabilities
+         Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
+                                Activations.Last_Element);
+      end if;
    end Forward_Pass;
 
    --  -------------------------------------------------------------------------
@@ -1220,12 +1222,15 @@ package body Multilayer_Perceptron is
          end loop;
       end loop;
 
-      for row in Sum'Range loop
-         Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
-                   Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
-                   "Total probability for row (" & Integer'Image (row) &
-                   ") not close to 1.0, Sum = " & Float'Image (Sum (row)));
-      end loop;
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "PM", PM);
+      if PM'Length (2) > 1 then
+         for row in Sum'Range loop
+            Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
+                      Sum (row) <= 1.0 + 10.0 ** (-6), Routine_Name & Msg &
+                      " Total probability for row (" & Integer'Image (row) &
+                      ") " & Float'Image (Sum (row)) & " is not close to 1.0");
+         end loop;
+      end if;
 
    end Is_Probilities_Matrix;
 
