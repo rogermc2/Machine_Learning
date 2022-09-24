@@ -1,7 +1,7 @@
 --  Based on scikit-learn/sklearn/neural_network/_base.py
 
 with Ada.Assertions; use Ada.Assertions;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
 
@@ -67,12 +67,12 @@ package body Base_Neural is
       Clip (YP_Clip);
       if YP_Clip'Length (2) > 1 and Y_True'Length (2) > 1 then
          Result := - (Sum_XlogY (Y_True, YP_Clip)) / Float (YP_Clip'Length);
-         Put_Line (Routine_Name & "Y_True'Length (2): " &
-                        Integer'Image (Y_True'Length (2)));
-         Put_Line (Routine_Name & "YP_Clip'Length (2): " &
-                        Integer'Image (YP_Clip'Length (2)));
-         Put_Line (Routine_Name & "Sum_XlogY: " &
-                        Float'Image (Sum_XlogY (Y_True, YP_Clip)));
+--           Put_Line (Routine_Name & "Y_True'Length (2): " &
+--                          Integer'Image (Y_True'Length (2)));
+--           Put_Line (Routine_Name & "YP_Clip'Length (2): " &
+--                          Integer'Image (YP_Clip'Length (2)));
+--           Put_Line (Routine_Name & "Sum_XlogY: " &
+--                          Float'Image (Sum_XlogY (Y_True, YP_Clip)));
 
       elsif YP_Clip'Length (2) = 1 and Y_True'Length (2) = 1 then
          declare
@@ -90,8 +90,8 @@ package body Base_Neural is
 --              Test_Support.Print_Float_Matrix (Routine_Name & "XlogY",
 --                                              X_Log_Y (YT2,  YP2));
 --              Put_Line (Routine_Name & "eps: " & Float'Image (EPS));
-            Put_Line (Routine_Name & "Sum_XlogY: " &
-                        Float'Image (Sum_XlogY (YT2, YP2)));
+--              Put_Line (Routine_Name & "Sum_XlogY: " &
+--                          Float'Image (Sum_XlogY (YT2, YP2)));
             Result := - (Sum_XlogY (YT2,  YP2)) / Float (YP2'Length);
          end;
       else
