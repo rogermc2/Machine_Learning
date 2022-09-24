@@ -166,8 +166,8 @@ package body Multilayer_Perceptron is
    begin
       --          BP_Count := BP_Count + 1;
       --  Y_Float checked; contains only 1s and 0s
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
+--        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
       --        Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
       --  L284
       --        Test_Support.Print_Matrix_Dimensions
@@ -732,6 +732,7 @@ package body Multilayer_Perceptron is
       Msg              : Unbounded_String;
       Is_Stopping      : Boolean := False;
    begin
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
       Self.Attributes.Loss_Curve.Clear;
       Early_Stopping := Early_Stopping and then not Incremental;
       --  L576
@@ -1387,10 +1388,9 @@ package body Multilayer_Perceptron is
       --        Routine_Name   : constant String :=
       --                           "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
-      Num_Classes    : constant Positive := Y'Length (2);
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
-      Y_Batch        : Binary_Matrix (1 .. Batch_Size, 1 .. Num_Classes);
+      Y_Batch        : Binary_Matrix (1 .. Batch_Size, Y'Range (2));
       --  Activations: layers x samples x features
       Activations    : Real_Matrix_List;
       Batch_Row      : Positive;
@@ -1404,7 +1404,7 @@ package body Multilayer_Perceptron is
             X_Batch (Batch_Row, col) := X (row, col);
          end loop;
 
-         for col in 1 .. Num_Classes loop
+         for col in Y'Range (2) loop
             Y_Batch (Batch_Row, col) := Y (row, col);
          end loop;
       end loop;
@@ -1655,6 +1655,7 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
       --  Python code downcasts to bool to prevent upcasting when working with
       --  float32 data
       return Label.Transform (Self.Attributes.Binarizer, Y);

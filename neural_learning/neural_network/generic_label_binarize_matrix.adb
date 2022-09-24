@@ -21,11 +21,11 @@ package body Generic_Label_Binarize_Matrix is
       use NL_Types.Unbounded_Package;
       Routine_Name :  constant String := "Generic_Label_Binarize.Binarize ";
       Class_Index  : Natural;
-      Result       : Binary_Matrix (1 .. Y'Length, 1 .. Classes'Length) :=
+      Result       : Binary_Matrix (Y'Range, 1 .. Classes'Length) :=
                        (others => (others => Neg_Label));
    begin
-      for row in 1 .. Y'Length loop
-         for col in 1 .. Y'Length (2) loop
+      for row in Y'Range loop
+         for col in Y'Range (2) loop
             Class_Index :=
               Find_Index (Classes, Y (row, col));
             Assert (Class_Index /= No_Index, Routine_Name &
@@ -78,7 +78,7 @@ package body Generic_Label_Binarize_Matrix is
 
       --  L516
       if Y_Kind = Y_Binary then
-         Put_Line (Routine_Name & "L516 Num_Classes:" &
+         Put_Line (Routine_Name & "L516 Y_Binary Num_Classes:" &
                      Integer'Image (Num_Classes));
          if Num_Classes = 1 then
             declare
@@ -110,9 +110,11 @@ package body Generic_Label_Binarize_Matrix is
          --  Label.py L539 - L549 needed to generate a csr sparse matrix
          --  Binarize is all that is needed for this implementation
          --           return Binarize (Y, Classes, Neg_Label, Pos_Label);
+         Put_Line (Routine_Name & "L538");
          null;
       elsif Y_Kind = Y_Multilabel_Indicator then
          --  L551
+         Put_Line (Routine_Name & "L551");
          Assert (False, "L551 Y_Multilabel_Indicator" &
                    " target data is not supported by " & Routine_Name);
          return Binarize (Y, Classes, Neg_Label, Pos_Label);
@@ -122,7 +124,7 @@ package body Generic_Label_Binarize_Matrix is
          return Binarize (Y, Classes, Neg_Label, Pos_Label);
       end if;
 
-      --  L587
+      --  L576
       if Y_Kind = Y_Binary then
          declare
             Y_Bin   : constant Binary_Matrix :=
@@ -137,6 +139,7 @@ package body Generic_Label_Binarize_Matrix is
          end;
       end if;
 
+      Put_Line (Routine_Name & "end");
       return Binarize (Y, Classes, Neg_Label, Pos_Label);
 
    end Label_Binarize;
