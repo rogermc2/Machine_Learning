@@ -155,6 +155,20 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
+   function Load_Raw_CSV_Data (File_Name : String) return Raw_Data_Vector is
+      Data_File : File_Type;
+      Data      : Raw_Data_Vector;
+   begin
+      Open (Data_File, In_File, File_Name);
+      Data := Load_Raw_CSV_Data (Data_File);
+      Close (Data_File);
+
+      return Data;
+
+   end Load_Raw_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
    function Load_Raw_CSV_Data (Data_File : File_Type)
                                return Raw_Data_Vector is
       use String_Package;

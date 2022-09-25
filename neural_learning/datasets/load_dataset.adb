@@ -5,6 +5,7 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 
 with Classifier_Utilities;
 --  with Printing;
+with Utilities;
 
 package body Load_Dataset is
 
@@ -89,6 +90,31 @@ package body Load_Dataset is
       end if;
 
    end Load_Digits;
+
+   --  -------------------------------------------------------------------------
+
+   function Load_Features (File_Name : String; Num_Classes : Natural := 1)
+                           return Integer_Matrix is
+      use Classifier_Utilities;
+      CSV_Data  : constant NL_Types.Raw_Data_Vector :=
+                    Utilities.Load_Raw_CSV_Data (File_Name);
+      List_Row  : NL_Types.Unbounded_List;
+      aFeature  : Unbounded_String;
+      Features  : Integer_Matrix (1 .. Positive (CSV_Data.Length),
+                                  1 .. Num_Classes);
+      --        List_Row  : NL_Types.Integer_List;
+   begin
+      for row in CSV_Data.First_Index .. CSV_Data.Last_Index loop
+         List_Row := CSV_Data (row);
+         --              List_Row := To_Integer_List (CSV_Data (row));
+         for col in List_Row.First_Index .. List_Row.Last_Index loop
+            Features (row, col) := List_Row.Element (col);
+         end loop;
+      end loop;
+
+      return Features;
+
+   end Load_Features;
 
    --  -------------------------------------------------------------------------
 
