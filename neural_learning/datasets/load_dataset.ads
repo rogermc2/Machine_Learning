@@ -24,7 +24,7 @@ package Load_Dataset is
 
     function Load_Digits (File_Name : String; Num_Classes : Natural := 10)
                          return Digits_Data_Record;
-    function Load_Features (File_Name : String; Num_Classes : Natural := 1)
+    function Load_Features (File_Name : String; Num_Features : Positive)
                            return Real_Float_Matrix;
     function Load_Iris (File_Name : String) return Iris_Data_Record;
     function Load_Labels (File_Name : String; Num_Outputs : Positive := 1)
