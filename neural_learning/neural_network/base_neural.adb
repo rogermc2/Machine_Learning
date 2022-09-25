@@ -139,7 +139,7 @@ package body Base_Neural is
    function Logistic_Sigmoid (X : Long_Float) return Float is
       use Maths.Long_Float_Math_Functions;
    begin
-      return Float (1.0 / (1.0 + Exp (X)));
+      return Float (1.0 / (1.0 + Exp (-X)));
    end Logistic_Sigmoid;
 
    --  ------------------------------------------------------------------------

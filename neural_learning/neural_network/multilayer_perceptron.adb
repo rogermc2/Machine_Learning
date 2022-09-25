@@ -924,6 +924,8 @@ package body Multilayer_Perceptron is
       --  Check that Activations.Last_Element rows are probabilities
 
       --  L138 For the last layer
+      Put_Line (Routine_Name & "L138 Output_Activation: " &
+                  Activation_Type'Image (Output_Activation));
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
@@ -936,8 +938,8 @@ package body Multilayer_Perceptron is
       end case;
 
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "Activations.Last_Element",
-         Activations.Last_Element, 1, 3);
+        (Routine_Name & "L138 Activations.Last_Element",
+         Activations.Last_Element, 1, 5);
       if Activations.Last_Element'Length (2) > 1 then
          --  Check that Activations.Last_Element rows are probabilities
          Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
