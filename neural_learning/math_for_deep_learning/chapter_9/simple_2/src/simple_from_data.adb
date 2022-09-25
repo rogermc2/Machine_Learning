@@ -2,7 +2,6 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
 with Utilities;
 
 with Base;
@@ -27,40 +26,6 @@ procedure Simple_From_Data is
    Score        : Float;
 begin
    Put_Line (Routine_Name);
-   for row in X1'Range loop
-      X1 (row) := abs (Maths.Random_Float) - 0.3;
-      X2 (row) := abs (Maths.Random_Float) + 0.3;
-      Y1 (row) := abs (Maths.Random_Float) + 0.3;
-      Y2 (row) := abs (Maths.Random_Float) - 0.3;
-   end loop;
-
-   for row in 1 ..50 loop
-      X (row, 1) := X1 (row);
-      X (row, 2) := Y1 (row);
-   end loop;
-   for row in 51 .. Num_Samples loop
-      X (row, 1) := X2 (row - 50);
-      X (row, 2) := Y2 (row - 50);
-   end loop;
-
-   for row in 1 ..Num_Samples loop
-      Indicies (row) := row;
-   end loop;
-   Utilities.Permute (Indicies);
-
-   for row in 1 .. 75 loop
-      for col in X'Range (2) loop
-         X_Train (row, col) := X (Indicies (row), col);
-      end loop;
-      Y_Train (row, 1) := Y (Indicies (row), 1);
-   end loop;
-
-   for row in 76 .. Num_Samples loop
-      for col in X'Range (2) loop
-         X_Test (row - 75, col) := X (Indicies (row), col);
-      end loop;
-      Y_Test (row - 75, 1) := Y (Indicies (row), 1);
-   end loop;
 
    Layer_Sizes.Append (5);
    MLP := C_Init (Hidden_Layer_Sizes => Layer_Sizes);
