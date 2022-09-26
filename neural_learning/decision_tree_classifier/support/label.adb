@@ -40,7 +40,7 @@ with Generic_Label_Binarize_Array;
 with Generic_Label_Binarize_Array_List;
 with Generic_Label_Binarize_Matrix;
 --  with Printing;
-with Test_Support;
+--  with Test_Support;
 
 package body Label is
 
@@ -993,7 +993,6 @@ package body Label is
            Type_Of_Target     => Multiclass_Utils.Type_Of_Target,
            "<"                => "<");
    begin
-      Put_Line (Routine_Name);
       Assert (not Classes.Is_Empty, Routine_Name &
                 "called with empty Classes list");
       return Label_Binarize_Integer_Array_List.Label_Binarize
@@ -1016,12 +1015,8 @@ package body Label is
          Class_Array_Type => Integer_Array,
          Type_Of_Target   => Multiclass_Utils.Type_Of_Target, "<" => "<");
    begin
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
       Assert (not Classes.Is_Empty, Routine_Name &
                 "called with empty Classes list");
-      Test_Support.Print_Matrix_Dimensions
-        (Routine_Name & "return", Label_Binarize_Integer.Label_Binarize
-        (Y, Classes_Array, Neg_Label, Pos_Label));
       return Label_Binarize_Integer.Label_Binarize
         (Y, Classes_Array, Neg_Label, Pos_Label);
 
@@ -1089,9 +1084,8 @@ package body Label is
    --  L327  Transform transforms multi-class labels to binary labels.
    function Transform (Self : Label_Binarizer; Y : Integer_Matrix)
                        return Binary_Matrix is
-      Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
+--        Routine_Name : constant String := "Label.Transform Binarize Integer Y ";
    begin
-      Put_Line (Routine_Name);
       return Label_Binarize (Y, Self.Classes);
 
    end Transform;

@@ -2,7 +2,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Base;
+--  with Base;
 with Load_Dataset;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -16,16 +16,16 @@ procedure Simple_From_Data is
    X_Train      : constant Real_Float_Matrix :=
                     Load_Dataset.Load_Features
                       ("../../../datasets/x_train.csv", Num_Features);
-   X_Test       : constant Real_Float_Matrix :=
-                    Load_Dataset.Load_Features
-                      ("../../../datasets/x_test.csv", Num_Features);
+--     X_Test       : constant Real_Float_Matrix :=
+--                      Load_Dataset.Load_Features
+--                        ("../../../datasets/x_test.csv", Num_Features);
    Y_Train      : constant Integer_Matrix :=
                     Load_Dataset.Load_Labels ("../../../datasets/y_train.csv");
-   Y_Test       : constant Integer_Matrix :=
-                    Load_Dataset.Load_Labels ("../../../datasets/y_test.csv");
+--     Y_Test       : constant Integer_Matrix :=
+--                      Load_Dataset.Load_Labels ("../../../datasets/y_test.csv");
    Layer_Sizes  : NL_Types.Integer_List;
    MLP          : MLP_Classifier;
-   Score        : Float;
+--     Score        : Float;
 begin
    Put_Line (Routine_Name);
 
@@ -34,14 +34,14 @@ begin
    Fit (MLP, X_Train, Y_Train);
 
    declare
-      W0 : constant Real_Float_Matrix :=
-             MLP.Attributes.Params.Element (1).Coeff_Gradients;
+--        W0 : constant Real_Float_Matrix :=
+--               MLP.Attributes.Params.Element (1).Coeff_Gradients;
       b0 : constant Real_Float_Vector :=
              MLP.Attributes.Params.Element (1).Intercept_Grads;
-      W1 : constant Real_Float_Matrix :=
-             MLP.Attributes.Params.Element (2).Coeff_Gradients;
-      b1 : constant Real_Float_Vector :=
-             MLP.Attributes.Params.Element (2).Intercept_Grads;
+--        W1 : constant Real_Float_Matrix :=
+--               MLP.Attributes.Params.Element (2).Coeff_Gradients;
+--        b1 : constant Real_Float_Vector :=
+--               MLP.Attributes.Params.Element (2).Intercept_Grads;
    begin
 --        Print_Float_Matrix ("X_Test", X_Test, 1, 1);
       --        Print_Matrix_Dimensions ("Hidden layer W0", W0);

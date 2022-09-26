@@ -161,10 +161,10 @@ package body Base_Neural is
    end Logistic_Sigmoid;
 
    --  ------------------------------------------------------------------------
-
+   --  L205
    function Binary_Log_Loss (Y_True, Y_Prob : Real_Float_Matrix)
                              return Float is
-      --        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
+--        Routine_Name : constant String := "Base_Neural.Binary_Log_Loss ";
       YT2          : Real_Float_Matrix
         (Y_True'Range, Y_True'First (2) .. Y_True'Last (2) + 1);
       YP_Clip      : Real_Float_Matrix := Y_Prob;
@@ -188,9 +188,10 @@ package body Base_Neural is
       end Do_XlogY;
 
    begin
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_True", Y_True);
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Prob", Y_Prob);
+      --  L226
       Clip (YP_Clip);
+--        Test_Support.Print_Float_Matrix (Routine_Name & "Y_Prob", Y_Prob, 1, 3);
+--        Test_Support.Print_Float_Matrix (Routine_Name & "Y_True", Y_True, 1, 3);
       --  xlogy = x*log(y) so that the result is 0 if x = 0
       for row in Y_Prob'Range loop
          for col in Y_Prob'Range (2) loop

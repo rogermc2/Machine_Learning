@@ -186,13 +186,11 @@ package body Multilayer_Perceptron is
       else
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284+ Y_Float",
-      --          Y_Float);
---        Test_Support.Print_Matrix_Dimensions
---          (Routine_Name & "L284+ Activations.Last_Element",
---           Activations.Last_Element);
---        Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
---                    Loss_Function_Type'Image (Loss_Function_Name));
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L284+ Activations.Last_Element",
+         Activations.Last_Element, 1, 3);
+      Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
+                  Loss_Function_Type'Image (Loss_Function_Name));
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
@@ -229,7 +227,7 @@ package body Multilayer_Perceptron is
       --        Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
       Loss := Loss + 0.5 * (Self.Parameters.Alpha *
                               Sum_Sq_Coeffs / Float (Num_Samples));
-      --        Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
+      Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following
@@ -563,11 +561,9 @@ package body Multilayer_Perceptron is
       --  Validate_Input generates class columns from the Y columns
       Y_Bin              : constant Binary_Matrix :=
                              Validate_Input (Self, Y, Incremental);
---        Num_Classes        : Positive;
       Layer_Units        : Integer_List;
       Activations        : Real_Matrix_List;
    begin
---        Put_Line (Routine_Name);
       Assert (not Hidden_Layer_Sizes.Is_Empty, Routine_Name &
                 "Hidden_Layer_Sizes is empty");
       --  L385
@@ -896,9 +892,9 @@ package body Multilayer_Perceptron is
             --                (Routine_Name & "L131 Updated_Activ_Grads ", Updated_Activ_Grads);
 
             --  L132 Add layer + 1 activation
-            Test_Support.Print_Float_Matrix
-              (Routine_Name & "L132 Activations (" & Integer'Image (layer) & ")",
-               Activations (layer), 1, 5);
+--              Test_Support.Print_Float_Matrix
+--                (Routine_Name & "L132 Activations (" & Integer'Image (layer) & ")",
+--                 Activations (layer), 1, 5);
             Activations.Append (Updated_Activ_Grads + Params.Intercept_Grads);
 --              Test_Support.Print_Float_Matrix
 --                (Routine_Name & "L132 Updated_Activ_Grads",
@@ -948,7 +944,7 @@ package body Multilayer_Perceptron is
 
 --        Test_Support.Print_Float_Matrix
 --          (Routine_Name & "L138+ Activations.Last_Element",
---           Activations.Last_Element, 1, 5);
+--           Activations.Last_Element, 1, 3);
       if Activations.Last_Element'Length (2) > 1 then
          --  Check that Activations.Last_Element rows are probabilities
          Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
@@ -1674,9 +1670,10 @@ package body Multilayer_Perceptron is
          end if;
       end if;
 
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
       --  Python code downcasts to bool to prevent upcasting when working with
       --  float32 data
+--        Test_Support.Print_Binary_Matrix
+--          (Routine_Name & "result", Label.Transform (Self.Attributes.Binarizer, Y), 1, 3);
       return Label.Transform (Self.Attributes.Binarizer, Y);
 
    end Validate_Input;

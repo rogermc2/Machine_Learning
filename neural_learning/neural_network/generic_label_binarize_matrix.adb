@@ -2,7 +2,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Generic_Array_Sort;
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with NL_Types;
 --  with Printing;
@@ -78,8 +78,8 @@ package body Generic_Label_Binarize_Matrix is
 
       --  L516
       if Y_Kind = Y_Binary then
-         Put_Line (Routine_Name & "L516 Y_Binary Num_Classes:" &
-                     Integer'Image (Num_Classes));
+--           Put_Line (Routine_Name & "L516 Y_Binary Num_Classes:" &
+--                       Integer'Image (Num_Classes));
          if Num_Classes = 1 then
             declare
                Y_Bin : Binary_Matrix (1 .. Y'Length, 1 .. 1)
@@ -110,11 +110,9 @@ package body Generic_Label_Binarize_Matrix is
          --  Label.py L539 - L549 needed to generate a csr sparse matrix
          --  Binarize is all that is needed for this implementation
          --           return Binarize (Y, Classes, Neg_Label, Pos_Label);
-         Put_Line (Routine_Name & "L538");
          null;
       elsif Y_Kind = Y_Multilabel_Indicator then
          --  L551
-         Put_Line (Routine_Name & "L551");
          Assert (False, "L551 Y_Multilabel_Indicator" &
                    " target data is not supported by " & Routine_Name);
          return Binarize (Y, Classes, Neg_Label, Pos_Label);
@@ -130,16 +128,17 @@ package body Generic_Label_Binarize_Matrix is
             Y_Bin   : constant Binary_Matrix :=
                         Binarize (Y, Classes, Neg_Label, Pos_Label);
             Y_Bin_1 : Binary_Matrix (Y'Range, 1 .. 1) :=
-                        (others => (others => Neg_Label));
+                        (others => (others => Pos_Label));
          begin
             for row in Y'Range loop
-               Y_Bin_1 (row, 1) := Y_Bin (row, Y'Last (2));
+               if Y_Bin (row, 1) = Pos_Label then
+                 Y_Bin_1 (row, 1) := Neg_Label;
+               end if;
             end loop;
             return Y_Bin_1;
          end;
       end if;
 
-      Put_Line (Routine_Name & "end");
       return Binarize (Y, Classes, Neg_Label, Pos_Label);
 
    end Label_Binarize;
