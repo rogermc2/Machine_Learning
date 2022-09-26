@@ -1060,8 +1060,8 @@ package body Multilayer_Perceptron is
    --  L360  MultilayerPerceptron._init_coef
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record is
-      use Maths;
-      use Float_Math_Functions;
+--        use Maths;
+      use Maths.Float_Math_Functions;
       use Base_Neural;
       --  Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
@@ -1078,14 +1078,14 @@ package body Multilayer_Perceptron is
       --  Generate random weights, Random_Float -1.0 .. 1.0
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Params.Coeff_Gradients (f_in, f_out) :=
-              Init_Bound * Random_Float;
+            Params.Coeff_Gradients (f_in, f_out) := Init_Bound * 0.1;
+--                Init_Bound * Random_Float;
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
+         Params.Intercept_Grads (f_out) := 0.0;  --  Init_Bound * Random_Float;
       end loop;
 
       return Params;
@@ -1458,8 +1458,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --        Routine_Name : constant String :=
-      --                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
+      Routine_Name : constant String :=
+                       "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
@@ -1490,8 +1490,8 @@ package body Multilayer_Perceptron is
             Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
          when Softmax_Activation => null;
       end case;
-      --        Printing.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
-      --                                     Deltas (Layer - 1), 1, 1);
+      Test_Support.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
+                                       Deltas (Layer - 1), 1, 1);
 
       --  L314
       Compute_Loss_Gradient
