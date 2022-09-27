@@ -42,7 +42,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with Maths;
 --  with Utilities;
 
---  with Base;
+with Base;
 --  with Classifier_Utilities;
 --  with Data_Splitter;
 with Multiclass_Utils;
@@ -97,10 +97,8 @@ package body Multilayer_Perceptron is
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float);
    procedure Update_No_Improvement_Count
-     (Self   : in out MLP_Classifier);
-   --     procedure Update_No_Improvement_Count
-   --       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
-   --        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix);
+     (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+      X_Val  : Real_Float_Matrix; Y_Val : Binary_Matrix);
    procedure Update_Hidden_Layer_Gradients
      (Self               : MLP_Classifier;
       Activations        : Real_Matrix_List;
@@ -194,13 +192,13 @@ package body Multilayer_Perceptron is
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
---              Put_Line (Routine_Name & "L289 Binary_Log_Loss" & Float'Image (Loss));
+            --              Put_Line (Routine_Name & "L289 Binary_Log_Loss" & Float'Image (Loss));
          when Log_Loss_Function =>
             Loss := Log_Loss (Y_Float, Activations.Last_Element);
---              Put_Line (Routine_Name & "L289 Log_Loss" & Float'Image (Loss));
+            --              Put_Line (Routine_Name & "L289 Log_Loss" & Float'Image (Loss));
          when Squared_Error_Function =>
             Loss := Squared_Loss (Y_Float, Activations.Last_Element);
---              Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
+            --              Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
       end case;
 
       --  L289  Add L2 regularization term to loss
@@ -576,11 +574,11 @@ package body Multilayer_Perceptron is
       --  0 or 1 for each sample depending whether or not the sample output
       --  value corresponds to th class value
       --        Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
---        Put_Line (Routine_Name & "L402 N_Outputs" &
---                    Integer'Image (Self.Attributes.N_Outputs));
---        Num_Classes := Positive (Y_Bin'Length (2));
---        Put_Line (Routine_Name & "L402 Num_Classes" &
---                    Integer'Image (Num_Classes));
+      --        Put_Line (Routine_Name & "L402 N_Outputs" &
+      --                    Integer'Image (Self.Attributes.N_Outputs));
+      --        Num_Classes := Positive (Y_Bin'Length (2));
+      --        Put_Line (Routine_Name & "L402 Num_Classes" &
+      --                    Integer'Image (Num_Classes));
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
       if Hidden_Layer_Sizes.Length > 0 then
@@ -593,8 +591,8 @@ package body Multilayer_Perceptron is
       Layer_Units.Append (Self.Attributes.N_Outputs);
 
       --  L409
---        Test_Support.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin", Y_Bin,
---                                          1, 7);
+      --        Test_Support.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin", Y_Bin,
+      --                                          1, 7);
       if First_Pass then
          Initialize (Self, Layer_Units);
          Test_Support.Print_Integer_List (Routine_Name & "L409 Layer_Units",
@@ -798,7 +796,7 @@ package body Multilayer_Perceptron is
 
          --  L669 Update no_improvement_count based on training loss or
          --       validation score according to early_stopping
-         Update_No_Improvement_Count (Self);
+         Update_No_Improvement_Count (Self, Early_Stopping, X, Y);
          --  for learning rate that needs to be updated at iteration end;
          if Self.Attributes.Optimizer.Kind = Optimizer_SGD then
             Iteration_Ends (Self.Attributes.Optimizer.SGD, Self.Attributes.T);
@@ -892,16 +890,16 @@ package body Multilayer_Perceptron is
             --                (Routine_Name & "L131 Updated_Activ_Grads ", Updated_Activ_Grads);
 
             --  L132 Add layer + 1 activation
---              Test_Support.Print_Float_Matrix
---                (Routine_Name & "L132 Activations (" & Integer'Image (layer) & ")",
---                 Activations (layer), 1, 5);
+            --              Test_Support.Print_Float_Matrix
+            --                (Routine_Name & "L132 Activations (" & Integer'Image (layer) & ")",
+            --                 Activations (layer), 1, 5);
             Activations.Append (Updated_Activ_Grads + Params.Intercept_Grads);
---              Test_Support.Print_Float_Matrix
---                (Routine_Name & "L132 Updated_Activ_Grads",
---                 Updated_Activ_Grads, 1, 5);
---              Test_Support.Print_Float_Matrix
---                (Routine_Name & "L132 Activations.Last_Element",
---                 Activations.Last_Element, 1, 5);
+            --              Test_Support.Print_Float_Matrix
+            --                (Routine_Name & "L132 Updated_Activ_Grads",
+            --                 Updated_Activ_Grads, 1, 5);
+            --              Test_Support.Print_Float_Matrix
+            --                (Routine_Name & "L132 Activations.Last_Element",
+            --                 Activations.Last_Element, 1, 5);
             Assert (Activations.Last_Index = layer + 1, Routine_Name &
                       "L132 Activations.Last_Index"
                     & Integer'Image (Activations.Last_Index) &
@@ -928,9 +926,9 @@ package body Multilayer_Perceptron is
       --  L138 For the last layer
       Put_Line (Routine_Name & "L138 Output_Activation: " &
                   Activation_Type'Image (Output_Activation));
---        Test_Support.Print_Float_Matrix
---          (Routine_Name & "L138 Activations.Last_Element",
---           Activations.Last_Element, 1, 5);
+      --        Test_Support.Print_Float_Matrix
+      --          (Routine_Name & "L138 Activations.Last_Element",
+      --           Activations.Last_Element, 1, 5);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
@@ -942,9 +940,9 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
---        Test_Support.Print_Float_Matrix
---          (Routine_Name & "L138+ Activations.Last_Element",
---           Activations.Last_Element, 1, 3);
+      --        Test_Support.Print_Float_Matrix
+      --          (Routine_Name & "L138+ Activations.Last_Element",
+      --           Activations.Last_Element, 1, 3);
       if Activations.Last_Element'Length (2) > 1 then
          --  Check that Activations.Last_Element rows are probabilities
          Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
@@ -1069,7 +1067,7 @@ package body Multilayer_Perceptron is
       --        use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
---        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
@@ -1093,8 +1091,8 @@ package body Multilayer_Perceptron is
       for f_out in 1 .. Fan_Out loop
          Params.Intercept_Grads (f_out) := 0.0;  --  Init_Bound * Random_Float;
       end loop;
---        Test_Support.Print_Float_Matrix (Routine_Name & "Params.Coeff_Gradients",
---                                         Params.Coeff_Gradients);
+      --        Test_Support.Print_Float_Matrix (Routine_Name & "Params.Coeff_Gradients",
+      --                                         Params.Coeff_Gradients);
 
       return Params;
 
@@ -1466,8 +1464,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
+      --        Routine_Name : constant String :=
+      --                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
@@ -1498,8 +1496,8 @@ package body Multilayer_Perceptron is
             Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
          when Softmax_Activation => null;
       end case;
---        Test_Support.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
---                                         Deltas (Layer - 1), 1, 1);
+      --        Test_Support.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
+      --                                         Deltas (Layer - 1), 1, 1);
 
       --  L314
       Compute_Loss_Gradient
@@ -1509,76 +1507,54 @@ package body Multilayer_Perceptron is
    end Update_Hidden_Layer_Gradients;
 
    --  -------------------------------------------------------------------------
-   --  L716 Early_Stopping
-   --     procedure Update_No_Improvement_Count
-   --       (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
-   --        X_Val  : Real_Float_Matrix; Y_Val : Integer_Matrix) is
-   --        Routine_Name     : constant String
-   --          := "Multilayer_Perceptron.Update_No_Improvement_Count ";
-   --        Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
-   --        Last_Valid_Score : Float;
-   --        Score_Val        : Float;
-   --     begin
-   --        if Early_Stopping then
-   --           Score_Val := Base.Score (Self, X_Val, Y_Val, Sample_Weight);
-   --           Self.Parameters.Validation_Scores.Append (Score_Val);
-   --           Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
-   --           if Self.Parameters.Verbose then
-   --              Put_Line (Routine_Name & "Validation score: " &
-   --      Float'Image (Last_Valid_Score));
-   --           end if;
-   --
-   --           --  L728
-   --           if Last_Valid_Score <
-   --             Self.Parameters.Best_Validation_Score + Self.Parameters.Tol then
-   --              Self.Attributes.No_Improvement_Count :=
-   --                Self.Attributes.No_Improvement_Count + 1;
-   --           else
-   --              Self.Attributes.No_Improvement_Count := 0;
-   --           end if;
-   --
-   --           if Last_Valid_Score > Self.Parameters.Best_Validation_Score then
-   --              Self.Parameters.Best_Validation_Score := Last_Valid_Score;
-   --              Self.Parameters.Best_Params := Self.Attributes.Params;
-   --           end if;
-   --
-   --        else
-   --           if Self.Attributes.Loss_Curve.Last_Element >
-   --             Self.Attributes.Best_Loss then
-   --              Self.Attributes.No_Improvement_Count :=
-   --                Self.Attributes.No_Improvement_Count + 1;
-   --           else
-   --              Self.Attributes.No_Improvement_Count := 0;
-   --           end if;
-   --
-   --           if Self.Attributes.Loss_Curve.Last_Element <
-   --             Self.Attributes.Best_Loss then
-   --              Self.Attributes.Best_Loss :=
-   --                Self.Attributes.Loss_Curve.Last_Element;
-   --           end if;
-   --        end if;
-   --
-   --     end Update_No_Improvement_Count;
-
-   --  -------------------------------------------------------------------------
-   --  L716 not Early_Stopping
+   --  L716
    procedure Update_No_Improvement_Count
-     (Self   : in out MLP_Classifier) is
-      --        Routine_Name     : constant String
-      --          := "Multilayer_Perceptron.Update_No_Improvement_Count ";
+     (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
+      X_Val  : Real_Float_Matrix; Y_Val : Binary_Matrix) is
+      Routine_Name     : constant String
+        := "Multilayer_Perceptron.Update_No_Improvement_Count ";
+      Sample_Weight    : constant Real_Float_Vector (1 .. 0) := (others => 0.0);
+      Last_Valid_Score : Float;
+      Score_Val        : Float;
    begin
-      if Self.Attributes.Loss_Curve.Last_Element >
-        Self.Attributes.Best_Loss then
-         Self.Attributes.No_Improvement_Count :=
-           Self.Attributes.No_Improvement_Count + 1;
-      else
-         Self.Attributes.No_Improvement_Count := 0;
-      end if;
+      if Early_Stopping then
+         Score_Val := Base.Score (Self, X_Val, To_Integer_Matrix (Y_Val),
+                                  Sample_Weight);
+         Self.Parameters.Validation_Scores.Append (Score_Val);
+         Last_Valid_Score := Self.Parameters.Validation_Scores.Last_Element;
+         if Self.Parameters.Verbose then
+            Put_Line (Routine_Name & "Validation score: " &
+                        Float'Image (Last_Valid_Score));
+         end if;
 
-      if Self.Attributes.Loss_Curve.Last_Element <
-        Self.Attributes.Best_Loss then
-         Self.Attributes.Best_Loss :=
-           Self.Attributes.Loss_Curve.Last_Element;
+         --  L728
+         if Last_Valid_Score <
+           Self.Parameters.Best_Validation_Score + Self.Parameters.Tol then
+            Self.Attributes.No_Improvement_Count :=
+              Self.Attributes.No_Improvement_Count + 1;
+         else
+            Self.Attributes.No_Improvement_Count := 0;
+         end if;
+
+         if Last_Valid_Score > Self.Parameters.Best_Validation_Score then
+            Self.Parameters.Best_Validation_Score := Last_Valid_Score;
+            Self.Parameters.Best_Params := Self.Attributes.Params;
+         end if;
+
+      else
+         if Self.Attributes.Loss_Curve.Last_Element >
+           Self.Attributes.Best_Loss then
+            Self.Attributes.No_Improvement_Count :=
+              Self.Attributes.No_Improvement_Count + 1;
+         else
+            Self.Attributes.No_Improvement_Count := 0;
+         end if;
+
+         if Self.Attributes.Loss_Curve.Last_Element <
+           Self.Attributes.Best_Loss then
+            Self.Attributes.Best_Loss :=
+              Self.Attributes.Loss_Curve.Last_Element;
+         end if;
       end if;
 
    end Update_No_Improvement_Count;
@@ -1672,8 +1648,8 @@ package body Multilayer_Perceptron is
 
       --  Python code downcasts to bool to prevent upcasting when working with
       --  float32 data
---        Test_Support.Print_Binary_Matrix
---          (Routine_Name & "result", Label.Transform (Self.Attributes.Binarizer, Y), 1, 3);
+      --        Test_Support.Print_Binary_Matrix
+      --          (Routine_Name & "result", Label.Transform (Self.Attributes.Binarizer, Y), 1, 3);
       return Label.Transform (Self.Attributes.Binarizer, Y);
 
    end Validate_Input;
