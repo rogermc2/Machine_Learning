@@ -30,7 +30,8 @@ begin
    Put_Line (Routine_Name);
 
    Layer_Sizes.Append (5);
-   MLP := C_Init (Hidden_Layer_Sizes => Layer_Sizes, Verbose => True);
+   MLP := C_Init (Hidden_Layer_Sizes => Layer_Sizes, Verbose => True,
+                  Shuffle => False);
    Fit (MLP, X_Train, Y_Train);
 
    declare

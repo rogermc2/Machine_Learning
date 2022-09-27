@@ -546,17 +546,8 @@ package body Stochastic_Optimizers is
 --        Routine_Name : constant String :=
 --                         "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
---        Max_Update   : Float := 0.0;
---        Max_Row      : Integer := 0;
---        Max_Col      : Integer := 0;
    begin
       --  L42
---        Printing.Print_Float_Matrix
---          (Routine_Name & "L42 Params (1) Coeffs row 29",
---           Params (1).Coeff_Gradients, 29, 29, 24, 30);
-      --        Printing.Print_Float_Matrix
-      --            (Routine_Name & "L42 Params (2) Coeffs",
-      --             Params (2).Coeff_Gradients, 1, 1);
       case Self.Kind is
          when Optimizer_Adam =>
             Updates := Get_Adam_Updates (Self.Adam, Gradients);
@@ -568,9 +559,6 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L44
---        Printing.Print_Float_Matrix
---          (Routine_Name & "L44 Updates (1) Coeffs row 29: ",
---           Updates (1).Coeff_Gradients, 29, 29, 24, 30);
 --        for row in 1 .. Updates.Element (1).Num_Rows loop
 --           for col in 1 .. Updates.Element (1).Num_Cols loop
 --              if abs (Updates.Element (1).Coeff_Gradients (row, col)) >
@@ -581,16 +569,8 @@ package body Stochastic_Optimizers is
 --              end if;
 --           end loop;
 --        end loop;
---        Put_Line (Routine_Name & "L44 Max Update (1) Coeffs ("&
---                    Integer'Image (Max_Row) & "," &
---                    Integer'Image (Max_Col) & "): " & Float'Image (Max_Update));
+
       Params := Params + Updates;
---        Printing.Print_Float_Matrix
---          (Routine_Name & "L44 Params (1) Coeffs row 29",
---           Params (1).Coeff_Gradients, 29, 29, 24, 30);
-      --        Printing.Print_Float_Matrix
-      --            (Routine_Name & "L44 Params (2) Coeffs",
-      --             Params (2).Coeff_Gradients, 1, 1);
       case Self.Kind is
          when Optimizer_Adam =>
             Self.Adam.Params := Params + Updates;
@@ -598,12 +578,6 @@ package body Stochastic_Optimizers is
             Self.SGD.Params := Params + Updates;
          when Optimizer_Base | No_Optimizer => null;
       end case;
---        Printing.Print_Float_Matrix
---          (Routine_Name & "end Params (1) Coeffs row 29",
---           Params (1).Coeff_Gradients, 29, 29, 24, 30);
-      --        Printing.Print_Float_Matrix
-      --            (Routine_Name & "end Params (2) Coeffs",
-      --             Params (2).Coeff_Gradients, 1, 1);
 
    end Update_Params;
 

@@ -1422,9 +1422,9 @@ package body Multilayer_Perceptron is
          end loop;
       end loop;
 
-      --          if Self.Parameters.Shuffle then
-      --              Permute (X_Batch, Y_Batch);
-      --          end if;
+--        if Self.Parameters.Shuffle then
+--            Permute (X_Batch, Y_Batch);
+--        end if;
 
       --  L644  Initialize Activations
       Activations.Clear;
