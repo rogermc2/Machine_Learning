@@ -1543,7 +1543,7 @@ package body Multilayer_Perceptron is
 
       else
          if Self.Attributes.Loss_Curve.Last_Element >
-           Self.Attributes.Best_Loss then
+           Self.Attributes.Best_Loss - Self.Parameters.Tol then
             Self.Attributes.No_Improvement_Count :=
               Self.Attributes.No_Improvement_Count + 1;
          else
