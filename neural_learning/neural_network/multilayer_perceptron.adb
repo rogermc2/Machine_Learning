@@ -717,7 +717,7 @@ package body Multilayer_Perceptron is
       --       Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples      : constant Positive := Positive (X'Length);
       Params           : Parameters_List := Self.Attributes.Params;
-      Iter             : Natural := 0;
+      Batch_Iter       : Natural := 0;
       Continue         : Boolean := True;
       Early_Stopping   : Boolean := Self.Parameters.Early_Stopping;
       Batch_Size       : Positive;
@@ -769,10 +769,8 @@ package body Multilayer_Perceptron is
       --        Put_Line (Routine_Name & "Batch_Size" & Integer'Image (Batch_Size));
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
       --  L628
-      --        Put_Line (Routine_Name & "Max_Iter" &
-      --                    Integer'Image (Self.Parameters.Max_Iter));
-      while Continue and then Iter < Self.Parameters.Max_Iter loop
-         Iter := Iter + 1;
+      while Continue and then Batch_Iter < Self.Parameters.Max_Iter loop
+         Batch_Iter := Batch_Iter + 1;
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  L636
@@ -846,7 +844,7 @@ package body Multilayer_Perceptron is
 
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
-                   & Integer'Image (Iter) & "  loss: " &
+                   & Integer'Image (Batch_Iter) & "  loss: " &
                      Float'Image (Self.Attributes.Loss));
       end if;
 
