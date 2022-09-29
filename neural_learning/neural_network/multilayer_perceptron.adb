@@ -164,15 +164,7 @@ package body Multilayer_Perceptron is
    begin
       --          BP_Count := BP_Count + 1;
       --  Y_Float checked; contains only 1s and 0s
-      --  Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y ", Y);
-      --        Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float ", Y_Float);
-      --        Test_Support.Print_Binary_Matrix (Routine_Name & "Y ", Slice (Y, 1, 5));
       --  L284
-      --        Test_Support.Print_Matrix_Dimensions
-      --          (Routine_Name & "Activations.Last_Element ", Activations.Last_Element);
-      --        Assert (Y_Float'Length = Activations.Last_Element'Length, Routine_Name &
-      --                  "L284+ Y_Float and Activations.Last_Element lengths are" &
-      --                  " different");
       --        Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
       --                Routine_Name & "L284+ Y_Float has different number of columns" &
       --                  Integer'Image (Y_Float'Length (2)) & " to" &
@@ -184,6 +176,7 @@ package body Multilayer_Perceptron is
       else
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
+
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L284+ Activations.Last_Element",
          Activations.Last_Element, 1, 3);
@@ -248,11 +241,10 @@ package body Multilayer_Perceptron is
                 " differs from Y_Float width" &
                 Integer'Image (Y_Float'Length (2)));
       --  L301  Y_Prob checked; contains only 1s and 0s
-      --        Printing.Print_Float_Matrix
-      --          (Routine_Name & "L301 Activations.Last_Element - Y_Float",
-      --           Activations.Last_Element - Y_Float, 1, 1);
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
+      Test_Support.Print_Float_Matrix
+      (Routine_Name & "L301 Deltas.Last_Element", Deltas.Last_Element, 1, 3);
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
@@ -1481,13 +1473,6 @@ package body Multilayer_Perceptron is
       --  L311
       Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                 Transpose (Params.Coeff_Gradients));
-      --  Put_Line (Routine_Name & "Activations size" &
-      --  Integer'Image (Activations.Element (layer)'Length) &
-      --  " x" &
-      --  Integer'Image (Activations.Element (layer)'Length (2)));
-      --  Put_Line (Routine_Name & "Deltas size" &
-      --  Integer'Image (Deltas.Element (layer - 1)'Length) & " x" &
-      --  Integer'Image (Deltas.Element (layer - 1)'Length (2)));
       --  Put_Line (Routine_Name & "L312 Activation_Type " &
       --              Activation_Type'Image (Self.Parameters.Activation));
       --  L312
