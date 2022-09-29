@@ -1,5 +1,6 @@
 --  Based on scikit-learn/sklearn/neural_network/_stochastic_optimizers.py
 
+with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
@@ -7,6 +8,7 @@ with Maths;
 with Ada.Numerics.Elementary_Functions;
 
 --  with Printing;
+with Test_Support;
 
 package body Stochastic_Optimizers is
 
@@ -368,8 +370,8 @@ package body Stochastic_Optimizers is
                               return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
-      --          Routine_Name          : constant String :=
-      --                                    "Stochastic_Optimizers.Get_Adam_Updates ";
+      Routine_Name          : constant String :=
+                                 "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       F_Cursor              : Cursor := Self.First_Moments.First;
@@ -377,10 +379,6 @@ package body Stochastic_Optimizers is
       Updates               : Parameters_List;
    begin
       Self.Time_Step := Self.Time_Step + 1;
-      --  L279 Update learning rate
-      Self.Learning_Rate := Sqrt
-        (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
-        (1.0 - Self.Beta_1 ** Self.Time_Step);
       --  L272
       --  "of" implies that layer is a cursor
       for layer of Grads loop
@@ -410,6 +408,11 @@ package body Stochastic_Optimizers is
       Self.First_Moments := First_Moment_Updates;
       Self.Second_Moments := Second_Moment_Updates;
 
+      --  L279 Update learning rate
+      Self.Learning_Rate := Sqrt
+        (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
+        (1.0 - Self.Beta_1 ** Self.Time_Step);
+
       F_Cursor := First_Moment_Updates.First;
       S_Cursor := Second_Moment_Updates.First;
       for layer of Self.Params loop
@@ -428,6 +431,13 @@ package body Stochastic_Optimizers is
          Next (F_Cursor);
          Next (S_Cursor);
       end loop;
+
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Coeff_Gradient updates",
+         Updates.Element (1).Coeff_Gradients);
+      Test_Support.Print_Float_Vector
+        (Routine_Name & "Intercept_Grads updates",
+         Updates.Element (1).Intercept_Grads);
 
       return Updates;
 
@@ -543,39 +553,33 @@ package body Stochastic_Optimizers is
    procedure Update_Params (Self      : in out Optimizer_Record;
                             Params    : in out Parameters_List;
                             Gradients : Parameters_List) is
---        Routine_Name : constant String :=
---                         "Stochastic_Optimizers.Update_Params ";
+      Routine_Name : constant String :=
+                       "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
+      Put_Line (Routine_Name & "Optimizer_Type: " &
+                  Optimizer_Type'Image (Self.Kind));
       --  L42
       case Self.Kind is
          when Optimizer_Adam =>
             Updates := Get_Adam_Updates (Self.Adam, Gradients);
          when Optimizer_SGD =>
             Updates := Get_SGD_Updates (Self.SGD, Gradients);
-         when Optimizer_Base =>
-            Update_Params (Self, Updates, Gradients);
-         when No_Optimizer => null;
+            --  when Optimizer_Base =>
+            --              Update_Params (Self, Updates, Gradients);
+            --  when No_Optimizer => null;
+         when others =>
+            Assert (False, Routine_Name & "invalid Optimizer_Type: " &
+                      Optimizer_Type'Image (Self.Kind));
       end case;
 
       --  L44
---        for row in 1 .. Updates.Element (1).Num_Rows loop
---           for col in 1 .. Updates.Element (1).Num_Cols loop
---              if abs (Updates.Element (1).Coeff_Gradients (row, col)) >
---              abs (Max_Update) then
---                 Max_Update := Updates.Element (1).Coeff_Gradients (row, col);
---                 Max_Row := row;
---                 Max_Col := col;
---              end if;
---           end loop;
---        end loop;
-
       Params := Params + Updates;
       case Self.Kind is
          when Optimizer_Adam =>
-            Self.Adam.Params := Params + Updates;
+            Self.Adam.Params := Params;
          when Optimizer_SGD =>
-            Self.SGD.Params := Params + Updates;
+            Self.SGD.Params := Params;
          when Optimizer_Base | No_Optimizer => null;
       end case;
 
@@ -583,25 +587,25 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
 
-      procedure Update_Params (Self      : in out Adam_Optimizer;
-                               Params    : in out Parameters_List;
-                               Gradients : Parameters_List) is
+   procedure Update_Params (Self      : in out Adam_Optimizer;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List) is
 
-      begin
-         Params := Params + Get_Adam_Updates (Self, Gradients);
+   begin
+      Params := Params + Get_Adam_Updates (Self, Gradients);
 
-      end Update_Params;
+   end Update_Params;
 
    --  -------------------------------------------------------------------------
 
-      procedure Update_Params (Self      : in out SGD_Optimizer;
-                               Params    : in out Parameters_List;
-                               Gradients : Parameters_List) is
+   procedure Update_Params (Self      : in out SGD_Optimizer;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List) is
 
-      begin
-         Params := Params + Get_SGD_Updates (Self, Gradients);
+   begin
+      Params := Params + Get_SGD_Updates (Self, Gradients);
 
-      end Update_Params;
+   end Update_Params;
 
    --  -------------------------------------------------------------------------
 
