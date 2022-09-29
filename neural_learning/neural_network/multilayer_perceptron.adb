@@ -330,6 +330,7 @@ package body Multilayer_Perceptron is
                   Bad := Bad and not Weight'Valid;
                end loop;
             end loop;
+
             for row in Params.Intercept_Grads'Range loop
                Weight := Params.Intercept_Grads (row);
                Bad := Bad and not Weight'Valid;
@@ -550,6 +551,7 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
+--        use Real_Float_Arrays;
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
@@ -710,7 +712,7 @@ package body Multilayer_Perceptron is
                              Y           : Binary_Matrix;
                              Gradients   : in out Parameters_List;
                              Incremental : Boolean := False) is
-      --        use Estimator;
+      use Real_Float_Arrays;
       Routine_Name     : constant String :=
                            "Multilayer_Perceptron.Fit_Stochastic ";
       --        Is_Classifier  : constant Boolean :=
@@ -779,6 +781,10 @@ package body Multilayer_Perceptron is
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
+            Test_Support.Print_Float_Matrix
+              (Routine_Name & "L636 Batch (" & Integer'Image (Batch_index) &
+                 ") Hidden layer W0",
+               Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
          end loop;
 
          --  L661
@@ -842,6 +848,10 @@ package body Multilayer_Perceptron is
       if Early_Stopping then
          Self.Attributes.Params := Self.Parameters.Best_Params;
       end if;
+
+      Test_Support.Print_Float_Matrix
+           (Routine_Name & "Hidden layer W0",
+            Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
 
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
