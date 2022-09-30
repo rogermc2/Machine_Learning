@@ -162,7 +162,9 @@ package body Multilayer_Perceptron is
       Sum_Sq_Coeffs      : Float := 0.0;
    begin
       --          BP_Count := BP_Count + 1;
-      --  Y_Float checked; contains only 1s and 0s
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L284 Coeff_Gradients 1",
+         Self.Attributes.Params (1).Coeff_Gradients);
       --  L284
       --        Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
       --                Routine_Name & "L284+ Y_Float has different number of columns" &
@@ -176,9 +178,6 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := Self.Attributes.Loss_Function_Name;
       end if;
 
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L284+ Activations.Last_Element",
-         Activations.Last_Element, 1, 3);
       Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
                   Loss_Function_Type'Image (Loss_Function_Name));
       case Loss_Function_Name is
@@ -254,12 +253,6 @@ package body Multilayer_Perceptron is
          Update_Hidden_Layer_Gradients
            (Self, Activations, Deltas, Gradients, layer, Num_Samples);
       end loop;
-      --        Put_Line (Routine_Name & "L317 Gradients 1 size" &
-      --                    Integer'Image (Gradients.Element (1).Num_Rows) & " x" &
-      --                    Integer'Image (Gradients.Element (1).Num_Cols));
-      --        Put_Line (Routine_Name & "L317 Gradients 2 size" &
-      --                    Integer'Image (Gradients.Element (2).Num_Rows) & " x" &
-      --                    Integer'Image (Gradients.Element (2).Num_Cols));
 
       --          for index in Deltas.First_Index .. Deltas.Last_Index loop
       --              Printing.Print_Float_Matrix
@@ -1419,7 +1412,7 @@ package body Multilayer_Perceptron is
       Forward_Pass (Self, Activations);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "Gradients 1",
+        (Routine_Name & "L665 Gradients 1",
          Gradients.Element (1).Coeff_Gradients);
 
       --  L665
