@@ -79,7 +79,6 @@ package body Multilayer_Perceptron is
                              Gradients    : in out Parameters_List;
                              Incremental  : Boolean := False);
    procedure Forward_Pass (Self         : MLP_Classifier;
-                           Gradients    : Parameters_List;
                            Activations  : in out Real_Matrix_List);
    function Forward_Pass_Fast (Self      : MLP_Classifier;
                                X         : Real_Float_Matrix)
@@ -858,7 +857,6 @@ package body Multilayer_Perceptron is
    --  computing the activation values of the neurons in the hidden layers and
    --  the output layer.
    procedure Forward_Pass (Self        : MLP_Classifier;
-                           Gradients   : Parameters_List;
                            Activations : in out Real_Matrix_List) is
       --  Activations: layers x samples x features
       --  The ith element of Activations (length n_layers - 1) holds the
@@ -879,28 +877,14 @@ package body Multilayer_Perceptron is
          declare
             use Real_Float_Arrays;
             Params              : constant Parameters_Record :=
-                                    Gradients (layer);
+                                    Self.Attributes.Params (layer);
             --  L131
             Updated_Activ_Grads : constant Real_Float_Matrix
               := Activations (layer) * Params.Coeff_Gradients;
          begin
-            --              Test_Support.Print_Matrix_Dimensions
-            --                (Routine_Name & "L131 Params.Coeff_Gradients layer " & Integer'Image (layer),
-            --                 Params.Coeff_Gradients);
-            --              Test_Support.Print_Matrix_Dimensions
-            --                (Routine_Name & "L131 Updated_Activ_Grads ", Updated_Activ_Grads);
 
             --  L132 Add layer + 1 activation
-            --              Test_Support.Print_Float_Matrix
-            --                (Routine_Name & "L132 Activations (" & Integer'Image (layer) & ")",
-            --                 Activations (layer), 1, 5);
             Activations.Append (Updated_Activ_Grads + Params.Intercept_Grads);
-            --              Test_Support.Print_Float_Matrix
-            --                (Routine_Name & "L132 Updated_Activ_Grads",
-            --                 Updated_Activ_Grads, 1, 5);
-            --              Test_Support.Print_Float_Matrix
-            --                (Routine_Name & "L132 Activations.Last_Element",
-            --                 Activations.Last_Element, 1, 5);
             Assert (Activations.Last_Index = layer + 1, Routine_Name &
                       "L132 Activations.Last_Index"
                     & Integer'Image (Activations.Last_Index) &
@@ -927,9 +911,6 @@ package body Multilayer_Perceptron is
       --  L138 For the last layer
       Put_Line (Routine_Name & "L138 Output_Activation: " &
                   Activation_Type'Image (Output_Activation));
-      --        Test_Support.Print_Float_Matrix
-      --          (Routine_Name & "L138 Activations.Last_Element",
-      --           Activations.Last_Element, 1, 5);
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
@@ -1252,7 +1233,7 @@ package body Multilayer_Perceptron is
       Loss        : Float := Float'Safe_Last;
    begin
       --  L237 _backprop
-      Forward_Pass (Self, Params, Activations);
+      Forward_Pass (Self, Activations);
       Backprop (Self, Args.X, Args.Y, Activations, Loss, Params);
 
       return (Loss, Params);
@@ -1399,8 +1380,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --                           "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                          "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -1430,16 +1411,16 @@ package body Multilayer_Perceptron is
       --  L644  Initialize Activations
       Activations.Clear;
       Activations.Append (X_Batch);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L645 Gradients 1",
+         Gradients.Element (1).Coeff_Gradients);
 
       --  L645
-      Forward_Pass (Self, Gradients, Activations);
-      --        Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Batch ",
-      --                                          Slice (Y_Batch, 1, 5));
-      --        Put_Line (Routine_Name & "Activations length:" &
-      --                    Integer'Image (Integer (Activations.Length)));
-      --        Test_Support.Print_Matrix_Dimensions
-      --          (Routine_Name & "Activations.Element (2)", Activations.Element (3));
+      Forward_Pass (Self, Activations);
       Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Gradients 1",
+         Gradients.Element (1).Coeff_Gradients);
 
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *

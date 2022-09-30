@@ -382,9 +382,6 @@ package body Stochastic_Optimizers is
       Test_Support.Print_Float_Matrix
         (Routine_Name & "Gradients 1",
          Gradients.Element (1).Coeff_Gradients);
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "Self.First_Moments 1",
-         Self.First_Moments.Element (1).Coeff_Gradients);
       --  L272
       --  "of" implies that layer is a cursor
       for layer of Gradients loop
