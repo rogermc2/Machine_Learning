@@ -437,8 +437,10 @@ package body Multilayer_Perceptron is
       Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
       Put_Line (Routine_Name & "Deltas length" &
                   Integer'Image (Integer (Deltas.Length)));
-      Put_Line (Routine_Name & "Deltas (1) length" &
-                  Integer'Image (Deltas.Element (1)'Length));
+      Put_Line (Routine_Name & "Deltas (Layer) length" &
+                  Integer'Image (Deltas.Element (Layer)'Length));
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L194 Deltas (Layer)", Deltas (Layer), 1, 3);
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
@@ -446,8 +448,8 @@ package body Multilayer_Perceptron is
       --  L194
       Test_Support.Print_Matrix_Dimensions
         (Routine_Name & "L194 New_Coeff_Gradients size", New_Coeff_Gradients);
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
+--        Test_Support.Print_Float_Matrix
+--          (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
       Gradients (Layer) := New_Gradients;
@@ -1451,6 +1453,11 @@ package body Multilayer_Perceptron is
       --  Activations (Layer) is the data computed by the logistic activation
       --  function during the forward pass.
       --  Deltas (Layer - 1) is the backpropagated error signal to be updated.
+--        Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
+--        Put_Line (Routine_Name & "Deltas length" &
+--                    Integer'Image (Integer (Deltas.Length)));
+--        Put_Line (Routine_Name & "Deltas (Layer - 1) length" &
+--                    Integer'Image (Deltas.Element (Layer - 1)'Length));
       case Self.Parameters.Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
