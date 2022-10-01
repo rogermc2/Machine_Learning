@@ -162,9 +162,6 @@ package body Multilayer_Perceptron is
       Sum_Sq_Coeffs      : Float := 0.0;
    begin
       --          BP_Count := BP_Count + 1;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L284 Coeff_Gradients 1",
-         Self.Attributes.Params (1).Coeff_Gradients);
       --  L284
       --        Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
       --                Routine_Name & "L284+ Y_Float has different number of columns" &
@@ -200,10 +197,6 @@ package body Multilayer_Perceptron is
             Coeffs : constant Real_Float_Matrix :=
                        Self.Attributes.Params (Layer).Coeff_Gradients;
          begin
-            --              if layer = 1 then
-            --                 Put_Line (Routine_Name & "L289 Coeffs (29, 28)" &
-            --                             Float'Image (Coeffs (29, 28)));
-            --              end if;
             for row in Coeffs'Range loop
                for col in Coeffs'Range (2) loop
                   Sum_Sq_Coeffs := Sum_Sq_Coeffs + Coeffs (row, col) ** 2;
@@ -211,6 +204,9 @@ package body Multilayer_Perceptron is
             end loop;
          end;  --  declare
       end loop;
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L292 Coeff_Gradients 1",
+         Self.Attributes.Params (1).Coeff_Gradients);
 
       --  L292
       --        Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
@@ -247,6 +243,8 @@ package body Multilayer_Perceptron is
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
+      Test_Support.Print_Float_Matrix (Routine_Name & "Gradients (last Layer)",
+                                      Gradients.Last_Element.Coeff_Gradients, 1, 3);
 
       --  L310, L308
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
@@ -254,6 +252,9 @@ package body Multilayer_Perceptron is
            (Self, Activations, Deltas, Gradients, layer, Num_Samples);
       end loop;
 
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L310 Coeff_Gradients 1",
+         Self.Attributes.Params (1).Coeff_Gradients);
       --          for index in Deltas.First_Index .. Deltas.Last_Index loop
       --              Printing.Print_Float_Matrix
       --                (Routine_Name & "Deltas " & Integer'Image (index),
@@ -417,8 +418,8 @@ package body Multilayer_Perceptron is
       Deltas        : Real_Matrix_List;
       Gradients     : in out Parameters_List) is
       use Real_Float_Arrays;
-      --        Routine_Name        : constant String :=
-      --            "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      Routine_Name        : constant String :=
+                "Multilayer_Perceptron.Compute_Loss_Gradient ";
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  An activation converts the output from a layer into a form that is
@@ -437,25 +438,16 @@ package body Multilayer_Perceptron is
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
           Float (Num_Samples);
-      --        Put_Line (Routine_Name & "Deltas length" &
-      --  Count_Type'Image (Deltas.Length));
-      --        Put_Line (Routine_Name & "New_Coeff_Gradients size" &
-      --  Integer'Image (New_Coeff_Gradients'Length) & " x" &
-      --  Integer'Image (New_Coeff_Gradients'Length (2)));
-      --        Put_Line (Routine_Name & "Activations size" &
-      --  Integer'Image (Activations.Element (layer)'Length) &
-      --" x" &
-      --  Integer'Image (Activations.Element (layer)'Length (2)));
-      --        Put_Line (Routine_Name & "Deltas size" &
-      --  Integer'Image (Deltas.Element (layer)'Length) & " x" &
-      --  Integer'Image (Deltas.Element (layer)'Length (2)));
-      --        Put_Line (Routine_Name & "New_Intercept_Grads length" &
-      --  Integer'Image (New_Intercept_Grads'Length));
-      --        Put_Line (Routine_Name & "New_Gradients.Intercept_Grads length" &
-      --  Integer'Image (New_Gradients.Intercept_Grads'Length));
+      --  L194
+      Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
       Gradients (Layer) := New_Gradients;
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Gradients (" & Integer'Image (Layer) & " )",
+         Gradients.Element (Layer).Coeff_Gradients, 1, 3);
 
    end  Compute_Loss_Gradient;
 
@@ -1439,8 +1431,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      --        Routine_Name : constant String :=
-      --                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
+      Routine_Name : constant String :=
+                        "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
       Params       : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
    begin
@@ -1467,10 +1459,17 @@ package body Multilayer_Perceptron is
       --        Test_Support.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
       --                                         Deltas (Layer - 1), 1, 1);
 
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L314 Coeff_Gradients 1",
+         Self.Attributes.Params (1).Coeff_Gradients);
       --  L314
       Compute_Loss_Gradient
         (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
          Activations => Activations, Deltas => Deltas, Gradients => Gradients);
+
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L314+ Coeff_Gradients 1",
+         Self.Attributes.Params (1).Coeff_Gradients);
 
    end Update_Hidden_Layer_Gradients;
 
