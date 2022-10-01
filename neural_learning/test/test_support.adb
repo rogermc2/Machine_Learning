@@ -111,14 +111,14 @@ package body Test_Support is
        Start : Integer := 1; Finish : Integer := 0) is
         Last  : Integer;
     begin
-        if Finish > 0 then
+        if Finish > 0 and then Finish < aMatrix'Length then
             Last := Finish;
         else
             Last := Integer (aMatrix'Length);
         end if;
 
         Put_Line (Name & ": ");
-        if Start >= aMatrix'First and then Finish <= aMatrix'Last then
+        if Start >= aMatrix'First then
             for row in Start .. Last loop
                 for col in aMatrix'Range (2) loop
                     Put (Float'Image (aMatrix (row, col)) & "  ");

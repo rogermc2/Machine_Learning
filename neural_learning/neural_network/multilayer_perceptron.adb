@@ -434,12 +434,18 @@ package body Multilayer_Perceptron is
       New_Gradients       : Parameters_Record
         (New_Coeff_Gradients'Length, New_Coeff_Gradients'Length (2));
    begin
+      Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
+      Put_Line (Routine_Name & "Deltas length" &
+                  Integer'Image (Integer (Deltas.Length)));
+      Put_Line (Routine_Name & "Deltas (1) length" &
+                  Integer'Image (Deltas.Element (1)'Length));
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
           Float (Num_Samples);
       --  L194
-      Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
+      Test_Support.Print_Matrix_Dimensions
+        (Routine_Name & "L194 New_Coeff_Gradients size", New_Coeff_Gradients);
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
