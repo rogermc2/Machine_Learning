@@ -240,11 +240,13 @@ package body Multilayer_Perceptron is
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L301 Deltas.Last_Element", Deltas.Last_Element, 1, 3);
 
+      Gradients.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
-      Test_Support.Print_Float_Matrix (Routine_Name & "Gradients (last Layer)",
-                                       Gradients.Last_Element.Coeff_Gradients, 1, 3);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Gradients (last Layer)",
+         Gradients.Last_Element.Coeff_Gradients, 1, 3);
 
       --  L310, L308
       Update_Hidden_Layer_Gradients
@@ -1441,24 +1443,18 @@ package body Multilayer_Perceptron is
                        "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
    begin
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
-            Params       : constant Parameters_Record :=
-                             Self.Attributes.Params (Layer);
+            Params : constant Parameters_Record :=
+                       Self.Attributes.Params (Layer);
          begin
             --  L311
             Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                       Transpose (Params.Coeff_Gradients));
-            --  Put_Line (Routine_Name & "L312 Activation_Type " &
-            --              Activation_Type'Image (Self.Parameters.Activation));
             --  L312
             --  Activations (Layer) is the data computed by the logistic activation
             --  function during the forward pass.
             --  Deltas (Layer - 1) is the backpropagated error signal to be updated.
-            --        Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
-            --        Put_Line (Routine_Name & "Deltas length" &
-            --                    Integer'Image (Integer (Deltas.Length)));
-            --        Put_Line (Routine_Name & "Deltas (Layer - 1) length" &
-            --                    Integer'Image (Deltas.Element (Layer - 1)'Length));
             case Self.Parameters.Activation is
             when Identity_Activation => null;
             when Logistic_Activation =>
