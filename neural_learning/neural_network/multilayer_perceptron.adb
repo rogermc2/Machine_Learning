@@ -1448,10 +1448,15 @@ package body Multilayer_Perceptron is
             Params : constant Parameters_Record :=
                        Self.Attributes.Params (Layer);
          begin
-            --  L311
+            --  L311  322
+            Test_Support.Print_Float_Matrix
+              (Routine_Name & "322 Deltas (layer):", Deltas (layer), 1, 2);
+            Test_Support.Print_Float_Matrix
+              (Routine_Name & "322 Transpose (Params.Coeff_Gradients):",
+               Transpose (Params.Coeff_Gradients), 1, 2);
             Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                       Transpose (Params.Coeff_Gradients));
-            Put_Line (Routine_Name & "L312 Deltas:");
+            Put_Line (Routine_Name & "L312 324 Deltas:");
             for index in Deltas.First_Index .. Deltas.Last_Index loop
                Test_Support.Print_Float_Matrix
                  ("", Deltas (index), 1, 2);
