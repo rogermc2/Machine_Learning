@@ -8,7 +8,7 @@ with Maths;
 with Ada.Numerics.Elementary_Functions;
 
 --  with Printing;
-with Test_Support;
+--  with Test_Support;
 
 package body Stochastic_Optimizers is
 
@@ -370,8 +370,8 @@ package body Stochastic_Optimizers is
                               return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
-      Routine_Name          : constant String :=
-                                 "Stochastic_Optimizers.Get_Adam_Updates ";
+--        Routine_Name          : constant String :=
+--                                   "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       F_Cursor              : Cursor := Self.First_Moments.First;
@@ -379,9 +379,9 @@ package body Stochastic_Optimizers is
       Updates               : Parameters_List;
    begin
       Self.Time_Step := Self.Time_Step + 1;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "Gradients 1",
-         Gradients.Element (1).Coeff_Gradients);
+--        Test_Support.Print_Float_Matrix
+--          (Routine_Name & "Gradients 1",
+--           Gradients.Element (1).Coeff_Gradients);
       --  L272
       --  "of" implies that layer is a cursor
       for layer of Gradients loop
@@ -438,12 +438,12 @@ package body Stochastic_Optimizers is
          Next (S_Cursor);
       end loop;
 
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "Coeff_Gradient updates",
-         Updates.Element (1).Coeff_Gradients);
-      Test_Support.Print_Float_Vector
-        (Routine_Name & "Intercept_Grads updates",
-         Updates.Element (1).Intercept_Grads);
+--        Test_Support.Print_Float_Matrix
+--          (Routine_Name & "Coeff_Gradient updates",
+--           Updates.Element (1).Coeff_Gradients);
+--        Test_Support.Print_Float_Vector
+--          (Routine_Name & "Intercept_Grads updates",
+--           Updates.Element (1).Intercept_Grads);
 
       return Updates;
 

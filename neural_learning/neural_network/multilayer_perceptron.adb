@@ -246,7 +246,7 @@ package body Multilayer_Perceptron is
                              Activations, Deltas, Gradients);
       Test_Support.Print_Float_Matrix
         (Routine_Name & "Gradients (last Layer)",
-         Gradients.Last_Element.Coeff_Gradients, 1, 3);
+         Gradients.Last_Element.Coeff_Gradients, 1, 2);
 
       --  L310, L308
       Update_Hidden_Layer_Gradients
@@ -1451,6 +1451,11 @@ package body Multilayer_Perceptron is
             --  L311
             Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                       Transpose (Params.Coeff_Gradients));
+            Put_Line (Routine_Name & "L311 Deltas:");
+            for index in Deltas.First_Index .. Deltas.Last_Index loop
+               Test_Support.Print_Float_Matrix
+                 ("", Deltas (index), 1, 2);
+            end loop;
             --  L312
             --  Activations (Layer) is the data computed by the logistic activation
             --  function during the forward pass.
@@ -1470,12 +1475,13 @@ package body Multilayer_Perceptron is
             --                                         Deltas (Layer - 1), 1, 1);
 
             Test_Support.Print_Float_Matrix
-              (Routine_Name & "L314 Coeff_Gradients 1",
-               Self.Attributes.Params (1).Coeff_Gradients);
+              (Routine_Name & "L314 Coeff_Gradients Layer - 1",
+               Self.Attributes.Params (Layer - 1).Coeff_Gradients);
             --  L314
             Compute_Loss_Gradient
               (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
-               Activations => Activations, Deltas => Deltas, Gradients => Gradients);
+               Activations => Activations, Deltas => Deltas,
+               Gradients => Gradients);
 
             Test_Support.Print_Float_Matrix
               (Routine_Name & "L314+ Coeff_Gradients 1",
