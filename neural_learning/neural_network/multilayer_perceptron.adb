@@ -99,11 +99,11 @@ package body Multilayer_Perceptron is
      (Self   : in out MLP_Classifier; Early_Stopping : Boolean;
       X_Val  : Real_Float_Matrix; Y_Val : Binary_Matrix);
    procedure Update_Hidden_Layer_Gradients
-     (Self               : MLP_Classifier;
-      Activations        : Real_Matrix_List;
-      Deltas             : in out Real_Matrix_List;
-      Gradients          : in out Parameters_List;
-      Layer, Num_Samples : Positive);
+     (Self        : MLP_Classifier;
+      Activations : Real_Matrix_List;
+      Deltas      : in out Real_Matrix_List;
+      Gradients   : in out Parameters_List;
+      Num_Samples : Positive);
    procedure Validate_Hyperparameters (Self : MLP_Classifier);
 
    --  -------------------------------------------------------------------------
@@ -238,19 +238,17 @@ package body Multilayer_Perceptron is
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
       Test_Support.Print_Float_Matrix
-      (Routine_Name & "L301 Deltas.Last_Element", Deltas.Last_Element, 1, 3);
+        (Routine_Name & "L301 Deltas.Last_Element", Deltas.Last_Element, 1, 3);
 
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
       Test_Support.Print_Float_Matrix (Routine_Name & "Gradients (last Layer)",
-                                      Gradients.Last_Element.Coeff_Gradients, 1, 3);
+                                       Gradients.Last_Element.Coeff_Gradients, 1, 3);
 
       --  L310, L308
-      for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
-         Update_Hidden_Layer_Gradients
-           (Self, Activations, Deltas, Gradients, layer, Num_Samples);
-      end loop;
+      Update_Hidden_Layer_Gradients
+        (Self, Activations, Deltas, Gradients, Num_Samples);
 
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L310 Coeff_Gradients 1",
@@ -419,7 +417,7 @@ package body Multilayer_Perceptron is
       Gradients     : in out Parameters_List) is
       use Real_Float_Arrays;
       Routine_Name        : constant String :=
-                "Multilayer_Perceptron.Compute_Loss_Gradient ";
+                              "Multilayer_Perceptron.Compute_Loss_Gradient ";
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  An activation converts the output from a layer into a form that is
@@ -448,8 +446,8 @@ package body Multilayer_Perceptron is
       --  L194
       Test_Support.Print_Matrix_Dimensions
         (Routine_Name & "L194 New_Coeff_Gradients size", New_Coeff_Gradients);
---        Test_Support.Print_Float_Matrix
---          (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
+      --        Test_Support.Print_Float_Matrix
+      --          (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
       Gradients (Layer) := New_Gradients;
@@ -535,7 +533,7 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
---        use Real_Float_Arrays;
+      --        use Real_Float_Arrays;
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
@@ -834,8 +832,8 @@ package body Multilayer_Perceptron is
       end if;
 
       Test_Support.Print_Float_Matrix
-           (Routine_Name & "Hidden layer W0",
-            Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
+        (Routine_Name & "Hidden layer W0",
+         Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
 
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
@@ -1374,7 +1372,7 @@ package body Multilayer_Perceptron is
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
       Routine_Name   : constant String :=
-                          "Multilayer_Perceptron.Process_Batch ";
+                         "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -1397,9 +1395,9 @@ package body Multilayer_Perceptron is
          end loop;
       end loop;
 
---        if Self.Parameters.Shuffle then
---            Permute (X_Batch, Y_Batch);
---        end if;
+      --        if Self.Parameters.Shuffle then
+      --            Permute (X_Batch, Y_Batch);
+      --        end if;
 
       --  L644  Initialize Activations
       Activations.Clear;
@@ -1431,58 +1429,63 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    procedure Update_Hidden_Layer_Gradients
-     (Self               : MLP_Classifier;
-      Activations        : Real_Matrix_List;
-      Deltas             : in out Real_Matrix_List;
-      Gradients          : in out Parameters_List;
-      Layer, Num_Samples : Positive) is
+     (Self        : MLP_Classifier;
+      Activations : Real_Matrix_List;
+      Deltas      : in out Real_Matrix_List;
+      Gradients   : in out Parameters_List;
+      Num_Samples : Positive) is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
       Routine_Name : constant String :=
-                        "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
-      Params       : constant Parameters_Record :=
-                       Self.Attributes.Params (Layer);
+                       "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
    begin
-      --  L311
-      Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
-                                Transpose (Params.Coeff_Gradients));
-      --  Put_Line (Routine_Name & "L312 Activation_Type " &
-      --              Activation_Type'Image (Self.Parameters.Activation));
-      --  L312
-      --  Activations (Layer) is the data computed by the logistic activation
-      --  function during the forward pass.
-      --  Deltas (Layer - 1) is the backpropagated error signal to be updated.
---        Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
---        Put_Line (Routine_Name & "Deltas length" &
---                    Integer'Image (Integer (Deltas.Length)));
---        Put_Line (Routine_Name & "Deltas (Layer - 1) length" &
---                    Integer'Image (Deltas.Element (Layer - 1)'Length));
-      case Self.Parameters.Activation is
-         when Identity_Activation => null;
-         when Logistic_Activation =>
-            Logistic_Derivative (Z => Activations (Layer),
-                                 Del => Deltas (Layer - 1));
-         when Tanh_Activation =>
-            Tanh_Derivative (Activations (Layer), Deltas (Layer - 1));
-         when Rect_LU_Activation =>
-            Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
-         when Softmax_Activation => null;
-      end case;
-      --        Test_Support.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
-      --                                         Deltas (Layer - 1), 1, 1);
+      for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
+         declare
+            Params       : constant Parameters_Record :=
+                             Self.Attributes.Params (Layer);
+         begin
+            --  L311
+            Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
+                                      Transpose (Params.Coeff_Gradients));
+            --  Put_Line (Routine_Name & "L312 Activation_Type " &
+            --              Activation_Type'Image (Self.Parameters.Activation));
+            --  L312
+            --  Activations (Layer) is the data computed by the logistic activation
+            --  function during the forward pass.
+            --  Deltas (Layer - 1) is the backpropagated error signal to be updated.
+            --        Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
+            --        Put_Line (Routine_Name & "Deltas length" &
+            --                    Integer'Image (Integer (Deltas.Length)));
+            --        Put_Line (Routine_Name & "Deltas (Layer - 1) length" &
+            --                    Integer'Image (Deltas.Element (Layer - 1)'Length));
+            case Self.Parameters.Activation is
+            when Identity_Activation => null;
+            when Logistic_Activation =>
+               Logistic_Derivative (Z => Activations (Layer),
+                                    Del => Deltas (Layer - 1));
+            when Tanh_Activation =>
+               Tanh_Derivative (Activations (Layer), Deltas (Layer - 1));
+            when Rect_LU_Activation =>
+               Rect_LU_Derivative (Activations (Layer), Deltas (Layer - 1));
+            when Softmax_Activation => null;
+            end case;
+            --        Test_Support.Print_Float_Matrix (Routine_Name & "L314 Deltas (Layer - 1)",
+            --                                         Deltas (Layer - 1), 1, 1);
 
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L314 Coeff_Gradients 1",
-         Self.Attributes.Params (1).Coeff_Gradients);
-      --  L314
-      Compute_Loss_Gradient
-        (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
-         Activations => Activations, Deltas => Deltas, Gradients => Gradients);
+            Test_Support.Print_Float_Matrix
+              (Routine_Name & "L314 Coeff_Gradients 1",
+               Self.Attributes.Params (1).Coeff_Gradients);
+            --  L314
+            Compute_Loss_Gradient
+              (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
+               Activations => Activations, Deltas => Deltas, Gradients => Gradients);
 
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L314+ Coeff_Gradients 1",
-         Self.Attributes.Params (1).Coeff_Gradients);
+            Test_Support.Print_Float_Matrix
+              (Routine_Name & "L314+ Coeff_Gradients 1",
+               Self.Attributes.Params (1).Coeff_Gradients);
+         end;
+      end loop;
 
    end Update_Hidden_Layer_Gradients;
 
