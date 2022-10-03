@@ -202,9 +202,6 @@ package body Multilayer_Perceptron is
             end loop;
          end;  --  declare
       end loop;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L292 Coeff_Gradients 1",
-         MLP.Attributes.Params (1).Coeff_Gradients);
 
       --  L292
       --        Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
@@ -236,8 +233,7 @@ package body Multilayer_Perceptron is
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
       Updated_Gradients.Set_Length (Count_Type (MLP.Attributes.N_Layers - 1));
-      Put_Line (Routine_Name & "310 Updated_Gradients.Length" &
-                  Integer'Image (Integer (Updated_Gradients.Length)));
+
       --  L304  313 Compute gradient for the last layer
       declare
          Grad : constant Parameters_Record :=
@@ -1374,7 +1370,6 @@ package body Multilayer_Perceptron is
       Batch_Row      : Positive;
       Batch_Loss     : Float;
    begin
-      --        Printing.Print_Binary_Matrix (Routine_Name & "Y", Y);
       --  Get batch data
       for row in Batch_Slice.First .. Batch_Slice.Last loop
          Batch_Row := row - Batch_Slice.First + 1;
@@ -1394,18 +1389,10 @@ package body Multilayer_Perceptron is
       --  L644  Initialize Activations
       Activations.Clear;
       Activations.Append (X_Batch);
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L645 Gradients 1",
-         Gradients.Element (1).Coeff_Gradients);
 
       --  L645
       Forward_Pass (Self, Activations);
       Gradients := Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
-      Put_Line (Routine_Name & "L665 Gradients length" &
-                  Integer'Image (Integer (Gradients.Length)));
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L665 Gradients 1",
-         Gradients.Element (1).Coeff_Gradients);
 
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
@@ -1417,7 +1404,6 @@ package body Multilayer_Perceptron is
       Stochastic_Optimizers.Update_Params
         (Self.Attributes.Optimizer, Params, Gradients);
       Self.Attributes.Params := Params;
-      Put_Line (Routine_Name & "done");
 
    end Process_Batch;
 

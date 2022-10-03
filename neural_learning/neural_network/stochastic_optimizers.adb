@@ -379,9 +379,6 @@ package body Stochastic_Optimizers is
       Updates               : Parameters_List;
    begin
       Adam.Time_Step := Adam.Time_Step + 1;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "Gradients 1",
-         Gradients.Element (1).Coeff_Gradients);
       --  L272
       --  "of" implies that Layer_Grads is a cursor
       for Layer_Grads of Gradients loop
@@ -396,13 +393,10 @@ package body Stochastic_Optimizers is
             Update_Second_Moments : Parameters_Record :=
                                       Adam.Beta_2 * Second_Moments;
          begin
-            Put_Line (Routine_Name & "1");
             Update_First_Moments := Update_First_Moments +
               (1.0 - Adam.Beta_1) * Layer_Grads;
-            Put_Line (Routine_Name & "2");
             Update_Second_Moments := Update_Second_Moments +
               (1.0 - Adam.Beta_2) * Square (Layer_Grads);
-            Put_Line (Routine_Name & "3");
             First_Moment_Updates.Append (Update_First_Moments);
             Second_Moment_Updates.Append (Update_Second_Moments);
          end;  --  declare
