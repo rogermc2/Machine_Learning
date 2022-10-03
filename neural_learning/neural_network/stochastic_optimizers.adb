@@ -8,7 +8,7 @@ with Maths;
 with Ada.Numerics.Elementary_Functions;
 
 --  with Printing;
---  with Test_Support;
+with Test_Support;
 
 package body Stochastic_Optimizers is
 
@@ -365,42 +365,44 @@ package body Stochastic_Optimizers is
 
    --  -------------------------------------------------------------------------
    --  L256
-   function Get_Adam_Updates (Self  : in out Adam_Optimizer;
+   function Get_Adam_Updates (Adam      : in out Adam_Optimizer;
                               Gradients : Parameters_List)
                               return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
---        Routine_Name          : constant String :=
---                                   "Stochastic_Optimizers.Get_Adam_Updates ";
+      Routine_Name          : constant String :=
+                                 "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
-      F_Cursor              : Cursor := Self.First_Moments.First;
-      S_Cursor              : Cursor := Self.Second_Moments.First;
+      F_Cursor              : Cursor := Adam.First_Moments.First;
+      S_Cursor              : Cursor := Adam.Second_Moments.First;
       Updates               : Parameters_List;
    begin
-      Self.Time_Step := Self.Time_Step + 1;
---        Test_Support.Print_Float_Matrix
---          (Routine_Name & "Gradients 1",
---           Gradients.Element (1).Coeff_Gradients);
+      Adam.Time_Step := Adam.Time_Step + 1;
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Gradients 1",
+         Gradients.Element (1).Coeff_Gradients);
       --  L272
-      --  "of" implies that layer is a cursor
-      for layer of Gradients loop
+      --  "of" implies that Layer_Grads is a cursor
+      for Layer_Grads of Gradients loop
          declare
-            Layer_Grads           : constant Parameters_Record := layer;
             First_Moments         : constant Parameters_Record :=
-                                      Self.First_Moments (F_Cursor);
+                                      Adam.First_Moments (F_Cursor);
             Second_Moments        : constant Parameters_Record :=
-                                      Self.Second_Moments (S_Cursor);
+                                      Adam.Second_Moments (S_Cursor);
             Update_First_Moments  : Parameters_Record :=
-                                      Self.Beta_1 * First_Moments;
+                                      Adam.Beta_1 * First_Moments;
             --  L276
             Update_Second_Moments : Parameters_Record :=
-                                      Self.Beta_2 * Second_Moments;
+                                      Adam.Beta_2 * Second_Moments;
          begin
+            Put_Line (Routine_Name & "1");
             Update_First_Moments := Update_First_Moments +
-              (1.0 - Self.Beta_1) * Layer_Grads;
+              (1.0 - Adam.Beta_1) * Layer_Grads;
+            Put_Line (Routine_Name & "2");
             Update_Second_Moments := Update_Second_Moments +
-              (1.0 - Self.Beta_2) * Square (Layer_Grads);
+              (1.0 - Adam.Beta_2) * Square (Layer_Grads);
+            Put_Line (Routine_Name & "3");
             First_Moment_Updates.Append (Update_First_Moments);
             Second_Moment_Updates.Append (Update_Second_Moments);
          end;  --  declare
@@ -408,16 +410,16 @@ package body Stochastic_Optimizers is
          Next (S_Cursor);
       end loop;
 
-      Self.First_Moments := First_Moment_Updates;
-      Self.Second_Moments := Second_Moment_Updates;
---        Test_Support.Print_Float_Matrix
---          (Routine_Name & "updated Self.First_Moments 1",
---           Self.First_Moments.Element (1).Coeff_Gradients);
+      Adam.First_Moments := First_Moment_Updates;
+      Adam.Second_Moments := Second_Moment_Updates;
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "updated Adam.First_Moments 1",
+         Adam.First_Moments.Element (1).Coeff_Gradients);
 
       --  L279 Update learning rate
-      Self.Learning_Rate := Sqrt
-        (1.0 - Self.Beta_2 ** Self.Time_Step) * Self.Initial_Learning_Rate /
-        (1.0 - Self.Beta_1 ** Self.Time_Step);
+      Adam.Learning_Rate := Sqrt
+        (1.0 - Adam.Beta_2 ** Adam.Time_Step) * Adam.Initial_Learning_Rate /
+        (1.0 - Adam.Beta_1 ** Adam.Time_Step);
 
       F_Cursor := First_Moment_Updates.First;
       S_Cursor := Second_Moment_Updates.First;
@@ -429,8 +431,8 @@ package body Stochastic_Optimizers is
             Update_Second_Moments : constant Parameters_Record :=
                                       Second_Moment_Updates (S_Cursor);
             Update                : constant Parameters_Record
-              := - Self.Learning_Rate * Update_First_Moments /
-                 Moments_Sqrt (Update_Second_Moments, Self.Epsilon);
+              := - Adam.Learning_Rate * Update_First_Moments /
+                 Moments_Sqrt (Update_Second_Moments, Adam.Epsilon);
          begin
             Updates.Append (Update);
          end;  --  declare
@@ -563,8 +565,8 @@ package body Stochastic_Optimizers is
                        "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
---        Put_Line (Routine_Name & "Optimizer_Type: " &
---                    Optimizer_Type'Image (Self.Kind));
+      Put_Line (Routine_Name & "Optimizer_Type: " &
+                  Optimizer_Type'Image (Self.Kind));
       --  L42
       case Self.Kind is
          when Optimizer_Adam =>
@@ -577,6 +579,7 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L44
+      Put_Line (Routine_Name & "L44: ");
       Params := Params + Updates;
       case Self.Kind is
          when Optimizer_Adam =>
