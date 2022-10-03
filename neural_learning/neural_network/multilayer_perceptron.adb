@@ -1464,7 +1464,7 @@ package body Multilayer_Perceptron is
             --  L314
             Gradients.Replace_Element
               (layer - 1, Compute_Loss_Gradient
-                 (Self => MLP, Layer => Layer, Num_Samples => Num_Samples,
+                 (Self => MLP, Layer => Layer - 1, Num_Samples => Num_Samples,
                   Activations => Activations, Deltas => Deltas));
          end;
       end loop;
