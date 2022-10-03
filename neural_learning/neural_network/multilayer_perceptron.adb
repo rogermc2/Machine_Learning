@@ -140,12 +140,11 @@ package body Multilayer_Perceptron is
    --  L241  Backprop computes the MLP loss function and its derivatives
    --       with respect to each parameter: weights and bias vectors.
    --  Activations contains an activation matrix for each layer
-   procedure Backprop (Self              : in out MLP_Classifier;
-                       X                 : Real_Float_Matrix;
-                       Y                 : Binary_Matrix;
-                       Activations       : in out Real_Matrix_List;
-                       Loss              : out Float;
-                       Updated_Gradients : out Parameters_List) is
+   function Backprop (Self              : in out MLP_Classifier;
+                      X                 : Real_Float_Matrix;
+                      Y                 : Binary_Matrix;
+                      Activations       : in out Real_Matrix_List;
+                      Loss              : out Float) return Parameters_List is
       use Ada.Containers;
       use Base_Neural;
       use Parameters_Package;
@@ -159,6 +158,7 @@ package body Multilayer_Perceptron is
       Loss_Function_Name : Loss_Function_Type;
       Deltas             : Real_Matrix_List;
       Sum_Sq_Coeffs      : Float := 0.0;
+      Updated_Gradients  : Parameters_List;
    begin
       --          BP_Count := BP_Count + 1;
       --  L284
@@ -236,22 +236,25 @@ package body Multilayer_Perceptron is
       --  L301  Y_Prob checked; contains only 1s and 0s
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
-
+      Put_Line (Routine_Name & "301 Updated_Gradients.Length" &
+                  Integer'Image (Integer (Updated_Gradients.Length)));
       --        Updated_Gradients.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L304 Self Gradients (last Layer)",
-         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
+      --        Put_Line (Routine_Name & "304 Updated_Gradients.Length" &
+      --                    Integer'Image (Integer (Updated_Gradients.Length)));
       --  L304  Compute gradient for the last layer
       declare
          Grad : constant Parameters_Record :=
                   Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1,
                                          Num_Samples, Activations, Deltas);
       begin
+         Test_Support.Print_Float_Matrix
+           (Routine_Name & "L304 Self Gradients (last Layer)",
+            Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
          Updated_Gradients.Replace_Element (Updated_Gradients.Last_Index, Grad);
+         Test_Support.Print_Float_Matrix
+           (Routine_Name & "L308 Self Gradients (last Layer)",
+            Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
       end;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L308 Self Gradients (last Layer)",
-         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L308 Updated_Gradients (last Layer)",
          Updated_Gradients.Last_Element.Coeff_Gradients, 1, 2);
@@ -269,6 +272,7 @@ package body Multilayer_Perceptron is
       --                 Deltas (index));
       --          end loop;
       --        Put_Line (Routine_Name & "count:" & Integer'Image (BP_Count));
+      return Updated_Gradients;
 
    end Backprop;
 
@@ -369,7 +373,7 @@ package body Multilayer_Perceptron is
                     Max_Fun             : Max_Function_Access := null;
                     RF_Fun              : Num_Diff.Deriv_Float_Fun_Access
                     := null)
-                    return MLP_Classifier is
+                       return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
       if Hidden_Layer_Sizes.Is_Empty then
@@ -439,7 +443,7 @@ package body Multilayer_Perceptron is
       New_Intercept_Grads : constant Real_Float_Vector :=
                               Neural_Maths.Mean (Deltas (Layer));
       New_Gradients       : Parameters_Record (New_Coeff_Gradients'Length,
-                                              New_Coeff_Gradients'Length (2));
+                                               New_Coeff_Gradients'Length (2));
    begin
       Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
       New_Coeff_Gradients :=
@@ -933,7 +937,7 @@ package body Multilayer_Perceptron is
    --  and returns only the last layer's activation of size
    --  n_samples x n_outputs
    function Forward_Pass_Fast (Self : MLP_Classifier; X : Real_Float_Matrix)
-                               return Real_Float_Matrix is
+                                  return Real_Float_Matrix is
       use Base_Neural;
       use Real_Float_Arrays;
       use Parameters_Package;
@@ -942,7 +946,7 @@ package body Multilayer_Perceptron is
                        "Multilayer_Perceptron.Forward_Pass_Fast ";
 
       function To_Activations_Array (Activations : Real_Float_Matrix)
-                                     return Activations_Array is
+                                        return Activations_Array is
          Result   : Activations_Array (Activations'Range);
       begin
          for row in Activations'Range loop
@@ -956,7 +960,7 @@ package body Multilayer_Perceptron is
       end To_Activations_Array;
 
       function To_Matrix (Activations : Activations_Array)
-                          return Real_Float_Matrix is
+                             return Real_Float_Matrix is
          Row_Data : Real_Float_List;
          Result   : Real_Float_Matrix (Activations'Range, 1 ..
                                          Integer (Activations (1).Length));
@@ -1225,7 +1229,7 @@ package body Multilayer_Perceptron is
    begin
       --  L237 _backprop
       Forward_Pass (Self, Activations);
-      Backprop (Self, Args.X, Args.Y, Activations, Loss, Params);
+      Params := Backprop (Self, Args.X, Args.Y, Activations, Loss);
 
       return (Loss, Params);
 
@@ -1314,7 +1318,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1168
    function Predict (Self : MLP_Classifier; X : Real_Float_Matrix)
-                     return Integer_Matrix is
+                        return Integer_Matrix is
       --        Routine_Name   : constant String := "Multilayer_Perceptron.Predict ";
       Y_Pred         : constant Real_Float_Matrix :=
                          Forward_Pass_Fast (Self, X);
@@ -1326,7 +1330,7 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
    --  L1237  Probability estimates
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
-                           return Real_Float_Matrix is
+                              return Real_Float_Matrix is
       Routine_Name : constant String := "Multilayer_Perceptron.Predict_ProbA ";
       --  L1265
       Y_Pred       : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
@@ -1408,7 +1412,7 @@ package body Multilayer_Perceptron is
 
       --  L645
       Forward_Pass (Self, Activations);
-      Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss, Gradients);
+      Gradients := Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L665 Gradients 1",
          Gradients.Element (1).Coeff_Gradients);
@@ -1482,8 +1486,8 @@ package body Multilayer_Perceptron is
                Self.Attributes.Params (Layer - 1).Coeff_Gradients);
             --  L314
             Gradients.Replace_Element (layer, Compute_Loss_Gradient
-              (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
-               Activations => Activations, Deltas => Deltas));
+                                       (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
+                                        Activations => Activations, Deltas => Deltas));
 
             Test_Support.Print_Float_Matrix
               (Routine_Name & "L314+ Coeff_Gradients 1",
