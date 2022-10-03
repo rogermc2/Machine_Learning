@@ -135,6 +135,19 @@ package body Test_Support is
 
     --  ------------------------------------------------------------------------
 
+    procedure Print_Float_Matrix_List
+      (Name  : String; aList : Real_Matrix_List;
+       Start : Integer := 1; Finish : Integer := 0) is
+    begin
+        Put_Line (Name);
+        for index in aList.First_Index .. aList.Last_Index loop
+            Test_Support.Print_Float_Matrix ("" & Integer'Image (index),
+                                             aList (index), Start, Finish);
+        end loop;
+    end Print_Float_Matrix_List;
+
+    --  ------------------------------------------------------------------------
+
     procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector) is
     begin
         Put_Line (Name & ": ");
