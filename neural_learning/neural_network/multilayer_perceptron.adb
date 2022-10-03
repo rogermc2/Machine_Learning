@@ -238,14 +238,18 @@ package body Multilayer_Perceptron is
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "L301 Deltas.Last_Element", Deltas.Last_Element, 1, 3);
+        (Routine_Name & "L304 Self Gradients (last Layer)",
+         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
 
       Gradients.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       --  L304  Compute gradient for the last layer
       Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
                              Activations, Deltas, Gradients);
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "Gradients (last Layer)",
+        (Routine_Name & "L308 Self Gradients (last Layer)",
+         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L308 Gradients (last Layer)",
          Gradients.Last_Element.Coeff_Gradients, 1, 2);
 
       --  L310, L308
@@ -435,19 +439,19 @@ package body Multilayer_Perceptron is
         (New_Coeff_Gradients'Length, New_Coeff_Gradients'Length (2));
    begin
       Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
-      Put_Line (Routine_Name & "Deltas length" &
-                  Integer'Image (Integer (Deltas.Length)));
-      Put_Line (Routine_Name & "Deltas (Layer) length" &
-                  Integer'Image (Deltas.Element (Layer)'Length));
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "L194 Deltas (Layer)", Deltas (Layer), 1, 3);
+        (Routine_Name & "L185 Self Gradients (last Layer)",
+         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
           Float (Num_Samples);
       --  L194
-      Test_Support.Print_Matrix_Dimensions
-        (Routine_Name & "L194 New_Coeff_Gradients size", New_Coeff_Gradients);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L194 Self Gradients (last Layer)",
+         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
+--        Test_Support.Print_Matrix_Dimensions
+--          (Routine_Name & "L194 New_Coeff_Gradients size", New_Coeff_Gradients);
       --        Test_Support.Print_Float_Matrix
       --          (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
@@ -456,6 +460,9 @@ package body Multilayer_Perceptron is
       Test_Support.Print_Float_Matrix
         (Routine_Name & "Gradients (" & Integer'Image (Layer) & " )",
          Gradients.Element (Layer).Coeff_Gradients, 1, 3);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "Self Gradients (last Layer)",
+         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
 
    end  Compute_Loss_Gradient;
 
@@ -765,10 +772,10 @@ package body Multilayer_Perceptron is
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
-            Test_Support.Print_Float_Matrix
-              (Routine_Name & "L636 Batch (" & Integer'Image (Batch_index) &
-                 ") Hidden layer W0",
-               Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
+--              Test_Support.Print_Float_Matrix
+--                (Routine_Name & "L636 Batch (" & Integer'Image (Batch_index) &
+--                   ") Hidden layer W0",
+--                 Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
          end loop;
 
          --  L661
@@ -1042,7 +1049,7 @@ package body Multilayer_Perceptron is
       --        use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+--        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
@@ -1066,8 +1073,6 @@ package body Multilayer_Perceptron is
       for f_out in 1 .. Fan_Out loop
          Params.Intercept_Grads (f_out) := 0.0;  --  Init_Bound * Random_Float;
       end loop;
-      --        Test_Support.Print_Float_Matrix (Routine_Name & "Params.Coeff_Gradients",
-      --                                         Params.Coeff_Gradients);
 
       return Params;
 
@@ -1450,13 +1455,13 @@ package body Multilayer_Perceptron is
          begin
             --  L311  322
             Test_Support.Print_Float_Matrix
-              (Routine_Name & "322 Deltas (layer):", Deltas (layer), 1, 2);
+              (Routine_Name & "322 Deltas (layer)", Deltas (layer), 1, 2);
             Test_Support.Print_Float_Matrix
               (Routine_Name & "322 Transpose (Params.Coeff_Gradients):",
                Transpose (Params.Coeff_Gradients), 1, 2);
             Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                       Transpose (Params.Coeff_Gradients));
-            Put_Line (Routine_Name & "L312 324 Deltas:");
+            Put_Line (Routine_Name & "L312 324 Deltas");
             for index in Deltas.First_Index .. Deltas.Last_Index loop
                Test_Support.Print_Float_Matrix
                  ("", Deltas (index), 1, 2);
