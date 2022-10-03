@@ -59,13 +59,12 @@ package body Multilayer_Perceptron is
    First_Pass : Boolean := True;
    --     BP_Count   : Integer := 0;
 
-   procedure Compute_Loss_Gradient
+   function Compute_Loss_Gradient
      (Self          : MLP_Classifier;
       Layer         : Positive;
       Num_Samples   : Positive;
       Activations   : Real_Matrix_List;
-      Deltas        : Real_Matrix_List;
-      Gradients     : in out Parameters_List);
+      Deltas        : Real_Matrix_List) return Parameters_Record;
    procedure Fit_Lbfgs (Self         : in out MLP_Classifier;
                         X            : Real_Float_Matrix;
                         Y            : Binary_Matrix;
@@ -141,12 +140,12 @@ package body Multilayer_Perceptron is
    --  L241  Backprop computes the MLP loss function and its derivatives
    --       with respect to each parameter: weights and bias vectors.
    --  Activations contains an activation matrix for each layer
-   procedure Backprop (Self        : in out MLP_Classifier;
-                       X           : Real_Float_Matrix;
-                       Y           : Binary_Matrix;
-                       Activations : in out Real_Matrix_List;
-                       Loss        : out Float;
-                       Gradients   : out Parameters_List) is
+   procedure Backprop (Self              : in out MLP_Classifier;
+                       X                 : Real_Float_Matrix;
+                       Y                 : Binary_Matrix;
+                       Activations       : in out Real_Matrix_List;
+                       Loss              : out Float;
+                       Updated_Gradients : out Parameters_List) is
       use Ada.Containers;
       use Base_Neural;
       use Parameters_Package;
@@ -237,24 +236,29 @@ package body Multilayer_Perceptron is
       --  L301  Y_Prob checked; contains only 1s and 0s
       Deltas.Replace_Element (Deltas.Last_Index,
                               Activations.Last_Element - Y_Float);
+
+      --        Updated_Gradients.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L304 Self Gradients (last Layer)",
          Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
-
-      Gradients.Set_Length (Count_Type (Self.Attributes.N_Layers - 1));
       --  L304  Compute gradient for the last layer
-      Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1, Num_Samples,
-                             Activations, Deltas, Gradients);
+      declare
+         Grad : constant Parameters_Record :=
+                  Compute_Loss_Gradient (Self, Self.Attributes.N_Layers - 1,
+                                         Num_Samples, Activations, Deltas);
+      begin
+         Updated_Gradients.Replace_Element (Updated_Gradients.Last_Index, Grad);
+      end;
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L308 Self Gradients (last Layer)",
          Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "L308 Gradients (last Layer)",
-         Gradients.Last_Element.Coeff_Gradients, 1, 2);
+        (Routine_Name & "L308 Updated_Gradients (last Layer)",
+         Updated_Gradients.Last_Element.Coeff_Gradients, 1, 2);
 
       --  L310, L308
       Update_Hidden_Layer_Gradients
-        (Self, Activations, Deltas, Gradients, Num_Samples);
+        (Self, Activations, Deltas, Updated_Gradients, Num_Samples);
 
       Test_Support.Print_Float_Matrix
         (Routine_Name & "L310 Coeff_Gradients 1",
@@ -414,13 +418,12 @@ package body Multilayer_Perceptron is
    --  Intercept_Grads is a 2D list of bias vectors where the vector at index
    --  the bias values added to layer i + 1.
    --  Compute_Loss_Gradient does backpropagation for the specified one layer.
-   procedure Compute_Loss_Gradient
+   function Compute_Loss_Gradient
      (Self          : MLP_Classifier;
       Layer         : Positive;
       Num_Samples   : Positive;
       Activations   : Real_Matrix_List;
-      Deltas        : Real_Matrix_List;
-      Gradients     : in out Parameters_List) is
+      Deltas        : Real_Matrix_List) return Parameters_Record is
       use Real_Float_Arrays;
       Routine_Name        : constant String :=
                               "Multilayer_Perceptron.Compute_Loss_Gradient ";
@@ -435,34 +438,24 @@ package body Multilayer_Perceptron is
       --  Mean computes mean of values along the specified axis.
       New_Intercept_Grads : constant Real_Float_Vector :=
                               Neural_Maths.Mean (Deltas (Layer));
-      New_Gradients       : Parameters_Record
-        (New_Coeff_Gradients'Length, New_Coeff_Gradients'Length (2));
+      New_Gradients       : Parameters_Record (New_Coeff_Gradients'Length,
+                                              New_Coeff_Gradients'Length (2));
    begin
       Put_Line (Routine_Name & "Layer" & Integer'Image (Layer));
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L185 Self Gradients (last Layer)",
-         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
           Float (Num_Samples);
       --  L194
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L194 Self Gradients (last Layer)",
-         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
---        Test_Support.Print_Matrix_Dimensions
---          (Routine_Name & "L194 New_Coeff_Gradients size", New_Coeff_Gradients);
-      --        Test_Support.Print_Float_Matrix
-      --          (Routine_Name & "L194 New_Coeff_Gradients", New_Coeff_Gradients, 1, 3);
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
-      Gradients (Layer) := New_Gradients;
       Test_Support.Print_Float_Matrix
-        (Routine_Name & "Gradients (" & Integer'Image (Layer) & " )",
-         Gradients.Element (Layer).Coeff_Gradients, 1, 3);
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "Self Gradients (last Layer)",
+        (Routine_Name & "L194+ Self Gradients (last Layer)",
          Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "end Self Gradients (last Layer)",
+         Self.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
+      return New_Gradients;
 
    end  Compute_Loss_Gradient;
 
@@ -772,10 +765,10 @@ package body Multilayer_Perceptron is
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
---              Test_Support.Print_Float_Matrix
---                (Routine_Name & "L636 Batch (" & Integer'Image (Batch_index) &
---                   ") Hidden layer W0",
---                 Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
+            --              Test_Support.Print_Float_Matrix
+            --                (Routine_Name & "L636 Batch (" & Integer'Image (Batch_index) &
+            --                   ") Hidden layer W0",
+            --                 Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
          end loop;
 
          --  L661
@@ -1049,7 +1042,7 @@ package body Multilayer_Perceptron is
       --        use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
---        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
@@ -1450,8 +1443,8 @@ package body Multilayer_Perceptron is
       for layer in reverse 2 .. Self.Attributes.N_Layers - 1 loop
          Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
-            Params : constant Parameters_Record :=
-                       Self.Attributes.Params (Layer);
+            Params   : constant Parameters_Record :=
+                         Self.Attributes.Params (Layer);
          begin
             --  L311  322
             Test_Support.Print_Float_Matrix
@@ -1488,10 +1481,9 @@ package body Multilayer_Perceptron is
               (Routine_Name & "L314 Coeff_Gradients Layer - 1",
                Self.Attributes.Params (Layer - 1).Coeff_Gradients);
             --  L314
-            Compute_Loss_Gradient
+            Gradients.Replace_Element (layer, Compute_Loss_Gradient
               (Self => Self, Layer => Layer - 1, Num_Samples => Num_Samples,
-               Activations => Activations, Deltas => Deltas,
-               Gradients => Gradients);
+               Activations => Activations, Deltas => Deltas));
 
             Test_Support.Print_Float_Matrix
               (Routine_Name & "L314+ Coeff_Gradients 1",

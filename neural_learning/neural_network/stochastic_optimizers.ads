@@ -23,8 +23,9 @@ package Stochastic_Optimizers is
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type Parameters_Record (Num_Rows, Num_Cols : Positive) is record
-      Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
-      Intercept_Grads : Real_Float_Vector (1 .. Num_Cols);
+      Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
+                          (others => (others => 0.0));
+      Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
    end record;
    function "*" (L : Float; R : Parameters_Record) return Parameters_Record;
    pragma Inline ("*");
@@ -117,20 +118,20 @@ package Stochastic_Optimizers is
    procedure C_Init (Self                  : out Base_Optimizer;
                      Initial_Learning_Rate : Float := 0.1);
    procedure Iteration_Ends (Self : in out SGD_Optimizer; Time_Step : Integer);
---     function Pack (Params : Parameters_List) return Real_Float_Vector;
+   --     function Pack (Params : Parameters_List) return Real_Float_Vector;
    function Square (Rec : Parameters_Record) return Parameters_Record;
    function Sqrt (Rec : Parameters_Record; Epsilon : Float := 0.0)
-      return Parameters_Record;
+                  return Parameters_Record;
    function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
                               Verbose : Boolean) return Boolean;
    procedure Update_Params (Self      : in out Optimizer_Record;
                             Params    : in out Parameters_List;
                             Gradients : Parameters_List);
---     procedure Update_Params (Self      : in out Adam_Optimizer;
---                              Params    : in out Parameters_List;
---                              Gradients : Parameters_List);
---     procedure Update_Params (Self      : in out SGD_Optimizer;
---                              Params    : in out Parameters_List;
---                              Gradients : Parameters_List);
+   --     procedure Update_Params (Self      : in out Adam_Optimizer;
+   --                              Params    : in out Parameters_List;
+   --                              Gradients : Parameters_List);
+   --     procedure Update_Params (Self      : in out SGD_Optimizer;
+   --                              Params    : in out Parameters_List;
+   --                              Gradients : Parameters_List);
 
 end Stochastic_Optimizers;
