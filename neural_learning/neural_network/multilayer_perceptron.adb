@@ -175,6 +175,15 @@ package body Multilayer_Perceptron is
 
 --        Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
 --                    Loss_Function_Type'Image (Loss_Function_Name));
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float",
+                                            Y_Float);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Activations",
+                                            Activations.Last_Element);
+      Assert (Y_Float'Length = Activations.Last_Element'Length,
+              Routine_Name & "unequal Y_Float and Activations lengths");
+      Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
+              Routine_Name &
+                "unequal Y_Float and Activations numbers of columns");
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
