@@ -161,10 +161,6 @@ package body Multilayer_Perceptron is
       Updated_Gradients  : Parameters_List;
    begin
       --  L284
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284 Y_Float",
-                                            Y_Float);
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284 Activations",
-                                            Activations.Last_Element);
       Assert (Y_Float'Length = Activations.Last_Element'Length,
               Routine_Name & "L284 unequal Y_Float and Activations lengths");
       Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
@@ -535,7 +531,7 @@ package body Multilayer_Perceptron is
       --  L402  In this context "Outputs" are "classes" having binary values
       --  0 or 1 for each sample depending whether or not the sample output
       --  value corresponds to th class value
-      --        Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
+      Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
       --        Put_Line (Routine_Name & "L402 N_Outputs" &
       --                    Integer'Image (Self.Attributes.N_Outputs));
       --        Num_Classes := Positive (Y_Bin'Length (2));
@@ -871,8 +867,6 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Activations last",
-                                            Activations.Last_Element);
       if Activations.Last_Element'Length (2) > 1 then
          --  Check that Activations.Last_Element rows are probabilities
          Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
@@ -1325,8 +1319,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      Routine_Name   : constant String :=
-                           "Multilayer_Perceptron.Process_Batch ";
+--        Routine_Name   : constant String :=
+--                             "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -1358,9 +1352,6 @@ package body Multilayer_Perceptron is
 
       --  L645
       Forward_Pass (Self, Activations);
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Batch", Y_Batch);
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Activations last",
-                                            Activations.Last_Element);
       Gradients := Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
 
       --  L665
