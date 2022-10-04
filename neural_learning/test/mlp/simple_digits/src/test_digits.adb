@@ -54,8 +54,8 @@ begin
       Y_Test (row, 1) := Data.Target (Random_Index);
    end loop;
 
-   Test_Support.Print_Matrix_Dimensions ("X", X_Train);
-   Test_Support.Print_Matrix_Dimensions ("Y", Y_Train);
+   Test_Support.Print_Matrix_Dimensions ("X_Train", X_Train);
+   Test_Support.Print_Matrix_Dimensions ("Y_Train", Y_Train);
 
    Layer_Sizes.Append (128);
    aClassifier := C_Init (Hidden_Layer_Sizes => Layer_Sizes);

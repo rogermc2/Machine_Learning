@@ -161,11 +161,18 @@ package body Multilayer_Perceptron is
       Updated_Gradients  : Parameters_List;
    begin
       --  L284
-      --        Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
-      --                Routine_Name & "L284+ Y_Float has different number of columns" &
-      --                  Integer'Image (Y_Float'Length (2)) & " to" &
-      --                  " Activations.Last_Element columns" &
-      --                  Integer'Image (Activations.Last_Element'Length (2)));
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284 Y_Float",
+                                            Y_Float);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "L284 Activations",
+                                            Activations.Last_Element);
+      Assert (Y_Float'Length = Activations.Last_Element'Length,
+              Routine_Name & "L284 unequal Y_Float and Activations lengths");
+      Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
+              Routine_Name & "L284 Y_Float has different number of columns" &
+                Integer'Image (Y_Float'Length (2)) & " to" &
+                " Activations.Last_Element columns" &
+                Integer'Image (Activations.Last_Element'Length (2)));
+
       if MLP.Attributes.Loss_Function_Name = Log_Loss_Function and then
         MLP.Attributes.Out_Activation = Logistic_Activation then
          Loss_Function_Name := Binary_Log_Loss_Function;
@@ -173,17 +180,8 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := MLP.Attributes.Loss_Function_Name;
       end if;
 
---        Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
---                    Loss_Function_Type'Image (Loss_Function_Name));
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Float",
-                                            Y_Float);
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Activations",
-                                            Activations.Last_Element);
-      Assert (Y_Float'Length = Activations.Last_Element'Length,
-              Routine_Name & "unequal Y_Float and Activations lengths");
-      Assert (Y_Float'Length (2) = Activations.Last_Element'Length (2),
-              Routine_Name &
-                "unequal Y_Float and Activations numbers of columns");
+      --        Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
+      --                    Loss_Function_Type'Image (Loss_Function_Name));
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
@@ -873,6 +871,8 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Activations last",
+                                            Activations.Last_Element);
       if Activations.Last_Element'Length (2) > 1 then
          --  Check that Activations.Last_Element rows are probabilities
          Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
@@ -1325,8 +1325,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
---        Routine_Name   : constant String :=
---                           "Multilayer_Perceptron.Process_Batch ";
+      Routine_Name   : constant String :=
+                           "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -1358,6 +1358,9 @@ package body Multilayer_Perceptron is
 
       --  L645
       Forward_Pass (Self, Activations);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y_Batch", Y_Batch);
+      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Activations last",
+                                            Activations.Last_Element);
       Gradients := Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
 
       --  L665
@@ -1382,8 +1385,8 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
---        Routine_Name : constant String :=
---                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
+      --        Routine_Name : constant String :=
+      --                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
    begin
       --  loop will be from MLP.Attributes.N_Layers - 1 down to 2
       for layer in reverse 2 .. MLP.Attributes.N_Layers - 1 loop
@@ -1535,8 +1538,8 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
---        Put_Line (Routine_Name & "Type_Of_Target (Y): " &
---                    Y_Type'Image (Type_Of_Target (Y)));
+      --        Put_Line (Routine_Name & "Type_Of_Target (Y): " &
+      --                    Y_Type'Image (Type_Of_Target (Y)));
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139
