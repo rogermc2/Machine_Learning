@@ -1,9 +1,10 @@
+--  Based on scikit-learn/sklearn/neural_network/tests/test_mlp.py
+--  test_predict_proba_binary
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base_Neural;
---  with Classifier_Utilities;
 with Load_Dataset;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
@@ -35,7 +36,7 @@ begin
 
     declare
         Y_Proba     : constant Real_Float_Matrix := Predict_ProbA (MLP, X);
-        --        Y_Log_Proba : constant Real_Float_Matrix := Predict_Log_ProbA (MLP, X);
+--          Y_Log_Proba : constant Real_Float_Matrix := Predict_Log_ProbA (MLP, X);
     begin
         Is_Probilities_Matrix (Routine_Name & "Y_Proba", Y_Proba);
         Put_Line ("Y_Proba probabilty matrix test passed.");

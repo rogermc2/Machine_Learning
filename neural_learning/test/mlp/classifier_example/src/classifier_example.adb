@@ -4,7 +4,7 @@
 --  with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
---  with Base;
+with Base;
 with Classifier_Utilities;
 with Data_Splitter;
 with Multilayer_Perceptron; use Multilayer_Perceptron;
@@ -28,7 +28,7 @@ procedure Classifier_Example is
    X_Test        : Real_Float_Matrix (1 .. Test_Size, X'Range (2));
    Y_Test        : Integer_Matrix (1 .. Test_Size, Y'Range (2));
    MLP           : MLP_Classifier := C_Init (Max_Iter => 300);
-   --      Score         : Float;
+   Score         : Float;
 begin
    Put_Line (Routine_Name);
    Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
@@ -58,7 +58,7 @@ begin
       --                                             Prediction);
    end;
 
-   --      Score := Base.Score (MLP, X_Train, Y_Train);
-   --      Put_Line ("Score: " & Float'Image (Score));
+   Score := Base.Score (MLP, X_Train, Y_Train);
+   Put_Line ("Score: " & Float'Image (Score));
 
 end Classifier_Example;
