@@ -848,6 +848,19 @@ package body NL_Arrays_And_Matrices is
 
    --  ------------------------------------------------------------------------
 
+   function To_Integer_Matrix (IA : Integer_Array) return Integer_Matrix is
+      Result : Integer_Matrix (IA'Range, 1 .. 1);
+   begin
+      for row in IA'Range loop
+               Result (row, 1) := IA (row);
+      end loop;
+
+      return Result;
+
+   end To_Integer_Matrix;
+
+   --  ------------------------------------------------------------------------
+
    function To_Natural_Array (List : NL_Types.Natural_List)
                               return Natural_Array is
    begin

@@ -23,8 +23,8 @@ package body Support_4 is
    --  -------------------------------------------------------------------------
 
    function Get_State
-     (Dataset : Load_Dataset.Digits_Data_Record; Test_Size, Train_Size : Positive)
-      return Base_State is
+     (Dataset               : Load_Dataset.Digits_Data_Record;
+      Test_Size, Train_Size : Positive) return Base_State is
       use Ada.Containers;
       Routine_Name : constant String := "Support_4.Get_State ";
       Num_Features : constant Positive := Dataset.Num_Features;
@@ -40,8 +40,8 @@ package body Support_4 is
       Data         : Base_State (Train_Size, Test_Size, Num_Features);
    begin
       Put_Line (Routine_Name & "X Length" & Integer'Image (X'Length));
-      Put_Line (Routine_Name & "Dataset.Target length" &
-                  Count_Type'Image (Dataset.Target.Length));
+      Put_Line (Routine_Name & "Dataset Target length" &
+                  Integer'Image (Dataset.Target'Length));
       Assert (Y'Length = X'Length, Routine_Name &
                 "Y length" & Integer'Image (Y'Length) &
                 " is different to X length" & Natural'Image (Positive (X'Length)));

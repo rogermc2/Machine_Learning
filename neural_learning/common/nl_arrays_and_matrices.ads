@@ -175,6 +175,7 @@ package NL_Arrays_And_Matrices is
                                 return Integer_Matrix;
    function To_Integer_Matrix (Bin : Binary_Matrix) return Integer_Matrix;
    function To_Integer_Matrix (Bool : Boolean_Matrix)  return Integer_Matrix;
+   function To_Integer_Matrix (IA : Integer_Array) return Integer_Matrix;
    function To_Natural_Array (List : NL_Types.Natural_List)
                                return Natural_Array;
    function To_Real_Float_Matrix (Matrix : Binary_Matrix)
