@@ -173,8 +173,8 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := MLP.Attributes.Loss_Function_Name;
       end if;
 
-      Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
-                  Loss_Function_Type'Image (Loss_Function_Name));
+--        Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
+--                    Loss_Function_Type'Image (Loss_Function_Name));
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
@@ -204,10 +204,8 @@ package body Multilayer_Perceptron is
       end loop;
 
       --  L292
-      --        Put_Line (Routine_Name & "L292 Sum_Sq_Coeffs" & Float'Image (Sum_Sq_Coeffs));
       Loss := Loss + 0.5 * (MLP.Parameters.Alpha *
                               Sum_Sq_Coeffs / Float (Num_Samples));
-      Put_Line (Routine_Name & "L292 Loss" & Float'Image (Loss));
 
       --  L297 Backward propagate
       --  The calculation of delta[last]  works with the following
@@ -222,8 +220,6 @@ package body Multilayer_Perceptron is
 
       --  L301  Initialize Deltas
       Deltas.Set_Length (Count_Type (MLP.Attributes.N_Layers - 1));
-      --          Printing.Print_Float_Matrix (Routine_Name & "L301+ Y_Float",
-      --                                       Y_Prob, 1, 2);
       Assert (Activations.Last_Element'Length (2) = Y_Float'Length (2),
               Routine_Name & "L301 last Activations item width" &
                 Integer'Image (Activations.Last_Element'Length (2)) &
@@ -234,7 +230,7 @@ package body Multilayer_Perceptron is
                               Activations.Last_Element - Y_Float);
       Updated_Gradients.Set_Length (Count_Type (MLP.Attributes.N_Layers - 1));
 
-      --  L304  313 Compute gradient for the last layer
+      --  L304 Compute gradient for the last layer
       declare
          Grad : constant Parameters_Record :=
                   Compute_Loss_Gradient (MLP, MLP.Attributes.N_Layers - 1,
@@ -243,25 +239,10 @@ package body Multilayer_Perceptron is
          Updated_Gradients.Replace_Element
            (Updated_Gradients.Last_Index, Grad);
       end;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L318 MLP Gradients (last Layer)",
-         MLP.Attributes.Params.Last_Element.Coeff_Gradients, 1, 2);
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L318 Updated_Gradients (last Layer)",
-         Updated_Gradients.Last_Element.Coeff_Gradients, 1, 2);
 
-      --  L310, L308  321
+      --  L310, L308
       Update_Hidden_Layer_Gradients
         (MLP, Activations, Deltas, Updated_Gradients, Num_Samples);
-
-      Put_Line (Routine_Name & "final Updated_Gradients length" &
-                  Integer'Image (Integer (Updated_Gradients.Length)));
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "final Updated_Gradients 1",
-         Updated_Gradients.Element (1).Coeff_Gradients);
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "final Coeff_Gradients 1",
-         MLP.Attributes.Params (1).Coeff_Gradients);
 
       return Updated_Gradients;
 
@@ -565,12 +546,8 @@ package body Multilayer_Perceptron is
       Layer_Units.Append (Self.Attributes.N_Outputs);
 
       --  L409
-      --        Test_Support.Print_Binary_Matrix (Routine_Name & "L409 Y_Bin", Y_Bin,
-      --                                          1, 7);
       if First_Pass then
          Initialize (Self, Layer_Units);
-         Test_Support.Print_Integer_List (Routine_Name & "L409 Layer_Units",
-                                          Layer_Units);
       end if;
 
       Activations.Clear;
@@ -684,7 +661,6 @@ package body Multilayer_Perceptron is
                              Y           : Binary_Matrix;
                              Gradients   : in out Parameters_List;
                              Incremental : Boolean := False) is
-      use Real_Float_Arrays;
       Routine_Name     : constant String :=
                            "Multilayer_Perceptron.Fit_Stochastic ";
       --        Is_Classifier  : constant Boolean :=
@@ -700,7 +676,6 @@ package body Multilayer_Perceptron is
       Msg              : Unbounded_String;
       Is_Stopping      : Boolean := False;
    begin
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "Y", Y);
       Self.Attributes.Loss_Curve.Clear;
       Early_Stopping := Early_Stopping and then not Incremental;
       --  L576
@@ -739,8 +714,6 @@ package body Multilayer_Perceptron is
          Batch_Size := Num_Samples;
       end if;
       --  Batches is a list of slice lists
-      --        Put_Line (Routine_Name & "Num_Samples" & Integer'Image (Num_Samples));
-      --        Put_Line (Routine_Name & "Batch_Size" & Integer'Image (Batch_Size));
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
       --  L628
       while Continue and then Iter < Self.Parameters.Max_Iter loop
@@ -753,10 +726,6 @@ package body Multilayer_Perceptron is
            Batches.Last_Index loop
             Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
-            --              Test_Support.Print_Float_Matrix
-            --                (Routine_Name & "L636 Batch (" & Integer'Image (Batch_index) &
-            --                   ") Hidden layer W0",
-            --                 Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
          end loop;
 
          --  L661
@@ -810,8 +779,6 @@ package body Multilayer_Perceptron is
                         Integer'Image (Self.Parameters.Max_Iter) &
                         ") reached but the optimization hasn't " &
                         "converged yet.");
-            Put_Line (Routine_Name & "Tol:" &
-                        Float'Image (Self.Parameters.Tol));
             New_Line;
          end if;
       end loop;
@@ -820,10 +787,6 @@ package body Multilayer_Perceptron is
       if Early_Stopping then
          Self.Attributes.Params := Self.Parameters.Best_Params;
       end if;
-
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "Hidden layer W0",
-         Transpose (Self.Attributes.Params.Element (1).Coeff_Gradients));
 
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
@@ -890,8 +853,6 @@ package body Multilayer_Perceptron is
       --  Check that Activations.Last_Element rows are probabilities
 
       --  L138 For the last layer
-      Put_Line (Routine_Name & "L138 Output_Activation: " &
-                  Activation_Type'Image (Output_Activation));
       case Output_Activation is
          when Identity_Activation => null;
          when Logistic_Activation =>
@@ -903,9 +864,6 @@ package body Multilayer_Perceptron is
             Softmax (Activations (Activations.Last_Index));
       end case;
 
-      --        Test_Support.Print_Float_Matrix
-      --          (Routine_Name & "L138+ Activations.Last_Element",
-      --           Activations.Last_Element, 1, 3);
       if Activations.Last_Element'Length (2) > 1 then
          --  Check that Activations.Last_Element rows are probabilities
          Is_Probilities_Matrix (Routine_Name & "final Activations.Last_Element ",
@@ -1191,7 +1149,6 @@ package body Multilayer_Perceptron is
          end loop;
       end loop;
 
-      Test_Support.Print_Matrix_Dimensions (Routine_Name & "PM", PM);
       if PM'Length (2) > 1 then
          for row in Sum'Range loop
             Assert (Sum (row) >= 1.0 - 10.0 ** (-6) and
@@ -1359,8 +1316,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      Routine_Name   : constant String :=
-                         "Multilayer_Perceptron.Process_Batch ";
+--        Routine_Name   : constant String :=
+--                           "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -1397,8 +1354,6 @@ package body Multilayer_Perceptron is
       --  L665
       Accumulated_Loss := Accumulated_Loss + Batch_Loss *
         Float (Batch_Slice.Last - Batch_Slice.First + 1);
-      Put_Line (Routine_Name & "Accumulated_Loss" &
-                 Float'Image (Accumulated_Loss));
       --  L667 update weights
       --  Update_Params updates parameters with given gradients
       Stochastic_Optimizers.Update_Params
@@ -1418,17 +1373,16 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Real_Float_Arrays;
       use Real_Matrix_List_Package;
-      Routine_Name : constant String :=
-                       "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
+--        Routine_Name : constant String :=
+--                         "Multilayer_Perceptron.Update_Hidden_Layer_Gradients ";
    begin
       --  loop will be from MLP.Attributes.N_Layers - 1 down to 2
       for layer in reverse 2 .. MLP.Attributes.N_Layers - 1 loop
-         Put_Line (Routine_Name & "layer" & Integer'Image (layer));
          declare
             Params : constant Parameters_Record :=
                        MLP.Attributes.Params (Layer);
          begin
-            --  L311  322
+            --  L311
             Deltas.Replace_Element (Layer - 1, Deltas.Element (Layer) *
                                       Transpose (Params.Coeff_Gradients));
             --  L312
@@ -1572,8 +1526,8 @@ package body Multilayer_Perceptron is
       Classes      : Integer_List;
       Binarizer    : Label.Label_Binarizer (Type_Of_Target (Y));
    begin
-      Put_Line (Routine_Name & "Type_Of_Target (Y): " &
-                  Y_Type'Image (Type_Of_Target (Y)));
+--        Put_Line (Routine_Name & "Type_Of_Target (Y): " &
+--                    Y_Type'Image (Type_Of_Target (Y)));
       if Self.Attributes.Classes.Is_Empty or else
         (not Self.Parameters.Warm_Start and not Incremental) then
          --  L1139

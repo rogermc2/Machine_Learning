@@ -8,7 +8,7 @@ with Maths;
 with Ada.Numerics.Elementary_Functions;
 
 --  with Printing;
-with Test_Support;
+--  with Test_Support;
 
 package body Stochastic_Optimizers is
 
@@ -370,8 +370,8 @@ package body Stochastic_Optimizers is
                               return Parameters_List is
       use Maths.Float_Math_Functions;
       use Parameters_Package;
-      Routine_Name          : constant String :=
-                                 "Stochastic_Optimizers.Get_Adam_Updates ";
+--        Routine_Name          : constant String :=
+--                                   "Stochastic_Optimizers.Get_Adam_Updates ";
       First_Moment_Updates  : Moments_List;
       Second_Moment_Updates : Moments_List;
       F_Cursor              : Cursor := Adam.First_Moments.First;
@@ -406,9 +406,6 @@ package body Stochastic_Optimizers is
 
       Adam.First_Moments := First_Moment_Updates;
       Adam.Second_Moments := Second_Moment_Updates;
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "updated Adam.First_Moments 1",
-         Adam.First_Moments.Element (1).Coeff_Gradients);
 
       --  L279 Update learning rate
       Adam.Learning_Rate := Sqrt
@@ -433,13 +430,6 @@ package body Stochastic_Optimizers is
          Next (F_Cursor);
          Next (S_Cursor);
       end loop;
-
---        Test_Support.Print_Float_Matrix
---          (Routine_Name & "Coeff_Gradient updates",
---           Updates.Element (1).Coeff_Gradients);
---        Test_Support.Print_Float_Vector
---          (Routine_Name & "Intercept_Grads updates",
---           Updates.Element (1).Intercept_Grads);
 
       return Updates;
 
@@ -559,8 +549,8 @@ package body Stochastic_Optimizers is
                        "Stochastic_Optimizers.Update_Params ";
       Updates      : Parameters_List;
    begin
-      Put_Line (Routine_Name & "Optimizer_Type: " &
-                  Optimizer_Type'Image (Self.Kind));
+--        Put_Line (Routine_Name & "Optimizer_Type: " &
+--                    Optimizer_Type'Image (Self.Kind));
       --  L42
       case Self.Kind is
          when Optimizer_Adam =>
@@ -573,7 +563,6 @@ package body Stochastic_Optimizers is
       end case;
 
       --  L44
-      Put_Line (Routine_Name & "L44: ");
       Params := Params + Updates;
       case Self.Kind is
          when Optimizer_Adam =>

@@ -1,10 +1,10 @@
 --  Based on scikit-learn/sklearn/base.py
 
-with Ada.Text_IO; use Ada.Text_IO;
+--  with Ada.Text_IO; use Ada.Text_IO;
 
 with Classification_Metrics;
 --  with Printing;
-with Test_Support;
+--  with Test_Support;
 
 package body Base is
 
@@ -18,10 +18,10 @@ package body Base is
                        Multilayer_Perceptron.Predict (Self, X);
    begin
       NL_Arrays_And_Matrices.Check_Lengths (Routine_Name, Y,  Pred);
-      Test_Support.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 10);
-      Test_Support.Print_Integer_Matrix (Routine_Name & "Pred", Pred, 1, 10);
+
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction => Pred, Normalize => True);
+
    end Score;
 
    --  ------------------------------------------------------------------------
@@ -33,7 +33,6 @@ package body Base is
       Pred         : constant Integer_Matrix :=
                        Multilayer_Perceptron.Predict (Self, X);
    begin
-      Put_Line (Routine_Name & "Y'Length (2)" & Integer'Image (Y'Length (2)));
       Check_Lengths (Routine_Name, Pred, Y);
       return Classification_Metrics.Accuracy_Score
         (Y_True  => Y, Y_Prediction => Pred, Normalize => True,
