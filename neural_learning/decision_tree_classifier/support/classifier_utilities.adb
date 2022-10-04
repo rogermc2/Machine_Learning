@@ -498,7 +498,7 @@ package body Classifier_Utilities is
    --  The Search_Sorted functions returns the indices where new elements in
    --  List_B should be inserted into List_A to keep List_A sorted.
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
-                                     return Integer_List is
+                                        return Integer_List is
       use Integer_Package;
       use Integer_Sorting;
       Item      : Integer;
@@ -534,7 +534,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Search_Sorted_Float_List (List_A, List_B : Float_List)
-                                   return Integer_List is
+                                      return Integer_List is
       use Float_Package;
       use Float_Sorting;
       Routine_Name : constant String :=
@@ -572,7 +572,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)
-                   return Natural_List is
+                      return Natural_List is
       use Natural_Package;
       Unique_Vals : constant Integer_Array := Encode_Utils.Unique (Values);
       aVal        : Integer;
@@ -601,7 +601,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Set_Diff (Values : Integer_Array; Uniques : Natural_Array)
-                   return Natural_List is
+                      return Natural_List is
       use Natural_Package;
       Unique_Vals : constant Integer_Array := Encode_Utils.Unique (Values);
       aVal        : Natural;
@@ -628,7 +628,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
-                   return Natural_List is
+                      return Natural_List is
       use Natural_Package;
       Unique_Vals : constant Natural_Array := Encode_Utils.Unique (Values);
       aVal        : Natural;
@@ -676,13 +676,72 @@ package body Classifier_Utilities is
       end loop;
 
       return Diff;
+
    end Set_Diff;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle (A : in out Real_Float_Matrix;
+                      B : in out Binary_Matrix) is
+      Num_Samples : constant Integer := A'Length;
+      Indicies    : Integer_Array (1 .. Num_Samples);
+      A2          : Real_Float_Matrix (A'Range, A'Range (2));
+      B2          : Binary_Matrix (B'Range, B'Range (2));
+   begin
+      for row in 1 ..Num_Samples loop
+         Indicies (row) := row;
+      end loop;
+      Utilities.Permute (Indicies);
+
+      for row in A'Range loop
+         for col in A'Range (2) loop
+            A2 (row, col) := A (Indicies (row), col);
+         end loop;
+
+         for col in B'Range (2) loop
+            B2 (row, col) := B (Indicies (row), col);
+         end loop;
+      end loop;
+
+      A := A2;
+      B := B2;
+
+   end Shuffle;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle (A : in out Real_Float_Matrix;
+                      B : in out Integer_Matrix) is
+      Num_Samples : constant Integer := A'Length;
+      Indicies    : Integer_Array (1 .. Num_Samples);
+      A2          : Real_Float_Matrix (A'Range, A'Range (2));
+      B2          : Integer_Matrix (B'Range, B'Range (2));
+   begin
+      for row in 1 ..Num_Samples loop
+         Indicies (row) := row;
+      end loop;
+      Utilities.Permute (Indicies);
+
+      for row in A'Range loop
+         for col in A'Range (2) loop
+            A2 (row, col) := A (Indicies (row), col);
+         end loop;
+
+         for col in B'Range (2) loop
+            B2 (row, col) := B (Indicies (row), col);
+         end loop;
+      end loop;
+
+      A := A2;
+      B := B2;
+
+   end Shuffle;
 
    --  -------------------------------------------------------------------------
 
    function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
                             Num_Outputs : Positive := 1)
-                         return Multi_Output_Data_Record is
+                            return Multi_Output_Data_Record is
       use Ada.Containers;
       use Ada.Strings;
       use Ada.Strings.Unbounded;
@@ -922,7 +981,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Float_List_2D (Data : Value_Data_Lists_2D)
-                           return Float_List_2D is
+                              return Float_List_2D is
       F2_List : Float_List_2D;
    begin
       for index in Data.First_Index .. Data.Last_Index loop
@@ -993,7 +1052,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
-                                return Value_Data_List is
+                                   return Value_Data_List is
       Data       : Value_Record (Integer_Type);
       A_List     : Value_Data_List;
    begin
@@ -1008,7 +1067,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
-                                   return Value_Data_Lists_2D is
+                                      return Value_Data_Lists_2D is
       Data       : Value_Record (Integer_Type);
       B_List     : Value_Data_List;
       Multi_List : Value_Data_Lists_2D;
@@ -1026,7 +1085,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Integer_List_2D (Data : Value_Data_Lists_2D)
-                             return Integer_List_2D  is
+                                return Integer_List_2D  is
       I2_List : Integer_List_2D;
    begin
       for index in Data.First_Index .. Data.Last_Index loop
@@ -1040,7 +1099,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
-                              return Value_Data_Lists_2D is
+                                 return Value_Data_Lists_2D is
       Value    : Value_Record (Integer_Type);
       Row_List : Value_Data_Lists_2D;
       Col_List : Value_Data_List;
@@ -1060,7 +1119,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                          return Natural_List is
+                             return Natural_List is
       A_List : Natural_List;
    begin
       for index in A'First .. A'Last loop
@@ -1073,7 +1132,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_List (Numbers : Value_Data_List)
-                          return Natural_List is
+                             return Natural_List is
       Item   : Value_Record;
       Values : Natural_List;
    begin
@@ -1096,7 +1155,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
-                                return Value_Data_Lists_2D is
+                                   return Value_Data_Lists_2D is
       Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
    begin
       for index in A'First .. A'Last loop
@@ -1108,7 +1167,7 @@ package body Classifier_Utilities is
    --  ------------------------------------------------------------------------
 
    function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
-                      return Real_Float_Matrix is
+                         return Real_Float_Matrix is
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_PL_Array ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
@@ -1135,7 +1194,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function To_Value_2D_List (A : Value_Data_List)
-                           return Value_Data_Lists_2D is
+                              return Value_Data_Lists_2D is
       Output_List : Value_Data_List;
       A2_List     : Value_Data_Lists_2D;
    begin
@@ -1154,7 +1213,7 @@ package body Classifier_Utilities is
 
    function To_Value_2D_List (List_1D  : Value_Data_List;
                               Num_Rows : Positive)
-                           return Value_Data_Lists_2D is
+                              return Value_Data_Lists_2D is
       Routine_Name : constant String :=
                        "Classifier_Utilities.To_Value_2D_List ";
       Length_1D    : constant Positive := Positive (List_1D.Length);
@@ -1184,7 +1243,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Transpose (Values : Value_Data_Lists_2D)
-                    return  Value_Data_Lists_2D is
+                       return  Value_Data_Lists_2D is
       use Ada.Containers;
       Num_Rows : constant Positive := Positive (Values.Length);
       Num_Cols : constant Count_Type := Values.Element (1).Length;
@@ -1209,7 +1268,7 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    function Unique (Nums : Integer_List)
-                 return Integer_List is
+                    return Integer_List is
       use Int_Sets;
       use Integer_Package;
       Unique_Set : Int_Sets.Set;

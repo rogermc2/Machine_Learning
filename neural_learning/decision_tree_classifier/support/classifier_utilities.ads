@@ -44,6 +44,8 @@ package Classifier_Utilities is
    function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
                       return Natural_List;
    function Set_Diff (Values, Uniques : Boolean_Array) return Boolean_List;
+   procedure Shuffle (A : in out Real_Float_Matrix; B : in out Binary_Matrix);
+   procedure Shuffle (A : in out Real_Float_Matrix; B : in out Integer_Matrix);
    function Sum_Cols (aList : Float_List_2D) return Float_List;
    function Sum_Cols (aMatrix : Real_Float_Matrix) return Real_Float_Vector;
    function Sum_Cols (aList : Value_Data_Lists_2D) return Value_Data_List;
