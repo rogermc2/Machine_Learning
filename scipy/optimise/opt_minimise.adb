@@ -179,7 +179,10 @@ package body Opt_Minimise is
    begin
       case Method is
          when Trust_Constr_Method | Powell_Method | Nelder_Mead_Method
-            | New_Method => null;
+            | New_Method =>
+            if Bounds.Is_Empty then
+               null;
+            end if;
          when L_BFGS_B_Method | Tnc_Method | Slsqp_Method | Old_Method => null;
          when others => null;
       end case;
