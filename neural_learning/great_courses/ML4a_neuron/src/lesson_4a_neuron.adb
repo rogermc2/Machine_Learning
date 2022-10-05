@@ -39,9 +39,6 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
-      Num_Classes   : constant Positive := 10;
-      Train_Y_Bin   : Boolean_Matrix (Train_Y'Range, 1 .. Num_Classes);
-      --        Test_Y_Bin    : Boolean_Matrix (Test_Y'Range, Test_Y'Range (2));
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
       Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
@@ -58,9 +55,7 @@ begin
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
-      Fit (aClassifier, Train_X, Train_Y, Train_Y_Bin);
-      --        Test_Y_Bin := Multilayer_Perceptron.Validate_Input
-      --          (aClassifier, Test_Y, Incremental => False);
+      Fit (aClassifier, Train_X, Train_Y);
       Put_Line ("Score: " & Float'Image (Base.Score
                 (Self => aClassifier, X => Test_X, Y => Test_Y,
                  Sample_Weight => Sample_Weight)));
