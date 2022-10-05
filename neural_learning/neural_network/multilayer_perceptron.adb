@@ -57,7 +57,6 @@ with Utils_Optimise;
 package body Multilayer_Perceptron is
 
    First_Pass : Boolean := True;
-   --     BP_Count   : Integer := 0;
 
    function Compute_Loss_Gradient
      (Self          : MLP_Classifier;
@@ -176,18 +175,13 @@ package body Multilayer_Perceptron is
          Loss_Function_Name := MLP.Attributes.Loss_Function_Name;
       end if;
 
-      --        Put_Line (Routine_Name & "L289 Loss_Function_Name: " &
-      --                    Loss_Function_Type'Image (Loss_Function_Name));
       case Loss_Function_Name is
          when Binary_Log_Loss_Function =>
             Loss := Binary_Log_Loss (Y_Float, Activations.Last_Element);
-            --              Put_Line (Routine_Name & "L289 Binary_Log_Loss" & Float'Image (Loss));
          when Log_Loss_Function =>
             Loss := Log_Loss (Y_Float, Activations.Last_Element);
-            --              Put_Line (Routine_Name & "L289 Log_Loss" & Float'Image (Loss));
          when Squared_Error_Function =>
             Loss := Squared_Loss (Y_Float, Activations.Last_Element);
-            --              Put_Line (Routine_Name & "L289 Squared_Loss" & Float'Image (Loss));
       end case;
 
       --  L292  Add L2 regularization term to loss
@@ -507,7 +501,6 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      --        use Real_Float_Arrays;
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
