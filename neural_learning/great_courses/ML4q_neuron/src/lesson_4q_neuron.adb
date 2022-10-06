@@ -29,7 +29,6 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
-      Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
       Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
                   Count_Type'Image (Train_X'Length (2)));
@@ -48,9 +47,7 @@ begin
          Fit (aClassifier, Train_X, Train_Y);
          Put_Line (Integer'Image (index * 10) & " Score: " &
                      Float'Image
-                     (Base.Score (Self => aClassifier, X => Test_X,
-                                  Y => To_Real_Float_Matrix (Test_Y),
-                                  Sample_Weight => Sample_Weight)));
+                     (Base.Score (Self => aClassifier, X => Test_X, Y => Test_Y)));
       end loop;
    end;  --  declare
 
