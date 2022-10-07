@@ -1,16 +1,16 @@
---  Based on scipy/optimize/optimize.py
+--  Based on scipy/optimize/_optimize.py
 
-with Ada.Assertions; use Ada.Assertions;
+--  with Ada.Assertions; use Ada.Assertions;
 --  with Ada.Text_IO; use Ada.Text_IO;
 
-with Maths;
+--  with Maths;
 
 package body Optimise is
 
    --      type BFGS_Options is (Gtol_Option, Norm_Option, Epsilon_Option, Disp_Option,
    --                            Max_Iter_Option, Return_All_Option);
 
-   Epsilon : constant Float := Maths.Float_Math_Functions.Sqrt (Float'Safe_Last);
+--     Epsilon : constant Float := Maths.Float_Math_Functions.Sqrt (Float'Safe_Last);
 
    --  ------------------------------------------------------------------------
    --  L912 Approx_Fprime finds the finite difference approximation of the
@@ -22,95 +22,93 @@ package body Optimise is
    --  called the Jacobian where an element (i, j) is a partial derivative of
    --  f[i] with respect to x[j].
    --  Approx_Fprime returns Func's partial derivatives with respect to Xk.
-   function Approx_Fprime
-     (Xk      : Real_Float_Vector; Func : Num_Diff.Deriv_Fun_Access;
-      Epsilon : Real_Float_Vector) return Real_Float_Vector is
-      use Num_Diff;
-      F0  : constant Real_Float_Vector := Func (Xk);
-
-   begin
---        return Approx_Derivative
+--     function Approx_Fprime
+--       (Xk      : Real_Float_Vector; Func : Num_Diff.Deriv_Fun_Access;
+--        Epsilon : Real_Float_Vector) return Real_Float_Vector is
+--        use Num_Diff;
+--        F0  : constant Real_Float_Vector := Func (Xk);
+--     begin
+--        return Num_Diff.Approx_Derivative
 --          (Fun => Func, X0 => Xk, Method => FD_2_Point, Abs_Step => Epsilon,
 --           F0  => F0);
-      return F0;
-
-   end Approx_Fprime;
+--
+--     end Approx_Fprime;
 
    --  ------------------------------------------------------------------------
    --  L985  Check_Grad checks the correctness of a gradient function by
    --  comparing it against a (forward) finite-difference approximation of the
    --  gradient.
-   function Check_Grad
-     (Fun, Grad_Func : Num_Diff.Deriv_Fun_Access;
-      X0             : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
-      Direction      : Direction_Kind := All_Direction) return Float is
-      use Real_Float_Arrays;
-      use Num_Diff;
-      Routine_Name    : constant String := "Optimise.Check_Grad ";
-      Step            : Real_Float_Vector (1 .. 1);
-      Analytical_Grad : Real_Float_Vector (X0'Range);
-      Diff            : Real_Float_Vector (X0'Range);
-   begin
-      Assert (Fun /= null, Routine_Name & "Fun is null");
-      Assert (Grad_Func /= null, Routine_Name & "Grad_Func is null");
-      Step (1) := Epsilon;
-      case Direction is
-         when Random_Direction => null;
-         when All_Direction =>
-            Analytical_Grad := Grad_Func (X0);
-      end case;
-
-      Diff := Analytical_Grad - Approx_Fprime (X0, Fun, Step);
-
-      return 0.0;
-
-   end Check_Grad;
+--     function Check_Grad
+--       (Fun, Grad_Func : Num_Diff.Deriv_Fun_Access;
+--        X0             : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
+--        Direction      : Direction_Kind := All_Direction) return Float is
+--        use Real_Float_Arrays;
+--        use Num_Diff;
+--        Routine_Name    : constant String := "Optimise.Check_Grad ";
+--        Step            : Real_Float_Vector (1 .. 1);
+--        Analytical_Grad : Real_Float_Vector (X0'Range);
+--        Diff            : Real_Float_Vector (X0'Range);
+--     begin
+--        Assert (Fun /= null, Routine_Name & "Fun is null");
+--        Assert (Grad_Func /= null, Routine_Name & "Grad_Func is null");
+--        Step (1) := Epsilon;
+--        case Direction is
+--           when Random_Direction => null;
+--           when All_Direction =>
+--              Analytical_Grad := Grad_Func (X0);
+--        end case;
+--
+--        Diff := Analytical_Grad - Approx_Fprime (X0, Fun, Step);
+--
+--        return 0.0;
+--
+--     end Check_Grad;
 
    --  ------------------------------------------------------------------------
    --  L1137 F_Min_BFGS minimizes a function using the BFGS algorithm.
-   function F_Min_BFGS
-     (F : RF_Fun_Access; X0 : Real_Float_Vector) return Optimise_Result is
-      Min_BFGS : Optimise_Result (0, 0, 0);
-   begin
-
-      return Min_BFGS;
-
-   end F_Min_BFGS;
+--     function F_Min_BFGS
+--       (F : RF_Fun_Access; X0 : Real_Float_Vector) return Optimise_Result is
+--        Min_BFGS : Optimise_Result (0, 0, 0);
+--     begin
+--
+--        return Min_BFGS;
+--
+--     end F_Min_BFGS;
 
    --  ------------------------------------------------------------------------
    --  L1261
-   function Minimise_BFGS
-     (Fun              : Multilayer_Perceptron.Loss_Grad_Access;
-      Args             : Multilayer_Perceptron.Loss_Grad_Args;
-      X0               : Real_Float_Vector;
-      Gtol             : Float := 10.0 ** (-5);
-      Norm             : Float := Float'Safe_Last;
-      Eps              : Float := Epsilon; Max_Iter : Natural := 0;
-      Disp, Return_All : Boolean := False) return Optimise_Result is
-      Min_BFGS   : Optimise_Result (0, 0, 0);
-      Iters      : Positive;
-      Ret_All    : Boolean := Return_All;
-      SF         : Scalar_Function (X0'Length, 1);
-      F          : Multilayer_Perceptron.Loss_Grad_Access;
-      My_F_Prime : Num_Diff.FD_Methods;
-      Old_Val    : Float;
-      K          : Natural := 0;
-   begin
-      --  L1301
-      if Max_Iter /= 0 then
-         Iters := Max_Iter;
-      else
-         Iters := 200 * X0'Length;
-      end if;
-
-      SF := Prepare_Scalar_Function (Fun, X0);
-      F := SF.Fun_Float;
-      My_F_Prime := SF.Grad;
-      Old_Val := F (Args).Loss;
-
-      return Min_BFGS;
-
-   end Minimise_BFGS;
+--     function Minimise_BFGS
+--       (Fun              : Multilayer_Perceptron.Loss_Grad_Access;
+--        Args             : Multilayer_Perceptron.Loss_Grad_Args;
+--        X0               : Real_Float_Vector;
+--        Gtol             : Float := 10.0 ** (-5);
+--        Norm             : Float := Float'Safe_Last;
+--        Eps              : Float := Epsilon; Max_Iter : Natural := 0;
+--        Disp, Return_All : Boolean := False) return Optimise_Result is
+--        Min_BFGS   : Optimise_Result (0, 0, 0);
+--        Iters      : Positive;
+--        Ret_All    : Boolean := Return_All;
+--        SF         : Scalar_Function (X0'Length, 1);
+--        F          : Multilayer_Perceptron.Loss_Grad_Access;
+--        My_F_Prime : Num_Diff.FD_Methods;
+--        Old_Val    : Float;
+--        K          : Natural := 0;
+--     begin
+--        --  L1301
+--        if Max_Iter /= 0 then
+--           Iters := Max_Iter;
+--        else
+--           Iters := 200 * X0'Length;
+--        end if;
+--
+--        SF := Prepare_Scalar_Function (Fun, X0);
+--        F := SF.Fun_Float;
+--        My_F_Prime := SF.Grad;
+--        Old_Val := F (Args).Loss;
+--
+--        return Min_BFGS;
+--
+--     end Minimise_BFGS;
 
    --  ------------------------------------------------------------------------
 

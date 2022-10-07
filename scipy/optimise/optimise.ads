@@ -4,7 +4,7 @@ with Opt_Constraints;
 with Differentiable_Functions; use Differentiable_Functions;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with Num_Diff;
+--  with Num_Diff;
 with Stochastic_Optimizers;
 
 package Optimise is
@@ -51,10 +51,10 @@ package Optimise is
         Success   : Boolean := False;
     end record;
 
-    function Check_Grad
-      (Fun, Grad_Func : Num_Diff.Deriv_Fun_Access;
-       X0             : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
-       Direction      : Direction_Kind := All_Direction) return Float;
+--      function Check_Grad
+--        (Fun, Grad_Func : Num_Diff.Deriv_Fun_Access;
+--         X0             : Real_Float_Vector; Epsilon : Float := 10.0 ** (-8);
+--         Direction      : Direction_Kind := All_Direction) return Float;
     function Prepare_Scalar_Function
       (Fun                  : Multilayer_Perceptron.Loss_Grad_Access;
        X0                   : Real_Float_Vector;
@@ -71,7 +71,7 @@ package Optimise is
          Opt_Constraints.Default_Bounds;
        Epsilon, Finite_Diff_Rel_Step : Float := 10.0 ** (-8))
       return Scalar_Function;
-    function F_Min_BFGS (F : RF_Fun_Access; X0 : Real_Float_Vector)
-                        return Optimise_Result;
+--      function F_Min_BFGS (F : RF_Fun_Access; X0 : Real_Float_Vector)
+--                          return Optimise_Result;
 
 end Optimise;

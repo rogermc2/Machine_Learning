@@ -1,6 +1,6 @@
 --  Based on scipy/optimize/_numdiff.py
 
---  with Constraints;
+with Opt_Constraints;
 --  with Lbfgsb_F_Interface; use Lbfgsb_F_Interface;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
@@ -22,21 +22,20 @@ package Num_Diff is
       Mat_Vec : Deriv_Fun_Access;  --  returns A * v.
    end record;
 
---     function Approx_Derivative
---       (Fun                : Deriv_Fun_Access;
---        X0                 : Real_Float_Vector;
---        Method             : FD_Methods := FD_None;
---        Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
---        Abs_Step           : Real_Float_Vector;
---        F0                 : Real_Float_Vector;
---        Bounds             : Constraints.Bounds_List :=
---          Constraints.Array_Bounds_Package.Empty_Vector;
---        As_Linear_Operator : Boolean := False) return Real_Float_Vector;
-
+   function Approx_Derivative
+     (Fun                : Deriv_Fun_Access;
+      X0                 : Real_Float_Vector;
+      Method             : FD_Methods := FD_None;
+      Rel_Step           : Real_Float_List := Real_Float_Package.Empty_Vector;
+      Abs_Step           : Real_Float_Vector;
+      F0                 : Real_Float_Vector;
+      Bounds             : Opt_Constraints.Bounds_List :=
+        Opt_Constraints.Array_Bounds_Package.Empty_Vector;
+      As_Linear_Operator : Boolean := False) return Real_Float_Matrix;
    function Dense_Difference (W_Fun            : Deriv_Fun_Access;
                               X0               : Real_Float_Vector;
                               F0               : Real_Float_Vector;
                               H, Use_One_Sided : Real_Float_Vector;
                               Method           : FD_Methods)
-                               return Real_Float_Matrix;
+                              return Real_Float_Matrix;
 end Num_Diff;
