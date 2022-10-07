@@ -13,11 +13,7 @@ package body Opt_Minimise is
       Args   :  Multilayer_Perceptron.Loss_Grad_Args;
       Bounds : Opt_Constraints.Bounds_List)
        return Optimise.Optimise_Result;
-   --  Standardize_Bounds converts bounds to the form required by the solver
-   function Standardize_Bounds
-     (Bounds : Opt_Constraints.Bounds_List;
-      X0     : Stochastic_Optimizers.Parameters_List;
-      Method : Method_Type) return Opt_Constraints.Bounds_List;
+   --  Standardize_Bounds is Python format specific
 
    --  -------------------------------------------------------------------------
 
@@ -50,8 +46,9 @@ package body Opt_Minimise is
       use Minimise_Constraints_Package;
       use Num_Diff;
       --          Routine_Name : constant String := "Opt_Minimise.Minimise ";
+      --  L prefix indicates local variable
       L_Method     : Method_Type := Method;
-      L_Bounds     : Opt_Constraints.Bounds_List := Bounds;
+      L_Bounds     : constant Opt_Constraints.Bounds_List := Bounds;
       I_Fixed      : NL_Types.Boolean_List;
       All_Fixed    : Boolean := True;
       --  L655 determine if finite differences are needed for any grad or jac
@@ -72,18 +69,16 @@ package body Opt_Minimise is
          end if;
       end if;
 
-      --  L518 Check_Options is currently always True
+      --  L545 Check_Options is currently always True
       --  Intent is to check if the optional parameters are supported by the
       --  selected method.
-      --  Check_Options covers L520 - L554
+      --  Check_Options covers L549 - L578
       if Check_Options then
-         --  L556 - 575 Jac checks
-         --  L578 - 595 set default tolerances
-         --  L605 if bounds is not None:
-         --           bounds = standardize_bounds(bounds, x0, meth)
-         --  L623
+         --  L581 - 599 Jac checks
+         --  L602 - 619 set default tolerances
+         --  L632
          if not Bounds.Is_Empty then
-            L_Bounds := Standardize_Bounds (Bounds, X0, L_Method);
+            --    bounds = standardize_bounds(bounds, x0, meth) Python specific
             if L_Method = Tnc_Method or L_Method = Slsqp_Method or
               L_Method = L_BFGS_B_Method then
                --  L645
@@ -96,6 +91,7 @@ package body Opt_Minimise is
                if All_Fixed then
                   return Optimize_Result_For_Equal_Bounds
                     (Fun, Args, Bounds);
+
                else
                   while Has_Element (Cons_Cursor) loop
                      if Element (Cons_Cursor) /= Callable_Constraint then
@@ -168,28 +164,6 @@ package body Opt_Minimise is
       return Result;
 
    end Optimize_Result_For_Equal_Bounds;
-
-   --  -------------------------------------------------------------------------
-
-   function Standardize_Bounds
-     (Bounds : Opt_Constraints.Bounds_List;
-      X0     : Stochastic_Optimizers.Parameters_List;
-      Method : Method_Type) return Opt_Constraints.Bounds_List is
-      New_Bounds : Opt_Constraints.Bounds_List;
-   begin
-      case Method is
-         when Trust_Constr_Method | Powell_Method | Nelder_Mead_Method
-            | New_Method =>
-            if Bounds.Is_Empty then
-               null;
-            end if;
-         when L_BFGS_B_Method | Tnc_Method | Slsqp_Method | Old_Method => null;
-         when others => null;
-      end case;
-
-      return New_Bounds;
-
-   end Standardize_Bounds;
 
    --  -------------------------------------------------------------------------
 
