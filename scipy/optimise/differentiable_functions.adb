@@ -7,8 +7,7 @@ package body Differentiable_Functions is
 
    procedure Update_Fun (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args);
-   procedure Update_Grad (Self : in out Scalar_Function;
-                         Args : Multilayer_Perceptron.Loss_Grad_Args);
+   procedure Update_Grad (Self : in out Scalar_Function);
    procedure Update_Grad_FD (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args);
    procedure Update_Hess (Self : in out Scalar_Function;
@@ -86,7 +85,7 @@ package body Differentiable_Functions is
       --  Routine_Name : constant String := "Differentiable_Functions.Fun_And_Grad ";
    begin
       Update_Fun (Self, Args);
-      Update_Grad (Self, Args);
+      Update_Grad (Self);
       Fun_Val := Self.Fun_Float (Args).Loss;
       Grad := Self.G;
 
@@ -134,7 +133,6 @@ package body Differentiable_Functions is
    --  -------------------------------------------------------------------------
    --  L270
    function Grad (Self : in out Scalar_Function;
-                  Args : Multilayer_Perceptron.Loss_Grad_Args;
                   X    : Real_Float_Vector)
                   return Real_Float_Vector is
       use Real_Float_Arrays;
@@ -144,7 +142,7 @@ package body Differentiable_Functions is
       if X /= Self.X0 then
             Put_Line (Routine_Name & "X /= Self.X0");
       end if;
-      Update_Grad (Self, Args);
+      Update_Grad (Self);
 
       return Self.G;
 
@@ -163,13 +161,11 @@ package body Differentiable_Functions is
 
    --  -------------------------------------------------------------------------
    --  L254  _update_grad
-   procedure Update_Grad (Self : in out Scalar_Function;
-                         Args : Multilayer_Perceptron.Loss_Grad_Args) is
---              F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
+   procedure Update_Grad (Self : in out Scalar_Function) is
       --  Routine_Name : String := "Differentiable_Functions.Update_Grad";
    begin
       if not Self.G_Updated then
---           Self.Update_Grad_Impl (F0);
+         Self.G := Self.Update_Grad_Impl (Self.X0);
          Self.G_Updated := True;
       end if;
 

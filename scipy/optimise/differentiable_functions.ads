@@ -11,7 +11,7 @@ package Differentiable_Functions is
    type RF_Fun_Access is access
      function (X : Real_Float_Vector) return Float;
    type UG_Fun_Access is access
-     function (X : Real_Float_Vector) return Float;
+     function (X : Real_Float_Vector) return Real_Float_Vector;
 
    --  The Scalar_Function class defines a scalar function F: R^n->R and
    --  methods for computing or approximating its first and second derivatives.
@@ -60,7 +60,6 @@ package Differentiable_Functions is
       Args    : Multilayer_Perceptron.Loss_Grad_Args;
       Fun_Val : out Float; Grad : out Real_Float_Vector);
    function Grad (Self : in out Scalar_Function;
-                  Args : Multilayer_Perceptron.Loss_Grad_Args;
                   X    : Real_Float_Vector) return Real_Float_Vector;
 
 private
