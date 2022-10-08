@@ -162,14 +162,14 @@ package body Differentiable_Functions is
    end Update_Fun;
 
    --  -------------------------------------------------------------------------
-   --  L239
+   --  L254  _update_grad
    procedure Update_Grad (Self : in out Scalar_Function;
                          Args : Multilayer_Perceptron.Loss_Grad_Args) is
-      --        F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
+--              F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
       --  Routine_Name : String := "Differentiable_Functions.Update_Grad";
    begin
       if not Self.G_Updated then
-         --           Self.Update_Grad_Impl;
+--           Self.Update_Grad_Impl (F0);
          Self.G_Updated := True;
       end if;
 
@@ -179,8 +179,8 @@ package body Differentiable_Functions is
    --  L152 for grad in FD_METHODS
    procedure Update_Grad_FD (Self : in out Scalar_Function;
                              Args : Multilayer_Perceptron.Loss_Grad_Args) is
-      Fun : Deriv_Fun_Access;
-      F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
+--        Fun : Deriv_Fun_Access;
+--        F0  : Real_Float_Vector (1 .. 1) := (1 => Self.F);
    begin
       Update_Fun (Self, Args);
       Self.N_Gev := Self.N_Gev + 1;

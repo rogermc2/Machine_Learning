@@ -21,7 +21,7 @@ package Differentiable_Functions is
       --  any additional fixed parameters needed to completely specify the
       --  function which should return a scalar.
       Fun_Float        : Multilayer_Perceptron.Loss_Grad_Access;
-      --        Update_Fun      : RF_Fun_Access;
+      Update_Fun       : RF_Fun_Access;
       Update_Grad_Impl : UG_Fun_Access;
       --  X0 is a vector of X0_Size independent variables
       X0               : Real_Float_Vector (1 .. X0_Size);
