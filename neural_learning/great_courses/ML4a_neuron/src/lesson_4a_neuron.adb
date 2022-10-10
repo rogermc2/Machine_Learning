@@ -1,5 +1,5 @@
 
-with Ada.Containers;
+--  with Ada.Containers; use Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
@@ -8,18 +8,19 @@ with Base_Neural;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
+with Test_Support; use Test_Support;
 
 with Support_4;
 
 procedure Lesson_4A_Neuron is
-   use Ada.Containers;
+   use Real_Float_Arrays;
    use Support_4;
    use Multilayer_Perceptron;
    Routine_Name    : constant String := "Lesson_4A_Neuron ";
    Dataset_Name    : constant String := "mnist_784";
    Test_Size       : constant Positive := 1000;
    Train_Size      : constant Positive := 5000;
-   aClassifier     : Multilayer_Perceptron.MLP_Classifier;
+   MLP             : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name);
    declare
@@ -40,24 +41,44 @@ begin
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
       Hidden_Layers.Append (5);
-      Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
-                  Count_Type'Image (Train_X'Length (2)));
-      Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
-                  Count_Type'Image (Train_Y'Length (2)));
-      Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
-      Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
+      --        Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
+      --                    Count_Type'Image (Train_X'Length (2)));
+      --        Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
+      --                    Count_Type'Image (Train_Y'Length (2)));
+      --        Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
+      --        Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
-      --        aClassifier := C_Init (Max_Iter => 10000,
-      aClassifier := C_Init (Max_Iter => 2000, Hidden_Layer_Sizes => Hidden_Layers,
+      --        MLP := C_Init (Max_Iter => 10000,
+      MLP := C_Init (Max_Iter => 2000, Hidden_Layer_Sizes => Hidden_Layers,
                              Activation => Base_Neural.Identity_Activation,
-                             Verbose => True, Shuffle => False);
+                             Verbose => False, Shuffle => False);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
-      Fit (aClassifier, Train_X, Train_Y);
+      Fit (MLP, Train_X, Train_Y);
       Put_Line ("Score: " & Float'Image (Base.Score
-                (Self => aClassifier, X => Test_X, Y => Test_Y,
+                (Self => MLP, X => Test_X, Y => Test_Y,
                  Sample_Weight => Sample_Weight)));
+
+      declare
+         W0 : constant Real_Float_Matrix :=
+                MLP.Attributes.Params.Element (1).Coeff_Gradients;
+         b0 : constant Real_Float_Vector :=
+                MLP.Attributes.Params.Element (1).Intercept_Grads;
+--           W1 : constant Real_Float_Matrix :=
+--                  MLP.Attributes.Params.Element (2).Coeff_Gradients;
+--           b1 : constant Real_Float_Vector :=
+--                  MLP.Attributes.Params.Element (2).Intercept_Grads;
+      begin
+--           Print_Float_Matrix ("Test_X", Test_X, 1, 1);
+
+         Print_Matrix_Dimensions ("Hidden layer W0 size", Transpose (W0));
+--           Print_Float_Matrix ("Hidden layer W0", Transpose (W0), 1, 1);
+         Print_Float_Vector ("Hidden layer b0", b0);
+
+--           Print_Float_Matrix ("Output layer W1", Transpose (W1));
+--           Print_Float_Vector ("Output layer b1", b1);
+      end;
    end;  --  declare
 
    Put_Line ("----------------------------------------------");

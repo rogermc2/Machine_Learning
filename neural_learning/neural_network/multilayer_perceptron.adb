@@ -784,6 +784,8 @@ package body Multilayer_Perceptron is
          Self.Attributes.Params := Self.Parameters.Best_Params;
       end if;
 
+      Put_Line (Routine_Name & "Iteration 1: " & "  loss: " &
+                  Float'Image (Self.Attributes.Loss));
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
                    & Integer'Image (Iter) & "  loss: " &
@@ -1312,8 +1314,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
---        Routine_Name   : constant String :=
---                             "Multilayer_Perceptron.Process_Batch ";
+      --        Routine_Name   : constant String :=
+      --                             "Multilayer_Perceptron.Process_Batch ";
       Num_Features   : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
