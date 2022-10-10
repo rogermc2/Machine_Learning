@@ -22,7 +22,7 @@ procedure Lesson_4A_Neuron is
    Train_Size      : constant Positive := 5000;
    MLP             : Multilayer_Perceptron.MLP_Classifier;
 begin
-   Put_Line (Routine_Name);
+   Put_Line (Routine_Name & "no hidden layers");
    declare
       --  Digits_Data   : constant Load_Dataset.Digits_Data_Record :=
       --                    Load_Dataset.Load_Digits ("../../Datasets/digits.csv");
@@ -37,21 +37,19 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
-      Hidden_Layers : NL_Types.Integer_List;
+      Hidden_Layers : constant NL_Types.Integer_List :=
+                        NL_Types.Integer_Package.Empty_Vector;
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
-      Hidden_Layers.Append (5);
-      --        Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
-      --                    Count_Type'Image (Train_X'Length (2)));
-      --        Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
-      --                    Count_Type'Image (Train_Y'Length (2)));
-      --        Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
-      --        Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
+      Test_Support.Print_Matrix_Dimensions ("Train X", Train_X);
+      Test_Support.Print_Matrix_Dimensions ("Train Y", Train_Y);
+      Test_Support.Print_Matrix_Dimensions ("Test X", Test_X);
+      Test_Support.Print_Matrix_Dimensions ("Test Y", Test_Y);
 
       --        MLP := C_Init (Max_Iter => 10000,
       MLP := C_Init (Max_Iter => 2000, Hidden_Layer_Sizes => Hidden_Layers,
-                             Activation => Base_Neural.Identity_Activation,
-                             Verbose => False, Shuffle => False);
+                     Activation => Base_Neural.Identity_Activation,
+                     Verbose => False, Shuffle => False);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
@@ -65,19 +63,19 @@ begin
                 MLP.Attributes.Params.Element (1).Coeff_Gradients;
          b0 : constant Real_Float_Vector :=
                 MLP.Attributes.Params.Element (1).Intercept_Grads;
---           W1 : constant Real_Float_Matrix :=
---                  MLP.Attributes.Params.Element (2).Coeff_Gradients;
---           b1 : constant Real_Float_Vector :=
---                  MLP.Attributes.Params.Element (2).Intercept_Grads;
+         --           W1 : constant Real_Float_Matrix :=
+         --                  MLP.Attributes.Params.Element (2).Coeff_Gradients;
+         --           b1 : constant Real_Float_Vector :=
+         --                  MLP.Attributes.Params.Element (2).Intercept_Grads;
       begin
---           Print_Float_Matrix ("Test_X", Test_X, 1, 1);
+         --           Print_Float_Matrix ("Test_X", Test_X, 1, 1);
 
          Print_Matrix_Dimensions ("Hidden layer W0 size", Transpose (W0));
---           Print_Float_Matrix ("Hidden layer W0", Transpose (W0), 1, 1);
-         Print_Float_Vector ("Hidden layer b0", b0);
+         --           Print_Float_Matrix ("Hidden layer W0", Transpose (W0), 1, 1);
+         Print_Float_Vector ("Hidden layer b0", b0, 1, 5);
 
---           Print_Float_Matrix ("Output layer W1", Transpose (W1));
---           Print_Float_Vector ("Output layer b1", b1);
+         --           Print_Float_Matrix ("Output layer W1", Transpose (W1));
+         --           Print_Float_Vector ("Output layer b1", b1);
       end;
    end;  --  declare
 

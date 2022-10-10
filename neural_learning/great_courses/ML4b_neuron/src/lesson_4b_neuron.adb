@@ -1,17 +1,16 @@
 
-with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
 with Base_Neural;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+with Test_Support;
 with NL_Types;
 --  with Printing;
 with Support_4;
 
 procedure Lesson_4B_Neuron is
-   use Ada.Containers;
    use Support_4;
    use Multilayer_Perceptron;
    Routine_Name       : constant String := "Lesson_4B_Neuron ";
@@ -30,12 +29,11 @@ begin
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
    begin
-      Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
-                  Count_Type'Image (Train_X'Length (2)));
-      Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
+      Test_Support.Print_Matrix_Dimensions ("Train X", Train_X);
+      Test_Support.Print_Matrix_Dimensions ("Test X", Test_X);
       New_Line;
 
-      for index in 1 .. 2 loop
+      for index in 1 .. 1 loop
          Hidden_Layer_Sizes.Clear;
          Hidden_Layer_Sizes.Append (index * 100);
          aClassifier := C_Init (Max_Iter => 1000,

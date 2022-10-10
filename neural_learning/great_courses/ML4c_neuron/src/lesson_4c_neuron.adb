@@ -1,5 +1,4 @@
 
-with Ada.Containers;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
@@ -8,11 +7,11 @@ with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 --  with Printing;
+with Test_Support;
 
 with Support_4;
 
 procedure Lesson_4C_Neuron is
-   use Ada.Containers;
    use Support_4;
    use Multilayer_Perceptron;
    Routine_Name       : constant String := "Lesson_4C_Neuron ";
@@ -32,9 +31,9 @@ begin
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
    begin
-      Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
-                  Count_Type'Image (Train_X'Length (2)));
-      Put_Line ("Test X length: " & Count_Type'Image (Test_X'Length));
+
+      Test_Support.Print_Matrix_Dimensions ("Train X", Train_X);
+      Test_Support.Print_Matrix_Dimensions ("Test X", Test_X);
       New_Line;
 
       Hidden_Layer_Sizes.Append (Num_Hidden);
@@ -42,7 +41,7 @@ begin
          aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
                                 Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                 Activation => Base_Neural.Identity_Activation,
-                                Verbose => False);
+                                Verbose => False, Shuffle => False);
          --  The Fit function adjusts weights according to data values so
          --  that better accuracy can be achieved
          Fit (aClassifier, Train_X, Train_Y);

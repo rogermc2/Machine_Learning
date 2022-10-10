@@ -8,13 +8,13 @@ with Load_ARFF_Data;
 with Load_ARFF_Data.ARFF_IO;
 --  with Load_ARFF_Data.ARFF_Printing; use Load_ARFF_Data.ARFF_Printing;
 
-procedure Test_ARFF is
+procedure Test_ARFF_From_File is
    use Ada.Containers;
    use Ada.Directories;
    use Load_ARFF_Data;
    use Load_ARFF_Data.ARFF_IO;
 --     use Load_ARFF_Data.ARFF_Printing;
-   Routine_Name : constant String := "Test_ARFF ";
+   Routine_Name : constant String := "Test_ARFF_From_File ";
    File_Name    : constant String := "../mnist_784.arff";
    Ada_File     : constant String := "../mnist_784.ada";
 --     File_Name    : constant String := "../diabetes.arff";
@@ -56,4 +56,4 @@ begin
   --     Print_Data (Data, 40, 100);
   New_Line;
 
-end Test_ARFF;
+end Test_ARFF_From_File;

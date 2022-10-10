@@ -13,17 +13,18 @@ package Test_Support is
    function Almost_Equal (A, B     : Stochastic_Optimizers.Parameters_Record;
                           Accuracy : Integer) return Boolean;
    procedure Print_Binary_Matrix (Name  : String; aMatrix : Binary_Matrix;
-                                  Start : Integer := 1; Finish : Integer := 0);
+                                  Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
-                                Start : Integer := 1; Finish : Integer := 0);
+                                Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
-                                 Start : Integer := 1; Finish : Integer := 0);
+                                 Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Matrix_List
       (Name  : String; aList : Real_Matrix_List;
-       Start : Integer := 1; Finish : Integer := 0);
-   procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector);
+       Start : Positive := 1; Finish : Natural := 0);
+   procedure Print_Float_Vector (Name : String; Vec : Real_Float_Vector;
+                                 Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_Array (Name  : String; anArray : Integer_Array;
-                                  Start : Integer := 1; Finish : Integer := 0);
+                                  Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Integer_List (Name  : String;
                                  aList : NL_Types.Integer_List);
    procedure Print_Integer_Map (Name : String;
