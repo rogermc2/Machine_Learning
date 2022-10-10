@@ -7,7 +7,6 @@ with Base_Neural;
 --  with Load_Dataset;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
-with NL_Types;
 with Test_Support; use Test_Support;
 
 with Support_4;
@@ -37,8 +36,6 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
-      Hidden_Layers : constant NL_Types.Integer_List :=
-                        NL_Types.Integer_Package.Empty_Vector;
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
       Test_Support.Print_Matrix_Dimensions ("Train X", Train_X);
@@ -46,8 +43,9 @@ begin
       Test_Support.Print_Matrix_Dimensions ("Test X", Test_X);
       Test_Support.Print_Matrix_Dimensions ("Test Y", Test_Y);
 
-      --        MLP := C_Init (Max_Iter => 10000,
-      MLP := C_Init (Max_Iter => 2000, Hidden_Layer_Sizes => Hidden_Layers,
+      --  default Hidden_Layer_Sizes is empty list
+      --  MLP := C_Init (Max_Iter => 10000,
+      MLP := C_Init (Max_Iter => 2000,
                      Activation => Base_Neural.Identity_Activation,
                      Verbose => False, Shuffle => False);
 
