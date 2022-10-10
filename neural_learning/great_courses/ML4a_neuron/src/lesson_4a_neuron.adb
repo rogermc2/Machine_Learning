@@ -1,6 +1,5 @@
 
 with Ada.Containers;
---  with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
@@ -8,7 +7,7 @@ with Base_Neural;
 --  with Load_Dataset;
 with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
---  with Printing;
+with NL_Types;
 
 with Support_4;
 
@@ -20,8 +19,6 @@ procedure Lesson_4A_Neuron is
    Dataset_Name    : constant String := "mnist_784";
    Test_Size       : constant Positive := 1000;
    Train_Size      : constant Positive := 5000;
-   --     Test_Size       : constant Positive := 300;
-   --     Train_Size      : constant Positive := 1400;
    aClassifier     : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name);
@@ -39,8 +36,10 @@ begin
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
       Test_Y        : constant Integer_Matrix := Data.Test_Y;
+      Hidden_Layers : NL_Types.Integer_List;
       Sample_Weight : Real_Float_Vector (1 .. 0);
    begin
+      Hidden_Layers.Append (5);
       Put_Line ("Train X length: " & Count_Type'Image (Train_X'Length) & " x" &
                   Count_Type'Image (Train_X'Length (2)));
       Put_Line ("Train Y length: " & Count_Type'Image (Train_Y'Length) & " x" &
@@ -49,9 +48,9 @@ begin
       Put_Line ("Test Y length: " & Count_Type'Image (Test_Y'Length));
 
       --        aClassifier := C_Init (Max_Iter => 10000,
-      aClassifier := C_Init (Max_Iter => 2000,
+      aClassifier := C_Init (Max_Iter => 2000, Hidden_Layer_Sizes => Hidden_Layers,
                              Activation => Base_Neural.Identity_Activation,
-                             Verbose => False);
+                             Verbose => True, Shuffle => False);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
