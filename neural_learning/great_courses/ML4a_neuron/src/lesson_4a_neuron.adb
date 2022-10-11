@@ -61,19 +61,10 @@ begin
                 MLP.Attributes.Params.Element (1).Coeff_Gradients;
          b0 : constant Real_Float_Vector :=
                 MLP.Attributes.Params.Element (1).Intercept_Grads;
-         --           W1 : constant Real_Float_Matrix :=
-         --                  MLP.Attributes.Params.Element (2).Coeff_Gradients;
---           b1 : constant Real_Float_Vector :=
---                  MLP.Attributes.Params.Element (2).Intercept_Grads;
       begin
-         --           Print_Float_Matrix ("Test_X", Test_X, 1, 1);
-
          Print_Matrix_Dimensions ("Hidden layer W0 size", Transpose (W0));
          --           Print_Float_Matrix ("Hidden layer W0", Transpose (W0), 1, 1);
          Print_Float_Vector ("Hidden layer b0", b0, 1, 5);
-
-         --           Print_Float_Matrix ("Output layer W1", Transpose (W1));
---           Print_Float_Vector ("Output layer b1", b1);
       end;
    end;  --  declare
 
