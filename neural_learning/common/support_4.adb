@@ -24,7 +24,7 @@ package body Support_4 is
 
    function Get_State
      (Dataset               : Load_Dataset.Digits_Data_Record;
-      Test_Size, Train_Size : Positive) return Base_State is
+      Train_Size, Test_Size : Positive) return Base_State is
       use Ada.Containers;
       Routine_Name : constant String := "Support_4.Get_State ";
       Num_Features : constant Positive := Dataset.Num_Features;
@@ -32,10 +32,8 @@ package body Support_4 is
                        To_Real_Float_Matrix (Dataset.Features);
       Y            : Integer_Matrix := To_Integer_Matrix (Dataset.Target);
       Train_X      : Real_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
---        Train_Y      : Integer_Array (1 .. Train_Size);
       Train_Y     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
       Test_X       : Real_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
---        Test_Y       : Integer_Array (1 .. Test_Size);
       Test_Y      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
       Data         : Base_State (Train_Size, Test_Size, Num_Features);
    begin
@@ -44,7 +42,8 @@ package body Support_4 is
                   Integer'Image (Dataset.Target'Length));
       Assert (Y'Length = X'Length, Routine_Name &
                 "Y length" & Integer'Image (Y'Length) &
-                " is different to X length" & Natural'Image (Positive (X'Length)));
+                " is different to X length" &
+                Natural'Image (Positive (X'Length)));
       --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
       Put_Line (Routine_Name & "permuting");
@@ -82,7 +81,7 @@ package body Support_4 is
    --  -------------------------------------------------------------------------
 
    function Get_State
-     (Dataset_Name : String; Test_Size, Train_Size : Positive)
+     (Dataset_Name : String; Train_Size, Test_Size : Positive)
       return Base_State is
       use Ada.Containers;
       use Ada.Directories;

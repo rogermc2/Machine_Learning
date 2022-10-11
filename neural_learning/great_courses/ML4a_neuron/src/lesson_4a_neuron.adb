@@ -23,15 +23,8 @@ procedure Lesson_4A_Neuron is
 begin
    Put_Line (Routine_Name & "no hidden layers");
    declare
-      --  Digits_Data   : constant Load_Dataset.Digits_Data_Record :=
-      --                    Load_Dataset.Load_Digits ("../../Datasets/digits.csv");
-      --        Features      : constant Real_Float_Matrix :=
-      --                          To_Real_Float_Matrix (Digits_Data.Features);
-      --        Target        : NL_Types.Integer_List;
       Data          : constant Base_State :=
                         Get_State (Dataset_Name, Train_Size, Test_Size);
-      --  Data          : constant Base_State :=
-      --                    Get_State (Digits_Data, Train_Size, Test_Size);
       Train_X       : constant Real_Float_Matrix := Data.Train_X;
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
@@ -45,7 +38,7 @@ begin
 
       --  default Hidden_Layer_Sizes is empty list
       --  MLP := C_Init (Max_Iter => 10000,
-      MLP := C_Init (Max_Iter => 2000,
+      MLP := C_Init (Max_Iter => 1,
                      Activation => Base_Neural.Identity_Activation,
                      Verbose => False, Shuffle => False);
 
@@ -62,9 +55,9 @@ begin
          b0 : constant Real_Float_Vector :=
                 MLP.Attributes.Params.Element (1).Intercept_Grads;
       begin
-         Print_Matrix_Dimensions ("Hidden layer W0 size", Transpose (W0));
-         --           Print_Float_Matrix ("Hidden layer W0", Transpose (W0), 1, 1);
-         Print_Float_Vector ("Hidden layer b0", b0, 1, 5);
+         Print_Matrix_Dimensions ("W0 size", Transpose (W0));
+         Print_Float_Matrix ("W0", Transpose (W0), 1, 1, 1, 4);
+         Print_Float_Vector ("b0", b0, 1, 2);
       end;
    end;  --  declare
 

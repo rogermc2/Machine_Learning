@@ -108,8 +108,10 @@ package body Test_Support is
 
    procedure Print_Float_Matrix
      (Name  : String; aMatrix : Real_Float_Matrix;
-      Start : Positive := 1; Finish : Natural := 0) is
-      Last : Positive;
+      Start : Positive := 1; Finish : Natural := 0;
+      Col_Start : Positive := 1; Col_Finish : Natural := 0) is
+      Last     : Positive;
+      Col_Last : Positive;
    begin
       if Finish > 0 and then Finish < aMatrix'Length then
          Last := Finish;
@@ -117,17 +119,23 @@ package body Test_Support is
          Last := Integer (aMatrix'Length);
       end if;
 
+      if Col_Finish > 0 and then Finish < aMatrix'Length (2) then
+         Col_Last := Col_Finish;
+      else
+         Col_Last := Integer (aMatrix'Length (2));
+      end if;
+
       Put_Line (Name & ": ");
-      if Start >= aMatrix'First then
+      if Start >= aMatrix'First and Col_Start >= aMatrix'First (2) then
          for row in Start .. Last loop
-            for col in aMatrix'Range (2) loop
+            for col in Col_Start .. Col_Last loop
                Put (Float'Image (aMatrix (row, col)) & "  ");
             end loop;
             New_Line;
          end loop;
 
       else
-         Put_Line ("Print_Float_Matrix called with invalid start or finish index.");
+         Put_Line ("Print_Float_Matrix called with invalid start index.");
       end if;
       New_Line;
 

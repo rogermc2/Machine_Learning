@@ -17,7 +17,9 @@ package Test_Support is
    procedure Print_Float_Array (Name  : String; anArray : Real_Float_Vector;
                                 Start : Positive := 1; Finish : Natural := 0);
    procedure Print_Float_Matrix (Name  : String; aMatrix : Real_Float_Matrix;
-                                 Start : Positive := 1; Finish : Natural := 0);
+                                 Start : Positive := 1; Finish : Natural := 0;
+                                 Col_Start  : Positive := 1;
+                                 Col_Finish : Natural := 0);
    procedure Print_Float_Matrix_List
       (Name  : String; aList : Real_Matrix_List;
        Start : Positive := 1; Finish : Natural := 0);
