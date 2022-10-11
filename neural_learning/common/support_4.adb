@@ -24,7 +24,8 @@ package body Support_4 is
 
    function Get_State
      (Dataset               : Load_Dataset.Digits_Data_Record;
-      Train_Size, Test_Size : Positive) return Base_State is
+      Train_Size, Test_Size : Positive; Permute : Boolean := True)
+      return Base_State is
       use Ada.Containers;
       Routine_Name : constant String := "Support_4.Get_State ";
       Num_Features : constant Positive := Dataset.Num_Features;
@@ -32,9 +33,9 @@ package body Support_4 is
                        To_Real_Float_Matrix (Dataset.Features);
       Y            : Integer_Matrix := To_Integer_Matrix (Dataset.Target);
       Train_X      : Real_Float_Matrix (1 .. Train_Size, 1 .. Num_Features);
-      Train_Y     : Integer_Matrix (1 .. Train_Size, 1 .. 1);
+      Train_Y      : Integer_Matrix (1 .. Train_Size, 1 .. 1);
       Test_X       : Real_Float_Matrix (1 .. Test_Size, 1 .. Num_Features);
-      Test_Y      : Integer_Matrix (1 .. Test_Size, 1 .. 1);
+      Test_Y       : Integer_Matrix (1 .. Test_Size, 1 .. 1);
       Data         : Base_State (Train_Size, Test_Size, Num_Features);
    begin
       Put_Line (Routine_Name & "X Length" & Integer'Image (X'Length));
@@ -46,11 +47,13 @@ package body Support_4 is
                 Natural'Image (Positive (X'Length)));
       --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
-      Put_Line (Routine_Name & "permuting");
-      X := Utilities.Permute (X);
-      Put_Line (Routine_Name & "X permuted");
-      Y := Utilities.Permute (Y);
-      Put_Line (Routine_Name & "Y permuted");
+      if Permute then
+         Put_Line (Routine_Name & "permuting");
+         X := Utilities.Permute (X);
+         Put_Line (Routine_Name & "X permuted");
+         Y := Utilities.Permute (Y);
+         Put_Line (Routine_Name & "Y permuted");
+      end if;
       --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
       Put_Line (Routine_Name & "splitting data");
       Data_Splitter.Train_Test_Split
@@ -61,13 +64,13 @@ package body Support_4 is
       Put_Line ("Train data length: " &
                   Count_Type'Image (Train_X'Length));
 
---        for row in Train_Y2'First .. Train_Y2'Last loop
---           Train_Y2 (row, 1) := Train_Y (row);
---        end loop;
+      --        for row in Train_Y2'First .. Train_Y2'Last loop
+      --           Train_Y2 (row, 1) := Train_Y (row);
+      --        end loop;
 
---        for row in Test_Y2'First .. Test_Y2'Last loop
---           Test_Y2 (row, 1) := Test_Y (row);
---        end loop;
+      --        for row in Test_Y2'First .. Test_Y2'Last loop
+      --           Test_Y2 (row, 1) := Test_Y (row);
+      --        end loop;
 
       Data.Train_X := Train_X;
       Data.Train_Y := Train_Y;
@@ -81,8 +84,8 @@ package body Support_4 is
    --  -------------------------------------------------------------------------
 
    function Get_State
-     (Dataset_Name : String; Train_Size, Test_Size : Positive)
-      return Base_State is
+     (Dataset_Name : String; Train_Size, Test_Size : Positive;
+      Permute      : Boolean := True) return Base_State is
       use Ada.Containers;
       use Ada.Directories;
       use Ada.Streams;
@@ -146,11 +149,13 @@ package body Support_4 is
                       " is different to X length" & Natural'Image (Positive (X'Length)));
             --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
-            Put_Line (Routine_Name & "permuting");
-            X := Utilities.Permute (X);
-            Put_Line (Routine_Name & "X permuted");
-            Utilities.Permute (Y);
-            Put_Line (Routine_Name & "Y permuted");
+            if Permute then
+               Put_Line (Routine_Name & "permuting");
+               X := Utilities.Permute (X);
+               Put_Line (Routine_Name & "X permuted");
+               Utilities.Permute (Y);
+               Put_Line (Routine_Name & "Y permuted");
+            end if;
             --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
             Put_Line (Routine_Name & "splitting data");
             Data_Splitter.Train_Test_Split

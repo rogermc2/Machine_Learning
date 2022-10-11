@@ -13,9 +13,10 @@ package Support_4 is
 
    function Get_State
      (Dataset               : Load_Dataset.Digits_Data_Record;
-      Train_Size, Test_Size : Positive) return Base_State;
+      Train_Size, Test_Size : Positive;
+      Permute               : Boolean := True) return Base_State;
    function Get_State
-     (Dataset_Name : String;
-      Train_Size, Test_Size : Positive) return Base_State;
+     (Dataset_Name : String; Train_Size, Test_Size : Positive;
+      Permute      : Boolean := True) return Base_State;
 
 end Support_4;
