@@ -40,7 +40,7 @@ begin
       --  MLP := C_Init (Max_Iter => 10000,
       MLP := C_Init (Max_Iter => 1,
                      Activation => Base_Neural.Identity_Activation,
-                     Verbose => False, Shuffle => False);
+                     Verbose => True, Shuffle => False);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved

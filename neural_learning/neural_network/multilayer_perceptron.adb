@@ -393,8 +393,8 @@ package body Multilayer_Perceptron is
       Activations   : Real_Matrix_List;
       Deltas        : Real_Matrix_List) return Parameters_Record is
       use Real_Float_Arrays;
-      Routine_Name        : constant String :=
-                              "Multilayer_Perceptron.Compute_Loss_Gradient ";
+--        Routine_Name        : constant String :=
+--                                "Multilayer_Perceptron.Compute_Loss_Gradient ";
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  An activation converts the output from a layer into a form that is
@@ -409,8 +409,8 @@ package body Multilayer_Perceptron is
       New_Gradients       : Parameters_Record (New_Coeff_Gradients'Length,
                                                New_Coeff_Gradients'Length (2));
    begin
-      Test_Support.Print_Float_Vector (Routine_Name & "Intercept_Grads",
-                          Self.Attributes.Params (layer).Intercept_Grads, 1, 2);
+--        Test_Support.Print_Float_Vector (Routine_Name & "Intercept_Grads",
+--                            Self.Attributes.Params (layer).Intercept_Grads, 1, 2);
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
@@ -418,8 +418,8 @@ package body Multilayer_Perceptron is
       --  L194
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
-      Test_Support.Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
-                                       New_Gradients.Intercept_Grads, 1, 2);
+--        Test_Support.Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
+--                                         New_Gradients.Intercept_Grads, 1, 2);
       return New_Gradients;
 
    end  Compute_Loss_Gradient;
@@ -706,24 +706,24 @@ package body Multilayer_Perceptron is
          Batch_Size := Num_Samples;
       end if;
 
-      Put_Line (Routine_Name & "L628 Num_Samples" &
-                  Integer'Image (Num_Samples));
-      Put_Line (Routine_Name & "L628 Batch_Size" & Integer'Image (Batch_Size));
+--        Put_Line (Routine_Name & "L628 Num_Samples" &
+--                    Integer'Image (Num_Samples));
+--        Put_Line (Routine_Name & "L628 Batch_Size" & Integer'Image (Batch_Size));
       --  Batches is a list of slice lists
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
-      Put_Line (Routine_Name & "L628 Batches length" &
-                  Integer'Image (Integer (Batches.Length)));
+--        Put_Line (Routine_Name & "L628 Batches length" &
+--                    Integer'Image (Integer (Batches.Length)));
       --  L628
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
-         Put_Line (Routine_Name & "Iter" & Integer'Image (Iter));
+--           Put_Line (Routine_Name & "Iter" & Integer'Image (Iter));
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  Batch_Iter := 0;  Batch_Iter NOT USED
          --  L636
          for Batch_index in Batches.First_Index ..
            Batches.Last_Index loop
-            Put_Line (Routine_Name & "Batch_index" & Integer'Image (Batch_index));
+--              Put_Line (Routine_Name & "Batch_index" & Integer'Image (Batch_index));
             Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
          end loop;
@@ -788,8 +788,6 @@ package body Multilayer_Perceptron is
          Self.Attributes.Params := Self.Parameters.Best_Params;
       end if;
 
-      Put_Line (Routine_Name & "Iteration 1: " & "  loss: " &
-                  Float'Image (Self.Attributes.Loss));
       if Self.Parameters.Verbose then
          Put_Line (Routine_Name & "Number of iterations: "
                    & Integer'Image (Iter) & "  loss: " &
@@ -987,7 +985,7 @@ package body Multilayer_Perceptron is
    --  L360  MultilayerPerceptron._init_coef
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record is
-      --        use Maths;
+      use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
       --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
@@ -1005,14 +1003,14 @@ package body Multilayer_Perceptron is
       --  Generate random weights, Random_Float -1.0 .. 1.0
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Params.Coeff_Gradients (f_in, f_out) := Init_Bound * 0.1;
-            --                Init_Bound * Random_Float;
+            Params.Coeff_Gradients (f_in, f_out) := --  Init_Bound * 0.1;
+                          Init_Bound * Random_Float;
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) := 0.0;  --  Init_Bound * Random_Float;
+         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
       end loop;
 
       return Params;
