@@ -159,6 +159,9 @@ package body Multilayer_Perceptron is
       Sum_Sq_Coeffs      : Float := 0.0;
       Updated_Gradients  : Parameters_List;
    begin
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L284 Activations Last",
+         Activations (Activations.Last_Index), 1, 1);
       --  L284
       Assert (Y_Float'Length = Activations.Last_Element'Length,
               Routine_Name & "L284 unequal Y_Float and Activations lengths");
@@ -184,6 +187,7 @@ package body Multilayer_Perceptron is
             Loss := Squared_Loss (Y_Float, Activations.Last_Element);
       end case;
 
+      Put_Line (Routine_Name & "L292 Loss: " & Float'Image (Loss));
       --  L292  Add L2 regularization term to loss
       --  for s in self.coefs_:
       for layer in MLP.Attributes.Params.First_Index ..
@@ -393,8 +397,8 @@ package body Multilayer_Perceptron is
       Activations   : Real_Matrix_List;
       Deltas        : Real_Matrix_List) return Parameters_Record is
       use Real_Float_Arrays;
---        Routine_Name        : constant String :=
---                                "Multilayer_Perceptron.Compute_Loss_Gradient ";
+      --        Routine_Name        : constant String :=
+      --                                "Multilayer_Perceptron.Compute_Loss_Gradient ";
       --  The ith element of Deltas holds the difference between the
       --  activations of the i + 1 layer and the backpropagated error.
       --  An activation converts the output from a layer into a form that is
@@ -409,8 +413,8 @@ package body Multilayer_Perceptron is
       New_Gradients       : Parameters_Record (New_Coeff_Gradients'Length,
                                                New_Coeff_Gradients'Length (2));
    begin
---        Test_Support.Print_Float_Vector (Routine_Name & "Intercept_Grads",
---                            Self.Attributes.Params (layer).Intercept_Grads, 1, 2);
+      --        Test_Support.Print_Float_Vector (Routine_Name & "Intercept_Grads",
+      --                            Self.Attributes.Params (layer).Intercept_Grads, 1, 2);
       New_Coeff_Gradients :=
         (New_Coeff_Gradients + Self.Parameters.Alpha *
            Self.Attributes.Params (layer).Coeff_Gradients) /
@@ -418,8 +422,8 @@ package body Multilayer_Perceptron is
       --  L194
       New_Gradients.Coeff_Gradients := New_Coeff_Gradients;
       New_Gradients.Intercept_Grads := New_Intercept_Grads;
---        Test_Support.Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
---                                         New_Gradients.Intercept_Grads, 1, 2);
+      --        Test_Support.Print_Float_Vector (Routine_Name & "updated Intercept_Grads",
+      --                                         New_Gradients.Intercept_Grads, 1, 2);
       return New_Gradients;
 
    end  Compute_Loss_Gradient;
@@ -706,24 +710,24 @@ package body Multilayer_Perceptron is
          Batch_Size := Num_Samples;
       end if;
 
---        Put_Line (Routine_Name & "L628 Num_Samples" &
---                    Integer'Image (Num_Samples));
---        Put_Line (Routine_Name & "L628 Batch_Size" & Integer'Image (Batch_Size));
+      --        Put_Line (Routine_Name & "L628 Num_Samples" &
+      --                    Integer'Image (Num_Samples));
+      --        Put_Line (Routine_Name & "L628 Batch_Size" & Integer'Image (Batch_Size));
       --  Batches is a list of slice lists
       Batches := Utils.Gen_Batches (Num_Samples, Batch_Size);
---        Put_Line (Routine_Name & "L628 Batches length" &
---                    Integer'Image (Integer (Batches.Length)));
+      --        Put_Line (Routine_Name & "L628 Batches length" &
+      --                    Integer'Image (Integer (Batches.Length)));
       --  L628
       while Continue and then Iter < Self.Parameters.Max_Iter loop
          Iter := Iter + 1;
---           Put_Line (Routine_Name & "Iter" & Integer'Image (Iter));
+         --           Put_Line (Routine_Name & "Iter" & Integer'Image (Iter));
          --  Shuffling done in Process_Batch
          Accumulated_Loss := 0.0;
          --  Batch_Iter := 0;  Batch_Iter NOT USED
          --  L636
          for Batch_index in Batches.First_Index ..
            Batches.Last_Index loop
---              Put_Line (Routine_Name & "Batch_index" & Integer'Image (Batch_index));
+            --              Put_Line (Routine_Name & "Batch_index" & Integer'Image (Batch_index));
             Process_Batch (Self, X, Y, Params, Gradients, Batches (Batch_Index),
                            Batch_Size, Accumulated_Loss);
          end loop;
@@ -1004,7 +1008,7 @@ package body Multilayer_Perceptron is
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
             Params.Coeff_Gradients (f_in, f_out) := Init_Bound * 0.1;
---                            Init_Bound * Random_Float;
+            --                            Init_Bound * Random_Float;
          end loop;
       end loop;
 
@@ -1314,8 +1318,8 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      Routine_Name : constant String :=
-                                 "Multilayer_Perceptron.Process_Batch ";
+      --        Routine_Name : constant String :=
+      --                                   "Multilayer_Perceptron.Process_Batch ";
       Num_Features : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
       X_Batch      : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
@@ -1349,9 +1353,9 @@ package body Multilayer_Perceptron is
       --  L645
       Forward_Pass (Self, Activations);
       --  Activations (1) checked OK after Forward_Pass
-      Test_Support.Print_Float_Matrix
-        (Routine_Name & "L645 Activations (last)",
-         Activations (Activations.Last_Index), 1, 1);
+      --        Test_Support.Print_Float_Matrix
+      --          (Routine_Name & "L645 Activations (last)",
+      --           Activations (Activations.Last_Index), 1, 1);
       Gradients := Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
 
       --  L665

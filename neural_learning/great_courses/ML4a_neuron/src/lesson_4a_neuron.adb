@@ -47,9 +47,6 @@ begin
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved
       Fit (MLP, Train_X, Train_Y);
-      Put_Line ("Score: " & Float'Image (Base.Score
-                (Self => MLP, X => Test_X, Y => Test_Y,
-                 Sample_Weight => Sample_Weight)));
 
       declare
          W0 : constant Real_Float_Matrix :=
@@ -61,6 +58,10 @@ begin
          Print_Float_Matrix ("W0", Transpose (W0), 1, 1, 1, 4);
          Print_Float_Vector ("b0", b0, 1, 2);
       end;
+
+      Put_Line ("Score: " & Float'Image (Base.Score
+                (Self => MLP, X => Test_X, Y => Test_Y,
+                 Sample_Weight => Sample_Weight)));
    end;  --  declare
 
    Put_Line ("----------------------------------------------");
