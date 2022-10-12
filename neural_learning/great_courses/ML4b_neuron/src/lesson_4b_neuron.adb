@@ -1,4 +1,5 @@
 
+with Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
@@ -21,9 +22,14 @@ procedure Lesson_4B_Neuron is
    Hidden_Layer_Sizes : NL_Types.Integer_List;
 begin
    Put_Line (Routine_Name);
+   if Ada.Directories.Exists (Dataset_Name & ".sta") then
+         Ada.Directories.Delete_File (Dataset_Name & ".sta");
+   end if;
+
    declare
       Data          : constant Base_State :=
-                        Get_State (Dataset_Name, Train_Size, Test_Size);
+                        Get_State (Dataset_Name, Train_Size, Test_Size,
+                                   Shuffle => False);
       Train_X       : constant Real_Float_Matrix := Data.Train_X;
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;

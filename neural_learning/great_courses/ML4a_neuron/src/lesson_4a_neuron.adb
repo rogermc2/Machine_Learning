@@ -21,11 +21,14 @@ procedure Lesson_4A_Neuron is
    MLP          : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name & "no hidden layers");
-   Ada.Directories.Delete_File ("mnist_784.sta");
+   if Ada.Directories.Exists (Dataset_Name & ".sta") then
+         Ada.Directories.Delete_File (Dataset_Name & ".sta");
+   end if;
+
    declare
       Data          : constant Base_State :=
                         Get_State (Dataset_Name, Train_Size, Test_Size,
-                                   Shuffle => False);
+                                   Shuffle => True);
       Train_X       : constant Real_Float_Matrix := Data.Train_X;
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
