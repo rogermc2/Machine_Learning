@@ -711,6 +711,33 @@ package body Classifier_Utilities is
    --  -------------------------------------------------------------------------
 
    procedure Shuffle (A : in out Real_Float_Matrix;
+                      B : in out Integer_Array) is
+      Num_Samples : constant Integer := A'Length;
+      Indicies    : Integer_Array (1 .. Num_Samples);
+      A2          : Real_Float_Matrix (A'Range, A'Range (2));
+      B2          : Integer_Array (B'Range);
+   begin
+      for row in 1 ..Num_Samples loop
+         Indicies (row) := row;
+      end loop;
+      Utilities.Permute (Indicies);
+
+      for row in A'Range loop
+         for col in A'Range (2) loop
+            A2 (row, col) := A (Indicies (row), col);
+         end loop;
+
+         B2 (row) := B (Indicies (row));
+      end loop;
+
+      A := A2;
+      B := B2;
+
+   end Shuffle;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle (A : in out Real_Float_Matrix;
                       B : in out Integer_Matrix) is
       Num_Samples : constant Integer := A'Length;
       Indicies    : Integer_Array (1 .. Num_Samples);
