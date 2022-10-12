@@ -26,7 +26,7 @@ procedure Test_Adam is
                        (0.995, 0.996, 0.997, 0.998, 0.999, 1.0);
     T              : constant Natural := 10;
     Params         : Parameters_List;
-    Adam           : Stochastic_Optimizers.Adam_Optimizer;
+    Adam           : Stochastic_Optimizers.Optimizer_Record (Optimizer_Adam);
     First_Moments  : Moments_List;
     Second_Moments : Moments_List;
     Grads          : Parameters_List;
@@ -40,7 +40,7 @@ begin
     --  L92
     for b1 in Beta_1'First .. Beta_1'Last loop
         for b2 in Beta_2'First .. Beta_2'Last loop
-            C_Init (Self => Adam, Params => Params,
+            C_Init (Self => Adam.Adam, Params => Params,
                     Initial_Learning_Rate => LR,
                     Beta_1 => Beta_1 (b1), Beta_2 => Beta_2 (b2));
             --  L95 Initialize first and second moments and ggradients
@@ -77,10 +77,10 @@ begin
                 end;
             end loop;
 
-            --  L98  Set inital values of Adam first and second moments
-            Adam.First_Moments := First_Moments;
-            Adam.Second_Moments := Second_Moments;
-            Adam.Time_Step := T - 1;
+            --  L98  Set inital values of optimizer first and second moments
+            Adam.Adam.First_Moments := First_Moments;
+            Adam.Adam.Second_Moments := Second_Moments;
+            Adam.Adam.Time_Step := T - 1;
 
             --  L103 Update local first and second moments
             for index in First_Moments.First_Index ..
