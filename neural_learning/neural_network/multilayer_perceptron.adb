@@ -40,16 +40,14 @@ with Ada.Strings.Unbounded; use Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Maths;
---  with Utilities;
 
 with Base;
-with Classifier_Utilities;
 --  with Data_Splitter;
 with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
---  with Printing;
+with Shuffle_Arrays;
 with Test_Support;
 with Utils;
 with Utils_Optimise;
@@ -1268,7 +1266,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       if Self.Parameters.Shuffle then
-         Classifier_Utilities.Shuffle (X_Batch, Y_Batch);
+         Shuffle_Arrays.Shuffle (X_Batch, Y_Batch);
       end if;
 
       --  L644  Initialize Activations

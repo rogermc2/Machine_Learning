@@ -1,0 +1,12 @@
+
+with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
+
+package Shuffle_Arrays is
+
+   procedure Shuffle (A : in out Integer_Array);
+   procedure Shuffle (A : in out Real_Float_Matrix);
+   procedure Shuffle (A : in out Real_Float_Matrix; B : in out Binary_Matrix);
+   procedure Shuffle (A : in out Real_Float_Matrix; B : in out Integer_Array);
+   procedure Shuffle (A : in out Real_Float_Matrix; B : in out Integer_Matrix);
+
+end Shuffle_Arrays;

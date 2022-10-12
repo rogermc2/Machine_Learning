@@ -6,10 +6,9 @@ with Ada.Text_IO; use Ada.Text_IO;
 
 with Openml_Ada;
 
-with Classifier_Utilities;
 with Data_Splitter;
 with NL_Types;
---  with Printing;
+with Shuffle_Arrays;
 
 package body Support_4 is
 
@@ -40,11 +39,10 @@ package body Support_4 is
                 "Y length" & Integer'Image (Y'Length) &
                 " is different to X length" &
                 Natural'Image (Positive (X'Length)));
-      --        Printing.Print_Float_List ("Features row 16", X.Element (16));
 
       if Shuffle then
          Put_Line (Routine_Name & "shuffling");
-         Classifier_Utilities.Shuffle (X, Y);
+         Shuffle_Arrays.Shuffle (X, Y);
       end if;
       --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
       Put_Line (Routine_Name & "splitting data");
@@ -130,9 +128,9 @@ package body Support_4 is
 
             if Shuffle then
                Put_Line (Routine_Name & "shuffling");
-               Classifier_Utilities.Shuffle (X, Y);
+               Shuffle_Arrays.Shuffle (X, Y);
             end if;
-            --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
+
             Put_Line (Routine_Name & "splitting data");
             Data_Splitter.Train_Test_Split
               (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
