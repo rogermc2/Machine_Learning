@@ -1,6 +1,7 @@
 
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Containers.Ordered_Sets;
+with Ada.Numerics.Discrete_Random;
 with Ada.Numerics.Elementary_Functions;
 with Ada.Strings.Unbounded;
 with Ada.Text_IO; use Ada.Text_IO;
@@ -681,6 +682,89 @@ package body Classifier_Utilities is
 
    --  -------------------------------------------------------------------------
 
+   generic
+      type Element_Type is private;
+      type Array_Type is array (Natural range <>) of Element_Type;
+   procedure Generic_Shuffle (A : in out Array_Type);
+
+   procedure Generic_Shuffle (A : in out Array_Type) is
+      package Discrete_Random is new
+        Ada.Numerics.Discrete_Random (Result_Subtype => Integer);
+      use Discrete_Random;
+      Gen       : Generator;
+      New_Index : Integer;
+      Item      : Element_Type;
+   begin
+      Reset (Gen);
+      for index in reverse A'Range loop
+         New_Index := (Random (Gen) mod index) + 1;
+         Item := A (index);
+         A (index) := A (New_Index);
+         A (New_Index) := Item;
+      end loop;
+
+   end Generic_Shuffle;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle_Integers is new Generic_Shuffle (Element_Type => Integer,
+                                                      Array_Type   => Integer_Array);
+
+   --  -------------------------------------------------------------------------
+
+   generic
+      type Element_Type is private;
+      type Array_Type is array (Integer range <>, Integer range <>)
+        of Element_Type;
+   procedure Generic_Float_Shuffle (A : in out Array_Type);
+
+   procedure Generic_Float_Shuffle (A : in out Array_Type) is
+      package Discrete_Random is new
+        Ada.Numerics.Discrete_Random (Result_Subtype => Integer);
+      use Discrete_Random;
+      Gen       : Generator;
+      New_Index : Integer;
+      Row       : array (A'Range (2)) of Element_Type;
+   begin
+      Reset (Gen);
+      for index in reverse A'Range loop
+         New_Index := (Random (Gen) mod index) + 1;
+         for col in A'Range (2) loop
+            Row (col) := A (index, col);
+         end loop;
+
+         for col in A'Range (2) loop
+            A (index, col) := A (New_Index, col);
+            A (New_Index, col) := Row (col);
+         end loop;
+      end loop;
+
+   end Generic_Float_Shuffle;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle_Floats is new
+     Generic_Float_Shuffle (Element_Type => Float,
+                            Array_Type   => Real_Float_Matrix);
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle (A : in out Real_Float_Matrix) is
+   begin
+      Shuffle_Floats (A);
+
+   end Shuffle;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Shuffle (A : in out Integer_Array) is
+   begin
+      Shuffle_Integers (A);
+
+   end Shuffle;
+
+   --  -------------------------------------------------------------------------
+
    procedure Shuffle (A : in out Real_Float_Matrix;
                       B : in out Binary_Matrix) is
       Num_Samples : constant Integer := A'Length;
@@ -740,100 +824,100 @@ package body Classifier_Utilities is
          end loop;
       end;
 
-      end Shuffle;
+   end Shuffle;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      procedure Shuffle (A : in out Real_Float_Matrix;
-                         B : in out Integer_Matrix) is
-         Num_Samples : constant Integer := A'Length;
-         Indicies    : Integer_Array (1 .. Num_Samples);
-         A2          : Real_Float_Matrix (A'Range, A'Range (2));
-         B2          : Integer_Matrix (B'Range, B'Range (2));
-      begin
-         for row in 1 ..Num_Samples loop
-            Indicies (row) := row;
-         end loop;
-         Utilities.Permute (Indicies);
+   procedure Shuffle (A : in out Real_Float_Matrix;
+                      B : in out Integer_Matrix) is
+      Num_Samples : constant Integer := A'Length;
+      Indicies    : Integer_Array (1 .. Num_Samples);
+      A2          : Real_Float_Matrix (A'Range, A'Range (2));
+      B2          : Integer_Matrix (B'Range, B'Range (2));
+   begin
+      for row in 1 ..Num_Samples loop
+         Indicies (row) := row;
+      end loop;
+      Utilities.Permute (Indicies);
 
-         for row in A'Range loop
-            for col in A'Range (2) loop
-               A2 (row, col) := A (Indicies (row), col);
-            end loop;
-
-            for col in B'Range (2) loop
-               B2 (row, col) := B (Indicies (row), col);
-            end loop;
+      for row in A'Range loop
+         for col in A'Range (2) loop
+            A2 (row, col) := A (Indicies (row), col);
          end loop;
 
-         A := A2;
-         B := B2;
+         for col in B'Range (2) loop
+            B2 (row, col) := B (Indicies (row), col);
+         end loop;
+      end loop;
 
-      end Shuffle;
+      A := A2;
+      B := B2;
 
-      --  -------------------------------------------------------------------------
+   end Shuffle;
 
-      function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
-                               Num_Outputs : Positive := 1)
+   --  -------------------------------------------------------------------------
+
+   function Split_Raw_Data (Raw_Data    : Raw_Data_Vector;
+                            Num_Outputs : Positive := 1)
                             return Multi_Output_Data_Record is
-         use Ada.Containers;
-         use Ada.Strings;
-         use Ada.Strings.Unbounded;
-         --        Routine_Name   : constant String :=
-         --                           "Classifier_Utilities.Split_Raw_Data ";
-         aRow           : Unbounded_List := Raw_Data.First_Element;
-         Num_Items      : constant Positive := Positive (aRow.Length);
-         Num_Features   : constant Positive := Num_Items - Num_Outputs;
-         Feature_Types  : Feature_Type_Array (1 .. Num_Features);
-         Features_List  : Value_Data_Lists_2D;
-         Label_Types    : Label_Type_Array  (1 .. Num_Outputs);
-         Label_Values   : Value_Data_List;
-         Labels_List    : Value_Data_Lists_2D;
-         Feature_Values : Value_Data_List;
-         Data           : Multi_Output_Data_Record;
-      begin
-         Parse_Header (aRow, Num_Features, Data);
-         aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
-         if aRow.Length > 1 then
+      use Ada.Containers;
+      use Ada.Strings;
+      use Ada.Strings.Unbounded;
+      --        Routine_Name   : constant String :=
+      --                           "Classifier_Utilities.Split_Raw_Data ";
+      aRow           : Unbounded_List := Raw_Data.First_Element;
+      Num_Items      : constant Positive := Positive (aRow.Length);
+      Num_Features   : constant Positive := Num_Items - Num_Outputs;
+      Feature_Types  : Feature_Type_Array (1 .. Num_Features);
+      Features_List  : Value_Data_Lists_2D;
+      Label_Types    : Label_Type_Array  (1 .. Num_Outputs);
+      Label_Values   : Value_Data_List;
+      Labels_List    : Value_Data_Lists_2D;
+      Feature_Values : Value_Data_List;
+      Data           : Multi_Output_Data_Record;
+   begin
+      Parse_Header (aRow, Num_Features, Data);
+      aRow := Raw_Data.Element (Positive'Succ (Raw_Data.First_Index));
+      if aRow.Length > 1 then
+         for f_index in 1 .. Num_Features loop
+            declare
+               Row_S     : constant String := To_String (aRow (f_index));
+               S_Last    : constant Integer := Row_S'Last;
+               Last_Char : constant Character := Row_S (S_Last);
+            begin
+               if Character'Pos (Last_Char) < 32 then
+                  aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+               end if;
+               Feature_Types (Positive (f_index)) :=
+                 Utilities.Get_Data_Type (aRow (Positive (f_index)));
+            end;
+         end loop;
+
+         for l_index in 1 .. Num_Outputs loop
+            declare
+               Row_S     : constant String := To_String (aRow (Num_Features + l_index));
+               S_Last    : constant Integer := Row_S'Last;
+               Last_Char : constant Character := Row_S (S_Last);
+            begin
+               if Character'Pos (Last_Char) < 32 then
+                  aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
+               end if;
+               Label_Types (Positive (l_index)) :=
+                 Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
+            end;
+         end loop;
+
+         for row_index in Positive'Succ (Raw_Data.First_Index) ..
+           Raw_Data.Last_Index loop
+            aRow := Raw_Data.Element (row_index);  --  Unbound list
+
+            Feature_Values.Clear;
             for f_index in 1 .. Num_Features loop
                declare
-                  Row_S     : constant String := To_String (aRow (f_index));
-                  S_Last    : constant Integer := Row_S'Last;
-                  Last_Char : constant Character := Row_S (S_Last);
+                  Feat_String : constant String := To_String (aRow (f_index));
+                  Value       : Value_Record (Feature_Types (Positive (f_index)));
                begin
-                  if Character'Pos (Last_Char) < 32 then
-                     aRow (f_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
-                  end if;
-                  Feature_Types (Positive (f_index)) :=
-                    Utilities.Get_Data_Type (aRow (Positive (f_index)));
-               end;
-            end loop;
-
-            for l_index in 1 .. Num_Outputs loop
-               declare
-                  Row_S     : constant String := To_String (aRow (Num_Features + l_index));
-                  S_Last    : constant Integer := Row_S'Last;
-                  Last_Char : constant Character := Row_S (S_Last);
-               begin
-                  if Character'Pos (Last_Char) < 32 then
-                     aRow (Num_Features + l_index) := To_Unbounded_String (Row_S (1 .. S_Last - 1));
-                  end if;
-                  Label_Types (Positive (l_index)) :=
-                    Utilities.Get_Data_Type (aRow (Positive (Num_Features + l_index)));
-               end;
-            end loop;
-
-            for row_index in Positive'Succ (Raw_Data.First_Index) ..
-              Raw_Data.Last_Index loop
-               aRow := Raw_Data.Element (row_index);  --  Unbound list
-
-               Feature_Values.Clear;
-               for f_index in 1 .. Num_Features loop
-                  declare
-                     Feat_String : constant String := To_String (aRow (f_index));
-                     Value       : Value_Record (Feature_Types (Positive (f_index)));
-                  begin
-                     case Feature_Types (Positive (f_index)) is
+                  case Feature_Types (Positive (f_index)) is
                      when Boolean_Type =>
                         Value.Boolean_Value := Boolean'Value (Feat_String);
                      when Integer_Type =>
@@ -842,32 +926,32 @@ package body Classifier_Utilities is
                         Value.Float_Value := Float'Value (Feat_String);
                      when UB_String_Type =>
                         Value.UB_String_Value := aRow (f_index);
-                     end case;
-                     Feature_Values.Append (Value);
-                  end;  --  declare block
-               end loop;
-               Features_List.Append (Feature_Values);
+                  end case;
+                  Feature_Values.Append (Value);
+               end;  --  declare block
+            end loop;
+            Features_List.Append (Feature_Values);
 
-               for o_index in 1 .. Num_Outputs loop
-                  Label_Values.Clear;
-                  declare
-                     Row_S     : constant String :=
-                                   To_String (aRow (Num_Features + o_index));
-                     S_Last    : constant Integer := Row_S'Last;
-                     Last_Char : constant Character := Row_S (S_Last);
-                  begin
-                     if Character'Pos (Last_Char) < 32 then
-                        aRow (Num_Features + o_index) :=
-                          To_Unbounded_String (Row_S (1 .. S_Last - 1));
-                     end if;
-                  end;
+            for o_index in 1 .. Num_Outputs loop
+               Label_Values.Clear;
+               declare
+                  Row_S     : constant String :=
+                                To_String (aRow (Num_Features + o_index));
+                  S_Last    : constant Integer := Row_S'Last;
+                  Last_Char : constant Character := Row_S (S_Last);
+               begin
+                  if Character'Pos (Last_Char) < 32 then
+                     aRow (Num_Features + o_index) :=
+                       To_Unbounded_String (Row_S (1 .. S_Last - 1));
+                  end if;
+               end;
 
-                  declare
-                     Label       : constant String :=
-                                     To_String (aRow (Num_Features + o_index));
-                     Label_Value : Value_Record (Label_Types (o_index));
-                  begin
-                     case Label_Types (Positive (o_index)) is
+               declare
+                  Label       : constant String :=
+                                  To_String (aRow (Num_Features + o_index));
+                  Label_Value : Value_Record (Label_Types (o_index));
+               begin
+                  case Label_Types (Positive (o_index)) is
                      when Boolean_Type =>
                         Label_Value.Boolean_Value := Boolean'Value (Label);
                      when Integer_Type =>
@@ -877,73 +961,73 @@ package body Classifier_Utilities is
                      when UB_String_Type =>
                         Label_Value.UB_String_Value :=
                           aRow (Num_Features + o_index);
-                     end case;
-                     Label_Values.Append (Label_Value);
-                  end;  --  declare block;
-                  Labels_List.Append (Label_Values);
-               end loop;
+                  end case;
+                  Label_Values.Append (Label_Value);
+               end;  --  declare block;
+               Labels_List.Append (Label_Values);
             end loop;
-
-            Data.Feature_Values := Features_List;
-            Data.Label_Values := Labels_List;
-         end if;
-
-         return Data;
-
-      end Split_Raw_Data;
-
-      --  -----------------------------------------------------------------------
-
-      function Sum_Cols (aList : Float_List_2D) return Float_List is
-         theSum : Float_List;
-         Value  : Float;
-      begin
-         for index in aList.First_Index .. aList.Last_Index loop
-            Value := 0.0;
-            for index_2 in aList.Element (1).First_Index ..
-              aList.Element (1).Last_Index loop
-               Value := Value + aList.Element (1).Element (index_2);
-            end loop;
-            theSum.Append (Value);
          end loop;
 
-         return theSum;
+         Data.Feature_Values := Features_List;
+         Data.Label_Values := Labels_List;
+      end if;
 
-      end Sum_Cols;
+      return Data;
 
-      --  -------------------------------------------------------------------------
+   end Split_Raw_Data;
 
-      function Sum_Cols (aMatrix : Real_Float_Matrix) return Real_Float_Vector is
-         theSum : Real_Float_Vector (aMatrix'Range);
-         Value  : Float;
-      begin
-         for row in aMatrix'Range loop
-            Value := 0.0;
-            for col in aMatrix'Range (2) loop
-               Value := Value + aMatrix (row, col);
-            end loop;
-            theSum (row) := Value;
+   --  -----------------------------------------------------------------------
+
+   function Sum_Cols (aList : Float_List_2D) return Float_List is
+      theSum : Float_List;
+      Value  : Float;
+   begin
+      for index in aList.First_Index .. aList.Last_Index loop
+         Value := 0.0;
+         for index_2 in aList.Element (1).First_Index ..
+           aList.Element (1).Last_Index loop
+            Value := Value + aList.Element (1).Element (index_2);
          end loop;
+         theSum.Append (Value);
+      end loop;
 
-         return theSum;
+      return theSum;
 
-      end Sum_Cols;
+   end Sum_Cols;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function Sum_Cols (aList : Value_Data_Lists_2D) return Value_Data_List is
-         theSum     : Value_Data_List;
-         Value_Type : constant Data_Type :=
-                        aList.Element (1).Element (1).Value_Kind;
-         F_Value    : Float;
-         I_Value    : Integer;
-         Value_Rec  : Value_Record;
-      begin
-         for index in aList.First_Index .. aList.Last_Index loop
-            F_Value := 0.0;
-            I_Value := 0;
-            Value_Rec := aList.Element (1).Element (1);
-            case Value_Type is
+   function Sum_Cols (aMatrix : Real_Float_Matrix) return Real_Float_Vector is
+      theSum : Real_Float_Vector (aMatrix'Range);
+      Value  : Float;
+   begin
+      for row in aMatrix'Range loop
+         Value := 0.0;
+         for col in aMatrix'Range (2) loop
+            Value := Value + aMatrix (row, col);
+         end loop;
+         theSum (row) := Value;
+      end loop;
+
+      return theSum;
+
+   end Sum_Cols;
+
+   --  -------------------------------------------------------------------------
+
+   function Sum_Cols (aList : Value_Data_Lists_2D) return Value_Data_List is
+      theSum     : Value_Data_List;
+      Value_Type : constant Data_Type :=
+                     aList.Element (1).Element (1).Value_Kind;
+      F_Value    : Float;
+      I_Value    : Integer;
+      Value_Rec  : Value_Record;
+   begin
+      for index in aList.First_Index .. aList.Last_Index loop
+         F_Value := 0.0;
+         I_Value := 0;
+         Value_Rec := aList.Element (1).Element (1);
+         case Value_Type is
             when Float_Type =>
                for index_2 in aList.Element (1).First_Index ..
                  aList.Element (1).Last_Index loop
@@ -961,24 +1045,24 @@ package body Classifier_Utilities is
                Value_Rec.Integer_Value := I_Value;
 
             when others => null;
-            end case;
-            theSum.Append (Value_Rec);
-         end loop;
+         end case;
+         theSum.Append (Value_Rec);
+      end loop;
 
-         return theSum;
+      return theSum;
 
-      end Sum_Cols;
+   end Sum_Cols;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Float_List (F : Value_Data_List) return Float_List is
-         use Ada.Strings.Unbounded;
-         Item   : Value_Record;
-         Floats : Float_List;
-      begin
-         for index in F.First_Index .. F.Last_Index loop
-            Item := F.Element (index);
-            case Item.Value_Kind is
+   function To_Float_List (F : Value_Data_List) return Float_List is
+      use Ada.Strings.Unbounded;
+      Item   : Value_Record;
+      Floats : Float_List;
+   begin
+      for index in F.First_Index .. F.Last_Index loop
+         Item := F.Element (index);
+         case Item.Value_Kind is
             when Boolean_Type =>
                if Item.Boolean_Value then
                   Floats.Append (1.0);
@@ -992,76 +1076,76 @@ package body Classifier_Utilities is
             when UB_String_Type =>
                Floats.Append
                  (Float (Integer'Value (To_String (Item.UB_String_Value))));
-            end case;
-         end loop;
+         end case;
+      end loop;
 
-         return Floats;
+      return Floats;
 
-      end To_Float_List;
+   end To_Float_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Float_List (I : Integer_List) return Float_List is
-         F_List : Float_List;
-      begin
-         for index in I.First_Index .. I.Last_Index loop
-            F_List.Append (Float (I.Element (index)));
-         end loop;
+   function To_Float_List (I : Integer_List) return Float_List is
+      F_List : Float_List;
+   begin
+      for index in I.First_Index .. I.Last_Index loop
+         F_List.Append (Float (I.Element (index)));
+      end loop;
 
-         return F_List;
+      return F_List;
 
-      end To_Float_List;
+   end To_Float_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Float_List_2D (Data : Value_Data_Lists_2D)
+   function To_Float_List_2D (Data : Value_Data_Lists_2D)
                               return Float_List_2D is
-         F2_List : Float_List_2D;
-      begin
-         for index in Data.First_Index .. Data.Last_Index loop
-            F2_List.Append (To_Float_List (Data (index)));
-         end loop;
+      F2_List : Float_List_2D;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         F2_List.Append (To_Float_List (Data (index)));
+      end loop;
 
-         return F2_List;
+      return F2_List;
 
-      end To_Float_List_2D;
+   end To_Float_List_2D;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D is
-         F2_List : Float_List_2D;
-      begin
-         for index in I.First_Index .. I.Last_Index loop
-            F2_List.Append (To_Float_List (I (index)));
-         end loop;
+   function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D is
+      F2_List : Float_List_2D;
+   begin
+      for index in I.First_Index .. I.Last_Index loop
+         F2_List.Append (To_Float_List (I (index)));
+      end loop;
 
-         return F2_List;
+      return F2_List;
 
-      end To_Float_List_2D;
+   end To_Float_List_2D;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Integer_List (Ints : Integer_Array) return Integer_List is
-         Values : Integer_List;
-      begin
-         for index in Ints'Range loop
-            Values.Append (Ints (index));
-         end loop;
+   function To_Integer_List (Ints : Integer_Array) return Integer_List is
+      Values : Integer_List;
+   begin
+      for index in Ints'Range loop
+         Values.Append (Ints (index));
+      end loop;
 
-         return Values;
+      return Values;
 
-      end To_Integer_List;
+   end To_Integer_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Integer_List (Ints : Value_Data_List) return Integer_List is
-         use Ada.Strings.Unbounded;
-         Item   : Value_Record;
-         Values : Integer_List;
-      begin
-         for index in Ints.First_Index .. Ints.Last_Index loop
-            Item := Ints.Element (index);
-            case Item.Value_Kind is
+   function To_Integer_List (Ints : Value_Data_List) return Integer_List is
+      use Ada.Strings.Unbounded;
+      Item   : Value_Record;
+      Values : Integer_List;
+   begin
+      for index in Ints.First_Index .. Ints.Last_Index loop
+         Item := Ints.Element (index);
+         case Item.Value_Kind is
             when Boolean_Type =>
                if Item.Boolean_Value then
                   Values.Append (1);
@@ -1075,254 +1159,254 @@ package body Classifier_Utilities is
             when UB_String_Type =>
                Values.Append
                  (Integer'Value (To_String (Item.UB_String_Value)));
-            end case;
+         end case;
 
-         end loop;
+      end loop;
 
-         return Values;
+      return Values;
 
-      end To_Integer_List;
+   end To_Integer_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
+   function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
                                    return Value_Data_List is
-         Data       : Value_Record (Integer_Type);
-         A_List     : Value_Data_List;
-      begin
-         for index in A'First .. A'Last loop
-            Data.Integer_Value := A (index);
-            A_List.Append (Data);
-         end loop;
+      Data       : Value_Record (Integer_Type);
+      A_List     : Value_Data_List;
+   begin
+      for index in A'First .. A'Last loop
+         Data.Integer_Value := A (index);
+         A_List.Append (Data);
+      end loop;
 
-         return A_List;
-      end To_Integer_Value_List;
+      return A_List;
+   end To_Integer_Value_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
+   function To_Integer_Value_List_2D (A : NL_Arrays_And_Matrices.Integer_Array)
                                       return Value_Data_Lists_2D is
-         Data       : Value_Record (Integer_Type);
-         B_List     : Value_Data_List;
-         Multi_List : Value_Data_Lists_2D;
-      begin
-         for index in A'First .. A'Last loop
-            B_List.Clear;
-            Data.Integer_Value := A (index);
-            B_List.Append (Data);
-            Multi_List.Append (B_List);
-         end loop;
+      Data       : Value_Record (Integer_Type);
+      B_List     : Value_Data_List;
+      Multi_List : Value_Data_Lists_2D;
+   begin
+      for index in A'First .. A'Last loop
+         B_List.Clear;
+         Data.Integer_Value := A (index);
+         B_List.Append (Data);
+         Multi_List.Append (B_List);
+      end loop;
 
-         return Multi_List;
-      end To_Integer_Value_List_2D;
+      return Multi_List;
+   end To_Integer_Value_List_2D;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Integer_List_2D (Data : Value_Data_Lists_2D)
+   function To_Integer_List_2D (Data : Value_Data_Lists_2D)
                                 return Integer_List_2D  is
-         I2_List : Integer_List_2D;
-      begin
-         for index in Data.First_Index .. Data.Last_Index loop
-            I2_List.Append (To_Integer_List (Data (index)));
-         end loop;
+      I2_List : Integer_List_2D;
+   begin
+      for index in Data.First_Index .. Data.Last_Index loop
+         I2_List.Append (To_Integer_List (Data (index)));
+      end loop;
 
-         return I2_List;
+      return I2_List;
 
-      end To_Integer_List_2D;
+   end To_Integer_List_2D;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
+   function To_Multi_Value_List (A : NL_Arrays_And_Matrices.Multi_Value_Array)
                                  return Value_Data_Lists_2D is
-         Value    : Value_Record (Integer_Type);
-         Row_List : Value_Data_Lists_2D;
-         Col_List : Value_Data_List;
-      begin
-         for row in A'First .. A'Last loop
-            Col_List.Clear;
-            for col in A'Range (2) loop
-               Value.Integer_Value := A (row, col);
-               Col_List.Append (Value);
-            end loop;
-            Row_List.Append (Col_List);
+      Value    : Value_Record (Integer_Type);
+      Row_List : Value_Data_Lists_2D;
+      Col_List : Value_Data_List;
+   begin
+      for row in A'First .. A'Last loop
+         Col_List.Clear;
+         for col in A'Range (2) loop
+            Value.Integer_Value := A (row, col);
+            Col_List.Append (Value);
          end loop;
-         return Row_List;
+         Row_List.Append (Col_List);
+      end loop;
+      return Row_List;
 
-      end To_Multi_Value_List;
+   end To_Multi_Value_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
+   function To_Natural_List (A : NL_Arrays_And_Matrices.Natural_Array)
                              return Natural_List is
-         A_List : Natural_List;
-      begin
-         for index in A'First .. A'Last loop
-            A_List.Append (A (index));
-         end loop;
-         return A_List;
+      A_List : Natural_List;
+   begin
+      for index in A'First .. A'Last loop
+         A_List.Append (A (index));
+      end loop;
+      return A_List;
 
-      end To_Natural_List;
+   end To_Natural_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Natural_List (Numbers : Value_Data_List)
+   function To_Natural_List (Numbers : Value_Data_List)
                              return Natural_List is
-         Item   : Value_Record;
-         Values : Natural_List;
-      begin
-         for index in Numbers.First_Index .. Numbers.Last_Index loop
-            Item := Numbers.Element (index);
-            Assert (Item.Value_Kind = Integer_Type,
-                    "Classifier_Utilities.To_Natural_List invalid item "
-                    & Integer'Image (index) & " data type is " &
-                      Data_Type'Image (Item.Value_Kind));
-            Assert (Item.Integer_Value >= 0,
-                    "Classifier_Utilities.To_Natural_List invalid value "
-                    & Integer'Image (Item.Integer_Value) & " should be >= 0.");
-            Values.Append (Natural (Item.Integer_Value));
-         end loop;
+      Item   : Value_Record;
+      Values : Natural_List;
+   begin
+      for index in Numbers.First_Index .. Numbers.Last_Index loop
+         Item := Numbers.Element (index);
+         Assert (Item.Value_Kind = Integer_Type,
+                 "Classifier_Utilities.To_Natural_List invalid item "
+                 & Integer'Image (index) & " data type is " &
+                   Data_Type'Image (Item.Value_Kind));
+         Assert (Item.Integer_Value >= 0,
+                 "Classifier_Utilities.To_Natural_List invalid value "
+                 & Integer'Image (Item.Integer_Value) & " should be >= 0.");
+         Values.Append (Natural (Item.Integer_Value));
+      end loop;
 
-         return Values;
+      return Values;
 
-      end To_Natural_List;
+   end To_Natural_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
+   function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
                                    return Value_Data_Lists_2D is
-         Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
-      begin
-         for index in A'First .. A'Last loop
-            Int_Array (index) := A (index);
-         end loop;
-         return To_Integer_Value_List_2D (Int_Array);
-      end To_Natural_Value_List;
+      Int_Array : NL_Arrays_And_Matrices.Integer_Array (1 .. A'Length);
+   begin
+      for index in A'First .. A'Last loop
+         Int_Array (index) := A (index);
+      end loop;
+      return To_Integer_Value_List_2D (Int_Array);
+   end To_Natural_Value_List;
 
-      --  ------------------------------------------------------------------------
+   --  ------------------------------------------------------------------------
 
-      function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
+   function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
                          return Real_Float_Matrix is
-         Routine_Name : constant String :=
-                          "Classifier_Utilities.To_PL_Array ";
-         Length_1D    : constant Positive := Positive (List_1D.Length);
-         Num_Cols     : constant Positive := Length_1D / Num_Rows;
-         End_Offset   : constant Positive := Num_Cols - 1;
-         Start        : Positive := List_1D.First_Index;
-         Result       : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
-      begin
-         Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
-                   Integer'Image (Num_Rows) & " is incompatible with List_1D size"
-                 & Integer'Image (Length_1D));
+      Routine_Name : constant String :=
+                       "Classifier_Utilities.To_PL_Array ";
+      Length_1D    : constant Positive := Positive (List_1D.Length);
+      Num_Cols     : constant Positive := Length_1D / Num_Rows;
+      End_Offset   : constant Positive := Num_Cols - 1;
+      Start        : Positive := List_1D.First_Index;
+      Result       : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
+   begin
+      Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
+                Integer'Image (Num_Rows) & " is incompatible with List_1D size"
+              & Integer'Image (Length_1D));
 
-         for row in reverse 1 .. Num_Rows loop
-            for col in Start .. Start + End_Offset loop
-               Result (col - Start + 1, row) := Float (List_1D.Element (col));
-            end loop;
-            Start := Start + Num_Cols;
+      for row in reverse 1 .. Num_Rows loop
+         for col in Start .. Start + End_Offset loop
+            Result (col - Start + 1, row) := Float (List_1D.Element (col));
          end loop;
+         Start := Start + Num_Cols;
+      end loop;
 
-         return Result;
+      return Result;
 
-      end To_PL_Array;
+   end To_PL_Array;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Value_2D_List (A : Value_Data_List)
+   function To_Value_2D_List (A : Value_Data_List)
                               return Value_Data_Lists_2D is
-         Output_List : Value_Data_List;
-         A2_List     : Value_Data_Lists_2D;
-      begin
-         A2_List.Clear;
-         for index in A.First_Index .. A.Last_Index loop
-            Output_List.Clear;
-            Output_List.Append (A.Element (index));
-            A2_List.Append (Output_List);
-         end loop;
+      Output_List : Value_Data_List;
+      A2_List     : Value_Data_Lists_2D;
+   begin
+      A2_List.Clear;
+      for index in A.First_Index .. A.Last_Index loop
+         Output_List.Clear;
+         Output_List.Append (A.Element (index));
+         A2_List.Append (Output_List);
+      end loop;
 
-         return A2_List;
+      return A2_List;
 
-      end To_Value_2D_List;
+   end To_Value_2D_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function To_Value_2D_List (List_1D  : Value_Data_List;
-                                 Num_Rows : Positive)
+   function To_Value_2D_List (List_1D  : Value_Data_List;
+                              Num_Rows : Positive)
                               return Value_Data_Lists_2D is
-         Routine_Name : constant String :=
-                          "Classifier_Utilities.To_Value_2D_List ";
-         Length_1D    : constant Positive := Positive (List_1D.Length);
-         Num_Cols     : constant Positive := Length_1D / Num_Rows;
-         End_Offset   : constant Positive := Num_Cols - 1;
-         Start        : Positive := List_1D.First_Index;
-         Column_List  : Value_Data_List;
-         List_2D      : Value_Data_Lists_2D;
-      begin
-         Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
-                   Integer'Image (Num_Rows) & " is incompatible with List_1D size"
-                 & Integer'Image (Length_1D));
+      Routine_Name : constant String :=
+                       "Classifier_Utilities.To_Value_2D_List ";
+      Length_1D    : constant Positive := Positive (List_1D.Length);
+      Num_Cols     : constant Positive := Length_1D / Num_Rows;
+      End_Offset   : constant Positive := Num_Cols - 1;
+      Start        : Positive := List_1D.First_Index;
+      Column_List  : Value_Data_List;
+      List_2D      : Value_Data_Lists_2D;
+   begin
+      Assert (Num_Rows * Num_Cols = Length_1D, Routine_Name & "Num_Rows" &
+                Integer'Image (Num_Rows) & " is incompatible with List_1D size"
+              & Integer'Image (Length_1D));
 
-         for index in 1 .. Num_Rows loop
-            Column_List.Clear;
-            for col in Start .. Start + End_Offset loop
-               Column_List.Append (List_1D (col));
-            end loop;
-            List_2D.Append (Column_List);
-            Start := Start + Num_Cols;
+      for index in 1 .. Num_Rows loop
+         Column_List.Clear;
+         for col in Start .. Start + End_Offset loop
+            Column_List.Append (List_1D (col));
          end loop;
+         List_2D.Append (Column_List);
+         Start := Start + Num_Cols;
+      end loop;
 
-         return List_2D;
+      return List_2D;
 
-      end To_Value_2D_List;
+   end To_Value_2D_List;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function Transpose (Values : Value_Data_Lists_2D)
+   function Transpose (Values : Value_Data_Lists_2D)
                        return  Value_Data_Lists_2D is
-         use Ada.Containers;
-         Num_Rows : constant Positive := Positive (Values.Length);
-         Num_Cols : constant Count_Type := Values.Element (1).Length;
-         In_Row   : Value_Data_List;
-         Out_Row  : Value_Data_List;
-         Result   : Value_Data_Lists_2D;
-      begin
-         Result.Set_Length (Num_Cols);
-         for row in 1 .. Num_Rows loop
-            In_Row := Values.Element (row);
-            for index in In_Row.First_Index ..  In_Row.Last_Index loop
-               Out_Row := Result.Element (index);
-               Out_Row.Append (In_Row.Element (index));
-               Result.Replace_Element (index, Out_Row);
-            end loop;
+      use Ada.Containers;
+      Num_Rows : constant Positive := Positive (Values.Length);
+      Num_Cols : constant Count_Type := Values.Element (1).Length;
+      In_Row   : Value_Data_List;
+      Out_Row  : Value_Data_List;
+      Result   : Value_Data_Lists_2D;
+   begin
+      Result.Set_Length (Num_Cols);
+      for row in 1 .. Num_Rows loop
+         In_Row := Values.Element (row);
+         for index in In_Row.First_Index ..  In_Row.Last_Index loop
+            Out_Row := Result.Element (index);
+            Out_Row.Append (In_Row.Element (index));
+            Result.Replace_Element (index, Out_Row);
          end loop;
+      end loop;
 
-         return Result;
+      return Result;
 
-      end Transpose;
+   end Transpose;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-      function Unique (Nums : Integer_List)
+   function Unique (Nums : Integer_List)
                     return Integer_List is
-         use Int_Sets;
-         use Integer_Package;
-         Unique_Set : Int_Sets.Set;
-         Int_Curs   : Integer_Package.Cursor := Nums.First;
-         Set_Curs   : Int_Sets.Cursor;
-         Nums_List  : Integer_List;
-      begin
-         while Has_Element (Int_Curs) loop
-            Unique_Set.Include (Element (Int_Curs));
-            Next (Int_Curs);
-         end loop;
+      use Int_Sets;
+      use Integer_Package;
+      Unique_Set : Int_Sets.Set;
+      Int_Curs   : Integer_Package.Cursor := Nums.First;
+      Set_Curs   : Int_Sets.Cursor;
+      Nums_List  : Integer_List;
+   begin
+      while Has_Element (Int_Curs) loop
+         Unique_Set.Include (Element (Int_Curs));
+         Next (Int_Curs);
+      end loop;
 
-         Set_Curs := Unique_Set.First;
-         while Has_Element (Set_Curs) loop
-            Nums_List.Append (Element (Set_Curs));
-            Next (Set_Curs);
-         end loop;
-         return Nums_List;
-      end Unique;
+      Set_Curs := Unique_Set.First;
+      while Has_Element (Set_Curs) loop
+         Nums_List.Append (Element (Set_Curs));
+         Next (Set_Curs);
+      end loop;
+      return Nums_List;
+   end Unique;
 
-      --  -------------------------------------------------------------------------
+   --  -------------------------------------------------------------------------
 
-   end Classifier_Utilities;
+end Classifier_Utilities;
