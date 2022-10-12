@@ -1003,14 +1003,14 @@ package body Multilayer_Perceptron is
       --  Generate random weights, Random_Float -1.0 .. 1.0
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Params.Coeff_Gradients (f_in, f_out) := --  Init_Bound * 0.1;
-                          Init_Bound * Random_Float;
+            Params.Coeff_Gradients (f_in, f_out) := Init_Bound * 0.1;
+--                            Init_Bound * Random_Float;
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
+         Params.Intercept_Grads (f_out) := 0.0; -- Init_Bound * Random_Float;
       end loop;
 
       return Params;
@@ -1314,16 +1314,16 @@ package body Multilayer_Perceptron is
                             Batch_Slice      : Slice_Record;
                             Batch_Size       : Positive;
                             Accumulated_Loss : in out Float) is
-      --        Routine_Name   : constant String :=
-      --                             "Multilayer_Perceptron.Process_Batch ";
-      Num_Features   : constant Positive := Positive (X'Length (2));
+      Routine_Name : constant String :=
+                                 "Multilayer_Perceptron.Process_Batch ";
+      Num_Features : constant Positive := Positive (X'Length (2));
       --  X_Batch: samples x features
-      X_Batch        : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
-      Y_Batch        : Binary_Matrix (1 .. Batch_Size, Y'Range (2));
+      X_Batch      : Real_Float_Matrix (1 .. Batch_Size, 1 .. Num_Features);
+      Y_Batch      : Binary_Matrix (1 .. Batch_Size, Y'Range (2));
       --  Activations: layers x samples x features
-      Activations    : Real_Matrix_List;
-      Batch_Row      : Positive;
-      Batch_Loss     : Float;
+      Activations  : Real_Matrix_List;
+      Batch_Row    : Positive;
+      Batch_Loss   : Float;
    begin
       --  Get batch data
       for row in Batch_Slice.First .. Batch_Slice.Last loop
@@ -1342,11 +1342,16 @@ package body Multilayer_Perceptron is
       end if;
 
       --  L644  Initialize Activations
+      --  Activations initialization checked OK
       Activations.Clear;
       Activations.Append (X_Batch);
 
       --  L645
       Forward_Pass (Self, Activations);
+      --  Activations (1) checked OK after Forward_Pass
+      Test_Support.Print_Float_Matrix
+        (Routine_Name & "L645 Activations (last)",
+         Activations (Activations.Last_Index), 1, 1);
       Gradients := Backprop (Self, X_Batch, Y_Batch, Activations, Batch_Loss);
 
       --  L665
