@@ -27,15 +27,19 @@ begin
       Shuffled_Data : constant Base_State :=
                         Get_State (Dataset_Name, Train_Size, Test_Size,
                                    Shuffle => True);
-      Train_X       : constant Real_Float_Matrix := Data.Train_X;
-      Train_Y       : constant Integer_Matrix := Data.Train_Y;
-      Test_X        : constant Real_Float_Matrix := Data.Test_X;
-      Test_Y        : constant Integer_Matrix := Data.Test_Y;
+      X          : constant Real_Float_Matrix := Data.Train_X;
+      Y          : constant Integer_Matrix := Data.Train_Y;
+      Shuffled_X : constant Real_Float_Matrix := Shuffled_Data.Train_X;
+      Shuffled_Y : constant Integer_Matrix := Shuffled_Data.Train_Y;
    begin
-      Print_Matrix_Dimensions ("Train X", Train_X);
-      Print_Matrix_Dimensions ("Train Y", Train_Y);
-      Print_Matrix_Dimensions ("Test X", Test_X);
-      Print_Matrix_Dimensions ("Test Y", Test_Y);
+--        Print_Matrix_Dimensions ("X", X);
+--        Print_Matrix_Dimensions ("Y", Y);
+--        Print_Matrix_Dimensions ("Shuffled X", Shuffled_X);
+--        Print_Matrix_Dimensions ("Shuffled Y", Shuffled_Y);
+      Print_Float_Matrix ("X", X, 1, Train_Size, 155, 160);
+      Print_Float_Matrix ("Shuffled_X", Shuffled_X, 1, Train_Size, 155, 160);
+      Print_Integer_Matrix ("Y", Y);
+      Print_Integer_Matrix ("Shuffled_Y", Shuffled_Y);
    end;  --  declare
 
    Put_Line ("----------------------------------------------");
