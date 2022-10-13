@@ -3,7 +3,7 @@ with Ada.Numerics.Discrete_Random;
 
 with Utilities;
 
-package body Shuffle_Arrays is
+package body Shuffler is
 
    generic
       type Element_Type is private;
@@ -180,4 +180,4 @@ package body Shuffle_Arrays is
 
    --  -------------------------------------------------------------------------
 
-end Shuffle_Arrays;
+end Shuffler;

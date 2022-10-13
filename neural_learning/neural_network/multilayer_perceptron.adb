@@ -47,7 +47,7 @@ with Multiclass_Utils;
 with Neural_Maths;
 with Optimise;
 with Opt_Minimise;
-with Shuffle_Arrays;
+with Shuffler;
 with Test_Support;
 with Utils;
 with Utils_Optimise;
@@ -1266,7 +1266,7 @@ package body Multilayer_Perceptron is
       end loop;
 
       if Self.Parameters.Shuffle then
-         Shuffle_Arrays.Shuffle (X_Batch, Y_Batch);
+         Shuffler.Shuffle (X_Batch, Y_Batch);
       end if;
 
       --  L644  Initialize Activations

@@ -8,7 +8,7 @@ with Openml_Ada;
 
 with Data_Splitter;
 with NL_Types;
-with Shuffle_Arrays;
+with Shuffler;
 
 package body Support_4 is
 
@@ -42,7 +42,7 @@ package body Support_4 is
 
       if Shuffle then
          Put_Line (Routine_Name & "shuffling");
-         Shuffle_Arrays.Shuffle (X, Y);
+         Shuffler.Shuffle (X, Y);
       end if;
       --        Printing.Print_Float_List ("permuted features row 16", X.Element (16));
       Put_Line (Routine_Name & "splitting data");
@@ -128,7 +128,7 @@ package body Support_4 is
 
             if Shuffle then
                Put_Line (Routine_Name & "shuffling");
-               Shuffle_Arrays.Shuffle (X, Y);
+               Shuffler.Shuffle (X, Y);
             end if;
 
             Put_Line (Routine_Name & "splitting data");
