@@ -127,7 +127,7 @@ package body Shuffler is
                                  B : in out Array_Type2);
 
    procedure Generic_MM_Shuffle (A : in out Array_Type1;
-                                     B : in out Array_Type2) is
+                                 B : in out Array_Type2) is
       use Discrete_Random;
       Gen       : Generator;
       New_Index : Integer;
@@ -139,6 +139,9 @@ package body Shuffler is
          New_Index := (Random (Gen) mod index) + 1;
          for col in A'Range (2) loop
             Row1 (col) := A (index, col);
+         end loop;
+
+         for col in B'Range (2) loop
             Row2 (col) := B (index, col);
          end loop;
 

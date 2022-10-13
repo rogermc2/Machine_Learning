@@ -5,6 +5,7 @@ with Ada.Text_IO; use Ada.Text_IO;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Test_Support; use Test_Support;
 
+with Shuffler; use Shuffler;
 with Support_4;
 
 procedure Test_Shuffle is
@@ -24,14 +25,13 @@ begin
       Data          : constant Base_State :=
                         Get_State (Dataset_Name, Train_Size, Test_Size,
                                    Shuffle => False);
-      Shuffled_Data : constant Base_State :=
-                        Get_State (Dataset_Name, Train_Size, Test_Size,
-                                   Shuffle => True);
       X          : constant Real_Float_Matrix := Data.Train_X;
       Y          : constant Integer_Matrix := Data.Train_Y;
-      Shuffled_X : constant Real_Float_Matrix := Shuffled_Data.Train_X;
-      Shuffled_Y : constant Integer_Matrix := Shuffled_Data.Train_Y;
+      Shuffled_X : Real_Float_Matrix := X;
+      Shuffled_Y : Integer_Matrix := Y;
    begin
+      Put_Line ("Shuffling");
+      Shuffle (Shuffled_X, Shuffled_Y);
 --        Print_Matrix_Dimensions ("X", X);
 --        Print_Matrix_Dimensions ("Y", Y);
 --        Print_Matrix_Dimensions ("Shuffled X", Shuffled_X);
