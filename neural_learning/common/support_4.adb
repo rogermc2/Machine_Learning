@@ -123,8 +123,8 @@ package body Support_4 is
             Put_Line (Routine_Name & "oml loaded");
             Assert (Y'Length = X'Length, Routine_Name &
                       "Y length" & Integer'Image (Y'Length) &
-                      " is different to X length" & Natural'Image (Positive (X'Length)));
-            --        Printing.Print_Float_List ("Features row 16", X.Element (16));
+                      " is different to X length" &
+                      Natural'Image (Positive (X'Length)));
 
             if Shuffle then
                Put_Line (Routine_Name & "shuffling");

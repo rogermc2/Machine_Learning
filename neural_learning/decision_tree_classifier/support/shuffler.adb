@@ -96,13 +96,13 @@ package body Shuffler is
          end loop;
 
          for col in A'Range (2) loop
-            A (index, col) := A (New_Index, col);
-            A (New_Index, col) := Row1 (col);
+            A (New_Index, col) := A (index, col);
+            A (index, col) := Row1 (col);
          end loop;
 
-         Value := B (Index);
-         B (New_Index) := B (Index);
-         B (Index) := Value;
+         Value := B (index);
+         B (index) := B (New_Index);
+         B (New_Index) := Value;
       end loop;
 
    end Generic_MA_Shuffle;
