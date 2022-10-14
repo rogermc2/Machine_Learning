@@ -6,6 +6,7 @@ with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with NL_Types;
 with Samples_Generator;
+with Test_Support; use Test_Support;
 
 procedure Test_Shuffle is
     use Real_Float_Arrays;
@@ -20,10 +21,11 @@ procedure Test_Shuffle is
     X            : constant Real_Float_Matrix := Data.X;
     Y            : constant Integer_Matrix := To_Integer_Matrix (Data.Y);
     Layer_Sizes  : NL_Types.Integer_List;
-    MLP1         : MLP_Classifier;
-    MLP2         : MLP_Classifier;
+    Classifier1  : MLP_Classifier;
+    Classifier2  : MLP_Classifier;
 
-    procedure Test (Shuffle1, Shuffle2 : Boolean) is
+    procedure Test (MLP1, MLP2 : out MLP_Classifier;
+                    Shuffle1, Shuffle2 : Boolean) is
     begin
         MLP1 := C_Init
           (Max_Iter => 1, Hidden_Layer_Sizes => Layer_Sizes,
@@ -44,24 +46,30 @@ begin
     Put_Line (Routine_Name);
     Layer_Sizes.Append (1);
 
-    Test (False, False);
+    Test (Classifier1, Classifier2, False, False);
+    Print_Float_Matrix
+      ("Classifier1 Coeff_Gradients",
+        Classifier1.Attributes.Params (1).Coeff_Gradients, 1, 5);
+    Print_Float_Matrix
+      ("Classifier1 Coeff_Gradients",
+        Classifier2.Attributes.Params (1).Coeff_Gradients, 1, 5);
 
-    Assert (MLP2.Attributes.Params (1).Coeff_Gradients =
-              MLP1.Attributes.Params (1).Coeff_Gradients,
+    Assert (Classifier2.Attributes.Params (1).Coeff_Gradients =
+              Classifier1.Attributes.Params (1).Coeff_Gradients,
             "False, False test failed");
     Put_Line ("Both false test passed");
 
-    Test (True, True);
+    Test (Classifier1, Classifier2, True, True);
 
-    Assert (MLP2.Attributes.Params (1).Coeff_Gradients =
-              MLP1.Attributes.Params (1).Coeff_Gradients,
+    Assert (Classifier2.Attributes.Params (1).Coeff_Gradients =
+              Classifier1.Attributes.Params (1).Coeff_Gradients,
             "Coeffs (1) Test failed");
     Put_Line ("Both true test passed");
 
-    Test (True, False);
+    Test (Classifier1, Classifier2, True, False);
 
-    Assert (MLP2.Attributes.Params (1).Coeff_Gradients =
-              MLP1.Attributes.Params (1).Coeff_Gradients,
+    Assert (Classifier2.Attributes.Params (1).Coeff_Gradients =
+              Classifier1.Attributes.Params (1).Coeff_Gradients,
             "True/False test passed");
 
     Put_Line ("Coeffs tests passed");
