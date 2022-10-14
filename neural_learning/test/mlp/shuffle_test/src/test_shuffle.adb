@@ -28,10 +28,10 @@ procedure Test_Shuffle is
                     Shuffle1, Shuffle2 : Boolean) is
     begin
         MLP1 := C_Init
-          (Max_Iter => 1, Hidden_Layer_Sizes => Layer_Sizes,
+          (Max_Iter => 1, Hidden_Layer_Sizes => Layer_Sizes, Batch_Size => 1,
            Random_State => 0, Shuffle => Shuffle1);
         MLP2 := C_Init
-          (Max_Iter => 1, Hidden_Layer_Sizes => Layer_Sizes,
+          (Max_Iter => 1, Hidden_Layer_Sizes => Layer_Sizes, Batch_Size => 1,
            Random_State => 0, Shuffle => Shuffle2);
 
         Init_Optimizer (MLP1);
@@ -65,12 +65,6 @@ begin
               Classifier1.Attributes.Params (1).Coeff_Gradients,
             "Coeffs (1) Test failed");
     Put_Line ("Both true test passed");
-
-    Test (Classifier1, Classifier2, True, False);
-
-    Assert (Classifier2.Attributes.Params (1).Coeff_Gradients =
-              Classifier1.Attributes.Params (1).Coeff_Gradients,
-            "True/False test passed");
 
     Put_Line ("Coeffs tests passed");
 
