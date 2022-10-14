@@ -493,8 +493,8 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      --          Routine_Name       : constant String :=
-      --                                 "Multilayer_Perceptron.Fit Integer Y ";
+      Routine_Name       : constant String :=
+                              "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -507,6 +507,9 @@ package body Multilayer_Perceptron is
    begin
       --  L385
       Validate_Hyperparameters (Self);
+      Test_Support.Print_Float_Matrix (Routine_Name & "X", X, 1, 2, 1, 5);
+      Test_Support.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 5);
+      Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Bin", Y_Bin, 1, 5);
       First_Pass :=
         Self.Attributes.Params.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
