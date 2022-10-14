@@ -45,8 +45,6 @@ begin
     Layer_Sizes.Append (1);
 
     Test (False, False);
-    Fit (MLP1, X, Y);
-    Fit (MLP2, X, Y);
 
     Assert (MLP2.Attributes.Params (1).Coeff_Gradients =
               MLP1.Attributes.Params (1).Coeff_Gradients,
@@ -61,8 +59,6 @@ begin
     Put_Line ("Both true test passed");
 
     Test (True, False);
-    Fit (MLP1, X, Y);
-    Fit (MLP2, X, Y);
 
     Assert (MLP2.Attributes.Params (1).Coeff_Gradients =
               MLP1.Attributes.Params (1).Coeff_Gradients,
