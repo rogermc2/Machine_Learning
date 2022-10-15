@@ -9,7 +9,7 @@ with Openml_Ada;
 with Data_Splitter;
 with NL_Types;
 with Shuffler;
-with Test_Support;
+--  with Test_Support;
 
 package body Support_4 is
 
@@ -107,11 +107,9 @@ package body Support_4 is
          Put_Line (Routine_Name & "Openml read");
 
          declare
-            X            : constant Real_Float_Matrix :=
+            X            : Real_Float_Matrix :=
                              To_Real_Float_Matrix (Bunch.Data);
-            Y            : constant Integer_Array := To_Integer_Array (Bunch.Target);
-            X_Small      : Real_Float_Matrix (1 .. 5, X'Range (2));
-            Y_Small      : Integer_Array (X_Small'Range);
+            Y            : Integer_Array := To_Integer_Array (Bunch.Target);
             Num_Features : constant Positive := Positive (X'Length (2));
             Train_X      : Real_Float_Matrix (1 .. Train_Size,
                                               1 .. Num_Features);
@@ -128,30 +126,15 @@ package body Support_4 is
                       "Y length" & Integer'Image (Y'Length) &
                       " is different to X length" &
                       Natural'Image (Positive (X'Length)));
-            for row in X_Small'Range loop
-               for col in X_Small'Range (2) loop
-                  X_Small (row, col) := X (row, col);
-               end loop;
-               Y_Small (row) := Y (row);
-            end loop;
-            Test_Support.Print_Float_Matrix
-              (Routine_Name & "X", X_Small, Col_Start => 154,
-               Col_Finish => 160);
-            Test_Support.Print_Integer_Array (Routine_Name & "Y", Y_Small);
 
             if Shuffle then
                Put_Line (Routine_Name & "shuffling");
-               Shuffler.Shuffle (X_Small, Y_Small);
-               Test_Support.Print_Float_Matrix
-                 (Routine_Name & "Shuffled X", X_Small, Col_Start => 154,
-                  Col_Finish => 160);
-               Test_Support.Print_Integer_Array (Routine_Name & "Shuffled Y",
-                                                 Y_Small);
+               Shuffler.Shuffle (X, Y);
             end if;
 
             Put_Line (Routine_Name & "splitting data");
             Data_Splitter.Train_Test_Split
-              (X => X_Small, Y => Y_Small, Train_Size => Train_Size, Test_Size => Test_Size,
+              (X => X, Y => Y, Train_Size => Train_Size, Test_Size => Test_Size,
                Train_X => Train_X, Train_Y => Train_Y,
                Test_X => Test_X, Test_Y => Test_Y);
 

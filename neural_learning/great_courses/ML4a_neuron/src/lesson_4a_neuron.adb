@@ -16,10 +16,8 @@ procedure Lesson_4A_Neuron is
    use Multilayer_Perceptron;
    Routine_Name : constant String := "Lesson_4A_Neuron ";
    Dataset_Name : constant String := "mnist_784";
-   Train_Size   : constant Positive := 20;
-   Test_Size    : constant Positive := 10;
---     Train_Size   : constant Positive := 5000;
---     Test_Size    : constant Positive := 1000;
+   Train_Size   : constant Positive := 5000;
+   Test_Size    : constant Positive := 1000;
    MLP          : Multilayer_Perceptron.MLP_Classifier;
 begin
    Put_Line (Routine_Name & "no hidden layers");
@@ -51,8 +49,7 @@ begin
       Fit (MLP, Train_X, Train_Y);
 
       Put_Line ("Score: " & Float'Image (Base.Score
-                (Self => MLP, X => Train_X, Y => Train_Y,
---                  (Self => MLP, X => Test_X, Y => Test_Y,
+                (Self => MLP, X => Test_X, Y => Test_Y,
                  Sample_Weight => Sample_Weight)));
    end;  --  declare
 

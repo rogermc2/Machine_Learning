@@ -75,35 +75,35 @@ package body Shuffler is
    generic
       type Element_Type1 is private;
       type Element_Type2 is private;
-      type Array_Type1 is array (Integer range <>, Integer range <>)
+      type Matrix_Type is array (Integer range <>, Integer range <>)
         of Element_Type1;
-      type Array_Type2 is array (Natural range <>) of Element_Type2;
-   procedure Generic_MA_Shuffle (A : in out Array_Type1;
-                                 B : in out Array_Type2);
+      type Array_Type is array (Natural range <>) of Element_Type2;
+   procedure Generic_MA_Shuffle (A : in out Matrix_Type;
+                                 B : in out Array_Type);
 
-   procedure Generic_MA_Shuffle (A : in out Array_Type1;
-                                 B : in out Array_Type2) is
+   procedure Generic_MA_Shuffle (A : in out Matrix_Type;
+                                 B : in out Array_Type) is
       use Discrete_Random;
       Gen       : Generator;
       New_Index : Integer;
-      Row1      : array (A'Range (2)) of Element_Type1;
-      Value     : Element_Type2;
+      A_Row     : array (A'Range (2)) of Element_Type1;
+      B_Value   : Element_Type2;
    begin
       Reset (Gen);
       for index in reverse A'Range loop
          New_Index := (Random (Gen) mod index) + 1;
          for col in A'Range (2) loop
-            Row1 (col) := A (index, col);
+            A_Row (col) := A (index, col);
          end loop;
 
          for col in A'Range (2) loop
-            A (New_Index, col) := A (index, col);
-            A (index, col) := Row1 (col);
+            A (index, col) := A (New_Index, col);
+            A (New_Index, col) := A_Row (col);
          end loop;
 
-         Value := B (index);
+         B_Value := B (index);
          B (index) := B (New_Index);
-         B (New_Index) := Value;
+         B (New_Index) := B_Value;
       end loop;
 
    end Generic_MA_Shuffle;
@@ -112,8 +112,8 @@ package body Shuffler is
 
    procedure Shuffle_MA is new
      Generic_MA_Shuffle (Element_Type1 => Float, Element_Type2 => Integer,
-                         Array_Type1   => Real_Float_Matrix,
-                         Array_Type2   => Integer_Array);
+                         Matrix_Type   => Real_Float_Matrix,
+                         Array_Type    => Integer_Array);
 
    --  -------------------------------------------------------------------------
 
