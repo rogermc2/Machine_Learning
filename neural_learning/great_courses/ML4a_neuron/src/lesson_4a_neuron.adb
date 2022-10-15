@@ -28,7 +28,7 @@ begin
    declare
       Data          : constant Base_State :=
                         Get_State (Dataset_Name, Train_Size, Test_Size,
-                                   Shuffle => True);
+                                   Shuffle => False);
       Train_X       : constant Real_Float_Matrix := Data.Train_X;
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
@@ -42,7 +42,7 @@ begin
       --  default Hidden_Layer_Sizes is empty list
       MLP := C_Init (Max_Iter => 10000,
                      Activation => Base_Neural.Identity_Activation,
-                     Verbose => False, Shuffle => False);
+                     Verbose => False, Shuffle => True);
 
       --  Fit function adjusts weights according to data values so that better
       --  accuracy can be achieved

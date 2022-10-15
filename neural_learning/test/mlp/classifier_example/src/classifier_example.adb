@@ -45,7 +45,7 @@ begin
 
    declare
       Predict_Prob : constant Real_Float_Matrix :=
-                       Predict_ProbA (MLP, Slice (X_Train, 1, 8));
+                       Predict_ProbA (MLP, Slice (X_Test, 1, 8));
       --        Prediction   : constant Integer_Matrix :=
       --                         Predict (MLP, Slice (X_Train, 1, 8));
    begin
@@ -58,7 +58,7 @@ begin
       --                                             Prediction);
    end;
 
-   Score := Base.Score (MLP, X_Train, Y_Train);
+   Score := Base.Score (MLP, X_Test, Y_Test);
    Put_Line ("Score: " & Float'Image (Score));
 
 end Classifier_Example;
