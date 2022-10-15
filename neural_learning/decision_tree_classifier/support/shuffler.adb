@@ -6,6 +6,8 @@ package body Shuffler is
    package Discrete_Random is new
      Ada.Numerics.Discrete_Random (Result_Subtype => Integer);
 
+   Discrete_Gen : Discrete_Random.Generator;
+
    --  -------------------------------------------------------------------------
 
    generic
@@ -15,13 +17,12 @@ package body Shuffler is
 
    procedure Generic_Shuffle (A : in out Array_Type) is
       use Discrete_Random;
-      Gen       : Generator;
       New_Index : Integer;
       Item      : Element_Type;
    begin
-      Reset (Gen);
+      Reset (Discrete_Gen);
       for index in reverse A'Range loop
-         New_Index := (Random (Gen) mod index) + 1;
+         New_Index := (Random (Discrete_Gen) mod index) + 1;
          Item := A (index);
          A (index) := A (New_Index);
          A (New_Index) := Item;

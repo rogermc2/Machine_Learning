@@ -17,7 +17,6 @@ procedure Test_Shuffle is
    Weights      :  NL_Types.Float_List;
    Data         : constant Samples_Generator.Classification_Test_Data :=
                     Samples_Generator.Make_Classification
-   --                         (N_Samples => 50, N_Features => 5,
      (Weights => Weights, Shuffle => False);
    X            : constant Real_Float_Matrix := Data.X;
    Y            : constant Integer_Matrix := To_Integer_Matrix (Data.Y);
