@@ -493,8 +493,8 @@ package body Multilayer_Perceptron is
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
       use Ada.Containers;
-      Routine_Name       : constant String :=
-                              "Multilayer_Perceptron.Fit Integer Y ";
+      --        Routine_Name       : constant String :=
+      --                               "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes : constant Integer_List :=
                              Self.Parameters.Hidden_Layer_Sizes;
@@ -507,9 +507,9 @@ package body Multilayer_Perceptron is
    begin
       --  L385
       Validate_Hyperparameters (Self);
-      Test_Support.Print_Float_Matrix (Routine_Name & "X", X, 1, 2, 1, 5);
-      Test_Support.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 5);
-      Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Bin", Y_Bin, 1, 5);
+      --        Test_Support.Print_Float_Matrix (Routine_Name & "X", X, 1, 2, 1, 5);
+      --        Test_Support.Print_Integer_Matrix (Routine_Name & "Y", Y, 1, 5);
+      --        Test_Support.Print_Binary_Matrix (Routine_Name & "Y_Bin", Y_Bin, 1, 5);
       First_Pass :=
         Self.Attributes.Params.Is_Empty or else
         (not Self.Parameters.Warm_Start and then not Incremental);
@@ -925,17 +925,18 @@ package body Multilayer_Perceptron is
    end Forward_Pass_Fast;
 
    --  -------------------------------------------------------------------------
-
    --  L360  MultilayerPerceptron._init_coef
    function Init_Coeff (Self            : in out MLP_Classifier;
                         Fan_In, Fan_Out : Positive) return Parameters_Record is
+      use Ada.Numerics.Float_Random;
       use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+--        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
+      Rand_Float   : Float;
    begin
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
@@ -947,13 +948,17 @@ package body Multilayer_Perceptron is
       --  Generate random weights, Random_Float -1.0 .. 1.0
       for f_in in 1 .. Fan_In loop
          for f_out in 1 .. Fan_Out loop
-            Params.Coeff_Gradients (f_in, f_out) := Init_Bound * Random_Float;
+            Rand_Float := Random (Float_Gen);
+            Params.Coeff_Gradients (f_in, f_out) :=
+              Init_Bound * (2.0 * Rand_Float - 1.0);
+--              Put_Line (Routine_Name & "" & Float'Image (Rand_Float));
          end loop;
       end loop;
 
       --  Generate random bias
       for f_out in 1 .. Fan_Out loop
-         Params.Intercept_Grads (f_out) := Init_Bound * Random_Float;
+         Params.Intercept_Grads (f_out) :=
+           Init_Bound * (2.0 * Random (Float_Gen) - 1.0);
       end loop;
 
       return Params;
@@ -967,7 +972,7 @@ package body Multilayer_Perceptron is
       use Base_Neural;
       use Estimator;
       use Multiclass_Utils;
---        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
+      --        Routine_Name   : constant String := "Multilayer_Perceptron.Initialize ";
       Fan_In         : Positive;
       Fan_Out        : Positive;
    begin
@@ -1116,7 +1121,7 @@ package body Multilayer_Perceptron is
    --        given data.
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Binary_Matrix) is
---        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
    begin
       Fit (Self, X, Y, Incremental => True);
 
@@ -1127,7 +1132,7 @@ package body Multilayer_Perceptron is
    --        given data.
    procedure Partial_Fit (Self : in out MLP_Classifier; X : Real_Float_Matrix;
                           Y    : Integer_Matrix) is
---        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Partial_Fit 1 ";
    begin
       Fit (Self, X, Y, Incremental => True);
 
@@ -1204,7 +1209,7 @@ package body Multilayer_Perceptron is
    --  L1237  Probability estimates
    function Predict_ProbA (Self : MLP_Classifier; X : Real_Float_Matrix)
                            return Real_Float_Matrix is
---        Routine_Name : constant String := "Multilayer_Perceptron.Predict_ProbA ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Predict_ProbA ";
       --  L1265
       Y_Pred       : constant Real_Float_Matrix := Forward_Pass_Fast (Self, X);
    begin

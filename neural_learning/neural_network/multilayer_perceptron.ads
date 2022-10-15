@@ -1,5 +1,6 @@
 
 --  with Ada.Containers.Vectors;
+with Ada.Numerics.Float_Random;
 
 with Base_Neural;
 with Estimator;
@@ -103,6 +104,8 @@ package Multilayer_Perceptron is
 
    type Loss_Grad_Access is access function (Args : Loss_Grad_Args)
                                              return Loss_Grad_Result;
+
+   Float_Gen : Ada.Numerics.Float_Random.Generator;
 
    function C_Init (Hidden_Layer_Sizes    : Integer_List :=
                       Integer_Package.Empty_Vector;
