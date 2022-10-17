@@ -1,5 +1,5 @@
 
-with Ada.Directories;
+--  with Ada.Directories;
 with Ada.Text_IO; use Ada.Text_IO;
 
 with Base;
@@ -22,14 +22,14 @@ procedure Lesson_4B_Neuron is
    Hidden_Layer_Sizes : NL_Types.Integer_List;
 begin
    Put_Line (Routine_Name);
-   if Ada.Directories.Exists (Dataset_Name & ".sta") then
-         Ada.Directories.Delete_File (Dataset_Name & ".sta");
-   end if;
+--     if Ada.Directories.Exists (Dataset_Name & ".sta") then
+--           Ada.Directories.Delete_File (Dataset_Name & ".sta");
+--     end if;
 
    declare
       Data          : constant Base_State :=
                         Get_State (Dataset_Name, Train_Size, Test_Size,
-                                   Shuffle => False);
+                                   Shuffle => True);
       Train_X       : constant Real_Float_Matrix := Data.Train_X;
       Train_Y       : constant Integer_Matrix := Data.Train_Y;
       Test_X        : constant Real_Float_Matrix := Data.Test_X;
@@ -39,13 +39,14 @@ begin
       Test_Support.Print_Matrix_Dimensions ("Test X", Test_X);
       New_Line;
 
-      for index in 1 .. 1 loop
+      for index in 1 .. 2 loop
          Hidden_Layer_Sizes.Clear;
          Hidden_Layer_Sizes.Append (index * 100);
          aClassifier := C_Init (Max_Iter => 1000,
                                 Hidden_Layer_Sizes => Hidden_Layer_Sizes,
                                 Activation => Base_Neural.Identity_Activation,
                                 Verbose => False);
+         Put_Line ("index: " & Integer'Image (index));
          --  The Fit function adjusts weights according to data values so
          --  that better accuracy can be achieved
          Fit (aClassifier, Train_X, Train_Y);
