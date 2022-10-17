@@ -121,12 +121,13 @@ package body Multilayer_Perceptron is
    --  -------------------------------------------------------------------------
 
    function "/" (L : Loss_Grad_Result; R : Float) return Loss_Grad_Result is
+      Recip_R : constant Float := 1.0 / R;
       Result : Loss_Grad_Result := L;
    begin
-      Result.Loss := Result.Loss / R;
+      Result.Loss := Recip_R * Result.Loss;
       for index in Result.Parameters.First_Index ..
         Result.Parameters.Last_Index loop
-         Result.Parameters (index) := Result.Parameters (index) / R;
+         Result.Parameters (index) := Recip_R * Result.Parameters (index);
       end loop;
 
       return Result;
@@ -615,16 +616,17 @@ package body Multilayer_Perceptron is
                            "Multilayer_Perceptron.Fit_Stochastic ";
       --        Is_Classifier  : constant Boolean :=
       --       Self.Estimator_Kind = Classifier_Estimator;
-      Num_Samples      : constant Positive := Positive (X'Length);
-      Params           : Parameters_List := Self.Attributes.Params;
-      Iter             : Natural := 0;
-      Continue         : Boolean := True;
-      Early_Stopping   : Boolean := Self.Parameters.Early_Stopping;
-      Batch_Size       : Positive;
-      Batches          : Slices_List;
-      Accumulated_Loss : Float := 0.0;
-      Msg              : Unbounded_String;
-      Is_Stopping      : Boolean := False;
+      Num_Samples       : constant Positive := Positive (X'Length);
+      Recip_Num_Samples : constant Float := 1.0 / Float (Num_Samples);
+      Params            : Parameters_List := Self.Attributes.Params;
+      Iter              : Natural := 0;
+      Continue          : Boolean := True;
+      Early_Stopping    : Boolean := Self.Parameters.Early_Stopping;
+      Batch_Size        : Positive;
+      Batches           : Slices_List;
+      Accumulated_Loss  : Float := 0.0;
+      Msg               : Unbounded_String;
+      Is_Stopping       : Boolean := False;
    begin
       Self.Attributes.Loss_Curve.Clear;
       Early_Stopping := Early_Stopping and then not Incremental;
@@ -682,7 +684,7 @@ package body Multilayer_Perceptron is
 
          --  L661
          Self.Attributes.N_Iter := Self.Attributes.N_Iter + 1;
-         Self.Attributes.Loss := Accumulated_Loss / Float (Num_Samples);
+         Self.Attributes.Loss := Recip_Num_Samples * Accumulated_Loss;
          Self.Attributes.T := Self.Attributes.T + Num_Samples;
          Self.Attributes.Loss_Curve.Append (Self.Attributes.Loss);
          --  L668

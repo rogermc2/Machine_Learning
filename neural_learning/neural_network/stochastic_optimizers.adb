@@ -238,18 +238,19 @@ package body Stochastic_Optimizers is
    --  -------------------------------------------------------------------------
 
    function "/" (L : Parameters_Record; R : Float) return Parameters_Record is
+      Recip_R : constant Float := 1.0 / R;
       Result  : Parameters_Record := L;
    begin
       for row in Result.Coeff_Gradients'Range loop
          for col in Result.Coeff_Gradients'Range (2) loop
             Result.Coeff_Gradients (row, col) :=
-              Result.Coeff_Gradients (row, col) / R;
+              Recip_R * Result.Coeff_Gradients (row, col);
          end loop;
       end loop;
 
       for row in Result.Intercept_Grads'Range loop
          Result.Intercept_Grads (row) :=
-           Result.Intercept_Grads (row) / R;
+           Recip_R * Result.Intercept_Grads (row);
       end loop;
 
       return Result;
@@ -516,7 +517,7 @@ package body Stochastic_Optimizers is
             if Self.SGD.LR_Schedule = Adaptive_LR_Schedule then
                Result := Self.SGD.Learning_Rate > 10.0 ** (-6);
                if Result then
-                  Self.SGD.Learning_Rate := Self.SGD.Learning_Rate  / 5.0;
+                  Self.SGD.Learning_Rate := 0.2 * Self.SGD.Learning_Rate;
                   Result := False;
                   if Verbose then
                      Put_Line (Msg & " Learning rate set to " &

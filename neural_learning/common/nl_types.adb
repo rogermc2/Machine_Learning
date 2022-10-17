@@ -222,13 +222,14 @@ package body NL_Types is
     --  ----------------------------------------------------------------------------
 
     function "/" (L : Float_List_2D; R : Float) return Float_List_2D is
+        Recip_R : constant Float := 1.0 / R;
         List_1D : Float_List;
         Result  : Float_List_2D;
     begin
         for row in L.First_Index .. L.Last_Index loop
             List_1D := L (row);
             for col in List_1D.First_Index .. List_1D.Last_Index loop
-                List_1D (col) := List_1D (col) / R;
+                List_1D (col) := Recip_R * List_1D (col);
             end loop;
             Result.Append (List_1D);
         end loop;

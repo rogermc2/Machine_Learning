@@ -39,7 +39,11 @@ begin
       Test_Support.Print_Matrix_Dimensions ("Test X", Test_X);
       New_Line;
 
+<<<<<<< Updated upstream
       for index in 1 .. 2 loop
+=======
+      for index in 1 .. 3 loop
+>>>>>>> Stashed changes
          Hidden_Layer_Sizes.Clear;
          Hidden_Layer_Sizes.Append (index * 100);
          aClassifier := C_Init (Max_Iter => 1000,

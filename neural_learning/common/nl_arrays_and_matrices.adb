@@ -150,9 +150,9 @@ package body NL_Arrays_And_Matrices is
       Result : Real_Float_Matrix := L;
    begin
       for row in L'Range loop
-         R_Val := R (row);
+         R_Val := 1.0 / R (row);
          for col in L'Range (2) loop
-            Result (row, col) := Result (row, col) / R_Val;
+            Result (row, col) := R_Val * Result (row, col);
          end loop;
       end loop;
 
@@ -488,15 +488,17 @@ package body NL_Arrays_And_Matrices is
    --  ------------------------------------------------------------------------
 
    function Normalize (M : Float_Array) return Float_Array is
-      Sum    : Float := 0.0;
-      Result : Float_Array (M'Range);
+      Sum       : Float := 0.0;
+      Recip_Sum : Float;
+      Result    : Float_Array (M'Range);
    begin
       for row in M'Range loop
          Sum := Sum + M (row);
       end loop;
 
+      Recip_Sum := 1.0 /Sum;
       for row in M'Range loop
-         Result (row) := M (row) / Sum;
+         Result (row) := Recip_Sum * M (row);
       end loop;
 
       return Result;
