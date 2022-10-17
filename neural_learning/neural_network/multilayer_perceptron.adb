@@ -122,7 +122,7 @@ package body Multilayer_Perceptron is
 
    function "/" (L : Loss_Grad_Result; R : Float) return Loss_Grad_Result is
       Recip_R : constant Float := 1.0 / R;
-      Result : Loss_Grad_Result := L;
+      Result  : Loss_Grad_Result := L;
    begin
       Result.Loss := Recip_R * Result.Loss;
       for index in Result.Parameters.First_Index ..
@@ -312,8 +312,7 @@ package body Multilayer_Perceptron is
 
    --  -------------------------------------------------------------------------
    --  L1054
-   function C_Init (Hidden_Layer_Sizes  : Integer_List :=
-                      Integer_Package.Empty_Vector;
+   function C_Init (Layer_Sizes         : Integer_List;
                     Activation          : Base_Neural.Activation_Type :=
                       Base_Neural.Rect_LU_Activation;
                     Solver              : Solver_Type := Adam_Solver;
@@ -344,7 +343,7 @@ package body Multilayer_Perceptron is
                     return MLP_Classifier is
       Classifier : MLP_Classifier;
    begin
-      Classifier.Parameters.Hidden_Layer_Sizes := Hidden_Layer_Sizes;
+      Classifier.Parameters.Hidden_Layer_Sizes  := Layer_Sizes;
       Classifier.Parameters.Activation          := Activation;
       Classifier.Parameters.Solver              := Solver;
       Classifier.Parameters.Alpha               := Alpha;
@@ -428,7 +427,6 @@ package body Multilayer_Perceptron is
    procedure Fit (Self  : in out MLP_Classifier;
                   X     : Real_Float_Matrix;
                   Y     : Binary_Matrix; Incremental : Boolean := False) is
-      use Ada.Containers;
       Routine_Name       : constant String :=
                              "Multilayer_Perceptron.Fit Binary Y ";
       Num_Features       : constant Positive := Positive (X'Length (2));
@@ -452,12 +450,10 @@ package body Multilayer_Perceptron is
 
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
-      if Hidden_Layer_Sizes.Length > 0 then
-         for index in Hidden_Layer_Sizes.First_Index ..
-           Hidden_Layer_Sizes.Last_Index loop
-            Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
-         end loop;
-      end if;
+      for index in Hidden_Layer_Sizes.First_Index ..
+        Hidden_Layer_Sizes.Last_Index loop
+         Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
+      end loop;
       Layer_Units.Append (Self.Attributes.N_Outputs);
 
       --  L409
@@ -493,18 +489,17 @@ package body Multilayer_Perceptron is
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
-      use Ada.Containers;
-      --        Routine_Name       : constant String :=
-      --                               "Multilayer_Perceptron.Fit Integer Y ";
-      Num_Features       : constant Positive := Positive (X'Length (2));
-      Hidden_Layer_Sizes : constant Integer_List :=
-                             Self.Parameters.Hidden_Layer_Sizes;
+      Routine_Name        : constant String :=
+                              "Multilayer_Perceptron.Fit Integer Y ";
+      Num_Features        : constant Positive := Positive (X'Length (2));
+      Hidden_Layer_Sizes  : constant Integer_List :=
+                              Self.Parameters.Hidden_Layer_Sizes;
       --  L394  Y_Bin has dimensions num_samples x num_classes
       --  Validate_Input generates class columns from the Y columns
-      Y_Bin              : constant Binary_Matrix :=
-                             Validate_Input (Self, Y, Incremental);
-      Layer_Units        : Integer_List;
-      Activations        : Real_Matrix_List;
+      Y_Bin               : constant Binary_Matrix :=
+                              Validate_Input (Self, Y, Incremental);
+      Layer_Units         : Integer_List;
+      Activations         : Real_Matrix_List;
    begin
       --  L385
       Validate_Hyperparameters (Self);
@@ -521,12 +516,12 @@ package body Multilayer_Perceptron is
       Self.Attributes.N_Outputs := Positive (Y_Bin'Length (2));
       --  layer_units = [n_features] + hidden_layer_sizes + [self.n_outputs_]
       Layer_Units.Append (Num_Features);
-      if Hidden_Layer_Sizes.Length > 0 then
-         for index in Hidden_Layer_Sizes.First_Index ..
-           Hidden_Layer_Sizes.Last_Index loop
-            Layer_Units.Append (Hidden_Layer_Sizes.Element (index));
-         end loop;
-      end if;
+      for index in Hidden_Layer_Sizes.First_Index ..
+        Hidden_Layer_Sizes.Last_Index loop
+         Put_Line (Routine_Name & "Hidden_Layer_Sizes" &
+                     Integer'Image (Hidden_Layer_Sizes (index)));
+         Layer_Units.Append (Hidden_Layer_Sizes (index));
+      end loop;
       --  Add last layer
       Layer_Units.Append (Self.Attributes.N_Outputs);
 
@@ -612,8 +607,8 @@ package body Multilayer_Perceptron is
                              Y           : Binary_Matrix;
                              Gradients   : in out Parameters_List;
                              Incremental : Boolean := False) is
-      Routine_Name     : constant String :=
-                           "Multilayer_Perceptron.Fit_Stochastic ";
+      Routine_Name      : constant String :=
+                            "Multilayer_Perceptron.Fit_Stochastic ";
       --        Is_Classifier  : constant Boolean :=
       --       Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples       : constant Positive := Positive (X'Length);
@@ -934,7 +929,7 @@ package body Multilayer_Perceptron is
       use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
---        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
@@ -953,7 +948,7 @@ package body Multilayer_Perceptron is
             Rand_Float := Random (Float_Gen);
             Params.Coeff_Gradients (f_in, f_out) :=
               Init_Bound * (2.0 * Rand_Float - 1.0);
---              Put_Line (Routine_Name & "" & Float'Image (Rand_Float));
+            --              Put_Line (Routine_Name & "" & Float'Image (Rand_Float));
          end loop;
       end loop;
 

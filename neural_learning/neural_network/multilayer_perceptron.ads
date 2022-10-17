@@ -107,8 +107,7 @@ package Multilayer_Perceptron is
 
    Float_Gen : Ada.Numerics.Float_Random.Generator;
 
-   function C_Init (Hidden_Layer_Sizes    : Integer_List :=
-                      Integer_Package.Empty_Vector;
+   function C_Init (Layer_Sizes           : Integer_List;
                     Activation            : Base_Neural.Activation_Type :=
                       Base_Neural.Rect_LU_Activation;
                     Solver                : Solver_Type := Adam_Solver;
