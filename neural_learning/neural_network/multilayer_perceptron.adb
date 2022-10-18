@@ -609,8 +609,6 @@ package body Multilayer_Perceptron is
                              Incremental : Boolean := False) is
       Routine_Name      : constant String :=
                             "Multilayer_Perceptron.Fit_Stochastic ";
-      --        Is_Classifier  : constant Boolean :=
-      --       Self.Estimator_Kind = Classifier_Estimator;
       Num_Samples       : constant Positive := Positive (X'Length);
       Recip_Num_Samples : constant Float := 1.0 / Float (Num_Samples);
       Params            : Parameters_List := Self.Attributes.Params;
@@ -731,6 +729,10 @@ package body Multilayer_Perceptron is
             New_Line;
          end if;
       end loop;
+
+      Put_Line (Routine_Name & "Iteration" &
+                        Integer'Image (Self.Attributes.N_Iter) &
+                        ", loss = " & Float'Image (Self.Attributes.Loss));
 
       --  L711
       if Early_Stopping then
@@ -929,12 +931,14 @@ package body Multilayer_Perceptron is
       use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
-      --        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+      Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
       Rand_Float   : Float;
    begin
+      Put_Line (Routine_Name & "Fan_In, Fan_Out" & Integer'Image (Fan_In)
+                & Integer'Image (Fan_Out));
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
       else
@@ -948,7 +952,6 @@ package body Multilayer_Perceptron is
             Rand_Float := Random (Float_Gen);
             Params.Coeff_Gradients (f_in, f_out) :=
               Init_Bound * (2.0 * Rand_Float - 1.0);
-            --              Put_Line (Routine_Name & "" & Float'Image (Rand_Float));
          end loop;
       end loop;
 
