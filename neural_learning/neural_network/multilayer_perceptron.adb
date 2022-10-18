@@ -931,14 +931,12 @@ package body Multilayer_Perceptron is
       use Maths;
       use Maths.Float_Math_Functions;
       use Base_Neural;
-      Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
+--        Routine_Name : constant String := "Multilayer_Perceptron.Init_Coeff ";
       Params       : Parameters_Record (Fan_In, Fan_Out);
       Factor       : Float;
       Init_Bound   : Float;
       Rand_Float   : Float;
    begin
-      Put_Line (Routine_Name & "Fan_In, Fan_Out" & Integer'Image (Fan_In)
-                & Integer'Image (Fan_Out));
       if Self.Parameters.Activation = Logistic_Activation then
          Factor := 2.0;
       else
