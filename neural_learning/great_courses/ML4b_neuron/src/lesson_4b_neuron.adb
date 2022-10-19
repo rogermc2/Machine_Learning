@@ -8,7 +8,6 @@ with Multilayer_Perceptron;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 with Test_Support;
 with NL_Types;
---  with Printing;
 with Support_4;
 
 procedure Lesson_4B_Neuron is

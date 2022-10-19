@@ -489,8 +489,8 @@ package body Multilayer_Perceptron is
                   X           : Real_Float_Matrix;
                   Y           : Integer_Matrix;
                   Incremental : Boolean := False) is
-      Routine_Name        : constant String :=
-                              "Multilayer_Perceptron.Fit Integer Y ";
+--        Routine_Name        : constant String :=
+--                                "Multilayer_Perceptron.Fit Integer Y ";
       Num_Features        : constant Positive := Positive (X'Length (2));
       Hidden_Layer_Sizes  : constant Integer_List :=
                               Self.Parameters.Hidden_Layer_Sizes;
@@ -518,8 +518,6 @@ package body Multilayer_Perceptron is
       Layer_Units.Append (Num_Features);
       for index in Hidden_Layer_Sizes.First_Index ..
         Hidden_Layer_Sizes.Last_Index loop
-         Put_Line (Routine_Name & "Hidden_Layer_Sizes" &
-                     Integer'Image (Hidden_Layer_Sizes (index)));
          Layer_Units.Append (Hidden_Layer_Sizes (index));
       end loop;
       --  Add last layer
