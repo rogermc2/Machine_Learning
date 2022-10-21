@@ -1256,7 +1256,7 @@ package body Multilayer_Perceptron is
       Batch_Row    : Positive;
       Batch_Loss   : Float;
    begin
-      --  Get batch data
+      --  Select batch data
       for row in Batch_Slice.First .. Batch_Slice.Last loop
          Batch_Row := row - Batch_Slice.First + 1;
          for col in 1 .. Num_Features loop

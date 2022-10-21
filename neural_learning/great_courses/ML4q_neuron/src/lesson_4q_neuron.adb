@@ -39,7 +39,7 @@ begin
          Hidden_Layer_Sizes.Clear;
          Hidden_Layer_Sizes.Append (index * 10);
          aClassifier := C_Init (Max_Iter => 1000, Tol => 0.001,
-                                Hidden_Layer_Sizes => Hidden_Layer_Sizes,
+                                Layer_Sizes => Hidden_Layer_Sizes,
                                 Activation => Base_Neural.Identity_Activation,
                                 Verbose => False);
          --  The Fit function adjusts weights according to data values so
