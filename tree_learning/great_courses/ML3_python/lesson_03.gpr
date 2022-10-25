@@ -21,7 +21,7 @@ project Lesson_03 is
             for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.4/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
 
          when "monterey" =>
-            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.4/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
+            for Default_Switches ("ada") use ("-L/usr/local/Cellar/python@3.10/3.10.8/Frameworks/Python.framework/Versions/Current/lib", "-lpython3.10");
       end case;
    end Linker;
 
