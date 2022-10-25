@@ -24,10 +24,10 @@ package body Python is
    pragma Import (C, Py_DecRef, "Py_DecRef");
     
    function PyInt_AsLong (I : in PyObject) return Interfaces.C.long;
-   pragma Import (C, PyInt_AsLong, "PyInt_AsLong");
+   pragma Import (C, PyInt_AsLong, "PyLong_AsLong");
       
    function PyString_FromString (Str : in Interfaces.C.char_array) return PyObject;
-   pragma Import (C, PyString_FromString, "PyString_FromString");
+   pragma Import (C, PyString_FromString, "PyUnicode_FromString");
     
    function PyImport_Import (Obj : in PyObject) return PyObject;
    pragma Import (C, PyImport_Import, "PyImport_Import");
@@ -64,6 +64,7 @@ package body Python is
 
       Execute_String ("import sys");
       Execute_String ("sys.path.append('.')");
+      Execute_String ("sys.path.append('../../python')");
    end Initialize;
     
    procedure Finalize is

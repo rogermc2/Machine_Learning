@@ -21,6 +21,7 @@
 *.cgpr
 *lyx~
 *.DS_Store
+*pycache*
 b__*
 .#*
 sklearn
