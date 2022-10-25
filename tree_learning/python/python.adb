@@ -65,6 +65,8 @@ package body Python is
       Execute_String ("import sys");
       Execute_String ("sys.path.append('.')");
       Execute_String ("sys.path.append('../../python')");
+      Execute_String
+        ("sys.path.append('/Applications_Packages/scikit-learn/sklearn/tree')");
    end Initialize;
     
    procedure Finalize is

@@ -29,6 +29,7 @@ procedure Lesson_3 is
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
    Module        : Python.Module;
+   Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
    aClassifier   : Base_Decision_Tree.Classifier
@@ -53,6 +54,7 @@ begin
 
    Python.Initialize;
    Module := Python.Import_File ("python_module");
+   Classes := Python.Import_File ("_classes.py");
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 3);
@@ -76,6 +78,7 @@ begin
    New_Line;
 
    Python.Close_Module (Module);
+   Python.Close_Module (Classes);
    Python.Finalize;
 
    Graphviz_Exporter.C_Init
