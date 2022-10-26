@@ -3,6 +3,16 @@ from abc import ABCMeta
 from base import BaseEstimator
 from base import MultiOutputMixin
 from base import ClassifierMixin
+__all__ = [
+           "BaseDecisionTree",
+           "DecisionTreeClassifier",
+           "DecisionTreeRegressor",
+           "ExtraTreeClassifier",
+           "ExtraTreeRegressor",
+           "export_graphviz",
+           "plot_tree",
+           "export_text",
+           ]
 
 class BaseDecisionTree (MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
         # Base class for decision trees.#

@@ -29,9 +29,7 @@ procedure Lesson_3 is
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
    Base          : Python.Module;
-   Module        : Python.Module;
    Classes       : Python.Module;
---     aClassifier   : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
 --     aClassifier   : Base_Decision_Tree.Classifier
@@ -55,14 +53,13 @@ begin
    New_Line;
 
    Python.Initialize;
-   Module := Python.Import_File ("python_module");
+   Python.Execute_String ("import tree");
    Base := Python.Import_File ("base");
-   Classes := Python.Import_File ("fit");
---     Classes := Python.Import_File ("classes");
+   Classes := Python.Import_File ("classes");
 
 --     C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
 --             Max_Leaf_Nodes => 3);
-   Python.Execute_String ("clf = DecisionTreeClassifier(max_leaf_nodes = 3)");
+   Python.Execute_String ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)");
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
 --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
@@ -83,7 +80,6 @@ begin
 
    Python.Close_Module (Base);
    Python.Close_Module (Classes);
-   Python.Close_Module (Module);
    Python.Finalize;
 
 --     Graphviz_Exporter.C_Init
