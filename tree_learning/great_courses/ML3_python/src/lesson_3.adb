@@ -31,7 +31,7 @@ procedure Lesson_3 is
    Base          : Python.Module;
    Module        : Python.Module;
    Classes       : Python.Module;
-   aClassifier   : Python.Module;
+--     aClassifier   : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
    Features      : Feature_Names_List;
 --     aClassifier   : Base_Decision_Tree.Classifier
@@ -62,7 +62,7 @@ begin
 
 --     C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
 --             Max_Leaf_Nodes => 3);
-
+   Python.Execute_String ("clf = DecisionTreeClassifier(max_leaf_nodes = 3)");
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
 --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
