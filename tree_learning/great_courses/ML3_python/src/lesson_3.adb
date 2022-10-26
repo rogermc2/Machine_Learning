@@ -54,7 +54,8 @@ begin
 
    Python.Initialize;
    Module := Python.Import_File ("python_module");
-   Classes := Python.Import_File ("_classes.py");
+   Classes := Python.Import_File ("fit");
+--     Classes := Python.Import_File ("classes");
 
    C_Init (aClassifier, Min_Split, Criterion.Gini_Criteria,
            Max_Leaf_Nodes => 3);
