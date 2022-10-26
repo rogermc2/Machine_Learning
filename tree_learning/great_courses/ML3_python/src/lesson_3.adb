@@ -28,6 +28,7 @@ procedure Lesson_3 is
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
+   Base          : Python.Module;
    Module        : Python.Module;
    Classes       : Python.Module;
    Names_Cursor  : String_Package.Cursor := Feature_Names.First;
@@ -54,6 +55,7 @@ begin
 
    Python.Initialize;
    Module := Python.Import_File ("python_module");
+   Base := Python.Import_File ("base");
    Classes := Python.Import_File ("fit");
 --     Classes := Python.Import_File ("classes");
 
