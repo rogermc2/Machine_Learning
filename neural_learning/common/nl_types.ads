@@ -23,22 +23,21 @@ package NL_Types is
    package Float_Package is new Ada.Containers.Vectors (Positive, Float);
    subtype Float_List is Float_Package.Vector;
    package Float_Sorting is new Float_Package.Generic_Sorting ("<");
-   function "+" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   function ">" (L, R : Float_List) return Boolean;
+   pragma Inline (">");
+   function "+" (L, R : Float_List) return Float_List;
    pragma Inline ("+");
-   function "-" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   function "-" (L, R : Float_List) return Float_List;
    pragma Inline ("-");
-   function "*" (L : Float; R : Float_Package.Vector)
-                 return Float_Package.Vector;
+   function "*" (L : Float; R : Float_List) return Float_List;
    pragma Inline ("*");
-   function "*" (L, R : Float_Package.Vector) return Float_Package.Vector;
+   function "*" (L, R : Float_List) return Float_List;
    pragma Inline ("*");
-   function "**" (L : Float_Package.Vector; P : Integer)
-                  return Float_Package.Vector;
+   function "**" (L : Float_List; P : Integer) return Float_List;
    pragma Inline ("**");
-   function "/" (L : Float_Package.Vector; R : Float)
-                 return Float_Package.Vector;
+   function "/" (L : Float_List; R : Float) return Float_List;
    pragma Inline ("/");
-   function "abs" (aVector : Float_Package.Vector) return Float_Package.Vector;
+   function "abs" (aVector : Float_List) return Float_List;
    pragma Inline ("abs");
    procedure Check_Lengths (Routine_Name : String; L, R : Float_List);
    pragma Inline (Check_Lengths);
@@ -47,6 +46,9 @@ package NL_Types is
    package Float_List_Package is new
      Ada.Containers.Vectors (Positive, Float_List);
    subtype Float_List_2D is Float_List_Package.Vector;
+--     function ">" (L, R : Float_List_Package.Vector) return Boolean;
+   function ">" (L, R : Float_List_2D) return Boolean;
+   pragma Inline (">");
    function "*" (L : Float; R : Float_List_2D) return Float_List_2D;
    pragma Inline ("*");
    function "*" (L, R : Float_List_2D) return Float_List_2D;
@@ -76,6 +78,8 @@ package NL_Types is
    package Integer_Package is new Ada.Containers.Vectors (Positive, Integer);
    subtype Integer_List is Integer_Package.Vector;
    package Integer_Sorting is new Integer_Package.Generic_Sorting ("<");
+   type Array_Of_Integer_Lists is array (Integer range <>) of Integer_List;
+
    procedure Check_Lengths (Routine_Name : String; L : Integer_List;
                             R            : Float_List);
 
@@ -95,6 +99,11 @@ package NL_Types is
    subtype Boolean_List is Boolean_Package.Vector;
    package Boolean_Sorting is new Boolean_Package.Generic_Sorting ("<");
 
+   use Boolean_Package;
+   package Boolean_Package_2D is new
+     Ada.Containers.Vectors (Positive, Boolean_List);
+   subtype Boolean_List_2D is Boolean_Package_2D.Vector;
+
    package Natural_Package is new Ada.Containers.Vectors (Positive, Natural);
    subtype Natural_List is Natural_Package.Vector;
    subtype Natural_Cursor is Natural_Package.Cursor;
@@ -112,9 +121,15 @@ package NL_Types is
    package Unbounded_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_String);
    subtype Unbounded_List is Unbounded_Package.Vector;
+   package Unbounded_Sorting is new Unbounded_Package.Generic_Sorting ("<");
    subtype Features_List is Unbounded_Package.Vector;
    subtype Class_Names_List is Unbounded_Package.Vector;
    subtype Feature_Names_List is Unbounded_Package.Vector;
+
+   use Unbounded_Package;
+   package Unbounded_Package_2D is new
+     Ada.Containers.Vectors (Positive, Unbounded_List);
+   subtype Unbounded_List_2D is Unbounded_Package_2D.Vector;
 
    type Row_Data (Class_Count : Class_Range := 2) is record
       Features : Feature_Data_Array (1 .. Class_Count);
@@ -124,7 +139,6 @@ package NL_Types is
    package Rows_Package is new Ada.Containers.Vectors (Positive, Row_Data);
    subtype Rows_Vector is Rows_Package.Vector;
 
-   use Unbounded_Package;
    package Raw_Data_Package is new Ada.Containers.Vectors
      (Positive, Unbounded_List);
    subtype Raw_Data_Vector is Raw_Data_Package.Vector;

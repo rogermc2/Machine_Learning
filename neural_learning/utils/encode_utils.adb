@@ -4,7 +4,7 @@
 with Ada.Assertions; use Ada.Assertions;
 with Ada.Text_IO; use Ada.Text_IO;
 
-with Printing;
+--  with Printing;
 
 package body Encode_Utils is
 
@@ -45,8 +45,8 @@ package body Encode_Utils is
                New_Line;
                Put ("Encode_Error: Encode_Utils.Encode Values contains ");
                Put_Line ("previously unseen labels.");
-               Printing.Print_Integer_Array ("Unique list", Uniques);
-               Printing.Print_Integer_Array ("Unseen labels", Diff);
+               --                 Printing.Print_Integer_Array ("Unique list", Uniques);
+               --                 Printing.Print_Integer_Array ("Unseen labels", Diff);
                raise Encode_Error;
             end if;
          end;
@@ -111,6 +111,35 @@ package body Encode_Utils is
    end Map_To_Integer;
 
    --  -------------------------------------------------------------------------
+
+   function Unique (Values : Binary_Matrix) return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Int_Value       : Natural;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_Integers.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
 
    function Unique (Values : Natural_Array) return Natural_Array is
       use NL_Types.Natural_Sorting;
@@ -217,9 +246,134 @@ package body Encode_Utils is
 
    -------------------------------------------------------------------------
 
+   function Unique (Values : Integer_Array) return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Int_Value       : Integer;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      for row in Values'Range loop
+         Unique_Integers.Include (Values (row));
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : NL_Types.Integer_List)
+                    return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Int_Value       : Integer;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Unique_Integers.Include (Values (index));
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : NL_Types.Integer_List; Inverse : out Natural_Array)
+                    return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Int_Value       : Integer;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         Unique_Integers.Include (Values (index));
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+      declare
+         Unique_Ints : constant Integer_Array := To_Integer_Array (Uniq_List);
+      begin
+         Inverse := Map_To_Integer (To_Integer_Array (Values), Unique_Ints);
+      end;
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (List : Integer_Array_List) return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      --  Routine_Name    : constant String :=
+      --                      "Encode_Utils.Unique Integer_Array_List ";
+      Int_Value       : Integer;
+      Unique_Integers : Int_Sets.Set;
+      Ints_Curs       : Int_Sets.Cursor;
+      Uniq_List       : NL_Types.Integer_List;
+   begin
+      for index in List.First_Index .. List.Last_Index loop
+         declare
+            Values : constant Integer_Array := List (index);
+         begin
+            for col in Values'Range loop
+               Unique_Integers.Include (Values (col));
+            end loop;
+         end;
+      end loop;
+
+      Ints_Curs := Unique_Integers.First;
+      while Int_Sets.Has_Element (Ints_Curs) loop
+         Int_Value := Int_Sets.Element (Ints_Curs);
+         Uniq_List.Append (Int_Value);
+         Int_Sets.Next (Ints_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
    function Unique (Values : Integer_Matrix) return NL_Types.Integer_List is
       use Int_Sets;
       use NL_Types.Integer_Sorting;
+--        Routine_Name    : constant String :=
+--                            "Encode_Utils.Unique Integer_Matrix ";
       Int_Value       : Integer;
       Unique_Integers : Int_Sets.Set;
       Ints_Curs       : Int_Sets.Cursor;
@@ -266,6 +420,157 @@ package body Encode_Utils is
       end loop;
 
       return Unique_Integers;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : NL_Types.Array_Of_Integer_Lists)
+                    return NL_Types.Integer_List is
+      use Int_Sets;
+      use NL_Types.Integer_Sorting;
+      Value_Row   : NL_Types.Integer_List;
+      Unique_Ints : Int_Sets.Set;
+      Int_Curs    : Int_Sets.Cursor;
+      Uniq_List   : NL_Types.Integer_List;
+   begin
+      for row in Values'Range loop
+         Value_Row := Values (row);
+         for col in Value_Row.First_Index .. Value_Row.Last_Index loop
+            Unique_Ints.Include (Value_Row (col));
+         end loop;
+      end loop;
+
+      Int_Curs := Unique_Ints.First;
+      while Has_Element (Int_Curs) loop
+         Uniq_List.Append (Element (Int_Curs));
+         Next (Int_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Real_Float_Matrix) return NL_Types.Float_List is
+      use Float_Sets;
+      use NL_Types.Float_Sorting;
+      Unique_Floats : Float_Sets.Set;
+      Float_Curs    : Float_Sets.Cursor;
+      Uniq_List     : NL_Types.Float_List;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_Floats.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      Float_Curs := Unique_Floats.First;
+      while Has_Element (Float_Curs) loop
+         Uniq_List.Append (Element (Float_Curs));
+         Next (Float_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Unbounded_String_Array)
+                    return NL_Types.Unbounded_List is
+      use UB_String_Sets;
+      use NL_Types.Unbounded_Sorting;
+      Value             : Unbounded_String;
+      Unique_UB_Strings : UB_String_Sets.Set;
+      UB_Curs           : UB_String_Sets.Cursor;
+      Uniq_List         : NL_Types.Unbounded_List;
+   begin
+      for row in Values'Range loop
+         Unique_UB_Strings.Include (Values (row));
+      end loop;
+
+      UB_Curs := Unique_UB_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Curs) loop
+         Value := UB_String_Sets.Element (UB_Curs);
+         Uniq_List.Append (Value);
+         UB_String_Sets.Next (UB_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Unbounded_String_Array_List)
+                    return NL_Types.Unbounded_List is
+      use UB_String_Sets;
+      use NL_Types.Unbounded_Sorting;
+      --  Routine_Name    : constant String :=
+      --                      "Encode_Utils.Unique Unbounded_String_Array_List ";
+      UB_Value        : Unbounded_String;
+      Unique_Strings  : UB_String_Sets.Set;
+      UB_Curs         : UB_String_Sets.Cursor;
+      Uniq_List       : NL_Types.Unbounded_List;
+   begin
+      for index in Values.First_Index .. Values.Last_Index loop
+         declare
+            UB_Array : constant Unbounded_String_Array := Values (index);
+         begin
+            for col in UB_Array'Range loop
+               Unique_Strings.Include (UB_Array (col));
+            end loop;
+         end;
+      end loop;
+
+      UB_Curs := Unique_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Curs) loop
+         UB_Value := UB_String_Sets.Element (UB_Curs);
+         Uniq_List.Append (UB_Value);
+         UB_String_Sets.Next (UB_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
+
+   end Unique;
+
+   -------------------------------------------------------------------------
+
+   function Unique (Values : Unbounded_String_Matrix)
+                    return NL_Types.Unbounded_List is
+      use UB_String_Sets;
+      use NL_Types.Unbounded_Sorting;
+      Value             : Unbounded_String;
+      Unique_UB_Strings : UB_String_Sets.Set;
+      UB_Curs           : UB_String_Sets.Cursor;
+      Uniq_List         : NL_Types.Unbounded_List;
+   begin
+      for row in Values'Range loop
+         for col in Values'Range (2) loop
+            Unique_UB_Strings.Include (Values (row, col));
+         end loop;
+      end loop;
+
+      UB_Curs := Unique_UB_Strings.First;
+      while UB_String_Sets.Has_Element (UB_Curs) loop
+         Value := UB_String_Sets.Element (UB_Curs);
+         Uniq_List.Append (Value);
+         UB_String_Sets.Next (UB_Curs);
+      end loop;
+
+      Sort (Uniq_List);
+
+      return Uniq_List;
 
    end Unique;
 

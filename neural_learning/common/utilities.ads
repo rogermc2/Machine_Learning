@@ -38,21 +38,16 @@ package Utilities is
    function Is_Boolean (Item : Unbounded_String) return Boolean;
    function Is_Float (Item : Unbounded_String) return Boolean;
    function Is_Integer (Item : Unbounded_String) return Boolean;
-   function Load_Raw_CSV_Data (Data_File : File_Type)
-                                return Raw_Data_Vector;
-   function Number_Of_Features (Rows : Rows_Vector)
-                                 return Class_Range;
-   function Number_Of_Features (Rows : Value_Data_List)
-                                 return Class_Range;
---     function Pair_Items (A, B : Float_Array) return Float_Pair_List;
+   function Load_Raw_CSV_Data (File_Name : String) return Raw_Data_Vector;
+   function Load_Raw_CSV_Data (Data_File : File_Type) return Raw_Data_Vector;
+   function Number_Of_Features (Rows : Rows_Vector) return Class_Range;
+   function Number_Of_Features (Rows : Value_Data_List) return Class_Range;
    function Pair_Items (A, B : Integer_Array) return Integer_Pair_List;
-   procedure Permute (aList : in out Integer_Array);
-   pragma Inline (Permute);
+   procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array);
+   procedure Permute (anArray : in out Integer_Array);
+   function Permute (aMatrix : Integer_Matrix) return Integer_Matrix;
    procedure Permute (aList : in out String_List);
-   pragma Inline (Permute);
---     function Permute (aList : Float_Matrix) return Float_Matrix;
---     pragma Inline (Permute);
-   function Permute (aList : Real_Float_Matrix) return Real_Float_Matrix;
+   function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix;
    pragma Inline (Permute);
    procedure Print_Feature_Values (Message : String; Rows : Rows_Vector;
                                    Column  : Class_Range);
@@ -72,9 +67,12 @@ package Utilities is
                                  Value   : Value_Record);
    function Split_String (aString, Pattern : String)
                            return String_List;
+   procedure Swap (Data : in out Binary_Matrix; L, R : Positive);
+   procedure Swap (Data : in out Boolean_Matrix; L, R : Positive);
    procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive);
-   pragma Inline (Swap);
+   procedure Swap (Data : in out Float_Array; L, R : Positive);
    procedure Swap (Data : in out Integer_Array; L, R : Positive);
+   procedure Swap (Data : in out Integer_Matrix; L, R : Positive);
    pragma Inline (Swap);
    function XY_To_Rows (X, Y : Value_Data_Lists_2D)
                          return Rows_Vector;

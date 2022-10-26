@@ -1,3 +1,4 @@
+--  Based on scikit-learn/sklearn/preprocessing/_encoders.py
 
 with NL_Types; use NL_Types;
 

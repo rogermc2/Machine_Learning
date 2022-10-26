@@ -12,11 +12,11 @@ package Classifier_Utilities is
    function Arg_Max (Values : Boolean_Array) return Positive;
    function Arg_Max (Values : Boolean_List) return Positive;
    function Arg_Max (Values : Float_List) return Positive;
+   function Arg_Max (Values : Real_Float_Matrix) return Integer_Array;
    function Arg_Max (Values : Integer_List) return Positive;
    function Bin_Count (Numbers : Natural_List) return Natural_List;
    function Bin_Count (Numbers : Value_Data_List) return Natural_List;
    function Compare_Float_Lists (L, R : Float_List) return Boolean;
---     function Dot (L : Weights.Weight_List; R : Natural_List) return Float;
    function Get_Column (List_2D      : Float_List_2D;
                         Column_Index : Positive) return Float_List;
    function Float_Precision (Number : Float; Precision : Natural) return String;
@@ -24,13 +24,18 @@ package Classifier_Utilities is
                                return Value_Data_Lists_2D;
    function Load_Data (File_Name : String; Num_Outputs : Positive := 1)
                        return Multi_Output_Data_Record;
---     function Samples_3D_To_Outputs_3D (Samples     : Weights.Weight_Lists_3D;
---                                        Num_Outputs : Positive)
---                                        return Weights.Weight_Lists_3D;
+   function Max_Probability_Indices (Probabilities : Binary_Matrix)
+                                     return Integer_Array;
+   function Max_Probability_Indices (Probabilities : Real_Float_Matrix)
+                                     return Integer_Array;
+   function Probabilities (aMatrix : Real_Float_Matrix)
+                           return Real_Float_Matrix;
+   function Probabilities (Vec : Real_Float_Vector) return Real_Float_Vector;
    function Row_Max_Indices (Values : Boolean_Matrix) return Natural_Array;
---     function Row_Max_Indices (Values : Float_Matrix) return Natural_Array;
    function Row_Max_Indices (Values : Real_Float_Matrix) return Natural_Array;
    function Search_Sorted_Integer_List (List_A, List_B : Integer_List)
+                                        return Integer_List;
+   function Search_Sorted_Float_List (List_A, List_B : Float_List)
                                         return Integer_List;
    function Set_Diff (Values : Integer_Array; Uniques : Integer_Array)
                       return Natural_List;
@@ -39,20 +44,19 @@ package Classifier_Utilities is
    function Set_Diff (Values : Natural_Array; Uniques : Integer_Array)
                       return Natural_List;
    function Set_Diff (Values, Uniques : Boolean_Array) return Boolean_List;
---     function Set_Value (List_Length : Positive; Value : Float)
---                         return Weights.Weight_List;
    function Sum_Cols (aList : Float_List_2D) return Float_List;
+   function Sum_Cols (aMatrix : Real_Float_Matrix) return Real_Float_Vector;
    function Sum_Cols (aList : Value_Data_Lists_2D) return Value_Data_List;
---     function Sum_Cols (aList : Weights.Weight_Lists_3D)
---                        return Weights.Weight_List;
    function To_Float_List (F : Value_Data_List) return Float_List;
    function To_Float_List (I : Integer_List) return Float_List;
---     function To_Float_List (A : Float_Array) return NL_Types.Float_List;
-   function To_Natural_List (A : Natural_Array) return NL_Types.Natural_List;
+   function To_Float_List_2D (Data : Value_Data_Lists_2D) return Float_List_2D;
    function To_Float_List_2D (I : Integer_List_2D) return Float_List_2D;
+   function To_Integer_List (Ints : Integer_Array) return Integer_List;
    function To_Integer_List (Ints : Value_Data_List) return Integer_List;
+   function To_Integer_List_2D (Data : Value_Data_Lists_2D) return Integer_List_2D;
    function To_Multi_Value_List (A : Multi_Value_Array)
-                                     return Value_Data_Lists_2D;
+                                 return Value_Data_Lists_2D;
+   function To_Natural_List (A : Natural_Array) return NL_Types.Natural_List;
    function To_Natural_List (Numbers : Value_Data_List) return Natural_List;
    function To_Integer_Value_List (A : NL_Arrays_And_Matrices.Integer_Array)
                                    return Value_Data_List;
@@ -60,7 +64,7 @@ package Classifier_Utilities is
                                       return Value_Data_Lists_2D;
    function To_Natural_Value_List (A : NL_Arrays_And_Matrices.Natural_Array)
                                    return Value_Data_Lists_2D;
-   function To_PL_Array (List_1D  : Float_List; Num_Rows : Positive)
+   function To_PL_Array (List_1D : Float_List; Num_Rows : Positive)
                          return Real_Float_Matrix;
    function To_Value_2D_List (A : Value_Data_List)
                               return Value_Data_Lists_2D;

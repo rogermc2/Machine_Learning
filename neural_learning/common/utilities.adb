@@ -155,6 +155,20 @@ package body Utilities is
 
    --  ---------------------------------------------------------------------------
 
+   function Load_Raw_CSV_Data (File_Name : String) return Raw_Data_Vector is
+      Data_File : File_Type;
+      Data      : Raw_Data_Vector;
+   begin
+      Open (Data_File, In_File, File_Name);
+      Data := Load_Raw_CSV_Data (Data_File);
+      Close (Data_File);
+
+      return Data;
+
+   end Load_Raw_CSV_Data;
+
+   --  -------------------------------------------------------------------------
+
    function Load_Raw_CSV_Data (Data_File : File_Type)
                                return Raw_Data_Vector is
       use String_Package;
@@ -198,21 +212,6 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
---     function Pair_Items (A, B : Float_Array) return Float_Pair_List is
---        Item   : Float_Pair;
---        Result : Float_Pair_List;
---     begin
---        for index in A'First .. A'Last loop
---           Item := (A (index), B (index));
---           Result.Append (Item);
---        end loop;
---
---        return Result;
---
---     end Pair_Items;
-
-   --  --------------------------------------------------------------------------
-
    function Pair_Items (a, b : Integer_Array) return Integer_Pair_List is
       Item   : Integer_Pair;
       Result : Integer_Pair_List;
@@ -228,26 +227,70 @@ package body Utilities is
 
    --  --------------------------------------------------------------------------
 
-   procedure Permute (aList : in out Integer_Array) is
-      List_Length  : constant Positive := Positive (aList'Length);
+   procedure Permute (anArray : in out NL_Arrays_And_Matrices.Float_Array) is
+      Array_Length  : constant Positive := Positive (anArray'Length);
       Index_2      : Natural;
       Rand         : Positive;
    begin
-      if List_Length > 1 then
-         for row in aList'First .. aList'Last loop
+      if Array_Length > 1 then
+         for row in anArray'Range loop
             Rand := row +
-              Natural (abs (Maths.Random_Float) * Float (List_Length - row));
+              Natural (abs (Maths.Random_Float) * Float (Array_Length - row));
             Index_2 := 0;
-            while Index_2 <= aList'Last and then Index_2 < Rand loop
+            while Index_2 <= anArray'Last and then Index_2 < Rand loop
                Index_2 := Index_2 + 1;
             end loop;
 
-            if Index_2 <= aList'Last then
-               Swap (aList, row, Index_2);
+            if Index_2 <= anArray'Last then
+               Swap (anArray, row, Index_2);
             end if;
 
          end loop;
       end if;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Permute (anArray : in out Integer_Array) is
+      Array_Length  : constant Positive := Positive (anArray'Length);
+      Index_2      : Natural;
+      Rand         : Positive;
+   begin
+      if Array_Length > 1 then
+         for row in anArray'Range loop
+            Rand := row +
+              Natural (abs (Maths.Random_Float) * Float (Array_Length - row));
+            Index_2 := 0;
+            while Index_2 <= anArray'Last and then Index_2 < Rand loop
+               Index_2 := Index_2 + 1;
+            end loop;
+
+            if Index_2 <= anArray'Last then
+               Swap (anArray, row, Index_2);
+            end if;
+
+         end loop;
+      end if;
+
+   end Permute;
+
+   --  -------------------------------------------------------------------------
+
+   function Permute (aMatrix : Integer_Matrix) return Integer_Matrix is
+      List_Length  : constant Positive := Positive (aMatrix'Length);
+      Rand         : Positive;
+      Permutation  : Integer_Matrix := aMatrix;
+   begin
+      if List_Length > 1 then
+         for index in 1 .. List_Length - 1 loop
+            Rand := index +
+              Natural (abs (Maths.Random_Float) * Float (List_Length - index));
+            Swap (Permutation, index, Rand);
+         end loop;
+      end if;
+
+      return Permutation;
 
    end Permute;
 
@@ -285,10 +328,10 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   function Permute (aList : Real_Float_Matrix) return Real_Float_Matrix is
-      List_Length  : constant Positive := Positive (aList'Length);
+   function Permute (aMatrix : Real_Float_Matrix) return Real_Float_Matrix is
+      List_Length  : constant Positive := Positive (aMatrix'Length);
       Rand         : Positive;
-      Permutation  : Real_Float_Matrix := aList;
+      Permutation  : Real_Float_Matrix := aMatrix;
    begin
       if List_Length > 1 then
          for index in 1 .. List_Length - 1 loop
@@ -301,46 +344,6 @@ package body Utilities is
       return Permutation;
 
    end Permute;
-
-   --  -------------------------------------------------------------------------
-
---     function Permute (aList : Float_List_2D) return Float_List_3D is
---        List_Length  : constant Positive := Positive (aList.Length);
---        Permutation  : Float_List_2D := aList;
---        Permutations : Float_List_3D;
---
---        procedure Recurse (K : Positive; A : in out Float_List_2D) is
---        begin
---           if K > 1 then
---              --  Generate permutations with k-th element unaltered
---              Recurse (K - 1, A);
---              --  Generate permutations for k-th element swapped with each
---              --  k-1 first element
---              for index in 1 .. K - 1 loop
---                 if K mod 2 = 0 then
---                    Swap (A, index, K);
---                 else
---                    Swap (A, A.First_Index, K);
---                 end if;
---
---                 Recurse (K - 1, A);
---              end loop;
---           else
---              Permutations.Append (A);
---           end if;
---
---        end Recurse;
---        pragma Inline (Recurse);
---
---     begin
---        if List_Length > 1 then
---           Recurse (List_Length, Permutation);
---        else
---           Permutations.Append (Permutation);
---        end if;
---
---        return Permutations;
---     end Permute;
 
    --  -------------------------------------------------------------------------
 
@@ -365,33 +368,33 @@ package body Utilities is
 
    --  ------------------------------------------------------------------------
 
---     function Prediction_String (Label_Counts : Predictions_List)
---                                 return String is
---        use Prediction_Data_Package;
---        Count_Cursor : Cursor := Label_Counts.First;
---        Prediction   : Prediction_Data;
---        Total        : Natural := 0;
---        Leaf_Data    : Unbounded_String := To_Unbounded_String
---          ("{'");
---     begin
---        while Has_Element (Count_Cursor) loop
---           Total := Total + Element (Count_Cursor).Num_Copies;
---           Next (Count_Cursor);
---        end loop;
---        Count_Cursor := Label_Counts.First;
---        while Has_Element (Count_Cursor) loop
---           Prediction := Element (Count_Cursor);
---           Leaf_Data := Leaf_Data & To_Unbounded_String
---             (To_String (Prediction.Label) & "': '" &
---                Integer'Image ((100 * Prediction.Num_Copies) / Total) &
---                "%'");
---           if Count_Cursor /= Label_Counts.Last then
---              Leaf_Data := Leaf_Data & ", ";
---           end if;
---           Next (Count_Cursor);
---        end loop;
---        return To_String (Leaf_Data) & "}";
---     end Prediction_String;
+   --     function Prediction_String (Label_Counts : Predictions_List)
+   --                                 return String is
+   --        use Prediction_Data_Package;
+   --        Count_Cursor : Cursor := Label_Counts.First;
+   --        Prediction   : Prediction_Data;
+   --        Total        : Natural := 0;
+   --        Leaf_Data    : Unbounded_String := To_Unbounded_String
+   --          ("{'");
+   --     begin
+   --        while Has_Element (Count_Cursor) loop
+   --           Total := Total + Element (Count_Cursor).Num_Copies;
+   --           Next (Count_Cursor);
+   --        end loop;
+   --        Count_Cursor := Label_Counts.First;
+   --        while Has_Element (Count_Cursor) loop
+   --           Prediction := Element (Count_Cursor);
+   --           Leaf_Data := Leaf_Data & To_Unbounded_String
+   --             (To_String (Prediction.Label) & "': '" &
+   --                Integer'Image ((100 * Prediction.Num_Copies) / Total) &
+   --                "%'");
+   --           if Count_Cursor /= Label_Counts.Last then
+   --              Leaf_Data := Leaf_Data & ", ";
+   --           end if;
+   --           Next (Count_Cursor);
+   --        end loop;
+   --        return To_String (Leaf_Data) & "}";
+   --     end Prediction_String;
 
    --  -------------------------------------------------------------------------
 
@@ -620,6 +623,32 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
    --  Swap swaps matrix rows
+   procedure Swap (Data : in out Binary_Matrix; L, R : Positive) is
+      Val : Natural;
+   begin
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+   --  Swap swaps matrix rows
+   procedure Swap (Data : in out Boolean_Matrix; L, R : Positive) is
+      Val : Boolean;
+   begin
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+   --  Swap swaps matrix rows
    procedure Swap (Data : in out Real_Float_Matrix; L, R : Positive) is
       Val : Float;
    begin
@@ -633,13 +662,36 @@ package body Utilities is
 
    --  -------------------------------------------------------------------------
 
-   procedure Swap (Data : in out Integer_Array;
-                   L, R : Positive) is
+   procedure Swap (Data : in out Float_Array; L, R : Positive) is
+      Item : Float;
+   begin
+      Item := Data (L);
+      Data (L) := Data (R);
+      Data (R) := Item;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Swap (Data : in out Integer_Array; L, R : Positive) is
       Item : Integer;
    begin
       Item := Data (L);
       Data (L) := Data (R);
       Data (R) := Item;
+
+   end Swap;
+
+   --  -------------------------------------------------------------------------
+
+   procedure Swap (Data : in out Integer_Matrix; L, R : Positive) is
+      Val : Integer;
+   begin
+      for col in Data'First (2) .. Data'Last (2) loop
+         Val := Data (L, col);
+         Data (L, col) := Data (R, col);
+         Data (R, col) := Val;
+      end loop;
 
    end Swap;
 

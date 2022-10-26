@@ -6,6 +6,7 @@
 *.csv
 *.o
 *.obj
+*obj*
 *.a
 *.ali
 *.dot
@@ -18,8 +19,14 @@
 *.db
 *.db*
 *.cgpr
+*.pyc
+*lyx~
+*.lyx#
 *.DS_Store
+*pycache*
 b__*
 .#*
 sklearn
 access token.txt
+*sublime-workspace
+*sublime-project

@@ -1,0 +1,24 @@
+
+project Gradient_Test is
+
+   for Source_Dirs use ("src", "../../../neural_network", "../../../decision_tree_classifier/support", "../../../common", "../../../utils", "../../../export", "../../../base", "../../../metrics", "../../../test", "../../../../scipy", "../../../../scipy/optimise");
+   for Object_Dir use "obj";
+   for Main use ("test_gradient");
+   for Exec_Dir use ".";
+
+   package Compiler is
+      for Default_Switches ("ada") use ("-O2", "-fstack-check", "-gnatwkmru", "-gnatyclux");
+   end Compiler;
+
+   package Linker is
+      for Switches ("ada") use ("-L/usr/local/gfortran/lib", "-lgfortran", "-llapack", "-lblas");
+   end Linker;
+
+   for Languages use ("Ada", "Fortran");
+
+   package Naming is
+      for Body_Suffix ("Fortran") use ".f";
+   end Naming;
+
+end Gradient_Test;
+

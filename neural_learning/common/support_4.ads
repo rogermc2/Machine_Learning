@@ -1,4 +1,5 @@
 
+with Load_Dataset;
 with NL_Arrays_And_Matrices; use NL_Arrays_And_Matrices;
 
 package Support_4 is
@@ -11,7 +12,11 @@ package Support_4 is
    end record;
 
    function Get_State
-     (Dataset_Name : String;
-      Test_Size, Train_Size : Positive) return Base_State;
+     (Dataset               : Load_Dataset.Digits_Data_Record;
+      Train_Size, Test_Size : Positive;
+      Shuffle               : Boolean := True) return Base_State;
+   function Get_State
+     (Dataset_Name : String; Train_Size, Test_Size : Positive;
+      Shuffle      : Boolean := True) return Base_State;
 
 end Support_4;

@@ -18,20 +18,38 @@ package Stochastic_Optimizers is
    --  tol or fail to increase the validation score by tol if 'early_stopping'
    --  is on, the current learning rate is divided by five.
 
-   type Optimizer_Type is (No_Optimizer, Optimizer_Adam, Optimizer_SGD);
+   type Optimizer_Type is (No_Optimizer, Optimizer_Adam, Optimizer_Base, Optimizer_SGD);
    type Solver_Type is (Lbfgs_Solver, Sgd_Solver, Adam_Solver);
    type Learning_Rate_Type is (Constant_Rate, Invscaling_Rate, Adaptive_Rate);
 
    type Parameters_Record (Num_Rows, Num_Cols : Positive) is record
-      Coeff_Grads     : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols);
-      Intercept_Grads : Real_Float_Vector (1 .. Num_Cols);
+      Coeff_Gradients : Real_Float_Matrix (1 .. Num_Rows, 1 .. Num_Cols) :=
+                          (others => (others => 0.0));
+      Intercept_Grads : Real_Float_Vector (1 .. Num_Cols) := (others => 0.0);
    end record;
+   function "*" (L : Float; R : Parameters_Record) return Parameters_Record;
+   pragma Inline ("*");
+   function "/" (L, R : Parameters_Record) return Parameters_Record;
+   function "/" (L : Parameters_Record; R : Float) return Parameters_Record;
+   pragma Inline ("/");
+   function "-" (L, R : Parameters_Record) return Parameters_Record;
+   pragma Inline ("-");
+   function "abs" (Rec : Parameters_Record) return Parameters_Record;
+   pragma Inline ("abs");
 
    package Parameters_Package is new
      Ada.Containers.Indefinite_Vectors (Positive, Parameters_Record);
    subtype Parameters_List is Parameters_Package.Vector;
    subtype Moments_List is Parameters_Package.Vector;
    function "+" (L, R : Parameters_List) return Parameters_List;
+
+   type Coeffs_Matrix is array (Integer range <>, Integer range <>) of Float;
+   package Coeffs_Package is new
+     Ada.Containers.Indefinite_Vectors (Positive, Coeffs_Matrix);
+   subtype Coeffs_List is Coeffs_Package.Vector;
+   function "+" (L : Real_Float_Matrix; R : Real_Float_Vector)
+                 return Coeffs_Matrix;
+   pragma Inline ("+");
 
    type Base_Optimizer is record
       Initial_Learning_Rate : Float := 0.1;
@@ -74,6 +92,7 @@ package Stochastic_Optimizers is
       case Kind is
          when No_Optimizer => null;
          when Optimizer_Adam => Adam : Adam_Optimizer;
+         when Optimizer_Base => Base : Base_Optimizer;
          when Optimizer_SGD => SGD   : SGD_Optimizer;
       end case;
    end record;
@@ -83,7 +102,7 @@ package Stochastic_Optimizers is
                      Initial_Learning_Rate : Float := 0.1;
                      Beta_1                : Float := 0.9;
                      Beta_2                : Float := 0.999;
-                     Epsilon               : Float);
+                     Epsilon               : Float := 10.0 ** (-8));
    procedure C_Init (Self                  : out SGD_Optimizer;
                      Params                : Parameters_List;
                      Initial_Learning_Rate : Float := 0.1;
@@ -95,10 +114,24 @@ package Stochastic_Optimizers is
                      Momentum              : Float := 0.9;
                      Use_Nesterov          : Boolean := True;
                      Power_T               : Float := 0.5);
+
+   procedure C_Init (Self                  : out Base_Optimizer;
+                     Initial_Learning_Rate : Float := 0.1);
+   procedure Iteration_Ends (Self : in out SGD_Optimizer; Time_Step : Integer);
+   --     function Pack (Params : Parameters_List) return Real_Float_Vector;
+   function Square (Rec : Parameters_Record) return Parameters_Record;
+   function Sqrt (Rec : Parameters_Record; Epsilon : Float := 0.0)
+                  return Parameters_Record;
    function Trigger_Stopping (Self    : in out Optimizer_Record; Msg : String;
                               Verbose : Boolean) return Boolean;
-   procedure Update_Params (Self   : in out Optimizer_Record;
-                            Params : in out Parameters_List;
-                            Grads  : Parameters_List);
+   procedure Update_Params (Self      : in out Optimizer_Record;
+                            Params    : in out Parameters_List;
+                            Gradients : Parameters_List);
+   --     procedure Update_Params (Self      : in out Adam_Optimizer;
+   --                              Params    : in out Parameters_List;
+   --                              Gradients : Parameters_List);
+   --     procedure Update_Params (Self      : in out SGD_Optimizer;
+   --                              Params    : in out Parameters_List;
+   --                              Gradients : Parameters_List);
 
 end Stochastic_Optimizers;

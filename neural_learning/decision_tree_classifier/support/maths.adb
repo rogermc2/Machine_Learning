@@ -29,6 +29,79 @@ package body Maths is
 
    --  -----------------------------------------------------------------------
 
+   function Normal_Distribution (Mu : Float := 0.0; Sigma : Float := 1.0) return Float is
+      use Ada.Numerics;
+      use Float_Random;
+      use Float_Math_Functions;
+   begin
+      return Mu + Sigma * Sqrt (-2.0 * Log (Random (Float_Gen), 10.0)) *
+        Cos (2.0 * Pi * Random (Float_Gen));
+
+   end Normal_Distribution;
+
+   --  -----------------------------------------------------------------------
+
+   --      function Poisson (Mean : Float := 0.0) return Integer is
+   --          use Ada.Numerics.Float_Random;
+   --          use Float_Math_Functions;
+   --          P      : Float := Exp (-Mean);
+   --          F      : Float := P;
+   --          U      : Float := Random (Float_Gen);
+   --          Result : Integer := 0;
+   --      begin
+   --          while U > F loop
+   --              Result := Result + 1;
+   --              P := (Mean / Float (Result)) * P;
+   --              F :=  F + P;
+   --          end loop;
+   --
+   --          return Result;
+   --
+   --      end Poisson;
+   --
+   --      --  -----------------------------------------------------------------------
+
+   function Poisson (Lambda : Float) return Integer is
+      use Ada.Numerics.Float_Random;
+      use Float_Math_Functions;
+      Sum_T  : Float := 0.0;
+      E      : Float;
+      Result : Integer := -1;
+   begin
+      while Sum_T < 1.0 loop
+         E := -(1.0 / Lambda) * Log (Random (Float_Gen));
+         Sum_T := Sum_T + E;
+         Result := Result + 1;
+      end loop;
+
+      return Result;
+
+   end Poisson;
+
+   --  -----------------------------------------------------------------------
+   --  Based on https://github.com/hpaulkeeler/posts/blob/master/
+   --  PoissonDirect/PoissonDirectSingle.c
+   function Poisson_Single (Lambda : Float) return Integer is
+      use Ada.Numerics.Float_Random;
+      use  Float_Math_Functions;
+      --  loop termination constant
+      Exp_Lambda      : constant Float := Exp (-Lambda);
+      Rand_Uniform    : Uniformly_Distributed;        --  range: 0.0 .. 1.0
+      Product_Uniform : Float := 1.0; --  Product of uniform variables
+      Rand_Poisson    : Integer := -1;
+   begin
+      while Product_Uniform > Exp_Lambda  loop
+         Rand_Uniform := Random (Float_Gen);
+         Product_Uniform := Product_Uniform * Float (Rand_Uniform);
+         Rand_Poisson := Rand_Poisson + 1;
+      end loop ;
+
+      return Rand_Poisson;
+
+   end Poisson_Single;
+
+   --  ------------------------------------------------------------------------
+
    function Radians (Angle : Degree) return Radian is
    begin
       return Radian (Angle) * Radians_Per_Degree;
@@ -50,6 +123,27 @@ package body Maths is
    begin
       return Integer (Random (Integer_Gen));
    end Random_Integer;
+
+   --  ------------------------------------------------------------------------
+
+   function Random_Integer (First, Last : Integer) return Integer is
+      subtype R_Range is Integer range First .. Last;
+      package Random_Integer_Package is new
+        Ada.Numerics.Discrete_Random (R_Range);
+      use Random_Integer_Package;
+      Gen : Generator;
+   begin
+      return Random (Gen);
+
+   end Random_Integer;
+
+   --  ------------------------------------------------------------------------
+
+   function Round (Num : Float; Places : Natural) return Float is
+   begin
+      return Float'Rounding (Num * 10.0 ** Places) / 10.0 ** (-Places);
+
+   end Round;
 
    --  ------------------------------------------------------------------------
 

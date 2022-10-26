@@ -10,8 +10,6 @@ with Openml_Ada; use Openml_Ada;
 
 package body OML_File_Tests is
 
-   --     pragma Warnings (Off);
-
    --  -------------------------------------------------------------------------
 
    procedure Test_Fetch_OML is
@@ -21,10 +19,6 @@ package body OML_File_Tests is
       Save_File      : constant String := "mnist_784.oml";
       As_Frame       : As_Frame_State := As_Frame_False;
       Target_Columns : String_List;
---        X              : Float_List_2D;
---        Y              : Integer_List;
---        X_Indices      : Integer_List;
---        Y_Indices      : Integer_List;
       Bunch          : Bunch_Data;
    begin
       Put_Line (Routine_Name);
@@ -32,10 +26,6 @@ package body OML_File_Tests is
       Fetch_Openml (Dataset_File_Name => File_Name,
                     Save_File_Name    => Save_File,
                     Target_Columns    => Target_Columns,
---                      X                 => X,
---                      Y                 => Y,
---                      X_Indices         => X_Indices,
---                      Y_Indices         => Y_Indices,
                     Bunch             => Bunch,
                     As_Frame          => As_Frame);
 
@@ -44,8 +34,8 @@ package body OML_File_Tests is
                   Count_Type'Image (Bunch.Data.Length));
       Put_Line (Routine_Name & "Y length: " &
                   Count_Type'Image (Bunch.Target.Length));
---        Printing.Print_Float_Lists_2D (Routine_Name & "X", Bunch.Data);
       Printing.Print_Integer_List (Routine_Name & "Y", Bunch.Target, 1, 20);
+
       if Bunch.Data.Length = Bunch.Target.Length then
          Put_Line (Routine_Name & "completed");
       else

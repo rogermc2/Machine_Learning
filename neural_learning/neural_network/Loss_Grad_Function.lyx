@@ -1,0 +1,516 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 15mm
+\topmargin 10mm
+\rightmargin 10mm
+\bottommargin 10mm
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Section
+Loss Grad Function
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+lgf\left(\theta,X,Y,A,D,CG,IG\right) & = & LGLBFGS\left(\theta,X,Y,A,D,CG,IG\right)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Basic Mean Square Error Cost Function
+\end_layout
+
+\begin_layout Standard
+Based on 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Grad_descent"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+C\left(\mathbf{y},\mathbf{o}\right) & = & \frac{1}{N}\sum_{i=1}^{N}\left(y_{i}-o_{i}\right)^{2}
+\end{eqnarray*}
+
+\end_inset
+
+ where:
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+y
+\series default
+ = [
+\begin_inset Formula $target(x₁),target(x₁),\cdots,target(x_{n})]$
+\end_inset
+
+ is a vector of true labels and
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+o
+\series default
+ is a vector of neural network predictions.
+\end_layout
+
+\begin_layout Standard
+The vector input x to a fully-connected layer generates the activations
+ of that layer which are the network outputs.
+\end_layout
+
+\begin_layout Standard
+Each item 
+\begin_inset Formula $x_{i}$
+\end_inset
+
+ of the input vector is multiplied by a weight 
+\begin_inset Formula $w_{i}$
+\end_inset
+
+.
+ Then all of the 
+\begin_inset Formula $x_{i}w_{i}$
+\end_inset
+
+ products are added together and a bias added onto that.
+ That value is passed through a ReLu function to form the activation 
+\begin_inset Formula $A$
+\end_inset
+
+ of the one neuron in the fully-connected layer:
+\begin_inset Formula 
+\begin{eqnarray*}
+z & = & \sum x_{i}w_{i}+b\\
+A & = & ReLu\left(z\right)
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $ReLu\left(z\right)=Max\left(0,z\left(\right)\right)$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+activation\left(\mathbf{x}\right) & = & max(0,\mathbf{w}∙\mathbf{x}+b)
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+With 
+\begin_inset Formula $\mathbf{X}=\left[x_{1},x_{2},\cdots,x_{n}\right]^{T}$
+\end_inset
+
+:
+\begin_inset Formula 
+\begin{eqnarray*}
+C\left(\mathbf{y},\mathbf{w},\mathbf{X},b\right) & = & \frac{1}{N}\sum_{i=1}^{N}\left(y_{i}-activation\left(X_{i}\right)\right)^{2}\\
+ & = & \frac{1}{N}\sum_{i=1}^{N}\left(y_{i}-max\left(0,\mathbf{w}\cdot X_{i}+b\right)\right)^{2}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This is the loss function for which the slope is needed.
+\end_layout
+
+\begin_layout Standard
+Finding the gradient is essentially finding the derivative of the loss function.
+ However, because there are many independent variables that can be tweaked
+ (all the weights and biases), the partial derivative with respect to each
+ variable is needed.
+ 
+\end_layout
+
+\begin_layout Subsection
+Gradient Of A Neuron
+\end_layout
+
+\begin_layout Standard
+The function of a single neuron (complete with an activation) is: 
+\begin_inset Formula 
+\begin{eqnarray*}
+neuron\left(\mathbf{x}\right) & = & max\left(0,\mathbf{w}\cdot\mathbf{x}+b\right)
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\end_layout
+
+\begin_layout Standard
+
+\series bold
+x
+\series default
+ is the input to the neuron,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\mathbf{w}$
+\end_inset
+
+ is a weight vector and
+\end_layout
+
+\begin_layout Standard
+b is a bias.
+\end_layout
+
+\begin_layout Standard
+The derivative is:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial neuron}{\partial\mathbf{w}} & = & \frac{\partial neuron}{\partial z}\frac{\partial z}{\partial\mathbf{w}}
+\end{eqnarray*}
+
+\end_inset
+
+where:
+\begin_inset Formula 
+\begin{eqnarray*}
+z=f\left(\mathbf{x}\right) & = & \mathbf{w}\cdot\mathbf{x}+b
+\end{eqnarray*}
+
+\end_inset
+
+There are two parts to this derivative:
+\end_layout
+
+\begin_layout Enumerate
+the partial derivative 
+\begin_inset Formula $\frac{\partial z}{\partial\mathbf{w}}$
+\end_inset
+
+ and
+\end_layout
+
+\begin_layout Enumerate
+the partial derivative of z with respect to both the weights 
+\series bold
+w
+\series default
+ and the bias b.
+\end_layout
+
+\begin_layout Subsubsection
+The Partial Derivative Of 
+\begin_inset Formula $\frac{\partial z}{\partial\mathbf{w}}$
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The dot product:
+\begin_inset Formula 
+\begin{eqnarray*}
+\mathbf{w}\cdot\mathbf{x}=\sum_{i=1}^{n}\left(w_{i}x_{i}\right) & = & sum\left(\mathbf{w}\otimes\mathbf{x}\right)
+\end{eqnarray*}
+
+\end_inset
+
+Therefore:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial\left(\mathbf{w}\otimes\mathbf{x}\right)}{\partial\mathbf{w}} & = & diag\left(\mathbf{x}\right)\frac{\partial\,sum\left(\mathbf{w}\otimes\mathbf{x}\right)}{\partial\mathbf{\left(\mathbf{w}\otimes\mathbf{x}\right)}}=1^{\rightarrow T}\\
+\therefore\frac{\partial\,sum\left(\mathbf{w}\otimes\mathbf{x}\right)}{\partial\mathbf{\left(\mathbf{w}\otimes\mathbf{x}\right)}}\frac{\partial\mathbf{\left(\mathbf{w}\otimes\mathbf{x}\right)}}{\partial\mathbf{w}} & = & 1^{\rightarrow T}diag\left(\mathbf{x}\right)=\mathbf{x}^{T}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+The Partial Derivative Of z With Respect ToThe Weights 
+\series bold
+w
+\series default
+ And The Bias b
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial z}{\partial\mathbf{w}} & = & \frac{\partial\left(\mathbf{w}\cdot\mathbf{x}+b\right)}{\partial\mathbf{\mathbf{w}}}\\
+ & = & \frac{\partial\left(\mathbf{w}\cdot\right)}{\partial\mathbf{\mathbf{w}}}+\frac{\partial b}{\partial\mathbf{w}}\\
+ & = & \mathbf{x}^{T}+0^{\rightarrow T}=\mathbf{x}^{T}
+\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial z}{\partial b} & = & \frac{\partial\left(\mathbf{w}\cdot\mathbf{x}+b\right)}{\partial b}\\
+ & = & 0+1=1
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+The Partial Derivative Of neuron (z) With Respect To z
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+neuron\left(z\right)=max\left(0,z\right) & = & max\left(0,sum\left(\mathbf{w}\otimes\mathbf{x}\right)+b\right)
+\end{eqnarray*}
+
+\end_inset
+
+Therefore, the derivative of 
+\begin_inset Formula $neuron\left(z\right)$
+\end_inset
+
+ is a piecewise function: it’s 0 for all values of z less than or equal
+ to 0, and 1 for all values of z greater than 0:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial}{\partial z}max\left(0,z\right) & = & \begin{cases}
+0 & z\leq0\\
+\frac{\partial z}{\partial z}=1 & z>0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Therefore, for weights:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial neuron}{\partial\mathbf{w}} & = & \frac{\partial neuron}{\partial z}\frac{\partial z}{\partial\mathbf{w}}\\
+ & = & \begin{cases}
+0\frac{\partial z}{\partial\mathbf{w}}=\overrightarrow{0}^{T} & z\leq0\\
+1\frac{\partial z}{\partial\mathbf{w}}=\mathbf{x}^{T} & z>0
+\end{cases}\\
+ & = & \begin{cases}
+\overrightarrow{0}^{T} & \mathbf{w}\cdot\mathbf{x}+b\leq0\\
+\mathbf{x}^{T} & \mathbf{w}\cdot\mathbf{x}+b>0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+and, for bias:
+\begin_inset Formula 
+\begin{eqnarray*}
+\frac{\partial neuron}{\partial b} & = & \begin{cases}
+0\frac{\partial z}{\partial b}=0 & \mathbf{w}\cdot\mathbf{x}+b\leq0\\
+1\frac{\partial z}{\partial b}=1 & \mathbf{w}\cdot\mathbf{x}+b>0
+\end{cases}
+\end{eqnarray*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+LBLBFGS Loss Grad Function
+\end_layout
+
+\begin_layout Standard
+Compute the MLP loss function and its corresponding derivatives with respect
+ to the given parameters.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{eqnarray*}
+LGLBFGS\left(\theta,X,Y,A,D,CG,IG\right) & = & BackPropogation\left(X,Y,A,D,CG,IG\right)
+\end{eqnarray*}
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula $\theta$
+\end_inset
+
+ : a vector comprising the coefficients and intercepts.
+\end_layout
+
+\begin_layout Standard
+X : input matrix, size: n_samples x n_features 
+\end_layout
+
+\begin_layout Standard
+y : target values vector, size: n_samples 
+\end_layout
+
+\begin_layout Standard
+activations : list, length: n_layers - 1.
+ The ith element of the list holds the values of the ith layer.
+\end_layout
+
+\begin_layout Standard
+deltas : list, length, n_layers - 1.
+ The ith element of the list holds the difference between the activations
+ of the i + 1 layer and the back-propagated error.
+ 
+\end_layout
+
+\begin_layout Standard
+More specifically, deltas are gradients of loss with respect to z in each
+ layer, where z = wx + b is the value of a particular layer before passing
+ through the activation function
+\end_layout
+
+\begin_layout Standard
+coef_grads : list, length: n_layers - 1 The ith element contains the amount
+ of change used to update the coefficient parameters of the ith layer in
+ an iteration.
+\end_layout
+
+\begin_layout Standard
+intercept_grads : list, length: n_layers - 1 The ith element contains the
+ amount of change used to update the intercept parameters of the ith layer
+ in an iteration.
+\end_layout
+
+\begin_layout Standard
+Results:
+\end_layout
+
+\begin_layout Standard
+loss
+\end_layout
+
+\begin_layout Standard
+gradient : array, size: number of nodes of all layers
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "https://towardsdatascience.com/calculating-gradient-descent-manually-6d9bee09aa0b"
+key "Grad_descent"
+literal "false"
+
+\end_inset
+
+https://towardsdatascience.com/calculating-gradient-descent-manually-6d9bee09aa0b
+\end_layout
+
+\end_body
+\end_document
