@@ -30,35 +30,9 @@
 
 
 def clone(estimator, *, safe=True):
-    """Construct a new unfitted estimator with the same parameters.
+    #Construct a new unfitted estimator with the same parameters.
 
-    Clone does a deep copy of the model in an estimator
-    without actually copying attached data. It returns a new estimator
-    with the same parameters that has not been fitted on any data.
-
-    Parameters
-    ----------
-    estimator : {list, tuple, set} of estimator instance or a single \
-            estimator instance
-        The estimator or group of estimators to be cloned.
-    safe : bool, default=True
-        If safe is False, clone will fall back to a deep copy on objects
-        that are not estimators.
-
-    Returns
-    -------
-    estimator : object
-        The deep copy of the input, an estimator if input is an estimator.
-
-    Notes
-    -----
-    If the estimator's `random_state` parameter is an integer (or if the
-    estimator doesn't have a `random_state` parameter), an *exact clone* is
-    returned: the clone and the original estimator will give the exact same
-    results. Otherwise, *statistical clone* is returned: the clone might
-    return different results from the original estimator. More details can be
-    found in :ref:`randomness`.
-    """
+   
     estimator_type = type(estimator)
     # XXX: not handling dictionaries
     if estimator_type in (list, tuple, set, frozenset):
@@ -101,21 +75,7 @@ def clone(estimator, *, safe=True):
 
 
 def _pprint(params, offset=0, printer=repr):
-    """Pretty print the dictionary 'params'
-
-    Parameters
-    ----------
-    params : dict
-        The dictionary to pretty print
-
-    offset : int, default=0
-        The offset in characters to add at the begin of each line.
-
-    printer : callable, default=repr
-        The function to convert entries to strings, typically
-        the builtin str or repr
-
-    """
+    # Pretty print the dictionary 'params'
     # Do a multi-line justified repr:
     options = np.get_printoptions()
     np.set_printoptions(precision=5, threshold=64, edgeitems=2)
@@ -153,8 +113,6 @@ def _pprint(params, offset=0, printer=repr):
 class BaseEstimator:
     """Base class for all estimators in scikit-learn.
 
-    Notes
-    -----
     All estimators should specify all the parameters that can be set
     at the class level in their ``__init__`` as explicit keyword
     arguments (no ``*args`` or ``**kwargs``).
@@ -500,63 +458,8 @@ class BaseEstimator:
         validate_separately=False,
         **check_params,
     ):
-        """Validate input data and set or check the `n_features_in_` attribute.
+        #Validate input data and set or check the `n_features_in_` attribute.
 
-        Parameters
-        ----------
-        X : {array-like, sparse matrix, dataframe} of shape \
-                (n_samples, n_features), default='no validation'
-            The input samples.
-            If `'no_validation'`, no validation is performed on `X`. This is
-            useful for meta-estimator which can delegate input validation to
-            their underlying estimator(s). In that case `y` must be passed and
-            the only accepted `check_params` are `multi_output` and
-            `y_numeric`.
-
-        y : array-like of shape (n_samples,), default='no_validation'
-            The targets.
-
-            - If `None`, `check_array` is called on `X`. If the estimator's
-              requires_y tag is True, then an error will be raised.
-            - If `'no_validation'`, `check_array` is called on `X` and the
-              estimator's requires_y tag is ignored. This is a default
-              placeholder and is never meant to be explicitly set. In that case
-              `X` must be passed.
-            - Otherwise, only `y` with `_check_y` or both `X` and `y` are
-              checked with either `check_array` or `check_X_y` depending on
-              `validate_separately`.
-
-        reset : bool, default=True
-            Whether to reset the `n_features_in_` attribute.
-            If False, the input will be checked for consistency with data
-            provided when reset was last True.
-            .. note::
-               It is recommended to call reset=True in `fit` and in the first
-               call to `partial_fit`. All other methods that validate `X`
-               should set `reset=False`.
-
-        validate_separately : False or tuple of dicts, default=False
-            Only used if y is not None.
-            If False, call validate_X_y(). Else, it must be a tuple of kwargs
-            to be used for calling check_array() on X and y respectively.
-
-            `estimator=self` is automatically added to these dicts to generate
-            more informative error message in case of invalid input data.
-
-        **check_params : kwargs
-            Parameters passed to :func:`sklearn.utils.check_array` or
-            :func:`sklearn.utils.check_X_y`. Ignored if validate_separately
-            is not False.
-
-            `estimator=self` is automatically added to these params to generate
-            more informative error message in case of invalid input data.
-
-        Returns
-        -------
-        out : {ndarray, sparse matrix} or tuple of these
-            The validated input. A tuple is returned if both `X` and `y` are
-            validated.
-        """
         self._check_feature_names(X, reset=reset)
 
         if y is None and self._get_tags()["requires_y"]:
@@ -675,46 +578,7 @@ class RegressorMixin:
     _estimator_type = "regressor"
 
     def score(self, X, y, sample_weight=None):
-        """Return the coefficient of determination of the prediction.
-
-        The coefficient of determination :math:`R^2` is defined as
-        :math:`(1 - \\frac{u}{v})`, where :math:`u` is the residual
-        sum of squares ``((y_true - y_pred)** 2).sum()`` and :math:`v`
-        is the total sum of squares ``((y_true - y_true.mean()) ** 2).sum()``.
-        The best possible score is 1.0 and it can be negative (because the
-        model can be arbitrarily worse). A constant model that always predicts
-        the expected value of `y`, disregarding the input features, would get
-        a :math:`R^2` score of 0.0.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Test samples. For some estimators this may be a precomputed
-            kernel matrix or a list of generic objects instead with shape
-            ``(n_samples, n_samples_fitted)``, where ``n_samples_fitted``
-            is the number of samples used in the fitting for the estimator.
-
-        y : array-like of shape (n_samples,) or (n_samples, n_outputs)
-            True values for `X`.
-
-        sample_weight : array-like of shape (n_samples,), default=None
-            Sample weights.
-
-        Returns
-        -------
-        score : float
-            :math:`R^2` of ``self.predict(X)`` wrt. `y`.
-
-        Notes
-        -----
-        The :math:`R^2` score used when calling ``score`` on a regressor uses
-        ``multioutput='uniform_average'`` from version 0.23 to keep consistent
-        with default value of :func:`~sklearn.metrics.r2_score`.
-        This influences the ``score`` method of all the multioutput
-        regressors (except for
-        :class:`~sklearn.multioutput.MultiOutputRegressor`).
-        """
-
+        #Return the coefficient of determination of the prediction.
         from .metrics import r2_score
 
         y_pred = self.predict(X)
@@ -839,26 +703,8 @@ class TransformerMixin:
     def fit_transform(self, X, y=None, **fit_params):
         """
         Fit to data, then transform it.
-
         Fits transformer to `X` and `y` with optional parameters `fit_params`
         and returns a transformed version of `X`.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Input samples.
-
-        y :  array-like of shape (n_samples,) or (n_samples, n_outputs), \
-                default=None
-            Target values (None for unsupervised transformations).
-
-        **fit_params : dict
-            Additional fit parameters.
-
-        Returns
-        -------
-        X_new : ndarray array of shape (n_samples, n_features_new)
-            Transformed array.
         """
         # non-optimized default implementation; override when a better
         # method is possible for a given clustering algorithm
@@ -878,24 +724,7 @@ class _OneToOneFeatureMixin:
     """
 
     def get_feature_names_out(self, input_features=None):
-        """Get output feature names for transformation.
-
-        Parameters
-        ----------
-        input_features : array-like of str or None, default=None
-            Input features.
-
-            - If `input_features` is `None`, then `feature_names_in_` is
-              used as feature names in. If `feature_names_in_` is not defined,
-              then names are generated: `[x0, x1, ..., x(n_features_in_)]`.
-            - If `input_features` is an array-like, then `input_features` must
-              match `feature_names_in_` if `feature_names_in_` is defined.
-
-        Returns
-        -------
-        feature_names_out : ndarray of str objects
-            Same as input features.
-        """
+        #Get output feature names for transformation.
         return _check_feature_names_in(self, input_features)
 
 
@@ -930,20 +759,7 @@ class DensityMixin:
     _estimator_type = "DensityEstimator"
 
     def score(self, X, y=None):
-        """Return the score of the model on the data `X`.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Test samples.
-
-        y : Ignored
-            Not used, present for API consistency by convention.
-
-        Returns
-        -------
-        score : float
-        """
+        #Return the score of the model on the data `X`.
         pass
 
 
@@ -954,21 +770,7 @@ class OutlierMixin:
 
     def fit_predict(self, X, y=None):
         """Perform fit on X and returns labels for X.
-
         Returns -1 for outliers and 1 for inliers.
-
-        Parameters
-        ----------
-        X : {array-like, sparse matrix} of shape (n_samples, n_features)
-            The input samples.
-
-        y : Ignored
-            Not used, present for API consistency by convention.
-
-        Returns
-        -------
-        y : ndarray of shape (n_samples,)
-            1 for inliers, -1 for outliers.
         """
         # override for transductive outlier detectors like LocalOulierFactor
         return self.fit(X).predict(X)

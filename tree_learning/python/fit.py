@@ -1,6 +1,10 @@
-from base import MultiOutputMixin
 
-class BaseDecisionTree: # (MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
+from abc import ABCMeta
+from base import BaseEstimator
+from base import MultiOutputMixin
+from base import ClassifierMixin
+
+class BaseDecisionTree (MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
         # Base class for decision trees.#
         #    Warning: This class should not be used directly.
         #    Use derived classes instead.
@@ -318,7 +322,7 @@ class BaseDecisionTree: # (MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
 
         return self
 
-class DecisionTreeClassifier: #(ClassifierMixin, BaseDecisionTree):
+class DecisionTreeClassifier (ClassifierMixin, BaseDecisionTree):
     def fit(self, X, y, sample_weight=None, check_input=True):
         # Build a decision tree classifier from the training set (X, y).
         super().fit(
