@@ -1,6 +1,39 @@
-def hello():
-    print ('Hello from fit module!')
-    
+#class BaseDecisionTree  #(MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
+#    """Base class for decision trees.
+#
+#        Warning: This class should not be used directly.
+#        Use derived classes instead.
+#        """
+#@abstractmethod
+#    def __init__(
+#                 self,
+#                 *,
+#                 criterion,
+#                 splitter,
+#                 max_depth,
+#                 min_samples_split,
+#                 min_samples_leaf,
+#                 min_weight_fraction_leaf,
+#                 max_features,
+#                 max_leaf_nodes,
+#                 random_state,
+#                 min_impurity_decrease,
+#                 class_weight=None,
+#                 ccp_alpha=0.0,
+#                 ):
+#        self.criterion = criterion
+#        self.splitter = splitter
+#        self.max_depth = max_depth
+#        self.min_samples_split = min_samples_split
+#        self.min_samples_leaf = min_samples_leaf
+#        self.min_weight_fraction_leaf = min_weight_fraction_leaf
+#        self.max_features = max_features
+#        self.max_leaf_nodes = max_leaf_nodes
+#        self.random_state = random_state
+#        self.min_impurity_decrease = min_impurity_decrease
+#        self.class_weight = class_weight
+#        self.ccp_alpha = ccp_alpha
+
 def fit(self, X, y, sample_weight=None, check_input=True):
     random_state = check_random_state(self.random_state)
 
