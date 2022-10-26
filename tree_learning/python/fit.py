@@ -1,3 +1,5 @@
+from base import MultiOutputMixin
+
 class BaseDecisionTree: # (MultiOutputMixin, BaseEstimator, metaclass=ABCMeta):
         # Base class for decision trees.#
         #    Warning: This class should not be used directly.
