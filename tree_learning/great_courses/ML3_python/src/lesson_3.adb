@@ -19,6 +19,7 @@ procedure Lesson_3 is
                      Classifier_Utilities.Load_Data ("../diabetes.csv");
    Feature_Names : constant String_List := Data.Feature_Names;
    X_Data        : constant Value_Data_Lists_2D := Data.Feature_Values;
+   Labels        : constant Value_Data_Lists_2D := Data.Label_Values;
    Num_Samples   : constant Natural := Natural (X_Data.Length);
    Base          : Python.Module;
    Classes       : Python.Module;
@@ -48,6 +49,7 @@ begin
      ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)");
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
+   Python.Execute_String ("clf = fit(X_Data, Labels)");
 --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
 --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
