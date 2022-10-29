@@ -1,6 +1,5 @@
 *.lyx~
 *.lyx#
-*.py
 *.dot
 *.ada
 *.oml
