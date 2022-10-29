@@ -1,7 +1,7 @@
 import os
 import Tree2
-import base
-import classes
+from Tree2 import base
+from Tree2 import classes
 
 cwd = os.getcwd()
 print ('load cwd: ', cwd)
