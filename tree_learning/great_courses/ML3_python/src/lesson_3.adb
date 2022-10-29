@@ -54,15 +54,18 @@ begin
    Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
    Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
    Python.Execute_Command ("from pathlib import Path", Errors => Errors);
-   Python.Execute_Command ("cwd = Path(cwd).parent / ('..')",
-                           Errors => Errors);
-   Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
+--     Python.Execute_Command ("cwd = Path(cwd).parent / ('..')",
+--                             Errors => Errors);
+--     Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
+   Python.Execute_Command ("cwd = '/System/Volumes/Data/Ada_Projects/machine_learning/tree_learning'", Errors => Errors);
    Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
    Python.Execute_Command (Command => "os.listdir()", Errors => Errors);
-   Python.Execute_Command (Command => "sys.path.append(cwd)", Errors => Errors);
+   Python.Execute_Command (Command => "sys.path.append('/System/Volumes/Data/Ada_Projects/machine_learning/tree_learning')", Errors => Errors);
+   Python.Execute_Command (Command => "os.listdir()", Errors => Errors);
 
-   Python.Execute_Command ("import Tree", Errors => Errors);
-   Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree')",
+   Python.Execute_Command ("import Tree2", Errors => Errors);
+   Put_Line ("Lesson 3 Tree imported");
+   Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree2')",
                            Errors => Errors);
    Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
    Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
