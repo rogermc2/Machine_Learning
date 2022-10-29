@@ -66,7 +66,7 @@ begin
                            Errors => Errors);
    Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
    Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command ("import_file (base)", Errors => Errors);
+   Python.Execute_Command ("import base", Errors => Errors);
    Python.Execute_Command ("import classes", Errors => Errors);
 --     Base := Python.Import_File ("base");
 --     Classes := Python.Import_File ("classes");
