@@ -1,4 +1,4 @@
-def load
+def load ():
     import os
     cwd = os.getcwd()
     print ('cwd: ', cwd)
