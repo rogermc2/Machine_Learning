@@ -1,14 +1,13 @@
-def load ():
-    import os
-    cwd = os.getcwd()
-    print ('cwd: ', cwd)
-    os.chdir(os.path.join (cwd, 'src'))
-    cwd = os.getcwd()
-    print ('cwd: ', os.getcwd())
-    os.listdir(os.getcwd())
-    import Tree2
-    cwd = os.path.join (cwd, 'Tree2')
-    os.chdir(cwd)
-    os.listdir(os.getcwd())
-    import base
-    import classes
+import os
+import Tree2
+import base
+import classes
+
+cwd = os.getcwd()
+print ('load cwd: ', cwd)
+
+print (os.listdir(os.getcwd()))
+
+cwd = os.path.join(cwd, 'Tree2')
+os.chdir(cwd)
+print (os.listdir(os.getcwd()))

@@ -51,43 +51,43 @@ begin
    Python.Execute_Command ("import os", Errors => Errors);
    Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
    Assert (not Errors, "os.getcwd()");
-   Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   --     Python.Execute_Command ("from pathlib import Path", Errors => Errors);
-   --     Assert (not Errors, "import Path failed");
-   --     Python.Execute_Command ("cwd = Path(cwd).parent / ('..')",
-   --                             Errors => Errors);
-   --     Python.Execute_Command ("cwd = '/Ada_Projects/machine_learning/tree_learning'",
-   --                             Errors => Errors);
    Python.Execute_Command (Command => "os.chdir(os.path.join (cwd, 'src'))", Errors => Errors);
    Assert (not Errors, "os.chdir(cwd) failed");
-   Python.Execute_Command ("cwd = os.getcwd()", Errors => Errors);
+   Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
+
+   Put_Line ("Lesson 3 load.py");
+   Python.Execute_File ("load.py", Errors => Errors);
+   Assert (not Errors, "Execute_File load.py failed");
+   Put_Line ("Lesson 3 file executed");
+
    Python.Execute_Command ("print ('cwd: ', os.getcwd())", Errors => Errors);
    Python.Execute_Command (Command => "os.listdir(os.getcwd())",
                            Errors => Errors);
    Assert (not Errors, "os.listdir(os.getcwd()) failed");
+--
+--     Python.Execute_Command ("import Tree2", Errors => Errors);
+--     Put_Line ("Errors: " & Boolean'Image (Errors));
+--     Assert (not Errors, "import Tree2 failed");
+--     Put_Line ("Lesson 3 Tree imported");
+--     Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree2')",
+--                             Errors => Errors);
+--     Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
+--     Python.Execute_Command (Command => "os.listdir(os.getcwd())", Errors => Errors);
+--     Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
+--     Python.Execute_Command ("import base", Errors => Errors);
+--     Python.Execute_Command ("import classes", Errors => Errors);
 
-   Python.Execute_Command ("import Tree2", Errors => Errors);
-   Put_Line ("Errors: " & Boolean'Image (Errors));
-   Assert (not Errors, "import Tree2 failed");
-   Put_Line ("Lesson 3 Tree imported");
-   Python.Execute_Command (Command => "cwd = os.path.join (cwd, 'Tree2')",
-                           Errors => Errors);
-   Python.Execute_Command (Command => "os.chdir(cwd)", Errors => Errors);
-   Python.Execute_Command (Command => "os.listdir(os.getcwd())", Errors => Errors);
-   Python.Execute_Command ("print ('cwd: ', cwd)", Errors => Errors);
-   Python.Execute_Command ("import base", Errors => Errors);
-   Python.Execute_Command ("import classes", Errors => Errors);
-
-   Python.Execute_Command
-     ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)",
-      Errors => Errors);
+--     Python.Execute_Command
+--       ("clf = tree.DecisionTreeClassifier(max_leaf_nodes = 3)",
+--        Errors => Errors);
    --  Fit function adjusts weights according to data values so that
    --  better accuracy can be achieved
-   Put_Line ("Lesson 3 fit");
-   Python.Execute_Command ("clf = fit(X_Data, Labels)", Errors => Errors);
+--     Put_Line ("Lesson 3 fit");
+--     Python.Execute_Command ("clf = fit(X_Data, Labels)", Errors => Errors);
    --     Classification_Fit (aClassifier, X_Data, Labels, No_Weights);
    --     Printing.Print_Tree ("Diabetes Tree", aClassifier);
    Put_Line ("----------------------------------------------");
+   Put_Line ("Lesson 3 competed.");
    New_Line;
 
    --     for index in X_Data.First_Index .. X_Data.Last_Index loop
